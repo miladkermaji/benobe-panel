@@ -1,0 +1,153 @@
+.my-container-fluid {
+ max-width: 800px !important;
+}
+
+#map {
+ height: 400px;
+ width: 100%;
+ border: 1px solid #ddd;
+ border-radius: 8px;
+}
+
+/* استایل کادر جستجو */
+#searchResults {
+ z-index: 1000;
+ background: white;
+ border-radius: 4px;
+ max-height: 200px;
+ overflow-y: auto;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-result-item {
+ padding: 10px;
+ cursor: pointer;
+}
+
+.search-result-item:hover {
+ background-color: #f1f1f1;
+}
+
+#searchContainer {
+ margin-bottom: 20px;
+}
+
+#searchInput {
+ width: 100%;
+ max-width: 100vw;
+ padding: 10px 15px;
+ font-size: 16px;
+ border: 2px solid #007bff;
+ border-radius: 8px;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ transition: all 0.3s ease;
+ outline: none;
+}
+
+#searchInput:focus {
+ border-color: #0056b3;
+ box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* استایل نقشه */
+#map {
+ height: 400px;
+ width: 100%;
+}
+
+iframe {
+ height: 400px;
+ width: 100%;
+}
+
+@media only screen and (max-width: 991px) {
+ .card-body {
+  padding: 0 !important;
+ }
+
+ .container-fluid {
+  max-width: 100% !important;
+ }
+}
+
+
+
+/* roadmap styles */
+.roadmap-container {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ margin-bottom: 20px;
+ position: relative;
+}
+
+.step {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ position: relative;
+}
+
+.step-title {
+ margin-bottom: 8px;
+ font-size: 13px;
+ font-weight: 600;
+ color: #333;
+ text-align: center;
+}
+
+.icon {
+ width: 32px;
+ height: 32px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ z-index: 1;
+}
+
+.line {
+ height: 2px;
+ width: 140px;
+ background-color: #e0e0e0;
+ flex: 1;
+ position: relative;
+ top: 16px;
+ margin-left: -16px;
+ margin-right: -16px;
+}
+
+/* خط‌های قبل از استپ active */
+.step.completed+.line,
+.step.active+.line {
+ background-color: #0d6efd;
+}
+.completed .line {
+ background-color: #0d6efd;
+}
+
+.active .icon circle {
+ stroke: #0d6efd;
+ fill: #fff;
+}
+
+.completed .icon circle {
+ stroke: #0d6efd;
+ fill: #0d6efd;
+}
+
+.completed .icon path {
+ stroke: #fff;
+}
+/* roadmap styles */
+@media only screen and (max-width: 768px) {
+ .roadmap-container {
+  overflow-y: hidden !important;
+  overflow-x: scroll !important;
+  text-wrap: nowrap !important;
+  width: 100% !important;
+  padding: 10px 20px !important;
+  }
+ .title-header{
+  display: none;
+ }
+}
