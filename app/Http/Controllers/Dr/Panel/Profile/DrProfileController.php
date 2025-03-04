@@ -3,6 +3,8 @@ namespace App\Http\Controllers\Dr\Panel\Profile;
 use Carbon\Carbon;
 use App\Models\Otp;
 use App\Models\Dr\Doctor;
+use App\Http\Controllers\Dr\Controller;
+
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Dr\SubSpecialty;
@@ -21,7 +23,7 @@ use App\Http\Requests\DoctorSpecialtyRequest;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
-class DrProfileController
+class DrProfileController extends Controller
 {
     use HandlesRateLimiting;
     protected $doctor;
@@ -53,7 +55,7 @@ class DrProfileController
             $path = $request->file('photo')->store('profile-photos', 'public');
             $doctor->update(['profile_photo_path' => $path]);
 
-           
+
 
             return response()->json(['success' => true, 'message' => 'عکس پروفایل با موفقیت آپدیت شد.', 'path' => Storage::url($path)]);
         } catch (\Exception $e) {
@@ -542,7 +544,7 @@ class DrProfileController
         }
         // مارک کردن OTP به عنوان استفاده شده
         $otp->update(['used' => 1]);
-      
+
         return response()->json([
             'success' => true,
             'message' => 'شماره موبایل با موفقیت تغییر یافت',

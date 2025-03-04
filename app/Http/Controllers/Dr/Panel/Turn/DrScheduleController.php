@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Dr\Panel\Turn;
 
+use App\Http\Controllers\Dr\Controller;
 use Carbon\Carbon;
 use App\Models\Dr\SubUser;
 use Illuminate\Http\Request;
@@ -8,7 +9,7 @@ use Morilog\Jalali\Jalalian;
 use App\Models\Dr\Appointment;
 use Illuminate\Support\Facades\Auth;
 
-class DrScheduleController
+class DrScheduleController extends Controller
 {
     /**
      * دریافت دکتر مرتبط با کاربر لاگین شده (پزشک یا منشی)

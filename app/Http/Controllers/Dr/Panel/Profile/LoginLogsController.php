@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Dr\Panel\Profile;
 
 use App\Models\LoginLog;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Dr\Controller;
+
 use Illuminate\Support\Facades\Auth;
 
-class LoginLogsController{
+class LoginLogsController extends Controller
+{
  public function security()
  {
   $doctor = Auth::guard('doctor')->user();

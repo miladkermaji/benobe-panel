@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Dr\Panel\Activation\Consult\Rules;
 
-class ConsultRulesController
+use App\Http\Controllers\Dr\Controller;
+
+class ConsultRulesController extends Controller
 {
     public function index()
     {

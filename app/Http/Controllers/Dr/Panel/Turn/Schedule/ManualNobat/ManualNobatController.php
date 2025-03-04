@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ManualNobat;
 
+use App\Http\Controllers\Dr\Controller;
 use Log;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Dr\ManualAppointment;
 use App\Models\Dr\ManualAppointmentSetting;
 
-class ManualNobatController
+class ManualNobatController extends Controller
 {
   /**
    * Display a listing of the resource.

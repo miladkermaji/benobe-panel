@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Dr\Panel\PatientRecords;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Dr\Controller;
 
-class PatientRecordsController
+
+class PatientRecordsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -12,7 +14,7 @@ class PatientRecordsController
     public function index()
     {
         $patients = [];
-        return view('dr.panel.patient-records.index',compact('patients'));
+        return view('dr.panel.patient-records.index', compact('patients'));
     }
 
     /**

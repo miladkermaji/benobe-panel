@@ -12,7 +12,7 @@
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}">
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/activation/index.css') }}">
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/clinic/cost/cost.css') }}">
- <link rel="stylesheet" href="{{ asset('dr-asset/panel/css/toastify/toastify.min.css') }}">
+ <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastify/toastify.min.css') }}">
  <!-- Leaflet -->
  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
  <!-- فونت آیکون -->
@@ -156,7 +156,7 @@
  </div>
  </div>
  @include('dr.panel.layouts.partials.scripts')
- <script src="{{ asset('dr-asset/panel/js/toastify/toastify.min.js') }}"></script>
+ <script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 

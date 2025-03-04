@@ -6,9 +6,10 @@ use Auth;
 use App\Models\Dr\Clinic;
 use Illuminate\Http\Request;
 use App\Models\Dr\DoctorWorkSchedule;
+use App\Http\Controllers\Dr\Controller;
 use App\Models\Dr\DoctorAppointmentConfig;
 
-class ActivationWorkhoursController
+class ActivationWorkhoursController extends Controller
 {
     public function index($clinicId)
     {

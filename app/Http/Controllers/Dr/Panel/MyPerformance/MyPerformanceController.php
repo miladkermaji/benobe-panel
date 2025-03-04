@@ -7,8 +7,9 @@ use App\Models\Dr\Clinic;
 use Illuminate\Http\Request;
 use App\Models\Dr\Appointment;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Dr\Controller;
 
-class MyPerformanceController
+class MyPerformanceController extends Controller
 {
     /**
      * نمایش صفحه اصلی آمار و نمودارها

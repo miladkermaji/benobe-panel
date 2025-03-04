@@ -11,6 +11,7 @@ use App\Models\Dr\LoginAttempt;
 use App\Http\Requests\MobileRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Dr\Controller;
 use App\Http\Requests\TwoFactorRequest;
 use App\Http\Requests\MobilePassRequest;
 use App\Http\Requests\OtpDoctorsRequest;
@@ -18,7 +19,7 @@ use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 
-class LoginController
+class LoginController extends Controller
 {
   public function loginRegisterForm()
   {

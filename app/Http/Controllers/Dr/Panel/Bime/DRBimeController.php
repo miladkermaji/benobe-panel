@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Http\Controllers\Dr\Panel\Bime;
+use App\Http\Controllers\Dr\Controller;
 
 use Illuminate\Http\Request;
 
-class DRBimeController
+class DRBimeController extends Controller
 {
     /**
      * Display a listing of the resource.

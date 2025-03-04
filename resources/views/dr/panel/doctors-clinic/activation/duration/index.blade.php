@@ -12,7 +12,7 @@
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}">
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/activation/index.css') }}">
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clinic/duration/duration.css') }}">
- <link rel="stylesheet" href="{{ asset('dr-asset/panel/css/toastify/toastify.min.css') }}">
+ <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastify/toastify.min.css') }}">
 </head>
 
 <body dir="rtl">
@@ -160,7 +160,7 @@
 
  @include('dr.panel.layouts.partials.scripts')
  <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
- <script src="{{ asset('dr-asset/panel/js/toastify/toastify.min.js') }}"></script>
+ <script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
       const badgeElements = document.querySelectorAll('.badge-time-styles');

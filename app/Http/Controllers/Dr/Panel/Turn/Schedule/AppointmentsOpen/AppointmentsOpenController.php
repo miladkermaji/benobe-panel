@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\AppointmentsOpen;
 
+use App\Http\Controllers\Dr\Controller;
 use Illuminate\Http\Request;
 
-class AppointmentsOpenController
+class AppointmentsOpenController extends Controller
 {
     /**
      * Display a listing of the resource.

@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Dr\Panel\SecretaryPermission;
 use App\Models\Dr\Doctor;
 use App\Models\Dr\Secretary;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Models\Dr\SecretaryPermission;
+use App\Http\Controllers\Dr\Controller;
 
-class SecretaryPermissionController
+class SecretaryPermissionController extends Controller
 {
  public function index(Request $request)
  {

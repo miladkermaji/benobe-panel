@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Dr\Panel\Tickets;
 
+use App\Http\Controllers\Dr\Controller;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Morilog\Jalali\Jalalian;
@@ -8,7 +9,7 @@ use App\Models\TicketResponse;
 use Illuminate\Support\Facades\Auth;
 
 
-class TicketResponseController
+class TicketResponseController extends Controller
 {
  public function store(Request $request, $ticket_id)
  {

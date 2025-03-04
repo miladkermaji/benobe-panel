@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Cost;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Dr\Controller;
 use App\Models\Dr\ClinicDepositSetting;
 
-class CostController
+class CostController extends Controller
 {
     public function index($clinicId)
     {

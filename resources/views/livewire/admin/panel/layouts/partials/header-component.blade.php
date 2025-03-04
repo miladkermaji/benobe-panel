@@ -30,7 +30,7 @@
                 <span>{{ number_format($walletBalance) }} تومان</span>
             </div>
         </div>
-        <a href="{{ route('dr.auth.logout') }}" class="logout" title="خروج"></a>
+        <a href="{{ route('admin.auth.logout') }}" class="logout" title="خروج"></a>
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {

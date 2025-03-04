@@ -37,7 +37,6 @@ use App\Http\Controllers\Dr\Panel\Profile\LoginLogsController;
 use App\Http\Controllers\Admin\Tools\SiteMap\SiteMapController;
 use App\Http\Controllers\Admin\Authentications\VerifyEmailBasic;
 use App\Http\Controllers\Admin\Authentications\VerifyEmailCover;
-use App\Http\Controllers\Dr\Turn\Schedule\AppointmentController;
 use App\Http\Controllers\Admin\Application\ApplicationController;
 use App\Http\Controllers\Admin\Dashboard\Cities\CitiesController;
 use App\Http\Controllers\Admin\Tools\Redirect\RedirectController;
@@ -61,6 +60,7 @@ use App\Http\Controllers\Admin\Tools\NewsLatter\NewsLatterController;
 use App\Http\Controllers\Admin\UsersManagement\Users\UsersController;
 use App\Http\Controllers\Dr\Panel\Profile\DrUpgradeProfileController;
 use App\Http\Controllers\Admin\Ads\Banner\Packages\PackagesController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\AppointmentController;
 use App\Http\Controllers\Admin\ContentManagement\Links\LinksController;
 use App\Http\Controllers\Admin\ContentManagement\Slide\SlideController;
 use App\Http\Controllers\Admin\Dashboard\Specialty\SpecialtyController;
@@ -156,10 +156,11 @@ Route::prefix('admin')
         // Main Page Route
         Route::get('dashboard/', [AdminDashboardController::class, 'index'])->name('admin-panel');
         Route::post('/upload-profile-photo', [AdminProfileController::class, 'uploadPhoto'])->name('admin.upload-photo')->middleware('auth:manager');
+        Route::prefix('tools/')->group(function () {
+            Route::get('/file-manager', [FileManagerController::class, 'index'])->name('admin.panel.tools.file-manager')->middleware('auth:manager');
+        });
     });
-Route::prefix('tools/')->group(function () {
-    Route::get('/file-manager', [FileManagerController::class, 'index'])->name('admin.panel.tools.file-manager')->middleware('auth:manager');
-});
+
 
 // end manager  routes
 // dr routes

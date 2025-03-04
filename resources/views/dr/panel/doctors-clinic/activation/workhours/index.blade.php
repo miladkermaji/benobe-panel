@@ -15,7 +15,7 @@
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clinic/duration/duration.css') }}">
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clinic/activation/workhours/workhours.css') }}">
  
- <link rel="stylesheet" href="{{ asset('dr-asset/panel/css/toastify/toastify.min.css') }}">
+ <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastify/toastify.min.css') }}">
 </head>
 
 <body dir="rtl">
@@ -181,7 +181,7 @@
  @include('dr.panel.layouts.partials.scripts')
 
 
- <script src="{{ asset('dr-asset/panel/js/toastify/toastify.min.js') }}"></script>
+ <script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
  <script>
   document.getElementById('startAppointmentBtn').addEventListener('click', function () {
       Swal.fire({

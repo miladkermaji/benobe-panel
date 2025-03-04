@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Dr\Panel\Profile;
 use App\Models\User;
 use App\Models\Dr\SubUser;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Dr\Controller;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class SubUserController
+class SubUserController extends Controller
 {
  public function index()
  {

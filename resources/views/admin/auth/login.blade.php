@@ -3,8 +3,8 @@
  <link rel="stylesheet" href="{{ asset('dr-assets/login/bootstrap5/bootstrap.min.css') }}">
  <link rel="stylesheet" href="{{ asset('dr-assets/login/css/login.css') }}">
  <meta name="csrf-token" content="{{ csrf_token() }}">
- <link rel="stylesheet" href="{{ asset('dr-asset/login/toast/toastify.css') }}">
- <script src="{{ asset('dr-asset/login/toast/toastify.js') }}"></script>
+ <link rel="stylesheet" href="{{ asset('dr-assets/login/toast/toastify.css') }}">
+ <script src="{{ asset('dr-assets/login/toast/toastify.js') }}"></script>
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastr/toastr.min.css') }}">
 @endsection
 @section('site-header')

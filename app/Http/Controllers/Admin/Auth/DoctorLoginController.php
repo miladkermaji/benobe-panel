@@ -184,7 +184,7 @@ class DoctorLoginController extends Controller
 
     return response()->json([
       'success' => true,
-      'redirect' => route('admin.index')
+      'redirect' => route('admin-panel')
     ]);
   }
 

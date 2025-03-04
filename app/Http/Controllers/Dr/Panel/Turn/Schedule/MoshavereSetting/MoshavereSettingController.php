@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting;
+use App\Http\Controllers\Dr\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Dr\Appointment;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Dr\DoctorCounselingConfig;
 use App\Models\Dr\DoctorCounselingWorkSchedule;
-class MoshavereSettingController
+class MoshavereSettingController extends Controller
 {
   /**
    * Display a listing of the resource.

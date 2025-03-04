@@ -1,14 +1,12 @@
 <?php
 namespace App\Http\Controllers\Dr\Panel;
+use App\Http\Controllers\Dr\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Morilog\Jalali\Jalalian;
 use App\Models\Dr\Appointment;
-use Hekmatinasser\Verta\Verta;
-use Morilog\Jalali\CalendarUtils;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-class DrPanelController
+class DrPanelController extends Controller
 {
   /**
    * Display a listing of the resource.

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Service;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Dr\Controller;
 
-class ServiceController
+class ServiceController extends Controller
 {
     /**
      * Display a listing of the resource.

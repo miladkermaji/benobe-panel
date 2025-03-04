@@ -12,11 +12,11 @@
 <script src="{{ asset('app-assets/js/timepicker/timepicker.js') }}"></script>
 <script src="{{ asset('app-assets/js/all-custom.js') }}"></script>
 <script type="text/javascript" src="{{ asset('dr-assets/panel/jalali-datepicker/jalalidatepicker.min.js') }}"></script>
-<script src="{{ asset('dr-asset/panel/js/toastify/toastify.min.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
 
 <script type="text/javascript" src="{{ asset('dr-assets/panel/jalali-datepicker/date.js') }}"></script>
 {{-- tom select --}}
-<script src="{{ asset('dr-asset/panel/js/tom-select.complete.min.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/tom-select.complete.min.js') }}"></script>
 {{-- tom select --}}
 <script src="{{ asset('dr-assets/panel/js/moment/jalali-moment.browser.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/toastr/toastr.min.js') }}"></script>

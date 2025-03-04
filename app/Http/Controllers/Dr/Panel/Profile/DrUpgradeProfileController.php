@@ -2,12 +2,14 @@
 namespace App\Http\Controllers\Dr\Panel\Profile;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Dr\Controller;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Dr\DoctorProfileUpgrade;
 use Modules\Payment\Services\PaymentService;
 
-class DrUpgradeProfileController
+class DrUpgradeProfileController extends Controller
 {
  protected $paymentService;
 

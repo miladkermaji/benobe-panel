@@ -7,8 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Admin\Dashboard\Cities\Zone;
+use App\Http\Controllers\Dr\Controller;
 
-class DoctorsClinicManagementController
+class DoctorsClinicManagementController extends Controller
 {
     /**
      * Display a listing of the resource.

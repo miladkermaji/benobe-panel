@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Panel\Tools\FileManager;
 
-use App\Http\Controllers\Controller;
 use Collator;
+use App\Http\Controllers\Admin\Controller;
 
 class FileManagerController extends Controller
 {

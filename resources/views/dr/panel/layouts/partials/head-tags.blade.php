@@ -21,9 +21,9 @@
 <link type="text/css" href="{{ asset('dr-assets/panel/jalali-datepicker/jalalidatepicker.min.css') }}"
  rel="stylesheet" />
 {{-- tom select --}}
-<link rel="stylesheet" href="{{ asset('dr-asset/panel/css/toastify/toastify.min.css') }}">
+<link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastify/toastify.min.css') }}">
 {{-- tom select --}}
-<link rel="stylesheet" href="{{ asset('dr-asset/panel/css/tom-select.bootstrap5.min.css') }}">
+<link rel="stylesheet" href="{{ asset('dr-assets/panel/css/tom-select.bootstrap5.min.css') }}">
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastr/toastr.min.css') }}">
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/global-loader.css') }}">
 {{-- tom select --}}

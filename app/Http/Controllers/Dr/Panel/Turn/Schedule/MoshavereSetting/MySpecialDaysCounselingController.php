@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting;
 
+use App\Http\Controllers\Dr\Controller;
 use App\Models\Dr\DoctorCounselingConfig;
 use Carbon\Carbon;
 use App\Models\User;
@@ -14,7 +15,8 @@ use App\Models\Dr\DoctorCounselingWorkSchedule;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
-class MySpecialDaysCounselingController{
+class MySpecialDaysCounselingController extends Controller
+{
  public function mySpecialDays()
  {
   return view("dr.panel.turn.schedule.Counseling.my-special-days");

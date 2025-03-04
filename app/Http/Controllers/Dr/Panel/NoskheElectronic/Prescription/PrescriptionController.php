@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Dr\Panel\NoskheElectronic\Prescription;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Dr\Controller;
 
-class PrescriptionController
+
+class PrescriptionController extends Controller
 {
     /**
      * Display a listing of the resource.

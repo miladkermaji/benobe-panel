@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Dr\Panel\DoctorServices;
 
 use Illuminate\Http\Request;
 use App\Models\Dr\DoctorService;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Dr\Controller;
 
-class DoctorServicesController
+class DoctorServicesController extends Controller
 {
  public function index()
  {

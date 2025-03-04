@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting;
+use App\Http\Controllers\Dr\Controller;
 use App\Models\Dr\Vacation;
 use Illuminate\Http\Request;
 use Morilog\Jalali\CalendarUtils;
@@ -8,7 +9,7 @@ use Morilog\Jalali\Jalalian;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
-class VacationController
+class VacationController extends Controller
 {
 
   public function index(Request $request)

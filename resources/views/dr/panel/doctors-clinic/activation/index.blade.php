@@ -11,7 +11,7 @@
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/panel.css') }}">
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}">
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/activation/index.css') }}">
- <link rel="stylesheet" href="{{ asset('dr-asset/panel/css/toastify/toastify.min.css') }}">
+ <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastify/toastify.min.css') }}">
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastr/toastr.min.css') }}">
  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/leaflet/leaflet.css') }}">
  @include('dr.panel.my-tools.loader-btn')
@@ -185,7 +185,7 @@
  </div>
 
  @include('dr.panel.layouts.partials.scripts')
- <script src="{{ asset('dr-asset/panel/js/toastify/toastify.min.js') }}"></script>
+ <script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
  <script src="{{ asset('dr-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
  <script src="{{ asset('dr-assets/panel/js/leaflet/leaflet.js') }}"></script>
  <script src="{{ asset('dr-assets/panel/js/leaflet/leaflet-control-geocoder/dist/Control.Geocoder.js') }}"></script>

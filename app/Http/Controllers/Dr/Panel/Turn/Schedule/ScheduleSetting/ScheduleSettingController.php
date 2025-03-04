@@ -9,16 +9,16 @@ use App\Models\Dr\AppointmentSlot;
 use Illuminate\Support\Facades\DB;
 use App\Traits\HandlesRateLimiting;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Dr\DoctorWorkSchedule;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Controllers\Dr\Controller;
 use App\Models\Dr\SpecialDailySchedule;
 use App\Models\Dr\DoctorAppointmentConfig;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
-class ScheduleSettingController
+class ScheduleSettingController extends Controller
 {
   use HandlesRateLimiting;
   /**

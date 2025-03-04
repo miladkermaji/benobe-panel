@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Dr\Panel\Tickets;
 
+use App\Http\Controllers\Dr\Controller;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class TicketsController
+class TicketsController extends Controller
 {
     /**
      * Display a listing of the resource.

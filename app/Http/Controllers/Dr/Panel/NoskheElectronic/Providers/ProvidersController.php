@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Dr\Panel\NoskheElectronic\Providers;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Dr\Controller;
 
-class ProvidersController
+
+class ProvidersController extends Controller
 {
     /**
      * Display a listing of the resource.

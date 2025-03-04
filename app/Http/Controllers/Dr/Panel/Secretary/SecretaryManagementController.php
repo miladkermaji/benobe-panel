@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Dr\Panel\Secretary;
 
+use App\Http\Controllers\Dr\Controller;
 use App\Models\Dr\Secretary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-class SecretaryManagementController
+class SecretaryManagementController extends Controller
 {
     public function index(Request $request)
     {

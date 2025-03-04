@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration;
 
+use App\Http\Controllers\Dr\Controller;
 use Auth;
 use Illuminate\Http\Request;
 use App\Models\Dr\DoctorAppointmentConfig;
 
-class DurationController
+class DurationController extends Controller
 {
     public function index($clinicId)
     {

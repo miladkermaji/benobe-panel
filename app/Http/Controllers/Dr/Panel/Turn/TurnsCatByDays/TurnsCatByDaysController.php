@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Dr\Panel\Turn\TurnsCatByDays;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Dr\Controller;
 
-class TurnsCatByDaysController
+class TurnsCatByDaysController extends Controller
 {
     /**
      * Display a listing of the resource.

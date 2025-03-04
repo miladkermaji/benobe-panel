@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation;
 
 use App\Models\Dr\Clinic;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Dr\Controller;
 
-class ActivationDoctorsClinicController
+
+class ActivationDoctorsClinicController extends Controller
 {
     /**
      * Display a listing of the resource.

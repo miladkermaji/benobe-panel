@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereWaiting;
 
+use App\Http\Controllers\Dr\Controller;
 use Illuminate\Http\Request;
 
-class MoshavereWaitingController
+class MoshavereWaitingController extends Controller
 {
     /**
      * Display a listing of the resource.

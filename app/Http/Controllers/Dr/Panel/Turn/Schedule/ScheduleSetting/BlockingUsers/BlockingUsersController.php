@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers;
 
+use App\Http\Controllers\Dr\Controller;
 use App\Models\Dr\Doctor;
 use Auth;
 use App\Models\User;
@@ -12,7 +13,7 @@ use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use Str;
 
-class BlockingUsersController
+class BlockingUsersController extends Controller
 {
   public function index(Request $request)
   {
