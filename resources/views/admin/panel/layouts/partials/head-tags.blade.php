@@ -13,6 +13,7 @@
 
 {{-- persian calander --}}
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/dr-panel.css') }}">
+<link rel="stylesheet" href="{{ asset('admin-assets/panel/css/custom-asset.css') }}">
 
 <script src="{{ asset('admin-assets/panel/js/jquery-3.4.1.min.js') }}"></script>
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/style.css') }}">

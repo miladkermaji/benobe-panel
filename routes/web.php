@@ -92,12 +92,12 @@ use App\Http\Controllers\Dr\Panel\NoskheElectronic\Providers\ProvidersController
 use App\Http\Controllers\Dr\Panel\Activation\Consult\Rules\ConsultRulesController;
 use App\Http\Controllers\Dr\Panel\DoctorsClinic\DoctorsClinicManagementController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ManualNobat\ManualNobatController;
-use App\Http\Controllers\Admin\Dashboard\PaymentGateways\PaymentGatewaysController;
 use App\Http\Controllers\Admin\Doctors\DoctorsManagement\Gallery\GalleryController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\VacationController;
 use App\Http\Controllers\Dr\Panel\SecretaryPermission\SecretaryPermissionController;
 use App\Http\Controllers\Admin\ContentManagement\CategoryBlog\CategoryBlogController;
 use App\Http\Controllers\Admin\Doctors\DoctorsManagement\DoctorsManagementController;
+use App\Http\Controllers\Admin\Panel\Tools\PaymentGateways\PaymentGatewaysController;
 use App\Http\Controllers\Admin\UsersManagement\ChargeAccount\ChargeAccountController;
 use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Service\ServiceController;
 use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration\DurationController;
@@ -158,6 +158,13 @@ Route::prefix('admin')
         Route::post('/upload-profile-photo', [AdminProfileController::class, 'uploadPhoto'])->name('admin.upload-photo')->middleware('auth:manager');
         Route::prefix('tools/')->group(function () {
             Route::get('/file-manager', [FileManagerController::class, 'index'])->name('admin.panel.tools.file-manager')->middleware('auth:manager');
+            Route::prefix('payment_gateways/')->group(function () {
+                Route::get('/', [PaymentGatewaysController::class, 'index'])->name('admin.panel.tools.payment_gateways.index');
+                Route::get('/edit/{name}', [PaymentGatewaysController::class, 'edit'])->name('admin.panel.tools.payment_gateways.edit');
+                Route::put('/payment-gateways/{name}', [PaymentGatewaysController::class, 'update'])->name('admin.payment_gateways.update');
+                Route::post('/payment-gateways/toggle', [PaymentGatewaysController::class, 'toggle'])->name('admin.payment_gateways.toggle');
+                Route::delete('/payment-gateways/{name}', [PaymentGatewaysController::class, 'destroy'])->name('admin.panel.tools.payment_gateways.destroy');
+            });
         });
     });
 
