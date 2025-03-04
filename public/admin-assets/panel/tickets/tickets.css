@@ -1,0 +1,33 @@
+@media only screen and (max-width: 425px) {
+ .col-md-12 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+ }
+ th {
+  font-size: 11px;
+ }
+ h4 {
+  font-size: 16px;
+ }
+ button {
+  font-size: 13px !important;
+ }
+}
+th {
+ text-wrap: nowrap !important;
+}
+.response-card {
+ border-left: 5px solid #007bff;
+ padding: 15px;
+ background: #f8f9fa;
+ border-radius: 8px;
+}
+
+.response-list {
+ max-height: 300px;
+ overflow-y: auto;
+}
+
+button .loader {
+ display: none;
+}

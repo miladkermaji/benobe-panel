@@ -5,9 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-
-
-
 class ManagersTableSeeder extends Seeder
 {
     /**
@@ -22,14 +19,13 @@ class ManagersTableSeeder extends Seeder
             'email' => 'miladkermaji09@gmail.com',
             'mobile' => '09182718639',
             'national_code' => null,
-            'sex' => null,
+            'gender' => null, // تغییر از 'sex' به 'gender'
             'status' => '0',
             'email_verified_at' => null,
-            'password' => '$2y$12$Gg8C1uOPiN/l/g/JsOk.pOiILYO08pzj5GMbOnkT.PY.Sjn6to.6O', // مطمئن شوید که پسورد را به درستی رمزگذاری کنید
+            'password' => '$2y$12$Gg8C1uOPiN/l/g/JsOk.pOiILYO08pzj5GMbOnkT.PY.Sjn6to.6O',
             'avatar' => null,
             'address' => null,
-            'permission' => '1',
+            'permission_level' => '1', // تغییر از 'permission' به 'permission_level' برای هماهنگی با Migration
         ]);
-        
     }
 }

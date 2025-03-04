@@ -5,53 +5,50 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('managers', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name');
+            $table->string('first_name', 100);
+            $table->string('last_name', 100);
             $table->date('date_of_birth')->nullable();
-            $table->string('email')->unique();
-            $table->string('mobile')->nullable()->unique();
-            $table->string('national_code')->nullable()->unique();
-            $table->enum('sex', ['male', 'female'])->nullable();
-            $table->tinyInteger('status')->default('0');
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('national_code', 10)->nullable()->unique();
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
+            $table->string('email')->unique()->index();
+            $table->string('mobile', 15)->nullable()->unique()->index();
             $table->string('password');
-            $table->text('avatar')->nullable();
-            $table->text('address')->nullable();
-            $table->integer('permission')->default('1');
-            $table->boolean('static_password_enabled')->default(false)->comment('آیا رمز عبور ثابت فعال است؟');
+            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('mobile_verified_at')->nullable();
             $table->string('two_factor_secret')->nullable();
-            $table->boolean('two_factor_secret_enabled')->default(false)->comment('آیا رمز عبور دومرحله‌ای فعال است؟');
+            $table->boolean('two_factor_enabled')->default(false);
             $table->timestamp('two_factor_confirmed_at')->nullable();
-            $table->string('slug')->unique()->nullable();
+            $table->boolean('static_password_enabled')->default(false);
+            $table->string('avatar')->nullable();
             $table->text('bio')->nullable();
-            $table->text('description')->nullable();
+            $table->text('address')->nullable();
+            $table->string('slug')->unique()->nullable()->index();
+            $table->unsignedTinyInteger('status')->default(0);
+            $table->unsignedTinyInteger('permission_level')->default(1);
             $table->boolean('is_active')->default(true);
             $table->boolean('is_verified')->default(false);
             $table->boolean('profile_completed')->default(false);
-            $table->timestamp('mobile_verified_at')->nullable();
             $table->timestamp('last_login_at')->nullable();
-            $table->softDeletes(); // قابلیت حذف نرم (soft delete)
-
+            $table->string('last_login_ip', 45)->nullable();
+            $table->unsignedInteger('login_count')->default(0);
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
+            $table->index(['first_name', 'last_name'], 'name_index');
+            $table->index('status', 'status_index');
         });
+
         Artisan::call('db:seed', [
             '--class' => 'ManagersTableSeeder',
+            '--force' => true,
         ]);
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('managers');

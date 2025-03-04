@@ -1,0 +1,35 @@
+/*.chart-content-wrapper{
+   background-color: #fff;
+  border-radius: 10px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  width: 1200px;
+}*/
+canvas {
+ font-family: IRANSans !important;
+ width: 100%;
+ height: 400px; /* یا هر ارتفاع دیگری که مناسب است */
+}
+
+@media only screen and (max-width: 768px) {
+ canvas {
+  width: 100% !important;
+ }
+}
+.chart-container {
+  height: 350px;
+  width: 90%;
+  margin-bottom: 30px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  background-color: #ffffff;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
+}
