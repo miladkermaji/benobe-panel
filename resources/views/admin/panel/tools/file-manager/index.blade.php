@@ -6,9 +6,9 @@
  {{ 'به نوبه | پنل مدیریت' }}
 @endsection
 @section('content')
-@section('bread-crumb-title', 'داشبورد')
+@section('bread-crumb-title', 'مدیریت فایل')
 @section('scripts')
 
-
+@livewire('admin.panel.tools.file-manager')
 
 @endsection

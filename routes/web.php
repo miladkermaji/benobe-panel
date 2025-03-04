@@ -79,6 +79,7 @@ use App\Http\Controllers\Admin\ContentManagement\Comments\CommentController;
 use App\Http\Controllers\Admin\Doctors\CommentDoctor\CommentDoctorController;
 use App\Http\Controllers\Admin\Doctors\DoctorsManagement\Bime\BimeController;
 use App\Http\Controllers\Admin\Hospitals\LogsHospital\LogsHospitalController;
+use App\Http\Controllers\Admin\Panel\Tools\FileManager\FileManagerController;
 use App\Http\Controllers\Admin\UsersManagement\UserGroup\UserGroupController;
 use App\Http\Controllers\Dr\Panel\Payment\Setting\DrPaymentSettingController;
 use App\Http\Controllers\Admin\ContentManagement\HomeVideo\HomeVideoController;
@@ -156,6 +157,10 @@ Route::prefix('admin')
         Route::get('dashboard/', [AdminDashboardController::class, 'index'])->name('admin-panel');
         Route::post('/upload-profile-photo', [AdminProfileController::class, 'uploadPhoto'])->name('admin.upload-photo')->middleware('auth:manager');
     });
+Route::prefix('tools/')->group(function () {
+    Route::get('/file-manager', [FileManagerController::class, 'index'])->name('admin.panel.tools.file-manager')->middleware('auth:manager');
+});
+
 // end manager  routes
 // dr routes
 Route::prefix('dr')->namespace('Dr')->group(function () {
