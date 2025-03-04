@@ -195,37 +195,39 @@ class FileManager extends Component
     public function render()
     {
         $fullPath = $this->currentPath ? $this->currentPath : '';
-        $directories = Storage::disk('public')->directories($fullPath);
-        $files = Storage::disk('public')->files($fullPath);
 
-        $items = [];
-        foreach ($directories as $dir) {
-            $name = basename($dir);
-            if ($this->search === '' || stripos($name, $this->search) !== false) {
-                $items[] = [
-                    'type' => 'folder',
-                    'name' => $name,
-                    'path' => $dir,
+        // دریافت آیتم‌ها در مسیر فعلی
+        $items = File::where(function ($query) use ($fullPath) {
+            $query->where('path', 'like', $fullPath . '/%')
+                ->whereRaw("CHAR_LENGTH(REPLACE(path, '$fullPath/', '')) - CHAR_LENGTH(REPLACE(REPLACE(path, '$fullPath/', ''), '/', '')) = 0");
+        })
+            ->orWhere(function ($query) use ($fullPath) {
+                // اگر در مسیر روت هستیم، تمام پوشه‌ها و فایل‌های سطح اول را نمایش دهیم
+                if ($fullPath == '') {
+                    $query->whereRaw("CHAR_LENGTH(path) - CHAR_LENGTH(REPLACE(path, '/', '')) = 0");
+                }
+            })
+            ->orderBy('type', 'desc') // نمایش پوشه‌ها در ابتدا
+            ->orderBy('name')
+            ->get()
+            ->map(function ($file) {
+                return [
+                    'type' => $file->type,
+                    'name' => $file->name,
+                    'path' => $file->path,
+                    'url' => $file->type === 'file' ? asset('storage/' . $file->path) : null,
+                    'isImage' => $file->type === 'file' && in_array(strtolower($file->extension), ['jpg', 'jpeg', 'png', 'gif']),
+                    'isText' => $file->type === 'file' && in_array(strtolower($file->extension), ['txt', 'md', 'log']),
                 ];
-            }
-        }
-        foreach ($files as $file) {
-            $name = basename($file);
-            if ($this->search === '' || stripos($name, $this->search) !== false) {
-                $extension = pathinfo($file, PATHINFO_EXTENSION);
-                $items[] = [
-                    'type' => 'file',
-                    'name' => $name,
-                    'path' => $file,
-                    'url' => asset('storage/' . $file),
-                    'isImage' => in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']),
-                    'isText' => in_array(strtolower($extension), ['txt', 'md', 'log']),
-                ];
-            }
-        }
+            })->toArray();
+
+        // بررسی خالی بودن پوشه
+        $emptyFolder = empty($items);
 
         return view('livewire.admin.panel.tools.file-manager', [
             'items' => $items,
+            'emptyFolder' => $emptyFolder,
         ]);
     }
+
 }
