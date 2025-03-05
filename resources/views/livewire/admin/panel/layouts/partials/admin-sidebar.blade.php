@@ -48,8 +48,8 @@
             <li class="item-li {{ Request::routeIs('admin.panel.tools.redirects.index') ? 'is-active' : '' }}">
                 <a href="{{ route('admin.panel.tools.redirects.index') }}">ابزار ریدایرکت</a>
             </li>
-            <li class="item-li {{ Request::routeIs('dr-mySpecialDays') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-mySpecialDays') }}">نقشه سایت</a>
+            <li class="item-li {{ Request::routeIs('admin.tools.sitemap.index') ? 'is-active' : '' }}">
+                <a href="{{ route('admin.tools.sitemap.index') }}">نقشه سایت</a>
             </li>
             <li class="item-li {{ Request::routeIs('dr-manual_nobat_setting') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-manual_nobat_setting') }}">صفحه ساز</a>

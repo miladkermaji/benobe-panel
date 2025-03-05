@@ -22,7 +22,9 @@
         "morilog/jalali": "^3.4",
         "nwidart/laravel-modules": "^11.1",
         "predis/predis": "^2.3",
-        "shetabit/payment": "^6.1"
+        "shetabit/payment": "^6.1",
+        "spatie/crawler": "^8.4",
+        "spatie/laravel-sitemap": "^7.3"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",
