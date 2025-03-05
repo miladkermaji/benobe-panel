@@ -41,7 +41,6 @@ use App\Http\Controllers\Admin\Authentications\VerifyEmailBasic;
 use App\Http\Controllers\Admin\Authentications\VerifyEmailCover;
 use App\Http\Controllers\Admin\Application\ApplicationController;
 use App\Http\Controllers\Admin\Dashboard\Cities\CitiesController;
-use App\Http\Controllers\Admin\Tools\Redirect\RedirectController;
 use App\Http\Controllers\Admin\Ads\Banner\AdsLog\AdsLogController;
 use App\Http\Controllers\Admin\Authentications\RegisterMultiSteps;
 use App\Http\Controllers\Admin\Authentications\ResetPasswordBasic;
@@ -68,6 +67,7 @@ use App\Http\Controllers\Admin\ContentManagement\Slide\SlideController;
 use App\Http\Controllers\Admin\Dashboard\Specialty\SpecialtyController;
 use App\Http\Controllers\Admin\Doctors\LogsDoctor\LogsDoctorController;
 use App\Http\Controllers\Admin\Doctors\OrderVisit\OrderVisitController;
+use App\Http\Controllers\Admin\Panel\Tools\Redirect\RedirectController;
 use App\Http\Controllers\Admin\Panel\Dashboard\AdminDashboardController;
 use App\Http\Controllers\Dr\Panel\MyPerformance\MyPerformanceController;
 use App\Http\Controllers\Admin\Tools\MailTemplate\MailTemplateController;
@@ -173,6 +173,15 @@ Route::prefix('admin')
             });
             // روت Telescope با UI پیش‌فرض
             Route::get('/telescope', '\Laravel\Telescope\Http\Controllers\HomeController@index')->name('admin.panel.tools.telescope');
+            Route::prefix('redirects/')->group(function () {
+                Route::get('/', [RedirectController::class, 'index'])->name('admin.panel.tools.redirects.index');
+                Route::get('/create', [RedirectController::class, 'create'])->name('admin.panel.tools.redirects.create'); // روت جدید
+                Route::post('/store', [RedirectController::class, 'store'])->name('admin.panel.tools.redirects.store'); // روت جدید
+                Route::get('/edit/{id}', [RedirectController::class, 'edit'])->name('admin.panel.tools.redirects.edit');
+                Route::put('/update/{id}', [RedirectController::class, 'update'])->name('admin.panel.tools.redirects.update');
+                Route::post('/toggle', [RedirectController::class, 'toggle'])->name('admin.panel.tools.redirects.toggle');
+                Route::delete('/delete/{id}', [RedirectController::class, 'destroy'])->name('admin.panel.tools.redirects.destroy');
+            });
         });
     });
 

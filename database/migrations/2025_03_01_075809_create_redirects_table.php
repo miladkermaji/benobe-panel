@@ -10,10 +10,11 @@ class CreateRedirectsTable extends Migration
     {
         Schema::create('redirects', function (Blueprint $table) {
             $table->id();
-            $table->string('source_url')->unique();
-            $table->string('destination_url');
-            $table->integer('status_code')->default(301); // 301 یا 302
-            $table->boolean('is_active')->default(true);
+            $table->string('source_url')->unique()->comment('URL مبدا');
+            $table->string('target_url')->comment('URL مقصد');
+            $table->integer('status_code')->default(301)->comment('کد وضعیت HTTP (301 یا 302)');
+            $table->boolean('is_active')->default(true)->comment('وضعیت فعال/غیرفعال');
+            $table->text('description')->nullable()->comment('توضیحات اختیاری');
             $table->timestamps();
         });
     }

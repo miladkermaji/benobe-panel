@@ -1,0 +1,24 @@
+/* در فایل redirects.css */
+@import url('./../payment-gateways/payment-gateways.css');
+/* استایل‌های مشترک */
+
+.gateway-card {
+ width: 360px;
+ height: 200px;
+}
+
+.gateway-title {
+ font-size: 1rem;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+ max-width: 250px;
+}
+
+@media (max-width: 768px) {
+ .gateway-card {
+  width: 100%;
+  max-width: 360px;
+  height: 180px;
+ }
+}

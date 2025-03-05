@@ -45,8 +45,8 @@
                 <a href="{{ route('admin.panel.tools.telescope') }}">تلسکوپ</a>
             </li>
             <!-- بقیه آیتم‌ها بدون تغییر -->
-            <li class="item-li {{ Request::routeIs('dr-workhours') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-workhours') }}">ابزار ریدایرکت</a>
+            <li class="item-li {{ Request::routeIs('admin.panel.tools.redirects.index') ? 'is-active' : '' }}">
+                <a href="{{ route('admin.panel.tools.redirects.index') }}">ابزار ریدایرکت</a>
             </li>
             <li class="item-li {{ Request::routeIs('dr-mySpecialDays') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-mySpecialDays') }}">نقشه سایت</a>
