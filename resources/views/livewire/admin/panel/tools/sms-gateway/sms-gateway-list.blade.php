@@ -115,7 +115,7 @@
   <div class="pagination-container mt-4">
    @if ($gateways && $gateways->hasPages())
     <nav aria-label="Page navigation">
-  {{ $gateways->links('livewire::simple-tailwind') }}
+  {{ $gateways->links('livewire::bootstrap') }}
     </nav>
    @endif
   </div>
