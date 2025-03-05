@@ -156,7 +156,6 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
-        // Main Page Route
         Route::get('dashboard/', [AdminDashboardController::class, 'index'])->name('admin-panel');
         Route::post('/upload-profile-photo', [AdminProfileController::class, 'uploadPhoto'])->name('admin.upload-photo')->middleware('auth:manager');
         Route::prefix('tools/')->group(function () {
@@ -168,13 +167,14 @@ Route::prefix('admin')
                 Route::post('/payment-gateways/toggle', [PaymentGatewaysController::class, 'toggle'])->name('admin.payment_gateways.toggle');
                 Route::delete('/payment-gateways/{name}', [PaymentGatewaysController::class, 'destroy'])->name('admin.panel.tools.payment_gateways.destroy');
             });
-            Route::prefix('sms_gateway')->group(function(){
+            Route::prefix('sms_gateway')->group(function () {
                 Route::get('/', [SmsGatewayController::class, 'index'])->name('admin.panel.tools.sms-gateways.index');
                 Route::get('/edit/{name}', [SmsGatewayController::class, 'edit'])->name('admin.panel.tools.sms-gateways.edit');
             });
+            // روت Telescope با UI پیش‌فرض
+            Route::get('/telescope', '\Laravel\Telescope\Http\Controllers\HomeController@index')->name('admin.panel.tools.telescope');
         });
     });
-
 
 // end manager  routes
 // dr routes
