@@ -5,6 +5,8 @@ use App\Models\Dr\SecretaryPermission;
 use App\Models\Admin\Dashboard\Cities\Zone;
 use App\Http\Controllers\Admin\layouts\Blank;
 use App\Http\Controllers\Admin\layouts\Fluid;
+use Modules\SendOtp\App\Livewire\SmsGatewayEdit;
+use Modules\SendOtp\App\Livewire\SmsGatewayList;
 use App\Http\Controllers\Dr\Auth\LoginController;
 use App\Http\Controllers\Admin\layouts\Horizontal;
 use App\Http\Controllers\Admin\Dashboard\Dashboard;
@@ -74,6 +76,7 @@ use App\Http\Controllers\Dr\Panel\DoctorServices\DoctorServicesContrroler;
 use App\Http\Controllers\Dr\Panel\PatientRecords\PatientRecordsController;
 use App\Http\Controllers\Dr\Panel\Secretary\SecretaryManagementController;
 use App\Http\Controllers\Admin\Dashboard\UserShipfee\UserShipfeeController;
+use App\Http\Controllers\Admin\Panel\Tools\SmsGateway\SmsGatewayController;
 use App\Http\Controllers\Admin\Questions\QuestionCat\QuestionCatController;
 use App\Http\Controllers\Admin\ContentManagement\Comments\CommentController;
 use App\Http\Controllers\Admin\Doctors\CommentDoctor\CommentDoctorController;
@@ -164,6 +167,10 @@ Route::prefix('admin')
                 Route::put('/payment-gateways/{name}', [PaymentGatewaysController::class, 'update'])->name('admin.payment_gateways.update');
                 Route::post('/payment-gateways/toggle', [PaymentGatewaysController::class, 'toggle'])->name('admin.payment_gateways.toggle');
                 Route::delete('/payment-gateways/{name}', [PaymentGatewaysController::class, 'destroy'])->name('admin.panel.tools.payment_gateways.destroy');
+            });
+            Route::prefix('sms_gateway')->group(function(){
+                Route::get('/', [SmsGatewayController::class, 'index'])->name('admin.panel.tools.sms-gateways.index');
+                Route::get('/edit/{name}', [SmsGatewayController::class, 'edit'])->name('admin.panel.tools.sms-gateways.edit');
             });
         });
     });

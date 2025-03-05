@@ -2,7 +2,7 @@
  <div class="container-fluid py-3" wire:init="loadGateways">
   <!-- Header -->
   <header
-   class="bg-gradient-header text-white p-3 rounded-3 mb-3 d-flex align-items-center justify-content-between shadow-lg">
+   class="glass-header text-white p-3 rounded-3 mb-3 d-flex align-items-center justify-content-between shadow-lg">
    <div class="d-flex align-items-center gap-3">
     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
      class="header-icon">
@@ -23,12 +23,15 @@
   </header>
 
   <!-- Alert -->
-  <div class="alert alert-custom rounded-3 mb-5 d-flex align-items-center gap-3 shadow-sm">
-   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2">
-    <circle cx="12" cy="12" r="10" />
-    <path d="M12 8v4M12 16h.01" />
-   </svg>
-   <span class="fw-medium text-dark">توجه: فقط یک درگاه می‌تواند فعال باشد.</span>
+  <div class="alert alert-custom rounded-3 mb-5   shadow-sm">
+   <div class="d-flex align-items-center">
+    <svg class=" text-red-500  animate-pulse" width="25px" height="25px" fill="none" stroke="currentColor"
+     style="width: 24px; height: 24px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <span class="fw-medium text-dark px-1">توجه: فقط یک درگاه می‌تواند فعال باشد.</span>
+   </div>
   </div>
 
   <!-- Gateway List -->
@@ -121,233 +124,6 @@
   </div>
  </div>
 
- <style>
-  .bg-gradient-header {
-   background: linear-gradient(135deg, #6d28d9, #ec4899);
-   transition: all 0.3s ease;
-  }
-
-  .bg-gradient-header:hover .header-icon {
-   transform: scale(1.2);
-  }
-
-  .alert-custom {
-   background: #fef2f2;
-   border-left: 5px solid #ef4444;
-   color: #1f2937;
-   border-radius: 8px;
-  }
-
-  .search-box {
-   width: 320px;
-   position: relative;
-  }
-
-  .search-box input {
-   background: #ffffff;
-   color: #1f2937;
-   border: 1px solid #d1d5db;
-   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-   transition: all 0.3s ease;
-   font-size: 0.95rem;
-   padding: 0.5rem 1rem 0.5rem 2.5rem;
-  }
-
-  .search-box input:focus {
-   border-color: #7c3aed;
-   box-shadow: 0 0 12px rgba(124, 58, 237, 0.2);
-   outline: none;
-  }
-
-  .search-box input::placeholder {
-   color: #9ca3af;
-  }
-
-  .gateway-card {
-   width: 340px;
-   height: 180px;
-   background: #fafafa;
-   transition: transform 0.3s ease, box-shadow 0.3s ease;
-   overflow: hidden;
-  }
-
-  .gateway-card:hover {
-   transform: translateY(-8px);
-   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-  }
-
-  .card-bg {
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   opacity: 0.05;
-   z-index: 0;
-   transition: opacity 0.3s ease;
-  }
-
-  .bg-active {
-   background: linear-gradient(45deg, #a7f3d0, #6ee7b7);
-  }
-
-  .bg-inactive {
-   background: linear-gradient(45deg, #fecaca, #f87171);
-  }
-
-  .gateway-card:hover .card-bg {
-   opacity: 0.1;
-  }
-
-  .gateway-logo {
-   transition: transform 0.3s ease;
-   z-index: 1;
-  }
-
-  .gateway-card:hover .gateway-logo {
-   transform: scale(1.1);
-  }
-
-  .gateway-title {
-   font-size: 1.1rem;
-   transition: color 0.3s ease;
-   z-index: 1;
-  }
-
-  .gateway-card:hover .gateway-title {
-   color: #7c3aed;
-  }
-
-  .status-switch {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   width: 36px;
-   height: 36px;
-   border-radius: 50%;
-   cursor: pointer;
-   transition: all 0.3s ease;
-   z-index: 1;
-  }
-
-  .status-switch.active {
-   background: #10b981;
-   box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
-   color: white;
-  }
-
-  .status-switch.inactive {
-   background: #f87171;
-   box-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
-   color: white;
-  }
-
-  .status-switch:hover {
-   transform: scale(1.15);
-  }
-
-  .status-icon {
-   transition: transform 0.3s ease;
-  }
-
-  .status-switch:hover .status-icon {
-   transform: rotate(20deg);
-  }
-
-  .btn-custom {
-   background: #7c3aed;
-   color: white;
-   border: none;
-   transition: all 0.3s ease;
-   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-   font-size: 0.9rem;
-  }
-
-  .btn-custom:hover {
-   background: #db2777;
-   transform: translateY(-2px);
-   box-shadow: 0 6px 16px rgba(219, 39, 119, 0.4);
-  }
-
-  .btn-danger {
-   background: #ef4444;
-   border: none;
-   transition: all 0.3s ease;
-   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-   font-size: 0.9rem;
-  }
-
-  .btn-danger:hover {
-   background: #dc2626;
-   transform: translateY(-2px);
-   box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-  }
-
-  .pagination-container {
-   bottom: 20px;
-   background: #fff;
-
-   padding: 10px;
-   border-radius: 8px;
-   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-   z-index: 10;
-   width: 100%;
-  }
-
-  .pagination .page-item.active .page-link {
-   background-color: #7c3aed;
-   border-color: #7c3aed;
-   color: white;
-  }
-
-  .pagination .page-link {
-   color: #6b7280;
-   transition: all 0.3s ease;
-  }
-
-  .pagination .page-link:hover {
-   background-color: #f3f4f6;
-   color: #7c3aed;
-  }
-
-  @media (max-width: 768px) {
-   .gateway-card {
-    width: 100%;
-    max-width: 360px;
-    height: 160px;
-   }
-
-   .gateway-list {
-    justify-content: center;
-   }
-
-   .bg-gradient-header h2 {
-    font-size: 1.5rem;
-   }
-
-   .status-switch {
-    width: 32px;
-    height: 32px;
-   }
-
-   .btn-custom,
-   .btn-danger {
-    font-size: 0.85rem;
-    padding: 0.5rem 1rem;
-   }
-
-   .search-box {
-    width: 100%;
-   }
-  }
-
-  @media (min-width: 769px) and (max-width: 1024px) {
-   .gateway-card {
-    width: 300px;
-    height: 170px;
-   }
-  }
- </style>
  <script>
   document.addEventListener('livewire:init', function() {
    Livewire.on('show-alert', (event) => {

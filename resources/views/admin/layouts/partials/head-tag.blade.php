@@ -44,9 +44,9 @@
 <link rel="canonical" href="https://benobe.ir/" />
 
 
-<script src="{{ asset('dr-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
-<link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastr/toastr.min.css') }}">
-@vite(['resources/js/app.js', 'resources/css/app.css'])
+<script src="{{ asset('admin-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
+<link rel="stylesheet" href="{{ asset('admin-assets/panel/css/toastr/toastr.min.css') }}">
 
+@vite(['resources/js/app.js', 'resources/css/app.css'])
 
 

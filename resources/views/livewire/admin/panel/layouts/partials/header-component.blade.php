@@ -17,7 +17,7 @@
                         stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></path>
                 </svg>
             </div>
-            <div class="mx-4 cursor-pointer" onclick="location.href='{{ route('dr-wallet-charge') }}'">
+            <div class="mx-4 cursor-pointer d-flex" onclick="location.href='{{ route('dr-wallet-charge') }}'">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="24px" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round"
                     class="plasmic-default__svg plasmic_all__FLoMj PlasmicQuickAccessWallet_svg__4uUbY lucide lucide-wallet"

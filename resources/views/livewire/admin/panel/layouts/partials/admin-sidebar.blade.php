@@ -38,6 +38,9 @@
         <li class="item-li {{ Request::routeIs('admin.panel.tools.payment_gateways.index') ? 'is-active' : '' }}">
             <a href="{{ route('admin.panel.tools.payment_gateways.index') }}">درگاه پرداخت</a>
         </li>
+        <li class="item-li {{ Request::routeIs('admin.sms-gateways.index') ? 'is-active' : '' }}">
+            <a href="{{ route('admin.panel.tools.sms-gateways.index') }}">پیامک</a>
+        </li>
        <li class="item-li {{ Request::routeIs('dr-workhours') ? 'is-active' : '' }}">
         <a href="{{ route('dr-workhours') }}">ابزار ریدایرکت</a>
        </li>

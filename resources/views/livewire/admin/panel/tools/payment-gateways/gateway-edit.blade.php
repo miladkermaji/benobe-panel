@@ -68,75 +68,7 @@
         </div>
     </div>
     
-    <style>
-        .bg-gradient-primary {
-            background: linear-gradient(135deg, #6b7280, #1f2937);
-        }
-    
-        .card {
-            transition: box-shadow 0.3s ease;
-        }
-    
-        .card:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-    
-        .gateway-logo {
-            transition: transform 0.3s ease;
-        }
-    
-        .gateway-logo:hover {
-            transform: scale(1.1);
-        }
-    
-        .form-check-input:checked {
-            background-color: #10b981;
-            border-color: #10b981;
-        }
-    
-        .btn-primary {
-            background: #7c3aed;
-            border: none;
-            transition: all 0.3s ease;
-        }
-    
-        .btn-primary:hover {
-            background: #5b21b6;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-        }
-    
-        .btn-outline-light {
-            transition: all 0.3s ease;
-        }
-    
-        .btn-outline-light:hover {
-            background: #ffffff;
-            color: #1f2937;
-        }
-    
-        @media (max-width: 768px) {
-            .card-body {
-                padding: 2rem;
-            }
-    
-            .gateway-logo {
-                width: 36px;
-                height: 36px;
-            }
-    
-            .btn-primary,
-            .btn-outline-light {
-                font-size: 0.9rem;
-                padding: 0.5rem 1.5rem;
-            }
-    
-            textarea {
-                font-size: 0.85rem;
-                rows: 4;
-            }
-        }
-    </style>
+  
     
     <script>
         document.addEventListener('livewire:init', function () {

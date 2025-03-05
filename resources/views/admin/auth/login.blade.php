@@ -1,11 +1,11 @@
-@extends('dr.layouts.master-login')
+@extends('admin.layouts.master-login')
 @section('head-tag')
- <link rel="stylesheet" href="{{ asset('dr-assets/login/bootstrap5/bootstrap.min.css') }}">
- <link rel="stylesheet" href="{{ asset('dr-assets/login/css/login.css') }}">
+ <link rel="stylesheet" href="{{ asset('admin-assets/login/bootstrap5/bootstrap.min.css') }}">
+ <link rel="stylesheet" href="{{ asset('admin-assets/login/css/login.css') }}">
  <meta name="csrf-token" content="{{ csrf_token() }}">
- <link rel="stylesheet" href="{{ asset('dr-assets/login/toast/toastify.css') }}">
- <script src="{{ asset('dr-assets/login/toast/toastify.js') }}"></script>
- <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastr/toastr.min.css') }}">
+ <link rel="stylesheet" href="{{ asset('admin-assets/login/toast/toastify.css') }}">
+ <script src="{{ asset('admin-assets/login/toast/toastify.js') }}"></script>
+ <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/toastr/toastr.min.css') }}">
 @endsection
 @section('site-header')
  <title>پنل مدیریت به نوبه</title>
@@ -33,7 +33,7 @@
         <a href="javascript:void(0);" class="back-link text-primary d-flex align-items-center go-back"
          data-step="{{ $step }}">
          <span class="ms-2">بازگشت</span>
-         <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
+         <img src="{{ asset('admin-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
           style="max-width: 24px;">
         </a>
        </div>
@@ -41,7 +41,7 @@
         @csrf
         <div class="mb-3">
          <div class="d-flex align-items-center mb-2">
-          <img src="{{ asset('dr-assets/login/images/phone.svg') }}" alt="Phone Icon" class="me-2">
+          <img src="{{ asset('admin-assets/login/images/phone.svg') }}" alt="Phone Icon" class="me-2">
           <label class="text-custom-gray">شماره موبایل</label>
          </div>
          <input dir="ltr" class="form-control custom-rounded custom-shadow h-50" type="text" name="mobile"
@@ -83,7 +83,7 @@
         <a href="javascript:void(0);" class="back-link text-primary d-flex align-items-center go-back"
          data-step="{{ $step }}">
          <span class="ms-2">بازگشت</span>
-         <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
+         <img src="{{ asset('admin-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
           style="max-width: 24px;">
         </a>
        </div>
@@ -124,7 +124,7 @@
         <a href="javascript:void(0);" class="back-link text-primary d-flex align-items-center go-back"
          data-step="{{ $step }}">
          <span class="ms-2">بازگشت</span>
-         <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
+         <img src="{{ asset('admin-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
           style="max-width: 24px;">
         </a>
        </div>
@@ -132,7 +132,7 @@
         @csrf
         <div class="mb-3">
          <div class="d-flex align-items-center mb-2">
-          <img src="{{ asset('dr-assets/login/images/phone.svg') }}" alt="Phone Icon" class="me-2">
+          <img src="{{ asset('admin-assets/login/images/phone.svg') }}" alt="Phone Icon" class="me-2">
           <label class="text-custom-gray">شماره موبایل</label>
          </div>
          <input dir="ltr" class="form-control custom-rounded custom-shadow h-50" type="text" name="mobile"
@@ -141,13 +141,13 @@
         </div>
         <div class="mb-3">
          <div class="d-flex align-items-center mb-2">
-          <img src="{{ asset('dr-assets/login/images/password.svg') }}" alt="Password Icon" class="me-2">
+          <img src="{{ asset('admin-assets/login/images/password.svg') }}" alt="Password Icon" class="me-2">
           <label class="text-custom-gray">رمز عبور</label>
          </div>
          <div class="position-relative">
           <input class="form-control custom-rounded custom-shadow h-50 text-end" type="password" name="password"
            placeholder="رمز عبور خود را وارد کنید">
-          <img src="{{ asset('dr-assets/login/images/visible.svg') }}" alt="Visible Icon" class="password-toggle"
+          <img src="{{ asset('admin-assets/login/images/visible.svg') }}" alt="Visible Icon" class="password-toggle"
            onclick="togglePasswordVisibility(this)">
          </div>
          <div class="invalid-feedback password-error"></div>
@@ -174,7 +174,7 @@
         <a href="javascript:void(0);" class="back-link text-primary d-flex align-items-center go-back"
          data-step="{{ $step }}">
          <span class="ms-2">بازگشت</span>
-         <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
+         <img src="{{ asset('admin-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
           style="max-width: 24px;">
         </a>
        </div>
@@ -182,7 +182,7 @@
         @csrf
         <div class="mb-3">
          <div class="d-flex align-items-center mb-2">
-          <img src="{{ asset('dr-assets/login/images/password.svg') }}" alt="Password Icon" class="me-2">
+          <img src="{{ asset('admin-assets/login/images/password.svg') }}" alt="Password Icon" class="me-2">
           <label class="text-custom-gray">رمز دوعاملی</label>
          </div>
          <input dir="ltr" class="form-control custom-rounded custom-shadow h-50" type="password"
@@ -203,8 +203,8 @@
 @endsection
 @section('scripts')
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
- <script src="{{ asset('dr-assets/js/login.js') }}"></script>
- <script src="{{ asset('dr-assets/panel/js/toastr/toastr.min.js') }}"></script>
+ <script src="{{ asset('admin-assets/js/login.js') }}"></script>
+ <script src="{{ asset('admin-assets/panel/js/toastr/toastr.min.js') }}"></script>
 
  @php
   // محاسبه زمان باقی‌مانده برای تایمر
