@@ -103,8 +103,13 @@ class PageBuilder extends Component
 
     public function createPage()
     {
+        $this->validate([
+            'newPageTitle' => 'required|unique:pages,title',
+            'metaTitle' => 'nullable|string|max:60',
+            'metaDescription' => 'nullable|string|max:160',
+        ]);
+
         try {
-            $this->validate(['newPageTitle' => 'required|unique:pages,title']);
             $page = Page::create([
                 'title' => $this->newPageTitle,
                 'slug' => Str::slug($this->newPageTitle),
@@ -113,7 +118,8 @@ class PageBuilder extends Component
                 'is_active' => $this->isActive,
                 'user_id' => auth('manager')->id(),
             ]);
-            $this->pages = Page::all();
+
+            $this->pages->push($page); // اضافه کردن صفحه جدید به لیست بدون رفرش کوئری
             $this->resetPageInputs();
             $this->isAddFormOpen = false;
             $this->dispatch('toast', 'صفحه جدید با موفقیت ایجاد شد.', ['type' => 'success']);
@@ -123,22 +129,25 @@ class PageBuilder extends Component
         }
     }
 
+
     public function togglePageStatus($pageId)
     {
         try {
             $page = Page::findOrFail($pageId);
-            $page->is_active = !$page->is_active;
-            $page->save();
-            $this->pages = Page::all();
-            if ($this->selectedPage && $this->selectedPage->id === $pageId) {
-                $this->isActive = $page->is_active;
-            }
+            $page->update(['is_active' => !$page->is_active]);
+
+            // به‌روزرسانی فقط صفحه موردنظر در لیست بدون کوئری مجدد کل صفحات
+            $this->pages = $this->pages->map(function ($p) use ($page) {
+                return $p->id === $page->id ? $page : $p;
+            });
+
             $this->dispatch('toast', 'وضعیت صفحه با موفقیت تغییر کرد.', ['type' => 'success']);
         } catch (\Exception $e) {
             Log::error('Error in togglePageStatus: ' . $e->getMessage());
             $this->dispatch('toast', 'خطایی در تغییر وضعیت صفحه رخ داد.', ['type' => 'error']);
         }
     }
+
 
     public function deletePage($pageId)
     {
@@ -255,19 +264,24 @@ class PageBuilder extends Component
         }
     }
 
-    public function updateElementOrder($orderedIds)
+    public function updateElementOrder($orderedElements)
     {
         try {
-            foreach ($orderedIds as $index => $id) {
-                Element::where('id', $id)->update(['order' => $index + 1]);
+            foreach ($orderedElements as $element) {
+                Element::where('id', $element['id'])->update(['order' => $element['order']]);
             }
-            $this->elements = Element::where('page_id', $this->selectedPage->id)->orderBy('order')->get();
-            $this->saveToHistory();
+            $this->elements = Element::where('page_id', $this->selectedPage->id)
+                ->orderBy('order')
+                ->get();
+            $this->dispatch('toast', 'ترتیب المان‌ها بروزرسانی شد.', ['type' => 'success']);
         } catch (\Exception $e) {
             Log::error('Error in updateElementOrder: ' . $e->getMessage());
             $this->dispatch('toast', 'خطایی در مرتب‌سازی المان‌ها رخ داد.', ['type' => 'error']);
         }
     }
+
+
+
 
     public function copyElement($elementId)
     {
@@ -333,6 +347,7 @@ class PageBuilder extends Component
     {
         try {
             $html = $this->generateHtml();
+
             return response()->streamDownload(function () use ($html) {
                 echo $html;
             }, $this->selectedPage->slug . '.html');
@@ -341,6 +356,7 @@ class PageBuilder extends Component
             $this->dispatch('toast', 'خطایی در خروجی HTML رخ داد.', ['type' => 'error']);
         }
     }
+
 
     public function toggleFullScreenPreview()
     {
@@ -369,10 +385,14 @@ class PageBuilder extends Component
             'elements' => $this->elements->toArray(),
             'selectedElement' => $this->selectedElement ? $this->selectedElement->toArray() : null,
         ];
-        $this->history = array_slice($this->history, 0, $this->historyIndex + 1);
+
+        // محدود کردن به 50 مورد آخر برای جلوگیری از مصرف بیش از حد حافظه
+        $this->history = array_slice($this->history, max(count($this->history) - 49, 0));
+
         $this->history[] = $state;
-        $this->historyIndex++;
+        $this->historyIndex = count($this->history) - 1;
     }
+
 
     public function restoreFromHistory()
     {
@@ -422,20 +442,87 @@ class PageBuilder extends Component
         $html .= '@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } } @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } } @keyframes zoomIn { from { transform: scale(0); } to { transform: scale(1); } }';
         $html .= 'body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f9fafb; } .grid { display: grid; gap: 10px; } video { max-width: 100%; }';
         $html .= '</style></head><body>';
+
         foreach ($this->elements as $element) {
-            $settings = json_decode($element->settings, true);
+            // بررسی مقدار settings
+            $settings = is_array($element->settings) ? $element->settings : json_decode($element->settings, true);
+
+            // در صورت وجود خطا، مقدار پیش‌فرض تنظیم شود
+            if (!is_array($settings)) {
+                $settings = [
+                    'color' => '#000000',
+                    'background_color' => '#ffffff',
+                    'font_size' => '16px',
+                    'padding' => '10px',
+                    'margin' => '0px',
+                    'animation' => 'none',
+                    'animation_duration' => '1s',
+                    'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
+                    'box_shadow' => 'none',
+                    'border' => 'none',
+                    'opacity' => '1',
+                    'grid_columns' => 1,
+                ];
+            }
+
+            // ساخت استایل‌ها
             $style = "color:{$settings['color']};background-color:{$settings['background_color']};font-size:{$settings['font_size']};padding:{$settings['padding']};margin:{$settings['margin']};box-shadow:{$settings['box_shadow']};border:{$settings['border']};opacity:{$settings['opacity']};";
             if ($settings['animation'] !== 'none') {
                 $style .= "animation:{$settings['animation']} {$settings['animation_duration']} ease-in-out;";
             }
+
+            // تولید HTML برای المان‌ها
             if ($element->type === 'video') {
                 $html .= "<div style='$style' class='grid grid-cols-{$settings['grid_columns']}'><video controls><source src='{$element->content}' type='video/mp4'></video></div>";
             } else {
                 $html .= "<div style='$style' class='grid grid-cols-{$settings['grid_columns']}'>{$element->content}</div>";
             }
         }
+
         $html .= '</body></html>';
         return $html;
+    }
+
+
+    public function applyTemplate($templateId)
+    {
+        // بررسی اینکه صفحه‌ای انتخاب شده است
+        if (!$this->selectedPage) {
+            $this->dispatch('toast', 'لطفاً ابتدا یک صفحه را انتخاب کنید.', ['type' => 'warning']);
+            return;
+        }
+
+        try {
+            // دریافت قالب از دیتابیس
+            $template = Template::findOrFail($templateId);
+
+            // دیکد کردن محتوای قالب به آرایه المان‌ها
+            $elementsData = json_decode($template->structure, true);
+
+            // حذف المان‌های فعلی صفحه انتخاب‌شده
+            Element::where('page_id', $this->selectedPage->id)->delete();
+
+            // اضافه کردن المان‌های قالب به صفحه
+            foreach ($elementsData as $element) {
+                Element::create([
+                    'page_id' => $this->selectedPage->id,
+                    'type' => $element['type'],
+                    'settings' => json_encode($element['settings']),
+                    'content' => $element['content'],
+                    'order' => $element['order'],
+                ]);
+            }
+
+            // بروزرسانی لیست المان‌ها در Livewire
+            $this->elements = Element::where('page_id', $this->selectedPage->id)->orderBy('order')->get();
+            $this->saveToHistory();
+
+            // ارسال پیام موفقیت
+            $this->dispatch('toast', 'قالب با موفقیت روی صفحه اعمال شد.', ['type' => 'success']);
+        } catch (\Exception $e) {
+            Log::error('Error in applyTemplate: ' . $e->getMessage());
+            $this->dispatch('toast', 'خطایی در اعمال قالب رخ داد.', ['type' => 'error']);
+        }
     }
 
     public function setPreviewMode($mode)

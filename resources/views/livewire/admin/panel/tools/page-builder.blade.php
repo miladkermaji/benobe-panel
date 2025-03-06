@@ -31,206 +31,205 @@
   <div class="container-fluid mx-auto">
    <div class="flex gap-4">
     <div class="w-80">
-        <!-- تاگل فرم افزودن صفحه -->
-        <div class="relative">
-            <button wire:click="toggleAddForm"
-                class="btn btn-gradient-primary w-full py-2 rounded-lg text-white text-sm mb-2">افزودن صفحه
-                {{ $isAddFormOpen ? '▲' : '▼' }}</button>
-            @if ($isAddFormOpen)
-                <div class="card p-4 rounded-xl shadow-lg bg-white absolute top-12 right-0 w-full z-10 animate-slide-in">
-                    <h6 class="text-indigo-700 font-bold mb-3 text-base">افزودن صفحه</h6>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">عنوان صفحه</label>
-                            <input type="text" wire:model="newPageTitle" class="input-shiny p-2 rounded-lg w-full text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">عنوان متا (SEO)</label>
-                            <input type="text" wire:model="metaTitle" class="input-shiny p-2 rounded-lg w-full text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">توضیحات متا (SEO)</label>
-                            <textarea wire:model="metaDescription" class="input-shiny p-2 rounded-lg w-full text-sm"
-                                rows="2"></textarea>
-                        </div>
-                    <div class="flex items-center  p-3">
-                        <label class="flex items-center gap-2 text-sm text-gray-700">
-                            <input type="checkbox" wire:model="isActive" class="form-check-input h-4 w-4 text-indigo-600 cursor-pointer"
-                                id="isActiveNew">
-                            <span>فعال</span>
-                        </label>
-                    </div>
-                        <button wire:click="createPage"
-                            class="btn btn-gradient-success w-full py-2 rounded-lg text-white text-sm">ایجاد صفحه</button>
-                    </div>
-                </div>
-            @endif
+     <!-- تاگل فرم افزودن صفحه -->
+     <div class="relative">
+      <button wire:click="toggleAddForm"
+       class="btn btn-gradient-primary w-full py-2 rounded-lg text-white text-sm mb-2">افزودن صفحه
+       {{ $isAddFormOpen ? '▲' : '▼' }}</button>
+      @if ($isAddFormOpen)
+       <div class="card p-4 rounded-xl shadow-lg bg-white absolute top-12 right-0 w-full z-10 animate-slide-in">
+        <h6 class="text-indigo-700 font-bold mb-3 text-base">افزودن صفحه</h6>
+        <div class="space-y-3">
+         <div>
+          <label class="block text-sm font-medium text-gray-700">عنوان صفحه</label>
+          <input type="text" wire:model="newPageTitle" class="input-shiny p-2 rounded-lg w-full text-sm">
+         </div>
+         <div>
+          <label class="block text-sm font-medium text-gray-700">عنوان متا (SEO)</label>
+          <input type="text" wire:model="metaTitle" class="input-shiny p-2 rounded-lg w-full text-sm">
+         </div>
+         <div>
+          <label class="block text-sm font-medium text-gray-700">توضیحات متا (SEO)</label>
+          <textarea wire:model="metaDescription" class="input-shiny p-2 rounded-lg w-full text-sm" rows="2"></textarea>
+         </div>
+         <div class="flex items-center  p-3">
+          <label class="flex items-center gap-2 text-sm text-gray-700">
+           <input type="checkbox" wire:model="isActive" class="form-check-input h-4 w-4 text-indigo-600 cursor-pointer"
+            id="isActiveNew">
+           <span>فعال</span>
+          </label>
+         </div>
+         <button wire:click="createPage"
+          class="btn btn-gradient-success w-full py-2 rounded-lg text-white text-sm">ایجاد صفحه</button>
         </div>
-    
-        <!-- المان‌ها -->
-        <div class="card p-4 rounded-xl shadow-lg bg-white mt-4">
-            <h6 class="text-indigo-700 font-bold mb-3 text-base">المان‌ها</h6>
-            <div class="grid grid-cols-2 gap-2">
-                @foreach (['text', 'image', 'button', 'video', 'form', 'slider'] as $type)
-                    <button wire:click="addElement('{{ $type }}')"
-                        class="btn btn-outline-primary flex items-center justify-center gap-2 p-2 rounded-lg hover:bg-indigo-50 transition-all duration-300">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            class="hover:rotate-6 transition-transform duration-200">
-                            @if ($type === 'text')
-                                <path d="M4 4h16v2H4zM4 10h16v2H4zM4 16h10v2H4z" />
-                            @elseif ($type === 'image')
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                <circle cx="8.5" cy="8.5" r="1.5" />
-                                <path d="M21 15l-5-5L5 21" />
-                            @elseif ($type === 'button')
-                                <rect x="4" y="8" width="16" height="8" rx="2" />
-                            @elseif ($type === 'video')
-                                <path d="M5 4h14v12H5z" />
-                                <path d="M10 8l5 4-5 4V8z" />
-                            @elseif ($type === 'form')
-                                <rect x="4" y="4" width="16" height="16" rx="2" />
-                                <path d="M8 10h8M8 14h8" />
-                            @elseif ($type === 'slider')
-                                <rect x="3" y="5" width="18" height="14" rx="2" />
-                                <path d="M9 12l3 3 3-3M12 9v6" />
-                            @endif
-                        </svg>
-                        <span
-                            class="text-sm font-medium">{{ $type === 'text' ? 'متن' : ($type === 'image' ? 'تصویر' : ($type === 'button' ? 'دکمه' : ($type === 'video' ? 'ویدیو' : ($type === 'form' ? 'فرم' : 'اسلایدر')))) }}</span>
-                    </button>
-                @endforeach
-            </div>
+       </div>
+      @endif
+     </div>
+
+     <!-- المان‌ها -->
+     <div class="card p-4 rounded-xl shadow-lg bg-white mt-4">
+      <h6 class="text-indigo-700 font-bold mb-3 text-base">المان‌ها</h6>
+      <div class="grid grid-cols-2 gap-2">
+       @foreach (['text', 'image', 'button', 'video', 'form', 'slider'] as $type)
+        <button wire:click="addElement('{{ $type }}')"
+         class="btn btn-outline-primary flex items-center justify-center gap-2 p-2 rounded-lg hover:bg-indigo-50 transition-all duration-300">
+         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="hover:rotate-6 transition-transform duration-200">
+          @if ($type === 'text')
+           <path d="M4 4h16v2H4zM4 10h16v2H4zM4 16h10v2H4z" />
+          @elseif ($type === 'image')
+           <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+           <circle cx="8.5" cy="8.5" r="1.5" />
+           <path d="M21 15l-5-5L5 21" />
+          @elseif ($type === 'button')
+           <rect x="4" y="8" width="16" height="8" rx="2" />
+          @elseif ($type === 'video')
+           <path d="M5 4h14v12H5z" />
+           <path d="M10 8l5 4-5 4V8z" />
+          @elseif ($type === 'form')
+           <rect x="4" y="4" width="16" height="16" rx="2" />
+           <path d="M8 10h8M8 14h8" />
+          @elseif ($type === 'slider')
+           <rect x="3" y="5" width="18" height="14" rx="2" />
+           <path d="M9 12l3 3 3-3M12 9v6" />
+          @endif
+         </svg>
+         <span
+          class="text-sm font-medium">{{ $type === 'text' ? 'متن' : ($type === 'image' ? 'تصویر' : ($type === 'button' ? 'دکمه' : ($type === 'video' ? 'ویدیو' : ($type === 'form' ? 'فرم' : 'اسلایدر')))) }}</span>
+        </button>
+       @endforeach
+      </div>
+     </div>
+
+     <!-- تنظیمات المان -->
+     @if ($selectedElement)
+      <div class="card p-4 mt-4 rounded-xl shadow-lg bg-white">
+       <h6 class="text-indigo-700 font-bold mb-3 text-base">تنظیمات المان</h6>
+       <div class="space-y-3">
+        <div>
+         <label class="block text-sm font-medium text-gray-700">محتوا</label>
+         @if ($selectedElement->type === 'form')
+          <textarea wire:model="content" class="input-shiny p-2 rounded-lg w-full text-sm" rows="3"></textarea>
+         @else
+          <input type="text" wire:model="content" class="input-shiny p-2 rounded-lg w-full text-sm">
+         @endif
         </div>
-    
-        <!-- تنظیمات المان -->
-        @if ($selectedElement)
-            <div class="card p-4 mt-4 rounded-xl shadow-lg bg-white">
-                <h6 class="text-indigo-700 font-bold mb-3 text-base">تنظیمات المان</h6>
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">محتوا</label>
-                        @if ($selectedElement->type === 'form')
-                            <textarea wire:model="content" class="input-shiny p-2 rounded-lg w-full text-sm" rows="3"></textarea>
-                        @else
-                            <input type="text" wire:model="content" class="input-shiny p-2 rounded-lg w-full text-sm">
-                        @endif
-                    </div>
-                    @if (in_array($selectedElement->type, ['text', 'button']))
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">رنگ متن</label>
-                            <input type="color" wire:model="elementSettings.color" class="w-full h-10 rounded-lg cursor-pointer">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">اندازه فونت</label>
-                            <input type="text" wire:model="elementSettings.font_size"
-                                class="input-shiny p-2 rounded-lg w-full text-sm">
-                        </div>
-                    @endif
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">رنگ پس‌زمینه</label>
-                        <input type="color" wire:model="elementSettings.background_color"
-                            class="w-full h-10 rounded-lg cursor-pointer">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">فاصله داخلی (Padding)</label>
-                        <input type="text" wire:model="elementSettings.padding"
-                            class="input-shiny p-2 rounded-lg w-full text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">فاصله خارجی (Margin)</label>
-                        <input type="text" wire:model="elementSettings.margin"
-                            class="input-shiny p-2 rounded-lg w-full text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">سایه (Box Shadow)</label>
-                        <input type="text" wire:model="elementSettings.box_shadow"
-                            class="input-shiny p-2 rounded-lg w-full text-sm" placeholder="0 4px 6px rgba(0,0,0,0.1)">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">بوردر</label>
-                        <input type="text" wire:model="elementSettings.border" class="input-shiny p-2 rounded-lg w-full text-sm"
-                            placeholder="1px solid #000">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">شفافیت (Opacity)</label>
-                        <input type="range" wire:model="elementSettings.opacity" min="0" max="1" step="0.1" class="w-full">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">تعداد ستون‌ها (Grid)</label>
-                        <select wire:model="elementSettings.grid_columns" class="input-shiny p-2 rounded-lg w-full text-sm">
-                            <option value="1">1 ستون</option>
-                            <option value="2">2 ستون</option>
-                            <option value="3">3 ستون</option>
-                            <option value="4">4 ستون</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">انیمیشن</label>
-                        <select wire:model="elementSettings.animation" class="input-shiny p-2 rounded-lg w-full text-sm">
-                            @foreach ($animations as $animation)
-                                <option value="{{ $animation }}">{{ $animation }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">مدت انیمیشن</label>
-                        <input type="text" wire:model="elementSettings.animation_duration"
-                            class="input-shiny p-2 rounded-lg w-full text-sm">
-                    </div>
-                    <div>
-                        <div class="">
-                            <label class="block text-sm font-medium text-gray-700">نمایش در:</label>
-                            <div class="flex gap-4 mt-2">
-                                <label class="flex items-center gap-2 text-sm text-gray-700 mx-2">
-                                    <input type="checkbox" wire:model="elementSettings.responsive.desktop"
-                                        class="form-check-input h-4 w-4 text-indigo-600 cursor-pointer">
-                                    <span>دسکتاپ</span>
-                                </label>
-                                <label class="flex items-center gap-2 text-sm text-gray-700 mx-2">
-                                    <input type="checkbox" wire:model="elementSettings.responsive.tablet"
-                                        class="form-check-input h-4 w-4 text-indigo-600 cursor-pointer">
-                                    <span>تبلت</span>
-                                </label>
-                                <label class="flex items-center gap-2 text-sm text-gray-700 mx-2">
-                                    <input type="checkbox" wire:model="elementSettings.responsive.mobile"
-                                        class="form-check-input h-4 w-4 text-indigo-600 cursor-pointer">
-                                    <span>موبایل</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    @if (in_array($selectedElement->type, ['image', 'video']))
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">آپلود فایل</label>
-                            <input type="file" wire:model="uploadedFile" class="input-shiny p-2 rounded-lg w-full text-sm">
-                        </div>
-                    @endif
-                    <div class="flex gap-2">
-                        <button wire:click="copyElement({{ $selectedElement->id }})"
-                            class="btn btn-outline-primary w-full py-2 rounded-lg text-sm">کپی</button>
-                        <button wire:click="pasteElement"
-                            class="btn btn-outline-primary w-full py-2 rounded-lg text-sm">پیست</button>
-                    </div>
-                    <button wire:click="updateElement"
-                        class="btn btn-gradient-success w-full py-2 rounded-lg text-white text-sm mt-3">ذخیره تغییرات</button>
-                </div>
-            </div>
+        @if (in_array($selectedElement->type, ['text', 'button']))
+         <div>
+          <label class="block text-sm font-medium text-gray-700">رنگ متن</label>
+          <input type="color" wire:model="elementSettings.color" class="w-full h-10 rounded-lg cursor-pointer">
+         </div>
+         <div>
+          <label class="block text-sm font-medium text-gray-700">اندازه فونت</label>
+          <input type="text" wire:model="elementSettings.font_size"
+           class="input-shiny p-2 rounded-lg w-full text-sm">
+         </div>
         @endif
-    
-        <!-- مدیریت لایه‌ها -->
-        <div class="card p-4 mt-4 rounded-xl shadow-lg bg-white">
-            <h6 class="text-indigo-700 font-bold mb-3 text-base">مدیریت لایه‌ها</h6>
-            <ul class="space-y-2">
-                @foreach ($elements as $element)
-                    <li
-                        class="flex justify-between items-center p-2 rounded-lg shadow-sm hover:bg-indigo-50 transition-all duration-300">
-                        <span class="text-sm text-gray-700">{{ $element->type }}</span>
-                        <button wire:click="selectElement({{ $element->id }})"
-                            class="text-indigo-600 text-sm hover:underline">انتخاب</button>
-                    </li>
-                @endforeach
-            </ul>
+        <div>
+         <label class="block text-sm font-medium text-gray-700">رنگ پس‌زمینه</label>
+         <input type="color" wire:model="elementSettings.background_color"
+          class="w-full h-10 rounded-lg cursor-pointer">
         </div>
+        <div>
+         <label class="block text-sm font-medium text-gray-700">فاصله داخلی (Padding)</label>
+         <input type="text" wire:model="elementSettings.padding"
+          class="input-shiny p-2 rounded-lg w-full text-sm">
+        </div>
+        <div>
+         <label class="block text-sm font-medium text-gray-700">فاصله خارجی (Margin)</label>
+         <input type="text" wire:model="elementSettings.margin" class="input-shiny p-2 rounded-lg w-full text-sm">
+        </div>
+        <div>
+         <label class="block text-sm font-medium text-gray-700">سایه (Box Shadow)</label>
+         <input type="text" wire:model="elementSettings.box_shadow"
+          class="input-shiny p-2 rounded-lg w-full text-sm" placeholder="0 4px 6px rgba(0,0,0,0.1)">
+        </div>
+        <div>
+         <label class="block text-sm font-medium text-gray-700">بوردر</label>
+         <input type="text" wire:model="elementSettings.border" class="input-shiny p-2 rounded-lg w-full text-sm"
+          placeholder="1px solid #000">
+        </div>
+        <div>
+         <label class="block text-sm font-medium text-gray-700">شفافیت (Opacity)</label>
+         <input type="range" wire:model="elementSettings.opacity" min="0" max="1" step="0.1"
+          class="w-full">
+        </div>
+        <div>
+         <label class="block text-sm font-medium text-gray-700">تعداد ستون‌ها (Grid)</label>
+         <select wire:model="elementSettings.grid_columns" class="input-shiny p-2 rounded-lg w-full text-sm">
+          <option value="1">1 ستون</option>
+          <option value="2">2 ستون</option>
+          <option value="3">3 ستون</option>
+          <option value="4">4 ستون</option>
+         </select>
+        </div>
+        <div>
+         <label class="block text-sm font-medium text-gray-700">انیمیشن</label>
+         <select wire:model="elementSettings.animation" class="input-shiny p-2 rounded-lg w-full text-sm">
+          @foreach ($animations as $animation)
+           <option value="{{ $animation }}">{{ $animation }}</option>
+          @endforeach
+         </select>
+        </div>
+        <div>
+         <label class="block text-sm font-medium text-gray-700">مدت انیمیشن</label>
+         <input type="text" wire:model="elementSettings.animation_duration"
+          class="input-shiny p-2 rounded-lg w-full text-sm">
+        </div>
+        <div>
+         <div class="">
+          <label class="block text-sm font-medium text-gray-700">نمایش در:</label>
+          <div class="flex gap-4 mt-2">
+           <label class="flex items-center gap-2 text-sm text-gray-700 mx-2">
+            <input type="checkbox" wire:model="elementSettings.responsive.desktop"
+             class="form-check-input h-4 w-4 text-indigo-600 cursor-pointer">
+            <span>دسکتاپ</span>
+           </label>
+           <label class="flex items-center gap-2 text-sm text-gray-700 mx-2">
+            <input type="checkbox" wire:model="elementSettings.responsive.tablet"
+             class="form-check-input h-4 w-4 text-indigo-600 cursor-pointer">
+            <span>تبلت</span>
+           </label>
+           <label class="flex items-center gap-2 text-sm text-gray-700 mx-2">
+            <input type="checkbox" wire:model="elementSettings.responsive.mobile"
+             class="form-check-input h-4 w-4 text-indigo-600 cursor-pointer">
+            <span>موبایل</span>
+           </label>
+          </div>
+         </div>
+        </div>
+        @if (in_array($selectedElement->type, ['image', 'video']))
+         <div>
+          <label class="block text-sm font-medium text-gray-700">آپلود فایل</label>
+          <input type="file" wire:model="uploadedFile" class="input-shiny p-2 rounded-lg w-full text-sm">
+         </div>
+        @endif
+        <div class="flex gap-2">
+         <button wire:click="copyElement({{ $selectedElement->id }})"
+          class="btn btn-outline-primary w-full py-2 rounded-lg text-sm">کپی</button>
+         <button wire:click="pasteElement"
+          class="btn btn-outline-primary w-full py-2 rounded-lg text-sm">پیست</button>
+        </div>
+        <button wire:click="updateElement"
+         class="btn btn-gradient-success w-full py-2 rounded-lg text-white text-sm mt-3">ذخیره تغییرات</button>
+       </div>
+      </div>
+     @endif
+
+     <!-- مدیریت لایه‌ها -->
+     <div class="card p-4 mt-4 rounded-xl shadow-lg bg-white">
+      <h6 class="text-indigo-700 font-bold mb-3 text-base">مدیریت لایه‌ها</h6>
+      <ul class="space-y-2">
+       @foreach ($elements as $element)
+        <li
+         class="flex justify-between items-center p-2 rounded-lg shadow-sm hover:bg-indigo-50 transition-all duration-300">
+         <span class="text-sm text-gray-700">{{ $element->type }}</span>
+         <button wire:click="selectElement({{ $element->id }})"
+          class="text-indigo-600 text-sm hover:underline">انتخاب</button>
+        </li>
+       @endforeach
+      </ul>
+     </div>
     </div>
     <!-- بخش اصلی: پیش‌نمایش و مدیریت صفحات -->
     <div class="flex-1">
@@ -259,27 +258,31 @@
         @endif
         @forelse ($elements as $element)
          @php
-        $settings = is_string($element->settings) ? json_decode($element->settings, true) : $element->settings;
-        $settings = $settings ?? [
-            'color' => '#000000',
-            'background_color' => '#ffffff',
-            'font_size' => '16px',
-            'padding' => '10px',
-            'margin' => '0px',
-            'animation' => 'none',
-            'animation_duration' => '1s',
-            'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
-            'box_shadow' => 'none',
-            'border' => 'none',
-            'opacity' => '1',
-            'grid_columns' => 1,
-        ];
+          $settings = is_array($element->settings) ? $element->settings : json_decode($element->settings, true);
+
+          // اگر مقدار settings نادرست بود، مقدار پیش‌فرض را جایگزین کن
+          if (!is_array($settings)) {
+              $settings = [
+                  'color' => '#000000',
+                  'background_color' => '#ffffff',
+                  'font_size' => '16px',
+                  'padding' => '10px',
+                  'margin' => '0px',
+                  'animation' => 'none',
+                  'animation_duration' => '1s',
+                  'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
+                  'box_shadow' => 'none',
+                  'border' => 'none',
+                  'opacity' => '1',
+                  'grid_columns' => 1,
+              ];
+          }
          @endphp
+
          @if (
-            ($previewMode === 'desktop' && $settings['responsive']['desktop']) ||
-            ($previewMode === 'tablet' && $settings['responsive']['tablet']) ||
-            ($previewMode === 'mobile' && $settings['responsive']['mobile'])
-        )
+             ($previewMode === 'desktop' && $settings['responsive']['desktop']) ||
+                 ($previewMode === 'tablet' && $settings['responsive']['tablet']) ||
+                 ($previewMode === 'mobile' && $settings['responsive']['mobile']))
           <div wire:sortable.item="{{ $element->id }}"
            class="card mb-3 p-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
            style="cursor: move; color: {{ $settings['color'] }}; background-color: {{ $settings['background_color'] }}; font-size: {{ $settings['font_size'] }}; padding: {{ $settings['padding'] }}; margin: {{ $settings['margin'] }}; box-shadow: {{ $settings['box_shadow'] }}; border: {{ $settings['border'] }}; opacity: {{ $settings['opacity'] }}; animation: {{ $settings['animation'] }} {{ $settings['animation_duration'] }} ease-in-out; display: grid; grid-template-columns: repeat({{ $settings['grid_columns'] }}, 1fr); gap: 5px;">
@@ -391,7 +394,11 @@
             </svg>
             <span class="text-sm font-medium">{{ $template->name }}</span>
            </span>
-           <button class="btn btn-sm btn-outline-primary py-1 px-3 rounded-full text-xs">استفاده</button>
+           <button wire:click="applyTemplate({{ $template->id }})"
+            class="btn btn-sm btn-outline-primary py-1 px-3 rounded-full text-xs">
+            استفاده
+           </button>
+
           </li>
          @endforeach
         </ul>
@@ -401,23 +408,23 @@
     </div>
 
     <!-- سایدبار راست: المان‌ها و تنظیمات -->
-   
+
    </div>
   </div>
  </div>
 
  <!-- پیش‌نمایش زنده -->
  @if ($isLivePreviewOpen)
-      <div class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center">
-       <div class="bg-white p-4 rounded-xl shadow-2xl w-11/12 max-h-[90vh] overflow-auto relative" style="width: 50%;height: 100%;">
-        <button wire:click="toggleLivePreview"
-         class="btn btn-danger text-sm  rounded-full absolute top-4 right-4">
-        <img src="{{ asset('admin-assets/icons/times-square-svgrepo-com.svg') }}" alt="" srcset="">
-        </button>
-        <iframe srcdoc="{{ $generatedHtml }}" class="w-full h-[80vh] rounded-md border-none"></iframe>
+  <div class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center">
+   <div class="bg-white p-4 rounded-xl shadow-2xl w-11/12 max-h-[90vh] overflow-auto relative"
+    style="width: 50%;height: 100%;">
+    <button wire:click="toggleLivePreview" class="btn btn-danger text-sm  rounded-full absolute top-4 right-4">
+     <img src="{{ asset('admin-assets/icons/times-square-svgrepo-com.svg') }}" alt="" srcset="">
+    </button>
+    <iframe srcdoc="{{ $generatedHtml }}" class="w-full h-[80vh] rounded-md border-none"></iframe>
 
-       </div>
-      </div>
+   </div>
+  </div>
  @endif
 
  <!-- استایل‌ها -->
@@ -560,4 +567,27 @@
    });
   });
  </script>
+ <script>
+document.addEventListener('livewire:init', () => {
+    const targetNode = document.body; // یا یک المان خاص نزدیک‌تر به sortable
+    const observer = new MutationObserver((mutations, observer) => {
+        const sortableEl = document.querySelector('[wire\\:sortable="updateElementOrder"]');
+        if (sortableEl) {
+            new Sortable(sortableEl, {
+                animation: 150,
+                handle: '[wire\\:sortable\\.item]',
+                onEnd: (event) => {
+                    const items = Array.from(sortableEl.querySelectorAll('[wire\\:sortable\\.item]')).map((item, index) => ({
+                        id: item.getAttribute('wire:sortable.item'),
+                        order: index
+                    }));
+                    Livewire.dispatch('updateElementOrder', [items]);
+                }
+            });
+            observer.disconnect(); // بعد از پیدا کردن المان، observer را متوقف می‌کنیم
+        }
+    });
+    observer.observe(targetNode, { childList: true, subtree: true });
+});
+</script>
 </div>
