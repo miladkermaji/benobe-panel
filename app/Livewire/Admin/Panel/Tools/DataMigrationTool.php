@@ -7,6 +7,9 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Visibility;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DataMigrationTool extends Component
 {
@@ -18,13 +21,14 @@ class DataMigrationTool extends Component
     public $newTableFields = [];
     public $fieldMapping = [];
     public $tables = [];
-    public $progress = 0; // برای انتقال داده‌ها
+    public $progress = 0; // برای مهاجرت داده‌ها
     public $uploadProgress = 0; // برای آپلود فایل
     public $isMigrating = false;
     public $isUploading = false;
     public $searchOld = '';
     public $searchNew = '';
     public $validationErrors = [];
+    public $logFilePath = null; // برای ذخیره مسیر فایل لاگ
 
     protected $rules = [
         'oldTableFile' => 'file|mimes:sql,csv', // فقط نوع فایل رو چک می‌کنیم
@@ -51,9 +55,8 @@ class DataMigrationTool extends Component
 
     public function updatedOldTableFile()
     {
-        // فقط وقتی فایل وجود داره، پردازش رو ادامه می‌دیم
         if ($this->oldTableFile) {
-            $this->resetErrorBag('oldTableFile'); // پاک کردن خطاهای قبلی
+            $this->resetErrorBag('oldTableFile');
             $this->validateOnly('oldTableFile');
 
             $this->isUploading = true;
@@ -73,8 +76,9 @@ class DataMigrationTool extends Component
     {
         for ($i = 0; $i <= 100; $i += 10) {
             $this->uploadProgress = $i;
+            Log::info("Upload progress updated: {$this->uploadProgress}%");
             $this->dispatch('uploadProgressUpdated', ['progress' => $this->uploadProgress]);
-            usleep(200); // تأخیر 0.2 ثانیه
+            usleep(200000);
         }
     }
 
@@ -87,7 +91,7 @@ class DataMigrationTool extends Component
     public function loadOldTableFields()
     {
         if (!$this->oldTableFile) {
-            return; // اگه فایل وجود نداشته باشه، پردازش رو متوقف می‌کنیم
+            return;
         }
 
         $file = $this->oldTableFile->getRealPath();
@@ -232,33 +236,48 @@ class DataMigrationTool extends Component
             }
 
             if (empty($records)) {
-                throw new \Exception('هیچ داده‌ای برای انتقال یافت نشد.');
+                throw new \Exception('هیچ داده‌ای برای مهاجرت یافت نشد.');
             }
 
             $totalRecords = count($records);
             $batchSize = 100;
             $batches = ceil($totalRecords / $batchSize);
             $columnTypes = [];
+            $columnLengths = [];
             foreach ($this->newTableFields as $field) {
                 $columnTypes[$field] = Schema::getColumnType($this->newTable, $field);
+                $columnInfo = DB::selectOne("SHOW COLUMNS FROM `$this->newTable` WHERE Field = ?", [$field]);
+                $columnLengths[$field] = $this->getColumnLength($columnInfo->Type);
             }
 
-            // شروع تراکنش و غیرفعال کردن کلید خارجی
             DB::beginTransaction();
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+            $failedRecords = [];
 
             foreach (array_chunk($records, $batchSize) as $index => $batch) {
                 $mappedData = [];
                 foreach ($batch as $record) {
                     $newRecord = [];
+                    $hasError = false;
+
                     foreach ($this->fieldMapping as $oldField => $newField) {
                         if (array_key_exists($oldField, $record)) {
                             $value = $record[$oldField];
                             $type = $columnTypes[$newField] ?? 'string';
-                            $newRecord[$newField] = $this->castValueToType($value, $type, $newField);
+                            $maxLength = $columnLengths[$newField] ?? 255;
+                            $castedValue = $this->castValueToType($value, $type, $newField, $oldField, $maxLength);
+
+                            if ($castedValue === null) {
+                                $hasError = true;
+                                $failedRecords[] = "فیلد '$oldField' با مقدار '$value' برای '$newField' با نوع '$type' تطابق ندارد.";
+                            } else {
+                                $newRecord[$newField] = $castedValue;
+                            }
                         }
                     }
-                    if (!empty($newRecord)) {
+
+                    if (!empty($newRecord) && !$hasError) {
                         $mappedData[] = $newRecord;
                     }
                 }
@@ -268,22 +287,119 @@ class DataMigrationTool extends Component
                 }
 
                 $this->progress = round((($index + 1) / $batches) * 100);
+                Log::info("Progress updated: {$this->progress}%");
                 $this->dispatch('progressUpdated', ['progress' => $this->progress]);
-                usleep(200); // تأخیر 0.5 ثانیه برای تست پروگرس بار
+                usleep(500000);
             }
 
-            // فعال کردن دوباره کلید خارجی و پایان تراکنش
+            // ذخیره خطاها توی فایل متنی با UTF-8
+            $logContent = implode("\n", array_merge(
+                ['گزارش خطاها و لاگ مهاجرت داده‌ها - ' . now()->format('Y-m-d H:i:s')],
+                !empty($failedRecords) ? $failedRecords : ['هیچ خطایی در حین مهاجرت رخ نداد.']
+            ));
+
+            $logFileName = 'migration_log_' . now()->format('Y-m-d_H-i-s') . '.txt';
+            $logFilePath = 'public/' . $logFileName;
+            $bom = "\xEF\xBB\xBF"; // BOM برای UTF-8
+            Storage::put($logFilePath, $bom . $logContent, Visibility::PUBLIC );
+            $this->logFilePath = $logFilePath; // مسیر خام رو ذخیره می‌کنیم، نه URL
+
+            Log::info("Log file path set: " . Storage::url($this->logFilePath));
+
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
             DB::commit();
 
-            $this->dispatch('toast', "انتقال داده‌ها با موفقیت انجام شد. $totalRecords رکورد منتقل شدند.", ['type' => 'success']);
+            $this->dispatch('toast', "مهاجرت داده‌ها با موفقیت انجام شد. $totalRecords رکورد منتقل شدند. " . (count($failedRecords) > 0 ? count($failedRecords) . " رکورد به دلیل خطا رد شدند." : ""), ['type' => 'success']);
+            $this->dispatch('toast', "فایل لاگ در حال دانلود است...", ['type' => 'info', 'duration' => 10000]);
+
+            // دانلود مستقیم فایل
+            return $this->downloadLogFile();
         } catch (\Exception $e) {
-            DB::rollBack(); // برگرداندن تغییرات در صورت خطا
-            DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // مطمئن شدن از فعال بودن کلید خارجی
+            DB::rollBack();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
             $errorMessage = $this->formatErrorMessage($e->getMessage());
+            Log::error('Error migrating data: ' . $e->getMessage());
             $this->dispatch('toast', $errorMessage, ['type' => 'error']);
         } finally {
             $this->isMigrating = false;
+        }
+    }
+
+    public function downloadLogFile()
+    {
+        if (!$this->logFilePath || !Storage::exists($this->logFilePath)) {
+            Log::error("Log file not found at: {$this->logFilePath}");
+            $this->dispatch('toast', "فایل لاگ یافت نشد. لطفاً دوباره تلاش کنید.", ['type' => 'error']);
+            return null;
+        }
+
+        $fileName = basename($this->logFilePath);
+        $filePath = storage_path('app/' . $this->logFilePath);
+
+        return response()->download($filePath, $fileName, [
+            'Content-Type' => 'text/plain; charset=UTF-8',
+        ]);
+    }
+
+    protected function getColumnLength($type)
+    {
+        if (preg_match('/varchar\((\d+)\)/', $type, $matches)) {
+            return (int) $matches[1];
+        } elseif (preg_match('/char\((\d+)\)/', $type, $matches)) {
+            return (int) $matches[1];
+        } elseif (preg_match('/text/', $type)) {
+            return 65535;
+        }
+        return 255;
+    }
+
+    protected function castValueToType($value, $type, $newField, $oldField, $maxLength = 255)
+    {
+        if (is_string($value)) {
+            $value = trim($value, "'\"");
+        }
+
+        $originalValue = $value;
+        switch ($type) {
+            case 'integer':
+                if (!is_numeric($value)) {
+                    return null;
+                }
+                return (int) $value;
+            case 'string':
+            case 'char':
+            case 'varchar':
+                $value = (string) $value;
+                if (mb_strlen($value) > $maxLength) {
+                    $this->dispatch('toast', "مقدار '$originalValue' برای فیلد '$newField' برش خورده شد (بیش از $maxLength کاراکتر).", ['type' => 'warning']);
+                    return mb_substr($value, 0, $maxLength);
+                }
+                return $value;
+            case 'enum':
+                $enumInfo = DB::selectOne("SHOW COLUMNS FROM `$this->newTable` WHERE Field = ?", [$newField])->Type;
+                preg_match("/enum\((.*?)\)/", $enumInfo, $matches);
+                $allowedValues = array_map('trim', explode(',', str_replace("'", "", $matches[1])));
+                if (!in_array($value, $allowedValues)) {
+                    return null;
+                }
+                return (string) $value;
+            case 'boolean':
+                return filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+            case 'float':
+            case 'double':
+                if (!is_numeric($value)) {
+                    return null;
+                }
+                return (float) $value;
+            case 'date':
+            case 'datetime':
+                try {
+                    return date('Y-m-d H:i:s', strtotime($value)) ?: null;
+                } catch (\Exception $e) {
+                    return null;
+                }
+            default:
+                return (string) $value;
         }
     }
 
@@ -295,31 +411,6 @@ class DataMigrationTool extends Component
             return 'خطای دیتابیس رخ داده است. لطفاً داده‌ها را بررسی کنید.';
         }
         return 'خطا: ' . $error;
-    }
-
-    protected function castValueToType($value, $type, $newField)
-    {
-        switch ($type) {
-            case 'integer':
-                return is_numeric($value) ? (int) $value : 0;
-            case 'string':
-                $lengthInfo = DB::selectOne("SHOW COLUMNS FROM `$this->newTable` WHERE Field = ?", [$newField])->Type;
-                preg_match('/varchar\((\d+)\)/', $lengthInfo, $matches);
-                $maxLength = $matches[1] ?? 255;
-                return mb_substr((string) $value, 0, $maxLength);
-            case 'enum':
-                $enumInfo = DB::selectOne("SHOW COLUMNS FROM `$this->newTable` WHERE Field = ?", [$newField])->Type;
-                preg_match("/enum\((.*?)\)/", $enumInfo, $matches);
-                $allowedValues = array_map('trim', explode(',', str_replace("'", "", $matches[1])));
-                return in_array($value, $allowedValues) ? $value : $allowedValues[0];
-            case 'boolean':
-                return filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-            case 'float':
-            case 'double':
-                return is_numeric($value) ? (float) $value : 0.0;
-            default:
-                return (string) $value;
-        }
     }
 
     protected function formatSqlError($error)
