@@ -13,4 +13,11 @@ class SitemapSetting extends Model
         'delay_between_requests',
         'ignore_robots',
     ];
+
+    protected $casts = [
+        'ignore_robots' => 'boolean',
+        'maximum_depth' => 'integer',
+        'total_crawl_limit' => 'integer',
+        'delay_between_requests' => 'integer',
+    ];
 }

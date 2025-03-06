@@ -13,7 +13,7 @@
   <!-- هدر -->
   <div
    class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
-   <h1 class="m-0 h3 font-thin">تنظیمات کراول نقشه سایت</h1>
+   <h1 class="m-0 h3 font-thin">تنظیمات پیمایش نقشه سایت</h1>
    <a href="{{ route('admin.tools.sitemap.index') }}"
     class="btn btn-gradient-primary rounded-pill px-4 d-flex align-items-center gap-2">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
