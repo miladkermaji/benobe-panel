@@ -107,6 +107,7 @@ use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Service\ServiceContr
 use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration\DurationController;
 use App\Http\Controllers\Dr\Panel\NoskheElectronic\Prescription\PrescriptionController;
 use App\Http\Controllers\Admin\Doctors\WalletDoctorRequest\WalletDoctorRequestController;
+use App\Http\Controllers\Admin\Panel\Tools\DataMigrationTool\DataMigrationToolController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController;
 use App\Http\Controllers\Admin\Hospitals\HospitalsManagement\HospitalsManagementController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereWaiting\MoshavereWaitingController;
@@ -192,6 +193,8 @@ Route::prefix('admin')
             });
             Route::get('mail-template', [MailTemplateController::class, 'index'])->name('admin.panel.tools.mail-template.index');
             Route::get('news-latter/', [NewsLatterController::class, 'index'])->name('admin.tools.news-latter.index');
+            Route::get('/data-migration', [DataMigrationToolController::class, 'index'])
+                ->name('admin.tools.data-migration.index');
         });
     });
 

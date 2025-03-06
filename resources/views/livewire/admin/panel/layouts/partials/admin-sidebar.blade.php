@@ -35,6 +35,9 @@
             <li class="item-li {{ Request::routeIs('admin.panel.tools.file-manager') ? 'is-active' : '' }}">
                 <a href="{{ route('admin.panel.tools.file-manager') }}">مدیریت فایل</a>
             </li>
+            <li class="item-li {{ Request::routeIs('admin.tools.data-migration.index') ? 'is-active' : '' }}">
+                <a href="{{ route('admin.tools.data-migration.index') }}">انتقال داده‌ها</a>
+            </li>
             <li class="item-li {{ Request::routeIs('admin.panel.tools.payment_gateways.index') ? 'is-active' : '' }}">
                 <a href="{{ route('admin.panel.tools.payment_gateways.index') }}">درگاه پرداخت</a>
             </li>

@@ -28,6 +28,7 @@
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/tom-select.bootstrap5.min.css') }}">
  <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/toastr/toastr.min.css') }}">
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/global-loader.css') }}">
+<link rel="stylesheet" href="{{ asset('admin-assets/panel/css/selesct2/select2.css') }}">
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/codemirror/5.65.16/codemirror.min.css') }}">
 
 {{-- tom select --}}
