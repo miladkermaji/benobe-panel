@@ -70,7 +70,6 @@ use App\Http\Controllers\Admin\Doctors\OrderVisit\OrderVisitController;
 use App\Http\Controllers\Admin\Panel\Tools\Redirect\RedirectController;
 use App\Http\Controllers\Admin\Panel\Dashboard\AdminDashboardController;
 use App\Http\Controllers\Dr\Panel\MyPerformance\MyPerformanceController;
-use App\Http\Controllers\Admin\Tools\MailTemplate\MailTemplateController;
 use App\Http\Controllers\Dr\Panel\DoctorServices\DoctorServicesController;
 use App\Http\Controllers\Dr\Panel\DoctorServices\DoctorServicesContrroler;
 use App\Http\Controllers\Dr\Panel\PatientRecords\PatientRecordsController;
@@ -88,6 +87,7 @@ use App\Http\Controllers\Admin\UsersManagement\UserGroup\UserGroupController;
 use App\Http\Controllers\Dr\Panel\Payment\Setting\DrPaymentSettingController;
 use App\Http\Controllers\Admin\ContentManagement\HomeVideo\HomeVideoController;
 use App\Http\Controllers\Admin\Dashboard\Membershipfee\MembershipfeeController;
+use App\Http\Controllers\Admin\Panel\Tools\MailTemplate\MailTemplateController;
 use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Cost\CostController;
 use App\Http\Controllers\Dr\Panel\Turn\TurnsCatByDays\TurnsCatByDaysController;
 use App\Http\Controllers\Admin\ContentManagement\FrontPages\FrontPagesController;
@@ -190,6 +190,7 @@ Route::prefix('admin')
                 Route::get('/settings', [SitemapSettingsController::class, 'index'])->name('admin.tools.sitemap.settings');
                 Route::put('/settings', [SitemapSettingsController::class, 'update'])->name('admin.tools.sitemap.settings.update');
             });
+            Route::get('mail-template', [MailTemplateController::class, 'index'])->name('admin.panel.tools.mail-template.index');
         });
     });
 

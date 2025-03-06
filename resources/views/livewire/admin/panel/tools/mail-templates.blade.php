@@ -1,9 +1,13 @@
-<div class="container-fluid py-1">
+<div class="container-fluid py-1" dir="rtl">
  <!-- هدر -->
- <header class="glass-header p-4 rounded-3 mb-2 shadow-lg">
-  <div class="d-flex align-items-center justify-content-between gap-4">
-   <div class="d-flex align-items-center gap-3">
-    <i class="fas fa-envelope fs-3 text-white animate-bounce"></i>
+ <header class="glass-header p-3 rounded-3 mb-4 shadow-lg">
+  <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+   <div class="d-flex align-items-center gap-2">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+     class="animate-bounce">
+     <path d="M4 4h16v12H4z" />
+     <path d="M4 8l8 4 8-4" />
+    </svg>
     <h4 class="mb-0 fw-bold text-white">مدیریت قالب‌های ایمیل</h4>
    </div>
    <div class="text-white fw-medium">لیست قالب‌ها</div>
@@ -11,29 +15,27 @@
  </header>
 
  <!-- فرم و سلکت قالب -->
- <div class="row g-4 mb-2">
+ <div class="row g-3 mb-4">
   <div class="col-md-3">
-   <div class="panel panel-default shadow-sm">
-    <div class="panel-heading">انتخاب قالب</div>
-    <div class="panel-body">
-     <div class="form-group">
-      <label class="control-label fw-bold mb-2">انتخاب:</label>
-      <select class="form-control input-shiny" wire:model.live="selectedTemplateId">
-       <option value="">-- انتخاب کنید --</option>
-       @foreach ($allTemplates as $template)
-        <option value="{{ $template->id }}">{{ $template->subject }}</option>
-       @endforeach
-      </select>
-     </div>
+   <div class="card shadow-sm border-0">
+    <div class="card-header bg-gradient-light text-dark fw-bold py-2">انتخاب قالب</div>
+    <div class="card-body pt-3 pb-2">
+     <label class="fw-bold mb-2 text-dark">انتخاب:</label>
+     <select class="form-control input-shiny" wire:model.live="selectedTemplateId">
+      <option value="">-- انتخاب کنید --</option>
+      @foreach ($allTemplates as $template)
+       <option value="{{ $template->id }}">{{ $template->subject }}</option>
+      @endforeach
+     </select>
     </div>
    </div>
   </div>
   <div class="col-md-9">
-   <div class="panel panel-default shadow-sm">
-    <div class="panel-heading">ایجاد یا ویرایش قالب</div>
-    <div class="panel-body">
+   <div class="card shadow-sm border-0">
+    <div class="card-header bg-gradient-light text-dark fw-bold py-2">ایجاد یا ویرایش قالب</div>
+    <div class="card-body pt-3 pb-2">
      <div class="form-group mb-3">
-      <label class="control-label fw-bold mb-2">عنوان قالب</label>
+      <label class="fw-bold mb-2 text-dark">عنوان قالب</label>
       <input type="text" class="form-control input-shiny" wire:model="newSubject"
        placeholder="مثال: بازگردانی رمزعبور">
       @if ($errors->has('newSubject'))
@@ -41,8 +43,8 @@
       @endif
      </div>
      <div class="form-group mb-3">
-      <label class="control-label fw-bold mb-2">محتوای قالب</label>
-      <textarea class="form-control" wire:model="newTemplate" rows="10" id="newTemplateEditor"></textarea>
+      <label class="fw-bold mb-2 text-dark">محتوای قالب</label>
+      <textarea class="form-control input-shiny" wire:model="newTemplate" rows="8" id="newTemplateEditor"></textarea>
       @if ($errors->has('newTemplate'))
        <span class="text-danger d-block mt-1">{{ $errors->first('newTemplate') }}</span>
       @endif
@@ -56,24 +58,32 @@
  </div>
 
  <!-- ابزارها و جستجو -->
- <div class="container px-0 mb-5">
-  <div class="bg-light p-4 rounded-3 shadow-sm">
-   <div class="row g-4">
+ <div class="container px-0 mb-4">
+  <div class="bg-light p-3 rounded-3 shadow-sm">
+   <div class="row g-3">
     <div class="col-md-6">
      <div class="input-group">
-      <span class="input-group-text bg-white border-0"><i class="fas fa-search text-muted"></i></span>
-      <input type="text" class="form-control border-0 shadow-none" wire:model.live="search"
+      <span class="input-group-text bg-white border-0">
+       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+        <circle cx="11" cy="11" r="8" />
+        <path d="M21 21l-4.35-4.35" />
+       </svg>
+      </span>
+      <input type="text" class="form-control input-shiny border-0 shadow-none" wire:model.live="search"
        placeholder="جستجو در قالب‌ها...">
      </div>
     </div>
     <div class="col-md-6">
      <div class="d-flex gap-2 justify-content-end">
-      <button wire:click="export" class="btn btn-gradient-secondary rounded-pill px-4">
-       <i class="fas fa-download"></i> خروجی CSV
-      </button>
-      <button wire:click="deleteSelected" class="btn btn-gradient-danger rounded-pill px-4"
+      <button wire:click="deleteSelected"
+       class="btn btn-gradient-danger rounded-pill px-3 d-flex align-items-center gap-2"
        @if (empty($selectedTemplates)) disabled @endif>
-       <i class="fas fa-trash"></i> حذف انتخاب‌شده‌ها
+       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <path d="M3 6h18" />
+        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+       </svg>
+       حذف انتخاب‌شده‌ها
       </button>
      </div>
     </div>
@@ -83,61 +93,84 @@
 
  <!-- لیست قالب‌ها -->
  <div class="container px-0">
-  <div class="card shadow-sm">
-   <div class="card-body">
+  <div class="card shadow-sm border-0">
+   <div class="card-body p-0">
     <div class="table-responsive text-nowrap">
-     <table class="table table-bordered">
-      <thead>
+     <table class="table table-bordered table-hover w-100 m-0">
+      <thead class="glass-header text-white">
        <tr>
-        <th><input type="checkbox" wire:model.live="selectAll" class="form-check-input"></th>
-        <th>ردیف</th>
-        <th>عنوان</th>
-        <th>وضعیت</th>
-        <th>عملیات</th>
+        <th class="text-center align-middle">
+         <input type="checkbox" wire:model.live="selectAll" class="py-2">
+        </th>
+        <th class="text-center align-middle">ردیف</th>
+        <th class="text-center align-middle">عنوان</th>
+        <th class="text-center align-middle">وضعیت</th>
+        <th class="text-center align-middle">عملیات</th>
        </tr>
       </thead>
       <tbody>
        @forelse ($templates as $index => $template)
         <tr>
-         <td><input type="checkbox" wire:model.live="selectedTemplates" value="{{ $template->id }}"
-           class="form-check-input"></td>
-         <td>{{ $templates->firstItem() + $index }}</td>
-         <td>{{ $template->subject }}</td>
-         <td>
+         <td class="align-middle text-center">
+          <input type="checkbox" wire:model.live="selectedTemplates" value="{{ $template->id }}"
+           class="py-2">
+         </td>
+         <td class="align-middle text-center">{{ $templates->firstItem() + $index }}</td>
+         <td class="align-middle text-center">{{ $template->subject }}</td>
+         <td class="align-middle text-center">
           <button wire:click="toggleStatus({{ $template->id }})"
-           class="badge {{ $template->is_active ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+           class="badge {{ $template->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer text-white py-1 px-2">
            {{ $template->is_active ? 'فعال' : 'غیرفعال' }}
           </button>
          </td>
-         <td>
-          <div class="d-flex gap-2">
+         <td class="align-middle text-center">
+          <div class="d-flex gap-2 justify-content-center">
            <button wire:click="startEdit({{ $template->id }})"
-            class="btn btn-gradient-warning rounded-full w-8 h-8 flex items-center justify-center">
-            <i class="fas fa-edit"></i>
+            class="btn btn-gradient-warning rounded-pill px-3 d-flex align-items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+            
            </button>
            <button wire:click="previewTemplate({{ $template->id }})"
-            class="btn btn-gradient-primary rounded-full w-8 h-8 flex items-center justify-center">
-            <i class="fas fa-eye"></i>
+            class="btn btn-gradient-primary rounded-pill px-3 d-flex align-items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+             <circle cx="12" cy="12" r="3" />
+            </svg>
+            
            </button>
            <button onclick="confirmDelete({{ $template->id }})"
-            class="btn btn-gradient-danger rounded-full w-8 h-8 flex items-center justify-center">
-            <i class="fas fa-trash"></i>
+            class="btn btn-gradient-danger rounded-pill px-3 d-flex align-items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+             <path d="M3 6h18" />
+             <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+            </svg>
+            
            </button>
           </div>
          </td>
         </tr>
        @empty
         <tr>
-         <td colspan="5" class="text-center py-5">
-          <i class="fas fa-envelope-open fs-1 text-muted mb-3"></i>
-          <p class="text-muted fw-medium">هیچ قالبی یافت نشد.</p>
+         <td colspan="5" class="text-center py-4">
+          <div class="d-flex justify-content-center align-items-center flex-column">
+           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"
+            class="mb-2">
+            <path d="M4 4h16v12H4z" />
+            <path d="M4 8l8 4 8-4" />
+           </svg>
+           <p class="text-muted fw-medium">هیچ قالبی یافت نشد.</p>
+          </div>
          </td>
         </tr>
        @endforelse
       </tbody>
      </table>
     </div>
-    <div class="d-flex justify-content-between mt-4">
+    <div class="d-flex justify-content-between mt-3 px-3">
      <div class="text-muted">نمایش {{ $templates->firstItem() }} تا {{ $templates->lastItem() }} از
       {{ $templates->total() }} ردیف</div>
      {{ $templates->links() }}
@@ -147,67 +180,69 @@
  </div>
 
  <!-- نکته راهنما -->
- <div class="help-block mt-4">
-  <i class="fa fa-lightbulb-o"></i> <i class="fa fa-angle-double-left"></i> کاربر گرامی، برای تغییر و جایگزینی هر گونه
-  محتوا ابتدا یک پشتیبان از آن دریافت کنید و سپس اقدام به تغییر اطلاعات نمایید. همچنین توجه داشته باشید که عباراتی مثل
-  [_sitename_] حاوی اطلاعات هستند که پس از ارسال ایمیل در ایمیل کاربران قابل مشاهده می‌شوند.
+ <div class="help-block mt-4 p-3 rounded-3 shadow-sm d-flex align-items-center gap-2">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+   <circle cx="12" cy="12" r="10" />
+   <path d="M12 16v-4" />
+   <path d="M12 8h.01" />
+  </svg>
+  <span class="text-dark">کاربر گرامی، برای تغییر و جایگزینی هر گونه محتوا ابتدا یک پشتیبان از آن دریافت کنید و سپس
+   اقدام به تغییر اطلاعات نمایید. همچنین توجه داشته باشید که عباراتی مثل [_sitename_] حاوی اطلاعات هستند که پس از ارسال
+   ایمیل در ایمیل کاربران قابل مشاهده می‌شوند.</span>
  </div>
 
  <!-- استایل‌ها -->
  <style>
   .glass-header {
-   background: linear-gradient(135deg, rgba(79, 70, 229, 0.9), rgba(124, 58, 237, 0.7));
-   backdrop-filter: blur(12px);
-   border: 1px solid rgba(255, 255, 255, 0.3);
-   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+   background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(124, 58, 237, 0.85));
+   backdrop-filter: blur(10px);
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
    transition: all 0.3s ease;
   }
 
   .glass-header:hover {
-   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   }
 
-  .panel-default {
-   border: 1px solid #e5e7eb;
-   border-radius: 8px;
-  }
-
-  .panel-heading {
+  .bg-gradient-light {
    background: linear-gradient(135deg, #f9fafb, #e5e7eb);
-   padding: 15px;
-   font-weight: bold;
    border-bottom: 1px solid #e5e7eb;
-   border-radius: 8px 8px 0 0;
-   color: #4b5563;
-  }
-
-  .panel-body {
-   padding: 20px;
   }
 
   .input-shiny,
   .form-control {
    border: 1px solid #d1d5db;
-   border-radius: 8px;
-   padding: 10px;
+   border-radius: 0;
+   /* گوشه‌ها تیز */
+   height: 50px;
+   /* ارتفاع بیشتر */
+   padding: 10px 15px;
    font-size: 14px;
-   transition: all 0.3s ease;
    background: #fff;
-   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+   transition: all 0.3s ease;
+  }
+
+  textarea.input-shiny,
+  textarea.form-control {
+   height: auto;
+   /* برای textarea ارتفاع ثابت نباشه */
   }
 
   .input-shiny:focus,
   .form-control:focus {
    border-color: #4f46e5;
-   box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25), inset 0 1px 3px rgba(0, 0, 0, 0.05);
+   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.05);
   }
 
   .btn-gradient-primary {
    background: linear-gradient(90deg, #4f46e5, #7c3aed);
    border: none;
    color: white;
-   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
    transition: all 0.3s ease;
+   height: 40px;
+   /* تراز با اینپوت‌ها */
   }
 
   .btn-gradient-primary:hover {
@@ -220,8 +255,8 @@
    background: linear-gradient(90deg, #10b981, #34d399);
    border: none;
    color: white;
-   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
    transition: all 0.3s ease;
+   height: 40px;
   }
 
   .btn-gradient-success:hover {
@@ -234,8 +269,8 @@
    background: linear-gradient(90deg, #f87171, #fca5a5);
    border: none;
    color: white;
-   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
    transition: all 0.3s ease;
+   height: 40px;
   }
 
   .btn-gradient-danger:hover:not(:disabled) {
@@ -253,8 +288,8 @@
    background: linear-gradient(90deg, #f59e0b, #fbbf24);
    border: none;
    color: white;
-   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
    transition: all 0.3s ease;
+   height: 40px;
   }
 
   .btn-gradient-warning:hover {
@@ -267,8 +302,8 @@
    background: linear-gradient(90deg, #6b7280, #9ca3af);
    border: none;
    color: white;
-   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
    transition: all 0.3s ease;
+   height: 40px;
   }
 
   .btn-gradient-secondary:hover {
@@ -280,28 +315,18 @@
   .bg-light {
    background: #f9fafb;
    border: 1px solid #e5e7eb;
+   border-radius: 6px;
   }
 
   .table-bordered {
    border: 1px solid #e5e7eb;
+   border-radius: 6px;
+   overflow: hidden;
   }
 
   .table-bordered th,
   .table-bordered td {
    border: 1px solid #e5e7eb;
-  }
-
-  .rounded-full {
-   border-radius: 50%;
-   padding: 0;
-  }
-
-  .w-8 {
-   width: 2rem;
-  }
-
-  .h-8 {
-   height: 2rem;
   }
 
   .cursor-pointer {
@@ -310,15 +335,15 @@
 
   .help-block {
    background: #fef3c7;
-   padding: 15px;
-   border-radius: 8px;
+   padding: 12px;
+   border-radius: 6px;
    color: #d97706;
    font-size: 14px;
+   border: 1px solid #fde68a;
   }
  </style>
 
  <!-- اسکریپت‌ها -->
-
  <script>
   document.addEventListener('livewire:init', () => {
    let editor = CodeMirror.fromTextArea(document.getElementById('newTemplateEditor'), {

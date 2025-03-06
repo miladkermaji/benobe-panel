@@ -54,8 +54,8 @@
             <li class="item-li {{ Request::routeIs('dr-manual_nobat_setting') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-manual_nobat_setting') }}">صفحه ساز</a>
             </li>
-            <li class="item-li {{ Request::routeIs('dr-manual_nobat') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-manual_nobat') }}">قالب ایمیل</a>
+            <li class="item-li {{ Request::routeIs('admin.panel.tools.mail-template.index') ? 'is-active' : '' }}">
+                <a href="{{ route('admin.panel.tools.mail-template.index') }}">قالب ایمیل</a>
             </li>
             <li class="item-li {{ Request::routeIs('dr-manual_nobat') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-manual_nobat') }}">پنل پیامک</a>

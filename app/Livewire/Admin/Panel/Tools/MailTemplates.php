@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Tools;
+namespace App\Livewire\Admin\Panel\Tools;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -208,7 +208,7 @@ class MailTemplates extends Component
         $templates = MailTemplate::where('subject', 'like', '%' . $this->search . '%')
             ->paginate($this->perPage);
 
-        return view('livewire.admin.tools.mail-templates', [
+        return view('livewire.admin.panel.tools.mail-templates', [
             'templates' => $templates,
             'allTemplates' => MailTemplate::all(),
         ])->layout('admin.content.layouts.layoutMaster');
