@@ -21,7 +21,7 @@ class DataMigrationTool extends Component
     public $newTableFields = [];
     public $fieldMapping = [];
     public $tables = [];
-    public $progress = 0; // برای مهاجرت داده‌ها
+    public $progress = 0; // برای انتقال داده‌ها
     public $uploadProgress = 0; // برای آپلود فایل
     public $isMigrating = false;
     public $isUploading = false;
@@ -236,7 +236,7 @@ class DataMigrationTool extends Component
             }
 
             if (empty($records)) {
-                throw new \Exception('هیچ داده‌ای برای مهاجرت یافت نشد.');
+                throw new \Exception('هیچ داده‌ای برای انتقال یافت نشد.');
             }
 
             $totalRecords = count($records);
@@ -294,8 +294,8 @@ class DataMigrationTool extends Component
 
             // ذخیره خطاها توی فایل متنی با UTF-8
             $logContent = implode("\n", array_merge(
-                ['گزارش خطاها و لاگ مهاجرت داده‌ها - ' . now()->format('Y-m-d H:i:s')],
-                !empty($failedRecords) ? $failedRecords : ['هیچ خطایی در حین مهاجرت رخ نداد.']
+                ['گزارش خطاها و لاگ انتقال داده‌ها - ' . now()->format('Y-m-d H:i:s')],
+                !empty($failedRecords) ? $failedRecords : ['هیچ خطایی در حین انتقال رخ نداد.']
             ));
 
             $logFileName = 'migration_log_' . now()->format('Y-m-d_H-i-s') . '.txt';
@@ -309,7 +309,7 @@ class DataMigrationTool extends Component
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
             DB::commit();
 
-            $this->dispatch('toast', "مهاجرت داده‌ها با موفقیت انجام شد. $totalRecords رکورد منتقل شدند. " . (count($failedRecords) > 0 ? count($failedRecords) . " رکورد به دلیل خطا رد شدند." : ""), ['type' => 'success']);
+            $this->dispatch('toast', "انتقال داده‌ها با موفقیت انجام شد. $totalRecords رکورد منتقل شدند. " . (count($failedRecords) > 0 ? count($failedRecords) . " رکورد به دلیل خطا رد شدند." : ""), ['type' => 'success']);
             $this->dispatch('toast', "فایل لاگ در حال دانلود است...", ['type' => 'info', 'duration' => 10000]);
 
             // دانلود مستقیم فایل
