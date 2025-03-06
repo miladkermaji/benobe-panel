@@ -82,6 +82,7 @@ use App\Http\Controllers\Admin\Doctors\CommentDoctor\CommentDoctorController;
 use App\Http\Controllers\Admin\Doctors\DoctorsManagement\Bime\BimeController;
 use App\Http\Controllers\Admin\Hospitals\LogsHospital\LogsHospitalController;
 use App\Http\Controllers\Admin\Panel\Tools\FileManager\FileManagerController;
+use App\Http\Controllers\Admin\Panel\Tools\PageBuilder\PageBuilderController;
 use App\Http\Controllers\Admin\Panel\Tools\Sitemap\SitemapSettingsController;
 use App\Http\Controllers\Admin\UsersManagement\UserGroup\UserGroupController;
 use App\Http\Controllers\Dr\Panel\Payment\Setting\DrPaymentSettingController;
@@ -195,6 +196,13 @@ Route::prefix('admin')
             Route::get('news-latter/', [NewsLatterController::class, 'index'])->name('admin.tools.news-latter.index');
             Route::get('/data-migration', [DataMigrationToolController::class, 'index'])
                 ->name('admin.tools.data-migration.index');
+            Route::prefix('tools/')->group(function () {
+                Route::get('/page-builder', [PageBuilderController::class, 'index'])->name('admin.tools.page-builder.index');
+                Route::post('/page-builder/store', [PageBuilderController::class, 'store'])->name('admin.tools.page-builder.store');
+                Route::get('/page-builder/edit/{id}', [PageBuilderController::class, 'edit'])->name('admin.tools.page-builder.edit');
+                Route::put('/page-builder/update/{id}', [PageBuilderController::class, 'update'])->name('admin.tools.page-builder.update');
+                Route::delete('/page-builder/destroy/{id}', [PageBuilderController::class, 'destroy'])->name('admin.tools.page-builder.destroy');
+            });
         });
     });
 

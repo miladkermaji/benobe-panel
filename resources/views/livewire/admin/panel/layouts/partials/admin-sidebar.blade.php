@@ -54,9 +54,9 @@
             <li class="item-li {{ Request::routeIs('admin.tools.sitemap.index') ? 'is-active' : '' }}">
                 <a href="{{ route('admin.tools.sitemap.index') }}">نقشه سایت</a>
             </li>
-            <li class="item-li {{ Request::routeIs('dr-manual_nobat_setting') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-manual_nobat_setting') }}">صفحه ساز</a>
-            </li>
+        <li class="item-li {{ Request::routeIs('admin.tools.page-builder.index') ? 'is-active' : '' }}">
+            <a href="{{ route('admin.tools.page-builder.index') }}">صفحه‌ساز</a>
+        </li>
             <li class="item-li {{ Request::routeIs('admin.panel.tools.mail-template.index') ? 'is-active' : '' }}">
                 <a href="{{ route('admin.panel.tools.mail-template.index') }}">قالب ایمیل</a>
             </li>
