@@ -57,11 +57,8 @@
             <li class="item-li {{ Request::routeIs('admin.panel.tools.mail-template.index') ? 'is-active' : '' }}">
                 <a href="{{ route('admin.panel.tools.mail-template.index') }}">قالب ایمیل</a>
             </li>
-            <li class="item-li {{ Request::routeIs('dr-manual_nobat') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-manual_nobat') }}">پنل پیامک</a>
-            </li>
-            <li class="item-li {{ Request::routeIs('dr-scheduleSetting') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-scheduleSetting') }}">خبرنامه</a>
+            <li class="item-li {{ Request::routeIs('admin.tools.news-latter.index') ? 'is-active' : '' }}">
+                <a href="{{ route('admin.tools.news-latter.index') }}">خبرنامه</a>
             </li>
         </ul>
     </li>

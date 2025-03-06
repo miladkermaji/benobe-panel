@@ -28,5 +28,7 @@
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/tom-select.bootstrap5.min.css') }}">
  <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/toastr/toastr.min.css') }}">
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/global-loader.css') }}">
+<link rel="stylesheet" href="{{ asset('admin-assets/panel/css/codemirror/5.65.16/codemirror.min.css') }}">
+
 {{-- tom select --}}
 @vite(['resources/js/app.js', 'resources/css/app.css'])

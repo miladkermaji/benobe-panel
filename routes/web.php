@@ -57,7 +57,6 @@ use App\Http\Controllers\Admin\Dashboard\HomePage\HomePageController;
 use App\Http\Controllers\Admin\Doctors\Moshavere\MoshavereController;
 use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapController;
 use App\Http\Controllers\Admin\Questions\Question\QuestionController;
-use App\Http\Controllers\Admin\Tools\NewsLatter\NewsLatterController;
 use App\Http\Controllers\Admin\UsersManagement\Users\UsersController;
 use App\Http\Controllers\Dr\Panel\Profile\DrUpgradeProfileController;
 use App\Http\Controllers\Admin\Ads\Banner\Packages\PackagesController;
@@ -75,6 +74,7 @@ use App\Http\Controllers\Dr\Panel\DoctorServices\DoctorServicesContrroler;
 use App\Http\Controllers\Dr\Panel\PatientRecords\PatientRecordsController;
 use App\Http\Controllers\Dr\Panel\Secretary\SecretaryManagementController;
 use App\Http\Controllers\Admin\Dashboard\UserShipfee\UserShipfeeController;
+use App\Http\Controllers\Admin\Panel\Tools\NewsLatter\NewsLatterController;
 use App\Http\Controllers\Admin\Panel\Tools\SmsGateway\SmsGatewayController;
 use App\Http\Controllers\Admin\Questions\QuestionCat\QuestionCatController;
 use App\Http\Controllers\Admin\ContentManagement\Comments\CommentController;
@@ -191,6 +191,7 @@ Route::prefix('admin')
                 Route::put('/settings', [SitemapSettingsController::class, 'update'])->name('admin.tools.sitemap.settings.update');
             });
             Route::get('mail-template', [MailTemplateController::class, 'index'])->name('admin.panel.tools.mail-template.index');
+            Route::get('news-latter/', [NewsLatterController::class, 'index'])->name('admin.tools.news-latter.index');
         });
     });
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Tools;
+namespace App\Livewire\Admin\Panel\Tools;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -22,6 +22,15 @@ class NewsLatter extends Component
     protected $rules = [
         'newEmail' => 'required|email|unique:newsletters,email',
         'editEmail' => 'required|email',
+    ];
+
+    // پیام‌های اعتبارسنجی فارسی
+    protected $messages = [
+        'newEmail.required' => 'لطفاً ایمیل را وارد کنید.',
+        'newEmail.email' => 'ایمیل واردشده معتبر نیست.',
+        'newEmail.unique' => 'این ایمیل قبلاً ثبت شده است.',
+        'editEmail.required' => 'لطفاً ایمیل را وارد کنید.',
+        'editEmail.email' => 'ایمیل واردشده معتبر نیست.',
     ];
 
     public function updatedSearch()
@@ -147,7 +156,7 @@ class NewsLatter extends Component
     public function export()
     {
         $members = Newsletter::all();
-        $csv = "Email,Status\n";
+        $csv = "ایمیل,وضعیت\n";
         foreach ($members as $member) {
             $csv .= "{$member->email}," . ($member->is_active ? 'فعال' : 'غیرفعال') . "\n";
         }
@@ -161,8 +170,8 @@ class NewsLatter extends Component
         $members = Newsletter::where('email', 'like', '%' . $this->search . '%')
             ->paginate($this->perPage);
 
-        return view('livewire.admin.tools.news-latter', [
+        return view('livewire.admin.panel.tools.news-latter', [
             'members' => $members,
-        ])->layout('admin.content.layouts.layoutMaster');
+        ]);
     }
 }
