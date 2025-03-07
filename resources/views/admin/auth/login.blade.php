@@ -3,8 +3,6 @@
  <link rel="stylesheet" href="{{ asset('admin-assets/login/bootstrap5/bootstrap.min.css') }}">
  <link rel="stylesheet" href="{{ asset('admin-assets/login/css/login.css') }}">
  <meta name="csrf-token" content="{{ csrf_token() }}">
- <link rel="stylesheet" href="{{ asset('admin-assets/login/toast/toastify.css') }}">
- <script src="{{ asset('admin-assets/login/toast/toastify.js') }}"></script>
  <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/toastr/toastr.min.css') }}">
 @endsection
 @section('site-header')
