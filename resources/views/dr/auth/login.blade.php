@@ -202,25 +202,25 @@ $step = $step ?? 1;
  </div>
 @endsection
 @section('scripts')
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-   <script src="{{ asset('dr-assets/js/login.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/toastr/toastr.min.js') }}"></script>
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+     <script src="{{ asset('dr-assets/js/login.js') }}"></script>
+    <script src="{{ asset('dr-assets/panel/js/toastr/toastr.min.js') }}"></script>
 
-   @php
-// محاسبه زمان باقی‌مانده برای تایمر
-$remainingTime = 0;
-if (isset($otp) && $otp instanceof \App\Models\Dr\Otp) {
-  $remainingTime = max(0, ($otp->created_at->addMinutes(2)->timestamp - now()->timestamp) * 1000);
-} elseif (isset($token)) {
-  // اگر توکن موجود است، تلاش برای بازیابی OTP
-  $otp = \App\Models\Otp::where('token', $token)->first();
-  if ($otp) {
+     @php
+  // محاسبه زمان باقی‌مانده برای تایمر
+  $remainingTime = 0;
+  if (isset($otp) && $otp instanceof \App\Models\Dr\Otp) {
     $remainingTime = max(0, ($otp->created_at->addMinutes(2)->timestamp - now()->timestamp) * 1000);
+  } elseif (isset($token)) {
+    // اگر توکن موجود است، تلاش برای بازیابی OTP
+    $otp = \App\Models\Otp::where('token', $token)->first();
+    if ($otp) {
+    $remainingTime = max(0, ($otp->created_at->addMinutes(2)->timestamp - now()->timestamp) * 1000);
+    }
   }
-}
-   @endphp
+     @endphp
 
-   <script>
+     <script>
     // استفاده از زمان باقی‌مانده از سمت سرور  
     var countDownDate = new Date().getTime() + {{ $remainingTime }};
     var timer = $('#timer');
@@ -245,9 +245,9 @@ if (isset($otp) && $otp instanceof \App\Models\Dr\Otp) {
     resendOtp.removeClass('d-none');
      }
     }, 1000);
-   </script>
+     </script>
 
-   <script>
+     <script>
     /* set timer */
     /* set timer */
     $(document).ready(function() {
@@ -372,7 +372,7 @@ if (isset($otp) && $otp instanceof \App\Models\Dr\Otp) {
     const form = $(this);
     const submitButton = form.find('button[type="submit"]');
     const termsCheckbox = form.find('input[name="terms_accepted"]');
-  /* 
+    /* 
     if (!termsCheckbox.is(':checked')) {
      Swal.fire({
       icon: 'warning',
@@ -555,7 +555,7 @@ if (isset($otp) && $otp instanceof \App\Models\Dr\Otp) {
     });
 
 
-  /*   مدیریت نوتیفیکیشن در موبایل */
+    /*   مدیریت نوتیفیکیشن در موبایل */
     function requestNotificationPermission() {
     if (Notification.permission === "default") {
       Notification.requestPermission();
@@ -570,12 +570,13 @@ if (isset($otp) && $otp instanceof \App\Models\Dr\Otp) {
       }
     }
 
+
     function autoFillOtp(code) {
-    const inputs = $('.otp-input');
-    const codeArray = code.split('');
-    inputs.each(function (index) {
+      const inputs = $('.otp-input');
+      const codeArray = code.split('').reverse(); // آرایه را برعکس می‌کنیم
+      inputs.each(function (index) {
       $(this).val(codeArray[index] || '').trigger('input');
-    });
+      });
     }
 
     // شبیه‌سازی دریافت کد از سرور
@@ -587,7 +588,7 @@ if (isset($otp) && $otp instanceof \App\Models\Dr\Otp) {
     // درخواست مجوز برای نمایش نوتیفیکیشن
     requestNotificationPermission();
 
-  /*   مدیریت نوتیفیکیشن در موبایل */
-   </script>
+    /*   مدیریت نوتیفیکیشن در موبایل */
+     </script>
 
 @endsection
