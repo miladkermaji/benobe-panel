@@ -82,7 +82,7 @@ class DoctorLoginController extends Controller
     $loginAttempts = new LoginAttemptsService();
 
     if (!$manager) {
-      $loginAttempts->incrementLoginAttempt(null, $formattedMobile,null, null, $manager->id);
+      $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
       return response()->json([
         'success' => false,
         'errors' => ['mobile' => ['کاربری با این شماره تلفن وجود ندارد.']]
