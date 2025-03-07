@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Panel\Tools;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Admin\Tools\Newsletter;
+use App\Models\Admin\Tools\NewsLetter;
 use Illuminate\Support\Facades\Log;
 
 class NewsLatter extends Component

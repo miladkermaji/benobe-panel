@@ -92,9 +92,19 @@ class SitemapManager extends Component
         $this->isCrawling = true;
         $this->crawlProgress = 0;
         CrawlLog::truncate();
-        CrawlSiteForSitemap::dispatch();
-        $this->dispatch('show-alert', type: 'info', message: 'پیمایش سایت در پس‌زمینه شروع شد.');
+        CrawlSiteForSitemap::dispatchSync(); // استفاده از dispatchSync به جای dispatch
+        $this->dispatch('show-alert', type: 'info', message: 'پیمایش سایت شروع شد.');
     }
+
+    /* this run on server */
+/*     public function crawlSite()
+    {
+        $this->isCrawling = true;
+        $this->crawlProgress = 0;
+        CrawlLog::truncate();
+        CrawlSiteForSitemap::dispatch(); // نگه داشتن حالت غیرهمزمان
+        $this->dispatch('show-alert', type: 'info', message: 'پیمایش سایت در پس‌زمینه شروع شد.');
+    } */
 
     public function stopCrawl()
     {
