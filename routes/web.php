@@ -83,7 +83,7 @@ use App\Http\Controllers\Admin\Doctors\DoctorsManagement\Bime\BimeController;
 use App\Http\Controllers\Admin\Hospitals\LogsHospital\LogsHospitalController;
 use App\Http\Controllers\Admin\Panel\Tools\FileManager\FileManagerController;
 use App\Http\Controllers\Admin\Panel\Tools\PageBuilder\PageBuilderController;
-use App\Http\Controllers\Admin\Panel\Tools\Sitemap\SitemapSettingsController;
+use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapSettingsController;
 use App\Http\Controllers\Admin\UsersManagement\UserGroup\UserGroupController;
 use App\Http\Controllers\Dr\Panel\Payment\Setting\DrPaymentSettingController;
 use App\Http\Controllers\Admin\ContentManagement\HomeVideo\HomeVideoController;

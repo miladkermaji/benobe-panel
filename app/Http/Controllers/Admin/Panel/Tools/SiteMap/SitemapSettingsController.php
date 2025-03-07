@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Panel\Tools\Sitemap;
+namespace App\Http\Controllers\Admin\Panel\Tools\SiteMap;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\Controller;
