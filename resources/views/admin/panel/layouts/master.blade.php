@@ -12,6 +12,7 @@
   @else
    به نوبه
   @endif
+  
  </title>
 
  @include('dr.panel.my-tools.loader-btn')
