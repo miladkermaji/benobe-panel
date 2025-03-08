@@ -20,7 +20,7 @@ use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Requests\Admin\Authentication\LoginRequest;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 
-class DoctorLoginController extends Controller
+class AdminLoginController extends Controller
 {
   public function loginRegisterForm()
   {

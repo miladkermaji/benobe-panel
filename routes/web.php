@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\layouts\ContentNavbar;
 use App\Http\Controllers\Admin\layouts\WithoutNavbar;
 use App\Http\Controllers\Admin\Tools\ToolsController;
 use App\Http\Controllers\Dr\Panel\Bime\DRBimeController;
+use App\Http\Controllers\Admin\Auth\AdminLoginController;
 use App\Http\Controllers\Admin\layouts\ContentNavSidebar;
 use App\Http\Controllers\Admin\Auth\DoctorLoginController;
 use App\Http\Controllers\Admin\Authentications\LoginCover;
@@ -130,26 +131,26 @@ use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettin
 /* login manager routes */
 Route::prefix('admin-panel/')->group(function () {
     /* login routes */
-    Route::get('/', [DoctorLoginController::class, 'loginRegisterForm'])->name('admin.auth.login-register-form');
-    Route::get('login', [DoctorLoginController::class, 'loginRegisterForm'])->name('admin.auth.login-register-form');
+    Route::get('/', [AdminLoginController::class, 'loginRegisterForm'])->name('admin.auth.login-register-form');
+    Route::get('login', [AdminLoginController::class, 'loginRegisterForm'])->name('admin.auth.login-register-form');
 
-    Route::get('login-user-pass', [DoctorLoginController::class, 'loginUserPassForm'])->name('admin.auth.login-user-pass-form');
+    Route::get('login-user-pass', [AdminLoginController::class, 'loginUserPassForm'])->name('admin.auth.login-user-pass-form');
 
-    Route::get('admin-two-factor', [DoctorLoginController::class, 'twoFactorForm'])->name('admin-two-factor');
+    Route::get('admin-two-factor', [AdminLoginController::class, 'twoFactorForm'])->name('admin-two-factor');
 
-    Route::post('admin-two-factor-store', [DoctorLoginController::class, 'twoFactorFormCheck'])->name('admin-two-factor-store');
+    Route::post('admin-two-factor-store', [AdminLoginController::class, 'twoFactorFormCheck'])->name('admin-two-factor-store');
 
-    Route::post('admin-login-with-mobile-pass', [DoctorLoginController::class, 'loginWithMobilePass'])->name('admin-login-with-mobile-pass');
+    Route::post('admin-login-with-mobile-pass', [AdminLoginController::class, 'loginWithMobilePass'])->name('admin-login-with-mobile-pass');
 
-    Route::post('/login-register', [DoctorLoginController::class, 'loginRegister'])->name('admin.auth.login-register');
+    Route::post('/login-register', [AdminLoginController::class, 'loginRegister'])->name('admin.auth.login-register');
 
-    Route::get('login-confirm/{token}', [DoctorLoginController::class, 'loginConfirmForm'])->name('admin.auth.login-confirm-form');
+    Route::get('login-confirm/{token}', [AdminLoginController::class, 'loginConfirmForm'])->name('admin.auth.login-confirm-form');
 
-    Route::post('/login-confirm/{token}', [DoctorLoginController::class, 'loginConfirm'])->name('admin.auth.login-confirm');
+    Route::post('/login-confirm/{token}', [AdminLoginController::class, 'loginConfirm'])->name('admin.auth.login-confirm');
 
-    Route::get('/login-resend-otp/{token}', [DoctorLoginController::class, 'loginResendOtp'])->name('admin.auth.login-resend-otp');
+    Route::get('/login-resend-otp/{token}', [AdminLoginController::class, 'loginResendOtp'])->name('admin.auth.login-resend-otp');
 
-    Route::get('/logout', [DoctorLoginController::class, 'logout'])->name('admin.auth.logout');
+    Route::get('/logout', [AdminLoginController::class, 'logout'])->name('admin.auth.logout');
     /* login routes */
 
 });
