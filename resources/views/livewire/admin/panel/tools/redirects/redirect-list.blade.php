@@ -1,18 +1,17 @@
-<div class="container-fluid py-2" wire:init="loadRedirects">
+<div class="container-fluid py-2" dir="rtl" wire:init="loadRedirects">
     <!-- هدر و ابزارها در یک ردیف -->
-    <div
-        class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <h1 class="m-n h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت ریدایرکت‌ها</h1>
+    <div class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت ریدایرکت‌ها</h1>
         <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
             <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
                 wire:model.live="search" placeholder="جستجو در ریدایرکت‌ها..." style="padding-right: 23px">
-            <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5;top:11px;right:5px;">
+            <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5; top: 11px; right: 5px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
                     <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
                 </svg>
             </span>
         </div>
-        <div class="d-flex gap-2 flex-shrink-0">
+        <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
             <a href="{{ route('admin.panel.tools.redirects.create') }}"
                 class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -21,7 +20,8 @@
                 <span>افزودن ریدایرکت</span>
             </a>
             <button wire:click="deleteSelected"
-                class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2" @if (empty($selectedRedirects)) disabled @endif>
+                class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
+                @if (empty($selectedRedirects)) disabled @endif>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                 </svg>
@@ -91,11 +91,13 @@
                                 @empty
                                     <tr>
                                         <td colspan="7" class="text-center py-5">
-                                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" class="text-muted mb-3">
-                                                <path d="M5 12h14M12 5l7 7-7 7" />
-                                            </svg>
-                                            <p class="text-muted fw-medium">هیچ ریدایرکتی یافت نشد.</p>
+                                            <div class="d-flex justify-content-center align-items-center flex-column">
+                                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    class="text-muted mb-3">
+                                                    <path d="M5 12h14M12 5l7 7-7 7" />
+                                                </svg>
+                                                <p class="text-muted fw-medium">هیچ ریدایرکتی یافت نشد.</p>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -107,7 +109,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="d-flex justify-content-between mt-4 px-4">
+                <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
                     <div class="text-muted">نمایش {{ $redirects ? $redirects->firstItem() : 0 }} تا
                         {{ $redirects ? $redirects->lastItem() : 0 }} از {{ $redirects ? $redirects->total() : 0 }} ردیف
                     </div>
@@ -118,124 +120,8 @@
             </div>
         </div>
     </div>
-
-    <style>
-        .glass-header {
-            background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(124, 58, 237, 0.85));
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .glass-header h1 {
-            color: #ffffff;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-
-        .input-group {
-            position: relative;
-        }
-
-        .form-control {
-            border-radius: 8px !important;
-            border: 1px solid #e5e7eb;
-            transition: all 0.3s ease;
-            padding-left: 2.5rem;
-            /* فضای کافی برای آیکون */
-            height: 38px;
-            /* ارتفاع ثابت برای تراز بهتر */
-        }
-
-        .form-control:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
-        }
-
-        .form-control::placeholder {
-            color: #6b7280;
-        }
-
-        .search-icon {
-            z-index: 5;
-            /* آیکون بالای اینپوت باشه */
-        }
-
-        .btn-gradient-danger {
-            background: linear-gradient(90deg, #f87171, #fca5a5);
-            border: none;
-            color: white;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .btn-gradient-danger:hover:not(:disabled) {
-            background: linear-gradient(90deg, #ef4444, #f87171);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-gradient-danger:disabled {
-            background: rgba(255, 255, 255, 0.2);
-            cursor: not-allowed;
-        }
-
-        .btn-gradient-success {
-            background: linear-gradient(90deg, #10b981, #34d399);
-            border: none;
-            color: white;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .btn-gradient-success:hover {
-            background: linear-gradient(90deg, #059669, #10b981);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .table {
-            width: 100% !important;
-            margin-bottom: 0;
-        }
-
-        .table-bordered {
-            border: 1px solid #e5e7eb;
-        }
-
-        .table-bordered th,
-        .table-bordered td {
-            border: 1px solid #e5e7eb;
-            vertical-align: middle;
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: #f9fafb;
-        }
-
-        .bg-label-success {
-            background-color: #d1fae5;
-            color: #10b981;
-        }
-
-        .bg-label-danger {
-            background-color: #fee2e2;
-            color: #ef4444;
-        }
-
-        .cursor-pointer {
-            cursor: pointer;
-        }
-
-        .rounded-pill {
-            border-radius: 50rem;
-        }
-
-        .form-check-input {
-            vertical-align: middle;
-            margin: 0;
-        }
-    </style>
+<link rel="stylesheet" href="{{ asset('admin-assets/panel/css/tools/redirect/redirect.css') }}">
+  
 
     <script>
         document.addEventListener('livewire:init', function () {

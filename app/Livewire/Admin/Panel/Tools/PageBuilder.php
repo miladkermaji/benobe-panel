@@ -38,6 +38,12 @@ class PageBuilder extends Component
         'border' => 'none',
         'opacity' => '1',
         'grid_columns' => 1,
+        // موارد جدید
+        'width' => '100%', // عرض پیش‌فرض
+        'height' => 'auto', // ارتفاع پیش‌فرض
+        'text_align' => 'right', // تراز متن پیش‌فرض (چون RTL هست)
+        'border_radius' => '0px', // شعاع بوردر پیش‌فرض
+        'rotation' => '0deg', // زاویه چرخش پیش‌فرض
     ];
     public $previewMode = 'desktop';
     public $newTemplateName = '';
@@ -427,11 +433,11 @@ class PageBuilder extends Component
     {
         return match ($type) {
             'text' => 'متن نمونه',
-            'image' => '/storage/default-image.jpg',
+            'image' => '/storage/default-image.jpeg',
             'button' => 'کلیک کنید',
-            'video' => '/storage/default-video.mp4',
+            'video' => 'https://benobe.ir/uploads/home_video/1666005351_benobe.mp4',
             'form' => '<form><input type="text" placeholder="نام"><input type="email" placeholder="ایمیل"><button type="submit">ارسال</button></form>',
-            'slider' => json_encode(['images' => ['/storage/default-image.jpg']]),
+            'slider' => json_encode(['images' => ['/storage/default-image.jpeg']]),
             default => '',
         };
     }
@@ -440,39 +446,45 @@ class PageBuilder extends Component
     {
         $html = '<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><title>' . ($this->selectedPage->meta_title ?? 'صفحه بدون عنوان') . '</title><meta name="description" content="' . ($this->selectedPage->meta_description ?? '') . '"><style>';
         $html .= '@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } } @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } } @keyframes zoomIn { from { transform: scale(0); } to { transform: scale(1); } }';
-        $html .= 'body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f9fafb; } .grid { display: grid; gap: 10px; } video { max-width: 100%; }';
+        $html .= 'body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f9fafb; } .grid { display: grid; gap: 10px; } video { max-width: 100%; } img { max-width: 100%; border-radius: 8px; }';
         $html .= '</style></head><body>';
 
         foreach ($this->elements as $element) {
-            // بررسی مقدار settings
-            $settings = is_array($element->settings) ? $element->settings : json_decode($element->settings, true);
+            // تنظیمات پیش‌فرض
+            $defaultSettings = [
+                'color' => '#000000',
+                'background_color' => '#ffffff',
+                'font_size' => '16px',
+                'padding' => '10px',
+                'margin' => '0px',
+                'animation' => 'none',
+                'animation_duration' => '1s',
+                'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
+                'box_shadow' => 'none',
+                'border' => 'none',
+                'opacity' => '1',
+                'grid_columns' => 1,
+                'width' => '100%',
+                'height' => 'auto',
+                'text_align' => 'right',
+                'border_radius' => '0px',
+                'rotation' => '0deg',
+            ];
 
-            // در صورت وجود خطا، مقدار پیش‌فرض تنظیم شود
-            if (!is_array($settings)) {
-                $settings = [
-                    'color' => '#000000',
-                    'background_color' => '#ffffff',
-                    'font_size' => '16px',
-                    'padding' => '10px',
-                    'margin' => '0px',
-                    'animation' => 'none',
-                    'animation_duration' => '1s',
-                    'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
-                    'box_shadow' => 'none',
-                    'border' => 'none',
-                    'opacity' => '1',
-                    'grid_columns' => 1,
-                ];
-            }
+            // دریافت تنظیمات ذخیره‌شده و ترکیب با پیش‌فرض
+            $settings = is_array($element->settings) ? $element->settings : json_decode($element->settings, true);
+            $settings = array_merge($defaultSettings, is_array($settings) ? $settings : []);
 
             // ساخت استایل‌ها
-            $style = "color:{$settings['color']};background-color:{$settings['background_color']};font-size:{$settings['font_size']};padding:{$settings['padding']};margin:{$settings['margin']};box-shadow:{$settings['box_shadow']};border:{$settings['border']};opacity:{$settings['opacity']};";
+            $style = "color:{$settings['color']};background-color:{$settings['background_color']};font-size:{$settings['font_size']};padding:{$settings['padding']};margin:{$settings['margin']};box-shadow:{$settings['box_shadow']};border:{$settings['border']};opacity:{$settings['opacity']};width:{$settings['width']};height:{$settings['height']};text-align:{$settings['text_align']};border-radius:{$settings['border_radius']};transform:rotate({$settings['rotation']});";
             if ($settings['animation'] !== 'none') {
                 $style .= "animation:{$settings['animation']} {$settings['animation_duration']} ease-in-out;";
             }
 
             // تولید HTML برای المان‌ها
-            if ($element->type === 'video') {
+            if ($element->type === 'image') {
+                $html .= "<div style='$style' class='grid grid-cols-{$settings['grid_columns']}'><img src='{$element->content}' alt='تصویر'></div>";
+            } elseif ($element->type === 'video') {
                 $html .= "<div style='$style' class='grid grid-cols-{$settings['grid_columns']}'><video controls><source src='{$element->content}' type='video/mp4'></video></div>";
             } else {
                 $html .= "<div style='$style' class='grid grid-cols-{$settings['grid_columns']}'>{$element->content}</div>";

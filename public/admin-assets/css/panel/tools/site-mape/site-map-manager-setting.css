@@ -1,0 +1,198 @@
+ .glass-header {
+   background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(124, 58, 237, 0.85));
+   backdrop-filter: blur(10px);
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+   transition: all 0.3s ease;
+  }
+
+  .btn-gradient-primary {
+   background: linear-gradient(90deg, #4f46e5, #7c3aed);
+   border: none;
+   color: white;
+   transition: all 0.3s ease;
+   border-radius: 8px;
+   /* گردی ملایم‌تر */
+  }
+
+  .btn-gradient-primary:hover {
+   background: linear-gradient(90deg, #4338ca, #4f46e5);
+   transform: translateY(-2px);
+   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-gradient-success {
+   background: linear-gradient(90deg, #10b981, #34d399);
+   border: none;
+   color: white;
+   transition: all 0.3s ease;
+   border-radius: 8px;
+   /* گردی ملایم‌تر */
+  }
+
+  .btn-gradient-success:hover {
+   background: linear-gradient(90deg, #059669, #10b981);
+   transform: translateY(-2px);
+   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .form-control {
+   background: #ffffff !important;
+   border-color: #6b7280 !important;
+   color: #1f2937 !important;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+   border-radius: 8px;
+   /* گردی کمتر */
+   padding: 0.75rem 1rem;
+   /* افزایش ارتفاع */
+   font-size: 0.9rem;
+   height: 44px;
+   /* ارتفاع ثابت */
+   transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+   border-color: #4f46e5 !important;
+   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+   background: #f9f9f9 !important;
+  }
+
+  .form-select {
+   background: #ffffff !important;
+   border-color: #6b7280 !important;
+   color: #1f2937 !important;
+   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+   border-radius: 8px;
+   /* گردی کمتر */
+   padding: 0.75rem 1rem;
+   font-size: 0.9rem;
+   height: 44px;
+   /* هماهنگی با اینپوت */
+   transition: all 0.3s ease;
+   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+   /* فلش سفارشی */
+   background-position: left 0.75rem center;
+   background-size: 16px;
+  }
+
+  .form-select:focus {
+   border-color: #4f46e5 !important;
+   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+   background-color: #f9f9f9 !important;
+  }
+
+  .custom-select {
+   padding-left: 2.5rem;
+   /* فضای بیشتر برای فلش */
+  }
+
+  .card {
+   border-radius: 10px;
+   overflow: hidden;
+   transition: all 0.3s ease;
+  }
+
+  .card:hover {
+   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .alert-success {
+   background-color: #d1fae5;
+   color: #10b981;
+   border: 1px solid #10b981;
+   border-radius: 8px;
+   padding: 1rem;
+  }
+
+  /* ریسپانسیو و تراز */
+  @media (max-width: 991px) {
+
+   /* تبلت */
+   .glass-header {
+    padding: 2rem;
+   }
+
+   .buttons-container {
+    width: 100%;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+   }
+
+   .btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+   }
+
+   .card-body {
+    padding: 2rem;
+   }
+
+   .row.g-4 {
+    gap: 1.5rem !important;
+   }
+  }
+
+  @media (max-width: 767px) {
+
+   /* موبایل */
+   .glass-header {
+    padding: 1.5rem;
+    flex-direction: column;
+    align-items: center;
+   }
+
+   .header-title {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 1rem;
+   }
+
+   .buttons-container {
+    margin-top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+   }
+
+   .btn {
+    max-width: 250px;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+   }
+
+   .card-body {
+    padding: 1.5rem;
+   }
+
+   .row.g-4 {
+    gap: 1rem !important;
+   }
+
+   .col-md-6,
+   .col-md-2,
+   .col-md-4,
+   .col-md-12 {
+    width: 100%;
+   }
+
+   .form-label {
+    font-size: 0.9rem;
+   }
+
+   .form-control,
+   .form-select {
+    font-size: 0.875rem;
+    height: 40px;
+    /* ارتفاع کمتر در موبایل */
+   }
+
+   h1.h3 {
+    font-size: 1.5rem;
+   }
+
+   .text-end {
+    text-align: center !important;
+   }
+  }

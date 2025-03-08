@@ -1,6 +1,6 @@
 <div class="relative min-h-screen mt-3" dir="rtl">
  <!-- هدر فیکس -->
- <header class="glass-header rounded-b-xl shadow-lg p-3">
+ <header class="glass-header rounded-b-xl shadow-lg p-3 z-50">
   <div class="container-fluid mx-auto">
    <div class="flex items-center justify-between gap-3 flex-wrap">
     <div class="flex items-center gap-2">
@@ -11,7 +11,7 @@
      </svg>
      <h4 class="mb-0 font-bold text-white text-lg">صفحه‌ساز</h4>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 flex-wrap">
      <button wire:click="undo" class="btn btn-glass text-sm py-1 px-3 rounded-full">Undo</button>
      <button wire:click="redo" class="btn btn-glass text-sm py-1 px-3 rounded-full">Redo</button>
      <button wire:click="toggleFullScreenPreview"
@@ -28,9 +28,10 @@
 
  <!-- محتوای اصلی -->
  <div class="pt-16 pb-4 overflow-y-auto mt-3" style="height: calc(100vh - 64px);">
-  <div class="container-fluid mx-auto">
-   <div class="flex gap-4">
-    <div class="w-80">
+  <div class="container-fluid mx-auto px-4">
+   <div class="flex gap-4 flex-col md:flex-row">
+    <!-- سایدبار چپ -->
+    <div class="w-full md:w-80">
      <!-- تاگل فرم افزودن صفحه -->
      <div class="relative">
       <button wire:click="toggleAddForm"
@@ -52,7 +53,7 @@
           <label class="block text-sm font-medium text-gray-700">توضیحات متا (SEO)</label>
           <textarea wire:model="metaDescription" class="input-shiny p-2 rounded-lg w-full text-sm" rows="2"></textarea>
          </div>
-         <div class="flex items-center  p-3">
+         <div class="flex items-center p-3">
           <label class="flex items-center gap-2 text-sm text-gray-700">
            <input type="checkbox" wire:model="isActive" class="form-check-input h-4 w-4 text-indigo-600 cursor-pointer"
             id="isActiveNew">
@@ -100,6 +101,7 @@
        @endforeach
       </div>
      </div>
+
 
      <!-- تنظیمات المان -->
      @if ($selectedElement)
@@ -231,13 +233,14 @@
       </ul>
      </div>
     </div>
+
     <!-- بخش اصلی: پیش‌نمایش و مدیریت صفحات -->
     <div class="flex-1">
      @if ($selectedPage)
       <div class="card p-4 rounded-xl shadow-lg bg-white">
-       <div class="flex justify-between items-center mb-4">
+       <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
         <h5 class="text-indigo-700 font-bold text-lg">{{ $selectedPage->title }}</h5>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
          <button wire:click="updatePage"
           class="btn btn-gradient-primary py-2 px-4 rounded-lg text-white text-sm">ذخیره</button>
          <button wire:click="exportHtml"
@@ -250,6 +253,8 @@
        </div>
 
        <!-- پیش‌نمایش -->
+       <!-- پیش‌نمایش -->
+       <!-- پیش‌نمایش -->
        <div wire:sortable="updateElementOrder" class="sortable p-4 rounded-xl border-2 border-dashed border-gray-300"
         style="min-height: 500px; background-color: #f9fafb; {{ $isFullScreenPreview ? 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; padding: 20px; background: #fff;' : '' }} {{ $previewMode === 'mobile' ? 'max-width: 400px; margin: 0 auto;' : ($previewMode === 'tablet' ? 'max-width: 768px; margin: 0 auto;' : 'width: 100%;') }}">
         @if ($isFullScreenPreview)
@@ -258,77 +263,73 @@
         @endif
         @forelse ($elements as $element)
          @php
+          $defaultSettings = [
+              'color' => '#000000',
+              'background_color' => '#ffffff',
+              'font_size' => '16px',
+              'padding' => '10px',
+              'margin' => '0px',
+              'animation' => 'none',
+              'animation_duration' => '1s',
+              'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
+              'box_shadow' => 'none',
+              'border' => 'none',
+              'opacity' => '1',
+              'grid_columns' => 1,
+              'width' => '100%',
+              'height' => 'auto',
+              'text_align' => 'right',
+              'border_radius' => '0px',
+              'rotation' => '0deg',
+          ];
           $settings = is_array($element->settings) ? $element->settings : json_decode($element->settings, true);
-
-          // اگر مقدار settings نادرست بود، مقدار پیش‌فرض را جایگزین کن
-          if (!is_array($settings)) {
-              $settings = [
-                  'color' => '#000000',
-                  'background_color' => '#ffffff',
-                  'font_size' => '16px',
-                  'padding' => '10px',
-                  'margin' => '0px',
-                  'animation' => 'none',
-                  'animation_duration' => '1s',
-                  'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
-                  'box_shadow' => 'none',
-                  'border' => 'none',
-                  'opacity' => '1',
-                  'grid_columns' => 1,
-              ];
-          }
+          $settings = array_merge($defaultSettings, is_array($settings) ? $settings : []);
          @endphp
-
-         @if (
-             ($previewMode === 'desktop' && $settings['responsive']['desktop']) ||
-                 ($previewMode === 'tablet' && $settings['responsive']['tablet']) ||
-                 ($previewMode === 'mobile' && $settings['responsive']['mobile']))
-          <div wire:sortable.item="{{ $element->id }}"
-           class="card mb-3 p-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
-           style="cursor: move; color: {{ $settings['color'] }}; background-color: {{ $settings['background_color'] }}; font-size: {{ $settings['font_size'] }}; padding: {{ $settings['padding'] }}; margin: {{ $settings['margin'] }}; box-shadow: {{ $settings['box_shadow'] }}; border: {{ $settings['border'] }}; opacity: {{ $settings['opacity'] }}; animation: {{ $settings['animation'] }} {{ $settings['animation_duration'] }} ease-in-out; display: grid; grid-template-columns: repeat({{ $settings['grid_columns'] }}, 1fr); gap: 5px;">
-           <div class="flex justify-between items-center">
-            @if ($element->type === 'text')
-             <span class="text-base">{{ $element->content }}</span>
-            @elseif ($element->type === 'image')
-             <img src="{{ $element->content }}" alt="Image" class="max-w-full rounded-md">
-            @elseif ($element->type === 'button')
-             <button class="btn btn-primary py-1 px-3 rounded-lg text-sm">{{ $element->content }}</button>
-            @elseif ($element->type === 'video')
-             <video controls class="w-full max-h-48 rounded-md">
-              <source src="{{ $element->content }}" type="video/mp4">
-              مرورگر شما از ویدیو پشتیبانی نمی‌کند.
-             </video>
-            @elseif ($element->type === 'form')
-             {!! $element->content !!}
-            @elseif ($element->type === 'slider')
-             <div class="carousel w-full">
-              @foreach (json_decode($element->content, true)['images'] ?? ['/storage/default-image.jpg'] as $image)
-               <img src="{{ $image }}" alt="Slide" class="max-w-full rounded-md">
-              @endforeach
-             </div>
-            @endif
-            <div class="flex gap-2">
-             <button wire:click="selectElement({{ $element->id }})"
-              class="btn btn-sm btn-warning py-1 px-2 rounded-full hover:bg-yellow-600 text-white">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2">
-               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-             </button>
-             <button wire:click="deleteElement({{ $element->id }})"
-              class="btn btn-sm btn-danger py-1 px-2 rounded-full hover:bg-red-600 text-white">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2">
-               <path d="M3 6h18"></path>
-               <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-              </svg>
-             </button>
+         <div wire:sortable.item="{{ $element->id }}"
+          class="card mb-3 p-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+          style="cursor: move; color: {{ $settings['color'] }}; background-color: {{ $settings['background_color'] }}; font-size: {{ $settings['font_size'] }}; padding: {{ $settings['padding'] }}; margin: {{ $settings['margin'] }}; box-shadow: {{ $settings['box_shadow'] }}; border: {{ $settings['border'] }}; opacity: {{ $settings['opacity'] }}; width: {{ $settings['width'] }}; height: {{ $settings['height'] }}; text-align: {{ $settings['text_align'] }}; border-radius: {{ $settings['border_radius'] }}; transform: rotate({{ $settings['rotation'] }}); animation: {{ $settings['animation'] }} {{ $settings['animation_duration'] }} ease-in-out;">
+          <div class="flex justify-between items-center">
+           @if ($element->type === 'text')
+            <span class="text-base">{{ $element->content }}</span>
+           @elseif ($element->type === 'image')
+            <img src="{{ $element->content }}" alt="Image" class="max-w-full rounded-md">
+           @elseif ($element->type === 'button')
+            <button class="btn btn-primary py-1 px-3 rounded-lg text-sm">{{ $element->content }}</button>
+           @elseif ($element->type === 'video')
+            <video controls class="w-full max-h-48 rounded-md">
+             <source src="{{ $element->content }}" type="video/mp4">
+             مرورگر شما از ویدیو پشتیبانی نمی‌کند.
+            </video>
+           @elseif ($element->type === 'form')
+            {!! $element->content !!}
+           @elseif ($element->type === 'slider')
+            <div class="carousel w-full">
+             @foreach (json_decode($element->content, true)['images'] ?? ['/storage/default-image.jpg'] as $image)
+              <img src="{{ $image }}" alt="Slide" class="max-w-full rounded-md">
+             @endforeach
             </div>
+           @endif
+           <div class="flex gap-2">
+            <button wire:click="selectElement({{ $element->id }})"
+             class="btn btn-sm btn-warning py-1 px-2 rounded-full hover:bg-yellow-600 text-white">
+             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+             </svg>
+            </button>
+            <button wire:click="deleteElement({{ $element->id }})"
+             class="btn btn-sm btn-danger py-1 px-2 rounded-full hover:bg-red-600 text-white">
+             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M3 6h18"></path>
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+             </svg>
+            </button>
            </div>
           </div>
-         @endif
+         </div>
         @empty
          <div class="text-center py-4">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"
@@ -342,13 +343,14 @@
        </div>
       </div>
      @else
-      <div class="alert alert-info text-center rounded-xl py-4">لطفاً یک صفحه انتخاب کنید یا صفحه جدیدی بسازید.</div>
+      <div class="alert alert-info text-center rounded-xl py-4">لطفاً یک صفحه انتخاب کنید یا صفحه جدیدی بسازید.
+      </div>
      @endif
 
      <!-- لیست صفحات و قالب‌ها -->
      <div class="card p-4 mt-4 rounded-xl shadow-lg bg-white">
       <h6 class="text-indigo-700 font-bold mb-3 text-lg">صفحات و قالب‌ها</h6>
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
        <div>
         <h6 class="text-gray-600 font-medium mb-2 text-base">صفحات</h6>
         <ul class="space-y-2">
@@ -395,10 +397,7 @@
             <span class="text-sm font-medium">{{ $template->name }}</span>
            </span>
            <button wire:click="applyTemplate({{ $template->id }})"
-            class="btn btn-sm btn-outline-primary py-1 px-3 rounded-full text-xs">
-            استفاده
-           </button>
-
+            class="btn btn-sm btn-outline-primary py-1 px-3 rounded-full text-xs">استفاده</button>
           </li>
          @endforeach
         </ul>
@@ -406,19 +405,15 @@
       </div>
      </div>
     </div>
-
-    <!-- سایدبار راست: المان‌ها و تنظیمات -->
-
    </div>
   </div>
  </div>
 
  <!-- پیش‌نمایش زنده -->
  @if ($isLivePreviewOpen)
-  <div class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center">
-   <div class="bg-white p-4 rounded-xl shadow-2xl w-11/12 max-h-[90vh] overflow-auto relative"
-    style="width: 50%;height: 100%;">
-    <button wire:click="toggleLivePreview" class="btn btn-danger text-sm  rounded-full absolute top-4 right-4">
+  <div class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center flex-row-reverse">
+   <div class="bg-white p-4 rounded-xl shadow-2xl w-11/12 md:w-3/4 max-h-[90vh] overflow-auto relative ">
+    <button wire:click="toggleLivePreview" class="btn btn-danger text-sm rounded-full absolute top-4 right-4">
      <img src="{{ asset('admin-assets/icons/times-square-svgrepo-com.svg') }}" alt="" srcset="">
     </button>
     <iframe srcdoc="{{ $generatedHtml }}" class="w-full h-[80vh] rounded-md border-none"></iframe>
@@ -426,132 +421,10 @@
    </div>
   </div>
  @endif
+ <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/page-builder/page-builder.css') }}">
 
  <!-- استایل‌ها -->
- <style>
-  .glass-header {
-   background: linear-gradient(135deg, rgba(79, 70, 229, 0.9), rgba(124, 58, 237, 0.8));
-   backdrop-filter: blur(12px);
-   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-   height: 74px;
-  }
 
-  .btn-glass {
-   background: rgba(255, 255, 255, 0.1);
-   border: 1px solid rgba(255, 255, 255, 0.3);
-   color: white;
-   transition: all 0.3s ease;
-  }
-
-  .btn-glass:hover {
-   background: rgba(255, 255, 255, 0.2);
-   transform: scale(1.05);
-  }
-
-  .input-shiny {
-   border: 1px solid #e5e7eb;
-   border-radius: 8px;
-   padding: 8px;
-   background: #fff;
-   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
-   transition: all 0.3s ease;
-  }
-
-  .input-shiny:focus {
-   border-color: #4f46e5;
-   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-   outline: none;
-  }
-
-  .btn-gradient-primary {
-   background: linear-gradient(90deg, #4f46e5, #7c3aed);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
-
-  .btn-gradient-primary:hover {
-   background: linear-gradient(90deg, #4338ca, #6b21a8);
-   transform: scale(1.05);
-   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-  }
-
-  .btn-gradient-success {
-   background: linear-gradient(90deg, #10b981, #34d399);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
-
-  .btn-gradient-success:hover {
-   background: linear-gradient(90deg, #059669, #10b981);
-   transform: scale(1.05);
-   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  }
-
-  .btn-gradient-secondary {
-   background: linear-gradient(90deg, #6b7280, #9ca3af);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
-
-  .btn-gradient-secondary:hover {
-   background: linear-gradient(90deg, #4b5563, #6b7280);
-   transform: scale(1.05);
-   box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
-  }
-
-  .btn-outline-primary {
-   border: 1px solid #4f46e5;
-   color: #4f46e5;
-   transition: all 0.3s ease;
-  }
-
-  .btn-outline-primary:hover {
-   background: #eef2ff;
-   transform: scale(1.05);
-   box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2);
-  }
-
-  .sortable {
-   border: 2px dashed #d1d5db;
-   transition: all 0.3s ease;
-  }
-
-  .sortable:hover {
-   border-color: #4f46e5;
-   box-shadow: 0 0 10px rgba(79, 70, 229, 0.1);
-  }
-
-  .card {
-   border: none;
-   background: #fff;
-   transition: all 0.3s ease;
-  }
-
-  .card:hover {
-   transform: translateY(-2px);
-   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  @keyframes slideIn {
-   from {
-    transform: translateY(20px);
-    opacity: 0;
-   }
-
-   to {
-    transform: translateY(0);
-    opacity: 1;
-   }
-  }
-
-  .animate-slide-in {
-   animation: slideIn 0.3s ease-out;
-  }
- </style>
 
  <!-- اسکریپت‌ها -->
  <script>
@@ -568,26 +441,29 @@
   });
  </script>
  <script>
-document.addEventListener('livewire:init', () => {
-    const targetNode = document.body; // یا یک المان خاص نزدیک‌تر به sortable
-    const observer = new MutationObserver((mutations, observer) => {
-        const sortableEl = document.querySelector('[wire\\:sortable="updateElementOrder"]');
-        if (sortableEl) {
-            new Sortable(sortableEl, {
-                animation: 150,
-                handle: '[wire\\:sortable\\.item]',
-                onEnd: (event) => {
-                    const items = Array.from(sortableEl.querySelectorAll('[wire\\:sortable\\.item]')).map((item, index) => ({
-                        id: item.getAttribute('wire:sortable.item'),
-                        order: index
-                    }));
-                    Livewire.dispatch('updateElementOrder', [items]);
-                }
-            });
-            observer.disconnect(); // بعد از پیدا کردن المان، observer را متوقف می‌کنیم
-        }
-    });
-    observer.observe(targetNode, { childList: true, subtree: true });
-});
-</script>
+  document.addEventListener('livewire:init', () => {
+   const targetNode = document.body; // یا یک المان خاص نزدیک‌تر به sortable
+   const observer = new MutationObserver((mutations, observer) => {
+    const sortableEl = document.querySelector('[wire\\:sortable="updateElementOrder"]');
+    if (sortableEl) {
+     new Sortable(sortableEl, {
+      animation: 150,
+      handle: '[wire\\:sortable\\.item]',
+      onEnd: (event) => {
+       const items = Array.from(sortableEl.querySelectorAll('[wire\\:sortable\\.item]')).map((item, index) => ({
+        id: item.getAttribute('wire:sortable.item'),
+        order: index
+       }));
+       Livewire.dispatch('updateElementOrder', [items]);
+      }
+     });
+     observer.disconnect(); // بعد از پیدا کردن المان، observer را متوقف می‌کنیم
+    }
+   });
+   observer.observe(targetNode, {
+    childList: true,
+    subtree: true
+   });
+  });
+ </script>
 </div>

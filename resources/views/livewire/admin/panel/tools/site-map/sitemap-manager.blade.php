@@ -1,20 +1,19 @@
 <div class="container-fluid py-1" wire:init="loadInitialData" dir="rtl">
  <!-- هدر -->
- <div
-  class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
-  <div class="d-flex align-items-center flex-grow-1 gap-3">
+ <div class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
+  <div class="d-flex align-items-center flex-grow-1 gap-3 header-title">
    <h1 class="m-0 h3 font-thin">مدیریت نقشه سایت</h1>
    <a href="{{ route('admin.tools.sitemap.settings') }}"
-    class="btn btn-gradient-primary rounded-pill px-3 py-1 text-white d-flex align-items-center gap-1"
+    class="btn btn-gradient-primary px-3 py-1 text-white d-flex align-items-center gap-1"
     style="font-size: 0.9rem;">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-     <path d="M12 5v.01M12 19v.01M19 12h.01M5 12h.01M16.5 16.5l-4.95-4.95M7.5 7.5l4.95 4.95" />
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin-slow">
+     <path d="M12 2a10 10 0 0 0-10 10c0 4.42 2.87 8.17 6.84 9.5M12 2v4m10 6a10 10 0 0 1-10 10c-4.42 0-8.17-2.87-9.5-6.84M22 12h-4m-6 10v-4M2 12a10 10 0 0 0 10-10" />
     </svg>
     <span>تنظیمات پیمایش</span>
    </a>
   </div>
-  <div class="d-flex gap-2 flex-shrink-0">
-   <button wire:click="crawlSite" class="btn btn-gradient-info rounded-pill px-4 d-flex align-items-center gap-2"
+  <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center buttons-container">
+   <button wire:click="crawlSite" class="btn btn-gradient-info px-4 py-2 d-flex align-items-center gap-2"
     @if ($isCrawling) disabled @endif>
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
      <path d="M21 10H3m18-4H3m18 8H3m18 4H3" />
@@ -23,7 +22,7 @@
     <span wire:loading.remove wire:target="crawlSite">پیمایش سایت</span>
    </button>
    @if ($isCrawling)
-    <button wire:click="stopCrawl" class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2">
+    <button wire:click="stopCrawl" class="btn btn-gradient-danger px-4 py-2 d-flex align-items-center gap-2">
      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M18 6L6 18M6 6l12 12" />
      </svg>
@@ -31,7 +30,7 @@
     </button>
    @endif
    <button wire:click="generateSitemap"
-    class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+    class="btn btn-gradient-success px-4 py-2 d-flex align-items-center gap-2">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
      <path d="M12 5v14M5 12h14" />
     </svg>
@@ -39,14 +38,14 @@
    </button>
    @if ($isGenerated)
     <a href="{{ route('admin.tools.sitemap.download') }}"
-     class="btn btn-gradient-primary rounded-pill px-4 d-flex align-items-center gap-2">
+     class="btn btn-gradient-primary px-4 py-2 d-flex align-items-center gap-2">
      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M12 15V3m0 12l-4-4m4 4l4-4M4 19h16" />
      </svg>
      <span>دانلود</span>
     </a>
    @endif
-   <button wire:click="deleteSelected" class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
+   <button wire:click="deleteSelected" class="btn btn-gradient-danger px-4 py-2 d-flex align-items-center gap-2"
     @if (empty($selectedRows)) disabled @endif>
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
@@ -93,12 +92,12 @@
    <div class="row g-3 align-items-end">
     <div class="col-md-5">
      <label class="form-label fw-bold text-dark">آدرس URL</label>
-     <input type="text" wire:model="newUrl" class="form-control bg-white border-dark text-dark rounded-pill"
+     <input type="text" wire:model="newUrl" class="form-control bg-white border-dark text-dark"
       placeholder="https://example.com/page">
     </div>
     <div class="col-md-2">
      <label class="form-label fw-bold text-dark">اولویت</label>
-     <select wire:model="newPriority" class="form-select bg-white border-dark text-dark rounded-pill">
+     <select wire:model="newPriority" class="form-select bg-white border-dark text-dark custom-select">
       @for ($i = 1.0; $i >= 0.1; $i -= 0.1)
        <option value="{{ number_format($i, 1) }}">{{ number_format($i, 1) }}</option>
       @endfor
@@ -106,7 +105,7 @@
     </div>
     <div class="col-md-2">
      <label class="form-label fw-bold text-dark">فرکانس تغییر</label>
-     <select wire:model="newFrequency" class="form-select bg-white border-dark text-dark rounded-pill">
+     <select wire:model="newFrequency" class="form-select bg-white border-dark text-dark custom-select">
       <option value="always">همیشه</option>
       <option value="hourly">ساعتی</option>
       <option value="daily">روزانه</option>
@@ -118,7 +117,7 @@
     </div>
     <div class="col-md-2">
      <label class="form-label fw-bold text-dark">نوع</label>
-     <select wire:model="newType" class="form-select bg-white border-dark text-dark rounded-pill">
+     <select wire:model="newType" class="form-select bg-white border-dark text-dark custom-select">
       <option value="page">صفحه</option>
       <option value="image">تصویر</option>
       <option value="video">ویدیو</option>
@@ -153,36 +152,35 @@
       <tbody>
        @if ($readyToLoad)
         @forelse ($urls as $index => $url)
-             <tr>
-              <td class="text-center align-middle">
-               <input type="checkbox" wire:model.live="selectedRows" value="{{ $url['id'] }}"
-                class="form-check-input m-0">
-              </td>
-              <td class="text-center align-middle">{{ $url['url'] }}</td>
-              <td class="text-center align-middle">{{ $url['priority'] }}</td>
-              <td class="text-center align-middle">{{ $url['frequency'] }}</td>
-              <td class="text-center align-middle">{{ $url['type'] }}</td>
-              <td class="text-center align-middle">
-               <button wire:click="toggleStatus({{ $url['id'] }})"
-                class="badge {{ $url['is_active'] ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer text-white">
-                {{ $url['is_active'] ? 'فعال' : 'غیرفعال' }}
-               </button>
-              </td>
-              <td class="text-center align-middle">
-                <button wire:click="confirmDelete({{ $url['id'] }})" class="btn btn-gradient-danger rounded-pill px-3">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                    </svg>
-                </button>
-              </td>
-             </tr>
+         <tr>
+          <td class="text-center align-middle">
+           <input type="checkbox" wire:model.live="selectedRows" value="{{ $url['id'] }}"
+            class="form-check-input m-0">
+          </td>
+          <td class="text-center align-middle">{{ $url['url'] }}</td>
+          <td class="text-center align-middle">{{ $url['priority'] }}</td>
+          <td class="text-center align-middle">{{ $url['frequency'] }}</td>
+          <td class="text-center align-middle">{{ $url['type'] }}</td>
+          <td class="text-center align-middle">
+           <button wire:click="toggleStatus({{ $url['id'] }})"
+            class="badge {{ $url['is_active'] ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer text-white">
+            {{ $url['is_active'] ? 'فعال' : 'غیرفعال' }}
+           </button>
+          </td>
+          <td class="text-center align-middle">
+           <button wire:click="confirmDelete({{ $url['id'] }})" class="btn btn-gradient-danger rounded-pill px-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+            </svg>
+           </button>
+          </td>
+         </tr>
         @empty
-             <tr>
-              <td colspan="7" class="text-center py-5 text-dark">هیچ URLای ثبت نشده است.</td>
-             </tr>
+         <tr>
+          <td colspan="7" class="text-center py-5 text-dark">هیچ URLای ثبت نشده است.</td>
+         </tr>
         @endforelse
        @endif
-
       </tbody>
      </table>
     </div>
@@ -204,149 +202,48 @@
    </div>
   </div>
  @endif
+<link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/site-map/sitemap-manager.css') }}">
 
- <style>
-  .glass-header {
-   background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(124, 58, 237, 0.85));
-   backdrop-filter: blur(10px);
-   border: 1px solid rgba(255, 255, 255, 0.2);
-   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
 
-  .btn-gradient-info {
-   background: linear-gradient(90deg, #06b6d4, #22d3ee);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
+ <script>
+  document.addEventListener('livewire:init', function () {
+   Livewire.on('show-alert', (event) => {
+    toastr[event.type](event.message);
+   });
 
-  .btn-gradient-info:hover {
-   background: linear-gradient(90deg, #0891b2, #06b6d4);
-   transform: translateY(-2px);
-  }
-
-  .btn-gradient-success {
-   background: linear-gradient(90deg, #10b981, #34d399);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
-
-  .btn-gradient-success:hover {
-   background: linear-gradient(90deg, #059669, #10b981);
-   transform: translateY(-2px);
-  }
-
-  .btn-gradient-danger {
-   background: linear-gradient(90deg, #f87171, #fca5a5);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
-
-  .btn-gradient-danger:hover {
-   background: linear-gradient(90deg, #ef4444, #f87171);
-   transform: translateY(-2px);
-  }
-
-  .btn-gradient-primary {
-   background: linear-gradient(90deg, #4f46e5, #7c3aed);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
-
-  .btn-gradient-primary:hover {
-   background: linear-gradient(90deg, #4338ca, #4f46e5);
-   transform: translateY(-2px);
-  }
-
-  .form-control,
-  .form-select {
-   background: #ffffff !important;
-   border-color: #6b7280 !important;
-   color: #1f2937 !important;
-   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-   border-radius: 12px;
-   padding: 0.5rem 1rem;
-   font-size: 0.9rem;
-   transition: all 0.3s ease;
-  }
-
-  .form-control:focus,
-  .form-select:focus {
-   border-color: #4f46e5 !important;
-   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
-   background: #f9f9f9 !important;
-  }
-
-  .vscode-preview {
-   background: #1e1e1e;
-   color: #d4d4d4;
-   font-family: 'Courier New', monospace;
-   font-size: 14px;
-   line-height: 1.5;
-   white-space: pre-wrap;
-   text-align: left;
-   direction: ltr;
-  }
-
-  .card {
-   border-radius: 10px;
-   overflow: hidden;
-  }
-
-  .table th,
-  .table td {
-   vertical-align: middle;
-  }
-
-  .form-check-input {
-   cursor: pointer;
-  }
- </style>
-
-<script>
-    document.addEventListener('livewire:init', function () {
-        Livewire.on('show-alert', (event) => {
-            toastr[event.type](event.message);
-        });
-
-        // تأیید حذف تکی
-        Livewire.on('confirm-delete', (event) => {
-            Swal.fire({
-                title: 'حذف مسیر',
-                text: 'آیا مطمئن هستید که می‌خواهید این مسیر را حذف کنید؟',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'بله، حذف کن',
-                cancelButtonText: 'خیر'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Livewire.dispatch('deleteUrlConfirmed', { id: event.id });
-                }
-            });
-        });
-
-        // تأیید حذف انتخاب‌شده‌ها
-        Livewire.on('confirm-delete-selected', () => {
-            Swal.fire({
-                title: 'حذف مسیرهای انتخاب‌شده',
-                text: 'آیا مطمئن هستید که می‌خواهید مسیرهای انتخاب‌شده را حذف کنید؟',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'بله، حذف کن',
-                cancelButtonText: 'خیر'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Livewire.dispatch('deleteSelectedConfirmed');
-                }
-            });
-        });
+   Livewire.on('confirm-delete', (event) => {
+    Swal.fire({
+     title: 'حذف مسیر',
+     text: 'آیا مطمئن هستید که می‌خواهید این مسیر را حذف کنید؟',
+     icon: 'warning',
+     showCancelButton: true,
+     confirmButtonColor: '#ef4444',
+     cancelButtonColor: '#6b7280',
+     confirmButtonText: 'بله، حذف کن',
+     cancelButtonText: 'خیر'
+    }).then((result) => {
+     if (result.isConfirmed) {
+      Livewire.dispatch('deleteUrlConfirmed', { id: event.id });
+     }
     });
-</script>
+   });
+
+   Livewire.on('confirm-delete-selected', () => {
+    Swal.fire({
+     title: 'حذف مسیرهای انتخاب‌شده',
+     text: 'آیا مطمئن هستید که می‌خواهید مسیرهای انتخاب‌شده را حذف کنید؟',
+     icon: 'warning',
+     showCancelButton: true,
+     confirmButtonColor: '#ef4444',
+     cancelButtonColor: '#6b7280',
+     confirmButtonText: 'بله، حذف کن',
+     cancelButtonText: 'خیر'
+    }).then((result) => {
+     if (result.isConfirmed) {
+      Livewire.dispatch('deleteSelectedConfirmed');
+     }
+    });
+   });
+  });
+ </script>
 </div>
