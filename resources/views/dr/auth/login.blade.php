@@ -12,15 +12,15 @@
  <title>پنل دکتر به نوبه</title>
 @endsection
 @section('content')
- <div class="login-wrapper d-flex w-100 justify-content-center align-items-center h-100vh">
-  <div class="">
-   @php
-$step = $step ?? 1;
-   @endphp
-   {{-- استپ اول: ورود با موبایل --}}
-   @if ($step == 1)
-  <div class="justify-content-center align-items-center">
-   <div class="col-md-6 login-container position-relative">
+     <div class="login-wrapper d-flex w-100 justify-content-center align-items-center h-100vh">
+    <div class="">
+     @php
+  $step = $step ?? 1;
+     @endphp
+     {{-- استپ اول: ورود با موبایل --}}
+     @if ($step == 1)
+    <div class="justify-content-center align-items-center">
+     <div class="col-md-6 login-container position-relative">
     <div class="login-card custom-rounded custom-shadow p-7">
      <div class="logo-wrapper w-100 d-flex justify-content-center">
     <img class="position-absolute mt-3 cursor-pointer" onclick="location.href='/'" width="85px"
@@ -52,7 +52,7 @@ $step = $step ?? 1;
     <a href="{{ route('dr.auth.login-user-pass-form') }}" class="text-primary text-decoration-none mb-3 d-block fw-bold">
      ورود با نام کاربری و کلمه عبور
     </a>
-{{--     <div class="d-flex align-items-center mt-1 mb-2">
+    {{--     <div class="d-flex align-items-center mt-1 mb-2">
       <input type="checkbox" class="form-check-input me-2" name="terms_accepted"
       style="vertical-align: middle; margin-top: -2px;">
       <label class="p-0 d-flex align-items-center" style="vertical-align: middle;">
@@ -67,157 +67,160 @@ $step = $step ?? 1;
 
      </form>
     </div>
-   </div>
-  </div>
-   @endif
-   {{-- استپ دوم: تایید کد OTP --}}
-   @if ($step == 2)
+     </div>
+    </div>
+     @endif
+     {{-- استپ دوم: تایید کد OTP --}}
+     @if ($step == 2)
     <div class="justify-content-center align-items-center">
      <div class="col-md-6 login-container position-relative">
       <div class="login-card custom-rounded custom-shadow p-7">
        <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="d-flex align-items-center">
-         <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
-         <span class="text-custom-gray px-1">ورود کاربر</span>
-        </div>
-        <a href="javascript:void(0);" class="back-link text-primary d-flex align-items-center go-back"
-         data-step="{{ $step }}">
-         <span class="ms-2">بازگشت</span>
-         <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
-          style="max-width: 24px;">
-        </a>
+      <div class="d-flex align-items-center">
+       <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
+       <span class="text-custom-gray px-1">ورود کاربر</span>
+      </div>
+      <a href="javascript:void(0);" class="back-link text-primary d-flex align-items-center go-back"
+       data-step="{{ $step }}">
+       <span class="ms-2">بازگشت</span>
+       <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
+      style="max-width: 24px;">
+      </a>
        </div>
        <form id="otp-form" method="POST" action="{{ route('dr.auth.login-confirm', ['token' => $token]) }}">
-        @csrf
-        <div class="d-flex justify-content-between mb-3" dir="rtl">
-         @for ($i = 0; $i < 4; $i++)
-          <input type="tel" name="otp[]" maxlength="1"
-           class="form-control otp-input text-center custom-rounded border">
-         @endfor
-        </div>
-        <div class="invalid-feedback otp-error" id="otp-error" style="display: none;"></div>
-        <button type="submit"
-         class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
-         ادامه
-        </button>
-        <section id="resend-otp" class="d-none mt-2">
-         <a href="{{ route('dr.auth.login-resend-otp', $token) }}"
-          class="text-decoration-none text-primary fw-bold">دریافت
-          مجدد کد تایید</a>
-        </section>
-        <section style="font-size: 14px" class="text-danger fw-bold fs-6 mt-3" id="timer"></section>
+      @csrf
+      <div class="d-flex justify-content-between mb-3" dir="rtl">
+       @for ($i = 0; $i < 4; $i++)
+      <input type="tel" name="otp[]" maxlength="1"
+       class="form-control otp-input text-center custom-rounded border">
+       @endfor
+      </div>
+      <div class="invalid-feedback otp-error" id="otp-error" style="display: none;"></div>
+      <button type="submit"
+       class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+       ادامه
+      </button>
+      <section id="resend-otp" class="d-none mt-2">
+       <a href="{{ route('dr.auth.login-resend-otp', $token) }}"
+      class="text-decoration-none text-primary fw-bold">دریافت
+      مجدد کد تایید</a>
+      </section>
+      <section style="font-size: 14px" class="text-danger fw-bold fs-6 mt-3" id="timer"></section>
        </form>
       </div>
      </div>
     </div>
-   @endif
-   {{-- استپ سوم: ورود با نام کاربری و کلمه عبور --}}
-   @if ($step == 3)
+     @endif
+     {{-- استپ سوم: ورود با نام کاربری و کلمه عبور --}}
+     @if ($step == 3)
     <div class="justify-content-center align-items-center">
      <div class="col-md-6 login-container position-relative">
       <div class="login-card custom-rounded custom-shadow p-7">
        <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="d-flex align-items-center">
-         <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
-         <span class="text-custom-gray px-1">ورود کاربر</span>
-        </div>
-        <a href="javascript:void(0);" class="back-link text-primary d-flex align-items-center go-back"
-         data-step="{{ $step }}">
-         <span class="ms-2">بازگشت</span>
-         <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
-          style="max-width: 24px;">
-        </a>
+      <div class="d-flex align-items-center">
+       <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
+       <span class="text-custom-gray px-1">ورود کاربر</span>
+      </div>
+      <a href="javascript:void(0);" class="back-link text-primary d-flex align-items-center go-back"
+       data-step="{{ $step }}">
+       <span class="ms-2">بازگشت</span>
+       <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
+      style="max-width: 24px;">
+      </a>
        </div>
        <form id="login-with-pass-form" method="POST" action="{{ route('dr-login-with-mobile-pass') }}">
-        @csrf
-        <div class="mb-3">
-         <div class="d-flex align-items-center mb-2">
-          <img src="{{ asset('dr-assets/login/images/phone.svg') }}" alt="Phone Icon" class="me-2">
-          <label class="text-custom-gray">شماره موبایل</label>
-         </div>
-         <input dir="ltr" class="form-control custom-rounded custom-shadow h-50" type="tel" name="mobile"
-          value="{{ old('mobile') }}" placeholder="09181234567" maxlength="11">
-         <div class="invalid-feedback mobile-error"></div>
-        </div>
-        <div class="mb-3">
-         <div class="d-flex align-items-center mb-2">
-          <img src="{{ asset('dr-assets/login/images/password.svg') }}" alt="Password Icon" class="me-2">
-          <label class="text-custom-gray">رمز عبور</label>
-         </div>
-         <div class="position-relative">
-          <input class="form-control custom-rounded custom-shadow h-50 text-end" type="password" name="password"
-           placeholder="رمز عبور خود را وارد کنید">
-          <img src="{{ asset('dr-assets/login/images/visible.svg') }}" alt="Visible Icon" class="password-toggle"
-           onclick="togglePasswordVisibility(this)">
-         </div>
-         <div class="invalid-feedback password-error"></div>
-        </div>
-        <button type="submit"
-         class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
-         ادامه
-        </button>
+      @csrf
+      <div class="mb-3">
+       <div class="d-flex align-items-center mb-2">
+      <img src="{{ asset('dr-assets/login/images/phone.svg') }}" alt="Phone Icon" class="me-2">
+      <label class="text-custom-gray">شماره موبایل</label>
+       </div>
+       <input dir="ltr" class="form-control custom-rounded custom-shadow h-50" type="tel" name="mobile"
+      value="{{ old('mobile') }}" placeholder="09181234567" maxlength="11">
+       <div class="invalid-feedback mobile-error"></div>
+      </div>
+      <div class="mb-3">
+      <div class="d-flex align-items-center mb-2">
+      <img src="{{ asset('admin-assets/login/images/password.svg') }}" alt="Password Icon" class="me-2">
+      <label class="text-custom-gray">رمز عبور</label>
+      </div>
+      <div class="position-relative">
+      <input class="form-control custom-rounded custom-shadow h-50 text-end" type="password" name="password"
+      placeholder="رمز عبور خود را وارد کنید" id="password-input">
+      <img src="{{ asset('admin-assets/login/images/visible.svg') }}" alt="Toggle Visibility" class="password-toggle"
+      onclick="togglePasswordVisibility('password-input')">
+      </div>
+      <div class="invalid-feedback password-error"></div>
+      </div>
+      <button type="submit"
+       class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+       ادامه
+      </button>
        </form>
       </div>
      </div>
     </div>
    @endif
-   {{-- استپ چهارم: ورود با رمز عبور دو مرحله‌ای --}}
-   @if ($step == 4)
+     {{-- استپ چهارم: ورود با رمز عبور دو مرحله‌ای --}}
+     @if ($step == 4)
     <div class="justify-content-center align-items-center">
      <div class="col-md-6 login-container position-relative">
       <div class="login-card custom-rounded custom-shadow p-7">
        <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="d-flex align-items-center">
-         <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
-         <span class="text-custom-gray px-1">ورود کاربر</span>
-        </div>
-        <a href="javascript:void(0);" class="back-link text-primary d-flex align-items-center go-back"
-         data-step="{{ $step }}">
-         <span class="ms-2">بازگشت</span>
-         <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
-          style="max-width: 24px;">
-        </a>
+      <div class="d-flex align-items-center">
+       <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
+       <span class="text-custom-gray px-1">ورود کاربر</span>
+      </div>
+      <a href="javascript:void(0);" class="back-link text-primary d-flex align-items-center go-back"
+       data-step="{{ $step }}">
+       <span class="ms-2">بازگشت</span>
+       <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="Back Icon" class="img-fluid"
+      style="max-width: 24px;">
+      </a>
        </div>
        <form id="two-factor-check-form" method="POST" action="{{ route('dr-two-factor-store') }}">
-        @csrf
-        <div class="mb-3">
-         <div class="d-flex align-items-center mb-2">
-          <img src="{{ asset('dr-assets/login/images/password.svg') }}" alt="Password Icon" class="me-2">
-          <label class="text-custom-gray">رمز دوعاملی</label>
-         </div>
-         <input dir="ltr" class="form-control custom-rounded custom-shadow h-50" type="password"
-          name="two_factor_secret" placeholder="رمز عبور خود را وارد کنید">
-         <div class="invalid-feedback two-factor-error"></div>
-        </div>
-        <button type="submit"
-         class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
-         ادامه
-        </button>
+      @csrf
+      <div class="mb-3">
+      <div class="d-flex align-items-center mb-2">
+      <img src="{{ asset('admin-assets/login/images/password.svg') }}" alt="Password Icon" class="me-2">
+      <label class="text-custom-gray">رمز دوعاملی</label>
+      </div>
+      <div class="position-relative">
+      <input dir="ltr" class="form-control custom-rounded custom-shadow h-50" type="password" name="two_factor_secret"
+      placeholder="رمز عبور خود را وارد کنید" id="two-factor-input">
+      <img src="{{ asset('admin-assets/login/images/visible.svg') }}" alt="Toggle Visibility" class="password-toggle"
+      onclick="togglePasswordVisibility('two-factor-input')">
+      </div>
+      <div class="invalid-feedback two-factor-error"></div>
+      </div>
+      <button type="submit"
+       class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+       ادامه
+      </button>
        </form>
       </div>
      </div>
     </div>
-   @endif
-  </div>
- </div>
+     @endif
+    </div>
+     </div>
 @endsection
 @section('scripts')
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
      <script src="{{ asset('dr-assets/js/login.js') }}"></script>
     <script src="{{ asset('dr-assets/panel/js/toastr/toastr.min.js') }}"></script>
 
      @php
-  // محاسبه زمان باقی‌مانده برای تایمر
-  $remainingTime = 0;
-  if (isset($otp) && $otp instanceof \App\Models\Dr\Otp) {
+// محاسبه زمان باقی‌مانده برای تایمر
+$remainingTime = 0;
+if (isset($otp) && $otp instanceof \App\Models\Dr\Otp) {
+  $remainingTime = max(0, ($otp->created_at->addMinutes(2)->timestamp - now()->timestamp) * 1000);
+} elseif (isset($token)) {
+  // اگر توکن موجود است، تلاش برای بازیابی OTP
+  $otp = \App\Models\Otp::where('token', $token)->first();
+  if ($otp) {
     $remainingTime = max(0, ($otp->created_at->addMinutes(2)->timestamp - now()->timestamp) * 1000);
-  } elseif (isset($token)) {
-    // اگر توکن موجود است، تلاش برای بازیابی OTP
-    $otp = \App\Models\Otp::where('token', $token)->first();
-    if ($otp) {
-    $remainingTime = max(0, ($otp->created_at->addMinutes(2)->timestamp - now()->timestamp) * 1000);
-    }
   }
+}
      @endphp
 
      <script>
@@ -248,8 +251,18 @@ $step = $step ?? 1;
      </script>
 
      <script>
-    /* set timer */
-    /* set timer */
+       function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = input.nextElementSibling; // آیکون چشم
+
+        if (input.type === 'password') {
+        input.type = 'text';
+        icon.style.opacity = '0.7'; // تغییر شفافیت برای نشان دادن حالت فعال (اختیاری)
+        } else {
+        input.type = 'password';
+        icon.style.opacity = '1'; // برگشت به حالت اولیه
+        }
+      }
     $(document).ready(function() {
      // Check if we have a token for the AJAX request
      const token = "{{ $token ?? '' }}"; // Use an empty string as a fallback
