@@ -10,7 +10,6 @@
    <h4 class="mb-0 fw-bold text-white tracking-tight">مدیریت قالب‌های ایمیل</h4>
   </div>
  </header>
-
  <!-- فرم و سلکت قالب -->
  <div class="row g-4 mb-5">
   <div class="col-lg-3 col-md-4 col-sm-12">
@@ -54,7 +53,6 @@
    </div>
   </div>
  </div>
-
  <!-- ابزارها و جستجو -->
  <div class="container-fluid px-0 mb-5">
   <div class="bg-light p-4 rounded-xl shadow-sm animate__animated animate__fadeInUp">
@@ -62,7 +60,7 @@
     <div class="col-md-6 col-sm-12">
      <div class="input-group align-items-center">
       <span class="input-group-text bg-white border-0 rounded-start-xl flex-shrink-0"
-       style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+       style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
         <circle cx="11" cy="11" r="8" />
         <path d="M21 21l-4.35-4.35" />
@@ -87,7 +85,6 @@
    </div>
   </div>
  </div>
-
  <!-- لیست قالب‌ها -->
  <div class="container-fluid px-0">
   <div class="card shadow-sm border-0 rounded-xl animate__animated animate__fadeInUp">
@@ -169,7 +166,6 @@
    </div>
   </div>
  </div>
-
  <!-- نکته راهنما -->
  <div
   class="help-block mt-5 p-4 rounded-xl shadow-sm d-flex align-items-center gap-3 animate__animated animate__fadeInUp">
@@ -184,8 +180,6 @@
  </div>
  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/mail-template/mail-template.css') }}">
  <!-- استایل‌ها -->
-
-
  <!-- اسکریپت‌ها (بدون تغییر) -->
 <script>
   document.addEventListener('livewire:init', () => {
@@ -198,13 +192,11 @@
       indentUnit: 4,
       theme: 'default'
     });
-
     // اطمینان از اینکه مقدار همیشه یک رشته باشد
     Livewire.on('updateEditor', (template) => {
       const safeTemplate = (template && typeof template === 'string') ? template : '';
       editor.setValue(safeTemplate);
     });
-
     Livewire.on('toast', (message, options = {}) => {
       if (typeof toastr === 'undefined') {
         console.error('Toastr is not loaded!');
@@ -221,7 +213,6 @@
       else if (type === 'warning') toastr.warning(message, '', toastOptions);
       else toastr.info(message, '', toastOptions);
     });
-
     Livewire.on('confirmDeleteSelected', () => {
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
@@ -238,17 +229,14 @@
         }
       });
     });
-
     Livewire.on('openPreview', (template) => {
       // لاگ برای دیباگ
-
       // اگر template آرایه باشد، اولین عنصر آن را بگیریم یا مقدار پیش‌فرضを設定 کنیم
       const safePreview = (template && typeof template === 'string')
         ? template
         : (Array.isArray(template) && template[0] && typeof template[0] === 'string')
           ? template[0]
           : '<p>محتوای پیش‌نمایش در دسترس نیست.</p>';
-
       let x = screen.width / 2 - 700 / 2;
       let y = screen.height / 2 - 450 / 2;
       let previewWindow = window.open('', 'Preview', 'height=500,width=600,left=' + x + ',top=' + y);
@@ -257,12 +245,10 @@
       previewWindow.document.close();
       if (previewWindow.focus) previewWindow.focus();
     });
-
     editor.on('change', (cm) => {
       @this.set('newTemplate', cm.getValue());
     });
   });
-
   function confirmDelete(id) {
     Swal.fire({
       title: 'آیا مطمئن هستید؟',

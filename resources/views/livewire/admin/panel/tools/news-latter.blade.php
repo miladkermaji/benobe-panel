@@ -18,7 +18,7 @@
                 <div class="col-md-4 col-sm-12">
                     <div class="input-group align-items-center">
                         <span class="input-group-text bg-white border-0 rounded-start-xl flex-shrink-0"
-                            style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                            style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
                                 stroke-width="2">
                                 <path d="M12 5v14M5 12h14" />
