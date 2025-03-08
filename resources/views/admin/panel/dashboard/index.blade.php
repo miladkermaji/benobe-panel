@@ -9,6 +9,4 @@
 @section('bread-crumb-title', 'داشبورد')
 @section('scripts')
 
-
-
 @endsection
