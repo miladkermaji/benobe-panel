@@ -144,7 +144,7 @@ class DoctorLoginController extends Controller
       ->first();
 
     if (!$otp || $otp->otp_code !== $otpCode) {
-      $mobile = $otp?->manager?->mobile  ?? $otp?->login_id ?? 'unknown';
+      $mobile = $otp?->manager?->mobile ?? $otp?->login_id ?? 'unknown';
       $userId = $otp?->manager_id ?? null;
 
       (new LoginAttemptsService())->incrementLoginAttempt(
@@ -233,7 +233,7 @@ class DoctorLoginController extends Controller
 
     $loginAttempts->resetLoginAttempts($mobile);
 
-    return response()->json(['success' => true, 'redirect' => route('admin.index')]);
+    return response()->json(['success' => true, 'redirect' => route('admin-panel')]);
   }
 
 
@@ -264,7 +264,7 @@ class DoctorLoginController extends Controller
 
     if ($user instanceof manager) {
       Auth::guard('manager')->login($user);
-    } 
+    }
 
     // **ثبت لاگ ورود با دو عاملی**
     LoginLog::create([
@@ -281,7 +281,7 @@ class DoctorLoginController extends Controller
 
     return response()->json([
       'success' => true,
-      'redirect' => route('admin.index')
+      'redirect' => route('admin-panel')
     ]);
   }
 
@@ -317,12 +317,12 @@ class DoctorLoginController extends Controller
       $user = Auth::guard('manager')->user();
       $guard = 'manager';
       Auth::guard('manager')->logout();
-    } 
+    }
 
     if ($user) {
       // به‌روزرسانی لاگ آخرین ورود با مقدار logout_at
       LoginLog::where('manager_id', $guard === 'manager' ? $user->id : null)
-        
+
         ->whereNull('logout_at')
         ->latest()
         ->first()
