@@ -71,7 +71,7 @@
      <div class="card p-4 rounded-xl shadow-lg bg-white mt-4">
       <h6 class="text-indigo-700 font-bold mb-3 text-base">المان‌ها</h6>
       <div class="grid grid-cols-2 gap-2">
-       @foreach (['text', 'image', 'button', 'video', 'form', 'slider'] as $type)
+       @foreach (['text', 'image', 'button', 'video', 'form'] as $type)
         <button wire:click="addElement('{{ $type }}')"
          class="btn btn-outline-primary flex items-center justify-center gap-2 p-2 rounded-lg hover:bg-indigo-50 transition-all duration-300">
          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -90,13 +90,10 @@
           @elseif ($type === 'form')
            <rect x="4" y="4" width="16" height="16" rx="2" />
            <path d="M8 10h8M8 14h8" />
-          @elseif ($type === 'slider')
-           <rect x="3" y="5" width="18" height="14" rx="2" />
-           <path d="M9 12l3 3 3-3M12 9v6" />
           @endif
          </svg>
          <span
-          class="text-sm font-medium">{{ $type === 'text' ? 'متن' : ($type === 'image' ? 'تصویر' : ($type === 'button' ? 'دکمه' : ($type === 'video' ? 'ویدیو' : ($type === 'form' ? 'فرم' : 'اسلایدر')))) }}</span>
+          class="text-sm font-medium">{{ $type === 'text' ? 'متن' : ($type === 'image' ? 'تصویر' : ($type === 'button' ? 'دکمه' : ($type === 'video' ? 'ویدیو' : ($type === 'form' ? 'فرم' : '')))) }}</span>
         </button>
        @endforeach
       </div>
@@ -239,110 +236,108 @@
      @if ($selectedPage)
       <div class="card p-4 rounded-xl shadow-lg bg-white">
        <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
-        <h5 class="text-indigo-700 font-bold text-lg">{{ $selectedPage->title }}</h5>
-        <div class="flex items-center gap-2 flex-wrap">
-         <button wire:click="updatePage"
-          class="btn btn-gradient-primary py-2 px-4 rounded-lg text-white text-sm">ذخیره</button>
-         <button wire:click="exportHtml"
-          class="btn btn-gradient-secondary py-2 px-4 rounded-lg text-white text-sm">خروجی HTML</button>
-         <button wire:click="saveAsTemplate"
-          class="btn btn-gradient-success py-2 px-4 rounded-lg text-white text-sm">ذخیره به‌عنوان قالب</button>
-         <input type="text" wire:model="newTemplateName" class="input-shiny p-2 rounded-lg w-32 text-sm"
-          placeholder="نام قالب">
-        </div>
+      <h5 class="text-indigo-700 font-bold text-lg">{{ $selectedPage->title }}</h5>
+      <div class="flex items-center gap-2 flex-wrap">
+       <button wire:click="updatePage"
+        class="btn btn-gradient-primary py-2 px-4 rounded-lg text-white text-sm">ذخیره</button>
+       <button wire:click="exportHtml"
+        class="btn btn-gradient-secondary py-2 px-4 rounded-lg text-white text-sm">خروجی HTML</button>
+       <button wire:click="saveAsTemplate"
+        class="btn btn-gradient-success py-2 px-4 rounded-lg text-white text-sm">ذخیره به‌عنوان قالب</button>
+       <input type="text" wire:model="newTemplateName" class="input-shiny p-2 rounded-lg w-32 text-sm"
+        placeholder="نام قالب">
+      </div>
        </div>
 
        <!-- پیش‌نمایش -->
        <!-- پیش‌نمایش -->
-       <!-- پیش‌نمایش -->
        <div wire:sortable="updateElementOrder" class="sortable p-4 rounded-xl border-2 border-dashed border-gray-300"
-        style="min-height: 500px; background-color: #f9fafb; {{ $isFullScreenPreview ? 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; padding: 20px; background: #fff;' : '' }} {{ $previewMode === 'mobile' ? 'max-width: 400px; margin: 0 auto;' : ($previewMode === 'tablet' ? 'max-width: 768px; margin: 0 auto;' : 'width: 100%;') }}">
-        @if ($isFullScreenPreview)
-         <button wire:click="toggleFullScreenPreview"
-          class="btn btn-danger text-sm py-2 px-4 rounded-full absolute top-4 right-4 z-50">خروج</button>
-        @endif
-        @forelse ($elements as $element)
-         @php
-          $defaultSettings = [
-              'color' => '#000000',
-              'background_color' => '#ffffff',
-              'font_size' => '16px',
-              'padding' => '10px',
-              'margin' => '0px',
-              'animation' => 'none',
-              'animation_duration' => '1s',
-              'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
-              'box_shadow' => 'none',
-              'border' => 'none',
-              'opacity' => '1',
-              'grid_columns' => 1,
-              'width' => '100%',
-              'height' => 'auto',
-              'text_align' => 'right',
-              'border_radius' => '0px',
-              'rotation' => '0deg',
-          ];
-          $settings = is_array($element->settings) ? $element->settings : json_decode($element->settings, true);
-          $settings = array_merge($defaultSettings, is_array($settings) ? $settings : []);
-         @endphp
-         <div wire:sortable.item="{{ $element->id }}"
-          class="card mb-3 p-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
-          style="cursor: move; color: {{ $settings['color'] }}; background-color: {{ $settings['background_color'] }}; font-size: {{ $settings['font_size'] }}; padding: {{ $settings['padding'] }}; margin: {{ $settings['margin'] }}; box-shadow: {{ $settings['box_shadow'] }}; border: {{ $settings['border'] }}; opacity: {{ $settings['opacity'] }}; width: {{ $settings['width'] }}; height: {{ $settings['height'] }}; text-align: {{ $settings['text_align'] }}; border-radius: {{ $settings['border_radius'] }}; transform: rotate({{ $settings['rotation'] }}); animation: {{ $settings['animation'] }} {{ $settings['animation_duration'] }} ease-in-out;">
-          <div class="flex justify-between items-center">
-           @if ($element->type === 'text')
-            <span class="text-base">{{ $element->content }}</span>
-           @elseif ($element->type === 'image')
-            <img src="{{ $element->content }}" alt="Image" class="max-w-full rounded-md">
-           @elseif ($element->type === 'button')
-            <button class="btn btn-primary py-1 px-3 rounded-lg text-sm">{{ $element->content }}</button>
-           @elseif ($element->type === 'video')
-            <video controls class="w-full max-h-48 rounded-md">
-             <source src="{{ $element->content }}" type="video/mp4">
-             مرورگر شما از ویدیو پشتیبانی نمی‌کند.
-            </video>
-           @elseif ($element->type === 'form')
-            {!! $element->content !!}
-           @elseif ($element->type === 'slider')
-            <div class="carousel w-full">
-             @foreach (json_decode($element->content, true)['images'] ?? ['/storage/default-image.jpg'] as $image)
-              <img src="{{ $image }}" alt="Slide" class="max-w-full rounded-md">
-             @endforeach
-            </div>
-           @endif
-           <div class="flex gap-2">
-            <button wire:click="selectElement({{ $element->id }})"
-             class="btn btn-sm btn-warning py-1 px-2 rounded-full hover:bg-yellow-600 text-white">
-             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-             </svg>
-            </button>
-            <button wire:click="deleteElement({{ $element->id }})"
-             class="btn btn-sm btn-danger py-1 px-2 rounded-full hover:bg-red-600 text-white">
-             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M3 6h18"></path>
-              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-             </svg>
-            </button>
-           </div>
-          </div>
-         </div>
-        @empty
-         <div class="text-center py-4">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"
-           class="mx-auto mb-3">
-           <path d="M4 4h16v16H4z" />
-           <path d="M4 4l16 16M4 20L20 4" />
-          </svg>
-          <p class="text-gray-500 text-base">المانی برای نمایش وجود ندارد.</p>
-         </div>
-        @endforelse
+      style="min-height: 500px; background-color: #f9fafb; {{ $isFullScreenPreview ? 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; padding: 20px; background: #fff;' : '' }} {{ $previewMode === 'mobile' ? 'max-width: 400px; margin: 0 auto;' : ($previewMode === 'tablet' ? 'max-width: 768px; margin: 0 auto;' : 'width: 100%;') }}">
+      @if ($isFullScreenPreview)
+       <button wire:click="toggleFullScreenPreview"
+        class="btn btn-danger text-sm py-2 px-4 rounded-full absolute top-4 right-4 z-50">خروج</button>
+      @endif
+      @forelse ($elements as $element)
+       @php
+    $defaultSettings = [
+      'color' => '#000000',
+      'background_color' => '#ffffff',
+      'font_size' => '16px',
+      'padding' => '10px',
+      'margin' => '0px',
+      'animation' => 'none',
+      'animation_duration' => '1s',
+      'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
+      'box_shadow' => 'none',
+      'border' => 'none',
+      'opacity' => '1',
+      'grid_columns' => 1,
+      'width' => '100%',
+      'height' => 'auto',
+      'text_align' => 'right',
+      'border_radius' => '0px',
+      'rotation' => '0deg',
+    ];
+    $settings = is_array($element->settings) ? $element->settings : json_decode($element->settings, true);
+    $settings = array_merge($defaultSettings, is_array($settings) ? $settings : []);
+       @endphp
+       <div wire:sortable.item="{{ $element->id }}"
+      class="card mb-3 p-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+      style="cursor: move; color: {{ $settings['color'] }}; background-color: {{ $settings['background_color'] }}; font-size: {{ $settings['font_size'] }}; padding: {{ $settings['padding'] }}; margin: {{ $settings['margin'] }}; box-shadow: {{ $settings['box_shadow'] }}; border: {{ $settings['border'] }}; opacity: {{ $settings['opacity'] }}; width: {{ $settings['width'] }}; height: {{ $settings['height'] }}; text-align: {{ $settings['text_align'] }}; border-radius: {{ $settings['border_radius'] }}; transform: rotate({{ $settings['rotation'] }}); animation: {{ $settings['animation'] }} {{ $settings['animation_duration'] }} ease-in-out;">
+      <div class="flex justify-between items-center">
+       @if ($element->type === 'text')
+      <span class="text-base">{{ $element->content }}</span>
+       @elseif ($element->type === 'image')
+      <img src="{{ $element->content }}" alt="تصویر" class="max-w-full rounded-md"
+       onerror="this.src='/storage/default-image.jpg';">
+       @elseif ($element->type === 'button')
+      <button class="btn btn-primary py-1 px-3 rounded-lg text-sm">{{ $element->content }}</button>
+       @elseif ($element->type === 'video')
+      <video controls class="w-full max-h-48 rounded-md">
+       <source src="{{ $element->content }}" type="video/mp4">
+       مرورگر شما از ویدیو پشتیبانی نمی‌کند.
+      </video>
+       @elseif ($element->type === 'form')
+      {!! $element->content !!}
+
+      </div>
+      <!-- دکمه‌های قبلی و بعدی -->
+      </div>
+     @endif
+       <div class="flex gap-2">
+      <button wire:click="selectElement({{ $element->id }})"
+       class="btn btn-sm btn-warning py-1 px-2 rounded-full hover:bg-yellow-600 text-white">
+       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+       </svg>
+      </button>
+      <button wire:click="deleteElement({{ $element->id }})"
+       class="btn btn-sm btn-danger py-1 px-2 rounded-full hover:bg-red-600 text-white">
+       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2">
+        <path d="M3 6h18"></path>
+        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+       </svg>
+      </button>
        </div>
       </div>
-     @else
+       </div>
+    @empty
+       <div class="text-center py-4">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"
+         class="mx-auto mb-3">
+         <path d="M4 4h16v16H4z" />
+         <path d="M4 4l16 16M4 20L20 4" />
+        </svg>
+        <p class="text-gray-500 text-base">المانی برای نمایش وجود ندارد.</p>
+       </div>
+      @endforelse
+       </div>
+      </div>
+   @else
       <div class="alert alert-info text-center rounded-xl py-4">لطفاً یک صفحه انتخاب کنید یا صفحه جدیدی بسازید.
       </div>
      @endif

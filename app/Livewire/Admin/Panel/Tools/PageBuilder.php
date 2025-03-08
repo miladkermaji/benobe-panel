@@ -135,7 +135,6 @@ class PageBuilder extends Component
         }
     }
 
-
     public function togglePageStatus($pageId)
     {
         try {
@@ -153,7 +152,6 @@ class PageBuilder extends Component
             $this->dispatch('toast', 'خطایی در تغییر وضعیت صفحه رخ داد.', ['type' => 'error']);
         }
     }
-
 
     public function deletePage($pageId)
     {
@@ -243,8 +241,9 @@ class PageBuilder extends Component
 
     public function updateElement()
     {
-        if (!$this->selectedElement)
+        if (!$this->selectedElement) {
             return;
+        }
         try {
             $this->selectedElement->update(['content' => $this->content, 'settings' => json_encode($this->elementSettings)]);
             $this->elements = Element::where('page_id', $this->selectedPage->id)->orderBy('order')->get();
@@ -276,18 +275,13 @@ class PageBuilder extends Component
             foreach ($orderedElements as $element) {
                 Element::where('id', $element['id'])->update(['order' => $element['order']]);
             }
-            $this->elements = Element::where('page_id', $this->selectedPage->id)
-                ->orderBy('order')
-                ->get();
+            $this->elements = Element::where('page_id', $this->selectedPage->id)->orderBy('order')->get();
             $this->dispatch('toast', 'ترتیب المان‌ها بروزرسانی شد.', ['type' => 'success']);
         } catch (\Exception $e) {
             Log::error('Error in updateElementOrder: ' . $e->getMessage());
             $this->dispatch('toast', 'خطایی در مرتب‌سازی المان‌ها رخ داد.', ['type' => 'error']);
         }
     }
-
-
-
 
     public function copyElement($elementId)
     {
@@ -302,8 +296,9 @@ class PageBuilder extends Component
 
     public function pasteElement()
     {
-        if (!$this->copiedElement || !$this->selectedPage)
+        if (!$this->copiedElement || !$this->selectedPage) {
             return;
+        }
         try {
             $order = Element::where('page_id', $this->selectedPage->id)->max('order') + 1;
             Element::create([
@@ -363,7 +358,6 @@ class PageBuilder extends Component
         }
     }
 
-
     public function toggleFullScreenPreview()
     {
         $this->isFullScreenPreview = !$this->isFullScreenPreview;
@@ -398,7 +392,6 @@ class PageBuilder extends Component
         $this->history[] = $state;
         $this->historyIndex = count($this->history) - 1;
     }
-
 
     public function restoreFromHistory()
     {
@@ -437,7 +430,6 @@ class PageBuilder extends Component
             'button' => 'کلیک کنید',
             'video' => 'https://benobe.ir/uploads/home_video/1666005351_benobe.mp4',
             'form' => '<form><input type="text" placeholder="نام"><input type="email" placeholder="ایمیل"><button type="submit">ارسال</button></form>',
-            'slider' => json_encode(['images' => ['/storage/default-image.jpeg']]),
             default => '',
         };
     }
@@ -494,7 +486,6 @@ class PageBuilder extends Component
         $html .= '</body></html>';
         return $html;
     }
-
 
     public function applyTemplate($templateId)
     {
@@ -556,5 +547,4 @@ class PageBuilder extends Component
             'generatedHtml' => $this->generateHtml(),
         ]);
     }
-
 }
