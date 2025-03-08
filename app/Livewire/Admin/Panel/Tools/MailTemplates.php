@@ -13,7 +13,7 @@ class MailTemplates extends Component
 
     public $search = '';
     public $newSubject = '';
-    public $newTemplate = '';
+    public $newTemplate = ''; // مقدار اولیه رشته خالی
     public $editId = null;
     public $selectedTemplateId = null;
     public $perPage = 10;
@@ -44,10 +44,15 @@ class MailTemplates extends Component
         if ($value) {
             $template = MailTemplate::find($value);
             if ($template) {
-                $this->newSubject = $template->subject;
-                $this->newTemplate = $template->template;
-                $this->dispatch('updateEditor', $template->template);
+                $this->newSubject = $template->subject ?? '';
+                $this->newTemplate = $template->template ?? '';
+                $this->editId = $template->id;
+                $this->dispatch('updateEditor', $this->newTemplate);
+            } else {
+                $this->resetInputFields();
             }
+        } else {
+            $this->resetInputFields();
         }
     }
 
@@ -81,9 +86,7 @@ class MailTemplates extends Component
                 'template' => $this->newTemplate,
                 'is_active' => true,
             ]);
-            $this->newSubject = '';
-            $this->newTemplate = '';
-            $this->dispatch('updateEditor', '');
+            $this->resetInputFields();
             $this->dispatch('toast', 'قالب جدید با موفقیت اضافه شد.', ['type' => 'success']);
         } catch (\Exception $e) {
             Log::error('Error adding mail template: ' . $e->getMessage());
@@ -95,9 +98,9 @@ class MailTemplates extends Component
     {
         $template = MailTemplate::findOrFail($id);
         $this->editId = $id;
-        $this->newSubject = $template->subject;
-        $this->newTemplate = $template->template;
-        $this->dispatch('updateEditor', $template->template);
+        $this->newSubject = $template->subject ?? '';
+        $this->newTemplate = $template->template ?? '';
+        $this->dispatch('updateEditor', $this->newTemplate);
         $this->resetValidation();
     }
 
@@ -112,10 +115,7 @@ class MailTemplates extends Component
                 'subject' => $this->newSubject,
                 'template' => $this->newTemplate,
             ]);
-            $this->editId = null;
-            $this->newSubject = '';
-            $this->newTemplate = '';
-            $this->dispatch('updateEditor', '');
+            $this->resetInputFields();
             $this->dispatch('toast', 'قالب با موفقیت ویرایش شد.', ['type' => 'success']);
         } catch (\Exception $e) {
             Log::error('Error updating mail template: ' . $e->getMessage());
@@ -125,10 +125,7 @@ class MailTemplates extends Component
 
     public function cancelEdit()
     {
-        $this->editId = null;
-        $this->newSubject = '';
-        $this->newTemplate = '';
-        $this->dispatch('updateEditor', '');
+        $this->resetInputFields();
         $this->resetValidation();
     }
 
@@ -186,7 +183,7 @@ class MailTemplates extends Component
         $templates = MailTemplate::all();
         $csv = "عنوان,محتوا,وضعیت\n";
         foreach ($templates as $template) {
-            $csv .= "{$template->subject},\"" . str_replace('"', '""', $template->template) . "\"," . ($template->is_active ? 'فعال' : 'غیرفعال') . "\n";
+            $csv .= "{$template->subject},\"" . str_replace('"', '""', $template->template ?? '') . "\"," . ($template->is_active ? 'فعال' : 'غیرفعال') . "\n";
         }
         return response()->streamDownload(function () use ($csv) {
             echo $csv;
@@ -196,11 +193,21 @@ class MailTemplates extends Component
     public function previewTemplate($id)
     {
         $template = MailTemplate::findOrFail($id);
-        if ($template && $template->template) {
-            $this->dispatch('openPreview', $template->template);
-        } else {
-            $this->dispatch('toast', 'محتوای قالب خالی است.', ['type' => 'warning']);
-        }
+        $templateContent = $template->template ?? '<p>محتوای قالب خالی است.</p>';
+
+        // لاگ برای دیباگ
+     
+
+        $this->dispatch('openPreview', $templateContent);
+    }
+
+    private function resetInputFields()
+    {
+        $this->editId = null;
+        $this->newSubject = '';
+        $this->newTemplate = '';
+        $this->selectedTemplateId = null;
+        $this->dispatch('updateEditor', '');
     }
 
     public function render()

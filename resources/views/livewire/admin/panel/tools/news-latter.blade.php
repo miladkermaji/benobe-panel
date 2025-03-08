@@ -12,7 +12,7 @@
     </header>
 
     <!-- ابزارها -->
-    <div class="container px-0 mb-5">
+    <div class="container-fluid px-0 mb-5">
         <div class="bg-light p-4 rounded-xl shadow-sm animate__animated animate__fadeInUp">
             <div class="row g-4 align-items-center">
                 <div class="col-md-4 col-sm-12">
@@ -68,7 +68,7 @@
     </div>
 
     <!-- لیست اعضا -->
-    <div class="container px-0">
+    <div class="container-fluid px-0">
         <div class="card shadow-sm border-0 rounded-xl animate__animated animate__fadeInUp">
             <div class="card-body p-0">
                 <div class="table-responsive text-nowrap">

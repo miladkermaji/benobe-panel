@@ -50,6 +50,7 @@
     .btn-gradient-success {
      background: linear-gradient(90deg, #10b981, #34d399);
      border: none;
+     height: 44px;
      color: white;
      transition: all 0.3s ease;
     }
@@ -127,17 +128,11 @@
       padding: 20px;
      }
 
-     .btn {
-
-      margin-top: 10px;
-     }
+   
     }
 
     @media (max-width: 768px) {
-     .input-group {
-
-      gap: 12px;
-     }
+   
 
      .input-modern {
       font-size: 14px;
@@ -150,9 +145,7 @@
       padding: 10px;
      }
 
-     .d-flex.gap-3 {
-      gap: 12px;
-     }
+   
     }
 
     @media (max-width: 576px) {

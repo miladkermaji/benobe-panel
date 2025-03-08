@@ -72,9 +72,9 @@
        <!-- مدیریت کاربران -->
        <li class="item-li i-users">
         <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-         <span>
+        
           مدیریت کاربران
-         </span>
+         
          <div class="d-flex justify-content-end w-100 align-items-center">
           <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
            xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
@@ -96,9 +96,7 @@
        <!-- مدیریت پزشکان -->
        <li class="item-li i-users">
         <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-         <span>
           مدیریت پزشکان
-         </span>
          <div class="d-flex justify-content-end w-100 align-items-center">
           <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
            xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
@@ -121,9 +119,7 @@
        <!-- مدیریت نوبت‌ها -->
        <li class="item-li i-courses">
         <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-         <span>
           مدیریت نوبت‌ها
-         </span>
          <div class="d-flex justify-content-end w-100 align-items-center">
           <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
            xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
@@ -145,9 +141,7 @@
        <!-- مدیریت بیماران -->
        <li class="item-li i-users">
         <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-         <span>
           مدیریت بیماران
-         </span>
          <div class="d-flex justify-content-end w-100 align-items-center">
           <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
            xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
@@ -168,10 +162,8 @@
        <!-- مدیریت مالی -->
        <li class="item-li i-courses">
         <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-         <span>
 
           مدیریت مالی
-         </span>
          <div class="d-flex justify-content-end w-100 align-items-center">
           <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
            xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
@@ -192,10 +184,8 @@
        <!-- تنظیمات سایت -->
        <li class="item-li i-courses">
         <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-         <span>
 
           تنظیمات سایت
-         </span>
          <div class="d-flex justify-content-end w-100 align-items-center">
           <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
            xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
@@ -217,10 +207,8 @@
        <!-- گزارش‌ها -->
        <li class="item-li i-courses">
         <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-         <span>
 
           گزارش‌ها
-         </span>
          <div class="d-flex justify-content-end w-100 align-items-center">
           <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
            xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
@@ -242,10 +230,8 @@
        <!-- پشتیبانی -->
        <li class="item-li i-courses">
         <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-         <span>
     
           پشتیبانی
-         </span>
          <div class="d-flex justify-content-end w-100 align-items-center">
           <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
            xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">

@@ -163,10 +163,7 @@
   }
 
   @media (max-width: 768px) {
-   .input-group {
-
-    gap: 12px;
-   }
+ 
 
    .input-modern {
     font-size: 14px;
@@ -179,10 +176,7 @@
     padding: 10px;
    }
 
-   .d-flex.gap-3 {
 
-    gap: 12px;
-   }
   }
 
   @media (max-width: 576px) {
