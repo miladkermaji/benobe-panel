@@ -52,7 +52,6 @@
 
 @push('scripts')
     <script>
-        // تعریف interval توی scope جهانی
         window.interval = window.interval || null;
 
         function startTimer(duration, countDownDate) {
@@ -63,9 +62,8 @@
             // تبدیل به عدد و مدیریت مقادیر نامعتبر
             duration = Number(duration) || 120000; // پیش‌فرض 2 دقیقه اگه duration نامعتبر باشه
             countDownDate = Number(countDownDate) || (new Date().getTime() + duration);
-            const totalDuration = duration; // totalDuration همیشه برابر duration
+            const totalDuration = 120000; // زمان کل ثابت (2 دقیقه)
 
-            console.log('startTimer فراخوانی شد با:', { duration, countDownDate, totalDuration });
 
             const timerElement = document.getElementById('timer');
             const progressBarContainer = document.getElementById('progress-bar-container');
@@ -73,7 +71,6 @@
             const resendSection = document.getElementById('resend-otp');
 
             if (!timerElement || !progressBarContainer || !progressBar || !resendSection) {
-                console.error('عناصر DOM پیدا نشدند');
                 return;
             }
 
@@ -149,7 +146,6 @@
         });
 
         Livewire.on('initOtpForm', (data) => {
-            console.log('داده‌های initOtpForm:', data);
             startTimer(data.remainingTime, data.countDownDate);
             setupOtpInputs();
             const resendSection = document.getElementById('resend-otp');
@@ -159,7 +155,6 @@
         });
 
         Livewire.on('otpResent', (data) => {
-            console.log('داده‌های otpResent:', data);
             if (!window.otpResentToastShown) {
                 toastr.success(data.message);
                 window.otpResentToastShown = true;
@@ -211,12 +206,6 @@
                 willClose: () => {
                     clearInterval(timerInterval);
                 }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    console.log('کاربر تأیید کرد');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    console.log('کاربر لغو کرد');
-                }
             });
         });
 
@@ -250,7 +239,6 @@
             const initialRemainingTime = {{ $remainingTime ?? 0 }};
             const initialCountDownDate = {{ $countDownDate ?? 0 }};
             const initialShowResendButton = {{ $showResendButton ? 'true' : 'false' }};
-            console.log('مقادیر اولیه:', { initialRemainingTime, initialCountDownDate, initialShowResendButton });
             if (initialRemainingTime > 0) {
                 startTimer(initialRemainingTime, initialCountDownDate);
             }

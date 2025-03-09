@@ -186,12 +186,12 @@ class LoginConfirm extends Component
         $countDownDate = now()->addMinutes(2)->timestamp * 1000; // زمان پایان جدید
         session(['otp_token' => $newToken]);
 
-        $this->dispatch('otpResent', [
-            'message' => 'کد جدید ارسال شد',
-            'remainingTime' => $this->remainingTime,
-            'countDownDate' => $countDownDate,
-            'showResendButton' => false,
-        ]);
+        $this->dispatch('otpResent', 
+            message : 'کد جدید ارسال شد',
+            remainingTime : $this->remainingTime,
+            countDownDate : $countDownDate,
+            showResendButton : false,
+        );
     
     }
 
