@@ -1,7 +1,12 @@
 <?php
 use Mockery\Container;
+use App\Livewire\Admin\Auth\Logout;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Admin\Auth\TwoFactor;
 use App\Models\Dr\SecretaryPermission;
+use App\Livewire\Admin\Auth\LoginConfirm;
+use App\Livewire\Admin\Auth\LoginRegister;
+use App\Livewire\Admin\Auth\LoginUserPass;
 use App\Models\Admin\Dashboard\Cities\Zone;
 use App\Http\Controllers\Admin\layouts\Blank;
 use App\Http\Controllers\Admin\layouts\Fluid;
@@ -130,29 +135,13 @@ use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettin
 //manager login routes
 /* login manager routes */
 Route::prefix('admin-panel/')->group(function () {
-    /* login routes */
-    Route::get('/', [AdminLoginController::class, 'loginRegisterForm'])->name('admin.auth.login-register-form');
-    Route::get('login', [AdminLoginController::class, 'loginRegisterForm'])->name('admin.auth.login-register-form');
-
-    Route::get('login-user-pass', [AdminLoginController::class, 'loginUserPassForm'])->name('admin.auth.login-user-pass-form');
-
-    Route::get('admin-two-factor', [AdminLoginController::class, 'twoFactorForm'])->name('admin-two-factor');
-
-    Route::post('admin-two-factor-store', [AdminLoginController::class, 'twoFactorFormCheck'])->name('admin-two-factor-store');
-
-    Route::post('admin-login-with-mobile-pass', [AdminLoginController::class, 'loginWithMobilePass'])->name('admin-login-with-mobile-pass');
-
-    Route::post('/login-register', [AdminLoginController::class, 'loginRegister'])->name('admin.auth.login-register');
-
-    Route::get('login-confirm/{token}', [AdminLoginController::class, 'loginConfirmForm'])->name('admin.auth.login-confirm-form');
-
-    Route::post('/login-confirm/{token}', [AdminLoginController::class, 'loginConfirm'])->name('admin.auth.login-confirm');
-
-    Route::get('/login-resend-otp/{token}', [AdminLoginController::class, 'loginResendOtp'])->name('admin.auth.login-resend-otp');
-
-    Route::get('/logout', [AdminLoginController::class, 'logout'])->name('admin.auth.logout');
-    /* login routes */
-
+    Route::get('/', LoginRegister::class)->name('admin.auth.login-register-form');
+    Route::get('login', LoginRegister::class)->name('admin.auth.login-register-form');
+    Route::get('login-user-pass', LoginUserPass::class)->name('admin.auth.login-user-pass-form');
+    Route::get('two-factor/{token}', TwoFactor::class)->name('admin-two-factor');
+    Route::get('login-confirm/{token}', LoginConfirm::class)->name('admin.auth.login-confirm-form');
+    Route::get('login-resend-otp/{token}', LoginConfirm::class)->name('admin.auth.login-resend-otp'); // اضافه شده
+    Route::get('logout', Logout::class)->name('admin.auth.logout');
 });
 /* end login manager routes */
 //  manager  routes

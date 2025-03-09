@@ -30,29 +30,16 @@
                 <span>{{ number_format($walletBalance) }} تومان</span>
             </div>
         </div>
-        <a href="{{ route('admin.auth.logout') }}" class="logout" title="خروج"></a>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const logoutLink = document.querySelector('.logout');
-                logoutLink.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    Swal.fire({
-                        title: 'آیا مطمئن هستید؟',
-                        text: "می‌خواهید از حساب کاربری خود خارج شوید؟",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'بله، خروج!',
-                        cancelButtonText: 'خیر، بمانم'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = logoutLink.href;
-                        }
-                    });
-                });
-            });
-        </script>
+        <!-- تغییر لینک لاگ‌اوت به نویگیشن Livewire -->
+        <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('admin.auth.logout') }}' })"
+            class="logout" title="خروج"></a>
     </div>
 </div>
+
+@livewireScripts
+    <script>
+        // اسکریپت نویگیشن Livewire
+        Livewire.on('navigateTo', (event) => {
+            window.Livewire.navigate(event.url);
+        });
+    </script>
