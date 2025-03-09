@@ -1,70 +1,90 @@
 <div class="justify-content-center align-items-center">
- <div class="col-md-6 login-container position-relative">
-  <div class="login-card custom-rounded custom-shadow p-7">
-   <div class="d-flex justify-content-between align-items-center mb-4">
-    <div class="d-flex align-items-center">
-     <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
-     <span class="text-custom-gray px-1">ورود کاربر</span>
-    </div>
-    <a href="#" wire:click.prevent="goBack" class="back-link text-primary d-flex align-items-center"
-     style="cursor: pointer;">
-     <span class="ms-2">بازگشت</span>
-     <img src="{{ asset('admin-assets/login/images/back.svg') }}" alt="آیکون بازگشت" class="img-fluid"
-      style="max-width: 24px;">
-    </a>
-   </div>
-   <form wire:submit.prevent="loginConfirm">
-    <div class="d-flex justify-content-between mb-3" dir="rtl">
-     @for ($i = 0; $i < 4; $i++)
-      <input wire:model="otpCode.{{ $i }}" type="text" maxlength="1"
-       class="form-control otp-input text-center custom-rounded border">
-     @endfor
-    </div>
-    @error('otpCode')
-     <div class="invalid-feedback otp-error" style="display: block; text-align: center;">{{ $message }}</div>
-    @enderror
-    <button type="submit" wire:loading.attr="disabled" wire:target="loginConfirm"
-     class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
-     <span wire:loading.remove wire:target="loginConfirm">ادامه</span>
-     <div wire:loading wire:target="loginConfirm" class="loader"></div>
-    </button>
+    <div class="col-md-6 login-container position-relative">
+        <div class="login-card custom-rounded custom-shadow p-7">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
+                    <span class="text-custom-gray px-1">ورود کاربر</span>
+                </div>
+                <a href="#" wire:click.prevent="goBack" class="back-link text-primary d-flex align-items-center"
+                    style="cursor: pointer;">
+                    <span class="ms-2">بازگشت</span>
+                    <img src="{{ asset('admin-assets/login/images/back.svg') }}" alt="آیکون بازگشت" class="img-fluid"
+                        style="max-width: 24px;">
+                </a>
+            </div>
+            <form wire:submit.prevent="loginConfirm">
+                <div class="d-flex justify-content-between mb-3" dir="rtl">
+                    @for ($i = 0; $i < 4; $i++)
+                        <input wire:model="otpCode.{{ $i }}" type="text" maxlength="1"
+                            class="form-control otp-input text-center custom-rounded border">
+                    @endfor
+                </div>
+                @error('otpCode')
+                    <div class="invalid-feedback otp-error" style="display: block; text-align: center;" id="otp-error">{{ $message }}</div>
+                @enderror
+                <button type="submit" wire:loading.attr="disabled" wire:target="loginConfirm"
+                    class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+                    <span wire:loading.remove wire:target="loginConfirm">ادامه</span>
+                    <div wire:loading wire:target="loginConfirm" class="loader"></div>
+                </button>
 
-    <div id="progress-bar-container" class="mt-2" wire:ignore.self
-     style="{{ $remainingTime <= 0 ? 'display: none;' : '' }}">
-     <div id="progress-bar" class="progress-bar"
-      style="width: {{ ($remainingTime / 120000) * 100 }}%; 
-       background-color: {{ $remainingTime > 60000 ? '#28a745' : ($remainingTime > 24000 ? '#ffc107' : '#dc3545') }};">
-     </div>
-    </div>
+                <div id="progress-bar-container" class="mt-2" style="display: none;" wire:ignore>
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
 
-    <section id="resend-otp" class="mt-2 text-center" style="{{ $showResendButton ? '' : 'display: none;' }}">
-     <a href="#" wire:click.prevent="resendOtp" wire:loading.remove wire:target="resendOtp"
-      class="text-decoration-none text-primary fw-bold">دریافت مجدد کد تأیید</a>
-     <span wire:loading wire:target="resendOtp" class="spinner-border spinner-border-sm" role="status"></span>
-    </section>
-    <section style="font-size: 14px" class="text-danger fw-bold fs-6 mt-3 text-center" id="timer" wire:ignore.self>
-     {{ $remainingTime > 0 ? 'زمان باقی‌مانده: ' . floor($remainingTime / 60000) . ' دقیقه و ' . floor(($remainingTime % 60000) / 1000) . ' ثانیه' : 'کد تأیید منقضی شده است.' }}
-    </section>
-   </form>
-  </div>
- </div>
+                <section id="resend-otp" class="mt-2 text-center" style="{{ $showResendButton ? '' : 'display: none;' }}">
+                    <a href="#" wire:click.prevent="resendOtp" wire:loading.remove wire:target="resendOtp"
+                        class="text-decoration-none text-primary fw-bold">دریافت مجدد کد تأیید</a>
+                    <span wire:loading wire:target="resendOtp" class="spinner-border spinner-border-sm" role="status"></span>
+                </section>
+                <section style="font-size: 14px" class="text-danger fw-bold fs-6 mt-3 text-center" id="timer" wire:ignore>
+                    {{ $remainingTime > 0 ? 'زمان باقی‌مانده: ' . floor($remainingTime / 60000) . ' دقیقه و ' . floor(($remainingTime % 60000) / 1000) . ' ثانیه' : '' }}
+                </section>
+            </form>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
     <script>
-        window.interval = window.interval || null;
+        // تعریف متغیرها فقط یک بار در اسکوپ سراسری
+        window.timerState = window.timerState || {
+            interval: null,
+            rateLimitTimerInterval: null,
+            otpCountDownDate: null,
+            isTimerRunning: false,
+            lastPercentage: 0,
+            currentToken: null
+        };
 
-        function startTimer(duration, countDownDate) {
-            if (window.interval) {
-                clearInterval(window.interval);
+        function startTimer(countDownDate, token) {
+            if (window.timerState.interval) {
+                clearInterval(window.timerState.interval);
             }
 
-            // تبدیل به عدد و مدیریت مقادیر نامعتبر
-            duration = Number(duration) || 120000; // پیش‌فرض 2 دقیقه اگه duration نامعتبر باشه
-            countDownDate = Number(countDownDate) || (new Date().getTime() + duration);
-            const totalDuration = 120000; // زمان کل ثابت (2 دقیقه)
+            const storedData = JSON.parse(localStorage.getItem('otpTimerData') || '{}');
+            const storedCountDownDate = storedData.countDownDate;
+            const storedToken = storedData.token;
+            const now = new Date().getTime();
 
+            // تصمیم‌گیری برای استفاده از مقدار سرور یا localStorage
+            if (!storedCountDownDate || storedToken !== token || storedCountDownDate <= now) {
+                window.timerState.otpCountDownDate = countDownDate || (new Date().getTime() + 120000);
+                window.timerState.isTimerRunning = true;
+                window.timerState.lastPercentage = 100;
+                window.timerState.currentToken = token;
+                localStorage.setItem('otpTimerData', JSON.stringify({
+                    countDownDate: window.timerState.otpCountDownDate,
+                    token: window.timerState.currentToken
+                }));
+            } else {
+                window.timerState.otpCountDownDate = Number(storedCountDownDate);
+                window.timerState.currentToken = storedToken;
+                window.timerState.isTimerRunning = true;
+            }
 
+            const totalDuration = 120000; // 2 دقیقه
             const timerElement = document.getElementById('timer');
             const progressBarContainer = document.getElementById('progress-bar-container');
             const progressBar = document.getElementById('progress-bar');
@@ -74,42 +94,44 @@
                 return;
             }
 
-            timerElement.classList.remove('d-none');
-            progressBarContainer.style.display = 'block';
-            resendSection.style.display = 'none';
+            if (window.timerState.isTimerRunning) {
+                timerElement.classList.remove('d-none');
+                progressBarContainer.style.display = 'block'; // فقط وقتی تایمر فعاله نشون بده
+                resendSection.style.display = 'none';
+                progressBar.style.width = window.timerState.lastPercentage + '%';
+                progressBar.style.backgroundColor = window.timerState.lastPercentage > 50 ? '#28a745' : (window.timerState.lastPercentage > 20 ? '#ffc107' : '#dc3545');
+            }
 
-            window.interval = setInterval(() => {
+            window.timerState.interval = setInterval(() => {
                 const now = new Date().getTime();
-                const distance = countDownDate - now;
+                const distance = window.timerState.otpCountDownDate - now;
 
-                if (isNaN(distance)) {
-                    console.error('فاصله نامعتبر:', { countDownDate, now });
-                    clearInterval(window.interval);
-                    window.interval = null;
+                if (isNaN(distance) || window.timerState.otpCountDownDate === null) {
+                    console.error('فاصله نامعتبر:', { countDownDate: window.timerState.otpCountDownDate, now });
+                    clearInterval(window.timerState.interval);
+                    window.timerState.interval = null;
+                    window.timerState.isTimerRunning = false;
+                    localStorage.removeItem('otpTimerData');
                     return;
                 }
 
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
                 const percentage = Math.max(0, (distance / totalDuration) * 100);
-                progressBar.style.width = percentage + '%';
 
-                if (percentage > 50) {
-                    progressBar.style.backgroundColor = '#28a745';
-                } else if (percentage > 20) {
-                    progressBar.style.backgroundColor = '#ffc107';
-                } else {
-                    progressBar.style.backgroundColor = '#dc3545';
-                }
+                window.timerState.lastPercentage = percentage;
+                progressBar.style.width = percentage + '%';
+                progressBar.style.backgroundColor = percentage > 50 ? '#28a745' : (percentage > 20 ? '#ffc107' : '#dc3545');
 
                 if (distance <= 0) {
-                    clearInterval(window.interval);
-                    window.interval = null;
-                    timerElement.innerHTML = 'کد تأیید منقضی شده است.';
+                    clearInterval(window.timerState.interval);
+                    window.timerState.interval = null;
+                    window.timerState.isTimerRunning = false;
+                    timerElement.innerHTML = '';
                     timerElement.classList.add('d-none');
                     progressBarContainer.style.display = 'none';
                     resendSection.style.display = 'block';
+                    localStorage.removeItem('otpTimerData');
                     Livewire.dispatch('updateShowResendButton', { show: true });
                 } else {
                     timerElement.innerHTML = `زمان باقی‌مانده: ${minutes} دقیقه و ${seconds} ثانیه`;
@@ -143,10 +165,18 @@
 
         document.addEventListener('livewire:navigated', () => {
             setupOtpInputs();
+            if (window.timerState.otpCountDownDate && window.timerState.isTimerRunning) {
+                startTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
+            }
         });
 
-        Livewire.on('initOtpForm', (data) => {
-            startTimer(data.remainingTime, data.countDownDate);
+        Livewire.on('initTimer', (data) => {
+            const storedData = JSON.parse(localStorage.getItem('otpTimerData') || '{}');
+            if (!storedData.countDownDate || storedData.token !== data.token) {
+                startTimer(data.countDownDate, data.token);
+            } else {
+                startTimer(storedData.countDownDate, storedData.token);
+            }
             setupOtpInputs();
             const resendSection = document.getElementById('resend-otp');
             if (resendSection) {
@@ -159,14 +189,10 @@
                 toastr.success(data.message);
                 window.otpResentToastShown = true;
             }
-            startTimer(data.remainingTime, data.countDownDate);
+            startTimer(data.countDownDate, data.token);
             const resendSection = document.getElementById('resend-otp');
             if (resendSection) {
                 resendSection.style.display = 'none';
-            }
-            const progressBarContainer = document.getElementById('progress-bar-container');
-            if (progressBarContainer) {
-                progressBarContainer.style.display = 'block';
             }
             Livewire.dispatch('updateShowResendButton', { show: false });
         });
@@ -174,10 +200,30 @@
         Livewire.on('otpExpired', () => {
             toastr.error('توکن منقضی شده است');
             window.Livewire.navigate('{{ route('admin.auth.login-register-form') }}');
+            localStorage.removeItem('otpTimerData');
+            if (window.timerState.interval) {
+                clearInterval(window.timerState.interval);
+                window.timerState.interval = null;
+            }
+            window.timerState.isTimerRunning = false;
         });
 
         Livewire.on('rateLimitExceeded', (data) => {
             let remainingTime = Math.round(data.remainingTime);
+            const errorElement = document.getElementById('otp-error');
+            if (errorElement) {
+                errorElement.innerHTML = `شما بیش از حد تلاش کرده‌اید. لطفاً <span id="live-error-time">${formatTime(remainingTime)}</span> صبر کنید.`;
+                let errorTimer = remainingTime;
+                const errorInterval = setInterval(() => {
+                    errorTimer--;
+                    const liveErrorTime = document.getElementById('live-error-time');
+                    if (liveErrorTime) {
+                        liveErrorTime.innerHTML = formatTime(errorTimer);
+                    }
+                    if (errorTimer <= 0) clearInterval(errorInterval);
+                }, 1000);
+            }
+
             Swal.fire({
                 icon: 'error',
                 title: 'تلاش بیش از حد',
@@ -194,23 +240,40 @@
                     if (!remainingTimeElement) return;
 
                     let liveTimer = remainingTime;
-                    const timerInterval = setInterval(() => {
+                    if (window.timerState.rateLimitTimerInterval) {
+                        clearInterval(window.timerState.rateLimitTimerInterval);
+                    }
+                    window.timerState.rateLimitTimerInterval = setInterval(() => {
                         liveTimer--;
                         remainingTimeElement.innerHTML = formatTime(liveTimer);
                         if (liveTimer <= 0) {
-                            clearInterval(timerInterval);
+                            clearInterval(window.timerState.rateLimitTimerInterval);
+                            window.timerState.rateLimitTimerInterval = null;
                             Swal.close();
                         }
                     }, 1000);
                 },
                 willClose: () => {
-                    clearInterval(timerInterval);
+                    if (window.timerState.rateLimitTimerInterval) {
+                        clearInterval(window.timerState.rateLimitTimerInterval);
+                        window.timerState.rateLimitTimerInterval = null;
+                    }
                 }
             });
+
+            if (window.timerState.otpCountDownDate && window.timerState.isTimerRunning) {
+                startTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
+            }
         });
 
         Livewire.on('loginSuccess', () => {
             toastr.success('با موفقیت وارد شدید');
+            localStorage.removeItem('otpTimerData');
+            if (window.timerState.interval) {
+                clearInterval(window.timerState.interval);
+                window.timerState.interval = null;
+            }
+            window.timerState.isTimerRunning = false;
         });
 
         Livewire.on('navigateTo', (event) => {
@@ -219,7 +282,7 @@
 
         Livewire.on('updateShowResendButton', (data) => {
             const resendSection = document.getElementById('resend-otp');
-            if (resendSection) {
+            if (resendSection && !window.timerState.isTimerRunning) {
                 resendSection.style.display = data.show ? 'block' : 'none';
             }
         });
@@ -231,20 +294,34 @@
             return `${minutes} دقیقه و ${remainingSeconds} ثانیه`;
         }
 
+        // بررسی وضعیت تایمر بعد از رفرش صفحه
         document.addEventListener('DOMContentLoaded', () => {
-            if (window.interval) {
-                clearInterval(window.interval);
-                window.interval = null;
+            const storedData = JSON.parse(localStorage.getItem('otpTimerData') || '{}');
+            const storedCountDownDate = storedData.countDownDate;
+            const storedToken = storedData.token;
+            const now = new Date().getTime();
+
+            if (storedCountDownDate && storedCountDownDate > now) {
+                window.timerState.otpCountDownDate = Number(storedCountDownDate);
+                window.timerState.currentToken = storedToken;
+                window.timerState.isTimerRunning = true;
+                startTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
             }
-            const initialRemainingTime = {{ $remainingTime ?? 0 }};
-            const initialCountDownDate = {{ $countDownDate ?? 0 }};
-            const initialShowResendButton = {{ $showResendButton ? 'true' : 'false' }};
-            if (initialRemainingTime > 0) {
-                startTimer(initialRemainingTime, initialCountDownDate);
+            setupOtpInputs();
+        });
+
+        // جلوگیری از ریست لحظه‌ای با wire:ignore
+        document.addEventListener('livewire:init', () => {
+            const timerElement = document.getElementById('timer');
+            const progressBarContainer = document.getElementById('progress-bar-container');
+            if (timerElement) {
+                timerElement.setAttribute('wire:ignore', '');
             }
-            const resendSection = document.getElementById('resend-otp');
-            if (resendSection) {
-                resendSection.style.display = initialShowResendButton ? 'block' : 'none';
+            if (progressBarContainer) {
+                progressBarContainer.setAttribute('wire:ignore', '');
+            }
+            if (window.timerState.otpCountDownDate && window.timerState.isTimerRunning) {
+                startTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
             }
         });
     </script>

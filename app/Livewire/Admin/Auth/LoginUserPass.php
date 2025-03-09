@@ -35,7 +35,7 @@ class LoginUserPass extends Component
     public function mount()
     {
         if (Auth::guard('manager')->check()) {
-            $this->redirect(route('admin-panel'), navigate: true);
+            $this->redirect(route('admin-panel'));
         }
     }
 
@@ -116,7 +116,7 @@ class LoginUserPass extends Component
         $loginAttempts->resetLoginAttempts($formattedMobile);
         LoginSession::where('manager_id', $manager->id)->delete();
         $this->dispatch('loginSuccess');
-        $this->redirect(route('admin-panel'), navigate: true);
+        $this->redirect(route('admin-panel'));
     }
 
     public function render()

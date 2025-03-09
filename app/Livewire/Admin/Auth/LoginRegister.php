@@ -19,7 +19,7 @@ class LoginRegister extends Component
     public function mount()
     {
         if (Auth::guard('manager')->check()) {
-            $this->redirect(route('admin-panel'), navigate: true);
+            $this->redirect(route('admin-panel'));
         } elseif (session('current_step') === 2) {
             $this->redirect(route('admin.auth.login-confirm-form', ['token' => session('otp_token')]), navigate: true);
         } elseif (session('current_step') === 3) {

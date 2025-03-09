@@ -18,6 +18,7 @@ class LoginConfirm extends Component
     public $token;
     public $otpCode = ['', '', '', ''];
     public $remainingTime;
+    public $countDownDate;
     public $showResendButton = false;
 
     public function mount($token)
@@ -36,10 +37,22 @@ class LoginConfirm extends Component
         }
 
         $otp = Otp::where('token', $token)->first();
-        $this->remainingTime = $otp
-            ? max(0, (int) ($otp->created_at->addMinutes(2)->timestamp * 1000 - now()->timestamp * 1000))
-            : 0;
-        $this->showResendButton = $this->remainingTime <= 0;
+        if ($otp) {
+            $this->countDownDate = $otp->created_at->addMinutes(2)->timestamp * 1000;
+            $this->remainingTime = max(0, $this->countDownDate - now()->timestamp * 1000);
+            $this->showResendButton = $this->remainingTime <= 0;
+        } else {
+            $this->remainingTime = 0;
+            $this->countDownDate = 0;
+            $this->showResendButton = true;
+        }
+
+        $this->dispatch('initTimer', [
+            'remainingTime' => $this->remainingTime,
+            'countDownDate' => $this->countDownDate,
+            'showResendButton' => $this->showResendButton,
+            'token' => $this->token,
+        ]);
     }
 
     public function goBack()
@@ -179,56 +192,29 @@ class LoginConfirm extends Component
             SmsService::create(100253, $otp->manager->mobile, [$otpCode])
         );
         $messagesService->send();
+
         $this->token = $newToken;
         $this->remainingTime = 120000; // 2 دقیقه
+        $this->countDownDate = now()->addMinutes(2)->timestamp * 1000;
         $this->showResendButton = false;
         $this->otpCode = ['', '', '', ''];
-        $countDownDate = now()->addMinutes(2)->timestamp * 1000; // زمان پایان جدید
         session(['otp_token' => $newToken]);
 
-        $this->dispatch('otpResent', 
-            message : 'کد جدید ارسال شد',
-            remainingTime : $this->remainingTime,
-            countDownDate : $countDownDate,
-            showResendButton : false,
+        $this->dispatch(
+            'otpResent',
+            message: 'کد جدید ارسال شد',
+            remainingTime: $this->remainingTime,
+            countDownDate: $this->countDownDate,
+            showResendButton: false,
+            token: $newToken,
         );
-    
-    }
-
-    // تابع جدید برای به‌روزرسانی تایمر
-    public function updateTimer()
-    {
-        $otp = Otp::where('token', $this->token)->first();
-        if ($otp) {
-            $this->remainingTime = max(0, (int) ($otp->created_at->addMinutes(2)->timestamp - now()->timestamp) * 1000);
-            $this->showResendButton = $this->remainingTime <= 0;
-        }
-    }
-
-    public function updated($propertyName)
-    {
-        if ($propertyName === 'remainingTime' && $this->remainingTime <= 0 && !$this->showResendButton) {
-            $this->showResendButton = true;
-            $this->dispatch('updateShowResendButton', ['show' => true]);
-        }
     }
 
     public function render()
     {
-        $otp = Otp::where('token', $this->token)->first();
-        $countDownDate = $otp ? $otp->created_at->addMinutes(2)->timestamp * 1000 : 0;
-        $this->remainingTime = $otp ? max(0, (int) ($countDownDate - now()->timestamp * 1000)) : 0;
-        $this->showResendButton = $this->remainingTime <= 0;
-
-        $this->dispatch('initOtpForm', [
-            'remainingTime' => $this->remainingTime,
-            'countDownDate' => $countDownDate,
-            'showResendButton' => $this->showResendButton,
-        ]);
-
         return view('livewire.admin.auth.login-confirm', [
             'remainingTime' => $this->remainingTime,
-            'countDownDate' => $countDownDate,
+            'countDownDate' => $this->countDownDate,
             'showResendButton' => $this->showResendButton,
         ])->layout('admin.layouts.admin-auth');
     }

@@ -46,7 +46,6 @@ class TwoFactor extends Component
         $this->redirect(route('admin.auth.login-user-pass-form'), navigate: true);
     }
 
-    // تابع جدید برای فرمت کردن زمان
     private function formatTime($seconds)
     {
         if (is_null($seconds) || $seconds < 0) {
@@ -59,9 +58,7 @@ class TwoFactor extends Component
 
     public function twoFactorCheck()
     {
-        \Log::info('TwoFactorCheck called with input: ' . $this->twoFactorSecret);
         $this->validate();
-        \Log::info('Validation passed');
 
         $loginSession = LoginSession::where('token', $this->token)
             ->where('step', 3)
@@ -76,20 +73,19 @@ class TwoFactor extends Component
         }
 
         $loginAttempts = new LoginAttemptsService();
-        $user = Manager::find($loginSession->manager_id);
+        $user = Manager::where('id', $loginSession->manager_id)->first();
 
         if (!$user) {
             $this->addError('twoFactorSecret', 'کاربر یافت نشد.');
-            \Log::info('Redirecting to login due to user not found');
             $this->redirect(route('admin.auth.login-register-form'), navigate: true);
             return;
         }
 
         if ($loginAttempts->isLocked($user->mobile)) {
             $remainingTime = $loginAttempts->getRemainingLockTime($user->mobile);
-            $formattedTime = $this->formatTime($remainingTime); // فرمت کردن زمان
-            $this->addError('twoFactorSecret', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
-            $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+            $formattedTime = $this->formatTime($remainingTime);
+            $this->addError('twoFactorSecret', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید."); // خطا زیر اینپوت
+            $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime); // SweetAlert
             \Log::info('Rate limit exceeded, remaining time: ' . $remainingTime);
             return;
         }
@@ -121,7 +117,7 @@ class TwoFactor extends Component
         LoginSession::where('token', $this->token)->delete();
         $this->dispatch('loginSuccess');
         \Log::info('Login successful, redirecting to admin panel');
-        $this->redirect(route('admin-panel'), navigate: true);
+        $this->redirect(route('admin-panel'));
     }
 
     public function render()
