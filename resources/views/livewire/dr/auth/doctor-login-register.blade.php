@@ -60,8 +60,9 @@
             });
         });
 
-        Livewire.on('otpSent', () => {
+       Livewire.on('otpSent', (data) => {
             toastr.success('کد تأیید با موفقیت ارسال شد');
+            localStorage.removeItem('otpTimerData'); // ریست کردن تایمر قبلی
         });
 
         Livewire.on('navigateTo', (event) => {
