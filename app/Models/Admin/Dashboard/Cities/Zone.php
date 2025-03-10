@@ -5,12 +5,11 @@ namespace App\Models\Admin\Dashboard\Cities;
 use App\Models\Dr\Clinic;
 use App\Models\Dr\Doctor;
 use Illuminate\Database\Eloquent\Model;
-use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Zone extends Model
 {
-    use HasFactory, Sluggable;
+    use HasFactory;
 
     protected $table = 'zone';
     protected $guarded = ['id'];

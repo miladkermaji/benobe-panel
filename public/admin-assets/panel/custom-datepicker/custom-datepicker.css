@@ -1,0 +1,213 @@
+body {
+  font-family: 'Vazirmatn', sans-serif;
+  transition: background 0.5s ease;
+}
+
+body.light {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+}
+
+body.dark {
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+}
+
+.datepicker-container {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+}
+
+.custom-datepicker {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+body.light .custom-datepicker {
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #1f2937;
+}
+
+body.dark .custom-datepicker {
+  background: #1f2937;
+  border-color: #374151;
+  color: #d1d5db;
+}
+
+.custom-datepicker:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+  outline: none;
+}
+
+.calendar {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 300px;
+  min-width: 300px;
+  border: 1px solid;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  background: #ffffff;
+}
+
+body.light .calendar {
+  border-color: #e5e7eb;
+}
+
+body.dark .calendar {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.calendar.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.header button {
+  background: none;
+  font-size: 1.5rem;
+  padding: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+body.light .header button {
+  color: #6b7280;
+}
+
+body.dark .header button {
+  color: #93c5fd;
+}
+
+.header button:hover {
+  transform: scale(1.2);
+  color: #3b82f6;
+}
+
+#month-year {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+body.light #month-year {
+  color: #1f2937;
+}
+
+body.dark #month-year {
+  color: #d1d5db;
+}
+
+#month-year:hover {
+  color: #60a5fa;
+}
+
+.days,
+.months,
+.years {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  text-align: center;
+}
+
+.months {
+  grid-template-columns: repeat(4, 1fr);
+  /* 4 ستون برای ماه‌ها */
+}
+
+.years {
+  grid-template-columns: repeat(4, 1fr);
+  /* 4 ستون برای سال‌ها */
+}
+
+.hidden {
+  display: none !important;
+  /* مطمئن می‌شیم وقتی مخفیه، کامل غیبش بزنه */
+}
+
+.day-name {
+  font-size: 0.875rem;
+  padding: 0.25rem;
+  color: #9ca3af;
+}
+
+.day,
+.month,
+.year {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+body.light .day,
+body.light .month,
+body.light .year {
+  color: #374151;
+}
+
+body.dark .day,
+body.dark .month,
+body.dark .year {
+  color: #e5e7eb;
+}
+
+.day:hover,
+.month:hover,
+.year:hover {
+  background: #eff6ff;
+  transform: scale(1.1);
+}
+
+.day.selected,
+.month.selected,
+.year.selected {
+  background: #60a5fa;
+  color: white;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+.day.today {
+  border: 1px solid #60a5fa;
+  background: #dbeafe;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.8);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+#month-year-new-date-input{
+  cursor: pointer;
+}

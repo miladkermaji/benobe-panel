@@ -28,213 +28,212 @@
       <!-- ابزار -->
       <li class="item-li i-courses">
       <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-        ابزار
-        <div class="d-flex justify-content-end w-100 align-items-center">
-        <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-          xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-          fill="currentColor"></path>
-        </svg>
-        </div>
+      ابزار
+      <div class="d-flex justify-content-end w-100 align-items-center">
+      <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+      xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+      fill="currentColor"></path>
+      </svg>
+      </div>
       </a>
       <ul class="drop-toggle d-none">
-        <li class="item-li {{ Request::routeIs('admin.panel.tools.file-manager') ? 'is-active' : '' }}">
-        <a href="{{ route('admin.panel.tools.file-manager') }}">مدیریت فایل</a>
-        </li>
-        <li class="item-li {{ Request::routeIs('admin.tools.data-migration.index') ? 'is-active' : '' }}">
-        <a href="{{ route('admin.tools.data-migration.index') }}">انتقال داده‌ها</a>
-        </li>
-        <li class="item-li {{ Request::routeIs('admin.panel.tools.payment_gateways.index') ? 'is-active' : '' }}">
-        <a href="{{ route('admin.panel.tools.payment_gateways.index') }}">درگاه پرداخت</a>
-        </li>
-        <li class="item-li {{ Request::routeIs('admin.panel.tools.sms-gateways.index') ? 'is-active' : '' }}">
-        <a href="{{ route('admin.panel.tools.sms-gateways.index') }}">پیامک</a>
-        </li>
-        <li class="item-li {{ Request::routeIs('admin.panel.tools.telescope') ? 'is-active' : '' }}">
-        <a href="{{ route('admin.panel.tools.telescope') }}">تلسکوپ</a>
-        </li>
-        <li class="item-li {{ Request::routeIs('admin.panel.tools.redirects.index') ? 'is-active' : '' }}">
-        <a href="{{ route('admin.panel.tools.redirects.index') }}">ابزار ریدایرکت</a>
-        </li>
-        <li class="item-li {{ Request::routeIs('admin.tools.sitemap.index') ? 'is-active' : '' }}">
-        <a href="{{ route('admin.tools.sitemap.index') }}">نقشه سایت</a>
-        </li>
-        <li class="item-li {{ Request::routeIs('admin.tools.page-builder.index') ? 'is-active' : '' }}">
-        <a href="{{ route('admin.tools.page-builder.index') }}">صفحه‌ساز</a>
-        </li>
-        <li class="item-li {{ Request::routeIs('admin.panel.tools.mail-template.index') ? 'is-active' : '' }}">
-        <a href="{{ route('admin.panel.tools.mail-template.index') }}">قالب ایمیل</a>
-        </li>
-        <li class="item-li {{ Request::routeIs('admin.tools.news-latter.index') ? 'is-active' : '' }}">
-        <a href="{{ route('admin.tools.news-latter.index') }}">خبرنامه</a>
-        </li>
+      <li class="item-li {{ Request::routeIs('admin.panel.tools.file-manager') ? 'is-active' : '' }}">
+      <a href="{{ route('admin.panel.tools.file-manager') }}">مدیریت فایل</a>
+      </li>
+      <li class="item-li {{ Request::routeIs('admin.tools.data-migration.index') ? 'is-active' : '' }}">
+      <a href="{{ route('admin.tools.data-migration.index') }}">انتقال داده‌ها</a>
+      </li>
+      <li class="item-li {{ Request::routeIs('admin.panel.tools.payment_gateways.index') ? 'is-active' : '' }}">
+      <a href="{{ route('admin.panel.tools.payment_gateways.index') }}">درگاه پرداخت</a>
+      </li>
+      <li class="item-li {{ Request::routeIs('admin.panel.tools.sms-gateways.index') ? 'is-active' : '' }}">
+      <a href="{{ route('admin.panel.tools.sms-gateways.index') }}">پیامک</a>
+      </li>
+      <li class="item-li {{ Request::routeIs('admin.panel.tools.telescope') ? 'is-active' : '' }}">
+      <a href="{{ route('admin.panel.tools.telescope') }}">تلسکوپ</a>
+      </li>
+      <li class="item-li {{ Request::routeIs('admin.panel.tools.redirects.index') ? 'is-active' : '' }}">
+      <a href="{{ route('admin.panel.tools.redirects.index') }}">ابزار ریدایرکت</a>
+      </li>
+      <li class="item-li {{ Request::routeIs('admin.tools.sitemap.index') ? 'is-active' : '' }}">
+      <a href="{{ route('admin.tools.sitemap.index') }}">نقشه سایت</a>
+      </li>
+      <li class="item-li {{ Request::routeIs('admin.tools.page-builder.index') ? 'is-active' : '' }}">
+      <a href="{{ route('admin.tools.page-builder.index') }}">صفحه‌ساز</a>
+      </li>
+      <li class="item-li {{ Request::routeIs('admin.panel.tools.mail-template.index') ? 'is-active' : '' }}">
+      <a href="{{ route('admin.panel.tools.mail-template.index') }}">قالب ایمیل</a>
+      </li>
+      <li class="item-li {{ Request::routeIs('admin.tools.news-latter.index') ? 'is-active' : '' }}">
+      <a href="{{ route('admin.tools.news-latter.index') }}">خبرنامه</a>
+      </li>
       </ul>
       </li>
       <!-- مدیریت کاربران -->
       <li class="item-li i-users">
       <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-        مدیریت کاربران
-        <div class="d-flex justify-content-end w-100 align-items-center">
-        <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-          xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-          fill="currentColor"></path>
-        </svg>
-        </div>
+      مدیریت کاربران
+      <div class="d-flex justify-content-end w-100 align-items-center">
+      <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+      xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+      fill="currentColor"></path>
+      </svg>
+      </div>
       </a>
       <ul class="drop-toggle d-none">
-        <li class="item-li"><a href="#">لیست کاربران</a></li>
-        <li class="item-li"><a href="#">افزودن کاربر</a></li>
-        <li class="item-li"><a href="#">مدیریت نقش‌ها</a></li>
-        <li class="item-li"><a href="#">تنظیمات دسترسی</a></li>
-        <li class="item-li"><a href="#">کاربران غیرفعال</a></li>
+      <li class="item-li"><a href="{{ route('admin.panel.users.index') }}">مدیریت کاربران</a></li>
+      <li class="item-li"><a href="#">مدیریت نقش‌ها</a></li>
+      <li class="item-li"><a href="#">تنظیمات دسترسی</a></li>
+      <li class="item-li"><a href="#">کاربران غیرفعال</a></li>
       </ul>
       </li>
       <!-- مدیریت پزشکان -->
       <li class="item-li i-users">
       <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-        مدیریت پزشکان
-        <div class="d-flex justify-content-end w-100 align-items-center">
-        <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-          xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-          fill="currentColor"></path>
-        </svg>
-        </div>
+      مدیریت پزشکان
+      <div class="d-flex justify-content-end w-100 align-items-center">
+      <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+      xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+      fill="currentColor"></path>
+      </svg>
+      </div>
       </a>
       <ul class="drop-toggle d-none">
-        <li class="item-li"><a href="#">لیست پزشکان</a></li>
-        <li class="item-li"><a href="#">افزودن پزشک</a></li>
-        <li class="item-li"><a href="#">تأیید مدارک</a></li>
-        <li class="item-li"><a href="#">مدیریت تخصص‌ها</a></li>
-        <li class="item-li"><a href="#">برنامه کاری پزشکان</a></li>
-        <li class="item-li"><a href="#">پروفایل پزشکان</a></li>
+      <li class="item-li"><a href="#">لیست پزشکان</a></li>
+      <li class="item-li"><a href="#">افزودن پزشک</a></li>
+      <li class="item-li"><a href="#">تأیید مدارک</a></li>
+      <li class="item-li"><a href="#">مدیریت تخصص‌ها</a></li>
+      <li class="item-li"><a href="#">برنامه کاری پزشکان</a></li>
+      <li class="item-li"><a href="#">پروفایل پزشکان</a></li>
       </ul>
       </li>
       <!-- مدیریت نوبت‌ها -->
       <li class="item-li i-courses">
       <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-        مدیریت نوبت‌ها
-        <div class="d-flex justify-content-end w-100 align-items-center">
-        <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-          xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-          fill="currentColor"></path>
-        </svg>
-        </div>
+      مدیریت نوبت‌ها
+      <div class="d-flex justify-content-end w-100 align-items-center">
+      <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+      xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+      fill="currentColor"></path>
+      </svg>
+      </div>
       </a>
       <ul class="drop-toggle d-none">
-        <li class="item-li"><a href="#">نوبت‌های فعال</a></li>
-        <li class="item-li"><a href="#">نوبت‌های لغو شده</a></li>
-        <li class="item-li"><a href="#">نوبت‌های در انتظار تأیید</a></li>
-        <li class="item-li"><a href="#">تنظیمات نوبت‌دهی</a></li>
-        <li class="item-li"><a href="#">تقویم نوبت‌ها</a></li>
+      <li class="item-li"><a href="#">نوبت‌های فعال</a></li>
+      <li class="item-li"><a href="#">نوبت‌های لغو شده</a></li>
+      <li class="item-li"><a href="#">نوبت‌های در انتظار تأیید</a></li>
+      <li class="item-li"><a href="#">تنظیمات نوبت‌دهی</a></li>
+      <li class="item-li"><a href="#">تقویم نوبت‌ها</a></li>
       </ul>
       </li>
       <!-- مدیریت بیماران -->
       <li class="item-li i-users">
       <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-        مدیریت بیماران
-        <div class="d-flex justify-content-end w-100 align-items-center">
-        <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-          xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-          fill="currentColor"></path>
-        </svg>
-        </div>
+      مدیریت بیماران
+      <div class="d-flex justify-content-end w-100 align-items-center">
+      <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+      xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+      fill="currentColor"></path>
+      </svg>
+      </div>
       </a>
       <ul class="drop-toggle d-none">
-        <li class="item-li"><a href="#">لیست بیماران</a></li>
-        <li class="item-li"><a href="#">افزودن بیمار</a></li>
-        <li class="item-li"><a href="#">پرونده پزشکی</a></li>
-        <li class="item-li"><a href="#">تاریخچه نوبت‌ها</a></li>
+      <li class="item-li"><a href="#">لیست بیماران</a></li>
+      <li class="item-li"><a href="#">افزودن بیمار</a></li>
+      <li class="item-li"><a href="#">پرونده پزشکی</a></li>
+      <li class="item-li"><a href="#">تاریخچه نوبت‌ها</a></li>
       </ul>
       </li>
       <!-- مدیریت مالی -->
       <li class="item-li i-courses">
       <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-        مدیریت مالی
-        <div class="d-flex justify-content-end w-100 align-items-center">
-        <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-          xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-          fill="currentColor"></path>
-        </svg>
-        </div>
+      مدیریت مالی
+      <div class="d-flex justify-content-end w-100 align-items-center">
+      <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+      xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+      fill="currentColor"></path>
+      </svg>
+      </div>
       </a>
       <ul class="drop-toggle d-none">
-        <li class="item-li"><a href="#">تراکنش‌ها</a></li>
-        <li class="item-li"><a href="#">صورت‌حساب‌ها</a></li>
-        <li class="item-li"><a href="#">پرداخت‌های پزشکان</a></li>
-        <li class="item-li"><a href="#">تنظیمات مالی</a></li>
+      <li class="item-li"><a href="#">تراکنش‌ها</a></li>
+      <li class="item-li"><a href="#">صورت‌حساب‌ها</a></li>
+      <li class="item-li"><a href="#">پرداخت‌های پزشکان</a></li>
+      <li class="item-li"><a href="#">تنظیمات مالی</a></li>
       </ul>
       </li>
       <!-- تنظیمات سایت -->
       <li class="item-li i-courses">
       <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-        تنظیمات سایت
-        <div class="d-flex justify-content-end w-100 align-items-center">
-        <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-          xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-          fill="currentColor"></path>
-        </svg>
-        </div>
+      تنظیمات سایت
+      <div class="d-flex justify-content-end w-100 align-items-center">
+      <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+      xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+      fill="currentColor"></path>
+      </svg>
+      </div>
       </a>
       <ul class="drop-toggle d-none">
-        <li class="item-li"><a href="#">تنظیمات عمومی</a></li>
-        <li class="item-li"><a href="#">مدیریت صفحات</a></li>
-        <li class="item-li"><a href="#">تنظیمات SEO</a></li>
-        <li class="item-li"><a href="#">تنظیمات اعلان‌ها</a></li>
-        <li class="item-li"><a href="#">پشتیبان‌گیری</a></li>
+      <li class="item-li"><a href="#">تنظیمات عمومی</a></li>
+      <li class="item-li"><a href="#">مدیریت صفحات</a></li>
+      <li class="item-li"><a href="#">تنظیمات SEO</a></li>
+      <li class="item-li"><a href="#">تنظیمات اعلان‌ها</a></li>
+      <li class="item-li"><a href="#">پشتیبان‌گیری</a></li>
       </ul>
       </li>
       <!-- گزارش‌ها -->
       <li class="item-li i-courses">
       <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-        گزارش‌ها
-        <div class="d-flex justify-content-end w-100 align-items-center">
-        <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-          xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-          fill="currentColor"></path>
-        </svg>
-        </div>
+      گزارش‌ها
+      <div class="d-flex justify-content-end w-100 align-items-center">
+      <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+      xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+      fill="currentColor"></path>
+      </svg>
+      </div>
       </a>
       <ul class="drop-toggle d-none">
-        <li class="item-li"><a href="#">گزارش فعالیت کاربران</a></li>
-        <li class="item-li"><a href="#">گزارش نوبت‌ها</a></li>
-        <li class="item-li"><a href="#">گزارش مالی</a></li>
-        <li class="item-li"><a href="#">گزارش عملکرد پزشکان</a></li>
-        <li class="item-li"><a href="#">آمار بازدید سایت</a></li>
+      <li class="item-li"><a href="#">گزارش فعالیت کاربران</a></li>
+      <li class="item-li"><a href="#">گزارش نوبت‌ها</a></li>
+      <li class="item-li"><a href="#">گزارش مالی</a></li>
+      <li class="item-li"><a href="#">گزارش عملکرد پزشکان</a></li>
+      <li class="item-li"><a href="#">آمار بازدید سایت</a></li>
       </ul>
       </li>
       <!-- پشتیبانی -->
       <li class="item-li i-courses">
       <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-        پشتیبانی
-        <div class="d-flex justify-content-end w-100 align-items-center">
-        <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-          xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-          fill="currentColor"></path>
-        </svg>
-        </div>
+      پشتیبانی
+      <div class="d-flex justify-content-end w-100 align-items-center">
+      <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+      xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+      fill="currentColor"></path>
+      </svg>
+      </div>
       </a>
       <ul class="drop-toggle d-none">
-        <li class="item-li"><a href="#">تیکت‌های پشتیبانی</a></li>
-        <li class="item-li"><a href="#">ارسال تیکت جدید</a></li>
-        <li class="item-li"><a href="#">سوالات متداول</a></li>
-        <li class="item-li"><a href="#">راهنمای سیستم</a></li>
+      <li class="item-li"><a href="#">تیکت‌های پشتیبانی</a></li>
+      <li class="item-li"><a href="#">ارسال تیکت جدید</a></li>
+      <li class="item-li"><a href="#">سوالات متداول</a></li>
+      <li class="item-li"><a href="#">راهنمای سیستم</a></li>
       </ul>
       </li>
       <!-- خروج -->

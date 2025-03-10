@@ -22,4 +22,5 @@
 <script src="{{ asset('admin-assets/panel/js/dr-panel.js') }}"></script>
 <script src="{{ asset('admin-assets/panel/js/codemirror/5.65.16/codemirror.min.js') }}"></script>
 <script src="{{ asset('admin-assets/panel/js/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js') }}"></script>
+<script src="{{ asset('admin-assets/panel/custom-datepicker/custom-datepicker.js') }}"></script>
 

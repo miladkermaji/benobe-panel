@@ -12,6 +12,7 @@ use App\Livewire\Dr\Auth\DoctorLoginRegister;
 use App\Livewire\Dr\Auth\DoctorLoginUserPass;
 use App\Http\Controllers\Dr\Panel\DrPanelController;
 use App\Http\Controllers\Dr\Panel\Bime\DRBimeController;
+use App\Http\Controllers\Admin\Panel\Users\UserController;
 use App\Http\Controllers\Dr\Panel\Profile\SubUserController;
 use App\Http\Controllers\Dr\Panel\Tickets\TicketsController;
 use App\Http\Controllers\Dr\Panel\Turn\DrScheduleController;
@@ -127,6 +128,12 @@ Route::prefix('admin')
                 Route::put('/page-builder/update/{id}', [PageBuilderController::class, 'update'])->name('admin.tools.page-builder.update');
                 Route::delete('/page-builder/destroy/{id}', [PageBuilderController::class, 'destroy'])->name('admin.tools.page-builder.destroy');
             });
+        });
+        Route::prefix('users/')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('admin.panel.users.index');
+            Route::get('/create', [UserController::class, 'create'])->name('admin.panel.users.create');
+            Route::get('/edit/{id}', [UserController::class, 'edit'])->name('admin.panel.users.edit');
+            // عملیات‌های دیگر مثل toggle، update و destroy در Livewire انجام می‌شوند
         });
     });
 

@@ -7,7 +7,9 @@ use App\Models\Dr\Appointment;
 
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Jetstream\HasProfilePhoto;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Admin\Dashboard\Cities\Zone;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -27,51 +29,39 @@ class User extends Authenticatable
      * @var array
      */
     protected $table = "users";
-    protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
-        'mobile',
-        'status',
-        'user_type',
-        'national_code',
-        'activation',
-        'profile_photo_path',
-        'password',
-        'email_verified_at',
-        'mobile_verified_at',
+   protected $fillable = [
+        'first_name', 'last_name', 'email', 'mobile', 'password', 'national_code',
+        'date_of_birth', 'sex', 'activation', 'profile_photo_path', 'zone_province_id', 'zone_city_id'
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-//        'two_factor_recovery_codes',
-//        'two_factor_secret',
-    ];
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->profile_photo_path
+            ? Storage::url($this->profile_photo_path)
+            : asset('admin-assets/images/default-avatar.png');
+    }
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
+    public function province()
+    {
+        return $this->belongsTo(Zone::class, 'zone_province_id');
+    }
 
-    ];
+    public function city()
+    {
+        return $this->belongsTo(Zone::class, 'zone_city_id');
+    }
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array
-     */
-    protected $appends = [
-        'profile_photo_url',
-    ];
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($user) {
+            if ($user->profile_photo_path) {
+                Storage::delete($user->profile_photo_path);
+            }
+        });
+    }
+
 
     public function getFullNameAttribute()
     {
@@ -81,22 +71,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(Appointment::class, 'patient_id');
     }
-
-//    public function ticketAdmin(){
-//        return $this->hasOne(TicketAdmin::class);
-//    }
-
-//    public function tickets()
-//    {
-//        return $this->hasMany(Ticket::class);
-//    }
-
-//    public function roles(){
-//        return $this->belongsToMany(Role::class);
-//    }
-
-//    public function payments()
-//    {
-//        return $this->hasMany(Payment::class);
-//    }
 }

@@ -30,6 +30,7 @@
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/global-loader.css') }}">
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/selesct2/select2.css') }}">
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/codemirror/5.65.16/codemirror.min.css') }}">
+<link rel="stylesheet" href="{{ asset('admin-assets/panel/custom-datepicker/custom-datepicker.css') }}">
 
 {{-- tom select --}}
 @vite(['resources/js/app.js', 'resources/css/app.css'])
