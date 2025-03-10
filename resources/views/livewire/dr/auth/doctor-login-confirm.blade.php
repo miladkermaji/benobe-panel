@@ -9,7 +9,7 @@
                 <a href="#" wire:click.prevent="goBack" class="back-link text-primary d-flex align-items-center"
                     style="cursor: pointer;">
                     <span class="ms-2">بازگشت</span>
-                    <img src="{{ asset('admin-assets/login/images/back.svg') }}" alt="آیکون بازگشت" class="img-fluid"
+                    <img src="{{ asset('dr-assets/login/images/back.svg') }}" alt="آیکون بازگشت" class="img-fluid"
                         style="max-width: 24px;">
                 </a>
             </div>
@@ -203,7 +203,7 @@
 
         Livewire.on('otpExpired', () => {
             toastr.error('توکن منقضی شده است');
-            window.Livewire.navigate('{{ route('admin.auth.login-register-form') }}');
+            window.Livewire.navigate('{{ route('dr.auth.login-register-form') }}');
             localStorage.removeItem('otpTimerData');
             if (window.timerState.interval) {
                 clearInterval(window.timerState.interval);

@@ -38,13 +38,14 @@ class DoctorLoginUserPass extends Component
         if (Auth::guard('doctor')->check()) {
             $this->redirect(route('dr-panel'));
         } elseif (Auth::guard('secretary')->check()) {
-            $this->redirect(route('sec-panel')); // فرض می‌کنم پنل منشی sec-panel باشه
+            $this->redirect(route('dr-panel')); // فرض می‌کنم پنل منشی dr-panel باشه
         }
         session(['current_step' => 3]);
     }
 
     public function goBack()
     {
+        session(['current_step' => 1]); // یا session()->forget('current_step')
         $this->redirect(route('dr.auth.login-register-form'), navigate: true);
     }
 
@@ -131,7 +132,7 @@ class DoctorLoginUserPass extends Component
             $userType = 'doctor';
         } else {
             Auth::guard('secretary')->login($user);
-            $redirectRoute = route('sec-panel');
+            $redirectRoute = route('dr-panel');
             $userType = 'secretary';
         }
 

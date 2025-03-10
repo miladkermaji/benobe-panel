@@ -25,7 +25,7 @@
                     @enderror
                 </div>
                 <a href="#"
-                    wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('admin.auth.login-user-pass-form') }}' })"
+                    wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('dr.auth.login-user-pass-form') }}' })"
                     class="text-primary text-decoration-none mb-3 d-block fw-bold">
                     ورود با نام کاربری و کلمه عبور
                 </a>

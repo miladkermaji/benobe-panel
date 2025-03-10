@@ -119,7 +119,7 @@ class DoctorTwoFactor extends Component
             $userType = 'doctor';
         } else {
             Auth::guard('secretary')->login($user);
-            $redirectRoute = route('sec-panel'); // فرض می‌کنم پنل منشی sec-panel باشه
+            $redirectRoute = route('dr-panel'); // فرض می‌کنم پنل منشی dr-panel باشه
             $userType = 'secretary';
         }
 

@@ -23,7 +23,7 @@ class DoctorLoginRegister extends Component
         if (Auth::guard('doctor')->check()) {
             $this->redirect(route('dr-panel'));
         } elseif (Auth::guard('secretary')->check()) {
-            $this->redirect(route('sec-panel')); // فرض می‌کنم پنل منشی sec-panel باشه
+            $this->redirect(route('dr-panel')); // فرض می‌کنم پنل منشی dr-panel باشه
         } elseif (session('current_step') === 2) {
             $this->redirect(route('dr.auth.login-confirm-form', ['token' => session('otp_token')]), navigate: true);
         } elseif (session('current_step') === 3) {
