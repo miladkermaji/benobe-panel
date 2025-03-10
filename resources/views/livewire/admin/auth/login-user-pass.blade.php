@@ -85,9 +85,7 @@
             });
         });
 
-        Livewire.on('loginSuccess', () => {
-            toastr.success('با موفقیت وارد شدید');
-        });
+       
 
         Livewire.on('navigateTo', (event) => {
             window.Livewire.navigate(event.url);

@@ -34,10 +34,7 @@ class TwoFactor extends Component
             ->first();
 
         if (!$loginSession) {
-            \Log::info('Mount: Invalid or expired token: ' . $token);
             $this->redirect(route('admin.auth.login-register-form'), navigate: true);
-        } else {
-            \Log::info('Mount: Valid token: ' . $token);
         }
     }
 
@@ -90,14 +87,9 @@ class TwoFactor extends Component
             return;
         }
 
-        \Log::info('Input: ' . $this->twoFactorSecret);
-        \Log::info('Stored two_factor_secret: ' . $user->two_factor_secret);
-        \Log::info('Hash check result: ' . (Hash::check($this->twoFactorSecret, $user->two_factor_secret) ? 'true' : 'false'));
-
         if (!$user->two_factor_secret || !Hash::check($this->twoFactorSecret, $user->two_factor_secret)) {
             $loginAttempts->incrementLoginAttempt($user->id, $user->mobile, '', '', $user->id);
             $this->addError('twoFactorSecret', 'کد دو عاملی وارد شده صحیح نیست.');
-            \Log::info('Invalid two-factor code');
             return;
         }
 
@@ -116,7 +108,6 @@ class TwoFactor extends Component
         $loginAttempts->resetLoginAttempts($user->mobile);
         LoginSession::where('token', $this->token)->delete();
         $this->dispatch('loginSuccess');
-        \Log::info('Login successful, redirecting to admin panel');
         $this->redirect(route('admin-panel'));
     }
 
