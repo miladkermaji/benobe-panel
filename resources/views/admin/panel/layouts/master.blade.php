@@ -41,6 +41,12 @@
 </body>
 @include('admin.panel.layouts.partials.scripts')
 @yield('scripts')
+    <script>
+      // اسکریپت نویگیشن Livewire
+      Livewire.on('navigateTo', (event) => {
+        window.Livewire.navigate(event.url);
+      });
+    </script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     Livewire.on('refreshDeleteButton', (data) => {

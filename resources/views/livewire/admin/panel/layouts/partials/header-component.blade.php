@@ -36,10 +36,4 @@
     </div>
 </div>
 
-@livewireScripts
-    <script>
-        // اسکریپت نویگیشن Livewire
-        Livewire.on('navigateTo', (event) => {
-            window.Livewire.navigate(event.url);
-        });
-    </script>
+

@@ -17,7 +17,7 @@
                         stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></path>
                 </svg>
             </div>
-            <div class="mx-4 cursor-pointer" onclick="location.href='{{ route('dr-wallet-charge') }}'">
+            <div class="mx-4 cursor-pointer d-flex" onclick="location.href='{{ route('dr-wallet-charge') }}'">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="24px" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round"
                     class="plasmic-default__svg plasmic_all__FLoMj PlasmicQuickAccessWallet_svg__4uUbY lucide lucide-wallet"
@@ -30,29 +30,8 @@
                 <span>{{ number_format($walletBalance) }} تومان</span>
             </div>
         </div>
-        <a href="{{ route('dr.auth.logout') }}" class="logout" title="خروج"></a>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const logoutLink = document.querySelector('.logout');
-                logoutLink.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    Swal.fire({
-                        title: 'آیا مطمئن هستید؟',
-                        text: "می‌خواهید از حساب کاربری خود خارج شوید؟",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'بله، خروج!',
-                        cancelButtonText: 'خیر، بمانم'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = logoutLink.href;
-                        }
-                    });
-                });
-            });
-        </script>
+        <!-- تغییر لینک لاگ‌اوت به نویگیشن Livewire -->
+        <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('dr.auth.logout') }}' })"
+            class="logout" title="خروج"></a>
     </div>
 </div>

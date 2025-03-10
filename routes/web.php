@@ -3,13 +3,18 @@ use Mockery\Container;
 use App\Livewire\Admin\Auth\Logout;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\Auth\TwoFactor;
+use App\Livewire\Dr\Auth\DoctorLogout;
 use App\Models\Dr\SecretaryPermission;
 use App\Livewire\Admin\Auth\LoginConfirm;
+use App\Livewire\Dr\Auth\DoctorTwoFactor;
 use App\Livewire\Admin\Auth\LoginRegister;
 use App\Livewire\Admin\Auth\LoginUserPass;
 use App\Models\Admin\Dashboard\Cities\Zone;
+use App\Livewire\Dr\Auth\DoctorLoginConfirm;
 use App\Http\Controllers\Admin\layouts\Blank;
 use App\Http\Controllers\Admin\layouts\Fluid;
+use App\Livewire\Dr\Auth\DoctorLoginRegister;
+use App\Livewire\Dr\Auth\DoctorLoginUserPass;
 use Modules\SendOtp\App\Livewire\SmsGatewayEdit;
 use Modules\SendOtp\App\Livewire\SmsGatewayList;
 use App\Http\Controllers\Dr\Auth\LoginController;
@@ -144,6 +149,15 @@ Route::prefix('admin-panel/')->group(function () {
     Route::get('logout', Logout::class)->name('admin.auth.logout');
 });
 /* end login manager routes */
+Route::prefix('dr/')->group(function () {
+    Route::get('/', DoctorLoginRegister::class)->name('dr.auth.login-register-form');
+    Route::get('login', DoctorLoginRegister::class)->name('dr.auth.login-register-form');
+    Route::get('login-user-pass', DoctorLoginUserPass::class)->name('dr.auth.login-user-pass-form');
+    Route::get('two-factor/{token}', DoctorTwoFactor::class)->name('dr-two-factor');
+    Route::get('login-confirm/{token}', DoctorLoginConfirm::class)->name('dr.auth.login-confirm-form');
+    Route::get('login-resend-otp/{token}', DoctorLoginConfirm::class)->name('dr.auth.login-resend-otp'); // اضافه شده
+    Route::get('logout', DoctorLogout::class)->name('dr.auth.logout');
+});
 //  manager  routes
 Route::prefix('admin')
     ->namespace('Admin')
@@ -199,28 +213,7 @@ Route::prefix('admin')
 // end manager  routes
 // dr routes
 Route::prefix('dr')->namespace('Dr')->group(function () {
-    /* login routes */
-    Route::get('login', [LoginController::class, 'loginRegisterForm'])->name('dr.auth.login-register-form');
-
-    Route::get('login-user-pass', [LoginController::class, 'loginUserPassForm'])->name('dr.auth.login-user-pass-form');
-
-    Route::get('dr-two-factor', [LoginController::class, 'twoFactorForm'])->name('dr-two-factor');
-
-    Route::post('dr-two-factor-store', [LoginController::class, 'twoFactorFormCheck'])->name('dr-two-factor-store');
-
-    Route::post('dr-login-with-mobile-pass', [LoginController::class, 'loginWithMobilePass'])->name('dr-login-with-mobile-pass');
-
-    Route::post('/login-register', [LoginController::class, 'loginRegister'])->name('dr.auth.login-register');
-
-    Route::get('login-confirm/{token}', [LoginController::class, 'loginConfirmForm'])->name('dr.auth.login-confirm-form');
-
-    Route::post('/login-confirm/{token}', [LoginController::class, 'loginConfirm'])->name('dr.auth.login-confirm');
-
-    Route::get('/login-resend-otp/{token}', [LoginController::class, 'loginResendOtp'])->name('dr.auth.login-resend-otp');
-
-    Route::get('/logout', [LoginController::class, 'logout'])->name('dr.auth.logout');
-    /* login routes */
-
+    
     Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {
         Route::get('/', [DrPanelController::class, 'index'])->middleware('secretary.permission:dashboard')->name('dr-panel');
         Route::get('/doctor/appointments/by-date', [DrPanelController::class, 'getAppointmentsByDate'])
