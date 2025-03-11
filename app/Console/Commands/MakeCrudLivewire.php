@@ -77,18 +77,33 @@ class MakeCrudLivewire extends Command
         }
     }
 
-    protected function createController($model, $namespacePrefix)
-    {
-        $controllerPath = app_path("Http/Controllers/{$namespacePrefix}/Panel/" . Str::plural($model) . "/{$model}Controller.php");
-        File::ensureDirectoryExists(dirname($controllerPath));
-        $stub = File::get(base_path('stubs/controller.stub'));
-        $stub = str_replace(
-            ['{{ namespace }}', '{{ class }}', '{{ modelLowerPlural }}', '{{ model }}'],
-            ["App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\" . Str::plural($model), "{$model}Controller", Str::plural(Str::lower($model)), $model],
-            $stub
-        );
-        File::put($controllerPath, $stub);
-    }
+protected function createController($model, $namespacePrefix)
+{
+    $controllerPath = app_path("Http/Controllers/{$namespacePrefix}/Panel/" . Str::plural($model) . "/{$model}Controller.php");
+    File::ensureDirectoryExists(dirname($controllerPath));
+    $stub = File::get(base_path('stubs/controller.stub'));
+    $stub = str_replace(
+        [
+            '{{ namespacePrefix }}', 
+            '{{ namespace }}', 
+            '{{ class }}', 
+            '{{ prefix }}', 
+            '{{ modelLowerPlural }}', 
+            '{{ model }}'
+        ],
+        [
+            $namespacePrefix, 
+            "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\" . Str::plural($model), 
+            "{$model}Controller", 
+            strtolower($namespacePrefix), 
+            Str::plural(Str::lower($model)), 
+            $model
+        ],
+        $stub
+    );
+    File::put($controllerPath, $stub);
+    $this->info("Controller for {$model} created at {$controllerPath}");
+}
 
     protected function createLivewireComponents($model, $namespacePrefix, $prefix)
     {
