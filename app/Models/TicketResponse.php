@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Models;
 
+use App\Models\Doctor;
 use App\Models\User;
-use App\Models\Dr\Doctor;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class TicketResponse extends Model
 {
@@ -25,7 +24,7 @@ class TicketResponse extends Model
 
     public function doctor()
     {
-        return $this->belongsTo(Doctor::class,'doctor_id');
+        return $this->belongsTo(Doctor::class, 'doctor_id');
     }
 
     public function user()

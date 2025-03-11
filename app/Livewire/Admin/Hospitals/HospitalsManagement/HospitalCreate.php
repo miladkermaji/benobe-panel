@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Livewire\Admin\Hospitals\HospitalsManagement;
 
-use Livewire\Component;
-use App\Models\Dr\Clinic;
-use App\Models\Dr\Doctor;
 use App\Models\Admin\Dashboard\Cities\Zone;
+use App\Models\Doctor;
+use App\Models\Dr\Clinic;
+use Livewire\Component;
 
 class HospitalCreate extends Component
 {
@@ -17,20 +16,20 @@ class HospitalCreate extends Component
     public $address;
 
     public $provinces = [];
-    public $cities = [];
+    public $cities    = [];
 
     protected $rules = [
-        'doctor_id' => 'required|exists:doctors,id',
-        'name' => 'required|string|max:255',
+        'doctor_id'    => 'required|exists:doctors,id',
+        'name'         => 'required|string|max:255',
         'phone_number' => 'nullable|string|max:20|regex:/^09[0-9]{9}$/',
-        'province_id' => 'nullable|exists:zone,id',
-        'city_id' => 'nullable|exists:zone,id',
-        'address' => 'nullable|string|max:500',
+        'province_id'  => 'nullable|exists:zone,id',
+        'city_id'      => 'nullable|exists:zone,id',
+        'address'      => 'nullable|string|max:500',
     ];
 
     protected $messages = [
         'doctor_id.required' => 'لطفاً پزشک مسئول را انتخاب کنید.',
-        'name.required' => 'نام بیمارستان الزامی است.',
+        'name.required'      => 'نام بیمارستان الزامی است.',
         'phone_number.regex' => 'شماره تماس باید با فرمت صحیح (مثل 09123456789) باشد.',
     ];
 
@@ -42,10 +41,10 @@ class HospitalCreate extends Component
     public function updatedProvinceId($value)
     {
         if ($value) {
-            $this->cities = Zone::where('parent_id', $value)->where('level', 2)->get();
+            $this->cities  = Zone::where('parent_id', $value)->where('level', 2)->get();
             $this->city_id = null; // ریست کردن شهر
         } else {
-            $this->cities = [];
+            $this->cities  = [];
             $this->city_id = null;
         }
     }
@@ -55,12 +54,12 @@ class HospitalCreate extends Component
         $this->validate();
 
         Clinic::create([
-            'doctor_id' => $this->doctor_id,
-            'name' => $this->name,
+            'doctor_id'    => $this->doctor_id,
+            'name'         => $this->name,
             'phone_number' => $this->phone_number,
-            'province_id' => $this->province_id,
-            'city_id' => $this->city_id,
-            'address' => $this->address,
+            'province_id'  => $this->province_id,
+            'city_id'      => $this->city_id,
+            'address'      => $this->address,
         ]);
 
         $this->dispatch('toast', ['message' => 'بیمارستان با موفقیت اضافه شد.', 'type' => 'success']);

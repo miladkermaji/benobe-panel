@@ -1,17 +1,16 @@
 <?php
-
 namespace App\Livewire\Dr\Auth;
 
-use App\Models\Otp;
-use Livewire\Component;
-use App\Models\Dr\Doctor;
-use Illuminate\Support\Str;
+use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
+use App\Models\Doctor;
 use App\Models\Dr\Secretary;
 use App\Models\LoginSession;
+use App\Models\Otp;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Livewire\Component;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
-use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 
 class DoctorLoginRegister extends Component
 {
@@ -37,7 +36,7 @@ class DoctorLoginRegister extends Component
         if (is_null($seconds) || $seconds < 0) {
             return '0 دقیقه و 0 ثانیه';
         }
-        $minutes = floor($seconds / 60);
+        $minutes          = floor($seconds / 60);
         $remainingSeconds = round($seconds % 60);
         return "$minutes دقیقه و $remainingSeconds ثانیه";
     }
@@ -48,23 +47,23 @@ class DoctorLoginRegister extends Component
             'mobile' => [
                 'required',
                 'string',
-                'regex:/^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/'
+                'regex:/^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/',
             ],
         ], [
             'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
-            'mobile.regex' => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
+            'mobile.regex'    => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
         ]);
 
-        $mobile = preg_replace('/^(\+98|98|0)/', '', $this->mobile);
+        $mobile          = preg_replace('/^(\+98|98|0)/', '', $this->mobile);
         $formattedMobile = '0' . $mobile;
 
         // چک کردن هر دو مدل Doctor و Secretary
-        $doctor = Doctor::where('mobile', $formattedMobile)->first();
-        $secretary = Secretary::where('mobile', $formattedMobile)->first();
+        $doctor        = Doctor::where('mobile', $formattedMobile)->first();
+        $secretary     = Secretary::where('mobile', $formattedMobile)->first();
         $loginAttempts = new LoginAttemptsService();
 
         // اگر هیچ کاربری پیدا نشد
-        if (!$doctor && !$secretary) {
+        if (! $doctor && ! $secretary) {
             $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
             $this->addError('mobile', 'کاربری با این شماره تلفن وجود ندارد.');
             return;
@@ -106,25 +105,25 @@ class DoctorLoginRegister extends Component
         session(['step1_completed' => true]);
 
         $otpCode = rand(1000, 9999);
-        $token = Str::random(60);
+        $token   = Str::random(60);
 
         // ثبت OTP بر اساس نوع کاربر
         Otp::create([
-            'token' => $token,
-            'doctor_id' => $doctor ? $user->id : null,
+            'token'        => $token,
+            'doctor_id'    => $doctor ? $user->id : null,
             'secretary_id' => $secretary ? $user->id : null,
-            'otp_code' => $otpCode,
-            'login_id' => $user->mobile,
-            'type' => 0,
+            'otp_code'     => $otpCode,
+            'login_id'     => $user->mobile,
+            'type'         => 0,
         ]);
 
         // ثبت LoginSession بر اساس نوع کاربر
         LoginSession::create([
-            'token' => $token,
-            'doctor_id' => $doctor ? $user->id : null,
+            'token'        => $token,
+            'doctor_id'    => $doctor ? $user->id : null,
             'secretary_id' => $secretary ? $user->id : null,
-            'step' => 2,
-            'expires_at' => now()->addMinutes(10),
+            'step'         => 2,
+            'expires_at'   => now()->addMinutes(10),
         ]);
 
         // ارسال پیامک

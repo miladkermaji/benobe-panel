@@ -1,10 +1,9 @@
 <?php
-
 namespace App\Models\Admin\Doctors\DoctorManagements;
 
-use App\Models\Dr\Doctor;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class DoctorComment extends Model
 {

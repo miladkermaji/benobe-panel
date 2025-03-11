@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Models\Admin\Dashboard\HomePage;
 
+use App\Models\Doctor;
 use App\Models\Hospital;
-use App\Models\Dr\Doctor;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class BestDoctor extends Model
 {

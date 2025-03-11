@@ -1,20 +1,18 @@
 <?php
-
 namespace App\Livewire\Admin\Doctors;
 
+use App\Models\Doctor;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Dr\Doctor;
-use Illuminate\Support\Facades\Log;
 
 class DoctorsManagementList extends Component
 {
     use WithPagination;
 
     public $searchMobile = '';
-    public $searchName = '';
-    public $status = '0'; // پیش‌فرض: همه
-    public $perPage = 10;
+    public $searchName   = '';
+    public $status       = '0'; // پیش‌فرض: همه
+    public $perPage      = 10;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -28,8 +26,8 @@ class DoctorsManagementList extends Component
     public function resetFilters()
     {
         $this->searchMobile = '';
-        $this->searchName = '';
-        $this->status = '0';
+        $this->searchName   = '';
+        $this->status       = '0';
         $this->resetPage();
     }
 

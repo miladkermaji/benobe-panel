@@ -1,12 +1,11 @@
 <?php
-
 namespace App\Models;
 
-use App\Models\User;
-use App\Models\Dr\Doctor;
+use App\Models\Doctor;
 use App\Models\Dr\Secretary;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class LoginLog extends Model
 {
@@ -21,7 +20,7 @@ class LoginLog extends Model
         'login_at',
         'logout_at',
         'ip_address',
-        'device'
+        'device',
     ];
 
     public function doctor()

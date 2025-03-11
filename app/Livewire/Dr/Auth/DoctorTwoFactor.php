@@ -1,16 +1,15 @@
 <?php
-
 namespace App\Livewire\Dr\Auth;
 
-use Carbon\Carbon;
-use Livewire\Component;
-use App\Models\LoginLog;
-use App\Models\Dr\Doctor;
+use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
+use App\Models\Doctor;
 use App\Models\Dr\Secretary;
+use App\Models\LoginLog;
 use App\Models\LoginSession;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
+use Livewire\Component;
 
 class DoctorTwoFactor extends Component
 {
@@ -23,18 +22,18 @@ class DoctorTwoFactor extends Component
 
     protected $messages = [
         'twoFactorSecret.required' => 'لطفاً کد دو عاملی را وارد کنید.',
-        'twoFactorSecret.min' => 'کد دو عاملی باید حداقل 6 کاراکتر باشد.',
+        'twoFactorSecret.min'      => 'کد دو عاملی باید حداقل 6 کاراکتر باشد.',
     ];
 
     public function mount($token)
     {
-        $this->token = $token;
+        $this->token  = $token;
         $loginSession = LoginSession::where('token', $token)
             ->where('step', 3)
             ->where('expires_at', '>', now())
             ->first();
 
-        if (!$loginSession) {
+        if (! $loginSession) {
             \Log::info('Mount: Invalid or expired token: ' . $token);
             $this->redirect(route('dr.auth.login-register-form'), navigate: true);
         } else {
@@ -52,7 +51,7 @@ class DoctorTwoFactor extends Component
         if (is_null($seconds) || $seconds < 0) {
             return '0 دقیقه و 0 ثانیه';
         }
-        $minutes = floor($seconds / 60);
+        $minutes          = floor($seconds / 60);
         $remainingSeconds = round($seconds % 60);
         return "$minutes دقیقه و $remainingSeconds ثانیه";
     }
@@ -66,7 +65,7 @@ class DoctorTwoFactor extends Component
             ->where('expires_at', '>', now())
             ->first();
 
-        if (!$loginSession) {
+        if (! $loginSession) {
             $this->addError('twoFactorSecret', 'دسترسی غیرمجاز یا توکن منقضی شده است. لطفاً دوباره وارد شوید.');
             \Log::info('Redirecting to login due to invalid session');
             $this->redirect(route('dr.auth.login-register-form'), navigate: true);
@@ -74,11 +73,11 @@ class DoctorTwoFactor extends Component
         }
 
         $loginAttempts = new LoginAttemptsService();
-        $user = $loginSession->doctor_id
-            ? Doctor::where('id', $loginSession->doctor_id)->first()
-            : Secretary::where('id', $loginSession->secretary_id)->first();
+        $user          = $loginSession->doctor_id
+        ? Doctor::where('id', $loginSession->doctor_id)->first()
+        : Secretary::where('id', $loginSession->secretary_id)->first();
 
-        if (!$user) {
+        if (! $user) {
             $this->addError('twoFactorSecret', 'کاربر یافت نشد.');
             $this->redirect(route('dr.auth.login-register-form'), navigate: true);
             return;
@@ -97,7 +96,7 @@ class DoctorTwoFactor extends Component
         \Log::info('Stored two_factor_secret: ' . $user->two_factor_secret);
         \Log::info('Hash check result: ' . (Hash::check($this->twoFactorSecret, $user->two_factor_secret) ? 'true' : 'false'));
 
-        if (!$user->two_factor_secret || !Hash::check($this->twoFactorSecret, $user->two_factor_secret)) {
+        if (! $user->two_factor_secret || ! Hash::check($this->twoFactorSecret, $user->two_factor_secret)) {
             $loginAttempts->incrementLoginAttempt(
                 $user->id,
                 $user->mobile,
@@ -116,20 +115,20 @@ class DoctorTwoFactor extends Component
         if ($user instanceof Doctor) {
             Auth::guard('doctor')->login($user);
             $redirectRoute = route('dr-panel');
-            $userType = 'doctor';
+            $userType      = 'doctor';
         } else {
             Auth::guard('secretary')->login($user);
             $redirectRoute = route('dr-panel'); // فرض می‌کنم پنل منشی dr-panel باشه
-            $userType = 'secretary';
+            $userType      = 'secretary';
         }
 
         LoginLog::create([
-            'doctor_id' => $user instanceof Doctor ? $user->id : null,
+            'doctor_id'    => $user instanceof Doctor ? $user->id : null,
             'secretary_id' => $user instanceof Secretary ? $user->id : null,
-            'user_type' => $userType,
-            'login_at' => now(),
-            'ip_address' => request()->ip(),
-            'device' => request()->header('User-Agent'),
+            'user_type'    => $userType,
+            'login_at'     => now(),
+            'ip_address'   => request()->ip(),
+            'device'       => request()->header('User-Agent'),
             'login_method' => 'two_factor',
         ]);
 

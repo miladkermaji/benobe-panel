@@ -1,23 +1,22 @@
 <?php
-
 namespace App\Models\Admin\Dashboard\Cities;
 
+use App\Models\Doctor;
 use App\Models\Dr\Clinic;
-use App\Models\Dr\Doctor;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Zone extends Model
 {
     use HasFactory;
 
-    protected $table = 'zone';
+    protected $table   = 'zone';
     protected $guarded = ['id'];
 
     public function sluggable(): array
     {
         return [
-            'slug' => ['source' => 'name']
+            'slug' => ['source' => 'name'],
         ];
     }
 

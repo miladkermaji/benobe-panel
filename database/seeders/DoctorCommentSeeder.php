@@ -1,12 +1,11 @@
 <?php
-
 namespace Database\Seeders;
 
-use Carbon\Carbon;
-use App\Models\Dr\Doctor;
-use Illuminate\Support\Str;
-use Illuminate\Database\Seeder;
 use App\Models\Admin\Doctors\DoctorManagements\DoctorComment;
+use App\Models\Doctor;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class DoctorCommentSeeder extends Seeder
 {
@@ -21,8 +20,8 @@ class DoctorCommentSeeder extends Seeder
             // اگر پزشکی وجود نداشت، یه پزشک تست ایجاد کن
             $doctor = Doctor::factory()->create([
                 'first_name' => 'کیوان',
-                'last_name' => 'فیاض مقدم',
-                'mobile' => '09123456789',
+                'last_name'  => 'فیاض مقدم',
+                'mobile'     => '09123456789',
             ]);
             $doctors = collect([$doctor]);
         }
@@ -67,11 +66,11 @@ class DoctorCommentSeeder extends Seeder
         // ایجاد 50 نظر تصادفی
         for ($i = 1; $i <= 50; $i++) {
             DoctorComment::create([
-                'doctor_id' => $doctors->random()->id,
-                'user_name' => $userNames[array_rand($userNames)],
+                'doctor_id'  => $doctors->random()->id,
+                'user_name'  => $userNames[array_rand($userNames)],
                 'user_phone' => '09' . Str::random(9), // شماره تلفن تصادفی
-                'comment' => $comments[array_rand($comments)],
-                'status' => rand(0, 1), // 0 یا 1 برای غیرفعال/فعال
+                'comment'    => $comments[array_rand($comments)],
+                'status'     => rand(0, 1),                                     // 0 یا 1 برای غیرفعال/فعال
                 'ip_address' => '192.168.' . rand(1, 255) . '.' . rand(1, 255), // IP تصادفی
                 'created_at' => Carbon::now()->subDays(rand(1, 30))->subHours(rand(0, 23))->subMinutes(rand(0, 59)),
                 'updated_at' => Carbon::now(),

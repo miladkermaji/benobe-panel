@@ -1,16 +1,12 @@
 <?php
 namespace App\Livewire\Admin\Doctors;
 
-use Carbon\Carbon;
-use Livewire\Component;
-use App\Models\Dr\Doctor;
-use Livewire\WithPagination;
-use Morilog\Jalali\Jalalian;
 use App\Helpers\JalaliHelper;
-use App\Models\Dr\Appointment;
-use App\Models\Dr\UserBlocking;
-use Illuminate\Support\Facades\Log;
+use App\Models\Doctor;
 use App\Models\Dr\CounselingAppointment;
+use App\Models\Dr\UserBlocking;
+use Livewire\Component;
+use Livewire\WithPagination;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
@@ -18,15 +14,15 @@ class DoctorCounselingLogs extends Component
 {
     use WithPagination;
 
-    public $reqDoctor = '0';
-    public $mobile = '';
-    public $trackingCode = '';
-    public $startDate = '';
-    public $endDate = '';
-    public $search = '';
+    public $reqDoctor            = '0';
+    public $mobile               = '';
+    public $trackingCode         = '';
+    public $startDate            = '';
+    public $endDate              = '';
+    public $search               = '';
     public $selectedAppointments = [];
-    public $selectAll = false;
-    public $perPage = 50;
+    public $selectAll            = false;
+    public $perPage              = 50;
 
     public function updated($propertyName)
     {
@@ -37,27 +33,27 @@ class DoctorCounselingLogs extends Component
 
     public function updatedSelectAll($value)
     {
-        $appointments = $this->getAppointmentsQuery()->paginate($this->perPage);
+        $appointments               = $this->getAppointmentsQuery()->paginate($this->perPage);
         $this->selectedAppointments = $value ? $appointments->pluck('id')->toArray() : [];
     }
 
     public function updatedSelectedAppointments()
     {
-        $appointments = $this->getAppointmentsQuery()->paginate($this->perPage);
-        $currentPageIds = $appointments->pluck('id')->toArray();
-        $this->selectAll = !empty($this->selectedAppointments) && !array_diff($currentPageIds, $this->selectedAppointments);
+        $appointments    = $this->getAppointmentsQuery()->paginate($this->perPage);
+        $currentPageIds  = $appointments->pluck('id')->toArray();
+        $this->selectAll = ! empty($this->selectedAppointments) && ! array_diff($currentPageIds, $this->selectedAppointments);
     }
 
     public function resetFilters()
     {
-        $this->reqDoctor = '0';
-        $this->mobile = '';
-        $this->trackingCode = '';
-        $this->startDate = '';
-        $this->endDate = '';
-        $this->search = '';
+        $this->reqDoctor            = '0';
+        $this->mobile               = '';
+        $this->trackingCode         = '';
+        $this->startDate            = '';
+        $this->endDate              = '';
+        $this->search               = '';
         $this->selectedAppointments = [];
-        $this->selectAll = false;
+        $this->selectAll            = false;
         $this->resetPage();
     }
 
@@ -66,8 +62,8 @@ class DoctorCounselingLogs extends Component
 
         $appointment = CounselingAppointment::where('patient_id', $userId)->where('doctor_id', $doctorId)->first();
         $patientName = $appointment && $appointment->patient
-            ? trim($appointment->patient->first_name . ' ' . $appointment->patient->last_name)
-            : 'کاربر بدون نام';
+        ? trim($appointment->patient->first_name . ' ' . $appointment->patient->last_name)
+        : 'کاربر بدون نام';
 
         $isBlocked = UserBlocking::where('user_id', $userId)
             ->where('doctor_id', $doctorId)
@@ -75,10 +71,10 @@ class DoctorCounselingLogs extends Component
             ->exists();
 
         $this->dispatch('show-ban-form', [
-            'userId' => $userId,
+            'userId'   => $userId,
             'doctorId' => $doctorId,
             'userName' => $patientName,
-            'status' => $isBlocked ? 0 : 1
+            'status'   => $isBlocked ? 0 : 1,
         ]);
     }
 
@@ -91,8 +87,8 @@ class DoctorCounselingLogs extends Component
                 ->where('status', 1)
                 ->exists();
 
-            $user = \App\Models\User::findOrFail($userId);
-            $doctor = Doctor::findOrFail($doctorId);
+            $user       = \App\Models\User::findOrFail($userId);
+            $doctor     = Doctor::findOrFail($doctorId);
             $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
 
             if ($data['status'] == 1) {
@@ -102,16 +98,16 @@ class DoctorCounselingLogs extends Component
                 }
                 $expiryGregorian = JalaliHelper::parsePersianTextDate($data['expiry']);
                 UserBlocking::create([
-                    'user_id' => $userId,
-                    'doctor_id' => $doctorId,
-                    'blocked_at' => now(),
+                    'user_id'      => $userId,
+                    'doctor_id'    => $doctorId,
+                    'blocked_at'   => now(),
                     'unblocked_at' => $expiryGregorian,
-                    'reason' => $data['reason'],
-                    'status' => 1,
+                    'reason'       => $data['reason'],
+                    'status'       => 1,
                 ]);
 
                 // ارسال پیامک برای مسدود کردن
-                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} مسدود شده‌اید.";
+                $message    = "کاربر گرامی، شما توسط پزشک {$doctorName} مسدود شده‌اید.";
                 $smsService = new MessageService(
                     SmsService::create(100254, $user->mobile, [$doctorName])
                 );
@@ -119,7 +115,7 @@ class DoctorCounselingLogs extends Component
 
                 $this->dispatch('toast', ['message' => 'کاربر با موفقیت مسدود شد و پیامک ارسال شد.', 'type' => 'success']);
             } else {
-                if (!$isBlocked) {
+                if (! $isBlocked) {
                     $this->dispatch('toast', ['message' => 'این کاربر مسدود نیست.', 'type' => 'error']);
                     return;
                 }
@@ -128,7 +124,7 @@ class DoctorCounselingLogs extends Component
                     ->update(['status' => 0]);
 
                 // ارسال پیامک برای رفع مسدودی
-                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید.";
+                $message    = "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید.";
                 $smsService = new MessageService(
                     SmsService::create(100255, $user->mobile, [$doctorName])
                 );
@@ -160,12 +156,12 @@ class DoctorCounselingLogs extends Component
             $appointment->update(['status' => 'cancelled']);
 
             // ارسال پیامک برای لغو نوبت
-            $user = \App\Models\User::findOrFail($appointment->patient_id);
-            $doctor = Doctor::findOrFail($appointment->doctor_id);
-            $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+            $user         = \App\Models\User::findOrFail($appointment->patient_id);
+            $doctor       = Doctor::findOrFail($appointment->doctor_id);
+            $doctorName   = $doctor->first_name . ' ' . $doctor->last_name;
             $trackingCode = $appointment->tracking_code;
-            $message = "نوبت شما با کد پیگیری {$trackingCode} توسط پزشک {$doctorName} لغو شد.";
-            $smsService = new MessageService(
+            $message      = "نوبت شما با کد پیگیری {$trackingCode} توسط پزشک {$doctorName} لغو شد.";
+            $smsService   = new MessageService(
                 SmsService::create(100256, $user->mobile, [$trackingCode, $doctorName])
             );
             $smsService->send();
@@ -209,7 +205,7 @@ class DoctorCounselingLogs extends Component
         try {
             CounselingAppointment::whereIn('id', $this->selectedAppointments)->delete();
             $this->selectedAppointments = [];
-            $this->selectAll = false;
+            $this->selectAll            = false;
             $this->dispatch('toast', ['message' => 'نوبت‌های انتخاب‌شده با موفقیت حذف شدند.', 'type' => 'success']);
         } catch (\Exception $e) {
             $this->dispatch('toast', ['message' => 'خطا در حذف نوبت‌ها: ' . $e->getMessage(), 'type' => 'error']);
@@ -219,7 +215,7 @@ class DoctorCounselingLogs extends Component
     public function export()
     {
         $appointments = $this->getAppointmentsQuery()->get();
-        $csv = "ردیف,پزشک,شماره تماس,استان/شهر,تاریخ ملاقات,زمان ملاقات,نام کاربر,کدملی کاربر,تاریخ رزرو,کد پیگیری,وضعیت,مبلغ (تومان),مدت زمان (دقیقه),زمان تماس,وضعیت تسویه\n";
+        $csv          = "ردیف,پزشک,شماره تماس,استان/شهر,تاریخ ملاقات,زمان ملاقات,نام کاربر,کدملی کاربر,تاریخ رزرو,کد پیگیری,وضعیت,مبلغ (تومان),مدت زمان (دقیقه),زمان تماس,وضعیت تسویه\n";
         foreach ($appointments as $index => $appointment) {
             $statusText = match ($appointment->status) {
                 'scheduled' => 'در انتظار خدمت',
@@ -234,14 +230,14 @@ class DoctorCounselingLogs extends Component
             };
 
             $csv .= ($index + 1) . ',' .
-                ($appointment->doctor->full_name ?? '') . ',' .
-                ($appointment->doctor->mobile ?? '') . ',' .
-                ($appointment->doctor->province->name ?? '') . '/' . ($appointment->doctor->city->name ?? '') . ',' .
-                JalaliHelper::toJalaliDate($appointment->appointment_date) . ',' .
-                ($appointment->start_time ?? '') . ',' .
-                ($appointment->patient->first_name ?? '') . ' ' . ($appointment->patient->last_name ?? '') . ' (' . ($appointment->patient->mobile ?? '') . '),' .
-                ($appointment->patient->national_code ?? '') . ',' .
-                JalaliHelper::toJalaliDateTime($appointment->reserved_at) . ',' .
+            ($appointment->doctor->full_name ?? '') . ',' .
+            ($appointment->doctor->mobile ?? '') . ',' .
+            ($appointment->doctor->province->name ?? '') . '/' . ($appointment->doctor->city->name ?? '') . ',' .
+            JalaliHelper::toJalaliDate($appointment->appointment_date) . ',' .
+            ($appointment->start_time ?? '') . ',' .
+            ($appointment->patient->first_name ?? '') . ' ' . ($appointment->patient->last_name ?? '') . ' (' . ($appointment->patient->mobile ?? '') . '),' .
+            ($appointment->patient->national_code ?? '') . ',' .
+            JalaliHelper::toJalaliDateTime($appointment->reserved_at) . ',' .
                 ($appointment->tracking_code ?? '') . ',' .
                 $statusText . ',' .
                 ($appointment->fee ? number_format($appointment->fee) : '0') . ',' .
@@ -262,9 +258,9 @@ class DoctorCounselingLogs extends Component
             $appointment->update(['status' => $newStatus]);
 
             // ارسال پیامک به کاربر (اختیاری، بر اساس نیاز)
-            $user = \App\Models\User::findOrFail($appointment->patient_id);
-            $doctor = Doctor::findOrFail($appointment->doctor_id);
-            $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+            $user         = \App\Models\User::findOrFail($appointment->patient_id);
+            $doctor       = Doctor::findOrFail($appointment->doctor_id);
+            $doctorName   = $doctor->first_name . ' ' . $doctor->last_name;
             $trackingCode = $appointment->tracking_code;
 
             $statusMessage = match ($newStatus) {
@@ -276,7 +272,7 @@ class DoctorCounselingLogs extends Component
                 default => 'وضعیت نوبت شما تغییر کرد.',
             };
 
-            $message = "نوبت شما با کد پیگیری {$trackingCode} با پزشک {$doctorName} به {$statusMessage}";
+            $message    = "نوبت شما با کد پیگیری {$trackingCode} با پزشک {$doctorName} به {$statusMessage}";
             $smsService = new MessageService(
                 SmsService::create(100257, $user->mobile, [$trackingCode, $doctorName, $statusMessage])
             );
@@ -290,7 +286,7 @@ class DoctorCounselingLogs extends Component
     private function getAppointmentsQuery()
     {
         $startDateGregorian = $this->startDate ? JalaliHelper::parsePersianTextDate($this->startDate) : null;
-        $endDateGregorian = $this->endDate ? JalaliHelper::parsePersianTextDate($this->endDate) : null;
+        $endDateGregorian   = $this->endDate ? JalaliHelper::parsePersianTextDate($this->endDate) : null;
         return CounselingAppointment::with(['doctor', 'patient', 'doctor.province', 'doctor.city'])
             ->when($this->reqDoctor && $this->reqDoctor != '0', fn($q) => $q->where('doctor_id', $this->reqDoctor))
             ->when($this->mobile, fn($q) => $q->whereHas('patient', fn($q2) => $q2->where('mobile', 'like', '%' . trim($this->mobile) . '%')))
@@ -300,14 +296,14 @@ class DoctorCounselingLogs extends Component
             ->when($this->search, fn($q) => $q->where(function ($query) {
                 $searchTerm = '%' . trim($this->search) . '%';
                 $query->whereHas('doctor', fn($q2) => $q2->where('first_name', 'like', $searchTerm)
-                    ->orWhere('last_name', 'like', $searchTerm)
-                    ->orWhere('mobile', 'like', $searchTerm)
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$searchTerm])) // جستجو بر اساس نام کامل پزشک
-                    ->orWhereHas('patient', fn($q2) => $q2->where('first_name', 'like', $searchTerm)
                         ->orWhere('last_name', 'like', $searchTerm)
                         ->orWhere('mobile', 'like', $searchTerm)
-                        ->orWhere('national_code', 'like', $searchTerm)
-                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$searchTerm])) // جستجو بر اساس نام کامل بیمار
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$searchTerm])) // جستجو بر اساس نام کامل پزشک
+                    ->orWhereHas('patient', fn($q2) => $q2->where('first_name', 'like', $searchTerm)
+                            ->orWhere('last_name', 'like', $searchTerm)
+                            ->orWhere('mobile', 'like', $searchTerm)
+                            ->orWhere('national_code', 'like', $searchTerm)
+                            ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$searchTerm])) // جستجو بر اساس نام کامل بیمار
                     ->orWhere('tracking_code', 'like', $searchTerm)
                     ->orWhere('appointment_date', 'like', $searchTerm)
                     ->orWhere('start_time', 'like', $searchTerm);
@@ -322,11 +318,11 @@ class DoctorCounselingLogs extends Component
     public function render()
     {
         $appointments = $this->getAppointmentsQuery()->paginate($this->perPage);
-        $doctors = Doctor::all();
+        $doctors      = Doctor::all();
         return view('livewire.admin.doctors.doctor-counseling-logs', [
-            'appointments' => $appointments,
-            'doctors' => $doctors,
-            'selectedDoctorId' => $this->reqDoctor
+            'appointments'     => $appointments,
+            'doctors'          => $doctors,
+            'selectedDoctorId' => $this->reqDoctor,
         ]);
     }
 }
