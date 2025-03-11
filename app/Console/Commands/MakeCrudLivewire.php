@@ -18,31 +18,31 @@ class MakeCrudLivewire extends Command
         $modelPlural     = Str::plural($modelLower);
         $namespacePrefix = $prefix === 'admin' ? 'Admin' : 'Dr';
 
-        // بررسی وجود مدل و تولید در صورت عدم وجود
-        $this->createModelIfNotExists($model, $namespacePrefix);
+        // تولید مدل (در مسیر ریشه Models)
+        $this->createModelIfNotExists($model);
 
-        // تولید مایگریشن در صورت عدم وجود
+        // تولید مایگریشن
         $this->createMigrationIfNotExists($modelLower, $modelPlural);
 
         // تولید کنترلر
-        $this->createController($model, $namespacePrefix);
+        $this->createController($model, $namespacePrefix, $prefix);
 
-        // تولید کامپوننت‌های Livewire
+        // تولید کامپوننت‌های Livewire در app/Livewire
         $this->createLivewireComponents($model, $namespacePrefix, $prefix);
 
-        // تولید فایل‌های Blade
-        $this->createBladeFiles($model, $namespacePrefix, $prefix);
+        // تولید فایل‌های Blade در resources/views/livewire
+        $this->createBladeFiles($model, $prefix);
 
         // تولید فایل CSS
         $this->createCssFile($modelLower, $prefix);
 
-        // اضافه کردن روت‌ها
+        // اضافه کردن روت‌ها (با بررسی وجود prefix)
         $this->appendRoutes($model, $prefix, $namespacePrefix);
 
         $this->info("CRUD Livewire for {$model} with prefix {$prefix} created successfully!");
     }
 
-    protected function createModelIfNotExists($model, $namespacePrefix)
+    protected function createModelIfNotExists($model)
     {
         $modelPath = app_path("Models/{$model}.php");
         if (! File::exists($modelPath)) {
@@ -77,33 +77,33 @@ class MakeCrudLivewire extends Command
         }
     }
 
-protected function createController($model, $namespacePrefix)
-{
-    $controllerPath = app_path("Http/Controllers/{$namespacePrefix}/Panel/" . Str::plural($model) . "/{$model}Controller.php");
-    File::ensureDirectoryExists(dirname($controllerPath));
-    $stub = File::get(base_path('stubs/controller.stub'));
-    $stub = str_replace(
-        [
-            '{{ namespacePrefix }}', 
-            '{{ namespace }}', 
-            '{{ class }}', 
-            '{{ prefix }}', 
-            '{{ modelLowerPlural }}', 
-            '{{ model }}'
-        ],
-        [
-            $namespacePrefix, 
-            "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\" . Str::plural($model), 
-            "{$model}Controller", 
-            strtolower($namespacePrefix), 
-            Str::plural(Str::lower($model)), 
-            $model
-        ],
-        $stub
-    );
-    File::put($controllerPath, $stub);
-    $this->info("Controller for {$model} created at {$controllerPath}");
-}
+    protected function createController($model, $namespacePrefix, $prefix)
+    {
+        $controllerPath = app_path("Http/Controllers/{$namespacePrefix}/Panel/" . Str::plural($model) . "/{$model}Controller.php");
+        File::ensureDirectoryExists(dirname($controllerPath));
+        $stub = File::get(base_path('stubs/controller.stub'));
+        $stub = str_replace(
+            [
+                '{{ namespace }}',
+                '{{ namespacePrefix }}',
+                '{{ class }}',
+                '{{ prefix }}',
+                '{{ modelLowerPlural }}',
+                '{{ model }}',
+            ],
+            [
+                "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\" . Str::plural($model),
+                $namespacePrefix,
+                "{$model}Controller",
+                $prefix,
+                Str::plural(Str::lower($model)),
+                $model,
+            ],
+            $stub
+        );
+        File::put($controllerPath, $stub);
+        $this->info("Controller created at {$controllerPath}");
+    }
 
     protected function createLivewireComponents($model, $namespacePrefix, $prefix)
     {
@@ -121,26 +121,45 @@ protected function createController($model, $namespacePrefix)
             File::ensureDirectoryExists(dirname($path));
             $stub = File::get(base_path("stubs/livewire-{$stubFile}"));
             $stub = str_replace(
-                ['{{ namespace }}', '{{ class }}', '{{ model }}', '{{ modelLower }}', '{{ modelPlural }}', '{{ prefix }}'],
-                ["App\\Livewire\\{$namespacePrefix}\\Panel\\" . Str::plural($model), $className, $model, $modelLower, $modelPlural, $prefix],
+                [
+                    '{{ namespace }}',
+                    '{{ class }}',
+                    '{{ model }}',
+                    '{{ modelLower }}',
+                    '{{ modelPlural }}',
+                    '{{ prefix }}',
+                    '{{ namespacePrefix }}',
+                ],
+                [
+                    "App\\Livewire\\{$namespacePrefix}\\Panel\\" . Str::plural($model),
+                    $className,
+                    $model,
+                    $modelLower,
+                    $modelPlural,
+                    $prefix,
+                    $namespacePrefix,
+                ],
                 $stub
             );
             File::put($path, $stub);
+            $this->info("Livewire component {$className} created at {$path}");
         }
     }
 
-    protected function createBladeFiles($model, $namespacePrefix, $prefix)
+    protected function createBladeFiles($model, $prefix)
     {
-        $modelLower  = Str::lower($model);
-        $modelPlural = Str::plural($modelLower);
-        $viewsPath   = resource_path("views/{$prefix}/panel/" . Str::plural($modelLower));
+        $modelLower        = Str::lower($model);
+        $modelPlural       = Str::plural($modelLower);
+        $livewireViewsPath = resource_path("views/livewire/{$prefix}/panel/" . Str::plural($modelLower));
+        $viewsPath         = resource_path("views/{$prefix}/panel/" . Str::plural($modelLower));
+        File::ensureDirectoryExists($livewireViewsPath);
         File::ensureDirectoryExists($viewsPath);
 
         // تولید ویوهای Livewire
         $livewireViews = [
-            'list'   => 'livewire-list-view.stub',
-            'create' => 'livewire-create-view.stub',
-            'edit'   => 'livewire-edit-view.stub',
+            'list'   => 'livewire-list.stub',
+            'create' => 'livewire-create.stub',
+            'edit'   => 'livewire-edit.stub',
         ];
         foreach ($livewireViews as $type => $stubFile) {
             $stub = File::get(base_path("stubs/{$stubFile}"));
@@ -149,7 +168,8 @@ protected function createController($model, $namespacePrefix)
                 [$model, $modelLower, $modelPlural, $prefix],
                 $stub
             );
-            File::put("{$viewsPath}/{$modelLower}-{$type}.blade.php", $stub);
+            File::put("{$livewireViewsPath}/{$modelLower}-{$type}.blade.php", $stub);
+            $this->info("Livewire Blade view {$modelLower}-{$type} created at {$livewireViewsPath}");
         }
 
         // تولید تمپلیت اصلی
@@ -160,6 +180,7 @@ protected function createController($model, $namespacePrefix)
             $templateStub
         );
         File::put("{$viewsPath}/index.blade.php", $templateStub);
+        $this->info("Main Blade template created at {$viewsPath}/index.blade.php");
     }
 
     protected function createCssFile($modelLower, $prefix)
@@ -167,6 +188,7 @@ protected function createController($model, $namespacePrefix)
         $cssPath = public_path("{$prefix}-assets/css/panel/" . Str::plural($modelLower) . "/{$modelLower}.css");
         File::ensureDirectoryExists(dirname($cssPath));
         File::copy(base_path('stubs/styles.stub'), $cssPath);
+        $this->info("CSS file created at {$cssPath}");
     }
 
     protected function appendRoutes($model, $prefix, $namespacePrefix)
@@ -175,12 +197,33 @@ protected function createController($model, $namespacePrefix)
         $modelLower  = Str::lower($model);
         $modelPlural = Str::plural($modelLower);
         $routeStub   = File::get(base_path('stubs/routes.stub'));
-        $routes      = str_replace(
+
+        $existingContent = File::get($routesFile);
+        $prefixExists    = Str::contains($existingContent, "Route::prefix('{$prefix}')");
+
+        $routes = str_replace(
             ['{{ prefix }}', '{{ namespace }}', '{{ model }}', '{{ modelLower }}', '{{ modelPlural }}'],
             [$prefix, $namespacePrefix, $model, $modelLower, $modelPlural],
             $routeStub
         );
-        File::append($routesFile, "\n" . $routes);
+
+        if ($prefixExists) {
+            // اگر prefix وجود دارد، روت‌ها را داخل گروه prefix اضافه کن
+            $pattern = "/Route::prefix\('{$prefix}'\)(.*?)->group\(function\s*\(\)\s*{(.*?)}\);/s";
+            if (preg_match($pattern, $existingContent, $matches)) {
+                $existingGroup   = $matches[0];
+                $groupContent    = $matches[2];
+                $newGroupContent = $groupContent . "\n" . trim($routes);
+                $newGroup        = str_replace($groupContent, $newGroupContent, $existingGroup);
+                $newContent      = str_replace($existingGroup, $newGroup, $existingContent);
+                File::put($routesFile, $newContent);
+                $this->info("Routes appended inside existing '{$prefix}' prefix.");
+            }
+        } else {
+            // اگر prefix وجود ندارد، گروه جدید اضافه کن
+            File::append($routesFile, "\n" . $routes);
+            $this->info("New route group with prefix '{$prefix}' created.");
+        }
     }
 
     protected function getFillableFields()
