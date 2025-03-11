@@ -44,12 +44,12 @@ class MakeCrudLivewire extends Command
 
     protected function createModelIfNotExists($model, $namespacePrefix)
     {
-        $modelPath = app_path("Models/{$namespacePrefix}/{$model}.php");
+        $modelPath = app_path("Models/{$model}.php");
         if (! File::exists($modelPath)) {
             $stub = File::get(base_path('stubs/model.stub'));
             $stub = str_replace(
                 ['{{ namespace }}', '{{ class }}', '{{ fillable }}'],
-                ["App\\Models\\{$namespacePrefix}", $model, $this->getFillableFields()],
+                ["App\\Models", $model, $this->getFillableFields()],
                 $stub
             );
             File::put($modelPath, $stub);
