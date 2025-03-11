@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Http\Controllers\{{namespacePrefix}}\Panel\{{model}};
+
+use App\Http\Controllers\{{namespacePrefix}}\Controller;
+
+class {{model}}Controller extends Controller
+{
+    public function index()
+    {
+        return view('{{prefix}}.panel.{{modelLower}}.index');
+    }
+
+    public function create()
+    {
+        return view('{{prefix}}.panel.{{modelLower}}.create');
+    }
+
+    public function edit($id)
+    {
+        return view('{{prefix}}.panel.{{modelLower}}.edit', compact('id'));
+    }
+}

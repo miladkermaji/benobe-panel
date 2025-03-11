@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Livewire\{{namespacePrefix}}\Panel\{{model}};
+
+use Livewire\Component;
+use Illuminate\Support\Facades\Validator;
+use App\Models\{{namespacePrefix}}\{{model}};
+
+class {{model}}Create extends Component
+{
+    public $name;
+    public $email;
+    public $is_active = true;
+
+    public function store()
+    {
+        $validator = Validator::make(
+            [
+                'name' => $this->name,
+                'email' => $this->email,
+                'is_active' => $this->is_active,
+            ],
+            [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:{{modelPlural}},email',
+                'is_active' => 'required|boolean',
+            ],
+            [
+                'name.required' => 'نام الزامی است.',
+                'email.required' => 'ایمیل الزامی است.',
+                'email.email' => 'ایمیل باید معتبر باشد.',
+                'email.unique' => 'این ایمیل قبلاً ثبت شده است.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            $this->dispatch('show-alert', type: 'error', message: $validator->errors()->first());
+            return;
+        }
+
+        {{model}}::create([
+            'name' => $this->name,
+            'email' => $this->email,
+            'is_active' => $this->is_active,
+        ]);
+
+        $this->dispatch('show-alert', type: 'success', message: 'ایجاد شد!');
+        return redirect()->route('{{prefix}}.panel.{{modelPlural}}.index');
+    }
+
+    public function render()
+    {
+        return view('livewire.{{prefix}}.panel.{{modelLower}}.{{modelLower}}-create');
+    }
+}
