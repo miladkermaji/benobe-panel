@@ -1,0 +1,113 @@
+<?php
+
+namespace {{ namespace }};
+
+use Livewire\Component;
+use Livewire\WithPagination;
+use Illuminate\Support\Facades\Cache;
+use App\Models\{{ namespacePrefix }}\{{ model }};
+
+class {{ class }} extends Component
+{
+    use WithPagination;
+
+    protected $paginationTheme = 'bootstrap';
+
+    protected $listeners = ['delete{{ model }}Confirmed' => 'delete{{ model }}'];
+
+    public $perPage = 10;
+    public $search = '';
+    public $readyToLoad = false;
+    public $selected{{ model }}s = [];
+    public $selectAll = false;
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+    ];
+
+    public function mount()
+    {
+        $this->perPage = max($this->perPage, 1);
+    }
+
+    public function load{{ model }}s()
+    {
+        $this->readyToLoad = true;
+    }
+
+    public function toggleStatus(${{ modelLower }}Id)
+    {
+        $item = {{ model }}::findOrFail(${{ modelLower }}Id);
+        $item->update(['is_active' => !$item->is_active]);
+
+        $this->dispatch('show-alert', type: $item->is_active ? 'success' : 'info', message: $item->is_active ? 'فعال شد!' : 'غیرفعال شد!');
+        Cache::forget('{{ modelLowerPlural }}_' . $this->search . '_page_' . $this->getPage());
+    }
+
+    public function confirmDelete($id)
+    {
+        $this->dispatch('confirm-delete', id: $id);
+    }
+
+    public function delete{{ model }}($id)
+    {
+        $item = {{ model }}::findOrFail($id);
+        $item->delete();
+
+        Cache::forget('{{ modelLowerPlural }}_' . $this->search . '_page_' . $this->getPage());
+        $this->dispatch('show-alert', type: 'success', message: '{{ model }} حذف شد!');
+
+        $totalItems = {{ model }}::count();
+        $maxPage = ceil($totalItems / $this->perPage);
+        if ($this->getPage() > $maxPage && $maxPage > 0) {
+            $this->setPage($maxPage);
+        } elseif ($maxPage == 0) {
+            $this->resetPage();
+        }
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSelectAll($value)
+    {
+        $currentPageIds = $this->get{{ model }}sQuery()->pluck('id')->toArray();
+        $this->selected{{ model }}s = $value ? $currentPageIds : [];
+    }
+
+    public function updatedSelected{{ model }}s()
+    {
+        $currentPageIds = $this->get{{ model }}sQuery()->pluck('id')->toArray();
+        $this->selectAll = !empty($this->selected{{ model }}s) && count(array_diff($currentPageIds, $this->selected{{ model }}s)) === 0;
+    }
+
+    public function deleteSelected()
+    {
+        if (empty($this->selected{{ model }}s)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ {{ modelLower }}ی انتخاب نشده است.');
+            return;
+        }
+
+        {{ model }}::whereIn('id', $this->selected{{ model }}s)->delete();
+        $this->selected{{ model }}s = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: '{{ model }}‌های انتخاب‌شده حذف شدند!');
+    }
+
+    private function get{{ model }}sQuery()
+    {
+        return {{ model }}::where('name', 'like', '%' . $this->search . '%')
+            ->paginate($this->perPage);
+    }
+
+    public function render()
+    {
+        $items = $this->readyToLoad ? $this->get{{ model }}sQuery() : null;
+
+        return view('livewire.{{ prefix }}.panel.{{ modelPlural }}.{{ modelLower }}-list', [
+            '{{ modelLowerPlural }}' => $items,
+        ]);
+    }
+}

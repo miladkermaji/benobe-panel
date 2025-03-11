@@ -1,0 +1,59 @@
+<?php
+
+namespace {{ namespace }};
+
+use Livewire\Component;
+use Illuminate\Support\Facades\Validator;
+use App\Models\{{ namespacePrefix }}\{{ model }};
+
+class {{ class }} extends Component
+{
+    public ${{ modelLower }};
+    public $name;
+    public $description;
+    public $is_active;
+
+    public function mount($id)
+    {
+        $this->{{ modelLower }} = {{ model }}::findOrFail($id);
+        $this->name = $this->{{ modelLower }}->name;
+        $this->description = $this->{{ modelLower }}->description;
+        $this->is_active = $this->{{ modelLower }}->is_active;
+    }
+
+    public function update()
+    {
+        $validator = Validator::make([
+            'name' => $this->name,
+            'description' => $this->description,
+            'is_active' => $this->is_active,
+        ], [
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:500',
+            'is_active' => 'required|boolean',
+        ], [
+            'name.required' => 'نام الزامی است.',
+            'name.max' => 'نام نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+            'description.max' => 'توضیحات نمی‌تواند بیشتر از ۵۰۰ کاراکتر باشد.',
+        ]);
+
+        if ($validator->fails()) {
+            $this->dispatch('show-alert', type: 'error', message: $validator->errors()->first());
+            return;
+        }
+
+        $this->{{ modelLower }}->update([
+            'name' => $this->name,
+            'description' => $this->description,
+            'is_active' => $this->is_active,
+        ]);
+
+        $this->dispatch('show-alert', type: 'success', message: '{{ model }} با موفقیت به‌روزرسانی شد!');
+        return redirect()->route('{{ prefix }}.panel.{{ modelPlural }}.index');
+    }
+
+    public function render()
+    {
+        return view('livewire.{{ prefix }}.panel.{{ modelPlural }}.{{ modelLower }}-edit');
+    }
+}
