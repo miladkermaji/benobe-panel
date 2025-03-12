@@ -50,88 +50,84 @@ class AuthController extends Controller
      *   }
      * }
      */
-    public function loginRegister(Request $request)
-    {
-        $request->validate([
-            'mobile' => [
-                'required',
-                'string',
-                'regex:/^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/',
-            ],
-        ], [
-            'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
-            'mobile.regex'    => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
-        ]);
+public function loginRegister(Request $request)
+{
+    $request->validate([
+        'mobile' => [
+            'required',
+            'string',
+            'regex:/^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/',
+        ],
+    ], [
+        'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
+        'mobile.regex'    => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
+    ]);
 
-        $mobile          = preg_replace('/^(\+98|98|0)/', '', $request->mobile);
-        $formattedMobile = '0' . $mobile;
+    $mobile          = preg_replace('/^(\+98|98|0)/', '', $request->mobile);
+    $formattedMobile = '0' . $mobile;
 
-        $user          = User::where('mobile', $formattedMobile)->first();
-        $loginAttempts = new LoginAttemptsService();
+    $user          = User::where('mobile', $formattedMobile)->first();
+    $loginAttempts = new LoginAttemptsService();
 
+    // اگر کاربر وجود ندارد یا وضعیتش صفر است، کاربر جدید ثبت‌نام می‌شود
+    if (! $user || $user->status === 0) {
         if (! $user) {
-            $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'کاربری با این شماره تلفن وجود ندارد.',
-                'data'    => null,
-            ], 422);
+            // ثبت‌نام کاربر جدید
+            $user = User::create([
+                'mobile' => $formattedMobile,
+                'status' => 1, // کاربر به صورت پیش‌فرض فعال می‌شود
+            ]);
+        } else {
+            // اگر کاربر وجود دارد ولی غیرفعال است، وضعیتش به فعال تغییر کند
+            $user->update(['status' => 1]);
         }
-
-        if ($user->status !== 1) {
-            $loginAttempts->incrementLoginAttempt($user->id, $formattedMobile, '', '', '');
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'حساب کاربری شما فعال نیست.',
-                'data'    => null,
-            ], 422);
-        }
-
-        if ($loginAttempts->isLocked($formattedMobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTime($formattedMobile);
-            $formattedTime = $this->formatTime($remainingTime);
-            return response()->json([
-                'status'  => 'error',
-                'message' => "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.",
-                'data'    => [
-                    'remaining_time' => $remainingTime,
-                    'formatted_time' => $formattedTime,
-                ],
-            ], 429);
-        }
-
-        $loginAttempts->incrementLoginAttempt($user->id, $formattedMobile, '', '', '');
-        $otpCode = rand(1000, 9999);
-        $token   = Str::random(60);
-
-        Otp::create([
-            'token'    => $token,
-            'user_id'  => $user->id,
-            'otp_code' => $otpCode,
-            'login_id' => $user->mobile,
-            'type'     => 0,
-        ]);
-
-        LoginSession::create([
-            'token'      => $token,
-            'user_id'    => $user->id,
-            'step'       => 2,
-            'expires_at' => now()->addMinutes(10),
-        ]);
-
-        $messagesService = new MessageService(
-            SmsService::create(100253, $user->mobile, [$otpCode])
-        );
-        $messagesService->send();
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'کد OTP ارسال شد',
-            'data'    => [
-                'token' => $token,
-            ],
-        ], 200);
     }
+
+    if ($loginAttempts->isLocked($formattedMobile)) {
+        $remainingTime = $loginAttempts->getRemainingLockTime($formattedMobile);
+        $formattedTime = $this->formatTime($remainingTime);
+        return response()->json([
+            'status'  => 'error',
+            'message' => "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.",
+            'data'    => [
+                'remaining_time' => $remainingTime,
+                'formatted_time' => $formattedTime,
+            ],
+        ], 429);
+    }
+
+    $loginAttempts->incrementLoginAttempt($user->id, $formattedMobile, '', '', '');
+    $otpCode = rand(1000, 9999);
+    $token   = Str::random(60);
+
+    Otp::create([
+        'token'    => $token,
+        'user_id'  => $user->id,
+        'otp_code' => $otpCode,
+        'login_id' => $user->mobile,
+        'type'     => 0,
+    ]);
+
+    LoginSession::create([
+        'token'      => $token,
+        'user_id'    => $user->id,
+        'step'       => 2,
+        'expires_at' => now()->addMinutes(10),
+    ]);
+
+    $messagesService = new MessageService(
+        SmsService::create(100253, $user->mobile, [$otpCode])
+    );
+    $messagesService->send();
+
+    return response()->json([
+        'status'  => 'success',
+        'message' => 'کد OTP ارسال شد',
+        'data'    => [
+            'token' => $token,
+        ],
+    ], 200);
+}
 
     /**
      * @bodyParam otpCode string required کد OTP وارد شده (مثال: 1234)
