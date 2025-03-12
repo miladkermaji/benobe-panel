@@ -26,25 +26,51 @@ endpoints:
         name: mobile
         description: 'شماره موبایل کاربر (مثال: 09181234567)'
         required: true
-        example: consequatur
+        example: architecto
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      mobile: consequatur
+      mobile: architecto
     fileParameters: []
     responses:
       -
         status: 200
-        content: '{"message": "کد OTP ارسال شد", "token": "random-token"}'
+        content: |-
+          {
+            "status": "success",
+            "message": "کد OTP ارسال شد",
+            "data": {
+              "token": "random-token"
+            }
+          }
         headers: []
         description: ''
         custom: []
       -
         status: 422
-        content: '{"message": "شماره موبایل معتبر نیست"}'
+        content: |-
+          {
+            "status": "error",
+            "message": "شماره موبایل معتبر نیست",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 429
+        content: |-
+          {
+            "status": "error",
+            "message": "شما بیش از حد تلاش کرده‌اید. لطفاً 2 دقیقه و 30 ثانیه صبر کنید.",
+            "data": {
+              "remaining_time": 150,
+              "formatted_time": "2 دقیقه و 30 ثانیه"
+            }
+          }
         headers: []
         description: ''
         custom: []
@@ -75,14 +101,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: consequatur
+        example: architecto
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: consequatur
+      token: architecto
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
@@ -90,25 +116,55 @@ endpoints:
         name: otpCode
         description: 'کد OTP وارد شده (مثال: 1234)'
         required: true
-        example: consequatur
+        example: architecto
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      otpCode: consequatur
+      otpCode: architecto
     fileParameters: []
     responses:
       -
         status: 200
-        content: '{"message": "ورود با موفقیت انجام شد"}'
+        content: |-
+          {
+            "status": "success",
+            "message": "ورود با موفقیت انجام شد",
+            "data": {
+              "user": {
+                "id": 1,
+                "mobile": "09181234567",
+                "mobile_verified_at": "2025-03-12T10:00:00Z"
+              }
+            }
+          }
         headers: []
         description: ''
         custom: []
       -
         status: 422
-        content: '{"message": "کد تأیید نامعتبر است"}'
+        content: |-
+          {
+            "status": "error",
+            "message": "کد تأیید نامعتبر است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 429
+        content: |-
+          {
+            "status": "error",
+            "message": "شما بیش از حد تلاش کرده‌اید. لطفاً 2 دقیقه و 30 ثانیه صبر کنید.",
+            "data": {
+              "remaining_time": 150,
+              "formatted_time": "2 دقیقه و 30 ثانیه"
+            }
+          }
         headers: []
         description: ''
         custom: []
@@ -139,14 +195,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: consequatur
+        example: architecto
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: consequatur
+      token: architecto
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -155,13 +211,39 @@ endpoints:
     responses:
       -
         status: 200
-        content: '{"message": "کد جدید ارسال شد", "token": "new-random-token"}'
+        content: |-
+          {
+            "status": "success",
+            "message": "کد جدید ارسال شد",
+            "data": {
+              "token": "new-random-token"
+            }
+          }
         headers: []
         description: ''
         custom: []
       -
         status: 422
-        content: '{"message": "توکن منقضی شده است"}'
+        content: |-
+          {
+            "status": "error",
+            "message": "توکن منقضی شده است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 429
+        content: |-
+          {
+            "status": "error",
+            "message": "شما بیش از حد تلاش کرده‌اید. لطفاً 2 دقیقه و 30 ثانیه صبر کنید.",
+            "data": {
+              "remaining_time": 150,
+              "formatted_time": "2 دقیقه و 30 ثانیه"
+            }
+          }
         headers: []
         description: ''
         custom: []
@@ -197,7 +279,14 @@ endpoints:
     responses:
       -
         status: 200
-        content: '{"message": "شما با موفقیت خارج شدید"}'
+        content: |-
+          {
+            "status": "success",
+            "message": "شما با موفقیت خارج شدید",
+            "data": {
+              "logout_at": "2025-03-12T10:00:00Z"
+            }
+          }
         headers: []
         description: ''
         custom: []

@@ -26,7 +26,7 @@
             </style>
 
     <script>
-        var tryItOutBaseUrl = "http://localhost";
+        var tryItOutBaseUrl = "https://emr-benobe.ir/";
         var useCsrf = Boolean();
         var csrfUrl = "/sanctum/csrf-cookie";
     </script>
@@ -103,7 +103,7 @@
     <div class="content">
         <h1 id="introduction">Introduction</h1>
 <aside>
-    <strong>Base URL</strong>: <code>http://localhost</code>
+    <strong>Base URL</strong>: <code>https://emr-benobe.ir/</code>
 </aside>
 <pre><code>This documentation aims to provide all the information you need to work with our API.
 
@@ -130,18 +130,18 @@ You can switch the language used with the tabs at the top right (or from the nav
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/login-register" \
+    "https://emr-benobe.ir/api/auth/login-register" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"mobile\": \"consequatur\"
+    \"mobile\": \"architecto\"
 }"
 </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/login-register"
+    "https://emr-benobe.ir/api/auth/login-register"
 );
 
 const headers = {
@@ -150,7 +150,7 @@ const headers = {
 };
 
 let body = {
-    "mobile": "consequatur"
+    "mobile": "architecto"
 };
 
 fetch(url, {
@@ -168,8 +168,11 @@ fetch(url, {
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;success&quot;,
     &quot;message&quot;: &quot;کد OTP ارسال شد&quot;,
-    &quot;token&quot;: &quot;random-token&quot;
+    &quot;data&quot;: {
+        &quot;token&quot;: &quot;random-token&quot;
+    }
 }</code>
  </pre>
             <blockquote>
@@ -178,7 +181,23 @@ fetch(url, {
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;شماره موبایل معتبر نیست&quot;
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;شماره موبایل معتبر نیست&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;شما بیش از حد تلاش کرده&zwnj;اید. لطفاً 2 دقیقه و 30 ثانیه صبر کنید.&quot;,
+    &quot;data&quot;: {
+        &quot;remaining_time&quot;: 150,
+        &quot;formatted_time&quot;: &quot;2 دقیقه و 30 ثانیه&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -258,10 +277,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="mobile"                data-endpoint="POSTapi-auth-login-register"
-               value="consequatur"
+               value="architecto"
                data-component="body">
     <br>
-<p>شماره موبایل کاربر (مثال: 09181234567) Example: <code>consequatur</code></p>
+<p>شماره موبایل کاربر (مثال: 09181234567) Example: <code>architecto</code></p>
         </div>
         </form>
 
@@ -278,18 +297,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/login-confirm/consequatur" \
+    "https://emr-benobe.ir/api/auth/login-confirm/architecto" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"otpCode\": \"consequatur\"
+    \"otpCode\": \"architecto\"
 }"
 </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/login-confirm/consequatur"
+    "https://emr-benobe.ir/api/auth/login-confirm/architecto"
 );
 
 const headers = {
@@ -298,7 +317,7 @@ const headers = {
 };
 
 let body = {
-    "otpCode": "consequatur"
+    "otpCode": "architecto"
 };
 
 fetch(url, {
@@ -316,7 +335,15 @@ fetch(url, {
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;ورود با موفقیت انجام شد&quot;
+    &quot;status&quot;: &quot;success&quot;,
+    &quot;message&quot;: &quot;ورود با موفقیت انجام شد&quot;,
+    &quot;data&quot;: {
+        &quot;user&quot;: {
+            &quot;id&quot;: 1,
+            &quot;mobile&quot;: &quot;09181234567&quot;,
+            &quot;mobile_verified_at&quot;: &quot;2025-03-12T10:00:00Z&quot;
+        }
+    }
 }</code>
  </pre>
             <blockquote>
@@ -325,7 +352,23 @@ fetch(url, {
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;کد تأیید نامعتبر است&quot;
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;کد تأیید نامعتبر است&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;شما بیش از حد تلاش کرده&zwnj;اید. لطفاً 2 دقیقه و 30 ثانیه صبر کنید.&quot;,
+    &quot;data&quot;: {
+        &quot;remaining_time&quot;: 150,
+        &quot;formatted_time&quot;: &quot;2 دقیقه و 30 ثانیه&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -405,10 +448,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="token"                data-endpoint="POSTapi-auth-login-confirm--token-"
-               value="consequatur"
+               value="architecto"
                data-component="url">
     <br>
-<p>Example: <code>consequatur</code></p>
+<p>Example: <code>architecto</code></p>
             </div>
                             <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
         <div style=" padding-left: 28px;  clear: unset;">
@@ -417,10 +460,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="otpCode"                data-endpoint="POSTapi-auth-login-confirm--token-"
-               value="consequatur"
+               value="architecto"
                data-component="body">
     <br>
-<p>کد OTP وارد شده (مثال: 1234) Example: <code>consequatur</code></p>
+<p>کد OTP وارد شده (مثال: 1234) Example: <code>architecto</code></p>
         </div>
         </form>
 
@@ -437,14 +480,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/resend-otp/consequatur" \
+    "https://emr-benobe.ir/api/auth/resend-otp/architecto" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/resend-otp/consequatur"
+    "https://emr-benobe.ir/api/auth/resend-otp/architecto"
 );
 
 const headers = {
@@ -466,8 +509,11 @@ fetch(url, {
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;success&quot;,
     &quot;message&quot;: &quot;کد جدید ارسال شد&quot;,
-    &quot;token&quot;: &quot;new-random-token&quot;
+    &quot;data&quot;: {
+        &quot;token&quot;: &quot;new-random-token&quot;
+    }
 }</code>
  </pre>
             <blockquote>
@@ -476,7 +522,23 @@ fetch(url, {
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;توکن منقضی شده است&quot;
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;توکن منقضی شده است&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;شما بیش از حد تلاش کرده&zwnj;اید. لطفاً 2 دقیقه و 30 ثانیه صبر کنید.&quot;,
+    &quot;data&quot;: {
+        &quot;remaining_time&quot;: 150,
+        &quot;formatted_time&quot;: &quot;2 دقیقه و 30 ثانیه&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -556,10 +618,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="token"                data-endpoint="POSTapi-auth-resend-otp--token-"
-               value="consequatur"
+               value="architecto"
                data-component="url">
     <br>
-<p>Example: <code>consequatur</code></p>
+<p>Example: <code>architecto</code></p>
             </div>
                     </form>
 
@@ -576,14 +638,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/logout" \
+    "https://emr-benobe.ir/api/auth/logout" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/logout"
+    "https://emr-benobe.ir/api/auth/logout"
 );
 
 const headers = {
@@ -605,7 +667,11 @@ fetch(url, {
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;شما با موفقیت خارج شدید&quot;
+    &quot;status&quot;: &quot;success&quot;,
+    &quot;message&quot;: &quot;شما با موفقیت خارج شدید&quot;,
+    &quot;data&quot;: {
+        &quot;logout_at&quot;: &quot;2025-03-12T10:00:00Z&quot;
+    }
 }</code>
  </pre>
     </span>
