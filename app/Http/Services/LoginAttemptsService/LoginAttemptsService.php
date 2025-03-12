@@ -2,7 +2,7 @@
 
 namespace App\Http\Services\LoginAttemptsService;
 
-use App\Models\Dr\LoginAttempt;
+use App\Models\LoginAttempt;
 
 class LoginAttemptsService
 {
