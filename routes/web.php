@@ -61,7 +61,6 @@ use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettin
 //manager login routes
 /* login manager routes */
 Route::prefix('admin-panel/')->group(function () {
-    Route::get('/', LoginRegister::class)->name('admin.auth.login-register-form');
     Route::get('login', LoginRegister::class)->name('admin.auth.login-register-form');
     Route::get('login-user-pass', LoginUserPass::class)->name('admin.auth.login-user-pass-form');
     Route::get('two-factor/{token}', TwoFactor::class)->name('admin-two-factor');
@@ -71,7 +70,6 @@ Route::prefix('admin-panel/')->group(function () {
 });
 /* end login manager routes */
 Route::prefix('dr/')->group(function () {
-    Route::get('/', DoctorLoginRegister::class)->name('dr.auth.login-register-form');
     Route::get('login', DoctorLoginRegister::class)->name('dr.auth.login-register-form');
     Route::get('login-user-pass', DoctorLoginUserPass::class)->name('dr.auth.login-user-pass-form');
     Route::get('two-factor/{token}', DoctorTwoFactor::class)->name('dr-two-factor');
