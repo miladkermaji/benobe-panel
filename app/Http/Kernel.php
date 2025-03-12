@@ -53,6 +53,10 @@ class Kernel extends HttpKernel
       'secretary' => \App\Http\Middleware\secretary::class,
       
     ],
+    'user' => [
+      'user' => \App\Http\Middleware\user::class,
+      
+    ],
   ];
 
   protected $middlewareAliases = [

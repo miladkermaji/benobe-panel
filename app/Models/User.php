@@ -1,21 +1,18 @@
 <?php
-
 namespace App\Models;
 
-
-use App\Models\Dr\Appointment;
-
+use App\Models\Appointment;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Jetstream\HasProfilePhoto;
 use Illuminate\Support\Facades\Storage;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Admin\Dashboard\Cities\Zone;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens;
     use HasFactory;
@@ -28,17 +25,25 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $table = "users";
-   protected $fillable = [
+    protected $table    = "users";
+    protected $fillable = [
         'first_name', 'last_name', 'email', 'mobile', 'password', 'national_code',
-        'date_of_birth', 'sex', 'activation', 'profile_photo_path', 'zone_province_id', 'zone_city_id'
+        'date_of_birth', 'sex', 'activation', 'profile_photo_path', 'zone_province_id', 'zone_city_id',
     ];
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
 
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
     public function getProfilePhotoUrlAttribute()
     {
         return $this->profile_photo_path
-            ? Storage::url($this->profile_photo_path)
-            : asset('admin-assets/images/default-avatar.png');
+        ? Storage::url($this->profile_photo_path)
+        : asset('admin-assets/images/default-avatar.png');
     }
 
     public function province()
@@ -61,7 +66,6 @@ class User extends Authenticatable
             }
         });
     }
-
 
     public function getFullNameAttribute()
     {

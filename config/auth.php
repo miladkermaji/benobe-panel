@@ -42,6 +42,10 @@ return [
             'driver' => 'session',
             'provider' => 'users'
         ],
+        'api' => [
+        'driver' => 'jwt',
+        'provider' => 'users',
+    ],
         'manager' => [
             'driver' => 'session',
             'provider' => 'managers',
@@ -53,6 +57,10 @@ return [
         'secretary' => [
             'driver' => 'session',
             'provider' => 'secretaries',
+        ],
+        'user' => [
+            'driver' => 'session',
+            'provider' => 'users',
         ],
     ],
 

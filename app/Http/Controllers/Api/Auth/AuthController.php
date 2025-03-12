@@ -1,18 +1,19 @@
 <?php
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
-use App\Models\LoginLog;
-use App\Models\LoginSession;
+use App\Models;
+use Carbon\Carbon;
 use App\Models\Otp;
 use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\LoginLog;
 use Illuminate\Support\Str;
+use App\Models\LoginSession;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 
 class AuthController extends Controller
 {
@@ -214,9 +215,10 @@ class AuthController extends Controller
             $user->update(['mobile_verified_at' => Carbon::now()]);
         }
 
-        Auth::guard('user')->login($user);
-        $loginAttempts->resetLoginAttempts($user->mobile);
-        LoginSession::where('token', $token)->delete();
+       $jwtToken = Auth::guard('api')->login($user);
+$loginAttempts->resetLoginAttempts($user->mobile);
+LoginSession::where('token', $token)->delete();
+
 
         LoginLog::create([
             'user_id'    => $user->id,
@@ -226,17 +228,19 @@ class AuthController extends Controller
             'device'     => $request->header('User-Agent'),
         ]);
 
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'ورود با موفقیت انجام شد',
-            'data'    => [
-                'user' => [
-                    'id'                 => $user->id,
-                    'mobile'             => $user->mobile,
-                    'mobile_verified_at' => $user->mobile_verified_at,
-                ],
-            ],
-        ], 200);
+       return response()->json([
+    'status'  => 'success',
+    'message' => 'ورود با موفقیت انجام شد',
+    'data'    => [
+        'user'  => [
+            'id'                 => $user->id,
+            'mobile'             => $user->mobile,
+            'mobile_verified_at' => $user->mobile_verified_at,
+        ],
+        'token' => $jwtToken, // توکن JWT
+    ],
+], 200);
+
     }
 
     /**
