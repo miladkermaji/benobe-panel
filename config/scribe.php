@@ -1,241 +1,245 @@
 <?php
 
-use Knuckles\Scribe\Extracting\Strategies;
-use Knuckles\Scribe\Config\Defaults;
-use Knuckles\Scribe\Config\AuthIn;
-use function Knuckles\Scribe\Config\{removeStrategies, configureStrategy};
+use function Knuckles\Scribe\Config\configureStrategy;
 
-// Only the most common configs are shown. See the https://scribe.knuckles.wtf/laravel/reference/config for all.
+use Knuckles\Scribe\Config\AuthIn;
+use Knuckles\Scribe\Config\Defaults;use Knuckles\Scribe\Extracting\Strategies;
 
 return [
-    // The HTML <title> for the generated documentation.
-    'title' => config('app.name').' API Documentation',
+    /*
+    |--------------------------------------------------------------------------
+    | General Information
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for API documentation, including title, description,
+    | and base URL.
+    |
+    */
 
-    // A short description of your API. Will be included in the docs webpage, Postman collection and OpenAPI spec.
-    'description' => '',
+    'title'                           => config('app.name') . ' API Documentation',
+    'description'                     => 'Official API documentation for your project, including authentication, user requests, and other operations.',
+    'base_url'                        => config("app.url"),
 
-    // The base URL displayed in the docs.
-    // If you're using `laravel` type, you can set this to a dynamic string, like '{{ config("app.tenant_url") }}' to get a dynamic base URL.
-    'base_url' => config("app.url"),
+    /*
+    |--------------------------------------------------------------------------
+    | API Routes
+    |--------------------------------------------------------------------------
+    |
+    | Define which API routes should be included in the documentation.
+    |
+    */
 
-    // Routes to include in the docs
-   'routes' => [
-    [
-        'match' => [
-            'prefixes' => ['api/auth/*'],
-            'domains' => ['*'],
+    'routes'                          => [
+        [
+            'match'   => [
+                'prefixes' => ['api/auth/*'],
+                'domains'  => ['*'],
+            ],
+            'include' => [],
+            'exclude' => ['api/sendotp*'],
         ],
-        'include' => [],
-        'exclude' => ['api/sendotp*'],
     ],
-],
 
-    // The type of documentation output to generate.
-    // - "static" will generate a static HTMl page in the /public/docs folder,
-    // - "laravel" will generate the documentation as a Blade view, so you can add routing and authentication.
-    // - "external_static" and "external_laravel" do the same as above, but pass the OpenAPI spec as a URL to an external UI template
-    'type' => 'laravel',
+    /*
+    |--------------------------------------------------------------------------
+    | Documentation Type
+    |--------------------------------------------------------------------------
+    |
+    | Choose how the API documentation should be generated and displayed.
+    | Options:
+    | - "static" generates a static HTML page in /public/docs
+    | - "laravel" generates Blade views for dynamic routing
+    |
+    */
 
-    // See https://scribe.knuckles.wtf/laravel/reference/config#theme for supported options
-    'theme' => 'default',
+    'type'                            => 'laravel',
+    'theme'                           => 'default',
 
-    'static' => [
-        // HTML documentation, assets and Postman collection will be generated to this folder.
-        // Source Markdown will still be in resources/docs.
+    'static'                          => [
         'output_path' => 'public/docs',
     ],
 
-    'laravel' => [
-        // Whether to automatically create a docs route for you to view your generated docs. You can still set up routing manually.
-        'add_routes' => true,
-
-        // URL path to use for the docs endpoint (if `add_routes` is true).
-        // By default, `/docs` opens the HTML page, `/docs.postman` opens the Postman collection, and `/docs.openapi` the OpenAPI spec.
-        'docs_url' => '/docs',
-
-        // Directory within `public` in which to store CSS and JS assets.
-        // By default, assets are stored in `public/vendor/scribe`.
-        // If set, assets will be stored in `public/{{assets_directory}}`
+    'laravel'                         => [
+        'add_routes'       => true,
+        'docs_url'         => '/docs',
         'assets_directory' => null,
-
-        // Middleware to attach to the docs endpoint (if `add_routes` is true).
-        'middleware' => [],
+        'middleware'       => [],
     ],
 
-    'external' => [
-        'html_attributes' => []
-    ],
+    /*
+    |--------------------------------------------------------------------------
+    | "Try It Out" Button
+    |--------------------------------------------------------------------------
+    |
+    | Enables a "Try It Out" button that allows users to test API endpoints.
+    |
+    */
 
-    'try_it_out' => [
-        // Add a Try It Out button to your endpoints so consumers can test endpoints right from their browser.
-        // Don't forget to enable CORS headers for your endpoints.
-        'enabled' => true,
-
-        // The base URL to use in the API tester. Leave as null to be the same as the displayed URL (`scribe.base_url`).
+    'try_it_out'                      => [
+        'enabled'  => true,
         'base_url' => null,
-
-        // [Laravel Sanctum] Fetch a CSRF token before each request, and add it as an X-XSRF-TOKEN header.
         'use_csrf' => false,
-
-        // The URL to fetch the CSRF token from (if `use_csrf` is true).
         'csrf_url' => '/sanctum/csrf-cookie',
     ],
 
-    // How is your API authenticated? This information will be used in the displayed docs, generated examples and response calls.
-    'auth' => [
-        // Set this to true if ANY endpoints in your API use authentication.
-        'enabled' => false,
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Specify how API authentication works, including token type and headers.
+    |
+    */
 
-        // Set this to true if your API should be authenticated by default. If so, you must also set `enabled` (above) to true.
-        // You can then use @unauthenticated or @authenticated on individual endpoints to change their status from the default.
-        'default' => false,
-
-        // Where is the auth value meant to be sent in a request?
-        'in' => AuthIn::BEARER->value,
-
-        // The name of the auth parameter (e.g. token, key, apiKey) or header (e.g. Authorization, Api-Key).
-        'name' => 'key',
-
-        // The value of the parameter to be used by Scribe to authenticate response calls.
-        // This will NOT be included in the generated documentation. If empty, Scribe will use a random value.
-        'use_value' => env('SCRIBE_AUTH_KEY'),
-
-        // Placeholder your users will see for the auth parameter in the example requests.
-        // Set this to null if you want Scribe to use a random value as placeholder instead.
-        'placeholder' => '{YOUR_AUTH_KEY}',
-
-        // Any extra authentication-related info for your users. Markdown and HTML are supported.
-        'extra_info' => 'You can retrieve your token by visiting your dashboard and clicking <b>Generate API token</b>.',
+    'auth'                            => [
+        'enabled'     => true,
+        'default'     => true,
+        'in'          => AuthIn::BEARER->value,
+        'name'        => 'Authorization',
+        'use_value'   => 'Bearer {YOUR_AUTH_TOKEN}',
+        'placeholder' => '{YOUR_AUTH_TOKEN}',
+        'extra_info'  => 'To obtain your token, log in to your panel and generate an API token.',
     ],
 
-    // Text to place in the "Introduction" section, right after the `description`. Markdown and HTML are supported.
-    'intro_text' => <<<INTRO
-        This documentation aims to provide all the information you need to work with our API.
+    /*
+    |--------------------------------------------------------------------------
+    | Documentation Introduction
+    |--------------------------------------------------------------------------
+    |
+    | Text that appears at the beginning of the API documentation.
+    |
+    */
 
-        <aside>As you scroll, you'll see code examples for working with the API in different programming languages in the dark area to the right (or as part of the content on mobile).
-        You can switch the language used with the tabs at the top right (or from the nav menu at the top left on mobile).</aside>
+    'intro_text'                      => <<<INTRO
+        This documentation provides all the necessary information to work with our API.
+
+        <aside>On the right side, you will see request examples in different programming languages.</aside>
     INTRO,
 
-    // Example requests for each endpoint will be shown in each of these languages.
-    // Supported options are: bash, javascript, php, python
-    // To add a language of your own, see https://scribe.knuckles.wtf/laravel/advanced/example-requests
-    // Note: does not work for `external` docs types
-    'example_languages' => [
-        'bash',
-        'javascript',
-    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Example Request Languages
+    |--------------------------------------------------------------------------
+    |
+    | Specify which programming languages should be shown in examples.
+    |
+    */
 
-    // Generate a Postman collection (v2.1.0) in addition to HTML docs.
-    // For 'static' docs, the collection will be generated to public/docs/collection.json.
-    // For 'laravel' docs, it will be generated to storage/app/scribe/collection.json.
-    // Setting `laravel.add_routes` to true (above) will also add a route for the collection.
-    'postman' => [
-        'enabled' => true,
+    'example_languages'               =>['bash','javascript','php','python'],
 
-        'overrides' => [
-            // 'info.version' => '2.0.0',
+    /*
+    |--------------------------------------------------------------------------
+    | Postman Collection
+    |--------------------------------------------------------------------------
+    |
+    | Generate a Postman collection for API testing.
+    |
+    */
+
+    'postman'                         =>['enabled'=>true],
+
+    /*
+    |--------------------------------------------------------------------------
+    | OpenAPI Specification
+    |--------------------------------------------------------------------------
+    |
+    | Generate an OpenAPI specification (v3.0.1).
+    |
+    */
+
+    'openapi'                         =>['enabled'=>true],
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Groups & Sorting
+    |--------------------------------------------------------------------------
+    |
+    | Define categories for API endpoints and control their order.
+    |
+    */
+
+    'groups'                          =>[
+        'default'=>'Endpoints',
+        'order'  =>[
+            'Authentication',
+            'Appointments',
+            'User Management',
         ],
     ],
 
-    // Generate an OpenAPI spec (v3.0.1) in addition to docs webpage.
-    // For 'static' docs, the collection will be generated to public/docs/openapi.yaml.
-    // For 'laravel' docs, it will be generated to storage/app/scribe/openapi.yaml.
-    // Setting `laravel.add_routes` to true (above) will also add a route for the spec.
-    'openapi' => [
-        'enabled' => true,
+    /*
+    |--------------------------------------------------------------------------
+    | "Last Updated" Information
+    |--------------------------------------------------------------------------
+    |
+    | Displays the last update date in the documentation.
+    |
+    */
 
-        'overrides' => [
-            // 'info.version' => '2.0.0',
-        ],
+    'last_updated'                    =>'Last updated: {date:F j, Y}',
 
-        // Additional generators to use when generating the OpenAPI spec.
-        // Should extend `Knuckles\Scribe\Writing\OpenApiSpecGenerators\OpenApiGenerator`.
-        'generators' => [],
+    /*
+    |--------------------------------------------------------------------------
+    | Example Data Generation
+    |--------------------------------------------------------------------------
+    |
+    | Configure how example data is generated for API requests and responses.
+    |
+    */
+
+'examples' => [
+    'faker_seed' => 1234,
+
+    // Override default example values
+    'override' => [
+        'mobile' => '09181234567',  // Use a valid phone number
+        'otpCode' => '1234',        // Use a realistic OTP format
+        'token' => 'sample-token',  // Use a readable token
     ],
+],
 
-    'groups' => [
-        // Endpoints which don't have a @group will be placed in this default group.
-        'default' => 'Endpoints',
 
-        // By default, Scribe will sort groups alphabetically, and endpoints in the order their routes are defined.
-        // You can override this by listing the groups, subgroups and endpoints here in the order you want them.
-        // See https://scribe.knuckles.wtf/blog/laravel-v4#easier-sorting and https://scribe.knuckles.wtf/laravel/reference/config#order for details
-        // Note: does not work for `external` docs types
-        'order' => [],
-    ],
 
-    // Custom logo path. This will be used as the value of the src attribute for the <img> tag,
-    // so make sure it points to an accessible URL or path. Set to false to not use a logo.
-    // For example, if your logo is in public/img:
-    // - 'logo' => '../img/logo.png' // for `static` type (output folder is public/docs)
-    // - 'logo' => 'img/logo.png' // for `laravel` type
-    'logo' => false,
 
-    // Customize the "Last updated" value displayed in the docs by specifying tokens and formats.
-    // Examples:
-    // - {date:F j Y} => March 28, 2022
-    // - {git:short} => Short hash of the last Git commit
-    // Available tokens are `{date:<format>}` and `{git:<format>}`.
-    // The format you pass to `date` will be passed to PHP's `date()` function.
-    // The format you pass to `git` can be either "short" or "long".
-    // Note: does not work for `external` docs types
-    'last_updated' => 'Last updated: {date:F j, Y}',
+    /*
+    |--------------------------------------------------------------------------
+    | Extraction Strategies
+    |--------------------------------------------------------------------------
+    |
+    | Define how Scribe extracts information from your routes.
+    |
+    */
 
-    'examples' => [
-        // Set this to any number to generate the same example values for parameters on each run,
-        'faker_seed' => 1234,
-
-        // With API resources and transformers, Scribe tries to generate example models to use in your API responses.
-        // By default, Scribe will try the model's factory, and if that fails, try fetching the first from the database.
-        // You can reorder or remove strategies here.
-        'models_source' => ['factoryCreate', 'factoryMake', 'databaseFirst'],
-    ],
-
-    // The strategies Scribe will use to extract information about your routes at each stage.
-    // Use configureStrategy() to specify settings for a strategy in the list.
-    // Use removeStrategies() to remove an included strategy.
-    'strategies' => [
-        'metadata' => [
-            ...Defaults::METADATA_STRATEGIES,
-        ],
-        'headers' => [
+    'strategies'                      =>[
+        'metadata'       =>[...Defaults::METADATA_STRATEGIES],
+        'headers'        =>[
             ...Defaults::HEADERS_STRATEGIES,
-            Strategies\StaticData::withSettings(data: [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
+            Strategies\StaticData::withSettings(data:[
+                'Content-Type'=>'application/json',
+                'Accept'      =>'application/json',
             ]),
         ],
-        'urlParameters' => [
-            ...Defaults::URL_PARAMETERS_STRATEGIES,
-        ],
-        'queryParameters' => [
-            ...Defaults::QUERY_PARAMETERS_STRATEGIES,
-        ],
-        'bodyParameters' => [
-            ...Defaults::BODY_PARAMETERS_STRATEGIES,
-        ],
-        'responses' => configureStrategy(
+        'urlParameters'  =>[...Defaults::URL_PARAMETERS_STRATEGIES],
+        'queryParameters'=>[...Defaults::QUERY_PARAMETERS_STRATEGIES],
+        'bodyParameters' =>[...Defaults::BODY_PARAMETERS_STRATEGIES],
+        'responses'      =>configureStrategy(
             Defaults::RESPONSES_STRATEGIES,
             Strategies\Responses\ResponseCalls::withSettings(
-                only: ['GET *'],
-                // Recommended: disable debug mode in response calls to avoid error stack traces in responses
-                config: [
-                    'app.debug' => false,
-                ]
+                only:['GET *'],
+                config:['app.debug'=>false]
             )
         ),
-        'responseFields' => [
-            ...Defaults::RESPONSE_FIELDS_STRATEGIES,
-        ]
+        'responseFields' =>[...Defaults::RESPONSE_FIELDS_STRATEGIES],
     ],
 
-    // For response calls, API resource responses and transformer responses,
-    // Scribe will try to start database transactions, so no changes are persisted to your database.
-    // Tell Scribe which connections should be transacted here. If you only use one db connection, you can leave this as is.
-    'database_connections_to_transact' => [config('database.default')],
+    /*
+    |--------------------------------------------------------------------------
+    | Database Transactions
+    |--------------------------------------------------------------------------
+    |
+    | Specify which database connections should use transactions.
+    |
+    */
 
-    'fractal' => [
-        // If you are using a custom serializer with league/fractal, you can specify it here.
-        'serializer' => null,
-    ],
+    'database_connections_to_transact'=>[config('database.default')],
 ];

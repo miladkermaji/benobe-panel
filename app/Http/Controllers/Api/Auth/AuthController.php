@@ -196,43 +196,18 @@ class AuthController extends Controller
         if (! $otp || $otp->otp_code !== $request->otpCode) {
             $userId = $otp->user_id ?? null;
             $loginAttempts->incrementLoginAttempt($userId, $mobile, '', '', '');
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'کد تأیید وارد شده صحیح نیست.',
-                'data'    => null,
-            ], 422);
+            return response()->json(['status' => 'error', 'message' => 'کد تأیید وارد شده صحیح نیست.', 'data' => null], 422);
         }
 
         $otp->update(['used' => 1]);
         $user = $otp->user;
-
-        // همیشه زمان فعلی برای mobile_verified_at ثبت می‌شود
         $user->update(['mobile_verified_at' => Carbon::now()]);
-
         $jwtToken = Auth::guard('api')->login($user);
         $loginAttempts->resetLoginAttempts($user->mobile);
         LoginSession::where('token', $token)->delete();
+        LoginLog::create(['user_id' => $user->id, 'user_type' => 'user', 'login_at' => now(), 'ip_address' => $request->ip(), 'device' => $request->header('User-Agent')]);
 
-        LoginLog::create([
-            'user_id'    => $user->id,
-            'user_type'  => 'user',
-            'login_at'   => now(),
-            'ip_address' => $request->ip(),
-            'device'     => $request->header('User-Agent'),
-        ]);
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'ورود با موفقیت انجام شد',
-            'data'    => [
-                'user'  => [
-                    'id'                 => $user->id,
-                    'mobile'             => $user->mobile,
-                    'mobile_verified_at' => $user->mobile_verified_at,
-                ],
-                'token' => $jwtToken, // توکن JWT
-            ],
-        ], 200);
+        return response()->json(['status' => 'success', 'message' => 'ورود موفقیت‌آمیز بود', 'data' => ['user' => $user]])->cookie('auth_token', $jwtToken, 10080, '/', null, true, true, false, 'Strict');
     }
 
     /**
@@ -350,13 +325,7 @@ class AuthController extends Controller
                 ->first()?->update(['logout_at' => $logoutTime]);
             Auth::guard('user')->logout();
 
-            return response()->json([
-                'status'  => 'success',
-                'message' => 'شما با موفقیت خارج شدید',
-                'data'    => [
-                    'logout_at' => $logoutTime->toIso8601String(),
-                ],
-            ], 200);
+            return response()->json(['status' => 'success', 'message' => 'با موفقیت خارج شدید'])->withCookie(cookie()->forget('auth_token', '/', null, true, true, 'Strict'));
         }
 
         return response()->json([
@@ -364,5 +333,14 @@ class AuthController extends Controller
             'message' => 'شما با موفقیت خارج شدید',
             'data'    => null,
         ], 200);
+    }
+
+    public function me(Request $request)
+    {
+        $user = Auth::guard('api')->user();
+        if (! $user) {
+            return response()->json(['status' => 'error', 'message' => 'کاربر لاگین نکرده است'], 401);
+        }
+        return response()->json(['status' => 'success', 'data' => ['user' => $user]]);
     }
 }
