@@ -4,7 +4,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/admin/auth/login-register
+    uri: api/auth/login-register
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -57,7 +57,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: 'api/admin/auth/login-confirm/{token}'
+    uri: 'api/auth/login-confirm/{token}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -121,7 +121,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: 'api/admin/auth/resend-otp/{token}'
+    uri: 'api/auth/resend-otp/{token}'
     metadata:
       groupName: Endpoints
       groupDescription: ''
@@ -174,7 +174,7 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/admin/auth/logout
+    uri: api/auth/logout
     metadata:
       groupName: Endpoints
       groupDescription: ''
