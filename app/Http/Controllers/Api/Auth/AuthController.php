@@ -121,7 +121,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status'  => 'success',
-            'message' => 'کد OTP ارسال شد',
+            'message' => 'کد تایید ارسال شد',
             'data'    => [
                 'token' => $token,
             ],
