@@ -232,71 +232,62 @@ class MakeCrudLivewire extends Command
                      "    Route::get('/', [\\{$fullNamespace}::class, 'index'])->name('$prefixLower.panel.$modelPlural.index');\n" .
                      "    Route::get('/create', [\\{$fullNamespace}::class, 'create'])->name('$prefixLower.panel.$modelPlural.create');\n" .
                      "    Route::get('/edit/{id}', [\\{$fullNamespace}::class, 'edit'])->name('$prefixLower.panel.$modelPlural.edit');\n" .
-                     "});";
+                     "});\n";
  
-     // پیدا کردن گروه اصلی
+     // پیدا کردن گروه اصلی (admin یا dr)
      $groupPattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)(?:->middleware\('[^']*'\))?\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
      if (preg_match($groupPattern, $webContent, $matches)) {
          $groupContent = $matches[1]; // محتوای داخل گروه prefix
  
-         if ($prefixLower === 'admin') {
-             // برای admin توی گروه اصلی و کنار بقیه روت‌ها (مثل users) اضافه می‌کنیم
-             if (strpos($groupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
-                 // پیدا کردن آخرین Route::prefix و اضافه کردن بعد از اون
-                 $lastPrefixPattern = "/(Route::prefix\('.*?\'\)->group\(function\s*\(\)\s*\{.*?\}\);)/s";
-                 if (preg_match_all($lastPrefixPattern, $groupContent, $prefixMatches)) {
-                     $lastPrefix = end($prefixMatches[0]); // آخرین prefix پیدا شده
-                     $newGroupContent = str_replace($lastPrefix, $lastPrefix . "\n\n" . trim($routeContent), $groupContent);
-                 } else {
-                     $newGroupContent = rtrim($groupContent) . "\n\n" . trim($routeContent); // اگه prefix نبود، آخر گروه اضافه می‌کنه
-                 }
+         // بررسی اینکه آیا روت برای این مدل قبلاً وجود دارد یا نه
+         if (strpos($groupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
+             // پیدا کردن آخرین Route::prefix و اضافه کردن بعد از آن
+             $lastPrefixPattern = "/(Route::prefix\('.*?\'\)->group\(function\s*\(\)\s*\{.*?\}\);)/s";
+             if (preg_match_all($lastPrefixPattern, $groupContent, $prefixMatches)) {
+                 $lastPrefix = end($prefixMatches[0]); // آخرین prefix پیدا شده
+                 $newGroupContent = str_replace($lastPrefix, $lastPrefix . "\n\n    " . trim($routeContent), $groupContent);
              } else {
-                 $newGroupContent = $groupContent; // جلوگیری از تکرار
+                 // اگر هیچ prefix دیگری نبود، به انتهای گروه اضافه می‌کنیم
+                 $newGroupContent = rtrim($groupContent) . "\n\n    " . trim($routeContent);
              }
-             $webContent = preg_replace(
-                 $groupPattern,
-                 "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {{$newGroupContent}\n});",
-                 $webContent
-             );
-         } elseif ($prefixLower === 'dr') {
-             // برای dr توی زیرگروه panel و کنار بقیه روت‌ها اضافه می‌کنیم
-             $panelPattern = "/Route::prefix\('panel'\)\s*->middleware\(\['doctor',\s*'secretary',\s*'complete-profile'\]\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
-             if (preg_match($panelPattern, $groupContent, $panelMatches)) {
-                 $panelContent = $panelMatches[1];
-                 if (strpos($panelContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
-                     // پیدا کردن آخرین Route::prefix و اضافه کردن بعد از اون
-                     $lastPrefixPattern = "/(Route::prefix\('.*?\'\)->group\(function\s*\(\)\s*\{.*?\}\);)/s";
-                     if (preg_match_all($lastPrefixPattern, $panelContent, $prefixMatches)) {
-                         $lastPrefix = end($prefixMatches[0]); // آخرین prefix پیدا شده
-                         $newPanelContent = str_replace($lastPrefix, $lastPrefix . "\n\n" . trim($routeContent), $panelContent);
+ 
+             // جایگزینی گروه جدید در محتوای اصلی
+             if ($prefixLower === 'admin') {
+                 $webContent = preg_replace(
+                     $groupPattern,
+                     "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {{$newGroupContent}\n});",
+                     $webContent
+                 );
+             } elseif ($prefixLower === 'dr') {
+                 // برای dr باید در زیرگروه panel اضافه شود
+                 $panelPattern = "/Route::prefix\('panel'\)\s*->middleware\(\['doctor',\s*'secretary',\s*'complete-profile'\]\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
+                 if (preg_match($panelPattern, $groupContent, $panelMatches)) {
+                     $panelContent = $panelMatches[1];
+                     if (strpos($panelContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
+                         if (preg_match_all($lastPrefixPattern, $panelContent, $prefixMatches)) {
+                             $lastPrefix = end($prefixMatches[0]);
+                             $newPanelContent = str_replace($lastPrefix, $lastPrefix . "\n\n        " . trim($routeContent), $panelContent);
+                         } else {
+                             $newPanelContent = rtrim($panelContent) . "\n\n        " . trim($routeContent);
+                         }
+                         $newGroupContent = preg_replace(
+                             $panelPattern,
+                             "Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {{$newPanelContent}\n    });",
+                             $groupContent
+                         );
                      } else {
-                         $newPanelContent = rtrim($panelContent) . "\n\n" . trim($routeContent); // اگه prefix نبود، آخر گروه اضافه می‌کنه
+                         $newGroupContent = $groupContent; // جلوگیری از تکرار
                      }
                  } else {
-                     $newPanelContent = $panelContent; // جلوگیری از تکرار
+                     $newGroupContent = rtrim($groupContent) . "\n\n    Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {\n        " . trim($routeContent) . "\n    });";
                  }
-                 $newGroupContent = preg_replace(
-                     $panelPattern,
-                     "Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {{$newPanelContent}\n});",
-                     $groupContent
+                 $webContent = preg_replace(
+                     $groupPattern,
+                     "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->group(function () {{$newGroupContent}\n});",
+                     $webContent
                  );
-             } else {
-                 $newGroupContent = rtrim($groupContent) . "\n\nRoute::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {\n" . trim($routeContent) . "\n});";
              }
-             $webContent = preg_replace(
-                 $groupPattern,
-                 "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->group(function () {{$newGroupContent}\n});",
-                 $webContent
-             );
          }
-     } else {
-         // اگه گروه وجود نداشت، گروه جدید می‌سازیم (اینجا بعید به کار بیاد چون فرض بر اینه گروه‌ها هستن)
-         if ($prefixLower === 'admin') {
-             $newGroup = "\n\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {\n" . trim($routeContent) . "\n});";
-         } elseif ($prefixLower === 'dr') {
-             $newGroup = "\n\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->group(function () {\nRoute::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {\n" . trim($routeContent) . "\n});\n});";
-         }
-         $webContent .= $newGroup ?? '';
      }
  
      File::put($webFile, $webContent);
