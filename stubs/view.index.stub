@@ -1,0 +1,14 @@
+@extends('{{prefix}}.panel.layouts.master')
+
+@section('styles')
+    <link type="text/css" href="{{ asset('{{prefix}}-assets/css/panel/{{model}}/index.css') }}" rel="stylesheet" />
+@endsection
+
+@section('site-header')
+    {{ 'به نوبه | پنل مدیریت' }}
+@endsection
+
+@section('content')
+    @section('bread-crumb-title', 'مدیریت {{modelPlural}}')
+    @livewire('{{prefix}}.panel.{{modelPlural}}.{{model}}-list')
+@endsection
