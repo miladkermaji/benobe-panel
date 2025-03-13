@@ -251,12 +251,24 @@ class MakeCrudLivewire extends Command
      if (preg_match($adminGroupPattern, $webContent, $adminMatches)) {
          $adminGroupContent = $adminMatches[1]; // محتوای داخل گروه admin
  
-         // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
-         if (strpos($adminGroupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
-             // اضافه کردن روت‌ها به آخر گروه admin، مثل users
-             $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});";
+         // پیدا کردن موقعیت گروه users برای قرار دادن روت‌های جدید بعد از اون
+         $usersPattern = "/Route::prefix\('users\/'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
+         if (preg_match($usersPattern, $adminGroupContent, $usersMatches)) {
+             $usersGroup = $usersMatches[0];
+             // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
+             if (strpos($adminGroupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
+                 // اضافه کردن روت‌ها درست بعد از گروه users
+                 $newAdminContent = str_replace(
+                     $usersGroup,
+                     "$usersGroup\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});",
+                     $adminGroupContent
+                 );
+             } else {
+                 $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
+             }
          } else {
-             $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
+             // اگه گروه users پیدا نشد، به آخر گروه admin اضافه می‌کنیم
+             $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});";
          }
  
          // جایگزینی گروه admin با محتوای جدید
