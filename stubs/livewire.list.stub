@@ -37,8 +37,8 @@ class {{class}} extends Component
     public function toggleStatus($id)
     {
         $item = {{model}}::findOrFail($id);
-        $item->update(['is_active' => !$item->is_active]);
-        $this->dispatch('show-alert', type: $item->is_active ? 'success' : 'info', message: $item->is_active ? 'فعال شد!' : 'غیرفعال شد!');
+        $item->update(['status' => !$item->status]);
+        $this->dispatch('show-alert', type: $item->status ? 'success' : 'info', message: $item->status ? 'فعال شد!' : 'غیرفعال شد!');
     }
 
     public function confirmDelete($id)
