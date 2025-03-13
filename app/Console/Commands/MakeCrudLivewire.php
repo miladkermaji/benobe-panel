@@ -251,35 +251,12 @@ class MakeCrudLivewire extends Command
      if (preg_match($adminGroupPattern, $webContent, $adminMatches)) {
          $adminGroupContent = $adminMatches[1]; // محتوای داخل گروه admin
  
-         // پیدا کردن موقعیت گروه users
-         $usersPattern = "/Route::prefix\('users\/'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
-         if (preg_match($usersPattern, $adminGroupContent, $usersMatches)) {
-             $usersGroup = $usersMatches[0];
-             // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
-             if (strpos($adminGroupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
-                 // اضافه کردن روت‌ها درست بعد از گروه users
-                 $newAdminContent = str_replace(
-                     $usersGroup,
-                     "$usersGroup\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});",
-                     $adminGroupContent
-                 );
-             } else {
-                 $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
-             }
+         // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
+         if (strpos($adminGroupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
+             // اضافه کردن روت‌ها به آخر گروه admin
+             $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});";
          } else {
-             // اگه گروه users پیدا نشد، قبل از tools اضافه می‌کنیم
-             $toolsPattern = "/Route::prefix\('tools\/'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
-             if (preg_match($toolsPattern, $adminGroupContent, $toolsMatches)) {
-                 $toolsGroup = $toolsMatches[0];
-                 $newAdminContent = str_replace(
-                     $toolsGroup,
-                     "Route::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});\n\n$toolsGroup",
-                     $adminGroupContent
-                 );
-             } else {
-                 // اگه tools هم نبود، به آخر گروه admin اضافه می‌کنیم
-                 $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});";
-             }
+             $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
          }
  
          // جایگزینی گروه admin با محتوای جدید
