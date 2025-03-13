@@ -216,41 +216,62 @@ class MakeCrudLivewire extends Command
  }
 
  protected function appendRoutes($model, $prefix)
- {
-     $modelLower = Str::lower($model);
-     $modelPlural = Str::plural($modelLower);
-     $namespacePrefix = ucfirst($prefix); // مثلا Admin یا Dr
-     $prefixLower = Str::lower($prefix); // مثلا admin یا dr
- 
-     $webFile = base_path('routes/web.php');
-     $webContent = File::get($webFile);
- 
-     $routeContent = <<<EOT
-     Route::prefix('$modelPlural')->group(function () {
-         Route::get('/', [{$model}Controller::class, 'index'])->name('{$prefixLower}.panel.$modelPlural.index');
-         Route::get('/create', [{$model}Controller::class, 'create'])->name('{$prefixLower}.panel.$modelPlural.create');
-         Route::get('/edit/{id}', [{$model}Controller::class, 'edit'])->name('{$prefixLower}.panel.$modelPlural.edit');
-     });
- EOT;
- 
-     // پیدا کردن گروه مناسب در web.php
-     $pattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)(.*?)\);\s*\/\//s";
-     
-     if (preg_match($pattern, $webContent, $matches)) {
-         $existingGroup = $matches[0];
- 
-         if (strpos($existingGroup, "Route::prefix('$modelPlural')") === false) {
-             $newGroup = str_replace(");// //", "\n$routeContent\n);// //", $existingGroup);
-             $webContent = str_replace($existingGroup, $newGroup, $webContent);
-             File::put($webFile, $webContent);
-             $this->info("Routes for $model added inside the $prefixLower panel.");
-         } else {
-             $this->warn("Routes for $model already exist inside the $prefixLower panel. Skipping...");
-         }
-     } else {
-         $this->warn("Could not find the $prefixLower panel group in routes/web.php. No routes were added.");
-     }
- }
+{
+    $modelLower = Str::lower($model);
+    $modelPlural = Str::plural($modelLower);
+    $namespacePrefix = ucfirst($prefix); // مثلاً Admin
+    $prefixLower = Str::lower($prefix); // مثلاً admin
+
+    // پیدا کردن فایل routes/web.php
+    $webFile = base_path('routes/web.php');
+    $webContent = File::get($webFile);
+
+    // تعریف محتوای روت جدید
+    $routeStub = File::get(base_path('stubs/routes.stub'));
+    $routeContent = str_replace(
+        ['{{prefix}}', '{{modelPlural}}', '{{model}}', '{{namespace}}'],
+        [$prefixLower, $modelPlural, $model, $namespacePrefix],
+        $routeStub
+    );
+
+    // اضافه کردن use برای کنترلر اگه از قبل نباشه
+    $controllerUse = "use App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}Controller;\n";
+    $usePattern = "/^<\?php\n(.*?use.*?\n)*?/s";
+    if (preg_match($usePattern, $webContent, $matches)) {
+        $existingUses = $matches[0];
+        if (strpos($existingUses, $controllerUse) === false) {
+            $webContent = preg_replace($usePattern, "$existingUses$controllerUse", $webContent);
+        }
+    } else {
+        $webContent = "<?php\n\n$controllerUse" . substr($webContent, 5);
+    }
+
+    // پیدا کردن گروه اصلی admin
+    $adminGroupPattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)\s*->middleware\('manager'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
+    if (preg_match($adminGroupPattern, $webContent, $adminMatches)) {
+        $adminGroupContent = $adminMatches[1]; // محتوای داخل گروه admin
+
+        // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
+        if (strpos($adminGroupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
+            // اضافه کردن روت‌ها به آخر گروه admin
+            $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});";
+        } else {
+            $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
+        }
+
+        // جایگزینی گروه admin با محتوای جدید
+        $webContent = preg_replace(
+            $adminGroupPattern,
+            "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {{$newAdminContent}\n});",
+            $webContent
+        );
+    } else {
+        // اگه گروه admin پیدا نشد، یه گروه جدید می‌سازیم
+        $webContent .= "\n\n$controllerUse\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});\n});";
+    }
+
+    File::put($webFile, $webContent);
+}
  
 
  protected function createCssFile($model, $prefix)
