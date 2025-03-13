@@ -1,19 +1,19 @@
 <?php
 namespace App\Http\Controllers\Api\Auth;
 
-use Carbon\Carbon;
+use App\Http\Controllers\Controller;
+use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
+use App\Models\LoginLog;
+use App\Models\LoginSession;
 use App\Models\Otp;
 use App\Models\User;
-use App\Models\LoginLog;
-use Illuminate\Support\Str;
-use App\Models\LoginSession;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
-use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -208,7 +208,7 @@ class AuthController extends Controller
         LoginSession::where('token', $token)->delete();
         LoginLog::create(['user_id' => $user->id, 'user_type' => 'user', 'login_at' => now(), 'ip_address' => $request->ip(), 'device' => $request->header('User-Agent')]);
 
-        return response()->json(['status' => 'success', 'message' => 'ورود موفقیت‌آمیز بود', 'data' => ['user' => $user]])->cookie('auth_token', $jwtToken, 10080, '/', null, true, true, false, 'Strict');
+        return response()->json(['status' => 'success', 'message' => 'ورود موفقیت‌آمیز بود', 'data' => ['user' => $user]])->cookie('auth_token', $jwtToken, 10080, '/', null, false, true, false, 'Strict');
     }
 
     /**
@@ -315,47 +315,46 @@ class AuthController extends Controller
      *   }
      * }
      */
-   public function logout(Request $request)
-{
-    try {
-        // دریافت توکن از درخواست
-        $token = JWTAuth::getToken();
-        
-        if ($token) {
-            // ابطال توکن در سرور
-            JWTAuth::invalidate($token);
-        }
+    public function logout(Request $request)
+    {
+        try {
+            // دریافت توکن از درخواست
+            $token = JWTAuth::getToken();
 
-        // دریافت کاربر لاگین شده
-        $user = Auth::guard('api')->user();
+            if ($token) {
+                // ابطال توکن در سرور
+                JWTAuth::invalidate($token);
+            }
 
-        if ($user) {
-            $logoutTime = now();
-            LoginLog::where('user_id', $user->id)
-                ->whereNull('logout_at')
-                ->latest()
-                ->first()?->update(['logout_at' => $logoutTime]);
+            // دریافت کاربر لاگین شده
+            $user = Auth::guard('api')->user();
 
-            // حذف کوکی توکن
+            if ($user) {
+                $logoutTime = now();
+                LoginLog::where('user_id', $user->id)
+                    ->whereNull('logout_at')
+                    ->latest()
+                    ->first()?->update(['logout_at' => $logoutTime]);
+
+                // حذف کوکی توکن
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'با موفقیت خارج شدید',
+                ])->withCookie(cookie()->forget('auth_token'));
+            }
+
             return response()->json([
-                'status' => 'success',
-                'message' => 'با موفقیت خارج شدید'
-            ])->withCookie(cookie()->forget('auth_token'));
+                'status'  => 'success',
+                'message' => 'با موفقیت خارج شدید',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'خطایی در خروج رخ داد',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'با موفقیت خارج شدید',
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status'  => 'error',
-            'message' => 'خطایی در خروج رخ داد',
-            'error'   => $e->getMessage(),
-        ], 500);
     }
-}
-
 
     public function me(Request $request)
     {
@@ -388,7 +387,20 @@ class AuthController extends Controller
     public function verifyToken(Request $request)
     {
         try {
-            $user = JWTAuth::parseToken()->authenticate();
+            // توکن رو از کوکی یا هدر بگیر (مثل میدلور)
+            $token = $request->cookie('auth_token') ?? $request->bearerToken();
+
+            if (! $token) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'توکن ارائه نشده است',
+                    'data'    => null,
+                ], 401);
+            }
+
+            // اعتبارسنجی توکن
+            $user = JWTAuth::setToken($token)->authenticate();
+
             return response()->json([
                 'status'  => 'success',
                 'message' => 'توکن معتبر است',
