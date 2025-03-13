@@ -234,15 +234,22 @@ class MakeCrudLivewire extends Command
                      "    Route::get('/edit/{id}', [\\{$fullNamespace}::class, 'edit'])->name('$prefixLower.panel.$modelPlural.edit');\n" .
                      "});";
  
-     // پیدا کردن یا ساخت گروه اصلی
+     // پیدا کردن گروه اصلی
      $groupPattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)(?:->middleware\('[^']*'\))?\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
      if (preg_match($groupPattern, $webContent, $matches)) {
          $groupContent = $matches[1]; // محتوای داخل گروه prefix
  
          if ($prefixLower === 'admin') {
-             // برای admin مستقیم توی گروه اصلی اضافه می‌کنیم
+             // برای admin توی گروه اصلی و کنار بقیه روت‌ها (مثل users) اضافه می‌کنیم
              if (strpos($groupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
-                 $newGroupContent = rtrim($groupContent) . "\n\n" . trim($routeContent);
+                 // پیدا کردن آخرین Route::prefix و اضافه کردن بعد از اون
+                 $lastPrefixPattern = "/(Route::prefix\('.*?\'\)->group\(function\s*\(\)\s*\{.*?\}\);)/s";
+                 if (preg_match_all($lastPrefixPattern, $groupContent, $prefixMatches)) {
+                     $lastPrefix = end($prefixMatches[0]); // آخرین prefix پیدا شده
+                     $newGroupContent = str_replace($lastPrefix, $lastPrefix . "\n\n" . trim($routeContent), $groupContent);
+                 } else {
+                     $newGroupContent = rtrim($groupContent) . "\n\n" . trim($routeContent); // اگه prefix نبود، آخر گروه اضافه می‌کنه
+                 }
              } else {
                  $newGroupContent = $groupContent; // جلوگیری از تکرار
              }
@@ -252,12 +259,19 @@ class MakeCrudLivewire extends Command
                  $webContent
              );
          } elseif ($prefixLower === 'dr') {
-             // برای dr توی زیرگروه panel اضافه می‌کنیم
+             // برای dr توی زیرگروه panel و کنار بقیه روت‌ها اضافه می‌کنیم
              $panelPattern = "/Route::prefix\('panel'\)\s*->middleware\(\['doctor',\s*'secretary',\s*'complete-profile'\]\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
              if (preg_match($panelPattern, $groupContent, $panelMatches)) {
                  $panelContent = $panelMatches[1];
                  if (strpos($panelContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
-                     $newPanelContent = rtrim($panelContent) . "\n\n" . trim($routeContent);
+                     // پیدا کردن آخرین Route::prefix و اضافه کردن بعد از اون
+                     $lastPrefixPattern = "/(Route::prefix\('.*?\'\)->group\(function\s*\(\)\s*\{.*?\}\);)/s";
+                     if (preg_match_all($lastPrefixPattern, $panelContent, $prefixMatches)) {
+                         $lastPrefix = end($prefixMatches[0]); // آخرین prefix پیدا شده
+                         $newPanelContent = str_replace($lastPrefix, $lastPrefix . "\n\n" . trim($routeContent), $panelContent);
+                     } else {
+                         $newPanelContent = rtrim($panelContent) . "\n\n" . trim($routeContent); // اگه prefix نبود، آخر گروه اضافه می‌کنه
+                     }
                  } else {
                      $newPanelContent = $panelContent; // جلوگیری از تکرار
                  }
@@ -276,7 +290,7 @@ class MakeCrudLivewire extends Command
              );
          }
      } else {
-         // اگه گروه وجود نداشت، گروه جدید می‌سازیم
+         // اگه گروه وجود نداشت، گروه جدید می‌سازیم (اینجا بعید به کار بیاد چون فرض بر اینه گروه‌ها هستن)
          if ($prefixLower === 'admin') {
              $newGroup = "\n\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {\n" . trim($routeContent) . "\n});";
          } elseif ($prefixLower === 'dr') {
