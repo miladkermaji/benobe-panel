@@ -69,8 +69,8 @@ class MakeCrudLivewire extends Command
         $controllerPath = app_path("Http/Controllers/{$namespacePrefix}/Panel/{$model}/{$model}Controller.php");
         $stub = File::get(base_path('stubs/controller.crud.stub'));
         $stub = str_replace(
-            ['{{namespace}}', '{{class}}', '{{modelLower}}', '{{prefix}}'],
-            ["App\\Http\\Controllers\\{$namespacePrefix}", "{$model}Controller", Str::lower($model), Str::lower($namespacePrefix)],
+            ['{{namespace}}', '{{class}}', '{{modelLower}}', '{{prefix}}', '{{modelPlural}}'],
+            ["App\\Http\\Controllers\\{$namespacePrefix}", "{$model}Controller", Str::lower($model), Str::lower($namespacePrefix), Str::plural(Str::lower($model))],
             $stub
         );
         File::ensureDirectoryExists(dirname($controllerPath));
