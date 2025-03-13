@@ -252,9 +252,9 @@ class MakeCrudLivewire extends Command
          $adminGroupContent = $adminMatches[1]; // محتوای داخل گروه admin
  
          // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
-         if (strpos($adminGroupContent, "Route::prefix('$modelPlural/')->group(function () {") === false) {
+         if (strpos($adminGroupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
              // اضافه کردن روت‌ها به آخر گروه admin، مثل users
-             $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('$modelPlural/')->group(function () {\n" . trim($routeContent) . "\n});";
+             $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});";
          } else {
              $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
          }
@@ -267,7 +267,7 @@ class MakeCrudLivewire extends Command
          );
      } else {
          // اگه گروه admin پیدا نشد، یه گروه جدید می‌سازیم
-         $webContent .= "\n\n$controllerUse\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {\nRoute::prefix('$modelPlural/')->group(function () {\n" . trim($routeContent) . "\n});\n});";
+         $webContent .= "\n\n$controllerUse\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});\n});";
      }
  
      File::put($webFile, $webContent);
