@@ -1,18 +1,19 @@
 <?php
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
-use App\Models\LoginLog;
-use App\Models\LoginSession;
+use Carbon\Carbon;
 use App\Models\Otp;
 use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\LoginLog;
 use Illuminate\Support\Str;
+use App\Models\LoginSession;
+use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 
 class AuthController extends Controller
 {
@@ -314,26 +315,47 @@ class AuthController extends Controller
      *   }
      * }
      */
-    public function logout(Request $request)
-    {
-        $user = Auth::guard('user')->user();
+   public function logout(Request $request)
+{
+    try {
+        // دریافت توکن از درخواست
+        $token = JWTAuth::getToken();
+        
+        if ($token) {
+            // ابطال توکن در سرور
+            JWTAuth::invalidate($token);
+        }
+
+        // دریافت کاربر لاگین شده
+        $user = Auth::guard('api')->user();
+
         if ($user) {
             $logoutTime = now();
             LoginLog::where('user_id', $user->id)
                 ->whereNull('logout_at')
                 ->latest()
                 ->first()?->update(['logout_at' => $logoutTime]);
-            Auth::guard('user')->logout();
 
-            return response()->json(['status' => 'success', 'message' => 'با موفقیت خارج شدید'])->withCookie(cookie()->forget('auth_token', '/', null, true, true, 'Strict'));
+            // حذف کوکی توکن
+            return response()->json([
+                'status' => 'success',
+                'message' => 'با موفقیت خارج شدید'
+            ])->withCookie(cookie()->forget('auth_token'));
         }
 
         return response()->json([
             'status'  => 'success',
-            'message' => 'شما با موفقیت خارج شدید',
-            'data'    => null,
+            'message' => 'با موفقیت خارج شدید',
         ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'خطایی در خروج رخ داد',
+            'error'   => $e->getMessage(),
+        ], 500);
     }
+}
+
 
     public function me(Request $request)
     {

@@ -5,7 +5,11 @@ namespace App\Exceptions;
 use Throwable;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 class Handler extends ExceptionHandler
 {
     /**
@@ -41,6 +45,46 @@ class Handler extends ExceptionHandler
                 'Retry-After' => $retryAfter
             ]);
         }
+        if ($exception instanceof TokenExpiredException) {
+    return response()->json([
+        'status'  => 'error',
+        'message' => 'توکن منقضی شده است. لطفاً دوباره وارد شوید.',
+        'data'    => null,
+    ], 401);
+}
+
+if ($exception instanceof TokenInvalidException) {
+    return response()->json([
+        'status'  => 'error',
+        'message' => 'توکن نامعتبر است.',
+        'data'    => null,
+    ], 401);
+}
+
+if ($exception instanceof TokenBlacklistedException) {
+    return response()->json([
+        'status'  => 'error',
+        'message' => 'توکن شما دیگر معتبر نیست. لطفاً دوباره وارد شوید.',
+        'data'    => null,
+    ], 401);
+}
+
+if ($exception instanceof JWTException) {
+    return response()->json([
+        'status'  => 'error',
+        'message' => 'خطایی در پردازش توکن رخ داده است.',
+        'data'    => null,
+    ], 401);
+}
+
+if ($exception instanceof UnauthorizedHttpException && $exception->getMessage() === 'The token has been blacklisted') {
+    return response()->json([
+        'status'  => 'error',
+        'message' => 'توکن شما دیگر معتبر نیست. لطفاً دوباره وارد شوید.',
+        'data'    => null,
+    ], 401);
+}
+
 
         return parent::render($request, $exception);
     }
