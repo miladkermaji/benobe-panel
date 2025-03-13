@@ -22,6 +22,7 @@ class Kernel extends HttpKernel
     'complete-profile' => \App\Http\Middleware\Dr\CheckCompleteProfile::class,
     'secretary.permission' => \App\Http\Middleware\Dr\CheckSecretaryPermission::class, // 👈 اضافه شد
     'doctor' => \App\Http\Middleware\doctor::class,
+    'jwt.auth' => \App\Http\Middleware\JwtMiddleware::class,
 
   ];
 

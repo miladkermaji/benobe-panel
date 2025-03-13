@@ -343,4 +343,43 @@ class AuthController extends Controller
         }
         return response()->json(['status' => 'success', 'data' => ['user' => $user]]);
     }
+    /**
+     * @authenticated
+     * @header Authorization Bearer {token}
+     * @response 200 {
+     *   "status": "success",
+     *   "message": "توکن معتبر است",
+     *   "data": {
+     *     "user": {
+     *       "id": 1,
+     *       "mobile": "09181234567",
+     *       "mobile_verified_at": "2025-03-12T10:00:00Z"
+     *     }
+     *   }
+     * }
+     * @response 401 {
+     *   "status": "error",
+     *   "message": "توکن نامعتبر است",
+     *   "data": null
+     * }
+     */
+    public function verifyToken(Request $request)
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'توکن معتبر است',
+                'data'    => [
+                    'user' => $user,
+                ],
+            ], 200);
+        } catch (JWTException $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+                'data'    => null,
+            ], 401);
+        }
+    }
 }
