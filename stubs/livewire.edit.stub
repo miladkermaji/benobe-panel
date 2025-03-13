@@ -11,14 +11,14 @@ class {{class}} extends Component
     public ${{modelLower}};
     public $name;
     public $description;
-    public $is_active;
+    public $status;
 
     public function mount($id)
     {
         $this->{{modelLower}} = {{model}}::findOrFail($id);
         $this->name = $this->{{modelLower}}->name;
         $this->description = $this->{{modelLower}}->description;
-        $this->is_active = $this->{{modelLower}}->is_active;
+        $this->status = $this->{{modelLower}}->status;
     }
 
     public function update()
@@ -26,11 +26,11 @@ class {{class}} extends Component
         $validator = Validator::make([
             'name' => $this->name,
             'description' => $this->description,
-            'is_active' => $this->is_active,
+            'status' => $this->status,
         ], [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
-            'is_active' => 'required|boolean',
+            'status' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -41,7 +41,7 @@ class {{class}} extends Component
         $this->{{modelLower}}->update([
             'name' => $this->name,
             'description' => $this->description,
-            'is_active' => $this->is_active,
+            'status' => $this->status,
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: '{{modelLower}} با موفقیت به‌روزرسانی شد!');

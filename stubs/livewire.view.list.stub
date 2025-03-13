@@ -59,8 +59,8 @@
                                         <td class="align-middle">{{ $item->description }}</td>
                                         <td class="text-center align-middle">
                                             <button wire:click="toggleStatus({{ $item->id }})"
-                                                class="badge {{ $item->is_active ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
-                                                {{ $item->is_active ? 'فعال' : 'غیرفعال' }}
+                                                class="badge {{ $item->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                                                {{ $item->status ? 'فعال' : 'غیرفعال' }}
                                             </button>
                                         </td>
                                         <td class="text-center align-middle">
