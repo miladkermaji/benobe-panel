@@ -109,7 +109,7 @@
                     <div class="text-muted">نمایش {{ ${{modelPlural}} ? ${{modelPlural}}->firstItem() : 0 }} تا
                         {{ ${{modelPlural}} ? ${{modelPlural}}->lastItem() : 0 }} از {{ ${{modelPlural}} ? ${{modelPlural}}->total() : 0 }} ردیف
                     </div>
-                    @if ($ {{modelPlural}} && ${{modelPlural}}->hasPages())
+                    @if (${{modelPlural}} && ${{modelPlural}}->hasPages())
                         {{ ${{modelPlural}}->links('livewire::bootstrap') }}
                     @endif
                 </div>

@@ -4,7 +4,7 @@ namespace {{namespace}};
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\{{namespacePrefix}}\{{model}};
+use App\Models\{{model}};
 
 class {{class}} extends Component
 {
