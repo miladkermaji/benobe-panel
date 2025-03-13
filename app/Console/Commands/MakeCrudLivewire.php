@@ -251,12 +251,24 @@ class MakeCrudLivewire extends Command
      if (preg_match($adminGroupPattern, $webContent, $adminMatches)) {
          $adminGroupContent = $adminMatches[1]; // محتوای داخل گروه admin
  
-         // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
-         if (strpos($adminGroupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
-             // اضافه کردن روت‌ها به آخر گروه admin
-             $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});";
+         // پیدا کردن گروه tools
+         $toolsPattern = "/Route::prefix\('tools\/'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
+         if (preg_match($toolsPattern, $adminGroupContent, $toolsMatches)) {
+             $toolsGroup = $toolsMatches[0];
+             // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
+             if (strpos($adminGroupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
+                 // اضافه کردن روت‌ها درست قبل از گروه tools
+                 $newAdminContent = str_replace(
+                     $toolsGroup,
+                     "Route::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});\n\n$toolsGroup",
+                     $adminGroupContent
+                 );
+             } else {
+                 $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
+             }
          } else {
-             $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
+             // اگه گروه tools پیدا نشد، به آخر گروه admin اضافه می‌کنیم
+             $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});";
          }
  
          // جایگزینی گروه admin با محتوای جدید
