@@ -106,33 +106,33 @@ class MakeCrudLivewire extends Command
         $modelLower = Str::lower($model);
         $modelPlural = Str::plural($modelLower);
         $modelStudly = Str::studly($model);
-
+    
         // List Component
         $listPath = app_path("Livewire/{$namespacePrefix}/Panel/{$modelPlural}/{$model}List.php");
         $listStub = File::get(base_path('stubs/livewire.list.stub'));
         $listStub = str_replace(
-            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelPlural}}'],
-            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPlural}", "{$model}List", $modelStudly, $modelLower, $modelPlural],
+            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelPlural}}', '{{namespacePrefix}}', '{{prefix}}'],
+            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPlural}", "{$model}List", $modelStudly, $modelLower, $modelPlural, $namespacePrefix, Str::lower($namespacePrefix)],
             $listStub
         );
         File::put($listPath, $listStub);
-
+    
         // Create Component
         $createPath = app_path("Livewire/{$namespacePrefix}/Panel/{$modelPlural}/{$model}Create.php");
         $createStub = File::get(base_path('stubs/livewire.create.stub'));
         $createStub = str_replace(
-            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelPlural}}'],
-            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPlural}", "{$model}Create", $modelStudly, $modelLower, $modelPlural],
+            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelPlural}}', '{{namespacePrefix}}', '{{prefix}}'],
+            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPlural}", "{$model}Create", $modelStudly, $modelLower, $modelPlural, $namespacePrefix, Str::lower($namespacePrefix)],
             $createStub
         );
         File::put($createPath, $createStub);
-
+    
         // Edit Component
         $editPath = app_path("Livewire/{$namespacePrefix}/Panel/{$modelPlural}/{$model}Edit.php");
         $editStub = File::get(base_path('stubs/livewire.edit.stub'));
         $editStub = str_replace(
-            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelPlural}}'],
-            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPlural}", "{$model}Edit", $modelStudly, $modelLower, $modelPlural],
+            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelPlural}}', '{{namespacePrefix}}', '{{prefix}}'],
+            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPlural}", "{$model}Edit", $modelStudly, $modelLower, $modelPlural, $namespacePrefix, Str::lower($namespacePrefix)],
             $editStub
         );
         File::put($editPath, $editStub);
