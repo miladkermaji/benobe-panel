@@ -86,9 +86,6 @@
      </a>
      <ul class="drop-toggle d-none">
       <li class="item-li"><a href="{{ route('admin.panel.users.index') }}">مدیریت کاربران</a></li>
-      <li class="item-li"><a href="#">مدیریت نقش‌ها</a></li>
-      <li class="item-li"><a href="#">تنظیمات دسترسی</a></li>
-      <li class="item-li"><a href="#">کاربران غیرفعال</a></li>
      </ul>
     </li>
     <!-- مدیریت پزشکان -->
@@ -105,8 +102,7 @@
       </div>
      </a>
      <ul class="drop-toggle d-none">
-      <li class="item-li"><a href="#">لیست پزشکان</a></li>
-      <li class="item-li"><a href="#">افزودن پزشک</a></li>
+      <li class="item-li"><a href="{{ route('admin.panel.doctors.index') }}">لیست پزشکان</a></li>
       <li class="item-li"><a href="#">تأیید مدارک</a></li>
       <li class="item-li"><a href="#">مدیریت تخصص‌ها</a></li>
       <li class="item-li"><a href="#">برنامه کاری پزشکان</a></li>
