@@ -1,12 +1,13 @@
 <?php
+
 namespace App\Livewire\Dr\Panel\Payment;
 
 use Livewire\Component;
-use App\Models\Dr\DoctorWallet;
+use App\Models\DoctorWallet;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Dr\DoctorPaymentSetting;
 use App\Models\Dr\DoctorSettlementRequest;
-use App\Models\Dr\DoctorWalletTransaction;
+use App\Models\DoctorWalletTransaction;
 
 class PaymentSettingComponent extends Component
 {
@@ -78,7 +79,7 @@ class PaymentSettingComponent extends Component
         }
 
         $availableAmount = DoctorWallet::where('doctor_id', $doctorId)
-            
+
             ->sum('balance');
         if ($availableAmount <= 0) {
             $this->dispatch('toast', message: 'مبلغ قابل برداشت وجود ندارد.');

@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'api',
+        'guard' => 'web',
         'passwords' => 'users'
         
     ],
@@ -95,13 +95,13 @@ return [
         'doctors' => [
             'driver' => 'eloquent',
             'table' => 'doctors',
-            'model' => App\Models\Dr\Doctor::class,
+            'model' => App\Models\Doctor::class,
 
         ],
         'secretaries' => [
             'driver' => 'eloquent',
             'table' => 'secretaries',
-            'model' => App\Models\Dr\Secretary::class,
+            'model' => App\Models\Secretary::class,
 
         ],
     ],

@@ -1,10 +1,11 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Layouts\Partials;
 
 use Livewire\Component;
-use App\Models\Dr\DoctorWallet;
+use App\Models\DoctorWallet;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Dr\DoctorWalletTransaction;
+use App\Models\DoctorWalletTransaction;
 
 class HeaderComponent extends Component
 {

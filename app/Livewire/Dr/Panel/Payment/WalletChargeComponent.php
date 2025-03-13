@@ -3,11 +3,11 @@
 namespace App\Livewire\Dr\Panel\Payment;
 
 use Livewire\Component;
-use App\Models\Dr\DoctorWallet;
+use App\Models\DoctorWallet;
 use App\Models\Dr\SystemSetting;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Dr\DoctorWalletTransaction;
+use App\Models\DoctorWalletTransaction;
 use Modules\Payment\Services\PaymentService;
 use Livewire\Features\SupportRedirects\Redirector;
 

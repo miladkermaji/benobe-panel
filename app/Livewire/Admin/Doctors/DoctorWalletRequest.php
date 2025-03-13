@@ -3,11 +3,11 @@
 namespace App\Livewire\Admin\Doctors;
 
 use Livewire\Component;
-use App\Models\Dr\DoctorWallet;
+use App\Models\DoctorWallet;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Dr\DoctorPaymentSetting;
 use App\Models\Dr\DoctorSettlementRequest;
-use App\Models\Dr\DoctorWalletTransaction;
+use App\Models\DoctorWalletTransaction;
 
 class DoctorWalletRequest extends Component
 {
@@ -99,7 +99,7 @@ class DoctorWalletRequest extends Component
             }
         }
 
-        $this->dispatch('toast', message : 'درخواست‌های انتخاب‌شده با موفقیت حذف شدند.', type : 'success');
+        $this->dispatch('toast', message: 'درخواست‌های انتخاب‌شده با موفقیت حذف شدند.', type: 'success');
         $this->selectedRequests = [];
         $this->selectAll = false;
         $this->loadData();
