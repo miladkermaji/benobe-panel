@@ -257,7 +257,7 @@ class MakeCrudLivewire extends Command
              $usersGroup = $usersMatches[0];
              // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
              if (strpos($adminGroupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
-                 // اضافه کردن روت‌ها درست بعد از گروه users
+                 // اضافه کردن روت‌ها درست بعد از گروه users و بیرون از tools
                  $newAdminContent = str_replace(
                      $usersGroup,
                      "$usersGroup\n\nRoute::prefix('$modelPlural')->group(function () {\n" . trim($routeContent) . "\n});",
