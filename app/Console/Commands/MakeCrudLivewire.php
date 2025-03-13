@@ -246,13 +246,13 @@ class MakeCrudLivewire extends Command
          $webContent = "<?php\n\n$controllerUse" . substr($webContent, 5);
      }
  
-     // پیدا کردن گروه اصلی admin و اضافه کردن روت‌ها به گروه panel
+     // پیدا کردن گروه اصلی admin
      $groupPattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)\s*->middleware\('manager'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
      if (preg_match($groupPattern, $webContent, $matches)) {
          $groupContent = $matches[1]; // محتوای داخل گروه admin
  
-         // پیدا کردن یا ایجاد گروه panel
-         $panelPattern = "/Route::prefix\('panel'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
+         // پیدا کردن یا ایجاد گروه panel در سطح اصلی گروه admin
+         $panelPattern = "/Route::prefix\('panel'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);(?!\s*->group\(function\s*\(\))/s";
          if (preg_match($panelPattern, $groupContent, $panelMatches)) {
              // اضافه کردن روت‌ها به گروه panel موجود
              $newPanelContent = rtrim($panelMatches[1]) . "\n" . trim($routeContent) . "\n";
@@ -262,7 +262,7 @@ class MakeCrudLivewire extends Command
                  $groupContent
              );
          } else {
-             // اگه گروه panel وجود نداشت، به آخر گروه admin اضافه می‌کنیم
+             // اگه گروه panel در سطح اصلی وجود نداشت، به آخر گروه admin اضافه می‌کنیم
              $newGroupContent = rtrim($groupContent) . "\n\nRoute::prefix('panel')->group(function () {\n" . trim($routeContent) . "\n});";
          }
  
@@ -273,7 +273,7 @@ class MakeCrudLivewire extends Command
              $webContent
          );
      } else {
-         // اگه گروه admin پیدا نشد (که بعیده)، یه گروه جدید می‌سازیم
+         // اگه گروه admin پیدا نشد، یه گروه جدید می‌سازیم
          $webContent .= "\n\n$controllerUse\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {\nRoute::prefix('panel')->group(function () {\n" . trim($routeContent) . "\n});\n});";
      }
  
