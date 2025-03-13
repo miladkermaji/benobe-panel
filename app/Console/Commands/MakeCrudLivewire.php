@@ -217,56 +217,59 @@ class MakeCrudLivewire extends Command
 
  protected function appendRoutes($model, $prefix)
  {
-     $modelLower = Str::lower($model);
-     $modelPlural = Str::plural($modelLower);
-     $namespacePrefix = ucfirst($prefix); // مثلاً Admin
-     $prefixLower = Str::lower($prefix); // مثلاً admin
- 
-     // پیدا کردن فایل routes/web.php
-     $webFile = base_path('routes/web.php');
-     $webContent = File::get($webFile);
- 
-     // تعریف محتوای روت جدید
-     $routeStub = File::get(base_path('stubs/routes.stub'));
-     $routeContent = str_replace(
-         ['{{prefix}}', '{{modelPlural}}', '{{model}}', '{{namespace}}'],
-         [$prefixLower, $modelPlural, $model, $namespacePrefix],
-         $routeStub
-     );
- 
-     // اضافه کردن use برای کنترلر اگه از قبل نباشه
-     $controllerUse = "use App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}Controller;\n";
-     $usePattern = "/^<\?php\n(.*?use.*?\n)*?/s";
-     if (preg_match($usePattern, $webContent, $matches)) {
-         $existingUses = $matches[0];
-         if (strpos($existingUses, $controllerUse) === false) {
-             $webContent = preg_replace($usePattern, "$existingUses$controllerUse", $webContent);
-         }
-     } else {
-         $webContent = "<?php\n\n$controllerUse" . substr($webContent, 5);
-     }
- 
-     // پیدا کردن گروه prefix و panel و اضافه کردن روت‌ها
-     $groupPattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)\s*(->middleware\('manager'\)\s*)?->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
-     if (preg_match($groupPattern, $webContent, $matches)) {
-         $groupContent = $matches[4]; // محتوای داخل گروه prefix
-         $panelPattern = "/Route::prefix\('panel'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
-         if (preg_match($panelPattern, $groupContent, $panelMatches)) {
-             // اضافه کردن روت‌ها به گروه panel موجود
-             $newPanelContent = $panelMatches[1] . "\n" . trim($routeContent);
-             $newGroupContent = str_replace($panelMatches[0], "Route::prefix('panel')->group(function () {\n$newPanelContent\n});", $groupContent);
-         } else {
-             // اگه گروه panel وجود نداشت، یه گروه جدید می‌سازیم
-             $newGroupContent = $groupContent . "\n\nRoute::prefix('panel')->group(function () {\n" . trim($routeContent) . "\n});";
-         }
-         // جایگزینی گروه prefix با محتوای جدید
-         $webContent = preg_replace($groupPattern, "Route::prefix('$prefixLower')->namespace('$namespacePrefix')" . ($matches[3] ?? '') . "->group(function () {{$newGroupContent}\n});", $webContent);
-     } else {
-         // اگه گروه prefix نبود (که بعیده)، یه گروه جدید می‌سازیم
-         $webContent .= "\n\n$controllerUse\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->group(function () {\nRoute::prefix('panel')->group(function () {\n" . trim($routeContent) . "\n});\n});";
-     }
- 
-     File::put($webFile, $webContent);
+  $modelLower = Str::lower($model);
+  $modelPlural = Str::plural($modelLower);
+  $namespacePrefix = ucfirst($prefix); // مثلاً Admin
+  $prefixLower = Str::lower($prefix); // مثلاً admin
+
+  // پیدا کردن فایل routes/web.php
+  $webFile = base_path('routes/web.php');
+  $webContent = File::get($webFile);
+
+  // تعریف محتوای روت جدید
+  $routeStub = File::get(base_path('stubs/routes.stub'));
+  $routeContent = str_replace(
+   ['{{prefix}}', '{{modelPlural}}', '{{model}}', '{{namespace}}'],
+   [$prefixLower, $modelPlural, $model, $namespacePrefix],
+   $routeStub
+  );
+
+  // اضافه کردن use برای کنترلر اگه از قبل نباشه
+  $controllerUse = "use App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}Controller;\n";
+  $usePattern = "/^<\?php\n(.*?use.*?\n)*?/s";
+  if (preg_match($usePattern, $webContent, $matches)) {
+   $existingUses = $matches[0];
+   if (strpos($existingUses, $controllerUse) === false) {
+    $webContent = preg_replace($usePattern, "$existingUses$controllerUse", $webContent);
+   }
+  } else {
+   $webContent = "<?php\n\n$controllerUse" . substr($webContent, 5);
+  }
+
+  // پیدا کردن گروه prefix و panel و اضافه کردن روت‌ها
+  $groupPattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)\s*(->middleware\([^)]*\)\s*)?->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
+  if (preg_match($groupPattern, $webContent, $matches)) {
+   // چک کردن وجود کلیدها
+   $middleware = isset($matches[1]) ? $matches[1] : ''; // middleware اختیاری
+   $groupContent = isset($matches[2]) ? $matches[2] : ''; // محتوای گروه
+
+   $panelPattern = "/Route::prefix\('panel'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
+   if (preg_match($panelPattern, $groupContent, $panelMatches)) {
+    // اضافه کردن روت‌ها به گروه panel موجود
+    $newPanelContent = rtrim($panelMatches[1]) . "\n" . trim($routeContent) . "\n";
+    $newGroupContent = str_replace($panelMatches[0], "Route::prefix('panel')->group(function () {\n$newPanelContent});", $groupContent);
+   } else {
+    // اگه گروه panel وجود نداشت، یه گروه جدید می‌سازیم
+    $newGroupContent = rtrim($groupContent) . "\n\nRoute::prefix('panel')->group(function () {\n" . trim($routeContent) . "\n});";
+   }
+   // جایگزینی گروه prefix با محتوای جدید
+   $webContent = preg_replace($groupPattern, "Route::prefix('$prefixLower')->namespace('$namespacePrefix')" . $middleware . "->group(function () {{$newGroupContent}\n});", $webContent);
+  } else {
+   // اگه گروه prefix نبود (که بعیده)، یه گروه جدید می‌سازیم
+   $webContent .= "\n\n$controllerUse\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->group(function () {\nRoute::prefix('panel')->group(function () {\n" . trim($routeContent) . "\n});\n});";
+  }
+
+  File::put($webFile, $webContent);
  }
 
  protected function createCssFile($model, $prefix)
