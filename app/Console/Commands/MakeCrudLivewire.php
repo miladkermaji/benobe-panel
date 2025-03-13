@@ -226,24 +226,13 @@ class MakeCrudLivewire extends Command
      $webFile = base_path('routes/web.php');
      $webContent = File::get($webFile);
  
-     // تعریف محتوای روت‌ها
+     // تعریف محتوای روت‌ها با نیم‌اسپیس کامل
+     $fullNamespace = "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}\\{$model}Controller";
      $routeContent = "Route::prefix('$modelPlural')->group(function () {\n" .
-                     "    Route::get('/', [{$model}Controller::class, 'index'])->name('$prefixLower.panel.$modelPlural.index');\n" .
-                     "    Route::get('/create', [{$model}Controller::class, 'create'])->name('$prefixLower.panel.$modelPlural.create');\n" .
-                     "    Route::get('/edit/{id}', [{$model}Controller::class, 'edit'])->name('$prefixLower.panel.$modelPlural.edit');\n" .
+                     "    Route::get('/', [\\{$fullNamespace}::class, 'index'])->name('$prefixLower.panel.$modelPlural.index');\n" .
+                     "    Route::get('/create', [\\{$fullNamespace}::class, 'create'])->name('$prefixLower.panel.$modelPlural.create');\n" .
+                     "    Route::get('/edit/{id}', [\\{$fullNamespace}::class, 'edit'])->name('$prefixLower.panel.$modelPlural.edit');\n" .
                      "});";
- 
-     // اضافه کردن use برای کنترلر
-     $controllerUse = "use App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}\\{$model}Controller;\n";
-     $usePattern = "/^<\?php\n(.*?use.*?\n)*?/s";
-     if (preg_match($usePattern, $webContent, $matches)) {
-         $existingUses = $matches[0];
-         if (strpos($existingUses, $controllerUse) === false) {
-             $webContent = preg_replace($usePattern, "$existingUses$controllerUse", $webContent);
-         }
-     } else {
-         $webContent = "<?php\n\n$controllerUse" . substr($webContent, 5);
-     }
  
      // پیدا کردن یا ساخت گروه اصلی
      $groupPattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)(?:->middleware\('[^']*'\))?\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
@@ -289,9 +278,9 @@ class MakeCrudLivewire extends Command
      } else {
          // اگه گروه وجود نداشت، گروه جدید می‌سازیم
          if ($prefixLower === 'admin') {
-             $newGroup = "\n\n$controllerUse\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {\n" . trim($routeContent) . "\n});";
+             $newGroup = "\n\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {\n" . trim($routeContent) . "\n});";
          } elseif ($prefixLower === 'dr') {
-             $newGroup = "\n\n$controllerUse\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->group(function () {\nRoute::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {\n" . trim($routeContent) . "\n});\n});";
+             $newGroup = "\n\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->group(function () {\nRoute::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {\n" . trim($routeContent) . "\n});\n});";
          }
          $webContent .= $newGroup ?? '';
      }
