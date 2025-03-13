@@ -251,24 +251,12 @@ class MakeCrudLivewire extends Command
      if (preg_match($adminGroupPattern, $webContent, $adminMatches)) {
          $adminGroupContent = $adminMatches[1]; // محتوای داخل گروه admin
  
-         // پیدا کردن گروه panel اصلی (در سطح اول گروه admin)
-         $panelPattern = "/Route::prefix\('panel'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
-         if (preg_match($panelPattern, $adminGroupContent, $panelMatches)) {
-             $panelContent = $panelMatches[1];
-             // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
-             if (strpos($panelContent, "Route::get('/$modelPlural', [{$model}Controller::class, 'index'])") === false) {
-                 $newPanelContent = rtrim($panelContent) . "\n" . trim($routeContent) . "\n";
-                 $newAdminContent = str_replace(
-                     $panelMatches[0],
-                     "Route::prefix('panel')->group(function () {\n$newPanelContent});",
-                     $adminGroupContent
-                 );
-             } else {
-                 $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
-             }
+         // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
+         if (strpos($adminGroupContent, "Route::prefix('$modelPlural/')->group(function () {") === false) {
+             // اضافه کردن روت‌ها به آخر گروه admin، مثل users
+             $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('$modelPlural/')->group(function () {\n" . trim($routeContent) . "\n});";
          } else {
-             // اگه گروه panel وجود نداشت، یه گروه جدید به آخر گروه admin اضافه می‌کنیم
-             $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('panel')->group(function () {\n" . trim($routeContent) . "\n});";
+             $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
          }
  
          // جایگزینی گروه admin با محتوای جدید
@@ -279,7 +267,7 @@ class MakeCrudLivewire extends Command
          );
      } else {
          // اگه گروه admin پیدا نشد، یه گروه جدید می‌سازیم
-         $webContent .= "\n\n$controllerUse\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {\nRoute::prefix('panel')->group(function () {\n" . trim($routeContent) . "\n});\n});";
+         $webContent .= "\n\n$controllerUse\nRoute::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {\nRoute::prefix('$modelPlural/')->group(function () {\n" . trim($routeContent) . "\n});\n});";
      }
  
      File::put($webFile, $webContent);
