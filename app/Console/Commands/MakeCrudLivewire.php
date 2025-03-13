@@ -247,29 +247,34 @@ class MakeCrudLivewire extends Command
      }
  
      // پیدا کردن گروه اصلی admin
-     $groupPattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)\s*->middleware\('manager'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
-     if (preg_match($groupPattern, $webContent, $matches)) {
-         $groupContent = $matches[1]; // محتوای داخل گروه admin
+     $adminGroupPattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)\s*->middleware\('manager'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
+     if (preg_match($adminGroupPattern, $webContent, $adminMatches)) {
+         $adminGroupContent = $adminMatches[1]; // محتوای داخل گروه admin
  
-         // پیدا کردن یا ایجاد گروه panel در سطح اصلی گروه admin
-         $panelPattern = "/Route::prefix\('panel'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);(?!\s*->group\(function\s*\(\))/s";
-         if (preg_match($panelPattern, $groupContent, $panelMatches)) {
-             // اضافه کردن روت‌ها به گروه panel موجود
-             $newPanelContent = rtrim($panelMatches[1]) . "\n" . trim($routeContent) . "\n";
-             $newGroupContent = str_replace(
-                 $panelMatches[0],
-                 "Route::prefix('panel')->group(function () {\n$newPanelContent});",
-                 $groupContent
-             );
+         // پیدا کردن گروه panel اصلی (در سطح اول گروه admin)
+         $panelPattern = "/Route::prefix\('panel'\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
+         if (preg_match($panelPattern, $adminGroupContent, $panelMatches)) {
+             $panelContent = $panelMatches[1];
+             // چک کردن اینکه روت‌های مشابه از قبل وجود نداشته باشن
+             if (strpos($panelContent, "Route::get('/$modelPlural', [{$model}Controller::class, 'index'])") === false) {
+                 $newPanelContent = rtrim($panelContent) . "\n" . trim($routeContent) . "\n";
+                 $newAdminContent = str_replace(
+                     $panelMatches[0],
+                     "Route::prefix('panel')->group(function () {\n$newPanelContent});",
+                     $adminGroupContent
+                 );
+             } else {
+                 $newAdminContent = $adminGroupContent; // اگه روت‌ها از قبل بودن، تغییری نمی‌دیم
+             }
          } else {
-             // اگه گروه panel در سطح اصلی وجود نداشت، به آخر گروه admin اضافه می‌کنیم
-             $newGroupContent = rtrim($groupContent) . "\n\nRoute::prefix('panel')->group(function () {\n" . trim($routeContent) . "\n});";
+             // اگه گروه panel وجود نداشت، یه گروه جدید به آخر گروه admin اضافه می‌کنیم
+             $newAdminContent = rtrim($adminGroupContent) . "\n\nRoute::prefix('panel')->group(function () {\n" . trim($routeContent) . "\n});";
          }
  
          // جایگزینی گروه admin با محتوای جدید
          $webContent = preg_replace(
-             $groupPattern,
-             "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {{$newGroupContent}\n});",
+             $adminGroupPattern,
+             "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {{$newAdminContent}\n});",
              $webContent
          );
      } else {
