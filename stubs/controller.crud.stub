@@ -2,7 +2,7 @@
 
 namespace {{namespace}}\Panel;
 
-use App\Http\Controllers\{{namespace}}\Controller;
+use {{namespace}}\Controller;
 
 class {{class}} extends Controller
 {
