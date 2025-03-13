@@ -66,7 +66,7 @@ class MakeCrudLivewire extends Command
 
     protected function createController($model, $namespacePrefix)
     {
-        $controllerPath = app_path("Http/Controllers/{$namespacePrefix}/Panel/{$model}Controller.php");
+        $controllerPath = app_path("Http/Controllers/{$namespacePrefix}/Panel/{$model}/{$model}Controller.php");
         $stub = File::get(base_path('stubs/controller.crud.stub'));
         $stub = str_replace(
             ['{{namespace}}', '{{class}}', '{{modelLower}}', '{{prefix}}'],
