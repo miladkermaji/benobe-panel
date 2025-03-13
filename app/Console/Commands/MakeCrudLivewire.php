@@ -222,75 +222,75 @@ class MakeCrudLivewire extends Command
      $namespacePrefix = ucfirst($prefix); // مثلاً Admin یا Dr
      $prefixLower = Str::lower($prefix); // مثلاً admin یا dr
  
-     // پیدا کردن فایل routes/web.php
+     // مسیر فایل routes/web.php
      $webFile = base_path('routes/web.php');
      $webContent = File::get($webFile);
  
      // تعریف محتوای روت‌ها با نیم‌اسپیس کامل
      $fullNamespace = "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}\\{$model}Controller";
-     $routeContent = "Route::prefix('$modelPlural')->group(function () {\n" .
-                     "    Route::get('/', [\\{$fullNamespace}::class, 'index'])->name('$prefixLower.panel.$modelPlural.index');\n" .
-                     "    Route::get('/create', [\\{$fullNamespace}::class, 'create'])->name('$prefixLower.panel.$modelPlural.create');\n" .
-                     "    Route::get('/edit/{id}', [\\{$fullNamespace}::class, 'edit'])->name('$prefixLower.panel.$modelPlural.edit');\n" .
-                     "});\n";
+     $routeContent = "    Route::prefix('$modelPlural')->group(function () {\n" .
+                     "        Route::get('/', [\\{$fullNamespace}::class, 'index'])->name('$prefixLower.panel.$modelPlural.index');\n" .
+                     "        Route::get('/create', [\\{$fullNamespace}::class, 'create'])->name('$prefixLower.panel.$modelPlural.create');\n" .
+                     "        Route::get('/edit/{id}', [\\{$fullNamespace}::class, 'edit'])->name('$prefixLower.panel.$modelPlural.edit');\n" .
+                     "    });\n";
  
-     // پیدا کردن گروه اصلی (admin یا dr)
+     // الگوی گروه اصلی (admin یا dr)
      $groupPattern = "/Route::prefix\('$prefixLower'\)\s*->namespace\('$namespacePrefix'\)(?:->middleware\('[^']*'\))?\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
+ 
      if (preg_match($groupPattern, $webContent, $matches)) {
-         $groupContent = $matches[1]; // محتوای داخل گروه prefix
+         $groupContent = $matches[1]; // محتوای داخل گروه
  
          // بررسی اینکه آیا روت برای این مدل قبلاً وجود دارد یا نه
          if (strpos($groupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
-             // پیدا کردن آخرین Route::prefix و اضافه کردن بعد از آن
-             $lastPrefixPattern = "/(Route::prefix\('.*?\'\)->group\(function\s*\(\)\s*\{.*?\}\);)/s";
-             if (preg_match_all($lastPrefixPattern, $groupContent, $prefixMatches)) {
-                 $lastPrefix = end($prefixMatches[0]); // آخرین prefix پیدا شده
-                 $newGroupContent = str_replace($lastPrefix, $lastPrefix . "\n\n    " . trim($routeContent), $groupContent);
-             } else {
-                 // اگر هیچ prefix دیگری نبود، به انتهای گروه اضافه می‌کنیم
-                 $newGroupContent = rtrim($groupContent) . "\n\n    " . trim($routeContent);
-             }
- 
-             // جایگزینی گروه جدید در محتوای اصلی
              if ($prefixLower === 'admin') {
+                 // برای admin مستقیماً به گروه اضافه می‌کنیم
+                 $newGroupContent = rtrim($groupContent) . "\n\n" . $routeContent;
                  $webContent = preg_replace(
                      $groupPattern,
                      "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->middleware('manager')->group(function () {{$newGroupContent}\n});",
                      $webContent
                  );
              } elseif ($prefixLower === 'dr') {
-                 // برای dr باید در زیرگروه panel اضافه شود
+                 // برای dr به زیرگروه panel اضافه می‌کنیم
                  $panelPattern = "/Route::prefix\('panel'\)\s*->middleware\(\['doctor',\s*'secretary',\s*'complete-profile'\]\)\s*->group\(function\s*\(\)\s*\{(.*?)\}\);/s";
                  if (preg_match($panelPattern, $groupContent, $panelMatches)) {
                      $panelContent = $panelMatches[1];
                      if (strpos($panelContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
-                         if (preg_match_all($lastPrefixPattern, $panelContent, $prefixMatches)) {
-                             $lastPrefix = end($prefixMatches[0]);
-                             $newPanelContent = str_replace($lastPrefix, $lastPrefix . "\n\n        " . trim($routeContent), $panelContent);
-                         } else {
-                             $newPanelContent = rtrim($panelContent) . "\n\n        " . trim($routeContent);
-                         }
+                         $newPanelContent = rtrim($panelContent) . "\n\n        " . trim($routeContent);
                          $newGroupContent = preg_replace(
                              $panelPattern,
                              "Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {{$newPanelContent}\n    });",
                              $groupContent
                          );
-                     } else {
-                         $newGroupContent = $groupContent; // جلوگیری از تکرار
+                         $webContent = preg_replace(
+                             $groupPattern,
+                             "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->group(function () {{$newGroupContent}\n});",
+                             $webContent
+                         );
                      }
                  } else {
-                     $newGroupContent = rtrim($groupContent) . "\n\n    Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {\n        " . trim($routeContent) . "\n    });";
+                     // اگر زیرگروه panel وجود نداشت، آن را اضافه می‌کنیم
+                     $newGroupContent = rtrim($groupContent) . "\n\n    Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {\n" . $routeContent . "    });";
+                     $webContent = preg_replace(
+                         $groupPattern,
+                         "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->group(function () {{$newGroupContent}\n});",
+                         $webContent
+                     );
                  }
-                 $webContent = preg_replace(
-                     $groupPattern,
-                     "Route::prefix('$prefixLower')->namespace('$namespacePrefix')->group(function () {{$newGroupContent}\n});",
-                     $webContent
-                 );
              }
-         }
-     }
  
-     File::put($webFile, $webContent);
+             // ذخیره تغییرات در فایل
+             if (File::put($webFile, $webContent) === false) {
+                 $this->error("Failed to write routes to $webFile. Check file permissions.");
+             } else {
+                 $this->info("Routes for $modelPlural added to $prefixLower group successfully.");
+             }
+         } else {
+             $this->info("Routes for $modelPlural already exist in $prefixLower group. Skipping.");
+         }
+     } else {
+         $this->error("Could not find $prefixLower group in routes/web.php. Please ensure it exists.");
+     }
  }
  
 
