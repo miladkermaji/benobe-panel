@@ -7,6 +7,8 @@
 @endsection
 @section('content')
 @section('bread-crumb-title', 'داشبورد')
+@livewire('admin-dashboard')
 @section('scripts')
 
+@endsection
 @endsection

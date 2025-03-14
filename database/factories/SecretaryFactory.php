@@ -1,21 +1,21 @@
 <?php
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Models\Secretary;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 
-class UserFactory extends Factory
+class SecretaryFactory extends Factory
 {
-    protected $model = User::class;
+    protected $model = Secretary::class;
 
     public function definition()
     {
         return [
+            'doctor_id' => $this->faker->numberBetween(1, 3), // Adjust based on your specialties table
+
             'first_name'       => $this->faker->name,
             'email'      => $this->faker->unique()->safeEmail,
-            'password'   => Hash::make('password'), // Default password
-            'user_type'  => 0,                      // Assuming 0 is for patients
+            'mobile'      => $this->faker->phoneNumber,
             'created_at' => now(),
             'updated_at' => now(),
         ];
