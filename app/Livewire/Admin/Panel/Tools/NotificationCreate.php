@@ -1,6 +1,7 @@
 <?php
 namespace App\Livewire\Admin\Panel\Tools;
 
+use App\Jobs\SendNotificationSms;
 use App\Models\Doctor;
 use App\Models\Notification;
 use App\Models\Secretary;
@@ -78,11 +79,9 @@ class NotificationCreate extends Component
         $startAtMiladi = null;
         if ($this->start_at) {
             try {
-                // ابتدا تلاش می‌کنیم با فرمت کامل (با ثانیه)
                 $startAtMiladi = Jalalian::fromFormat('Y/m/d H:i:s', $this->start_at)->toCarbon()->toDateTimeString();
             } catch (\Exception $e1) {
                 try {
-                    // اگر با ثانیه جواب نداد، بدون ثانیه امتحان می‌کنیم
                     $startAtMiladi = Jalalian::fromFormat('Y/m/d H:i', $this->start_at)->toCarbon()->toDateTimeString();
                 } catch (\Exception $e2) {
                     $this->dispatch('show-alert', type: 'error', message: 'زمان شروع نامعتبر است. لطفاً به فرمت ۱۴۰۳/۱۲/۱۳ ۱۴:۳۰ یا ۱۴۰۳/۱۲/۱۳ ۱۴:۳۰:۰۰ وارد کنید.');
@@ -122,12 +121,15 @@ class NotificationCreate extends Component
 
         $notification = Notification::create($notificationData);
 
+        $recipientNumbers = []; // آرایه شماره‌های گیرنده
+
         if ($this->target_mode === 'single') {
             $notification->recipients()->create([
                 'recipient_type' => null,
                 'recipient_id'   => null,
                 'phone_number'   => $this->single_phone,
             ]);
+            $recipientNumbers = [$this->single_phone];
         } elseif ($this->target_mode === 'multiple') {
             foreach ($this->selected_recipients as $recipient) {
                 [$type, $id] = explode(':', $recipient);
@@ -135,6 +137,10 @@ class NotificationCreate extends Component
                     'recipient_type' => $type,
                     'recipient_id'   => $id,
                 ]);
+                $model = $type::find($id);
+                if ($model && $model->phone_number) {
+                    $recipientNumbers[] = $model->phone_number;
+                }
             }
         } elseif ($this->target_mode === 'group') {
             $recipients = match ($this->target_group) {
@@ -148,10 +154,26 @@ class NotificationCreate extends Component
                     'recipient_type' => $recipient->getMorphClass(),
                     'recipient_id'   => $recipient->id,
                 ]);
+                if ($recipient->phone_number) {
+                    $recipientNumbers[] = $recipient->phone_number;
+                }
             }
         }
 
-        $this->dispatch('show-alert', type: 'success', message: 'اعلان با موفقیت ایجاد شد!');
+        // اضافه کردن ارسال پیامک به صف
+        if (! empty($recipientNumbers) && $this->is_active) {
+            $chunks = array_chunk($recipientNumbers, 10); // تکه‌تکه کردن به گروه‌های 10 تایی
+            $delay  = 0;
+            foreach ($chunks as $chunk) {
+                SendNotificationSms::dispatch($this->message, $chunk)
+                    ->delay(now()->addSeconds($delay)); // تاخیر بین هر گروه
+                $delay += 5;                        // 5 ثانیه تاخیر بین هر گروه
+            }
+            $this->dispatch('show-alert', type: 'success', message: 'اعلان ایجاد و ارسال پیامک‌ها در صف قرار گرفت!');
+        } else {
+            $this->dispatch('show-alert', type: 'success', message: 'اعلان با موفقیت ایجاد شد!');
+        }
+
         return redirect()->route('admin.panel.tools.notifications.index');
     }
 
