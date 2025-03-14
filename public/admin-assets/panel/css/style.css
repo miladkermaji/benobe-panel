@@ -481,7 +481,7 @@ textarea {
 .table td {
   white-space: nowrap;
   color: #444;
-  padding: 13px 30px;
+/*   padding: 13px 30px; */
   font-size: 13px;
 }
 

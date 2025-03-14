@@ -2,12 +2,12 @@
 namespace App\Http\Controllers\Dr\Panel\Turn;
 
 use App\Http\Controllers\Dr\Controller;
+use App\Models\Appointment;
+use App\Models\SubUser;
 use Carbon\Carbon;
-use App\Models\Dr\SubUser;
 use Illuminate\Http\Request;
-use Morilog\Jalali\Jalalian;
-use App\Models\Dr\Appointment;
 use Illuminate\Support\Facades\Auth;
+use Morilog\Jalali\Jalalian;
 
 class DrScheduleController extends Controller
 {
@@ -20,7 +20,7 @@ class DrScheduleController extends Controller
         $doctor = Auth::guard('doctor')->user();
 
         // اگر پزشک لاگین نکرده بود، بررسی دکتر مرتبط با منشی
-        if (!$doctor) {
+        if (! $doctor) {
             $secretary = Auth::guard('secretary')->user();
             if ($secretary && $secretary->doctor) {
                 $doctor = $secretary->doctor;
@@ -40,7 +40,7 @@ class DrScheduleController extends Controller
         $doctor = $this->getAuthenticatedDoctor();
 
         // Check if the doctor is authenticated
-        if (!$doctor) {
+        if (! $doctor) {
             abort(403, 'شما به این بخش دسترسی ندارید.');
         }
 
@@ -48,9 +48,9 @@ class DrScheduleController extends Controller
         $clinics = $doctor->clinics()->where('is_active', 0)->get();
 
         // Get today's date
-        $now = Carbon::now()->format('Y-m-d');
+        $now              = Carbon::now()->format('Y-m-d');
         $selectedClinicId = $request->query('selectedClinicId');
-        $filterType = $request->input('type');
+        $filterType       = $request->input('type');
 
         // Get today's appointments for the doctor
         $appointments = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
@@ -84,14 +84,13 @@ class DrScheduleController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'appointments' => $appointments,
-                'clinics' => $clinics,
+                'clinics'      => $clinics,
             ]);
         }
 
         // Return the view with appointments and clinics data
         return view("dr.panel.turn.schedule.appointments", compact('appointments', 'clinics'));
     }
-
 
     /**
      * نمایش صفحه نوبت‌های من
@@ -100,7 +99,7 @@ class DrScheduleController extends Controller
     {
         $doctor = $this->getAuthenticatedDoctor();
 
-        if (!$doctor) {
+        if (! $doctor) {
             abort(403, 'شما به این بخش دسترسی ندارید.');
         }
 
@@ -121,13 +120,13 @@ class DrScheduleController extends Controller
     public function filterAppointments(Request $request)
     {
         $doctor = $this->getAuthenticatedDoctor();
-        if (!$doctor) {
+        if (! $doctor) {
             return response()->json(['error' => 'دسترسی غیرمجاز!'], 403);
         }
 
         $selectedClinicId = $request->query('selectedClinicId');
-        $filterType = $request->input('type');
-        $selectedDate = $request->input('date'); // دریافت تاریخ جلالی از فرانت‌اند
+        $filterType       = $request->input('type');
+        $selectedDate     = $request->input('date'); // دریافت تاریخ جلالی از فرانت‌اند
 
         // تبدیل تاریخ جلالی به میلادی
         try {
@@ -164,9 +163,6 @@ class DrScheduleController extends Controller
         return response()->json(['appointments' => $appointments]);
     }
 
-
-
-
     /**
      * دریافت نوبت‌ها بر اساس تاریخ انتخاب شده
      */
@@ -175,14 +171,14 @@ class DrScheduleController extends Controller
         // دریافت پزشک مرتبط
         $doctor = $this->getAuthenticatedDoctor();
         // اگر دکتر یافت نشد، دسترسی غیرمجاز است
-        if (!$doctor) {
+        if (! $doctor) {
             abort(403, 'شما به این بخش دسترسی ندارید.');
         }
 
         // دریافت تاریخ انتخاب شده یا پیش‌فرض به امروز
-        $selectedDate = $request->input('date', Jalalian::now()->format('Y/m/d'));
+        $selectedDate     = $request->input('date', Jalalian::now()->format('Y/m/d'));
         $selectedClinicId = $request->query('selectedClinicId');
-        $filterType = $request->input('type'); // دریافت نوع فیلتر از درخواست
+        $filterType       = $request->input('type'); // دریافت نوع فیلتر از درخواست
 
         // بررسی فرمت تاریخ ورودی
         try {

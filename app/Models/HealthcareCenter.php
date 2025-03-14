@@ -1,12 +1,9 @@
 <?php
-
 namespace App\Models;
 
-use App\Models\Dr\DrSpecialty;
-use App\Models\Dr\DrSpecialties;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Admin\Dashboard\Cities\Zone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class HealthcareCenter extends Model
 {
@@ -20,7 +17,7 @@ class HealthcareCenter extends Model
         'city_id',
         'specialty_id',
         'address',
-        'description'
+        'description',
     ];
     public function city()
     {

@@ -9,6 +9,6 @@
 @endsection
 
 @section('content')
-    @section('bread-crumb-title', 'مدیریت doctors')
+    @section('bread-crumb-title', 'مدیریت پزشکان')
     @livewire('admin.panel.doctors.doctor-list')
 @endsection

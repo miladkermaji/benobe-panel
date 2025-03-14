@@ -3,9 +3,9 @@ namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUs
 
 use App\Http\Controllers\Dr\Controller;
 use App\Models\Doctor;
-use App\Models\Dr\SmsTemplate;
-use App\Models\Dr\UserBlocking;
+use App\Models\SmsTemplate;
 use App\Models\User;
+use App\Models\UserBlocking;
 use Auth;
 use Illuminate\Http\Request;
 use Modules\SendOtp\App\Http\Services\MessageService;

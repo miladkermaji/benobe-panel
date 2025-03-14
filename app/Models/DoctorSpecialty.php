@@ -2,7 +2,7 @@
 namespace App\Models;
 
 use App\Models\Doctor;
-use App\Models\Dr\Specialty;
+use App\Models\Specialty;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

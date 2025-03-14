@@ -3,9 +3,9 @@ namespace App\Livewire\Dr\Auth;
 
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 use App\Models\Doctor;
-use App\Models\Dr\Secretary;
 use App\Models\LoginSession;
 use App\Models\Otp;
+use App\Models\Secretary;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;

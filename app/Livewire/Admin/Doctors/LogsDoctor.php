@@ -2,9 +2,9 @@
 namespace App\Livewire\Admin\Doctors;
 
 use App\Helpers\JalaliHelper;
+use App\Models\Appointment;
 use App\Models\Doctor;
-use App\Models\Dr\Appointment;
-use App\Models\Dr\UserBlocking;
+use App\Models\UserBlocking;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Modules\SendOtp\App\Http\Services\MessageService;

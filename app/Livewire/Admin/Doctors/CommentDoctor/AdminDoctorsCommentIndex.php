@@ -1,22 +1,20 @@
 <?php
-
 namespace App\Livewire\Admin\Doctors\CommentDoctor;
 
+use App\Models\Doctors\DoctorManagements\DoctorComment;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Log;
-use App\Models\Admin\Doctors\DoctorManagements\DoctorComment;
 
 class AdminDoctorsCommentIndex extends Component
 {
     use WithPagination;
 
-    public $search = ''; // برای جستجوی لایو
-    public $selectAll = false; // برای انتخاب همه
-    public $selectedComments = []; // آرایه برای ذخیره نظرات انتخاب‌شده
-    public $perPage = 10; // تعداد ردیف‌ها در هر صفحه
-    public $commentItems = []; // برای ذخیره داده‌های خام (بدون صفحه‌بندی)
-    public $commentStatuses = []; // برای ذخیره وضعیت‌های نظرات
+    public $search           = '';    // برای جستجوی لایو
+    public $selectAll        = false; // برای انتخاب همه
+    public $selectedComments = [];    // آرایه برای ذخیره نظرات انتخاب‌شده
+    public $perPage          = 10;    // تعداد ردیف‌ها در هر صفحه
+    public $commentItems     = [];    // برای ذخیره داده‌های خام (بدون صفحه‌بندی)
+    public $commentStatuses  = [];    // برای ذخیره وضعیت‌های نظرات
 
     public function mount()
     {
@@ -36,7 +34,6 @@ class AdminDoctorsCommentIndex extends Component
             ->orderBy('created_at', 'desc');
 
         // دیباگ: لاگ کردن کوئری برای بررسی
-       
 
         $paginatedComments = $query->paginate($this->perPage);
 
@@ -80,7 +77,7 @@ class AdminDoctorsCommentIndex extends Component
             message: 'نظرات انتخاب‌شده با موفقیت حذف شدند.',
         );
         $this->selectedComments = [];
-        $this->selectAll = false;
+        $this->selectAll        = false;
         $this->loadCommentStatuses(); // به‌روزرسانی وضعیت‌ها بعد از حذف
     }
 
@@ -109,9 +106,9 @@ class AdminDoctorsCommentIndex extends Component
     {
         $comment = DoctorComment::find($commentId);
         if ($comment) {
-            $comment->update(['status' => !$comment->status]);
+            $comment->update(['status' => ! $comment->status]);
             $this->commentStatuses[$commentId] = $comment->status; // به‌روزرسانی وضعیت توی پراپرتی
-            $status = $comment->status ? 'فعال' : 'غیرفعال';
+            $status                            = $comment->status ? 'فعال' : 'غیرفعال';
             $this->dispatch(
                 'show-toastr',
                 type: 'success',

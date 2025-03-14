@@ -1,18 +1,17 @@
 <?php
-
 namespace App\Livewire\Dr\Panel\DoctorServices;
 
+use App\Models\DoctorService;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Dr\DoctorService;
 
 class DoctorServices extends Component
 {
     use WithPagination;
 
-    public $search = '';
+    public $search       = '';
     public $selectedRows = [];
-    public $selectAll = false;
+    public $selectAll    = false;
 
     public $selectedClinicId;
     public $dummy = 0; // property کمکی برای رفرش شدن کامپوننت
@@ -28,9 +27,9 @@ class DoctorServices extends Component
     public $description;
 
     protected $paginationTheme = 'bootstrap';
-    protected $listeners = [
+    protected $listeners       = [
         'updateDeleteButton' => 'refreshDeleteButton',
-        'doDelete' => 'delete'
+        'doDelete'           => 'delete',
     ];
 
     public function mount()
@@ -50,8 +49,8 @@ class DoctorServices extends Component
             $service->status = $service->status == 1 ? 0 : 1;
             $service->save();
             $this->dummy++; // تغییر dummy برای رفرش کامپوننت
-            $this->dispatch('show-toastr', 
-                type : 'success',
+            $this->dispatch('show-toastr',
+                type: 'success',
                 message: 'وضعیت خدمت با موفقیت تغییر کرد.'
             );
         }
@@ -65,14 +64,14 @@ class DoctorServices extends Component
                 return abort(403, 'Access denied');
             }
             $this->editingService = $service->id;
-            $this->name = $service->name;
-            $this->doctor_id = $service->doctor_id;
-            $this->duration = $service->duration;
-            $this->price = $service->price;
-            $this->discount = $service->discount;
-            $this->status = $service->status;
-            $this->parent_id = $service->parent_id;
-            $this->description = $service->description;
+            $this->name           = $service->name;
+            $this->doctor_id      = $service->doctor_id;
+            $this->duration       = $service->duration;
+            $this->price          = $service->price;
+            $this->discount       = $service->discount;
+            $this->status         = $service->status;
+            $this->parent_id      = $service->parent_id;
+            $this->description    = $service->description;
             $this->dispatch('show-edit-modal');
         }
     }
@@ -80,28 +79,28 @@ class DoctorServices extends Component
     public function updateService()
     {
         $this->validate([
-            'doctor_id' => 'required|exists:doctors,id',
-            'name' => 'required|string|max:255',
-            'duration' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'discount' => 'nullable|numeric|min:0|lte:price',
-            'parent_id' => 'nullable|exists:doctor_services,id',
+            'doctor_id'   => 'required|exists:doctors,id',
+            'name'        => 'required|string|max:255',
+            'duration'    => 'required|integer|min:1',
+            'price'       => 'required|numeric|min:0',
+            'discount'    => 'nullable|numeric|min:0|lte:price',
+            'parent_id'   => 'nullable|exists:doctor_services,id',
             'description' => 'nullable|string',
         ], [
             'doctor_id.required' => 'شناسه دکتر الزامی است.',
-            'doctor_id.exists' => 'شناسه دکتر معتبر نمی‌باشد.',
-            'name.required' => 'نام خدمت الزامی است.',
-            'name.max' => 'نام خدمت نمی‌تواند بیش از 255 کاراکتر باشد.',
-            'duration.required' => 'مدت زمان خدمت الزامی است.',
-            'duration.integer' => 'مدت زمان خدمت باید به صورت عددی وارد شود.',
-            'duration.min' => 'مدت زمان خدمت باید حداقل 1 دقیقه باشد.',
-            'price.required' => 'قیمت خدمت الزامی است.',
-            'price.numeric' => 'قیمت خدمت باید به صورت عددی وارد شود.',
-            'price.min' => 'قیمت خدمت نمی‌تواند منفی باشد.',
-            'discount.numeric' => 'تخفیف باید به صورت عددی وارد شود.',
-            'discount.min' => 'تخفیف نمی‌تواند منفی باشد.',
-            'discount.lte' => 'تخفیف نمی‌تواند از قیمت بیشتر باشد.',
-            'parent_id.exists' => 'شناسه خدمت مادر نامعتبر است.',
+            'doctor_id.exists'   => 'شناسه دکتر معتبر نمی‌باشد.',
+            'name.required'      => 'نام خدمت الزامی است.',
+            'name.max'           => 'نام خدمت نمی‌تواند بیش از 255 کاراکتر باشد.',
+            'duration.required'  => 'مدت زمان خدمت الزامی است.',
+            'duration.integer'   => 'مدت زمان خدمت باید به صورت عددی وارد شود.',
+            'duration.min'       => 'مدت زمان خدمت باید حداقل 1 دقیقه باشد.',
+            'price.required'     => 'قیمت خدمت الزامی است.',
+            'price.numeric'      => 'قیمت خدمت باید به صورت عددی وارد شود.',
+            'price.min'          => 'قیمت خدمت نمی‌تواند منفی باشد.',
+            'discount.numeric'   => 'تخفیف باید به صورت عددی وارد شود.',
+            'discount.min'       => 'تخفیف نمی‌تواند منفی باشد.',
+            'discount.lte'       => 'تخفیف نمی‌تواند از قیمت بیشتر باشد.',
+            'parent_id.exists'   => 'شناسه خدمت مادر نامعتبر است.',
         ]);
 
         $service = DoctorService::find($this->editingService);
@@ -110,19 +109,19 @@ class DoctorServices extends Component
                 return abort(403, 'Access denied');
             }
             $service->update([
-                'doctor_id' => $this->doctor_id,
-                'name' => $this->name,
-                'duration' => $this->duration,
-                'price' => $this->price,
-                'discount' => $this->discount,
-                'status' => $this->status,
-                'parent_id' => $this->parent_id,
+                'doctor_id'   => $this->doctor_id,
+                'name'        => $this->name,
+                'duration'    => $this->duration,
+                'price'       => $this->price,
+                'discount'    => $this->discount,
+                'status'      => $this->status,
+                'parent_id'   => $this->parent_id,
                 'description' => $this->description,
             ]);
             $this->dummy++; // برای رفرش شدن کامپوننت
             $this->dispatch('show-toastr', [
-                'type' => 'success',
-                'message' => 'خدمت با موفقیت به‌روزرسانی شد.'
+                'type'    => 'success',
+                'message' => 'خدمت با موفقیت به‌روزرسانی شد.',
             ]);
             $this->resetInputFields();
             $this->dispatch('hide-edit-modal');
@@ -146,16 +145,15 @@ class DoctorServices extends Component
     public function resetInputFields()
     {
         $this->editingService = null;
-        $this->name = '';
-        $this->doctor_id = '';
-        $this->duration = '';
-        $this->price = '';
-        $this->discount = '';
-        $this->status = '';
-        $this->parent_id = '';
-        $this->description = '';
+        $this->name           = '';
+        $this->doctor_id      = '';
+        $this->duration       = '';
+        $this->price          = '';
+        $this->discount       = '';
+        $this->status         = '';
+        $this->parent_id      = '';
+        $this->description    = '';
     }
-
 
     public function render()
     {
@@ -178,10 +176,5 @@ class DoctorServices extends Component
 
         return view('livewire.dr.panel.doctor-services.doctor-services', compact('services'));
     }
-
-
-
-
-
 
 }

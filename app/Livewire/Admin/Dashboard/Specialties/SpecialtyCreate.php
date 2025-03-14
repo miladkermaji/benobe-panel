@@ -1,15 +1,13 @@
 <?php
-
 namespace App\Livewire\Admin\Dashboard\Specialties;
 
+use App\Models\Specialty;
 use Livewire\Component;
-use App\Models\Dr\Specialty;
-;
 
 class SpecialtyCreate extends Component
 {
     public $name;
-    public $level = 1;  // مقدار پیش‌فرض
+    public $level = 1; // مقدار پیش‌فرض
 
     public $successMessage = '';
 
@@ -20,7 +18,7 @@ class SpecialtyCreate extends Component
     public function store()
     {
         // اطمینان از اینکه مقدار `level` به درستی عددی است
-        if (!is_numeric($this->level)) {
+        if (! is_numeric($this->level)) {
             $this->level = 1;
         }
 
@@ -29,7 +27,7 @@ class SpecialtyCreate extends Component
 
         // ذخیره در دیتابیس
         Specialty::create([
-            'name' => $this->name,
+            'name'  => $this->name,
             'level' => (int) $this->level, // تبدیل مقدار level به عدد صحیح
         ]);
 

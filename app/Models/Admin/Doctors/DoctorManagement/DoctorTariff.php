@@ -1,6 +1,5 @@
 <?php
-
-namespace App\Models\Admin\Doctors\DoctorManagement;
+namespace App\Models\Doctors\DoctorManagement;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,6 +9,6 @@ class DoctorTariff extends Model
 
     public function doctor()
     {
-        return $this->belongsTo(\App\Models\Dr\Doctor::class, 'doctor_id');
+        return $this->belongsTo(\App\Models\Doctor::class, 'doctor_id');
     }
 }

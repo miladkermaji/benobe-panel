@@ -1,32 +1,31 @@
 <?php
-
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours;
 
-use Auth;
-use App\Models\Dr\Clinic;
-use Illuminate\Http\Request;
-use App\Models\Dr\DoctorWorkSchedule;
 use App\Http\Controllers\Dr\Controller;
-use App\Models\Dr\DoctorAppointmentConfig;
+use App\Models\Clinic;
+use App\Models\DoctorAppointmentConfig;
+use App\Models\DoctorWorkSchedule;
+use Auth;
+use Illuminate\Http\Request;
 
 class ActivationWorkhoursController extends Controller
 {
     public function index($clinicId)
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
-        $otherSite = DoctorAppointmentConfig::where('collaboration_with_other_sites',1)->first();
-        return view('dr.panel.doctors-clinic.activation.workhours.index', compact(['clinicId', 'doctorId','otherSite']));
+        $doctorId  = Auth::guard('doctor')->user()->id;
+        $otherSite = DoctorAppointmentConfig::where('collaboration_with_other_sites', 1)->first();
+        return view('dr.panel.doctors-clinic.activation.workhours.index', compact(['clinicId', 'doctorId', 'otherSite']));
     }
     public function store(Request $request)
     {
         $request->validate([
-            'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'required|exists:clinics,id',
-            'day' => 'required|array|min:1',
-            'day.*' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
-            'work_hours' => 'required|array|min:1',
+            'doctor_id'          => 'required|exists:doctors,id',
+            'clinic_id'          => 'required|exists:clinics,id',
+            'day'                => 'required|array|min:1',
+            'day.*'              => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
+            'work_hours'         => 'required|array|min:1',
             'work_hours.*.start' => ['required', 'date_format:H:i'],
-            'work_hours.*.end' => ['required', 'date_format:H:i', 'after:work_hours.*.start'],
+            'work_hours.*.end'   => ['required', 'date_format:H:i', 'after:work_hours.*.start'],
         ]);
 
         $appointmentDuration = DoctorAppointmentConfig::where('clinic_id', $request->clinic_id)->first()->appointment_duration;
@@ -35,7 +34,7 @@ class ActivationWorkhoursController extends Controller
             $schedule = DoctorWorkSchedule::firstOrNew([
                 'doctor_id' => $request->doctor_id,
                 'clinic_id' => $request->clinic_id,
-                'day' => $day,
+                'day'       => $day,
             ]);
 
             $existingHours = $schedule->work_hours ? json_decode($schedule->work_hours, true) : [];
@@ -43,11 +42,11 @@ class ActivationWorkhoursController extends Controller
             $newHours = [];
             foreach ($request->work_hours as $hour) {
                 $start = \Carbon\Carbon::createFromFormat('H:i', $hour['start']);
-                $end = \Carbon\Carbon::createFromFormat('H:i', $hour['end']);
+                $end   = \Carbon\Carbon::createFromFormat('H:i', $hour['end']);
 
                 // بررسی همه شرایط زمانی:
                 if ($end->lessThan($start)) {
-                    // اگر زمان پایان کوچکتر از شروع بود (عبور از نیمه‌شب)
+                                           // اگر زمان پایان کوچکتر از شروع بود (عبور از نیمه‌شب)
                     $end = $end->addDay(); // روز بعد برای زمان پایان
                 }
 
@@ -62,14 +61,11 @@ class ActivationWorkhoursController extends Controller
                 $maxAppointments = intdiv($diffInMinutes, $appointmentDuration);
 
                 $newHours[] = [
-                    'start' => $hour['start'],
-                    'end' => $hour['end'],
+                    'start'            => $hour['start'],
+                    'end'              => $hour['end'],
                     'max_appointments' => max($maxAppointments, 0), // اطمینان از عدم منفی بودن
                 ];
             }
-
-
-
 
             // ترکیب و حذف ساعات تکراری
             $mergedHours = array_merge($existingHours, $newHours);
@@ -82,8 +78,6 @@ class ActivationWorkhoursController extends Controller
 
         return response()->json(['success' => true, 'message' => 'ساعات کاری با موفقیت ذخیره شد.']);
     }
-
-
 
     public function getWorkHours($clinicId, $doctorId)
     {
@@ -105,12 +99,12 @@ class ActivationWorkhoursController extends Controller
             ->where('clinic_id', $request->clinic_id)
             ->exists();
 
-        if (!$workHours) {
+        if (! $workHours) {
             return response()->json(['message' => 'ابتدا برنامه ساعت کاری را تعریف کنید.'], 400);
         }
 
         // تغییر فیلد is_active به 1
-        $clinic = Clinic::findOrFail($request->clinic_id);
+        $clinic            = Clinic::findOrFail($request->clinic_id);
         $clinic->is_active = 1;
         $clinic->save();
 
@@ -122,10 +116,10 @@ class ActivationWorkhoursController extends Controller
         $request->validate([
             'doctor_id' => 'required|exists:doctors,id',
             'clinic_id' => 'required|exists:clinics,id',
-            'days' => 'required|array|min:1',
-            'days.*' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
-            'start' => ['required', 'date_format:H:i'],
-            'end' => ['required', 'date_format:H:i', 'after:start'],
+            'days'      => 'required|array|min:1',
+            'days.*'    => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
+            'start'     => ['required', 'date_format:H:i'],
+            'end'       => ['required', 'date_format:H:i', 'after:start'],
         ]);
 
         foreach ($request->days as $day) {
@@ -136,8 +130,8 @@ class ActivationWorkhoursController extends Controller
 
             if ($schedule) {
                 $existingHours = json_decode($schedule->work_hours, true) ?: [];
-                $updatedHours = array_filter($existingHours, function ($hour) use ($request) {
-                    return !($hour['start'] === $request->start && $hour['end'] === $request->end);
+                $updatedHours  = array_filter($existingHours, function ($hour) use ($request) {
+                    return ! ($hour['start'] === $request->start && $hour['end'] === $request->end);
                 });
 
                 if (empty($updatedHours)) {

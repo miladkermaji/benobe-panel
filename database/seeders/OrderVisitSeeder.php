@@ -1,9 +1,9 @@
 <?php
 namespace Database\Seeders;
 
-use App\Models\Admin\Doctors\OrderVisit;
+use App\Models\Clinic;
 use App\Models\Doctor;
-use App\Models\Dr\Clinic;
+use App\Models\Doctors\OrderVisit;
 use App\Models\User;
 use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;

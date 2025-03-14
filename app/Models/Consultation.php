@@ -1,8 +1,8 @@
 <?php
 namespace App\Models;
 
-use App\Models\Dr\Clinic;
-use App\Models\Dr\Insurance;
+use App\Models\Clinic;
+use App\Models\Insurance;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

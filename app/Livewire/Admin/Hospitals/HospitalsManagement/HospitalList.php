@@ -1,19 +1,18 @@
 <?php
-
 namespace App\Livewire\Admin\Hospitals\HospitalsManagement;
 
+use App\Models\Clinic;
 use Livewire\Component;
-use App\Models\Dr\Clinic;
 use Livewire\WithPagination;
 
 class HospitalList extends Component
 {
     use WithPagination;
 
-    public $search = '';
-    public $perPage = 10;
+    public $search            = '';
+    public $perPage           = 10;
     public $selectedHospitals = [];
-    public $selectAll = false;
+    public $selectAll         = false;
 
     public function updated($propertyName)
     {
@@ -24,15 +23,15 @@ class HospitalList extends Component
 
     public function updatedSelectAll($value)
     {
-        $hospitals = $this->getHospitalsQuery()->paginate($this->perPage);
+        $hospitals               = $this->getHospitalsQuery()->paginate($this->perPage);
         $this->selectedHospitals = $value ? $hospitals->pluck('id')->toArray() : [];
     }
 
     public function updatedSelectedHospitals()
     {
-        $hospitals = $this->getHospitalsQuery()->paginate($this->perPage);
-        $currentPageIds = $hospitals->pluck('id')->toArray();
-        $this->selectAll = !empty($this->selectedHospitals) && !array_diff($currentPageIds, $this->selectedHospitals);
+        $hospitals       = $this->getHospitalsQuery()->paginate($this->perPage);
+        $currentPageIds  = $hospitals->pluck('id')->toArray();
+        $this->selectAll = ! empty($this->selectedHospitals) && ! array_diff($currentPageIds, $this->selectedHospitals);
     }
 
     public function deleteSelected()
@@ -44,21 +43,21 @@ class HospitalList extends Component
 
         Clinic::whereIn('id', $this->selectedHospitals)->delete();
         $this->selectedHospitals = [];
-        $this->selectAll = false;
+        $this->selectAll         = false;
         $this->dispatch('toast', ['message' => 'بیمارستان‌های انتخاب‌شده با موفقیت حذف شدند.', 'type' => 'success']);
     }
 
     public function toggleStatus($hospitalId)
     {
-        $hospital = Clinic::findOrFail($hospitalId);
-        $newStatus = !$hospital->is_active;
+        $hospital  = Clinic::findOrFail($hospitalId);
+        $newStatus = ! $hospital->is_active;
 
         $hospital->update(['is_active' => $newStatus]);
 
         // ارسال پیامک (اختیاری، بر اساس نیاز)
-        $doctor = $hospital->doctor;
+        $doctor     = $hospital->doctor;
         $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-        $message = "وضعیت بیمارستان {$hospital->name} به " . ($newStatus ? 'فعال' : 'غیرفعال') . " تغییر کرد.";
+        $message    = "وضعیت بیمارستان {$hospital->name} به " . ($newStatus ? 'فعال' : 'غیرفعال') . " تغییر کرد.";
         // فرض می‌کنیم سرویس پیامک مشابه قبلی دارید
         // $smsService = new MessageService(SmsService::create(100258, $doctor->mobile, [$hospital->name, $newStatus ? 'فعال' : 'غیرفعال']));
         // $smsService->send();
@@ -76,9 +75,9 @@ class HospitalList extends Component
     {
         return Clinic::with('doctor')
             ->when($this->search, fn($q) => $q->where('name', 'like', '%' . $this->search . '%')
-                ->orWhereHas('doctor', fn($q2) => $q2->where('first_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])));
+                    ->orWhereHas('doctor', fn($q2) => $q2->where('first_name', 'like', '%' . $this->search . '%')
+                            ->orWhere('last_name', 'like', '%' . $this->search . '%')
+                            ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])));
     }
 
     public function render()

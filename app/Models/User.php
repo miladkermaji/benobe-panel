@@ -1,16 +1,17 @@
 <?php
 namespace App\Models;
 
-use App\Models\Appointment;
-use Laravel\Sanctum\HasApiTokens;
-use Laravel\Jetstream\HasProfilePhoto;
-use Illuminate\Support\Facades\Storage;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Notifications\Notifiable;
 use App\Models\Admin\Dashboard\Cities\Zone;
-use Laravel\Fortify\TwoFactorAuthenticatable;
+use App\Models\Appointment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Sanctum\HasApiTokens;
+use Morilog\Jalali\Jalalian;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -55,7 +56,15 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Zone::class, 'zone_city_id');
     }
+    public function getJalaliCreatedAtAttribute()
+    {
+        // چک کردن اینکه created_at مقدار داره یا نه
+        if (! $this->created_at) {
+            return '---'; // یا یه مقدار پیش‌فرض مثل '----/--/--'
+        }
 
+        return Jalalian::fromCarbon($this->created_at)->format('Y/m/d');
+    }
     protected static function boot()
     {
         parent::boot();

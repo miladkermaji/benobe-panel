@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Admin\Doctors\DoctorManagements;
+namespace App\Models\Doctors\DoctorManagements;
 
 use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

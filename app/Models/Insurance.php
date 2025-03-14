@@ -1,9 +1,9 @@
 <?php
 namespace App\Models;
 
+use App\Models\Appointment;
+use App\Models\Clinic;
 use App\Models\Doctor;
-use App\Models\Dr\Appointment;
-use App\Models\Dr\Clinic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

@@ -1,9 +1,8 @@
 <?php
-
 namespace App\Http\Controllers\Dr\Panel\Secretary;
 
 use App\Http\Controllers\Dr\Controller;
-use App\Models\Dr\Secretary;
+use App\Models\Secretary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -12,7 +11,7 @@ class SecretaryManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $doctorId         = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
 
         $secretaries = Secretary::where('doctor_id', $doctorId)
@@ -32,8 +31,6 @@ class SecretaryManagementController extends Controller
         return view('dr.panel.secretary.index', compact('secretaries'));
     }
 
-
-
     public function store(Request $request)
     {
         // دریافت شناسه دکتر و کلینیک
@@ -42,21 +39,21 @@ class SecretaryManagementController extends Controller
 
         // اعتبارسنجی داده‌های ورودی
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'mobile' => [
+            'first_name'    => 'required|string|max:255',
+            'last_name'     => 'required|string|max:255',
+            'mobile'        => [
                 'required',
                 function ($attribute, $value, $fail) use ($doctorId, $clinicId) {
                     // بررسی شرط شماره موبایل
                     $exists = Secretary::where('mobile', $value)
                         ->where('doctor_id', $doctorId)
                         ->where(function ($query) use ($clinicId) {
-                        if ($clinicId) {
-                            $query->where('clinic_id', $clinicId);
-                        } else {
-                            $query->whereNull('clinic_id');
-                        }
-                    })->exists();
+                            if ($clinicId) {
+                                $query->where('clinic_id', $clinicId);
+                            } else {
+                                $query->whereNull('clinic_id');
+                            }
+                        })->exists();
                     if ($exists) {
                         $fail('این شماره موبایل قبلاً برای این دکتر یا کلینیک ثبت شده است.');
                     }
@@ -69,40 +66,40 @@ class SecretaryManagementController extends Controller
                     $exists = Secretary::where('national_code', $value)
                         ->where('doctor_id', $doctorId)
                         ->where(function ($query) use ($clinicId) {
-                        if ($clinicId) {
-                            $query->where('clinic_id', $clinicId);
-                        } else {
-                            $query->whereNull('clinic_id');
-                        }
-                    })->exists();
+                            if ($clinicId) {
+                                $query->where('clinic_id', $clinicId);
+                            } else {
+                                $query->whereNull('clinic_id');
+                            }
+                        })->exists();
                     if ($exists) {
                         $fail('این کد ملی قبلاً برای این دکتر یا کلینیک ثبت شده است.');
                     }
                 },
             ],
-            'gender' => 'required|string',
-            'password' => 'required|min:6',
+            'gender'        => 'required|string',
+            'password'      => 'required|min:6',
         ]);
 
         try {
             // 👇 ذخیره اطلاعات منشی در جدول `secretaries`
             $secretary = Secretary::create([
-                'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'mobile' => $request->mobile,
+                'doctor_id'     => $doctorId,
+                'clinic_id'     => $clinicId,
+                'first_name'    => $request->first_name,
+                'last_name'     => $request->last_name,
+                'mobile'        => $request->mobile,
                 'national_code' => $request->national_code,
-                'gender' => $request->gender,
-                'password' => Hash::make($request->password),
+                'gender'        => $request->gender,
+                'password'      => Hash::make($request->password),
             ]);
 
             // 👇 ذخیره دسترسی‌های پیش‌فرض برای منشی جدید در جدول `secretary_permissions`
-            \App\Models\Dr\SecretaryPermission::create([
-                'doctor_id' => $doctorId,
+            \App\Models\SecretaryPermission::create([
+                'doctor_id'    => $doctorId,
                 'secretary_id' => $secretary->id,
-                'clinic_id' => $clinicId,
-                'permissions' => json_encode([
+                'clinic_id'    => $clinicId,
+                'permissions'  => json_encode([
                     "dashboard",
                     "0",
                     "appointments",
@@ -131,9 +128,9 @@ class SecretaryManagementController extends Controller
                     "insurance",
                     "0",
                     "messages",
-                    "dr-panel-tickets"
+                    "dr-panel-tickets",
                 ]),
-                'has_access' => true,
+                'has_access'   => true,
             ]);
 
             // برگرداندن منشی‌های فعلی
@@ -147,29 +144,17 @@ class SecretaryManagementController extends Controller
                 })->get();
 
             return response()->json([
-                'message' => 'منشی با موفقیت ثبت شد و دسترسی‌های پیش‌فرض اضافه شدند.',
-                'secretary' => $secretary,
+                'message'     => 'منشی با موفقیت ثبت شد و دسترسی‌های پیش‌فرض اضافه شدند.',
+                'secretary'   => $secretary,
                 'secretaries' => $secretaries,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'خطا در ثبت منشی یا دسترسی‌ها!',
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     public function edit(Request $request, $id)
     {
@@ -184,16 +169,15 @@ class SecretaryManagementController extends Controller
         return response()->json($secretary);
     }
 
-
     public function update(Request $request, $id)
     {
         $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
 
         // اعتبارسنجی با شرط صحیح
         $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'mobile' => [
+            'first_name'    => 'required',
+            'last_name'     => 'required',
+            'mobile'        => [
                 'required',
                 function ($attribute, $value, $fail) use ($id, $selectedClinicId) {
                     $exists = Secretary::where('mobile', $value)
@@ -227,7 +211,7 @@ class SecretaryManagementController extends Controller
                     }
                 },
             ],
-            'gender' => 'required',
+            'gender'        => 'required',
         ]);
 
         // پیدا کردن منشی برای ویرایش
@@ -235,12 +219,12 @@ class SecretaryManagementController extends Controller
 
         // به‌روزرسانی اطلاعات
         $secretary->update([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'mobile' => $request->mobile,
+            'first_name'    => $request->first_name,
+            'last_name'     => $request->last_name,
+            'mobile'        => $request->mobile,
             'national_code' => $request->national_code,
-            'gender' => $request->gender,
-            'password' => $request->password ? Hash::make($request->password) : $secretary->password,
+            'gender'        => $request->gender,
+            'password'      => $request->password ? Hash::make($request->password) : $secretary->password,
         ]);
 
         // بازگردانی لیست منشی‌های به‌روزرسانی‌شده با فیلتر صحیح
@@ -255,16 +239,10 @@ class SecretaryManagementController extends Controller
             ->get();
 
         return response()->json([
-            'message' => 'منشی با موفقیت ویرایش شد.',
+            'message'     => 'منشی با موفقیت ویرایش شد.',
             'secretaries' => $secretaries,
         ]);
     }
-
-
-
-
-
-
 
     public function destroy(Request $request, $id)
     {

@@ -1,17 +1,16 @@
 <?php
-
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Cost;
 
+use App\Http\Controllers\Dr\Controller;
+use App\Models\ClinicDepositSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Dr\Controller;
-use App\Models\Dr\ClinicDepositSetting;
 
 class CostController extends Controller
 {
     public function index($clinicId)
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId       = Auth::guard('doctor')->user()->id;
         $averageDeposit = ClinicDepositSetting::whereNotNull('deposit_amount')->avg('deposit_amount'); // میانگین بیعانه
 
         return view('dr.panel.doctors-clinic.activation.cost.index', compact('clinicId', 'doctorId', 'averageDeposit'));
@@ -39,9 +38,9 @@ class CostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'clinic_id' => 'required|exists:clinics,id',
-            'doctor_id' => 'required|exists:users,id',
-            'deposit_amount' => 'nullable|numeric',
+            'clinic_id'       => 'required|exists:clinics,id',
+            'doctor_id'       => 'required|exists:users,id',
+            'deposit_amount'  => 'nullable|numeric',
             'is_custom_price' => 'required|boolean',
         ]);
 
@@ -55,14 +54,13 @@ class CostController extends Controller
         }
 
         $setting = ClinicDepositSetting::create([
-            'clinic_id' => $request->clinic_id,
-            'doctor_id' => $request->doctor_id,
-            'deposit_amount' => $request->deposit_amount,
+            'clinic_id'       => $request->clinic_id,
+            'doctor_id'       => $request->doctor_id,
+            'deposit_amount'  => $request->deposit_amount,
             'is_custom_price' => $request->is_custom_price,
         ]);
 
         return response()->json(['success' => true, 'message' => 'تنظیمات بیعانه با موفقیت ذخیره شد.']);
     }
-
 
 }

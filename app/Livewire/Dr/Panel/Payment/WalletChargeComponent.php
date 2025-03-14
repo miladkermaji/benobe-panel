@@ -1,21 +1,19 @@
 <?php
-
 namespace App\Livewire\Dr\Panel\Payment;
 
-use Livewire\Component;
 use App\Models\DoctorWallet;
-use App\Models\Dr\SystemSetting;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 use App\Models\DoctorWalletTransaction;
-use Modules\Payment\Services\PaymentService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Livewire\Component;
 use Livewire\Features\SupportRedirects\Redirector;
+use Modules\Payment\Services\PaymentService;
 
 class WalletChargeComponent extends Component
 {
-    public $amount = 0;
+    public $amount        = 0;
     public $displayAmount = '';
-    public $isLoading = false;
+    public $isLoading     = false;
     public $transactionId;
 
     protected $paymentService;
@@ -31,19 +29,19 @@ class WalletChargeComponent extends Component
 
     public function mount()
     {
-        $this->amount = 0;
+        $this->amount        = 0;
         $this->displayAmount = '';
         $this->transactionId = null;
     }
 
     public function render()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId     = Auth::guard('doctor')->user()->id;
         $transactions = DoctorWalletTransaction::where('doctor_id', $doctorId)
             ->latest()
             ->take(10)
             ->get();
-        $wallet = DoctorWallet::firstOrCreate(['doctor_id' => $doctorId], ['balance' => 0]);
+        $wallet          = DoctorWallet::firstOrCreate(['doctor_id' => $doctorId], ['balance' => 0]);
         $availableAmount = $wallet->balance;
 
         if (session('success')) {
@@ -53,7 +51,7 @@ class WalletChargeComponent extends Component
         }
 
         return view('livewire.dr.panel.payment.wallet-charge-component', [
-            'transactions' => $transactions,
+            'transactions'    => $transactions,
             'availableAmount' => $availableAmount,
         ]);
     }
@@ -64,26 +62,26 @@ class WalletChargeComponent extends Component
 
         $this->isLoading = true;
 
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId    = Auth::guard('doctor')->user()->id;
         $callbackUrl = route('payment.callback');
 
         $transaction = DoctorWalletTransaction::create([
-            'doctor_id' => $doctorId,
-            'amount' => $this->amount,
-            'status' => 'pending',
-            'type' => 'charge',
-            'description' => "شارژ کیف پول",
+            'doctor_id'     => $doctorId,
+            'amount'        => $this->amount,
+            'status'        => 'pending',
+            'type'          => 'charge',
+            'description'   => "شارژ کیف پول",
             'registered_at' => now(),
         ]);
 
         $this->transactionId = $transaction->id;
 
         try {
-            $activeGateway = \App\Models\Dr\PaymentGateway::active()->first();
+            $activeGateway = \App\Models\PaymentGateway::active()->first();
             Log::info('Attempting payment with gateway:', [
-                'gateway' => $activeGateway->name,
+                'gateway'  => $activeGateway->name,
                 'settings' => $activeGateway->settings,
-                'amount' => $this->amount,
+                'amount'   => $this->amount,
                 'callback' => $callbackUrl,
             ]);
 
@@ -91,16 +89,16 @@ class WalletChargeComponent extends Component
                 $this->amount,
                 $callbackUrl,
                 [
-                    'doctor_id' => $doctorId,
+                    'doctor_id'      => $doctorId,
                     'transaction_id' => $transaction->id,
-                    'type' => 'wallet_charge',
+                    'type'           => 'wallet_charge',
                 ]
             );
 
             Log::info('Payment Response:', [
                 'response' => $paymentResponse,
-                'type' => gettype($paymentResponse),
-                'class' => is_object($paymentResponse) ? get_class($paymentResponse) : null,
+                'type'     => gettype($paymentResponse),
+                'class'    => is_object($paymentResponse) ? get_class($paymentResponse) : null,
             ]);
 
             if ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
@@ -117,9 +115,9 @@ class WalletChargeComponent extends Component
         } catch (\Exception $e) {
             Log::error('Payment Error Details:', [
                 'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'trace'   => $e->getTraceAsString(),
             ]);
             $this->isLoading = false;
             $this->dispatch('toast', message: 'خطایی در فرآیند پرداخت رخ داد: ' . $e->getMessage());
@@ -135,7 +133,7 @@ class WalletChargeComponent extends Component
         $this->isLoading = false;
 
         if ($transaction) {
-            $doctorId = Auth::guard('doctor')->user()->id;
+            $doctorId          = Auth::guard('doctor')->user()->id;
             $walletTransaction = DoctorWalletTransaction::where('id', $transaction->meta['transaction_id'])
                 ->where('doctor_id', $doctorId)
                 ->first();
@@ -157,7 +155,7 @@ class WalletChargeComponent extends Component
 
     public function deleteTransaction($transactionId)
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId    = Auth::guard('doctor')->user()->id;
         $transaction = DoctorWalletTransaction::where('doctor_id', $doctorId)
             ->where('id', $transactionId)
             ->first();

@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-use App\Models\Dr\SecretaryPermission;
+use App\Models\SecretaryPermission;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 

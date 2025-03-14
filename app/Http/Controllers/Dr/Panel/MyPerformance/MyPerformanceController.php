@@ -1,13 +1,12 @@
 <?php
-
 namespace App\Http\Controllers\Dr\Panel\MyPerformance;
 
-use App\Models\User;
-use App\Models\Dr\Clinic;
-use Illuminate\Http\Request;
-use App\Models\Dr\Appointment;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Dr\Controller;
+use App\Models\Appointment;
+use App\Models\Clinic;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MyPerformanceController extends Controller
 {
@@ -63,7 +62,7 @@ class MyPerformanceController extends Controller
          */
         $monthlyIncome = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
-            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month, 
+            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
                      COALESCE(SUM(CASE WHEN payment_status = 'paid' THEN fee ELSE 0 END), 0) as total_paid_income,
                      COALESCE(SUM(CASE WHEN payment_status = 'unpaid' THEN fee ELSE 0 END), 0) as total_unpaid_income")
             ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
@@ -76,7 +75,7 @@ class MyPerformanceController extends Controller
         $newPatients = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->join('users', 'appointments.patient_id', '=', 'users.id')
-            ->selectRaw("DATE_FORMAT(appointments.appointment_date, '%m') as month, 
+            ->selectRaw("DATE_FORMAT(appointments.appointment_date, '%m') as month,
                      COUNT(DISTINCT appointments.patient_id) as total_patients")
             ->groupByRaw("DATE_FORMAT(appointments.appointment_date, '%m')")
             ->orderByRaw("DATE_FORMAT(appointments.appointment_date, '%m')")
@@ -102,7 +101,7 @@ class MyPerformanceController extends Controller
         $averageDurationByMonth = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->whereNotNull('duration')
-            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month, 
+            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
                      AVG(duration) as average_duration")
             ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
             ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
@@ -112,22 +111,22 @@ class MyPerformanceController extends Controller
          * 📝 لاگ اطلاعات نهایی برای اطمینان
          */
         \Log::info('نتایج داده‌های نمودار:', [
-            'appointments' => $appointments->toArray(),
-            'monthlyIncome' => $monthlyIncome->toArray(),
-            'newPatients' => $newPatients->toArray(),
+            'appointments'             => $appointments->toArray(),
+            'monthlyIncome'            => $monthlyIncome->toArray(),
+            'newPatients'              => $newPatients->toArray(),
             'appointmentStatusByMonth' => $appointmentStatusByMonth->toArray(),
-            'averageDurationByMonth' => $averageDurationByMonth->toArray(),
+            'averageDurationByMonth'   => $averageDurationByMonth->toArray(),
         ]);
 
         /**
          * ✅ ارسال داده‌ها به فرانت به‌صورت JSON
          */
         return response()->json([
-            'appointments' => $appointments->isEmpty() ? [] : $appointments,
-            'monthlyIncome' => $monthlyIncome->isEmpty() ? [] : $monthlyIncome,
-            'newPatients' => $newPatients->isEmpty() ? [] : $newPatients,
+            'appointments'             => $appointments->isEmpty() ? [] : $appointments,
+            'monthlyIncome'            => $monthlyIncome->isEmpty() ? [] : $monthlyIncome,
+            'newPatients'              => $newPatients->isEmpty() ? [] : $newPatients,
             'appointmentStatusByMonth' => $appointmentStatusByMonth->isEmpty() ? [] : $appointmentStatusByMonth,
-            'averageDurationByMonth' => $averageDurationByMonth->isEmpty() ? [] : $averageDurationByMonth,
+            'averageDurationByMonth'   => $averageDurationByMonth->isEmpty() ? [] : $averageDurationByMonth,
         ]);
     }
 

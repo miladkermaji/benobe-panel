@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation;
 
-use App\Models\Dr\Clinic;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Dr\Controller;
-
+use App\Models\Clinic;
+use Illuminate\Http\Request;
 
 class ActivationDoctorsClinicController extends Controller
 {
@@ -55,9 +53,9 @@ class ActivationDoctorsClinicController extends Controller
      */
     public function updateAddress(Request $request, $id)
     {
-        $clinic = Clinic::findOrFail($id);
-        $clinic->address = $request->input('address');
-        $clinic->latitude = $request->input('latitude');
+        $clinic            = Clinic::findOrFail($id);
+        $clinic->address   = $request->input('address');
+        $clinic->latitude  = $request->input('latitude');
         $clinic->longitude = $request->input('longitude');
         $clinic->save();
 
@@ -66,8 +64,8 @@ class ActivationDoctorsClinicController extends Controller
 
     public function getPhones($id)
     {
-        $clinic = Clinic::findOrFail($id);
-        $phones = $clinic->phone_numbers ? json_decode($clinic->phone_numbers, true) : [];
+        $clinic         = Clinic::findOrFail($id);
+        $phones         = $clinic->phone_numbers ? json_decode($clinic->phone_numbers, true) : [];
         $secretaryPhone = $clinic->secretary_phone;
 
         return response()->json(['phones' => $phones, 'secretary_phone' => $secretaryPhone]);
@@ -75,11 +73,11 @@ class ActivationDoctorsClinicController extends Controller
 
     public function updatePhones(Request $request, $id)
     {
-        
+
         $clinic = Clinic::findOrFail($id);
 
         // ذخیره شماره‌های موبایل
-        $clinic->phone_numbers = json_encode($request->input('phones', []));
+        $clinic->phone_numbers   = json_encode($request->input('phones', []));
         $clinic->secretary_phone = $request->secretary_phone;
         $clinic->save();
 
@@ -90,7 +88,7 @@ class ActivationDoctorsClinicController extends Controller
         // پیدا کردن کلینیک بر اساس ID
         $clinic = Clinic::find($id);
 
-        if (!$clinic) {
+        if (! $clinic) {
             return response()->json(['error' => 'کلینیک پیدا نشد.'], 404);
         }
 
@@ -102,13 +100,13 @@ class ActivationDoctorsClinicController extends Controller
 
     public function deletePhone(Request $request, $id)
     {
-        $clinic = Clinic::findOrFail($id);
+        $clinic     = Clinic::findOrFail($id);
         $phoneIndex = $request->input('phone_index');
 
         if ($clinic->phone_numbers) {
             $phones = json_decode($clinic->phone_numbers, true);
             if (isset($phones[$phoneIndex])) {
-                unset($phones[$phoneIndex]); // حذف شماره تماس از آرایه
+                unset($phones[$phoneIndex]);                                 // حذف شماره تماس از آرایه
                 $clinic->phone_numbers = json_encode(array_values($phones)); // مرتب‌سازی مجدد آرایه
                 $clinic->save();
             }

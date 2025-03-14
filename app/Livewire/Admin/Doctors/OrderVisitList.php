@@ -1,17 +1,15 @@
 <?php
-
 namespace App\Livewire\Admin\Doctors;
 
+use App\Models\Doctors\OrderVisit;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Log;
-use App\Models\Admin\Doctors\OrderVisit;
 
 class OrderVisitList extends Component
 {
     use WithPagination;
 
-    public $search = '';
+    public $search  = '';
     public $perPage = 10; // صفحه‌بندی 10 تایی
 
     protected $paginationTheme = 'bootstrap'; // استفاده از تم بوت‌استرپ برای صفحه‌بندی

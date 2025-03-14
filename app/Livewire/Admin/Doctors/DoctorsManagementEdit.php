@@ -2,9 +2,9 @@
 namespace App\Livewire\Admin\Doctors;
 
 use App\Models\Admin\Dashboard\Cities\Zone;
-use App\Models\Admin\Doctors\DoctorManagement\DoctorTariff;
+use App\Models\Clinic;
 use App\Models\Doctor;
-use App\Models\Dr\Clinic;
+use App\Models\Doctors\DoctorManagement\DoctorTariff;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -70,7 +70,7 @@ class DoctorsManagementEdit extends Component
 
         $this->provinces       = Zone::where('level', 1)->get();
         $this->cities          = $this->province_id ? Zone::where('level', 2)->where('parent_id', $this->province_id)->get() : collect();
-        $this->specialtiesList = \App\Models\Dr\SubSpecialty::all();
+        $this->specialtiesList = \App\Models\SubSpecialty::all();
     }
 
     public function updatedProvinceId($value)

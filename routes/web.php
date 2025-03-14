@@ -1,63 +1,64 @@
 <?php
-use App\Livewire\Admin\Auth\Logout;
-use Illuminate\Support\Facades\Route;
-use App\Livewire\Admin\Auth\TwoFactor;
-use App\Livewire\Dr\Auth\DoctorLogout;
+use App\Http\Controllers\Admin\Panel\Dashboard\AdminDashboardController;
+use App\Http\Controllers\Admin\Panel\Profile\AdminProfileController;
+use App\Http\Controllers\Admin\Panel\Tools\DataMigrationTool\DataMigrationToolController;
+use App\Http\Controllers\Admin\Panel\Tools\FileManager\FileManagerController;
+use App\Http\Controllers\Admin\Panel\Tools\MailTemplate\MailTemplateController;
+use App\Http\Controllers\Admin\Panel\Tools\NewsLatter\NewsLatterController;
+use App\Http\Controllers\Admin\Panel\Tools\PageBuilder\PageBuilderController;
+use App\Http\Controllers\Admin\Panel\Tools\PaymentGateways\PaymentGatewaysController;
+use App\Http\Controllers\Admin\Panel\Tools\Redirect\RedirectController;
+use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapController;
+use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapSettingsController;
+use App\Http\Controllers\Admin\Panel\Tools\SmsGateway\SmsGatewayController;
+use App\Http\Controllers\Admin\Panel\Users\UserController;
+use App\Http\Controllers\Dr\Panel\Activation\Consult\Rules\ConsultRulesController;
+use App\Http\Controllers\Dr\Panel\Bime\DRBimeController;
+use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\ActivationDoctorsClinicController;
+use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Cost\CostController;
+use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration\DurationController;
+use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationWorkhoursController;
+use App\Http\Controllers\Dr\Panel\DoctorsClinic\DoctorsClinicManagementController;
+use App\Http\Controllers\Dr\Panel\DoctorServices\DoctorServicesController;
+use App\Http\Controllers\Dr\Panel\DrPanelController;
+use App\Http\Controllers\Dr\Panel\MyPerformance\MyPerformanceController;
+use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Service\ServiceController;
+use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Templates\FavoriteTemplatesController;
+use App\Http\Controllers\Dr\Panel\NoskheElectronic\Prescription\PrescriptionController;
+use App\Http\Controllers\Dr\Panel\NoskheElectronic\Providers\ProvidersController;
+use App\Http\Controllers\Dr\Panel\PatientRecords\PatientRecordsController;
+use App\Http\Controllers\Dr\Panel\Payment\Setting\DrPaymentSettingController;
+use App\Http\Controllers\Dr\Panel\Profile\DrProfileController;
+use App\Http\Controllers\Dr\Panel\Profile\DrUpgradeProfileController;
+use App\Http\Controllers\Dr\Panel\Profile\LoginLogsController;
+use App\Http\Controllers\Dr\Panel\Profile\SubUserController;
+use App\Http\Controllers\Dr\Panel\SecretaryPermission\SecretaryPermissionController;
+use App\Http\Controllers\Dr\Panel\Secretary\SecretaryManagementController;
+use App\Http\Controllers\Dr\Panel\Tickets\TicketResponseController;
+use App\Http\Controllers\Dr\Panel\Tickets\TicketsController;
+use App\Http\Controllers\Dr\Panel\Turn\DrScheduleController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\AppointmentController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\Counseling\ConsultTerm\ConsultTermController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\ManualNobat\ManualNobatController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereWaiting\MoshavereWaitingController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\VacationController;
+use App\Http\Controllers\Dr\Panel\Turn\TurnsCatByDays\TurnsCatByDaysController;
 use App\Livewire\Admin\Auth\LoginConfirm;
-use App\Livewire\Dr\Auth\DoctorTwoFactor;
 use App\Livewire\Admin\Auth\LoginRegister;
 use App\Livewire\Admin\Auth\LoginUserPass;
+use App\Livewire\Admin\Auth\Logout;
+use App\Livewire\Admin\Auth\TwoFactor;
 use App\Livewire\Dr\Auth\DoctorLoginConfirm;
 use App\Livewire\Dr\Auth\DoctorLoginRegister;
 use App\Livewire\Dr\Auth\DoctorLoginUserPass;
-use App\Http\Controllers\Dr\Panel\DrPanelController;
-use App\Http\Controllers\Dr\Panel\Bime\DRBimeController;
-use App\Http\Controllers\Admin\Panel\Users\UserController;
-use App\Http\Controllers\Dr\Panel\Profile\SubUserController;
-use App\Http\Controllers\Dr\Panel\Tickets\TicketsController;
-use App\Http\Controllers\Dr\Panel\Turn\DrScheduleController;
-use App\Http\Controllers\Dr\Panel\Profile\DrProfileController;
-use App\Http\Controllers\Dr\Panel\Profile\LoginLogsController;
-use App\Http\Controllers\Dr\Panel\Tickets\TicketResponseController;
-use App\Http\Controllers\Admin\Panel\Profile\AdminProfileController;
-use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapController;
-use App\Http\Controllers\Dr\Panel\Profile\DrUpgradeProfileController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\AppointmentController;
-use App\Http\Controllers\Admin\Panel\Tools\Redirect\RedirectController;
-use App\Http\Controllers\Admin\Panel\Dashboard\AdminDashboardController;
-use App\Http\Controllers\Dr\Panel\MyPerformance\MyPerformanceController;
-use App\Http\Controllers\Dr\Panel\DoctorServices\DoctorServicesController;
-use App\Http\Controllers\Dr\Panel\PatientRecords\PatientRecordsController;
-use App\Http\Controllers\Dr\Panel\Secretary\SecretaryManagementController;
-use App\Http\Controllers\Admin\Panel\Tools\NewsLatter\NewsLatterController;
-use App\Http\Controllers\Admin\Panel\Tools\SmsGateway\SmsGatewayController;
-use App\Http\Controllers\Admin\Panel\Tools\FileManager\FileManagerController;
-use App\Http\Controllers\Admin\Panel\Tools\PageBuilder\PageBuilderController;
-use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapSettingsController;
-use App\Http\Controllers\Dr\Panel\Payment\Setting\DrPaymentSettingController;
-use App\Http\Controllers\Admin\Panel\Tools\MailTemplate\MailTemplateController;
-use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Cost\CostController;
-use App\Http\Controllers\Dr\Panel\Turn\TurnsCatByDays\TurnsCatByDaysController;
-use App\Http\Controllers\Dr\Panel\NoskheElectronic\Providers\ProvidersController;
-use App\Http\Controllers\Dr\Panel\Activation\Consult\Rules\ConsultRulesController;
-use App\Http\Controllers\Dr\Panel\DoctorsClinic\DoctorsClinicManagementController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\ManualNobat\ManualNobatController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\VacationController;
-use App\Http\Controllers\Dr\Panel\SecretaryPermission\SecretaryPermissionController;
-use App\Http\Controllers\Admin\Panel\Tools\PaymentGateways\PaymentGatewaysController;
-use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Service\ServiceController;
-use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration\DurationController;
-use App\Http\Controllers\Dr\Panel\NoskheElectronic\Prescription\PrescriptionController;
-use App\Http\Controllers\Admin\Panel\Tools\DataMigrationTool\DataMigrationToolController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereWaiting\MoshavereWaitingController;
-use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\ActivationDoctorsClinicController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\Counseling\ConsultTerm\ConsultTermController;
-use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Templates\FavoriteTemplatesController;
-use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationWorkhoursController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
+use App\Livewire\Dr\Auth\DoctorLogout;
+use App\Livewire\Dr\Auth\DoctorTwoFactor;
+use Illuminate\Support\Facades\Route;
+
 //manager login routes
 /* login manager routes */
 Route::prefix('admin-panel/')->group(function () {
@@ -82,13 +83,20 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
-    Route::prefix('doctors')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'index'])->name('admin.panel.doctors.index');
-        Route::get('/create', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'create'])->name('admin.panel.doctors.create');
-        Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'edit'])->name('admin.panel.doctors.edit');
-    });
+        Route::prefix('doctors')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'index'])->name('admin.panel.doctors.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'create'])->name('admin.panel.doctors.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'edit'])->name('admin.panel.doctors.edit');
+        });
+        Route::get('/doctor-login/{doctor}', function (\App\Models\Doctor $doctor) {
+            // لاگین کردن دکتر با گارد doctor
+            Auth::guard('doctor')->login($doctor);
 
-Route::get('dashboard/', [AdminDashboardController::class, 'index'])->name('admin-panel');
+            // ریدایرکت به پنل دکتر
+            return redirect()->route('dr-panel');
+        })->name('doctor.login');
+
+        Route::get('dashboard/', [AdminDashboardController::class, 'index'])->name('admin-panel');
         Route::post('/upload-profile-photo', [AdminProfileController::class, 'uploadPhoto'])->name('admin.upload-photo')->middleware('auth:manager');
         Route::prefix('tools/')->group(function () {
             Route::get('/file-manager', [FileManagerController::class, 'index'])->name('admin.panel.tools.file-manager')->middleware('auth:manager');
@@ -98,7 +106,7 @@ Route::get('dashboard/', [AdminDashboardController::class, 'index'])->name('admi
                 Route::put('/payment-gateways/{name}', [PaymentGatewaysController::class, 'update'])->name('admin.payment_gateways.update');
                 Route::post('/payment-gateways/toggle', [PaymentGatewaysController::class, 'toggle'])->name('admin.payment_gateways.toggle');
                 Route::delete('/payment-gateways/{name}', [PaymentGatewaysController::class, 'destroy'])->name('admin.panel.tools.payment_gateways.destroy');
-});
+            });
             Route::prefix('sms_gateway')->group(function () {
                 Route::get('/', [SmsGatewayController::class, 'index'])->name('admin.panel.tools.sms-gateways.index');
                 Route::get('/edit/{name}', [SmsGatewayController::class, 'edit'])->name('admin.panel.tools.sms-gateways.edit');
@@ -108,7 +116,7 @@ Route::get('dashboard/', [AdminDashboardController::class, 'index'])->name('admi
             Route::prefix('redirects/')->group(function () {
                 Route::get('/', [RedirectController::class, 'index'])->name('admin.panel.tools.redirects.index');
                 Route::get('/create', [RedirectController::class, 'create'])->name('admin.panel.tools.redirects.create'); // روت جدید
-                Route::post('/store', [RedirectController::class, 'store'])->name('admin.panel.tools.redirects.store'); // روت جدید
+                Route::post('/store', [RedirectController::class, 'store'])->name('admin.panel.tools.redirects.store');   // روت جدید
                 Route::get('/edit/{id}', [RedirectController::class, 'edit'])->name('admin.panel.tools.redirects.edit');
                 Route::put('/update/{id}', [RedirectController::class, 'update'])->name('admin.panel.tools.redirects.update');
                 Route::post('/toggle', [RedirectController::class, 'toggle'])->name('admin.panel.tools.redirects.toggle');
@@ -230,7 +238,6 @@ Route::prefix('dr')->namespace('Dr')->group(function () {
                         ->middleware('secretary.permission:appointments')
                         ->name('doctor-blocking-users.delete-message');
                 });
-
 
                 Route::get('/scheduleSetting/workhours', [ScheduleSettingController::class, 'workhours'])->middleware('secretary.permission:appointments')->name('dr-workhours');
                 Route::post('/save-appointment-settings', [ScheduleSettingController::class, 'saveAppointmentSettings'])->middleware('secretary.permission:appointments')->name('save-appointment-settings');
@@ -369,8 +376,6 @@ Route::prefix('dr')->namespace('Dr')->group(function () {
 
         Route::get('bime', [DRBimeController::class, 'index'])->middleware('secretary.permission:insurance')->name('dr-bime');
 
-
-
         Route::prefix('payment')->group(function () {
             Route::get('/wallet', [DrPaymentSettingController::class, 'wallet'])->middleware('secretary.permission:financial_reports')->name('dr-wallet');
             Route::get('/setting', [DrPaymentSettingController::class, 'index'])->middleware('secretary.permission:financial_reports')->name('dr-payment-setting');
@@ -378,7 +383,6 @@ Route::prefix('dr')->namespace('Dr')->group(function () {
                 return view('dr.panel.payment.charge');
             })->middleware('secretary.permission:financial_reports')->name('dr-wallet-charge');
         });
-
 
         Route::prefix('profile')->group(function () {
             Route::get('edit-profile', [DrProfileController::class, 'edit'])->middleware('secretary.permission:profile')->name('dr-edit-profile');
@@ -423,8 +427,5 @@ Route::prefix('dr')->namespace('Dr')->group(function () {
             Route::delete('/{service}', [DoctorServicesController::class, 'destroy'])->name('dr-services.destroy');
         });
 
-
-
     });
 });
-

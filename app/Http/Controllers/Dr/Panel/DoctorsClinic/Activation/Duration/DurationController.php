@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration;
 
 use App\Http\Controllers\Dr\Controller;
+use App\Models\DoctorAppointmentConfig;
 use Auth;
 use Illuminate\Http\Request;
-use App\Models\Dr\DoctorAppointmentConfig;
 
 class DurationController extends Controller
 {
@@ -18,10 +17,10 @@ class DurationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'clinic_id' => 'required|exists:clinics,id',
-            'doctor_id' => 'required|exists:doctors,id',
+            'clinic_id'            => 'required|exists:clinics,id',
+            'doctor_id'            => 'required|exists:doctors,id',
             'appointment_duration' => 'required|integer|min:5|max:120',
-            'collaboration' => 'required|boolean',
+            'collaboration'        => 'required|boolean',
         ]);
 
         // بررسی وجود رکورد
@@ -30,7 +29,7 @@ class DurationController extends Controller
             'doctor_id' => $request->doctor_id,
         ]);
 
-        $config->appointment_duration = $request->appointment_duration;
+        $config->appointment_duration           = $request->appointment_duration;
         $config->collaboration_with_other_sites = $request->collaboration;
         $config->save();
 

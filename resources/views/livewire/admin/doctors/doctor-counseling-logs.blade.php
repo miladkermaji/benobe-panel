@@ -92,129 +92,130 @@
       </thead>
       <tbody>
        @forelse ($appointments as $index => $appointment)
-            <tr>
-             <td><input type="checkbox" wire:model.live="selectedAppointments" value="{{ $appointment->id }}"
-               class="form-check-input"></td>
-             <td>{{ $appointment->doctor->full_name }}</td>
-             <td>{{ $appointment->doctor->mobile }}</td>
+        <tr>
+         <td><input type="checkbox" wire:model.live="selectedAppointments" value="{{ $appointment->id }}"
+           class="form-check-input"></td>
+         <td>{{ $appointment->doctor->full_name }}</td>
+         <td>{{ $appointment->doctor->mobile }}</td>
 
-             <td>{{ \App\Helpers\JalaliHelper::toJalaliDate($appointment->appointment_date) }}</td>
-             <td>{{ $appointment->start_time }}</td>
-             <td>{{ $appointment->patient->first_name ?? '' }} {{ $appointment->patient->last_name ?? '' }}
-              ({{ $appointment->patient->mobile ?? '' }})
-             </td>
-             <td>{{ \App\Helpers\JalaliHelper::toJalaliDateTime($appointment->reserved_at) }}</td>
-             <td>{{ $appointment->tracking_code }}</td>
-            <td>
-                <span class="badge 
+         <td>{{ \App\Helpers\JalaliHelper::toJalaliDate($appointment->appointment_date) }}</td>
+         <td>{{ $appointment->start_time }}</td>
+         <td>{{ $appointment->patient->first_name ?? '' }} {{ $appointment->patient->last_name ?? '' }}
+          ({{ $appointment->patient->mobile ?? '' }})
+         </td>
+         <td>{{ \App\Helpers\JalaliHelper::toJalaliDateTime($appointment->reserved_at) }}</td>
+         <td>{{ $appointment->tracking_code }}</td>
+         <td>
+          <span
+           class="badge 
                 {{ $appointment->status === 'scheduled'
-            ? 'bg-label-info'
-            : ($appointment->status === 'cancelled'
-                ? 'bg-label-danger'
-                : ($appointment->status === 'attended'
-                    ? 'bg-label-success'
-                    : ($appointment->status === 'missed'
-                        ? 'bg-label-warning'
-                        : ($appointment->status === 'pending_review'
-                            ? 'bg-label-info'
-                            : ($appointment->status === 'call_answered'
-                                ? 'bg-label-success'
-                                : ($appointment->status === 'call_completed'
-                                    ? 'bg-label-success'
-                                    : ($appointment->status === 'refunded'
+                    ? 'bg-label-info'
+                    : ($appointment->status === 'cancelled'
+                        ? 'bg-label-danger'
+                        : ($appointment->status === 'attended'
+                            ? 'bg-label-success'
+                            : ($appointment->status === 'missed'
+                                ? 'bg-label-warning'
+                                : ($appointment->status === 'pending_review'
+                                    ? 'bg-label-info'
+                                    : ($appointment->status === 'call_answered'
                                         ? 'bg-label-success'
-                                        : ''))))))) }}">
-                    {{ $appointment->status === 'scheduled'
-            ? 'در انتظار خدمت'
-            : ($appointment->status === 'cancelled'
-                ? 'لغو شده'
-                : ($appointment->status === 'attended'
-                    ? 'حضور یافته'
-                    : ($appointment->status === 'missed'
-                        ? 'غایب'
-                        : ($appointment->status === 'pending_review'
-                            ? 'در انتظار بررسی و تماس'
-                            : ($appointment->status === 'call_answered'
-                                ? 'تماس و پاسخ داده شده'
-                                : ($appointment->status === 'call_completed'
-                                    ? 'مکالمه انجام و پایان یافته است'
-                                    : ($appointment->status === 'refunded'
-                                        ? 'بازگشت به کیف پول'
-                                        : ''))))))) }}
-                </span>
-            </td>
-             <!-- فیلدهای جدید -->
-             <td>{{ $appointment->fee ? number_format($appointment->fee) : '0' }}</td>
-             <td>{{ $appointment->duration ?? '0' }}</td>
-             <td>
-              {{ $appointment->confirmed_at ? \App\Helpers\JalaliHelper::toJalaliDateTime($appointment->confirmed_at) : '---' }}
-             </td>
-             <td>
-              <span
-               class="badge 
+                                        : ($appointment->status === 'call_completed'
+                                            ? 'bg-label-success'
+                                            : ($appointment->status === 'refunded'
+                                                ? 'bg-label-success'
+                                                : ''))))))) }}">
+           {{ $appointment->status === 'scheduled'
+               ? 'در انتظار خدمت'
+               : ($appointment->status === 'cancelled'
+                   ? 'لغو شده'
+                   : ($appointment->status === 'attended'
+                       ? 'حضور یافته'
+                       : ($appointment->status === 'missed'
+                           ? 'غایب'
+                           : ($appointment->status === 'pending_review'
+                               ? 'در انتظار بررسی و تماس'
+                               : ($appointment->status === 'call_answered'
+                                   ? 'تماس و پاسخ داده شده'
+                                   : ($appointment->status === 'call_completed'
+                                       ? 'مکالمه انجام و پایان یافته است'
+                                       : ($appointment->status === 'refunded'
+                                           ? 'بازگشت به کیف پول'
+                                           : ''))))))) }}
+          </span>
+         </td>
+         <!-- فیلدهای جدید -->
+         <td>{{ $appointment->fee ? number_format($appointment->fee) : '0' }}</td>
+         <td>{{ $appointment->duration ?? '0' }}</td>
+         <td>
+          {{ $appointment->confirmed_at ? \App\Helpers\JalaliHelper::toJalaliDateTime($appointment->confirmed_at) : '---' }}
+         </td>
+         <td>
+          <span
+           class="badge 
                         {{ $appointment->payment_status === 'paid'
-            ? 'bg-label-success'
-            : ($appointment->payment_status === 'unpaid'
-                ? 'bg-label-danger'
-                : 'bg-label-warning') }}">
-               {{ $appointment->payment_status === 'paid'
-            ? 'پرداخت شده'
-            : ($appointment->payment_status === 'unpaid'
-                ? 'پرداخت نشده'
-                : 'در انتظار پرداخت') }}
-              </span>
-             </td>
-             <td class="text-center">
-              <div class="dropdown">
-               <button class="btn btn-gradient-secondary btn-sm" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-ellipsis-v"></i>
-               </button>
-               <ul class="dropdown-menu dropdown-menu-end">
-                @php
-        $userName = trim(
-            ($appointment->patient->first_name ?? '') . ' ' . ($appointment->patient->last_name ?? ''),
-        );
-        $userName = $userName !== '' ? $userName : 'کاربر بدون نام';
-        $isBlocked = \App\Models\Dr\UserBlocking::where('user_id', $appointment->patient_id)
-            ->where('doctor_id', $appointment->doctor_id)
-            ->where('status', 1)
-            ->exists();
-                @endphp
-                <li>
-                 <a class="dropdown-item" href="#"
-                  wire:click.prevent="toggleBlockUser({{ $appointment->patient_id }}, {{ $appointment->doctor_id }}, '{{ addslashes($userName) }}', {{ $isBlocked ? 0 : 1 }})">
-                  {{ $isBlocked ? 'خروج از مسدودی' : 'مسدود کردن' }}
-                 </a>
-                </li>
-                <li><a class="dropdown-item" href="#"
-                  wire:click.prevent="cancelAppointment({{ $appointment->id }})">لغو
-                  نوبت</a></li>
-                <li><a class="dropdown-item text-danger" href="#"
-                  wire:click.prevent="deleteAppointment({{ $appointment->id }})">حذف</a></li>
-                <!-- اضافه کردن تغییر وضعیت -->
-                <li class="dropdown-submenu">
-                 <a class="dropdown-item dropdown-toggle d-flex align-items-center" href="#">تغییر وضعیت</a>
-                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#"
-                    wire:click.prevent="changeStatus({{ $appointment->id }}, 'pending_review')">در انتظار بررسی
-                    و تماس</a></li>
-                  <li><a class="dropdown-item" href="#"
-                    wire:click.prevent="changeStatus({{ $appointment->id }}, 'call_answered')">تماس پاسخ داده
-                    شده</a></li>
-                  <li><a class="dropdown-item" href="#"
-                    wire:click.prevent="changeStatus({{ $appointment->id }}, 'call_completed')">مکالمه انجام و
-                    پایان یافته است</a></li>
-                  <li><a class="dropdown-item" href="#"
-                    wire:click.prevent="changeStatus({{ $appointment->id }}, 'refunded')">بازگشت به کیف پول</a>
-                  </li>
-                  <li><a class="dropdown-item" href="#"
-                    wire:click.prevent="changeStatus({{ $appointment->id }}, 'missed')">عدم پاسخگویی</a></li>
-                 </ul>
-                </li>
-               </ul>
-              </div>
-             </td>
-            </tr>
+                            ? 'bg-label-success'
+                            : ($appointment->payment_status === 'unpaid'
+                                ? 'bg-label-danger'
+                                : 'bg-label-warning') }}">
+           {{ $appointment->payment_status === 'paid'
+               ? 'پرداخت شده'
+               : ($appointment->payment_status === 'unpaid'
+                   ? 'پرداخت نشده'
+                   : 'در انتظار پرداخت') }}
+          </span>
+         </td>
+         <td class="text-center">
+          <div class="dropdown">
+           <button class="btn btn-gradient-secondary btn-sm" type="button" data-bs-toggle="dropdown">
+            <i class="fas fa-ellipsis-v"></i>
+           </button>
+           <ul class="dropdown-menu dropdown-menu-end">
+            @php
+             $userName = trim(
+                 ($appointment->patient->first_name ?? '') . ' ' . ($appointment->patient->last_name ?? ''),
+             );
+             $userName = $userName !== '' ? $userName : 'کاربر بدون نام';
+             $isBlocked = \App\Models\UserBlocking::where('user_id', $appointment->patient_id)
+                 ->where('doctor_id', $appointment->doctor_id)
+                 ->where('status', 1)
+                 ->exists();
+            @endphp
+            <li>
+             <a class="dropdown-item" href="#"
+              wire:click.prevent="toggleBlockUser({{ $appointment->patient_id }}, {{ $appointment->doctor_id }}, '{{ addslashes($userName) }}', {{ $isBlocked ? 0 : 1 }})">
+              {{ $isBlocked ? 'خروج از مسدودی' : 'مسدود کردن' }}
+             </a>
+            </li>
+            <li><a class="dropdown-item" href="#"
+              wire:click.prevent="cancelAppointment({{ $appointment->id }})">لغو
+              نوبت</a></li>
+            <li><a class="dropdown-item text-danger" href="#"
+              wire:click.prevent="deleteAppointment({{ $appointment->id }})">حذف</a></li>
+            <!-- اضافه کردن تغییر وضعیت -->
+            <li class="dropdown-submenu">
+             <a class="dropdown-item dropdown-toggle d-flex align-items-center" href="#">تغییر وضعیت</a>
+             <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#"
+                wire:click.prevent="changeStatus({{ $appointment->id }}, 'pending_review')">در انتظار بررسی
+                و تماس</a></li>
+              <li><a class="dropdown-item" href="#"
+                wire:click.prevent="changeStatus({{ $appointment->id }}, 'call_answered')">تماس پاسخ داده
+                شده</a></li>
+              <li><a class="dropdown-item" href="#"
+                wire:click.prevent="changeStatus({{ $appointment->id }}, 'call_completed')">مکالمه انجام و
+                پایان یافته است</a></li>
+              <li><a class="dropdown-item" href="#"
+                wire:click.prevent="changeStatus({{ $appointment->id }}, 'refunded')">بازگشت به کیف پول</a>
+              </li>
+              <li><a class="dropdown-item" href="#"
+                wire:click.prevent="changeStatus({{ $appointment->id }}, 'missed')">عدم پاسخگویی</a></li>
+             </ul>
+            </li>
+           </ul>
+          </div>
+         </td>
+        </tr>
        @empty
         <tr>
          <td colspan="18" class="text-center py-5"> <!-- colspan به 18 تغییر کرد -->

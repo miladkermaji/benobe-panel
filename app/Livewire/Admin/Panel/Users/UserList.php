@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Users;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Cache;
-use App\Models\User;
 
 class UserList extends Component
 {
@@ -15,11 +14,11 @@ class UserList extends Component
 
     protected $listeners = ['deleteUserConfirmed' => 'deleteUser'];
 
-    public $perPage = 10;
-    public $search = '';
-    public $readyToLoad = false;
+    public $perPage       = 10;
+    public $search        = '';
+    public $readyToLoad   = false;
     public $selectedUsers = [];
-    public $selectAll = false;
+    public $selectAll     = false;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -38,7 +37,7 @@ class UserList extends Component
     public function toggleStatus($userId)
     {
         $user = User::findOrFail($userId);
-        $user->update(['activation' => !$user->activation]);
+        $user->update(['activation' => ! $user->activation]);
 
         $this->dispatch('show-alert', type: $user->activation ? 'success' : 'info', message: $user->activation ? 'کاربر فعال شد!' : 'کاربر غیرفعال شد!');
         Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
@@ -65,14 +64,14 @@ class UserList extends Component
 
     public function updatedSelectAll($value)
     {
-        $currentPageIds = $this->getUsersQuery()->pluck('id')->toArray();
+        $currentPageIds      = $this->getUsersQuery()->pluck('id')->toArray();
         $this->selectedUsers = $value ? $currentPageIds : [];
     }
 
     public function updatedSelectedUsers()
     {
-        $currentPageIds = $this->getUsersQuery()->pluck('id')->toArray();
-        $this->selectAll = !empty($this->selectedUsers) && count(array_diff($currentPageIds, $this->selectedUsers)) === 0;
+        $currentPageIds  = $this->getUsersQuery()->pluck('id')->toArray();
+        $this->selectAll = ! empty($this->selectedUsers) && count(array_diff($currentPageIds, $this->selectedUsers)) === 0;
     }
 
     public function deleteSelected()
@@ -84,7 +83,7 @@ class UserList extends Component
 
         User::whereIn('id', $this->selectedUsers)->delete();
         $this->selectedUsers = [];
-        $this->selectAll = false;
+        $this->selectAll     = false;
         $this->dispatch('show-alert', type: 'success', message: 'کاربران انتخاب‌شده حذف شدند!');
     }
 
@@ -94,7 +93,10 @@ class UserList extends Component
             ->orWhere('last_name', 'like', '%' . $this->search . '%')
             ->orWhere('email', 'like', '%' . $this->search . '%')
             ->orWhere('mobile', 'like', '%' . $this->search . '%')
+            ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])
+            ->with(['province', 'city'])
             ->paginate($this->perPage);
+
     }
 
     public function render()

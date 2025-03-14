@@ -1,9 +1,8 @@
 <?php
-
 namespace App\Livewire\Admin\Doctors\CommentDoctor;
 
+use App\Models\Doctors\DoctorManagements\DoctorComment;
 use Livewire\Component;
-use App\Models\Admin\Doctors\DoctorManagements\DoctorComment;
 
 class AdminDoctorsCommentShow extends Component
 {
@@ -14,11 +13,11 @@ class AdminDoctorsCommentShow extends Component
 
     public function mount($id)
     {
-        $comment = DoctorComment::findOrFail($id);
-        $this->commentId = $comment->id;
-        $this->commentText = $comment->comment;
+        $comment             = DoctorComment::findOrFail($id);
+        $this->commentId     = $comment->id;
+        $this->commentText   = $comment->comment;
         $this->commentStatus = $comment->status;
-        $this->replyText = $comment->reply ?? '';
+        $this->replyText     = $comment->reply ?? '';
     }
 
     public function render()
@@ -32,12 +31,12 @@ class AdminDoctorsCommentShow extends Component
     public function updateComment()
     {
         $this->validate([
-            'commentText' => 'required|string|max:1000|min:3',
+            'commentText'   => 'required|string|max:1000|min:3',
             'commentStatus' => 'required|boolean',
         ], [
-            'commentText.required' => 'متن نظر الزامی است.',
-            'commentText.max' => 'متن نظر نباید بیشتر از 1000 کاراکتر باشد.',
-            'commentText.min' => 'متن نظر باید حداقل 3 کاراکتر باشد.',
+            'commentText.required'   => 'متن نظر الزامی است.',
+            'commentText.max'        => 'متن نظر نباید بیشتر از 1000 کاراکتر باشد.',
+            'commentText.min'        => 'متن نظر باید حداقل 3 کاراکتر باشد.',
             'commentStatus.required' => 'وضعیت نظر الزامی است.',
         ]);
 
@@ -45,7 +44,7 @@ class AdminDoctorsCommentShow extends Component
         if ($comment) {
             $comment->update([
                 'comment' => $this->commentText,
-                'status' => $this->commentStatus,
+                'status'  => $this->commentStatus,
             ]);
             $this->dispatch(
                 'show-toastr',
@@ -66,8 +65,8 @@ class AdminDoctorsCommentShow extends Component
             'replyText' => 'required|string|max:1000|min:3',
         ], [
             'replyText.required' => 'متن پاسخ الزامی است.',
-            'replyText.max' => 'متن پاسخ نباید بیشتر از 1000 کاراکتر باشد.',
-            'replyText.min' => 'متن پاسخ باید حداقل 3 کاراکتر باشد.',
+            'replyText.max'      => 'متن پاسخ نباید بیشتر از 1000 کاراکتر باشد.',
+            'replyText.min'      => 'متن پاسخ باید حداقل 3 کاراکتر باشد.',
         ]);
 
         $comment = DoctorComment::find($this->commentId);

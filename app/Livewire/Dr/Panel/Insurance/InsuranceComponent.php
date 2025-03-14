@@ -1,12 +1,11 @@
 <?php
 namespace App\Livewire\Dr\Panel\Insurance;
 
+use App\Models\Insurance;
 use GuzzleHttp\Psr7\Request;
-use Livewire\Component;
-use App\Models\Dr\Insurance;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
-use function Laravel\Prompts\alert;
+use Livewire\Component;
 
 class InsuranceComponent extends Component
 {
@@ -15,11 +14,11 @@ class InsuranceComponent extends Component
     public $selectedClinicId; // متغیر جدید برای کلینیک انتخاب‌شده
 
     protected $rules = [
-        'name' => 'required|string|max:255',
+        'name'               => 'required|string|max:255',
         'calculation_method' => 'required|in:0,1,2',
-        'appointment_price' => 'nullable|integer',
-        'insurance_percent' => 'nullable|integer',
-        'final_price' => 'nullable|integer',
+        'appointment_price'  => 'nullable|integer',
+        'insurance_percent'  => 'nullable|integer',
+        'final_price'        => 'nullable|integer',
     ];
 
     public function mount()
@@ -63,7 +62,7 @@ class InsuranceComponent extends Component
                 $data['appointment_price'] = null;
                 break;
             case '1':
-                $data['final_price'] = null;
+                $data['final_price']       = null;
                 $data['appointment_price'] = null;
                 break;
             case '2':
@@ -74,8 +73,8 @@ class InsuranceComponent extends Component
         // Set the doctor_id based on the authentication context
         if (Auth::guard('manager')->check()) {
             // If a manager is logged in, get the ID from the URL
-            $CurrentUrl = $_SERVER['HTTP_REFERER'];
-            $doctorId = explode("/",$CurrentUrl)[7];
+            $CurrentUrl        = $_SERVER['HTTP_REFERER'];
+            $doctorId          = explode("/", $CurrentUrl)[7];
             $data['doctor_id'] = $doctorId; // Ensure this is the correct segment
         } else {
             // If a doctor is logged in, use their ID
@@ -104,16 +103,16 @@ class InsuranceComponent extends Component
     public function delete($id)
     {
         $insuranceId = is_array($id) ? $id['id'] : $id;
-        $insurance = Insurance::where('doctor_id', Auth::guard('doctor')->user()->id)
+        $insurance   = Insurance::where('doctor_id', Auth::guard('doctor')->user()->id)
             ->where('id', $insuranceId);
 
         // شرط برای clinic_id موقع حذف
         if ($this->selectedClinicId === 'default') {
             $insurance->whereNull('clinic_id');
-        }else if (Auth::guard('manager')->check()) {
+        } else if (Auth::guard('manager')->check()) {
             // If a manager is logged in, get the ID from the URL
             $CurrentUrl = $_SERVER['HTTP_REFERER'];
-            $doctorId = explode("/", $CurrentUrl)[7];
+            $doctorId   = explode("/", $CurrentUrl)[7];
             $insurance->where('doctor_id', $doctorId);
             // Ensure this is the correct segment
         } else {
@@ -126,11 +125,11 @@ class InsuranceComponent extends Component
 
     private function resetFields()
     {
-        $this->insurance_id = null;
-        $this->name = '';
+        $this->insurance_id       = null;
+        $this->name               = '';
         $this->calculation_method = "0";
-        $this->appointment_price = null;
-        $this->insurance_percent = null;
-        $this->final_price = null;
+        $this->appointment_price  = null;
+        $this->insurance_percent  = null;
+        $this->final_price        = null;
     }
 }

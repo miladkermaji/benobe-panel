@@ -1,10 +1,8 @@
 <?php
-
 namespace App\Livewire\Admin\Doctors;
 
+use App\Models\Doctors\OrderVisit;
 use Livewire\Component;
-use Illuminate\Support\Facades\Log;
-use App\Models\Admin\Doctors\OrderVisit;
 
 class OrderVisitDetails extends Component
 {

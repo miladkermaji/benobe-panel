@@ -1,8 +1,8 @@
 <?php
 namespace Database\Seeders;
 
-use App\Models\Admin\Doctors\DoctorManagements\DoctorComment;
 use App\Models\Doctor;
+use App\Models\Doctors\DoctorManagements\DoctorComment;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;

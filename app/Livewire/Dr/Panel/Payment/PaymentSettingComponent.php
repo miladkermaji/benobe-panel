@@ -1,13 +1,12 @@
 <?php
-
 namespace App\Livewire\Dr\Panel\Payment;
 
-use Livewire\Component;
+use App\Models\DoctorPaymentSetting;
+use App\Models\DoctorSettlementRequest;
 use App\Models\DoctorWallet;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Dr\DoctorPaymentSetting;
-use App\Models\Dr\DoctorSettlementRequest;
 use App\Models\DoctorWalletTransaction;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class PaymentSettingComponent extends Component
 {
@@ -19,35 +18,35 @@ class PaymentSettingComponent extends Component
         $doctorId = Auth::guard('doctor')->user()->id;
         $settings = DoctorPaymentSetting::where('doctor_id', $doctorId)->first();
 
-        if (!$settings) {
+        if (! $settings) {
             DoctorPaymentSetting::create([
-                'doctor_id' => $doctorId,
-                'visit_fee' => $this->visit_fee,
+                'doctor_id'   => $doctorId,
+                'visit_fee'   => $this->visit_fee,
                 'card_number' => null,
             ]);
         } else {
-            $this->visit_fee = $settings->visit_fee; // مقدار خام
+            $this->visit_fee   = $settings->visit_fee; // مقدار خام
             $this->card_number = $settings->card_number;
         }
     }
 
     public function render()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId    = Auth::guard('doctor')->user()->id;
         $totalIncome = DoctorWallet::where('doctor_id', $doctorId)->sum('balance');
-        $paid = DoctorWalletTransaction::where('doctor_id', $doctorId)->where('status', 'paid')->sum('amount');
-        $available = DoctorWallet::where('doctor_id', $doctorId)->sum('balance');
+        $paid        = DoctorWalletTransaction::where('doctor_id', $doctorId)->where('status', 'paid')->sum('amount');
+        $available   = DoctorWallet::where('doctor_id', $doctorId)->sum('balance');
         $this->loadData();
         return view('livewire.dr.panel.payment.payment-setting-component', [
-            'totalIncome' => $totalIncome,
-            'paid' => $paid,
-            'available' => $available,
+            'totalIncome'         => $totalIncome,
+            'paid'                => $paid,
+            'available'           => $available,
             'formatted_visit_fee' => number_format($this->visit_fee), // فرمت‌شده برای نمایش
         ]);
     }
     public function deleteRequest($requestId)
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId    = Auth::guard('doctor')->user()->id;
         $transaction = DoctorSettlementRequest::where('doctor_id', $doctorId)->where('id', $requestId)->first();
 
         if ($transaction) {
@@ -87,14 +86,14 @@ class PaymentSettingComponent extends Component
         }
 
         $settings->update([
-            'visit_fee' => $this->visit_fee,
+            'visit_fee'   => $this->visit_fee,
             'card_number' => $this->card_number,
         ]);
 
         DoctorSettlementRequest::create([
             'doctor_id' => $doctorId,
-            'amount' => $availableAmount,
-            'status' => 'pending',
+            'amount'    => $availableAmount,
+            'status'    => 'pending',
         ]);
 
         DoctorWalletTransaction::where('doctor_id', $doctorId)
@@ -105,11 +104,11 @@ class PaymentSettingComponent extends Component
     }
     protected function loadData()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId       = Auth::guard('doctor')->user()->id;
         $this->requests = DoctorSettlementRequest::where('doctor_id', $doctorId)
             ->latest()->with('doctor')
             ->get();
-        $wallet = DoctorWallet::where('doctor_id', $doctorId)->firstOrCreate(['doctor_id' => $doctorId], ['balance' => 0]);
+        $wallet                = DoctorWallet::where('doctor_id', $doctorId)->firstOrCreate(['doctor_id' => $doctorId], ['balance' => 0]);
         $this->availableAmount = $wallet->balance;
     }
 }

@@ -1,8 +1,8 @@
 <?php
 namespace App\Models\Admin\Dashboard\Cities;
 
+use App\Models\Clinic;
 use App\Models\Doctor;
-use App\Models\Dr\Clinic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

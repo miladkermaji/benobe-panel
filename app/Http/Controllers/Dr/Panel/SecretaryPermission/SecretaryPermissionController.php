@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\Dr\Panel\SecretaryPermission;
 
 use App\Http\Controllers\Dr\Controller;
-use App\Models\Dr\SecretaryPermission;
+use App\Models\SecretaryPermission;
 use Illuminate\Http\Request;
 
 class SecretaryPermissionController extends Controller

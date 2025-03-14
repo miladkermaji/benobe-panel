@@ -1,6 +1,5 @@
 <?php
-
-namespace App\Models\Admin\Doctors;
+namespace App\Models\Doctors;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,11 +19,11 @@ class OrderVisit extends Model
         'appointment_time',
         'center_name',
         'visit_cost',
-        'service_cost'
+        'service_cost',
     ];
 
     protected $casts = [
-        'payment_date' => 'datetime',
+        'payment_date'     => 'datetime',
         'appointment_date' => 'datetime',
     ];
 
@@ -35,11 +34,11 @@ class OrderVisit extends Model
 
     public function doctor()
     {
-        return $this->belongsTo(\App\Models\Dr\Doctor::class, 'doctor_id');
+        return $this->belongsTo(\App\Models\Doctor::class, 'doctor_id');
     }
 
     public function clinic()
     {
-        return $this->belongsTo(\App\Models\Dr\Clinic::class, 'clinic_id');
+        return $this->belongsTo(\App\Models\Clinic::class, 'clinic_id');
     }
 }
