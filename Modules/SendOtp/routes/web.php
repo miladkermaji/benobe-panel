@@ -23,3 +23,4 @@ Route::prefix('admin')->group(function () {
     Route::get('/sms-gateways', SmsGatewayList::class)->name('admin.sms-gateways.index');
     Route::get('/sms-gateways/{name}/edit', SmsGatewayEdit::class)->name('admin.sms-gateways.edit');
 });
+Route::post('/send-message', [SendOtpController::class, 'sendMessage'])->name('send.message');

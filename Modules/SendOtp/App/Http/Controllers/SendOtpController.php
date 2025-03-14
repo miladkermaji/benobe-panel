@@ -1,55 +1,30 @@
 <?php
-
 namespace Modules\SendOtp\App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Modules\SendOtp\App\Http\Services\MessageService;
+use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use Nwidart\Modules\Routing\Controller;
 
 class SendOtpController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return view('sendotp::index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // متد جدید برای ارسال پیام معمولی
+    public function sendMessage(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'message' => 'required|string',
+            'mobile'  => 'required|string',
+        ]);
 
-    /**
-     * Show the specified resource.
-     */
+        $smsService     = SmsService::createMessage($request->message, $request->mobile);
+        $messageService = new MessageService($smsService);
+        $response       = $messageService->send();
 
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        //
+        return response()->json(['status' => 'success', 'response' => $response]);
     }
 }

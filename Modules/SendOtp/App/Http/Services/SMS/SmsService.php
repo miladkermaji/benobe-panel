@@ -1,68 +1,89 @@
 <?php
-
 namespace Modules\SendOtp\App\Http\Services\SMS;
 
 use Modules\SendOtp\App\Http\Interfaces\MessageInterface;
 
 class SmsService implements MessageInterface
 {
- protected $otpId;
- protected $parameters;
- protected $senderNumber;
- protected $recipientNumbers;
+    protected $otpId;
+    protected $parameters;
+    protected $senderNumber;
+    protected $recipientNumbers;
+    protected $message; // برای پیام معمولی
 
- public static function create($otpId, $newMobile, $parameters)
- {
-  $smsService = new self();
-  $smsService->setSenderNumber(env('SMS_SENDER_NUMBER', '5000309180607211'));
-  $smsService->setOtpId($otpId);
-  $smsService->setParameters($parameters);
-  $smsService->setRecipientNumbers([$newMobile]);
-  return $smsService;
- }
+    // متد فعلی برای OTP
+    public static function create($otpId, $newMobile, $parameters)
+    {
+        $smsService = new self();
+        $smsService->setSenderNumber(env('SMS_SENDER_NUMBER', '5000309180607211'));
+        $smsService->setOtpId($otpId);
+        $smsService->setParameters($parameters);
+        $smsService->setRecipientNumbers([$newMobile]);
+        return $smsService;
+    }
 
- public function fire()
- {
-  // نیازی به این متد نیست چون ارسال توسط MessageService انجام می‌شه
- }
+    // متد جدید برای پیام معمولی
+    public static function createMessage($message, $newMobile)
+    {
+        $smsService = new self();
+        $smsService->setSenderNumber(env('SMS_SENDER_NUMBER', '5000309180607211'));
+        $smsService->setMessage($message);
+        $smsService->setRecipientNumbers([$newMobile]);
+        return $smsService;
+    }
 
- public function getOtpId()
- {
-  return $this->otpId;
- }
+    public function fire()
+    {
+        // بعداً توی MessageService استفاده می‌شه
+    }
 
- public function setOtpId($otpId)
- {
-  $this->otpId = $otpId;
- }
+    public function getOtpId()
+    {
+        return $this->otpId;
+    }
 
- public function getParameters()
- {
-  return $this->parameters;
- }
+    public function setOtpId($otpId)
+    {
+        $this->otpId = $otpId;
+    }
 
- public function setParameters($parameters)
- {
-  $this->parameters = $parameters;
- }
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
 
- public function getSenderNumber()
- {
-  return $this->senderNumber;
- }
+    public function setParameters($parameters)
+    {
+        $this->parameters = $parameters;
+    }
 
- public function setSenderNumber($senderNumber)
- {
-  $this->senderNumber = $senderNumber;
- }
+    public function getSenderNumber()
+    {
+        return $this->senderNumber;
+    }
 
- public function getRecipientNumbers()
- {
-  return $this->recipientNumbers;
- }
+    public function setSenderNumber($senderNumber)
+    {
+        $this->senderNumber = $senderNumber;
+    }
 
- public function setRecipientNumbers($recipientNumbers)
- {
-  $this->recipientNumbers = $recipientNumbers;
- }
+    public function getRecipientNumbers()
+    {
+        return $this->recipientNumbers;
+    }
+
+    public function setRecipientNumbers($recipientNumbers)
+    {
+        $this->recipientNumbers = $recipientNumbers;
+    }
+
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
 }
