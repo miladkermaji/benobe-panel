@@ -1,11 +1,13 @@
 <?php
 namespace App\Livewire\Admin\Panel\Tools;
 
-use App\Jobs\SendNotificationSms;
+use App\Jobs\Admin\Panel\Tools\SendNotificationSms;
+
 use App\Models\Doctor;
 use App\Models\Notification;
 use App\Models\Secretary;
 use App\Models\User;
+use Illuminate\Support\Facades\Log; // اضافه کردن Log
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 use Morilog\Jalali\Jalalian;
@@ -123,11 +125,16 @@ class NotificationCreate extends Component
 
         $recipientNumbers = []; // آرایه شماره‌های گیرنده
 
+        Log::info('شروع جمع‌آوری گیرنده‌ها', [
+            'target_mode' => $this->target_mode,
+            'is_active'   => $this->is_active,
+        ]);
+
         if ($this->target_mode === 'single') {
             $notification->recipients()->create([
-                'recipient_type' => null,
+                'recipient_type' => 'phone',
                 'recipient_id'   => null,
-                'phone_number'   => $this->single_phone,
+                'mobile'   => $this->single_phone,
             ]);
             $recipientNumbers = [$this->single_phone];
         } elseif ($this->target_mode === 'multiple') {
@@ -138,8 +145,8 @@ class NotificationCreate extends Component
                     'recipient_id'   => $id,
                 ]);
                 $model = $type::find($id);
-                if ($model && $model->phone_number) {
-                    $recipientNumbers[] = $model->phone_number;
+                if ($model && $model->mobile) {
+                    $recipientNumbers[] = $model->mobile;
                 }
             }
         } elseif ($this->target_mode === 'group') {
@@ -154,23 +161,36 @@ class NotificationCreate extends Component
                     'recipient_type' => $recipient->getMorphClass(),
                     'recipient_id'   => $recipient->id,
                 ]);
-                if ($recipient->phone_number) {
-                    $recipientNumbers[] = $recipient->phone_number;
+                if ($recipient->mobile) {
+                    $recipientNumbers[] = $recipient->mobile;
                 }
             }
         }
+
+        Log::info('گیرنده‌ها جمع‌آوری شدند', [
+            'recipient_numbers' => $recipientNumbers,
+            'is_active'         => $this->is_active,
+        ]);
 
         // اضافه کردن ارسال پیامک به صف
         if (! empty($recipientNumbers) && $this->is_active) {
             $chunks = array_chunk($recipientNumbers, 10); // تکه‌تکه کردن به گروه‌های 10 تایی
             $delay  = 0;
             foreach ($chunks as $chunk) {
+                Log::info('ارسال Job به صف', [
+                    'chunk' => $chunk,
+                    'delay' => $delay,
+                ]);
                 SendNotificationSms::dispatch($this->message, $chunk)
                     ->delay(now()->addSeconds($delay)); // تاخیر بین هر گروه
                 $delay += 5;                        // 5 ثانیه تاخیر بین هر گروه
             }
             $this->dispatch('show-alert', type: 'success', message: 'اعلان ایجاد و ارسال پیامک‌ها در صف قرار گرفت!');
         } else {
+            Log::warning('ارسال به صف انجام نشد', [
+                'recipient_numbers_empty' => empty($recipientNumbers),
+                'is_active'               => $this->is_active,
+            ]);
             $this->dispatch('show-alert', type: 'success', message: 'اعلان با موفقیت ایجاد شد!');
         }
 
