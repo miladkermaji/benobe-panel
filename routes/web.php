@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\Panel\Tools\DataMigrationTool\DataMigrationToolCo
 use App\Http\Controllers\Admin\Panel\Tools\FileManager\FileManagerController;
 use App\Http\Controllers\Admin\Panel\Tools\MailTemplate\MailTemplateController;
 use App\Http\Controllers\Admin\Panel\Tools\NewsLatter\NewsLatterController;
+use App\Http\Controllers\Admin\Panel\Tools\Notification\NotificationController;
 use App\Http\Controllers\Admin\Panel\Tools\PageBuilder\PageBuilderController;
 use App\Http\Controllers\Admin\Panel\Tools\PaymentGateways\PaymentGatewaysController;
 use App\Http\Controllers\Admin\Panel\Tools\Redirect\RedirectController;
@@ -140,14 +141,20 @@ Route::prefix('admin')
                 Route::put('/page-builder/update/{id}', [PageBuilderController::class, 'update'])->name('admin.tools.page-builder.update');
                 Route::delete('/page-builder/destroy/{id}', [PageBuilderController::class, 'destroy'])->name('admin.tools.page-builder.destroy');
             });
+            Route::prefix('notifications')->group(function () {
+                Route::get('/', [NotificationController::class, 'index'])->name('admin.panel.tools.notifications.index');
+                Route::get('/notifications/create', [NotificationController::class, 'create'])->name('admin.panel.tools.notifications.create');
+                Route::get('/notifications/{id}/edit', [NotificationController::class, 'edit'])->name('admin.panel.tools.notifications.edit');
+            });
         });
-        Route::prefix('users/')->group(function () {
-            Route::get('/', [UserController::class, 'index'])->name('admin.panel.users.index');
-            Route::get('/create', [UserController::class, 'create'])->name('admin.panel.users.create');
-            Route::get('/edit/{id}', [UserController::class, 'edit'])->name('admin.panel.users.edit');
-            // عملیات‌های دیگر مثل toggle، update و destroy در Livewire انجام می‌شوند
-        });
+
     });
+Route::prefix('users/')->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('admin.panel.users.index');
+    Route::get('/create', [UserController::class, 'create'])->name('admin.panel.users.create');
+    Route::get('/edit/{id}', [UserController::class, 'edit'])->name('admin.panel.users.edit');
+    // عملیات‌های دیگر مثل toggle، update و destroy در Livewire انجام می‌شوند
+});
 
 // end manager  routes
 // dr routes
