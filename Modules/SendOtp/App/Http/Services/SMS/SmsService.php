@@ -23,12 +23,16 @@ class SmsService implements MessageInterface
     }
 
     // متد جدید برای پیام معمولی
-    public static function createMessage($message, $newMobile)
+    public static function createMessage($message, $recipients, $senderNumber = null, $sendDateTime = null)
     {
+        $senderNumber = $senderNumber ?? env('SMS_SENDER_NUMBER', '5000309180607211');
+        $sendDateTime = $sendDateTime ?? now()->format('Y-m-d\TH:i:s');
+
         $smsService = new self();
-        $smsService->setSenderNumber(env('SMS_SENDER_NUMBER', '5000309180607211'));
         $smsService->setMessage($message);
-        $smsService->setRecipientNumbers([$newMobile]);
+        $smsService->setSenderNumber($senderNumber);
+        $smsService->setRecipientNumbers(is_array($recipients) ? $recipients : [$recipients]);
+
         return $smsService;
     }
 

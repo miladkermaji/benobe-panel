@@ -2,7 +2,6 @@
 namespace App\Livewire\Admin\Panel\Tools;
 
 use App\Jobs\Admin\Panel\Tools\SendNotificationSms;
-
 use App\Models\Doctor;
 use App\Models\Notification;
 use App\Models\Secretary;
@@ -134,7 +133,7 @@ class NotificationCreate extends Component
             $notification->recipients()->create([
                 'recipient_type' => 'phone',
                 'recipient_id'   => null,
-                'mobile'   => $this->single_phone,
+                'mobile'         => $this->single_phone,
             ]);
             $recipientNumbers = [$this->single_phone];
         } elseif ($this->target_mode === 'multiple') {
@@ -173,25 +172,24 @@ class NotificationCreate extends Component
         ]);
 
         // اضافه کردن ارسال پیامک به صف
+        // توی متد store
         if (! empty($recipientNumbers) && $this->is_active) {
-            $chunks = array_chunk($recipientNumbers, 10); // تکه‌تکه کردن به گروه‌های 10 تایی
+            $chunks = array_chunk($recipientNumbers, 10);
             $delay  = 0;
             foreach ($chunks as $chunk) {
                 Log::info('ارسال Job به صف', [
-                    'chunk' => $chunk,
-                    'delay' => $delay,
+                    'chunk'        => $chunk,
+                    'delay'        => $delay,
+                    'sendDateTime' => $this->start_at, // تاریخ شمسی از فرم
                 ]);
-                SendNotificationSms::dispatch($this->message, $chunk)
-                    ->delay(now()->addSeconds($delay)); // تاخیر بین هر گروه
-                $delay += 5;                        // 5 ثانیه تاخیر بین هر گروه
+                SendNotificationSms::dispatch(
+                    $this->message,
+                    $chunk,
+                    $this->start_at// تاریخ شمسی
+                )->delay(now()->addSeconds($delay));
+                $delay += 5;
             }
             $this->dispatch('show-alert', type: 'success', message: 'اعلان ایجاد و ارسال پیامک‌ها در صف قرار گرفت!');
-        } else {
-            Log::warning('ارسال به صف انجام نشد', [
-                'recipient_numbers_empty' => empty($recipientNumbers),
-                'is_active'               => $this->is_active,
-            ]);
-            $this->dispatch('show-alert', type: 'success', message: 'اعلان با موفقیت ایجاد شد!');
         }
 
         return redirect()->route('admin.panel.tools.notifications.index');
