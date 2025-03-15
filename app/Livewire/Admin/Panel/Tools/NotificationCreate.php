@@ -1,6 +1,6 @@
 <?php
 namespace App\Livewire\Admin\Panel\Tools;
-//this changes from local 222
+//new changes added
 use App\Jobs\Admin\Panel\Tools\SendNotificationSms;
 use App\Models\Doctor;
 use App\Models\Notification;
