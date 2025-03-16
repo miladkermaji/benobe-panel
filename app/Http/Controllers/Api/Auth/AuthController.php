@@ -1,19 +1,20 @@
 <?php
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
-use App\Models\LoginLog;
-use App\Models\LoginSession;
+use Carbon\Carbon;
 use App\Models\Otp;
 use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\LoginLog;
 use Illuminate\Support\Str;
+use App\Models\LoginSession;
+use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 
 class AuthController extends Controller
 {
