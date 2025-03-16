@@ -416,9 +416,7 @@ class AuthController extends Controller
             ], 401);
         }
     }
-    /**
-     * @authenticated
-     * @header Authorization Bearer {token}
+  /**
      * @bodyParam first_name string optional نام کاربر
      * @bodyParam last_name string optional نام خانوادگی کاربر
      * @bodyParam national_code string optional کد ملی (باید یکتا باشد)
@@ -446,33 +444,47 @@ class AuthController extends Controller
      *     }
      *   }
      * }
-     * @response 422 {
-     *   "status": "error",
-     *   "message": "خطا در اعتبارسنجی",
-     *   "data": {
-     *     "errors": {
-     *       "national_code": ["کد ملی قبلاً ثبت شده است"],
-     *       "email": ["ایمیل قبلاً ثبت شده است"]
-     *     }
-     *   }
-     * }
      * @response 401 {
      *   "status": "error",
      *   "message": "کاربر احراز هویت نشده است",
      *   "data": null
      * }
      */
-    public function updateProfile(Request $request)
-    {
-        // دریافت کاربر احراز هویت شده
-        $user = Auth::guard('api')->user();
+  public function updateProfile(Request $request)
+{
+    Log::info('UpdateProfile - Headers: ' . json_encode($request->headers->all()));
+    Log::info('UpdateProfile - Cookies: ' . json_encode($request->cookies->all()));
+
+    // گرفتن توکن از کوکی یا هدر
+    $token = $request->cookie('auth_token') ?: $request->bearerToken();
+    Log::info('UpdateProfile - Token retrieved: ' . ($token ?: 'None'));
+
+    if (! $token) {
+        Log::warning('UpdateProfile - No token provided');
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'توکن یافت نشد',
+            'data'    => null,
+        ], 401);
+    }
+
+    try {
+        // دیکد کردن توکن برای دیباگ
+        $payload = JWTAuth::setToken($token)->getPayload();
+        Log::info('UpdateProfile - Token payload: ' . json_encode($payload->toArray()));
+
+        // اعتبارسنجی توکن و گرفتن کاربر
+        $user = JWTAuth::setToken($token)->authenticate();
         if (! $user) {
+            Log::warning('UpdateProfile - User not found for token: ' . $token);
             return response()->json([
                 'status'  => 'error',
-                'message' => 'کاربر احراز هویت نشده است',
+                'message' => 'کاربر یافت نشد',
                 'data'    => null,
             ], 401);
         }
+
+        Log::info('UpdateProfile - User authenticated: ' . $user->id);
 
         // اعتبارسنجی درخواست
         $request->validate([
@@ -481,23 +493,9 @@ class AuthController extends Controller
             'national_code' => 'nullable|string|size:10|unique:users,national_code,' . $user->id,
             'date_of_birth' => 'nullable|date|before:today',
             'sex'           => 'nullable|in:male,female',
-            'zone_city_id'  => 'nullable|exists:zone,id,level,2', // فقط شهرها (level = 2)
-            'zone_province_id'  => 'nullable|exists:zone,id,level,1', 
+            'zone_city_id'  => 'nullable|exists:zone,id,level,2',
             'email'         => 'nullable|email|unique:users,email,' . $user->id,
             'address'       => 'nullable|string|max:1000',
-        ], [
-            'first_name.max'         => 'نام نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
-            'last_name.max'          => 'نام خانوادگی نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
-            'national_code.size'     => 'کد ملی باید دقیقاً ۱۰ رقم باشد.',
-            'national_code.unique'   => 'کد ملی قبلاً ثبت شده است.',
-            'date_of_birth.date'     => 'تاریخ تولد باید معتبر باشد.',
-            'date_of_birth.before'   => 'تاریخ تولد باید قبل از امروز باشد.',
-            'sex.in'                 => 'جنسیت باید "مرد" یا "زن" باشد.',
-            'zone_city_id.exists'    => 'شهر انتخاب‌شده معتبر نیست.',
-            'zone_province_id.exists'    => 'استان انتخاب‌شده معتبر نیست.',
-            'email.email'            => 'ایمیل باید فرمت معتبر داشته باشد.',
-            'email.unique'           => 'ایمیل قبلاً ثبت شده است.',
-            'address.max'            => 'آدرس نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد.',
         ]);
 
         // به‌روزرسانی اطلاعات کاربر
@@ -508,7 +506,6 @@ class AuthController extends Controller
             'date_of_birth' => $request->input('date_of_birth', $user->date_of_birth),
             'sex'           => $request->input('sex', $user->sex),
             'zone_city_id'  => $request->input('zone_city_id', $user->zone_city_id),
-            'zone_province_id'  => $request->input('zone_province_id', $user->zone_province_id),
             'email'         => $request->input('email', $user->email),
             'address'       => $request->input('address', $user->address),
         ]);
@@ -516,9 +513,30 @@ class AuthController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'اطلاعات با موفقیت به‌روزرسانی شد',
-            'data'    => [
-                'user' => $user->fresh(), // دریافت نسخه به‌روز شده کاربر
-            ],
+            'data'    => ['user' => $user->fresh()],
         ], 200);
+
+    } catch (TokenExpiredException $e) {
+        Log::error('UpdateProfile - Token expired: ' . $e->getMessage());
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'توکن منقضی شده است. لطفاً دوباره وارد شوید.',
+            'data'    => null,
+        ], 401);
+    } catch (TokenInvalidException $e) {
+        Log::error('UpdateProfile - Token invalid: ' . $e->getMessage());
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'توکن نامعتبر است.',
+            'data'    => null,
+        ], 401);
+    } catch (JWTException $e) {
+        Log::error('UpdateProfile - JWT error: ' . $e->getMessage());
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'خطا در پردازش توکن: ' . $e->getMessage(),
+            'data'    => null,
+        ], 401);
     }
+}
 }
