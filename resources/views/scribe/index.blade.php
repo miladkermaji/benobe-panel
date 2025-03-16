@@ -96,6 +96,12 @@
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-auth-update-profile">
                                 <a href="#endpoints-POSTapi-auth-update-profile">POST api/auth/update-profile</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appointments-my_appointments--id--cancel">
+                                <a href="#endpoints-POSTapi-appointments-my_appointments--id--cancel">لغو نوبت</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-GETapi-appointments-my_appointments">
+                                <a href="#endpoints-GETapi-appointments-my_appointments">گرفتن لیست نوبت‌های کاربر</a>
+                            </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-GETapi-zone-provinces">
                                 <a href="#endpoints-GETapi-zone-provinces">گرفتن لیست استان‌ها</a>
                             </li>
@@ -121,7 +127,7 @@
     <div class="dark-box"></div>
     <div class="content">
         <h1 id="introduction">Introduction</h1>
-<p>مستندات رسمی API پروژه، شامل احراز هویت، درخواست‌های کاربر و سایر عملیات.</p>
+<p>مستندات رسمی API پروژه، شامل احراز هویت، درخواست‌های کاربر، مدیریت نوبت‌ها و سایر عملیات.</p>
 <aside>
     <strong>Base URL</strong>: <code>http://localhost</code>
 </aside>
@@ -130,9 +136,7 @@
 &lt;aside&gt;در سمت راست، مثال‌های درخواست به زبان‌های مختلف برنامه‌نویسی را مشاهده می‌کنید.&lt;/aside&gt;</code></pre>
 
         <h1 id="authenticating-requests">Authenticating requests</h1>
-<p>To authenticate requests, include an <strong><code>Authorization</code></strong> header with the value <strong><code>"Bearer {YOUR_AUTH_TOKEN}"</code></strong>.</p>
-<p>All authenticated endpoints are marked with a <code>requires authentication</code> badge in the documentation below.</p>
-<p>برای دریافت توکن، به پنل خود وارد شوید و یک توکن API تولید کنید.</p>
+<p>This API is not authenticated.</p>
 
         <h1 id="endpoints">Endpoints</h1>
 
@@ -153,11 +157,10 @@
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost/api/auth/login-register" \
-    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"mobile\": \"consequatur\"
+    \"mobile\": \"numquam\"
 }"
 </code></pre></div>
 
@@ -168,13 +171,12 @@
 );
 
 const headers = {
-    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
 
 let body = {
-    "mobile": "consequatur"
+    "mobile": "numquam"
 };
 
 fetch(url, {
@@ -191,12 +193,11 @@ $response = $client-&gt;post(
     $url,
     [
         'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
             'Content-Type' =&gt; 'application/json',
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'mobile' =&gt; 'consequatur',
+            'mobile' =&gt; 'numquam',
         ],
     ]
 );
@@ -210,10 +211,9 @@ import json
 
 url = 'http://localhost/api/auth/login-register'
 payload = {
-    "mobile": "consequatur"
+    "mobile": "numquam"
 }
 headers = {
-  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
@@ -311,17 +311,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-auth-login-register"
-               value="Bearer {YOUR_AUTH_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -350,10 +339,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="mobile"                data-endpoint="POSTapi-auth-login-register"
-               value="consequatur"
+               value="numquam"
                data-component="body">
     <br>
-<p>شماره موبایل کاربر (مثال: 09181234567) Example: <code>consequatur</code></p>
+<p>شماره موبایل کاربر (مثال: 09181234567) Example: <code>numquam</code></p>
         </div>
         </form>
 
@@ -371,29 +360,27 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/login-confirm/debitis" \
-    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
+    "http://localhost/api/auth/login-confirm/ipsam" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"otpCode\": \"porro\"
+    \"otpCode\": \"aut\"
 }"
 </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/login-confirm/debitis"
+    "http://localhost/api/auth/login-confirm/ipsam"
 );
 
 const headers = {
-    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
 
 let body = {
-    "otpCode": "porro"
+    "otpCode": "aut"
 };
 
 fetch(url, {
@@ -405,17 +392,16 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/login-confirm/debitis';
+$url = 'http://localhost/api/auth/login-confirm/ipsam';
 $response = $client-&gt;post(
     $url,
     [
         'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
             'Content-Type' =&gt; 'application/json',
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'otpCode' =&gt; 'porro',
+            'otpCode' =&gt; 'aut',
         ],
     ]
 );
@@ -427,12 +413,11 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/login-confirm/debitis'
+url = 'http://localhost/api/auth/login-confirm/ipsam'
 payload = {
-    "otpCode": "porro"
+    "otpCode": "aut"
 }
 headers = {
-  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
@@ -534,17 +519,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-auth-login-confirm--token-"
-               value="Bearer {YOUR_AUTH_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -573,10 +547,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="token"                data-endpoint="POSTapi-auth-login-confirm--token-"
-               value="debitis"
+               value="ipsam"
                data-component="url">
     <br>
-<p>Example: <code>debitis</code></p>
+<p>Example: <code>ipsam</code></p>
             </div>
                             <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
         <div style=" padding-left: 28px;  clear: unset;">
@@ -585,10 +559,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="otpCode"                data-endpoint="POSTapi-auth-login-confirm--token-"
-               value="porro"
+               value="aut"
                data-component="body">
     <br>
-<p>کد OTP وارد شده (مثال: 1234) Example: <code>porro</code></p>
+<p>کد OTP وارد شده (مثال: 1234) Example: <code>aut</code></p>
         </div>
         </form>
 
@@ -606,19 +580,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/resend-otp/et" \
-    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
+    "http://localhost/api/auth/resend-otp/ut" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/resend-otp/et"
+    "http://localhost/api/auth/resend-otp/ut"
 );
 
 const headers = {
-    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -631,12 +603,11 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/resend-otp/et';
+$url = 'http://localhost/api/auth/resend-otp/ut';
 $response = $client-&gt;post(
     $url,
     [
         'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
             'Content-Type' =&gt; 'application/json',
             'Accept' =&gt; 'application/json',
         ],
@@ -650,9 +621,8 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/resend-otp/et'
+url = 'http://localhost/api/auth/resend-otp/ut'
 headers = {
-  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
@@ -750,17 +720,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-auth-resend-otp--token-"
-               value="Bearer {YOUR_AUTH_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -789,10 +748,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="token"                data-endpoint="POSTapi-auth-resend-otp--token-"
-               value="et"
+               value="ut"
                data-component="url">
     <br>
-<p>Example: <code>et</code></p>
+<p>Example: <code>ut</code></p>
             </div>
                     </form>
 
@@ -811,7 +770,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost/api/auth/logout" \
-    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -822,7 +780,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
-    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -840,7 +797,6 @@ $response = $client-&gt;post(
     $url,
     [
         'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
             'Content-Type' =&gt; 'application/json',
             'Accept' =&gt; 'application/json',
         ],
@@ -856,7 +812,6 @@ import json
 
 url = 'http://localhost/api/auth/logout'
 headers = {
-  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
@@ -929,17 +884,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-auth-logout"
-               value="Bearer {YOUR_AUTH_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -978,7 +922,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost/api/auth/profile" \
-    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -989,7 +932,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
-    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1007,7 +949,6 @@ $response = $client-&gt;get(
     $url,
     [
         'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
             'Content-Type' =&gt; 'application/json',
             'Accept' =&gt; 'application/json',
         ],
@@ -1023,7 +964,6 @@ import json
 
 url = 'http://localhost/api/auth/profile'
 headers = {
-  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
@@ -1051,7 +991,7 @@ access-control-allow-credentials: true
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;status&quot;: &quot;error&quot;,
-    &quot;message&quot;: &quot;توکن نامعتبر است.&quot;,
+    &quot;message&quot;: &quot;توکن  یافت نشد&quot;,
     &quot;data&quot;: null
 }</code>
  </pre>
@@ -1103,17 +1043,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/auth/profile</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="GETapi-auth-profile"
-               value="Bearer {YOUR_AUTH_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
-            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -1335,18 +1264,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost/api/auth/update-profile" \
-    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"first_name\": \"quasi\",
-    \"last_name\": \"cumque\",
-    \"national_code\": \"omnis\",
-    \"date_of_birth\": \"consectetur\",
-    \"sex\": \"tempora\",
-    \"zone_city_id\": 8,
-    \"email\": \"schoen.telly@example.com\",
-    \"address\": \"libero\"
+    \"first_name\": \"officia\",
+    \"last_name\": \"quaerat\",
+    \"national_code\": \"alias\",
+    \"date_of_birth\": \"consequatur\",
+    \"sex\": \"velit\",
+    \"zone_city_id\": 15,
+    \"email\": \"strosin.norene@example.com\",
+    \"address\": \"maxime\"
 }"
 </code></pre></div>
 
@@ -1357,20 +1285,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
-    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
 
 let body = {
-    "first_name": "quasi",
-    "last_name": "cumque",
-    "national_code": "omnis",
-    "date_of_birth": "consectetur",
-    "sex": "tempora",
-    "zone_city_id": 8,
-    "email": "schoen.telly@example.com",
-    "address": "libero"
+    "first_name": "officia",
+    "last_name": "quaerat",
+    "national_code": "alias",
+    "date_of_birth": "consequatur",
+    "sex": "velit",
+    "zone_city_id": 15,
+    "email": "strosin.norene@example.com",
+    "address": "maxime"
 };
 
 fetch(url, {
@@ -1387,19 +1314,18 @@ $response = $client-&gt;post(
     $url,
     [
         'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
             'Content-Type' =&gt; 'application/json',
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'first_name' =&gt; 'quasi',
-            'last_name' =&gt; 'cumque',
-            'national_code' =&gt; 'omnis',
-            'date_of_birth' =&gt; 'consectetur',
-            'sex' =&gt; 'tempora',
-            'zone_city_id' =&gt; 8,
-            'email' =&gt; 'schoen.telly@example.com',
-            'address' =&gt; 'libero',
+            'first_name' =&gt; 'officia',
+            'last_name' =&gt; 'quaerat',
+            'national_code' =&gt; 'alias',
+            'date_of_birth' =&gt; 'consequatur',
+            'sex' =&gt; 'velit',
+            'zone_city_id' =&gt; 15,
+            'email' =&gt; 'strosin.norene@example.com',
+            'address' =&gt; 'maxime',
         ],
     ]
 );
@@ -1413,17 +1339,16 @@ import json
 
 url = 'http://localhost/api/auth/update-profile'
 payload = {
-    "first_name": "quasi",
-    "last_name": "cumque",
-    "national_code": "omnis",
-    "date_of_birth": "consectetur",
-    "sex": "tempora",
-    "zone_city_id": 8,
-    "email": "schoen.telly@example.com",
-    "address": "libero"
+    "first_name": "officia",
+    "last_name": "quaerat",
+    "national_code": "alias",
+    "date_of_birth": "consequatur",
+    "sex": "velit",
+    "zone_city_id": 15,
+    "email": "strosin.norene@example.com",
+    "address": "maxime"
 }
 headers = {
-  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
@@ -1519,17 +1444,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-auth-update-profile"
-               value="Bearer {YOUR_AUTH_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -1558,10 +1472,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="first_name"                data-endpoint="POSTapi-auth-update-profile"
-               value="quasi"
+               value="officia"
                data-component="body">
     <br>
-<p>optional نام کاربر Example: <code>quasi</code></p>
+<p>optional نام کاربر Example: <code>officia</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>last_name</code></b>&nbsp;&nbsp;
@@ -1569,10 +1483,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="last_name"                data-endpoint="POSTapi-auth-update-profile"
-               value="cumque"
+               value="quaerat"
                data-component="body">
     <br>
-<p>optional نام خانوادگی کاربر Example: <code>cumque</code></p>
+<p>optional نام خانوادگی کاربر Example: <code>quaerat</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>national_code</code></b>&nbsp;&nbsp;
@@ -1580,10 +1494,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="national_code"                data-endpoint="POSTapi-auth-update-profile"
-               value="omnis"
+               value="alias"
                data-component="body">
     <br>
-<p>optional کد ملی (باید یکتا باشد) Example: <code>omnis</code></p>
+<p>optional کد ملی (باید یکتا باشد) Example: <code>alias</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>date_of_birth</code></b>&nbsp;&nbsp;
@@ -1591,10 +1505,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="date_of_birth"                data-endpoint="POSTapi-auth-update-profile"
-               value="consectetur"
+               value="consequatur"
                data-component="body">
     <br>
-<p>optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15) Example: <code>consectetur</code></p>
+<p>optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15) Example: <code>consequatur</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>sex</code></b>&nbsp;&nbsp;
@@ -1602,10 +1516,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="sex"                data-endpoint="POSTapi-auth-update-profile"
-               value="tempora"
+               value="velit"
                data-component="body">
     <br>
-<p>optional جنسیت (male یا female) Example: <code>tempora</code></p>
+<p>optional جنسیت (male یا female) Example: <code>velit</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>zone_city_id</code></b>&nbsp;&nbsp;
@@ -1613,10 +1527,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="zone_city_id"                data-endpoint="POSTapi-auth-update-profile"
-               value="8"
+               value="15"
                data-component="body">
     <br>
-<p>optional شناسه شهر Example: <code>8</code></p>
+<p>optional شناسه شهر Example: <code>15</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
@@ -1624,10 +1538,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="email"                data-endpoint="POSTapi-auth-update-profile"
-               value="schoen.telly@example.com"
+               value="strosin.norene@example.com"
                data-component="body">
     <br>
-<p>optional ایمیل (باید یکتا باشد) Example: <code>schoen.telly@example.com</code></p>
+<p>optional ایمیل (باید یکتا باشد) Example: <code>strosin.norene@example.com</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
@@ -1635,12 +1549,387 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="address"                data-endpoint="POSTapi-auth-update-profile"
-               value="libero"
+               value="maxime"
                data-component="body">
     <br>
-<p>optional آدرس Example: <code>libero</code></p>
+<p>optional آدرس Example: <code>maxime</code></p>
         </div>
         </form>
+
+                    <h2 id="endpoints-POSTapi-appointments-my_appointments--id--cancel">لغو نوبت</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-POSTapi-appointments-my_appointments--id--cancel">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost/api/appointments/my_appointments/19/cancel" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/appointments/my_appointments/19/cancel"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost/api/appointments/my_appointments/19/cancel';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost/api/appointments/my_appointments/19/cancel'
+headers = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('POST', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-appointments-my_appointments--id--cancel">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;success&quot;,
+    &quot;message&quot;: &quot;نوبت با موفقیت لغو شد&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;نوبت قبلاً لغو شده است&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;کاربر احراز هویت نشده است&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;نوبت یافت نشد&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-appointments-my_appointments--id--cancel" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-appointments-my_appointments--id--cancel"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-appointments-my_appointments--id--cancel"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-appointments-my_appointments--id--cancel" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-appointments-my_appointments--id--cancel">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-appointments-my_appointments--id--cancel" data-method="POST"
+      data-path="api/appointments/my_appointments/{id}/cancel"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-appointments-my_appointments--id--cancel', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-appointments-my_appointments--id--cancel"
+                    onclick="tryItOut('POSTapi-appointments-my_appointments--id--cancel');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-appointments-my_appointments--id--cancel"
+                    onclick="cancelTryOut('POSTapi-appointments-my_appointments--id--cancel');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-appointments-my_appointments--id--cancel"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/appointments/my_appointments/{id}/cancel</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-appointments-my_appointments--id--cancel"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-appointments-my_appointments--id--cancel"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="POSTapi-appointments-my_appointments--id--cancel"
+               value="19"
+               data-component="url">
+    <br>
+<p>شناسه نوبت Example: <code>19</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="endpoints-GETapi-appointments-my_appointments">گرفتن لیست نوبت‌های کاربر</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-GETapi-appointments-my_appointments">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost/api/appointments/my_appointments" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/appointments/my_appointments"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost/api/appointments/my_appointments';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost/api/appointments/my_appointments'
+headers = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('GET', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-appointments-my_appointments">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;success&quot;,
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;doctor&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;دکتر محمدی&quot;,
+                &quot;specialty&quot;: &quot;متخصص قلب و عروق&quot;,
+                &quot;license_number&quot;: &quot;۱۲۳۴۵۶&quot;,
+                &quot;profile_photo&quot;: &quot;https://example.com/photos/doctor1.jpg&quot;
+            },
+            &quot;clinic&quot;: {
+                &quot;name&quot;: &quot;کلینیک تهران&quot;,
+                &quot;address&quot;: &quot;خیابان ولیعصر&quot;
+            },
+            &quot;appointment_date&quot;: &quot;۱۴۰۲/۰۵/۱۲&quot;,
+            &quot;start_time&quot;: &quot;۱۴:۳۰:۰۰&quot;,
+            &quot;fee&quot;: 500000,
+            &quot;notes&quot;: &quot;این نوبت شامل بررسی اولیه و نوار قلب می&zwnj;باشد.&quot;,
+            &quot;status&quot;: &quot;scheduled&quot;
+        }
+    ]
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;کاربر احراز هویت نشده است&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-appointments-my_appointments" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-appointments-my_appointments"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-appointments-my_appointments"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-appointments-my_appointments" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-appointments-my_appointments">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-appointments-my_appointments" data-method="GET"
+      data-path="api/appointments/my_appointments"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-appointments-my_appointments', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-appointments-my_appointments"
+                    onclick="tryItOut('GETapi-appointments-my_appointments');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-appointments-my_appointments"
+                    onclick="cancelTryOut('GETapi-appointments-my_appointments');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-appointments-my_appointments"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/appointments/my_appointments</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-appointments-my_appointments"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-appointments-my_appointments"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
 
                     <h2 id="endpoints-GETapi-zone-provinces">گرفتن لیست استان‌ها</h2>
 
@@ -1657,7 +1946,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost/api/zone/provinces" \
-    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -1668,7 +1956,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
-    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1686,7 +1973,6 @@ $response = $client-&gt;get(
     $url,
     [
         'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
             'Content-Type' =&gt; 'application/json',
             'Accept' =&gt; 'application/json',
         ],
@@ -1702,7 +1988,6 @@ import json
 
 url = 'http://localhost/api/zone/provinces'
 headers = {
-  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
@@ -1781,17 +2066,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="GETapi-zone-provinces"
-               value="Bearer {YOUR_AUTH_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -1829,8 +2103,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/zone/cities?province_id=17" \
-    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
+    --get "http://localhost/api/zone/cities?province_id=10" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -1841,13 +2114,12 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const params = {
-    "province_id": "17",
+    "province_id": "10",
 };
 Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
-    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1865,12 +2137,11 @@ $response = $client-&gt;get(
     $url,
     [
         'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
             'Content-Type' =&gt; 'application/json',
             'Accept' =&gt; 'application/json',
         ],
         'query' =&gt; [
-            'province_id' =&gt; '17',
+            'province_id' =&gt; '10',
         ],
     ]
 );
@@ -1884,10 +2155,9 @@ import json
 
 url = 'http://localhost/api/zone/cities'
 params = {
-  'province_id': '17',
+  'province_id': '10',
 }
 headers = {
-  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
@@ -1988,17 +2258,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="GETapi-zone-cities"
-               value="Bearer {YOUR_AUTH_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -2027,10 +2286,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="province_id"                data-endpoint="GETapi-zone-cities"
-               value="17"
+               value="10"
                data-component="query">
     <br>
-<p>شناسه استان Example: <code>17</code></p>
+<p>شناسه استان Example: <code>10</code></p>
             </div>
                 </form>
 

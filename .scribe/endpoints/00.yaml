@@ -15,7 +15,6 @@ endpoints:
       authenticated: true
       custom: []
     headers:
-      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -27,14 +26,14 @@ endpoints:
         name: mobile
         description: 'شماره موبایل کاربر (مثال: 09181234567)'
         required: true
-        example: consequatur
+        example: numquam
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      mobile: consequatur
+      mobile: numquam
     fileParameters: []
     responses:
       -
@@ -76,10 +75,7 @@ endpoints:
         description: ''
         custom: []
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    auth: []
     controller: null
     method: null
     route: null
@@ -98,7 +94,6 @@ endpoints:
       authenticated: true
       custom: []
     headers:
-      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -106,14 +101,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: debitis
+        example: ipsam
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: debitis
+      token: ipsam
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
@@ -121,14 +116,14 @@ endpoints:
         name: otpCode
         description: 'کد OTP وارد شده (مثال: 1234)'
         required: true
-        example: porro
+        example: aut
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      otpCode: porro
+      otpCode: aut
     fileParameters: []
     responses:
       -
@@ -174,10 +169,7 @@ endpoints:
         description: ''
         custom: []
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    auth: []
     controller: null
     method: null
     route: null
@@ -196,7 +188,6 @@ endpoints:
       authenticated: true
       custom: []
     headers:
-      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -204,14 +195,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: et
+        example: ut
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: et
+      token: ut
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -257,10 +248,7 @@ endpoints:
         description: ''
         custom: []
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    auth: []
     controller: null
     method: null
     route: null
@@ -279,7 +267,6 @@ endpoints:
       authenticated: true
       custom: []
     headers:
-      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -304,10 +291,7 @@ endpoints:
         description: ''
         custom: []
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    auth: []
     controller: null
     method: null
     route: null
@@ -326,7 +310,6 @@ endpoints:
       authenticated: true
       custom: []
     headers:
-      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -339,7 +322,7 @@ endpoints:
     responses:
       -
         status: 401
-        content: '{"status":"error","message":"\u062a\u0648\u06a9\u0646 \u0646\u0627\u0645\u0639\u062a\u0628\u0631 \u0627\u0633\u062a.","data":null}'
+        content: '{"status":"error","message":"\u062a\u0648\u06a9\u0646  \u06cc\u0627\u0641\u062a \u0646\u0634\u062f","data":null}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -350,10 +333,7 @@ endpoints:
         description: null
         custom: []
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    auth: []
     controller: null
     method: null
     route: null
@@ -412,10 +392,7 @@ endpoints:
         description: ''
         custom: []
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    auth: []
     controller: null
     method: null
     route: null
@@ -434,7 +411,6 @@ endpoints:
       authenticated: true
       custom: []
     headers:
-      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -446,7 +422,7 @@ endpoints:
         name: first_name
         description: 'optional نام کاربر'
         required: false
-        example: quasi
+        example: officia
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -456,7 +432,7 @@ endpoints:
         name: last_name
         description: 'optional نام خانوادگی کاربر'
         required: false
-        example: cumque
+        example: quaerat
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -466,7 +442,7 @@ endpoints:
         name: national_code
         description: 'optional کد ملی (باید یکتا باشد)'
         required: false
-        example: omnis
+        example: alias
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -476,7 +452,7 @@ endpoints:
         name: date_of_birth
         description: 'optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15)'
         required: false
-        example: consectetur
+        example: consequatur
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -486,7 +462,7 @@ endpoints:
         name: sex
         description: 'optional جنسیت (male یا female)'
         required: false
-        example: tempora
+        example: velit
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -496,7 +472,7 @@ endpoints:
         name: zone_city_id
         description: 'optional شناسه شهر'
         required: false
-        example: 8
+        example: 15
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -506,7 +482,7 @@ endpoints:
         name: email
         description: 'optional ایمیل (باید یکتا باشد)'
         required: false
-        example: schoen.telly@example.com
+        example: strosin.norene@example.com
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -516,21 +492,21 @@ endpoints:
         name: address
         description: 'optional آدرس'
         required: false
-        example: libero
+        example: maxime
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      first_name: quasi
-      last_name: cumque
-      national_code: omnis
-      date_of_birth: consectetur
-      sex: tempora
-      zone_city_id: 8
-      email: schoen.telly@example.com
-      address: libero
+      first_name: officia
+      last_name: quaerat
+      national_code: alias
+      date_of_birth: consequatur
+      sex: velit
+      zone_city_id: 15
+      email: strosin.norene@example.com
+      address: maxime
     fileParameters: []
     responses:
       -
@@ -570,10 +546,163 @@ endpoints:
         description: ''
         custom: []
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: 'api/appointments/my_appointments/{id}/cancel'
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'لغو نوبت'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'شناسه نوبت'
+        required: true
+        example: 19
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 19
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "message": "نوبت با موفقیت لغو شد",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 400
+        content: |-
+          {
+            "status": "error",
+            "message": "نوبت قبلاً لغو شده است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "status": "error",
+            "message": "کاربر احراز هویت نشده است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "status": "error",
+            "message": "نوبت یافت نشد",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/appointments/my_appointments
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست نوبت‌های کاربر'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {
+                "id": 1,
+                "doctor": {
+                  "id": 1,
+                  "name": "دکتر محمدی",
+                  "specialty": "متخصص قلب و عروق",
+                  "license_number": "۱۲۳۴۵۶",
+                  "profile_photo": "https://example.com/photos/doctor1.jpg"
+                },
+                "clinic": {
+                  "name": "کلینیک تهران",
+                  "address": "خیابان ولیعصر"
+                },
+                "appointment_date": "۱۴۰۲/۰۵/۱۲",
+                "start_time": "۱۴:۳۰:۰۰",
+                "fee": 500000,
+                "notes": "این نوبت شامل بررسی اولیه و نوار قلب می‌باشد.",
+                "status": "scheduled"
+              }
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "status": "error",
+            "message": "کاربر احراز هویت نشده است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
     controller: null
     method: null
     route: null
@@ -592,7 +721,6 @@ endpoints:
       authenticated: true
       custom: []
     headers:
-      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -617,10 +745,7 @@ endpoints:
         description: ''
         custom: []
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    auth: []
     controller: null
     method: null
     route: null
@@ -639,7 +764,6 @@ endpoints:
       authenticated: true
       custom: []
     headers:
-      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -649,14 +773,14 @@ endpoints:
         name: province_id
         description: 'شناسه استان'
         required: true
-        example: 17
+        example: 10
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanQueryParameters:
-      province_id: 17
+      province_id: 10
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -697,10 +821,7 @@ endpoints:
         description: ''
         custom: []
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    auth: []
     controller: null
     method: null
     route: null

@@ -15,7 +15,7 @@ return [
     |
     */
     'title'                           => config('app.name') . ' API Documentation',
-    'description'                     => 'مستندات رسمی API پروژه، شامل احراز هویت، درخواست‌های کاربر و سایر عملیات.',
+    'description'                     => 'مستندات رسمی API پروژه، شامل احراز هویت، درخواست‌های کاربر، مدیریت نوبت‌ها و سایر عملیات.',
     'base_url'                        => config('app.url'),
 
     /*
@@ -26,16 +26,26 @@ return [
     | تعریف مسیرهایی که باید در مستندات گنجانده شوند.
     |
     */
- 'routes' => [
-    [
-        'match' => [
-            'prefixes' => ['api/auth/*', 'api/zone/*'],
-            'domains' => ['*'],
+    'routes'                          => [
+        [
+            'match'   => [
+                'prefixes' => ['api/auth/*', 'api/zone/*', 'api/appointments/*'],
+                'domains'  => ['*'],
+            ],
+            'include' => [],
+            'exclude' => ['api/sendotp*'],
         ],
-        'include' => [],
-        'exclude' => ['api/sendotp*'],
     ],
-],
+
+    'strategies'                      => [
+        'responses' => configureStrategy(
+            Defaults::RESPONSES_STRATEGIES,
+            Strategies\Responses\ResponseCalls::withSettings(
+                only: ['GET *', 'POST *'],
+                config: ['app.debug' => false]
+            )
+        ),
+    ],
 
     /*
     |-------------------------------------------------------------------------
@@ -85,11 +95,11 @@ return [
     |
     */
     'auth'                            => [
-        'enabled'     => true,
+        'enabled'     => false,
         'default'     => true,
         'in'          => AuthIn::BEARER->value,
         'name'        => 'Authorization',
-        'use_value'   => 'Bearer {YOUR_AUTH_TOKEN}',
+        'use_value'   => 'Bearer CCK9WNldS2SHFoIB41AEidML0r6oS9PPojZlOdbmBX4Dt6t3IadgdzvcYchJqO12', // توکن واقعی
         'placeholder' => '{YOUR_AUTH_TOKEN}',
         'extra_info'  => 'برای دریافت توکن، به پنل خود وارد شوید و یک توکن API تولید کنید.',
     ],
@@ -190,6 +200,11 @@ return [
             'zone_city_id'    =>'1',                                      // ID شهر
             'email'           =>'ali@example.com',                        // ایمیل نمونه
             'address'         =>'تهران، خیابان ولیعصر', // آدرس فارسی
+            'appointment_date'=>'1402-05-12',                             // تاریخ نمونه نوبت
+            'start_time'      =>'14:30:00',                               // ساعت شروع نمونه
+            'fee'             =>500000,                                   // مبلغ نمونه
+            'doctor_id'       =>1,                                        // ID پزشک نمونه
+            'clinic_id'       =>1,                                        // ID کلینیک نمونه
         ],
     ],
 
@@ -216,7 +231,7 @@ return [
         'responses'      =>configureStrategy(
             Defaults::RESPONSES_STRATEGIES,
             Strategies\Responses\ResponseCalls::withSettings(
-                only:['GET *'],
+                only:['GET *','POST *'],// اضافه کردن POST برای cancelAppointment
                 config:['app.debug'=>false]
             )
         ),

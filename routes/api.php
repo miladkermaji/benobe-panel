@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\ZoneController;
+use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\ZoneController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('/auth')->group(function () {
     Route::post('/login-register', [AuthController::class, 'loginRegister'])->name('api.auth.login-register');
@@ -16,6 +17,13 @@ Route::prefix('/auth')->group(function () {
         Route::get('/verify-token', [AuthController::class, 'verifyToken']);
         // مسیر جدید برای ویرایش اطلاعات کاربر
         Route::post('/update-profile', [AuthController::class, 'updateProfile'])->name('api.auth.update-profile');
+
+    });
+});
+Route::middleware(['custom-auth.jwt'])->group(function () {
+    Route::prefix('appointments')->group(function () {
+        Route::post('my_appointments/{id}/cancel', [AppointmentController::class, 'cancelAppointment'])->name('api.appointments.cancel');
+        Route::get('/my_appointments', [AppointmentController::class, 'getAppointments'])->name('api.appointments.index');
     });
 });
 
