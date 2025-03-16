@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('sub_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('doctor_id')->constrained('doctors')->onDelete('cascade'); // ارتباط با پزشک
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // ارتباط با کاربر زیرمجموعه
+            $table->foreignId('doctor_id')->nullable()->constrained('doctors')->onDelete('cascade'); // ارتباط با پزشک
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade'); // ارتباط با کاربر زیرمجموعه
             $table->enum('status', ['active', 'inactive'])->default('active'); // وضعیت کاربر
             $table->timestamps();
         });

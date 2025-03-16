@@ -28,7 +28,10 @@ class Appointment extends Model
         'include_holidays',
         'disabled_days',
     ];
-
+protected $casts = [
+        'appointment_date' => 'date', // تبدیل به Carbon برای تاریخ
+        'start_time' => 'datetime:H:i:s', // تبدیل به Carbon برای زمان
+    ];
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);

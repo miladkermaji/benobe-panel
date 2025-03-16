@@ -5,6 +5,7 @@ use App\Models\Admin\Dashboard\Cities\Zone;
 use App\Models\Doctors\DoctorManagement\DoctorTariff;
 use App\Models\Secretary;
 use App\Models\Specialty;
+use App\Models\UserDoctorLike;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -204,5 +205,8 @@ class Doctor extends Authenticatable
 
         return $incompleteSections;
     }
-
+    public function likes()
+    {
+        return $this->hasMany(UserDoctorLike::class);
+    }
 }

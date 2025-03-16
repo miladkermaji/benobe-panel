@@ -26,14 +26,14 @@ endpoints:
         name: mobile
         description: 'شماره موبایل کاربر (مثال: 09181234567)'
         required: true
-        example: numquam
+        example: est
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      mobile: numquam
+      mobile: est
     fileParameters: []
     responses:
       -
@@ -101,14 +101,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: ipsam
+        example: non
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: ipsam
+      token: non
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
@@ -116,14 +116,14 @@ endpoints:
         name: otpCode
         description: 'کد OTP وارد شده (مثال: 1234)'
         required: true
-        example: aut
+        example: rerum
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      otpCode: aut
+      otpCode: rerum
     fileParameters: []
     responses:
       -
@@ -195,14 +195,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: ut
+        example: voluptate
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: ut
+      token: voluptate
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -422,7 +422,7 @@ endpoints:
         name: first_name
         description: 'optional نام کاربر'
         required: false
-        example: officia
+        example: modi
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -432,7 +432,7 @@ endpoints:
         name: last_name
         description: 'optional نام خانوادگی کاربر'
         required: false
-        example: quaerat
+        example: est
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -442,7 +442,7 @@ endpoints:
         name: national_code
         description: 'optional کد ملی (باید یکتا باشد)'
         required: false
-        example: alias
+        example: sed
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -452,7 +452,7 @@ endpoints:
         name: date_of_birth
         description: 'optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15)'
         required: false
-        example: consequatur
+        example: sint
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -462,7 +462,7 @@ endpoints:
         name: sex
         description: 'optional جنسیت (male یا female)'
         required: false
-        example: velit
+        example: excepturi
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -472,7 +472,7 @@ endpoints:
         name: zone_city_id
         description: 'optional شناسه شهر'
         required: false
-        example: 15
+        example: 5
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -482,7 +482,7 @@ endpoints:
         name: email
         description: 'optional ایمیل (باید یکتا باشد)'
         required: false
-        example: strosin.norene@example.com
+        example: sophia.eichmann@example.com
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -492,21 +492,21 @@ endpoints:
         name: address
         description: 'optional آدرس'
         required: false
-        example: maxime
+        example: quia
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      first_name: officia
-      last_name: quaerat
-      national_code: alias
-      date_of_birth: consequatur
-      sex: velit
-      zone_city_id: 15
-      email: strosin.norene@example.com
-      address: maxime
+      first_name: modi
+      last_name: est
+      national_code: sed
+      date_of_birth: sint
+      sex: excepturi
+      zone_city_id: 5
+      email: sophia.eichmann@example.com
+      address: quia
     fileParameters: []
     responses:
       -
@@ -553,6 +553,125 @@ endpoints:
     custom: []
   -
     httpMethods:
+      - GET
+    uri: api/zone/provinces
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست استان‌ها'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {"id": 1, "name": "تهران"},
+              {"id": 2, "name": "مشهد"}
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/zone/cities
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست شهرها بر اساس استان'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      province_id:
+        name: province_id
+        description: 'شناسه استان'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      province_id: 16
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {"id": 1, "name": "تهران"},
+              {"id": 3, "name": "ری"}
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 400
+        content: |-
+          {
+            "status": "error",
+            "message": "شناسه استان الزامی است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "status": "error",
+            "message": "استان یافت نشد",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
       - POST
     uri: 'api/appointments/my_appointments/{id}/cancel'
     metadata:
@@ -572,14 +691,14 @@ endpoints:
         name: id
         description: 'شناسه نوبت'
         required: true
-        example: 19
+        example: 12
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: 19
+      id: 12
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -668,22 +787,26 @@ endpoints:
             "data": [
               {
                 "id": 1,
+                "tracking_code": "۱۲۳۴۵۶",
+                "appointment_date": "1402-05-12",
+                "start_time": "14:30:00",
+                "status": "completed",
+                "consultation_type": "in_person",
+                "fee": 500000,
+                "notes": "این نوبت شامل بررسی اولیه و نوار قلب می‌باشد. لطفاً ۱۵ دقیقه زودتر در محل حضور داشته باشید.",
                 "doctor": {
                   "id": 1,
                   "name": "دکتر محمدی",
-                  "specialty": "متخصص قلب و عروق",
-                  "license_number": "۱۲۳۴۵۶",
-                  "profile_photo": "https://example.com/photos/doctor1.jpg"
+                  "specialty": "متخصص قلب و عروق"
                 },
                 "clinic": {
-                  "name": "کلینیک تهران",
-                  "address": "خیابان ولیعصر"
+                  "id": 1,
+                  "address": "تهران، میدان آرژانتین، خیابان الوند، جنب بیمارستان کسری، بن بست آفرین، ساختمان پزشکان آفرین، طبقه دوم"
                 },
-                "appointment_date": "۱۴۰۲/۰۵/۱۲",
-                "start_time": "۱۴:۳۰:۰۰",
-                "fee": 500000,
-                "notes": "این نوبت شامل بررسی اولیه و نوار قلب می‌باشد.",
-                "status": "scheduled"
+                "patient": {
+                  "mobile": "09121234567",
+                  "name": "زهرا احمدی"
+                }
               }
             ]
           }
@@ -695,7 +818,18 @@ endpoints:
         content: |-
           {
             "status": "error",
-            "message": "کاربر احراز هویت نشده است",
+            "message": "توکن نامعتبر است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "خطای سرور",
             "data": null
           }
         headers: []
@@ -710,13 +844,13 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: api/zone/provinces
+    uri: api/orders/my_orders
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'گرفتن لیست استان‌ها'
+      title: 'گرفتن لیست سفارشات کاربر'
       description: ''
       authenticated: true
       custom: []
@@ -737,9 +871,41 @@ endpoints:
           {
             "status": "success",
             "data": [
-              {"id": 1, "name": "تهران"},
-              {"id": 2, "name": "مشهد"}
+              {
+                "id": 1,
+                "order_code": "ORD-123456",
+                "total_amount": 750000,
+                "status": "completed",
+                "order_date": "2025-03-16",
+                "notes": "سفارش شامل تجهیزات پزشکی است.",
+                "user": {
+                  "mobile": "09121234567",
+                  "name": "زهرا احمدی"
+                }
+              }
             ]
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "status": "error",
+            "message": "توکن نامعتبر است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "خطای سرور",
+            "data": null
           }
         headers: []
         description: ''
@@ -753,13 +919,13 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: api/zone/cities
+    uri: api/wallet/my_wallet
     metadata:
       groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'گرفتن لیست شهرها بر اساس استان'
+      title: 'گرفتن اطلاعات کیف پول کاربر'
       description: ''
       authenticated: true
       custom: []
@@ -768,19 +934,8 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters:
-      province_id:
-        name: province_id
-        description: 'شناسه استان'
-        required: true
-        example: 10
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanQueryParameters:
-      province_id: 10
+    queryParameters: []
+    cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -790,20 +945,19 @@ endpoints:
         content: |-
           {
             "status": "success",
-            "data": [
-              {"id": 1, "name": "تهران"},
-              {"id": 3, "name": "ری"}
-            ]
+            "data": {
+              "balance": 1000000.50
+            }
           }
         headers: []
         description: ''
         custom: []
       -
-        status: 400
+        status: 401
         content: |-
           {
             "status": "error",
-            "message": "شناسه استان الزامی است",
+            "message": "توکن نامعتبر است",
             "data": null
           }
         headers: []
@@ -814,7 +968,251 @@ endpoints:
         content: |-
           {
             "status": "error",
-            "message": "استان یافت نشد",
+            "message": "کیف پول یافت نشد",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "خطای سرور",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/wallet/my_transactions
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست تراکنش‌های کیف پول کاربر'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {
+                "id": 1,
+                "amount": 500000,
+                "status": "paid",
+                "type": "deposit",
+                "description": "شارژ کیف پول",
+                "registered_at": "2025-03-16T10:00:00Z",
+                "paid_at": "2025-03-16T10:05:00Z"
+              },
+              {
+                "id": 2,
+                "amount": 250000,
+                "status": "paid",
+                "type": "payment",
+                "description": "پرداخت سفارش ORD-123456",
+                "registered_at": "2025-03-16T11:00:00Z",
+                "paid_at": "2025-03-16T11:05:00Z"
+              }
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "status": "error",
+            "message": "توکن نامعتبر است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "خطای سرور",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/sub_users/list
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست کاربران زیرمجموعه'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {
+                "id": 1,
+                "status": "active",
+                "created_at": "2025-03-16T12:00:00Z",
+                "updated_at": "2025-03-16T12:00:00Z",
+                "doctor": {
+                  "id": 1,
+                  "first_name": "دکتر",
+                  "last_name": "محمدی",
+                  "license_number": "۱۲۳۴۵۶",
+                  "profile_photo_path": "https://example.com/photos/doctor1.jpg"
+                },
+                "user": {
+                  "id": 2,
+                  "mobile": "09182718639",
+                  "name": "علی احمدی" // فرض می‌کنیم جدول users فیلد name داره
+                }
+              }
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "status": "error",
+            "message": "توکن نامعتبر است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "خطای سرور",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/doctors/my_doctors
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست پزشکان لایک‌شده توسط کاربر'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {
+                "id": 1,
+                "name": "دکتر محمدی",
+                "specialty": "متخصص قلب و عروق",
+                "license_number": "۱۲۳۴۵۶",
+                "profile_photo_path": "https://example.com/photos/doctor1.jpg",
+                "liked_at": "2025-03-16T12:00:00Z"
+              }
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "status": "error",
+            "message": "توکن نامعتبر است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "خطای سرور",
             "data": null
           }
         headers: []

@@ -3,6 +3,7 @@ namespace App\Models;
 
 use App\Models\Admin\Dashboard\Cities\Zone;
 use App\Models\Appointment;
+use App\Models\UserDoctorLike;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -83,5 +84,9 @@ class User extends Authenticatable implements JWTSubject
     public function appointments()
     {
         return $this->hasMany(Appointment::class, 'patient_id');
+    }
+    public function likedDoctors()
+    {
+        return $this->hasMany(UserDoctorLike::class);
     }
 }

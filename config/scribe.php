@@ -29,7 +29,7 @@ return [
     'routes'                          => [
         [
             'match'   => [
-                'prefixes' => ['api/auth/*', 'api/zone/*', 'api/appointments/*'],
+                'prefixes' => ['api/auth/*', 'api/zone/*', 'api/appointments/*', 'api/sub_users/*', 'api/orders/*', 'api/wallet/*', 'api/doctors/*'],
                 'domains'  => ['*'],
             ],
             'include' => [],

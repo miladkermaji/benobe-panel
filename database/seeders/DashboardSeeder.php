@@ -20,9 +20,9 @@ class DashboardSeeder extends Seeder
     $clinics = Clinic::factory()->count(4)->create();
 
     Appointment::factory()->count(20)->create([
-        'doctor_id' => fn() => $doctors->random()->id,
-        'user_id' => fn() => $users->random()->id,
-        'clinic_id' => fn() => $clinics->random()->id,
+        'doctor_id' => fn() => $doctors->numberBetween(1, 2)->id,
+        'user_id' => fn() => $users->numberBetween(1, 2)->id,
+        'clinic_id' => fn() => $clinics->numberBetween(1, 2)->id,
     ]);
 }
 }

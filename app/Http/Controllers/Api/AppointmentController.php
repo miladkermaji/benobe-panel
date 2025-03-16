@@ -7,10 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-
 class AppointmentController extends Controller
 {
-   /**
+    /**
      * لغو نوبت
      * @authenticated
      * @urlParam id integer required شناسه نوبت
@@ -99,47 +98,74 @@ class AppointmentController extends Controller
     }
     /**
      * گرفتن لیست نوبت‌های کاربر
-     * @authenticated
+     *
      * @response 200 {
      *   "status": "success",
      *   "data": [
      *     {
      *       "id": 1,
+     *       "tracking_code": "۱۲۳۴۵۶",
+     *       "appointment_date": "1402-05-12",
+     *       "start_time": "14:30:00",
+     *       "status": "completed",
+     *       "consultation_type": "in_person",
+     *       "fee": 500000,
+     *       "notes": "این نوبت شامل بررسی اولیه و نوار قلب می‌باشد. لطفاً ۱۵ دقیقه زودتر در محل حضور داشته باشید.",
      *       "doctor": {
      *         "id": 1,
      *         "name": "دکتر محمدی",
-     *         "specialty": "متخصص قلب و عروق",
-     *         "license_number": "۱۲۳۴۵۶",
-     *         "profile_photo": "https://example.com/photos/doctor1.jpg"
+     *         "specialty": "متخصص قلب و عروق"
      *       },
      *       "clinic": {
-     *         "name": "کلینیک تهران",
-     *         "address": "خیابان ولیعصر"
+     *         "id": 1,
+     *         "address": "تهران، میدان آرژانتین، خیابان الوند، جنب بیمارستان کسری، بن بست آفرین، ساختمان پزشکان آفرین، طبقه دوم"
      *       },
-     *       "appointment_date": "۱۴۰۲/۰۵/۱۲",
-     *       "start_time": "۱۴:۳۰:۰۰",
-     *       "fee": 500000,
-     *       "notes": "این نوبت شامل بررسی اولیه و نوار قلب می‌باشد.",
-     *       "status": "scheduled"
+     *       "patient": {
+     *         "mobile": "09121234567",
+     *         "name": "زهرا احمدی"
+     *       }
      *     }
      *   ]
      * }
      * @response 401 {
      *   "status": "error",
-     *   "message": "کاربر احراز هویت نشده است",
+     *   "message": "توکن نامعتبر است",
+     *   "data": null
+     * }
+     * @response 500 {
+     *   "status": "error",
+     *   "message": "خطای سرور",
      *   "data": null
      * }
      */
-
-   public function getAppointments(Request $request)
+  public function getAppointments(Request $request)
 {
     try {
-        // احراز هویت کاربر
-        $user = JWTAuth::setToken($request->cookie('auth_token') ?: $request->bearerToken())->authenticate();
-        if (! $user) {
+        // گرفتن توکن از هدر یا کوکی
+        $token = $request->bearerToken() ?: $request->cookie('auth_token');
+        if (!$token) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'کاربر احراز هویت نشده است',
+                'message' => 'توکن ارائه نشده است',
+                'data'    => null,
+            ], 401);
+        }
+
+        // احراز هویت کاربر
+        try {
+            $user = JWTAuth::setToken($token)->authenticate();
+            if (!$user) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'کاربر یافت نشد',
+                    'data'    => null,
+                ], 401);
+            }
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            Log::error('GetAppointments - JWT Error: ' . $e->getMessage());
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'توکن نامعتبر است: ' . $e->getMessage(),
                 'data'    => null,
             ], 401);
         }
@@ -148,61 +174,61 @@ class AppointmentController extends Controller
         $appointments = Appointment::where('patient_id', $user->id)
             ->with([
                 'doctor' => function ($query) {
-                    $query->select('id', 'first_name', 'last_name', 'license_number', 'profile_photo_path', 'specialty_id')
+                    $query->select('id', 'first_name', 'last_name', 'specialty_id')
                         ->with(['specialty' => function ($query) {
                             $query->select('id', 'name');
                         }]);
                 },
                 'clinic' => function ($query) {
-                    $query->select('id', 'name', 'address');
+                    $query->select('id', 'address');
+                },
+                'patient' => function ($query) {
+                    $query->select('id', 'mobile', 'first_name', 'last_name');
                 },
             ])
-            ->select('id', 'doctor_id', 'clinic_id', 'appointment_date', 'start_time', 'fee', 'notes', 'status')
-            ->where('status', '!=', 'cancelled')
-            ->orderBy('appointment_date', 'desc')
+            ->select('id', 'doctor_id', 'clinic_id', 'patient_id', 'appointment_date', 'start_time', 'status', 'consultation_type', 'fee', 'notes', 'tracking_code')
             ->get();
 
         // فرمت کردن داده‌ها
         $formattedAppointments = $appointments->map(function ($appointment) {
             return [
-                'id'               => $appointment->id,
-                'doctor'           => [
-                    'id'             => $appointment->doctor->id,
-                    'name'           => $appointment->doctor->first_name . ' ' . $appointment->doctor->last_name,
-                    'specialty'      => $appointment->doctor->specialty ? $appointment->doctor->specialty->name : null,
-                    'license_number' => $appointment->doctor->license_number,
-                    'profile_photo'  => $appointment->doctor->profile_photo_path,
-                ],
-                'clinic'           => [
-                    'name'    => $appointment->clinic ? $appointment->clinic->name : null,
-                    'address' => $appointment->clinic ? $appointment->clinic->address : null,
-                ],
-                'appointment_date' => is_string($appointment->appointment_date) 
-                    ? $appointment->appointment_date 
-                    : $appointment->appointment_date->toDateString(),
-                'start_time'       => is_string($appointment->start_time) 
-                    ? $appointment->start_time 
-                    : $appointment->start_time->toTimeString(),
-                'fee'              => $appointment->fee,
-                'notes'            => $appointment->notes,
-                'status'           => $appointment->status,
+                'id' => $appointment->id,
+                'tracking_code' => $appointment->tracking_code ?? 'نامشخص',
+                'appointment_date' => $appointment->appointment_date ? $appointment->appointment_date->format('Y-m-d') : null,
+                'start_time' => $appointment->start_time ? $appointment->start_time->format('H:i:s') : null,
+                'status' => $appointment->status,
+                'consultation_type' => $appointment->consultation_type ?? 'in_person',
+                'fee' => $appointment->fee,
+                'notes' => $appointment->notes,
+                'doctor' => $appointment->doctor ? [
+                    'id' => $appointment->doctor->id,
+                    'name' => $appointment->doctor->first_name . ' ' . $appointment->doctor->last_name,
+                    'specialty' => $appointment->doctor->specialty ? $appointment->doctor->specialty->name : null,
+                ] : null,
+                'clinic' => $appointment->clinic ? [
+                    'id' => $appointment->clinic->id,
+                    'address' => $appointment->clinic->address,
+                ] : null,
+                'patient' => $appointment->patient ? [
+                    'mobile' => $appointment->patient->mobile,
+                    'name' => $appointment->patient->first_name . ' ' . $appointment->patient->last_name,
+                ] : null,
             ];
         });
 
         return response()->json([
             'status' => 'success',
-            'data'   => $formattedAppointments,
+            'data' => $formattedAppointments,
         ], 200);
 
     } catch (\Exception $e) {
         Log::error('GetAppointments - Error: ' . $e->getMessage());
         return response()->json([
-            'status'  => 'error',
+            'status' => 'error',
             'message' => 'خطای سرور',
-            'data'    => null,
+            'data' => null,
         ], 500);
     }
 }
 
-  
 }
