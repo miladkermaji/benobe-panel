@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ZoneController;
+use App\Http\Controllers\Api\Auth\AuthController;
 
 Route::prefix('/auth')->group(function () {
     Route::post('/login-register', [AuthController::class, 'loginRegister'])->name('api.auth.login-register');
@@ -16,4 +17,9 @@ Route::prefix('/auth')->group(function () {
         // مسیر جدید برای ویرایش اطلاعات کاربر
         Route::post('/update-profile', [AuthController::class, 'updateProfile'])->name('api.auth.update-profile');
     });
+});
+
+Route::prefix('zone')->group(function () {
+    Route::get('/provinces', [ZoneController::class, 'getProvinces'])->name('api.zone.provinces');
+    Route::get('/cities', [ZoneController::class, 'getCities'])->name('api.zone.cities');
 });

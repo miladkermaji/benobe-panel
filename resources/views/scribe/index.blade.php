@@ -96,6 +96,12 @@
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-auth-update-profile">
                                 <a href="#endpoints-POSTapi-auth-update-profile">POST api/auth/update-profile</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-GETapi-zone-provinces">
+                                <a href="#endpoints-GETapi-zone-provinces">گرفتن لیست استان‌ها</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-GETapi-zone-cities">
+                                <a href="#endpoints-GETapi-zone-cities">گرفتن لیست شهرها بر اساس استان</a>
+                            </li>
                                                                         </ul>
                             </ul>
             </div>
@@ -115,18 +121,18 @@
     <div class="dark-box"></div>
     <div class="content">
         <h1 id="introduction">Introduction</h1>
-<p>Official API documentation for your project, including authentication, user requests, and other operations.</p>
+<p>مستندات رسمی API پروژه، شامل احراز هویت، درخواست‌های کاربر و سایر عملیات.</p>
 <aside>
     <strong>Base URL</strong>: <code>http://localhost</code>
 </aside>
-<pre><code>This documentation provides all the necessary information to work with our API.
+<pre><code>این مستندات تمام اطلاعات لازم برای کار با API ما را فراهم می‌کند.
 
-&lt;aside&gt;On the right side, you will see request examples in different programming languages.&lt;/aside&gt;</code></pre>
+&lt;aside&gt;در سمت راست، مثال‌های درخواست به زبان‌های مختلف برنامه‌نویسی را مشاهده می‌کنید.&lt;/aside&gt;</code></pre>
 
         <h1 id="authenticating-requests">Authenticating requests</h1>
 <p>To authenticate requests, include an <strong><code>Authorization</code></strong> header with the value <strong><code>"Bearer {YOUR_AUTH_TOKEN}"</code></strong>.</p>
 <p>All authenticated endpoints are marked with a <code>requires authentication</code> badge in the documentation below.</p>
-<p>To obtain your token, log in to your panel and generate an API token.</p>
+<p>برای دریافت توکن، به پنل خود وارد شوید و یک توکن API تولید کنید.</p>
 
         <h1 id="endpoints">Endpoints</h1>
 
@@ -365,19 +371,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/login-confirm/consequatur" \
+    "http://localhost/api/auth/login-confirm/debitis" \
     --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"otpCode\": \"consequatur\"
+    \"otpCode\": \"porro\"
 }"
 </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/login-confirm/consequatur"
+    "http://localhost/api/auth/login-confirm/debitis"
 );
 
 const headers = {
@@ -387,7 +393,7 @@ const headers = {
 };
 
 let body = {
-    "otpCode": "consequatur"
+    "otpCode": "porro"
 };
 
 fetch(url, {
@@ -399,7 +405,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/login-confirm/consequatur';
+$url = 'http://localhost/api/auth/login-confirm/debitis';
 $response = $client-&gt;post(
     $url,
     [
@@ -409,7 +415,7 @@ $response = $client-&gt;post(
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'otpCode' =&gt; 'consequatur',
+            'otpCode' =&gt; 'porro',
         ],
     ]
 );
@@ -421,9 +427,9 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/login-confirm/consequatur'
+url = 'http://localhost/api/auth/login-confirm/debitis'
 payload = {
-    "otpCode": "consequatur"
+    "otpCode": "porro"
 }
 headers = {
   'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
@@ -567,10 +573,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="token"                data-endpoint="POSTapi-auth-login-confirm--token-"
-               value="consequatur"
+               value="debitis"
                data-component="url">
     <br>
-<p>Example: <code>consequatur</code></p>
+<p>Example: <code>debitis</code></p>
             </div>
                             <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
         <div style=" padding-left: 28px;  clear: unset;">
@@ -579,10 +585,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="otpCode"                data-endpoint="POSTapi-auth-login-confirm--token-"
-               value="consequatur"
+               value="porro"
                data-component="body">
     <br>
-<p>کد OTP وارد شده (مثال: 1234) Example: <code>consequatur</code></p>
+<p>کد OTP وارد شده (مثال: 1234) Example: <code>porro</code></p>
         </div>
         </form>
 
@@ -600,7 +606,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/resend-otp/consequatur" \
+    "http://localhost/api/auth/resend-otp/et" \
     --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -608,7 +614,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/resend-otp/consequatur"
+    "http://localhost/api/auth/resend-otp/et"
 );
 
 const headers = {
@@ -625,7 +631,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/resend-otp/consequatur';
+$url = 'http://localhost/api/auth/resend-otp/et';
 $response = $client-&gt;post(
     $url,
     [
@@ -644,7 +650,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/resend-otp/consequatur'
+url = 'http://localhost/api/auth/resend-otp/et'
 headers = {
   'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
   'Content-Type': 'application/json',
@@ -783,10 +789,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="token"                data-endpoint="POSTapi-auth-resend-otp--token-"
-               value="consequatur"
+               value="et"
                data-component="url">
     <br>
-<p>Example: <code>consequatur</code></p>
+<p>Example: <code>et</code></p>
             </div>
                     </form>
 
@@ -1329,18 +1335,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost/api/auth/update-profile" \
-    --header "Authorization: Bearer {token}" \
+    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"first_name\": \"consequatur\",
-    \"last_name\": \"consequatur\",
-    \"national_code\": \"consequatur\",
-    \"date_of_birth\": \"consequatur\",
-    \"sex\": \"consequatur\",
-    \"zone_city_id\": 17,
-    \"email\": \"qkunze@example.com\",
-    \"address\": \"consequatur\"
+    \"first_name\": \"quasi\",
+    \"last_name\": \"cumque\",
+    \"national_code\": \"omnis\",
+    \"date_of_birth\": \"consectetur\",
+    \"sex\": \"tempora\",
+    \"zone_city_id\": 8,
+    \"email\": \"schoen.telly@example.com\",
+    \"address\": \"libero\"
 }"
 </code></pre></div>
 
@@ -1351,20 +1357,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
-    "Authorization": "Bearer {token}",
+    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
 
 let body = {
-    "first_name": "consequatur",
-    "last_name": "consequatur",
-    "national_code": "consequatur",
-    "date_of_birth": "consequatur",
-    "sex": "consequatur",
-    "zone_city_id": 17,
-    "email": "qkunze@example.com",
-    "address": "consequatur"
+    "first_name": "quasi",
+    "last_name": "cumque",
+    "national_code": "omnis",
+    "date_of_birth": "consectetur",
+    "sex": "tempora",
+    "zone_city_id": 8,
+    "email": "schoen.telly@example.com",
+    "address": "libero"
 };
 
 fetch(url, {
@@ -1381,19 +1387,19 @@ $response = $client-&gt;post(
     $url,
     [
         'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {token}',
+            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
             'Content-Type' =&gt; 'application/json',
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'first_name' =&gt; 'consequatur',
-            'last_name' =&gt; 'consequatur',
-            'national_code' =&gt; 'consequatur',
-            'date_of_birth' =&gt; 'consequatur',
-            'sex' =&gt; 'consequatur',
-            'zone_city_id' =&gt; 17,
-            'email' =&gt; 'qkunze@example.com',
-            'address' =&gt; 'consequatur',
+            'first_name' =&gt; 'quasi',
+            'last_name' =&gt; 'cumque',
+            'national_code' =&gt; 'omnis',
+            'date_of_birth' =&gt; 'consectetur',
+            'sex' =&gt; 'tempora',
+            'zone_city_id' =&gt; 8,
+            'email' =&gt; 'schoen.telly@example.com',
+            'address' =&gt; 'libero',
         ],
     ]
 );
@@ -1407,17 +1413,17 @@ import json
 
 url = 'http://localhost/api/auth/update-profile'
 payload = {
-    "first_name": "consequatur",
-    "last_name": "consequatur",
-    "national_code": "consequatur",
-    "date_of_birth": "consequatur",
-    "sex": "consequatur",
-    "zone_city_id": 17,
-    "email": "qkunze@example.com",
-    "address": "consequatur"
+    "first_name": "quasi",
+    "last_name": "cumque",
+    "national_code": "omnis",
+    "date_of_birth": "consectetur",
+    "sex": "tempora",
+    "zone_city_id": 8,
+    "email": "schoen.telly@example.com",
+    "address": "libero"
 }
 headers = {
-  'Authorization': 'Bearer {token}',
+  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
@@ -1462,26 +1468,6 @@ response.json()</code></pre></div>
     &quot;status&quot;: &quot;error&quot;,
     &quot;message&quot;: &quot;کاربر احراز هویت نشده است&quot;,
     &quot;data&quot;: null
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (422):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;status&quot;: &quot;error&quot;,
-    &quot;message&quot;: &quot;خطا در اعتبارسنجی&quot;,
-    &quot;data&quot;: {
-        &quot;errors&quot;: {
-            &quot;national_code&quot;: [
-                &quot;کد ملی قبلاً ثبت شده است&quot;
-            ],
-            &quot;email&quot;: [
-                &quot;ایمیل قبلاً ثبت شده است&quot;
-            ]
-        }
-    }
 }</code>
  </pre>
     </span>
@@ -1538,10 +1524,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="Authorization" class="auth-value"               data-endpoint="POSTapi-auth-update-profile"
-               value="Bearer {token}"
+               value="Bearer {YOUR_AUTH_TOKEN}"
                data-component="header">
     <br>
-<p>Example: <code>Bearer {token}</code></p>
+<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
             </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
@@ -1572,10 +1558,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="first_name"                data-endpoint="POSTapi-auth-update-profile"
-               value="consequatur"
+               value="quasi"
                data-component="body">
     <br>
-<p>optional نام کاربر Example: <code>consequatur</code></p>
+<p>optional نام کاربر Example: <code>quasi</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>last_name</code></b>&nbsp;&nbsp;
@@ -1583,10 +1569,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="last_name"                data-endpoint="POSTapi-auth-update-profile"
-               value="consequatur"
+               value="cumque"
                data-component="body">
     <br>
-<p>optional نام خانوادگی کاربر Example: <code>consequatur</code></p>
+<p>optional نام خانوادگی کاربر Example: <code>cumque</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>national_code</code></b>&nbsp;&nbsp;
@@ -1594,10 +1580,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="national_code"                data-endpoint="POSTapi-auth-update-profile"
-               value="consequatur"
+               value="omnis"
                data-component="body">
     <br>
-<p>optional کد ملی (باید یکتا باشد) Example: <code>consequatur</code></p>
+<p>optional کد ملی (باید یکتا باشد) Example: <code>omnis</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>date_of_birth</code></b>&nbsp;&nbsp;
@@ -1605,10 +1591,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="date_of_birth"                data-endpoint="POSTapi-auth-update-profile"
-               value="consequatur"
+               value="consectetur"
                data-component="body">
     <br>
-<p>optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15) Example: <code>consequatur</code></p>
+<p>optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15) Example: <code>consectetur</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>sex</code></b>&nbsp;&nbsp;
@@ -1616,10 +1602,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="sex"                data-endpoint="POSTapi-auth-update-profile"
-               value="consequatur"
+               value="tempora"
                data-component="body">
     <br>
-<p>optional جنسیت (male یا female) Example: <code>consequatur</code></p>
+<p>optional جنسیت (male یا female) Example: <code>tempora</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>zone_city_id</code></b>&nbsp;&nbsp;
@@ -1627,21 +1613,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="zone_city_id"                data-endpoint="POSTapi-auth-update-profile"
-               value="17"
+               value="8"
                data-component="body">
     <br>
-<p>optional شناسه شهر Example: <code>17</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>zone_province_id</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
-<i>optional</i> &nbsp;
-                <input type="text" style="display: none"
-                              name="zone_province_id"                data-endpoint="POSTapi-auth-update-profile"
-               value=""
-               data-component="body">
-    <br>
-<p>فقط شهرها (level = 2). The <code>id</code> of an existing record in the zone table.</p>
+<p>optional شناسه شهر Example: <code>8</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
@@ -1649,10 +1624,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="email"                data-endpoint="POSTapi-auth-update-profile"
-               value="qkunze@example.com"
+               value="schoen.telly@example.com"
                data-component="body">
     <br>
-<p>optional ایمیل (باید یکتا باشد) Example: <code>qkunze@example.com</code></p>
+<p>optional ایمیل (باید یکتا باشد) Example: <code>schoen.telly@example.com</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
@@ -1660,12 +1635,404 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="address"                data-endpoint="POSTapi-auth-update-profile"
-               value="consequatur"
+               value="libero"
                data-component="body">
     <br>
-<p>optional آدرس Example: <code>consequatur</code></p>
+<p>optional آدرس Example: <code>libero</code></p>
         </div>
         </form>
+
+                    <h2 id="endpoints-GETapi-zone-provinces">گرفتن لیست استان‌ها</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-GETapi-zone-provinces">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost/api/zone/provinces" \
+    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/zone/provinces"
+);
+
+const headers = {
+    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost/api/zone/provinces';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost/api/zone/provinces'
+headers = {
+  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('GET', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-zone-provinces">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;success&quot;,
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;تهران&quot;
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;name&quot;: &quot;مشهد&quot;
+        }
+    ]
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-zone-provinces" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-zone-provinces"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-zone-provinces"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-zone-provinces" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-zone-provinces">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-zone-provinces" data-method="GET"
+      data-path="api/zone/provinces"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-zone-provinces', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-zone-provinces"
+                    onclick="tryItOut('GETapi-zone-provinces');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-zone-provinces"
+                    onclick="cancelTryOut('GETapi-zone-provinces');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-zone-provinces"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/zone/provinces</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-zone-provinces"
+               value="Bearer {YOUR_AUTH_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-zone-provinces"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-zone-provinces"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="endpoints-GETapi-zone-cities">گرفتن لیست شهرها بر اساس استان</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-GETapi-zone-cities">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost/api/zone/cities?province_id=17" \
+    --header "Authorization: Bearer {YOUR_AUTH_TOKEN}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/zone/cities"
+);
+
+const params = {
+    "province_id": "17",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Authorization": "Bearer {YOUR_AUTH_TOKEN}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost/api/zone/cities';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer {YOUR_AUTH_TOKEN}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'query' =&gt; [
+            'province_id' =&gt; '17',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost/api/zone/cities'
+params = {
+  'province_id': '17',
+}
+headers = {
+  'Authorization': 'Bearer {YOUR_AUTH_TOKEN}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('GET', url, headers=headers, params=params)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-zone-cities">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;success&quot;,
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;تهران&quot;
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;name&quot;: &quot;ری&quot;
+        }
+    ]
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;شناسه استان الزامی است&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;استان یافت نشد&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-zone-cities" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-zone-cities"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-zone-cities"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-zone-cities" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-zone-cities">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-zone-cities" data-method="GET"
+      data-path="api/zone/cities"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-zone-cities', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-zone-cities"
+                    onclick="tryItOut('GETapi-zone-cities');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-zone-cities"
+                    onclick="cancelTryOut('GETapi-zone-cities');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-zone-cities"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/zone/cities</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-zone-cities"
+               value="Bearer {YOUR_AUTH_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_AUTH_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-zone-cities"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-zone-cities"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>province_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="province_id"                data-endpoint="GETapi-zone-cities"
+               value="17"
+               data-component="query">
+    <br>
+<p>شناسه استان Example: <code>17</code></p>
+            </div>
+                </form>
 
             
 

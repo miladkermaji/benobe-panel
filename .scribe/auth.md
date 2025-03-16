@@ -4,4 +4,4 @@ To authenticate requests, include an **`Authorization`** header with the value *
 
 All authenticated endpoints are marked with a `requires authentication` badge in the documentation below.
 
-To obtain your token, log in to your panel and generate an API token.
+برای دریافت توکن، به پنل خود وارد شوید و یک توکن API تولید کنید.

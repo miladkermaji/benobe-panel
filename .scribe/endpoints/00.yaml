@@ -106,14 +106,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: consequatur
+        example: debitis
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: consequatur
+      token: debitis
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
@@ -121,14 +121,14 @@ endpoints:
         name: otpCode
         description: 'کد OTP وارد شده (مثال: 1234)'
         required: true
-        example: consequatur
+        example: porro
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      otpCode: consequatur
+      otpCode: porro
     fileParameters: []
     responses:
       -
@@ -204,14 +204,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: consequatur
+        example: et
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: consequatur
+      token: et
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -434,7 +434,7 @@ endpoints:
       authenticated: true
       custom: []
     headers:
-      Authorization: 'Bearer {token}'
+      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -446,27 +446,27 @@ endpoints:
         name: first_name
         description: 'optional نام کاربر'
         required: false
-        example: consequatur
+        example: quasi
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         custom: []
       last_name:
         name: last_name
         description: 'optional نام خانوادگی کاربر'
         required: false
-        example: consequatur
+        example: cumque
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         custom: []
       national_code:
         name: national_code
         description: 'optional کد ملی (باید یکتا باشد)'
         required: false
-        example: consequatur
+        example: omnis
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -476,47 +476,37 @@ endpoints:
         name: date_of_birth
         description: 'optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15)'
         required: false
-        example: consequatur
+        example: consectetur
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         custom: []
       sex:
         name: sex
         description: 'optional جنسیت (male یا female)'
         required: false
-        example: consequatur
+        example: tempora
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         custom: []
       zone_city_id:
         name: zone_city_id
         description: 'optional شناسه شهر'
         required: false
-        example: 17
+        example: 8
         type: integer
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
-        custom: []
-      zone_province_id:
-        name: zone_province_id
-        description: 'فقط شهرها (level = 2). The <code>id</code> of an existing record in the zone table.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
+        nullable: false
         custom: []
       email:
         name: email
         description: 'optional ایمیل (باید یکتا باشد)'
         required: false
-        example: qkunze@example.com
+        example: schoen.telly@example.com
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -526,21 +516,21 @@ endpoints:
         name: address
         description: 'optional آدرس'
         required: false
-        example: consequatur
+        example: libero
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         custom: []
     cleanBodyParameters:
-      first_name: consequatur
-      last_name: consequatur
-      national_code: consequatur
-      date_of_birth: consequatur
-      sex: consequatur
-      zone_city_id: 17
-      email: qkunze@example.com
-      address: consequatur
+      first_name: quasi
+      last_name: cumque
+      national_code: omnis
+      date_of_birth: consectetur
+      sex: tempora
+      zone_city_id: 8
+      email: schoen.telly@example.com
+      address: libero
     fileParameters: []
     responses:
       -
@@ -579,18 +569,129 @@ endpoints:
         headers: []
         description: ''
         custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/zone/provinces
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست استان‌ها'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
       -
-        status: 422
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {"id": 1, "name": "تهران"},
+              {"id": 2, "name": "مشهد"}
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer Bearer {YOUR_AUTH_TOKEN}'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/zone/cities
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست شهرها بر اساس استان'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      province_id:
+        name: province_id
+        description: 'شناسه استان'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      province_id: 17
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {"id": 1, "name": "تهران"},
+              {"id": 3, "name": "ری"}
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 400
         content: |-
           {
             "status": "error",
-            "message": "خطا در اعتبارسنجی",
-            "data": {
-              "errors": {
-                "national_code": ["کد ملی قبلاً ثبت شده است"],
-                "email": ["ایمیل قبلاً ثبت شده است"]
-              }
-            }
+            "message": "شناسه استان الزامی است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "status": "error",
+            "message": "استان یافت نشد",
+            "data": null
           }
         headers: []
         description: ''

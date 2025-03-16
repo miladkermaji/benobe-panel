@@ -495,6 +495,7 @@ class AuthController extends Controller
             'date_of_birth' => 'nullable|date|before:today',
             'sex'           => 'nullable|in:male,female',
             'zone_city_id'  => 'nullable|exists:zone,id,level,2',
+            'zone_province_id'  => 'nullable|exists:zone,id,level,1',
             'email'         => 'nullable|email|unique:users,email,' . $user->id,
             'address'       => 'nullable|string|max:1000',
         ]);
@@ -507,6 +508,7 @@ class AuthController extends Controller
             'date_of_birth' => $request->input('date_of_birth', $user->date_of_birth),
             'sex'           => $request->input('sex', $user->sex),
             'zone_city_id'  => $request->input('zone_city_id', $user->zone_city_id),
+            'zone_province_id'  => $request->input('zone_province_id', $user->zone_province_id),
             'email'         => $request->input('email', $user->email),
             'address'       => $request->input('address', $user->address),
         ]);
