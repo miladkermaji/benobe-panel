@@ -2,50 +2,54 @@
 namespace Modules\SendOtp\App\Http\Services\SMS;
 
 use Modules\SendOtp\App\Http\Interfaces\SmsDriverInterface;
+use Kavenegar\KavenegarApi;
 
 class KavenegarDriver implements SmsDriverInterface
 {
+    protected $api;
+
+    public function __construct()
+    {
+        $apiKey = env('KAVENEGAR_API_KEY', '');
+        if (empty($apiKey)) {
+            \Log::error('Kavenegar API Key is not set in .env');
+            throw new \Exception('Kavenegar API Key is missing');
+        }
+        $this->api = new KavenegarApi($apiKey);
+    }
+
     public function send($otpId, $parameters, $senderNumber, $recipientNumbers)
     {
-        $apiKey = env('KAVENEGAR_API_KEY', '');
-        $url    = "https://api.kavenegar.com/v1/{$apiKey}/sms/send.json";
-        $data   = [
-            'receptor' => implode(',', $recipientNumbers),
-            'sender'   => $senderNumber,
-            'message'  => $parameters['message'] ?? 'کد تأیید: ' . ($parameters['code'] ?? ''),
-        ];
+        try {
+            // پیام پیش‌فرض یا از پارامترها
+            $code = $parameters['code'] ?? '';
+            $message = $parameters['message'] ?? "کد ورود شما: {$code} - به نوبه";
+            $receptors = is_array($recipientNumbers) ? $recipientNumbers : [$recipientNumbers];
 
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL            => $url . '?' . http_build_query($data),
-            CURLOPT_RETURNTRANSFER => true,
-        ]);
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-
-        return $response;
+            $result = $this->api->Send($senderNumber, $receptors, $message);
+            \Log::info('Kavenegar OTP sent', ['result' => $result]);
+            return json_encode($result);
+        } catch (\Exception $e) {
+            \Log::error('Kavenegar OTP error', ['error' => $e->getMessage()]);
+            return json_encode(['error' => $e->getMessage()]);
+        }
     }
 
-    public function sendMessage($message, $senderNumber, $recipientNumbers)
-    {
-        $apiKey = env('KAVENEGAR_API_KEY', '');
-        $url    = "https://api.kavenegar.com/v1/{$apiKey}/sms/send.json";
-        $data   = [
-            'receptor' => implode(',', $recipientNumbers),
-            'sender'   => $senderNumber,
-            'message'  => $message,
-        ];
-
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL            => $url . '?' . http_build_query($data),
-            CURLOPT_RETURNTRANSFER => true,
+   public function sendMessage($message, $senderNumber, $recipientNumbers)
+{
+    try {
+        $receptors = is_array($recipientNumbers) ? $recipientNumbers : [$recipientNumbers];
+        \Log::info('درخواست ارسال به کاوه‌نگار', [
+            'sender'    => $senderNumber,
+            'receptors' => $receptors,
+            'message'   => $message,
         ]);
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-
-        return $response;
+        $result = $this->api->Send($senderNumber, $receptors, $message);
+        \Log::info('Kavenegar message sent', ['result' => $result]);
+        return json_encode($result);
+    } catch (\Exception $e) {
+        \Log::error('Kavenegar message error', ['error' => $e->getMessage()]);
+        return json_encode(['error' => $e->getMessage()]);
     }
+}
 }

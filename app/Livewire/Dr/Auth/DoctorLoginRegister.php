@@ -128,10 +128,10 @@ class DoctorLoginRegister extends Component
 
         // ارسال پیامک
         $messagesService = new MessageService(
-            SmsService::create(100253, $user->mobile, [$otpCode])
-        );
-        $messagesService->send();
-
+    SmsService::create(100253, $user->mobile, [$otpCode])
+);
+$response = $messagesService->send();
+\Log::info('SMS send response', ['response' => $response]);
         session(['current_step' => 2, 'otp_token' => $token]);
         $this->dispatch('otpSent', token: $token);
         $this->redirect(route('dr.auth.login-confirm-form', ['token' => $token]), navigate: true);

@@ -59,7 +59,7 @@ use App\Livewire\Dr\Auth\DoctorLoginUserPass;
 use App\Livewire\Dr\Auth\DoctorLogout;
 use App\Livewire\Dr\Auth\DoctorTwoFactor;
 use Illuminate\Support\Facades\Route;
-
+use Modules\SendOtp\App\Http\Controllers\SendOtpController;
 //manager login routes
 /* login manager routes */
 Route::prefix('admin-panel/')->group(function () {
@@ -79,6 +79,7 @@ Route::prefix('dr/')->group(function () {
     Route::get('login-resend-otp/{token}', DoctorLoginConfirm::class)->name('dr.auth.login-resend-otp'); // اضافه شده
     Route::get('logout', DoctorLogout::class)->name('dr.auth.logout');
 });
+Route::post('/send-message', [SendOtpController::class, 'sendMessage'])->name('send.message');
 //  manager  routes
 Route::prefix('admin')
     ->namespace('Admin')
