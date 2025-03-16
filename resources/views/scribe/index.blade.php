@@ -93,6 +93,9 @@
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-GETapi-auth-verify-token">
                                 <a href="#endpoints-GETapi-auth-verify-token">GET api/auth/verify-token</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-POSTapi-auth-update-profile">
+                                <a href="#endpoints-POSTapi-auth-update-profile">POST api/auth/update-profile</a>
+                            </li>
                                                                         </ul>
                             </ul>
             </div>
@@ -104,7 +107,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: March 13, 2025</li>
+        <li>Last updated: March 16, 2025</li>
     </ul>
 </div>
 
@@ -1032,8 +1035,7 @@ response.json()</code></pre></div>
             <summary style="cursor: pointer;">
                 <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
             </summary>
-            <pre><code class="language-http">www-authenticate: jwt-auth
-cache-control: no-cache, private
+            <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
 access-control-allow-origin: http://localhost:3000
 access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS
@@ -1042,7 +1044,9 @@ access-control-allow-credentials: true
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Wrong number of segments&quot;
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;توکن نامعتبر است.&quot;,
+    &quot;data&quot;: null
 }</code>
  </pre>
     </span>
@@ -1309,6 +1313,359 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Example: <code>application/json</code></p>
             </div>
                         </form>
+
+                    <h2 id="endpoints-POSTapi-auth-update-profile">POST api/auth/update-profile</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-POSTapi-auth-update-profile">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost/api/auth/update-profile" \
+    --header "Authorization: Bearer {token}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"first_name\": \"consequatur\",
+    \"last_name\": \"consequatur\",
+    \"national_code\": \"consequatur\",
+    \"date_of_birth\": \"consequatur\",
+    \"sex\": \"consequatur\",
+    \"zone_city_id\": 17,
+    \"email\": \"qkunze@example.com\",
+    \"address\": \"consequatur\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/auth/update-profile"
+);
+
+const headers = {
+    "Authorization": "Bearer {token}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "first_name": "consequatur",
+    "last_name": "consequatur",
+    "national_code": "consequatur",
+    "date_of_birth": "consequatur",
+    "sex": "consequatur",
+    "zone_city_id": 17,
+    "email": "qkunze@example.com",
+    "address": "consequatur"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost/api/auth/update-profile';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer {token}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'first_name' =&gt; 'consequatur',
+            'last_name' =&gt; 'consequatur',
+            'national_code' =&gt; 'consequatur',
+            'date_of_birth' =&gt; 'consequatur',
+            'sex' =&gt; 'consequatur',
+            'zone_city_id' =&gt; 17,
+            'email' =&gt; 'qkunze@example.com',
+            'address' =&gt; 'consequatur',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost/api/auth/update-profile'
+payload = {
+    "first_name": "consequatur",
+    "last_name": "consequatur",
+    "national_code": "consequatur",
+    "date_of_birth": "consequatur",
+    "sex": "consequatur",
+    "zone_city_id": 17,
+    "email": "qkunze@example.com",
+    "address": "consequatur"
+}
+headers = {
+  'Authorization': 'Bearer {token}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('POST', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-auth-update-profile">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;success&quot;,
+    &quot;message&quot;: &quot;اطلاعات با موفقیت به&zwnj;روزرسانی شد&quot;,
+    &quot;data&quot;: {
+        &quot;user&quot;: {
+            &quot;id&quot;: 1,
+            &quot;mobile&quot;: &quot;09181234567&quot;,
+            &quot;first_name&quot;: &quot;علی&quot;,
+            &quot;last_name&quot;: &quot;رضایی&quot;,
+            &quot;national_code&quot;: &quot;1234567890&quot;,
+            &quot;date_of_birth&quot;: &quot;1990-05-15&quot;,
+            &quot;sex&quot;: &quot;male&quot;,
+            &quot;zone_city_id&quot;: 1,
+            &quot;email&quot;: &quot;ali@example.com&quot;,
+            &quot;address&quot;: &quot;تهران، خیابان ولیعصر&quot;,
+            &quot;mobile_verified_at&quot;: &quot;2025-03-12T10:00:00Z&quot;
+        }
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;کاربر احراز هویت نشده است&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;خطا در اعتبارسنجی&quot;,
+    &quot;data&quot;: {
+        &quot;errors&quot;: {
+            &quot;national_code&quot;: [
+                &quot;کد ملی قبلاً ثبت شده است&quot;
+            ],
+            &quot;email&quot;: [
+                &quot;ایمیل قبلاً ثبت شده است&quot;
+            ]
+        }
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-auth-update-profile" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-auth-update-profile"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-auth-update-profile"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-auth-update-profile" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-auth-update-profile">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-auth-update-profile" data-method="POST"
+      data-path="api/auth/update-profile"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-auth-update-profile', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-auth-update-profile"
+                    onclick="tryItOut('POSTapi-auth-update-profile');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-auth-update-profile"
+                    onclick="cancelTryOut('POSTapi-auth-update-profile');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-auth-update-profile"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/auth/update-profile</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-auth-update-profile"
+               value="Bearer {token}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {token}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-auth-update-profile"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-auth-update-profile"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>first_name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="first_name"                data-endpoint="POSTapi-auth-update-profile"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>optional نام کاربر Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>last_name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="last_name"                data-endpoint="POSTapi-auth-update-profile"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>optional نام خانوادگی کاربر Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>national_code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="national_code"                data-endpoint="POSTapi-auth-update-profile"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>optional کد ملی (باید یکتا باشد) Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>date_of_birth</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="date_of_birth"                data-endpoint="POSTapi-auth-update-profile"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15) Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sex</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="sex"                data-endpoint="POSTapi-auth-update-profile"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>optional جنسیت (male یا female) Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>zone_city_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="zone_city_id"                data-endpoint="POSTapi-auth-update-profile"
+               value="17"
+               data-component="body">
+    <br>
+<p>optional شناسه شهر Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>zone_province_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="zone_province_id"                data-endpoint="POSTapi-auth-update-profile"
+               value=""
+               data-component="body">
+    <br>
+<p>فقط شهرها (level = 2). The <code>id</code> of an existing record in the zone table.</p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-auth-update-profile"
+               value="qkunze@example.com"
+               data-component="body">
+    <br>
+<p>optional ایمیل (باید یکتا باشد) Example: <code>qkunze@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="address"                data-endpoint="POSTapi-auth-update-profile"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>optional آدرس Example: <code>consequatur</code></p>
+        </div>
+        </form>
 
             
 

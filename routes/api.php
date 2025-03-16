@@ -13,6 +13,7 @@ Route::prefix('/auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
         Route::get('/profile', [AuthController::class, 'me']);
         Route::get('/verify-token', [AuthController::class, 'verifyToken']);
+        // مسیر جدید برای ویرایش اطلاعات کاربر
+        Route::post('/update-profile', [AuthController::class, 'updateProfile'])->name('api.auth.update-profile');
     });
 });
-

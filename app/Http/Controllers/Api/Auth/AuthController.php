@@ -416,4 +416,109 @@ class AuthController extends Controller
             ], 401);
         }
     }
+    /**
+     * @authenticated
+     * @header Authorization Bearer {token}
+     * @bodyParam first_name string optional نام کاربر
+     * @bodyParam last_name string optional نام خانوادگی کاربر
+     * @bodyParam national_code string optional کد ملی (باید یکتا باشد)
+     * @bodyParam date_of_birth string optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15)
+     * @bodyParam sex string optional جنسیت (male یا female)
+     * @bodyParam zone_city_id integer optional شناسه شهر
+     * @bodyParam email string optional ایمیل (باید یکتا باشد)
+     * @bodyParam address string optional آدرس
+     * @response 200 {
+     *   "status": "success",
+     *   "message": "اطلاعات با موفقیت به‌روزرسانی شد",
+     *   "data": {
+     *     "user": {
+     *       "id": 1,
+     *       "mobile": "09181234567",
+     *       "first_name": "علی",
+     *       "last_name": "رضایی",
+     *       "national_code": "1234567890",
+     *       "date_of_birth": "1990-05-15",
+     *       "sex": "male",
+     *       "zone_city_id": 1,
+     *       "email": "ali@example.com",
+     *       "address": "تهران، خیابان ولیعصر",
+     *       "mobile_verified_at": "2025-03-12T10:00:00Z"
+     *     }
+     *   }
+     * }
+     * @response 422 {
+     *   "status": "error",
+     *   "message": "خطا در اعتبارسنجی",
+     *   "data": {
+     *     "errors": {
+     *       "national_code": ["کد ملی قبلاً ثبت شده است"],
+     *       "email": ["ایمیل قبلاً ثبت شده است"]
+     *     }
+     *   }
+     * }
+     * @response 401 {
+     *   "status": "error",
+     *   "message": "کاربر احراز هویت نشده است",
+     *   "data": null
+     * }
+     */
+    public function updateProfile(Request $request)
+    {
+        // دریافت کاربر احراز هویت شده
+        $user = Auth::guard('api')->user();
+        if (! $user) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'کاربر احراز هویت نشده است',
+                'data'    => null,
+            ], 401);
+        }
+
+        // اعتبارسنجی درخواست
+        $request->validate([
+            'first_name'    => 'nullable|string|max:255',
+            'last_name'     => 'nullable|string|max:255',
+            'national_code' => 'nullable|string|size:10|unique:users,national_code,' . $user->id,
+            'date_of_birth' => 'nullable|date|before:today',
+            'sex'           => 'nullable|in:male,female',
+            'zone_city_id'  => 'nullable|exists:zone,id,level,2', // فقط شهرها (level = 2)
+            'zone_province_id'  => 'nullable|exists:zone,id,level,1', 
+            'email'         => 'nullable|email|unique:users,email,' . $user->id,
+            'address'       => 'nullable|string|max:1000',
+        ], [
+            'first_name.max'         => 'نام نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+            'last_name.max'          => 'نام خانوادگی نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+            'national_code.size'     => 'کد ملی باید دقیقاً ۱۰ رقم باشد.',
+            'national_code.unique'   => 'کد ملی قبلاً ثبت شده است.',
+            'date_of_birth.date'     => 'تاریخ تولد باید معتبر باشد.',
+            'date_of_birth.before'   => 'تاریخ تولد باید قبل از امروز باشد.',
+            'sex.in'                 => 'جنسیت باید "مرد" یا "زن" باشد.',
+            'zone_city_id.exists'    => 'شهر انتخاب‌شده معتبر نیست.',
+            'zone_province_id.exists'    => 'استان انتخاب‌شده معتبر نیست.',
+            'email.email'            => 'ایمیل باید فرمت معتبر داشته باشد.',
+            'email.unique'           => 'ایمیل قبلاً ثبت شده است.',
+            'address.max'            => 'آدرس نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد.',
+        ]);
+
+        // به‌روزرسانی اطلاعات کاربر
+        $user->update([
+            'first_name'    => $request->input('first_name', $user->first_name),
+            'last_name'     => $request->input('last_name', $user->last_name),
+            'national_code' => $request->input('national_code', $user->national_code),
+            'date_of_birth' => $request->input('date_of_birth', $user->date_of_birth),
+            'sex'           => $request->input('sex', $user->sex),
+            'zone_city_id'  => $request->input('zone_city_id', $user->zone_city_id),
+            'zone_province_id'  => $request->input('zone_province_id', $user->zone_province_id),
+            'email'         => $request->input('email', $user->email),
+            'address'       => $request->input('address', $user->address),
+        ]);
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'اطلاعات با موفقیت به‌روزرسانی شد',
+            'data'    => [
+                'user' => $user->fresh(), // دریافت نسخه به‌روز شده کاربر
+            ],
+        ], 200);
+    }
 }
