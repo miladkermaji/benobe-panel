@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\Specialty;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,6 +32,10 @@ class Appointment extends Model
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);
+    }
+    public function specialty()
+    {
+        return $this->belongsTo(Specialty::class);
     }
 
     public function clinic()

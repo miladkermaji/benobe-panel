@@ -1,23 +1,23 @@
 <?php
 namespace App\Http\Controllers\Dr\Panel\Profile;
 
-use App\Http\Controllers\Dr\Controller;
-use App\Http\Requests\DoctorSpecialtyRequest;
-use App\Http\Requests\UpdateProfileRequest;
-use App\Models\AcademicDegree;
-use App\Models\Doctor;
-use App\Models\DoctorSpecialty;
-use App\Models\Otp;
-use App\Models\SubSpecialty;
-use App\Traits\HandlesRateLimiting;
 use Carbon\Carbon;
+use App\Models\Otp;
+use App\Models\Doctor;
+use App\Models\Specialty;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\AcademicDegree;
+use App\Models\DoctorSpecialty;
 use Illuminate\Support\Facades\DB;
+use App\Traits\HandlesRateLimiting;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Dr\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\DoctorSpecialtyRequest;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
@@ -87,7 +87,7 @@ class DrProfileController extends Controller
         $doctor                   = $this->getAuthenticatedDoctor();
         $currentSpecialty         = DoctorSpecialty::where('doctor_id', $doctor->id)->first();
         $specialtyName            = $currentSpecialty->specialty_title ?? 'نامشخص';
-        $specialties              = DoctorSpecialty::where('doctor_id', $doctor->id)->get();
+        $doctor_specialties              = DoctorSpecialty::where('doctor_id', $doctor->id)->get();
         $doctorSpecialties        = DoctorSpecialty::where('doctor_id', $doctor->id)->get();
         $existingSpecialtiesCount = DoctorSpecialty::where('doctor_id', $doctor->id)->count();
         $doctorSpecialtyId        = DoctorSpecialty::where('doctor_id', $doctor->id)->first();
@@ -95,15 +95,15 @@ class DrProfileController extends Controller
             ->orderBy('sort_order')
             ->get();
         $messengers         = $doctor->messengers;
-        $sub_specialties    = SubSpecialty::getOptimizedList();
+        $specialties    = Specialty::getOptimizedList();
         $incompleteSections = $doctor->getIncompleteProfileSections();
 
         return view("dr.panel.profile.edit-profile", compact([
             'specialtyName',
             'academic_degrees',
-            'sub_specialties',
-            'currentSpecialty',
             'specialties',
+            'currentSpecialty',
+            'doctor_specialties',
             'doctorSpecialtyId',
             'existingSpecialtiesCount',
             'messengers',

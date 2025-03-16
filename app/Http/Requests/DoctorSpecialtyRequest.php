@@ -23,10 +23,10 @@ class DoctorSpecialtyRequest extends FormRequest
     {
         return [
             'academic_degree_id' => 'required|exists:academic_degrees,id',
-            'specialty_id' => 'required|exists:sub_specialties,id',
+            'specialty_id' => 'required|exists:specialties,id',
             'specialty_title' => 'required|string',
             'degrees.*' => 'sometimes|exists:academic_degrees,id',
-            'specialties.*' => 'sometimes|exists:sub_specialties,id',
+            'specialties.*' => 'sometimes|exists:specialties,id',
             'titles.*' => 'sometimes|string'
         ];
     }

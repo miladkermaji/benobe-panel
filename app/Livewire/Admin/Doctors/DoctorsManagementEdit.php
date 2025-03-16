@@ -70,7 +70,7 @@ class DoctorsManagementEdit extends Component
 
         $this->provinces       = Zone::where('level', 1)->get();
         $this->cities          = $this->province_id ? Zone::where('level', 2)->where('parent_id', $this->province_id)->get() : collect();
-        $this->specialtiesList = \App\Models\SubSpecialty::all();
+        $this->specialtiesList = \App\Models\Specialty::all();
     }
 
     public function updatedProvinceId($value)

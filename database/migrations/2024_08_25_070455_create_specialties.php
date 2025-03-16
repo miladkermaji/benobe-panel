@@ -10,20 +10,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('specialties', function (Blueprint $table) {
-            $table->id();
-            $table->mediumInteger('sort')->default('1');
-            $table->tinyInteger('level'); 
-            $table->string('slug')->nullable();
-            $table->integer('parent_id')->nullable();
-            $table->string('name')->nullable();
-            $table->tinyInteger('status')->default('0');// تعداد جستجوها  
-            $table->timestamps();
+            $table->id(); // شناسه یکتا
+            $table->string('name'); // نام تخصص
+            $table->text('description')->nullable(); // توضیحات تخصص (اختیاری)
+            $table->tinyInteger('status')->default(0);
+
+            $table->timestamps(); // زمان ایجاد و به روز رسانی رکورد
         });
-        // اجرای Seeder به صورت خودکار
-        Artisan::call('db:seed', [
+         // اجرای Seeder به صورت خودکار
+         Artisan::call('db:seed', [
             '--class' => 'SpecialtiesSeeder',
         ]);
     }
@@ -34,5 +32,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('specialties');
+        
     }
 };

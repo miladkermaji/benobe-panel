@@ -21,7 +21,7 @@ return new class extends Migration {
 
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
             $table->foreign('academic_degree_id')->references('id')->on('academic_degrees')->onDelete('cascade');
-            $table->foreign('specialty_id')->references('id')->on('sub_specialties')->onDelete('cascade');
+            $table->foreign('specialty_id')->references('id')->on('specialties')->onDelete('cascade');
         });
     }
 

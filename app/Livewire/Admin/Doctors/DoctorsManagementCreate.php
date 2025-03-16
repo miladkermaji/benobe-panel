@@ -43,7 +43,7 @@ class DoctorsManagementCreate extends Component
     {
         $this->provinces       = Zone::where('level', 1)->get();
         $this->cities          = collect(); // لیست شهرها ابتدا خالی است
-        $this->specialtiesList = \App\Models\SubSpecialty::all();
+        $this->specialtiesList = \App\Models\Specialty::all();
     }
 
     public function updatedProvinceId($value)

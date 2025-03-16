@@ -61,7 +61,6 @@
    // برای فارسی
    locale: 'fa',
    // تنظیمات بیشتر
-   maxItems: 1,
    sortField: {
     field: 'text'
    }
@@ -72,8 +71,9 @@
    noResultsText: 'نتیجه‌ای یافت نشد',
    labelField: 'name',
    searchField: ['name'],
+   maxOptions:1000,
    placeholder: 'انتخاب تخصص...',
-   maxItems: 1,
+   
    render: {
     option: function(item, escape) {
      return `<div>
@@ -114,7 +114,7 @@
                <div class="w-100">
                  <label for="specialty${inputCount}" class="label-top-input">تخصص</label>
                  <select name="specialties[${inputCount}]" id="specialty${inputCount}" class="form-control h-50 w-100 border-radius-6 mt-3 col-12 position-relative takhasos-input">
-                   @foreach ($sub_specialties as $specialtyOption)
+                   @foreach ($specialties as $specialtyOption)
                      <option value="{{ $specialtyOption->id }}">{{ $specialtyOption->name }}</option>
                    @endforeach
                  </select>
@@ -135,7 +135,7 @@
      searchField: ['text'],
      noResultsText: 'نتیجه‌ای یافت نشد',
      locale: 'fa',
-     maxItems: 1,
+     
      sortField: {
       field: 'text'
      }
@@ -147,7 +147,7 @@
      labelField: 'name',
      searchField: ['name'],
      placeholder: 'انتخاب تخصص...',
-     maxItems: 1,
+     
     });
    } else {
     Swal.fire({
@@ -388,7 +388,7 @@
                             <div class="w-100">
                                 <label for="specialty${inputCount + 1}" class="label-top-input">تخصص</label>
                                 <select name="specialties[${inputCount}]" id="specialty${inputCount + 1}" class="form-control h-50 w-100 border-radius-6 mt-3 col-12 position-relative takhasos-input">
-                                    @foreach ($sub_specialties as $specialtyOption)
+                                    @foreach ($specialties as $specialtyOption)
                                         <option value="{{ $specialtyOption->id }}">{{ $specialtyOption->name }}</option>
                                     @endforeach
                                 </select>
@@ -454,20 +454,20 @@
     buttonText.style.display = 'block';
     loader.style.display = 'none';
     if (data.success) {
-      toastr.success(data.message || "تخصص با موفقیت به‌روز شد");
+     toastr.success(data.message || "تخصص با موفقیت به‌روز شد");
 
      updateAlert();
      callCheckProfileCompleteness();
      updateProfileSections(data);
     } else {
-         toastr.error(data.message || "خطا در به‌روزرسانی تخصص");
+     toastr.error(data.message || "خطا در به‌روزرسانی تخصص");
     }
    })
    .catch(error => {
     // بازگردانی دکمه به حالت اولیه
     buttonText.style.display = 'block';
     loader.style.display = 'none';
-           toastr.error(error.message || 'خطا در برقراری ارتباط با سرور');
+    toastr.error(error.message || 'خطا در برقراری ارتباط با سرور');
    });
  });
  document.getElementById("specialtyEdit").addEventListener('submit', function(e) {
@@ -505,7 +505,7 @@
     loader.style.display = 'none';
     if (data.success) {
      // نمایش توست موفقیت
-    
+
      updateAlert();
      callCheckProfileCompleteness();
      updateProfileSections(data);
@@ -514,7 +514,7 @@
       updateSpecialties(data.specialties);
      }
     } else {
-               toastr.error(data.message || "خطا در به‌روزرسانی تخصص");
+     toastr.error(data.message || "خطا در به‌روزرسانی تخصص");
     }
    })
    .catch(error => {
@@ -559,7 +559,8 @@
                                 <div class="w-100">
                                     <label for="specialty${index + 1}" class="label-top-input">تخصص</label>
                                     <select name="specialties[${index}]" id="specialty${index + 1}" class="form-control h-50 w-100 border-radius-6 mt-3 col-12 position-relative takhasos-input">
-                                        @foreach ($sub_specialties as $specialtyOption)
+
+                                        @foreach ($specialties as $specialtyOption)
                                             <option value="{{ $specialtyOption->id }}" ${specialty.specialty_id == {{ $specialtyOption->id }} ? 'selected' : ''}>{{ $specialtyOption->name }}</option>
                                         @endforeach
                                     </select>
@@ -619,12 +620,12 @@
     buttonText.style.display = 'block';
     loader.style.display = 'none';
     if (data.success) {
-    toastr.success(data.message || "آیدی شما با موفقیت به‌روز شد");
+     toastr.success(data.message || "آیدی شما با موفقیت به‌روز شد");
      updateAlert();
      callCheckProfileCompleteness();
      updateProfileSections(data);
     } else {
-        toastr.error(data.message || "خطا در به‌روزرسانی آیدی");
+     toastr.error(data.message || "خطا در به‌روزرسانی آیدی");
     }
    })
    .catch(error => {
@@ -681,7 +682,7 @@
   const mobileRegex =
    /^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/;
   if (!mobileRegex.test(newMobile)) {
-  toastr.error("شماره موبایل نامعتبر است");
+   toastr.error("شماره موبایل نامعتبر است");
 
    // بازگردانی دکمه به حالت اولیه
    buttonText.style.display = 'block';
@@ -706,11 +707,11 @@
     // فوکوس روی اولین اینپوت
     document.querySelector('.otp-input').focus();
     startResendTimer();
-  toastr.success("کد تایید ارسال شد");
+    toastr.success("کد تایید ارسال شد");
 
    },
    error: function(xhr) {
-  toastr.error(xhr.responseJSON.message || "خطا در ارسال کد");
+    toastr.error(xhr.responseJSON.message || "خطا در ارسال کد");
    },
    complete: function() {
     // بازگردانی دکمه به حالت اولیه
@@ -729,7 +730,7 @@
   const buttonText = verifyButton.querySelector('.button_text');
   // بررسی کامل بودن کد
   if (otpCode.length !== 4) {
-  toastr.error("لطفاً تمام ارقام کد را وارد کنید");
+   toastr.error("لطفاً تمام ارقام کد را وارد کنید");
 
    return;
   }
@@ -750,7 +751,7 @@
    success: function(response) {
     // بررسی دقیق پاسخ موفقیت
     if (response.success) {
-  toastr.success(response.message);
+     toastr.success(response.message);
 
      // به‌روزرسانی المان‌های موبایل در صفحه
      $('input[name="mobile"]').val(response.mobile);
@@ -761,7 +762,7 @@
       location.reload();
      }, 1000);
     } else {
-  toastr.error(response.message || "خطا در تغییر شماره موبایل");
+     toastr.error(response.message || "خطا در تغییر شماره موبایل");
     }
    },
    error: function(xhr) {
@@ -770,7 +771,7 @@
     if (xhr.responseJSON && xhr.responseJSON.message) {
      errorMessage = xhr.responseJSON.message;
     }
-  toastr.error(errorMessage);
+    toastr.error(errorMessage);
    },
    complete: function() {
     // بازگردانی دکمه به حالت اولیه
@@ -850,13 +851,13 @@
      loader.style.display = 'none';
      // نمایش پیام موفقیت یا خطا
      if (data.success) {
-  toastr.success(data.message);
+      toastr.success(data.message);
 
       updateAlert();
       callCheckProfileCompleteness();
       updateProfileSections(data);
      } else {
-  toastr.error(data.message || "خطا در به‌روزرسانی اطلاعات");
+      toastr.error(data.message || "خطا در به‌روزرسانی اطلاعات");
      }
     })
     .catch(error => {
@@ -864,7 +865,7 @@
      buttonText.style.display = 'block';
      loader.style.display = 'none';
      // نمایش خطا
-  toastr.error("خطا در برقراری ارتباط با سرور");
+     toastr.error("خطا در برقراری ارتباط با سرور");
     });
   });
  });
@@ -902,11 +903,11 @@
     if (data.success) {
      // Show success toast
 
-  toastr.success(data.message || "تنظیمات با موفقیت به‌روزرسانی شد");
+     toastr.success(data.message || "تنظیمات با موفقیت به‌روزرسانی شد");
 
     } else {
      // Show error toast
-  toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
+     toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
     }
    })
    .catch(error => {
@@ -918,7 +919,7 @@
      handleValidationErrors(error.errors);
     } else {
      // Show error toast
-  toastr.error(error.message || 'خطا در برقراری ارتباط با سرور');
+     toastr.error(error.message || 'خطا در برقراری ارتباط با سرور');
 
     }
    });
@@ -980,7 +981,7 @@
      .then(response => response.json())
      .then(data => {
       if (data.success) {
-  toastr.success(data.message);
+       toastr.success(data.message);
       } else {
        toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
       }
@@ -1067,7 +1068,7 @@
    loader.style.display = 'block';
    // اعتبارسنجی کلید مخفی اگر تاگل فعال باشد
    if (toggleSwitch.checked && !secretInput.value) {
-       toastr.error("لطفاً کلید مخفی را وارد کنید");
+    toastr.error("لطفاً کلید مخفی را وارد کنید");
 
     buttonText.style.display = 'block';
     loader.style.display = 'none';
@@ -1092,11 +1093,11 @@
      loader.style.display = 'none';
      if (data.success) {
       // Show success toast
-       toastr.success(data.message || "تنظیمات با موفقیت به‌روزرسانی شد");
+      toastr.success(data.message || "تنظیمات با موفقیت به‌روزرسانی شد");
 
      } else {
       // Show error toast
-       toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
+      toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
      }
     })
     .catch(error => {
@@ -1107,7 +1108,7 @@
      if (error.errors) {
       handleValidationErrors(error.errors);
      } else {
-       toastr.error(error.message || 'خطا در برقراری ارتباط با سرور');
+      toastr.error(error.message || 'خطا در برقراری ارتباط با سرور');
 
      }
     });
@@ -1148,7 +1149,7 @@
     // کدهای قبلی...
    })
    .catch(error => {
-       toastr.error("خطا در دریافت اطلاعات پروفایل");
+    toastr.error("خطا در دریافت اطلاعات پروفایل");
    });
  }
 

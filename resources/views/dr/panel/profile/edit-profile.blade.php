@@ -237,7 +237,7 @@
          <label for="name" class="label-top-input">تخصص</label>
          <select name="specialty_id" id="specialties_list"
           class="form-control h-50 border-radius-6 mt-3 col-12 position-relative takhasos-input">
-          @foreach ($sub_specialties as $specialtyOption)
+          @foreach ($specialties as $specialtyOption)
            <option value="{{ $specialtyOption->id }}"
             {{ $specialtyOption->id == ($currentSpecialty->specialty_id ?? '') ? 'selected' : '' }}>
             {{ $specialtyOption->name }}
@@ -258,7 +258,7 @@
          تخصص جدید بسازید
         </div>
         <!-- تخصص‌های اضافه شده از دیتابیس -->
-        @foreach ($specialties as $index => $specialty)
+        @foreach ($doctor_specialties as $index => $specialty)
          @if ($index > 0)
           <div class="w-100 mt-3 specialty-item" data-specialty-id="{{ $specialty->id }}">
            <div class="text-left mt-3 remove-form-item" onclick="removeInput(this)">
@@ -288,7 +288,7 @@
                <label for="specialty{{ $index + 1 }}" class="label-top-input">تخصص</label>
                <select name="specialties[{{ $index }}]" id="specialty{{ $index + 1 }}"
                 class="form-control h-50 w-100 border-radius-6 mt-3 col-12 position-relative takhasos-input" disabled>
-                @foreach ($sub_specialties as $specialtyOption)
+                @foreach ($specialties as $specialtyOption)
                  <option value="{{ $specialtyOption->id }}"
                   {{ $specialty->specialty_id == $specialtyOption->id ? 'selected' : '' }}>
                   {{ $specialtyOption->name }}

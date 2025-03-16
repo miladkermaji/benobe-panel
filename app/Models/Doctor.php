@@ -4,7 +4,7 @@ namespace App\Models;
 use App\Models\Admin\Dashboard\Cities\Zone;
 use App\Models\Doctors\DoctorManagement\DoctorTariff;
 use App\Models\Secretary;
-use App\Models\SubSpecialty;
+use App\Models\Specialty;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -135,7 +135,7 @@ class Doctor extends Authenticatable
     }
     public function specialties()
     {
-        return $this->belongsToMany(SubSpecialty::class, 'doctor_specialty', 'doctor_id', 'specialty_id')
+        return $this->belongsToMany(Specialty::class, 'doctor_specialty', 'doctor_id', 'specialty_id')
             ->withPivot('academic_degree_id', 'specialty_title'); // اضافه کردن فیلدهای اضافی
     }
     public function messengers()
@@ -143,9 +143,9 @@ class Doctor extends Authenticatable
         return $this->hasMany(DoctorMessenger::class);
     }
 
-    public function subSpecialty()
+    public function Specialty()
     {
-        return $this->belongsTo(SubSpecialty::class, 'sub_specialty_id');
+        return $this->belongsTo(Specialty::class, 'specialty_id');
     }
     public function scopeActive($query)
     {
