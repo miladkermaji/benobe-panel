@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d8ec75dd465ab009493104870be3c21a",
+    "content-hash": "1f42f97a2c95d05226c4eb5d1e7e1dd9",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1259,6 +1259,46 @@
                 "source": "https://github.com/guzzle/uri-template/tree/v1.0.4"
             },
             "time": "2025-02-03T10:55:03+00:00"
+        },
+        {
+            "name": "kavenegar/php",
+            "version": "v1.2.2",
+            "dist": {
+                "type": "zip",
+                "url": "https://mirrors.cloud.tencent.com/repository/composer/kavenegar/php/v1.2.2/kavenegar-php-v1.2.2.zip",
+                "reference": "884561b8d8c91b01f7db25284c2be9923c809412",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kavenegar\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kavenegar API Team",
+                    "email": "support@kavenegar.com"
+                }
+            ],
+            "description": "A PHP wrapper for Kavenegar's API",
+            "homepage": "http://github.com/Kavenegar/kavenegar-php",
+            "keywords": [
+                "api",
+                "kavenegar",
+                "sms"
+            ],
+            "support": {
+                "issues": "https://github.com/kavenegar/kavenegar-php/issues",
+                "source": "https://github.com/kavenegar/kavenegar-php/tree/master"
+            },
+            "time": "2019-02-26T12:49:19+00:00"
         },
         {
             "name": "knuckleswtf/scribe",
