@@ -325,6 +325,7 @@
       </div>
      </a>
      <ul class="drop-toggle d-none">
+      <li class="item-li"><a href="{{ route('admin.panel.menus.index') }}">منوها</a></li>
       <li class="item-li"><a href="#">تنظیمات عمومی</a></li>
       <li class="item-li"><a href="#">مدیریت صفحات</a></li>
       <li class="item-li"><a href="#">تنظیمات SEO</a></li>

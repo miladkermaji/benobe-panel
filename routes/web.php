@@ -60,6 +60,7 @@ use App\Livewire\Dr\Auth\DoctorLogout;
 use App\Livewire\Dr\Auth\DoctorTwoFactor;
 use Illuminate\Support\Facades\Route;
 use Modules\SendOtp\App\Http\Controllers\SendOtpController;
+
 //manager login routes
 /* login manager routes */
 Route::prefix('admin-panel/')->group(function () {
@@ -85,6 +86,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('menus')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Menu\MenuController::class, 'index'])->name('admin.panel.menus.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Menu\MenuController::class, 'create'])->name('admin.panel.menus.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Menu\MenuController::class, 'edit'])->name('admin.panel.menus.edit');
+        });
+
         Route::prefix('doctors')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'index'])->name('admin.panel.doctors.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'create'])->name('admin.panel.doctors.create');
