@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\ZoneController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\DoctorController;
 use App\Http\Controllers\Api\WalletController;
 use App\Http\Controllers\Api\SubUserController;
@@ -57,4 +58,9 @@ Route::middleware(['custom-auth.jwt'])->group(function () {
 
 Route::prefix('menus')->group(function () {
     Route::get('/custom', [MenuController::class, 'getCustomMenus'])->name('api.menus.custom');
+});
+
+Route::prefix('banner')->group(function () {
+    Route::get('/text', [BannerController::class, 'getBannerText'])->name('api.banner.text');
+    Route::get('/stats', [BannerController::class, 'getStats'])->name('api.banner.stats');
 });

@@ -26,14 +26,14 @@ endpoints:
         name: mobile
         description: 'شماره موبایل کاربر (مثال: 09181234567)'
         required: true
-        example: et
+        example: laudantium
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      mobile: et
+      mobile: laudantium
     fileParameters: []
     responses:
       -
@@ -101,14 +101,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: porro
+        example: quas
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: porro
+      token: quas
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
@@ -116,14 +116,14 @@ endpoints:
         name: otpCode
         description: 'کد OTP وارد شده (مثال: 1234)'
         required: true
-        example: fugiat
+        example: necessitatibus
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      otpCode: fugiat
+      otpCode: necessitatibus
     fileParameters: []
     responses:
       -
@@ -195,14 +195,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: quae
+        example: et
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: quae
+      token: et
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -422,7 +422,7 @@ endpoints:
         name: first_name
         description: 'optional نام کاربر'
         required: false
-        example: maiores
+        example: eveniet
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -432,7 +432,7 @@ endpoints:
         name: last_name
         description: 'optional نام خانوادگی کاربر'
         required: false
-        example: beatae
+        example: quam
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -442,7 +442,7 @@ endpoints:
         name: national_code
         description: 'optional کد ملی (باید یکتا باشد)'
         required: false
-        example: mollitia
+        example: modi
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -452,7 +452,7 @@ endpoints:
         name: date_of_birth
         description: 'optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15)'
         required: false
-        example: nihil
+        example: adipisci
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -462,7 +462,7 @@ endpoints:
         name: sex
         description: 'optional جنسیت (male یا female)'
         required: false
-        example: facere
+        example: qui
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -472,7 +472,7 @@ endpoints:
         name: zone_city_id
         description: 'optional شناسه شهر'
         required: false
-        example: 17
+        example: 12
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -482,7 +482,7 @@ endpoints:
         name: email
         description: 'optional ایمیل (باید یکتا باشد)'
         required: false
-        example: gleffler@example.org
+        example: julian.roberts@example.net
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -492,21 +492,21 @@ endpoints:
         name: address
         description: 'optional آدرس'
         required: false
-        example: in
+        example: aut
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      first_name: maiores
-      last_name: beatae
-      national_code: mollitia
-      date_of_birth: nihil
-      sex: facere
-      zone_city_id: 17
-      email: gleffler@example.org
-      address: in
+      first_name: eveniet
+      last_name: quam
+      national_code: modi
+      date_of_birth: adipisci
+      sex: qui
+      zone_city_id: 12
+      email: julian.roberts@example.net
+      address: aut
     fileParameters: []
     responses:
       -
@@ -617,14 +617,14 @@ endpoints:
         name: province_id
         description: 'شناسه استان'
         required: true
-        example: 8
+        example: 18
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanQueryParameters:
-      province_id: 8
+      province_id: 18
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -691,14 +691,14 @@ endpoints:
         name: id
         description: 'شناسه نوبت'
         required: true
-        example: 19
+        example: 6
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: 19
+      id: 6
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -1275,6 +1275,130 @@ endpoints:
             "status": "error",
             "message": "توکن نامعتبر است",
             "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "خطای سرور",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/banner/text
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن متن بنر'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": {
+              "main_text": "بنوب: سلامت جامعه چطور به دست {word} می‌رسد",
+              "switch_words": ["پزشک", "بیمارستان", "کلینیک", "تخصص"],
+              "switch_interval": 2000,
+              "image_path": "/images/stethoscope-background.png"
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "status": "error",
+            "message": "متن بنر یافت نشد",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "خطای سرور",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/banner/stats
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن آمار (تعداد پزشکان، بیمارستان‌ها، کلینیک‌ها، تخصص‌ها و آزمایشگاه‌ها)'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": {
+              "doctors_count": 1200,
+              "hospitals_count": 300,
+              "clinics_count": 500,
+              "specialties_count": 40,
+              "laboratories_count": 200
+            }
           }
         headers: []
         description: ''
