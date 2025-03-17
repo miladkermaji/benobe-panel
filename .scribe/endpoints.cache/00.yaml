@@ -28,14 +28,14 @@ endpoints:
         name: mobile
         description: 'شماره موبایل کاربر (مثال: 09181234567)'
         required: true
-        example: est
+        example: et
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      mobile: est
+      mobile: et
     fileParameters: []
     responses:
       -
@@ -103,14 +103,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: non
+        example: porro
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: non
+      token: porro
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
@@ -118,14 +118,14 @@ endpoints:
         name: otpCode
         description: 'کد OTP وارد شده (مثال: 1234)'
         required: true
-        example: rerum
+        example: fugiat
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      otpCode: rerum
+      otpCode: fugiat
     fileParameters: []
     responses:
       -
@@ -197,14 +197,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: voluptate
+        example: quae
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: voluptate
+      token: quae
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -424,7 +424,7 @@ endpoints:
         name: first_name
         description: 'optional نام کاربر'
         required: false
-        example: modi
+        example: maiores
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -434,7 +434,7 @@ endpoints:
         name: last_name
         description: 'optional نام خانوادگی کاربر'
         required: false
-        example: est
+        example: beatae
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -444,7 +444,7 @@ endpoints:
         name: national_code
         description: 'optional کد ملی (باید یکتا باشد)'
         required: false
-        example: sed
+        example: mollitia
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -454,7 +454,7 @@ endpoints:
         name: date_of_birth
         description: 'optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15)'
         required: false
-        example: sint
+        example: nihil
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -464,7 +464,7 @@ endpoints:
         name: sex
         description: 'optional جنسیت (male یا female)'
         required: false
-        example: excepturi
+        example: facere
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -474,7 +474,7 @@ endpoints:
         name: zone_city_id
         description: 'optional شناسه شهر'
         required: false
-        example: 5
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -484,7 +484,7 @@ endpoints:
         name: email
         description: 'optional ایمیل (باید یکتا باشد)'
         required: false
-        example: sophia.eichmann@example.com
+        example: gleffler@example.org
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -494,21 +494,21 @@ endpoints:
         name: address
         description: 'optional آدرس'
         required: false
-        example: quia
+        example: in
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      first_name: modi
-      last_name: est
-      national_code: sed
-      date_of_birth: sint
-      sex: excepturi
-      zone_city_id: 5
-      email: sophia.eichmann@example.com
-      address: quia
+      first_name: maiores
+      last_name: beatae
+      national_code: mollitia
+      date_of_birth: nihil
+      sex: facere
+      zone_city_id: 17
+      email: gleffler@example.org
+      address: in
     fileParameters: []
     responses:
       -
@@ -619,14 +619,14 @@ endpoints:
         name: province_id
         description: 'شناسه استان'
         required: true
-        example: 16
+        example: 8
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanQueryParameters:
-      province_id: 16
+      province_id: 8
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -693,14 +693,14 @@ endpoints:
         name: id
         description: 'شناسه نوبت'
         required: true
-        example: 12
+        example: 19
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: 12
+      id: 19
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -1192,6 +1192,78 @@ endpoints:
                 "license_number": "۱۲۳۴۵۶",
                 "profile_photo_path": "https://example.com/photos/doctor1.jpg",
                 "liked_at": "2025-03-16T12:00:00Z"
+              }
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "status": "error",
+            "message": "توکن نامعتبر است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "خطای سرور",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/menus/custom
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست منوهای سفارشی'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {
+                "id": 1,
+                "name": "پزشکان من",
+                "url": "/my-doctors",
+                "icon": "doctors.svg",
+                "position": "top",
+                "order": 1,
+                "children": []
               }
             ]
           }

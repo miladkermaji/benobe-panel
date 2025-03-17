@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\ZoneController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\DoctorController;
@@ -52,4 +53,8 @@ Route::middleware(['custom-auth.jwt'])->group(function () {
         Route::get('/my_doctors', [DoctorController::class, 'getMyDoctors'])->name('api.doctors.my_doctors');
     });
 
+});
+
+Route::prefix('menus')->group(function () {
+    Route::get('/custom', [MenuController::class, 'getCustomMenus'])->name('api.menus.custom');
 });
