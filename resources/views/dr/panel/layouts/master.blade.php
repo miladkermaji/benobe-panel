@@ -112,7 +112,7 @@
 
             <div class="d-flex flex-column mx-3">
              <span class="font-weight-bold d-block fs-15"> {{ $clinic->name }}</span>
-             <span class="font-weight-bold d-block fs-13">{{ $clinic->province->name }} ، {{ $clinic->city->name }}</span>
+          <span class="font-weight-bold d-block fs-13">{{ $clinic->province->name ?? '' }} ، {{ $clinic->city->name ?? '' }}</span>
             </div>
 
             @if (!$clinic->is_active)

@@ -19,7 +19,7 @@ class CreateBestDoctorsTable extends Migration
 
             // کلیدهای خارجی
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('hospital_id')->references('id')->on('hospitals')->onDelete('set null');
+            $table->foreign('hospital_id')->references('id')->on('clinics')->onDelete('set null');
         });
     }
 

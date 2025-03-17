@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Livewire\Admin\Agent;
 
-use Livewire\Component;
 use App\Models\Admin\Agent\Agent;
+use App\Models\Zone;
 use Illuminate\Support\Facades\Log;
-use App\Models\Admin\Dashboard\Cities\Zone;
+use Livewire\Component;
 
 class CreateAgent extends Component
 {
@@ -17,15 +16,15 @@ class CreateAgent extends Component
     public $status = true;
 
     public $provinces = [];
-    public $cities = [];
+    public $cities    = [];
 
     protected $rules = [
-        'full_name' => 'required|string|max:255',
-        'mobile' => 'required|string|size:11|unique:agents,mobile',
+        'full_name'     => 'required|string|max:255',
+        'mobile'        => 'required|string|size:11|unique:agents,mobile',
         'national_code' => 'required|string|size:10|unique:agents,national_code',
-        'province_id' => 'required|exists:zone,id',
-        'city_id' => 'required|exists:zone,id',
-        'status' => 'boolean',
+        'province_id'   => 'required|exists:zone,id',
+        'city_id'       => 'required|exists:zone,id',
+        'status'        => 'boolean',
     ];
 
     public function mount()
@@ -58,22 +57,22 @@ class CreateAgent extends Component
 
         try {
             $province = Zone::find($this->province_id)->name;
-            $city = Zone::find($this->city_id)->name;
+            $city     = Zone::find($this->city_id)->name;
 
             Agent::create([
-                'full_name' => $this->full_name,
-                'mobile' => $this->mobile,
+                'full_name'     => $this->full_name,
+                'mobile'        => $this->mobile,
                 'national_code' => $this->national_code,
-                'province' => $province,
-                'city' => $city,
-                'status' => $this->status,
+                'province'      => $province,
+                'city'          => $city,
+                'status'        => $this->status,
             ]);
 
             Log::info('New agent created', ['full_name' => $this->full_name]);
             $this->dispatch('toast', 'نماینده با موفقیت اضافه شد.', [
-                'type' => 'success',
-                'position' => 'top-right',
-                'timeOut' => 3000,
+                'type'        => 'success',
+                'position'    => 'top-right',
+                'timeOut'     => 3000,
                 'progressBar' => true,
             ]);
 
@@ -83,9 +82,9 @@ class CreateAgent extends Component
         } catch (\Exception $e) {
             Log::error('Error creating agent:', ['message' => $e->getMessage()]);
             $this->dispatch('toast', 'خطا در افزودن نماینده: ' . $e->getMessage(), [
-                'type' => 'error',
-                'position' => 'top-right',
-                'timeOut' => 3000,
+                'type'        => 'error',
+                'position'    => 'top-right',
+                'timeOut'     => 3000,
                 'progressBar' => true,
             ]);
         }

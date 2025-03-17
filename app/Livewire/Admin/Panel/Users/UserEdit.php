@@ -1,8 +1,8 @@
 <?php
 namespace App\Livewire\Admin\Panel\Users;
 
-use App\Models\Admin\Dashboard\Cities\Zone;
 use App\Models\User;
+use App\Models\Zone;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;

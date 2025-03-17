@@ -1,21 +1,20 @@
 <?php
-
 namespace App\Livewire\Admin\Dashboard\Cities;
 
+use App\Models\Zone;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Admin\Dashboard\Cities\Zone;
 
 class SearchZones extends Component
 {
     use WithPagination;
 
-    public $search = '';
+    public $search       = '';
     public $selectedRows = []; // آرایه‌ای برای ذخیره ردیف‌های انتخاب‌شده
-    public $selectAll = false;
+    public $selectAll    = false;
     protected $listeners = [
         'updateDeleteButton' => 'refreshDeleteButton',
-        'doDeleteSelected' => 'deleteSelected' // تست اجرای متد
+        'doDeleteSelected'   => 'deleteSelected', // تست اجرای متد
     ];
     protected $paginationTheme = 'bootstrap';
 
@@ -35,7 +34,7 @@ class SearchZones extends Component
 
     public function toggleStatus($id)
     {
-        $city = Zone::find($id);
+        $city         = Zone::find($id);
         $city->status = $city->status == 1 ? 0 : 1;
         $city->save();
 
@@ -47,8 +46,6 @@ class SearchZones extends Component
     {
         $this->dispatch('refreshDeleteButton', hasSelectedRows: count($this->selectedRows) > 0);
     }
-
-
 
     public function confirmDelete()
     {
@@ -62,14 +59,11 @@ class SearchZones extends Component
         if (count($this->selectedRows) > 0) {
             Zone::whereIn('id', $this->selectedRows)->delete();
             $this->selectedRows = [];
-            $this->selectAll = false;
+            $this->selectAll    = false;
             $this->dispatch('refreshDeleteButton', hasSelectedRows: false);
             $this->dispatch('show-toastr', type: 'success', message: 'استان‌های انتخاب‌شده با موفقیت حذف شدند.');
         }
     }
-
-
-
 
     // ✅ مدیریت انتخاب همه
     public function updatedSelectAll($value)
@@ -90,6 +84,5 @@ class SearchZones extends Component
     {
         $this->resetPage(); // هنگام تغییر مقدار جستجو، صفحه را ریست می‌کند
     }
-
 
 }

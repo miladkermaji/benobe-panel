@@ -1,9 +1,9 @@
 <?php
 namespace App\Livewire\Admin\Hospitals\HospitalsManagement;
 
-use App\Models\Admin\Dashboard\Cities\Zone;
 use App\Models\Clinic;
 use App\Models\Doctor;
+use App\Models\Zone;
 use Livewire\Component;
 
 class HospitalEdit extends Component

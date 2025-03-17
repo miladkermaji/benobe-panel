@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use App\Models\Clinic;
+use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Model;
 
 class DoctorAppointmentConfig extends Model
@@ -25,5 +27,14 @@ class DoctorAppointmentConfig extends Model
     public function getCalendarDaysAttribute($value)
     {
         return intval($value) ?: 30;
+    }
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
+
+    public function clinic()
+    {
+        return $this->belongsTo(Clinic::class);
     }
 }

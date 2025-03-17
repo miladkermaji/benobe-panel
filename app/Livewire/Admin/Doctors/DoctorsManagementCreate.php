@@ -1,10 +1,10 @@
 <?php
 namespace App\Livewire\Admin\Doctors;
 
-use App\Models\Admin\Dashboard\Cities\Zone;
 use App\Models\Clinic;
 use App\Models\Doctor;
 use App\Models\Doctors\DoctorManagement\DoctorTariff;
+use App\Models\Zone;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 

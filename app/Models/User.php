@@ -1,9 +1,9 @@
 <?php
 namespace App\Models;
 
-use App\Models\Admin\Dashboard\Cities\Zone;
 use App\Models\Appointment;
 use App\Models\UserDoctorLike;
+use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;

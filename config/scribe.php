@@ -29,11 +29,10 @@ return [
     'routes'                          => [
         [
             'match'   => [
-                'prefixes' => ['api/auth/*', 'api/zone/*', 'api/appointments/*', 'api/sub_users/*', 'api/orders/*', 'api/wallet/*', 'api/doctors/*', 'api/menus/*','api/banner/*'],
+                'prefixes' => ['api/*'],
                 'domains'  => ['*'],
             ],
             'include' => [],
-            'exclude' => ['api/sendotp*'],
         ],
     ],
 
@@ -247,4 +246,10 @@ return [
     |
     */
     'database_connections_to_transact'=>[config('database.default')],
+    'theme' => 'default',
+'static' => [
+    'js' => [
+        'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/http.js',
+    ],
+],
 ];

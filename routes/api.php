@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\DoctorController;
 use App\Http\Controllers\Api\WalletController;
 use App\Http\Controllers\Api\SubUserController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\SpecialtyController;
 use App\Http\Controllers\Api\AppointmentController;
 
 Route::prefix('/auth')->group(function () {
@@ -63,4 +64,11 @@ Route::prefix('menus')->group(function () {
 Route::prefix('banner')->group(function () {
     Route::get('/text', [BannerController::class, 'getBannerText'])->name('api.banner.text');
     Route::get('/stats', [BannerController::class, 'getStats'])->name('api.banner.stats');
+});
+
+Route::prefix('doctors')->group(function () {
+    Route::get('/best', [DoctorController::class, 'getBestDoctors'])->name('api.doctors.best');
+});
+Route::prefix('specialties')->group(function () {
+    Route::get('/', [SpecialtyController::class, 'getSpecialties'])->name('api.specialties.index');
 });

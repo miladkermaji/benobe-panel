@@ -2,8 +2,8 @@
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic;
 
 use App\Http\Controllers\Dr\Controller;
-use App\Models\Admin\Dashboard\Cities\Zone;
 use App\Models\Clinic;
+use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;

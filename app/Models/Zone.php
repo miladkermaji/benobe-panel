@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Admin\Dashboard\Cities;
+namespace App\Models;
 
 use App\Models\Clinic;
 use App\Models\Doctor;

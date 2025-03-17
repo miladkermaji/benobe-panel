@@ -1,22 +1,21 @@
 <?php
-
 namespace App\Livewire\Admin\Dashboard\Cities;
 
+use App\Models\Zone;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Admin\Dashboard\Cities\Zone;
 
 class SearchCities extends Component
 {
     use WithPagination;
 
     public $provinceId;
-    public $search = ''; // مقدار جستجو
+    public $search       = ''; // مقدار جستجو
     public $selectedRows = [];
-    public $selectAll = false;
+    public $selectAll    = false;
 
     protected $paginationTheme = 'bootstrap';
-    protected $listeners = ['updateDeleteButton' => 'refreshDeleteButton', 'doDeleteSelected' => 'deleteSelected'];
+    protected $listeners       = ['updateDeleteButton' => 'refreshDeleteButton', 'doDeleteSelected' => 'deleteSelected'];
 
     public function mount($provinceId)
     {
@@ -37,8 +36,8 @@ class SearchCities extends Component
 
     public function toggleStatus($id)
     {
-        $city = Zone::find($id);
-        $city->status = !$city->status;
+        $city         = Zone::find($id);
+        $city->status = ! $city->status;
         $city->save();
 
         $this->dispatch('show-toastr', type: 'success', message: 'وضعیت شهر با موفقیت تغییر کرد.');
@@ -56,7 +55,7 @@ class SearchCities extends Component
         if (count($this->selectedRows) > 0) {
             Zone::whereIn('id', $this->selectedRows)->delete();
             $this->selectedRows = [];
-            $this->selectAll = false;
+            $this->selectAll    = false;
             $this->dispatch('refreshDeleteButton', hasSelectedRows: false);
             $this->dispatch('show-toastr', type: 'success', message: 'شهرهای انتخاب‌شده با موفقیت حذف شدند.');
         }
@@ -72,7 +71,7 @@ class SearchCities extends Component
         \Log::info("Search Query in Render: " . $this->search); // تست مقدار جستجو در render
 
         $cities = Zone::where('parent_id', $this->provinceId)
-            ->when(!empty($this->search), function ($query) {
+            ->when(! empty($this->search), function ($query) {
                 return $query->where('name', 'like', '%' . $this->search . '%');
             })
             ->paginate(10);
@@ -80,12 +79,8 @@ class SearchCities extends Component
         return view('livewire.admin.dashboard.cities.search-cities', compact('cities'));
     }
 
-
- 
     public function updatedSearch($value)
     {
     }
-
-
 
 }

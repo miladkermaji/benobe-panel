@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // میدلورهای سراسری (Global Middleware)
         $middleware->append([
             \App\Http\Middleware\TrustProxies::class,
-            \Illuminate\Http\Middleware\HandleCors::class,
+            /* \Illuminate\Http\Middleware\HandleCors::class, */
             \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
             \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
             \App\Http\Middleware\TrimStrings::class,
@@ -39,6 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             /* \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api', */
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+             \App\Http\Middleware\CorsMiddleware::class,
         ]);
 
         $middleware->group('doctor', [

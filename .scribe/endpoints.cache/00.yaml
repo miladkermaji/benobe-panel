@@ -28,14 +28,14 @@ endpoints:
         name: mobile
         description: 'شماره موبایل کاربر (مثال: 09181234567)'
         required: true
-        example: laudantium
+        example: quasi
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      mobile: laudantium
+      mobile: quasi
     fileParameters: []
     responses:
       -
@@ -103,14 +103,14 @@ endpoints:
         name: token
         description: ''
         required: true
-        example: quas
+        example: sint
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      token: quas
+      token: sint
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
@@ -118,14 +118,14 @@ endpoints:
         name: otpCode
         description: 'کد OTP وارد شده (مثال: 1234)'
         required: true
-        example: necessitatibus
+        example: quidem
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      otpCode: necessitatibus
+      otpCode: quidem
     fileParameters: []
     responses:
       -
@@ -328,10 +328,9 @@ endpoints:
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: 'http://localhost:3000'
+          access-control-allow-origin: '*'
           access-control-allow-methods: 'GET, POST, PUT, DELETE, OPTIONS'
           access-control-allow-headers: 'Content-Type, Authorization'
-          access-control-allow-credentials: 'true'
         description: null
         custom: []
     responseFields: []
@@ -424,7 +423,7 @@ endpoints:
         name: first_name
         description: 'optional نام کاربر'
         required: false
-        example: eveniet
+        example: et
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -434,7 +433,7 @@ endpoints:
         name: last_name
         description: 'optional نام خانوادگی کاربر'
         required: false
-        example: quam
+        example: minus
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -444,7 +443,7 @@ endpoints:
         name: national_code
         description: 'optional کد ملی (باید یکتا باشد)'
         required: false
-        example: modi
+        example: blanditiis
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -454,7 +453,7 @@ endpoints:
         name: date_of_birth
         description: 'optional تاریخ تولد (فرمت: Y-m-d مثلاً 1990-05-15)'
         required: false
-        example: adipisci
+        example: officia
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -474,7 +473,7 @@ endpoints:
         name: zone_city_id
         description: 'optional شناسه شهر'
         required: false
-        example: 12
+        example: 5
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -484,7 +483,7 @@ endpoints:
         name: email
         description: 'optional ایمیل (باید یکتا باشد)'
         required: false
-        example: julian.roberts@example.net
+        example: rosella.yundt@example.net
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -494,21 +493,21 @@ endpoints:
         name: address
         description: 'optional آدرس'
         required: false
-        example: aut
+        example: fugiat
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      first_name: eveniet
-      last_name: quam
-      national_code: modi
-      date_of_birth: adipisci
+      first_name: et
+      last_name: minus
+      national_code: blanditiis
+      date_of_birth: officia
       sex: qui
-      zone_city_id: 12
-      email: julian.roberts@example.net
-      address: aut
+      zone_city_id: 5
+      email: rosella.yundt@example.net
+      address: fugiat
     fileParameters: []
     responses:
       -
@@ -619,14 +618,14 @@ endpoints:
         name: province_id
         description: 'شناسه استان'
         required: true
-        example: 18
+        example: 15
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanQueryParameters:
-      province_id: 18
+      province_id: 15
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -693,14 +692,14 @@ endpoints:
         name: id
         description: 'شناسه نوبت'
         required: true
-        example: 6
+        example: 19
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: 6
+      id: 19
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -1415,6 +1414,190 @@ endpoints:
           }
         headers: []
         description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/doctors/best
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست پزشکان برتر'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      limit:
+        name: limit
+        description: 'تعداد آیتم‌ها (اختیاری، اگر نباشد همه برگردانده می‌شود)'
+        required: false
+        example: 14
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      limit: 14
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {
+                "id": 1,
+                "name": "دکتر محمدی",
+                "specialty": "قلب و عروق",
+                "hospital": "بیمارستان کسری",
+                "star_rating": 4.5,
+                "appointment_count": 150,
+                "image": "https://example.com/doctor1.jpg",
+                "province": "تهران",
+                "next_available_slot": "2025-03-17 10:00:00"
+              }
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/specialties
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'گرفتن لیست تخصص‌ها'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      limit:
+        name: limit
+        description: 'تعداد آیتم‌ها (اختیاری، اگر نباشد همه برگردانده می‌شود)'
+        required: false
+        example: 4
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      limit: 4
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "data": [
+              {
+                "id": 1,
+                "name": "قلب و عروق",
+                "description": "تخصص در درمان قلب",
+                "doctor_count": 50
+              }
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "status": "error",
+            "message": "توکن نامعتبر است",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "خطای سرور",
+            "data": null
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/sendotp
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          access-control-allow-methods: 'GET, POST, PUT, DELETE, OPTIONS'
+          access-control-allow-headers: 'Content-Type, Authorization'
+        description: null
         custom: []
     responseFields: []
     auth: []

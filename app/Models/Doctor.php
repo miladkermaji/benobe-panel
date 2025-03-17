@@ -1,20 +1,22 @@
 <?php
 namespace App\Models;
 
-use App\Models\Admin\Dashboard\Cities\Zone;
-use App\Models\Doctors\DoctorManagement\DoctorTariff;
+use App\Models\Zone;
 use App\Models\Secretary;
 use App\Models\Specialty;
+use Morilog\Jalali\Jalalian;
 use App\Models\UserDoctorLike;
+use Laravel\Sanctum\HasApiTokens;
+use App\Models\DoctorWorkSchedule;
+use Laravel\Jetstream\HasProfilePhoto;
+use App\Models\DoctorAppointmentConfig;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Notifications\Notifiable;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use App\Models\Doctors\DoctorManagement\DoctorTariff;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
-use Laravel\Sanctum\HasApiTokens;
-use Morilog\Jalali\Jalalian;
 
 class Doctor extends Authenticatable
 {
@@ -208,5 +210,14 @@ class Doctor extends Authenticatable
     public function likes()
     {
         return $this->hasMany(UserDoctorLike::class);
+    }
+    public function workSchedules()
+    {
+        return $this->hasMany(DoctorWorkSchedule::class);
+    }
+
+    public function appointmentConfig()
+    {
+        return $this->hasOne(DoctorAppointmentConfig::class);
     }
 }
