@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ZoneController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\DoctorController;
+use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WalletController;
 use App\Http\Controllers\Api\SubUserController;
 use App\Http\Controllers\Api\Auth\AuthController;
@@ -81,5 +82,12 @@ Route::prefix('medical-centers')->group(function () {
     Route::get('/hospitals', [MedicalCentersController::class, 'getHospitals'])->name('api.medical-centers.hospitals');
     Route::get('/laboratories', [MedicalCentersController::class, 'getLaboratories'])->name('api.medical-centers.laboratories');
 });
+
+Route::prefix('reviews')->group(function () {
+    Route::get('/', [ReviewController::class, 'index'])->name('api.reviews.index');
+    Route::post('/', [ReviewController::class, 'store'])->middleware('custom-auth.jwt')->name('api.reviews.store');
+});
+
+
 
 

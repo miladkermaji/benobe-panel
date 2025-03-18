@@ -1,18 +1,19 @@
 <?php
 namespace App\Models;
 
-use App\Models\Appointment;
-use App\Models\UserDoctorLike;
 use App\Models\Zone;
+use App\Models\Review;
+use App\Models\Appointment;
+use Morilog\Jalali\Jalalian;
+use App\Models\UserDoctorLike;
+use Laravel\Sanctum\HasApiTokens;
+use Laravel\Jetstream\HasProfilePhoto;
+use Illuminate\Support\Facades\Storage;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
-use Laravel\Sanctum\HasApiTokens;
-use Morilog\Jalali\Jalalian;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -88,5 +89,9 @@ class User extends Authenticatable implements JWTSubject
     public function likedDoctors()
     {
         return $this->hasMany(UserDoctorLike::class);
+    }
+    public function reviews()
+    {
+        return $this->morphMany(Review::class, 'reviewable');
     }
 }
