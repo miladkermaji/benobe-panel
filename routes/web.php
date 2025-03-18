@@ -86,6 +86,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('bannertexts')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'index'])->name('admin.panel.bannertexts.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'create'])->name('admin.panel.bannertexts.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'edit'])->name('admin.panel.bannertexts.edit');
+        });
+
         Route::prefix('menus')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Menu\MenuController::class, 'index'])->name('admin.panel.menus.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Menu\MenuController::class, 'create'])->name('admin.panel.menus.create');
