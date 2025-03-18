@@ -12,18 +12,18 @@
   @else
    به نوبه
   @endif
-  
+
  </title>
 
  @include('dr.panel.my-tools.loader-btn')
-@livewireStyles
+ @livewireStyles
 
 </head>
 
 <body>
  @include('admin.panel.layouts.partials.sidebar')
  <div class="content">
-<x-global-loader />
+  <x-global-loader />
   @include('admin.panel.layouts.partials.header')
   <div class="top-dr-panel d-flex justify-content-between w-100 align-items-start">
    <div class="p-3 bg-white">
@@ -37,60 +37,60 @@
   </div>
   @yield('content')
   @livewireScripts
-@networkStatus
+  @networkStatus
 </body>
 @include('admin.panel.layouts.partials.scripts')
 @yield('scripts')
-    <script>
-      // اسکریپت نویگیشن Livewire
-      Livewire.on('navigateTo', (event) => {
-        window.Livewire.navigate(event.url);
-      });
-    </script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    Livewire.on('refreshDeleteButton', (data) => {
-      document.getElementById('deleteButton').disabled = !data.hasSelectedRows;
-    });
+ // اسکریپت نویگیشن Livewire
+ Livewire.on('navigateTo', (event) => {
+  window.Livewire.navigate(event.url);
+ });
+</script>
+<script>
+ document.addEventListener("DOMContentLoaded", function() {
+  Livewire.on('refreshDeleteButton', (data) => {
+   document.getElementById('deleteButton').disabled = !data.hasSelectedRows;
   });
+ });
 </script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    Livewire.on('show-toastr', (data) => {
-      toastr.options = {
-        progressBar: true,
-        positionClass: "toast-top-right", // نمایش در سمت راست بالا
-        timeOut: 3000 // زمان نمایش
-      };
+ document.addEventListener('DOMContentLoaded', function() {
+  Livewire.on('show-toastr', (data) => {
+   toastr.options = {
+    progressBar: true,
+    positionClass: "toast-top-right", // نمایش در سمت راست بالا
+    timeOut: 3000 // زمان نمایش
+   };
 
-      if (data.type === 'success') {
-        toastr.success(data.message);
-      } else {
-        toastr.warning(data.message);
-      }
-    });
+   if (data.type === 'success') {
+    toastr.success(data.message);
+   } else {
+    toastr.warning(data.message);
+   }
   });
+ });
 </script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    Livewire.on('show-delete-confirmation', () => {
-      Swal.fire({
-        title: "آیا مطمئن هستید؟",
-        text: "این عملیات غیرقابل بازگشت است!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "بله، حذف شود!",
-        cancelButtonText: "لغو"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Livewire.dispatch('doDeleteSelected');
-        }
-      });
-    });
+ document.addEventListener("DOMContentLoaded", function() {
+  Livewire.on('show-delete-confirmation', () => {
+   Swal.fire({
+    title: "آیا مطمئن هستید؟",
+    text: "این عملیات غیرقابل بازگشت است!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "بله، حذف شود!",
+    cancelButtonText: "لغو"
+   }).then((result) => {
+    if (result.isConfirmed) {
+     Livewire.dispatch('doDeleteSelected');
+    }
+   });
   });
+ });
 </script>
 <script>
  $(document).ready(function() {

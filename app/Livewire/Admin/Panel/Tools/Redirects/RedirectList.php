@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Tools\Redirects;
 
+use App\Models\Admin\Panel\Tools\Redirect;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Cache;
-use App\Models\Admin\Panel\Tools\Redirect;
 
 class RedirectList extends Component
 {
@@ -15,11 +14,11 @@ class RedirectList extends Component
 
     protected $listeners = ['deleteRedirectConfirmed' => 'deleteRedirect'];
 
-    public $perPage = 10;
-    public $search = '';
-    public $readyToLoad = false;
+    public $perPage           = 10;
+    public $search            = '';
+    public $readyToLoad       = false;
     public $selectedRedirects = [];
-    public $selectAll = false;
+    public $selectAll         = false;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -38,7 +37,7 @@ class RedirectList extends Component
     public function toggleStatus($redirectId)
     {
         $redirect = Redirect::findOrFail($redirectId);
-        $redirect->update(['is_active' => !$redirect->is_active]);
+        $redirect->update(['is_active' => ! $redirect->is_active]);
 
         $this->dispatch('show-alert', type: $redirect->is_active ? 'success' : 'info', message: $redirect->is_active ? 'فعال شد!' : 'غیرفعال شد!');
         Cache::forget('redirects_' . $this->search . '_page_' . $this->getPage()); // اصلاح $this->page به $this->getPage()
@@ -58,7 +57,7 @@ class RedirectList extends Component
         $this->dispatch('show-alert', type: 'success', message: 'ریدایرکت حذف شد!');
 
         $totalRedirects = Redirect::count();
-        $maxPage = ceil($totalRedirects / $this->perPage);
+        $maxPage        = ceil($totalRedirects / $this->perPage);
         if ($this->getPage() > $maxPage && $maxPage > 0) {
             $this->setPage($maxPage);
         } elseif ($maxPage == 0) {
@@ -73,14 +72,14 @@ class RedirectList extends Component
 
     public function updatedSelectAll($value)
     {
-        $currentPageIds = $this->getRedirectsQuery()->pluck('id')->toArray();
+        $currentPageIds          = $this->getRedirectsQuery()->pluck('id')->toArray();
         $this->selectedRedirects = $value ? $currentPageIds : [];
     }
 
     public function updatedSelectedRedirects()
     {
-        $currentPageIds = $this->getRedirectsQuery()->pluck('id')->toArray();
-        $this->selectAll = !empty($this->selectedRedirects) && count(array_diff($currentPageIds, $this->selectedRedirects)) === 0;
+        $currentPageIds  = $this->getRedirectsQuery()->pluck('id')->toArray();
+        $this->selectAll = ! empty($this->selectedRedirects) && count(array_diff($currentPageIds, $this->selectedRedirects)) === 0;
     }
 
     public function deleteSelected()
@@ -92,7 +91,7 @@ class RedirectList extends Component
 
         Redirect::whereIn('id', $this->selectedRedirects)->delete();
         $this->selectedRedirects = [];
-        $this->selectAll = false;
+        $this->selectAll         = false;
         $this->dispatch('show-alert', type: 'success', message: 'ریدایرکت‌های انتخاب‌شده حذف شدند!');
     }
 

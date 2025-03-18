@@ -1,15 +1,13 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Tools;
 
-use Livewire\Component;
-use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Visibility;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class DataMigrationTool extends Component
 {
@@ -17,32 +15,32 @@ class DataMigrationTool extends Component
 
     public $oldTableFile;
     public $newTable;
-    public $oldTableFields = [];
-    public $newTableFields = [];
-    public $fieldMapping = [];
-    public $tables = [];
-    public $progress = 0; // برای انتقال داده‌ها
-    public $uploadProgress = 0; // برای آپلود فایل
-    public $isMigrating = false;
-    public $isUploading = false;
-    public $searchOld = '';
-    public $searchNew = '';
+    public $oldTableFields   = [];
+    public $newTableFields   = [];
+    public $fieldMapping     = [];
+    public $tables           = [];
+    public $progress         = 0; // برای انتقال داده‌ها
+    public $uploadProgress   = 0; // برای آپلود فایل
+    public $isMigrating      = false;
+    public $isUploading      = false;
+    public $searchOld        = '';
+    public $searchNew        = '';
     public $validationErrors = [];
-    public $logFilePath = null; // برای ذخیره مسیر فایل لاگ
+    public $logFilePath      = null; // برای ذخیره مسیر فایل لاگ
 
     protected $rules = [
         'oldTableFile' => 'file|mimes:sql,csv', // فقط نوع فایل رو چک می‌کنیم
-        'newTable' => 'required|string',
+        'newTable'     => 'required|string',
         'fieldMapping' => 'required|array|min:1',
     ];
 
     protected $messages = [
-        'oldTableFile.file' => 'فایل انتخاب‌شده معتبر نیست.',
-        'oldTableFile.mimes' => 'فقط فایل‌های SQL یا CSV مجاز هستند.',
-        'newTable.required' => 'لطفاً جدول جدید را انتخاب کنید.',
+        'oldTableFile.file'     => 'فایل انتخاب‌شده معتبر نیست.',
+        'oldTableFile.mimes'    => 'فقط فایل‌های SQL یا CSV مجاز هستند.',
+        'newTable.required'     => 'لطفاً جدول جدید را انتخاب کنید.',
         'fieldMapping.required' => 'حداقل یک نگاشت فیلد باید انتخاب شود.',
-        'fieldMapping.array' => 'نگاشت فیلدها باید به‌صورت آرایه باشد.',
-        'fieldMapping.min' => 'حداقل یک نگاشت فیلد باید انتخاب شود.',
+        'fieldMapping.array'    => 'نگاشت فیلدها باید به‌صورت آرایه باشد.',
+        'fieldMapping.min'      => 'حداقل یک نگاشت فیلد باید انتخاب شود.',
     ];
 
     public function mount()
@@ -59,7 +57,7 @@ class DataMigrationTool extends Component
             $this->resetErrorBag('oldTableFile');
             $this->validateOnly('oldTableFile');
 
-            $this->isUploading = true;
+            $this->isUploading    = true;
             $this->uploadProgress = 0;
 
             $fileSize = $this->oldTableFile->getSize();
@@ -90,26 +88,26 @@ class DataMigrationTool extends Component
 
     public function loadOldTableFields()
     {
-        if (!$this->oldTableFile) {
+        if (! $this->oldTableFile) {
             return;
         }
 
-        $file = $this->oldTableFile->getRealPath();
+        $file      = $this->oldTableFile->getRealPath();
         $extension = $this->oldTableFile->getClientOriginalExtension();
 
         $this->oldTableFields = [];
 
         if ($extension === 'csv') {
             $data = array_map('str_getcsv', file($file));
-            if (!empty($data)) {
-                $headers = array_shift($data);
+            if (! empty($data)) {
+                $headers              = array_shift($data);
                 $this->oldTableFields = array_map('trim', $headers);
             }
         } elseif ($extension === 'sql') {
             $content = file_get_contents($file);
             preg_match('/CREATE TABLE `.*?` \((.*?)\)\s*(ENGINE|;)/s', $content, $matches);
             if (isset($matches[1])) {
-                $fieldsRaw = preg_split('/,\s*(?![^()]*\))/', $matches[1]);
+                $fieldsRaw            = preg_split('/,\s*(?![^()]*\))/', $matches[1]);
                 $this->oldTableFields = array_filter(array_map(function ($field) {
                     $field = trim($field);
                     if (preg_match('/`([^`]+)`/', $field, $fieldMatch)) {
@@ -141,7 +139,7 @@ class DataMigrationTool extends Component
             $this->fieldMapping[$oldField] = $newField;
             $this->validateFieldMapping($oldField, $newField);
 
-            if (!empty($this->validationErrors[$oldField])) {
+            if (! empty($this->validationErrors[$oldField])) {
                 $this->dispatch('toast', $this->validationErrors[$oldField], ['type' => 'warning']);
             }
         } else {
@@ -152,13 +150,13 @@ class DataMigrationTool extends Component
 
     protected function validateFieldMapping($oldField, $newField)
     {
-        $file = $this->oldTableFile->getRealPath();
-        $extension = $this->oldTableFile->getClientOriginalExtension();
+        $file          = $this->oldTableFile->getRealPath();
+        $extension     = $this->oldTableFile->getClientOriginalExtension();
         $sampleRecords = [];
 
         if ($extension === 'csv') {
-            $data = array_map('str_getcsv', file($file));
-            $headers = array_shift($data);
+            $data          = array_map('str_getcsv', file($file));
+            $headers       = array_shift($data);
             $sampleRecords = [array_combine($headers, $data[0] ?? [])];
         } elseif ($extension === 'sql') {
             $content = file_get_contents($file);
@@ -170,13 +168,13 @@ class DataMigrationTool extends Component
             }
         }
 
-        if (!empty($sampleRecords)) {
-            $sampleValue = $sampleRecords[0][$oldField] ?? null;
+        if (! empty($sampleRecords)) {
+            $sampleValue  = $sampleRecords[0][$oldField] ?? null;
             $newFieldType = Schema::getColumnType($this->newTable, $newField);
 
             switch ($newFieldType) {
                 case 'integer':
-                    if (!is_numeric($sampleValue)) {
+                    if (! is_numeric($sampleValue)) {
                         $this->validationErrors[$oldField] = "مقدار '$sampleValue' برای '$newField' باید عدد باشد.";
                     }
                     break;
@@ -192,7 +190,7 @@ class DataMigrationTool extends Component
                     $enumValues = DB::selectOne("SHOW COLUMNS FROM `$this->newTable` WHERE Field = ?", [$newField])->Type;
                     preg_match("/enum\((.*?)\)/", $enumValues, $matches);
                     $allowedValues = array_map('trim', explode(',', str_replace("'", "", $matches[1])));
-                    if (!in_array($sampleValue, $allowedValues)) {
+                    if (! in_array($sampleValue, $allowedValues)) {
                         $this->validationErrors[$oldField] = "مقدار '$sampleValue' برای '$newField' باید یکی از " . implode(', ', $allowedValues) . " باشد.";
                     }
                     break;
@@ -205,15 +203,15 @@ class DataMigrationTool extends Component
         $this->validate();
 
         $this->isMigrating = true;
-        $this->progress = 0;
+        $this->progress    = 0;
 
         try {
-            $file = $this->oldTableFile->getRealPath();
+            $file      = $this->oldTableFile->getRealPath();
             $extension = $this->oldTableFile->getClientOriginalExtension();
-            $records = [];
+            $records   = [];
 
             if ($extension === 'csv') {
-                $data = array_map('str_getcsv', file($file));
+                $data    = array_map('str_getcsv', file($file));
                 $headers = array_shift($data);
                 foreach ($data as $row) {
                     if (count($headers) === count($row)) {
@@ -239,14 +237,14 @@ class DataMigrationTool extends Component
                 throw new \Exception('هیچ داده‌ای برای انتقال یافت نشد.');
             }
 
-            $totalRecords = count($records);
-            $batchSize = 100;
-            $batches = ceil($totalRecords / $batchSize);
-            $columnTypes = [];
+            $totalRecords  = count($records);
+            $batchSize     = 100;
+            $batches       = ceil($totalRecords / $batchSize);
+            $columnTypes   = [];
             $columnLengths = [];
             foreach ($this->newTableFields as $field) {
-                $columnTypes[$field] = Schema::getColumnType($this->newTable, $field);
-                $columnInfo = DB::selectOne("SHOW COLUMNS FROM `$this->newTable` WHERE Field = ?", [$field]);
+                $columnTypes[$field]   = Schema::getColumnType($this->newTable, $field);
+                $columnInfo            = DB::selectOne("SHOW COLUMNS FROM `$this->newTable` WHERE Field = ?", [$field]);
                 $columnLengths[$field] = $this->getColumnLength($columnInfo->Type);
             }
 
@@ -259,17 +257,17 @@ class DataMigrationTool extends Component
                 $mappedData = [];
                 foreach ($batch as $record) {
                     $newRecord = [];
-                    $hasError = false;
+                    $hasError  = false;
 
                     foreach ($this->fieldMapping as $oldField => $newField) {
                         if (array_key_exists($oldField, $record)) {
-                            $value = $record[$oldField];
-                            $type = $columnTypes[$newField] ?? 'string';
-                            $maxLength = $columnLengths[$newField] ?? 255;
+                            $value       = $record[$oldField];
+                            $type        = $columnTypes[$newField] ?? 'string';
+                            $maxLength   = $columnLengths[$newField] ?? 255;
                             $castedValue = $this->castValueToType($value, $type, $newField, $oldField, $maxLength);
 
                             if ($castedValue === null) {
-                                $hasError = true;
+                                $hasError        = true;
                                 $failedRecords[] = "فیلد '$oldField' با مقدار '$value' برای '$newField' با نوع '$type' تطابق ندارد.";
                             } else {
                                 $newRecord[$newField] = $castedValue;
@@ -277,12 +275,12 @@ class DataMigrationTool extends Component
                         }
                     }
 
-                    if (!empty($newRecord) && !$hasError) {
+                    if (! empty($newRecord) && ! $hasError) {
                         $mappedData[] = $newRecord;
                     }
                 }
 
-                if (!empty($mappedData)) {
+                if (! empty($mappedData)) {
                     DB::table($this->newTable)->insert($mappedData);
                 }
 
@@ -295,13 +293,13 @@ class DataMigrationTool extends Component
             // ذخیره خطاها توی فایل متنی با UTF-8
             $logContent = implode("\n", array_merge(
                 ['گزارش خطاها و لاگ انتقال داده‌ها - ' . now()->format('Y-m-d H:i:s')],
-                !empty($failedRecords) ? $failedRecords : ['هیچ خطایی در حین انتقال رخ نداد.']
+                ! empty($failedRecords) ? $failedRecords : ['هیچ خطایی در حین انتقال رخ نداد.']
             ));
 
             $logFileName = 'migration_log_' . now()->format('Y-m-d_H-i-s') . '.txt';
             $logFilePath = 'public/' . $logFileName;
-            $bom = "\xEF\xBB\xBF"; // BOM برای UTF-8
-            Storage::put($logFilePath, $bom . $logContent, Visibility::PUBLIC );
+            $bom         = "\xEF\xBB\xBF"; // BOM برای UTF-8
+            Storage::put($logFilePath, $bom . $logContent, Visibility::PUBLIC);
             $this->logFilePath = $logFilePath; // مسیر خام رو ذخیره می‌کنیم، نه URL
 
             Log::info("Log file path set: " . Storage::url($this->logFilePath));
@@ -327,7 +325,7 @@ class DataMigrationTool extends Component
 
     public function downloadLogFile()
     {
-        if (!$this->logFilePath || !Storage::exists($this->logFilePath)) {
+        if (! $this->logFilePath || ! Storage::exists($this->logFilePath)) {
             Log::error("Log file not found at: {$this->logFilePath}");
             $this->dispatch('toast', "فایل لاگ یافت نشد. لطفاً دوباره تلاش کنید.", ['type' => 'error']);
             return null;
@@ -362,7 +360,7 @@ class DataMigrationTool extends Component
         $originalValue = $value;
         switch ($type) {
             case 'integer':
-                if (!is_numeric($value)) {
+                if (! is_numeric($value)) {
                     return null;
                 }
                 return (int) $value;
@@ -379,7 +377,7 @@ class DataMigrationTool extends Component
                 $enumInfo = DB::selectOne("SHOW COLUMNS FROM `$this->newTable` WHERE Field = ?", [$newField])->Type;
                 preg_match("/enum\((.*?)\)/", $enumInfo, $matches);
                 $allowedValues = array_map('trim', explode(',', str_replace("'", "", $matches[1])));
-                if (!in_array($value, $allowedValues)) {
+                if (! in_array($value, $allowedValues)) {
                     return null;
                 }
                 return (string) $value;
@@ -387,7 +385,7 @@ class DataMigrationTool extends Component
                 return filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
             case 'float':
             case 'double':
-                if (!is_numeric($value)) {
+                if (! is_numeric($value)) {
                     return null;
                 }
                 return (float) $value;
@@ -416,9 +414,9 @@ class DataMigrationTool extends Component
     protected function formatSqlError($error)
     {
         if (preg_match('/SQLSTATE\[(\w+)\]: (.+?) \(.*?: (.+?)\)/', $error, $matches)) {
-            $code = $matches[1];
+            $code        = $matches[1];
             $description = $matches[2];
-            $sql = $matches[3];
+            $sql         = $matches[3];
             return "کد خطا: $code - $description\nجزئیات: $sql";
         }
         return $error;

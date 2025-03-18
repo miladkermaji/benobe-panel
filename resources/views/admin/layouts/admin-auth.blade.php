@@ -67,41 +67,41 @@
  <script src="{{ asset('admin-assets/js/login.js') }}"></script>
 
  @livewireScripts
-<script>
- // مطمئن شو toastr لود شده باشه
- if (typeof toastr !== 'undefined') {
-  // شیء سراسری برای مدیریت توسترها
-  window.toastrState = window.toastrState || {
-   successShown: false,
-   errorShown: false
-  };
+ <script>
+  // مطمئن شو toastr لود شده باشه
+  if (typeof toastr !== 'undefined') {
+   // شیء سراسری برای مدیریت توسترها
+   window.toastrState = window.toastrState || {
+    successShown: false,
+    errorShown: false
+   };
 
-  // ذخیره توابع اصلی toastr
-  const originalToastrSuccess = toastr.success;
-  const originalToastrError = toastr.error;
+   // ذخیره توابع اصلی toastr
+   const originalToastrSuccess = toastr.success;
+   const originalToastrError = toastr.error;
 
-  // بازنویسی تابع toastr.success
-  toastr.success = function (message, title, options) {
-   if (!window.toastrState.successShown) {
-    originalToastrSuccess.call(this, message, title, options);
-    window.toastrState.successShown = true;
-   }
-  };
+   // بازنویسی تابع toastr.success
+   toastr.success = function(message, title, options) {
+    if (!window.toastrState.successShown) {
+     originalToastrSuccess.call(this, message, title, options);
+     window.toastrState.successShown = true;
+    }
+   };
 
-  // بازنویسی تابع toastr.error
-  toastr.error = function (message, title, options) {
-   if (!window.toastrState.errorShown) {
-    originalToastrError.call(this, message, title, options);
-    window.toastrState.errorShown = true;
-   }
-  };
- }
+   // بازنویسی تابع toastr.error
+   toastr.error = function(message, title, options) {
+    if (!window.toastrState.errorShown) {
+     originalToastrError.call(this, message, title, options);
+     window.toastrState.errorShown = true;
+    }
+   };
+  }
 
- // مدیریت otpSent برای ریست تایمر (مثل قبل)
- Livewire.on('otpSent', (data) => {
-  localStorage.removeItem('otpTimerData');
- });
-</script>
+  // مدیریت otpSent برای ریست تایمر (مثل قبل)
+  Livewire.on('otpSent', (data) => {
+   localStorage.removeItem('otpTimerData');
+  });
+ </script>
  @stack('scripts')
 </body>
 

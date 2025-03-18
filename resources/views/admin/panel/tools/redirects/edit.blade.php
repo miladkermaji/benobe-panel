@@ -10,5 +10,5 @@
 
 @section('content')
 @section('bread-crumb-title', 'ویرایش ریدایرکت')
- @livewire('admin.panel.tools.redirects.redirect-edit', ['id' => $id])
+@livewire('admin.panel.tools.redirects.redirect-edit', ['id' => $id])
 @endsection

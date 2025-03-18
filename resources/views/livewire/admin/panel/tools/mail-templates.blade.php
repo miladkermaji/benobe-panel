@@ -40,7 +40,8 @@
      </div>
      <div class="form-group mb-4">
       <label class="fw-bold mb-2 text-dark">محتوای قالب</label>
-      <textarea class="form-control input-modern w-100" wire:model="newTemplate" rows="10" id="newTemplateEditor" dir="ltr"></textarea>
+      <textarea class="form-control input-modern w-100" wire:model="newTemplate" rows="10" id="newTemplateEditor"
+       dir="ltr"></textarea>
       @if ($errors->has('newTemplate'))
        <span class="text-danger d-block mt-2 text-sm">{{ $errors->first('newTemplate') }}</span>
       @endif
@@ -181,89 +182,90 @@
  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/mail-template/mail-template.css') }}">
  <!-- استایل‌ها -->
  <!-- اسکریپت‌ها (بدون تغییر) -->
-<script>
+ <script>
   document.addEventListener('livewire:init', () => {
-    let editor = CodeMirror.fromTextArea(document.getElementById('newTemplateEditor'), {
-      mode: 'htmlmixed',
-      lineNumbers: true,
-      dragDrop: false,
-      indentWithTabs: false,
-      lineWrapping: true,
-      indentUnit: 4,
-      theme: 'default'
-    });
-    // اطمینان از اینکه مقدار همیشه یک رشته باشد
-    Livewire.on('updateEditor', (template) => {
-      const safeTemplate = (template && typeof template === 'string') ? template : '';
-      editor.setValue(safeTemplate);
-    });
-    Livewire.on('toast', (message, options = {}) => {
-      if (typeof toastr === 'undefined') {
-        console.error('Toastr is not loaded!');
-        return;
-      }
-      const type = options.type || 'info';
-      const toastOptions = {
-        positionClass: options.position || 'toast-top-right',
-        timeOut: options.timeOut || 3000,
-        progressBar: options.progressBar || false,
-      };
-      if (type === 'success') toastr.success(message, '', toastOptions);
-      else if (type === 'error') toastr.error(message, '', toastOptions);
-      else if (type === 'warning') toastr.warning(message, '', toastOptions);
-      else toastr.info(message, '', toastOptions);
-    });
-    Livewire.on('confirmDeleteSelected', () => {
-      Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: 'قالب‌های انتخاب‌شده حذف خواهند شد و قابل بازگشت نیستند!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#d1d5db',
-        confirmButtonText: 'بله، حذف کن',
-        cancelButtonText: 'خیر',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          @this.confirmDeleteSelected();
-        }
-      });
-    });
-    Livewire.on('openPreview', (template) => {
-      // لاگ برای دیباگ
-      // اگر template آرایه باشد، اولین عنصر آن را بگیریم یا مقدار پیش‌فرضを設定 کنیم
-      const safePreview = (template && typeof template === 'string')
-        ? template
-        : (Array.isArray(template) && template[0] && typeof template[0] === 'string')
-          ? template[0]
-          : '<p>محتوای پیش‌نمایش در دسترس نیست.</p>';
-      let x = screen.width / 2 - 700 / 2;
-      let y = screen.height / 2 - 450 / 2;
-      let previewWindow = window.open('', 'Preview', 'height=500,width=600,left=' + x + ',top=' + y);
-      previewWindow.document.open();
-      previewWindow.document.write(safePreview);
-      previewWindow.document.close();
-      if (previewWindow.focus) previewWindow.focus();
-    });
-    editor.on('change', (cm) => {
-      @this.set('newTemplate', cm.getValue());
-    });
-  });
-  function confirmDelete(id) {
+   let editor = CodeMirror.fromTextArea(document.getElementById('newTemplateEditor'), {
+    mode: 'htmlmixed',
+    lineNumbers: true,
+    dragDrop: false,
+    indentWithTabs: false,
+    lineWrapping: true,
+    indentUnit: 4,
+    theme: 'default'
+   });
+   // اطمینان از اینکه مقدار همیشه یک رشته باشد
+   Livewire.on('updateEditor', (template) => {
+    const safeTemplate = (template && typeof template === 'string') ? template : '';
+    editor.setValue(safeTemplate);
+   });
+   Livewire.on('toast', (message, options = {}) => {
+    if (typeof toastr === 'undefined') {
+     console.error('Toastr is not loaded!');
+     return;
+    }
+    const type = options.type || 'info';
+    const toastOptions = {
+     positionClass: options.position || 'toast-top-right',
+     timeOut: options.timeOut || 3000,
+     progressBar: options.progressBar || false,
+    };
+    if (type === 'success') toastr.success(message, '', toastOptions);
+    else if (type === 'error') toastr.error(message, '', toastOptions);
+    else if (type === 'warning') toastr.warning(message, '', toastOptions);
+    else toastr.info(message, '', toastOptions);
+   });
+   Livewire.on('confirmDeleteSelected', () => {
     Swal.fire({
-      title: 'آیا مطمئن هستید؟',
-      text: 'این قالب حذف خواهد شد و قابل بازگشت نیست!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#d1d5db',
-      confirmButtonText: 'بله، حذف کن',
-      cancelButtonText: 'خیر',
+     title: 'آیا مطمئن هستید؟',
+     text: 'قالب‌های انتخاب‌شده حذف خواهند شد و قابل بازگشت نیستند!',
+     icon: 'warning',
+     showCancelButton: true,
+     confirmButtonColor: '#ef4444',
+     cancelButtonColor: '#d1d5db',
+     confirmButtonText: 'بله، حذف کن',
+     cancelButtonText: 'خیر',
     }).then((result) => {
-      if (result.isConfirmed) {
-        @this.deleteTemplate(id);
-      }
+     if (result.isConfirmed) {
+      @this.confirmDeleteSelected();
+     }
     });
+   });
+   Livewire.on('openPreview', (template) => {
+    // لاگ برای دیباگ
+    // اگر template آرایه باشد، اولین عنصر آن را بگیریم یا مقدار پیش‌فرضを設定 کنیم
+    const safePreview = (template && typeof template === 'string') ?
+     template :
+     (Array.isArray(template) && template[0] && typeof template[0] === 'string') ?
+     template[0] :
+     '<p>محتوای پیش‌نمایش در دسترس نیست.</p>';
+    let x = screen.width / 2 - 700 / 2;
+    let y = screen.height / 2 - 450 / 2;
+    let previewWindow = window.open('', 'Preview', 'height=500,width=600,left=' + x + ',top=' + y);
+    previewWindow.document.open();
+    previewWindow.document.write(safePreview);
+    previewWindow.document.close();
+    if (previewWindow.focus) previewWindow.focus();
+   });
+   editor.on('change', (cm) => {
+    @this.set('newTemplate', cm.getValue());
+   });
+  });
+
+  function confirmDelete(id) {
+   Swal.fire({
+    title: 'آیا مطمئن هستید؟',
+    text: 'این قالب حذف خواهد شد و قابل بازگشت نیست!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#d1d5db',
+    confirmButtonText: 'بله، حذف کن',
+    cancelButtonText: 'خیر',
+   }).then((result) => {
+    if (result.isConfirmed) {
+     @this.deleteTemplate(id);
+    }
+   });
   }
-</script>
+ </script>
 </div>

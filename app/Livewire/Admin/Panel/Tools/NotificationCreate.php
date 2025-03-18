@@ -1,5 +1,6 @@
 <?php
 namespace App\Livewire\Admin\Panel\Tools;
+
 //new changes added by me2222222222
 use App\Jobs\Admin\Panel\Tools\SendNotificationSms;
 use App\Models\Doctor;
@@ -173,26 +174,26 @@ class NotificationCreate extends Component
 
         // اضافه کردن ارسال پیامک به صف
         // توی متد store
-   // اضافه کردن ارسال پیامک به صف
-if (!empty($recipientNumbers) && $this->is_active) {
-    $chunks = array_chunk($recipientNumbers, 10);
-    $delay  = 0;
-    $fullMessage = $this->title . "\n" . $this->message; // ترکیب عنوان و متن با خط جدید
-    foreach ($chunks as $chunk) {
-        Log::info('ارسال Job به صف', [
-            'chunk'        => $chunk,
-            'delay'        => $delay,
-            'sendDateTime' => $this->start_at,
-        ]);
-        SendNotificationSms::dispatch(
-            $fullMessage,
-            $chunk,
-            $this->start_at
-        )->delay(now()->addSeconds($delay));
-        $delay += 5;
-    }
-    $this->dispatch('show-alert', type: 'success', message: 'اعلان ایجاد و ارسال پیامک‌ها در صف قرار گرفت!');
-}
+        // اضافه کردن ارسال پیامک به صف
+        if (! empty($recipientNumbers) && $this->is_active) {
+            $chunks      = array_chunk($recipientNumbers, 10);
+            $delay       = 0;
+            $fullMessage = $this->title . "\n" . $this->message; // ترکیب عنوان و متن با خط جدید
+            foreach ($chunks as $chunk) {
+                Log::info('ارسال Job به صف', [
+                    'chunk'        => $chunk,
+                    'delay'        => $delay,
+                    'sendDateTime' => $this->start_at,
+                ]);
+                SendNotificationSms::dispatch(
+                    $fullMessage,
+                    $chunk,
+                    $this->start_at
+                )->delay(now()->addSeconds($delay));
+                $delay += 5;
+            }
+            $this->dispatch('show-alert', type: 'success', message: 'اعلان ایجاد و ارسال پیامک‌ها در صف قرار گرفت!');
+        }
 
         return redirect()->route('admin.panel.tools.notifications.index');
     }

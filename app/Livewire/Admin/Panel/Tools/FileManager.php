@@ -1,31 +1,30 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Tools;
 
-use Livewire\Component;
-use Livewire\WithFileUploads;
 use App\Models\Admin\Panel\Tools\File;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class FileManager extends Component
 {
     use WithFileUploads;
 
-    public $currentPath = '';
+    public $currentPath   = '';
     public $newFolderName = '';
     public $filesToUpload = [];
-    public $search = '';
-    public $renamingPath = null;
-    public $newName = '';
+    public $search        = '';
+    public $renamingPath  = null;
+    public $newName       = '';
     public $selectedImage = null;
-    public $editingFile = null;
-    public $fileContent = '';
+    public $editingFile   = null;
+    public $fileContent   = '';
 
     protected $rules = [
-        'newFolderName' => 'required|string|max:255',
+        'newFolderName'   => 'required|string|max:255',
         'filesToUpload.*' => 'file|max:10240', // حداکثر 10MB
-        'newName' => 'required|string|max:255',
-        'fileContent' => 'nullable|string',
+        'newName'         => 'required|string|max:255',
+        'fileContent'     => 'nullable|string',
     ];
 
     public function updatedFilesToUpload()
@@ -39,7 +38,7 @@ class FileManager extends Component
         $this->validateOnly('newFolderName');
         $path = $this->currentPath ? $this->currentPath . '/' . $this->newFolderName : $this->newFolderName;
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             Storage::disk('public')->makeDirectory($path);
             File::create([
                 'name' => $this->newFolderName,
@@ -59,15 +58,15 @@ class FileManager extends Component
 
         foreach ($this->filesToUpload as $file) {
             $fileName = $file->getClientOriginalName();
-            $path = $this->currentPath ? $this->currentPath . '/' . $fileName : $fileName;
+            $path     = $this->currentPath ? $this->currentPath . '/' . $fileName : $fileName;
             Storage::disk('public')->putFileAs($this->currentPath, $file, $fileName);
 
             File::create([
-                'name' => $fileName,
-                'path' => $path,
-                'type' => 'file',
+                'name'      => $fileName,
+                'path'      => $path,
+                'type'      => 'file',
                 'extension' => $file->getClientOriginalExtension(),
-                'size' => $file->getSize(),
+                'size'      => $file->getSize(),
             ]);
         }
         $this->filesToUpload = [];
@@ -93,7 +92,7 @@ class FileManager extends Component
     public function startRename($path)
     {
         $this->renamingPath = $path;
-        $this->newName = basename($path);
+        $this->newName      = basename($path);
     }
 
     public function renameItem()
@@ -103,7 +102,7 @@ class FileManager extends Component
         $newPath = $this->currentPath ? $this->currentPath . '/' . $this->newName : $this->newName;
 
         if (Storage::disk('public')->exists($oldPath)) {
-            if (!Storage::disk('public')->exists($newPath)) {
+            if (! Storage::disk('public')->exists($newPath)) {
                 Storage::disk('public')->move($oldPath, $newPath);
                 $file = File::where('path', $oldPath)->first();
                 if ($file) {
@@ -113,7 +112,7 @@ class FileManager extends Component
                     ]);
                 }
                 $this->renamingPath = null;
-                $this->newName = '';
+                $this->newName      = '';
                 $this->dispatch('toast', 'نام آیتم با موفقیت تغییر کرد.', ['type' => 'success']);
             } else {
                 $this->dispatch('toast', 'نام جدید قبلاً وجود دارد.', ['type' => 'error']);
@@ -126,7 +125,7 @@ class FileManager extends Component
     public function cancelRename()
     {
         $this->renamingPath = null;
-        $this->newName = '';
+        $this->newName      = '';
     }
 
     public function changePath($path)
@@ -212,12 +211,12 @@ class FileManager extends Component
             ->get()
             ->map(function ($file) {
                 return [
-                    'type' => $file->type,
-                    'name' => $file->name,
-                    'path' => $file->path,
-                    'url' => $file->type === 'file' ? asset('storage/' . $file->path) : null,
+                    'type'    => $file->type,
+                    'name'    => $file->name,
+                    'path'    => $file->path,
+                    'url'     => $file->type === 'file' ? asset('storage/' . $file->path) : null,
                     'isImage' => $file->type === 'file' && in_array(strtolower($file->extension), ['jpg', 'jpeg', 'png', 'gif']),
-                    'isText' => $file->type === 'file' && in_array(strtolower($file->extension), ['txt', 'md', 'log']),
+                    'isText'  => $file->type === 'file' && in_array(strtolower($file->extension), ['txt', 'md', 'log']),
                 ];
             })->toArray();
 
@@ -225,7 +224,7 @@ class FileManager extends Component
         $emptyFolder = empty($items);
 
         return view('livewire.admin.panel.tools.file-manager', [
-            'items' => $items,
+            'items'       => $items,
             'emptyFolder' => $emptyFolder,
         ]);
     }

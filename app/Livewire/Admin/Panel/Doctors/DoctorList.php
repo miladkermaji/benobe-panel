@@ -84,14 +84,13 @@ class DoctorList extends Component
 
     private function getdoctorsQuery()
     {
-       return Doctor::where('first_name', 'like', '%' . $this->search . '%')
-    ->orWhere('last_name', 'like', '%' . $this->search . '%')
-    ->orWhere('email', 'like', '%' . $this->search . '%')
-    ->orWhere('mobile', 'like', '%' . $this->search . '%')
-    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])
-    ->with(['province', 'city'])
-    ->paginate($this->perPage);
-
+        return Doctor::where('first_name', 'like', '%' . $this->search . '%')
+            ->orWhere('last_name', 'like', '%' . $this->search . '%')
+            ->orWhere('email', 'like', '%' . $this->search . '%')
+            ->orWhere('mobile', 'like', '%' . $this->search . '%')
+            ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])
+            ->with(['province', 'city'])
+            ->paginate($this->perPage);
 
     }
 

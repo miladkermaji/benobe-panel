@@ -13,8 +13,6 @@ class NotificationController
         return view('admin.panel.tools.notifications.create');
     }
 
- 
-
     public function edit($id)
     {
         return view('admin.panel.tools.notifications.edit', compact('id'));

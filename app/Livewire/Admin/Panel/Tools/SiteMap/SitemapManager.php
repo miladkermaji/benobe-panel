@@ -1,32 +1,31 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Tools\SiteMap;
 
-use Livewire\Component;
-use Spatie\Sitemap\Sitemap;
+use App\Jobs\Admin\Panel\Tools\CrawlSiteForSitemap;
 use App\Models\Admin\Panel\Tools\CrawlLog;
 use App\Models\Admin\Panel\Tools\SitemapUrl;
+use Livewire\Component;
+use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url as SitemapUrlTag;
-use App\Jobs\Admin\Panel\Tools\CrawlSiteForSitemap;
 
 class SitemapManager extends Component
 {
-    public $urls = [];
-    public $newUrl = '';
-    public $readyToLoad = false;
-    public $newPriority = 0.8;
-    public $newFrequency = 'weekly';
-    public $newType = 'page';
-    public $isGenerated = false;
-    public $previewXml = '';
-    public $isCrawling = false;
+    public $urls          = [];
+    public $newUrl        = '';
+    public $readyToLoad   = false;
+    public $newPriority   = 0.8;
+    public $newFrequency  = 'weekly';
+    public $newType       = 'page';
+    public $isGenerated   = false;
+    public $previewXml    = '';
+    public $isCrawling    = false;
     public $crawlProgress = 0;
-    public $crawlLogs = [];
-    public $selectAll = false;
-    public $selectedRows = [];
+    public $crawlLogs     = [];
+    public $selectAll     = false;
+    public $selectedRows  = [];
 
     protected $listeners = [
-        'deleteUrlConfirmed' => 'removeUrl',
+        'deleteUrlConfirmed'      => 'removeUrl',
         'deleteSelectedConfirmed' => 'executeDeleteSelected', // لیسنر جدید برای حذف انتخاب‌شده‌ها
     ];
 
@@ -40,13 +39,13 @@ class SitemapManager extends Component
 
     public function loadUrls()
     {
-        $this->urls = SitemapUrl::all()->toArray();
+        $this->urls        = SitemapUrl::all()->toArray();
         $this->readyToLoad = true;
     }
 
     public function addUrl()
     {
-        if (!filter_var($this->newUrl, FILTER_VALIDATE_URL)) {
+        if (! filter_var($this->newUrl, FILTER_VALIDATE_URL)) {
             $this->dispatch('show-alert', type: 'error', message: 'URL معتبر نیست.');
             return;
         }
@@ -54,9 +53,9 @@ class SitemapManager extends Component
         SitemapUrl::updateOrCreate(
             ['url' => $this->newUrl],
             [
-                'priority' => $this->newPriority,
+                'priority'  => $this->newPriority,
                 'frequency' => $this->newFrequency,
-                'type' => $this->newType,
+                'type'      => $this->newType,
                 'is_active' => true,
             ]
         );
@@ -69,7 +68,7 @@ class SitemapManager extends Component
     public function toggleStatus($id)
     {
         $url = SitemapUrl::findOrFail($id);
-        $url->update(['is_active' => !$url->is_active]);
+        $url->update(['is_active' => ! $url->is_active]);
         $this->loadUrls();
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت URL تغییر کرد.');
     }
@@ -89,7 +88,7 @@ class SitemapManager extends Component
 
     public function crawlSite()
     {
-        $this->isCrawling = true;
+        $this->isCrawling    = true;
         $this->crawlProgress = 0;
         CrawlLog::truncate();
         CrawlSiteForSitemap::dispatchSync(); // استفاده از dispatchSync به جای dispatch
@@ -111,7 +110,7 @@ class SitemapManager extends Component
         $this->isCrawling = false;
         CrawlLog::truncate(); // خالی کردن لاگ‌ها
         $this->crawlProgress = 0;
-        $this->crawlLogs = [];
+        $this->crawlLogs     = [];
         $this->loadUrls(); // آپدیت جدول URLها
         $this->dispatch('show-alert', type: 'warning', message: 'پیمایش سایت متوقف شد.');
     }
@@ -135,18 +134,18 @@ class SitemapManager extends Component
     {
         SitemapUrl::whereIn('id', $this->selectedRows)->delete();
         $this->selectedRows = [];
-        $this->selectAll = false;
+        $this->selectAll    = false;
         $this->loadUrls();
         $this->dispatch('show-alert', type: 'success', message: 'ردیف‌های انتخاب‌شده حذف شدند!');
     }
 
     public function updateCrawlProgress()
     {
-        $total = 100; // setTotalCrawlLimit(100)
-        $processed = CrawlLog::count();
-        $crawled = CrawlLog::whereIn('status', ['crawled', 'failed'])->count();
+        $total               = 100; // setTotalCrawlLimit(100)
+        $processed           = CrawlLog::count();
+        $crawled             = CrawlLog::whereIn('status', ['crawled', 'failed'])->count();
         $this->crawlProgress = $total > 0 ? ($processed / $total) * 100 : 0;
-        $this->crawlLogs = CrawlLog::orderBy('created_at', 'desc')->get()->toArray();
+        $this->crawlLogs     = CrawlLog::orderBy('created_at', 'desc')->get()->toArray();
 
         \Log::info('Crawl Progress Update - Total: ' . $total . ' - Processed: ' . $processed . ' - Crawled: ' . $crawled . ' - Pending: ' . ($total - $processed) . ' - Progress: ' . $this->crawlProgress);
 
@@ -160,7 +159,7 @@ class SitemapManager extends Component
     public function generateSitemap()
     {
         $sitemap = Sitemap::create();
-        $urls = SitemapUrl::where('is_active', true)->get();
+        $urls    = SitemapUrl::where('is_active', true)->get();
 
         foreach ($urls as $url) {
             $sitemap->add(
@@ -171,7 +170,7 @@ class SitemapManager extends Component
         }
 
         $sitemap->writeToFile(public_path('sitemap.xml'));
-        $this->previewXml = file_exists(public_path('sitemap.xml')) ? file_get_contents(public_path('sitemap.xml')) : '';
+        $this->previewXml  = file_exists(public_path('sitemap.xml')) ? file_get_contents(public_path('sitemap.xml')) : '';
         $this->isGenerated = true;
         $this->dispatch('show-alert', type: 'success', message: 'نقشه سایت با موفقیت تولید شد!');
     }

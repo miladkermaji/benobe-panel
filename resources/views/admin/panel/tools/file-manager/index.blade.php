@@ -9,6 +9,6 @@
 @section('bread-crumb-title', 'مدیریت فایل')
 @section('scripts')
 
-@livewire('admin.panel.tools.file-manager')
+ @livewire('admin.panel.tools.file-manager')
 
 @endsection

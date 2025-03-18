@@ -25,26 +25,26 @@
         <div class="gateway-logo rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center"
          style="width: 40px; height: 40px; border: 2px solid #e5e7eb;">
          @if ($gateway->name === 'pishgamrayan')
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
-     <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 4v6l5 5" />
-    </svg>
-   @elseif($gateway->name === 'farazsms')
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
-   <path d="M4 4h16v16H4zM8 8l8 8M8 16L16 8" />
-  </svg>
- @elseif($gateway->name === 'mellipayamak')
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2">
-   <path d="M4 12a8 8 0 018-8 8 8 0 018 8H4z" />
-  </svg>
- @elseif($gateway->name === 'kavenegar')
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
-   <path d="M12 2L2 12l10 10 10-10L12 2zm0 4v12" />
-  </svg>
- @elseif($gateway->name === 'payamito')
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2">
-   <path d="M3 6l9 9 9-9M5 4h14v16H5z" />
-  </svg>
- @endif
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+           <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 4v6l5 5" />
+          </svg>
+         @elseif($gateway->name === 'farazsms')
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+           <path d="M4 4h16v16H4zM8 8l8 8M8 16L16 8" />
+          </svg>
+         @elseif($gateway->name === 'mellipayamak')
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2">
+           <path d="M4 12a8 8 0 018-8 8 8 0 018 8H4z" />
+          </svg>
+         @elseif($gateway->name === 'kavenegar')
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+           <path d="M12 2L2 12l10 10 10-10L12 2zm0 4v12" />
+          </svg>
+         @elseif($gateway->name === 'payamito')
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2">
+           <path d="M3 6l9 9 9-9M5 4h14v16H5z" />
+          </svg>
+         @endif
         </div>
         <input type="text" wire:model="title" class="form-control fw-bold" placeholder="عنوان پنل" required>
        </div>
@@ -84,7 +84,7 @@
 
 
  <script>
-  document.addEventListener('livewire:init', function () {
+  document.addEventListener('livewire:init', function() {
    Livewire.on('show-alert', (event) => {
     toastr[event.type](event.message);
    });

@@ -80,7 +80,8 @@
             {{ $item->status ? 'فعال' : 'غیرفعال' }}
            </button>
           </td>
-          <td class="align-middle"><a href="{{ route('doctor.login',$item->id) }}" class="btn btn-light btn-sm">ورود</a></td>
+          <td class="align-middle"><a href="{{ route('doctor.login', $item->id) }}"
+            class="btn btn-light btn-sm">ورود</a></td>
 
           <td class="text-center align-middle">
            <div class="d-flex justify-content-center gap-2">

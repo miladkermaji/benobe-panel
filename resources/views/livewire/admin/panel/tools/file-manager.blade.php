@@ -208,7 +208,7 @@
    </div>
   </div>
  @endif
-<link rel="stylesheet" href="{{ asset('admin-assets/panel/cee/tools/file-manager/file-manager.css') }}">
+ <link rel="stylesheet" href="{{ asset('admin-assets/panel/cee/tools/file-manager/file-manager.css') }}">
  <script>
   document.addEventListener('livewire:init', () => {
    Livewire.on('toast', (message, options = {}) => {

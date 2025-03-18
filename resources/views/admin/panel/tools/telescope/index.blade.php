@@ -11,5 +11,4 @@
 
 @section('content')
  @livewire('admin.panel.tools.telescope.telescope-viewer')
-
 @endsection

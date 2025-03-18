@@ -86,6 +86,17 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('zones')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'index'])->name('admin.panel.zones.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'create'])->name('admin.panel.zones.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'edit'])->name('admin.panel.zones.edit');
+        });
+        Route::prefix('cities')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'citiesIndex'])->name('admin.panel.cities.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'citiesCreate'])->name('admin.panel.cities.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'citiesEdit'])->name('admin.panel.cities.edit');
+        });
+
         Route::prefix('bannertexts')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'index'])->name('admin.panel.bannertexts.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'create'])->name('admin.panel.bannertexts.create');

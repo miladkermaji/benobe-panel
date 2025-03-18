@@ -69,14 +69,14 @@
         id="date_of_birth" placeholder="" data-jdp>
        <label for="date_of_birth" class="form-label">تاریخ تولد</label>
       </div>
-        <div class="col-6 col-md-6 position-relative mt-5">
-            <select wire:model="sex" class="form-select" id="sex">
-                <option value="">انتخاب کنید</option>
-                <option value="male">مرد</option>
-                <option value="female">زن</option>
-            </select>
-            <label for="sex" class="form-label">جنسیت</label>
-        </div>
+      <div class="col-6 col-md-6 position-relative mt-5">
+       <select wire:model="sex" class="form-select" id="sex">
+        <option value="">انتخاب کنید</option>
+        <option value="male">مرد</option>
+        <option value="female">زن</option>
+       </select>
+       <label for="sex" class="form-label">جنسیت</label>
+      </div>
       <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
        <select wire:model.live="zone_province_id" class="form-select select2" id="zone_province_id">
         <option value="">انتخاب کنید</option>
@@ -122,171 +122,171 @@
   </div>
  </div>
 
-<style>
-    .bg-gradient-primary {
-        background: linear-gradient(90deg, #6b7280, #374151);
-    }
+ <style>
+  .bg-gradient-primary {
+   background: linear-gradient(90deg, #6b7280, #374151);
+  }
 
-    .card {
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
+  .card {
+   border-radius: 12px;
+   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
 
-    .form-group {
-        position: relative;
-    }
+  .form-group {
+   position: relative;
+  }
 
-    .form-control,
-    .form-select {
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 12px 15px;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        height: 48px;
-        background: #fafafa;
-        width: 100%;
-    }
+  .form-control,
+  .form-select {
+   border: 1px solid #e5e7eb;
+   border-radius: 8px;
+   padding: 12px 15px;
+   font-size: 14px;
+   transition: all 0.3s ease;
+   height: 48px;
+   background: #fafafa;
+   width: 100%;
+  }
 
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #6b7280;
-        box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
-        background: #fff;
-    }
+  .form-control:focus,
+  .form-select:focus {
+   border-color: #6b7280;
+   box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
+   background: #fff;
+  }
 
-    .form-label {
-        position: absolute;
-        top: -25px;
-        /* همیشه بالا باشه */
-        right: 15px;
-        color: #374151;
-        font-size: 12px;
-        background: #ffffff;
-        padding: 0 5px;
-        transition: none;
-        /* حذف انیمیشن */
-        pointer-events: none;
-    }
+  .form-label {
+   position: absolute;
+   top: -25px;
+   /* همیشه بالا باشه */
+   right: 15px;
+   color: #374151;
+   font-size: 12px;
+   background: #ffffff;
+   padding: 0 5px;
+   transition: none;
+   /* حذف انیمیشن */
+   pointer-events: none;
+  }
 
-    .btn-primary {
-        background: linear-gradient(90deg, #6b7280, #374151);
-        border: none;
-        color: white;
-        font-weight: 600;
-    }
+  .btn-primary {
+   background: linear-gradient(90deg, #6b7280, #374151);
+   border: none;
+   color: white;
+   font-weight: 600;
+  }
 
-    .btn-primary:hover {
-        background: linear-gradient(90deg, #4b5563, #1f2937);
-        transform: translateY(-2px);
-    }
+  .btn-primary:hover {
+   background: linear-gradient(90deg, #4b5563, #1f2937);
+   transform: translateY(-2px);
+  }
 
-    .btn-outline-light {
-        border-color: rgba(255, 255, 255, 0.8);
-    }
+  .btn-outline-light {
+   border-color: rgba(255, 255, 255, 0.8);
+  }
 
-    .btn-outline-light:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px);
-    }
+  .btn-outline-light:hover {
+   background: rgba(255, 255, 255, 0.15);
+   transform: translateY(-2px);
+  }
 
-    .form-check-input {
-        margin-top: 0;
-        height: 20px;
-        width: 20px;
-        vertical-align: middle;
-    }
+  .form-check-input {
+   margin-top: 0;
+   height: 20px;
+   width: 20px;
+   vertical-align: middle;
+  }
 
-    .form-check-label {
-        margin-right: 25px;
-        line-height: 1.5;
-        vertical-align: middle;
-    }
+  .form-check-label {
+   margin-right: 25px;
+   line-height: 1.5;
+   vertical-align: middle;
+  }
 
-    .form-check-input:checked {
-        background-color: #6b7280;
-        border-color: #6b7280;
-    }
+  .form-check-input:checked {
+   background-color: #6b7280;
+   border-color: #6b7280;
+  }
 
-    .animate-bounce {
-        animation: bounce 1s infinite;
-    }
+  .animate-bounce {
+   animation: bounce 1s infinite;
+  }
 
-    @keyframes bounce {
+  @keyframes bounce {
 
-        0%,
-        100% {
-            transform: translateY(0);
-        }
+   0%,
+   100% {
+    transform: translateY(0);
+   }
 
-        50% {
-            transform: translateY(-5px);
-        }
-    }
+   50% {
+    transform: translateY(-5px);
+   }
+  }
 
-    .text-shadow {
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
+  .text-shadow {
+   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
 
-    .select2-container {
-        width: 100% !important;
-    }
+  .select2-container {
+   width: 100% !important;
+  }
 
-    .select2-container--default .select2-selection--single {
-        height: 48px;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        background: #fafafa;
-    }
+  .select2-container--default .select2-selection--single {
+   height: 48px;
+   border: 1px solid #e5e7eb;
+   border-radius: 8px;
+   background: #fafafa;
+  }
 
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 46px;
-        padding-right: 15px;
-    }
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+   line-height: 46px;
+   padding-right: 15px;
+  }
 
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 46px;
-    }
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+   height: 46px;
+  }
 
-    .select2-dropdown {
-        z-index: 1050 !important;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-    }
+  .select2-dropdown {
+   z-index: 1050 !important;
+   border: 1px solid #e5e7eb;
+   border-radius: 8px;
+  }
 
-    .jalali-datepicker {
-        z-index: 1050 !important;
-    }
+  .jalali-datepicker {
+   z-index: 1050 !important;
+  }
 
-    /* ریسپانسیو */
-    @media (max-width: 767px) {
-        .card-header {
-            flex-direction: column;
-            gap: 1rem;
-        }
+  /* ریسپانسیو */
+  @media (max-width: 767px) {
+   .card-header {
+    flex-direction: column;
+    gap: 1rem;
+   }
 
-        .btn-outline-light {
-            width: 100%;
-            justify-content: center;
-        }
+   .btn-outline-light {
+    width: 100%;
+    justify-content: center;
+   }
 
-        .col-md-6 {
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
-    }
+   .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+   }
+  }
 
-    @media (max-width: 575px) {
-        .card-body {
-            padding: 2rem 1.5rem;
-        }
+  @media (max-width: 575px) {
+   .card-body {
+    padding: 2rem 1.5rem;
+   }
 
-        .btn-primary {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-</style>
+   .btn-primary {
+    width: 100%;
+    justify-content: center;
+   }
+  }
+ </style>
  <script>
   document.addEventListener('livewire:init', function() {
    // تابع برای مقداردهی اولیه یا به‌روزرسانی Select2

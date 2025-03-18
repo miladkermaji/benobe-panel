@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Tools\PaymentGateways;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 
 class GatewayList extends Component
 {
@@ -15,14 +14,13 @@ class GatewayList extends Component
 
     protected $listeners = ['deleteGatewayConfirmed' => 'deleteGateway'];
 
-    public $perPage = 10;
-    public $search = '';
+    public $perPage     = 10;
+    public $search      = '';
     public $readyToLoad = false;
 
     protected $queryString = [
         'search' => ['except' => ''],
     ];
-
 
     public function mount()
     {
@@ -36,8 +34,8 @@ class GatewayList extends Component
 
     public function toggleStatus($gatewayId)
     {
-        $gateway = DB::table('payment_gateways')->where('id', $gatewayId)->first();
-        $isActive = !$gateway->is_active;
+        $gateway  = DB::table('payment_gateways')->where('id', $gatewayId)->first();
+        $isActive = ! $gateway->is_active;
 
         if ($isActive) {
             DB::table('payment_gateways')->update(['is_active' => false]);
@@ -74,7 +72,7 @@ class GatewayList extends Component
         $this->dispatch('show-alert', type: 'success', message: 'حذف شد!');
 
         $totalGateways = DB::table('payment_gateways')->count();
-        $maxPage = ceil($totalGateways / $this->perPage);
+        $maxPage       = ceil($totalGateways / $this->perPage);
         if ($this->getPage() > $maxPage && $maxPage > 0) {
             $this->setPage($maxPage);
         } elseif ($maxPage == 0) {
@@ -90,17 +88,16 @@ class GatewayList extends Component
     public function render()
     {
         $gateways = $this->readyToLoad
-            ? DB::table('payment_gateways')
-                ->select('id', 'name', 'title', 'is_active')
-                ->where('title', 'like', '%' . $this->search . '%')
-                ->orWhere('name', 'like', '%' . $this->search . '%')
-                ->paginate($this->perPage) // مطمئن شو که paginate فراخوانی شده
-            : null;
+        ? DB::table('payment_gateways')
+            ->select('id', 'name', 'title', 'is_active')
+            ->where('title', 'like', '%' . $this->search . '%')
+            ->orWhere('name', 'like', '%' . $this->search . '%')
+            ->paginate($this->perPage) // مطمئن شو که paginate فراخوانی شده
+        : null;
 
         return view('livewire.admin.panel.tools.payment-gateways.gateway-list', [
             'gateways' => $gateways,
         ]);
     }
-
 
 }

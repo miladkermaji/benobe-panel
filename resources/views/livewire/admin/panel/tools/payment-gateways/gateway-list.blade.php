@@ -1,8 +1,7 @@
 <div>
  <div class="container-fluid py-3" wire:init="loadGateways">
   <!-- Header -->
-  <header
-   class="glass-header text-white p-3 rounded-3 mb-3 d-flex align-items-center justify-content-between shadow-lg">
+  <header class="glass-header text-white p-3 rounded-3 mb-3 d-flex align-items-center justify-content-between shadow-lg">
    <div class="d-flex align-items-center gap-3">
     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
      class="header-icon">

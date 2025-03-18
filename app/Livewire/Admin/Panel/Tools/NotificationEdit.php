@@ -6,10 +6,10 @@ use App\Models\Doctor;
 use App\Models\Notification;
 use App\Models\Secretary;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 use Morilog\Jalali\Jalalian;
-use Illuminate\Support\Facades\Log;
 
 class NotificationEdit extends Component
 {
@@ -28,17 +28,17 @@ class NotificationEdit extends Component
         $this->target_group   = $notification->target_group;
         $this->is_active      = $notification->is_active;
         $this->start_at       = $notification->start_at
-            ? Jalalian::fromCarbon(\Carbon\Carbon::parse($notification->start_at))->format('Y/m/d H:i:s')
-            : null;
+        ? Jalalian::fromCarbon(\Carbon\Carbon::parse($notification->start_at))->format('Y/m/d H:i:s')
+        : null;
         $this->end_at = $notification->end_at
-            ? Jalalian::fromCarbon(\Carbon\Carbon::parse($notification->end_at))->format('Y/m/d H:i:s')
-            : null;
+        ? Jalalian::fromCarbon(\Carbon\Carbon::parse($notification->end_at))->format('Y/m/d H:i:s')
+        : null;
 
         $recipients = $notification->recipients;
         if ($recipients->count() === 1 && $recipients->first()->mobile) {
             $this->target_mode  = 'single';
             $this->single_phone = $recipients->first()->mobile;
-        } elseif ($recipients->count() > 0 && !$notification->target_group) {
+        } elseif ($recipients->count() > 0 && ! $notification->target_group) {
             $this->target_mode         = 'multiple';
             $this->selected_recipients = $recipients->map(fn($r) => "{$r->recipient_type}:{$r->recipient_id}")->toArray();
         } else {
@@ -202,9 +202,9 @@ class NotificationEdit extends Component
             'is_active'         => $this->is_active,
         ]);
 
-        if (!empty($recipientNumbers) && $this->is_active) {
-            $chunks = array_chunk($recipientNumbers, 10);
-            $delay  = 0;
+        if (! empty($recipientNumbers) && $this->is_active) {
+            $chunks      = array_chunk($recipientNumbers, 10);
+            $delay       = 0;
             $fullMessage = $this->title . "\n" . $this->message; // ترکیب عنوان و متن
             foreach ($chunks as $chunk) {
                 Log::info('ارسال Job به صف', [

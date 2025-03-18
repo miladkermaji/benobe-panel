@@ -1,9 +1,8 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Layouts\Partials;
 
-use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class AdminSidebar extends Component
 {
@@ -34,7 +33,7 @@ class AdminSidebar extends Component
 
     public function render()
     {
-        if (!$this->user) {
+        if (! $this->user) {
             return redirect()->route('admin.login');
         }
 

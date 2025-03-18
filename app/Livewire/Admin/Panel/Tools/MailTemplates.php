@@ -1,37 +1,36 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Tools;
 
+use App\Models\Admin\Tools\MailTemplate\MailTemplate;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Log;
-use App\Models\Admin\Tools\MailTemplate\MailTemplate;
 
 class MailTemplates extends Component
 {
     use WithPagination;
 
-    public $search = '';
-    public $newSubject = '';
-    public $newTemplate = ''; // مقدار اولیه رشته خالی
-    public $editId = null;
+    public $search             = '';
+    public $newSubject         = '';
+    public $newTemplate        = ''; // مقدار اولیه رشته خالی
+    public $editId             = null;
     public $selectedTemplateId = null;
-    public $perPage = 10;
-    public $selectedTemplates = [];
-    public $selectAll = false;
+    public $perPage            = 10;
+    public $selectedTemplates  = [];
+    public $selectAll          = false;
 
     protected $rules = [
-        'newSubject' => 'required|string|max:255|unique:mail_templates,subject',
+        'newSubject'  => 'required|string|max:255|unique:mail_templates,subject',
         'newTemplate' => 'required|string',
     ];
 
     protected $messages = [
-        'newSubject.required' => 'لطفاً عنوان قالب را وارد کنید.',
-        'newSubject.string' => 'عنوان قالب باید یک متن باشد.',
-        'newSubject.max' => 'عنوان قالب نباید بیشتر از 255 کاراکتر باشد.',
-        'newSubject.unique' => 'این عنوان قبلاً ثبت شده است.',
+        'newSubject.required'  => 'لطفاً عنوان قالب را وارد کنید.',
+        'newSubject.string'    => 'عنوان قالب باید یک متن باشد.',
+        'newSubject.max'       => 'عنوان قالب نباید بیشتر از 255 کاراکتر باشد.',
+        'newSubject.unique'    => 'این عنوان قبلاً ثبت شده است.',
         'newTemplate.required' => 'لطفاً محتوای قالب را وارد کنید.',
-        'newTemplate.string' => 'محتوای قالب باید یک متن باشد.',
+        'newTemplate.string'   => 'محتوای قالب باید یک متن باشد.',
     ];
 
     public function updatedSearch()
@@ -44,9 +43,9 @@ class MailTemplates extends Component
         if ($value) {
             $template = MailTemplate::find($value);
             if ($template) {
-                $this->newSubject = $template->subject ?? '';
+                $this->newSubject  = $template->subject ?? '';
                 $this->newTemplate = $template->template ?? '';
-                $this->editId = $template->id;
+                $this->editId      = $template->id;
                 $this->dispatch('updateEditor', $this->newTemplate);
             } else {
                 $this->resetInputFields();
@@ -73,7 +72,7 @@ class MailTemplates extends Component
             ->pluck('id')
             ->toArray();
 
-        $this->selectAll = !empty($this->selectedTemplates) && count(array_diff($currentPageIds, $this->selectedTemplates)) === 0;
+        $this->selectAll = ! empty($this->selectedTemplates) && count(array_diff($currentPageIds, $this->selectedTemplates)) === 0;
     }
 
     public function addTemplate()
@@ -82,8 +81,8 @@ class MailTemplates extends Component
 
         try {
             MailTemplate::create([
-                'subject' => $this->newSubject,
-                'template' => $this->newTemplate,
+                'subject'   => $this->newSubject,
+                'template'  => $this->newTemplate,
                 'is_active' => true,
             ]);
             $this->resetInputFields();
@@ -96,9 +95,9 @@ class MailTemplates extends Component
 
     public function startEdit($id)
     {
-        $template = MailTemplate::findOrFail($id);
-        $this->editId = $id;
-        $this->newSubject = $template->subject ?? '';
+        $template          = MailTemplate::findOrFail($id);
+        $this->editId      = $id;
+        $this->newSubject  = $template->subject ?? '';
         $this->newTemplate = $template->template ?? '';
         $this->dispatch('updateEditor', $this->newTemplate);
         $this->resetValidation();
@@ -112,7 +111,7 @@ class MailTemplates extends Component
         try {
             $template = MailTemplate::findOrFail($this->editId);
             $template->update([
-                'subject' => $this->newSubject,
+                'subject'  => $this->newSubject,
                 'template' => $this->newTemplate,
             ]);
             $this->resetInputFields();
@@ -132,8 +131,8 @@ class MailTemplates extends Component
     public function toggleStatus($id)
     {
         try {
-            $template = MailTemplate::findOrFail($id);
-            $template->is_active = !$template->is_active;
+            $template            = MailTemplate::findOrFail($id);
+            $template->is_active = ! $template->is_active;
             $template->save();
             $this->dispatch('toast', 'وضعیت قالب با موفقیت تغییر کرد.', ['type' => 'success']);
         } catch (\Exception $e) {
@@ -170,7 +169,7 @@ class MailTemplates extends Component
         try {
             MailTemplate::whereIn('id', $this->selectedTemplates)->delete();
             $this->selectedTemplates = [];
-            $this->selectAll = false;
+            $this->selectAll         = false;
             $this->dispatch('toast', 'قالب‌های انتخاب‌شده با موفقیت حذف شدند.', ['type' => 'success']);
         } catch (\Exception $e) {
             Log::error('Error deleting selected mail templates: ' . $e->getMessage());
@@ -181,7 +180,7 @@ class MailTemplates extends Component
     public function export()
     {
         $templates = MailTemplate::all();
-        $csv = "عنوان,محتوا,وضعیت\n";
+        $csv       = "عنوان,محتوا,وضعیت\n";
         foreach ($templates as $template) {
             $csv .= "{$template->subject},\"" . str_replace('"', '""', $template->template ?? '') . "\"," . ($template->is_active ? 'فعال' : 'غیرفعال') . "\n";
         }
@@ -192,20 +191,19 @@ class MailTemplates extends Component
 
     public function previewTemplate($id)
     {
-        $template = MailTemplate::findOrFail($id);
+        $template        = MailTemplate::findOrFail($id);
         $templateContent = $template->template ?? '<p>محتوای قالب خالی است.</p>';
 
         // لاگ برای دیباگ
-     
 
         $this->dispatch('openPreview', $templateContent);
     }
 
     private function resetInputFields()
     {
-        $this->editId = null;
-        $this->newSubject = '';
-        $this->newTemplate = '';
+        $this->editId             = null;
+        $this->newSubject         = '';
+        $this->newTemplate        = '';
         $this->selectedTemplateId = null;
         $this->dispatch('updateEditor', '');
     }
@@ -216,7 +214,7 @@ class MailTemplates extends Component
             ->paginate($this->perPage);
 
         return view('livewire.admin.panel.tools.mail-templates', [
-            'templates' => $templates,
+            'templates'    => $templates,
             'allTemplates' => MailTemplate::all(),
         ])->layout('admin.content.layouts.layoutMaster');
     }

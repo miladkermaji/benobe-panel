@@ -1,85 +1,84 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Tools;
 
-use Livewire\Component;
-use Illuminate\Support\Str;
-use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Log;
-use App\Models\Admin\Panel\Tools\Page;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Admin\Panel\Tools\Element;
-use App\Models\Admin\Panel\Tools\Template;
+use App\Models\Admin\Panel\Tools\Page;
 use App\Models\Admin\Panel\Tools\PageBuilderSetting;
+use App\Models\Admin\Panel\Tools\Template;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class PageBuilder extends Component
 {
     use WithFileUploads;
 
-    public $pages = [];
-    public $templates = [];
-    public $selectedPage = null;
-    public $elements = [];
-    public $newPageTitle = '';
-    public $metaTitle = '';
+    public $pages           = [];
+    public $templates       = [];
+    public $selectedPage    = null;
+    public $elements        = [];
+    public $newPageTitle    = '';
+    public $metaTitle       = '';
     public $metaDescription = '';
-    public $isActive = true;
+    public $isActive        = true;
     public $selectedElement = null;
     public $elementSettings = [
-        'color' => '#000000',
-        'background_color' => '#ffffff',
-        'font_size' => '16px',
-        'padding' => '10px',
-        'margin' => '0px',
-        'animation' => 'none',
+        'color'              => '#000000',
+        'background_color'   => '#ffffff',
+        'font_size'          => '16px',
+        'padding'            => '10px',
+        'margin'             => '0px',
+        'animation'          => 'none',
         'animation_duration' => '1s',
-        'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
-        'box_shadow' => 'none',
-        'border' => 'none',
-        'opacity' => '1',
-        'grid_columns' => 1,
-        // موارد جدید
-        'width' => '100%', // عرض پیش‌فرض
-        'height' => 'auto', // ارتفاع پیش‌فرض
-        'text_align' => 'right', // تراز متن پیش‌فرض (چون RTL هست)
-        'border_radius' => '0px', // شعاع بوردر پیش‌فرض
-        'rotation' => '0deg', // زاویه چرخش پیش‌فرض
+        'responsive'         => ['desktop' => true, 'tablet' => true, 'mobile' => true],
+        'box_shadow'         => 'none',
+        'border'             => 'none',
+        'opacity'            => '1',
+        'grid_columns'       => 1,
+                                         // موارد جدید
+        'width'              => '100%',  // عرض پیش‌فرض
+        'height'             => 'auto',  // ارتفاع پیش‌فرض
+        'text_align'         => 'right', // تراز متن پیش‌فرض (چون RTL هست)
+        'border_radius'      => '0px',   // شعاع بوردر پیش‌فرض
+        'rotation'           => '0deg',  // زاویه چرخش پیش‌فرض
     ];
-    public $previewMode = 'desktop';
+    public $previewMode     = 'desktop';
     public $newTemplateName = '';
     public $uploadedFile;
-    public $content = '';
-    public $animations = ['none', 'fadeIn', 'slideInLeft', 'slideInRight', 'zoomIn'];
-    public $history = [];
-    public $historyIndex = -1;
-    public $copiedElement = null;
+    public $content             = '';
+    public $animations          = ['none', 'fadeIn', 'slideInLeft', 'slideInRight', 'zoomIn'];
+    public $history             = [];
+    public $historyIndex        = -1;
+    public $copiedElement       = null;
     public $isFullScreenPreview = false;
-    public $isAddFormOpen = false;
-    public $isLivePreviewOpen = false;
-    public $autoSaveEnabled = true;
+    public $isAddFormOpen       = false;
+    public $isLivePreviewOpen   = false;
+    public $autoSaveEnabled     = true;
 
     protected $rules = [
-        'newPageTitle' => 'required|unique:pages,title',
-        'metaTitle' => 'nullable|string|max:60',
+        'newPageTitle'    => 'required|unique:pages,title',
+        'metaTitle'       => 'nullable|string|max:60',
         'metaDescription' => 'nullable|string|max:160',
         'newTemplateName' => 'required|unique:templates,name',
-        'uploadedFile' => 'nullable|file|max:10240',
+        'uploadedFile'    => 'nullable|file|max:10240',
     ];
 
     protected $messages = [
-        'newPageTitle.required' => 'لطفاً عنوان صفحه را وارد کنید.',
-        'newPageTitle.unique' => 'این عنوان قبلاً استفاده شده است.',
-        'metaTitle.max' => 'عنوان متا نمی‌تواند بیشتر از ۶۰ کاراکتر باشد.',
-        'metaDescription.max' => 'توضیحات متا نمی‌تواند بیشتر از ۱۶۰ کاراکتر باشد.',
+        'newPageTitle.required'    => 'لطفاً عنوان صفحه را وارد کنید.',
+        'newPageTitle.unique'      => 'این عنوان قبلاً استفاده شده است.',
+        'metaTitle.max'            => 'عنوان متا نمی‌تواند بیشتر از ۶۰ کاراکتر باشد.',
+        'metaDescription.max'      => 'توضیحات متا نمی‌تواند بیشتر از ۱۶۰ کاراکتر باشد.',
         'newTemplateName.required' => 'لطفاً نام قالب را وارد کنید.',
-        'newTemplateName.unique' => 'این نام قالب قبلاً استفاده شده است.',
-        'uploadedFile.max' => 'فایل نمی‌تواند بزرگ‌تر از ۱۰ مگابایت باشد.',
+        'newTemplateName.unique'   => 'این نام قالب قبلاً استفاده شده است.',
+        'uploadedFile.max'         => 'فایل نمی‌تواند بزرگ‌تر از ۱۰ مگابایت باشد.',
     ];
 
     public function mount()
     {
         try {
-            $this->pages = Page::all();
+            $this->pages     = Page::all();
             $this->templates = Template::where('is_public', true)->get();
             $this->loadDefaultSettings();
             $this->startAutoSave();
@@ -99,30 +98,30 @@ class PageBuilder extends Component
 
     public function toggleAddForm()
     {
-        $this->isAddFormOpen = !$this->isAddFormOpen;
+        $this->isAddFormOpen = ! $this->isAddFormOpen;
     }
 
     public function toggleLivePreview()
     {
-        $this->isLivePreviewOpen = !$this->isLivePreviewOpen;
+        $this->isLivePreviewOpen = ! $this->isLivePreviewOpen;
     }
 
     public function createPage()
     {
         $this->validate([
-            'newPageTitle' => 'required|unique:pages,title',
-            'metaTitle' => 'nullable|string|max:60',
+            'newPageTitle'    => 'required|unique:pages,title',
+            'metaTitle'       => 'nullable|string|max:60',
             'metaDescription' => 'nullable|string|max:160',
         ]);
 
         try {
             $page = Page::create([
-                'title' => $this->newPageTitle,
-                'slug' => Str::slug($this->newPageTitle),
-                'meta_title' => $this->metaTitle,
+                'title'            => $this->newPageTitle,
+                'slug'             => Str::slug($this->newPageTitle),
+                'meta_title'       => $this->metaTitle,
                 'meta_description' => $this->metaDescription,
-                'is_active' => $this->isActive,
-                'user_id' => auth('manager')->id(),
+                'is_active'        => $this->isActive,
+                'user_id'          => auth('manager')->id(),
             ]);
 
             $this->pages->push($page); // اضافه کردن صفحه جدید به لیست بدون رفرش کوئری
@@ -139,7 +138,7 @@ class PageBuilder extends Component
     {
         try {
             $page = Page::findOrFail($pageId);
-            $page->update(['is_active' => !$page->is_active]);
+            $page->update(['is_active' => ! $page->is_active]);
 
             // به‌روزرسانی فقط صفحه موردنظر در لیست بدون کوئری مجدد کل صفحات
             $this->pages = $this->pages->map(function ($p) use ($page) {
@@ -160,11 +159,11 @@ class PageBuilder extends Component
             $page->delete();
             $this->pages = Page::all();
             if ($this->selectedPage && $this->selectedPage->id === $pageId) {
-                $this->selectedPage = null;
-                $this->elements = [];
-                $this->metaTitle = '';
+                $this->selectedPage    = null;
+                $this->elements        = [];
+                $this->metaTitle       = '';
                 $this->metaDescription = '';
-                $this->isActive = true;
+                $this->isActive        = true;
             }
             $this->dispatch('toast', 'صفحه با موفقیت حذف شد.', ['type' => 'success']);
         } catch (\Exception $e) {
@@ -176,14 +175,14 @@ class PageBuilder extends Component
     public function selectPage($pageId)
     {
         try {
-            $this->selectedPage = Page::findOrFail($pageId);
-            $this->elements = Element::where('page_id', $pageId)->orderBy('order')->get();
-            $this->metaTitle = $this->selectedPage->meta_title;
+            $this->selectedPage    = Page::findOrFail($pageId);
+            $this->elements        = Element::where('page_id', $pageId)->orderBy('order')->get();
+            $this->metaTitle       = $this->selectedPage->meta_title;
             $this->metaDescription = $this->selectedPage->meta_description;
-            $this->isActive = $this->selectedPage->is_active;
+            $this->isActive        = $this->selectedPage->is_active;
             $this->selectedElement = null;
-            $this->history = [];
-            $this->historyIndex = -1;
+            $this->history         = [];
+            $this->historyIndex    = -1;
             $this->saveToHistory();
         } catch (\Exception $e) {
             Log::error('Error in selectPage: ' . $e->getMessage());
@@ -206,18 +205,18 @@ class PageBuilder extends Component
 
     public function addElement($type)
     {
-        if (!$this->selectedPage) {
+        if (! $this->selectedPage) {
             $this->dispatch('toast', 'لطفاً ابتدا یک صفحه انتخاب کنید.', ['type' => 'warning']);
             return;
         }
         try {
             $order = Element::where('page_id', $this->selectedPage->id)->max('order') + 1;
             Element::create([
-                'page_id' => $this->selectedPage->id,
-                'type' => $type,
+                'page_id'  => $this->selectedPage->id,
+                'type'     => $type,
                 'settings' => json_encode($this->elementSettings),
-                'content' => $this->getDefaultContent($type),
-                'order' => $order,
+                'content'  => $this->getDefaultContent($type),
+                'order'    => $order,
             ]);
             $this->elements = Element::where('page_id', $this->selectedPage->id)->orderBy('order')->get();
             $this->saveToHistory();
@@ -231,7 +230,7 @@ class PageBuilder extends Component
     {
         try {
             $this->selectedElement = Element::findOrFail($elementId);
-            $this->content = $this->selectedElement->content;
+            $this->content         = $this->selectedElement->content;
             $this->elementSettings = json_decode($this->selectedElement->settings, true) ?? $this->elementSettings;
         } catch (\Exception $e) {
             Log::error('Error in selectElement: ' . $e->getMessage());
@@ -241,7 +240,7 @@ class PageBuilder extends Component
 
     public function updateElement()
     {
-        if (!$this->selectedElement) {
+        if (! $this->selectedElement) {
             return;
         }
         try {
@@ -259,7 +258,7 @@ class PageBuilder extends Component
     {
         try {
             Element::findOrFail($elementId)->delete();
-            $this->elements = Element::where('page_id', $this->selectedPage->id)->orderBy('order')->get();
+            $this->elements        = Element::where('page_id', $this->selectedPage->id)->orderBy('order')->get();
             $this->selectedElement = null;
             $this->saveToHistory();
             $this->dispatch('toast', 'المان با موفقیت حذف شد.', ['type' => 'success']);
@@ -296,17 +295,17 @@ class PageBuilder extends Component
 
     public function pasteElement()
     {
-        if (!$this->copiedElement || !$this->selectedPage) {
+        if (! $this->copiedElement || ! $this->selectedPage) {
             return;
         }
         try {
             $order = Element::where('page_id', $this->selectedPage->id)->max('order') + 1;
             Element::create([
-                'page_id' => $this->selectedPage->id,
-                'type' => $this->copiedElement->type,
+                'page_id'  => $this->selectedPage->id,
+                'type'     => $this->copiedElement->type,
                 'settings' => $this->copiedElement->settings,
-                'content' => $this->copiedElement->content,
-                'order' => $order,
+                'content'  => $this->copiedElement->content,
+                'order'    => $order,
             ]);
             $this->elements = Element::where('page_id', $this->selectedPage->id)->orderBy('order')->get();
             $this->saveToHistory();
@@ -321,7 +320,7 @@ class PageBuilder extends Component
     {
         try {
             $this->validate(['uploadedFile' => 'nullable|file|max:10240']);
-            $path = $this->uploadedFile->store('page_builder_files', 'public');
+            $path          = $this->uploadedFile->store('page_builder_files', 'public');
             $this->content = Storage::url($path);
             $this->updateElement();
         } catch (\Exception $e) {
@@ -335,7 +334,7 @@ class PageBuilder extends Component
         try {
             $this->validate(['newTemplateName' => 'required|unique:templates,name']);
             Template::create(['name' => $this->newTemplateName, 'structure' => json_encode($this->elements->toArray()), 'is_public' => true]);
-            $this->templates = Template::where('is_public', true)->get();
+            $this->templates       = Template::where('is_public', true)->get();
             $this->newTemplateName = '';
             $this->dispatch('toast', 'قالب با موفقیت ذخیره شد.', ['type' => 'success']);
         } catch (\Exception $e) {
@@ -360,7 +359,7 @@ class PageBuilder extends Component
 
     public function toggleFullScreenPreview()
     {
-        $this->isFullScreenPreview = !$this->isFullScreenPreview;
+        $this->isFullScreenPreview = ! $this->isFullScreenPreview;
     }
 
     public function undo()
@@ -382,24 +381,24 @@ class PageBuilder extends Component
     public function saveToHistory()
     {
         $state = [
-            'elements' => $this->elements->toArray(),
+            'elements'        => $this->elements->toArray(),
             'selectedElement' => $this->selectedElement ? $this->selectedElement->toArray() : null,
         ];
 
         // محدود کردن به 50 مورد آخر برای جلوگیری از مصرف بیش از حد حافظه
         $this->history = array_slice($this->history, max(count($this->history) - 49, 0));
 
-        $this->history[] = $state;
+        $this->history[]    = $state;
         $this->historyIndex = count($this->history) - 1;
     }
 
     public function restoreFromHistory()
     {
-        $state = $this->history[$this->historyIndex];
-        $this->elements = collect($state['elements'])->mapInto(Element::class);
+        $state                 = $this->history[$this->historyIndex];
+        $this->elements        = collect($state['elements'])->mapInto(Element::class);
         $this->selectedElement = $state['selectedElement'] ? Element::make($state['selectedElement']) : null;
         if ($this->selectedElement) {
-            $this->content = $this->selectedElement->content;
+            $this->content         = $this->selectedElement->content;
             $this->elementSettings = json_decode($this->selectedElement->settings, true) ?? $this->elementSettings;
         }
     }
@@ -444,23 +443,23 @@ class PageBuilder extends Component
         foreach ($this->elements as $element) {
             // تنظیمات پیش‌فرض
             $defaultSettings = [
-                'color' => '#000000',
-                'background_color' => '#ffffff',
-                'font_size' => '16px',
-                'padding' => '10px',
-                'margin' => '0px',
-                'animation' => 'none',
+                'color'              => '#000000',
+                'background_color'   => '#ffffff',
+                'font_size'          => '16px',
+                'padding'            => '10px',
+                'margin'             => '0px',
+                'animation'          => 'none',
                 'animation_duration' => '1s',
-                'responsive' => ['desktop' => true, 'tablet' => true, 'mobile' => true],
-                'box_shadow' => 'none',
-                'border' => 'none',
-                'opacity' => '1',
-                'grid_columns' => 1,
-                'width' => '100%',
-                'height' => 'auto',
-                'text_align' => 'right',
-                'border_radius' => '0px',
-                'rotation' => '0deg',
+                'responsive'         => ['desktop' => true, 'tablet' => true, 'mobile' => true],
+                'box_shadow'         => 'none',
+                'border'             => 'none',
+                'opacity'            => '1',
+                'grid_columns'       => 1,
+                'width'              => '100%',
+                'height'             => 'auto',
+                'text_align'         => 'right',
+                'border_radius'      => '0px',
+                'rotation'           => '0deg',
             ];
 
             // دریافت تنظیمات ذخیره‌شده و ترکیب با پیش‌فرض
@@ -490,7 +489,7 @@ class PageBuilder extends Component
     public function applyTemplate($templateId)
     {
         // بررسی اینکه صفحه‌ای انتخاب شده است
-        if (!$this->selectedPage) {
+        if (! $this->selectedPage) {
             $this->dispatch('toast', 'لطفاً ابتدا یک صفحه را انتخاب کنید.', ['type' => 'warning']);
             return;
         }
@@ -508,11 +507,11 @@ class PageBuilder extends Component
             // اضافه کردن المان‌های قالب به صفحه
             foreach ($elementsData as $element) {
                 Element::create([
-                    'page_id' => $this->selectedPage->id,
-                    'type' => $element['type'],
+                    'page_id'  => $this->selectedPage->id,
+                    'type'     => $element['type'],
                     'settings' => json_encode($element['settings']),
-                    'content' => $element['content'],
-                    'order' => $element['order'],
+                    'content'  => $element['content'],
+                    'order'    => $element['order'],
                 ]);
             }
 
@@ -535,10 +534,10 @@ class PageBuilder extends Component
 
     private function resetPageInputs()
     {
-        $this->newPageTitle = '';
-        $this->metaTitle = '';
+        $this->newPageTitle    = '';
+        $this->metaTitle       = '';
         $this->metaDescription = '';
-        $this->isActive = true;
+        $this->isActive        = true;
     }
 
     public function render()

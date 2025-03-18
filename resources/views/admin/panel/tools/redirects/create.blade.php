@@ -10,5 +10,5 @@
 
 @section('content')
 @section('bread-crumb-title', 'افزودن ریدایرکت جدید')
- @livewire('admin.panel.tools.redirects.redirect-create')
+@livewire('admin.panel.tools.redirects.redirect-create')
 @endsection

@@ -1,10 +1,9 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Tools\PaymentGateways;
 
-use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Livewire\Component;
 
 class GatewayEdit extends Component
 {
@@ -16,35 +15,35 @@ class GatewayEdit extends Component
     public function mount($name)
     {
         $gateway = DB::table('payment_gateways')->where('name', $name)->first();
-        if (!$gateway) {
+        if (! $gateway) {
             session()->flash('error', 'درگاه مورد نظر یافت نشد.');
             return redirect()->route('admin.panel.tools.payment_gateways.index');
         }
 
-        $this->gateway = $gateway;
-        $this->title = $gateway->title;
+        $this->gateway   = $gateway;
+        $this->title     = $gateway->title;
         $this->is_active = $gateway->is_active;
-        $this->settings = $gateway->settings;
+        $this->settings  = $gateway->settings;
     }
 
     public function update()
     {
         $validator = Validator::make([
-            'title' => $this->title,
+            'title'     => $this->title,
             'is_active' => $this->is_active,
-            'settings' => $this->settings,
+            'settings'  => $this->settings,
         ], [
-            'title' => 'required|string|max:255',
+            'title'     => 'required|string|max:255',
             'is_active' => 'required|boolean',
-            'settings' => 'required|json',
+            'settings'  => 'required|json',
         ], [
-            'title.required' => 'عنوان درگاه الزامی است.',
-            'title.string' => 'عنوان درگاه باید متنی باشد.',
-            'title.max' => 'عنوان درگاه نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+            'title.required'     => 'عنوان درگاه الزامی است.',
+            'title.string'       => 'عنوان درگاه باید متنی باشد.',
+            'title.max'          => 'عنوان درگاه نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
             'is_active.required' => 'وضعیت درگاه الزامی است.',
-            'is_active.boolean' => 'وضعیت درگاه باید فعال یا غیرفعال باشد.',
-            'settings.required' => 'تنظیمات درگاه الزامی است.',
-            'settings.json' => 'تنظیمات باید به فرمت JSON معتبر باشد.',
+            'is_active.boolean'  => 'وضعیت درگاه باید فعال یا غیرفعال باشد.',
+            'settings.required'  => 'تنظیمات درگاه الزامی است.',
+            'settings.json'      => 'تنظیمات باید به فرمت JSON معتبر باشد.',
         ]);
 
         if ($validator->fails()) {
@@ -57,9 +56,9 @@ class GatewayEdit extends Component
         }
 
         $updated = DB::table('payment_gateways')->where('name', $this->gateway->name)->update([
-            'title' => $this->title,
-            'is_active' => $this->is_active,
-            'settings' => $this->settings,
+            'title'      => $this->title,
+            'is_active'  => $this->is_active,
+            'settings'   => $this->settings,
             'updated_at' => now(),
         ]);
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Admin\Panel\Menu;
 
 use App\Http\Controllers\Admin\Controller;

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Admin\Panel\BannerText;
 
 use App\Http\Controllers\Admin\Controller;

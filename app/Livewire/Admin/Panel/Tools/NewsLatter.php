@@ -1,36 +1,35 @@
 <?php
-
 namespace App\Livewire\Admin\Panel\Tools;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\Admin\Tools\NewsLetter;
 use Illuminate\Support\Facades\Log;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class NewsLatter extends Component
 {
     use WithPagination;
 
-    public $search = '';
-    public $newEmail = '';
-    public $editId = null;
-    public $editEmail = '';
-    public $perPage = 10;
+    public $search          = '';
+    public $newEmail        = '';
+    public $editId          = null;
+    public $editEmail       = '';
+    public $perPage         = 10;
     public $selectedMembers = [];
-    public $selectAll = false;
+    public $selectAll       = false;
 
     protected $rules = [
-        'newEmail' => 'required|email|unique:newsletters,email',
+        'newEmail'  => 'required|email|unique:newsletters,email',
         'editEmail' => 'required|email',
     ];
 
     // پیام‌های اعتبارسنجی فارسی
     protected $messages = [
-        'newEmail.required' => 'لطفاً ایمیل را وارد کنید.',
-        'newEmail.email' => 'ایمیل واردشده معتبر نیست.',
-        'newEmail.unique' => 'این ایمیل قبلاً ثبت شده است.',
+        'newEmail.required'  => 'لطفاً ایمیل را وارد کنید.',
+        'newEmail.email'     => 'ایمیل واردشده معتبر نیست.',
+        'newEmail.unique'    => 'این ایمیل قبلاً ثبت شده است.',
         'editEmail.required' => 'لطفاً ایمیل را وارد کنید.',
-        'editEmail.email' => 'ایمیل واردشده معتبر نیست.',
+        'editEmail.email'    => 'ایمیل واردشده معتبر نیست.',
     ];
 
     public function updatedSearch()
@@ -55,7 +54,7 @@ class NewsLatter extends Component
             ->pluck('id')
             ->toArray();
 
-        $this->selectAll = !empty($this->selectedMembers) && count(array_diff($currentPageIds, $this->selectedMembers)) === 0;
+        $this->selectAll = ! empty($this->selectedMembers) && count(array_diff($currentPageIds, $this->selectedMembers)) === 0;
     }
 
     public function addMember()
@@ -64,7 +63,7 @@ class NewsLatter extends Component
 
         try {
             Newsletter::create([
-                'email' => $this->newEmail,
+                'email'     => $this->newEmail,
                 'is_active' => true,
             ]);
             $this->newEmail = '';
@@ -77,8 +76,8 @@ class NewsLatter extends Component
 
     public function startEdit($id)
     {
-        $member = Newsletter::findOrFail($id);
-        $this->editId = $id;
+        $member          = Newsletter::findOrFail($id);
+        $this->editId    = $id;
         $this->editEmail = $member->email;
     }
 
@@ -89,7 +88,7 @@ class NewsLatter extends Component
         try {
             $member = Newsletter::findOrFail($this->editId);
             $member->update(['email' => $this->editEmail]);
-            $this->editId = null;
+            $this->editId    = null;
             $this->editEmail = '';
             $this->dispatch('toast', 'عضو با موفقیت ویرایش شد.', ['type' => 'success']);
         } catch (\Exception $e) {
@@ -100,15 +99,15 @@ class NewsLatter extends Component
 
     public function cancelEdit()
     {
-        $this->editId = null;
+        $this->editId    = null;
         $this->editEmail = '';
     }
 
     public function toggleStatus($id)
     {
         try {
-            $member = Newsletter::findOrFail($id);
-            $member->is_active = !$member->is_active;
+            $member            = Newsletter::findOrFail($id);
+            $member->is_active = ! $member->is_active;
             $member->save();
             $this->dispatch('toast', 'وضعیت عضو با موفقیت تغییر کرد.', ['type' => 'success']);
         } catch (\Exception $e) {
@@ -145,7 +144,7 @@ class NewsLatter extends Component
         try {
             Newsletter::whereIn('id', $this->selectedMembers)->delete();
             $this->selectedMembers = [];
-            $this->selectAll = false;
+            $this->selectAll       = false;
             $this->dispatch('toast', 'اعضای انتخاب‌شده با موفقیت حذف شدند.', ['type' => 'success']);
         } catch (\Exception $e) {
             Log::error('Error deleting selected members: ' . $e->getMessage());
@@ -156,7 +155,7 @@ class NewsLatter extends Component
     public function export()
     {
         $members = Newsletter::all();
-        $csv = "ایمیل,وضعیت\n";
+        $csv     = "ایمیل,وضعیت\n";
         foreach ($members as $member) {
             $csv .= "{$member->email}," . ($member->is_active ? 'فعال' : 'غیرفعال') . "\n";
         }

@@ -10,5 +10,5 @@
 
 @section('content')
 @section('bread-crumb-title', 'مدیریت ریدایرکت‌ها')
- @livewire('admin.panel.tools.redirects.redirect-list')
+@livewire('admin.panel.tools.redirects.redirect-list')
 @endsection

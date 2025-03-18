@@ -1,13 +1,15 @@
 <div class="container-fluid py-1" wire:init="loadInitialData" dir="rtl">
  <!-- هدر -->
- <div class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
+ <div
+  class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
   <div class="d-flex align-items-center flex-grow-1 gap-3 header-title">
    <h1 class="m-0 h3 font-thin">مدیریت نقشه سایت</h1>
    <a href="{{ route('admin.tools.sitemap.settings') }}"
-    class="btn btn-gradient-primary px-3 py-1 text-white d-flex align-items-center gap-1"
-    style="font-size: 0.9rem;">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin-slow">
-     <path d="M12 2a10 10 0 0 0-10 10c0 4.42 2.87 8.17 6.84 9.5M12 2v4m10 6a10 10 0 0 1-10 10c-4.42 0-8.17-2.87-9.5-6.84M22 12h-4m-6 10v-4M2 12a10 10 0 0 0 10-10" />
+    class="btn btn-gradient-primary px-3 py-1 text-white d-flex align-items-center gap-1" style="font-size: 0.9rem;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+     class="animate-spin-slow">
+     <path
+      d="M12 2a10 10 0 0 0-10 10c0 4.42 2.87 8.17 6.84 9.5M12 2v4m10 6a10 10 0 0 1-10 10c-4.42 0-8.17-2.87-9.5-6.84M22 12h-4m-6 10v-4M2 12a10 10 0 0 0 10-10" />
     </svg>
     <span>تنظیمات پیمایش</span>
    </a>
@@ -29,8 +31,7 @@
      <span>توقف پیمایش</span>
     </button>
    @endif
-   <button wire:click="generateSitemap"
-    class="btn btn-gradient-success px-4 py-2 d-flex align-items-center gap-2">
+   <button wire:click="generateSitemap" class="btn btn-gradient-success px-4 py-2 d-flex align-items-center gap-2">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
      <path d="M12 5v14M5 12h14" />
     </svg>
@@ -169,7 +170,8 @@
           </td>
           <td class="text-center align-middle">
            <button wire:click="confirmDelete({{ $url['id'] }})" class="btn btn-gradient-danger rounded-pill px-3">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2">
              <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
             </svg>
            </button>
@@ -202,11 +204,11 @@
    </div>
   </div>
  @endif
-<link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/site-map/sitemap-manager.css') }}">
+ <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/site-map/sitemap-manager.css') }}">
 
 
  <script>
-  document.addEventListener('livewire:init', function () {
+  document.addEventListener('livewire:init', function() {
    Livewire.on('show-alert', (event) => {
     toastr[event.type](event.message);
    });
@@ -223,7 +225,9 @@
      cancelButtonText: 'خیر'
     }).then((result) => {
      if (result.isConfirmed) {
-      Livewire.dispatch('deleteUrlConfirmed', { id: event.id });
+      Livewire.dispatch('deleteUrlConfirmed', {
+       id: event.id
+      });
      }
     });
    });
