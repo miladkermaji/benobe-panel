@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\SubUserController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\SpecialtyController;
 use App\Http\Controllers\Api\AppointmentController;
+use App\Http\Controllers\Api\MedicalCentersController;
 
 Route::prefix('/auth')->group(function () {
     Route::post('/login-register', [AuthController::class, 'loginRegister'])->name('api.auth.login-register');
@@ -72,3 +73,13 @@ Route::prefix('doctors')->group(function () {
 Route::prefix('specialties')->group(function () {
     Route::get('/', [SpecialtyController::class, 'getSpecialties'])->name('api.specialties.index');
 });
+Route::prefix('medical-centers')->group(function () {
+    Route::get('/stats', [MedicalCentersController::class, 'getStats'])->name('api.medical-centers.stats');
+    Route::get('/clinics', [MedicalCentersController::class, 'getClinics'])->name('api.medical-centers.clinics');
+    Route::get('/treatment-centers', [MedicalCentersController::class, 'getTreatmentCenters'])->name('api.medical-centers.treatment-centers');
+    Route::get('/imaging-centers', [MedicalCentersController::class, 'getImagingCenters'])->name('api.medical-centers.imaging-centers');
+    Route::get('/hospitals', [MedicalCentersController::class, 'getHospitals'])->name('api.medical-centers.hospitals');
+    Route::get('/laboratories', [MedicalCentersController::class, 'getLaboratories'])->name('api.medical-centers.laboratories');
+});
+
+

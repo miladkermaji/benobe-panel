@@ -5,7 +5,9 @@ use App\Http\Controllers\Controller;
 use App\Models\BannerText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
+/**
+ * @group بنر و گرفتن  امار
+ */
 class BannerController extends Controller
 {
     /**
@@ -67,7 +69,7 @@ class BannerController extends Controller
     }
 
    /**
- * گرفتن آمار (تعداد پزشکان، بیمارستان‌ها، کلینیک‌ها، تخصص‌ها و آزمایشگاه‌ها)
+ * گرفتن آمار (تعداد پزشکان، بیمارستان‌ها،  کاربران و آزمایشگاه‌ها)
  *
  * @response 200 {
  *   "status": "success",
@@ -89,19 +91,19 @@ public function getStats(Request $request)
 {
     try {
         $doctorsCount = \App\Models\Doctor::count();
-        $hospitalsCount = \App\Models\Clinic::where('type', 'hospital')->count();
-        $clinicsCount = \App\Models\Clinic::where('type', 'clinic')->count();
-        $specialtiesCount = \App\Models\Specialty::count();
+        $usersCount = \App\Models\User::count();
+        $hospitalsCount = \App\Models\Hospital::where('is_active', 1)->count();
         $laboratoriesCount = \App\Models\Laboratory::where('is_active', 1)->count();
+
 
         return response()->json([
             'status' => 'success',
             'data' => [
                 'doctors_count' => $doctorsCount,
+                'users_count' => $usersCount,
                 'hospitals_count' => $hospitalsCount,
-                'clinics_count' => $clinicsCount,
-                'specialties_count' => $specialtiesCount,
                 'laboratories_count' => $laboratoriesCount,
+
             ],
         ], 200);
 

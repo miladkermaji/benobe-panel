@@ -1,14 +1,14 @@
 <?php
 namespace App\Models;
 
-use App\Models\Doctor;
 use App\Models\Zone;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Hospital extends Model
+class ImagingCenter extends Model
 {
-    use HasFactory;
+    protected $table = 'imaging_centers';
 
     protected $fillable = [
         'doctor_id',
@@ -25,7 +25,7 @@ class Hospital extends Model
         'description',
         'latitude',
         'longitude',
-        'consultation_fee',
+        'service_fee',
         'payment_methods',
         'is_active',
         'working_days',
@@ -43,7 +43,7 @@ class Hospital extends Model
         'gallery'            => 'array', // تبدیل JSON به آرایه
         'documents'          => 'array', // تبدیل JSON به آرایه
         'phone_numbers'      => 'array', // تبدیل JSON به آرایه
-        'consultation_fee'   => 'decimal:2',
+        'service_fee'        => 'decimal:2',
         'latitude'           => 'decimal:7',
         'longitude'          => 'decimal:7',
     ];
@@ -51,9 +51,9 @@ class Hospital extends Model
     /**
      * رابطه با جدول doctors
      */
-    public function doctor()
+    public function doctor(): BelongsTo
     {
-        return $this->belongsTo(Doctor::class, 'doctor_id');
+        return $this->belongsTo(Doctor::class);
     }
 
     /**
@@ -70,10 +70,5 @@ class Hospital extends Model
     public function city(): BelongsTo
     {
         return $this->belongsTo(Zone::class, 'city_id');
-    }
-
-    public function bestDoctors()
-    {
-        return $this->hasMany(BestDoctor::class);
     }
 }
