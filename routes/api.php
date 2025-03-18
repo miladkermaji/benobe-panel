@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\SpecialtyController;
 use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\MedicalCentersController;
+use App\Http\Controllers\Api\TeleCounselingController;
 
 Route::prefix('/auth')->group(function () {
     Route::post('/login-register', [AuthController::class, 'loginRegister'])->name('api.auth.login-register');
@@ -86,6 +87,9 @@ Route::prefix('medical-centers')->group(function () {
 Route::prefix('reviews')->group(function () {
     Route::get('/', [ReviewController::class, 'index'])->name('api.reviews.index');
     Route::post('/', [ReviewController::class, 'store'])->middleware('custom-auth.jwt')->name('api.reviews.store');
+});
+Route::prefix('tele-counseling')->group(function () {
+    Route::get('/', [TeleCounselingController::class, 'index'])->name('api.tele-counseling.index');
 });
 
 

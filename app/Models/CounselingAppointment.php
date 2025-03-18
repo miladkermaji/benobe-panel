@@ -16,12 +16,13 @@ class CounselingAppointment extends Model
     protected $table = 'counseling_appointments';
 
     // فیلدهای قابل پرکردن
-    protected $fillable = [
+  protected $fillable = [
         'doctor_id',
         'patient_id',
         'insurance_id',
         'clinic_id',
         'duration',
+        'actual_call_duration',
         'consultation_type',
         'priority',
         'payment_status',
@@ -29,6 +30,8 @@ class CounselingAppointment extends Model
         'appointment_date',
         'start_time',
         'end_time',
+        'video_meeting_link',
+        'chat_history',
         'reserved_at',
         'confirmed_at',
         'status',
@@ -38,9 +41,11 @@ class CounselingAppointment extends Model
         'tracking_code',
         'max_appointments',
         'fee',
+        'doctor_rating',
         'appointment_category',
         'location',
         'notification_sent',
+        'call_recording_url',
     ];
 
     // نوع‌های داده‌ای که باید به صورت تاریخ شناخته شوند
@@ -52,29 +57,26 @@ class CounselingAppointment extends Model
     ];
 
     // رابطه با پزشک
-    public function doctor()
+   public function doctor()
     {
-        return $this->belongsTo(Doctor::class);
+        return $this->belongsTo(Doctor::class, 'doctor_id')
+            ->with(['specialty']);
     }
 
-    // رابطه با بیمار
     public function patient()
     {
         return $this->belongsTo(User::class, 'patient_id');
     }
 
-    // رابطه با بیمه
     public function insurance()
     {
-        return $this->belongsTo(Insurance::class);
+        return $this->belongsTo(Insurance::class, 'insurance_id');
     }
 
-    // رابطه با کلینیک
     public function clinic()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(Clinic::class, 'clinic_id');
     }
-
     /**
      * وضعیت پرداخت خوانا
      */
