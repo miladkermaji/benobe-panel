@@ -71,6 +71,8 @@ Route::prefix('banner')->group(function () {
 
 Route::prefix('doctors')->group(function () {
     Route::get('/best', [DoctorController::class, 'getBestDoctors'])->name('api.doctors.best');
+    Route::get('/new', [DoctorController::class, 'getNewDoctors'])->name('api.doctors.new'); // مسیر جدید
+
 });
 Route::prefix('specialties')->group(function () {
     Route::get('/', [SpecialtyController::class, 'getSpecialties'])->name('api.specialties.index');

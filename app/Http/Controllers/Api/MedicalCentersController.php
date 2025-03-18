@@ -79,7 +79,8 @@ class MedicalCentersController extends Controller
      *       "id": 1,
      *       "name": "کلینیک نمونه",
      *       "address": "تهران، خیابان اصلی",
-     *       "doctor_count": 5
+     *       "doctor_count": 5,
+     *       "province": "تهران"
      *     }
      *   ]
      * }
@@ -96,7 +97,8 @@ class MedicalCentersController extends Controller
 
             $clinics = Clinic::where('is_active', 1)
                 ->withCount('doctor')
-                ->select('id', 'name', 'address')
+                ->with(['province' => fn($query) => $query->select('id', 'name')])
+                ->select('id', 'name', 'address', 'province_id')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -109,6 +111,7 @@ class MedicalCentersController extends Controller
                     'name'         => $clinic->name,
                     'address'      => $clinic->address,
                     'doctor_count' => $clinic->doctor_count,
+                    'province'     => $clinic->province ? $clinic->province->name : null,
                 ];
             })->values();
 
@@ -140,7 +143,8 @@ class MedicalCentersController extends Controller
      *       "id": 1,
      *       "name": "درمانگاه نمونه",
      *       "address": "تهران، خیابان اصلی",
-     *       "doctor_count": 3
+     *       "doctor_count": 3,
+     *       "province": "تهران"
      *     }
      *   ]
      * }
@@ -157,7 +161,8 @@ class MedicalCentersController extends Controller
 
             $treatmentCenters = TreatmentCenter::where('is_active', 1)
                 ->withCount('doctor')
-                ->select('id', 'name', 'address')
+                ->with(['province' => fn($query) => $query->select('id', 'name')])
+                ->select('id', 'name', 'address', 'province_id')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -170,6 +175,7 @@ class MedicalCentersController extends Controller
                     'name'         => $treatmentCenter->name,
                     'address'      => $treatmentCenter->address,
                     'doctor_count' => $treatmentCenter->doctor_count,
+                    'province'     => $treatmentCenter->province ? $treatmentCenter->province->name : null,
                 ];
             })->values();
 
@@ -201,7 +207,8 @@ class MedicalCentersController extends Controller
      *       "id": 1,
      *       "name": "مرکز تصویربرداری نمونه",
      *       "address": "تهران، خیابان اصلی",
-     *       "doctor_count": 2
+     *       "doctor_count": 2,
+     *       "province": "تهران"
      *     }
      *   ]
      * }
@@ -218,7 +225,8 @@ class MedicalCentersController extends Controller
 
             $imagingCenters = ImagingCenter::where('is_active', 1)
                 ->withCount('doctor')
-                ->select('id', 'name', 'address')
+                ->with(['province' => fn($query) => $query->select('id', 'name')])
+                ->select('id', 'name', 'address', 'province_id')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -231,6 +239,7 @@ class MedicalCentersController extends Controller
                     'name'         => $imagingCenter->name,
                     'address'      => $imagingCenter->address,
                     'doctor_count' => $imagingCenter->doctor_count,
+                    'province'     => $imagingCenter->province ? $imagingCenter->province->name : null,
                 ];
             })->values();
 
@@ -262,7 +271,8 @@ class MedicalCentersController extends Controller
      *       "id": 1,
      *       "name": "بیمارستان نمونه",
      *       "address": "تهران، خیابان اصلی",
-     *       "doctor_count": 10
+     *       "doctor_count": 10,
+     *       "province": "تهران"
      *     }
      *   ]
      * }
@@ -279,7 +289,8 @@ class MedicalCentersController extends Controller
 
             $hospitals = Hospital::where('is_active', 1)
                 ->withCount('doctor')
-                ->select('id', 'name', 'address')
+                ->with(['province' => fn($query) => $query->select('id', 'name')])
+                ->select('id', 'name', 'address', 'province_id')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -292,6 +303,7 @@ class MedicalCentersController extends Controller
                     'name'         => $hospital->name,
                     'address'      => $hospital->address,
                     'doctor_count' => $hospital->doctor_count,
+                    'province'     => $hospital->province ? $hospital->province->name : null,
                 ];
             })->values();
 
@@ -323,7 +335,8 @@ class MedicalCentersController extends Controller
      *       "id": 1,
      *       "name": "لابراتوار نمونه",
      *       "address": "تهران، خیابان اصلی",
-     *       "doctor_count": 4
+     *       "doctor_count": 4,
+     *       "province": "تهران"
      *     }
      *   ]
      * }
@@ -340,7 +353,8 @@ class MedicalCentersController extends Controller
 
             $laboratories = Laboratory::where('is_active', 1)
                 ->withCount('doctor')
-                ->select('id', 'name', 'address')
+                ->with(['province' => fn($query) => $query->select('id', 'name')])
+                ->select('id', 'name', 'address', 'province_id')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -353,6 +367,7 @@ class MedicalCentersController extends Controller
                     'name'         => $laboratory->name,
                     'address'      => $laboratory->address,
                     'doctor_count' => $laboratory->doctor_count,
+                    'province'     => $laboratory->province ? $laboratory->province->name : null,
                 ];
             })->values();
 

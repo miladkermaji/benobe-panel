@@ -1,22 +1,22 @@
 <?php
 namespace App\Models;
 
-use App\Models\Zone;
+use App\Models\DoctorAppointmentConfig;
+use App\Models\Doctors\DoctorManagement\DoctorTariff;
+use App\Models\DoctorWorkSchedule;
 use App\Models\Secretary;
 use App\Models\Specialty;
-use Morilog\Jalali\Jalalian;
 use App\Models\UserDoctorLike;
-use Laravel\Sanctum\HasApiTokens;
-use App\Models\DoctorWorkSchedule;
-use Laravel\Jetstream\HasProfilePhoto;
-use App\Models\DoctorAppointmentConfig;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Notifications\Notifiable;
+use App\Models\Zone;
 use Cviebrock\EloquentSluggable\Sluggable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use App\Models\Doctors\DoctorManagement\DoctorTariff;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Sanctum\HasApiTokens;
+use Morilog\Jalali\Jalalian;
 
 class Doctor extends Authenticatable
 {
@@ -79,7 +79,7 @@ class Doctor extends Authenticatable
         'email_verified_at'  => 'datetime',
         'last_login_at'      => 'datetime',
     ];
-
+    protected $dates = ['created_at', 'updated_at', 'date_of_birth', 'mobile_verified_at', 'email_verified_at', 'last_login_at'];
     /**
      * The accessors to append to the model's array form.
      *
