@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MagController;
 use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\ZoneController;
 use App\Http\Controllers\Api\OrderController;
@@ -94,6 +95,7 @@ Route::prefix('tele-counseling')->group(function () {
     Route::get('/', [TeleCounselingController::class, 'index'])->name('api.tele-counseling.index');
 });
 
+Route::get('/mag/latest-posts', [MagController::class, 'getLatestPosts']);
 
 
 
