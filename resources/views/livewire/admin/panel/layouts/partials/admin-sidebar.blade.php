@@ -207,7 +207,7 @@
      </a>
      <ul class="drop-toggle d-none">
       <li class="item-li"><a href="{{ route('admin.panel.services.index') }}">لیست خدمات</a></li>
-      <li class="item-li"><a href="{{ route('dr-services.create') }}">افزودن خدمت</a></li>
+      <li class="item-li"><a href="{{ route('admin.panel.doctorservices.index') }}"> خدمات پزشکان</a></li>
      </ul>
     </li>
     <!-- نسخه الکترونیک -->

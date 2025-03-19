@@ -86,6 +86,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('doctorservices')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'index'])->name('admin.panel.doctorservices.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'create'])->name('admin.panel.doctorservices.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'edit'])->name('admin.panel.doctorservices.edit');
+        });
+
         Route::prefix('services')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Service\ServiceController::class, 'index'])->name('admin.panel.services.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Service\ServiceController::class, 'create'])->name('admin.panel.services.create');
