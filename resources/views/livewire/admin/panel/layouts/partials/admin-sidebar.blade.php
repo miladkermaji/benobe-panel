@@ -306,6 +306,7 @@
      </a>
      <ul class="drop-toggle d-none">
       <li class="item-li"><a href="#">مدیریت بلاگ</a></li>
+      <li class="item-li"><a href="{{ route('admin.panel.specialties.index') }}">مدیریت تخصص ها</a></li>
       <li class="item-li"><a href="{{ route('admin.panel.zones.index') }}"> شهر و استان</a></li>
       <li class="item-li"><a href="#">اخبار پزشکی</a></li>
       <li class="item-li"><a href="#">مدیریت نظرات</a></li>

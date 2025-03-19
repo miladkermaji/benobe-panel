@@ -86,17 +86,23 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
-    Route::prefix('bestdoctors')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'index'])->name('admin.panel.bestdoctors.index');
-        Route::get('/create', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'create'])->name('admin.panel.bestdoctors.create');
-        Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'edit'])->name('admin.panel.bestdoctors.edit');
-    });
+        Route::prefix('specialties')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Specialty\SpecialtyController::class, 'index'])->name('admin.panel.specialties.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Specialty\SpecialtyController::class, 'create'])->name('admin.panel.specialties.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Specialty\SpecialtyController::class, 'edit'])->name('admin.panel.specialties.edit');
+        });
 
-Route::prefix('zones')->group(function () {
+        Route::prefix('bestdoctors')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'index'])->name('admin.panel.bestdoctors.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'create'])->name('admin.panel.bestdoctors.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'edit'])->name('admin.panel.bestdoctors.edit');
+        });
+
+        Route::prefix('zones')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'index'])->name('admin.panel.zones.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'create'])->name('admin.panel.zones.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'edit'])->name('admin.panel.zones.edit');
-});
+        });
         Route::prefix('cities')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'citiesIndex'])->name('admin.panel.cities.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Zone\ZoneController::class, 'citiesCreate'])->name('admin.panel.cities.create');

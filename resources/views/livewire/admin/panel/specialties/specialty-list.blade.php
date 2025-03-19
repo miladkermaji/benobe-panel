@@ -1,10 +1,10 @@
-<div class="container-fluid py-2" dir="rtl" wire:init="loadZones">
+<div class="container-fluid py-2" dir="rtl" wire:init="loadSpecialties">
  <div
   class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
-  <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت استان‌ها</h1>
+  <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت تخصص‌ها</h1>
   <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
    <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
-    wire:model.live="search" placeholder="جستجو در استان‌ها..." style="padding-right: 23px">
+    wire:model.live="search" placeholder="جستجو در تخصص‌ها..." style="padding-right: 23px">
    <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3"
     style="z-index: 5; top: 11px; right: 5px;">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
@@ -13,15 +13,15 @@
    </span>
   </div>
   <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
-   <a href="{{ route('admin.panel.zones.create') }}"
+   <a href="{{ route('admin.panel.specialties.create') }}"
     class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
      <path d="M12 5v14M5 12h14" />
     </svg>
-    <span>افزودن استان</span>
+    <span>افزودن تخصص</span>
    </a>
    <button wire:click="deleteSelected" class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
-    @if (empty($selectedZones)) disabled @endif>
+    @if (empty($selectedSpecialties)) disabled @endif>
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
     </svg>
@@ -41,28 +41,23 @@
          <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
         </th>
         <th class="text-center align-middle" style="width: 70px;">ردیف</th>
-        <th class="align-middle">نام استان</th>
-        <th class="align-middle">ترتیب</th>
-        <th class="align-middle">جمعیت</th>
-        <th class="align-middle">هزینه ارسال</th>
+        <th class="align-middle">نام</th>
+        <th class="align-middle">توضیحات</th>
         <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
-        <th class="text-center align-middle" style="width: 200px;">عملیات</th>
+        <th class="text-center align-middle" style="width: 150px;">عملیات</th>
        </tr>
       </thead>
       <tbody>
        @if ($readyToLoad)
-        @forelse ($zones as $index => $item)
+        @forelse ($specialties as $index => $item)
          <tr>
           <td class="text-center align-middle">
-           <input type="checkbox" wire:model.live="selectedZones" value="{{ $item->id }}"
+           <input type="checkbox" wire:model.live="selectedSpecialties" value="{{ $item->id }}"
             class="form-check-input m-0">
           </td>
-          <td class="text-center align-middle">{{ $zones->firstItem() + $index }}</td>
+          <td class="text-center align-middle">{{ $specialties->firstItem() + $index }}</td>
           <td class="align-middle">{{ $item->name }}</td>
-          <td class="align-middle">{{ $item->sort }}</td>
-          <td class="align-middle">{{ $item->population ? number_format($item->population) : '-' }}</td>
-          <td class="align-middle">{{ $item->price_shipping ? number_format($item->price_shipping) . ' تومان' : '-' }}
-          </td>
+          <td class="align-middle">{{ $item->description }}</td>
           <td class="text-center align-middle">
            <button wire:click="toggleStatus({{ $item->id }})"
             class="badge {{ $item->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
@@ -71,7 +66,7 @@
           </td>
           <td class="text-center align-middle">
            <div class="d-flex justify-content-center gap-2">
-            <a href="{{ route('admin.panel.zones.edit', $item->id) }}"
+            <a href="{{ route('admin.panel.specialties.edit', $item->id) }}"
              class="btn btn-gradient-success rounded-pill px-3">
              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2">
@@ -85,43 +80,36 @@
               <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
              </svg>
             </button>
-            <a href="{{ route('admin.panel.cities.index', ['province_id' => $item->id]) }}"
-             class="btn btn-light rounded-pill px-3" title="مشاهده شهرها">
-             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-             </svg>
-            </a>
            </div>
           </td>
          </tr>
         @empty
          <tr>
-          <td colspan="8" class="text-center py-5">
+          <td colspan="6" class="text-center py-5">
            <div class="d-flex justify-content-center align-items-center flex-column">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" class="text-muted mb-3">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             class="text-muted mb-3">
              <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-            <p class="text-muted fw-medium">هیچ استانی یافت نشد.</p>
+            <p class="text-muted fw-medium">هیچ تخصصی یافت نشد.</p>
            </div>
           </td>
          </tr>
         @endforelse
        @else
         <tr>
-         <td colspan="8" class="text-center py-5">در حال بارگذاری استان‌ها...</td>
+         <td colspan="6" class="text-center py-5">در حال بارگذاری تخصص‌ها...</td>
         </tr>
        @endif
       </tbody>
      </table>
     </div>
     <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
-     <div class="text-muted">نمایش {{ $zones ? $zones->firstItem() : 0 }} تا {{ $zones ? $zones->lastItem() : 0 }} از
-      {{ $zones ? $zones->total() : 0 }} ردیف</div>
-     @if ($zones && $zones->hasPages())
-      {{ $zones->links('livewire::bootstrap') }}
+     <div class="text-muted">نمایش {{ $specialties ? $specialties->firstItem() : 0 }} تا
+      {{ $specialties ? $specialties->lastItem() : 0 }} از {{ $specialties ? $specialties->total() : 0 }} ردیف
+     </div>
+     @if ($specialties && $specialties->hasPages())
+      {{ $specialties->links('livewire::bootstrap') }}
      @endif
     </div>
    </div>
@@ -136,8 +124,8 @@
 
    Livewire.on('confirm-delete', (event) => {
     Swal.fire({
-     title: 'حذف استان',
-     text: 'آیا مطمئن هستید که می‌خواهید این استان را حذف کنید؟',
+     title: 'حذف تخصص',
+     text: 'آیا مطمئن هستید که می‌خواهید این تخصص را حذف کنید؟',
      icon: 'warning',
      showCancelButton: true,
      confirmButtonColor: '#ef4444',
@@ -146,7 +134,7 @@
      cancelButtonText: 'خیر'
     }).then((result) => {
      if (result.isConfirmed) {
-      Livewire.dispatch('deleteZoneConfirmed', {
+      Livewire.dispatch('deleteSpecialtyConfirmed', {
        id: event.id
       });
      }

@@ -28,16 +28,16 @@
     </svg>
     <span>حذف انتخاب‌شده‌ها</span>
    </button>
-   
-    <a href="{{ route('admin.panel.zones.index') }}"
-     class="btn btn-outline-light rounded-pill px-4 d-flex align-items-center gap-2">
-     <svg width="16" height="16" style="transform: rotate(180deg)" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2">
-      <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-     </svg>
-     <span>بازگشت به استان‌ها</span>
-    </a>
-   
+
+   <a href="{{ route('admin.panel.zones.index') }}"
+    class="btn btn-outline-light rounded-pill px-4 d-flex align-items-center gap-2">
+    <svg width="16" height="16" style="transform: rotate(180deg)" viewBox="0 0 24 24" fill="none"
+     stroke="currentColor" stroke-width="2">
+     <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    </svg>
+    <span>بازگشت به استان‌ها</span>
+   </a>
+
   </div>
  </div>
 

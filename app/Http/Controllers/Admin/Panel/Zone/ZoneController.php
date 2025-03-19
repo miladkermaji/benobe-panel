@@ -19,7 +19,7 @@ class ZoneController extends Controller
     {
         return view('admin.panel.zones.edit', compact('id'));
     }
-     public function citiesIndex()
+    public function citiesIndex()
     {
         return view('admin.panel.cities.index');
     }
