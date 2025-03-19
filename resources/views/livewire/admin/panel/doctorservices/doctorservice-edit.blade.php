@@ -243,9 +243,7 @@
    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
-  .select2-container {
-   width: 100% !important;
-  }
+
 
   .select2-container--default .select2-selection--single {
    height: 48px;
@@ -292,7 +290,6 @@
      placeholder: 'انتخاب کنید',
      width: '100%',
      dropdownAutoWidth: true,
-     allowClear: true
     });
     $('#clinic_id').select2({
      dir: 'rtl',
