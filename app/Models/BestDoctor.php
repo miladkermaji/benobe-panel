@@ -19,7 +19,7 @@ class BestDoctor extends Model
         'star_rating'     => 'decimal:1',
     ];
 
-    public function doctor()
+   public function doctor()
     {
         return $this->belongsTo(Doctor::class, 'doctor_id');
     }
