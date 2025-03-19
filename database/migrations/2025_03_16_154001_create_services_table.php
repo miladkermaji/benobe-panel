@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;
@@ -9,14 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // ایجاد جدول services
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // نام خدمت
+            $table->string('name');                   // نام خدمت
+            $table->text('description')->nullable();  // توضیحات (اختیاری)
+            $table->boolean('status')->default(true); // وضعیت (فعال/غیرفعال)
             $table->timestamps();
         });
 
-        // اجرای Seeder با مدیریت خطا
         try {
             Artisan::call('db:seed', [
                 '--class' => 'ServicesSeeder',

@@ -86,6 +86,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('services')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Service\ServiceController::class, 'index'])->name('admin.panel.services.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Service\ServiceController::class, 'create'])->name('admin.panel.services.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Service\ServiceController::class, 'edit'])->name('admin.panel.services.edit');
+        });
+
         Route::prefix('specialties')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Specialty\SpecialtyController::class, 'index'])->name('admin.panel.specialties.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Specialty\SpecialtyController::class, 'create'])->name('admin.panel.specialties.create');
