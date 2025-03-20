@@ -71,4 +71,8 @@ class TreatmentCenter extends Model
     {
         return $this->belongsTo(Zone::class, 'city_id');
     }
+     public function galleries()
+    {
+        return $this->hasMany(TreatmentCenterGallery::class);
+    }
 }

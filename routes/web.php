@@ -87,6 +87,15 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('treatmentcenters')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'index'])->name('admin.panel.treatmentcenters.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'create'])->name('admin.panel.treatmentcenters.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'edit'])->name('admin.panel.treatmentcenters.edit');
+            Route::get('/gallery/{id}', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'gallery'])
+                ->name('admin.panel.treatmentcenters.gallery');
+
+        });
+
         Route::prefix('clinics')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Clinic\ClinicController::class, 'index'])->name('admin.panel.clinics.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Clinic\ClinicController::class, 'create'])->name('admin.panel.clinics.create');

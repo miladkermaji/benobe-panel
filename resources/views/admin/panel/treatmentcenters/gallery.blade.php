@@ -9,6 +9,6 @@
 @endsection
 
 @section('content')
-@section('bread-crumb-title', 'مدیریت آزمایشگاه')
-@livewire('admin.panel.laboratories.laboratory-list')
+@section('bread-crumb-title', ' گالری تصاویر')
+@livewire('admin.panel.treatmentcenters.treatment-centers-gallery', ['id' => $id])
 @endsection

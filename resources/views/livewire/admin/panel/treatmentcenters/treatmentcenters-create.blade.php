@@ -7,9 +7,9 @@
      class="animate-bounce">
      <path d="M5 12h14M12 5l7 7-7 7" />
     </svg>
-    <h5 class="mb-0 fw-bold text-shadow">افزودن کلینیک جدید</h5>
+    <h5 class="mb-0 fw-bold text-shadow">افزودن درمانگاه جدید</h5>
    </div>
-   <a href="{{ route('admin.panel.clinics.index') }}"
+   <a href="{{ route('admin.panel.treatmentcenters.index') }}"
     class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">
     <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
      stroke="currentColor" stroke-width="2">
@@ -34,7 +34,7 @@
       </div>
       <div class="col-6 col-md-6 position-relative mt-5">
        <input type="text" wire:model="name" class="form-control" id="name" placeholder=" " required>
-       <label for="name" class="form-label">نام کلینیک</label>
+       <label for="name" class="form-label">نام درمانگاه</label>
       </div>
       <div class="col-6 col-md-6 position-relative mt-5">
        <input type="text" wire:model="address" class="form-control" id="address" placeholder=" ">
@@ -95,8 +95,8 @@
       </div>
       <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
        <div class="form-check form-switch w-100 d-flex align-items-center">
-        <input class="form-check-input" type="checkbox" id="is_main_clinic" wire:model="is_main_clinic">
-        <label class="form-check-label fw-medium" for="is_main_clinic">کلینیک اصلی</label>
+        <input class="form-check-input" type="checkbox" id="is_main_center" wire:model="is_main_center">
+        <label class="form-check-label fw-medium" for="is_main_center">درمانگاه اصلی</label>
        </div>
       </div>
       <div class="col-12 position-relative mt-5">
@@ -110,7 +110,7 @@
          stroke-width="2">
          <path d="M12 5v14M5 12h14" />
         </svg>
-        افزودن کلینیک
+        افزودن درمانگاه
        </button>
       </div>
      </div>
