@@ -22,3 +22,5 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+git_pull_log.txt
+webhook_log.txt
