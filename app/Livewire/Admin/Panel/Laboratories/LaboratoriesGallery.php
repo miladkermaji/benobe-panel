@@ -1,18 +1,18 @@
 <?php
 namespace App\Livewire\Admin\Panel\Laboratories;
 
-use Livewire\Component;
-use Livewire\WithFileUploads;
 use App\Models\Laboratory;
 use App\Models\LaboratoryGallery;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class LaboratoriesGallery extends Component
 {
     use WithFileUploads;
 
     public $laboratory;
-    public $images = [];
+    public $images   = [];
     public $captions = [];
 
     public function mount($id)
@@ -24,7 +24,7 @@ class LaboratoriesGallery extends Component
     public function uploadImages()
     {
         $this->validate([
-            'images.*' => 'image|max:2048',
+            'images.*'   => 'image|max:2048',
             'captions.*' => 'nullable|string|max:255',
         ]);
 
@@ -32,12 +32,12 @@ class LaboratoriesGallery extends Component
             $path = $image->store('laboratory_galleries', 'public');
             LaboratoryGallery::create([
                 'laboratory_id' => $this->laboratory->id,
-                'image_path' => $path,
-                'caption' => $this->captions[$index] ?? null,
+                'image_path'    => $path,
+                'caption'       => $this->captions[$index] ?? null,
             ]);
         }
 
-        $this->images = [];
+        $this->images   = [];
         $this->captions = [];
         $this->dispatch('show-alert', type: 'success', message: 'تصاویر با موفقیت آپلود شدند!');
     }

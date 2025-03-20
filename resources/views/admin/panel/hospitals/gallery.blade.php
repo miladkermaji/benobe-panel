@@ -10,5 +10,5 @@
 
 @section('content')
 @section('bread-crumb-title', 'مدیریت بیمارستان')
-@livewire('admin.panel.hospitals.hospitals-gallery',['id'=>$id])
+@livewire('admin.panel.hospitals.hospitals-gallery', ['id' => $id])
 @endsection

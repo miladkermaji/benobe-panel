@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Admin\Panel\Laboratory;
 
 use App\Http\Controllers\Admin\Controller;
@@ -20,7 +19,7 @@ class LaboratoryController extends Controller
     {
         return view('admin.panel.laboratories.edit', compact('id'));
     }
-     public function gallery($id)
+    public function gallery($id)
     {
         return view('admin.panel.laboratories.gallery', compact('id'));
     }

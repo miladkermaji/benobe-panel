@@ -7,9 +7,9 @@
      class="animate-bounce">
      <path d="M5 12h14M12 5l7 7-7 7" />
     </svg>
-    <h5 class="mb-0 fw-bold">گالری تصاویر آزمایشگاه: {{ $laboratory->name }}</h5>
+    <h5 class="mb-0 fw-bold">گالری تصاویر کلینیک: {{ $clinic->name }}</h5>
    </div>
-   <a href="{{ route('admin.panel.laboratories.index') }}"
+   <a href="{{ route('admin.panel.clinics.index') }}"
     class="btn btn-outline-light btn-sm rounded-pill d-flex align-items-center gap-2 hover:shadow-md transition-all">
     <svg width="16" style="transform: rotate(180deg)" height="16" viewBox="0 0 24 24" fill="none"
      stroke="currentColor" stroke-width="2">
@@ -47,7 +47,7 @@
        <div class="col-md-3 col-sm-6">
         <div class="card shadow-sm position-relative">
          <img src="{{ Storage::url($gallery->image_path) }}" class="card-img-top"
-          alt="{{ $gallery->caption ?? 'تصویر آزمایشگاه' }}" style="height: 150px; object-fit: cover;">
+          alt="{{ $gallery->caption ?? 'تصویر کلینیک' }}" style="height: 150px; object-fit: cover;">
          <div class="card-body p-2 text-center">
           <p class="text-muted small">{{ $gallery->caption ?? 'بدون توضیح' }}</p>
           <div class="d-flex justify-content-center gap-2">

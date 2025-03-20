@@ -23,11 +23,28 @@ class Clinic extends Model
         'city_id',
         'postal_code',
         'description',
+        'is_active', // Added from migration
+        'is_main_clinic',
+        'start_time',
+        'end_time',
+        'latitude',
+        'longitude',
+        'consultation_fee',
+        'payment_methods',
+        'working_days',
+        'gallery', // JSON field, though we’ll use a separate table for galleries
+        'documents',
+        'location_confirmed',
     ];
 
     protected $casts = [
-        'phone_numbers' => 'array',
-        'is_active'     => 'boolean',
+        'phone_numbers'      => 'array',
+        'is_active'          => 'boolean',
+        'is_main_clinic'     => 'boolean',
+        'gallery'            => 'array',
+        'documents'          => 'array',
+        'working_days'       => 'array',
+        'location_confirmed' => 'boolean',
     ];
 
     public function city()
@@ -43,6 +60,11 @@ class Clinic extends Model
     public function doctor()
     {
         return $this->belongsTo(Doctor::class, 'doctor_id');
+    }
+
+    public function galleries()
+    {
+        return $this->hasMany(ClinicGallery::class, 'clinic_id');
     }
 
     public function scopeActive($query)
