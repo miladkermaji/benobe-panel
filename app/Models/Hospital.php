@@ -59,7 +59,7 @@ class Hospital extends Model
     /**
      * رابطه با جدول zone برای province
      */
-    public function province(): BelongsTo
+    public function province()
     {
         return $this->belongsTo(Zone::class, 'province_id');
     }
@@ -67,7 +67,7 @@ class Hospital extends Model
     /**
      * رابطه با جدول zone برای city
      */
-    public function city(): BelongsTo
+    public function city()
     {
         return $this->belongsTo(Zone::class, 'city_id');
     }
@@ -75,5 +75,9 @@ class Hospital extends Model
     public function bestDoctors()
     {
         return $this->hasMany(BestDoctor::class);
+    }
+    public function galleries()
+    {
+        return $this->hasMany(HospitalGallery::class);
     }
 }

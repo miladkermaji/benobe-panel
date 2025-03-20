@@ -86,6 +86,14 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('hospitals')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Hospital\HospitalController::class, 'index'])->name('admin.panel.hospitals.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Hospital\HospitalController::class, 'create'])->name('admin.panel.hospitals.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Hospital\HospitalController::class, 'edit'])->name('admin.panel.hospitals.edit');
+            Route::get('/edit/{id}/gallery', [\App\Http\Controllers\Admin\Panel\Hospital\HospitalController::class, 'gallery'])->name('admin.panel.hospitals.gallery');
+
+        });
+
         Route::prefix('doctorservices')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'index'])->name('admin.panel.doctorservices.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'create'])->name('admin.panel.doctorservices.create');
