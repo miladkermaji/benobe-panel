@@ -39,6 +39,7 @@ return new class extends Migration {
             $table->boolean('is_active')->default(true);
             $table->boolean('is_verified')->default(false);
             $table->boolean('profile_completed')->default(false);
+            $table->unsignedInteger('views_count')->default(0)->nullable();
             $table->tinyInteger('status')->default(0)->comment('وضعیت حساب');
             $table->string('api_token', 80)->unique()->nullable();
             $table->rememberToken();

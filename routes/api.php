@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\SubUserController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\SpecialtyController;
 use App\Http\Controllers\Api\AppointmentController;
+use App\Http\Controllers\Api\DoctorFilterController;
+use App\Http\Controllers\Api\DoctorListingController;
 use App\Http\Controllers\Api\MedicalCentersController;
 use App\Http\Controllers\Api\TeleCounselingController;
 
@@ -96,6 +98,8 @@ Route::prefix('tele-counseling')->group(function () {
 });
 
 Route::get('/mag/latest-posts', [MagController::class, 'getLatestPosts']);
+Route::get('/doctors', [DoctorListingController::class, 'getDoctors']);
 
+Route::get('/doctor-filters', [DoctorFilterController::class, 'getFilterOptions']);
 
 

@@ -61,6 +61,7 @@ class Doctor extends Authenticatable
         'api_token',
         'two_factor_secret', // فیلد برای ذخیره کلید مخفی
         'two_factor_enabled',
+        'views_count',
     ];
 
     protected $hidden = [
@@ -220,4 +221,10 @@ class Doctor extends Authenticatable
     {
         return $this->hasOne(DoctorAppointmentConfig::class);
     }
+    public function reviews()
+    {
+        return $this->morphMany(Review::class, 'reviewable');
+    }
+    public function appointments()
+    {return $this->hasMany(Appointment::class);}
 }
