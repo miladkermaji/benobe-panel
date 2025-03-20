@@ -87,6 +87,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('reviews')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Review\ReviewController::class, 'index'])->name('admin.panel.reviews.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Review\ReviewController::class, 'create'])->name('admin.panel.reviews.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Review\ReviewController::class, 'edit'])->name('admin.panel.reviews.edit');
+        });
+
         Route::prefix('imaging-centers')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\ImagingCenter\ImagingCenterController::class, 'index'])->name('admin.panel.imaging-centers.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\ImagingCenter\ImagingCenterController::class, 'create'])->name('admin.panel.imaging-centers.create');

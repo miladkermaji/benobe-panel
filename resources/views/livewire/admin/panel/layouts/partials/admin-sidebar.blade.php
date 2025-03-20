@@ -374,7 +374,7 @@
       <li class="item-li"><a href="{{ route('admin.panel.specialties.index') }}">مدیریت تخصص ها</a></li>
       <li class="item-li"><a href="{{ route('admin.panel.zones.index') }}"> شهر و استان</a></li>
       <li class="item-li"><a href="#">اخبار پزشکی</a></li>
-      <li class="item-li"><a href="#">مدیریت نظرات</a></li>
+      <li class="item-li"><a href="{{ route('admin.panel.reviews.index') }}">مدیریت نظرات</a></li>
       <li class="item-li"><a href="#">گالری تصاویر</a></li>
       <li class="item-li"><a href="#">مدیریت تبلیغات</a></li>
      </ul>
