@@ -1,65 +1,66 @@
 <?php
-use App\Http\Controllers\Admin\Panel\Dashboard\AdminDashboardController;
-use App\Http\Controllers\Admin\Panel\Profile\AdminProfileController;
-use App\Http\Controllers\Admin\Panel\Tools\DataMigrationTool\DataMigrationToolController;
-use App\Http\Controllers\Admin\Panel\Tools\FileManager\FileManagerController;
-use App\Http\Controllers\Admin\Panel\Tools\MailTemplate\MailTemplateController;
-use App\Http\Controllers\Admin\Panel\Tools\NewsLatter\NewsLatterController;
-use App\Http\Controllers\Admin\Panel\Tools\Notification\NotificationController;
-use App\Http\Controllers\Admin\Panel\Tools\PageBuilder\PageBuilderController;
-use App\Http\Controllers\Admin\Panel\Tools\PaymentGateways\PaymentGatewaysController;
-use App\Http\Controllers\Admin\Panel\Tools\Redirect\RedirectController;
-use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapController;
-use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapSettingsController;
-use App\Http\Controllers\Admin\Panel\Tools\SmsGateway\SmsGatewayController;
-use App\Http\Controllers\Admin\Panel\Users\UserController;
-use App\Http\Controllers\Dr\Panel\Activation\Consult\Rules\ConsultRulesController;
-use App\Http\Controllers\Dr\Panel\Bime\DRBimeController;
-use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\ActivationDoctorsClinicController;
-use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Cost\CostController;
-use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration\DurationController;
-use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationWorkhoursController;
-use App\Http\Controllers\Dr\Panel\DoctorsClinic\DoctorsClinicManagementController;
-use App\Http\Controllers\Dr\Panel\DoctorServices\DoctorServicesController;
-use App\Http\Controllers\Dr\Panel\DrPanelController;
-use App\Http\Controllers\Dr\Panel\MyPerformance\MyPerformanceController;
-use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Service\ServiceController;
-use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Templates\FavoriteTemplatesController;
-use App\Http\Controllers\Dr\Panel\NoskheElectronic\Prescription\PrescriptionController;
-use App\Http\Controllers\Dr\Panel\NoskheElectronic\Providers\ProvidersController;
-use App\Http\Controllers\Dr\Panel\PatientRecords\PatientRecordsController;
-use App\Http\Controllers\Dr\Panel\Payment\Setting\DrPaymentSettingController;
-use App\Http\Controllers\Dr\Panel\Profile\DrProfileController;
-use App\Http\Controllers\Dr\Panel\Profile\DrUpgradeProfileController;
-use App\Http\Controllers\Dr\Panel\Profile\LoginLogsController;
-use App\Http\Controllers\Dr\Panel\Profile\SubUserController;
-use App\Http\Controllers\Dr\Panel\SecretaryPermission\SecretaryPermissionController;
-use App\Http\Controllers\Dr\Panel\Secretary\SecretaryManagementController;
-use App\Http\Controllers\Dr\Panel\Tickets\TicketResponseController;
-use App\Http\Controllers\Dr\Panel\Tickets\TicketsController;
-use App\Http\Controllers\Dr\Panel\Turn\DrScheduleController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\AppointmentController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\Counseling\ConsultTerm\ConsultTermController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\ManualNobat\ManualNobatController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereWaiting\MoshavereWaitingController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\VacationController;
-use App\Http\Controllers\Dr\Panel\Turn\TurnsCatByDays\TurnsCatByDaysController;
+use App\Livewire\Admin\Auth\Logout;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use App\Livewire\Admin\Auth\TwoFactor;
+use App\Livewire\Dr\Auth\DoctorLogout;
 use App\Livewire\Admin\Auth\LoginConfirm;
+use App\Livewire\Dr\Auth\DoctorTwoFactor;
 use App\Livewire\Admin\Auth\LoginRegister;
 use App\Livewire\Admin\Auth\LoginUserPass;
-use App\Livewire\Admin\Auth\Logout;
-use App\Livewire\Admin\Auth\TwoFactor;
 use App\Livewire\Dr\Auth\DoctorLoginConfirm;
 use App\Livewire\Dr\Auth\DoctorLoginRegister;
 use App\Livewire\Dr\Auth\DoctorLoginUserPass;
-use App\Livewire\Dr\Auth\DoctorLogout;
-use App\Livewire\Dr\Auth\DoctorTwoFactor;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Dr\Panel\DrPanelController;
+use App\Http\Controllers\Dr\Panel\Bime\DRBimeController;
+use App\Http\Controllers\Admin\Panel\Users\UserController;
 use Modules\SendOtp\App\Http\Controllers\SendOtpController;
+use App\Http\Controllers\Dr\Panel\Profile\SubUserController;
+use App\Http\Controllers\Dr\Panel\Tickets\TicketsController;
+use App\Http\Controllers\Dr\Panel\Turn\DrScheduleController;
+use App\Http\Controllers\Dr\Panel\Profile\DrProfileController;
+use App\Http\Controllers\Dr\Panel\Profile\LoginLogsController;
+use App\Http\Controllers\Dr\Panel\Tickets\TicketResponseController;
+use App\Http\Controllers\Admin\Panel\Profile\AdminProfileController;
+use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapController;
+use App\Http\Controllers\Dr\Panel\Profile\DrUpgradeProfileController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\AppointmentController;
+use App\Http\Controllers\Admin\Panel\Tools\Redirect\RedirectController;
+use App\Http\Controllers\Admin\Panel\Dashboard\AdminDashboardController;
+use App\Http\Controllers\Dr\Panel\MyPerformance\MyPerformanceController;
+use App\Http\Controllers\Dr\Panel\DoctorServices\DoctorServicesController;
+use App\Http\Controllers\Dr\Panel\PatientRecords\PatientRecordsController;
+use App\Http\Controllers\Dr\Panel\Secretary\SecretaryManagementController;
+use App\Http\Controllers\Admin\Panel\Tools\NewsLatter\NewsLatterController;
+use App\Http\Controllers\Admin\Panel\Tools\SmsGateway\SmsGatewayController;
+use App\Http\Controllers\Admin\Panel\Tools\FileManager\FileManagerController;
+use App\Http\Controllers\Admin\Panel\Tools\PageBuilder\PageBuilderController;
+use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapSettingsController;
+use App\Http\Controllers\Dr\Panel\Payment\Setting\DrPaymentSettingController;
+use App\Http\Controllers\Admin\Panel\Tools\MailTemplate\MailTemplateController;
+use App\Http\Controllers\Admin\Panel\Tools\Notification\NotificationController;
+use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Cost\CostController;
+use App\Http\Controllers\Dr\Panel\Turn\TurnsCatByDays\TurnsCatByDaysController;
+use App\Http\Controllers\Dr\Panel\NoskheElectronic\Providers\ProvidersController;
+use App\Http\Controllers\Dr\Panel\Activation\Consult\Rules\ConsultRulesController;
+use App\Http\Controllers\Dr\Panel\DoctorsClinic\DoctorsClinicManagementController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\ManualNobat\ManualNobatController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\VacationController;
+use App\Http\Controllers\Dr\Panel\SecretaryPermission\SecretaryPermissionController;
+use App\Http\Controllers\Admin\Panel\Tools\PaymentGateways\PaymentGatewaysController;
+use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Service\ServiceController;
+use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration\DurationController;
+use App\Http\Controllers\Dr\Panel\NoskheElectronic\Prescription\PrescriptionController;
+use App\Http\Controllers\Admin\Panel\Tools\DataMigrationTool\DataMigrationToolController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereWaiting\MoshavereWaitingController;
+use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\ActivationDoctorsClinicController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\Counseling\ConsultTerm\ConsultTermController;
+use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Templates\FavoriteTemplatesController;
+use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationWorkhoursController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
 
 //manager login routes
 /* login manager routes */
@@ -86,12 +87,19 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('laboratories')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Laboratory\LaboratoryController::class, 'index'])->name('admin.panel.laboratories.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Laboratory\LaboratoryController::class, 'create'])->name('admin.panel.laboratories.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Laboratory\LaboratoryController::class, 'edit'])->name('admin.panel.laboratories.edit');
+            Route::get('/edit/{id}/gallery', [\App\Http\Controllers\Admin\Panel\Laboratory\LaboratoryController::class, 'gallery'])->name('admin.panel.laboratories.gallery');
+
+        });
+
         Route::prefix('hospitals')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Hospital\HospitalController::class, 'index'])->name('admin.panel.hospitals.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Hospital\HospitalController::class, 'create'])->name('admin.panel.hospitals.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Hospital\HospitalController::class, 'edit'])->name('admin.panel.hospitals.edit');
             Route::get('/edit/{id}/gallery', [\App\Http\Controllers\Admin\Panel\Hospital\HospitalController::class, 'gallery'])->name('admin.panel.hospitals.gallery');
-
         });
 
         Route::prefix('doctorservices')->group(function () {
