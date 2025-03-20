@@ -17,7 +17,7 @@ class SmsGatewayEdit extends Component
         $gateway = DB::table('sms_gateways')->where('name', $name)->first();
         if (! $gateway) {
             session()->flash('error', 'پنل پیامک مورد نظر یافت نشد.');
-            return redirect()->route(admin.panel.tools.sms-gateways.index');
+            return redirect()->route('admin.panel.tools.sms-gateways.index');
         }
 
         $this->gateway   = $gateway;
@@ -64,7 +64,7 @@ class SmsGatewayEdit extends Component
 
         if ($updated) {
             $this->dispatch('show-alert', type: 'success', message: 'تغییرات با موفقیت ذخیره شد!');
-            return redirect()->route(admin.panel.tools.sms-gateways.index');
+            return redirect()->route('admin.panel.tools.sms-gateways.index');
         } else {
             $this->dispatch('show-alert', type: 'error', message: 'خطا در ذخیره تغییرات!');
         }
