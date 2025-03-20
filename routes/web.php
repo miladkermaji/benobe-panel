@@ -87,6 +87,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('footercontents')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'index'])->name('admin.panel.footercontents.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'create'])->name('admin.panel.footercontents.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'edit'])->name('admin.panel.footercontents.edit');
+        });
+
         Route::prefix('reviews')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Review\ReviewController::class, 'index'])->name('admin.panel.reviews.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Review\ReviewController::class, 'create'])->name('admin.panel.reviews.create');

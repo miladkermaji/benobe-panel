@@ -1,14 +1,14 @@
-@extends('Admin.panel.layouts.master')
+@extends('admin.panel.layouts.master')
 
 @section('styles')
-    <link type="text/css" href="{{ asset('Admin-assets/css/panel/imagingcenter/imagingcenter.css') }}" rel="stylesheet" />
+ <link type="text/css" href="{{ asset('Admin-assets/css/panel/imagingcenter/imagingcenter.css') }}" rel="stylesheet" />
 @endsection
 
 @section('site-header')
-    {{ 'به نوبه | پنل مدیریت' }}
+ {{ 'به نوبه | پنل مدیریت' }}
 @endsection
 
 @section('content')
-    @section('bread-crumb-title', 'افزودن  مراکز تصویربرداری جدید')
-    @livewire('Admin.panel.imagingcenters.imagingcenter-create')
+@section('bread-crumb-title', 'افزودن مراکز تصویربرداری جدید')
+@livewire('admin.panel.imagingcenters.imagingcenter-create')
 @endsection
