@@ -16,18 +16,14 @@ return new class extends Migration
             $table->unsignedBigInteger('doctor_id');
             $table->unsignedBigInteger('patient_id')->nullable();
             $table->unsignedBigInteger('insurance_id')->nullable();
-            $table->unsignedBigInteger('clinic_id')->nullable();
-
-                                                                 // فیلدهای مشابه نوبت‌ها
-            $table->integer('duration')->nullable();             // مدت زمان مشاوره (دقیقه)
+            $table->unsignedBigInteger('clinic_id')->nullable();            // مدت زمان مشاوره (دقیقه)
             $table->integer('actual_call_duration')->nullable(); // مدت زمان واقعی تماس (دقیقه)
             $table->enum('consultation_type', ['general', 'specialized', 'emergency'])->nullable();
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
             $table->enum('payment_status', ['pending', 'paid', 'unpaid'])->default('pending');
             $table->enum('appointment_type', ['in_person', 'phone', 'video', 'text']); // به‌روزرسانی برای پشتیبانی از video و text
             $table->date('appointment_date');
-            $table->time('start_time');
-            $table->time('end_time');
+            $table->time('appointment_time');
 
                                                               // لینک یا شناسه جلسه برای مشاوره تصویری
             $table->string('video_meeting_link')->nullable(); // لینک جلسه ویدئویی

@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\DoctorFilterController;
 use App\Http\Controllers\Api\DoctorListingController;
 use App\Http\Controllers\Api\MedicalCentersController;
 use App\Http\Controllers\Api\TeleCounselingController;
+use App\Http\Controllers\Api\DoctorAppointmentController;
 
 Route::prefix('/auth')->group(function () {
     Route::post('/login-register', [AuthController::class, 'loginRegister'])->name('api.auth.login-register');
@@ -101,5 +102,6 @@ Route::get('/mag/latest-posts', [MagController::class, 'getLatestPosts']);
 Route::get('/doctors', [DoctorListingController::class, 'getDoctors']);
 
 Route::get('/doctor-filters', [DoctorFilterController::class, 'getFilterOptions']);
+Route::get('/doctors/{doctorId}/appointment-options', [DoctorAppointmentController::class, 'getAppointmentOptions']);
 
 
