@@ -16,8 +16,7 @@ class Appointment extends Model
         'insurance_id',
         'appointment_type',
         'appointment_date',
-        'start_time',
-        'end_time',
+        'appointment_time',
         'status',
         'notes',
         'tracking_code',
@@ -28,9 +27,9 @@ class Appointment extends Model
         'include_holidays',
         'disabled_days',
     ];
-protected $casts = [
-        'appointment_date' => 'date', // تبدیل به Carbon برای تاریخ
-        'start_time' => 'datetime:H:i:s', // تبدیل به Carbon برای زمان
+    protected $casts = [
+        'appointment_date' => 'date',           // تبدیل به Carbon برای تاریخ
+        'appointment_time' => 'datetime:H:i:s', // تبدیل به Carbon برای زمان
     ];
     public function doctor()
     {

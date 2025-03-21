@@ -64,7 +64,6 @@ class DoctorController extends Controller
                     ], 401);
                 }
             } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-                Log::error('GetMyDoctors - JWT Error: ' . $e->getMessage());
                 return response()->json([
                     'status'  => 'error',
                     'message' => 'توکن نامعتبر است: ' . $e->getMessage(),
@@ -109,7 +108,6 @@ class DoctorController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetMyDoctors - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -204,7 +202,6 @@ class DoctorController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetBestDoctors - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -276,7 +273,6 @@ class DoctorController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetNewDoctors - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -291,89 +287,68 @@ class DoctorController extends Controller
     private function getNextAvailableSlot($doctor)
     {
         $doctorId        = $doctor->id;
-        $today           = Carbon::today();
+        $today           = Carbon::today('Asia/Tehran');
+        $now             = Carbon::now('Asia/Tehran');
         $daysOfWeek      = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         $currentDayIndex = $today->dayOfWeek;
 
-        // کش کردن تنظیمات تقوim
-        $appointmentConfig = Cache::remember("appointment_config_{$doctorId}", 3600, function () use ($doctor) {
-            return $doctor->appointmentConfig;
-        });
+        $appointmentConfig = $doctor->appointmentConfig; // بدون کش
+        $calendarDays      = $appointmentConfig ? ($appointmentConfig->calendar_days ?? 30) : 30;
+        $duration          = $appointmentConfig ? ($appointmentConfig->appointment_duration ?? 15) : 15;
 
-        // تعداد روزهایی که باید بررسی کنیم
-        $calendarDays = $appointmentConfig ? ($appointmentConfig->calendar_days ?? 30) : 30;
-
-        // کش کردن برنامه‌های کاری
-        $schedules = Cache::remember("work_schedules_{$doctorId}", 3600, function () use ($doctor) {
-            return $doctor->workSchedules;
-        });
-
+        $schedules = $doctor->workSchedules; // بدون کش
         if ($schedules->isEmpty()) {
             return ['next_available_slot' => null, 'max_appointments' => 0];
         }
 
-        // گرفتن نوبت‌های رزرو شده (اینجا کش نمی‌کنیم چون داده‌ها پویا هستن)
         $bookedAppointments = Appointment::where('doctor_id', $doctorId)
-            ->where('appointments.status', 'scheduled')
+            ->where('status', 'scheduled')
             ->where('appointment_date', '>=', $today->toDateString())
             ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
             ->get()
             ->groupBy('appointment_date');
 
-        // بررسی روزهای آینده
         for ($i = 0; $i < $calendarDays; $i++) {
             $checkDayIndex = ($currentDayIndex + $i) % 7;
             $dayName       = $daysOfWeek[$checkDayIndex];
             $checkDate     = $today->copy()->addDays($i);
 
-            // نوبت‌های رزرو شده برای این روز
             $dayAppointments = $bookedAppointments->get($checkDate->toDateString(), collect());
 
             foreach ($schedules as $schedule) {
-                $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
-                if (! is_array($workHours)) {
-                    Log::warning("Invalid work_hours JSON for doctor_id: {$doctorId}, schedule_id: {$schedule->id}");
+                if ($schedule->day !== $dayName) {
                     continue;
                 }
 
-                foreach ($workHours as $workHour) {
-                    $startTime = (clone $checkDate)->setTimeFromTimeString($workHour['start']);
-                    $endTime   = (clone $checkDate)->setTimeFromTimeString($workHour['end']);
+                $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
+                if (! is_array($workHours) || empty($workHours)) {
 
-                    $appointmentSettings = is_string($schedule->appointment_settings) ? json_decode($schedule->appointment_settings, true) : $schedule->appointment_settings;
-                    if (! is_array($appointmentSettings)) {
-                        Log::warning("Invalid appointment_settings JSON for doctor_id: {$doctorId}, schedule_id: {$schedule->id}");
-                        continue;
+                    continue;
+                }
+                $workHour = $workHours[0];
+
+                $startTime = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['start'], 'Asia/Tehran');
+                $endTime   = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['end'], 'Asia/Tehran');
+
+                $currentTime = $startTime->copy();
+                while ($currentTime->lessThan($endTime)) {
+                    $nextTime = (clone $currentTime)->addMinutes($duration);
+
+                    $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
+                        $apptStart = Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time, 'Asia/Tehran');
+                        $apptEnd   = (clone $apptStart)->addMinutes($duration);
+                        return $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
+                    });
+
+                    if (! $isBooked && $currentTime->gte($now)) {
+
+                        return [
+                            'next_available_slot' => $currentTime->toIso8601String(),
+                            'max_appointments'    => $schedule->appointment_settings[0]['max_appointments'] ?? 22,
+                        ];
                     }
 
-                    foreach ($appointmentSettings as $appointmentSetting) {
-                        $selectedDay = $appointmentSetting['selected_day'];
-                        if ($daysOfWeek[$checkDayIndex] !== $selectedDay) {
-                            continue;
-                        }
-
-                        $maxAppointments = $appointmentSetting['max_appointments'] ?? $workHour['max_appointments'] ?? 10;
-                        $duration        = $appointmentConfig->appointment_duration ?? 30;
-
-                        $currentTime        = $startTime;
-                        $appointmentsBooked = $dayAppointments->count();
-
-                        while ($currentTime < $endTime && $appointmentsBooked < $maxAppointments) {
-                            $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime) {
-                                return Carbon::parse($appointment->start_time)->eq($currentTime);
-                            });
-
-                            if (! $isBooked) {
-                                return [
-                                    'next_available_slot' => $currentTime->toIso8601String(),
-                                    'max_appointments'    => $maxAppointments,
-                                ];
-                            }
-
-                            $currentTime->addMinutes($duration);
-                            $appointmentsBooked++;
-                        }
-                    }
+                    $currentTime->addMinutes($duration);
                 }
             }
         }

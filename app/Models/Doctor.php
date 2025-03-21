@@ -212,9 +212,9 @@ class Doctor extends Authenticatable
     {
         return $this->hasMany(UserDoctorLike::class);
     }
-    public function workSchedules()
+   public function workSchedules()
     {
-        return $this->hasMany(DoctorWorkSchedule::class);
+        return $this->hasMany(DoctorWorkSchedule::class, 'doctor_id')->where('is_working', true);
     }
 
     public function appointmentConfig()
