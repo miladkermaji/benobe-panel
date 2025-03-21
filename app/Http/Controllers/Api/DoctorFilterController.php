@@ -2,8 +2,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Doctor;    // برای جنسیت و نوبت باز
+use App\Models\Insurance; // فرض می‌کنیم جدول بیمه‌ها
 use App\Models\Service;
-use App\Models\Specialty; // مدل Service برای جدول services
+use App\Models\Specialty;
 use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -11,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
 class DoctorFilterController extends Controller
 {
     /**
-     * گرفتن لیست گزینه‌های فیلتر (استان‌ها، شهرها، تخصص‌ها، خدمات)
+     * گرفتن لیست گزینه‌های فیلتر (استان‌ها، شهرها، تخصص‌ها، خدمات، بیمه‌ها، جنسیت، نوبت باز)
      *
      * @response 200 {
      *   "status": "success",
@@ -31,7 +33,20 @@ class DoctorFilterController extends Controller
      *     "services": [
      *       {"id": 1, "name": "نوبت‌دهی مطب"},
      *       {"id": 2, "name": "مشاوره تلفنی"}
-     *     ]
+     *     ],
+     *     "insurances": [
+     *       {"id": 1, "name": "بیمه تامین اجتماعی"},
+     *       {"id": 2, "name": "بیمه سلامت"}
+     *     ],
+     *     "genders": [
+     *       {"value": "male", "name": "مرد"},
+     *       {"value": "female", "name": "زن"},
+     *       {"value": "both", "name": "مرد و زن"}
+     *     ],
+     *     "available_appointments": {
+     *       "value": true,
+     *       "name": "پزشکان دارای نوبت باز"
+     *     }
      *   }
      * }
      * @response 500 {
@@ -68,11 +83,32 @@ class DoctorFilterController extends Controller
                     ->orderBy('name')
                     ->get();
 
+                // گرفتن بیمه‌ها از جدول insurances (فرضی)
+                $insurances = Insurance::select('id', 'name')
+                    ->orderBy('name')
+                    ->get();
+
+                // تعریف گزینه‌های جنسیت به‌صورت دستی
+                $genders = [
+                    ['value' => 'male', 'name' => 'مرد'],
+                    ['value' => 'female', 'name' => 'زن'],
+                    ['value' => 'both', 'name' => 'مرد و زن'],
+                ];
+
+                // گزینه نوبت باز (فقط یک مقدار ثابت)
+                $availableAppointments = [
+                    'value' => true,
+                    'name'  => 'پزشکان دارای نوبت باز',
+                ];
+
                 return [
-                    'provinces'   => $provinces,
-                    'cities'      => $cities,
-                    'specialties' => $specialties,
-                    'services'    => $services,
+                    'provinces'              => $provinces,
+                    'cities'                 => $cities,
+                    'specialties'            => $specialties,
+                    'services'               => $services,
+                    'insurances'             => $insurances,
+                    'sex'                => $genders,
+                    'available_appointments' => $availableAppointments,
                 ];
             });
 
