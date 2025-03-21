@@ -1040,82 +1040,87 @@ $(document).on("click", ".remove-row-btn", function() {
   initializeTimepicker();
  }
  $(document).ready(function() {
-  // تابع ذخیره‌سازی برنامه کاری
-  function saveWorkSchedule() {
-   const submitButton = document.getElementById("save-work-schedule");
-   const loader = submitButton.querySelector('.loader');
-   const buttonText = submitButton.querySelector('.button_text');
-   buttonText.style.display = 'none';
-   loader.style.display = 'block';
-   const data = {
-    auto_scheduling: $('#appointment-toggle').is(':checked'),
-    calendar_days: parseInt($('input[name="calendar_days"]').val()) || 30,
-    online_consultation: $('#posible-appointments').is(':checked'),
-    holiday_availability: $('#posible-appointments-inholiday').is(':checked'),
-    days: {}
-   };
-   data.price_15min = $('input[name="call_15min_1"]').val();
-   data.price_30min = $('input[name="call_15min_2"]').val();
-   data.price_45min = $('input[name="call_15min_3"]').val();
-   data.price_60min = $('input[name="call_15min_4"]').val();
-   // جمع‌آوری اطلاعات برای هر روز
-   const days = ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday"];
-   // فقط روزهای تیک خورده را جمع‌آوری کن
-   days.forEach(day => {
-    if ($(`#${day}`).is(':checked')) {
-     const slots = collectSlots(day);
-     data.days[day] = {
-      is_working: true,
-      work_hours: {
-       start: $(`#morning-start-${day}`).val(),
-       end: $(`#morning-end-${day}`).val()
-      },
-      slots: slots
-     };
-    }
-   });
-   // ارسال درخواست AJAX
-   $.ajax({
-    url: "{{ route('dr-save-work-schedule-counseling') }}",
-    method: 'POST',
-    data: JSON.stringify({
-     ...data,
-     selectedClinicId: localStorage.getItem('selectedClinicId')
-    }),
-    contentType: 'application/json',
-    headers: {
-     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    },
-    success: function(response) {
-     buttonText.style.display = 'block';
-     loader.style.display = 'none';
-     // نمایش پیام موفقیت
-     toastr.success('تنظیمات با موفقیت ذخیره شد');
-     if (response.data) {
-      $('input[name="call_15min_1"]').val(response.data.price_15min);
-      $('input[name="call_15min_2"]').val(response.data.price_30min);
-      $('input[name="call_15min_3"]').val(response.data.price_45min);
-      $('input[name="call_15min_4"]').val(response.data.price_60min);
-      $('input[name="calendar_days"]').val(response.data.calendar_days);
-     }
-    },
-    error: function(xhr) {
-     // نمایش خطاهای دقیق
-     buttonText.style.display = 'block';
-     loader.style.display = 'none';
-     if (xhr.responseJSON) {
-      let errorMessage = '';
-      $.each(xhr.responseJSON.errors, function(field, messages) {
-       errorMessage += messages.join('\n') + '\n';
-      });
-      // نمایش خطا با SweetAlert
-      toastr.error(xhr.responseJSON.message || 'خطا در برقراری ارتباط با سرور');
-     } else {
-      toastr.error('خطا در برقراری ارتباط با سرور');
-     }
-    }
-   });
-  }
+function saveWorkSchedule() {
+    const submitButton = document.getElementById("save-work-schedule");
+    const loader = submitButton.querySelector('.loader');
+    const buttonText = submitButton.querySelector('.button_text');
+    buttonText.style.display = 'none';
+    loader.style.display = 'block';
+
+    const data = {
+        auto_scheduling: $('#appointment-toggle').is(':checked'),
+        calendar_days: parseInt($('input[name="calendar_days"]').val()) || 30,
+        online_consultation: $('#posible-appointments').is(':checked'),
+        holiday_availability: $('#posible-appointments-inholiday').is(':checked'),
+        price_15min: $('input[name="call_15min_1"]').val(),
+        price_30min: $('input[name="call_15min_2"]').val(),
+        price_45min: $('input[name="call_15min_3"]').val(),
+        price_60min: $('input[name="call_15min_4"]').val(),
+        has_phone_counseling: $('#phone-counseling').is(':checked'), // اضافه کردن مقدار مشاوره تلفنی
+        has_text_counseling: $('#text-counseling').is(':checked'),   // اضافه کردن مقدار مشاوره متنی
+        has_video_counseling: $('#video-counseling').is(':checked'), // اضافه کردن مقدار مشاوره ویدیویی
+        days: {}
+    };
+
+    // جمع‌آوری اطلاعات برای هر روز
+    const days = ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday"];
+    days.forEach(day => {
+        if ($(`#${day}`).is(':checked')) {
+            const slots = collectSlots(day);
+            data.days[day] = {
+                is_working: true,
+                work_hours: {
+                    start: $(`#morning-start-${day}`).val(),
+                    end: $(`#morning-end-${day}`).val()
+                },
+                slots: slots
+            };
+        }
+    });
+
+    // ارسال درخواست AJAX
+    $.ajax({
+        url: "{{ route('dr-save-work-schedule-counseling') }}",
+        method: 'POST',
+        data: JSON.stringify({
+            ...data,
+            selectedClinicId: localStorage.getItem('selectedClinicId')
+        }),
+        contentType: 'application/json',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            buttonText.style.display = 'block';
+            loader.style.display = 'none';
+            toastr.success('تنظیمات با موفقیت ذخیره شد');
+            if (response.data) {
+                $('input[name="call_15min_1"]').val(response.data.price_15min);
+                $('input[name="call_15min_2"]').val(response.data.price_30min);
+                $('input[name="call_15min_3"]').val(response.data.price_45min);
+                $('input[name="call_15min_4"]').val(response.data.price_60min);
+                $('input[name="calendar_days"]').val(response.data.calendar_days);
+                // به‌روزرسانی وضعیت چک‌باکس‌ها با مقادیر بازگشتی
+                $('#phone-counseling').prop('checked', response.data.has_phone_counseling);
+                $('#text-counseling').prop('checked', response.data.has_text_counseling);
+                $('#video-counseling').prop('checked', response.data.has_video_counseling);
+            }
+        },
+        error: function(xhr) {
+            buttonText.style.display = 'block';
+            loader.style.display = 'none';
+            if (xhr.responseJSON) {
+                let errorMessage = '';
+                $.each(xhr.responseJSON.errors, function(field, messages) {
+                    errorMessage += messages.join('\n') + '\n';
+                });
+                toastr.error(xhr.responseJSON.message || 'خطا در برقراری ارتباط با سرور');
+            } else {
+                toastr.error('خطا در برقراری ارتباط با سرور');
+            }
+        }
+    });
+}
   // تابع جمع‌آوری برنامه کاری‌ها
   function collectSlots(day) {
    const slots = [];

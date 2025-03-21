@@ -2,8 +2,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Doctor;    // برای جنسیت و نوبت باز
-use App\Models\Insurance; // فرض می‌کنیم جدول بیمه‌ها
+use App\Models\DoctorCounselingConfig;
+use App\Models\Insurance;
 use App\Models\Service;
 use App\Models\Specialty;
 use App\Models\Zone;
@@ -13,47 +13,7 @@ use Illuminate\Support\Facades\Cache;
 class DoctorFilterController extends Controller
 {
     /**
-     * گرفتن لیست گزینه‌های فیلتر (استان‌ها، شهرها، تخصص‌ها، خدمات، بیمه‌ها، جنسیت، نوبت باز)
-     *
-     * @response 200 {
-     *   "status": "success",
-     *   "data": {
-     *     "provinces": [
-     *       {"id": 1, "name": "تهران"},
-     *       {"id": 2, "name": "اصفهان"}
-     *     ],
-     *     "cities": [
-     *       {"id": 1, "name": "تهران", "province_id": 1},
-     *       {"id": 2, "name": "کرج", "province_id": 1}
-     *     ],
-     *     "specialties": [
-     *       {"id": 1, "name": "فوق تخصص قلب و عروق"},
-     *       {"id": 2, "name": "جراحی عمومی"}
-     *     ],
-     *     "services": [
-     *       {"id": 1, "name": "نوبت‌دهی مطب"},
-     *       {"id": 2, "name": "مشاوره تلفنی"}
-     *     ],
-     *     "insurances": [
-     *       {"id": 1, "name": "بیمه تامین اجتماعی"},
-     *       {"id": 2, "name": "بیمه سلامت"}
-     *     ],
-     *     "genders": [
-     *       {"value": "male", "name": "مرد"},
-     *       {"value": "female", "name": "زن"},
-     *       {"value": "both", "name": "مرد و زن"}
-     *     ],
-     *     "available_appointments": {
-     *       "value": true,
-     *       "name": "پزشکان دارای نوبت باز"
-     *     }
-     *   }
-     * }
-     * @response 500 {
-     *   "status": "error",
-     *   "message": "خطای سرور",
-     *   "data": null
-     * }
+     * گرفتن لیست گزینه‌های فیلتر (استان‌ها، شهرها، تخصص‌ها، انواع خدمات، خدمات، بیمه‌ها، جنسیت، نوبت باز)
      */
     public function getFilterOptions(Request $request)
     {
@@ -77,25 +37,42 @@ class DoctorFilterController extends Controller
                     ->orderBy('name')
                     ->get();
 
-                // گرفتن خدمات از جدول services
+                // بررسی اینکه کدام نوع مشاوره فعال است
+                $hasPhoneCounseling = DoctorCounselingConfig::where('has_phone_counseling', true)->exists();
+                $hasTextCounseling  = DoctorCounselingConfig::where('has_text_counseling', true)->exists();
+                $hasVideoCounseling = DoctorCounselingConfig::where('has_video_counseling', true)->exists();
+
+                                                                                           // تعریف انواع خدمات (تب‌ها) - فقط مواردی که حداقل یک پزشک فعال کرده باشد
+                $serviceTypes = [['value' => 'in_person', 'name' => 'نوبت‌دهی']]; // نوبت‌دهی همیشه وجود دارد
+                if ($hasPhoneCounseling) {
+                    $serviceTypes[] = ['value' => 'phone', 'name' => 'مشاوره تلفنی'];
+                }
+                if ($hasTextCounseling) {
+                    $serviceTypes[] = ['value' => 'text', 'name' => 'مشاوره متنی'];
+                }
+                if ($hasVideoCounseling) {
+                    $serviceTypes[] = ['value' => 'video', 'name' => 'مشاوره ویدیویی'];
+                }
+
+                // گرفتن خدمات از جدول services (فقط 10 مورد اول برای بهینه‌سازی)
                 $services = Service::where('status', true)
                     ->select('id', 'name')
                     ->orderBy('name')
                     ->get();
 
-                // گرفتن بیمه‌ها از جدول insurances (فرضی)
+                // گرفتن بیمه‌ها از جدول insurances
                 $insurances = Insurance::select('id', 'name')
                     ->orderBy('name')
                     ->get();
 
-                // تعریف گزینه‌های جنسیت به‌صورت دستی
+                // تعریف گزینه‌های جنسیت (هماهنگ با UI)
                 $genders = [
-                    ['value' => 'male', 'name' => 'مرد'],
-                    ['value' => 'female', 'name' => 'زن'],
-                    ['value' => 'both', 'name' => 'مرد و زن'],
+                    ['value' => 'male', 'name' => 'آقا'],
+                    ['value' => 'female', 'name' => 'خانم'],
+                    ['value' => 'both', 'name' => 'خانم و آقا'],
                 ];
 
-                // گزینه نوبت باز (فقط یک مقدار ثابت)
+                // گزینه نوبت باز
                 $availableAppointments = [
                     'value' => true,
                     'name'  => 'پزشکان دارای نوبت باز',
@@ -105,9 +82,10 @@ class DoctorFilterController extends Controller
                     'provinces'              => $provinces,
                     'cities'                 => $cities,
                     'specialties'            => $specialties,
+                    'service_types'          => $serviceTypes,
                     'services'               => $services,
                     'insurances'             => $insurances,
-                    'sex'                => $genders,
+                    'genders'                => $genders,
                     'available_appointments' => $availableAppointments,
                 ];
             });

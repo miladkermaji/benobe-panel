@@ -12,28 +12,32 @@ use Illuminate\Support\Facades\Log;
 
 class MoshavereSettingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
-        $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
+  /**
+ * Display a listing of the resource.
+ */
+public function index(Request $request)
+{
+    $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
+    $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
 
-        // بررسی یا ایجاد تنظیمات مشاوره آنلاین
-        $appointmentConfig = DoctorCounselingConfig::firstOrCreate(
-            ['doctor_id' => $doctorId, 'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
-            [
-                'auto_scheduling'      => true,
-                'calendar_days'        => 30,
-                'online_consultation'  => false,
-                'holiday_availability' => false,
-            ]
-        );
-        return view('dr.panel.turn.schedule.moshavere_setting.index', [
-            'appointmentConfig' => $appointmentConfig,
-        ]);
-    }
+    // بررسی یا ایجاد تنظیمات مشاوره آنلاین
+    $appointmentConfig = DoctorCounselingConfig::firstOrCreate(
+        ['doctor_id' => $doctorId, 'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
+        [
+            'auto_scheduling'      => true,
+            'calendar_days'        => 30,
+            'online_consultation'  => false,
+            'holiday_availability' => false,
+            'has_phone_counseling' => false, // مقدار پیش‌فرض برای مشاوره تلفنی
+            'has_text_counseling'  => false, // مقدار پیش‌فرض برای مشاوره متنی
+            'has_video_counseling' => false, // مقدار پیش‌فرض برای مشاوره ویدیویی
+        ]
+    );
+
+    return view('dr.panel.turn.schedule.moshavere_setting.index', [
+        'appointmentConfig' => $appointmentConfig,
+    ]);
+}
 
     /**
      * Show the form for creating a new resource.
@@ -592,86 +596,103 @@ class MoshavereSettingController extends Controller
         ]);
     }
 
-    public function saveWorkSchedule(Request $request)
-    {
-        $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
-        $validatedData    = $request->validate([
-            'auto_scheduling'      => 'boolean',
-            'calendar_days'        => 'nullable|integer|min:1|max:365',
-            'online_consultation'  => 'boolean',
-            'holiday_availability' => 'boolean',
-            'appointment_duration' => 'nullable|integer|min:5|max:120',
-            'days'                 => 'array',
-            'price_15min'          => 'nullable|integer|min:0',
-            'price_30min'          => 'nullable|integer|min:0',
-            'price_45min'          => 'nullable|integer|min:0',
-            'price_60min'          => 'nullable|integer|min:0',
-        ]);
-        DB::beginTransaction();
-        try {
-            $doctor = Auth::guard('doctor')->user();
-            // حذف تنظیمات قبلی
-            DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
-                ->where(function ($query) use ($selectedClinicId) {
-                    if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
-                    } else {
-                        $query->whereNull('clinic_id');
-                    }
-                })
-                ->delete();
-            // ذخیره تنظیمات کلی
-            $counselingConfig = DoctorCounselingConfig::updateOrCreate(
-                [
-                    'doctor_id' => $doctor->id,
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
-                ],
-                [
-                    'auto_scheduling'      => $validatedData['auto_scheduling'] ?? false,
-                    'calendar_days'        => $request->input('calendar_days'),
-                    'online_consultation'  => $validatedData['online_consultation'] ?? false,
-                    'holiday_availability' => $validatedData['holiday_availability'] ?? false,
-                    'appointment_duration' => $validatedData['appointment_duration'] ?? 15,
-                    'price_15min'          => $validatedData['price_15min'],
-                    'price_30min'          => $validatedData['price_30min'],
-                    'price_45min'          => $validatedData['price_45min'],
-                    'price_60min'          => $validatedData['price_60min'],
-                ]
-            );
-            // ذخیره برنامه کاری روزها
-            foreach ($validatedData['days'] as $day => $dayConfig) {
-                $workSchedule = DoctorCounselingWorkSchedule::create([
-                    'doctor_id'            => $doctor->id,
-                    'day'                  => $day,
-                    'clinic_id'            => $selectedClinicId !== 'default' ? $selectedClinicId : null,
-                    'is_working'           => $dayConfig['is_working'] ?? false,
-                    'work_hours'           => $dayConfig['work_hours'] ?? null,
-                    'appointment_settings' => json_encode($dayConfig['appointment_settings'] ?? []),
-                ]);
-            }
-            DB::commit();
-            return response()->json([
-                'message' => 'تنظیمات با موفقیت ذخیره شد.',
-                'status'  => true,
-                'data'    => [
-                    'calendar_days' => $counselingConfig->calendar_days,
-                    'price_15min'   => $counselingConfig->price_15min,
-                    'price_30min'   => $counselingConfig->price_30min,
-                    'price_45min'   => $counselingConfig->price_45min,
-                    'price_60min'   => $counselingConfig->price_60min,
-                ],
+   /**
+ * ذخیره تنظیمات برنامه کاری
+ */
+public function saveWorkSchedule(Request $request)
+{
+    $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
+    $validatedData    = $request->validate([
+        'auto_scheduling'      => 'boolean',
+        'calendar_days'        => 'nullable|integer|min:1|max:365',
+        'online_consultation'  => 'boolean',
+        'holiday_availability' => 'boolean',
+        'appointment_duration' => 'nullable|integer|min:5|max:120',
+        'days'                 => 'array',
+        'price_15min'          => 'nullable|integer|min:0',
+        'price_30min'          => 'nullable|integer|min:0',
+        'price_45min'          => 'nullable|integer|min:0',
+        'price_60min'          => 'nullable|integer|min:0',
+        'has_phone_counseling' => 'boolean', // اعتبارسنجی برای مشاوره تلفنی
+        'has_text_counseling'  => 'boolean', // اعتبارسنجی برای مشاوره متنی
+        'has_video_counseling' => 'boolean', // اعتبارسنجی برای مشاوره ویدیویی
+    ]);
+
+    DB::beginTransaction();
+    try {
+        $doctor = Auth::guard('doctor')->user();
+
+        // حذف تنظیمات قبلی
+        DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
+            ->where(function ($query) use ($selectedClinicId) {
+                if ($selectedClinicId !== 'default') {
+                    $query->where('clinic_id', $selectedClinicId);
+                } else {
+                    $query->whereNull('clinic_id');
+                }
+            })
+            ->delete();
+
+        // ذخیره تنظیمات کلی
+        $counselingConfig = DoctorCounselingConfig::updateOrCreate(
+            [
+                'doctor_id' => $doctor->id,
+                'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+            ],
+            [
+                'auto_scheduling'      => $validatedData['auto_scheduling'] ?? false,
+                'calendar_days'        => $request->input('calendar_days'),
+                'online_consultation'  => $validatedData['online_consultation'] ?? false,
+                'holiday_availability' => $validatedData['holiday_availability'] ?? false,
+                'appointment_duration' => $validatedData['appointment_duration'] ?? 15,
+                'price_15min'          => $validatedData['price_15min'],
+                'price_30min'          => $validatedData['price_30min'],
+                'price_45min'          => $validatedData['price_45min'],
+                'price_60min'          => $validatedData['price_60min'],
+                'has_phone_counseling' => $validatedData['has_phone_counseling'] ?? false, // ذخیره مشاوره تلفنی
+                'has_text_counseling'  => $validatedData['has_text_counseling'] ?? false,  // ذخیره مشاوره متنی
+                'has_video_counseling' => $validatedData['has_video_counseling'] ?? false, // ذخیره مشاوره ویدیویی
+            ]
+        );
+
+        // ذخیره برنامه کاری روزها
+        foreach ($validatedData['days'] as $day => $dayConfig) {
+            $workSchedule = DoctorCounselingWorkSchedule::create([
+                'doctor_id'            => $doctor->id,
+                'day'                  => $day,
+                'clinic_id'            => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                'is_working'           => $dayConfig['is_working'] ?? false,
+                'work_hours'           => $dayConfig['work_hours'] ?? null,
+                'appointment_settings' => json_encode($dayConfig['appointment_settings'] ?? []),
             ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('خطا در ذخیره‌سازی تنظیمات: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
-            return response()->json([
-                'message' => 'خطا در ذخیره‌سازی تنظیمات.',
-                'status'  => false,
-            ], 500);
         }
+
+        DB::commit();
+        return response()->json([
+            'message' => 'تنظیمات با موفقیت ذخیره شد.',
+            'status'  => true,
+            'data'    => [
+                'calendar_days'        => $counselingConfig->calendar_days,
+                'price_15min'          => $counselingConfig->price_15min,
+                'price_30min'          => $counselingConfig->price_30min,
+                'price_45min'          => $counselingConfig->price_45min,
+                'price_60min'          => $counselingConfig->price_60min,
+                'has_phone_counseling' => $counselingConfig->has_phone_counseling,
+                'has_text_counseling'  => $counselingConfig->has_text_counseling,
+                'has_video_counseling' => $counselingConfig->has_video_counseling,
+            ],
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('خطا در ذخیره‌سازی تنظیمات: ' . $e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+        ]);
+        return response()->json([
+            'message' => 'خطا در ذخیره‌سازی تنظیمات.',
+            'status'  => false,
+        ], 500);
     }
+}
 
     public function getAllDaysSettings(Request $request)
     {

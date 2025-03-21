@@ -14,15 +14,62 @@ class DoctorListingController extends Controller
     public function getDoctors(Request $request)
     {
         try {
-            $provinceId  = $request->input('province_id');
-            $specialtyId = $request->input('specialty_id');
-            $limit       = $request->input('limit', 10);
-            $page        = $request->input('page', 1);
-            $sort        = $request->input('sort', 'rating_desc');
+            // اعتبارسنجی ورودی‌ها
+            $validated = $request->validate([
+                'province_id'                => 'nullable|integer|exists:zones,id',
+                'specialty_id'               => 'nullable|integer|exists:specialties,id',
+                'sex'                        => 'nullable|in:male,female,both',
+                'has_available_appointments' => 'nullable|boolean',
+                'service_ids'                => 'nullable|array',
+                'service_ids.*'              => 'integer|exists:services,id',
+                'insurance_ids'              => 'nullable|array',
+                'insurance_ids.*'            => 'integer|exists:insurances,id',
+                'limit'                      => 'nullable|integer|min:1|max:100',
+                'page'                       => 'nullable|integer|min:1',
+                'sort'                       => 'nullable|in:rating_desc,views_desc,appointment_soonest,successful_appointments_desc,appointment_asc',
+                'service_type'               => 'nullable|in:in_person,phone,text,video',
+            ]);
 
-            $cacheKey = "doctors_list_{$provinceId}_{$specialtyId}_{$limit}_{$page}_{$sort}";
+            $provinceId               = $request->input('province_id');
+            $specialtyId              = $request->input('specialty_id');
+            $gender                   = $request->input('sex');
+            $hasAvailableAppointments = $request->input('has_available_appointments', false);
+            $serviceIds               = $request->input('service_ids');
+            $insuranceIds             = $request->input('insurance_ids');
+            $limit                    = $request->input('limit', 10);
+            $page                     = $request->input('page', 1);
+            $sort                     = $request->input('sort', 'rating_desc');
+            $serviceType              = $request->input('service_type', 'in_person');
 
-            $doctors = Cache::remember($cacheKey, 300, function () use ($provinceId, $specialtyId, $limit, $page, $sort) {
+            // اعتبارسنجی پارامترها
+            $validServiceTypes = ['in_person', 'phone', 'text', 'video'];
+            $validSorts        = ['rating_desc', 'views_desc', 'appointment_soonest', 'successful_appointments_desc', 'appointment_asc'];
+
+            if (! in_array($serviceType, $validServiceTypes)) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'نوع سرویس نامعتبر است. مقادیر مجاز: in_person, phone, text, video',
+                    'data'    => null,
+                ], 400);
+            }
+
+            if (! in_array($sort, $validSorts)) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'نوع مرتب‌سازی نامعتبر است. مقادیر مجاز: rating_desc, views_desc, appointment_soonest, successful_appointments_desc, appointment_asc',
+                    'data'    => null,
+                ], 400);
+            }
+
+            $cacheKey = "doctors_list_{$provinceId}_{$specialtyId}_{$gender}_{$hasAvailableAppointments}_" .
+                (is_array($serviceIds) ? implode('_', $serviceIds) : 'no_services') . "_" .
+                (is_array($insuranceIds) ? implode('_', $insuranceIds) : 'no_insurances') .
+                "_{$limit}_{$page}_{$sort}_{$serviceType}";
+
+            $doctors = Cache::remember($cacheKey, 300, function () use ($provinceId, $specialtyId, $gender, $hasAvailableAppointments, $serviceIds, $insuranceIds, $limit, $page, $sort, $serviceType) {
+                $today        = Carbon::today('Asia/Tehran');
+                $calendarDays = 30;
+
                 $query = Doctor::query()
                     ->where('status', true)
                     ->with([
@@ -30,13 +77,46 @@ class DoctorListingController extends Controller
                         'province'      => fn($q)      => $q->select('id', 'name'),
                         'clinics'       => fn($q)       => $q->where('is_active', true)
                             ->with(['city' => fn($q) => $q->select('id', 'name')])
-                            ->select('id', 'doctor_id', 'address', 'province_id', 'city_id'),
-                        'workSchedules' => fn($q) => $q->where('is_working', true),
-                        'appointmentConfig',
-                        'appointments'  => fn($q)  => $q->where('status', 'scheduled'),
-                        'reviews'       => fn($q)       => $q->where('is_approved', true)->select('reviewable_id', 'reviewable_type', 'rating'),
+                            ->select('id', 'doctor_id', 'address', 'province_id', 'city_id', 'is_main_clinic', 'payment_methods'),
+                        'workSchedules' => fn($q) => $q->where('is_working', true)
+                            ->select('id', 'doctor_id', 'day', 'work_hours', 'appointment_settings'),
+                        'appointments'  => fn($q)  => $q->where('status', 'scheduled')
+                            ->select('id', 'doctor_id', 'appointment_date', 'appointment_time', 'status'),
+                        'reviews'       => fn($q)       => $q->where('is_approved', true)
+                            ->select('reviewable_id', 'reviewable_type', 'rating'),
+                        'doctorTags'    => fn($q)    => $q->select('id', 'doctor_id', 'name', 'color', 'text_color'),
                     ]);
 
+                // لود کردن رابطه appointmentConfig فقط برای نوبت‌های حضوری
+                if ($serviceType === 'in_person') {
+                    $query->with([
+                        'appointmentConfig' => fn($q) => $q->select(
+                            'id',
+                            'doctor_id',
+                            'calendar_days',
+                            'appointment_duration'
+                        ),
+                    ]);
+                }
+
+                // لود کردن رابطه counselingConfig برای نوبت‌های مشاوره
+                if (in_array($serviceType, ['phone', 'text', 'video'])) {
+                    $query->with([
+                        'counselingConfig' => fn($q) => $q->select(
+                            'id',
+                            'doctor_id',
+                            'online_consultation',
+                            'has_phone_counseling',
+                            'has_text_counseling',
+                            'has_video_counseling',
+                            'calendar_days',
+                            'appointment_duration',
+                            'active'
+                        ),
+                    ]);
+                }
+
+                // فیلتر کردن بر اساس province و specialty
                 if ($provinceId) {
                     $query->where('province_id', $provinceId);
                 }
@@ -44,6 +124,52 @@ class DoctorListingController extends Controller
                     $query->where('specialty_id', $specialtyId);
                 }
 
+                // فیلتر کردن بر اساس جنسیت
+                if ($gender && $gender !== 'both') {
+                    $query->where('sex', $gender);
+                }
+
+                // فیلتر کردن بر اساس نوبت باز
+                if ($hasAvailableAppointments) {
+                    $query->whereHas('appointments', function ($q) use ($today, $calendarDays) {
+                        $q->where('status', 'scheduled')
+                            ->where('appointment_date', '>=', $today->toDateString())
+                            ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString());
+                    })->whereHas('workSchedules', function ($q) use ($today, $calendarDays) {
+                        $q->where('is_working', true);
+                    });
+                }
+
+                // فیلتر کردن بر اساس خدمات
+                if ($serviceIds) {
+                    $query->whereHas('services', function ($q) use ($serviceIds) {
+                        $q->whereIn('services.id', $serviceIds);
+                    });
+                }
+
+                // فیلتر کردن بر اساس بیمه‌ها
+                if ($insuranceIds) {
+                    $query->whereHas('insurances', function ($q) use ($insuranceIds) {
+                        $q->whereIn('insurances.id', $insuranceIds);
+                    });
+                }
+
+                // فیلتر کردن بر اساس نوع سرویس (مشاوره)
+                if ($serviceType && $serviceType !== 'in_person') {
+                    $query->whereHas('counselingConfig', function ($q) use ($serviceType) {
+                        $q->where('online_consultation', true)
+                            ->where('active', true); // فقط رکوردهای فعال
+                        if ($serviceType === 'phone') {
+                            $q->where('has_phone_counseling', true);
+                        } elseif ($serviceType === 'text') {
+                            $q->where('has_text_counseling', true);
+                        } elseif ($serviceType === 'video') {
+                            $q->where('has_video_counseling', true);
+                        }
+                    });
+                }
+
+                // مرتب‌سازی
                 switch ($sort) {
                     case 'rating_desc':
                         $query->withAvg('reviews as avg_rating', 'rating')->orderBy('avg_rating', 'desc');
@@ -51,39 +177,60 @@ class DoctorListingController extends Controller
                     case 'views_desc':
                         $query->orderBy('views_count', 'desc');
                         break;
+                    case 'appointment_soonest':
+                        $doctors = $query->paginate($limit, ['*'], 'page', $page);
+                        $doctors->getCollection()->sortBy(function ($doctor) use ($serviceType) {
+                            $slotData = $this->getNextAvailableSlot($doctor, $serviceType);
+                            return $slotData['next_available_slot'] ? Carbon::parse($slotData['next_available_slot'])->timestamp : PHP_INT_MAX;
+                        });
+                        return $doctors;
+                    case 'successful_appointments_desc':
+                        $query->withCount(['appointments as successful_appointments_count' => function ($q) {
+                            $q->where('status', 'completed');
+                        }])->orderBy('successful_appointments_count', 'desc');
+                        break;
                     case 'appointment_asc':
                         $query->orderBy('id', 'asc');
                         break;
-                    default:
-                        $query->orderBy('id', 'desc');
                 }
 
                 return $query->paginate($limit, ['*'], 'page', $page);
             });
 
-            $formattedDoctors = $doctors->map(function ($doctor) {
+            $formattedDoctors = $doctors->map(function ($doctor) use ($serviceType) {
                 $mainClinic        = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
                 $otherClinicsCount = $doctor->clinics->count() - 1;
                 $city              = $mainClinic && $mainClinic->city ? $mainClinic->city->name : ($doctor->city ? $doctor->city->name : 'نامشخص');
 
-                $slotData   = $this->getNextAvailableSlot($doctor);
-                $jalaliDate = $slotData['next_available_slot']
-                ? Jalalian::fromCarbon(Carbon::parse($slotData['next_available_slot']))->format('j F Y ساعت H:i')
-                : null;
+                $slotData = $this->getNextAvailableSlot($doctor, $serviceType);
 
-                $tags = [];
-                if ($slotData['max_appointments'] > 0) {
-                    $tags[] = 'کمترین معطلی';
-                }
-                $tags[] = 'خوش برخورد';
-                if ($doctor->clinics->pluck('payment_methods')->contains('online')) {
-                    $tags[] = 'پوشش بیمه';
+                $tags = $doctor->doctorTags->map(function ($tag) {
+                    return [
+                        'name'       => $tag->name,
+                        'color'      => $tag->color,
+                        'text_color' => $tag->text_color,
+                    ];
+                })->toArray();
+
+                if ($slotData['max_appointments'] > 0 && ! in_array('کمترین معطلی', array_column($tags, 'name'))) {
+                    $tags[] = [
+                        'name'       => 'کمترین معطلی',
+                        'color'      => 'green-100',
+                        'text_color' => 'green-700',
+                    ];
                 }
 
                 $services = ['نوبت‌دهی مطب'];
-                if ($doctor->appointmentConfig && $doctor->appointmentConfig->online_consultation) {
-                    $services[] = 'مشاوره تلفنی';
-                    $services[] = 'مشاوره متنی';
+                if ($doctor->counselingConfig && $doctor->counselingConfig->online_consultation && $doctor->counselingConfig->active) {
+                    if ($doctor->counselingConfig->has_phone_counseling) {
+                        $services[] = 'مشاوره تلفنی';
+                    }
+                    if ($doctor->counselingConfig->has_text_counseling) {
+                        $services[] = 'مشاوره متنی';
+                    }
+                    if ($doctor->counselingConfig->has_video_counseling) {
+                        $services[] = 'مشاوره ویدیویی';
+                    }
                 }
 
                 $rating       = $doctor->reviews->avg('rating') ?: 0;
@@ -104,7 +251,7 @@ class DoctorListingController extends Controller
                     'rating'              => round($rating, 1),
                     'reviews_count'       => $reviewsCount,
                     'views_count'         => $viewsCount,
-                    'next_available_slot' => $jalaliDate,
+                    'next_available_slot' => $slotData['next_available_slot'] ?? 'نوبت خالی ندارد',
                     'tags'                => $tags,
                     'services'            => $services,
                     'profile_url'         => "/profile/doctor/{$doctor->slug}",
@@ -124,6 +271,10 @@ class DoctorListingController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
+            \Log::error('GetDoctors - Error: ' . $e->getMessage(), [
+                'request'   => $request->all(),
+                'exception' => $e->getTraceAsString(),
+            ]);
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -132,10 +283,7 @@ class DoctorListingController extends Controller
         }
     }
 
-    /**
-     * محاسبه اولین نوبت خالی برای یک پزشک (کپی از DoctorController)
-     */
-    private function getNextAvailableSlot($doctor)
+    private function getNextAvailableSlot($doctor, $clinicId)
     {
         $doctorId        = $doctor->id;
         $today           = Carbon::today('Asia/Tehran');
@@ -143,28 +291,36 @@ class DoctorListingController extends Controller
         $daysOfWeek      = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         $currentDayIndex = $today->dayOfWeek;
 
-        $appointmentConfig = $doctor->appointmentConfig; // بدون کش
+        $appointmentConfig = $doctor->appointmentConfig;
         $calendarDays      = $appointmentConfig ? ($appointmentConfig->calendar_days ?? 30) : 30;
         $duration          = $appointmentConfig ? ($appointmentConfig->appointment_duration ?? 15) : 15;
 
-        $schedules = $doctor->workSchedules; // بدون کش
+        $schedules = $doctor->workSchedules;
         if ($schedules->isEmpty()) {
-            return ['next_available_slot' => null, 'max_appointments' => 0];
+            return ['next_available_slot' => null, 'slots' => [], 'max_appointments' => 0];
         }
 
         $bookedAppointments = Appointment::where('doctor_id', $doctorId)
+            ->where('clinic_id', $clinicId)
             ->where('status', 'scheduled')
             ->where('appointment_date', '>=', $today->toDateString())
             ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
             ->get()
             ->groupBy('appointment_date');
 
+        $slots             = [];
+        $nextAvailableSlot = null;
+
         for ($i = 0; $i < $calendarDays; $i++) {
-            $checkDayIndex = ($currentDayIndex + $i) % 7;
-            $dayName       = $daysOfWeek[$checkDayIndex];
-            $checkDate     = $today->copy()->addDays($i);
+            $checkDayIndex  = ($currentDayIndex + $i) % 7;
+            $dayName        = $daysOfWeek[$checkDayIndex];
+            $checkDate      = $today->copy()->addDays($i);
+            $jalaliDate     = Jalalian::fromCarbon($checkDate)->format('j F Y');
+            $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
 
             $dayAppointments = $bookedAppointments->get($checkDate->toDateString(), collect());
+            $activeSlots     = [];
+            $inactiveSlots   = [];
 
             foreach ($schedules as $schedule) {
                 if ($schedule->day !== $dayName) {
@@ -173,7 +329,6 @@ class DoctorListingController extends Controller
 
                 $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
                 if (! is_array($workHours) || empty($workHours)) {
-
                     continue;
                 }
                 $workHour = $workHours[0];
@@ -184,6 +339,7 @@ class DoctorListingController extends Controller
                 $currentTime = $startTime->copy();
                 while ($currentTime->lessThan($endTime)) {
                     $nextTime = (clone $currentTime)->addMinutes($duration);
+                    $slotTime = $currentTime->format('H:i');
 
                     $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
                         $apptStart = Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time, 'Asia/Tehran');
@@ -191,19 +347,47 @@ class DoctorListingController extends Controller
                         return $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
                     });
 
-                    if (! $isBooked && $currentTime->gte($now)) {
-
-                        return [
-                            'next_available_slot' => $currentTime->toIso8601String(),
-                            'max_appointments'    => $schedule->appointment_settings[0]['max_appointments'] ?? 22,
-                        ];
+                    if ($checkDate->isToday()) {
+                        if ($isBooked || $currentTime->lt($now)) {
+                            $inactiveSlots[] = $slotTime;
+                        } else {
+                            $activeSlots[] = $slotTime;
+                            if (! $nextAvailableSlot) {
+                                $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                            }
+                        }
+                    } else {
+                        if (! $isBooked) {
+                            $activeSlots[] = $slotTime;
+                            if (! $nextAvailableSlot) {
+                                $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                            }
+                        }
                     }
 
                     $currentTime->addMinutes($duration);
                 }
             }
+
+            if (! empty($activeSlots) || ! empty($inactiveSlots)) {
+                $slotData = [
+                    'date'            => $jalaliDate,
+                    'day_name'        => $persianDayName,
+                    'available_slots' => $activeSlots,
+                    'available_count' => count($activeSlots),
+                ];
+                if ($checkDate->isToday()) {
+                    $slotData['inactive_slots'] = $inactiveSlots;
+                    $slotData['inactive_count'] = count($inactiveSlots);
+                }
+                $slots[] = $slotData;
+            }
         }
 
-        return ['next_available_slot' => null, 'max_appointments' => 0];
+        return [
+            'next_available_slot' => $nextAvailableSlot,
+            'slots'               => $slots,
+            'max_appointments'    => $schedules->first()->appointment_settings[0]['max_appointments'] ?? 22,
+        ];
     }
 }

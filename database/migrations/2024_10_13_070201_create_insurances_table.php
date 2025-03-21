@@ -12,7 +12,6 @@ return new class extends Migration
         // ایجاد جدول insurances
         Schema::create('insurances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('doctor_id')->nullable()->constrained('doctors')->cascadeOnDelete();
             $table->foreignId('clinic_id')->nullable()->constrained('clinics')->nullOnDelete();
             $table->string('name');
             $table->tinyInteger('calculation_method')->default(0);

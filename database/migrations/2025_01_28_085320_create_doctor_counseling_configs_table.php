@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -13,8 +14,15 @@ return new class extends Migration {
         Schema::create('doctor_counseling_configs', function (Blueprint $table) {
             $table->id(); // شناسه منحصر به فرد
 
-            $table->unsignedBigInteger('doctor_id'); // شناسه پزشک
+            $table->unsignedBigInteger('doctor_id');             // شناسه پزشک
             $table->unsignedBigInteger('clinic_id')->nullable(); // شناسه کلینیک (اختیاری)
+            $table->boolean('has_phone_counseling')->default(false);
+// آیا مشاوره تلفنی ارائه می‌دهد؟
+
+            $table->boolean('has_text_counseling')->default(false);
+// آیا مشاوره متنی ارائه می‌دهد؟
+
+            $table->boolean('has_video_counseling')->default(false);
 
             $table->boolean('auto_scheduling')->default(true);
             // آیا نوبت‌دهی به صورت خودکار انجام شود؟

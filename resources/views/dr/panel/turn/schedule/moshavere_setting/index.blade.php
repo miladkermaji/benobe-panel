@@ -34,6 +34,16 @@
        <div class="input-group-append count-span-prepand-style"><span class="input-group-text px-2">روز</span>
        </div>
       </div>
+      <!-- اضافه کردن بخش انواع مشاوره -->
+      <div class="mt-3">
+       <label class="text-dark font-weight-bold">انواع مشاوره</label>
+       <div class="d-flex flex-wrap justify-content-start mt-2 gap-40">
+        <x-my-check :isChecked="$appointmentConfig->has_phone_counseling" id="phone-counseling" day="مشاوره تلفنی" name="has_phone_counseling" />
+        <x-my-check :isChecked="$appointmentConfig->has_text_counseling" id="text-counseling" day="مشاوره متنی" name="has_text_counseling" />
+        <x-my-check :isChecked="$appointmentConfig->has_video_counseling" id="video-counseling" day="مشاوره ویدیویی" name="has_video_counseling" />
+       </div>
+      </div>
+      <!-- پایان بخش انواع مشاوره -->
       <div class="d-flex justify-content-end w-100 mt-2">
        <div class="my-tooltip mx-2 position-absolute">
       <svg data-toggle="tooltip" data-placement="bottom" title="" width="16" height="17"
@@ -59,7 +69,7 @@
       <div class="col-md-6">
        <div class="input-group position-relative">
         <label class="label-top-input-special-takhasos">15 دقیقه</label>
-        <input type="tel" value="{{  explode(".", $appointmentConfig->price_15min)[0] }}" class="form-control numberkey ltr text-center h-50 border-radius-0"
+        <input type="tel" value="{{  explode('.', $appointmentConfig->price_15min)[0] }}" class="form-control numberkey ltr text-center h-50 border-radius-0"
          name="call_15min_1">
         <div class="input-group-append"><span class="input-group-text">تومان</span></div>
        </div>
@@ -67,7 +77,7 @@
       <div class="col-md-6 therty-min-768">
        <div class="input-group position-relative">
         <label class="label-top-input-special-takhasos">30 دقیقه</label>
-        <input type="tel" value="{{  explode(".", $appointmentConfig->price_30min)[0] }}" class="form-control numberkey ltr text-center h-50 border-radius-0"
+        <input type="tel" value="{{  explode('.', $appointmentConfig->price_30min)[0] }}" class="form-control numberkey ltr text-center h-50 border-radius-0"
          name="call_15min_2">
         <div class="input-group-append"><span class="input-group-text">تومان</span></div>
        </div>
@@ -78,7 +88,7 @@
       <div class="col-md-6">
        <div class="input-group position-relative">
         <label class="label-top-input-special-takhasos">45 دقیقه</label>
-        <input type="tel" value="{{  explode(".", $appointmentConfig->price_45min)[0] }}" class="form-control numberkey ltr text-center h-50 border-radius-0"
+        <input type="tel" value="{{  explode('.', $appointmentConfig->price_45min)[0] }}" class="form-control numberkey ltr text-center h-50 border-radius-0"
          name="call_15min_3">
         <div class="input-group-append"><span class="input-group-text">تومان</span></div>
        </div>
@@ -86,7 +96,7 @@
       <div class="col-md-6 sixty-min-768">
        <div class="input-group position-relative">
         <label class="label-top-input-special-takhasos">60 دقیقه</label>
-        <input type="tel" value="{{  explode(".", $appointmentConfig->price_60min)[0] }}" class="form-control numberkey ltr text-center h-50 border-radius-0"
+        <input type="tel" value="{{  explode('.', $appointmentConfig->price_60min)[0] }}" class="form-control numberkey ltr text-center h-50 border-radius-0"
          name="call_15min_4">
         <div class="input-group-append"><span class="input-group-text">تومان</span></div>
        </div>
@@ -137,7 +147,7 @@
       <div class="modal-header">
        <h5 class="modal-title" id="activation-modal-label">فعالسازی نوبت دهی</h5>
        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true">×</span>
        </button>
       </div>
       <div class="modal-body">
@@ -148,7 +158,7 @@
          پایین‌تری
          قرار می‌گیرد.</p>
         <p>برای هر گونه سوال یا توضیح بیشتر، لطفا با ما <a style="color: blue"
-        href="https://newsupport.paziresh24.com/new-ticket/?department=4&amp;product=9">ارتباط</a> بگیرید.
+        href="https://newsupport.paziresh24.com/new-ticket/?department=4&product=9">ارتباط</a> بگیرید.
          تیم ما
          اینجاست تا از شما در هر مرحله حمایت کند.</p>
        </div>
@@ -173,7 +183,7 @@
       <div class="modal-header">
       <h6 class="modal-title font-weight-bold" id="scheduleModalLabel">برنامه زمانبندی</h6>
       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true">×</span>
       </button>
       </div>
       <div class="modal-body">
@@ -234,7 +244,7 @@
       <div class="modal-header">
       <h6 class="modal-title font-weight-bold" id="checkboxModalLabel"> کپی ساعت کاری برای روز های : </h6>
       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true">×</span>
       </button>
       </div>
       <div class="modal-body">
@@ -268,7 +278,7 @@
       <div class="modal-header">
       <h6 class="modal-title font-weight-bold" id="checkboxModalLabel"> انتخاب تعداد نوبت یا زمان ویزیت: </h6>
       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true">×</span>
       </button>
       </div>
       <div class="modal-body">

@@ -3,6 +3,7 @@ namespace App\Models;
 
 use App\Models\DoctorAppointmentConfig;
 use App\Models\Doctors\DoctorManagement\DoctorTariff;
+use App\Models\DoctorTag;
 use App\Models\DoctorWorkSchedule;
 use App\Models\Secretary;
 use App\Models\Specialty;
@@ -20,15 +21,9 @@ use Morilog\Jalali\Jalalian;
 
 class Doctor extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, TwoFactorAuthenticatable, Sluggable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $table    = "doctors";
-    protected $slugable = 'slug';
     protected $fillable = [
         'uuid',
         'first_name',
@@ -59,7 +54,7 @@ class Doctor extends Authenticatable
         'profile_completed',
         'status',
         'api_token',
-        'two_factor_secret', // فیلد برای ذخیره کلید مخفی
+        'two_factor_secret',
         'two_factor_enabled',
         'views_count',
     ];
@@ -80,12 +75,9 @@ class Doctor extends Authenticatable
         'email_verified_at'  => 'datetime',
         'last_login_at'      => 'datetime',
     ];
+
     protected $dates = ['created_at', 'updated_at', 'date_of_birth', 'mobile_verified_at', 'email_verified_at', 'last_login_at'];
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array
-     */
+
     protected $appends = [
         'profile_photo_url',
     ];
@@ -98,50 +90,67 @@ class Doctor extends Authenticatable
             ],
         ];
     }
+public function appointmentConfig()
+    {
+        return $this->hasOne(DoctorAppointmentConfig::class);
+    }
+
+    // رابطه جدید با doctor_counseling_configs (برای تنظیمات مشاوره)
+    public function counselingConfig()
+    {
+        return $this->hasOne(DoctorCounselingConfig::class);
+    }
     public function getProfilePhotoUrlAttribute()
     {
         return $this->profile_photo_path
         ? Storage::url($this->profile_photo_path)
         : asset('admin-assets/images/default-avatar.png');
     }
+
     public function getJalaliCreatedAtAttribute()
     {
-        // چک کردن اینکه created_at مقدار داره یا نه
         if (! $this->created_at) {
-            return '---'; // یا یه مقدار پیش‌فرض مثل '----/--/--'
+            return '---';
         }
-
         return Jalalian::fromCarbon($this->created_at)->format('Y/m/d');
     }
+
     public function getFullNameAttribute()
     {
         return "$this->first_name $this->last_name";
     }
+
     public function clinics()
     {
         return $this->hasMany(Clinic::class);
     }
+
     public function province()
     {
         return $this->belongsTo(Zone::class, 'province_id');
     }
+
     public function tariff()
     {
         return $this->hasOne(DoctorTariff::class, 'doctor_id');
     }
+
     public function city()
     {
-        return $this->belongsTo(Zone::class, 'city_id'); // ارتباط با شهر
+        return $this->belongsTo(Zone::class, 'city_id');
     }
+
     public function academicDegree()
     {
         return $this->belongsTo(AcademicDegree::class, 'academic_degree_id');
     }
+
     public function specialties()
     {
         return $this->belongsToMany(Specialty::class, 'doctor_specialty', 'doctor_id', 'specialty_id')
-            ->withPivot('academic_degree_id', 'specialty_title'); // اضافه کردن فیلدهای اضافی
+            ->withPivot('academic_degree_id', 'specialty_title');
     }
+
     public function messengers()
     {
         return $this->hasMany(DoctorMessenger::class);
@@ -151,14 +160,17 @@ class Doctor extends Authenticatable
     {
         return $this->belongsTo(Specialty::class, 'specialty_id');
     }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
+
     public function doctorSpecialties()
     {
         return $this->hasMany(DoctorSpecialty::class);
     }
+
     public function isProfileComplete(): bool
     {
         return $this->first_name &&
@@ -172,10 +184,12 @@ class Doctor extends Authenticatable
             return $messenger->phone_number || $messenger->username;
         });
     }
+
     public function secretaries()
     {
         return $this->hasMany(Secretary::class, 'doctor_id');
     }
+
     public function getIncompleteProfileSections(): array
     {
         $incompleteSections = [];
@@ -208,23 +222,37 @@ class Doctor extends Authenticatable
 
         return $incompleteSections;
     }
+
     public function likes()
     {
         return $this->hasMany(UserDoctorLike::class);
     }
-   public function workSchedules()
+
+    public function workSchedules()
     {
         return $this->hasMany(DoctorWorkSchedule::class, 'doctor_id')->where('is_working', true);
     }
 
-    public function appointmentConfig()
-    {
-        return $this->hasOne(DoctorAppointmentConfig::class);
-    }
+   
+
     public function reviews()
     {
         return $this->morphMany(Review::class, 'reviewable');
     }
+
     public function appointments()
-    {return $this->hasMany(Appointment::class);}
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    public function doctorTags()
+    {
+        return $this->hasMany(DoctorTag::class);
+    }
+
+    public function insurances()
+    {
+        return $this->belongsToMany(Insurance::class, 'doctor_insurance', 'doctor_id', 'insurance_id')
+            ->withTimestamps();
+    }
 }

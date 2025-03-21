@@ -12,7 +12,6 @@ class Insurance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'doctor_id',
         'clinic_id',
         'name',
         'calculation_method',
@@ -34,5 +33,10 @@ class Insurance extends Model
     public function appointments()
     {
         return $this->hasMany(Appointment::class);
+    }
+    public function doctors()
+    {
+        return $this->belongsToMany(Doctor::class, 'doctor_insurance', 'insurance_id', 'doctor_id')
+                    ->withTimestamps();
     }
 }
