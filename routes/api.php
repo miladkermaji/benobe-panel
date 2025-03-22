@@ -91,6 +91,10 @@ Route::prefix('medical-centers')->group(function () {
     Route::get('/imaging-centers', [MedicalCentersController::class, 'getImagingCenters'])->name('api.medical-centers.imaging-centers');
     Route::get('/hospitals', [MedicalCentersController::class, 'getHospitals'])->name('api.medical-centers.hospitals');
     Route::get('/laboratories', [MedicalCentersController::class, 'getLaboratories'])->name('api.medical-centers.laboratories');
+    // مسیرهای جدید
+    Route::get('/cities', [MedicalCentersController::class, 'getCitiesWithCenters'])->name('api.medical-centers.cities');
+    Route::get('/all', [MedicalCentersController::class, 'getAllCenters'])->name('api.medical-centers.all');
+
 });
 
 Route::prefix('reviews')->group(function () {

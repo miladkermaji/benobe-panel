@@ -41,7 +41,7 @@ return new class extends Migration
                                                           // وضعیت و تنظیمات
             $table->boolean('is_active')->default(false); // وضعیت فعال‌سازی
             $table->json('working_days')->nullable();     // روزهای کاری
-            $table->json('gallery')->nullable();                   // گالری تصاویر مطب
+            $table->text('avatar')->nullable();                  // گالری تصاویر مطب
             $table->json('documents')->nullable();                 // مدارک مطب
             $table->json('phone_numbers')->nullable();             // شماره‌های تماس مطب
             $table->boolean('location_confirmed')->default(false); // تایید مکان روی نقشه

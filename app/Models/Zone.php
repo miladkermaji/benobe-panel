@@ -3,6 +3,10 @@ namespace App\Models;
 
 use App\Models\Clinic;
 use App\Models\Doctor;
+use App\Models\Hospital;
+use App\Models\ImagingCenter;
+use App\Models\Laboratory;
+use App\Models\TreatmentCenter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +32,26 @@ class Zone extends Model
     public function clinics()
     {
         return $this->hasMany(Clinic::class, 'city_id');
+    }
+
+    public function treatmentCenters()
+    {
+        return $this->hasMany(TreatmentCenter::class, 'city_id');
+    }
+
+    public function imagingCenters()
+    {
+        return $this->hasMany(ImagingCenter::class, 'city_id');
+    }
+
+    public function hospitals()
+    {
+        return $this->hasMany(Hospital::class, 'city_id');
+    }
+
+    public function laboratories()
+    {
+        return $this->hasMany(Laboratory::class, 'city_id');
     }
 
     public function children()

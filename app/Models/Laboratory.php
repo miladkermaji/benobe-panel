@@ -9,7 +9,7 @@ class Laboratory extends Model
         'doctor_id', 'name', 'address', 'secretary_phone', 'phone_number', 'postal_code',
         'province_id', 'city_id', 'is_main_center', 'start_time', 'end_time', 'description',
         'latitude', 'longitude', 'consultation_fee', 'payment_methods', 'is_active',
-        'working_days', 'documents', 'phone_numbers', 'location_confirmed',
+        'working_days', 'documents', 'phone_numbers', 'location_confirmed','avatar'
     ];
 
     protected $casts = [

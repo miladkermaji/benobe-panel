@@ -32,7 +32,7 @@ class Clinic extends Model
         'consultation_fee',
         'payment_methods',
         'working_days',
-        'gallery', // JSON field, though we’ll use a separate table for galleries
+        'avatar', // JSON field, though we’ll use a separate table for galleries
         'documents',
         'location_confirmed',
     ];

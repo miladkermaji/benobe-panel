@@ -40,7 +40,7 @@ return new class extends Migration
             $table->json('working_days')->nullable();     // روزهای کاری
 
                                                                    // فیلدهای جدید
-            $table->json('gallery')->nullable();                   // گالری تصاویر مرکز
+           $table->text('avatar')->nullable();                   // گالری تصاویر مرکز
             $table->json('documents')->nullable();                 // مدارک مرکز
             $table->json('phone_numbers')->nullable();             // شماره‌های تماس مرکز
             $table->boolean('location_confirmed')->default(false); // تایید مکان روی نقشه

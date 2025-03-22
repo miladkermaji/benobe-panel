@@ -29,7 +29,7 @@ class TreatmentCenter extends Model
         'payment_methods',
         'is_active',
         'working_days',
-        'gallery',
+        'avatar',
         'documents',
         'phone_numbers',
         'location_confirmed',
