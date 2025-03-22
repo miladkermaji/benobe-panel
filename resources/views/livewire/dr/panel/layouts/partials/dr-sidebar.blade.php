@@ -17,7 +17,7 @@
   </div>
  </div>
  <div class="sidebar__scrollable">
-  <ul class="mt-65" id="mt-65">
+  <ul class="" id="">
    @if (Auth::guard('doctor')->check())
     <li class="item-li i-dashboard {{ Request::routeIs('dr-panel') ? 'is-active' : '' }}">
      <a href="{{ route('dr-panel') }}">داشبورد</a>
