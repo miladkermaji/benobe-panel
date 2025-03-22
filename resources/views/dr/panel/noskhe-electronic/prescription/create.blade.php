@@ -17,7 +17,7 @@
 @section('bread-crumb-title', 'تجویز نسخه')
 <div class="">
  <div class="patient-profile-details p-3 border">
-  <div id="patient-profile-details-wrapper"  class="d-flex justify-content-between align-items-center">
+  <div id="patient-profile-details-wrapper" class="d-flex justify-content-between align-items-center">
    <div class="cursor-pointer" onclick="toggleDetails()">
     <span>
      <svg id="toggle-icon" width="7" height="11" viewBox="0 0 7 11" fill="none"
@@ -79,13 +79,14 @@
      </div>
     </div>
     <div>
-     <button data-toggle="modal" data-target="#saveNoskheModalCenter" class="btn btn-primary h-50">نهایی سازی نسخه</button>
-        <div class="modal  fade" id="saveNoskheModalCenter" tabindex="-1" role="dialog"
+     <button data-toggle="modal" data-target="#saveNoskheModalCenter" class="btn btn-primary h-50">نهایی سازی
+      نسخه</button>
+     <div class="modal  fade" id="saveNoskheModalCenter" tabindex="-1" role="dialog"
       aria-labelledby="endVisitModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
        <div class="modal-content border-radius-6">
         <div class="modal-header">
-         <h6 class="modal-title font-weight-bold" id="exampleModalCenterTitle">   ویزیت</h6>
+         <h6 class="modal-title font-weight-bold" id="exampleModalCenterTitle"> ویزیت</h6>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
          </button>
@@ -96,11 +97,12 @@
          </p>
          <div class="mt-3">
           <form action="">
-           <textarea name="" id="" cols="30" rows="30" class="form-control w-100" placeholder="توضیحات (اختیاری)"></textarea>
-          <div class="mt-2 d-flex justify-content-center gap-10">
+           <textarea name="" id="" cols="30" rows="30" class="form-control w-100"
+            placeholder="توضیحات (اختیاری)"></textarea>
+           <div class="mt-2 d-flex justify-content-center gap-10">
             <button class="h-50 w-50 btn btn-primary mt-3">ثبت ویزیت</button>
-           <button class="h-50 w-50 btn btn-outline-danger mt-3"> انصراف</button>
-          </div>
+            <button class="h-50 w-50 btn btn-outline-danger mt-3"> انصراف</button>
+           </div>
           </form>
          </div>
         </div>

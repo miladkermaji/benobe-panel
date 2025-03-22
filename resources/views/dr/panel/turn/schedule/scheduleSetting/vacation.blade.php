@@ -187,123 +187,123 @@
 
 @endsection
 @section('scripts')
-  <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/vacation/vacation.js') }}"></script>
-  <script>
-   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-   var updateStatusAppointmentUrl =
-    "{{ route('updateStatusAppointment', ':id') }}";
-  </script>
-  <script>
-   $(document).ready(function() {
-    let dropdownOpen = false;
-    let selectedClinic = localStorage.getItem('selectedClinic');
-    let selectedClinicId = localStorage.getItem('selectedClinicId');
-    if (selectedClinic && selectedClinicId) {
-     $('.dropdown-label').text(selectedClinic);
-     $('.option-card').each(function() {
+<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/vacation/vacation.js') }}"></script>
+<script>
+ var appointmentsSearchUrl = "{{ route('search.appointments') }}";
+ var updateStatusAppointmentUrl =
+  "{{ route('updateStatusAppointment', ':id') }}";
+</script>
+<script>
+ $(document).ready(function() {
+  let dropdownOpen = false;
+  let selectedClinic = localStorage.getItem('selectedClinic');
+  let selectedClinicId = localStorage.getItem('selectedClinicId');
+  if (selectedClinic && selectedClinicId) {
+   $('.dropdown-label').text(selectedClinic);
+   $('.option-card').each(function() {
     if ($(this).attr('data-id') === selectedClinicId) {
      $('.option-card').removeClass('card-active');
      $(this).addClass('card-active');
     }
-     });
-    } else {
-     localStorage.setItem('selectedClinic', 'ویزیت آنلاین به نوبه');
-     localStorage.setItem('selectedClinicId', 'default');
-    }
+   });
+  } else {
+   localStorage.setItem('selectedClinic', 'ویزیت آنلاین به نوبه');
+   localStorage.setItem('selectedClinicId', 'default');
+  }
 
-    function checkInactiveClinics() {
-     var hasInactiveClinics = $('.option-card[data-active="0"]').length > 0;
-     if (hasInactiveClinics) {
+  function checkInactiveClinics() {
+   var hasInactiveClinics = $('.option-card[data-active="0"]').length > 0;
+   if (hasInactiveClinics) {
     $('.dropdown-trigger').addClass('warning');
-     } else {
+   } else {
     $('.dropdown-trigger').removeClass('warning');
-     }
-    }
-    checkInactiveClinics();
+   }
+  }
+  checkInactiveClinics();
 
-    $('.dropdown-trigger').on('click', function(event) {
-     event.stopPropagation();
-     dropdownOpen = !dropdownOpen;
-     $(this).toggleClass('border border-primary');
-     $('.my-dropdown-menu').toggleClass('d-none');
-     setTimeout(() => {
+  $('.dropdown-trigger').on('click', function(event) {
+   event.stopPropagation();
+   dropdownOpen = !dropdownOpen;
+   $(this).toggleClass('border border-primary');
+   $('.my-dropdown-menu').toggleClass('d-none');
+   setTimeout(() => {
     dropdownOpen = $('.my-dropdown-menu').is(':visible');
-     }, 100);
-    });
+   }, 100);
+  });
 
-    $(document).on('click', function() {
-     if (dropdownOpen) {
+  $(document).on('click', function() {
+   if (dropdownOpen) {
     $('.dropdown-trigger').removeClass('border border-primary');
     $('.my-dropdown-menu').addClass('d-none');
     dropdownOpen = false;
-     }
-    });
+   }
+  });
 
-    $('.my-dropdown-menu').on('click', function(event) {
-     event.stopPropagation();
-    });
+  $('.my-dropdown-menu').on('click', function(event) {
+   event.stopPropagation();
+  });
 
-    $('.option-card').on('click', function() {
-     var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
-     var selectedId = $(this).attr('data-id');
-     $('.option-card').removeClass('card-active');
-     $(this).addClass('card-active');
-     $('.dropdown-label').text(selectedText);
+  $('.option-card').on('click', function() {
+   var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+   var selectedId = $(this).attr('data-id');
+   $('.option-card').removeClass('card-active');
+   $(this).addClass('card-active');
+   $('.dropdown-label').text(selectedText);
 
-     localStorage.setItem('selectedClinic', selectedText);
-     localStorage.setItem('selectedClinicId', selectedId);
-     checkInactiveClinics();
-     $('.dropdown-trigger').removeClass('border border-primary');
-     $('.my-dropdown-menu').addClass('d-none');
-     dropdownOpen = false;
+   localStorage.setItem('selectedClinic', selectedText);
+   localStorage.setItem('selectedClinicId', selectedId);
+   checkInactiveClinics();
+   $('.dropdown-trigger').removeClass('border border-primary');
+   $('.my-dropdown-menu').addClass('d-none');
+   dropdownOpen = false;
 
-     // ریلود صفحه با پارامتر جدید
-     window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
-    });
-   });
-   $(document).ready(function() {
-    // دریافت تاریخ جلالی جاری
-    const now = new Date();
-    const jalaliMoment = moment(now, 'YYYY/MM/DD').locale('fa');
+   // ریلود صفحه با پارامتر جدید
+   window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
+  });
+ });
+ $(document).ready(function() {
+  // دریافت تاریخ جلالی جاری
+  const now = new Date();
+  const jalaliMoment = moment(now, 'YYYY/MM/DD').locale('fa');
 
-    const currentYear = jalaliMoment.jYear().toString();
-    const currentMonth = (jalaliMoment.jMonth() + 1).toString().padStart(2, '0');
+  const currentYear = jalaliMoment.jYear().toString();
+  const currentMonth = (jalaliMoment.jMonth() + 1).toString().padStart(2, '0');
 
-    // انتخاب سال جاری در سلکت‌باکس
-    $('#filter-year').val(currentYear);
+  // انتخاب سال جاری در سلکت‌باکس
+  $('#filter-year').val(currentYear);
 
-    // انتخاب ماه جاری در سلکت‌باکس
-    $('#filter-month').val(currentMonth);
+  // انتخاب ماه جاری در سلکت‌باکس
+  $('#filter-month').val(currentMonth);
 
-    // بارگذاری لیست مرخصی‌ها بر اساس سال و ماه جاری
-    loadVacations(currentYear, currentMonth);
+  // بارگذاری لیست مرخصی‌ها بر اساس سال و ماه جاری
+  loadVacations(currentYear, currentMonth);
 
-    // اضافه کردن رویداد تغییر برای سلکت‌باکس‌ها
-    $('#filter-year, #filter-month').on('change', function() {
-     const selectedYear = $('#filter-year').val();
-     const selectedMonth = $('#filter-month').val();
+  // اضافه کردن رویداد تغییر برای سلکت‌باکس‌ها
+  $('#filter-year, #filter-month').on('change', function() {
+   const selectedYear = $('#filter-year').val();
+   const selectedMonth = $('#filter-month').val();
 
-     loadVacations(selectedYear, selectedMonth);
-    });
-   });
+   loadVacations(selectedYear, selectedMonth);
+  });
+ });
 
 
-   function loadVacations(year = null, month = null) {
-    const data = {
-     selectedClinicId: localStorage.getItem('selectedClinicId') ?? 'default' // پیش‌فرض: default
-    };
+ function loadVacations(year = null, month = null) {
+  const data = {
+   selectedClinicId: localStorage.getItem('selectedClinicId') ?? 'default' // پیش‌فرض: default
+  };
 
-    // فقط اضافه کردن پارامترهایی که مقدار دارند
-    if (year !== null) data.year = year;
-    if (month !== null) data.month = month;
-    $.ajax({
-     url: "{{ route('dr-vacation') }}",
-     method: "GET",
-     data: data,
-     success: function(response) {
+  // فقط اضافه کردن پارامترهایی که مقدار دارند
+  if (year !== null) data.year = year;
+  if (month !== null) data.month = month;
+  $.ajax({
+   url: "{{ route('dr-vacation') }}",
+   method: "GET",
+   data: data,
+   success: function(response) {
     if (response.year && response.month) {
      $('#filter-year').val(response.year);
      $('#filter-month').val(response.month.toString().padStart(2, '0'));
@@ -348,57 +348,57 @@
      html = '<span class="font-weight-bold text-dark mt-2">مرخصی وجود ندارد</span>';
     }
     $('.vacation-list').html(html);
-     },
-     error: function(xhr, status, error) {
+   },
+   error: function(xhr, status, error) {
     toastr.error("خطا در بارگذاری مرخصی‌ها!");
-     }
-    });
    }
+  });
+ }
 
-   // بارگذاری اولیه مرخصی‌ها
-   loadVacations();
-   // مدیریت نمایش/پنهان‌سازی ساعت‌ها برای "تمام روز"
-   $('#full-day-vacation').on('change', function() {
-    if ($(this).is(':checked')) {
-     $('#start-time, #end-time').prop('disabled', true).val('');
-     $(this).val(1); // تنظیم مقدار 1
-    } else {
-     $('#start-time, #end-time').prop('disabled', false);
-     $(this).val(0); // تنظیم مقدار 0
-    }
-   });
+ // بارگذاری اولیه مرخصی‌ها
+ loadVacations();
+ // مدیریت نمایش/پنهان‌سازی ساعت‌ها برای "تمام روز"
+ $('#full-day-vacation').on('change', function() {
+  if ($(this).is(':checked')) {
+   $('#start-time, #end-time').prop('disabled', true).val('');
+   $(this).val(1); // تنظیم مقدار 1
+  } else {
+   $('#start-time, #end-time').prop('disabled', false);
+   $(this).val(0); // تنظیم مقدار 0
+  }
+ });
 
-   const modal = $('#exampleModalCenterAddVacation');
-   modal.on('show.bs.modal', function() {
-    $("#full-day-vacation").prop('checked', false);
-   });
+ const modal = $('#exampleModalCenterAddVacation');
+ modal.on('show.bs.modal', function() {
+  $("#full-day-vacation").prop('checked', false);
+ });
 
-   $('#add-vacation-form').on('submit', function(e) {
-    e.preventDefault();
-    const formData = $(this).serializeArray();
-    const button = $(this).find('button[type="submit"]');
-    const loader = button.find('.loader');
-    const buttonText = button.find('.button_text');
+ $('#add-vacation-form').on('submit', function(e) {
+  e.preventDefault();
+  const formData = $(this).serializeArray();
+  const button = $(this).find('button[type="submit"]');
+  const loader = button.find('.loader');
+  const buttonText = button.find('.button_text');
 
-    // نمایش لودینگ
-    buttonText.css({
-     'display': 'none'
-    });
-    loader.css({
-     'display': 'block'
-    });
-    formData.push({
-     name: 'selectedClinicId',
-     value: localStorage.getItem('selectedClinicId') ?? 'default'
-    });
-    $.ajax({
-     url: "{{ route('doctor.vacation.store') }}",
-     method: "POST",
-     data: $.param(formData),
-     headers: {
+  // نمایش لودینگ
+  buttonText.css({
+   'display': 'none'
+  });
+  loader.css({
+   'display': 'block'
+  });
+  formData.push({
+   name: 'selectedClinicId',
+   value: localStorage.getItem('selectedClinicId') ?? 'default'
+  });
+  $.ajax({
+   url: "{{ route('doctor.vacation.store') }}",
+   method: "POST",
+   data: $.param(formData),
+   headers: {
     'X-CSRF-TOKEN': '{{ csrf_token() }}',
-     },
-     success: function(response) {
+   },
+   success: function(response) {
     toastr.success(response.message);
 
     const modal = $('#exampleModalCenterAddVacation');
@@ -408,8 +408,8 @@
      $('.modal-backdrop').remove(); // حذف backdrop
     });
     loadVacations(); // بروزرسانی لیست مرخصی‌ها
-     },
-     error: function(xhr) {
+   },
+   error: function(xhr) {
     if (xhr.status === 422) {
      const errors = xhr.responseJSON.errors || {};
      const messages = new Set();
@@ -433,9 +433,9 @@
      toastr.error(errorMessage);
 
     }
-     },
+   },
 
-     complete: function() {
+   complete: function() {
     // مخفی کردن لودینگ
     buttonText.css({
      'display': 'block'
@@ -443,29 +443,29 @@
     loader.css({
      'display': 'none'
     });
-     }
-    });
-   });
+   }
+  });
+ });
 
-   $(document).on('click', '.edit-vacation-btn', function() {
-    const vacationId = $(this).data('id');
-    $('#edit-full-day-vacation').on('change', function() {
-     if ($(this).prop('checked')) {
+ $(document).on('click', '.edit-vacation-btn', function() {
+  const vacationId = $(this).data('id');
+  $('#edit-full-day-vacation').on('change', function() {
+   if ($(this).prop('checked')) {
     $('#edit-start-time').prop('disabled', true)
     $('#edit-end-time').prop('disabled', true)
-     } else {
+   } else {
     $('#edit-start-time').prop('disabled', false)
     $('#edit-end-time').prop('disabled', false)
-     }
+   }
 
-    })
-    $.ajax({
-     url: "{{ route('doctor.vacation.edit', ':id') }}".replace(':id', vacationId),
-     method: "GET",
-     data: {
+  })
+  $.ajax({
+   url: "{{ route('doctor.vacation.edit', ':id') }}".replace(':id', vacationId),
+   method: "GET",
+   data: {
     selectedClinicId: localStorage.getItem('selectedClinicId')
-     },
-     success: function(response) {
+   },
+   success: function(response) {
     const vacation = response.vacation;
 
     // تبدیل تاریخ به جلالی
@@ -484,138 +484,138 @@
     $('#edit-end-time').val(response.vacation.end_time);
     $('#edit-full-day-vacation').prop('checked', response.vacation.is_full_day);
     $('#exampleModalCenterEditVacation').modal('show');
-     },
-     error: function() {
+   },
+   error: function() {
     toastr.error("خطا در بارگذاری اطلاعات!");
 
-     }
-    });
-   });
+   }
+  });
+ });
 
-  $('#edit-vacation-form').on('submit', function(e) {
-    e.preventDefault();
+ $('#edit-vacation-form').on('submit', function(e) {
+  e.preventDefault();
 
-    const vacationId = $('#edit-vacation-id').val();
-    const formData = $(this).serializeArray(); // تبدیل به آرایه برای افزودن پارامتر جدید
+  const vacationId = $('#edit-vacation-id').val();
+  const formData = $(this).serializeArray(); // تبدیل به آرایه برای افزودن پارامتر جدید
 
-    // افزودن selectedClinicId به داده‌های فرم
-    formData.push({
-    name: 'selectedClinicId',
-    value: localStorage.getItem('selectedClinicId') ?? 'default'
-    });
-
-    const button = $(this).find('button[type="submit"]');
-    const loader = button.find('.loader');
-    const buttonText = button.find('.button_text');
-
-    // نمایش لودینگ
-    buttonText.hide();
-    loader.show();
-
-    // ارسال درخواست AJAX
-    $.ajax({
-    url: "{{ route('doctor.vacation.update', ':id') }}".replace(':id', vacationId),
-    method: "POST",
-    data: $.param(formData),
-    headers: {
-      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // توکن CSRF
-    },
-    success: function(response) {
-      if (response.success) {
-      toastr.success(response.message);
-      $('#exampleModalCenterEditVacation').modal('hide');
-      loadVacations(); // بروزرسانی لیست مرخصی‌ها
-      } else {
-      toastr.error(response.message);
-      }
-    },
-    error: function(xhr) {
-      console.error("خطا در ویرایش مرخصی:", xhr.responseJSON?.message || xhr.statusText);
-      toastr.error("خطا در ذخیره تغییرات!");
-    },
-    complete: function() {
-      buttonText.show();
-      loader.hide();
-    }
-    });
+  // افزودن selectedClinicId به داده‌های فرم
+  formData.push({
+   name: 'selectedClinicId',
+   value: localStorage.getItem('selectedClinicId') ?? 'default'
   });
 
+  const button = $(this).find('button[type="submit"]');
+  const loader = button.find('.loader');
+  const buttonText = button.find('.button_text');
 
+  // نمایش لودینگ
+  buttonText.hide();
+  loader.show();
 
-
-    $(document).on('click', '.delete-vacation-btn', function () {
-    const vacationId = $(this).data('id');
-    const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default'; // دریافت Clinic ID از Local Storage
-
-    Swal.fire({
-      title: "آیا مطمئن هستید؟",
-      text: "این عمل قابل بازگشت نیست!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "بله، حذف کن!",
-      cancelButtonText: "لغو",
-    }).then((result) => {
-      if (result.isConfirmed) {
-      $.ajax({
-        url: "{{ route('doctor.vacation.destroy', ':id') }}".replace(':id', vacationId),
-        method: "DELETE",
-        data: {
-        selectedClinicId: selectedClinicId // ارسال selectedClinicId به کنترلر
-        },
-        headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-        },
-        success: function (response) {
-        if (response.success) {
-          toastr.success(response.message);
-          loadVacations(); // بروزرسانی لیست مرخصی‌ها
-        } else {
-          toastr.error(response.message);
-        }
-        },
-        error: function (xhr) {
-        console.error("خطا در حذف مرخصی:", xhr.responseJSON?.message || xhr.statusText);
-        toastr.error("خطا در حذف مرخصی!");
-        }
-      });
-      }
-    });
-    });
-
-
-
-   $('#filter-year, #filter-month').on('change', function() {
-
-    const year = $('#filter-year').val();
-
-    const month = $('#filter-month').val();
-
-    loadVacations(year, month); // تابع بارگذاری مرخصی‌ها
-   });
-
-   function calculateDuration(start, end) {
-    if (!start || !end) return '---';
-
-    const [startHours, startMinutes] = start.split(':').map(Number);
-    const [endHours, endMinutes] = end.split(':').map(Number);
-
-    const startDate = new Date(0, 0, 0, startHours, startMinutes);
-    const endDate = new Date(0, 0, 0, endHours, endMinutes);
-
-    const diffMs = endDate - startDate;
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-    // تغییر متن بر اساس مقادیر
-    if (diffHours > 0 && diffMinutes === 0) {
-     return `${diffHours} ساعت`;
-    } else if (diffHours === 0 && diffMinutes > 0) {
-     return `${diffMinutes} دقیقه`;
+  // ارسال درخواست AJAX
+  $.ajax({
+   url: "{{ route('doctor.vacation.update', ':id') }}".replace(':id', vacationId),
+   method: "POST",
+   data: $.param(formData),
+   headers: {
+    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // توکن CSRF
+   },
+   success: function(response) {
+    if (response.success) {
+     toastr.success(response.message);
+     $('#exampleModalCenterEditVacation').modal('hide');
+     loadVacations(); // بروزرسانی لیست مرخصی‌ها
     } else {
-     return `${diffHours} ساعت و ${diffMinutes} دقیقه`;
+     toastr.error(response.message);
     }
+   },
+   error: function(xhr) {
+    console.error("خطا در ویرایش مرخصی:", xhr.responseJSON?.message || xhr.statusText);
+    toastr.error("خطا در ذخیره تغییرات!");
+   },
+   complete: function() {
+    buttonText.show();
+    loader.hide();
    }
-  </script>
+  });
+ });
+
+
+
+
+ $(document).on('click', '.delete-vacation-btn', function() {
+  const vacationId = $(this).data('id');
+  const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default'; // دریافت Clinic ID از Local Storage
+
+  Swal.fire({
+   title: "آیا مطمئن هستید؟",
+   text: "این عمل قابل بازگشت نیست!",
+   icon: "warning",
+   showCancelButton: true,
+   confirmButtonColor: "#3085d6",
+   cancelButtonColor: "#d33",
+   confirmButtonText: "بله، حذف کن!",
+   cancelButtonText: "لغو",
+  }).then((result) => {
+   if (result.isConfirmed) {
+    $.ajax({
+     url: "{{ route('doctor.vacation.destroy', ':id') }}".replace(':id', vacationId),
+     method: "DELETE",
+     data: {
+      selectedClinicId: selectedClinicId // ارسال selectedClinicId به کنترلر
+     },
+     headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+     },
+     success: function(response) {
+      if (response.success) {
+       toastr.success(response.message);
+       loadVacations(); // بروزرسانی لیست مرخصی‌ها
+      } else {
+       toastr.error(response.message);
+      }
+     },
+     error: function(xhr) {
+      console.error("خطا در حذف مرخصی:", xhr.responseJSON?.message || xhr.statusText);
+      toastr.error("خطا در حذف مرخصی!");
+     }
+    });
+   }
+  });
+ });
+
+
+
+ $('#filter-year, #filter-month').on('change', function() {
+
+  const year = $('#filter-year').val();
+
+  const month = $('#filter-month').val();
+
+  loadVacations(year, month); // تابع بارگذاری مرخصی‌ها
+ });
+
+ function calculateDuration(start, end) {
+  if (!start || !end) return '---';
+
+  const [startHours, startMinutes] = start.split(':').map(Number);
+  const [endHours, endMinutes] = end.split(':').map(Number);
+
+  const startDate = new Date(0, 0, 0, startHours, startMinutes);
+  const endDate = new Date(0, 0, 0, endHours, endMinutes);
+
+  const diffMs = endDate - startDate;
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  // تغییر متن بر اساس مقادیر
+  if (diffHours > 0 && diffMinutes === 0) {
+   return `${diffHours} ساعت`;
+  } else if (diffHours === 0 && diffMinutes > 0) {
+   return `${diffMinutes} دقیقه`;
+  } else {
+   return `${diffHours} ساعت و ${diffMinutes} دقیقه`;
+  }
+ }
+</script>
 @endsection

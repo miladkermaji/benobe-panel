@@ -1,9 +1,11 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
- <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}" rel="stylesheet" />
+ <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
+  rel="stylesheet" />
  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
- <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}" rel="stylesheet" />
+ <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
+  rel="stylesheet" />
  <link type="text/css" href="{{ asset('dr-assets/panel/css/activation/consult/rules/index.css') }}" rel="stylesheet" />
 @endsection
 @section('site-header')
@@ -76,29 +78,32 @@
       <div class="mt-2">
        <h6 class="text-left font-weight-bold d-block font-size-13"> تماس امن</h6>
       </div>
-      <div class="d-flex gap-4 justify-content-between align-items-center p-3 border border-solid rounded-lg border-slate-200 ">
+      <div
+       class="d-flex gap-4 justify-content-between align-items-center p-3 border border-solid rounded-lg border-slate-200 ">
        <div>
         <span class="text-responsive font-size-13 font-weight-bold">تماس امن به عنوان راه ارتباط جانبی در کنار هر یک از
          پیام‌رسان‌ها قرار می‌گیرد.</span>
-        <svg class="help-svg" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg"
-         color="#3f4079">
+        <svg class="help-svg" width="16" height="17" viewBox="0 0 16 17" fill="none"
+         xmlns="http://www.w3.org/2000/svg" color="#3f4079">
          <path
           d="M8.00006 9.9198V9.70984C8.00006 9.02984 8.42009 8.66982 8.84009 8.37982C9.25009 8.09982 9.66003 7.73983 9.66003 7.07983C9.66003 6.15983 8.92006 5.4198 8.00006 5.4198C7.08006 5.4198 6.34009 6.15983 6.34009 7.07983"
           stroke="#3f4079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-         <path d="M7.9955 12.0692H8.0045" stroke="#3f4079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+         <path d="M7.9955 12.0692H8.0045" stroke="#3f4079" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round">
          </path>
          <circle cx="8" cy="8.99445" r="7.25" stroke="#3f4079" stroke-width="1.5"></circle>
         </svg>
        </div>
        <div class="flex flex-col gap-2">
         <div class="flex items-center rounded-lg elative MuiBox-root muirtl-0">
-         <div class="password_toggle__AXK9v"><input type="checkbox" id="switch" name="secureCall" checked=""><label
-           for="switch">Toggle</label></div>
+         <div class="password_toggle__AXK9v"><input type="checkbox" id="switch" name="secureCall"
+           checked=""><label for="switch">Toggle</label></div>
         </div>
        </div>
       </div>
       <div class="mt-3">
-       <button onclick="location.href='{{ route('dr-workhours','activation-path=true') }}'" class="btn btn-primary w-100 h-50 border-radius-4">
+       <button onclick="location.href='{{ route('dr-workhours', 'activation-path=true') }}'"
+        class="btn btn-primary w-100 h-50 border-radius-4">
         ادامه</button>
       </div>
 

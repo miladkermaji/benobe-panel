@@ -1,9 +1,11 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
- <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}" rel="stylesheet" />
+ <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
+  rel="stylesheet" />
  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
- <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}" rel="stylesheet" />
+ <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
+  rel="stylesheet" />
  <link type="text/css" href="{{ asset('dr-assets/panel/css/activation/consult/rules/index.css') }}" rel="stylesheet" />
  <link type="text/css" href="{{ asset('dr-assets/panel/css/activation/consult/help/help.css') }}" rel="stylesheet" />
 @endsection
@@ -31,8 +33,8 @@
       <video src="" class="border-radius-6 w-100" controls></video>
 
      </div>
-     <button onclick="location.href='{{ route('activation.consult.messengers') }}'" class="btn btn-primary h-50 w-100 mt-2"
-      tabindex="0" type="button">ادامه
+     <button onclick="location.href='{{ route('activation.consult.messengers') }}'"
+      class="btn btn-primary h-50 w-100 mt-2" tabindex="0" type="button">ادامه
      </button>
     </div>
    </div>

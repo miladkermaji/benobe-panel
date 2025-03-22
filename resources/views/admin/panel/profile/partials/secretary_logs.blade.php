@@ -12,7 +12,7 @@
  </thead>
  <tbody>
   @foreach ($secretaryLogs as $log)
-    <tr>
+   <tr>
     <td>{{ \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($log->login_at))->format('Y/m/d') }}</td>
 
     <td>{{ \Carbon\Carbon::parse($log->login_at)->format('H:i') }}</td>
@@ -23,12 +23,13 @@
     <td>{{ $log->ip_address }}</td>
     <td>{{ $log->device }}</td>
     <td>
-     <button class="btn btn-light btn-sm delete-log" data-id="{{ $log->id }}"><img src="{{ asset('dr-assets/icons/trash.svg') }}" alt=""></button>
+     <button class="btn btn-light btn-sm delete-log" data-id="{{ $log->id }}"><img
+       src="{{ asset('dr-assets/icons/trash.svg') }}" alt=""></button>
     </td>
-    </tr>
+   </tr>
   @endforeach
  </tbody>
 </table>
 <div class="pagination-links w-100 d-flex justify-content-center">
-  {{ $secretaryLogs->links("pagination::bootstrap-4") }}
+ {{ $secretaryLogs->links('pagination::bootstrap-4') }}
 </div>

@@ -238,102 +238,102 @@
 </div>
 @endsection
 @section('scripts')
-    <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-    <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-    <script>
-     var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-     var updateStatusAppointmentUrl =
-    "{{ route('updateStatusAppointment', ':id') }}";
-    </script>
-    <script>
-     $(document).ready(function() {
-    let dropdownOpen = false;
-    let selectedClinic = localStorage.getItem('selectedClinic');
-    let selectedClinicId = localStorage.getItem('selectedClinicId');
-    if (selectedClinic && selectedClinicId) {
-     $('.dropdown-label').text(selectedClinic);
-     $('.option-card').each(function() {
+<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script>
+ var appointmentsSearchUrl = "{{ route('search.appointments') }}";
+ var updateStatusAppointmentUrl =
+  "{{ route('updateStatusAppointment', ':id') }}";
+</script>
+<script>
+ $(document).ready(function() {
+  let dropdownOpen = false;
+  let selectedClinic = localStorage.getItem('selectedClinic');
+  let selectedClinicId = localStorage.getItem('selectedClinicId');
+  if (selectedClinic && selectedClinicId) {
+   $('.dropdown-label').text(selectedClinic);
+   $('.option-card').each(function() {
     if ($(this).attr('data-id') === selectedClinicId) {
      $('.option-card').removeClass('card-active');
      $(this).addClass('card-active');
     }
-     });
-    } else {
-     localStorage.setItem('selectedClinic', 'ویزیت آنلاین به نوبه');
-     localStorage.setItem('selectedClinicId', 'default');
-    }
+   });
+  } else {
+   localStorage.setItem('selectedClinic', 'ویزیت آنلاین به نوبه');
+   localStorage.setItem('selectedClinicId', 'default');
+  }
 
-    function checkInactiveClinics() {
-     var hasInactiveClinics = $('.option-card[data-active="0"]').length > 0;
-     if (hasInactiveClinics) {
+  function checkInactiveClinics() {
+   var hasInactiveClinics = $('.option-card[data-active="0"]').length > 0;
+   if (hasInactiveClinics) {
     $('.dropdown-trigger').addClass('warning');
-     } else {
+   } else {
     $('.dropdown-trigger').removeClass('warning');
-     }
-    }
-    checkInactiveClinics();
+   }
+  }
+  checkInactiveClinics();
 
-    $('.dropdown-trigger').on('click', function(event) {
-     event.stopPropagation();
-     dropdownOpen = !dropdownOpen;
-     $(this).toggleClass('border border-primary');
-     $('.my-dropdown-menu').toggleClass('d-none');
-     setTimeout(() => {
+  $('.dropdown-trigger').on('click', function(event) {
+   event.stopPropagation();
+   dropdownOpen = !dropdownOpen;
+   $(this).toggleClass('border border-primary');
+   $('.my-dropdown-menu').toggleClass('d-none');
+   setTimeout(() => {
     dropdownOpen = $('.my-dropdown-menu').is(':visible');
-     }, 100);
-    });
+   }, 100);
+  });
 
-    $(document).on('click', function() {
-     if (dropdownOpen) {
+  $(document).on('click', function() {
+   if (dropdownOpen) {
     $('.dropdown-trigger').removeClass('border border-primary');
     $('.my-dropdown-menu').addClass('d-none');
     dropdownOpen = false;
-     }
-    });
+   }
+  });
 
-    $('.my-dropdown-menu').on('click', function(event) {
-     event.stopPropagation();
-    });
+  $('.my-dropdown-menu').on('click', function(event) {
+   event.stopPropagation();
+  });
 
-    $('.option-card').on('click', function() {
-     var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
-     var selectedId = $(this).attr('data-id');
-     $('.option-card').removeClass('card-active');
-     $(this).addClass('card-active');
-     $('.dropdown-label').text(selectedText);
+  $('.option-card').on('click', function() {
+   var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+   var selectedId = $(this).attr('data-id');
+   $('.option-card').removeClass('card-active');
+   $(this).addClass('card-active');
+   $('.dropdown-label').text(selectedText);
 
-     localStorage.setItem('selectedClinic', selectedText);
-     localStorage.setItem('selectedClinicId', selectedId);
-     checkInactiveClinics();
-     $('.dropdown-trigger').removeClass('border border-primary');
-     $('.my-dropdown-menu').addClass('d-none');
-     dropdownOpen = false;
+   localStorage.setItem('selectedClinic', selectedText);
+   localStorage.setItem('selectedClinicId', selectedId);
+   checkInactiveClinics();
+   $('.dropdown-trigger').removeClass('border border-primary');
+   $('.my-dropdown-menu').addClass('d-none');
+   dropdownOpen = false;
 
-     // ریلود صفحه با پارامتر جدید
-     window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
-    });
-     });
-     $(document).on('click', '.add-secretary-btn', function() {
-    const modal = $('#addSecretaryModal');
-    if (modal.length) {
-     modal.modal('show');
-    }
-     });
+   // ریلود صفحه با پارامتر جدید
+   window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
+  });
+ });
+ $(document).on('click', '.add-secretary-btn', function() {
+  const modal = $('#addSecretaryModal');
+  if (modal.length) {
+   modal.modal('show');
+  }
+ });
 
-     function updateSecretaryList(secretaries) {
-    const container = $('.subuser-cards');
-    container.empty(); // پاک کردن لیست قبلی
+ function updateSecretaryList(secretaries) {
+  const container = $('.subuser-cards');
+  container.empty(); // پاک کردن لیست قبلی
 
-    if (secretaries.length === 0) {
-     container.append(
+  if (secretaries.length === 0) {
+   container.append(
     `<div class="alert alert-info w-100 d-flex justify-content-center align-items-center">
       شما منشی فعالی ندارید
       </div>
 
       `
-     );
-    } else {
-     secretaries.forEach(secretary => {
+   );
+  } else {
+   secretaries.forEach(secretary => {
     const card = `
       <div class="subuser-card p-3 w-100 d-flex justify-content-between align-items-end">
       <div>
@@ -367,27 +367,27 @@
       </div>
       `;
     container.append(card);
-     });
-    }
-     }
+   });
+  }
+ }
 
-     $(document).ready(function() {
-    $('#add-secretary-form').on('submit', function(e) {
-     e.preventDefault();
+ $(document).ready(function() {
+  $('#add-secretary-form').on('submit', function(e) {
+   e.preventDefault();
 
-     const form = $(this);
-     const submitButton = form.find('button[type="submit"]');
-     const loader = submitButton.find('.loader');
-     const buttonText = submitButton.find('.button_text');
+   const form = $(this);
+   const submitButton = form.find('button[type="submit"]');
+   const loader = submitButton.find('.loader');
+   const buttonText = submitButton.find('.button_text');
 
-     // پنهان کردن متن دکمه و نمایش لودینگ
-     buttonText.hide();
-     loader.show();
+   // پنهان کردن متن دکمه و نمایش لودینگ
+   buttonText.hide();
+   loader.show();
 
-     // پاک کردن پیام‌های خطای قبلی
-     form.find('.text-danger').text('');
+   // پاک کردن پیام‌های خطای قبلی
+   form.find('.text-danger').text('');
 
-     $.ajax({
+   $.ajax({
     url: "{{ route('dr-secretary-store') }}",
     method: 'POST',
     data: form.serialize() + '&selectedClinicId=' + localStorage.getItem('selectedClinicId'),
@@ -416,14 +416,14 @@
 
        // پیدا کردن لیبل مرتبط با فیلد
        const relatedLabel = form.find(`input[name="${key}"], select[name="${key}"]`).siblings(
-      '.label-top-input-special-takhasos');
+        '.label-top-input-special-takhasos');
 
        if (relatedLabel.length > 0) {
-      // اعمال استایل برای خطاها
-      relatedLabel.css({
-       'position': 'absolute',
-       'bottom': relatedLabel.hasClass('password-label') ? '32px' : '56px'
-      });
+        // اعمال استایل برای خطاها
+        relatedLabel.css({
+         'position': 'absolute',
+         'bottom': relatedLabel.hasClass('password-label') ? '32px' : '56px'
+        });
        }
       });
 
@@ -436,15 +436,15 @@
      buttonText.show();
      loader.hide();
     },
-     });
-    });
+   });
+  });
 
 
-    $(document).on('click', '.edit-btn', function() {
-     const id = $(this).data('id');
-     const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
+  $(document).on('click', '.edit-btn', function() {
+   const id = $(this).data('id');
+   const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
 
-     $.get(
+   $.get(
     "{{ route('dr-secretary-edit', ':id') }}".replace(':id', id) +
     '?selectedClinicId=' + selectedClinicId,
     function(response) {
@@ -456,77 +456,78 @@
      $('#edit-national-code').val(response.national_code);
      $('#editSecretaryModal').modal('show');
     }
-     ).fail(function() {
+   ).fail(function() {
     toastr.error('خطا در دریافت اطلاعات منشی!');
-     });
-    });
+   });
+  });
 
 
-     $('#edit-secretary-form').on('submit', function (e) {
-     e.preventDefault();
-     const id = $('#edit-secretary-id').val();
-     const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
-     const form = $(this);
-     const submitButton = form.find('button[type="submit"]');
-     const loader = submitButton.find('.loader');
-     const buttonText = submitButton.find('.button_text');
+  $('#edit-secretary-form').on('submit', function(e) {
+   e.preventDefault();
+   const id = $('#edit-secretary-id').val();
+   const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
+   const form = $(this);
+   const submitButton = form.find('button[type="submit"]');
+   const loader = submitButton.find('.loader');
+   const buttonText = submitButton.find('.button_text');
 
-     buttonText.hide();
-     loader.show();
+   buttonText.hide();
+   loader.show();
 
-     const formData = form.serialize() + '&selectedClinicId=' + selectedClinicId;
+   const formData = form.serialize() + '&selectedClinicId=' + selectedClinicId;
 
+   $.ajax({
+    url: "{{ route('dr-secretary-update', ':id') }}".replace(':id', id),
+    method: 'POST',
+    data: formData,
+    success: function(response) {
+     toastr.success('منشی با موفقیت ویرایش شد!');
+     buttonText.show();
+     loader.hide();
+     $('#editSecretaryModal').modal('hide');
+     $('body').removeClass('modal-open');
+     $('.modal-backdrop').remove();
+     updateSecretaryList(response.secretaries);
+    },
+    error: function() {
+     buttonText.show();
+     loader.hide();
+     toastr.error('خطا در ویرایش منشی!');
+    },
+   });
+  });
+  $(document).on('click', '.delete-btn', function() {
+   const id = $(this).data('id');
+   const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
+
+   Swal.fire({
+    title: 'آیا مطمئن هستید؟',
+    text: 'این عمل قابل بازگشت نیست!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'بله',
+    cancelButtonText: 'لغو',
+   }).then((result) => {
+    if (result.isConfirmed) {
      $.ajax({
-       url: "{{ route('dr-secretary-update', ':id') }}".replace(':id', id),
-       method: 'POST',
-       data: formData,
-       success: function (response) {
-       toastr.success('منشی با موفقیت ویرایش شد!');
-       buttonText.show();
-       loader.hide();
-       $('#editSecretaryModal').modal('hide');
-       $('body').removeClass('modal-open');
-       $('.modal-backdrop').remove();
+      url: "{{ route('dr-secretary-delete', ':id') }}".replace(':id', id) + '?selectedClinicId=' +
+       selectedClinicId,
+      method: 'DELETE',
+      headers: {
+       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      success: function(response) {
+       toastr.success('منشی با موفقیت حذف شد!');
        updateSecretaryList(response.secretaries);
-       },
-       error: function () {
-       buttonText.show();
-       loader.hide();
-       toastr.error('خطا در ویرایش منشی!');
-       },
+      },
+      error: function() {
+       toastr.error('خطا در حذف منشی!');
+      },
      });
-     });
-     $(document).on('click', '.delete-btn', function () {
-       const id = $(this).data('id');
-       const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
+    }
+   });
+  });
 
-       Swal.fire({
-       title: 'آیا مطمئن هستید؟',
-       text: 'این عمل قابل بازگشت نیست!',
-       icon: 'warning',
-       showCancelButton: true,
-       confirmButtonText: 'بله',
-       cancelButtonText: 'لغو',
-       }).then((result) => {
-       if (result.isConfirmed) {
-         $.ajax({
-         url: "{{ route('dr-secretary-delete', ':id') }}".replace(':id', id) + '?selectedClinicId=' + selectedClinicId,
-         method: 'DELETE',
-         headers: {
-           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-         },
-         success: function (response) {
-           toastr.success('منشی با موفقیت حذف شد!');
-           updateSecretaryList(response.secretaries);
-         },
-         error: function () {
-           toastr.error('خطا در حذف منشی!');
-         },
-         });
-       }
-       });
-     });
-
-     });
-    </script>
+ });
+</script>
 @endsection

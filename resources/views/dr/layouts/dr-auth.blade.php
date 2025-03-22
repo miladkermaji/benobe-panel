@@ -81,7 +81,7 @@
    const originalToastrError = toastr.error;
 
    // بازنویسی تابع toastr.success
-   toastr.success = function (message, title, options) {
+   toastr.success = function(message, title, options) {
     if (!window.toastrState.successShown) {
      originalToastrSuccess.call(this, message, title, options);
      window.toastrState.successShown = true;
@@ -89,7 +89,7 @@
    };
 
    // بازنویسی تابع toastr.error
-   toastr.error = function (message, title, options) {
+   toastr.error = function(message, title, options) {
     if (!window.toastrState.errorShown) {
      originalToastrError.call(this, message, title, options);
      window.toastrState.errorShown = true;

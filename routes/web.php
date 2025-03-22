@@ -256,16 +256,23 @@ Route::prefix('admin')
 
 // end manager  routes
 // dr routes
-Route::prefix('dr')->namespace('Dr')->group(function () {
+Route::prefix('dr')
+    ->namespace('Dr')
+    ->group(function () {
+   
 
-    Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {
+Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {
         Route::get('/', [DrPanelController::class, 'index'])->middleware('secretary.permission:dashboard')->name('dr-panel');
         Route::get('/doctor/appointments/by-date', [DrPanelController::class, 'getAppointmentsByDate'])
             ->name('doctor.appointments.by-date');
         Route::get('/search/patients', [DrPanelController::class, 'searchPatients'])->name('search.patients');
         Route::post('/appointments/update-date/{id}', [DrPanelController::class, 'updateAppointmentDate'])
             ->name('updateAppointmentDate');
-
+ Route::prefix('doctornotes')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'index'])->name('dr.panel.doctornotes.index');
+        Route::get('/create', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'create'])->name('dr.panel.doctornotes.create');
+        Route::get('/edit/{id}', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'edit'])->name('dr.panel.doctornotes.edit');
+    });
         Route::get('/doctor/appointments/filter', [DrPanelController::class, 'filterAppointments'])->name('doctor.appointments.filter');
 
         Route::prefix('turn')->middleware('secretary.permission:appointments')->group(function () {
@@ -307,7 +314,7 @@ Route::prefix('dr')->namespace('Dr')->group(function () {
                     Route::post('/update/{id}', [VacationController::class, 'update'])->middleware('secretary.permission:appointments')->name('doctor.vacation.update');
                     Route::delete('/delete/{id}', [VacationController::class, 'destroy'])->middleware('secretary.permission:appointments')->name('doctor.vacation.destroy');
                     Route::get('/doctor/vacation/{id}/edit', [VacationController::class, 'edit'])->middleware('secretary.permission:appointments')->name('doctor.vacation.edit');
-                });
+});
 
                 Route::prefix('scheduleSetting/blocking_users')->group(function () {
                     Route::get('/', [BlockingUsersController::class, 'index'])

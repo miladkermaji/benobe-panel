@@ -4,8 +4,8 @@
  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
  <link type="text/css" href="{{ asset('dr-assets/panel/css/profile/subuser.css') }}" rel="stylesheet" />
  <style>
-  .myPanelOption{
-    display: none;
+  .myPanelOption {
+   display: none;
   }
  </style>
 @endsection
@@ -365,7 +365,7 @@
      }
     },
     error: function() {
-        toastr.error('خطا در دریافت اطلاعات مطب!');
+     toastr.error('خطا در دریافت اطلاعات مطب!');
     },
    });
   });
@@ -388,15 +388,15 @@
     method: 'POST',
     data: form.serialize(),
     success: function() {
-        toastr.success('مطب با موفقیت اضافه شد!');
+     toastr.success('مطب با موفقیت اضافه شد!');
 
-    
+
      $('#clinicModal').modal('hide');
      loadClinics(); // بروزرسانی لیست مطب‌ها
     },
     error: function(xhr) {
      handleValidationErrors(xhr, form);
-        toastr.error('خطا در ذخیره اطلاعات!');
+     toastr.error('خطا در ذخیره اطلاعات!');
     },
     complete: function() {
      buttonText.show();
@@ -418,14 +418,14 @@
     method: 'POST',
     data: form.serialize(),
     success: function() {
-        toastr.success('مطب با موفقیت ویرایش شد!');
+     toastr.success('مطب با موفقیت ویرایش شد!');
 
      $('#clinicEditModal').modal('hide');
      loadClinics();
     },
     error: function(xhr) {
      handleValidationErrors(xhr, form);
-        toastr.error('خطا در ذخیره اطلاعات!');
+     toastr.error('خطا در ذخیره اطلاعات!');
     },
     complete: function() {
      buttonText.show();
@@ -453,11 +453,11 @@
        _token: $('meta[name="csrf-token"]').attr('content'),
       },
       success: function() {
-        toastr.success('مطب با موفقیت حذف شد!');
+       toastr.success('مطب با موفقیت حذف شد!');
        loadClinics();
       },
       error: function() {
-        toastr.error('خطا در حذف مطب!');
+       toastr.error('خطا در حذف مطب!');
       },
      });
     }

@@ -1,12 +1,12 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
-   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-   <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
-    <style>
-    .myPanelOption {
-      display: none;
-    }
-    </style>
+ <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
+ <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
+ <style>
+  .myPanelOption {
+   display: none;
+  }
+ </style>
 @endsection
 @section('site-header')
  {{ 'به نوبه | پنل دکتر' }}
@@ -493,9 +493,9 @@
          <div class="password_toggle__AXK9v">
           <input type="checkbox" id="secure_call" name="secure_call" value="1"
            {{ ($messengers->where('messenger_type', 'ita')->first()->is_secure_call ?? false) ||
-  ($messengers->where('messenger_type', 'whatsapp')->first()->is_secure_call ?? false)
-  ? 'checked'
-  : '' }}>
+           ($messengers->where('messenger_type', 'whatsapp')->first()->is_secure_call ?? false)
+               ? 'checked'
+               : '' }}>
           <label for="secure_call">Toggle</label>
          </div>
         </div>

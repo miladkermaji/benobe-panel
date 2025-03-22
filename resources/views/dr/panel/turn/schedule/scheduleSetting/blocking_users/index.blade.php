@@ -218,22 +218,22 @@
 </div>
 @endsection
 @section('scripts')
-  <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/vacation/vacation.js') }}"></script>
-  <script>
-   $(document).ready(function() {
+<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/vacation/vacation.js') }}"></script>
+<script>
+ $(document).ready(function() {
   let dropdownOpen = false;
   let selectedClinic = localStorage.getItem('selectedClinic');
   let selectedClinicId = localStorage.getItem('selectedClinicId');
   if (selectedClinic && selectedClinicId) {
    $('.dropdown-label').text(selectedClinic);
    $('.option-card').each(function() {
-  if ($(this).attr('data-id') === selectedClinicId) {
-   $('.option-card').removeClass('card-active');
-   $(this).addClass('card-active');
-  }
+    if ($(this).attr('data-id') === selectedClinicId) {
+     $('.option-card').removeClass('card-active');
+     $(this).addClass('card-active');
+    }
    });
   } else {
    localStorage.setItem('selectedClinic', 'ویزیت آنلاین به نوبه');
@@ -243,9 +243,9 @@
   function checkInactiveClinics() {
    var hasInactiveClinics = $('.option-card[data-active="0"]').length > 0;
    if (hasInactiveClinics) {
-  $('.dropdown-trigger').addClass('warning');
+    $('.dropdown-trigger').addClass('warning');
    } else {
-  $('.dropdown-trigger').removeClass('warning');
+    $('.dropdown-trigger').removeClass('warning');
    }
   }
   checkInactiveClinics();
@@ -256,15 +256,15 @@
    $(this).toggleClass('border border-primary');
    $('.my-dropdown-menu').toggleClass('d-none');
    setTimeout(() => {
-  dropdownOpen = $('.my-dropdown-menu').is(':visible');
+    dropdownOpen = $('.my-dropdown-menu').is(':visible');
    }, 100);
   });
 
   $(document).on('click', function() {
    if (dropdownOpen) {
-  $('.dropdown-trigger').removeClass('border border-primary');
-  $('.my-dropdown-menu').addClass('d-none');
-  dropdownOpen = false;
+    $('.dropdown-trigger').removeClass('border border-primary');
+    $('.my-dropdown-menu').addClass('d-none');
+    dropdownOpen = false;
    }
   });
 
@@ -289,17 +289,17 @@
    // ریلود صفحه با پارامتر جدید
    window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
   });
-   });
-   $('#smsRecipient').on('change', function() {
+ });
+ $('#smsRecipient').on('change', function() {
   const specificField = $('#specificRecipientField');
   if ($(this).val() === 'specific') {
    specificField.show();
   } else {
    specificField.hide();
   }
-   });
+ });
 
-   $('#sendSmsForm').on('submit', function(e) {
+ $('#sendSmsForm').on('submit', function(e) {
   e.preventDefault();
 
   const form = $(this);
@@ -325,39 +325,39 @@
    method: "POST",
    data: $.param(formData), // تبدیل آرایه داده‌ها به رشته
    success: function(response) {
-  if (response.success) {
-   toastr.success(response.message);
+    if (response.success) {
+     toastr.success(response.message);
 
-   const modal = $('#sendSmsModal');
-   modal.modal('hide');
-   modal.on('hidden.bs.modal', function() {
-    $('body').removeClass('modal-open');
-    $('.modal-backdrop').remove();
-   });
-   form[0].reset();
-   loadMessages(); // بروزرسانی لیست پیام‌ها
-  } else {
-   toastr.error(response.message);
-  }
+     const modal = $('#sendSmsModal');
+     modal.modal('hide');
+     modal.on('hidden.bs.modal', function() {
+      $('body').removeClass('modal-open');
+      $('.modal-backdrop').remove();
+     });
+     form[0].reset();
+     loadMessages(); // بروزرسانی لیست پیام‌ها
+    } else {
+     toastr.error(response.message);
+    }
    },
    error: function(xhr) {
-  if (xhr.status === 422) {
-   const errorMessage = xhr.responseJSON.message || "خطای اعتبارسنجی رخ داده است.";
-   toastr.error(errorMessage);
-  } else {
-   toastr.error("خطا در ارسال پیام!");
-  }
+    if (xhr.status === 422) {
+     const errorMessage = xhr.responseJSON.message || "خطای اعتبارسنجی رخ داده است.";
+     toastr.error(errorMessage);
+    } else {
+     toastr.error("خطا در ارسال پیام!");
+    }
    },
    complete: function() {
-  button.prop('disabled', false);
-  buttonText.show();
-  loader.hide();
+    button.prop('disabled', false);
+    buttonText.show();
+    loader.hide();
    }
   });
-   });
-  </script>
-  <script>
-   function appendBlockedUser(user) {
+ });
+</script>
+<script>
+ function appendBlockedUser(user) {
   const tableBody = $('#blockedUsersTable tbody');
   const rowCount = tableBody.find('tr').length;
 
@@ -391,11 +391,11 @@
 
   tableBody.append(newRow);
   $('[data-toggle="tooltip"]').tooltip();
-   }
+ }
 
 
 
-   $('#addUserForm').on('submit', function(e) {
+ $('#addUserForm').on('submit', function(e) {
   e.preventDefault();
 
   const form = $(this);
@@ -421,59 +421,59 @@
    method: "POST",
    data: $.param(formData), // تبدیل آرایه داده‌ها به رشته
    success: function(response) {
-  if (response.success) {
-   toastr.success(response.message);
-   appendBlockedUser(response.blocking_user); // ارسال داده به تابع
-   form[0].reset();
+    if (response.success) {
+     toastr.success(response.message);
+     appendBlockedUser(response.blocking_user); // ارسال داده به تابع
+     form[0].reset();
 
-   const modal = $('#addUserModal');
-   modal.modal('hide');
-   modal.on('hidden.bs.modal', function() {
-    $('body').removeClass('modal-open');
-    $('.modal-backdrop').remove();
-   });
-  }
+     const modal = $('#addUserModal');
+     modal.modal('hide');
+     modal.on('hidden.bs.modal', function() {
+      $('body').removeClass('modal-open');
+      $('.modal-backdrop').remove();
+     });
+    }
    },
    error: function(xhr) {
-  const errorMessage = xhr.responseJSON?.message || "خطا در ذخیره‌سازی!";
-  toastr.error(errorMessage);
+    const errorMessage = xhr.responseJSON?.message || "خطا در ذخیره‌سازی!";
+    toastr.error(errorMessage);
    },
    complete: function() {
-  button.prop('disabled', false);
-  buttonText.show();
-  loader.hide();
+    button.prop('disabled', false);
+    buttonText.show();
+    loader.hide();
    }
   });
-   });
+ });
 
 
 
 
 
 
-   function loadBlockedUsers() {
+ function loadBlockedUsers() {
   const selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
 
   $.ajax({
    url: "{{ route('doctor-blocking-users.index') }}",
    method: "GET",
    data: {
-  selectedClinicId: selectedClinicId // افزودن کلینیک به درخواست
+    selectedClinicId: selectedClinicId // افزودن کلینیک به درخواست
    },
    success: function(response) {
-  // به‌روزرسانی لیست کاربران مسدود
-  console.log(response);
+    // به‌روزرسانی لیست کاربران مسدود
+    console.log(response);
 
-  const tableBody = $('#blockedUsersTable tbody');
-  tableBody.empty();
+    const tableBody = $('#blockedUsersTable tbody');
+    tableBody.empty();
 
-  if (response.blockedUsers.length === 0) {
-   tableBody.append('<tr><td colspan="7" class="text-center">هیچ کاربر مسدودی یافت نشد.</td></tr>');
-   return;
-  }
+    if (response.blockedUsers.length === 0) {
+     tableBody.append('<tr><td colspan="7" class="text-center">هیچ کاربر مسدودی یافت نشد.</td></tr>');
+     return;
+    }
 
-  response.blockedUsers.forEach((user, index) => {
-   tableBody.append(`
+    response.blockedUsers.forEach((user, index) => {
+     tableBody.append(`
     <tr data-id="${user.id}">
     <td>${user.user.first_name} ${user.user.last_name}</td>
     <td>${user.user.mobile}</td>
@@ -497,19 +497,19 @@
     </td>
     </tr>
     `);
-  });
+    });
 
-  // فعال‌سازی تولتیپ‌ها
-  $('[data-toggle="tooltip"]').tooltip();
+    // فعال‌سازی تولتیپ‌ها
+    $('[data-toggle="tooltip"]').tooltip();
    },
    error: function() {
-  toastr.error("خطا در بارگذاری لیست کاربران!");
+    toastr.error("خطا در بارگذاری لیست کاربران!");
    }
   });
-   }
+ }
 
-   // تغییر از $(document).on('click', '.delete-user-btn', function (e) به این صورت:
-   $(document).on('click', '#blockedUsersTable .delete-user-btn', function(e) {
+ // تغییر از $(document).on('click', '.delete-user-btn', function (e) به این صورت:
+ $(document).on('click', '#blockedUsersTable .delete-user-btn', function(e) {
   e.preventDefault();
 
   const row = $(this).closest('tr'); // پیدا کردن ردیف
@@ -517,9 +517,9 @@
 
   if (!userId) {
    Swal.fire(
-  'خطا!',
-  'شناسه کاربر یافت نشد.',
-  'error'
+    'خطا!',
+    'شناسه کاربر یافت نشد.',
+    'error'
    );
    return;
   }
@@ -535,72 +535,72 @@
    cancelButtonText: 'لغو'
   }).then((result) => {
    if (result.isConfirmed) {
-  // ارسال درخواست حذف با ایجکس
-  $.ajax({
-   url: "{{ route('doctor-blocking-users.destroy', ['id' => ':userId']) }}".replace(':userId', userId),
-   method: 'DELETE',
-   data: {
-    _token: '{{ csrf_token() }}',
-    selectedClinicId:localStorage.getItem('selectedClinicId')
-   },
-   success: function(response) {
-    if (response.success) {
-     Swal.fire(
-    'حذف شد!',
-    response.message || 'کاربر با موفقیت حذف شد.',
-    'success'
-     );
-     // حذف ردیف از جدول
-     row.remove();
-    } else {
-     Swal.fire(
-    'خطا!',
-    response.message || 'خطا در حذف کاربر.',
-    'error'
-     );
-    }
-   },
-   error: function(xhr) {
-    Swal.fire(
-     'خطا!',
-     xhr.responseJSON?.message || 'خطایی رخ داده است.',
-     'error'
-    );
+    // ارسال درخواست حذف با ایجکس
+    $.ajax({
+     url: "{{ route('doctor-blocking-users.destroy', ['id' => ':userId']) }}".replace(':userId', userId),
+     method: 'DELETE',
+     data: {
+      _token: '{{ csrf_token() }}',
+      selectedClinicId: localStorage.getItem('selectedClinicId')
+     },
+     success: function(response) {
+      if (response.success) {
+       Swal.fire(
+        'حذف شد!',
+        response.message || 'کاربر با موفقیت حذف شد.',
+        'success'
+       );
+       // حذف ردیف از جدول
+       row.remove();
+      } else {
+       Swal.fire(
+        'خطا!',
+        response.message || 'خطا در حذف کاربر.',
+        'error'
+       );
+      }
+     },
+     error: function(xhr) {
+      Swal.fire(
+       'خطا!',
+       xhr.responseJSON?.message || 'خطایی رخ داده است.',
+       'error'
+      );
+     }
+    });
    }
   });
-   }
-  });
-   });
+ });
 
 
 
 
 
-   // بارگذاری پیام‌ها
-   function loadMessages() {
+ // بارگذاری پیام‌ها
+ function loadMessages() {
   $.ajax({
    url: "{{ route('doctor-blocking-users.messages') }}",
    method: "GET",
-   data:{
-   selectedClinicId: localStorage.getItem('selectedClinicId')
+   data: {
+    selectedClinicId: localStorage.getItem('selectedClinicId')
 
    },
    success: function(messages) {
-  const tableBody = $('#messagesTableBody');
-  tableBody.empty();
+    const tableBody = $('#messagesTableBody');
+    tableBody.empty();
 
-  messages.forEach((message, index) => {
-   const recipientName = message.user ?
-    `${message.user.first_name} ${message.user.last_name}` :
-    'نامشخص';
+    messages.forEach((message, index) => {
+     const recipientName = message.user ?
+      `${message.user.first_name} ${message.user.last_name}` :
+      'نامشخص';
 
-   const jalaliDate = new Intl.DateTimeFormat('fa-IR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-   }).format(new Date(message.created_at));
+     const jalaliDate = new Intl.DateTimeFormat('fa-IR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+     }).format(new Date(message.created_at));
 
-   tableBody.append(`
+     tableBody.append(`
     <tr data-id="${message.id}">
     <td>${message.title}</td>
     <td>${message.content}</td>
@@ -613,23 +613,23 @@
     </td>
     </tr>
     `);
-  });
+    });
    },
    error: function() {
-  toastr.error("خطا در بارگذاری پیام‌ها!");
+    toastr.error("خطا در بارگذاری پیام‌ها!");
 
    }
   });
-   }
-   loadMessages()
-   // بارگذاری اولیه پیام‌ها
-   // فعال‌سازی تولتیپ بوت‌استرپ
-   $(document).ready(function() {
+ }
+ loadMessages()
+ // بارگذاری اولیه پیام‌ها
+ // فعال‌سازی تولتیپ بوت‌استرپ
+ $(document).ready(function() {
   $('[data-toggle="tooltip"]').tooltip();
-   });
+ });
 
-   // تغییر وضعیت مسدودی کاربر
-   function toggleStatus(element) {
+ // تغییر وضعیت مسدودی کاربر
+ function toggleStatus(element) {
   const userId = $(element).data('id');
   const currentStatus = $(element).data('status');
   const newStatus = currentStatus === 1 ? 0 : 1;
@@ -648,46 +648,46 @@
    cancelButtonColor: '#3085d6',
   }).then((result) => {
    if (result.isConfirmed) {
-  // ارسال درخواست AJAX برای تغییر وضعیت
-  $.ajax({
-   url: "{{ route('doctor-blocking-users.update-status') }}",
-   method: "PATCH",
-   data: {
-    _token: '{{ csrf_token() }}',
-    selectedClinicId: localStorage.getItem('selectedClinicId'),
-    id: userId,
-    status: newStatus,
-   },
-   success: function(response) {
-    if (response.success) {
-     // تغییر متن وضعیت
-     $(element)
-    .removeClass('text-danger text-success')
-    .addClass(newStatus === 1 ? 'text-danger' : 'text-success')
-    .text(statusText);
-     $(element).data('status', newStatus);
+    // ارسال درخواست AJAX برای تغییر وضعیت
+    $.ajax({
+     url: "{{ route('doctor-blocking-users.update-status') }}",
+     method: "PATCH",
+     data: {
+      _token: '{{ csrf_token() }}',
+      selectedClinicId: localStorage.getItem('selectedClinicId'),
+      id: userId,
+      status: newStatus,
+     },
+     success: function(response) {
+      if (response.success) {
+       // تغییر متن وضعیت
+       $(element)
+        .removeClass('text-danger text-success')
+        .addClass(newStatus === 1 ? 'text-danger' : 'text-success')
+        .text(statusText);
+       $(element).data('status', newStatus);
 
-     toastr.success(response.message);
+       toastr.success(response.message);
 
 
-     // بروزرسانی لیست پیام‌ها
-     loadMessages();
-    } else {
-     toastr.error(response.message);
+       // بروزرسانی لیست پیام‌ها
+       loadMessages();
+      } else {
+       toastr.error(response.message);
 
-    }
-   },
-   error: function() {
-    toastr.error('خطا در تغییر وضعیت.');
+      }
+     },
+     error: function() {
+      toastr.error('خطا در تغییر وضعیت.');
 
-   },
-  });
+     },
+    });
    }
   });
-   }
+ }
 
 
-   function deleteMessage(messageId, element) {
+ function deleteMessage(messageId, element) {
   Swal.fire({
    title: 'آیا مطمئن هستید؟',
    text: 'این پیام برای همیشه حذف خواهد شد!',
@@ -699,36 +699,36 @@
    cancelButtonColor: '#3085d6',
   }).then((result) => {
    if (result.isConfirmed) {
-  // ارسال درخواست حذف پیام
-  $.ajax({
-   url: "{{ route('doctor-blocking-users.delete-message', '') }}/" + messageId,
-   method: "DELETE",
-   data: {
-    _token: "{{ csrf_token() }}",
-    selectedClinicId: localStorage.getItem('selectedClinicId')
+    // ارسال درخواست حذف پیام
+    $.ajax({
+     url: "{{ route('doctor-blocking-users.delete-message', '') }}/" + messageId,
+     method: "DELETE",
+     data: {
+      _token: "{{ csrf_token() }}",
+      selectedClinicId: localStorage.getItem('selectedClinicId')
 
-   },
-   success: function(response) {
-    if (response.success) {
-     // حذف سطر از جدول
-     $(element).closest('tr').remove();
+     },
+     success: function(response) {
+      if (response.success) {
+       // حذف سطر از جدول
+       $(element).closest('tr').remove();
 
-     // نمایش پیام موفقیت
-     toastr.success('پیام با موفقیت حذف شد.');
+       // نمایش پیام موفقیت
+       toastr.success('پیام با موفقیت حذف شد.');
 
-    } else {
-     toastr.error('خطا در حذف پیام.');
+      } else {
+       toastr.error('خطا در حذف پیام.');
 
-    }
-   },
-   error: function() {
-    toastr.error('خطا در ارتباط با سرور.');
+      }
+     },
+     error: function() {
+      toastr.error('خطا در ارتباط با سرور.');
 
+     }
+    });
    }
   });
-   }
-  });
-   }
-  </script>
+ }
+</script>
 
 @endsection

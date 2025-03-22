@@ -15,7 +15,7 @@
  </title>
 
  @include('dr.panel.my-tools.loader-btn')
-@livewireStyles
+ @livewireStyles
 
 </head>
 
@@ -46,8 +46,8 @@
      <div class="my-tooltip mx-2">
       <svg data-toggle="tooltip" data-placement="bottom"
        title="از این قسمت، مرکزی که در آن مشغول تجویز و طبابت هستید را انتخاب کنید" width="16" height="17"
-       viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg" class=" lg:block svg-help"
-       color="#3f4079" data-tip="true" data-for="centerSelect" currentItem="false">
+       viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg" class=" lg:block svg-help" color="#3f4079"
+       data-tip="true" data-for="centerSelect" currentItem="false">
        <path
         d="M8.00006 9.9198V9.70984C8.00006 9.02984 8.42009 8.66982 8.84009 8.37982C9.25009 8.09982 9.66003 7.73983 9.66003 7.07983C9.66003 6.15983 8.92006 5.4198 8.00006 5.4198C7.08006 5.4198 6.34009 6.15983 6.34009 7.07983"
         stroke="#3f4079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -112,7 +112,8 @@
 
             <div class="d-flex flex-column mx-3">
              <span class="font-weight-bold d-block fs-15"> {{ $clinic->name }}</span>
-          <span class="font-weight-bold d-block fs-13">{{ $clinic->province->name ?? '' }} ، {{ $clinic->city->name ?? '' }}</span>
+             <span class="font-weight-bold d-block fs-13">{{ $clinic->province->name ?? '' }} ،
+              {{ $clinic->city->name ?? '' }}</span>
             </div>
 
             @if (!$clinic->is_active)
@@ -141,60 +142,60 @@
   </div>
   @yield('content')
   @livewireScripts
-@networkStatus
+  @networkStatus
 </body>
 @include('dr.panel.layouts.partials.scripts')
 @yield('scripts')
-    <script>
-      // اسکریپت نویگیشن Livewire
-      Livewire.on('navigateTo', (event) => {
-        window.Livewire.navigate(event.url);
-      });
-    </script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    Livewire.on('refreshDeleteButton', (data) => {
-      document.getElementById('deleteButton').disabled = !data.hasSelectedRows;
-    });
+ // اسکریپت نویگیشن Livewire
+ Livewire.on('navigateTo', (event) => {
+  window.Livewire.navigate(event.url);
+ });
+</script>
+<script>
+ document.addEventListener("DOMContentLoaded", function() {
+  Livewire.on('refreshDeleteButton', (data) => {
+   document.getElementById('deleteButton').disabled = !data.hasSelectedRows;
   });
+ });
 </script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    Livewire.on('show-toastr', (data) => {
-      toastr.options = {
-        progressBar: true,
-        positionClass: "toast-top-right", // نمایش در سمت راست بالا
-        timeOut: 3000 // زمان نمایش
-      };
+ document.addEventListener('DOMContentLoaded', function() {
+  Livewire.on('show-toastr', (data) => {
+   toastr.options = {
+    progressBar: true,
+    positionClass: "toast-top-right", // نمایش در سمت راست بالا
+    timeOut: 3000 // زمان نمایش
+   };
 
-      if (data.type === 'success') {
-        toastr.success(data.message);
-      } else {
-        toastr.warning(data.message);
-      }
-    });
+   if (data.type === 'success') {
+    toastr.success(data.message);
+   } else {
+    toastr.warning(data.message);
+   }
   });
+ });
 </script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    Livewire.on('show-delete-confirmation', () => {
-      Swal.fire({
-        title: "آیا مطمئن هستید؟",
-        text: "این عملیات غیرقابل بازگشت است!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "بله، حذف شود!",
-        cancelButtonText: "لغو"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Livewire.dispatch('doDeleteSelected');
-        }
-      });
-    });
+ document.addEventListener("DOMContentLoaded", function() {
+  Livewire.on('show-delete-confirmation', () => {
+   Swal.fire({
+    title: "آیا مطمئن هستید؟",
+    text: "این عملیات غیرقابل بازگشت است!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "بله، حذف شود!",
+    cancelButtonText: "لغو"
+   }).then((result) => {
+    if (result.isConfirmed) {
+     Livewire.dispatch('doDeleteSelected');
+    }
+   });
   });
+ });
 </script>
 <script>
  $(document).ready(function() {

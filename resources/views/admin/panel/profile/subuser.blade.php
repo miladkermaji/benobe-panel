@@ -1,14 +1,14 @@
 @extends('dr.panel.layouts.master')
 
 @section('styles')
-   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-   <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
-   <link type="text/css" href="{{ asset('dr-assets/panel/css/profile/subuser.css') }}" rel="stylesheet" />
-    <style>
-    .myPanelOption {
-      display: none;
-    }
-    </style>
+ <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
+ <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
+ <link type="text/css" href="{{ asset('dr-assets/panel/css/profile/subuser.css') }}" rel="stylesheet" />
+ <style>
+  .myPanelOption {
+   display: none;
+  }
+ </style>
 @endsection
 
 @section('site-header', 'به نوبه | پنل دکتر')
@@ -310,7 +310,7 @@
     let selected = user.id === response.user_id ? 'selected' : '';
     $('#edit-user-select').append(
      `<option value="${user.id}" ${selected}>${user.first_name} ${user.last_name} -- ${user.national_code}</option>`
-     );
+    );
    });
 
    window.editUserSelect = new TomSelect("#edit-user-select", {
