@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -48,8 +49,8 @@ class DoctorAppointmentController extends Controller
             }
 
             $inPersonData = $selectedClinic
-            ? $this->getInPersonAppointmentData($doctor, $selectedClinic)
-            : $this->getInPersonAppointmentDataForAllClinics($doctor, $clinics);
+                ? $this->getInPersonAppointmentData($doctor, $selectedClinic)
+                : $this->getInPersonAppointmentDataForAllClinics($doctor, $clinics);
             $onlineData = $this->getOnlineAppointmentData($doctor);
 
             return response()->json([
@@ -91,7 +92,6 @@ class DoctorAppointmentController extends Controller
                     ],
                 ],
             ], 200);
-
         } catch (\Exception $e) {
             Log::error('GetAppointmentOptions - Error: ' . $e->getMessage());
             return response()->json([
@@ -187,298 +187,296 @@ class DoctorAppointmentController extends Controller
         return $data;
     }
 
-private function getNextAvailableSlot($doctor, $clinicId)
-{
-    $doctorId        = $doctor->id;
-    $today           = Carbon::today('Asia/Tehran');
-    $now             = Carbon::now('Asia/Tehran');
-    $daysOfWeek      = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    $currentDayIndex = $today->dayOfWeek;
+    private function getNextAvailableSlot($doctor, $clinicId)
+    {
+        $doctorId        = $doctor->id;
+        $today           = Carbon::today('Asia/Tehran');
+        $now             = Carbon::now('Asia/Tehran');
+        $daysOfWeek      = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        $currentDayIndex = $today->dayOfWeek;
 
-   
 
-    $appointmentConfig = $doctor->appointmentConfig;
-    $calendarDays      = $appointmentConfig ? ($appointmentConfig->calendar_days ?? 30) : 30;
-    $duration          = $appointmentConfig ? ($appointmentConfig->appointment_duration ?? 15) : 15;
 
-    $schedules = $doctor->workSchedules;
-    if ($schedules->isEmpty()) {
-        return ['next_available_slot' => null, 'slots' => [], 'max_appointments' => 0];
-    }
+        $appointmentConfig = $doctor->appointmentConfig;
+        $calendarDays      = $appointmentConfig ? ($appointmentConfig->calendar_days ?? 30) : 30;
+        $duration          = $appointmentConfig ? ($appointmentConfig->appointment_duration ?? 15) : 15;
 
-    $bookedAppointments = Appointment::where('doctor_id', $doctorId)
-        ->where('clinic_id', $clinicId)
-        ->where('status', 'scheduled')
-        ->orwhere('status', 'pending_review')
-        ->where('appointment_date', '>=', $today->toDateString())
-        ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
-        ->get()
-        ->groupBy(function ($appointment) {
-        return Carbon::parse($appointment->appointment_date)->toDateString();
-    });
-    Log::debug("GetNextAvailableSlot - Booked appointments: ", ['bookedAppointments' => $bookedAppointments->toArray()]);
+        $schedules = $doctor->workSchedules;
+        if ($schedules->isEmpty()) {
+            return ['next_available_slot' => null, 'slots' => [], 'max_appointments' => 0];
+        }
 
-    $slots             = [];
-    $nextAvailableSlot = null;
+        $bookedAppointments = Appointment::where('doctor_id', $doctorId)
+            ->where('clinic_id', $clinicId)
+            ->where(function ($query) {
+                $query->where('status', 'scheduled')
+                    ->orWhere('status', 'pending_review');
+            })
+            ->where('appointment_date', '>=', $today->toDateString())
+            ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
+            ->get();
+        Log::debug("GetNextAvailableSlot - Booked appointments: ", ['bookedAppointments' => $bookedAppointments->toArray()]);
 
-    for ($i = 0; $i < $calendarDays; $i++) {
-        $checkDayIndex  = ($currentDayIndex + $i) % 7;
-        $dayName        = $daysOfWeek[$checkDayIndex];
-        $checkDate      = $today->copy()->addDays($i);
-        $jalaliDate     = Jalalian::fromCarbon($checkDate)->format('j F Y');
-        $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
+        $slots             = [];
+        $nextAvailableSlot = null;
 
-        Log::debug("GetNextAvailableSlot - Checking date: {$checkDate->toDateString()}", [
-            'dayName' => $dayName,
-            'jalaliDate' => $jalaliDate,
-            'persianDayName' => $persianDayName,
-        ]);
+        for ($i = 0; $i < $calendarDays; $i++) {
+            $checkDayIndex  = ($currentDayIndex + $i) % 7;
+            $dayName        = $daysOfWeek[$checkDayIndex];
+            $checkDate      = $today->copy()->addDays($i);
+            $jalaliDate     = Jalalian::fromCarbon($checkDate)->format('j F Y');
+            $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
 
-        $dayAppointments = $bookedAppointments->get($checkDate->toDateString(), collect());
-        Log::debug("GetNextAvailableSlot - Day appointments for {$checkDate->toDateString()}: ", ['dayAppointments' => $dayAppointments->toArray()]);
-
-        $activeSlots     = [];
-        $inactiveSlots   = [];
-
-        foreach ($schedules as $schedule) {
-            if ($schedule->day !== $dayName) {
-                Log::debug("GetNextAvailableSlot - Skipping schedule for day {$schedule->day}, current day: {$dayName}");
-                continue;
-            }
-
-            $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
-            if (! is_array($workHours) || empty($workHours)) {
-                Log::warning("GetNextAvailableSlot - Invalid work hours for schedule: ", ['schedule' => $schedule->toArray()]);
-                continue;
-            }
-            $workHour = $workHours[0];
-            Log::debug("GetNextAvailableSlot - Work hours: ", ['workHour' => $workHour]);
-
-            $startTime = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['start'], 'Asia/Tehran');
-            $endTime   = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['end'], 'Asia/Tehran');
-            Log::debug("GetNextAvailableSlot - Time range: ", [
-                'startTime' => $startTime->toDateTimeString(),
-                'endTime' => $endTime->toDateTimeString(),
+            Log::debug("GetNextAvailableSlot - Checking date: {$checkDate->toDateString()}", [
+                'dayName' => $dayName,
+                'jalaliDate' => $jalaliDate,
+                'persianDayName' => $persianDayName,
             ]);
 
-            $currentTime = $startTime->copy();
-            while ($currentTime->lessThan($endTime)) {
-                $nextTime = (clone $currentTime)->addMinutes($duration);
-                $slotTime = $currentTime->format('H:i');
+            $dayAppointments = $bookedAppointments->get($checkDate->toDateString(), collect());
+            Log::debug("GetNextAvailableSlot - Day appointments for {$checkDate->toDateString()}: ", ['dayAppointments' => $dayAppointments->toArray()]);
 
-$isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
-    $dateOnly = Carbon::parse($appointment->appointment_date)->toDateString();
-    // فقط بخش زمان رو از appointment_time بگیریم
-    $timeOnly = Carbon::parse($appointment->appointment_time)->format('H:i:s');
-    $combinedDateTime = $dateOnly . ' ' . $timeOnly;
-    Log::debug("GetNextAvailableSlot - Combined date and time: ", ['combined' => $combinedDateTime]);
-    $apptStart = Carbon::parse($combinedDateTime, 'Asia/Tehran');
-    $apptEnd   = (clone $apptStart)->addMinutes($duration);
-    $isOverlapping = $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
-    Log::debug("GetNextAvailableSlot - Checking slot {$currentTime->format('H:i')} for overlap: ", [
-        'appointment_start' => $apptStart->toDateTimeString(),
-        'appointment_end' => $apptEnd->toDateTimeString(),
-        'slot_start' => $currentTime->toDateTimeString(),
-        'slot_end' => $nextTime->toDateTimeString(),
-        'is_overlapping' => $isOverlapping,
-    ]);
-    return $isOverlapping;
-});
+            $activeSlots     = [];
+            $inactiveSlots   = [];
 
-                if ($checkDate->isToday()) {
-                    if ($isBooked || $currentTime->lt($now)) {
-                        $inactiveSlots[] = $slotTime;
-                    } else {
-                        $activeSlots[] = $slotTime;
-                        if (! $nextAvailableSlot) {
-                            $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
-                        }
-                    }
-                } else {
-                    if ($isBooked) {
-                        $inactiveSlots[] = $slotTime;
-                    } else {
-                        $activeSlots[] = $slotTime;
-                        if (! $nextAvailableSlot) {
-                            $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
-                        }
-                    }
+            foreach ($schedules as $schedule) {
+                if ($schedule->day !== $dayName) {
+                    Log::debug("GetNextAvailableSlot - Skipping schedule for day {$schedule->day}, current day: {$dayName}");
+                    continue;
                 }
 
-                $currentTime->addMinutes($duration);
+                $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
+                if (! is_array($workHours) || empty($workHours)) {
+                    Log::warning("GetNextAvailableSlot - Invalid work hours for schedule: ", ['schedule' => $schedule->toArray()]);
+                    continue;
+                }
+                $workHour = $workHours[0];
+                Log::debug("GetNextAvailableSlot - Work hours: ", ['workHour' => $workHour]);
+
+                $startTime = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['start'], 'Asia/Tehran');
+                $endTime   = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['end'], 'Asia/Tehran');
+                Log::debug("GetNextAvailableSlot - Time range: ", [
+                    'startTime' => $startTime->toDateTimeString(),
+                    'endTime' => $endTime->toDateTimeString(),
+                ]);
+
+                $currentTime = $startTime->copy();
+                while ($currentTime->lessThan($endTime)) {
+                    $nextTime = (clone $currentTime)->addMinutes($duration);
+                    $slotTime = $currentTime->format('H:i');
+
+                    $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
+                        $dateOnly = Carbon::parse($appointment->appointment_date)->toDateString();
+                        // فقط بخش زمان رو از appointment_time بگیریم
+                        $timeOnly = Carbon::parse($appointment->appointment_time)->format('H:i:s');
+                        $combinedDateTime = $dateOnly . ' ' . $timeOnly;
+                        Log::debug("GetNextAvailableSlot - Combined date and time: ", ['combined' => $combinedDateTime]);
+                        $apptStart = Carbon::parse($combinedDateTime, 'Asia/Tehran');
+                        $apptEnd   = (clone $apptStart)->addMinutes($duration);
+                        $isOverlapping = $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
+                        Log::debug("GetNextAvailableSlot - Checking slot {$currentTime->format('H:i')} for overlap: ", [
+                            'appointment_start' => $apptStart->toDateTimeString(),
+                            'appointment_end' => $apptEnd->toDateTimeString(),
+                            'slot_start' => $currentTime->toDateTimeString(),
+                            'slot_end' => $nextTime->toDateTimeString(),
+                            'is_overlapping' => $isOverlapping,
+                        ]);
+                        return $isOverlapping;
+                    });
+
+                    if ($checkDate->isToday()) {
+                        if ($isBooked || $currentTime->lt($now)) {
+                            $inactiveSlots[] = $slotTime;
+                        } else {
+                            $activeSlots[] = $slotTime;
+                            if (! $nextAvailableSlot) {
+                                $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                            }
+                        }
+                    } else {
+                        if ($isBooked) {
+                            $inactiveSlots[] = $slotTime;
+                        } else {
+                            $activeSlots[] = $slotTime;
+                            if (! $nextAvailableSlot) {
+                                $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                            }
+                        }
+                    }
+
+                    $currentTime->addMinutes($duration);
+                }
+            }
+
+            if (! empty($activeSlots) || ! empty($inactiveSlots)) {
+                $slotData = [
+                    'date'            => $jalaliDate,
+                    'day_name'        => $persianDayName,
+                    'available_slots' => $activeSlots,
+                    'available_count' => count($activeSlots),
+                    'inactive_slots'  => $inactiveSlots,
+                    'inactive_count'  => count($inactiveSlots),
+                ];
+                $slots[] = $slotData;
             }
         }
 
-        if (! empty($activeSlots) || ! empty($inactiveSlots)) {
-            $slotData = [
-                'date'            => $jalaliDate,
-                'day_name'        => $persianDayName,
-                'available_slots' => $activeSlots,
-                'available_count' => count($activeSlots),
-                'inactive_slots'  => $inactiveSlots,
-                'inactive_count'  => count($inactiveSlots),
-            ];
-            $slots[] = $slotData;
-        }
-    }
-
-    Log::debug("GetNextAvailableSlot - Final result: ", [
-        'next_available_slot' => $nextAvailableSlot,
-        'slots' => $slots,
-    ]);
-
-    return [
-        'next_available_slot' => $nextAvailableSlot,
-        'slots'               => $slots,
-        'max_appointments'    => $schedules->first()->appointment_settings[0]['max_appointments'] ?? 22,
-    ];
-}
-
-private function getNextAvailableOnlineSlot($doctor, $type)
-{
-    $doctorId        = $doctor->id;
-    $today           = Carbon::today('Asia/Tehran');
-    $now             = Carbon::now('Asia/Tehran');
-    $daysOfWeek      = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    $currentDayIndex = $today->dayOfWeek;
-
-    Log::debug("GetNextAvailableOnlineSlot - Starting for doctor {$doctorId}, type {$type}", [
-        'today' => $today->toDateString(),
-        'now' => $now->toDateTimeString(),
-        'currentDayIndex' => $currentDayIndex,
-    ]);
-
-    $counselingConfig = DoctorCounselingConfig::where('doctor_id', $doctorId)->first();
-    $calendarDays     = $counselingConfig ? ($counselingConfig->calendar_days ?? 30) : 30;
-    $duration         = $counselingConfig ? ($counselingConfig->appointment_duration ?? 15) : 15;
-
-    $schedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
-        ->where('is_working', true)
-        ->get();
-    if ($schedules->isEmpty()) {
-        Log::warning("GetNextAvailableOnlineSlot - No schedules found for doctor {$doctorId}");
-        return ['next_available_slot' => null, 'slots' => []];
-    }
-    Log::debug("GetNextAvailableOnlineSlot - Schedules found: ", ['schedules' => $schedules->toArray()]);
-
-    $bookedAppointments = CounselingAppointment::where('doctor_id', $doctorId)
-        ->where('appointment_type', $type)
-        ->where('status', 'scheduled')
-        ->orWhere('status', 'pending_review')
-        
-        ->where('appointment_date', '>=', $today->toDateString())
-        ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
-        ->get()
-        ->groupBy('appointment_date');
-    Log::debug("GetNextAvailableOnlineSlot - Booked appointments: ", ['bookedAppointments' => $bookedAppointments->toArray()]);
-
-    $slots             = [];
-    $nextAvailableSlot = null;
-
-    for ($i = 0; $i < $calendarDays; $i++) {
-        $checkDayIndex  = ($currentDayIndex + $i) % 7;
-        $dayName        = $daysOfWeek[$checkDayIndex];
-        $checkDate      = $today->copy()->addDays($i);
-        $jalaliDate     = Jalalian::fromCarbon($checkDate)->format('j F Y');
-        $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
-
-        Log::debug("GetNextAvailableOnlineSlot - Checking date: {$checkDate->toDateString()}", [
-            'dayName' => $dayName,
-            'jalaliDate' => $jalaliDate,
-            'persianDayName' => $persianDayName,
+        Log::debug("GetNextAvailableSlot - Final result: ", [
+            'next_available_slot' => $nextAvailableSlot,
+            'slots' => $slots,
         ]);
 
-        $dayAppointments = $bookedAppointments->get($checkDate->toDateString(), collect());
-        Log::debug("GetNextAvailableOnlineSlot - Day appointments for {$checkDate->toDateString()}: ", ['dayAppointments' => $dayAppointments->toArray()]);
-
-        $activeSlots     = [];
-        $inactiveSlots   = [];
-
-        foreach ($schedules as $schedule) {
-            if ($schedule->day !== $dayName) {
-                Log::debug("GetNextAvailableOnlineSlot - Skipping schedule for day {$schedule->day}, current day: {$dayName}");
-                continue;
-            }
-
-            $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
-            if (! is_array($workHours) || empty($workHours)) {
-                Log::warning("GetNextAvailableOnlineSlot - Invalid work hours for schedule: ", ['schedule' => $schedule->toArray()]);
-                continue;
-            }
-            $workHour = $workHours[0];
-            Log::debug("GetNextAvailableOnlineSlot - Work hours: ", ['workHour' => $workHour]);
-
-            $startTime = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['start'], 'Asia/Tehran');
-            $endTime   = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['end'], 'Asia/Tehran');
-            Log::debug("GetNextAvailableOnlineSlot - Time range: ", [
-                'startTime' => $startTime->toDateTimeString(),
-                'endTime' => $endTime->toDateTimeString(),
-            ]);
-
-            $currentTime = $startTime->copy();
-            while ($currentTime->lessThan($endTime)) {
-                $nextTime = (clone $currentTime)->addMinutes($duration);
-                $slotTime = $currentTime->format('H:i');
-
-                $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
-                    $apptStart = Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time, 'Asia/Tehran');
-                    $apptEnd   = (clone $apptStart)->addMinutes($duration);
-                    $isOverlapping = $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
-                    Log::debug("GetNextAvailableOnlineSlot - Checking slot {$currentTime->format('H:i')} for overlap: ", [
-                        'appointment_start' => $apptStart->toDateTimeString(),
-                        'appointment_end' => $apptEnd->toDateTimeString(),
-                        'slot_start' => $currentTime->toDateTimeString(),
-                        'slot_end' => $nextTime->toDateTimeString(),
-                        'is_overlapping' => $isOverlapping,
-                    ]);
-                    return $isOverlapping;
-                });
-
-                if ($checkDate->isToday()) {
-                    if ($isBooked || $currentTime->lt($now)) {
-                        $inactiveSlots[] = $slotTime;
-                    } else {
-                        $activeSlots[] = $slotTime;
-                        if (! $nextAvailableSlot) {
-                            $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
-                        }
-                    }
-                } else {
-                    if ($isBooked) {
-                        $inactiveSlots[] = $slotTime;
-                    } else {
-                        $activeSlots[] = $slotTime;
-                        if (! $nextAvailableSlot) {
-                            $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
-                        }
-                    }
-                }
-
-                $currentTime->addMinutes($duration);
-            }
-        }
-
-        if (! empty($activeSlots) || ! empty($inactiveSlots)) {
-            $slotData = [
-                'date'            => $jalaliDate,
-                'day_name'        => $persianDayName,
-                'available_slots' => $activeSlots,
-                'available_count' => count($activeSlots),
-                'inactive_slots'  => $inactiveSlots,
-                'inactive_count'  => count($inactiveSlots),
-            ];
-            $slots[] = $slotData;
-        }
+        return [
+            'next_available_slot' => $nextAvailableSlot,
+            'slots'               => $slots,
+            'max_appointments'    => $schedules->first()->appointment_settings[0]['max_appointments'] ?? 22,
+        ];
     }
 
-    Log::debug("GetNextAvailableOnlineSlot - Final result: ", [
-        'next_available_slot' => $nextAvailableSlot,
-        'slots' => $slots,
-    ]);
+    private function getNextAvailableOnlineSlot($doctor, $type)
+    {
+        $doctorId        = $doctor->id;
+        $today           = Carbon::today('Asia/Tehran');
+        $now             = Carbon::now('Asia/Tehran');
+        $daysOfWeek      = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        $currentDayIndex = $today->dayOfWeek;
 
-    return [
-        'next_available_slot' => $nextAvailableSlot,
-        'slots'               => $slots,
-    ];
-}
+        Log::debug("GetNextAvailableOnlineSlot - Starting for doctor {$doctorId}, type {$type}", [
+            'today' => $today->toDateString(),
+            'now' => $now->toDateTimeString(),
+            'currentDayIndex' => $currentDayIndex,
+        ]);
+
+        $counselingConfig = DoctorCounselingConfig::where('doctor_id', $doctorId)->first();
+        $calendarDays     = $counselingConfig ? ($counselingConfig->calendar_days ?? 30) : 30;
+        $duration         = $counselingConfig ? ($counselingConfig->appointment_duration ?? 15) : 15;
+
+        $schedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
+            ->where('is_working', true)
+            ->get();
+        if ($schedules->isEmpty()) {
+            Log::warning("GetNextAvailableOnlineSlot - No schedules found for doctor {$doctorId}");
+            return ['next_available_slot' => null, 'slots' => []];
+        }
+        Log::debug("GetNextAvailableOnlineSlot - Schedules found: ", ['schedules' => $schedules->toArray()]);
+        $bookedAppointments = CounselingAppointment::where('doctor_id', $doctorId)
+            ->where('appointment_type', $type)
+            ->where(function ($query) {
+                $query->where('status', 'scheduled')
+                    ->orWhere('status', 'pending_review');
+            })
+            ->where('appointment_date', '>=', $today->toDateString())
+            ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
+            ->get();
+        Log::debug("GetNextAvailableOnlineSlot - Booked appointments: ", ['bookedAppointments' => $bookedAppointments->toArray()]);
+
+        $slots             = [];
+        $nextAvailableSlot = null;
+
+        for ($i = 0; $i < $calendarDays; $i++) {
+            $checkDayIndex  = ($currentDayIndex + $i) % 7;
+            $dayName        = $daysOfWeek[$checkDayIndex];
+            $checkDate      = $today->copy()->addDays($i);
+            $jalaliDate     = Jalalian::fromCarbon($checkDate)->format('j F Y');
+            $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
+
+            Log::debug("GetNextAvailableOnlineSlot - Checking date: {$checkDate->toDateString()}", [
+                'dayName' => $dayName,
+                'jalaliDate' => $jalaliDate,
+                'persianDayName' => $persianDayName,
+            ]);
+
+            $dayAppointments = $bookedAppointments->get($checkDate->toDateString(), collect());
+            Log::debug("GetNextAvailableOnlineSlot - Day appointments for {$checkDate->toDateString()}: ", ['dayAppointments' => $dayAppointments->toArray()]);
+
+            $activeSlots     = [];
+            $inactiveSlots   = [];
+
+            foreach ($schedules as $schedule) {
+                if ($schedule->day !== $dayName) {
+                    Log::debug("GetNextAvailableOnlineSlot - Skipping schedule for day {$schedule->day}, current day: {$dayName}");
+                    continue;
+                }
+
+                $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
+                if (! is_array($workHours) || empty($workHours)) {
+                    Log::warning("GetNextAvailableOnlineSlot - Invalid work hours for schedule: ", ['schedule' => $schedule->toArray()]);
+                    continue;
+                }
+                $workHour = $workHours[0];
+                Log::debug("GetNextAvailableOnlineSlot - Work hours: ", ['workHour' => $workHour]);
+
+                $startTime = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['start'], 'Asia/Tehran');
+                $endTime   = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['end'], 'Asia/Tehran');
+                Log::debug("GetNextAvailableOnlineSlot - Time range: ", [
+                    'startTime' => $startTime->toDateTimeString(),
+                    'endTime' => $endTime->toDateTimeString(),
+                ]);
+
+                $currentTime = $startTime->copy();
+                while ($currentTime->lessThan($endTime)) {
+                    $nextTime = (clone $currentTime)->addMinutes($duration);
+                    $slotTime = $currentTime->format('H:i');
+
+                    $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
+                        $apptStart = Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time, 'Asia/Tehran');
+                        $apptEnd   = (clone $apptStart)->addMinutes($duration);
+                        $isOverlapping = $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
+                        Log::debug("GetNextAvailableOnlineSlot - Checking slot {$currentTime->format('H:i')} for overlap: ", [
+                            'appointment_start' => $apptStart->toDateTimeString(),
+                            'appointment_end' => $apptEnd->toDateTimeString(),
+                            'slot_start' => $currentTime->toDateTimeString(),
+                            'slot_end' => $nextTime->toDateTimeString(),
+                            'is_overlapping' => $isOverlapping,
+                        ]);
+                        return $isOverlapping;
+                    });
+
+                    if ($checkDate->isToday()) {
+                        if ($isBooked || $currentTime->lt($now)) {
+                            $inactiveSlots[] = $slotTime;
+                        } else {
+                            $activeSlots[] = $slotTime;
+                            if (! $nextAvailableSlot) {
+                                $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                            }
+                        }
+                    } else {
+                        if ($isBooked) {
+                            $inactiveSlots[] = $slotTime;
+                        } else {
+                            $activeSlots[] = $slotTime;
+                            if (! $nextAvailableSlot) {
+                                $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                            }
+                        }
+                    }
+
+                    $currentTime->addMinutes($duration);
+                }
+            }
+
+            if (! empty($activeSlots) || ! empty($inactiveSlots)) {
+                $slotData = [
+                    'date'            => $jalaliDate,
+                    'day_name'        => $persianDayName,
+                    'available_slots' => $activeSlots,
+                    'available_count' => count($activeSlots),
+                    'inactive_slots'  => $inactiveSlots,
+                    'inactive_count'  => count($inactiveSlots),
+                ];
+                $slots[] = $slotData;
+            }
+        }
+
+        Log::debug("GetNextAvailableOnlineSlot - Final result: ", [
+            'next_available_slot' => $nextAvailableSlot,
+            'slots' => $slots,
+        ]);
+
+        return [
+            'next_available_slot' => $nextAvailableSlot,
+            'slots'               => $slots,
+        ];
+    }
 }
