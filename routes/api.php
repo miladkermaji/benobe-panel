@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\SpecialtyController;
 use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\DoctorFilterController;
 use App\Http\Controllers\Api\DoctorListingController;
+use App\Http\Controllers\Api\DoctorProfileController;
 use App\Http\Controllers\Api\MedicalCentersController;
 use App\Http\Controllers\Api\TeleCounselingController;
 use App\Http\Controllers\Api\DoctorAppointmentController;
@@ -118,3 +119,6 @@ Route::prefix('appointments')->group(function () {
 
 Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 Route::get('/appointments/payment/result', [AppointmentBookingController::class, 'paymentResult'])->name('appointment.payment.result');
+Route::prefix('doctors')->group(function () {
+    Route::get('/{doctorId}/profile', [DoctorProfileController::class, 'getDoctorProfile'])->name('api.doctors.profile');
+});
