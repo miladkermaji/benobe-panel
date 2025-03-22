@@ -28,11 +28,13 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array
      */
-    protected $table    = "users";
+    protected $table = "users";
     protected $fillable = [
         'first_name', 'last_name', 'email', 'mobile', 'password', 'national_code',
         'date_of_birth', 'sex', 'activation', 'profile_photo_path', 'zone_province_id', 'zone_city_id',
+        'created_by', 'user_type', 'status',
     ];
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -42,11 +44,12 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
     public function getProfilePhotoUrlAttribute()
     {
         return $this->profile_photo_path
-        ? Storage::url($this->profile_photo_path)
-        : asset('admin-assets/images/default-avatar.png');
+            ? Storage::url($this->profile_photo_path)
+            : asset('admin-assets/images/default-avatar.png');
     }
 
     public function province()
@@ -58,15 +61,22 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Zone::class, 'zone_city_id');
     }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function getJalaliCreatedAtAttribute()
     {
         // چک کردن اینکه created_at مقدار داره یا نه
-        if (! $this->created_at) {
+        if (!$this->created_at) {
             return '---'; // یا یه مقدار پیش‌فرض مثل '----/--/--'
         }
 
         return Jalalian::fromCarbon($this->created_at)->format('Y/m/d');
     }
+
     protected static function boot()
     {
         parent::boot();
@@ -80,16 +90,19 @@ class User extends Authenticatable implements JWTSubject
 
     public function getFullNameAttribute()
     {
-        return "$this->first_name . $this->last_name";
+        return "$this->first_name $this->last_name";
     }
+
     public function appointments()
     {
         return $this->hasMany(Appointment::class, 'patient_id');
     }
+
     public function likedDoctors()
     {
         return $this->hasMany(UserDoctorLike::class);
     }
+
     public function reviews()
     {
         return $this->morphMany(Review::class, 'reviewable');

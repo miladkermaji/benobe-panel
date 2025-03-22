@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('actual_call_duration')->nullable(); // مدت زمان واقعی تماس (دقیقه)
             $table->enum('consultation_type', ['general', 'specialized', 'emergency'])->nullable();
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
-            $table->enum('payment_status', ['pending', 'paid', 'unpaid'])->default('pending');
+            $table->enum('payment_status', ['pending', 'paid', 'unpaid','failed'])->default('pending');
             $table->enum('appointment_type', ['in_person', 'phone', 'video', 'text']); // به‌روزرسانی برای پشتیبانی از video و text
             $table->date('appointment_date');
             $table->time('appointment_time');
@@ -39,6 +39,7 @@ return new class extends Migration
                 'scheduled',       // در انتظار خدمت
                 'cancelled',       // لغو شده
                 'attended',        // حضور یافته
+                'confirmed',        // حضور یافته
                 'missed',          // غایب
                 'pending_review',  // در انتظار بررسی و تماس
                 'call_answered',   // تماس و پاسخ داده شده

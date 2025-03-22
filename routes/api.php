@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\DoctorListingController;
 use App\Http\Controllers\Api\MedicalCentersController;
 use App\Http\Controllers\Api\TeleCounselingController;
 use App\Http\Controllers\Api\DoctorAppointmentController;
+use App\Http\Controllers\Api\AppointmentBookingController;
+use Modules\Payment\App\Http\Controllers\PaymentController;
 
 Route::prefix('/auth')->group(function () {
     Route::post('/login-register', [AuthController::class, 'loginRegister'])->name('api.auth.login-register');
@@ -104,4 +106,15 @@ Route::get('/doctors', [DoctorListingController::class, 'getDoctors']);
 Route::get('/doctor-filters', [DoctorFilterController::class, 'getFilterOptions']);
 Route::get('/doctors/{doctorId}/appointment-options', [DoctorAppointmentController::class, 'getAppointmentOptions']);
 
+Route::prefix('appointments')->group(function () {
+    // دریافت اطلاعات پزشک و نوبت
+    Route::get('book/{doctorId}', [AppointmentBookingController::class, 'getBookingDetails'])
+        ->middleware('custom-auth.jwt'); // اعمال میدلویر برای احراز هویت
 
+    // ثبت رزرو نوبت
+    Route::post('book/{doctorId}', [AppointmentBookingController::class, 'bookAppointment'])
+        ->middleware('custom-auth.jwt'); // اعمال میدلویر برای احراز هویت
+});
+
+Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+Route::get('/appointments/payment/result', [AppointmentBookingController::class, 'paymentResult'])->name('appointment.payment.result');

@@ -26,7 +26,7 @@ return new class extends Migration {
             $table->timestamp('reserved_at')->nullable();
             $table->timestamp('confirmed_at')->nullable();
 
-            $table->enum('status', ['scheduled', 'cancelled', 'attended', 'missed'])->default('scheduled');
+            $table->enum('status', ['scheduled', 'cancelled', 'attended', 'missed', 'pending_review'])->default('scheduled');
 
             // فیلد مدیریت وضعیت حضور
             $table->enum('attendance_status', ['attended', 'missed', 'cancelled'])->nullable();
