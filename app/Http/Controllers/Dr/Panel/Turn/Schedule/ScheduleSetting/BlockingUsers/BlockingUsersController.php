@@ -35,24 +35,81 @@ class BlockingUsersController extends Controller
         return view('dr.panel.turn.schedule.scheduleSetting.blocking_users.index', compact('blockedUsers', 'messages', 'users'));
     }
 
-    public function store(Request $request)
-    {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+   public function store(Request $request)
+{
+    $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
-        try {
-            $validated = $request->validate([
-                'mobile'           => 'required|exists:users,mobile',
-                'blocked_at'       => 'required|date',
-                'unblocked_at'     => 'nullable|date|after:blocked_at',
-                'reason'           => 'nullable|string|max:255',
-                'selectedClinicId' => 'nullable|string',
-            ]);
+    try {
+        $validated = $request->validate([
+            'mobile'           => 'required|exists:users,mobile',
+            'blocked_at'       => 'required|date',
+            'unblocked_at'     => 'nullable|date|after:blocked_at',
+            'reason'           => 'nullable|string|max:255',
+            'selectedClinicId' => 'nullable|string',
+        ]);
 
-            $clinicId = ($validated['selectedClinicId'] === 'default') ? null : $validated['selectedClinicId'];
-            $user     = User::where('mobile', $validated['mobile'])->first();
+        // استفاده از درخواست مستقیم به جای $validated برای جلوگیری از خطا
+        $clinicId = $request->input('selectedClinicId') === 'default' ? null : $request->input('selectedClinicId');
+        $user = User::where('mobile', $validated['mobile'])->first();
 
-            if (! $user) {
-                return response()->json(['success' => false, 'message' => 'کاربر یافت نشد!'], 422);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'کاربر یافت نشد!'], 422);
+        }
+
+        $isBlocked = UserBlocking::where('user_id', $user->id)
+            ->where('doctor_id', $doctorId)
+            ->where('clinic_id', $clinicId)
+            ->where('status', 1)
+            ->exists();
+
+        if ($isBlocked) {
+            return response()->json(['success' => false, 'message' => 'این کاربر قبلاً در این کلینیک مسدود شده است.'], 422);
+        }
+
+        $blockingUser = UserBlocking::create([
+            'user_id'      => $user->id,
+            'doctor_id'    => $doctorId,
+            'clinic_id'    => $clinicId,
+            'blocked_at'   => $validated['blocked_at'],
+            'unblocked_at' => $validated['unblocked_at'] ?? null,
+            'reason'       => $validated['reason'] ?? null,
+            'status'       => 1,
+        ]);
+
+        return response()->json([
+            'success'       => true,
+            'message'       => 'کاربر با موفقیت مسدود شد.',
+            'blocking_user' => $blockingUser->load('user'),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'خطا در ذخیره‌سازی کاربر.',
+            'error'   => $e->getMessage(),
+        ], 500);
+    }
+}
+
+   public function storeMultiple(Request $request)
+{
+    $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+    $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
+
+    try {
+        $validated = $request->validate([
+            'mobiles'      => 'required|array',
+            'mobiles.*'    => 'exists:users,mobile',
+            'blocked_at'   => 'required|date',
+            'unblocked_at' => 'nullable|date|after:blocked_at',
+            'reason'       => 'nullable|string|max:255',
+        ]);
+
+        $blockedUsers = [];
+        $alreadyBlocked = []; // برای ذخیره کاربرانی که قبلاً مسدود شدن
+        foreach ($validated['mobiles'] as $mobile) {
+            $user = User::where('mobile', $mobile)->first();
+            if (!$user) {
+                continue;
             }
 
             $isBlocked = UserBlocking::where('user_id', $user->id)
@@ -62,7 +119,8 @@ class BlockingUsersController extends Controller
                 ->exists();
 
             if ($isBlocked) {
-                return response()->json(['success' => false, 'message' => 'این کاربر قبلاً در این کلینیک مسدود شده است.'], 422);
+                $alreadyBlocked[] = $mobile; // اضافه کردن به لیست مسدود شده‌ها
+                continue;
             }
 
             $blockingUser = UserBlocking::create([
@@ -75,77 +133,38 @@ class BlockingUsersController extends Controller
                 'status'       => 1,
             ]);
 
-            return response()->json([
-                'success'       => true,
-                'message'       => 'کاربر با موفقیت مسدود شد.',
-                'blocking_user' => $blockingUser->load('user'),
-            ]);
-        } catch (\Exception $e) {
+            $blockedUsers[] = $blockingUser;
+        }
+
+        // چک کردن نتیجه
+        if (empty($blockedUsers) && !empty($alreadyBlocked)) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در ذخیره‌سازی کاربر.',
-                'error'   => $e->getMessage(),
-            ], 500);
+                'message' => ' کاربران انتخاب‌شده قبلاً مسدود شده‌اند.',
+            ], 422);
         }
-    }
 
-    public function storeMultiple(Request $request)
-    {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
-
-        try {
-            $validated = $request->validate([
-                'mobiles'      => 'required|array',
-                'mobiles.*'    => 'exists:users,mobile',
-                'blocked_at'   => 'required|date',
-                'unblocked_at' => 'nullable|date|after:blocked_at',
-                'reason'       => 'nullable|string|max:255',
-            ]);
-
-            $blockedUsers = [];
-            foreach ($validated['mobiles'] as $mobile) {
-                $user = User::where('mobile', $mobile)->first();
-                if (! $user) {
-                    continue;
-                }
-
-                $isBlocked = UserBlocking::where('user_id', $user->id)
-                    ->where('doctor_id', $doctorId)
-                    ->where('clinic_id', $clinicId)
-                    ->where('status', 1)
-                    ->exists();
-
-                if ($isBlocked) {
-                    continue;
-                }
-
-                $blockingUser = UserBlocking::create([
-                    'user_id'      => $user->id,
-                    'doctor_id'    => $doctorId,
-                    'clinic_id'    => $clinicId,
-                    'blocked_at'   => $validated['blocked_at'],
-                    'unblocked_at' => $validated['unblocked_at'] ?? null,
-                    'reason'       => $validated['reason'] ?? null,
-                    'status'       => 1,
-                ]);
-
-                $blockedUsers[] = $blockingUser;
-            }
-
-            return response()->json([
-                'success'       => true,
-                'message'       => 'کاربران با موفقیت مسدود شدند.',
-                'blocked_users' => $blockedUsers,
-            ]);
-        } catch (\Exception $e) {
+        if (empty($blockedUsers)) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در ذخیره‌سازی کاربران.',
-                'error'   => $e->getMessage(),
-            ], 500);
+                'message' => 'هیچ کاربری برای مسدود کردن پیدا نشد.',
+            ], 422);
         }
+
+        return response()->json([
+            'success'       => true,
+            'message'       => 'کاربران با موفقیت مسدود شدند.',
+            'blocked_users' => $blockedUsers,
+            'already_blocked' => $alreadyBlocked, // اختیاری: برای اطلاع‌رسانی
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'خطا در ذخیره‌سازی کاربران.',
+            'error'   => $e->getMessage(),
+        ], 500);
     }
+}
 
     public function sendMessage(Request $request)
     {

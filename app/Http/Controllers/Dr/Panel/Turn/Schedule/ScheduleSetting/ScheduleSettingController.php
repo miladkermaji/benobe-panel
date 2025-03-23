@@ -1133,42 +1133,55 @@ class ScheduleSettingController extends Controller
         ]);
     }
 
-    public function cancelAppointments(Request $request)
-    {
-        // اعتبارسنجی ورودی‌ها
-        $validatedData = $request->validate([
-            'date'             => 'required|date',
-            'selectedClinicId' => 'nullable|string',
-        ]);
+   public function cancelAppointments(Request $request)
+{
+    // اعتبارسنجی ورودی‌ها
+    $validatedData = $request->validate([
+        'date'             => 'required|date',
+        'selectedClinicId' => 'nullable|string',
+        'appointment_ids'  => 'required|array', // اضافه کردن اعتبارسنجی برای IDهای نوبت‌ها
+        'appointment_ids.*' => 'integer|exists:appointments,id', // مطمئن شدن که IDها معتبرن
+    ]);
 
-        $selectedClinicId = $request->input('selectedClinicId');
+    $selectedClinicId = $request->input('selectedClinicId');
+    $appointmentIds = $request->input('appointment_ids');
 
-        // دریافت نوبت‌ها با اعمال فیلتر کلینیک
-        $appointmentsQuery = Appointment::where('appointment_date', $validatedData['date'])
-            ->when($selectedClinicId === 'default', function ($query) {
-                // اگر selectedClinicId برابر با 'default' باشد، فقط نوبت‌های بدون کلینیک را در نظر بگیرد
-                $query->whereNull('clinic_id');
-            })
-            ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                // اگر selectedClinicId مشخص شده باشد و برابر 'default' نباشد
-                $query->where('clinic_id', $selectedClinicId);
-            });
+    // دریافت نوبت‌ها با اعمال فیلتر کلینیک و IDها
+    $appointmentsQuery = Appointment::whereIn('id', $appointmentIds)
+        ->where('appointment_date', $validatedData['date'])
+        ->when($selectedClinicId === 'default', function ($query) {
+            $query->whereNull('clinic_id');
+        })
+        ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+            $query->where('clinic_id', $selectedClinicId);
+        });
 
-        $appointments = $appointmentsQuery->get();
+    $appointments = $appointmentsQuery->get();
 
-        // لغو نوبت‌ها (حذف نرم‌افزاری)
-        foreach ($appointments as $appointment) {
-            $appointment->status     = 'cancelled';
-            $appointment->deleted_at = now();
-            $appointment->save();
-        }
-
+    // چک کردن اینکه آیا نوبت ویزیت‌شده وجود داره
+    $attendedAppointments = $appointments->where('status', 'attended');
+    if ($attendedAppointments->isNotEmpty()) {
         return response()->json([
-            'status'          => true,
-            'message'         => 'نوبت‌ها با موفقیت لغو شدند.',
-            'total_cancelled' => $appointments->count(),
-        ]);
+            'status' => false,
+            'message' => 'نمی‌توانید نوبت‌های ویزیت‌شده را لغو کنید.',
+        ], 400);
     }
+
+    // لغو نوبت‌ها (حذف نرم‌افزاری)
+    $cancelledCount = 0;
+    foreach ($appointments as $appointment) {
+        $appointment->status = 'cancelled';
+        $appointment->deleted_at = now();
+        $appointment->save();
+        $cancelledCount++;
+    }
+
+    return response()->json([
+        'status'          => true,
+        'message'         => 'نوبت‌ها با موفقیت لغو شدند.',
+        'total_cancelled' => $cancelledCount,
+    ]);
+}
 
     public function rescheduleAppointment(Request $request)
     {

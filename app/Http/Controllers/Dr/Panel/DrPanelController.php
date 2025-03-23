@@ -117,16 +117,24 @@ class DrPanelController extends Controller
     public function updateAppointmentDate(Request $request, $id)
     {
         $request->validate([
-            'new_date' => 'required|date_format:Y-m-d', // اعتبارسنجی تاریخ
+            'new_date' => 'required|date_format:Y-m-d',
         ]);
-        $appointment = Appointment::findOrFail($id);      // یافتن نوبت
-        $newDate     = Carbon::parse($request->new_date); // تبدیل به Carbon
-        // بررسی اینکه تاریخ جدید از امروز عقب‌تر نباشد
+
+        $appointment = Appointment::findOrFail($id);
+
+        // چک کردن وضعیت نوبت
+        if ($appointment->status === 'attended') {
+            return response()->json(['error' => 'نمی‌توانید نوبت ویزیت‌شده را جابجا کنید.'], 400);
+        }
+
+        $newDate = Carbon::parse($request->new_date);
         if ($newDate->lt(Carbon::today())) {
             return response()->json(['error' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'], 400);
         }
+
         $appointment->appointment_date = $newDate;
-        $appointment->save(); // ذخیره تغییرات
+        $appointment->save();
+
         return response()->json(['message' => 'نوبت با موفقیت جابجا شد.']);
     }
     public function filterAppointments(Request $request)
@@ -152,5 +160,36 @@ class DrPanelController extends Controller
             'success'      => true,
             'appointments' => $appointments,
         ]);
+    }
+    public function endVisit(Request $request, $id)
+    {
+        try {
+            // پیدا کردن نوبت با شناسه
+            $appointment = Appointment::findOrFail($id);
+
+            // اعتبارسنجی درخواست
+            $request->validate([
+                'description' => 'nullable|string|max:1000', // توضیحات اختیاری
+            ]);
+
+            // به‌روزرسانی توضیحات و وضعیت نوبت
+            $appointment->description = $request->input('description');
+            $appointment->status = 'attended'; // تغییر وضعیت به attended
+            $appointment->attendance_status = 'attended'; // هماهنگ کردن attendance_status
+            $appointment->save();
+
+            // برگرداندن پاسخ موفقیت‌آمیز
+            return response()->json([
+                'success' => true,
+                'message' => 'ویزیت با موفقیت ثبت شد.',
+                'appointment' => $appointment // اطلاعات نوبت به‌روز شده
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ثبت ویزیت: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

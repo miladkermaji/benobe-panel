@@ -937,3 +937,8 @@ button {
     padding: 8px;
   }
 }
+.dropdown-menu li.disabled {
+    pointer-events: none; /* غیرفعال کردن کلیک */
+    opacity: 0.5; /* کم‌رنگ کردن آیتم */
+    cursor: not-allowed; /* تغییر شکل مکان‌نما */
+}

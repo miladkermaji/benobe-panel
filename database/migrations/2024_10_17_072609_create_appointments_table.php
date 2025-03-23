@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     public function up()
     {
         Schema::create('appointments', function (Blueprint $table) {
@@ -32,6 +32,9 @@ return new class extends Migration {
             $table->enum('attendance_status', ['attended', 'missed', 'cancelled'])->nullable();
 
             $table->text('notes')->nullable();
+
+            $table->text('description')->nullable();
+
             $table->text('title')->nullable();
             $table->string('tracking_code')->nullable()->unique();
             $table->integer('max_appointments')->nullable();

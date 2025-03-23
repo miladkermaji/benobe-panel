@@ -19,6 +19,8 @@ class Appointment extends Model
         'appointment_time',
         'status',
         'notes',
+        'description',
+
         'tracking_code',
         'fee',
         'appointment_category',

@@ -53,6 +53,7 @@ return new class extends Migration
 
             // توضیحات و اطلاعات تکمیلی
             $table->text('notes')->nullable();
+            $table->text('description')->nullable();
             $table->text('title')->nullable();
             $table->string('tracking_code')->nullable()->unique();
             $table->integer('max_appointments')->nullable();

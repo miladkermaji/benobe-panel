@@ -35,6 +35,7 @@ class CounselingAppointment extends Model
         'status',
         'attendance_status',
         'notes',
+        'description',
         'title',
         'tracking_code',
         'max_appointments',
