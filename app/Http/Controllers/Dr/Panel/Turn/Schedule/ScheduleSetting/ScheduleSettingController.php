@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
+use Morilog\Jalali\Jalalian;
 use App\Models\DoctorHoliday;
 use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\DB;
@@ -1135,64 +1136,60 @@ class ScheduleSettingController extends Controller
         ]);
     }
 
-    public function cancelAppointments(Request $request)
-    {
-        $validatedData = $request->validate([
-            'date'             => 'required|date',
-            'selectedClinicId' => 'nullable|string',
-            'appointment_ids'  => 'required|array',
-            'appointment_ids.*' => 'integer|exists:appointments,id',
-        ]);
 
-        $selectedClinicId = $request->input('selectedClinicId');
-        $appointmentIds = $request->input('appointment_ids');
 
-        $appointmentsQuery = Appointment::whereIn('id', $appointmentIds)
-            ->where('appointment_date', $validatedData['date'])
-            ->when($selectedClinicId === 'default', function ($query) {
-                $query->whereNull('clinic_id');
-            })
-            ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                $query->where('clinic_id', $selectedClinicId);
-            });
+   public function cancelAppointments(Request $request)
+{
+    $appointmentIds = $request->input('appointment_ids');
+    $date = $request->input('date');
+    $selectedClinicId = $request->input('selectedClinicId');
 
-        $appointments = $appointmentsQuery->get();
-
-        if ($appointments->where('status', 'attended')->isNotEmpty()) {
-            return response()->json(['status' => false, 'message' => 'نمی‌توانید نوبت‌های ویزیت‌شده را لغو کنید.'], 400);
-        }
-
-        $cancelledCount = 0;
-        $recipients = [];
-        $dateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validatedData['date'])->format('Y/m/d');
-
-        foreach ($appointments as $appointment) {
-            $appointment->status = 'cancelled';
-            $appointment->deleted_at = now();
-            $appointment->save();
-            $cancelledCount++;
-
-            if ($appointment->patient && $appointment->patient->mobile) {
-                $recipients[] = $appointment->patient->mobile;
-            }
-        }
-
-        if (!empty($recipients)) {
-            $message = "کاربر گرامی، نوبت شما در تاریخ {$dateJalali} لغو شد.";
-            SendSmsNotificationJob::dispatch(
-                $message,
-                $recipients,
-                100253, // شناسه قالب لغو نوبت
-                [$dateJalali]
-            )->delay(now()->addSeconds(5));
-        }
-
+    if (empty($appointmentIds)) {
         return response()->json([
-            'status'          => true,
-            'message'         => 'نوبت‌ها با موفقیت لغو شدند و پیامک در صف قرار گرفت.',
-            'total_cancelled' => $cancelledCount,
-        ]);
+            'status' => false,
+            'message' => 'هیچ نوبتی انتخاب نشده است'
+        ], 400);
     }
+
+    // تبدیل تاریخ شمسی به میلادی
+    $gregorianDate = $date;
+    if (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $date)) {
+        $gregorianDate = \Morilog\Jalali\Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->toDateString();
+    }
+
+    // ساخت کوئری
+    $query = Appointment::whereIn('id', $appointmentIds)
+        ->where('appointment_date', $gregorianDate);
+
+    if ($selectedClinicId === 'default') {
+        $query->whereNull('clinic_id');
+    } else {
+        $query->where('clinic_id', $selectedClinicId);
+    }
+
+    $appointments = $query->get();
+
+    if ($appointments->isEmpty()) {
+        return response()->json([
+            'status' => false,
+            'message' => 'هیچ نوبتی با این مشخصات یافت نشد'
+        ], 404);
+    }
+
+    // سافت‌دیلت به جای تغییر وضعیت
+    foreach ($appointments as $appointment) {
+        $appointment->delete(); // این deleted_at رو پر می‌کنه
+        // اگه می‌خوای وضعیت هم تغییر کنه:
+         $appointment->status = 'cancelled';
+         $appointment->save();
+         $appointment->delete();
+    }
+
+    return response()->json([
+        'status' => true,
+        'message' => 'نوبت‌ها با موفقیت لغو شدند'
+    ]);
+}
 
     public function rescheduleAppointment(Request $request)
     {

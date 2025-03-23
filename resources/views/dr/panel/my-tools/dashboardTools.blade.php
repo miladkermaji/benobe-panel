@@ -1743,15 +1743,27 @@
 
   function getSelectedAppointments() {
     let selected = [];
-    $('.row-checkbox:checked').each(function() {
-      let row = $(this).closest('tr');
-      let status = row.find('td:nth-child(5) span').text().trim(); // متن وضعیت (مثل "ویزیت شده")
+    let checkboxes = $('.row-checkbox:checked');
+
+    checkboxes.each(function() {
+      let checkbox = $(this);
+      let row = checkbox.closest('tr');
+      let appointmentId = row.find('.btn-end-visit').attr('data-appointment-id'); // ID از دکمه
+
+   
+
+      if (!appointmentId) {
+        console.error('No data-appointment-id found in row or button:', row);
+      }
+
+    
+
       selected.push({
-        id: row.data('appointment-id'),
-        row: row,
-        mobile: row.find('td:nth-child(3)').text().trim(), // شماره موبایل برای مسدود کردن
-        date: row.find('.move-appointment').data('date'), // تاریخ برای جابجایی
-        status: status === 'ویزیت شده' ? 'attended' : status // تبدیل متن به وضعیت استاندارد
+        id: appointmentId,
+        status: row.find('td:nth-child(5)').text().trim(),
+        date: row.find('td:nth-child(7)').text().trim(),
+        mobile: row.find('td:nth-child(3)').text().trim(),
+        row: row
       });
     });
     return selected;
@@ -1767,55 +1779,68 @@
       $('.row-checkbox').prop('checked', $(this).prop('checked'));
     });
 
-    // ✅ تابع گرفتن ردیف‌های انتخاب‌شده
+
 
 
     // ✅ لغو نوبت گروهی
     $('#cancel-appointments-btn').click(function() {
       let selected = getSelectedAppointments();
-      if (!selected.length) {
-        return Swal.fire('هشدار', 'نوبتی انتخاب نشده!', 'warning');
+
+
+      if (!Array.isArray(selected) || !selected.length) {
+        Swal.fire('هشدار', 'نوبتی انتخاب نشده!', 'warning');
+        return; // اینجا return رو جدا گذاشتم برای وضوح
       }
 
-      // چک کردن اینکه آیا نوبت ویزیت‌شده وجود داره
       const hasAttended = selected.some(appointment => appointment.status === 'attended');
       if (hasAttended) {
         return Swal.fire('خطا', 'نمی‌توانید نوبت‌های ویزیت‌شده را لغو کنید!', 'error');
       }
 
-      // گرفتن تاریخ اولین نوبت انتخاب‌شده (فرض می‌کنیم همه نوبت‌ها توی یه تاریخ باشن)
-      const date = selected[0].date; // تاریخ از ستون جدول یا داده‌های ردیف
+      const date = selected[0].date;
+      const appointmentIds = selected
+        .map(app => app.id)
+        .filter(id => id !== undefined && id !== null && Number.isInteger(Number(id)));
+
+      if (!appointmentIds.length) {
+        return Swal.fire('خطا', 'هیچ شناسه نوبتی معتبر انتخاب نشده است!', 'error');
+      }
 
       Swal.fire({
         title: 'لغو نوبت‌ها؟',
-        text: `${selected.length} نوبت لغو می‌شود.`,
+        text: `${appointmentIds.length} نوبت لغو می‌شود.`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'بله',
         cancelButtonText: 'لغو'
       }).then((result) => {
         if (result.isConfirmed) {
+          let data = {
+            _token: '{{ csrf_token() }}',
+            date: date,
+            selectedClinicId: localStorage.getItem('selectedClinicId'),
+            appointment_ids: appointmentIds
+          };
           $.ajax({
-            url: "{{ route('doctor.cancel_appointments') }}", // روت متد cancelAppointments
+            url: "{{ route('doctor.cancel_appointments') }}",
             method: 'POST',
-            data: {
-              _token: '{{ csrf_token() }}',
-              date: date, // تاریخ نوبت‌ها
-              selectedClinicId: localStorage.getItem('selectedClinicId'),
-              appointment_ids: selected.map(app => app.id) // ارسال IDهای نوبت‌ها
-            },
-            success: function(response) {
-              if (response.status) {
-                Swal.fire('موفقیت', response.message, 'success');
-                selected.forEach(app => app.row.fadeOut(300, function() {
-                  app.row.remove();
-                }));
-              } else {
-                Swal.fire('خطا', response.message, 'error');
-              }
-            },
+            data: data,
+           success: function(response) {
+  if (response.status) {
+    Swal.fire('موفقیت', response.message, 'success');
+    selected.forEach(app => {
+      app.row.find('td:nth-child(5)').html('<span class="font-weight-bold text-danger">لغو شده</span>');
+      app.row.find('.row-checkbox').prop('checked', false); // تیک رو بردار
+    });
+  } else {
+    Swal.fire('خطا', response.message, 'error');
+  }
+},
             error: function(xhr) {
-              Swal.fire('خطا', 'مشکلی در لغو نوبت‌ها رخ داد.', 'error');
+              let errorMessage = xhr.responseJSON && xhr.responseJSON.message ?
+                xhr.responseJSON.error :
+                'مشکلی در لغو نوبت‌ها رخ داد.';
+              Swal.fire('خطا', errorMessage, 'error');
             }
           });
         }
