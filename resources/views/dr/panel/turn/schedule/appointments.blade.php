@@ -2,6 +2,7 @@
 @section('styles')
  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/appointments.css') }}" rel="stylesheet" />
+
 @endsection
 @section('site-header')
  {{ 'به نوبه | پنل دکتر' }}
@@ -80,7 +81,11 @@
 
    </div>
   </div>
+  <div class="mt-2 w-100 d-flex justify-content-center">
+  <input type="text" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 h-50 form-control" placeholder="جستجو بیمار .....">
  </div>
+ </div>
+ 
 </div>
 <div class="my-appointments-list w-100 mt-3" id="appointment-lists-container">
  <div class="my-appointments-lists-cards d-flex gap-10 w-100 flex-wrap position-relative">

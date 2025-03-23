@@ -181,6 +181,9 @@
                             <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
                             <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
                             <td>${appointment.appointment_time}</td>
+                            <td><button class="btn btn-outline-info" data-toggle="modal" data-target="#endVisitModalCenter">
+                                        پایان ویزیت
+                                    </button></td>
                             <td class="text-center">
                                 <div class="dropdown d-inline-block position-relative">
                                     <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
@@ -265,7 +268,9 @@
                                 <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
                                 <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
                             <td>${appointment.appointment_time}</td>
-
+<td><button class="btn btn-outline-info" data-toggle="modal" data-target="#endVisitModalCenter">
+                                        پایان ویزیت
+                                    </button></td>
  <td class="text-center">
     <div class="dropdown d-inline-block position-relative">
         <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
@@ -441,6 +446,9 @@
                                 <td>${insurance}</td>
                                 <td>${appointmentDate}</td>
                                 <td>${appointment.appointment_time}</td>
+                                <td><button class="btn btn-outline-info" data-toggle="modal" data-target="#endVisitModalCenter">
+                                        پایان ویزیت
+                                    </button></td>
                                 <td class="text-center">
                     <div class="dropdown d-inline-block position-relative">
                         <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
@@ -1118,7 +1126,7 @@
         } else {
           $("#workHoursContainer").append(
             `<p class="text-center text-danger font-weight-bold">هیچ ساعات کاری برای این روز تعریف نشده است.</p>`
-            );
+          );
           $("#updateWorkHours").hide();
         }
       },
@@ -1343,7 +1351,7 @@
                 data: {
                   old_date: selectedDate,
                   new_date: moment(targetDate, 'jYYYY-jMM-jDD').format(
-                  'YYYY-MM-DD'), // تبدیل به فرمت میلادی
+                    'YYYY-MM-DD'), // تبدیل به فرمت میلادی
                   _token: '{{ csrf_token() }}',
                   selectedClinicId: localStorage.getItem('selectedClinicId')
                 },
@@ -1687,6 +1695,9 @@
                                 <td>${insurance}</td>
                                 <td>${appointmentDate}</td>
                                 <td>${appointment.appointment_time}</td>
+                                <td><button class="btn btn-outline-info" data-toggle="modal" data-target="#endVisitModalCenter">
+                                        پایان ویزیت
+                                    </button></td>
                                 <td class="text-center">
                                     <div class="dropdown d-inline-block position-relative">
                                         <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
@@ -1694,6 +1705,7 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
                                             <li><a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">لغو نوبت</a></li>
+                                            
                                             <li><a class="dropdown-item text-dark move-appointment" data-date="${appointment.appointment_date}" href="#" data-id="${appointment.id}">جابجایی نوبت</a></li>
                                             <li><a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name }">مسدود کردن کاربر</a></li>
                                         </ul>

@@ -186,7 +186,7 @@ class AppointmentController extends Controller
                     $query->select('id', 'mobile', 'first_name', 'last_name');
                 },
             ])
-            ->select('id', 'doctor_id', 'clinic_id', 'patient_id', 'appointment_date', 'start_time', 'status', 'consultation_type', 'fee', 'notes', 'tracking_code')
+            ->select('id', 'doctor_id', 'clinic_id', 'patient_id', 'appointment_date', 'appointment_time', 'status', 'consultation_type', 'fee', 'notes', 'tracking_code')
             ->get();
 
         // فرمت کردن داده‌ها
