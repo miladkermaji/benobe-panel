@@ -21,10 +21,6 @@ return new class extends Migration
                 ->onDelete('cascade');
         });
 
-        // حذف ستون gallery از جدول treatment_centers
-        Schema::table('treatment_centers', function (Blueprint $table) {
-            $table->dropColumn('gallery');
-        });
     }
 
     public function down(): void
