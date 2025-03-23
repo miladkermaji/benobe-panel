@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Dr\Panel;
 
 use App\Http\Controllers\Dr\Controller;
@@ -17,7 +18,7 @@ class DrPanelController extends Controller
     {
         $today    = Carbon::today();
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id; // گرفتن ID پزشک لاگین‌شده
-                                                                                                      // تعداد بیماران امروز فقط برای این پزشک
+        // تعداد بیماران امروز فقط برای این پزشک
         $totalPatientsToday = Appointment::where('doctor_id', $doctorId)
             ->whereDate('appointment_date', $today)
             ->count();
@@ -35,7 +36,7 @@ class DrPanelController extends Controller
 
         $selectedClinicId = $request->selectedClinicId;
         $jalaliDate       = $request->input('date'); // دریافت تاریخ جلالی از فرانت‌اند
-                                                     // **اصلاح فرمت تاریخ ورودی**
+        // **اصلاح فرمت تاریخ ورودی**
         if (strpos($jalaliDate, '-') !== false) {
             // اگر تاریخ با `-` جدا شده بود، آن را به `/` تبدیل کنیم
             $jalaliDate = str_replace('-', '/', $jalaliDate);
@@ -50,10 +51,10 @@ class DrPanelController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'], 500);
         }
-                                                       // لاگ‌گیری برای بررسی تبدیل صحیح
+        // لاگ‌گیری برای بررسی تبدیل صحیح
         $doctorId = Auth::guard('doctor')->user()->id; // دریافت ID پزشک لاگین‌شده
-                                                       // گرفتن نوبت‌های پزشک جاری در تاریخ تبدیل‌شده به میلادی
-                                                       // Fetch appointments
+        // گرفتن نوبت‌های پزشک جاری در تاریخ تبدیل‌شده به میلادی
+        // Fetch appointments
         $query = Appointment::where('doctor_id', $doctorId)
             ->whereDate('appointment_date', $gregorianDate)
             ->with(['patient', 'insurance']);
@@ -120,7 +121,7 @@ class DrPanelController extends Controller
         ]);
         $appointment = Appointment::findOrFail($id);      // یافتن نوبت
         $newDate     = Carbon::parse($request->new_date); // تبدیل به Carbon
-                                                          // بررسی اینکه تاریخ جدید از امروز عقب‌تر نباشد
+        // بررسی اینکه تاریخ جدید از امروز عقب‌تر نباشد
         if ($newDate->lt(Carbon::today())) {
             return response()->json(['error' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'], 400);
         }

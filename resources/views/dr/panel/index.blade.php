@@ -159,6 +159,7 @@
       <th scope="col" class="px-6 py-3">وضعیت نوبت</th>
       <th scope="col" class="px-6 py-3">بیمه</th>
       <th scope="col" class="px-6 py-3">تاریخ نوبت</th>
+      <th scope="col" class="px-6 py-3">زمان نوبت</th>
       <th scope="col" class="px-6 py-3">عملیات</th>
      </tr>
     </thead>

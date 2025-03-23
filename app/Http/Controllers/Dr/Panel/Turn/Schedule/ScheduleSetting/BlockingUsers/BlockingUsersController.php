@@ -1,16 +1,17 @@
 <?php
+
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Models\User;
 use App\Models\Doctor;
 use App\Models\SmsTemplate;
-use App\Models\User;
+use Illuminate\Support\Str;
 use App\Models\UserBlocking;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Dr\Controller;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
-use Str;
 
 class BlockingUsersController extends Controller
 {
