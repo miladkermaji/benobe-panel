@@ -1,19 +1,21 @@
 <?php
+
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting;
 
-use App\Http\Controllers\Dr\Controller;
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Appointment;
-use App\Models\DoctorAppointmentConfig;
+use Illuminate\Http\Request;
 use App\Models\DoctorHoliday;
 use App\Models\DoctorWorkSchedule;
-use App\Models\SpecialDailySchedule;
-use App\Models\User;
-use App\Traits\HandlesRateLimiting;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Traits\HandlesRateLimiting;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\SendSmsNotificationJob;
+use App\Models\SpecialDailySchedule;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Dr\Controller;
+use App\Models\DoctorAppointmentConfig;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
@@ -610,9 +612,9 @@ class ScheduleSettingController extends Controller
             $end   = Carbon::createFromFormat('H:i', $endTime);
             // محاسبه تفاوت زمانی به دقیقه
             $diffInMinutes = $start->diffInMinutes($end);
-                                                                                        // تعیین طول هر نوبت (به دقیقه)
+            // تعیین طول هر نوبت (به دقیقه)
             $appointmentDuration = config('settings.default_appointment_duration', 20); // 20 دقیقه پیش‌فرض
-                                                                                        // محاسبه تعداد نوبت‌ها
+            // محاسبه تعداد نوبت‌ها
             return floor($diffInMinutes / $appointmentDuration);
         } catch (\Exception $e) {
             return 0; // بازگرداندن مقدار صفر در صورت بروز خطا
@@ -1133,70 +1135,77 @@ class ScheduleSettingController extends Controller
         ]);
     }
 
-   public function cancelAppointments(Request $request)
-{
-    // اعتبارسنجی ورودی‌ها
-    $validatedData = $request->validate([
-        'date'             => 'required|date',
-        'selectedClinicId' => 'nullable|string',
-        'appointment_ids'  => 'required|array', // اضافه کردن اعتبارسنجی برای IDهای نوبت‌ها
-        'appointment_ids.*' => 'integer|exists:appointments,id', // مطمئن شدن که IDها معتبرن
-    ]);
+    public function cancelAppointments(Request $request)
+    {
+        $validatedData = $request->validate([
+            'date'             => 'required|date',
+            'selectedClinicId' => 'nullable|string',
+            'appointment_ids'  => 'required|array',
+            'appointment_ids.*' => 'integer|exists:appointments,id',
+        ]);
 
-    $selectedClinicId = $request->input('selectedClinicId');
-    $appointmentIds = $request->input('appointment_ids');
+        $selectedClinicId = $request->input('selectedClinicId');
+        $appointmentIds = $request->input('appointment_ids');
 
-    // دریافت نوبت‌ها با اعمال فیلتر کلینیک و IDها
-    $appointmentsQuery = Appointment::whereIn('id', $appointmentIds)
-        ->where('appointment_date', $validatedData['date'])
-        ->when($selectedClinicId === 'default', function ($query) {
-            $query->whereNull('clinic_id');
-        })
-        ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-            $query->where('clinic_id', $selectedClinicId);
-        });
+        $appointmentsQuery = Appointment::whereIn('id', $appointmentIds)
+            ->where('appointment_date', $validatedData['date'])
+            ->when($selectedClinicId === 'default', function ($query) {
+                $query->whereNull('clinic_id');
+            })
+            ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                $query->where('clinic_id', $selectedClinicId);
+            });
 
-    $appointments = $appointmentsQuery->get();
+        $appointments = $appointmentsQuery->get();
 
-    // چک کردن اینکه آیا نوبت ویزیت‌شده وجود داره
-    $attendedAppointments = $appointments->where('status', 'attended');
-    if ($attendedAppointments->isNotEmpty()) {
+        if ($appointments->where('status', 'attended')->isNotEmpty()) {
+            return response()->json(['status' => false, 'message' => 'نمی‌توانید نوبت‌های ویزیت‌شده را لغو کنید.'], 400);
+        }
+
+        $cancelledCount = 0;
+        $recipients = [];
+        $dateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validatedData['date'])->format('Y/m/d');
+
+        foreach ($appointments as $appointment) {
+            $appointment->status = 'cancelled';
+            $appointment->deleted_at = now();
+            $appointment->save();
+            $cancelledCount++;
+
+            if ($appointment->patient && $appointment->patient->mobile) {
+                $recipients[] = $appointment->patient->mobile;
+            }
+        }
+
+        if (!empty($recipients)) {
+            $message = "کاربر گرامی، نوبت شما در تاریخ {$dateJalali} لغو شد.";
+            SendSmsNotificationJob::dispatch(
+                $message,
+                $recipients,
+                100253, // شناسه قالب لغو نوبت
+                [$dateJalali]
+            )->delay(now()->addSeconds(5));
+        }
+
         return response()->json([
-            'status' => false,
-            'message' => 'نمی‌توانید نوبت‌های ویزیت‌شده را لغو کنید.',
-        ], 400);
+            'status'          => true,
+            'message'         => 'نوبت‌ها با موفقیت لغو شدند و پیامک در صف قرار گرفت.',
+            'total_cancelled' => $cancelledCount,
+        ]);
     }
-
-    // لغو نوبت‌ها (حذف نرم‌افزاری)
-    $cancelledCount = 0;
-    foreach ($appointments as $appointment) {
-        $appointment->status = 'cancelled';
-        $appointment->deleted_at = now();
-        $appointment->save();
-        $cancelledCount++;
-    }
-
-    return response()->json([
-        'status'          => true,
-        'message'         => 'نوبت‌ها با موفقیت لغو شدند.',
-        'total_cancelled' => $cancelledCount,
-    ]);
-}
 
     public function rescheduleAppointment(Request $request)
     {
-        // اعتبارسنجی ورودی‌ها
         $validated = $request->validate([
-            'old_date'         => 'required|date',   // تاریخ قبلی نوبت
-            'new_date'         => 'required|date',   // تاریخ جدید نوبت
-            'selectedClinicId' => 'nullable|string', // کلینیک انتخابی
+            'old_date'         => 'required|date',
+            'new_date'         => 'required|date',
+            'selectedClinicId' => 'nullable|string',
         ]);
 
-        $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
         $selectedClinicId = $request->input('selectedClinicId');
 
         try {
-            // پیدا کردن تمام نوبت‌های آن تاریخ با فیلتر کلینیک
             $appointments = Appointment::where('doctor_id', $doctorId)
                 ->where('appointment_date', $validated['old_date'])
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
@@ -1205,18 +1214,11 @@ class ScheduleSettingController extends Controller
                 ->get();
 
             if ($appointments->isEmpty()) {
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.',
-                ], 404);
+                return response()->json(['status' => false, 'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.'], 404);
             }
 
-            // بررسی ساعات کاری پزشک برای تاریخ جدید
-            $selectedDate = Carbon::parse($validated['new_date']);
-            $dayOfWeek    = strtolower($selectedDate->format('l'));
-            // بررسی ساعات کاری پزشک برای تاریخ جدید
             $workHours = DoctorWorkSchedule::where('doctor_id', $doctorId)
-                ->where('day', $dayOfWeek)
+                ->where('day', strtolower(Carbon::parse($validated['new_date'])->format('l')))
                 ->when($selectedClinicId === 'default', function ($query) {
                     $query->whereNull('clinic_id');
                 })
@@ -1225,21 +1227,13 @@ class ScheduleSettingController extends Controller
                 })
                 ->first();
 
-            // دیباگ برای بررسی داده‌های بازگشتی از ساعات کاری
-            if (! $workHours) {
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'ساعات کاری یافت نشد.',
-                    'debug'   => [
-                        'doctor_id' => $doctorId,
-                        'clinic_id' => $selectedClinicId,
-                        'day'       => $dayOfWeek,
-                    ],
-                ], 400);
+            if (!$workHours) {
+                return response()->json(['status' => false, 'message' => 'ساعات کاری یافت نشد.'], 400);
             }
 
-            // لیست شماره‌های موبایل کاربران برای ارسال پیامک
             $recipients = [];
+            $oldDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['old_date'])->format('Y/m/d');
+            $newDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['new_date'])->format('Y/m/d');
 
             foreach ($appointments as $appointment) {
                 $appointment->appointment_date = $validated['new_date'];
@@ -1250,31 +1244,19 @@ class ScheduleSettingController extends Controller
                 }
             }
 
-            // تبدیل تاریخ‌ها به شمسی
-            $oldDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['old_date'])->format('Y/m/d');
-            $newDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['new_date'])->format('Y/m/d');
-
-            // ارسال پیامک به کاربران
-            if (! empty($recipients)) {
-                $messageContent = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به تاریخ {$newDateJalali} تغییر یافت.";
-                foreach ($recipients as $recipient) {
-                    $user         = User::where('mobile', $recipient)->first();
-                    $userFullName = $user ? ($user->first_name . " " . $user->last_name) : "کاربر گرامی";
-
-                    $messagesService = new MessageService(
-                        SmsService::create(
-                            100252,
-                            $recipient,
-                            [$userFullName, $oldDateJalali, $newDateJalali, 'به نوبه']
-                        )
-                    );
-                    $messagesService->send();
-                }
+            if (!empty($recipients)) {
+                $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به تاریخ {$newDateJalali} تغییر یافت.";
+                SendSmsNotificationJob::dispatch(
+                    $message,
+                    $recipients,
+                    100252, // شناسه قالب جابجایی نوبت
+                    [$oldDateJalali, $newDateJalali, 'به نوبه']
+                )->delay(now()->addSeconds(5));
             }
 
             return response()->json([
                 'status'           => true,
-                'message'          => 'نوبت‌ها با موفقیت جابجا شدند و پیامک ارسال گردید.',
+                'message'          => 'نوبت‌ها با موفقیت جابجا شدند و پیامک در صف قرار گرفت.',
                 'total_recipients' => count($recipients),
             ]);
         } catch (\Exception $e) {
@@ -1319,7 +1301,7 @@ class ScheduleSettingController extends Controller
                 ], 404);
             }
 
-                                                                   // بررسی ساعات کاری پزشک برای تاریخ جدید
+            // بررسی ساعات کاری پزشک برای تاریخ جدید
             $selectedDate = Carbon::parse($validated['new_date']); // تبدیل تاریخ جدید به میلادی
             $dayOfWeek    = strtolower($selectedDate->format('l'));
             // بررسی ساعات کاری پزشک برای تاریخ جدید

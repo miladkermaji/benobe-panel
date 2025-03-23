@@ -1,21 +1,30 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Tools;
 
 //new changes added by me2222222222
-use App\Jobs\Admin\Panel\Tools\SendNotificationSms;
-use App\Models\Doctor;
-use App\Models\Notification;
-use App\Models\Secretary;
 use App\Models\User;
-use Illuminate\Support\Facades\Log; // اضافه کردن Log
-use Illuminate\Support\Facades\Validator;
+use App\Models\Doctor;
 use Livewire\Component;
+use App\Models\Secretary;
+use App\Models\Notification;
 use Morilog\Jalali\Jalalian;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use App\Jobs\Admin\Panel\Tools\SendNotificationSms;
+use Illuminate\Support\Facades\Log; // اضافه کردن Log
 
 class NotificationCreate extends Component
 {
-    public $title, $message, $type = 'info', $target_group, $single_phone, $selected_recipients = [];
-    public $is_active              = true, $start_at, $end_at;
+    public $title;
+    public $message;
+    public $type = 'info';
+    public $target_group;
+    public $single_phone;
+    public $selected_recipients = [];
+    public $is_active              = true;
+    public $start_at;
+    public $end_at;
     public $target_mode            = 'group';
 
     public function store()
@@ -118,7 +127,7 @@ class NotificationCreate extends Component
             'is_active'    => $this->is_active,
             'start_at'     => $startAtMiladi,
             'end_at'       => $endAtMiladi,
-            'created_by'   => auth()->id(),
+            'created_by'   => Auth::guard('manager')->user()->id,
         ];
 
         $notification = Notification::create($notificationData);
@@ -201,12 +210,12 @@ class NotificationCreate extends Component
     public function render()
     {
         $allRecipients = collect()
-            ->merge(User::all()->map(fn($u) => ['id' => "App\\Models\\User:{$u->id}", 'text' => $u->first_name . ' ' . $u->last_name . ' (بیمار)']))
-            ->merge(Doctor::all()->map(fn($d) => ['id' => "App\\Models\\Doctor:{$d->id}", 'text' => $d->first_name . ' ' . $d->last_name . ' (پزشک)']))
-            ->merge(Secretary::all()->map(fn($s) => ['id' => "App\\Models\\Secretary:{$s->id}", 'text' => $s->first_name . ' ' . $s->last_name . ' (منشی)']));
+            ->merge(User::all()->map(fn ($u) => ['id' => "App\\Models\\User:{$u->id}", 'text' => $u->first_name . ' ' . $u->last_name . ' (بیمار)']))
+            ->merge(Doctor::all()->map(fn ($d) => ['id' => "App\\Models\\Doctor:{$d->id}", 'text' => $d->first_name . ' ' . $d->last_name . ' (پزشک)']))
+            ->merge(Secretary::all()->map(fn ($s) => ['id' => "App\\Models\\Secretary:{$s->id}", 'text' => $s->first_name . ' ' . $s->last_name . ' (منشی)']));
 
         return view('livewire.admin.panel.tools.notification-create', [
             'allRecipients' => $allRecipients,
-        ])->layout('layouts.admin');
+        ]);
     }
 }

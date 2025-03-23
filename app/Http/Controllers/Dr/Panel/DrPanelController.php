@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Dr\Panel;
 
-use App\Http\Controllers\Dr\Controller;
-use App\Models\Appointment;
 use Carbon\Carbon;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Morilog\Jalali\Jalalian;
+use App\Jobs\SendSmsNotificationJob;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Dr\Controller;
 
 class DrPanelController extends Controller
 {
@@ -114,29 +115,43 @@ class DrPanelController extends Controller
         return response()->json(['patients' => $patients]);
     }
 
-    public function updateAppointmentDate(Request $request, $id)
-    {
-        $request->validate([
-            'new_date' => 'required|date_format:Y-m-d',
-        ]);
+   public function updateAppointmentDate(Request $request, $id)
+{
+    $request->validate([
+        'new_date' => 'required|date_format:Y-m-d',
+    ]);
 
-        $appointment = Appointment::findOrFail($id);
+    $appointment = Appointment::findOrFail($id);
 
-        // چک کردن وضعیت نوبت
-        if ($appointment->status === 'attended') {
-            return response()->json(['error' => 'نمی‌توانید نوبت ویزیت‌شده را جابجا کنید.'], 400);
-        }
-
-        $newDate = Carbon::parse($request->new_date);
-        if ($newDate->lt(Carbon::today())) {
-            return response()->json(['error' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'], 400);
-        }
-
-        $appointment->appointment_date = $newDate;
-        $appointment->save();
-
-        return response()->json(['message' => 'نوبت با موفقیت جابجا شد.']);
+    if ($appointment->status === 'attended') {
+        return response()->json(['error' => 'نمی‌توانید نوبت ویزیت‌شده را جابجا کنید.'], 400);
     }
+
+    $newDate = Carbon::parse($request->new_date);
+    if ($newDate->lt(Carbon::today())) {
+        return response()->json(['error' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'], 400);
+    }
+
+    $oldDate = $appointment->appointment_date;
+    $appointment->appointment_date = $newDate;
+    $appointment->save();
+
+    // ارسال پیامک با جاب
+    if ($appointment->patient && $appointment->patient->mobile) {
+        $oldDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($oldDate)->format('Y/m/d');
+        $newDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($newDate)->format('Y/m/d');
+        $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به تاریخ {$newDateJalali} تغییر یافت.";
+
+        SendSmsNotificationJob::dispatch(
+            $message,
+            [$appointment->patient->mobile],
+            100252, // شناسه قالب جابجایی نوبت
+            [$oldDateJalali, $newDateJalali, 'به نوبه']
+        )->delay(now()->addSeconds(5));
+    }
+
+    return response()->json(['message' => 'نوبت با موفقیت جابجا شد و پیامک در صف قرار گرفت.']);
+}
     public function filterAppointments(Request $request)
     {
         $status           = $request->query('status');
