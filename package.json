@@ -13,6 +13,7 @@
         "laravel-vite-plugin": "^1.0",
         "sortablejs": "^1.15.6",
         "tailwindcss": "^4.0.7",
+        "timepicker-ui": "^2.6.1",
         "vite": "^6.0"
     },
     "optionalDependencies": {

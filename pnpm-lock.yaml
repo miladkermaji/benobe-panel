@@ -29,6 +29,9 @@ importers:
       tailwindcss:
         specifier: ^4.0.7
         version: 4.0.9
+      timepicker-ui:
+        specifier: ^2.6.1
+        version: 2.6.1
       vite:
         specifier: ^6.0
         version: 6.2.0(jiti@2.4.2)(lightningcss@1.29.1)
@@ -709,6 +712,9 @@ packages:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==, tarball: https://registry.npmjs.org/tapable/-/tapable-2.2.1.tgz}
     engines: {node: '>=6'}
 
+  timepicker-ui@2.6.1:
+    resolution: {integrity: sha512-T199nYp0uyNpKTn37+1DGfgROfsdZYKg3rE6mRmQU095nKDRL0ZSz87/XoT64s6Lic2q1MwGv93jQGFFo8uLlA==, tarball: https://registry.npmjs.org/timepicker-ui/-/timepicker-ui-2.6.1.tgz}
+
   tree-kill@1.2.2:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==, tarball: https://registry.npmjs.org/tree-kill/-/tree-kill-1.2.2.tgz}
     hasBin: true
@@ -1311,6 +1317,8 @@ snapshots:
   tailwindcss@4.0.9: {}
 
   tapable@2.2.1: {}
+
+  timepicker-ui@2.6.1: {}
 
   tree-kill@1.2.2: {}
 

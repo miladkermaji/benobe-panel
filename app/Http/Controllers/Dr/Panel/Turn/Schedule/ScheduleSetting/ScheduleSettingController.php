@@ -1073,57 +1073,68 @@ class ScheduleSettingController extends Controller
         ]);
     }
 
-    public function getHolidayStatus(Request $request)
-    {
-        // اعتبارسنجی ورودی
-        $validated = $request->validate([
-            'date'             => 'required|date',
-            'selectedClinicId' => 'nullable|string', // فیلتر selectedClinicId
-        ]);
+  public function getHolidayStatus(Request $request)
+{
+    $validated = $request->validate([
+        'date' => 'required|date',
+        'selectedClinicId' => 'nullable|string',
+    ]);
 
-        // گرفتن شناسه دکتر
-        $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-        $selectedClinicId = $request->input('selectedClinicId');
+    $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+    $selectedClinicId = $request->input('selectedClinicId');
 
-        /**
-         * 🟡 بخش ۱: بررسی تعطیلی پزشک با شرط کلینیک
-         */
-        $holidayRecord = DoctorHoliday::where('doctor_id', $doctorId)
-            ->where(function ($query) use ($selectedClinicId) {
-                if ($selectedClinicId === 'default') {
-                    $query->whereNull('clinic_id');
-                } elseif ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
-                }
-            })
-            ->first();
+    // بخش ۱: بررسی تعطیلی
+    $holidayRecord = DoctorHoliday::where('doctor_id', $doctorId)
+        ->where(function ($query) use ($selectedClinicId) {
+            if ($selectedClinicId === 'default') {
+                $query->whereNull('clinic_id');
+            } elseif ($selectedClinicId) {
+                $query->where('clinic_id', $selectedClinicId);
+            }
+        })
+        ->first();
 
-        $holidayDates = json_decode($holidayRecord->holiday_dates ?? '[]', true);
-        $isHoliday    = in_array($validated['date'], $holidayDates);
+    $holidayDates = json_decode($holidayRecord->holiday_dates ?? '[]', true);
+    $isHoliday = in_array($validated['date'], $holidayDates);
 
-        /**
-         * 🟡 بخش ۲: بررسی نوبت‌های پزشک با شرط کلینیک
-         */
-        $appointments = Appointment::where('doctor_id', $doctorId)
-            ->where('appointment_date', $validated['date'])
-            ->where(function ($query) use ($selectedClinicId) {
-                if ($selectedClinicId === 'default') {
-                    $query->whereNull('clinic_id');
-                } elseif ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
-                }
-            })
-            ->get();
+    // بخش ۲: بررسی نوبت‌ها (فقط نوبت‌های فعال)
+    $appointments = Appointment::where('doctor_id', $doctorId)
+        ->where('appointment_date', $validated['date'])
+        ->where('status', '!=', 'cancelled') // نوبت‌های لغو شده رو حذف کن
+        ->whereNull('deleted_at') // فقط نوبت‌های فعال
+        ->where(function ($query) use ($selectedClinicId) {
+            if ($selectedClinicId === 'default') {
+                $query->whereNull('clinic_id');
+            } elseif ($selectedClinicId) {
+                $query->where('clinic_id', $selectedClinicId);
+            }
+        })
+        ->get();
 
-        /**
-         * 🟡 بخش ۳: ارسال پاسخ به‌صورت JSON
-         */
-        return response()->json([
-            'status'     => true,
-            'is_holiday' => $isHoliday,
-            'data'       => $appointments,
-        ]);
-    }
+    // بخش ۳: بررسی ساعات کاری
+    $dayOfWeek = strtolower(Carbon::parse($validated['date'])->englishDayOfWeek);
+    $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+        ->where('day', $dayOfWeek)
+        ->where(function ($query) use ($selectedClinicId) {
+            if ($selectedClinicId === 'default') {
+                $query->whereNull('clinic_id');
+            } elseif ($selectedClinicId) {
+                $query->where('clinic_id', $selectedClinicId);
+            }
+        })
+        ->first();
+
+    $hasWorkHours = $workSchedule && !empty(json_decode($workSchedule->work_hours, true));
+
+    // پاسخ نهایی
+    return response()->json([
+        'status' => true,
+        'is_holiday' => $isHoliday,
+        'has_appointments' => !$appointments->isEmpty(),
+        'has_work_hours' => $hasWorkHours,
+        'data' => $appointments,
+    ]);
+}
 
 
 

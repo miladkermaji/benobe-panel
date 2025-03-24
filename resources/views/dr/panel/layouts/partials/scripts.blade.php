@@ -21,3 +21,23 @@
 <script src="{{ asset('dr-assets/panel/js/moment/jalali-moment.browser.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/toastr/toastr.min.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/global-loader.js') }}"></script>
+<script>
+   function initializeTimepicker() {
+
+    const DOMElement = $(".timepicker-ui");
+
+    const options = {
+      clockType: '24h',
+      theme: 'basic',
+      mobile: true,
+      enableScrollbar: true,
+      disableTimeRangeValidation: false,
+      autoClose: true
+    };
+    DOMElement.each(function() {
+
+      const newTimepicker = new window.tui.TimepickerUI(this, options);
+      newTimepicker.create();
+    });
+  }
+</script>
