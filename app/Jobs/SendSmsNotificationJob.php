@@ -58,7 +58,7 @@ class SendSmsNotificationJob implements ShouldQueue
                             $this->message,
                             [$recipient],
                             null,
-                            /* $this->sendDateTime */
+                            $this->sendDateTime
                         )
                     );
 
