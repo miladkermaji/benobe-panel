@@ -1,8 +1,9 @@
 <?php
 namespace Modules\SendOtp\App\Http\Services\SMS;
 
-use Modules\SendOtp\App\Http\Interfaces\SmsDriverInterface;
 use Kavenegar\KavenegarApi;
+use Illuminate\Support\Facades\Log;
+use Modules\SendOtp\App\Http\Interfaces\SmsDriverInterface;
 
 class KavenegarDriver implements SmsDriverInterface
 {
@@ -12,7 +13,7 @@ class KavenegarDriver implements SmsDriverInterface
     {
         $apiKey = env('KAVENEGAR_API_KEY', '');
         if (empty($apiKey)) {
-            \Log::error('Kavenegar API Key is not set in .env');
+            Log::error('Kavenegar API Key is not set in .env');
             throw new \Exception('Kavenegar API Key is missing');
         }
         $this->api = new KavenegarApi($apiKey);
@@ -27,10 +28,10 @@ class KavenegarDriver implements SmsDriverInterface
             $receptors = is_array($recipientNumbers) ? $recipientNumbers : [$recipientNumbers];
 
             $result = $this->api->Send($senderNumber, $receptors, $message);
-            \Log::info('Kavenegar OTP sent', ['result' => $result]);
+            Log::info('Kavenegar OTP sent', ['result' => $result]);
             return json_encode($result);
         } catch (\Exception $e) {
-            \Log::error('Kavenegar OTP error', ['error' => $e->getMessage()]);
+            Log::error('Kavenegar OTP error', ['error' => $e->getMessage()]);
             return json_encode(['error' => $e->getMessage()]);
         }
     }
@@ -39,16 +40,16 @@ class KavenegarDriver implements SmsDriverInterface
 {
     try {
         $receptors = is_array($recipientNumbers) ? $recipientNumbers : [$recipientNumbers];
-        \Log::info('درخواست ارسال به کاوه‌نگار', [
+        Log::info('درخواست ارسال به کاوه‌نگار', [
             'sender'    => $senderNumber,
             'receptors' => $receptors,
             'message'   => $message,
         ]);
         $result = $this->api->Send($senderNumber, $receptors, $message);
-        \Log::info('Kavenegar message sent', ['result' => $result]);
+        Log::info('Kavenegar message sent', ['result' => $result]);
         return json_encode($result);
     } catch (\Exception $e) {
-        \Log::error('Kavenegar message error', ['error' => $e->getMessage()]);
+        Log::error('Kavenegar message error', ['error' => $e->getMessage()]);
         return json_encode(['error' => $e->getMessage()]);
     }
 }

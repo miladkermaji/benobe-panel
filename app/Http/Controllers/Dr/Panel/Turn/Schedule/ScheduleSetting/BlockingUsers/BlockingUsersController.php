@@ -107,146 +107,153 @@ class BlockingUsersController extends Controller
     }
 }
 
-    public function storeMultiple(Request $request)
-    {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
+  public function storeMultiple(Request $request)
+{
+    $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+    $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
 
-        try {
-            $validated = $request->validate([
-                'mobiles'      => 'required|array',
-                'mobiles.*'    => 'exists:users,mobile',
-                'blocked_at'   => 'required|date',
-                'unblocked_at' => 'nullable|date|after:blocked_at',
-                'reason'       => 'nullable|string|max:255',
-            ]);
+    try {
+        $validated = $request->validate([
+            'mobiles'      => 'required|array',
+            'mobiles.*'    => 'exists:users,mobile',
+            'blocked_at'   => 'required|date',
+            'unblocked_at' => 'nullable|date|after:blocked_at',
+            'reason'       => 'nullable|string|max:255',
+        ]);
 
-            $blockedUsers = [];
-            $alreadyBlocked = [];
-            $recipients = [];
+        $blockedUsers = [];
+        $alreadyBlocked = [];
+        $recipients = [];
 
-            foreach ($validated['mobiles'] as $mobile) {
-                $user = User::where('mobile', $mobile)->first();
-                if (!$user) {
-                    continue;
-                }
-
-                $isBlocked = UserBlocking::where('user_id', $user->id)
-                    ->where('doctor_id', $doctorId)
-                    ->where('clinic_id', $clinicId)
-                    ->where('status', 1)
-                    ->exists();
-
-                if ($isBlocked) {
-                    $alreadyBlocked[] = $mobile;
-                    continue;
-                }
-
-                $blockingUser = UserBlocking::create([
-                    'user_id'      => $user->id,
-                    'doctor_id'    => $doctorId,
-                    'clinic_id'    => $clinicId,
-                    'blocked_at'   => $validated['blocked_at'],
-                    'unblocked_at' => $validated['unblocked_at'] ?? null,
-                    'reason'       => $validated['reason'] ?? null,
-                    'status'       => 1,
-                ]);
-
-                $blockedUsers[] = $blockingUser;
-                $recipients[] = $mobile;
+        foreach ($validated['mobiles'] as $mobile) {
+            $user = User::where('mobile', $mobile)->first();
+            if (!$user) {
+                continue;
             }
 
-            if (empty($blockedUsers) && !empty($alreadyBlocked)) {
-                return response()->json(['success' => false, 'message' => 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.'], 422);
-            }
-
-            if (empty($blockedUsers)) {
-                return response()->json(['success' => false, 'message' => 'هیچ کاربری برای مسدود کردن پیدا نشد.'], 422);
-            }
-
-            // ارسال پیامک مسدودیت برای همه کاربران جدید
-            if (!empty($recipients)) {
-                $doctor = Doctor::find($doctorId);
-                $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-
-                SendSmsNotificationJob::dispatch(
-                    $message,
-                    $recipients,
-                    100254, // شناسه قالب مسدودیت
-                    [$doctorName]
-                )->delay(now()->addSeconds(5));
-            }
-
-            return response()->json([
-                'success'         => true,
-                'message'         => 'کاربران با موفقیت مسدود شدند و پیامک در صف قرار گرفت.',
-                'blocked_users'   => $blockedUsers,
-                'already_blocked' => $alreadyBlocked,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'خطا در ذخیره‌سازی کاربران.',
-                'error'   => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function updateStatus(Request $request)
-    {
-        try {
-            $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
-
-            $userBlocking = UserBlocking::where('id', $request->id)
+            $isBlocked = UserBlocking::where('user_id', $user->id)
+                ->where('doctor_id', $doctorId)
                 ->where('clinic_id', $clinicId)
-                ->firstOrFail();
+                ->where('status', 1)
+                ->exists();
 
-            $userBlocking->status = $request->status;
-            $userBlocking->save();
-
-            $user = $userBlocking->user;
-            $doctor = $userBlocking->doctor;
-            $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-
-            // تعیین پیام و قالب بر اساس وضعیت
-            if ($request->status == 1) {
-                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-                $templateId = 100254; // قالب مسدودیت
-            } else {
-                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.";
-                $templateId = 100255; // قالب رفع مسدودیت
+            if ($isBlocked) {
+                $alreadyBlocked[] = $mobile;
+                continue;
             }
+
+            $blockingUser = UserBlocking::create([
+                'user_id'      => $user->id,
+                'doctor_id'    => $doctorId,
+                'clinic_id'    => $clinicId,
+                'blocked_at'   => $validated['blocked_at'],
+                'unblocked_at' => $validated['unblocked_at'] ?? null,
+                'reason'       => $validated['reason'] ?? null,
+                'status'       => 1,
+            ]);
+
+            $blockedUsers[] = $blockingUser;
+            $recipients[] = $mobile;
+        }
+
+        if (empty($blockedUsers) && !empty($alreadyBlocked)) {
+            return response()->json(['success' => false, 'message' => 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.'], 422);
+        }
+
+        if (empty($blockedUsers)) {
+            return response()->json(['success' => false, 'message' => 'هیچ کاربری برای مسدود کردن پیدا نشد.'], 422);
+        }
+
+        // ارسال پیامک مسدودیت برای همه کاربران جدید
+        if (!empty($recipients)) {
+            $doctor = Doctor::find($doctorId);
+            $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+            $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
+
+            $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+            $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+            $templateId = ($gatewayName === 'pishgamrayan') ? 100254 : null;
 
             SendSmsNotificationJob::dispatch(
                 $message,
-                [$user->mobile],
-                $templateId,
+                $recipients,
+                $templateId, // شرط اعمال‌شده
                 [$doctorName]
             )->delay(now()->addSeconds(5));
-
-            // ذخیره پیام در SmsTemplate
-            SmsTemplate::create([
-                'doctor_id'  => $doctor->id,
-                'clinic_id'  => $clinicId,
-                'user_id'    => $user->id,
-                'identifier' => Str::random(11),
-                'title'      => $request->status == 1 ? 'مسدودی کاربر' : 'رفع مسدودی',
-                'content'    => $message,
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'وضعیت با موفقیت به‌روزرسانی شد و پیامک در صف قرار گرفت.',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'خطا در به‌روزرسانی وضعیت.',
-                'error'   => $e->getMessage(),
-            ], 500);
         }
+
+        return response()->json([
+            'success'         => true,
+            'message'         => 'کاربران با موفقیت مسدود شدند و پیامک در صف قرار گرفت.',
+            'blocked_users'   => $blockedUsers,
+            'already_blocked' => $alreadyBlocked,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'خطا در ذخیره‌سازی کاربران.',
+            'error'   => $e->getMessage(),
+        ], 500);
     }
+}
+public function updateStatus(Request $request)
+{
+    try {
+        $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
+
+        $userBlocking = UserBlocking::where('id', $request->id)
+            ->where('clinic_id', $clinicId)
+            ->firstOrFail();
+
+        $userBlocking->status = $request->status;
+        $userBlocking->save();
+
+        $user = $userBlocking->user;
+        $doctor = $userBlocking->doctor;
+        $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+
+        // تعیین پیام و قالب بر اساس وضعیت
+        if ($request->status == 1) {
+            $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
+            $defaultTemplateId = 100254; // قالب مسدودیت
+        } else {
+            $message = "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.";
+            $defaultTemplateId = 100255; // قالب رفع مسدودیت
+        }
+
+        $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+        $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+        $templateId = ($gatewayName === 'pishgamrayan') ? $defaultTemplateId : null;
+
+        SendSmsNotificationJob::dispatch(
+            $message,
+            [$user->mobile],
+            $templateId, // شرط اعمال‌شده
+            [$doctorName]
+        )->delay(now()->addSeconds(5));
+
+        // ذخیره پیام در SmsTemplate
+        SmsTemplate::create([
+            'doctor_id'  => $doctor->id,
+            'clinic_id'  => $clinicId,
+            'user_id'    => $user->id,
+            'identifier' => Str::random(11),
+            'title'      => $request->status == 1 ? 'مسدودی کاربر' : 'رفع مسدودی',
+            'content'    => $message,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'وضعیت با موفقیت به‌روزرسانی شد و پیامک در صف قرار گرفت.',
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'خطا در به‌روزرسانی وضعیت.',
+            'error'   => $e->getMessage(),
+        ], 500);
+    }
+}
 
     public function sendMessage(Request $request)
     {

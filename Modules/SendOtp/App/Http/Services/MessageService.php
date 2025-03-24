@@ -2,13 +2,14 @@
 
 namespace Modules\SendOtp\App\Http\Services;
 
+use Illuminate\Support\Facades\Log;
+use Modules\SendOtp\App\Models\SmsGateway;
 use Modules\SendOtp\App\Http\Interfaces\MessageInterface;
 use Modules\SendOtp\App\Http\Services\SMS\FarazSMSDriver;
+use Modules\SendOtp\App\Http\Services\SMS\PayamitoDriver;
 use Modules\SendOtp\App\Http\Services\SMS\KavenegarDriver;
 use Modules\SendOtp\App\Http\Services\SMS\MelliPayamakDriver;
-use Modules\SendOtp\App\Http\Services\SMS\PayamitoDriver;
 use Modules\SendOtp\App\Http\Services\SMS\PishgamRayanDriver;
-use Modules\SendOtp\App\Models\SmsGateway;
 
 class MessageService
 {
@@ -24,7 +25,7 @@ public function send()
     $activeGateway = SmsGateway::where('is_active', true)->first();
     $driver = $activeGateway ? $this->getDriver($activeGateway->name) : new PishgamRayanDriver();
 
-    \Log::info('بررسی مقادیر قبل از ارسال', [
+    Log::info('بررسی مقادیر قبل از ارسال', [
         'otpId' => $this->message->getOtpId(),
         'message' => $this->message->getMessage(),
         'parameters' => $this->message->getParameters(),
