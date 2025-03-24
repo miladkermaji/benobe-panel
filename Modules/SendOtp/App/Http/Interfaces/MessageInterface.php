@@ -11,6 +11,8 @@ interface MessageInterface
  public function getParameters();
 
  public function getSenderNumber();
+ public function getMessage();
 
  public function getRecipientNumbers();
+
 }

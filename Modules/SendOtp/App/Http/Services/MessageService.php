@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\SendOtp\App\Http\Services;
 
 use Modules\SendOtp\App\Http\Interfaces\MessageInterface;
