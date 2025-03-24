@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Dr\Controller;
+use App\Jobs\Admin\Panel\Tools\SendNotificationSms;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
@@ -81,7 +82,7 @@ class BlockingUsersController extends Controller
             $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
             $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
 
-            SendSmsNotificationJob::dispatch(
+            SendNotificationSms::dispatch(
                 $message,
                 [$user->mobile],
                 100254, // شناسه قالب مسدودیت
@@ -165,7 +166,7 @@ class BlockingUsersController extends Controller
                 $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
                 $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
 
-                SendSmsNotificationJob::dispatch(
+                SendNotificationSms::dispatch(
                     $message,
                     $recipients,
                     100254, // شناسه قالب مسدودیت
@@ -213,7 +214,7 @@ class BlockingUsersController extends Controller
                 $templateId = 100255; // قالب رفع مسدودیت
             }
 
-            SendSmsNotificationJob::dispatch(
+            SendNotificationSms::dispatch(
                 $message,
                 [$user->mobile],
                 $templateId,
