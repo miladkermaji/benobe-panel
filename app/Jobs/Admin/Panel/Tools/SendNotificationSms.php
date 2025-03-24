@@ -31,6 +31,7 @@ class SendNotificationSms implements ShouldQueue
 
   public function handle()
 {
+    
     Log::info('شروع اجرای Job ارسال پیامک', [
         'message'      => $this->message,
         'recipients'   => $this->recipientNumbers,

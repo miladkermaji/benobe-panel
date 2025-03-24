@@ -9,15 +9,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use Modules\SendOtp\App\Models\SmsGateway;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class SendSmsNotificationJob implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $message;
     protected $recipients;
@@ -40,12 +38,15 @@ class SendSmsNotificationJob implements ShouldQueue
             $chunks = array_chunk($this->recipients, 10);
             $delay = 0;
 
-            // تبدیل تاریخ میلادی به شمسی
             $jalaliSendDateTime = $this->sendDateTime
                 ? \Morilog\Jalali\Jalalian::fromDateTime(
                     \Carbon\Carbon::parse($this->sendDateTime)
                 )->format('Y/m/d H:i:s')
                 : \Morilog\Jalali\Jalalian::now()->format('Y/m/d H:i:s');
+
+            // چک کردن پنل فعال
+            $activeGateway = SmsGateway::where('is_active', true)->first();
+            $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
 
             foreach ($chunks as $chunk) {
                 foreach ($chunk as $recipient) {
@@ -57,16 +58,29 @@ class SendSmsNotificationJob implements ShouldQueue
                             $this->message,
                             [$recipient],
                             null,
-                            $jalaliSendDateTime // تاریخ شمسی رو پاس می‌دیم
+                            $jalaliSendDateTime
                         )
                     );
 
-                    $smsService->send();
+                    // شرط بر اساس پنل فعال
+                    if ($gatewayName === 'pishgamrayan' && $this->templateId) {
+                        // برای پیشگام‌رایان، templateId رو به‌عنوان otpId استفاده کن
+                        $smsService->message->setOtpId($this->templateId);
+                        $smsService->message->setParameters($this->params);
+                    } else {
+                        // برای کاوه‌نگار یا بقیه پنل‌ها، otpId رو null کن
+                        $smsService->message->setOtpId(null);
+                        $smsService->message->setParameters([]);
+                    }
+
+                    $response = $smsService->send();
 
                     Log::info('پیامک با موفقیت ارسال شد', [
                         'recipient' => $recipient,
                         'message' => $this->message,
                         'template_id' => $this->templateId,
+                        'gateway' => $gatewayName,
+                        'response' => $response,
                     ]);
                 }
                 $delay += 5;
