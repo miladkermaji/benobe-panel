@@ -152,12 +152,6 @@ class DrPanelController extends Controller
                 [] // بدون پارامتر اضافی
             )->delay(now()->addSeconds(5));
 
-            Log::info('جابجایی نوبت و ارسال پیامک در صف قرار گرفت', [
-                'appointment_id' => $id,
-                'old_date' => $oldDateJalali,
-                'new_date' => $newDateJalali,
-                'recipient' => $appointment->patient->mobile,
-            ]);
         }
 
         return response()->json(['message' => 'نوبت با موفقیت جابجا شد و پیامک در صف قرار گرفت.']);
