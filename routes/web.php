@@ -284,6 +284,11 @@ Route::prefix('dr')
             Route::prefix('turn')->middleware('secretary.permission:appointments')->group(function () {
                 Route::prefix('schedule')->group(function () {
                     Route::get('/appointments', [DrScheduleController::class, 'index'])->middleware('secretary.permission:appointments')->name('dr-appointments');
+
+                    Route::get('search-appointments', [DrScheduleController::class, 'searchAppointments'])->name('dr.search.appointments');
+
+                    Route::post('end-visit/{id}', [DrScheduleController::class, 'endVisit'])->name('end.visit');
+
                     Route::get('/my-appointments', [DrScheduleController::class, 'myAppointments'])->middleware('secretary.permission:my-appointments')->name('my-dr-appointments');
 
                     Route::get('/my-appointments/by-date', [DrScheduleController::class, 'showByDateAppointments'])->name('dr.turn.my-appointments.by-date');

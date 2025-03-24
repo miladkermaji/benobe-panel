@@ -82,7 +82,7 @@
    </div>
   </div>
   <div class="mt-2 w-100 d-flex justify-content-center">
-  <input type="text" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 h-50 form-control" placeholder="جستجو بیمار .....">
+  <input id="my-appointment-search" type="text" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 h-50 form-control" placeholder="جستجو بیمار .....">
  </div>
  </div>
  
@@ -94,38 +94,39 @@
  </div>
 </div>
 <div class="modal  fade" id="endVisitModalCenter" tabindex="-1" role="dialog"
- aria-labelledby="endVisitModalCenterTitle" aria-hidden="true">
- <div class="modal-dialog modal-dialog-centered" role="document">
-  <div class="modal-content border-radius-6">
-   <div class="modal-header">
-    <h6 class="modal-title font-weight-bold" id="exampleModalCenterTitle"> توضیحات درمان</h6>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-     <span aria-hidden="true">&times;</span>
-    </button>
-   </div>
-   <div class="modal-body">
-    <div>
-     <span class="font-weight-bold">پزشک گرامی</span>
-     <br>
-     <p class="mt-2 font-size-14">
-      لطفا در صورتی که برای بیمار نسخه الکترونیک ثبت کرده اید <span class="font-weight-bold">“کد پیگیری
-       نسخه”</span> و در صورت نیاز <span class="font-weight-bold">“توضیحات درمان”</span> خود را
-      یادداشت نمایید.
-     </p>
-     <span class="mt-2">
-      (این توضیحات در قسمت "نوبت‌های من" بیمار ذخیره می‌شود.)
+  aria-labelledby="endVisitModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content border-radius-6">
+      <div class="modal-header">
+        <h6 class="modal-title font-weight-bold" id="exampleModalCenterTitle"> توضیحات درمان</h6>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <span class="font-weight-bold">پزشک گرامی</span>
+          <br>
+          <p class="mt-2 font-size-14">
+            لطفا در صورتی که برای بیمار نسخه الکترونیک ثبت کرده اید <span class="font-weight-bold">“کد پیگیری
+              نسخه”</span> و در صورت نیاز <span class="font-weight-bold">“توضیحات درمان”</span> خود را
+            یادداشت نمایید.
+          </p>
+          <span class="mt-2">
+            (این توضیحات در قسمت "نوبت‌های من" بیمار ذخیره می‌شود.)
 
-     </span>
+          </span>
+        </div>
+        <div class="mt-3">
+          <form action="">
+           
+            <textarea name="" id=""  placeholder="توضیحات خود را وارد کنید" class="my-form-control-light w-100"></textarea>
+            <button class="h-50 w-100 btn btn-primary mt-3">ثبت</button>
+          </form>
+        </div>
+      </div>
     </div>
-    <div class="mt-3">
-     <form action="">
-      <input type="text" placeholder="توضیحات خود را وارد کنید" class="h-50 my-form-control-light w-100">
-      <button class="h-50 w-100 btn btn-primary mt-3">ثبت</button>
-     </form>
-    </div>
-   </div>
   </div>
- </div>
 </div>
 <div class="modal  fade" id="userInfoModalCenter" tabindex="-1" role="dialog"
  aria-labelledby="userInfoModalCenterTitle" aria-hidden="true">
