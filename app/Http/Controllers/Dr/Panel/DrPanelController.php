@@ -116,46 +116,45 @@ class DrPanelController extends Controller
         return response()->json(['patients' => $patients]);
     }
 
-    public function updateAppointmentDate(Request $request, $id)
-    {
-        $request->validate([
-            'new_date' => 'required|date_format:Y-m-d',
-        ]);
+  public function updateAppointmentDate(Request $request, $id)
+{
+    $request->validate([
+        'new_date' => 'required|date_format:Y-m-d',
+    ]);
 
-        $appointment = Appointment::findOrFail($id);
+    $appointment = Appointment::findOrFail($id);
 
-        // چک کردن وضعیت نوبت
-        if ($appointment->status === 'attended') {
-            return response()->json(['error' => 'نمی‌توانید نوبت ویزیت‌شده را جابجا کنید.'], 400);
-        }
-
-        $newDate = Carbon::parse($request->new_date);
-        if ($newDate->lt(Carbon::today())) {
-            return response()->json(['error' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'], 400);
-        }
-
-        $oldDate = $appointment->appointment_date; // تاریخ قبلی
-        $appointment->appointment_date = $newDate;
-        $appointment->save();
-
-        // تبدیل تاریخ‌ها به فرمت شمسی
-        $oldDateJalali = Jalalian::fromDateTime($oldDate)->format('Y/m/d');
-        $newDateJalali = Jalalian::fromDateTime($newDate)->format('Y/m/d');
-
-        // ارسال پیامک جابجایی نوبت
-        if ($appointment->patient && $appointment->patient->mobile) {
-            $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به {$newDateJalali} تغییر یافت.";
-            SendSmsNotificationJob::dispatch(
-                $message,
-                [$appointment->patient->mobile],
-                null, // بدون قالب
-                [] // بدون پارامتر اضافی
-            )->delay(now()->addSeconds(5));
-
-        }
-
-        return response()->json(['message' => 'نوبت با موفقیت جابجا شد و پیامک در صف قرار گرفت.']);
+    // چک کردن وضعیت نوبت
+    if ($appointment->status === 'attended' || $appointment->status === 'cancelled') {
+        return response()->json(['error' => 'نمی‌توانید نوبت ویزیت‌شده یا لغو شده را جابجا کنید.'], 400);
     }
+
+    $newDate = Carbon::parse($request->new_date);
+    if ($newDate->lt(Carbon::today())) {
+        return response()->json(['error' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'], 400);
+    }
+
+    $oldDate = $appointment->appointment_date; // تاریخ قبلی
+    $appointment->appointment_date = $newDate;
+    $appointment->save();
+
+    // تبدیل تاریخ‌ها به فرمت شمسی
+    $oldDateJalali = Jalalian::fromDateTime($oldDate)->format('Y/m/d');
+    $newDateJalali = Jalalian::fromDateTime($newDate)->format('Y/m/d');
+
+    // ارسال پیامک جابجایی نوبت
+    if ($appointment->patient && $appointment->patient->mobile) {
+        $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به {$newDateJalali} تغییر یافت.";
+        SendSmsNotificationJob::dispatch(
+            $message,
+            [$appointment->patient->mobile],
+            null, // بدون قالب
+            [] // بدون پارامتر اضافی
+        )->delay(now()->addSeconds(5));
+    }
+
+    return response()->json(['message' => 'نوبت با موفقیت جابجا شد و پیامک در صف قرار گرفت.']);
+}
     public function filterAppointments(Request $request)
     {
         $status           = $request->query('status');

@@ -173,33 +173,49 @@
             const buttonDisabled = isAttended ? 'disabled' : '';
             const dropdownItemDisabled = isAttended ? 'disabled' : ''; // برای غیرفعال کردن آیتم‌های دراپ‌داون
             const appointmentHTML = `
-                        <tr data-appointment-id="${appointment.id}">
-                            <td><input type="checkbox" class="row-checkbox"></td>
-                            <td>${appointment.patient.first_name} ${appointment.patient.last_name}</td>
-                            <td>${appointment.patient.mobile}</td>
-                            <td>${nationalCode}</td> 
-                            <td>${getPrescriptionStatus(appointment.status)}</td>
-                            <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
-                            <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
-                            <td>${appointment.appointment_time}</td>
-                            <td>
-                                <button class="btn btn-outline-info btn-end-visit ${buttonDisabled}" data-appointment-id="${appointment.id}" ${buttonDisabled}>
-                                    پایان ویزیت
-                                </button>
-                            </td>
-                            <td class="text-center">
-                                <div class="dropdown d-inline-block position-relative">
-                                    <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
-                                        <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
-                                        <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">لغو نوبت</a></li>
-                                        <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">جابجایی نوبت</a></li>
-                                        <li><a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">مسدود کردن کاربر</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>`;
+    <tr data-appointment-id="${appointment.id}">
+        <td><input type="checkbox" class="row-checkbox"></td>
+        <td>${appointment.patient.first_name} ${appointment.patient.last_name}</td>
+        <td>${appointment.patient.mobile}</td>
+        <td>${nationalCode}</td> 
+        <td>${getPrescriptionStatus(appointment.status)}</td>
+        <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
+        <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
+        <td>${appointment.appointment_time}</td>
+        <td>
+            <button class="btn btn-outline-info btn-end-visit ${
+                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
+            }" data-appointment-id="${appointment.id}">
+                پایان ویزیت
+            </button>
+        </td>
+        <td class="text-center">
+            <div class="dropdown d-inline-block position-relative">
+                <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
+                    <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
+                    <li class=" ${
+                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
+            }">
+                        <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
+                            لغو نوبت
+                        </a>
+                    </li>
+                    <li class="${(appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''}">
+                        <a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">
+                            جابجایی نوبت
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">
+                            مسدود کردن کاربر
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>`;
             appointmentsTableBody.append(appointmentHTML);
           });
         } else {
@@ -262,33 +278,49 @@
             const buttonDisabled = isAttended ? 'disabled' : '';
             const dropdownItemDisabled = isAttended ? 'disabled' : ''; // برای غیرفعال کردن آیتم‌های دراپ‌داون
             const appointmentHTML = `
-                        <tr data-appointment-id="${appointment.id}">
-                            <td><input type="checkbox" class="row-checkbox"></td>
-                            <td>${appointment.patient.first_name} ${appointment.patient.last_name}</td>
-                            <td>${appointment.patient.mobile}</td>
-                            <td>${appointment.patient.national_code}</td>
-                            <td>${getPrescriptionStatus(appointment.status)}</td>
-                            <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
-                            <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
-                            <td>${appointment.appointment_time}</td>
-                            <td>
-                                <button class="btn btn-outline-info btn-end-visit ${buttonDisabled}" data-appointment-id="${appointment.id}" ${buttonDisabled}>
-                                    پایان ویزیت
-                                </button>
-                            </td>
-                            <td class="text-center">
-                                <div class="dropdown d-inline-block position-relative">
-                                    <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
-                                        <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
-                                        <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">لغو نوبت</a></li>
-                                        <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">جابجایی نوبت</a></li>
-                                        <li><a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">مسدود کردن کاربر</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>`;
+    <tr data-appointment-id="${appointment.id}">
+        <td><input type="checkbox" class="row-checkbox"></td>
+        <td>${appointment.patient.first_name} ${appointment.patient.last_name}</td>
+        <td>${appointment.patient.mobile}</td>
+        <td>${nationalCode}</td> 
+        <td>${getPrescriptionStatus(appointment.status)}</td>
+        <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
+        <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
+        <td>${appointment.appointment_time}</td>
+        <td>
+            <button class="btn btn-outline-info btn-end-visit ${
+                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
+            }" data-appointment-id="${appointment.id}">
+                پایان ویزیت
+            </button>
+        </td>
+        <td class="text-center">
+            <div class="dropdown d-inline-block position-relative">
+                <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
+                    <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
+                    <li class=" ${
+                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
+            }">
+                        <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
+                            لغو نوبت
+                        </a>
+                    </li>
+                    <li class="${(appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''}">
+                        <a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">
+                            جابجایی نوبت
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">
+                            مسدود کردن کاربر
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>`;
             appointmentsTableBody.append(appointmentHTML);
           });
         } else {
@@ -438,7 +470,9 @@
                 'نامشخص';
               const isAttended = appointment.status === 'attended';
               const buttonDisabled = isAttended ? 'disabled' : '';
-              const dropdownItemDisabled = isAttended ? 'disabled' : '';
+              const dropdownItemDisabled = (appointment.status === 'attended' || appointment.status ===
+                'cancelled') ? 'disabled' : '';
+
               let appointmentHTML = `
                         <tr>
                             <td><input type="checkbox" class="row-checkbox"></td>
@@ -451,7 +485,9 @@
                             <td>${appointmentDate}</td>
                             <td>${appointment.appointment_time}</td>
                             <td>
-                                <button class="btn btn-outline-info btn-end-visit ${buttonDisabled}" data-appointment-id="${appointment.id}" ${buttonDisabled}>
+                                <button class="btn btn-outline-info btn-end-visit ${buttonDisabled}" data-appointment-id="${appointment.id}" ${buttonDisabled}  ${
+                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
+            }>
                                     پایان ویزیت
                                 </button>
                             </td>
@@ -460,6 +496,7 @@
                                     <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
                                         <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
                                     </button>
+                                    
                                     <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
                                         <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">لغو نوبت</a></li>
                                         <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark move-appointment" data-date="${appointment.appointment_date}" href="#" data-id="${appointment.id}">جابجایی نوبت</a></li>
@@ -1700,7 +1737,9 @@
                                 <td>${appointmentDate}</td>
                                 <td>${appointment.appointment_time}</td>
                                 <td>
-    <button class="btn btn-outline-info btn-end-visit" data-appointment-id="${appointment.id}">
+    <button class="btn btn-outline-info btn-end-visit" data-appointment-id="${appointment.id}"  ${
+                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
+            }>
         پایان ویزیت
     </button>
 </td>
@@ -1710,9 +1749,13 @@
                                             <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
-                                            <li><a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">لغو نوبت</a></li>
+                                            <li class="${
+                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
+            }" href="#" data-id="${appointment.id}"><a class="dropdown-item text-dark cancel-appointment">لغو نوبت</a></li>
                                             
-                                            <li><a class="dropdown-item text-dark move-appointment" data-date="${appointment.appointment_date}" href="#" data-id="${appointment.id}">جابجایی نوبت</a></li>
+                                            <li class=" ${
+                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
+            }"><a class="dropdown-item text-dark move-appointment" data-date="${appointment.appointment_date}" href="#" data-id="${appointment.id}">جابجایی نوبت</a></li>
                                             <li><a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name }">مسدود کردن کاربر</a></li>
                                         </ul>
                                     </div>
@@ -1750,13 +1793,13 @@
       let row = checkbox.closest('tr');
       let appointmentId = row.find('.btn-end-visit').attr('data-appointment-id'); // ID از دکمه
 
-   
+
 
       if (!appointmentId) {
         console.error('No data-appointment-id found in row or button:', row);
       }
 
-    
+
 
       selected.push({
         id: appointmentId,
@@ -1825,20 +1868,21 @@
             url: "{{ route('doctor.cancel_appointments') }}",
             method: 'POST',
             data: data,
-           success: function(response) {
-  if (response.status) {
-    Swal.fire('موفقیت', response.message, 'success');
-    selected.forEach(app => {
-      app.row.find('td:nth-child(5)').html('<span class="font-weight-bold text-danger">لغو شده</span>');
-      app.row.find('.row-checkbox').prop('checked', false); // تیک رو بردار
-    });
-  } else {
-    Swal.fire('خطا', response.message, 'error');
-  }
-},
+            success: function(response) {
+              if (response.status) {
+                Swal.fire('موفقیت', response.message, 'success');
+                selected.forEach(app => {
+                  app.row.find('td:nth-child(5)').html(
+                    '<span class="font-weight-bold text-danger">لغو شده</span>');
+                  app.row.find('.row-checkbox').prop('checked', false); // تیک رو بردار
+                });
+              } else {
+                Swal.fire('خطا', response.message, 'error');
+              }
+            },
             error: function(xhr) {
-              let errorMessage = xhr.responseJSON && xhr.responseJSON.message ?
-                xhr.responseJSON.error :
+              let errorMessage = xhr.responseJSON || xhr.responseJSON.message ?
+                xhr.responseJSON.message :
                 'مشکلی در لغو نوبت‌ها رخ داد.';
               Swal.fire('خطا', errorMessage, 'error');
             }
