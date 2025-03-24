@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting;
 
 use App\Http\Controllers\Dr\Controller;
@@ -12,32 +13,32 @@ use Illuminate\Support\Facades\Log;
 
 class MoshavereSettingController extends Controller
 {
-  /**
+    /**
  * Display a listing of the resource.
  */
-public function index(Request $request)
-{
-    $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
-    $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
+    public function index(Request $request)
+    {
+        $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
+        $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
 
-    // بررسی یا ایجاد تنظیمات مشاوره آنلاین
-    $appointmentConfig = DoctorCounselingConfig::firstOrCreate(
-        ['doctor_id' => $doctorId, 'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
-        [
-            'auto_scheduling'      => true,
-            'calendar_days'        => 30,
-            'online_consultation'  => false,
-            'holiday_availability' => false,
-            'has_phone_counseling' => false, // مقدار پیش‌فرض برای مشاوره تلفنی
-            'has_text_counseling'  => false, // مقدار پیش‌فرض برای مشاوره متنی
-            'has_video_counseling' => false, // مقدار پیش‌فرض برای مشاوره ویدیویی
-        ]
-    );
+        // بررسی یا ایجاد تنظیمات مشاوره آنلاین
+        $appointmentConfig = DoctorCounselingConfig::firstOrCreate(
+            ['doctor_id' => $doctorId, 'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
+            [
+                'auto_scheduling'      => true,
+                'calendar_days'        => 30,
+                'online_consultation'  => false,
+                'holiday_availability' => false,
+                'has_phone_counseling' => false, // مقدار پیش‌فرض برای مشاوره تلفنی
+                'has_text_counseling'  => false, // مقدار پیش‌فرض برای مشاوره متنی
+                'has_video_counseling' => false, // مقدار پیش‌فرض برای مشاوره ویدیویی
+            ]
+        );
 
-    return view('dr.panel.turn.schedule.moshavere_setting.index', [
-        'appointmentConfig' => $appointmentConfig,
-    ]);
-}
+        return view('dr.panel.turn.schedule.moshavere_setting.index', [
+            'appointmentConfig' => $appointmentConfig,
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -169,19 +170,33 @@ public function index(Request $request)
     public function copySingleSlot(Request $request)
     {
         $validated = $request->validate([
-            'source_day'  => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
-            'target_days' => 'required|array|min:1',
-            'start_time'  => 'required|date_format:H:i',
-            'end_time'    => 'required|date_format:H:i|after:start_time',
-            'override'    => 'nullable|in:0,1,true,false',
+            'source_day' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
+            'target_days' => 'required|array',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i',
+            'max_appointments' => 'required|integer|min:1',
+            'override' => 'boolean',
         ]);
-        $override         = filter_var($request->input('override', false), FILTER_VALIDATE_BOOLEAN);
-        $doctor           = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
-        DB::beginTransaction();
-        try {
-            $sourceWorkSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
-                ->where('day', $validated['source_day'])
+
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $selectedClinicId = $request->input('selectedClinicId', 'default');
+        $sourceDay = $validated['source_day'];
+        $targetDays = array_diff($validated['target_days'], [$sourceDay]); // حذف روز مبدأ
+
+        if (empty($targetDays)) {
+            return response()->json(['message' => 'هیچ روز مقصدی انتخاب نشده است'], 400);
+        }
+
+        $newSlot = [
+            'start' => $validated['start_time'],
+            'end' => $validated['end_time'],
+            'max_appointments' => $validated['max_appointments'],
+        ];
+
+        $conflictingSlots = [];
+        foreach ($targetDays as $day) {
+            $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
+                ->where('day', $day)
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
@@ -190,83 +205,87 @@ public function index(Request $request)
                     }
                 })
                 ->first();
-            if (! $sourceWorkSchedule || empty($sourceWorkSchedule->work_hours)) {
-                return response()->json([
-                    'message' => 'روز مبدأ یافت نشد یا فاقد ساعات کاری است.',
-                    'status'  => false,
-                ], 404);
-            }
-            $sourceWorkHours = json_decode($sourceWorkSchedule->work_hours, true) ?? [];
-            // یافتن بازه موردنظر برای کپی
-            $slotToCopy = collect($sourceWorkHours)->first(function ($slot) use ($validated) {
-                return $slot['start'] === $validated['start_time'] && $slot['end'] === $validated['end_time'];
-            });
-            if (! $slotToCopy) {
-                return response()->json([
-                    'message' => 'ساعات کاری مورد نظر برای کپی یافت نشد.',
-                    'status'  => false,
-                ], 404);
-            }
-            foreach ($validated['target_days'] as $targetDay) {
-                $targetWorkSchedule = DoctorCounselingWorkSchedule::firstOrCreate(
-                    [
-                        'doctor_id' => $doctor->id,
-                        'day'       => $targetDay,
-                        'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
-                    ],
-                    [
-                        'is_working' => true,
-                        'work_hours' => json_encode([])
-                    ]
-                );
-                $existingWorkHours = json_decode($targetWorkSchedule->work_hours, true) ?? [];
-                if ($override) {
-                    // حذف بازه‌های متداخل
-                    $existingWorkHours = array_filter($existingWorkHours, function ($existingSlot) use ($validated) {
-                        return ! (
-                            ($existingSlot['start'] == $validated['start_time'] && $existingSlot['end'] == $validated['end_time'])
-                        );
-                    });
-                } else {
-                    // بررسی تداخل زمانی
-                    foreach ($existingWorkHours as $existingSlot) {
-                        $existingStart = Carbon::createFromFormat('H:i', $existingSlot['start']);
-                        $existingEnd   = Carbon::createFromFormat('H:i', $existingSlot['end']);
-                        $newStart      = Carbon::createFromFormat('H:i', $slotToCopy['start']);
-                        $newEnd        = Carbon::createFromFormat('H:i', $slotToCopy['end']);
-                        if (
-                            ($newStart >= $existingStart && $newStart < $existingEnd) ||
-                            ($newEnd > $existingStart && $newEnd <= $existingEnd) ||
-                            ($newStart <= $existingStart && $newEnd >= $existingEnd)
-                        ) {
-                            return response()->json([
-                                'message' => 'بازه زمانی ' . $newStart->format('H:i') . ' تا ' . $newEnd->format('H:i') . ' با بازه‌های موجود تداخل دارد.',
-                                'status'  => false,
-                                'day'     => $targetDay,
-                            ], 400);
-                        }
+
+            if ($workSchedule && $workSchedule->work_hours) {
+                $workHours = json_decode($workSchedule->work_hours, true);
+                foreach ($workHours as $slot) {
+                    if ($this->isTimeConflict($newSlot['start'], $newSlot['end'], $slot['start'], $slot['end'])) {
+                        $conflictingSlots[] = [
+                            'day' => $day,
+                            'start' => $slot['start'],
+                            'end' => $slot['end'],
+                        ];
                     }
                 }
-                // اضافه کردن بازه جدید
-                $existingWorkHours[]            = $slotToCopy;
-                $targetWorkSchedule->work_hours = json_encode(array_values($existingWorkHours));
-                $targetWorkSchedule->save();
             }
-            DB::commit();
-            return response()->json([
-                'message'     => 'ساعات کاری با موفقیت کپی شد',
-                'status'      => true,
-                'target_days' => $validated['target_days'],
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'خطا در کپی ساعات کاری',
-                'status'  => false,
-            ], 500);
         }
-    }
 
+        if (!empty($conflictingSlots) && !$validated['override']) {
+            return response()->json(['conflicting_slots' => $conflictingSlots], 400);
+        }
+
+        foreach ($targetDays as $day) {
+            $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
+                ->where('day', $day)
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->first();
+
+            if (!$workSchedule) {
+                $workSchedule = DoctorCounselingWorkSchedule::create([
+                    'doctor_id' => $doctor->id,
+                    'day' => $day,
+                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'is_working' => true,
+                    'work_hours' => json_encode([$newSlot]),
+                ]);
+            } else {
+                $workHours = json_decode($workSchedule->work_hours, true) ?? [];
+                if ($validated['override']) {
+                    $workHours = array_filter($workHours, function ($slot) use ($newSlot) {
+                        return !$this->isTimeConflict($newSlot['start'], $newSlot['end'], $slot['start'], $slot['end']);
+                    });
+                }
+                $workHours[] = $newSlot;
+                $workSchedule->update(['work_hours' => json_encode(array_values($workHours)), 'is_working' => true]);
+            }
+        }
+
+        $updatedSchedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
+            ->where(function ($query) use ($selectedClinicId) {
+                if ($selectedClinicId !== 'default') {
+                    $query->where('clinic_id', $selectedClinicId);
+                } else {
+                    $query->whereNull('clinic_id');
+                }
+            })
+            ->get();
+
+        return response()->json([
+            'message' => $validated['override'] ? 'بازه‌ها جایگزین شدند' : 'بازه‌ها کپی شدند',
+            'target_days' => $targetDays,
+            'workSchedules' => $updatedSchedules,
+        ]);
+    }
+    private function isTimeConflict($newStart, $newEnd, $existingStart, $existingEnd)
+    {
+        $newStartMinutes = $this->timeToMinutes($newStart);
+        $newEndMinutes = $this->timeToMinutes($newEnd);
+        $existingStartMinutes = $this->timeToMinutes($existingStart);
+        $existingEndMinutes = $this->timeToMinutes($existingEnd);
+
+        return ($newStartMinutes < $existingEndMinutes && $newEndMinutes > $existingStartMinutes);
+    }
+     private function timeToMinutes($time)
+    {
+        [$hours, $minutes] = explode(':', $time);
+        return ($hours * 60) + $minutes;
+    }
     // تابع کمکی برای تبدیل روز به فارسی
     private function getDayNameInPersian($day)
     {
@@ -548,9 +567,9 @@ public function index(Request $request)
             $end   = Carbon::createFromFormat('H:i', $endTime);
             // محاسبه تفاوت زمانی به دقیقه
             $diffInMinutes = $start->diffInMinutes($end);
-                                                                                        // تعیین طول هر نوبت (به دقیقه)
+            // تعیین طول هر نوبت (به دقیقه)
             $appointmentDuration = config('settings.default_appointment_duration', 20); // 20 دقیقه پیش‌فرض
-                                                                                        // محاسبه تعداد نوبت‌ها
+            // محاسبه تعداد نوبت‌ها
             return floor($diffInMinutes / $appointmentDuration);
         } catch (\Exception $e) {
             return 0; // بازگرداندن مقدار صفر در صورت بروز خطا
@@ -596,13 +615,13 @@ public function index(Request $request)
         ]);
     }
 
-   /**
+    /**
  * ذخیره تنظیمات برنامه کاری
  */
-public function saveWorkSchedule(Request $request)
+  public function saveWorkSchedule(Request $request)
 {
     $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
-    $validatedData    = $request->validate([
+    $validatedData = $request->validate([
         'auto_scheduling'      => 'boolean',
         'calendar_days'        => 'nullable|integer|min:1|max:365',
         'online_consultation'  => 'boolean',
@@ -613,25 +632,14 @@ public function saveWorkSchedule(Request $request)
         'price_30min'          => 'nullable|integer|min:0',
         'price_45min'          => 'nullable|integer|min:0',
         'price_60min'          => 'nullable|integer|min:0',
-        'has_phone_counseling' => 'boolean', // اعتبارسنجی برای مشاوره تلفنی
-        'has_text_counseling'  => 'boolean', // اعتبارسنجی برای مشاوره متنی
-        'has_video_counseling' => 'boolean', // اعتبارسنجی برای مشاوره ویدیویی
+        'has_phone_counseling' => 'boolean',
+        'has_text_counseling'  => 'boolean',
+        'has_video_counseling' => 'boolean',
     ]);
 
     DB::beginTransaction();
     try {
         $doctor = Auth::guard('doctor')->user();
-
-        // حذف تنظیمات قبلی
-        DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
-            ->where(function ($query) use ($selectedClinicId) {
-                if ($selectedClinicId !== 'default') {
-                    $query->where('clinic_id', $selectedClinicId);
-                } else {
-                    $query->whereNull('clinic_id');
-                }
-            })
-            ->delete();
 
         // ذخیره تنظیمات کلی
         $counselingConfig = DoctorCounselingConfig::updateOrCreate(
@@ -649,22 +657,34 @@ public function saveWorkSchedule(Request $request)
                 'price_30min'          => $validatedData['price_30min'],
                 'price_45min'          => $validatedData['price_45min'],
                 'price_60min'          => $validatedData['price_60min'],
-                'has_phone_counseling' => $validatedData['has_phone_counseling'] ?? false, // ذخیره مشاوره تلفنی
-                'has_text_counseling'  => $validatedData['has_text_counseling'] ?? false,  // ذخیره مشاوره متنی
-                'has_video_counseling' => $validatedData['has_video_counseling'] ?? false, // ذخیره مشاوره ویدیویی
+                'has_phone_counseling' => $validatedData['has_phone_counseling'] ?? false,
+                'has_text_counseling'  => $validatedData['has_text_counseling'] ?? false,
+                'has_video_counseling' => $validatedData['has_video_counseling'] ?? false,
             ]
         );
 
-        // ذخیره برنامه کاری روزها
+        // به‌روزرسانی یا ایجاد برنامه کاری روزها
         foreach ($validatedData['days'] as $day => $dayConfig) {
-            $workSchedule = DoctorCounselingWorkSchedule::create([
-                'doctor_id'            => $doctor->id,
-                'day'                  => $day,
-                'clinic_id'            => $selectedClinicId !== 'default' ? $selectedClinicId : null,
-                'is_working'           => $dayConfig['is_working'] ?? false,
-                'work_hours'           => $dayConfig['work_hours'] ?? null,
-                'appointment_settings' => json_encode($dayConfig['appointment_settings'] ?? []),
-            ]);
+            $slots = isset($dayConfig['slots']) ? array_map(function ($slot) {
+                return [
+                    'start'            => $slot['start'],
+                    'end'              => $slot['end'],
+                    'max_appointments' => $slot['max_appointments'] ?? 1,
+                ];
+            }, $dayConfig['slots']) : [];
+
+            DoctorCounselingWorkSchedule::updateOrCreate(
+                [
+                    'doctor_id' => $doctor->id,
+                    'day'       => $day,
+                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                ],
+                [
+                    'is_working'           => $dayConfig['is_working'] ?? false,
+                    'work_hours'           => !empty($slots) ? json_encode($slots) : null,
+                    'appointment_settings' => json_encode($dayConfig['appointment_settings'] ?? []),
+                ]
+            );
         }
 
         DB::commit();
@@ -688,7 +708,7 @@ public function saveWorkSchedule(Request $request)
             'trace' => $e->getTraceAsString(),
         ]);
         return response()->json([
-            'message' => 'خطا در ذخیره‌سازی تنظیمات.',
+            'message' => 'خطا در ذخیره‌سازی تنظیمات: ' . $e->getMessage(),
             'status'  => false,
         ], 500);
     }
