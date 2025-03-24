@@ -274,6 +274,8 @@
         appointmentsTableBody.html('');
         if (response.appointments.length > 0) {
           response.appointments.forEach(function(appointment) {
+            const nationalCode = appointment.patient.national_code ?
+              appointment.patient.national_code : 'نامشخص';
             const isAttended = appointment.status === 'attended';
             const buttonDisabled = isAttended ? 'disabled' : '';
             const dropdownItemDisabled = isAttended ? 'disabled' : ''; // برای غیرفعال کردن آیتم‌های دراپ‌داون
