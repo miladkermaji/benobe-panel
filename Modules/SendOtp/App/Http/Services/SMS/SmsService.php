@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\SendOtp\App\Http\Services\SMS;
 
 use Modules\SendOtp\App\Http\Interfaces\MessageInterface;
@@ -32,7 +33,7 @@ class SmsService implements MessageInterface
     public static function create($otpId, $newMobile, $parameters)
     {
         $smsService = new self();
-        
+
         $activeGateway = SmsGateway::where('is_active', true)->first();
         $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
 
@@ -45,10 +46,17 @@ class SmsService implements MessageInterface
             default => env('SMS_SENDER_NUMBER', '5000309180607211'),
         };
 
-        $formattedParameters = ($gatewayName === 'pishgamrayan') ? $parameters : ['code' => $parameters[0] ?? ''];
+        // اگه پیشگام رایان باشه، از قالب استفاده کن
+        if ($gatewayName === 'pishgamrayan') {
+            $formattedParameters = $parameters; // پارامترها برای پیشگام رایان همون شکلی که هستن
+            $smsService->setOtpId($otpId); // تنظیم otpId برای پیشگام رایان
+        } else {
+            // برای بقیه پنل‌ها، فقط کد رو به عنوان پیام ساده بفرست
+            $formattedParameters = ['message' => $parameters[0] ?? '']; // پیام ساده
+            $smsService->setOtpId(null); // بدون otpId
+        }
 
         $smsService->setSenderNumber($senderNumber);
-        $smsService->setOtpId($otpId);
         $smsService->setParameters($formattedParameters);
         $smsService->setRecipientNumbers([$newMobile]);
         return $smsService;
@@ -71,27 +79,66 @@ class SmsService implements MessageInterface
         $sendDateTime = $sendDateTime ?? \Morilog\Jalali\Jalalian::now()->format('Y/m/d H:i:s');
 
         $smsService = new self();
-        $smsService->setMessage($message);
+        $smsService->setMessage($message); // متن پیام همون چیزی که کاربر داده
         $smsService->setRecipientNumbers($recipients);
         $smsService->setSenderNumber($senderNumber);
-        $smsService->sendDateTime = $sendDateTime; // اینو مستقیم ست می‌کنیم چون گتر/ستر نداره
+        $smsService->sendDateTime = $sendDateTime;
+
+        // اگه پیشگام رایان باشه و otpId بخواد، اینجا می‌تونی شرط اضافه کنی
+        if ($gatewayName === 'pishgamrayan') {
+            // اگه نیاز به otpId داری، می‌تونی اینجا تنظیمش کنی
+            // $smsService->setOtpId($otpId);
+        }
+
         return $smsService;
     }
 
-    public function fire() {}
+    public function fire()
+    {
+    }
 
-    public function getOtpId() { return $this->otpId; }
-    public function setOtpId($otpId) { $this->otpId = $otpId; }
+    public function getOtpId()
+    {
+        return $this->otpId;
+    }
+    public function setOtpId($otpId)
+    {
+        $this->otpId = $otpId;
+    }
 
-    public function getParameters() { return $this->parameters; }
-    public function setParameters($parameters) { $this->parameters = $parameters; }
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+    public function setParameters($parameters)
+    {
+        $this->parameters = $parameters;
+    }
 
-    public function getSenderNumber() { return $this->senderNumber; }
-    public function setSenderNumber($senderNumber) { $this->senderNumber = $senderNumber; }
+    public function getSenderNumber()
+    {
+        return $this->senderNumber;
+    }
+    public function setSenderNumber($senderNumber)
+    {
+        $this->senderNumber = $senderNumber;
+    }
 
-    public function getRecipientNumbers() { return $this->recipientNumbers; }
-    public function setRecipientNumbers($recipientNumbers) { $this->recipientNumbers = $recipientNumbers; }
+    public function getRecipientNumbers()
+    {
+        return $this->recipientNumbers;
+    }
+    public function setRecipientNumbers($recipientNumbers)
+    {
+        $this->recipientNumbers = $recipientNumbers;
+    }
 
-    public function getMessage() { return $this->message; }
-    public function setMessage($message) { $this->message = $message; }
+    public function getMessage()
+    {
+        return $this->message;
+    }
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
 }
