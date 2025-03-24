@@ -1138,157 +1138,177 @@ class ScheduleSettingController extends Controller
 
 
 
-    public function cancelAppointments(Request $request)
-    {
-        $appointmentIds = $request->input('appointment_ids');
-        $date = $request->input('date');
-        $selectedClinicId = $request->input('selectedClinicId');
+public function cancelAppointments(Request $request)
+{
+    $appointmentIds = $request->input('appointment_ids');
+    $date = $request->input('date');
+    $selectedClinicId = $request->input('selectedClinicId');
 
-        if (empty($appointmentIds)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'هیچ نوبتی انتخاب نشده است'
-            ], 400);
-        }
+    Log::info('ورودی cancelAppointments', [
+        'appointment_ids' => $appointmentIds,
+        'date' => $date,
+        'selectedClinicId' => $selectedClinicId
+    ]);
 
-        // تبدیل تاریخ شمسی به میلادی
-        $gregorianDate = $date;
-        $jalaliDate = $date; // نگه داشتن تاریخ شمسی برای پیامک
-        if (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $date)) {
-            $gregorianDate = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->toDateString();
-            $jalaliDate = $date; // تاریخ شمسی رو نگه می‌داریم
-        }
-
-        // ساخت کوئری
-        $query = Appointment::whereIn('id', $appointmentIds)
-            ->where('appointment_date', $gregorianDate);
-
-        if ($selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
-        } else {
-            $query->where('clinic_id', $selectedClinicId);
-        }
-
-        $appointments = $query->get();
-
-        if ($appointments->isEmpty()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'هیچ نوبتی با این مشخصات یافت نشد'
-            ], 404);
-        }
-
-        // جمع‌آوری شماره‌ها و لغو نوبت‌ها
-        $recipients = [];
-        foreach ($appointments as $appointment) {
-            if ($appointment->user && $appointment->user->mobile) {
-                $recipients[] = $appointment->user->mobile;
-            }
-            $appointment->status = 'cancelled';
-            $appointment->save();
-            $appointment->delete(); // این deleted_at رو پر می‌کنه
-        }
-
-        // ارسال پیامک با جاب
-        if (!empty($recipients)) {
-            $message = "کاربر گرامی، نوبت شما برای تاریخ {$jalaliDate} لغو شد.";
-
-            $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
-            $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-            $templateId = ($gatewayName === 'pishgamrayan') ? 100253 : null; // فرضاً 100253 برای لغو نوبت
-
-            SendSmsNotificationJob::dispatch(
-                $message,
-                $recipients,
-                $templateId, // شرط اعمال‌شده
-                [$jalaliDate]
-            )->delay(now()->addSeconds(5));
-        }
-
+    if (empty($appointmentIds)) {
         return response()->json([
-            'status' => true,
-            'message' => 'نوبت‌ها با موفقیت لغو شدند و پیامک در صف قرار گرفت.',
-            'total_recipients' => count($recipients),
-        ]);
+            'status' => false,
+            'message' => 'هیچ نوبتی انتخاب نشده است'
+        ], 400);
     }
 
-    public function rescheduleAppointment(Request $request)
-    {
-        $validated = $request->validate([
-            'old_date'         => 'required|date',
-            'new_date'         => 'required|date',
-            'selectedClinicId' => 'nullable|string',
-        ]);
+    $gregorianDate = $date;
+    $jalaliDate = $date;
+    if (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $date)) {
+        $gregorianDate = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->toDateString();
+        $jalaliDate = $date;
+    }
 
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-        $selectedClinicId = $request->input('selectedClinicId');
+    $query = Appointment::whereIn('id', $appointmentIds)
+        ->where('appointment_date', $gregorianDate);
 
-        try {
-            $appointments = Appointment::where('doctor_id', $doctorId)
-                ->where('appointment_date', $validated['old_date'])
-                ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
-                })
-                ->get();
+    if ($selectedClinicId === 'default') {
+        $query->whereNull('clinic_id');
+    } else {
+        $query->where('clinic_id', $selectedClinicId);
+    }
 
-            if ($appointments->isEmpty()) {
-                return response()->json(['status' => false, 'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.'], 404);
+    $appointments = $query->get();
+
+    Log::info('نتایج کوئری لغو نوبت', ['appointments' => $appointments->toArray()]);
+
+    if ($appointments->isEmpty()) {
+        return response()->json([
+            'status' => false,
+            'message' => 'هیچ نوبتی با این مشخصات یافت نشد'
+        ], 404);
+    }
+
+    $recipients = [];
+    foreach ($appointments as $appointment) {
+        if ($appointment->user && $appointment->user->mobile) {
+            $recipients[] = $appointment->user->mobile;
+        }
+        $appointment->status = 'cancelled';
+        $appointment->save();
+        $appointment->delete();
+    }
+
+    Log::info('گیرندگان پیامک لغو نوبت', ['recipients' => $recipients]);
+
+    if (!empty($recipients)) {
+        $message = "کاربر گرامی، نوبت شما برای تاریخ {$jalaliDate} لغو شد.";
+
+        $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+        $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+        $templateId = ($gatewayName === 'pishgamrayan') ? 100253 : null;
+
+        SendSmsNotificationJob::dispatch(
+            $message,
+            $recipients,
+            $templateId,
+            [$jalaliDate]
+        )->delay(now()->addSeconds(5));
+    }
+
+    return response()->json([
+        'status' => true,
+        'message' => 'نوبت‌ها با موفقیت لغو شدند و پیامک در صف قرار گرفت.',
+        'total_recipients' => count($recipients),
+    ]);
+}
+
+  public function rescheduleAppointment(Request $request)
+{
+    $validated = $request->validate([
+        'old_date'         => 'required|date',
+        'new_date'         => 'required|date',
+        'selectedClinicId' => 'nullable|string',
+    ]);
+
+    $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+    $selectedClinicId = $request->input('selectedClinicId');
+
+    Log::info('ورودی rescheduleAppointment', [
+        'old_date' => $validated['old_date'],
+        'new_date' => $validated['new_date'],
+        'doctor_id' => $doctorId,
+        'selectedClinicId' => $selectedClinicId
+    ]);
+
+    try {
+        $appointments = Appointment::where('doctor_id', $doctorId)
+            ->whereDate('appointment_date', $validated['old_date']) // استفاده از whereDate برای اطمینان
+            ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                $query->where('clinic_id', $selectedClinicId);
+            }, function ($query) {
+                $query->whereNull('clinic_id'); // اگه default باشه، clinic_id باید null باشه
+            })
+            ->get();
+
+        Log::info('نتایج کوئری جابجایی نوبت', ['appointments' => $appointments->toArray()]);
+
+        if ($appointments->isEmpty()) {
+            return response()->json(['status' => false, 'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.'], 404);
+        }
+
+        $workHours = DoctorWorkSchedule::where('doctor_id', $doctorId)
+            ->where('day', strtolower(Carbon::parse($validated['new_date'])->format('l')))
+            ->when($selectedClinicId === 'default', function ($query) {
+                $query->whereNull('clinic_id');
+            })
+            ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                $query->where('clinic_id', $selectedClinicId);
+            })
+            ->first();
+
+        if (!$workHours) {
+            return response()->json(['status' => false, 'message' => 'ساعات کاری یافت نشد.'], 400);
+        }
+
+        $recipients = [];
+        $oldDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['old_date'])->format('Y/m/d');
+        $newDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['new_date'])->format('Y/m/d');
+
+        foreach ($appointments as $appointment) {
+            $appointment->appointment_date = $validated['new_date'];
+            $appointment->save();
+
+            if ($appointment->patient && $appointment->patient->mobile) {
+                $recipients[] = $appointment->patient->mobile;
             }
+        }
 
-            $workHours = DoctorWorkSchedule::where('doctor_id', $doctorId)
-                ->where('day', strtolower(Carbon::parse($validated['new_date'])->format('l')))
-                ->when($selectedClinicId === 'default', function ($query) {
-                    $query->whereNull('clinic_id');
-                })
-                ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
-                })
-                ->first();
+        Log::info('گیرندگان پیامک جابجایی نوبت', ['recipients' => $recipients]);
 
-            if (!$workHours) {
-                return response()->json(['status' => false, 'message' => 'ساعات کاری یافت نشد.'], 400);
-            }
-
-            $recipients = [];
-            $oldDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['old_date'])->format('Y/m/d');
-            $newDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['new_date'])->format('Y/m/d');
-
-            foreach ($appointments as $appointment) {
-                $appointment->appointment_date = $validated['new_date'];
-                $appointment->save();
-
-                if ($appointment->patient && $appointment->patient->mobile) {
-                    $recipients[] = $appointment->patient->mobile;
-                }
-            }
+        if (!empty($recipients)) {
+            $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به تاریخ {$newDateJalali} تغییر یافت.";
 
             $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
             $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
             $templateId = ($gatewayName === 'pishgamrayan') ? 100252 : null;
 
-            if (!empty($recipients)) {
-                $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به تاریخ {$newDateJalali} تغییر یافت.";
-                SendSmsNotificationJob::dispatch(
-                    $message,
-                    $recipients,
-                    $templateId, // شناسه قالب جابجایی نوبت
-                    [$oldDateJalali, $newDateJalali, 'به نوبه']
-                )->delay(now()->addSeconds(5));
-            }
-
-            return response()->json([
-                'status'           => true,
-                'message'          => 'نوبت‌ها با موفقیت جابجا شدند و پیامک در صف قرار گرفت.',
-                'total_recipients' => count($recipients),
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'خطا در جابجایی نوبت‌ها.',
-                'error'   => $e->getMessage(),
-            ], 500);
+            SendSmsNotificationJob::dispatch(
+                $message,
+                $recipients,
+                $templateId,
+                [$oldDateJalali, $newDateJalali, 'به نوبه']
+            )->delay(now()->addSeconds(5));
         }
+
+        return response()->json([
+            'status'           => true,
+            'message'          => 'نوبت‌ها با موفقیت جابجا شدند و پیامک در صف قرار گرفت.',
+            'total_recipients' => count($recipients),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status'  => false,
+            'message' => 'خطا در جابجایی نوبت‌ها.',
+            'error'   => $e->getMessage(),
+        ], 500);
     }
+}
     public function updateFirstAvailableAppointment(Request $request)
     {
         // اعتبارسنجی ورودی
