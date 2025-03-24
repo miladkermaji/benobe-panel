@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Log;
 
 class SendSmsNotificationJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     protected $message;
     protected $recipients;
@@ -44,7 +47,6 @@ class SendSmsNotificationJob implements ShouldQueue
                 )->format('Y/m/d H:i:s')
                 : \Morilog\Jalali\Jalalian::now()->format('Y/m/d H:i:s');
 
-            // چک کردن پنل فعال
             $activeGateway = SmsGateway::where('is_active', true)->first();
             $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
 
@@ -62,15 +64,13 @@ class SendSmsNotificationJob implements ShouldQueue
                         )
                     );
 
-                    // شرط بر اساس پنل فعال
+                    // تنظیم مستقیم پراپرتی‌ها
                     if ($gatewayName === 'pishgamrayan' && $this->templateId) {
-                        // برای پیشگام‌رایان، templateId رو به‌عنوان otpId استفاده کن
-                        $smsService->message->setOtpId($this->templateId);
-                        $smsService->message->setParameters($this->params);
+                        $smsService->message->otpId = $this->templateId;
+                        $smsService->message->parameters = $this->params;
                     } else {
-                        // برای کاوه‌نگار یا بقیه پنل‌ها، otpId رو null کن
-                        $smsService->message->setOtpId(null);
-                        $smsService->message->setParameters([]);
+                        $smsService->message->otpId = null;
+                        $smsService->message->parameters = [];
                     }
 
                     $response = $smsService->send();
