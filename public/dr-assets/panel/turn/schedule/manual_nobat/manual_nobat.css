@@ -97,3 +97,22 @@ body,
     line-height: 22px;
   }
 }
+   .modal-content { 
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); 
+            z-index: 1050; 
+            border-radius: 10px; 
+        }
+        .table-responsive { 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+            border-radius: 8px; 
+            overflow: hidden; 
+        }
+        .btn-primary { 
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); 
+            transition: all 0.3s ease; 
+        }
+        .btn-primary:hover { 
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); 
+        }
+        .search-results { z-index: 1000; }
+        .calendar-and-add-sick-section { padding: 20px; background: #f8f9fa; border-radius: 10px; }

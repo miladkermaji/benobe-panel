@@ -176,117 +176,128 @@ class ManualNobatController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'user_id'          => 'required|exists:users,id',
-            'doctor_id'        => 'required|exists:doctors,id',
-            'appointment_date' => 'required|date',
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'doctor_id' => 'required|exists:doctors,id',
+            'appointment_date' => 'required|date_format:Y/m/d',
             'appointment_time' => 'required|date_format:H:i',
-            'description'      => 'nullable|string|max:1000',
-            'selectedClinicId' => 'nullable', // اعتبارسنجی کلینیک آیدی
+            'description' => 'nullable|string|max:1000',
+            'selectedClinicId' => 'nullable|string',
+        ], [
+            'user_id.required' => 'شناسه کاربر الزامی است.',
+            'user_id.exists' => 'کاربر موردنظر وجود ندارد.',
+            'doctor_id.required' => 'شناسه پزشک الزامی است.',
+            'doctor_id.exists' => 'پزشک موردنظر وجود ندارد.',
+            'appointment_date.required' => 'تاریخ نوبت الزامی است.',
+            'appointment_date.date_format' => 'فرمت تاریخ باید به صورت Y/m/d باشد.',
+            'appointment_time.required' => 'ساعت نوبت الزامی است.',
+            'appointment_time.date_format' => 'فرمت ساعت باید H:i باشد.',
+            'description.max' => 'توضیحات نمی‌تواند بیش از ۱۰۰۰ کاراکتر باشد.',
         ]);
 
-        try {
-            // تبدیل تاریخ شمسی به میلادی
-            $gregorianDate                     = CalendarUtils::createDatetimeFromFormat('Y/m/d', $request->appointment_date)->format('Y-m-d');
-            $validatedData['appointment_date'] = $gregorianDate;
-
-            // افزودن کلینیک آیدی به داده‌ها اگر موجود باشد
-            if ($request->has('selectedClinicId') && $request->selectedClinicId !== 'default') {
-                $validatedData['clinic_id'] = $request->selectedClinicId;
-            } else {
-                $validatedData['clinic_id'] = null; // اگر دیفالت باشد، مقدار نال بماند
-            }
-
-            // بررسی نوبت تکراری برای هر کلینیک به صورت جداگانه
-            $existingAppointment = ManualAppointment::where('user_id', $validatedData['user_id'])
-                ->where('appointment_date', $gregorianDate)
-                ->where('appointment_time', $validatedData['appointment_time'])
-                ->where(function ($query) use ($validatedData) {
-                    // اگر کلینیک خاص ارسال شده باشد، برای همان کلینیک بررسی شود
-                    if (! empty($validatedData['clinic_id'])) {
-                        $query->where('clinic_id', $validatedData['clinic_id']);
-                    } else {
-                        // اگر selectedClinicId برابر با 'default' باشد، کلینیک نال باشد
-                        $query->whereNull('clinic_id');
-                    }
-                })
-                ->exists();
-
-            // لاگ برای دیباگ
-            Log::info('Existing Appointment Check:', ['exists' => $existingAppointment]);
-
-            if ($existingAppointment) {
-                return response()->json(['success' => false, 'message' => 'نوبت تکراری است.'], 400);
-            }
-
-            // ثبت نوبت جدید
-            ManualAppointment::create($validatedData);
-
-            return response()->json(['success' => true, 'message' => 'نوبت با موفقیت ثبت شد.']);
-        } catch (\Exception $e) {
-            Log::error('Error in ManualNobatController@store: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'خطا در ثبت نوبت.'], 500);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در اطلاعات ورودی!',
+                'errors' => $validator->errors()->all(),
+            ], 422);
         }
-    }
-
-    public function storeWithUser(Request $request)
-    {
-        $validatedData = $request->validate([
-            'first_name'       => 'required|string|max:255',
-            'last_name'        => 'required|string|max:255',
-            'mobile'           => 'required|digits:11|unique:users,mobile',
-            'national_code'    => 'required|digits:10|unique:users,national_code',
-            'appointment_date' => 'required|date',
-            'appointment_time' => 'required|date_format:H:i',
-            'description'      => 'nullable|string|max:1000',
-            'selectedClinicId' => 'nullable|string', // اضافه کردن فیلد کلینیک
-        ]);
 
         try {
-            // تبدیل تاریخ جلالی به میلادی
-            $gregorianDate                     = CalendarUtils::createDatetimeFromFormat('Y/m/d', $request->appointment_date)->format('Y-m-d');
-            $validatedData['appointment_date'] = $gregorianDate;
+            $data = $validator->validated();
+            $data['appointment_date'] = CalendarUtils::createDatetimeFromFormat('Y/m/d', $request->appointment_date)->format('Y-m-d');
+            $data['clinic_id'] = $request->selectedClinicId === 'default' ? null : $request->selectedClinicId;
 
-            DB::beginTransaction();
+            if (ManualAppointment::where('user_id', $data['user_id'])
+                ->where('appointment_date', $data['appointment_date'])
+                ->where('appointment_time', $data['appointment_time'])
+                ->where('clinic_id', $data['clinic_id'])
+                ->exists()) {
+                return response()->json(['success' => false, 'message' => 'این نوبت قبلاً ثبت شده است!'], 400);
+            }
 
-            // ایجاد کاربر
-            $user = User::create([
-                'first_name'    => $validatedData['first_name'],
-                'last_name'     => $validatedData['last_name'],
-                'mobile'        => $validatedData['mobile'],
-                'national_code' => $validatedData['national_code'],
-            ]);
+            ManualAppointment::create($data);
 
-            // ایجاد نوبت با کلینیک انتخابی
-            $appointment = ManualAppointment::create([
-                'user_id'          => $user->id,
-                'doctor_id'        => auth('doctor')->id() ?? auth('secretary')->id(),
-                'clinic_id'        => $validatedData['selectedClinicId'] === 'default' ? null : $validatedData['selectedClinicId'],
-                'appointment_date' => $validatedData['appointment_date'],
-                'appointment_time' => $validatedData['appointment_time'],
-                'description'      => $validatedData['description'],
-            ]);
-
-            DB::commit();
-
-            // بارگذاری اطلاعات مرتبط با کاربر
-            $appointment->load('user');
-
-            return response()->json(['data' => $appointment], 201);
+            return response()->json(['success' => true, 'message' => 'نوبت با موفقیت ثبت شد!']);
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in storeWithUser: ' . $e->getMessage());
-            return response()->json(['error' => 'خطا در ذخیره اطلاعات!'], 500);
+            Log::error('خطا در ثبت نوبت: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'خطا در ثبت نوبت!'], 500);
         }
     }
 
     /**
-     * Display the specified resource.
+     * ثبت نوبت همراه با کاربر جدید
      */
-    public function show(string $id)
+    public function storeWithUser(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'mobile' => 'required|digits:11|unique:users,mobile',
+            'national_code' => 'required|digits:10|unique:users,national_code',
+            'appointment_date' => 'required|date_format:Y/m/d',
+            'appointment_time' => 'required|date_format:H:i',
+            'description' => 'nullable|string|max:1000',
+            'selectedClinicId' => 'nullable|string',
+        ], [
+            'first_name.required' => 'نام بیمار الزامی است.',
+            'first_name.max' => 'نام بیمار نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
+            'last_name.required' => 'نام خانوادگی بیمار الزامی است.',
+            'last_name.max' => 'نام خانوادگی نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
+            'mobile.required' => 'شماره موبایل الزامی است.',
+            'mobile.digits' => 'شماره موبایل باید ۱۱ رقمی باشد.',
+            'mobile.unique' => 'این شماره موبایل قبلاً ثبت شده است.',
+            'national_code.required' => 'کد ملی الزامی است.',
+            'national_code.digits' => 'کد ملی باید ۱۰ رقمی باشد.',
+            'national_code.unique' => 'این کد ملی قبلاً ثبت شده است.',
+            'appointment_date.required' => 'تاریخ نوبت الزامی است.',
+            'appointment_date.date_format' => 'فرمت تاریخ باید Y/m/d باشد.',
+            'appointment_time.required' => 'ساعت نوبت الزامی است.',
+            'appointment_time.date_format' => 'فرمت ساعت باید H:i باشد.',
+            'description.max' => 'توضیحات نمی‌تواند بیش از ۱۰۰۰ کاراکتر باشد.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در اطلاعات ورودی!',
+                'errors' => $validator->errors()->all(),
+            ], 422);
+        }
+
+        try {
+            $data = $validator->validated();
+            $data['appointment_date'] = CalendarUtils::createDatetimeFromFormat('Y/m/d', $request->appointment_date)->format('Y-m-d');
+
+            DB::beginTransaction();
+
+            $user = User::create([
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'mobile' => $data['mobile'],
+                'national_code' => $data['national_code'],
+            ]);
+
+            $appointment = ManualAppointment::create([
+                'user_id' => $user->id,
+                'doctor_id' => auth('doctor')->id() ?? auth('secretary')->id(),
+                'clinic_id' => $data['selectedClinicId'] === 'default' ? null : $data['selectedClinicId'],
+                'appointment_date' => $data['appointment_date'],
+                'appointment_time' => $data['appointment_time'],
+                'description' => $data['description'],
+            ]);
+
+            DB::commit();
+
+            $appointment->load('user');
+            return response()->json(['success' => true, 'data' => $appointment], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('خطا در ثبت نوبت با کاربر جدید: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'خطا در ثبت اطلاعات!'], 500);
+        }
     }
+   
 
     /**
      * Show the form for editing the specified resource.
@@ -314,44 +325,64 @@ class ManualNobatController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'first_name'       => 'required|string|max:255',
-            'last_name'        => 'required|string|max:255',
-            'mobile'           => 'required|digits:11',
-            'national_code'    => 'required|digits:10',
-            'appointment_date' => 'required|date',
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'mobile' => 'required|digits:11',
+            'national_code' => 'required|digits:10',
+            'appointment_date' => 'required|date_format:Y/m/d',
             'appointment_time' => 'required|date_format:H:i',
-            'description'      => 'nullable|string|max:1000',
-            'selectedClinicId' => 'nullable|string', // افزودن کلینیک آیدی
+            'description' => 'nullable|string|max:1000',
+            'selectedClinicId' => 'nullable|string',
+        ], [
+            'first_name.required' => 'نام بیمار الزامی است.',
+            'last_name.required' => 'نام خانوادگی بیمار الزامی است.',
+            'mobile.required' => 'شماره موبایل الزامی است.',
+            'mobile.digits' => 'شماره موبایل باید ۱۱ رقمی باشد.',
+            'national_code.required' => 'کد ملی الزامی است.',
+            'national_code.digits' => 'کد ملی باید ۱۰ رقمی باشد.',
+            'appointment_date.required' => 'تاریخ نوبت الزامی است.',
+            'appointment_date.date_format' => 'فرمت تاریخ باید Y/m/d باشد.',
+            'appointment_time.required' => 'ساعت نوبت الزامی است.',
+            'appointment_time.date_format' => 'فرمت ساعت باید H:i باشد.',
+            'description.max' => 'توضیحات نمی‌تواند بیش از ۱۰۰۰ کاراکتر باشد.',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در اطلاعات ورودی!',
+                'errors' => $validator->errors()->all(),
+            ], 422);
+        }
+
         try {
+            $data = $validator->validated();
+            $data['appointment_date'] = CalendarUtils::createDatetimeFromFormat('Y/m/d', $request->appointment_date)->format('Y-m-d');
             $appointment = ManualAppointment::when(
-                $validatedData['selectedClinicId'] === 'default',
+                $data['selectedClinicId'] === 'default',
                 fn ($query) => $query->whereNull('clinic_id'),
-                fn ($query) => $query->where('clinic_id', $validatedData['selectedClinicId'])
+                fn ($query) => $query->where('clinic_id', $data['selectedClinicId'])
             )->findOrFail($id);
 
-            // به‌روزرسانی اطلاعات کاربر مرتبط
             $appointment->user->update([
-                'first_name'    => $validatedData['first_name'],
-                'last_name'     => $validatedData['last_name'],
-                'mobile'        => $validatedData['mobile'],
-                'national_code' => $validatedData['national_code'],
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'mobile' => $data['mobile'],
+                'national_code' => $data['national_code'],
             ]);
 
-            // به‌روزرسانی اطلاعات نوبت
             $appointment->update([
-                'clinic_id'        => $validatedData['selectedClinicId'] === 'default' ? null : $validatedData['selectedClinicId'],
-                'appointment_date' => CalendarUtils::createDatetimeFromFormat('Y/m/d', $request->appointment_date)->format('Y-m-d'),
-                'appointment_time' => $validatedData['appointment_time'],
-                'description'      => $validatedData['description'],
+                'clinic_id' => $data['selectedClinicId'] === 'default' ? null : $data['selectedClinicId'],
+                'appointment_date' => $data['appointment_date'],
+                'appointment_time' => $data['appointment_time'],
+                'description' => $data['description'],
             ]);
 
-            return response()->json(['success' => true, 'message' => 'نوبت با موفقیت ویرایش شد.']);
+            return response()->json(['success' => true, 'message' => 'نوبت با موفقیت ویرایش شد!']);
         } catch (\Exception $e) {
-            Log::error('Error in update: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'خطا در ویرایش نوبت.'], 500);
+            Log::error('خطا در ویرایش نوبت: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'خطا در ویرایش نوبت!'], 500);
         }
     }
 
