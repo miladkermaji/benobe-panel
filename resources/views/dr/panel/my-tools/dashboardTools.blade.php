@@ -109,6 +109,19 @@
         return '<span class="font-weight-bold text-dark">نامشخص</span>';
     }
   }
+
+  function getPaymentStatus(status) {
+    switch (status) {
+      case 'pending':
+        return '<span class="font-weight-bold text-warning">در حال پرداخت</span>';
+      case 'paid':
+        return '<span class="font-weight-bold text-success">پرداخت شده</span>';
+      case 'unpaid':
+        return '<span class="font-weight-bold text-danger">پرداخت نشده</span>';
+      default:
+        return '<span class="font-weight-bold text-dark">نامشخص</span>';
+    }
+  }
   let currentDate = moment().format('YYYY-MM-DD');
   const days = 14;
   const calendar = $('#calendar');
@@ -179,6 +192,7 @@
         <td>${appointment.patient.mobile}</td>
         <td>${nationalCode}</td> 
         <td>${getPrescriptionStatus(appointment.status)}</td>
+        <td>${getPaymentStatus(appointment.payment_status)}</td>
         <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
         <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
         <td>${appointment.appointment_time}</td>
@@ -286,6 +300,8 @@
         <td>${appointment.patient.mobile}</td>
         <td>${nationalCode}</td> 
         <td>${getPrescriptionStatus(appointment.status)}</td>
+                <td>${getPaymentStatus(appointment.payment_status)}</td>
+
         <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
         <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
         <td>${appointment.appointment_time}</td>
@@ -483,6 +499,8 @@
                             <td>${patient.mobile ? patient.mobile : 'نامشخص'}</td>
                             <td>${patient.national_code ? patient.national_code : 'نامشخص'}</td>
                             <td>${getPrescriptionStatus(appointment.status)}</td>
+        <td>${getPaymentStatus(appointment.payment_status)}</td>
+
                             <td>${insurance}</td>
                             <td>${appointmentDate}</td>
                             <td>${appointment.appointment_time}</td>
@@ -1735,6 +1753,8 @@
                                 <td>${patient.mobile ? patient.mobile : 'نامشخص'}</td>
                                 <td>${patient.national_code ? patient.national_code : 'نامشخص'}</td>
                                 <td>${getPrescriptionStatus(appointment.status)}</td>
+        <td>${getPaymentStatus(appointment.payment_status)}</td>
+
                                 <td>${insurance}</td>
                                 <td>${appointmentDate}</td>
                                 <td>${appointment.appointment_time}</td>
