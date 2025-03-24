@@ -2,15 +2,15 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class SendSmsNotificationJob implements ShouldQueue
 {
@@ -25,58 +25,61 @@ class SendSmsNotificationJob implements ShouldQueue
     protected $params;
     protected $sendDateTime;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct(string $message, array $recipients, ?int $templateId = null, array $params = [], ?string $sendDateTime = null)
+    public function __construct($message, $recipients, $templateId = null, $params = [], $sendDateTime = null)
     {
         $this->message = $message;
         $this->recipients = $recipients;
-        $this->templateId = $templateId; // شناسه قالب پیامک (اختیاری)
-        $this->params = $params; // پارامترهای اضافی برای قالب پیامک
-        $this->sendDateTime = $sendDateTime ?? now()->format('Y-m-d\TH:i:s'); // زمان ارسال پیش‌فرض
+        $this->templateId = $templateId;
+        $this->params = $params;
+        $this->sendDateTime = $sendDateTime;
     }
 
-    /**
-     * Execute the job.
-     */
-  public function handle()
-{
-    try {
-        $chunks = array_chunk($this->recipients, 10);
-        $delay = 0;
+    public function handle()
+    {
+        try {
+            $chunks = array_chunk($this->recipients, 10);
+            $delay = 0;
 
-        // تبدیل sendDateTime از میلادی به شمسی
-        $jalaliSendDateTime = \Morilog\Jalali\Jalalian::fromDateTime(
-            \Carbon\Carbon::parse($this->sendDateTime)
-        )->format('Y/m/d H:i:s');
+            // تبدیل تاریخ میلادی به شمسی
+            $jalaliSendDateTime = $this->sendDateTime
+                ? \Morilog\Jalali\Jalalian::fromDateTime(
+                    \Carbon\Carbon::parse($this->sendDateTime)
+                )->format('Y/m/d H:i:s')
+                : \Morilog\Jalali\Jalalian::now()->format('Y/m/d H:i:s');
 
-        foreach ($chunks as $chunk) {
-            foreach ($chunk as $recipient) {
-                $user = User::where('mobile', $recipient)->first();
-                $userFullName = $user ? ($user->first_name . ' ' . $user->last_name) : 'کاربر گرامی';
+            foreach ($chunks as $chunk) {
+                foreach ($chunk as $recipient) {
+                    $user = User::where('mobile', $recipient)->first();
+                    $userFullName = $user ? ($user->first_name . ' ' . $user->last_name) : 'کاربر گرامی';
 
-                $smsService = new MessageService(
-                    SmsService::createMessage(
-                        $this->message,
-                        [$recipient],
-                        null,
-                        $jalaliSendDateTime // فرمت شمسی رو پاس می‌دیم
-                    )
-                );
+                    $smsService = new MessageService(
+                        SmsService::createMessage(
+                            $this->message,
+                            [$recipient],
+                            null,
+                            $jalaliSendDateTime // تاریخ شمسی رو پاس می‌دیم
+                        )
+                    );
 
-                $smsService->send();
+                    $smsService->send();
+
+                    Log::info('پیامک با موفقیت ارسال شد', [
+                        'recipient' => $recipient,
+                        'message' => $this->message,
+                        'template_id' => $this->templateId,
+                    ]);
+                }
+                $delay += 5;
             }
-            $delay += 5;
+        } catch (\Exception $e) {
+            Log::error('خطا در ارسال پیامک', [
+                'recipients' => $this->recipients,
+                'message' => $this->message,
+                'template_id' => $this->templateId,
+                'error' => $e->getMessage(),
+                'stack' => $e->getTraceAsString(),
+            ]);
+            throw $e;
         }
-    } catch (\Exception $e) {
-        Log::error('خطا در ارسال پیامک', [
-            'recipients' => $this->recipients,
-            'message' => $this->message,
-            'template_id' => $this->templateId,
-            'error' => $e->getMessage(),
-        ]);
-        throw $e;
     }
-}
 }
