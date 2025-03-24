@@ -1186,8 +1186,8 @@ public function cancelAppointments(Request $request)
 
     $recipients = [];
     foreach ($appointments as $appointment) {
-        if ($appointment->user && $appointment->user->mobile) {
-            $recipients[] = $appointment->user->mobile;
+        if ($appointment->patient && $appointment->patient->mobile) { // تغییر user به patient
+            $recipients[] = $appointment->patient->mobile;
         }
         $appointment->status = 'cancelled';
         $appointment->save();
@@ -1209,6 +1209,14 @@ public function cancelAppointments(Request $request)
             $templateId,
             [$jalaliDate]
         )->delay(now()->addSeconds(5));
+
+        Log::info('جاب ارسال پیامک dispatch شد', [
+            'message' => $message,
+            'recipients' => $recipients,
+            'templateId' => $templateId
+        ]);
+    } else {
+        Log::warning('هیچ گیرنده‌ای برای پیامک لغو نوبت پیدا نشد');
     }
 
     return response()->json([
