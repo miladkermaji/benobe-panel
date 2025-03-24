@@ -1277,7 +1277,7 @@ public function rescheduleAppointment(Request $request)
 
         $recipients = [];
         $oldDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($oldDateGregorian)->format('Y/m/d');
-        $newDateJalali = \Morilog\Jalalian::fromDateTime($validated['new_date'])->format('Y/m/d');
+        $newDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['new_date'])->format('Y/m/d');
 
         foreach ($appointments as $appointment) {
             $appointment->appointment_date = $validated['new_date'];
