@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ManualNobat;
 
-use App\Http\Controllers\Dr\Controller;
-use App\Models\ManualAppointment;
-use App\Models\ManualAppointmentSetting;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Log;
+use App\Models\ManualAppointment;
 use Morilog\Jalali\CalendarUtils;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Dr\Controller;
+use App\Models\ManualAppointmentSetting;
+use Illuminate\Support\Facades\Validator;
 
 class ManualNobatController extends Controller
 {
@@ -74,21 +76,40 @@ class ManualNobatController extends Controller
 
     public function saveSettings(Request $request)
     {
-        // اعتبارسنجی ورودی‌ها
-        $request->validate([
+        // اعتبارسنجی ورودی‌ها با پیام‌های فارسی
+        $validator = Validator::make($request->all(), [
             'status'                => 'required|boolean',
             'duration_send_link'    => 'required|integer|min:1',
             'duration_confirm_link' => 'required|integer|min:1',
-            'selectedClinicId'      => 'nullable|string', // اضافه کردن کلینیک آیدی
+            'selectedClinicId'      => 'nullable|string',
+        ], [
+            'status.required'                => 'وضعیت فعال یا غیرفعال بودن باید مشخص شود.',
+            'status.boolean'                 => 'وضعیت باید "بلی" یا "خیر" باشد.',
+            'duration_send_link.required'    => 'زمان ارسال لینک تأیید الزامی است.',
+            'duration_send_link.integer'     => 'زمان ارسال لینک باید یک عدد صحیح باشد.',
+            'duration_send_link.min'         => 'زمان ارسال لینک باید حداقل ۱ ساعت باشد.',
+            'duration_confirm_link.required' => 'مدت زمان اعتبار لینک الزامی است.',
+            'duration_confirm_link.integer'  => 'مدت زمان اعتبار لینک باید یک عدد صحیح باشد.',
+            'duration_confirm_link.min'      => 'مدت زمان اعتبار لینک باید حداقل ۱ ساعت باشد.',
+            'selectedClinicId.string'        => 'شناسه کلینیک باید معتبر باشد.',
         ]);
+
+        // اگر اعتبارسنجی ناموفق بود
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در اعتبارسنجی اطلاعات واردشده.',
+                'errors'  => $validator->errors()->all(), // همه خطاها به صورت آرایه
+            ], 422); // کد وضعیت 422 برای خطاهای اعتبارسنجی
+        }
 
         try {
             // گرفتن آیدی پزشک یا منشی
-            $doctorId         = auth('doctor')->id() ?? auth('secretary')->id();
-            $selectedClinicId = $request->input('selectedClinicId');
+            $doctorId = auth('doctor')->id() ?? auth('secretary')->id();
+            $selectedClinicId = $request->input('selectedClinicId', 'default');
 
             // ذخیره یا به‌روزرسانی تنظیمات نوبت‌دهی دستی
-            ManualAppointmentSetting::updateOrCreate(
+            $settings = ManualAppointmentSetting::updateOrCreate(
                 [
                     'doctor_id' => $doctorId,
                     'clinic_id' => $selectedClinicId === 'default' ? null : $selectedClinicId,
@@ -100,12 +121,24 @@ class ManualNobatController extends Controller
                 ]
             );
 
-            return response()->json(['success' => true, 'message' => 'تنظیمات با موفقیت ذخیره شد.']);
+            return response()->json([
+                'success' => true,
+                'message' => 'تنظیمات با موفقیت ذخیره شد.',
+                'data'    => [
+                    'is_active'             => $settings->is_active ? 'بلی' : 'خیر',
+                    'duration_send_link'    => $settings->duration_send_link . ' ساعت',
+                    'duration_confirm_link' => $settings->duration_confirm_link . ' ساعت',
+                    'clinic_id'             => $settings->clinic_id ?? 'پیش‌فرض',
+                ],
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در ذخیره تنظیمات.',
-                'error'   => $e->getMessage(),
+                'message' => 'خطا در ذخیره تنظیمات رخ داد.',
+                'error'   => [
+                    'details' => $e->getMessage(),
+                    'code'    => $e->getCode(),
+                ],
             ], 500);
         }
     }
@@ -295,8 +328,8 @@ class ManualNobatController extends Controller
         try {
             $appointment = ManualAppointment::when(
                 $validatedData['selectedClinicId'] === 'default',
-                fn($query) => $query->whereNull('clinic_id'),
-                fn($query) => $query->where('clinic_id', $validatedData['selectedClinicId'])
+                fn ($query) => $query->whereNull('clinic_id'),
+                fn ($query) => $query->where('clinic_id', $validatedData['selectedClinicId'])
             )->findOrFail($id);
 
             // به‌روزرسانی اطلاعات کاربر مرتبط
@@ -333,8 +366,8 @@ class ManualNobatController extends Controller
             // جستجوی نوبت بر اساس کلینیک
             $appointment = ManualAppointment::when(
                 $selectedClinicId === 'default',
-                fn($query) => $query->whereNull('clinic_id'),
-                fn($query) => $query->where('clinic_id', $selectedClinicId)
+                fn ($query) => $query->whereNull('clinic_id'),
+                fn ($query) => $query->where('clinic_id', $selectedClinicId)
             )
                 ->findOrFail($id);
 
