@@ -780,41 +780,65 @@
 
 
     generateCalendar(moment().jYear(), moment().jMonth() + 1);
-    $(document).on('click', '.cancle-btn-appointment', function() {
-      const selectedDate = $('#dateModal').data('selectedDate');
-      Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: "تمام نوبت‌های این روز لغو خواهند شد.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'بله، لغو کن!',
-        cancelButtonText: 'لغو'
-      }).then(result => {
-        if (result.isConfirmed) {
-          $.ajax({
-            url: "{{ route('doctor.cancel_appointments') }}",
-            method: 'POST',
-            data: {
-              date: selectedDate,
-              _token: '{{ csrf_token() }}',
-              selectedClinicId: localStorage.getItem('selectedClinicId')
-            },
-            success: function(response) {
-              if (response.status) {
-                Swal.fire('موفقیت', response.message, 'success');
-                $('#dateModal').modal('hide'); // بستن مودال
-                loadAppointmentsCount(); // بروزرسانی تقویم
-              } else {
-                Swal.fire('خطا', response.message, 'error');
+  $(document).on('click', '.cancle-btn-appointment', function() {
+  const selectedDate = $('#dateModal').data('selectedDate');
+
+  Swal.fire({
+    title: 'آیا مطمئن هستید؟',
+    text: "تمام نوبت‌های این روز لغو خواهند شد.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'بله، لغو کن!',
+    cancelButtonText: 'لغو'
+  }).then(result => {
+    if (result.isConfirmed) {
+      // مرحله ۱: دریافت شناسه‌های نوبت‌ها برای تاریخ انتخاب‌شده
+      $.ajax({
+        url: "{{ route('doctor.get_appointments_by_date') }}", // فرض می‌کنیم این روت وجود داره
+        method: 'GET',
+        data: {
+          date: selectedDate,
+          selectedClinicId: localStorage.getItem('selectedClinicId')
+        },
+        success: function(response) {
+          if (response.status && response.data.length > 0) {
+            // استخراج شناسه‌های نوبت‌ها
+            const appointmentIds = response.data.map(appointment => appointment.id);
+
+            // مرحله ۲: ارسال درخواست لغو با شناسه‌ها
+            $.ajax({
+              url: "{{ route('doctor.cancel_appointments') }}",
+              method: 'POST',
+              data: {
+                date: selectedDate,
+                appointment_ids: appointmentIds, // ارسال آرایه شناسه‌ها
+                _token: '{{ csrf_token() }}',
+                selectedClinicId: localStorage.getItem('selectedClinicId')
+              },
+              success: function(cancelResponse) {
+                if (cancelResponse.status) {
+                  Swal.fire('موفقیت', cancelResponse.message, 'success');
+                  $('#dateModal').modal('hide'); // بستن مودال
+                  loadAppointmentsCount(); // بروزرسانی تقویم
+                } else {
+                  Swal.fire('خطا', cancelResponse.message, 'error');
+                }
+              },
+              error: function() {
+                Swal.fire('خطا', 'مشکلی در ارتباط با سرور وجود دارد.', 'error');
               }
-            },
-            error: function() {
-              Swal.fire('خطا', 'مشکلی در ارتباط با سرور وجود دارد.', 'error');
-            }
-          });
+            });
+          } else {
+            Swal.fire('خطا', 'هیچ نوبتی برای این تاریخ یافت نشد.', 'error');
+          }
+        },
+        error: function() {
+          Swal.fire('خطا', 'مشکلی در دریافت نوبت‌ها وجود دارد.', 'error');
         }
       });
-    });
+    }
+  });
+});
 
     // Modal for Appointment Reschedule
     $(document).on('click', '#confirmReschedule', function() {

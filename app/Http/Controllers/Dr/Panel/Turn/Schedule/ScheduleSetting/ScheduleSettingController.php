@@ -669,75 +669,75 @@ class ScheduleSettingController extends Controller
         ]);
     }
 
-  public function saveWorkSchedule(Request $request)
-{
-    $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
+    public function saveWorkSchedule(Request $request)
+    {
+        $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
 
-    $validatedData = $request->validate([
-        'auto_scheduling'      => 'required|boolean',
-        'calendar_days'        => 'nullable|integer|min:1|max:365',
-        'online_consultation'  => 'required|boolean',
-        'holiday_availability' => 'required|boolean',
-        'days'                 => 'array',
-    ]);
+        $validatedData = $request->validate([
+            'auto_scheduling'      => 'required|boolean',
+            'calendar_days'        => 'nullable|integer|min:1|max:365',
+            'online_consultation'  => 'required|boolean',
+            'holiday_availability' => 'required|boolean',
+            'days'                 => 'array',
+        ]);
 
-    DB::beginTransaction();
-    try {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        DB::beginTransaction();
+        try {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
 
-        // ذخیره تنظیمات کلی نوبت‌دهی
-        $appointmentConfig = DoctorAppointmentConfig::updateOrCreate(
-            [
-                'doctor_id' => $doctor->id,
-                'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
-            ],
-            [
-                'auto_scheduling'      => $validatedData['auto_scheduling'],
-                'calendar_days'        => $validatedData['calendar_days'] ?? null,
-                'online_consultation'  => $validatedData['online_consultation'],
-                'holiday_availability' => $validatedData['holiday_availability'],
-            ]
-        );
-
-        // به‌روزرسانی یا ایجاد ساعات کاری برای هر روز
-        foreach ($validatedData['days'] as $day => $dayConfig) {
-            $workHours = isset($dayConfig['slots']) ? array_map(function ($slot) {
-                return [
-                    'start'            => $slot['start_time'],
-                    'end'              => $slot['end_time'],
-                    'max_appointments' => $slot['max_appointments'] ?? 1,
-                ];
-            }, $dayConfig['slots']) : [];
-
-            DoctorWorkSchedule::updateOrCreate(
+            // ذخیره تنظیمات کلی نوبت‌دهی
+            $appointmentConfig = DoctorAppointmentConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctor->id,
-                    'day'       => $day,
                     'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ],
                 [
-                    'is_working' => $dayConfig['is_working'] ?? false,
-                    'work_hours' => !empty($workHours) ? json_encode($workHours) : null,
+                    'auto_scheduling'      => $validatedData['auto_scheduling'],
+                    'calendar_days'        => $validatedData['calendar_days'] ?? null,
+                    'online_consultation'  => $validatedData['online_consultation'],
+                    'holiday_availability' => $validatedData['holiday_availability'],
                 ]
             );
-        }
 
-        DB::commit();
-        return response()->json([
-            'message' => 'تنظیمات ساعات کاری با موفقیت ذخیره شد.',
-            'status'  => true,
-            'data'    => [
-                'calendar_days' => $appointmentConfig->calendar_days,
-            ],
-        ]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'message' => 'خطا در ذخیره‌سازی تنظیمات ساعات کاری: ' . $e->getMessage(),
-            'status'  => false,
-        ], 500);
+            // به‌روزرسانی یا ایجاد ساعات کاری برای هر روز
+            foreach ($validatedData['days'] as $day => $dayConfig) {
+                $workHours = isset($dayConfig['slots']) ? array_map(function ($slot) {
+                    return [
+                        'start'            => $slot['start_time'],
+                        'end'              => $slot['end_time'],
+                        'max_appointments' => $slot['max_appointments'] ?? 1,
+                    ];
+                }, $dayConfig['slots']) : [];
+
+                DoctorWorkSchedule::updateOrCreate(
+                    [
+                        'doctor_id' => $doctor->id,
+                        'day'       => $day,
+                        'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    ],
+                    [
+                        'is_working' => $dayConfig['is_working'] ?? false,
+                        'work_hours' => !empty($workHours) ? json_encode($workHours) : null,
+                    ]
+                );
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => 'تنظیمات ساعات کاری با موفقیت ذخیره شد.',
+                'status'  => true,
+                'data'    => [
+                    'calendar_days' => $appointmentConfig->calendar_days,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'خطا در ذخیره‌سازی تنظیمات ساعات کاری: ' . $e->getMessage(),
+                'status'  => false,
+            ], 500);
+        }
     }
-}
 
     public function getAllDaysSettings(Request $request)
     {
@@ -1073,68 +1073,68 @@ class ScheduleSettingController extends Controller
         ]);
     }
 
-  public function getHolidayStatus(Request $request)
-{
-    $validated = $request->validate([
-        'date' => 'required|date',
-        'selectedClinicId' => 'nullable|string',
-    ]);
+    public function getHolidayStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'selectedClinicId' => 'nullable|string',
+        ]);
 
-    $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-    $selectedClinicId = $request->input('selectedClinicId');
+        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $selectedClinicId = $request->input('selectedClinicId');
 
-    // بخش ۱: بررسی تعطیلی
-    $holidayRecord = DoctorHoliday::where('doctor_id', $doctorId)
-        ->where(function ($query) use ($selectedClinicId) {
-            if ($selectedClinicId === 'default') {
-                $query->whereNull('clinic_id');
-            } elseif ($selectedClinicId) {
-                $query->where('clinic_id', $selectedClinicId);
-            }
-        })
-        ->first();
+        // بخش ۱: بررسی تعطیلی
+        $holidayRecord = DoctorHoliday::where('doctor_id', $doctorId)
+            ->where(function ($query) use ($selectedClinicId) {
+                if ($selectedClinicId === 'default') {
+                    $query->whereNull('clinic_id');
+                } elseif ($selectedClinicId) {
+                    $query->where('clinic_id', $selectedClinicId);
+                }
+            })
+            ->first();
 
-    $holidayDates = json_decode($holidayRecord->holiday_dates ?? '[]', true);
-    $isHoliday = in_array($validated['date'], $holidayDates);
+        $holidayDates = json_decode($holidayRecord->holiday_dates ?? '[]', true);
+        $isHoliday = in_array($validated['date'], $holidayDates);
 
-    // بخش ۲: بررسی نوبت‌ها (فقط نوبت‌های فعال)
-    $appointments = Appointment::where('doctor_id', $doctorId)
-        ->where('appointment_date', $validated['date'])
-        ->where('status', '!=', 'cancelled') // نوبت‌های لغو شده رو حذف کن
-        ->whereNull('deleted_at') // فقط نوبت‌های فعال
-        ->where(function ($query) use ($selectedClinicId) {
-            if ($selectedClinicId === 'default') {
-                $query->whereNull('clinic_id');
-            } elseif ($selectedClinicId) {
-                $query->where('clinic_id', $selectedClinicId);
-            }
-        })
-        ->get();
+        // بخش ۲: بررسی نوبت‌ها (فقط نوبت‌های فعال)
+        $appointments = Appointment::where('doctor_id', $doctorId)
+            ->where('appointment_date', $validated['date'])
+            ->where('status', '!=', 'cancelled') // نوبت‌های لغو شده رو حذف کن
+            ->whereNull('deleted_at') // فقط نوبت‌های فعال
+            ->where(function ($query) use ($selectedClinicId) {
+                if ($selectedClinicId === 'default') {
+                    $query->whereNull('clinic_id');
+                } elseif ($selectedClinicId) {
+                    $query->where('clinic_id', $selectedClinicId);
+                }
+            })
+            ->get();
 
-    // بخش ۳: بررسی ساعات کاری
-    $dayOfWeek = strtolower(Carbon::parse($validated['date'])->englishDayOfWeek);
-    $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-        ->where('day', $dayOfWeek)
-        ->where(function ($query) use ($selectedClinicId) {
-            if ($selectedClinicId === 'default') {
-                $query->whereNull('clinic_id');
-            } elseif ($selectedClinicId) {
-                $query->where('clinic_id', $selectedClinicId);
-            }
-        })
-        ->first();
+        // بخش ۳: بررسی ساعات کاری
+        $dayOfWeek = strtolower(Carbon::parse($validated['date'])->englishDayOfWeek);
+        $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+            ->where('day', $dayOfWeek)
+            ->where(function ($query) use ($selectedClinicId) {
+                if ($selectedClinicId === 'default') {
+                    $query->whereNull('clinic_id');
+                } elseif ($selectedClinicId) {
+                    $query->where('clinic_id', $selectedClinicId);
+                }
+            })
+            ->first();
 
-    $hasWorkHours = $workSchedule && !empty(json_decode($workSchedule->work_hours, true));
+        $hasWorkHours = $workSchedule && !empty(json_decode($workSchedule->work_hours, true));
 
-    // پاسخ نهایی
-    return response()->json([
-        'status' => true,
-        'is_holiday' => $isHoliday,
-        'has_appointments' => !$appointments->isEmpty(),
-        'has_work_hours' => $hasWorkHours,
-        'data' => $appointments,
-    ]);
-}
+        // پاسخ نهایی
+        return response()->json([
+            'status' => true,
+            'is_holiday' => $isHoliday,
+            'has_appointments' => !$appointments->isEmpty(),
+            'has_work_hours' => $hasWorkHours,
+            'data' => $appointments,
+        ]);
+    }
 
 
 
@@ -1619,6 +1619,34 @@ class ScheduleSettingController extends Controller
             'is_holiday'    => $isHoliday,
             'message'       => $message,
             'holiday_dates' => $holidayDates,
+        ]);
+    }public function getAppointmentsByDateSpecial(Request $request)
+    {
+        $date = $request->input('date');
+        $selectedClinicId = $request->input('selectedClinicId');
+        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+
+        $appointments = Appointment::where('doctor_id', $doctorId)
+            ->where('appointment_date', $date)
+            ->where('status', '!=', 'cancelled') // فقط نوبت‌های فعال
+            ->whereNull('deleted_at')
+            ->when($selectedClinicId === 'default', function ($query) {
+                $query->whereNull('clinic_id');
+            })
+            ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                $query->where('clinic_id', $selectedClinicId);
+            })
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $appointments->map(function ($appointment) {
+                return [
+                    'id' => $appointment->id,
+                    'appointment_date' => $appointment->appointment_date,
+                    'status' => $appointment->status,
+                ];
+            }),
         ]);
     }
 
