@@ -1218,10 +1218,10 @@ public function cancelAppointments(Request $request)
     ]);
 }
 
-  public function rescheduleAppointment(Request $request)
+public function rescheduleAppointment(Request $request)
 {
     $validated = $request->validate([
-        'old_date'         => 'required|date',
+        'old_date'         => 'required', // تاریخ می‌تونه شمسی یا میلادی باشه
         'new_date'         => 'required|date',
         'selectedClinicId' => 'nullable|string',
     ]);
@@ -1237,16 +1237,25 @@ public function cancelAppointments(Request $request)
     ]);
 
     try {
+        // تبدیل تاریخ old_date از شمسی به میلادی اگه شمسی باشه
+        $oldDateGregorian = $validated['old_date'];
+        if (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $validated['old_date'])) {
+            $oldDateGregorian = Jalalian::fromFormat('Y/m/d', $validated['old_date'])->toCarbon()->toDateString();
+        }
+
         $appointments = Appointment::where('doctor_id', $doctorId)
-            ->whereDate('appointment_date', $validated['old_date']) // استفاده از whereDate برای اطمینان
+            ->whereDate('appointment_date', $oldDateGregorian)
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                 $query->where('clinic_id', $selectedClinicId);
             }, function ($query) {
-                $query->whereNull('clinic_id'); // اگه default باشه، clinic_id باید null باشه
+                $query->whereNull('clinic_id');
             })
             ->get();
 
-        Log::info('نتایج کوئری جابجایی نوبت', ['appointments' => $appointments->toArray()]);
+        Log::info('نتایج کوئری جابجایی نوبت', [
+            'appointments' => $appointments->toArray(),
+            'converted_old_date' => $oldDateGregorian
+        ]);
 
         if ($appointments->isEmpty()) {
             return response()->json(['status' => false, 'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.'], 404);
@@ -1267,8 +1276,8 @@ public function cancelAppointments(Request $request)
         }
 
         $recipients = [];
-        $oldDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['old_date'])->format('Y/m/d');
-        $newDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($validated['new_date'])->format('Y/m/d');
+        $oldDateJalali = \Morilog\Jalali\Jalalian::fromDateTime($oldDateGregorian)->format('Y/m/d');
+        $newDateJalali = \Morilog\Jalalian::fromDateTime($validated['new_date'])->format('Y/m/d');
 
         foreach ($appointments as $appointment) {
             $appointment->appointment_date = $validated['new_date'];
