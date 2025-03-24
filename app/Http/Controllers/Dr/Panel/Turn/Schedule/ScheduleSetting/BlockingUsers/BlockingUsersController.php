@@ -76,14 +76,15 @@ class BlockingUsersController extends Controller
                 'status'       => 1,
             ]);
 
-            // ارسال پیامک با جاب
+            // ارسال پیامک مسدودیت
             $doctor = Doctor::find($doctorId);
             $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
             $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
+
             SendSmsNotificationJob::dispatch(
                 $message,
                 [$user->mobile],
-                100254, // شناسه قالب مسدود شدن
+                100254, // شناسه قالب مسدودیت
                 [$doctorName]
             )->delay(now()->addSeconds(5));
 
@@ -158,28 +159,85 @@ class BlockingUsersController extends Controller
                 return response()->json(['success' => false, 'message' => 'هیچ کاربری برای مسدود کردن پیدا نشد.'], 422);
             }
 
+            // ارسال پیامک مسدودیت برای همه کاربران جدید
             if (!empty($recipients)) {
                 $doctor = Doctor::find($doctorId);
                 $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
                 $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
+
                 SendSmsNotificationJob::dispatch(
                     $message,
                     $recipients,
-                    100254, // شناسه قالب مسدود شدن
+                    100254, // شناسه قالب مسدودیت
                     [$doctorName]
                 )->delay(now()->addSeconds(5));
             }
 
             return response()->json([
-                'success'       => true,
-                'message'       => 'کاربران با موفقیت مسدود شدند و پیامک در صف قرار گرفت.',
-                'blocked_users' => $blockedUsers,
+                'success'         => true,
+                'message'         => 'کاربران با موفقیت مسدود شدند و پیامک در صف قرار گرفت.',
+                'blocked_users'   => $blockedUsers,
                 'already_blocked' => $alreadyBlocked,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'خطا در ذخیره‌سازی کاربران.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateStatus(Request $request)
+    {
+        try {
+            $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
+
+            $userBlocking = UserBlocking::where('id', $request->id)
+                ->where('clinic_id', $clinicId)
+                ->firstOrFail();
+
+            $userBlocking->status = $request->status;
+            $userBlocking->save();
+
+            $user = $userBlocking->user;
+            $doctor = $userBlocking->doctor;
+            $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+
+            // تعیین پیام و قالب بر اساس وضعیت
+            if ($request->status == 1) {
+                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
+                $templateId = 100254; // قالب مسدودیت
+            } else {
+                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.";
+                $templateId = 100255; // قالب رفع مسدودیت
+            }
+
+            SendSmsNotificationJob::dispatch(
+                $message,
+                [$user->mobile],
+                $templateId,
+                [$doctorName]
+            )->delay(now()->addSeconds(5));
+
+            // ذخیره پیام در SmsTemplate
+            SmsTemplate::create([
+                'doctor_id'  => $doctor->id,
+                'clinic_id'  => $clinicId,
+                'user_id'    => $user->id,
+                'identifier' => Str::random(11),
+                'title'      => $request->status == 1 ? 'مسدودی کاربر' : 'رفع مسدودی',
+                'content'    => $message,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'وضعیت با موفقیت به‌روزرسانی شد و پیامک در صف قرار گرفت.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در به‌روزرسانی وضعیت.',
                 'error'   => $e->getMessage(),
             ], 500);
         }
@@ -243,53 +301,7 @@ class BlockingUsersController extends Controller
         return response()->json($messages);
     }
 
-    public function updateStatus(Request $request)
-    {
-        try {
-            $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
-
-            $userBlocking = UserBlocking::where('id', $request->id)
-                ->where('clinic_id', $clinicId)
-                ->firstOrFail();
-
-            $userBlocking->status = $request->status;
-            $userBlocking->save();
-
-            $user = $userBlocking->user;
-            $doctor = $userBlocking->doctor;
-            $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-            $message = $request->status == 1
-                ? "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید."
-                : "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.";
-
-            SendSmsNotificationJob::dispatch(
-                $message,
-                [$user->mobile],
-                $request->status == 1 ? 100254 : 100255, // 100254 برای مسدود، 100255 برای رفع مسدودیت
-                [$doctorName]
-            )->delay(now()->addSeconds(5));
-
-            SmsTemplate::create([
-                'doctor_id'  => $doctor->id,
-                'clinic_id'  => $clinicId,
-                'user_id'    => $user->id,
-                'identifier' => Str::random(11),
-                'title'      => $request->status == 1 ? 'مسدودی کاربر' : 'رفع مسدودی',
-                'content'    => $message,
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'وضعیت با موفقیت به‌روزرسانی شد و پیامک در صف قرار گرفت.',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'خطا در به‌روزرسانی وضعیت.',
-                'error'   => $e->getMessage(),
-            ], 500);
-        }
-    }
+ 
 
     public function deleteMessage($id)
     {
