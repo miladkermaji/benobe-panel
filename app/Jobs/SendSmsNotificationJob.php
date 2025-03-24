@@ -64,13 +64,6 @@ class SendSmsNotificationJob implements ShouldQueue
 
 
                     $smsService->send();
-
-                    Log::info('پیامک با موفقیت ارسال شد', [
-                        'recipient' => $recipient,
-                        'message' => $this->message,
-                        'template_id' => $this->templateId,
-                        'params' => $this->params,
-                    ]);
                 }
 
                 $delay += 5; // تاخیر 5 ثانیه‌ای برای هر تکه
