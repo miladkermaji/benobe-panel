@@ -308,7 +308,6 @@ class ScheduleSettingController extends Controller
 
     public function saveTimeSlot(Request $request)
     {
-        Log::info($request);
         $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
         $validated        = $request->validate([
             'day'              => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
@@ -469,7 +468,6 @@ class ScheduleSettingController extends Controller
 
     public function updateAutoScheduling(Request $request)
     {
-        Log::info('Request received:', ['request' => $request->all()]);
         $selectedClinicId = $request->input('selectedClinicId', 'default');
         $validated        = $request->validate([
             'auto_scheduling' => [
@@ -477,11 +475,9 @@ class ScheduleSettingController extends Controller
                 'in:0,1,true,false', // Explicitly allow these values
             ],
         ]);
-        Log::info('Validated data:', ['validated' => $validated]);
 
         // Convert to strict boolean
         $autoScheduling = filter_var($validated['auto_scheduling'], FILTER_VALIDATE_BOOLEAN);
-        Log::info('Auto scheduling:', ['auto_scheduling' => $autoScheduling]);
 
         try {
             $doctor            = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
@@ -496,7 +492,6 @@ class ScheduleSettingController extends Controller
                     'clinic_id'       => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ]
             );
-            Log::info('Appointment config:', ['appointmentConfig' => $appointmentConfig->toArray()]);
 
             return response()->json([
                 'message' => $autoScheduling
@@ -508,7 +503,6 @@ class ScheduleSettingController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating auto scheduling:', ['error' => $e->getMessage()]);
 
             return response()->json([
                 'message' => 'خطا در به‌روزرسانی تنظیمات',
@@ -664,9 +658,7 @@ class ScheduleSettingController extends Controller
 
     public function saveWorkSchedule(Request $request)
     {
-        Log::info('Request received:', ['request' => $request->all()]);
         $selectedClinicId = $request->input('selectedClinicId');
-        Log::info('Selected Clinic ID:', ['selectedClinicId' => $selectedClinicId]);
 
         // Default value if selectedClinicId is not present
         if (is_null($selectedClinicId)) {
@@ -680,12 +672,10 @@ class ScheduleSettingController extends Controller
             'holiday_availability' => 'required|boolean', // اصلاح: افزودن `required`
             'days'                 => 'array',
         ]);
-        Log::info('Validated data:', ['validatedData' => $validatedData]);
 
         DB::beginTransaction();
         try {
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-            Log::info('Doctor ID:', ['doctor_id' => $doctor->id, 'clinic_id' => $selectedClinicId]);
 
             // حذف تنظیمات قبلی
             DoctorWorkSchedule::where('doctor_id', $doctor->id)
@@ -697,7 +687,6 @@ class ScheduleSettingController extends Controller
                     }
                 })
                 ->delete();
-            Log::info('Deleted previous work schedules');
 
             // ذخیره تنظیمات کلی نوبت‌دهی
             $appointmentConfig = DoctorAppointmentConfig::updateOrCreate(
@@ -712,7 +701,6 @@ class ScheduleSettingController extends Controller
                     'holiday_availability' => $validatedData['holiday_availability'],
                 ]
             );
-            Log::info('Appointment config:', ['appointmentConfig' => $appointmentConfig->toArray()]);
 
             // ذخیره ساعات کاری پزشک در `work_hours`
             foreach ($validatedData['days'] as $day => $dayConfig) {
@@ -730,7 +718,7 @@ class ScheduleSettingController extends Controller
                     'is_working' => $dayConfig['is_working'] ?? false,
                     'work_hours' => ! empty($workHours) ? json_encode($workHours) : null,
                 ]);
-                Log::info('Work schedule created for day:', ['day' => $day, 'clinic_id' => $selectedClinicId, 'work_hours' => $workHours]);
+            
             }
             DB::commit();
             return response()->json([
@@ -742,7 +730,6 @@ class ScheduleSettingController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error saving work schedule:', ['error' => $e->getMessage()]);
             return response()->json([
                 'message' => 'خطا در ذخیره‌سازی تنظیمات ساعات کاری.',
                 'status'  => false,
@@ -1144,11 +1131,7 @@ public function cancelAppointments(Request $request)
     $date = $request->input('date');
     $selectedClinicId = $request->input('selectedClinicId');
 
-    Log::info('ورودی cancelAppointments', [
-        'appointment_ids' => $appointmentIds,
-        'date' => $date,
-        'selectedClinicId' => $selectedClinicId
-    ]);
+   ;
 
     if (empty($appointmentIds)) {
         return response()->json([
@@ -1175,7 +1158,6 @@ public function cancelAppointments(Request $request)
 
     $appointments = $query->get();
 
-    Log::info('نتایج کوئری لغو نوبت', ['appointments' => $appointments->toArray()]);
 
     if ($appointments->isEmpty()) {
         return response()->json([
@@ -1194,7 +1176,6 @@ public function cancelAppointments(Request $request)
         $appointment->delete();
     }
 
-    Log::info('گیرندگان پیامک لغو نوبت', ['recipients' => $recipients]);
 
     if (!empty($recipients)) {
         $message = "کاربر گرامی، نوبت شما برای تاریخ {$jalaliDate} لغو شد.";
@@ -1210,14 +1191,8 @@ public function cancelAppointments(Request $request)
             [$jalaliDate]
         )->delay(now()->addSeconds(5));
 
-        Log::info('جاب ارسال پیامک dispatch شد', [
-            'message' => $message,
-            'recipients' => $recipients,
-            'templateId' => $templateId
-        ]);
-    } else {
-        Log::warning('هیچ گیرنده‌ای برای پیامک لغو نوبت پیدا نشد');
-    }
+       
+    } 
 
     return response()->json([
         'status' => true,
@@ -1237,12 +1212,7 @@ public function rescheduleAppointment(Request $request)
     $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
     $selectedClinicId = $request->input('selectedClinicId');
 
-    Log::info('ورودی rescheduleAppointment', [
-        'old_date' => $validated['old_date'],
-        'new_date' => $validated['new_date'],
-        'doctor_id' => $doctorId,
-        'selectedClinicId' => $selectedClinicId
-    ]);
+    
 
     try {
         // تبدیل تاریخ old_date از شمسی به میلادی اگه شمسی باشه
@@ -1260,10 +1230,7 @@ public function rescheduleAppointment(Request $request)
             })
             ->get();
 
-        Log::info('نتایج کوئری جابجایی نوبت', [
-            'appointments' => $appointments->toArray(),
-            'converted_old_date' => $oldDateGregorian
-        ]);
+       
 
         if ($appointments->isEmpty()) {
             return response()->json(['status' => false, 'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.'], 404);
@@ -1296,7 +1263,6 @@ public function rescheduleAppointment(Request $request)
             }
         }
 
-        Log::info('گیرندگان پیامک جابجایی نوبت', ['recipients' => $recipients]);
 
         if (!empty($recipients)) {
             $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به تاریخ {$newDateJalali} تغییر یافت.";
@@ -1692,7 +1658,6 @@ public function rescheduleAppointment(Request $request)
             $workHours = json_decode($workSchedule->work_hours, true);
 
             if (! is_array($workHours)) {
-                Log::error('❌ مقدار `work_hours` نامعتبر است:', ['work_hours' => $workSchedule->work_hours]);
                 return response()->json([
                     'message' => 'خطا در پردازش ساعات کاری',
                     'status'  => false,
@@ -1700,7 +1665,6 @@ public function rescheduleAppointment(Request $request)
             }
 
             // 🟢 لاگ مقدار اولیه قبل از حذف
-            Log::info('🔍 مقدار اولیه `work_hours`:', ['work_hours' => $workHours]);
 
             // فیلتر بازه زمانی مشخص از `work_hours`
             $filteredWorkHours = array_filter($workHours, function ($slot) use ($validated) {
@@ -1711,7 +1675,6 @@ public function rescheduleAppointment(Request $request)
             });
 
             // 🟢 لاگ مقدار بعد از حذف بازه
-            Log::info('📌 مقدار `work_hours` بعد از حذف:', ['filtered_work_hours' => $filteredWorkHours]);
 
             // بررسی اینکه آیا تغییری رخ داده است
             if (count($filteredWorkHours) === count($workHours)) {
@@ -1725,7 +1688,6 @@ public function rescheduleAppointment(Request $request)
             $workSchedule->work_hours = empty($filteredWorkHours) ? null : json_encode(array_values($filteredWorkHours));
 
             if (! $workSchedule->save()) {
-                Log::error('❌ خطا در ذخیره تغییرات در پایگاه داده');
                 return response()->json([
                     'message' => 'خطا در ذخیره تغییرات',
                     'status'  => false,
@@ -1737,7 +1699,6 @@ public function rescheduleAppointment(Request $request)
                 'status'  => true,
             ]);
         } catch (\Exception $e) {
-            Log::error('❌ خطای حذف بازه زمانی:', ['error' => $e->getMessage()]);
             return response()->json([
                 'message' => 'خطا در حذف بازه زمانی',
                 'status'  => false,
