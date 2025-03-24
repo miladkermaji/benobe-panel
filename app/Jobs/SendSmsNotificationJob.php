@@ -40,42 +40,43 @@ class SendSmsNotificationJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle()
-    {
-        try {
-            $chunks = array_chunk($this->recipients, 10); // ارسال گروهی به صورت تکه‌های 10 تایی
-            $delay = 0;
+  public function handle()
+{
+    try {
+        $chunks = array_chunk($this->recipients, 10);
+        $delay = 0;
 
-            foreach ($chunks as $chunk) {
-                foreach ($chunk as $recipient) {
-                    $user = User::where('mobile', $recipient)->first();
-                    $userFullName = $user ? ($user->first_name . ' ' . $user->last_name) : 'کاربر گرامی';
+        // تبدیل sendDateTime از میلادی به شمسی
+        $jalaliSendDateTime = \Morilog\Jalali\Jalalian::fromDateTime(
+            \Carbon\Carbon::parse($this->sendDateTime)
+        )->format('Y/m/d H:i:s');
 
+        foreach ($chunks as $chunk) {
+            foreach ($chunk as $recipient) {
+                $user = User::where('mobile', $recipient)->first();
+                $userFullName = $user ? ($user->first_name . ' ' . $user->last_name) : 'کاربر گرامی';
 
-                    // ارسال پیام معمولی
-                    $smsService = new MessageService(
-                        SmsService::createMessage(
-                            $this->message,
-                            [$recipient],
-                            null,
-                            $this->sendDateTime
-                        )
-                    );
+                $smsService = new MessageService(
+                    SmsService::createMessage(
+                        $this->message,
+                        [$recipient],
+                        null,
+                        $jalaliSendDateTime // فرمت شمسی رو پاس می‌دیم
+                    )
+                );
 
-
-                    $smsService->send();
-                }
-
-                $delay += 5; // تاخیر 5 ثانیه‌ای برای هر تکه
+                $smsService->send();
             }
-        } catch (\Exception $e) {
-            Log::error('خطا در ارسال پیامک', [
-                'recipients' => $this->recipients,
-                'message' => $this->message,
-                'template_id' => $this->templateId,
-                'error' => $e->getMessage(),
-            ]);
-            throw $e; // برای اطمینان از اینکه خطا به Queue گزارش بشه
+            $delay += 5;
         }
+    } catch (\Exception $e) {
+        Log::error('خطا در ارسال پیامک', [
+            'recipients' => $this->recipients,
+            'message' => $this->message,
+            'template_id' => $this->templateId,
+            'error' => $e->getMessage(),
+        ]);
+        throw $e;
     }
+}
 }

@@ -62,36 +62,33 @@ class SmsService implements MessageInterface
         return $smsService;
     }
 
-    public static function createMessage($message, $recipients, $senderNumber = null, $sendDateTime = null)
-    {
-        $activeGateway = SmsGateway::where('is_active', true)->first();
-        $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+  public static function createMessage($message, $recipients, $senderNumber = null, $sendDateTime = null)
+{
+    $activeGateway = SmsGateway::where('is_active', true)->first();
+    $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
 
-        $senderNumber = $senderNumber ?? match ($gatewayName) {
-            'kavenegar' => env('KAVENEGAR_SENDER_NUMBER', '2000990007700'),
-            'pishgamrayan' => env('SMS_SENDER_NUMBER', '5000309180607211'),
-            'farazsms' => env('FARAZSMS_SENDER_NUMBER', ''),
-            'mellipayamak' => env('MELLIPAYAMAK_SENDER_NUMBER', ''),
-            'payamito' => env('PAYAMITO_SENDER_NUMBER', ''),
-            default => env('SMS_SENDER_NUMBER', '5000309180607211'),
-        };
+    $senderNumber = $senderNumber ?? match ($gatewayName) {
+        'kavenegar' => env('KAVENEGAR_SENDER_NUMBER', '2000990007700'),
+        'pishgamrayan' => env('SMS_SENDER_NUMBER', '5000309180607211'),
+        'farazsms' => env('FARAZSMS_SENDER_NUMBER', ''),
+        'mellipayamak' => env('MELLIPAYAMAK_SENDER_NUMBER', ''),
+        'payamito' => env('PAYAMITO_SENDER_NUMBER', ''),
+        default => env('SMS_SENDER_NUMBER', '5000309180607211'),
+    };
 
-        $sendDateTime = $sendDateTime ?? \Morilog\Jalali\Jalalian::now()->format('Y/m/d H:i:s');
-
-        $smsService = new self();
-        $smsService->setMessage($message); // متن پیام همون چیزی که کاربر داده
-        $smsService->setRecipientNumbers($recipients);
-        $smsService->setSenderNumber($senderNumber);
-        $smsService->sendDateTime = $sendDateTime;
-
-        // اگه پیشگام رایان باشه و otpId بخواد، اینجا می‌تونی شرط اضافه کنی
-        if ($gatewayName === 'pishgamrayan') {
-            // اگه نیاز به otpId داری، می‌تونی اینجا تنظیمش کنی
-            // $smsService->setOtpId($otpId);
-        }
-
-        return $smsService;
+    // اگه sendDateTime نبود یا فرمتش اشتباه بود، زمان فعلی رو به شمسی بذار
+    if (!$sendDateTime) {
+        $sendDateTime = \Morilog\Jalali\Jalalian::now()->format('Y/m/d H:i:s');
     }
+
+    $smsService = new self();
+    $smsService->setMessage($message);
+    $smsService->setRecipientNumbers($recipients);
+    $smsService->setSenderNumber($senderNumber);
+    $smsService->sendDateTime = $sendDateTime;
+
+    return $smsService;
+}
 
     public function fire()
     {
