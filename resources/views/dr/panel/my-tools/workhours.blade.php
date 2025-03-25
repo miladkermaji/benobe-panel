@@ -860,121 +860,141 @@
   }
   // فراخوانی تابع برای تنظیم دکمه‌های مدال
   $(document).ready(setupModalButtons);
-  $(document).on('show.bs.modal', '#scheduleModal', function() {
-    // ریست کردن `data-attributes` مدال
-    $(this).removeData('day')
-      .removeData('max-appointments')
-      .removeData('workhours');
-    // پاک کردن مقادیر ورودی‌های مدال
-    $('#schedule-start').val('');
-    $('#schedule-end').val('');
-    // حذف کلاس `active-hover` از روزهای انتخاب‌شده قبلی
-    $('.badge-time-styles-day').removeClass('active-hover');
-    // حذف لیست تنظیمات قبلی از داخل `modal`
-    $('.settings-list').remove();
-    $('.not-appointment-found').remove();
-  });
-  $(document).on('click', '[data-target="#scheduleModal"]', function() {
-    $("#saveSchedule").removeData('workhours');
-    let currentRow = $(this).closest(".form-row");
-    // دریافت `start-time` و `end-time` از مقدار `value` اینپوت‌ها
-    let start_time = currentRow.find(".start-time").val();
-    let end_time = currentRow.find(".end-time").val();
-    let max_appointments = currentRow.find(".max-appointments").val();
-    // 📌 دریافت مقدار `day` به درستی از `data-day` یا `id` ورودی تعداد نوبت
-    let day = currentRow.find(".max-appointments").data('day');
-    // اگر مقدار `day` موجود نیست، آن را از `id` ورودی استخراج کن
-    if (!day) {
-      let inputId = currentRow.find(".max-appointments").attr("id") || "";
-      let idParts = inputId.split("-");
-      if (idParts.length >= 2) {
-        day = idParts[idParts.length - 1]; // آخرین بخش `id` که مربوط به `day` است
-      }
-    }
-    checkAllDaysSettings(day, start_time, end_time, max_appointments)
-    $('#scheduleModal').data('currentDay', day); // ذخیره روز جاری در مدال
-    $("#saveSchedule").attr('data-day', day);
-    $("#saveSchedule").attr('data-workhours', `${day}-${start_time}-${end_time}-${max_appointments}`);
-    const persianDay = getPersianDayName(day);
-    const modal = $('#scheduleModal');
-    // 📌 مقدار `data-max-appointments` و `data-day` در مدال را مقداردهی کن
-    modal.attr('data-max-appointments', max_appointments || 0);
-    modal.attr('data-day', day);
-    // 📌 تنظیم مقدار `value` در ورودی‌های مدال
-    $('#schedule-start').val(start_time);
-    $('#schedule-end').val(end_time);
-    // 📌 تغییر عنوان مدال با اطلاعات دقیق، جلوگیری از `undefined`
-    if (persianDay && start_time && end_time && max_appointments) {
-      $("#scheduleModalLabel").text(
-        `برنامه زمانبندی برای نوبت‌های ${persianDay} از ${start_time} تا ${end_time} (${max_appointments} نوبت)`
-      );
-    } else {
-      $("#scheduleModalLabel").text("برنامه زمانبندی برای نوبت‌ها"); // مقدار پیش‌فرض برای جلوگیری از `undefined`
-    }
-    $('.setting-item').remove();
-    $('.not-appointment-found').remove();
-    // پاک کردن چک‌باکس‌های قبلی
-    $('input[type="checkbox"][id$="-copy-modal"]').prop('checked', false);
-    $(`#${day}-copy-modal`).prop('checked', true);
-    // 📌 دریافت تنظیمات از سرور بر اساس مقادیر `value`
-    $.ajax({
-      url: "{{ route('get-appointment-settings') }}",
-      method: 'GET',
-      data: {
-        id: `${day}-${start_time}-${end_time}-${max_appointments}`,
-        day: day,
-        start_time: start_time,
-        end_time: end_time,
-        max_appointments: max_appointments,
-        selectedClinicId: localStorage.getItem('selectedClinicId')
+ $(document).on('show.bs.modal', '#scheduleModal', function() {
+  // نمایش لودینگ هنگام باز شدن مدال
+  const $modal = $(this);
+  const $loading = $modal.find('#scheduleLoading');
+  const $content = $modal.find('.modal-content-inner');
+  
+  $loading.removeClass('d-none');
+  $content.hide();
 
-      },
-      success: function(response) {
-        if (response.status && response.settings.length > 0) {
-          let settingsListHtml = '<div class="mt-3 settings-list">';
-          const dayMapFa = {
-            'saturday': 'شنبه',
-            'sunday': 'یکشنبه',
-            'monday': 'دوشنبه',
-            'tuesday': 'سه‌شنبه',
-            'wednesday': 'چهارشنبه',
-            'thursday': 'پنج‌شنبه',
-            'friday': 'جمعه'
-          };
-          response.settings.forEach(setting => {
-            settingsListHtml += `
-                        <div class="d-flex justify-content-between align-items-center border-bottom p-2 border-radius-4 mb-2 setting-item mt-2 bg-active-slot"
-                             data-day="${response.day}" data-selected-day="${setting.selected_day}">
-                            <span class="font-weight-bold text-success p-2">
-                                باز شدن نوبت‌ها از ${setting.start_time} تا ${setting.end_time} روز ${dayMapFa[setting.selected_day]}
-                            </span>
-                            <button class="btn btn-sm btn-light delete-schedule-setting"
-                                    data-day="${response.day}"
-                                    data-start-time="${setting.start_time}"
-                                    data-end-time="${setting.end_time}"
-                                    data-selected-day="${setting.selected_day}">
-                                <img src="${trashSvg}">
-                            </button>
-                        </div>`;
-          });
-          settingsListHtml += '</div>';
-          $('#scheduleModal .modal-body').append(settingsListHtml);
-        } else {
-          $('#scheduleModal .modal-body').append(
-            '<div class="mt-3 font-weight-bold settings-list text-danger text-center not-appointment-found">هیچ برنامه‌ای یافت نشد.</div>'
-          );
-        }
-      },
-      error: function(xhr) {
-        console.error('❌ خطا در دریافت تنظیمات:', xhr);
+  // ریست کردن `data-attributes` مدال
+  $(this).removeData('day')
+    .removeData('max-appointments')
+    .removeData('workhours');
+  // پاک کردن مقادیر ورودی‌های مدال
+  $('#schedule-start').val('');
+  $('#schedule-end').val('');
+  // حذف کلاس `active-hover` از روزهای انتخاب‌شده قبلی
+  $('.badge-time-styles-day').removeClass('active-hover');
+  // حذف لیست تنظیمات قبلی از داخل `modal`
+  $('.settings-list').remove();
+  $('.not-appointment-found').remove();
+});
+
+$(document).on('click', '[data-target="#scheduleModal"]', function() {
+  const $modal = $('#scheduleModal');
+  const $loading = $modal.find('#scheduleLoading');
+  const $content = $modal.find('.modal-content-inner');
+
+  $("#saveSchedule").removeData('workhours');
+  let currentRow = $(this).closest(".form-row");
+  // دریافت `start-time` و `end-time` از مقدار `value` اینپوت‌ها
+  let start_time = currentRow.find(".start-time").val();
+  let end_time = currentRow.find(".end-time").val();
+  let max_appointments = currentRow.find(".max-appointments").val();
+  // 📌 دریافت مقدار `day` به درستی از `data-day` یا `id` ورودی تعداد نوبت
+  let day = currentRow.find(".max-appointments").data('day');
+  // اگر مقدار `day` موجود نیست، آن را از `id` ورودی استخراج کن
+  if (!day) {
+    let inputId = currentRow.find(".max-appointments").attr("id") || "";
+    let idParts = inputId.split("-");
+    if (idParts.length >= 2) {
+      day = idParts[idParts.length - 1]; // آخرین بخش `id` که مربوط به `day` است
+    }
+  }
+  checkAllDaysSettings(day, start_time, end_time, max_appointments);
+  $('#scheduleModal').data('currentDay', day); // ذخیره روز جاری در مدال
+  $("#saveSchedule").attr('data-day', day);
+  $("#saveSchedule").attr('data-workhours', `${day}-${start_time}-${end_time}-${max_appointments}`);
+  const persianDay = getPersianDayName(day);
+  const modal = $('#scheduleModal');
+  // 📌 مقدار `data-max-appointments` و `data-day` در مدال را مقداردهی کن
+  modal.attr('data-max-appointments', max_appointments || 0);
+  modal.attr('data-day', day);
+  // 📌 تنظیم مقدار `value` در ورودی‌های مدال
+  $('#schedule-start').val(start_time);
+  $('#schedule-end').val(end_time);
+  // 📌 تغییر عنوان مدال با اطلاعات دقیق، جلوگیری از `undefined`
+  if (persianDay && start_time && end_time && max_appointments) {
+    $("#scheduleModalLabel").text(
+      `برنامه زمانبندی برای نوبت‌های ${persianDay} از ${start_time} تا ${end_time} (${max_appointments} نوبت)`
+    );
+  } else {
+    $("#scheduleModalLabel").text("برنامه زمانبندی برای نوبت‌ها"); // مقدار پیش‌فرض برای جلوگیری از `undefined`
+  }
+  $('.setting-item').remove();
+  $('.not-appointment-found').remove();
+  // پاک کردن چک‌باکس‌های قبلی
+  $('input[type="checkbox"][id$="-copy-modal"]').prop('checked', false);
+  $(`#${day}-copy-modal`).prop('checked', true);
+  // 📌 دریافت تنظیمات از سرور بر اساس مقادیر `value`
+  $.ajax({
+    url: "{{ route('get-appointment-settings') }}",
+    method: 'GET',
+    data: {
+      id: `${day}-${start_time}-${end_time}-${max_appointments}`,
+      day: day,
+      start_time: start_time,
+      end_time: end_time,
+      max_appointments: max_appointments,
+      selectedClinicId: localStorage.getItem('selectedClinicId')
+    },
+    success: function(response) {
+      // پس از اتمام لود، لودینگ مخفی و محتوا نمایش داده شود
+      $loading.addClass('d-none');
+      $content.show();
+
+      if (response.status && response.settings.length > 0) {
+        let settingsListHtml = '<div class="mt-3 settings-list">';
+        const dayMapFa = {
+          'saturday': 'شنبه',
+          'sunday': 'یکشنبه',
+          'monday': 'دوشنبه',
+          'tuesday': 'سه‌شنبه',
+          'wednesday': 'چهارشنبه',
+          'thursday': 'پنج‌شنبه',
+          'friday': 'جمعه'
+        };
+        response.settings.forEach(setting => {
+          settingsListHtml += `
+                      <div class="d-flex justify-content-between align-items-center border-bottom p-2 border-radius-4 mb-2 setting-item mt-2 bg-active-slot"
+                           data-day="${response.day}" data-selected-day="${setting.selected_day}">
+                          <span class="font-weight-bold text-success p-2">
+                              باز شدن نوبت‌ها از ${setting.start_time} تا ${setting.end_time} روز ${dayMapFa[setting.selected_day]}
+                          </span>
+                          <button class="btn btn-sm btn-light delete-schedule-setting"
+                                  data-day="${response.day}"
+                                  data-start-time="${setting.start_time}"
+                                  data-end-time="${setting.end_time}"
+                                  data-selected-day="${setting.selected_day}">
+                              <img src="${trashSvg}">
+                          </button>
+                      </div>`;
+        });
+        settingsListHtml += '</div>';
+        $('#scheduleModal .modal-body').append(settingsListHtml);
+      } else {
+        $('#scheduleModal .modal-body').append(
+          '<div class="mt-3 font-weight-bold settings-list text-danger text-center not-appointment-found">هیچ برنامه‌ای یافت نشد.</div>'
+        );
       }
-    });
-    $(document).on('click', '.badge-time-styles-day', function() {
-      $('.badge-time-styles-day').removeClass('active-hover');
-      const dayEn = $(this).data('day');
-      $(this).addClass('active-hover');
-    });
+    },
+    error: function(xhr) {
+      // در صورت خطا هم لودینگ مخفی و محتوا نمایش داده شود
+      $loading.addClass('d-none');
+      $content.show();
+      console.error('❌ خطا در دریافت تنظیمات:', xhr);
+    }
   });
+
+  $(document).on('click', '.badge-time-styles-day', function() {
+    $('.badge-time-styles-day').removeClass('active-hover');
+    const dayEn = $(this).data('day');
+    $(this).addClass('active-hover');
+  });
+});
   // تابع تبدیل نام روز به فارسی (اگر قبلاً تعریف نشده باشد)
   function addNewRow(day) {
     const newRow = `

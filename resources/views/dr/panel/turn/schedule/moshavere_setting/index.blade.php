@@ -7,6 +7,16 @@
  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
   rel="stylesheet" />
+    <style>
+    .loading-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 1000;
+    }
+  </style>
 @endsection
 
 @section('site-header')
@@ -37,8 +47,7 @@
       </div>
       <!-- اضافه کردن بخش انواع مشاوره -->
       <div class="mt-3">
-       <label class="text-dark font-weight-bold">انواع مشاوره</label>
-       <div class="d-flex flex-wrap justify-content-start mt-2 gap-40">
+       <div class="d-flex flex-wrap justify-content-start mt-2 gap-40 bg-light p-3">
         <x-my-check :isChecked="$appointmentConfig->has_phone_counseling" id="phone-counseling" day="مشاوره تلفنی" name="has_phone_counseling" />
         <x-my-check :isChecked="$appointmentConfig->has_text_counseling" id="text-counseling" day="مشاوره متنی" name="has_text_counseling" />
         <x-my-check :isChecked="$appointmentConfig->has_video_counseling" id="video-counseling" day="مشاوره ویدیویی" name="has_video_counseling" />
@@ -178,65 +187,71 @@
  </div>
 </div>
 <div class="modal fade" id="scheduleModal" tabindex="-1" data-selected-day="" role="dialog"
- aria-labelledby="scheduleModalLabel" aria-hidden="true">
- <div class="modal-dialog modal-dialog-centered my-modal-lg" role="document">
-  <div class="modal-content border-radius-6">
-   <div class="modal-header">
-    <h6 class="modal-title font-weight-bold" id="scheduleModalLabel">برنامه زمانبندی</h6>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-     <span aria-hidden="true">×</span>
-    </button>
-   </div>
-   <div class="modal-body">
-    <div class="">
-     <div class="">
-      <label class="font-weight-bold text-dark">روزهای کاری</label>
-      <div class="mt-2 d-flex flex-wrap gap-10 justify-content-start my-768px-styles-day-and-times">
-       <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
-         data-day="saturday">شنبه</span><span class=""></span>
-       </div>
-       <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
-         data-day="sunday">یکشنبه</span><span class=""></span>
-       </div>
-       <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
-         data-day="monday">دوشنبه</span><span class=""></span>
-       </div>
-       <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
-         data-day="tuesday">سه‌شنبه</span><span class=""></span>
-       </div>
-       <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
-         data-day="wednesday">چهارشنبه</span><span class=""></span>
-       </div>
-       <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
-         data-day="thursday">پنج‌شنبه</span><span class=""></span>
-       </div>
-       <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
-         data-day="friday">جمعه</span><span class=""></span></div>
+  aria-labelledby="scheduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered my-modal-lg" role="document">
+    <div class="modal-content border-radius-6">
+      <div class="modal-header">
+        <h6 class="modal-title font-weight-bold" id="scheduleModalLabel">برنامه زمانبندی</h6>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-     </div>
+      <div class="modal-body position-relative">
+        <!-- اضافه کردن لودینگ -->
+        <div class="loading-overlay d-none" id="scheduleLoading">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">در حال بارگذاری...</span>
+          </div>
+          <p class="mt-2">در حال بارگذاری...</p>
+        </div>
+        <!-- محتوای اصلی که ابتدا مخفی است -->
+        <div class="modal-content-inner" style="display: none;">
+          <div class="">
+            <div class="">
+              <label class="font-weight-bold text-dark">روزهای کاری</label>
+              <div class="mt-2 d-flex flex-wrap gap-10 justify-content-start my-768px-styles-day-and-times">
+                <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
+                    data-day="saturday">شنبه</span><span class=""></span></div>
+                <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
+                    data-day="sunday">یکشنبه</span><span class=""></span></div>
+                <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
+                    data-day="monday">دوشنبه</span><span class=""></span></div>
+                <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
+                    data-day="tuesday">سه‌شنبه</span><span class=""></span></div>
+                <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
+                    data-day="wednesday">چهارشنبه</span><span class=""></span></div>
+                <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
+                    data-day="thursday">پنج‌شنبه</span><span class=""></span></div>
+                <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
+                    data-day="friday">جمعه</span><span class=""></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="w-100 d-flex mt-4 gap-4 justify-content-center">
+            <div class="form-group position-relative timepicker-ui">
+              <label class="label-top-input-special-takhasos">شروع</label>
+              <input type="text"
+                class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13"
+                id="schedule-start" value="00:00">
+            </div>
+            <div class="form-group position-relative timepicker-ui">
+              <label class="label-top-input-special-takhasos">پایان</label>
+              <input type="text"
+                class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13"
+                id="schedule-end" value="23:59">
+            </div>
+          </div>
+          <div class="w-100 d-flex justify-content-end mt-3">
+            <button type="submit"
+              class="btn btn-primary h-50 col-12 d-flex justify-content-center align-items-center" id="saveSchedule">
+              <span class="button_text">ذخیره تغییرات</span>
+              <div class="loader"></div>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="w-100 d-flex mt-4 gap-4 justify-content-center">
-     <div class="form-group position-relative timepicker-ui">
-      <label class="label-top-input-special-takhasos">شروع</label>
-      <input type="text" class="form-control  h-50 timepicker-ui-input text-center font-weight-bold font-size-13"
-       id="schedule-start" value="00:00">
-     </div>
-     <div class="form-group position-relative timepicker-ui">
-      <label class="label-top-input-special-takhasos">پایان</label>
-      <input type="text" class="form-control  h-50 timepicker-ui-input text-center font-weight-bold font-size-13"
-       id="schedule-end" value="23:59">
-     </div>
-    </div>
-    <div class="w-100 d-flex justify-content-end mt-3">
-     <button type="submit" class="btn btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-      id="saveSchedule">
-      <span class="button_text">ذخیره تغیرات</span>
-      <div class="loader"></div>
-     </button>
-    </div>
-   </div>
   </div>
- </div>
 </div>
 <div class="modal fade" id="checkboxModal" tabindex="-1" role="dialog" aria-labelledby="checkboxModalLabel"
  aria-hidden="true">
