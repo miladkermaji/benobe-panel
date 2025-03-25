@@ -64,45 +64,55 @@
       </div>
     </div>
 
-    <!-- جدول پیام‌های ارسالی -->
-    <div class="mt-4">
-      <div class="card-header">
-        <h5 class="mb-0">لیست پیام‌های ارسالی</h5>
-      </div>
-      <div class="card-body">
-        <div class="w-100 d-flex justify-content-end mb-3">
-{{--           <button class="btn btn-success h-50" data-toggle="modal" data-target="#sendSmsModal">ارسال پیام جدید</button> --}}
-        </div>
-        <div class="table-responsive">
-          <table id="messagesTable" class="table table-striped table-bordered text-center">
-            <thead>
-              <tr>
-                <th>عنوان پیام</th>
-                <th>متن پیام</th>
-                <th>تاریخ ارسال</th>
-                <th>گیرنده</th>
-                <th>عملیات</th>
-              </tr>
-            </thead>
-            <tbody id="messagesTableBody">
-              @foreach ($messages as $message)
-                <tr data-id="{{ $message->id }}">
-                  <td>{{ $message->title }}</td>
-                  <td>{{ $message->content }}</td>
-                  <td>{{ \Morilog\Jalali\Jalalian::fromDateTime($message->created_at)->format('Y/m/d') }}</td>
-                  <td>{{ $message->user ? $message->user->first_name . ' ' . $message->user->last_name : 'نامشخص' }}</td>
-                  <td>
-                    <button class="btn btn-light btn-sm delete-message-btn" onclick="deleteMessage({{ $message->id }}, this)">
-                      <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
-                    </button>
-                  </td>
-                </tr>
-              @endforeach
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <!-- جدول پیام‌های ارسالی -->
+<div class="mt-4">
+  <div class="card-header">
+    <h5 class="mb-0">لیست پیام‌های ارسالی</h5>
+  </div>
+  <div class="card-body">
+    <div class="w-100 d-flex justify-content-end mb-3">
+      <button class="btn btn-success h-50" data-toggle="modal" data-target="#sendSmsModal">ارسال پیام جدید</button>
     </div>
+    <div class="table-responsive">
+      <table id="messagesTable" class="table table-striped table-bordered text-center">
+        <thead>
+          <tr>
+            <th>عنوان پیام</th>
+            <th>متن پیام</th>
+            <th>تاریخ ارسال</th>
+            <th>گیرنده</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody id="messagesTableBody">
+          @foreach ($messages as $message)
+            <tr data-id="{{ $message->id }}">
+              <td>{{ $message->title }}</td>
+              <td>{{ $message->content }}</td>
+              <td>{{ \Morilog\Jalali\Jalalian::fromDateTime($message->created_at)->format('Y/m/d') }}</td>
+              <td>
+                @if ($message->recipient_type === 'all')
+                  همه کاربران
+                @elseif ($message->recipient_type === 'blocked')
+                  کاربران مسدود
+                @elseif ($message->recipient_type === 'specific' && $message->user)
+                  {{ $message->user->first_name . ' ' . $message->user->last_name }} ({{ $message->user->mobile }})
+                @else
+                  نامشخص
+                @endif
+              </td>
+              <td>
+                <button class="btn btn-light btn-sm delete-message-btn rounded-circle" onclick="deleteMessage({{ $message->id }}, this)">
+                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
+                </button>
+              </td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
   </div>
 
   <!-- مودال افزودن کاربر -->
@@ -324,7 +334,8 @@
   });
 
   // ارسال پیام
-  $('#sendSmsForm').on('submit', function(e) {
+// ارسال پیام
+$('#sendSmsForm').on('submit', function(e) {
     e.preventDefault();
     const form = $(this);
     const formData = form.serializeArray();
@@ -340,37 +351,47 @@
     loader.show();
 
     $.ajax({
-      url: "{{ route('doctor-blocking-users.send-message') }}",
-      method: "POST",
-      data: $.param(formData),
-      headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-      success: function(response) {
-        if (response.success) {
-          toastr.success(response.message);
-          form[0].reset();
-          $('#sendSmsModal').modal('hide');
-          loadMessages();
+        url: "{{ route('doctor-blocking-users.send-message') }}",
+        method: "POST",
+        data: $.param(formData),
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        success: function(response) {
+            if (response.success) {
+                toastr.success(response.message);
+                form[0].reset();
+                $('#sendSmsModal').modal('hide');
+                $('#specificRecipientField').hide(); // مخفی کردن فیلد کاربر خاص بعد از ریست
+                loadMessages();
+            }
+        },
+        error: function(xhr) {
+            const response = xhr.responseJSON;
+            if (xhr.status === 422 && response.errors) {
+                Object.values(response.errors).forEach(error => {
+                    toastr.error(error[0]);
+                });
+            } else {
+                toastr.error(response?.message || 'خطایی در ارسال پیام رخ داد!');
+            }
+        },
+        complete: function() {
+            button.prop('disabled', false);
+            buttonText.show();
+            loader.hide();
         }
-      },
-      error: function(xhr) {
-        const response = xhr.responseJSON;
-        if (xhr.status === 422 && response.errors) {
-          for (const field in response.errors) {
-            toastr.error(response.errors[field][0]);
-          }
-        } else if (response && response.message) {
-          toastr.error(response.message);
-        } else {
-          toastr.error("خطا در ارسال پیام!");
-        }
-      },
-      complete: function() {
-        button.prop('disabled', false);
-        buttonText.show();
-        loader.hide();
-      }
     });
-  });
+});
+
+// نمایش/مخفی کردن فیلد گیرنده خاص
+$('#smsRecipient').on('change', function() {
+    const specificField = $('#specificRecipientField');
+    if ($(this).val() === 'specific') {
+        specificField.show();
+    } else {
+        specificField.hide();
+        $('#specificRecipient').val(''); // خالی کردن فیلد در صورت تغییر گزینه
+    }
+});
 
   // اضافه کردن کاربر به جدول
   function appendBlockedUser(user) {
@@ -465,42 +486,50 @@
   });
 
   // بارگذاری پیام‌ها
-  function loadMessages() {
+function loadMessages() {
     $.ajax({
-      url: "{{ route('doctor-blocking-users.messages') }}",
-      method: "GET",
-      data: { selectedClinicId: localStorage.getItem('selectedClinicId') },
-      success: function(messages) {
-        const tableBody = $('#messagesTableBody');
-        tableBody.empty();
-        messages.forEach(message => {
-          const recipientName = message.user ? `${message.user.first_name} ${message.user.last_name}` : 'نامشخص';
-          const jalaliDate = new Intl.DateTimeFormat('fa-IR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-          }).format(new Date(message.created_at));
+        url: "{{ route('doctor-blocking-users.messages') }}",
+        method: "GET",
+        data: { selectedClinicId: localStorage.getItem('selectedClinicId') },
+        success: function(messages) {
+            const tableBody = $('#messagesTableBody');
+            tableBody.empty();
+            messages.forEach(message => {
+                let recipientText = 'نامشخص';
+                if (message.recipient_type === 'all') {
+                    recipientText = 'همه کاربران';
+                } else if (message.recipient_type === 'blocked') {
+                    recipientText = 'کاربران مسدود';
+                } else if (message.recipient_type === 'specific' && message.user) {
+                    recipientText = `${message.user.first_name} ${message.user.last_name} (${message.user.mobile})`;
+                }
 
-          tableBody.append(`
-            <tr data-id="${message.id}">
-              <td>${message.title}</td>
-              <td>${message.content}</td>
-              <td>${jalaliDate}</td>
-              <td>${recipientName}</td>
-              <td>
-                <button class="btn btn-light btn-sm delete-message-btn" onclick="deleteMessage(${message.id}, this)">
-                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
-                </button>
-              </td>
-            </tr>
-          `);
-        });
-      },
-      error: function() {
-        toastr.error("خطا در بارگذاری پیام‌ها!");
-      }
+                const jalaliDate = new Intl.DateTimeFormat('fa-IR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }).format(new Date(message.created_at));
+
+                tableBody.append(`
+                    <tr data-id="${message.id}">
+                        <td>${message.title}</td>
+                        <td>${message.content}</td>
+                        <td>${jalaliDate}</td>
+                        <td>${recipientText}</td>
+                        <td>
+                            <button class="btn btn-light btn-sm delete-message-btn rounded-circle" onclick="deleteMessage(${message.id}, this)">
+                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+        },
+        error: function() {
+            toastr.error("خطا در بارگذاری پیام‌ها!");
+        }
     });
-  }
+}
   loadMessages();
 
   // تغییر وضعیت کاربر

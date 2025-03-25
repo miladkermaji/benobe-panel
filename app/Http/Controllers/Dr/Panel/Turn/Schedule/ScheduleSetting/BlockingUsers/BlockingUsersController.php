@@ -8,7 +8,9 @@ use App\Models\SmsTemplate;
 use Illuminate\Support\Str;
 use App\Models\UserBlocking;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Dr\Controller;
@@ -273,73 +275,87 @@ class BlockingUsersController extends Controller
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
 
         $messages = [
-            'title.required' => 'لطفاً عنوان پیام را وارد کنید.',
-            'title.max' => 'عنوان پیام نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-            'content.required' => 'لطفاً متن پیام را وارد کنید.',
-            'recipient_type.required' => 'لطفاً نوع گیرنده را انتخاب کنید.',
-            'recipient_type.in' => 'نوع گیرنده انتخاب‌شده معتبر نیست.',
-            'specific_recipient.required' => 'لطفاً شماره موبایل گیرنده را وارد کنید.',
-            'specific_recipient.exists' => 'شماره موبایل واردشده در سیستم ثبت نشده است.',
+            'title.required' => 'عنوان پیام را وارد کنید.',
+            'title.max' => 'عنوان پیام نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+            'content.required' => 'متن پیام را وارد کنید.',
+            'content.max' => 'متن پیام نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد.',
+            'recipient_type.required' => 'نوع گیرنده را انتخاب کنید.',
+            'recipient_type.in' => 'نوع گیرنده انتخاب‌شده نامعتبر است.',
+            'specific_recipient.required_if' => 'شماره موبایل گیرنده را وارد کنید.',
+            'specific_recipient.exists' => 'شماره موبایل واردشده در سیستم ثبت نشده یا نوبت نگرفته است.',
         ];
 
         try {
-            $validated = $request->validate([
+            $rules = [
                 'title' => 'required|string|max:255',
-                'content' => 'required|string',
+                'content' => 'required|string|max:1000',
                 'recipient_type' => 'required|in:all,blocked,specific',
-                'specific_recipient' => 'required_if:recipient_type,specific|exists:users,mobile',
-            ], $messages);
+            ];
+
+            if ($request->input('recipient_type') === 'specific') {
+                $rules['specific_recipient'] = [
+                    'required',
+                    Rule::exists('users', 'mobile')->where(function ($query) use ($doctorId) {
+                        $query->whereIn('id', DB::table('appointments')->where('doctor_id', $doctorId)->pluck('patient_id'));
+                    }),
+                ];
+            }
+
+            $validated = $request->validate($rules, $messages);
 
             $recipients = [];
             $userId = null;
 
             if ($validated['recipient_type'] === 'all') {
-                // کاربرانی که با این پزشک در جدول appointments رابطه دارند
                 $recipients = DB::table('appointments')
                     ->where('doctor_id', $doctorId)
-                    ->join('users', 'appointments.user_id', '=', 'users.id')
+                    ->join('users', 'appointments.patient_id', '=', 'users.id')
                     ->distinct()
                     ->pluck('users.mobile')
                     ->toArray();
+                if (empty($recipients)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'هیچ کاربری با شما نوبت ثبت نکرده است.',
+                    ], 422);
+                }
             } elseif ($validated['recipient_type'] === 'blocked') {
-                // کاربران مسدود با وضعیت 1
-                $recipients = UserBlocking::where('doctor_id', $doctorId)
-                    ->where('clinic_id', $clinicId)
-                    ->where('status', 1)
+                $recipients = UserBlocking::where('user_blockings.doctor_id', $doctorId)
+                    ->where('user_blockings.clinic_id', $clinicId)
+                    ->where('user_blockings.status', 1)
                     ->join('users', 'user_blockings.user_id', '=', 'users.id')
                     ->pluck('users.mobile')
                     ->toArray();
+                if (empty($recipients)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'هیچ کاربر مسدودی یافت نشد.',
+                    ], 422);
+                }
             } elseif ($validated['recipient_type'] === 'specific') {
                 $user = User::where('mobile', $validated['specific_recipient'])->first();
                 $recipients[] = $validated['specific_recipient'];
                 $userId = $user->id;
             }
 
-            if (empty($recipients)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'هیچ گیرنده‌ای برای ارسال پیام یافت نشد.',
-                ], 422);
-            }
-
-            // ذخیره پیام در SmsTemplate
-            SmsTemplate::create([
+            // ذخیره پیام در SmsTemplate با اضافه کردن recipient_type
+            $smsTemplate = SmsTemplate::create([
                 'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
-                'user_id' => $userId, // فقط برای کاربر خاص مقدار دارد
+                'user_id' => $userId,
                 'title' => $validated['title'],
                 'content' => $validated['content'],
                 'type' => 'manual',
+                'recipient_type' => $validated['recipient_type'], // اضافه کردن نوع گیرنده
                 'identifier' => uniqid(),
             ]);
 
-            // ارسال پیامک با روش مسدودی
+            // ارسال پیامک
             $doctor = Doctor::find($doctorId);
             $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
 
             $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
             $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-            $templateId = ($gatewayName === 'pishgamrayan') ? null : null; // بدون قالب خاص برای پیام دستی
+            $templateId = ($gatewayName === 'pishgamrayan') ? null : null;
 
             SendSmsNotificationJob::dispatch(
                 $validated['content'],
@@ -350,12 +366,28 @@ class BlockingUsersController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'پیام با موفقیت ثبت و در صف ارسال قرار گرفت.',
+                'message' => 'پیام با موفقیت در صف ارسال قرار گرفت.',
             ]);
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed in sendMessage', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all(),
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در ثبت و ارسال پیام!',
+                'message' => 'خطا در اطلاعات ارسالی!',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error in sendMessage', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'خطایی در ارسال پیام رخ داد. لطفاً دوباره تلاش کنید.',
                 'error' => $e->getMessage(),
             ], 500);
         }
