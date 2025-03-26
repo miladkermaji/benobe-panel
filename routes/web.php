@@ -526,6 +526,11 @@ Route::prefix('dr')
                 Route::get('gallery', [DoctorsClinicManagementController::class, 'gallery'])->middleware('secretary.permission:clinic_management')->name('dr-office-gallery');
                 Route::get('medicalDoc', [DoctorsClinicManagementController::class, 'medicalDoc'])->middleware('secretary.permission:clinic_management')->name('dr-office-medicalDoc');
                 Route::get('/', [DoctorsClinicManagementController::class, 'index'])->middleware('secretary.permission:clinic_management')->name('dr-clinic-management');
+
+                Route::get('/medical-documents', [DoctorsClinicManagementController::class, 'medicalDoc'])->name('dr.panel.clinics.medical-documents');
+
+                Route::get('/edit/{id}/gallery', [DoctorsClinicManagementController::class, 'gallery'])->name('dr.panel.clinics.gallery');
+
                 Route::post('/store', [DoctorsClinicManagementController::class, 'store'])->middleware('secretary.permission:clinic_management')->name('dr-clinic-store');
                 Route::get('/dr/panel/DoctorsClinic/edit/{id}', [DoctorsClinicManagementController::class, 'edit'])->middleware('secretary.permission:clinic_management')->name('dr-clinic-edit');
 

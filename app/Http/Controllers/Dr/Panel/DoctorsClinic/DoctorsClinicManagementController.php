@@ -175,16 +175,17 @@ class DoctorsClinicManagementController extends Controller
         return response()->json(['message' => 'مطب با موفقیت حذف شد']);
     }
 
-    public function gallery()
+    public function gallery($id)
     {
-        return view("dr.panel.doctors-clinic.gallery");
+        return view("dr.panel.doctors-clinic.gallery",compact('id'));
     }
 
-    public function medicalDoc()
-    {
-        return view("dr.panel.doctors-clinic.medicalDoc");
-    }
-
+ 
+public function medicalDoc()
+{
+    $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+    return view("dr.panel.doctors-clinic.medicalDoc", compact('doctorId'));
+}
     /**
      * Show the form for creating a new resource.
      */

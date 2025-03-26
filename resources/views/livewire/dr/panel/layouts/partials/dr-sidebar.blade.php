@@ -215,21 +215,8 @@
             <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-clinic-management') ? 'is-active' : '' }}">
               <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
             </li>
-            <li class="item-li i-user__inforamtion {{ Request::routeIs('doctors.clinic.cost') ? 'is-active' : '' }}">
-              <a href="#">هزینه‌ها</a>
-            </li>
-            <li class="item-li i-user__inforamtion {{ Request::routeIs('duration.index') ? 'is-active' : '' }}">
-              <a href="#">مدت زمان ویزیت</a>
-            </li>
-            <li
-              class="item-li i-user__inforamtion {{ Request::routeIs('activation.workhours.index') ? 'is-active' : '' }}">
-              <a href="#">ساعات کاری کلینیک</a>
-            </li>
-            <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-office-gallery') ? 'is-active' : '' }}">
-              <a href="#">گالری تصاویر</a>
-            </li>
-            <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-office-medicalDoc') ? 'is-active' : '' }}">
-              <a href="#">مدارک من</a>
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.clinics.medical-documents') ? 'is-active' : '' }}">
+              <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
             </li>
           </ul>
         </li>
