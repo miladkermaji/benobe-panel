@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Livewire\Dr\Panel\DoctorServices;
 
 use Livewire\Component;
@@ -16,6 +17,9 @@ class DoctorServiceEdit extends Component
     public $price;
     public $discount;
     public $parent_id;
+    public $showDiscountModal = false;
+    public $discountPercent = 0;
+    public $discountAmount = 0;
 
     public function mount($id)
     {
@@ -27,6 +31,42 @@ class DoctorServiceEdit extends Component
         $this->price = $this->doctorService->price;
         $this->discount = $this->doctorService->discount;
         $this->parent_id = $this->doctorService->parent_id;
+    }
+
+    public function openDiscountModal()
+    {
+        $this->showDiscountModal = true;
+        $this->discountPercent = $this->discount ?? 0;
+        $this->discountAmount = $this->price && $this->discount ? ($this->price * $this->discount / 100) : 0;
+    }
+
+    public function closeDiscountModal()
+    {
+        $this->showDiscountModal = false;
+    }
+
+    public function updatedDiscountPercent($value)
+    {
+        if ($this->price && $value) {
+            $this->discountAmount = $this->price * $value / 100;
+        } else {
+            $this->discountAmount = 0;
+        }
+    }
+
+    public function updatedDiscountAmount($value)
+    {
+        if ($this->price && $value) {
+            $this->discountPercent = ($value / $this->price) * 100;
+        } else {
+            $this->discountPercent = 0;
+        }
+    }
+
+    public function applyDiscount()
+    {
+        $this->discount = $this->discountPercent;
+        $this->showDiscountModal = false;
     }
 
     public function update()

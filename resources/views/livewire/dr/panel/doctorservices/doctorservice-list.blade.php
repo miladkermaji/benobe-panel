@@ -38,6 +38,10 @@
                                 <th class="text-center align-middle" style="width: 70px;">ردیف</th>
                                 <th class="align-middle">نام خدمت</th>
                                 <th class="align-middle">توضیحات</th>
+                                <th class="align-middle">زمان</th>
+                                <th class="align-middle">قیمت</th>
+                                <th class="align-middle">تخفیف</th>
+                                <th class="align-middle">قیمت نهایی</th>
                                 <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
                                 <th class="text-center align-middle" style="width: 150px;">عملیات</th>
                             </tr>
@@ -48,7 +52,7 @@
                                     @include('livewire.dr.panel.doctorservices.doctor-service-tree', ['service' => $item, 'level' => 0, 'index' => $doctorServices->firstItem() + $index])
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">
+                                        <td colspan="12" class="text-center py-5">
                                             <div class="d-flex justify-content-center align-items-center flex-column">
                                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-3">
                                                     <path d="M5 12h14M12 5l7 7-7 7" />
@@ -60,7 +64,7 @@
                                 @endforelse
                             @else
                                 <tr>
-                                    <td colspan="6" class="text-center py-5">در حال بارگذاری خدمات...</td>
+                                    <td colspan="12" class="text-center py-5">در حال بارگذاری خدمات...</td>
                                 </tr>
                             @endif
                         </tbody>

@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Livewire\Dr\Panel\DoctorServices;
 
 use Livewire\Component;
@@ -16,6 +17,45 @@ class DoctorServiceCreate extends Component
     public $price;
     public $discount;
     public $parent_id;
+    public $showDiscountModal = false;
+    public $discountPercent = 0;
+    public $discountAmount = 0;
+
+    public function openDiscountModal()
+    {
+        $this->showDiscountModal = true;
+        $this->discountPercent = $this->discount ?? 0;
+        $this->discountAmount = $this->price && $this->discount ? ($this->price * $this->discount / 100) : 0;
+    }
+
+    public function closeDiscountModal()
+    {
+        $this->showDiscountModal = false;
+    }
+
+    public function updatedDiscountPercent($value)
+    {
+        if ($this->price && $value) {
+            $this->discountAmount = $this->price * $value / 100;
+        } else {
+            $this->discountAmount = 0;
+        }
+    }
+
+    public function updatedDiscountAmount($value)
+    {
+        if ($this->price && $value) {
+            $this->discountPercent = ($value / $this->price) * 100;
+        } else {
+            $this->discountPercent = 0;
+        }
+    }
+
+    public function applyDiscount()
+    {
+        $this->discount = $this->discountPercent;
+        $this->showDiscountModal = false;
+    }
 
     public function store()
     {
@@ -50,7 +90,7 @@ class DoctorServiceCreate extends Component
             'discount.numeric' => 'تخفیف باید یک عدد باشد.',
             'discount.min' => 'تخفیف نمی‌تواند منفی باشد.',
             'discount.max' => 'تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد.',
-            'parent_id.exists' => 'خدمت مادر انتخاب‌شده معتبر نیست.',
+            'parent_id.exists' => 'سرویس مادر انتخاب‌شده معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -59,7 +99,7 @@ class DoctorServiceCreate extends Component
         }
 
         DoctorService::create([
-            'doctor_id' => Auth::guard('doctor')->user()->id, // فرض بر این است که پزشک لاگین کرده است
+            'doctor_id' => Auth::guard('doctor')->user()->id,
             'name' => $this->name,
             'description' => $this->description,
             'status' => $this->status,
@@ -69,7 +109,7 @@ class DoctorServiceCreate extends Component
             'parent_id' => $this->parent_id,
         ]);
 
-        $this->dispatch('show-alert', type: 'success', message: 'خدمت با موفقیت ایجاد شد!');
+        $this->dispatch('show-alert', type: 'success', message: 'سرویس با موفقیت ایجاد شد!');
         return redirect()->route('dr.panel.doctor-services.index');
     }
 

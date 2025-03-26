@@ -36,9 +36,9 @@
                     </div>
                 </div>
                 <div class="col-md-6 col-sm-12">
-                    <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+                    <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
                         <label for="discount" class="form-label fw-bold text-dark mb-2">تخفیف (درصد)</label>
-                        <input type="number" wire:model="discount" class="form-control input-shiny" id="discount" placeholder="تخفیف (اختیاری)">
+                        <input type="number" wire:model="discount" wire:click="openDiscountModal" class="form-control input-shiny cursor-pointer" id="discount" placeholder="تخفیف (اختیاری)" readonly>
                     </div>
                 </div>
                 <div class="col-md-6 col-sm-12">
@@ -80,6 +80,36 @@
             </div>
         </div>
     </div>
+
+    <!-- مودال تخفیف -->
+<!-- مودال تخفیف -->
+@if($showDiscountModal)
+    <div class="modal fade show d-block" id="discountModal" tabindex="-1" role="dialog" aria-labelledby="discountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="discountModalLabel">محاسبه تخفیف</h5>
+                    <button type="button" class="btn-close" wire:click="closeDiscountModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <label for="discountPercent" class="form-label">درصد تخفیف</label>
+                        <input type="number" wire:model.live="discountPercent" class="form-control" id="discountPercent" placeholder="درصد را وارد کنید">
+                    </div>
+                    <div class="mb-4">
+                        <label for="discountAmount" class="form-label">مبلغ تخفیف (تومان)</label>
+                        <input type="number" wire:model.live="discountAmount" class="form-control" id="discountAmount" placeholder="مبلغ را وارد کنید">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" wire:click="closeDiscountModal">لغو</button>
+                    <button type="button" class="btn btn-primary" style="background: linear-gradient(to right, #4B5EAA, #8B5CF6); border: none;" wire:click="applyDiscount">تأیید</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+@endif
 
     <script>
         document.addEventListener('livewire:init', function () {

@@ -20,6 +20,31 @@
         </span>
     </td>
     <td class="align-middle" style="color: #6b7280; font-size: 0.9rem; padding: 15px;">{{ $service->description ?? 'بدون توضیحات' }}</td>
+      <td class="align-middle" style="color: #6b7280; font-size: 0.9rem; padding: 15px;">{{ $service->duration . " دقیقه" ?? '---' }}</td>
+<!-- قیمت -->
+<td class="align-middle" style="padding: 15px;">
+    <span class="inline-block px-3 py-1 rounded-full text-sm font-medium {{ $service->price ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-500' }}">
+        {{ $service->price ? number_format($service->price) . ' تومان' : '---' }}
+    </span>
+</td>
+
+<!-- تخفیف (مبلغ تخفیف به تومان) -->
+<td class="align-middle" style="padding: 15px;">
+    <span class="inline-block px-3 py-1 rounded-full text-sm font-medium {{ $service->discount > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500' }}">
+        @if ($service->discount > 0 && $service->price)
+            {{ number_format(($service->price * $service->discount) / 100) . ' تومان' }}
+        @else
+            ---
+        @endif
+    </span>
+</td>
+
+<!-- قیمت نهایی (بعد از تخفیف) -->
+<td class="align-middle" style="padding: 15px;">
+    <span class="inline-block px-3 py-1 rounded-full text-sm font-medium {{ $service->price ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-500' }}">
+        {{ $service->price ? number_format($service->price - (($service->price * $service->discount) / 100)) . ' تومان' : '---' }}
+    </span>
+</td>
     <td class="text-center align-middle" style="width: 100px;">
         <button wire:click="toggleStatus({{ $service->id }})" class="badge rounded-pill {{ $service->status ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} border-0 cursor-pointer px-3 py-1 transition-colors duration-200 hover:brightness-110">
             {{ $service->status ? 'فعال' : 'غیرفعال' }}
