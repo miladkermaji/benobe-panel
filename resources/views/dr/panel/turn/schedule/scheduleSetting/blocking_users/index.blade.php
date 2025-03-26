@@ -75,9 +75,6 @@
         <h5 class="mb-0">لیست پیام‌های ارسالی</h5>
       </div>
       <div class="card-body">
-        <div class="w-100 d-flex justify-content-end mb-3">
-          <button class="btn btn-success h-50" data-toggle="modal" data-target="#sendSmsModal">ارسال پیام جدید</button>
-        </div>
         <div class="table-responsive">
           <table id="messagesTable" class="table table-striped table-bordered text-center">
             <thead>
@@ -167,53 +164,7 @@
     </div>
   </div>
 
-  <!-- مودال ارسال پیام -->
-  <div class="modal fade" id="sendSmsModal" tabindex="-1" aria-labelledby="sendSmsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-radius-6">
-        <div class="modal-header">
-          <h5 class="modal-title" id="sendSmsModalLabel">ارسال پیام جدید</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="sendSmsForm">
-            @csrf
-            <div class="form-group position-relative">
-              <label class="label-top-input-special-takhasos" for="smsTitle">عنوان پیام</label>
-              <input type="text" id="smsTitle" name="title" class="form-control h-50 mb-3"
-                placeholder="عنوان پیام">
-            </div>
-            <div class="form-group position-relative">
-              <label class="label-top-input-special-takhasos" for="smsMessage">متن پیام</label>
-              <textarea id="smsMessage" name="content" class="form-control h-50 mb-3" rows="4" placeholder="متن پیام"></textarea>
-            </div>
-            <div class="form-group position-relative">
-              <label class="label-top-input-special-takhasos" for="smsRecipient">گیرنده</label>
-              <select id="smsRecipient" name="recipient_type" class="form-control form-select h-50 mb-3">
-                <option value="all">همه کاربران</option>
-                <option value="blocked">کاربران مسدود</option>
-                <option value="specific">کاربر خاص</option>
-              </select>
-            </div>
-            <div class="form-group position-relative" id="specificRecipientField" style="display: none;">
-              <label class="label-top-input-special-takhasos" for="specificRecipient">شماره موبایل گیرنده</label>
-              <input type="text" id="specificRecipient" name="specific_recipient" class="form-control h-50 mb-3"
-                placeholder="09123456789">
-            </div>
-            <div class="mt-2 w-100">
-              <button type="submit"
-                class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
-                <span class="button_text">ارسال</span>
-                <div class="loader" style="display: none;"></div>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+
 </div>
 @endsection
 @section('scripts')
@@ -287,15 +238,7 @@
       window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
     });
 
-    // نمایش/مخفی کردن فیلد گیرنده خاص
-    $('#smsRecipient').on('change', function() {
-      const specificField = $('#specificRecipientField');
-      if ($(this).val() === 'specific') {
-        specificField.show();
-      } else {
-        specificField.hide();
-      }
-    });
+   
   });
 
   // ثبت کاربر مسدود
@@ -352,70 +295,8 @@
     });
   });
 
-  // ارسال پیام
-  // ارسال پیام
-  $('#sendSmsForm').on('submit', function(e) {
-    e.preventDefault();
-    const form = $(this);
-    const formData = form.serializeArray();
-    const selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
-    formData.push({
-      name: 'selectedClinicId',
-      value: selectedClinicId
-    });
 
-    const button = form.find('button[type="submit"]');
-    const loader = button.find('.loader');
-    const buttonText = button.find('.button_text');
 
-    button.prop('disabled', true);
-    buttonText.hide();
-    loader.show();
-
-    $.ajax({
-      url: "{{ route('doctor-blocking-users.send-message') }}",
-      method: "POST",
-      data: $.param(formData),
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-      },
-      success: function(response) {
-        if (response.success) {
-          toastr.success(response.message);
-          form[0].reset();
-          $('#sendSmsModal').modal('hide');
-          $('#specificRecipientField').hide(); // مخفی کردن فیلد کاربر خاص بعد از ریست
-          loadMessages();
-        }
-      },
-      error: function(xhr) {
-        const response = xhr.responseJSON;
-        if (xhr.status === 422 && response.errors) {
-          Object.values(response.errors).forEach(error => {
-            toastr.error(error[0]);
-          });
-        } else {
-          toastr.error(response?.message || 'خطایی در ارسال پیام رخ داد!');
-        }
-      },
-      complete: function() {
-        button.prop('disabled', false);
-        buttonText.show();
-        loader.hide();
-      }
-    });
-  });
-
-  // نمایش/مخفی کردن فیلد گیرنده خاص
-  $('#smsRecipient').on('change', function() {
-    const specificField = $('#specificRecipientField');
-    if ($(this).val() === 'specific') {
-      specificField.show();
-    } else {
-      specificField.hide();
-      $('#specificRecipient').val(''); // خالی کردن فیلد در صورت تغییر گزینه
-    }
-  });
 
   // اضافه کردن کاربر به جدول
   function appendBlockedUser(user) {

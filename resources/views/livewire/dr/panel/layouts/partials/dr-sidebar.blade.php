@@ -168,9 +168,7 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="#">ارسال پیام</a></li>
-            <li class="item-li"><a href="#">اعلان‌های گروهی</a></li>
-            <li class="item-li"><a href="#">یادآوری نوبت</a></li>
+            <li class="item-li"><a href="{{ route('dr.panel.send-message') }}">ارسال پیام</a></li>
           </ul>
         </li>
         <li
