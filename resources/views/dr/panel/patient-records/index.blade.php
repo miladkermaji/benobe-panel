@@ -26,7 +26,7 @@
      <div class="row">
       <div class="col-md-12">
        <div class="input-group">
-        <input type="text" class="form-control h-50 h-50 my-border-0" id="search-patient" placeholder="جستجو...">
+        <input type="text" class="form-control h-50 mb-3  my-border-0" id="search-patient" placeholder="جستجو...">
         <div class="input-group-append">
          <button class="btn btn-primary h-50 w-100" type="button">جستجو</button>
         </div>
@@ -87,19 +87,19 @@
     <form>
      <div class="form-group position-relative">
       <label class="label-top-input-special-takhasos" for="name">نام بیمار</label>
-      <input type="text" class="form-control h-50" id="name" placeholder="نام بیمار">
+      <input type="text" class="form-control h-50 mb-3" id="name" placeholder="نام بیمار">
      </div>
      <div class="form-group position-relative">
       <label class="label-top-input-special-takhasos"for="family">نام خانوادگی</label>
-      <input type="text" class="form-control h-50" id="family" placeholder="نام خانوادگی">
+      <input type="text" class="form-control h-50 mb-3" id="family" placeholder="نام خانوادگی">
      </div>
      <div class="form-group position-relative">
       <label class="label-top-input-special-takhasos"for="phone">شماره تلفن</label>
-      <input type="text" class="form-control h-50" id="phone" placeholder="شماره تلفن">
+      <input type="text" class="form-control h-50 mb-3" id="phone" placeholder="شماره تلفن">
      </div>
      <div class="form-group position-relative">
       <label class="label-top-input-special-takhasos"for="address">آدرس</label>
-      <input type="text" class="form-control h-50" id="address" placeholder="آدرس">
+      <input type="text" class="form-control h-50 mb-3" id="address" placeholder="آدرس">
      </div>
      <div class="w-100">
       <button type="button" class="btn btn-primary h-50 w-100">افزودن</button>
@@ -127,22 +127,22 @@
      <form>
       <div class="form-group position-relative">
        <label class="label-top-input-special-takhasos"for="name-{{ $patient->id }}">نام بیمار</label>
-       <input type="text" class="form-control h-50" id="name-{{ $patient->id }}" value="{{ $patient->name }}"
+       <input type="text" class="form-control h-50 mb-3" id="name-{{ $patient->id }}" value="{{ $patient->name }}"
         placeholder="نام بیمار">
       </div>
       <div class="form-group position-relative">
        <label class="label-top-input-special-takhasos"for="family-{{ $patient->id }}">نام خانوادگی</label>
-       <input type="text" class="form-control h-50" id="family-{{ $patient->id }}"
+       <input type="text" class="form-control h-50 mb-3" id="family-{{ $patient->id }}"
         value="{{ $patient->family }}" placeholder="نام خانوادگی">
       </div>
       <div class="form-group position-relative">
        <label class="label-top-input-special-takhasos"for="phone-{{ $patient->id }}">شماره تلفن</label>
-       <input type="text" class="form-control h-50" id="phone-{{ $patient->id }}"
+       <input type="text" class="form-control h-50 mb-3" id="phone-{{ $patient->id }}"
         value="{{ $patient->phone }}" placeholder="شماره تلفن">
       </div>
       <div class="form-group position-relative">
        <label class="label-top-input-special-takhasos"for="address-{{ $patient->id }}">آدرس</label>
-       <input type="text" class="form-control h-50" id="address-{{ $patient->id }}"
+       <input type="text" class="form-control h-50 mb-3" id="address-{{ $patient->id }}"
         value="{{ $patient->address }}" placeholder="آدرس">
       </div>
       <div class="w-100">
