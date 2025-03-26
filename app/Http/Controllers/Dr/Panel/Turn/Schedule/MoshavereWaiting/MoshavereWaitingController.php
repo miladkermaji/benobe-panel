@@ -43,6 +43,35 @@ class MoshavereWaitingController extends Controller
 
         return view("dr.panel.turn.schedule.moshavere_waiting.index", compact('totalPatientsToday', 'visitedPatients', 'remainingPatients'));
     }
+      public function getAppointmentsByDateSpecial(Request $request)
+    {
+        $date = $request->input('date');
+        $selectedClinicId = $request->input('selectedClinicId');
+        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+
+        $appointments = CounselingAppointment::where('doctor_id', $doctorId)
+            ->where('appointment_date', $date)
+            ->where('status', '!=', 'cancelled') // فقط نوبت‌های فعال
+            ->whereNull('deleted_at')
+            ->when($selectedClinicId === 'default', function ($query) {
+                $query->whereNull('clinic_id');
+            })
+            ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                $query->where('clinic_id', $selectedClinicId);
+            })
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $appointments->map(function ($appointment) {
+                return [
+                    'id' => $appointment->id,
+                    'appointment_date' => $appointment->appointment_date,
+                    'status' => $appointment->status,
+                ];
+            }),
+        ]);
+    }
     public function cancelAppointments(Request $request)
     {
         $appointmentIds = $request->input('appointment_ids');

@@ -399,6 +399,7 @@ Route::prefix('dr')
                     Route::get('/scheduleSetting/counseling/my-special-days', [MySpecialDaysCounselingController::class, 'mySpecialDays'])->middleware('secretary.permission:appointments')->name('dr-mySpecialDays-counseling');
 
                     Route::get('/appointments-by-date', [ScheduleSettingController::class, 'getAppointmentsByDateSpecial'])->name('doctor.get_appointments_by_date');
+                    Route::get('/appointments-by-date-counseling', [MoshavereWaitingController::class, 'getAppointmentsByDateSpecial'])->name('doctor.get_appointments_by_date_counseling');
 
                     Route::get('/doctor/default-schedule', [ScheduleSettingController::class, 'getDefaultSchedule'])->name('doctor.get_default_schedule');
 

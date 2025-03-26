@@ -1620,7 +1620,8 @@ class ScheduleSettingController extends Controller
             'message'       => $message,
             'holiday_dates' => $holidayDates,
         ]);
-    }public function getAppointmentsByDateSpecial(Request $request)
+    }
+    public function getAppointmentsByDateSpecial(Request $request)
     {
         $date = $request->input('date');
         $selectedClinicId = $request->input('selectedClinicId');
