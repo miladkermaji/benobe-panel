@@ -281,7 +281,7 @@ class MoshavereSettingController extends Controller
 
         return ($newStartMinutes < $existingEndMinutes && $newEndMinutes > $existingStartMinutes);
     }
-     private function timeToMinutes($time)
+    private function timeToMinutes($time)
     {
         [$hours, $minutes] = explode(':', $time);
         return ($hours * 60) + $minutes;
@@ -618,101 +618,101 @@ class MoshavereSettingController extends Controller
     /**
  * ذخیره تنظیمات برنامه کاری
  */
-  public function saveWorkSchedule(Request $request)
-{
-    $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
-    $validatedData = $request->validate([
-        'auto_scheduling'      => 'boolean',
-        'calendar_days'        => 'nullable|integer|min:1|max:365',
-        'online_consultation'  => 'boolean',
-        'holiday_availability' => 'boolean',
-        'appointment_duration' => 'nullable|integer|min:5|max:120',
-        'days'                 => 'array',
-        'price_15min'          => 'nullable|integer|min:0',
-        'price_30min'          => 'nullable|integer|min:0',
-        'price_45min'          => 'nullable|integer|min:0',
-        'price_60min'          => 'nullable|integer|min:0',
-        'has_phone_counseling' => 'boolean',
-        'has_text_counseling'  => 'boolean',
-        'has_video_counseling' => 'boolean',
-    ]);
+    public function saveWorkSchedule(Request $request)
+    {
+        $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
+        $validatedData = $request->validate([
+            'auto_scheduling'      => 'boolean',
+            'calendar_days'        => 'nullable|integer|min:1|max:365',
+            'online_consultation'  => 'boolean',
+            'holiday_availability' => 'boolean',
+            'appointment_duration' => 'nullable|integer|min:5|max:120',
+            'days'                 => 'array',
+            'price_15min'          => 'nullable|integer|min:0',
+            'price_30min'          => 'nullable|integer|min:0',
+            'price_45min'          => 'nullable|integer|min:0',
+            'price_60min'          => 'nullable|integer|min:0',
+            'has_phone_counseling' => 'boolean',
+            'has_text_counseling'  => 'boolean',
+            'has_video_counseling' => 'boolean',
+        ]);
 
-    DB::beginTransaction();
-    try {
-        $doctor = Auth::guard('doctor')->user();
+        DB::beginTransaction();
+        try {
+            $doctor = Auth::guard('doctor')->user();
 
-        // ذخیره تنظیمات کلی
-        $counselingConfig = DoctorCounselingConfig::updateOrCreate(
-            [
-                'doctor_id' => $doctor->id,
-                'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
-            ],
-            [
-                'auto_scheduling'      => $validatedData['auto_scheduling'] ?? false,
-                'calendar_days'        => $request->input('calendar_days'),
-                'online_consultation'  => $validatedData['online_consultation'] ?? false,
-                'holiday_availability' => $validatedData['holiday_availability'] ?? false,
-                'appointment_duration' => $validatedData['appointment_duration'] ?? 15,
-                'price_15min'          => $validatedData['price_15min'],
-                'price_30min'          => $validatedData['price_30min'],
-                'price_45min'          => $validatedData['price_45min'],
-                'price_60min'          => $validatedData['price_60min'],
-                'has_phone_counseling' => $validatedData['has_phone_counseling'] ?? false,
-                'has_text_counseling'  => $validatedData['has_text_counseling'] ?? false,
-                'has_video_counseling' => $validatedData['has_video_counseling'] ?? false,
-            ]
-        );
-
-        // به‌روزرسانی یا ایجاد برنامه کاری روزها
-        foreach ($validatedData['days'] as $day => $dayConfig) {
-            $slots = isset($dayConfig['slots']) ? array_map(function ($slot) {
-                return [
-                    'start'            => $slot['start'],
-                    'end'              => $slot['end'],
-                    'max_appointments' => $slot['max_appointments'] ?? 1,
-                ];
-            }, $dayConfig['slots']) : [];
-
-            DoctorCounselingWorkSchedule::updateOrCreate(
+            // ذخیره تنظیمات کلی
+            $counselingConfig = DoctorCounselingConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctor->id,
-                    'day'       => $day,
                     'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ],
                 [
-                    'is_working'           => $dayConfig['is_working'] ?? false,
-                    'work_hours'           => !empty($slots) ? json_encode($slots) : null,
-                    'appointment_settings' => json_encode($dayConfig['appointment_settings'] ?? []),
+                    'auto_scheduling'      => $validatedData['auto_scheduling'] ?? false,
+                    'calendar_days'        => $request->input('calendar_days'),
+                    'online_consultation'  => $validatedData['online_consultation'] ?? false,
+                    'holiday_availability' => $validatedData['holiday_availability'] ?? false,
+                    'appointment_duration' => $validatedData['appointment_duration'] ?? 15,
+                    'price_15min'          => $validatedData['price_15min'],
+                    'price_30min'          => $validatedData['price_30min'],
+                    'price_45min'          => $validatedData['price_45min'],
+                    'price_60min'          => $validatedData['price_60min'],
+                    'has_phone_counseling' => $validatedData['has_phone_counseling'] ?? false,
+                    'has_text_counseling'  => $validatedData['has_text_counseling'] ?? false,
+                    'has_video_counseling' => $validatedData['has_video_counseling'] ?? false,
                 ]
             );
-        }
 
-        DB::commit();
-        return response()->json([
-            'message' => 'تنظیمات با موفقیت ذخیره شد.',
-            'status'  => true,
-            'data'    => [
-                'calendar_days'        => $counselingConfig->calendar_days,
-                'price_15min'          => $counselingConfig->price_15min,
-                'price_30min'          => $counselingConfig->price_30min,
-                'price_45min'          => $counselingConfig->price_45min,
-                'price_60min'          => $counselingConfig->price_60min,
-                'has_phone_counseling' => $counselingConfig->has_phone_counseling,
-                'has_text_counseling'  => $counselingConfig->has_text_counseling,
-                'has_video_counseling' => $counselingConfig->has_video_counseling,
-            ],
-        ]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('خطا در ذخیره‌سازی تنظیمات: ' . $e->getMessage(), [
-            'trace' => $e->getTraceAsString(),
-        ]);
-        return response()->json([
-            'message' => 'خطا در ذخیره‌سازی تنظیمات: ' . $e->getMessage(),
-            'status'  => false,
-        ], 500);
+            // به‌روزرسانی یا ایجاد برنامه کاری روزها
+            foreach ($validatedData['days'] as $day => $dayConfig) {
+                $slots = isset($dayConfig['slots']) ? array_map(function ($slot) {
+                    return [
+                        'start'            => $slot['start'],
+                        'end'              => $slot['end'],
+                        'max_appointments' => $slot['max_appointments'] ?? 1,
+                    ];
+                }, $dayConfig['slots']) : [];
+
+                DoctorCounselingWorkSchedule::updateOrCreate(
+                    [
+                        'doctor_id' => $doctor->id,
+                        'day'       => $day,
+                        'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    ],
+                    [
+                        'is_working'           => $dayConfig['is_working'] ?? false,
+                        'work_hours'           => !empty($slots) ? json_encode($slots) : null,
+                        'appointment_settings' => json_encode($dayConfig['appointment_settings'] ?? []),
+                    ]
+                );
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => 'تنظیمات با موفقیت ذخیره شد.',
+                'status'  => true,
+                'data'    => [
+                    'calendar_days'        => $counselingConfig->calendar_days,
+                    'price_15min'          => $counselingConfig->price_15min,
+                    'price_30min'          => $counselingConfig->price_30min,
+                    'price_45min'          => $counselingConfig->price_45min,
+                    'price_60min'          => $counselingConfig->price_60min,
+                    'has_phone_counseling' => $counselingConfig->has_phone_counseling,
+                    'has_text_counseling'  => $counselingConfig->has_text_counseling,
+                    'has_video_counseling' => $counselingConfig->has_video_counseling,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('خطا در ذخیره‌سازی تنظیمات: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'message' => 'خطا در ذخیره‌سازی تنظیمات: ' . $e->getMessage(),
+                'status'  => false,
+            ], 500);
+        }
     }
-}
 
     public function getAllDaysSettings(Request $request)
     {

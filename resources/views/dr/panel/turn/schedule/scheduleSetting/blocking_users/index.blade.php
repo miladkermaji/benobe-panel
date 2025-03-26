@@ -2,9 +2,13 @@
 @section('styles')
 
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/turn/schedule/schedule-setting/blocking-users/blocking-user.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
+    rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
+    rel="stylesheet" />
+  <link type="text/css"
+    href="{{ asset('dr-assets/panel/turn/schedule/schedule-setting/blocking-users/blocking-user.css') }}"
+    rel="stylesheet" />
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -45,9 +49,10 @@
                   <td>{{ explode(' ', $blockedUser->unblocked_at)[0] ?? '-' }}</td>
                   <td>{{ $blockedUser->reason ?? 'بدون دلیل' }}</td>
                   <td>
-                    <span class="cursor-pointer font-weight-bold {{ $blockedUser->status == 1 ? 'text-danger' : 'text-success' }}"
-                          title="برای تغییر وضعیت کلیک کنید" data-toggle="tooltip" data-status="{{ $blockedUser->status }}"
-                          data-id="{{ $blockedUser->id }}" onclick="toggleStatus(this)">
+                    <span
+                      class="cursor-pointer font-weight-bold {{ $blockedUser->status == 1 ? 'text-danger' : 'text-success' }}"
+                      title="برای تغییر وضعیت کلیک کنید" data-toggle="tooltip" data-status="{{ $blockedUser->status }}"
+                      data-id="{{ $blockedUser->id }}" onclick="toggleStatus(this)">
                       {{ $blockedUser->status == 1 ? 'مسدود' : 'آزاد' }}
                     </span>
                   </td>
@@ -64,55 +69,57 @@
       </div>
     </div>
 
-  <!-- جدول پیام‌های ارسالی -->
-<div class="mt-4">
-  <div class="card-header">
-    <h5 class="mb-0">لیست پیام‌های ارسالی</h5>
-  </div>
-  <div class="card-body">
-    <div class="w-100 d-flex justify-content-end mb-3">
-      <button class="btn btn-success h-50" data-toggle="modal" data-target="#sendSmsModal">ارسال پیام جدید</button>
+    <!-- جدول پیام‌های ارسالی -->
+    <div class="mt-4">
+      <div class="card-header">
+        <h5 class="mb-0">لیست پیام‌های ارسالی</h5>
+      </div>
+      <div class="card-body">
+        <div class="w-100 d-flex justify-content-end mb-3">
+          <button class="btn btn-success h-50" data-toggle="modal" data-target="#sendSmsModal">ارسال پیام جدید</button>
+        </div>
+        <div class="table-responsive">
+          <table id="messagesTable" class="table table-striped table-bordered text-center">
+            <thead>
+              <tr>
+                <th>عنوان پیام</th>
+                <th>متن پیام</th>
+                <th>تاریخ ارسال</th>
+                <th>گیرنده</th>
+                <th>عملیات</th>
+              </tr>
+            </thead>
+            <tbody id="messagesTableBody">
+              @foreach ($messages as $message)
+                <tr data-id="{{ $message->id }}">
+                  <td>{{ $message->title }}</td>
+                  <td>{{ $message->content }}</td>
+                  <td>{{ \Morilog\Jalali\Jalalian::fromDateTime($message->created_at)->format('Y/m/d') }}</td>
+                  <td>
+                    @if ($message->recipient_type === 'all')
+                      همه کاربران
+                    @elseif ($message->recipient_type === 'blocked')
+                      کاربران مسدود
+                    @elseif ($message->recipient_type === 'specific' && $message->user)
+                      {{ $message->user->first_name . ' ' . $message->user->last_name }}
+                      ({{ $message->user->mobile }})
+                    @else
+                      نامشخص
+                    @endif
+                  </td>
+                  <td>
+                    <button class="btn btn-light btn-sm delete-message-btn rounded-circle"
+                      onclick="deleteMessage({{ $message->id }}, this)">
+                      <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
+                    </button>
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    <div class="table-responsive">
-      <table id="messagesTable" class="table table-striped table-bordered text-center">
-        <thead>
-          <tr>
-            <th>عنوان پیام</th>
-            <th>متن پیام</th>
-            <th>تاریخ ارسال</th>
-            <th>گیرنده</th>
-            <th>عملیات</th>
-          </tr>
-        </thead>
-        <tbody id="messagesTableBody">
-          @foreach ($messages as $message)
-            <tr data-id="{{ $message->id }}">
-              <td>{{ $message->title }}</td>
-              <td>{{ $message->content }}</td>
-              <td>{{ \Morilog\Jalali\Jalalian::fromDateTime($message->created_at)->format('Y/m/d') }}</td>
-              <td>
-                @if ($message->recipient_type === 'all')
-                  همه کاربران
-                @elseif ($message->recipient_type === 'blocked')
-                  کاربران مسدود
-                @elseif ($message->recipient_type === 'specific' && $message->user)
-                  {{ $message->user->first_name . ' ' . $message->user->last_name }} ({{ $message->user->mobile }})
-                @else
-                  نامشخص
-                @endif
-              </td>
-              <td>
-                <button class="btn btn-light btn-sm delete-message-btn rounded-circle" onclick="deleteMessage({{ $message->id }}, this)">
-                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
-                </button>
-              </td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
   </div>
 
   <!-- مودال افزودن کاربر -->
@@ -130,22 +137,26 @@
             @csrf
             <div class="form-group position-relative">
               <label class="label-top-input-special-takhasos" for="userMobile">شماره موبایل</label>
-              <input type="text" name="mobile" id="userMobile" class="form-control h-50 mb-3" placeholder="09123456789">
+              <input type="text" name="mobile" id="userMobile" class="form-control h-50 mb-3"
+                placeholder="09123456789">
             </div>
             <div class="form-group position-relative">
               <label class="label-top-input-special-takhasos" for="startDate">تاریخ شروع مسدودیت</label>
-              <input type="text" id="startDate" name="blocked_at" class="form-control h-50 mb-3" placeholder="1403/01/01" data-jdp>
+              <input type="text" id="startDate" name="blocked_at" class="form-control h-50 mb-3"
+                placeholder="1403/01/01" data-jdp>
             </div>
             <div class="form-group position-relative">
               <label class="label-top-input-special-takhasos" for="endDate">تاریخ پایان مسدودیت</label>
-              <input type="text" id="endDate" name="unblocked_at" class="form-control h-50 mb-3" placeholder="1403/01/10" data-jdp>
+              <input type="text" id="endDate" name="unblocked_at" class="form-control h-50 mb-3"
+                placeholder="1403/01/10" data-jdp>
             </div>
             <div class="form-group position-relative">
               <label class="label-top-input-special-takhasos" for="reason">دلیل مسدودیت</label>
               <textarea id="reason" name="reason" class="form-control h-50 mb-3" placeholder="دلیل مسدودیت را وارد کنید"></textarea>
             </div>
             <div class="mt-2 w-100">
-              <button id="saveBlockedUserBtn" type="submit" class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+              <button id="saveBlockedUserBtn" type="submit"
+                class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
                 <span class="button_text">ثبت</span>
                 <div class="loader" style="display: none;"></div>
               </button>
@@ -171,7 +182,8 @@
             @csrf
             <div class="form-group position-relative">
               <label class="label-top-input-special-takhasos" for="smsTitle">عنوان پیام</label>
-              <input type="text" id="smsTitle" name="title" class="form-control h-50 mb-3" placeholder="عنوان پیام">
+              <input type="text" id="smsTitle" name="title" class="form-control h-50 mb-3"
+                placeholder="عنوان پیام">
             </div>
             <div class="form-group position-relative">
               <label class="label-top-input-special-takhasos" for="smsMessage">متن پیام</label>
@@ -187,10 +199,12 @@
             </div>
             <div class="form-group position-relative" id="specificRecipientField" style="display: none;">
               <label class="label-top-input-special-takhasos" for="specificRecipient">شماره موبایل گیرنده</label>
-              <input type="text" id="specificRecipient" name="specific_recipient" class="form-control h-50 mb-3" placeholder="09123456789">
+              <input type="text" id="specificRecipient" name="specific_recipient" class="form-control h-50 mb-3"
+                placeholder="09123456789">
             </div>
             <div class="mt-2 w-100">
-              <button type="submit" class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+              <button type="submit"
+                class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
                 <span class="button_text">ارسال</span>
                 <div class="loader" style="display: none;"></div>
               </button>
@@ -290,7 +304,10 @@
     const form = $(this);
     const formData = form.serializeArray();
     const selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
-    formData.push({ name: 'selectedClinicId', value: selectedClinicId });
+    formData.push({
+      name: 'selectedClinicId',
+      value: selectedClinicId
+    });
 
     const button = form.find('button[type="submit"]');
     const loader = button.find('.loader');
@@ -304,7 +321,9 @@
       url: "{{ route('doctor-blocking-users.store') }}",
       method: "POST",
       data: $.param(formData),
-      headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
       success: function(response) {
         if (response.success) {
           toastr.success(response.message);
@@ -334,13 +353,16 @@
   });
 
   // ارسال پیام
-// ارسال پیام
-$('#sendSmsForm').on('submit', function(e) {
+  // ارسال پیام
+  $('#sendSmsForm').on('submit', function(e) {
     e.preventDefault();
     const form = $(this);
     const formData = form.serializeArray();
     const selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
-    formData.push({ name: 'selectedClinicId', value: selectedClinicId });
+    formData.push({
+      name: 'selectedClinicId',
+      value: selectedClinicId
+    });
 
     const button = form.find('button[type="submit"]');
     const loader = button.find('.loader');
@@ -351,47 +373,49 @@ $('#sendSmsForm').on('submit', function(e) {
     loader.show();
 
     $.ajax({
-        url: "{{ route('doctor-blocking-users.send-message') }}",
-        method: "POST",
-        data: $.param(formData),
-        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        success: function(response) {
-            if (response.success) {
-                toastr.success(response.message);
-                form[0].reset();
-                $('#sendSmsModal').modal('hide');
-                $('#specificRecipientField').hide(); // مخفی کردن فیلد کاربر خاص بعد از ریست
-                loadMessages();
-            }
-        },
-        error: function(xhr) {
-            const response = xhr.responseJSON;
-            if (xhr.status === 422 && response.errors) {
-                Object.values(response.errors).forEach(error => {
-                    toastr.error(error[0]);
-                });
-            } else {
-                toastr.error(response?.message || 'خطایی در ارسال پیام رخ داد!');
-            }
-        },
-        complete: function() {
-            button.prop('disabled', false);
-            buttonText.show();
-            loader.hide();
+      url: "{{ route('doctor-blocking-users.send-message') }}",
+      method: "POST",
+      data: $.param(formData),
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      success: function(response) {
+        if (response.success) {
+          toastr.success(response.message);
+          form[0].reset();
+          $('#sendSmsModal').modal('hide');
+          $('#specificRecipientField').hide(); // مخفی کردن فیلد کاربر خاص بعد از ریست
+          loadMessages();
         }
+      },
+      error: function(xhr) {
+        const response = xhr.responseJSON;
+        if (xhr.status === 422 && response.errors) {
+          Object.values(response.errors).forEach(error => {
+            toastr.error(error[0]);
+          });
+        } else {
+          toastr.error(response?.message || 'خطایی در ارسال پیام رخ داد!');
+        }
+      },
+      complete: function() {
+        button.prop('disabled', false);
+        buttonText.show();
+        loader.hide();
+      }
     });
-});
+  });
 
-// نمایش/مخفی کردن فیلد گیرنده خاص
-$('#smsRecipient').on('change', function() {
+  // نمایش/مخفی کردن فیلد گیرنده خاص
+  $('#smsRecipient').on('change', function() {
     const specificField = $('#specificRecipientField');
     if ($(this).val() === 'specific') {
-        specificField.show();
+      specificField.show();
     } else {
-        specificField.hide();
-        $('#specificRecipient').val(''); // خالی کردن فیلد در صورت تغییر گزینه
+      specificField.hide();
+      $('#specificRecipient').val(''); // خالی کردن فیلد در صورت تغییر گزینه
     }
-});
+  });
 
   // اضافه کردن کاربر به جدول
   function appendBlockedUser(user) {
@@ -428,7 +452,9 @@ $('#smsRecipient').on('change', function() {
     $.ajax({
       url: "{{ route('doctor-blocking-users.index') }}",
       method: "GET",
-      data: { selectedClinicId: selectedClinicId },
+      data: {
+        selectedClinicId: selectedClinicId
+      },
       success: function(response) {
         const tableBody = $('#blockedUsersTable tbody');
         tableBody.empty();
@@ -464,10 +490,15 @@ $('#smsRecipient').on('change', function() {
     }).then((result) => {
       if (result.isConfirmed) {
         $.ajax({
-          url: "{{ route('doctor-blocking-users.destroy', ['id' => ':userId']) }}".replace(':userId', userId),
+          url: "{{ route('doctor-blocking-users.destroy', ['id' => ':userId']) }}".replace(':userId',
+            userId),
           method: 'DELETE',
-          data: { selectedClinicId: localStorage.getItem('selectedClinicId') },
-          headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+          data: {
+            selectedClinicId: localStorage.getItem('selectedClinicId')
+          },
+          headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+          },
           success: function(response) {
             if (response.success) {
               toastr.success(response.message);
@@ -486,31 +517,33 @@ $('#smsRecipient').on('change', function() {
   });
 
   // بارگذاری پیام‌ها
-function loadMessages() {
+  function loadMessages() {
     $.ajax({
-        url: "{{ route('doctor-blocking-users.messages') }}",
-        method: "GET",
-        data: { selectedClinicId: localStorage.getItem('selectedClinicId') },
-        success: function(messages) {
-            const tableBody = $('#messagesTableBody');
-            tableBody.empty();
-            messages.forEach(message => {
-                let recipientText = 'نامشخص';
-                if (message.recipient_type === 'all') {
-                    recipientText = 'همه کاربران';
-                } else if (message.recipient_type === 'blocked') {
-                    recipientText = 'کاربران مسدود';
-                } else if (message.recipient_type === 'specific' && message.user) {
-                    recipientText = `${message.user.first_name} ${message.user.last_name} (${message.user.mobile})`;
-                }
+      url: "{{ route('doctor-blocking-users.messages') }}",
+      method: "GET",
+      data: {
+        selectedClinicId: localStorage.getItem('selectedClinicId')
+      },
+      success: function(messages) {
+        const tableBody = $('#messagesTableBody');
+        tableBody.empty();
+        messages.forEach(message => {
+          let recipientText = 'نامشخص';
+          if (message.recipient_type === 'all') {
+            recipientText = 'همه کاربران';
+          } else if (message.recipient_type === 'blocked') {
+            recipientText = 'کاربران مسدود';
+          } else if (message.recipient_type === 'specific' && message.user) {
+            recipientText = `${message.user.first_name} ${message.user.last_name} (${message.user.mobile})`;
+          }
 
-                const jalaliDate = new Intl.DateTimeFormat('fa-IR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                }).format(new Date(message.created_at));
+          const jalaliDate = new Intl.DateTimeFormat('fa-IR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          }).format(new Date(message.created_at));
 
-                tableBody.append(`
+          tableBody.append(`
                     <tr data-id="${message.id}">
                         <td>${message.title}</td>
                         <td>${message.content}</td>
@@ -523,13 +556,13 @@ function loadMessages() {
                         </td>
                     </tr>
                 `);
-            });
-        },
-        error: function() {
-            toastr.error("خطا در بارگذاری پیام‌ها!");
-        }
+        });
+      },
+      error: function() {
+        toastr.error("خطا در بارگذاری پیام‌ها!");
+      }
     });
-}
+  }
   loadMessages();
 
   // تغییر وضعیت کاربر
@@ -596,8 +629,12 @@ function loadMessages() {
         $.ajax({
           url: "{{ route('doctor-blocking-users.delete-message', '') }}/" + messageId,
           method: "DELETE",
-          data: { selectedClinicId: localStorage.getItem('selectedClinicId') },
-          headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+          data: {
+            selectedClinicId: localStorage.getItem('selectedClinicId')
+          },
+          headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+          },
           success: function(response) {
             if (response.success) {
               $(element).closest('tr').remove();

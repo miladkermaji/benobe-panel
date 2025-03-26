@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Dr\Panel\NoskheElectronic\Prescription;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Dr\Controller;
 
-
 class PrescriptionController extends Controller
 {
     /**

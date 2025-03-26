@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours;
 
 use App\Http\Controllers\Dr\Controller;
@@ -46,7 +47,7 @@ class ActivationWorkhoursController extends Controller
 
                 // بررسی همه شرایط زمانی:
                 if ($end->lessThan($start)) {
-                                           // اگر زمان پایان کوچکتر از شروع بود (عبور از نیمه‌شب)
+                    // اگر زمان پایان کوچکتر از شروع بود (عبور از نیمه‌شب)
                     $end = $end->addDay(); // روز بعد برای زمان پایان
                 }
 

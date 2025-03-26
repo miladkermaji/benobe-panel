@@ -21,7 +21,7 @@ class FavoriteTemplatesController extends Controller
     public function create()
     {
         return view("dr.panel.noskhe-electronic.favorite.templates.create");
-        
+
     }
 
     /**

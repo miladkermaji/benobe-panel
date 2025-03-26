@@ -425,8 +425,8 @@
         </div>
         <div class="mt-3">
           <form action="">
-           
-            <textarea name="" id=""  placeholder="توضیحات خود را وارد کنید" class="my-form-control-light w-100"></textarea>
+
+            <textarea name="" id="" placeholder="توضیحات خود را وارد کنید" class="my-form-control-light w-100"></textarea>
             <button class="h-50 w-100 btn btn-primary mt-3">ثبت</button>
           </form>
         </div>

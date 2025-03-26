@@ -43,7 +43,7 @@ class MoshavereWaitingController extends Controller
 
         return view("dr.panel.turn.schedule.moshavere_waiting.index", compact('totalPatientsToday', 'visitedPatients', 'remainingPatients'));
     }
-      public function getAppointmentsByDateSpecial(Request $request)
+    public function getAppointmentsByDateSpecial(Request $request)
     {
         $date = $request->input('date');
         $selectedClinicId = $request->input('selectedClinicId');

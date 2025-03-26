@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Dr\Panel\PatientRecords;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Dr\Controller;
 
-
 class PatientRecordsController extends Controller
 {
     /**

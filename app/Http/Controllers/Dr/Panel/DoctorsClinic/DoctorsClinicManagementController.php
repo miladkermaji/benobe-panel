@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic;
 
 use App\Http\Controllers\Dr\Controller;
@@ -28,7 +29,7 @@ class DoctorsClinicManagementController extends Controller
                 ->get(['id', 'name', 'parent_id', 'level']);
         });
 
-                                                                      // دسته‌بندی اطلاعات به استان و شهر
+        // دسته‌بندی اطلاعات به استان و شهر
         $provinces = $zones->where('level', 1);                       // سطح 1 => استان‌ها
         $cities    = $zones->where('level', 2)->groupBy('parent_id'); // سطح 2 => شهرها
 
@@ -54,7 +55,7 @@ class DoctorsClinicManagementController extends Controller
                 ->get(['id', 'name', 'parent_id', 'level']);
         });
 
-                                                                      // دسته‌بندی داده‌ها به استان‌ها و شهرها
+        // دسته‌بندی داده‌ها به استان‌ها و شهرها
         $provinces = $zones->where('level', 1)->values();             // سطح 1 => استان‌ها
         $cities    = $zones->where('level', 2)->groupBy('parent_id'); // سطح 2 => شهرها
 

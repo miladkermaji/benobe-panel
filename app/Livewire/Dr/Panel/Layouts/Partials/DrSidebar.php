@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Dr\Panel\Layouts\Partials;
 
 use Livewire\Component;
@@ -17,7 +18,7 @@ class DrSidebar extends Component
     public function render()
     {
         $user = Auth::guard('doctor')->check() ? Auth::guard('doctor')->user() : Auth::guard('secretary')->user();
-       
+
         return view('livewire.dr.panel.layouts.partials.dr-sidebar', compact('user'));
     }
 }

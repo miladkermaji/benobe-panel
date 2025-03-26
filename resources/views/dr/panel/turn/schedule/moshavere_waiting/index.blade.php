@@ -1,14 +1,14 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
- <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
- <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
-  rel="stylesheet" />
- <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
- <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
-  rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
+    rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
+    rel="stylesheet" />
 @endsection
 @section('site-header')
- {{ 'به نوبه | پنل دکتر' }}
+  {{ 'به نوبه | پنل دکتر' }}
 @endsection
 @section('content')
 @section('bread-crumb-title', ' گزارش مشاوره')
@@ -378,7 +378,8 @@
           </div>
         </div>
         <div class="w-100 d-flex justify-content-end">
-          <button id="goToFirstAvailableDashboard" class="btn btn-light w-100 border">برو به اولین مشاوره خالی</button>
+          <button id="goToFirstAvailableDashboard" class="btn btn-light w-100 border">برو به اولین مشاوره
+            خالی</button>
         </div>
         <div class="calendar-body calendar-body-g-425"> <!-- عناوین روزهای هفته -->
           <div class="calendar-day-name text-center">شنبه</div>
@@ -430,8 +431,8 @@
         </div>
         <div class="mt-3">
           <form action="">
-           
-            <textarea name="" id=""  placeholder="توضیحات خود را وارد کنید" class="my-form-control-light w-100"></textarea>
+
+            <textarea name="" id="" placeholder="توضیحات خود را وارد کنید" class="my-form-control-light w-100"></textarea>
             <button class="h-50 w-100 btn btn-primary mt-3">ثبت</button>
           </form>
         </div>
@@ -441,7 +442,7 @@
 </div>
 
 @section('scripts')
- <script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
+  <script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
 
   @include('dr.panel.my-tools.moshaver-witing-tools')
 

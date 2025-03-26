@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration;
 
 use App\Http\Controllers\Dr\Controller;

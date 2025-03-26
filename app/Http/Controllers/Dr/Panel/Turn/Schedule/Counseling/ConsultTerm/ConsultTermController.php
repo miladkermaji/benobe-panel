@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 
 class ConsultTermController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         return view('dr.panel.turn.schedule.Counseling.consult-term.index');
     }
 }

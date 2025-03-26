@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Dr\Panel\Insurance;
 
 use App\Models\Insurance;
@@ -9,8 +10,13 @@ use Livewire\Component;
 
 class InsuranceComponent extends Component
 {
-    public $insurances, $insurance_id;
-    public $name, $calculation_method = "0", $appointment_price, $insurance_percent, $final_price;
+    public $insurances;
+    public $insurance_id;
+    public $name;
+    public $calculation_method = "0";
+    public $appointment_price;
+    public $insurance_percent;
+    public $final_price;
     public $selectedClinicId; // متغیر جدید برای کلینیک انتخاب‌شده
 
     protected $rules = [
@@ -37,7 +43,7 @@ class InsuranceComponent extends Component
         // شرط برای clinic_id
         if ($this->selectedClinicId === 'default') {
             $query->whereNull('clinic_id');
-        } else if (Auth::guard('manager')->check()) {
+        } elseif (Auth::guard('manager')->check()) {
             // Get the last segment of the current URL
             $id = last(request()->segments());
             $query->where('doctor_id', $id);
@@ -109,7 +115,7 @@ class InsuranceComponent extends Component
         // شرط برای clinic_id موقع حذف
         if ($this->selectedClinicId === 'default') {
             $insurance->whereNull('clinic_id');
-        } else if (Auth::guard('manager')->check()) {
+        } elseif (Auth::guard('manager')->check()) {
             // If a manager is logged in, get the ID from the URL
             $CurrentUrl = $_SERVER['HTTP_REFERER'];
             $doctorId   = explode("/", $CurrentUrl)[7];

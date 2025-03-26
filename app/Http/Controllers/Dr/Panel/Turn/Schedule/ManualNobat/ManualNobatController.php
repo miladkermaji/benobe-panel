@@ -297,7 +297,7 @@ class ManualNobatController extends Controller
             return response()->json(['success' => false, 'message' => 'خطا در ثبت اطلاعات!'], 500);
         }
     }
-   
+
 
     /**
      * Show the form for editing the specified resource.

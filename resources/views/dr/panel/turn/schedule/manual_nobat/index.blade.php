@@ -276,8 +276,8 @@
           <small class="text-danger error-national_code"></small>
           <div class="mt-3 position-relative">
             <label class="label-top-input-special-takhasos">تاریخ مراجعه:</label>
-            <input type="text" name="appointment_date" placeholder="1403/05/02" id="edit-appointment-date" data-jdp=""
-              class="form-control h-50">
+            <input type="text" name="appointment_date" placeholder="1403/05/02" id="edit-appointment-date"
+              data-jdp="" class="form-control h-50">
           </div>
           <small class="text-danger error-appointment_date"></small>
           <div class="mt-3 position-relative timepicker-ui w-100">
@@ -454,7 +454,7 @@
   $(document).on('show.bs.modal', '.modal', function() {
     $("#search-results").addClass('d-none')
   });
-   $(document).on('hide.bs.modal', '.modal', function() {
+  $(document).on('hide.bs.modal', '.modal', function() {
     $("#search-results").removeClass('d-none')
   });
 </script>
@@ -503,87 +503,88 @@
       }
     });
   }
-$(document).ready(function() {
+  $(document).ready(function() {
     // ثبت فرم
     $('#manual-appointment-form').on('submit', function(e) {
-        e.preventDefault();
-        const form = this;
-        const submitButton = form.querySelector('button[type="submit"]');
-        const loader = submitButton.querySelector('.loader');
-        const buttonText = submitButton.querySelector('.button_text');
-        const data = {
-            user_id: $('#user-id').val(),
-            doctor_id: $('#doctor-id').val(),
-            appointment_date: $('#selected-date').val(), // اگر باید text باشه، اصلاح کنید
-            appointment_time: $('#appointment-time').val(),
-            description: $('#description').val(),
-        };
+      e.preventDefault();
+      const form = this;
+      const submitButton = form.querySelector('button[type="submit"]');
+      const loader = submitButton.querySelector('.loader');
+      const buttonText = submitButton.querySelector('.button_text');
+      const data = {
+        user_id: $('#user-id').val(),
+        doctor_id: $('#doctor-id').val(),
+        appointment_date: $('#selected-date').val(), // اگر باید text باشه، اصلاح کنید
+        appointment_time: $('#appointment-time').val(),
+        description: $('#description').val(),
+      };
 
-        // بررسی خالی نبودن فیلدها
-        if (!data.user_id || !data.doctor_id || !data.appointment_date || !data.appointment_time) {
-            toastr.error('لطفاً تمام فیلدهای ضروری را تکمیل کنید!');
-            return;
-        }
+      // بررسی خالی نبودن فیلدها
+      if (!data.user_id || !data.doctor_id || !data.appointment_date || !data.appointment_time) {
+        toastr.error('لطفاً تمام فیلدهای ضروری را تکمیل کنید!');
+        return;
+      }
 
-        buttonText.style.display = 'none';
-        loader.style.display = 'block';
+      buttonText.style.display = 'none';
+      loader.style.display = 'block';
 
-        $.ajax({
-            url: "{{ route('manual-nobat.store') }}",
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            },
-            data: {
-                ...data,
-                selectedClinicId: localStorage.getItem('selectedClinicId')
-            },
-            success: function(response) {
-                toastr.success(response.message || 'نوبت با موفقیت ثبت شد!');
-                form.reset(); // ریست کردن فرم
-                $('.patient-information-content').removeClass('d-flex'); // حذف کلاس d-flex
-                $('.patient-information-content').addClass('d-none'); // اضافه کردن d-none برای پنهان کردن
-                loadAppointments(); // به‌روزرسانی لیست
-            },
-            error: function(xhr) {
-                const errors = xhr.responseJSON.errors || {};
-                let errorMessages = Object.values(errors).map(errArray => errArray[0]).join(' - ');
-                toastr.error(errorMessages || xhr.responseJSON.message);
-                $('.patient-information-content').removeClass('d-flex'); // حذف کلاس d-flex
-                $('.patient-information-content').addClass('d-none'); // پنهان کردن در صورت خطا
-            },
-            complete: function() {
-                buttonText.style.display = 'block';
-                loader.style.display = 'none';
-            },
-        });
+      $.ajax({
+        url: "{{ route('manual-nobat.store') }}",
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        },
+        data: {
+          ...data,
+          selectedClinicId: localStorage.getItem('selectedClinicId')
+        },
+        success: function(response) {
+          toastr.success(response.message || 'نوبت با موفقیت ثبت شد!');
+          form.reset(); // ریست کردن فرم
+          $('.patient-information-content').removeClass('d-flex'); // حذف کلاس d-flex
+          $('.patient-information-content').addClass('d-none'); // اضافه کردن d-none برای پنهان کردن
+          loadAppointments(); // به‌روزرسانی لیست
+        },
+        error: function(xhr) {
+          const errors = xhr.responseJSON.errors || {};
+          let errorMessages = Object.values(errors).map(errArray => errArray[0]).join(' - ');
+          toastr.error(errorMessages || xhr.responseJSON.message);
+          $('.patient-information-content').removeClass('d-flex'); // حذف کلاس d-flex
+          $('.patient-information-content').addClass('d-none'); // پنهان کردن در صورت خطا
+        },
+        complete: function() {
+          buttonText.style.display = 'block';
+          loader.style.display = 'none';
+        },
+      });
     });
 
     // کلیک روی نتایج جستجو برای نمایش فرم
     $(document).on('click', '.search-result-item', function() {
-        const userId = $(this).data('user-id');
-        const firstName = $(this).data('first-name');
-        const lastName = $(this).data('last-name');
-        const mobile = $(this).data('mobile');
-        const nationalCode = $(this).data('national-code');
+      const userId = $(this).data('user-id');
+      const firstName = $(this).data('first-name');
+      const lastName = $(this).data('last-name');
+      const mobile = $(this).data('mobile');
+      const nationalCode = $(this).data('national-code');
 
-        // پر کردن فیلدهای فرم
-        $('#user-id').val(userId);
-        $('input[name="fristname"]').val(firstName); // اگر باید firstname باشه، اصلاح کنید
-        $('input[name="lastname"]').val(lastName);
-        $('input[name="mobile"]').val(mobile);
-        $('input[name="codemeli"]').val(nationalCode);
+      // پر کردن فیلدهای فرم
+      $('#user-id').val(userId);
+      $('input[name="fristname"]').val(firstName); // اگر باید firstname باشه، اصلاح کنید
+      $('input[name="lastname"]').val(lastName);
+      $('input[name="mobile"]').val(mobile);
+      $('input[name="codemeli"]').val(nationalCode);
 
-        // نمایش فرم با حذف d-none و اضافه کردن کلاس‌های لازم
-        $('.patient-information-content').removeClass('d-none'); // حذف d-none برای نمایش
-        $('.patient-information-content').addClass('d-flex justify-content-center'); // اضافه کردن کلاس‌های مورد نیاز
+      // نمایش فرم با حذف d-none و اضافه کردن کلاس‌های لازم
+      $('.patient-information-content').removeClass('d-none'); // حذف d-none برای نمایش
+      $('.patient-information-content').addClass(
+      'd-flex justify-content-center'); // اضافه کردن کلاس‌های مورد نیاز
 
-        // پاک کردن نتایج جستجو
-        $('#search-results-body').empty();
-        $('#search-input').val('');
-        $('#search-results').css('display', 'none');
+      // پاک کردن نتایج جستجو
+      $('#search-results-body').empty();
+      $('#search-input').val('');
+      $('#search-results').css('display', 'none');
     });
-});;
+  });;
   $(document).ready(function() {
     // افزودن کاربر جدید و ثبت نوبت
     loadAppointments();

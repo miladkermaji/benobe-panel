@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Dr\Panel\Payment\Setting;
 
 use App\Http\Controllers\Dr\Controller;
 
-
 class DrPaymentSettingController extends Controller
 {
     public function index()

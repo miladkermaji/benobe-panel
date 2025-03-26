@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Dr\Panel\Payment;
 
 use App\Models\DoctorPaymentSetting;

@@ -265,6 +265,12 @@ Route::prefix('dr')
         Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {
             Route::get('/', [DrPanelController::class, 'index'])->middleware('secretary.permission:dashboard')->name('dr-panel');
 
+            Route::prefix('doctor-services')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorService\DoctorServiceController::class, 'index'])->name('dr.panel.doctor-services.index');
+                Route::get('/create', [\App\Http\Controllers\Dr\Panel\DoctorService\DoctorServiceController::class, 'create'])->name('dr.panel.doctor-services.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Dr\Panel\DoctorService\DoctorServiceController::class, 'edit'])->name('dr.panel.doctor-services.edit');
+            });
+
 
             Route::post('appointments/{id}/end-visit-counseling', [MoshavereWaitingController::class, 'endVisit'])->name('doctor.end-visit-counseling');
 
@@ -572,7 +578,7 @@ Route::prefix('dr')
                 Route::post('sub-users/update/{id}', [SubUserController::class, 'update'])->name('dr-sub-users-update');
                 Route::delete('sub-users/delete/{id}', [SubUserController::class, 'destroy'])->name('dr-sub-users-delete');
             });
-    
+
 
         });
     });

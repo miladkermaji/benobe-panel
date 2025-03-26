@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting;
 
 use App\Http\Controllers\Dr\Controller;
@@ -451,7 +452,7 @@ class MySpecialDaysCounselingController extends Controller
                 ], 404);
             }
 
-                                                                   // بررسی ساعات کاری پزشک برای تاریخ جدید
+            // بررسی ساعات کاری پزشک برای تاریخ جدید
             $selectedDate = Carbon::parse($validated['new_date']); // تبدیل تاریخ جدید به میلادی
             $dayOfWeek    = strtolower($selectedDate->format('l'));
             // بررسی ساعات کاری پزشک برای تاریخ جدید

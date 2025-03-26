@@ -28,3 +28,4 @@
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastr/toastr.min.css') }}">
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/global-loader.css') }}">
 {{-- tom select --}}
+@vite(['resources/js/app.js', 'resources/css/app.css'])

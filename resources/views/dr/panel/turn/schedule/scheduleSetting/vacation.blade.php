@@ -31,10 +31,12 @@
         <div class="" role="alert">
           <div class="">
             <p class="font-weight-bold text-dark">ثبت مرخصی</p>
-            <p class="alert alert-warning font-size-13 font-weight-bold mt-2">شما می‌توانید برای ساعاتی که طبق ساعت کاری خود حضور ندارید، مرخصی اعمال کنید.</p>
+            <p class="alert alert-warning font-size-13 font-weight-bold mt-2">شما می‌توانید برای ساعاتی که طبق ساعت کاری
+              خود حضور ندارید، مرخصی اعمال کنید.</p>
             <div class="w-100">
               <button data-toggle="modal" data-target="#exampleModalCenterAddVacation"
-                class="h-50 w-100 btn btn-outline-primary" tabindex="0" type="button" id=":r18:">اضافه کردن مرخصی<span class=""></span>
+                class="h-50 w-100 btn btn-outline-primary" tabindex="0" type="button" id=":r18:">اضافه کردن
+                مرخصی<span class=""></span>
               </button>
               <div class="modal fade " id="exampleModalCenterAddVacation" tabindex="-1" role="dialog"
                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -51,8 +53,8 @@
                         @csrf
                         <div class="position-relative">
                           <label class="label-top-input-special-takhasos">تاریخ :</label>
-                          <input id="vacation-date" data-jdp="" type="text" name="date" class="form-control h-50"
-                            placeholder="1403/05/02">
+                          <input id="vacation-date" data-jdp="" type="text" name="date"
+                            class="form-control h-50" placeholder="1403/05/02">
                         </div>
                         <div class="d-flex justify-content-between gap-4 mt-3">
                           <div class="mt-3 position-relative timepicker-ui w-100">
@@ -152,7 +154,8 @@
           <input type="hidden" id="edit-vacation-id" name="id">
           <div class="mt-3 position-relative">
             <label class="label-top-input-special-takhasos">تاریخ:</label>
-            <input id="edit-date" type="text" name="date" class="form-control h-50" placeholder="1403/05/02" data-jdp>
+            <input id="edit-date" type="text" name="date" class="form-control h-50" placeholder="1403/05/02"
+              data-jdp>
           </div>
           <div class="d-flex justify-content-between gap-4 mt-3">
             <div class="mt-3 position-relative timepicker-ui w-100">
@@ -369,8 +372,12 @@
     const loader = button.find('.loader');
     const buttonText = button.find('.button_text');
 
-    buttonText.css({'display': 'none'});
-    loader.css({'display': 'block'});
+    buttonText.css({
+      'display': 'none'
+    });
+    loader.css({
+      'display': 'block'
+    });
 
     formData.push({
       name: 'selectedClinicId',
@@ -402,8 +409,12 @@
         }
       },
       complete: function() {
-        buttonText.css({'display': 'block'});
-        loader.css({'display': 'none'});
+        buttonText.css({
+          'display': 'block'
+        });
+        loader.css({
+          'display': 'none'
+        });
       }
     });
   });

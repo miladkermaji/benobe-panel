@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Dr\Panel\Bime;
-use App\Http\Controllers\Dr\Controller;
 
+use App\Http\Controllers\Dr\Controller;
 use Illuminate\Http\Request;
 
 class DRBimeController extends Controller

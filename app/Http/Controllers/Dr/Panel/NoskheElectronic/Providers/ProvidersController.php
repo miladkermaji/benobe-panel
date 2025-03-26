@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Dr\Panel\NoskheElectronic\Providers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Dr\Controller;
 
-
 class ProvidersController extends Controller
 {
     /**
