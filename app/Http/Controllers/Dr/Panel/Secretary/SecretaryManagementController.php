@@ -38,14 +38,14 @@ class SecretaryManagementController extends Controller
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $clinicId = $request->selectedClinicId === 'default' ? null : $request->selectedClinicId;
 
-        // اعتبارسنجی داده‌های ورودی
+        // اعتبارسنجی داده‌های ورودی با پیام‌های فارسی
         $request->validate([
             'first_name'    => 'required|string|max:255',
             'last_name'     => 'required|string|max:255',
             'mobile'        => [
                 'required',
+                'regex:/^09[0-9]{9}$/', // فرمت شماره موبایل ایرانی
                 function ($attribute, $value, $fail) use ($doctorId, $clinicId) {
-                    // بررسی شرط شماره موبایل
                     $exists = Secretary::where('mobile', $value)
                         ->where('doctor_id', $doctorId)
                         ->where(function ($query) use ($clinicId) {
@@ -62,8 +62,8 @@ class SecretaryManagementController extends Controller
             ],
             'national_code' => [
                 'required',
+                'digits:10', // کد ملی باید 10 رقمی باشد
                 function ($attribute, $value, $fail) use ($doctorId, $clinicId) {
-                    // بررسی شرط کد ملی
                     $exists = Secretary::where('national_code', $value)
                         ->where('doctor_id', $doctorId)
                         ->where(function ($query) use ($clinicId) {
@@ -78,12 +78,26 @@ class SecretaryManagementController extends Controller
                     }
                 },
             ],
-            'gender'        => 'required|string',
-            'password'      => 'required|min:6',
+            'gender'        => 'required|string|in:male,female',
+            'password'      => 'nullable|min:6', // کلمه عبور اختیاری است
+        ], [
+            'first_name.required'    => 'لطفاً نام را وارد کنید.',
+            'first_name.string'      => 'نام باید یک رشته متنی باشد.',
+            'first_name.max'         => 'نام نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+            'last_name.required'     => 'لطفاً نام خانوادگی را وارد کنید.',
+            'last_name.string'       => 'نام خانوادگی باید یک رشته متنی باشد.',
+            'last_name.max'          => 'نام خانوادگی نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+            'mobile.required'        => 'لطفاً شماره موبایل را وارد کنید.',
+            'mobile.regex'           => 'شماره موبایل باید با 09 شروع شود و 11 رقم باشد.',
+            'national_code.required' => 'لطفاً کد ملی را وارد کنید.',
+            'national_code.digits'   => 'کد ملی باید دقیقاً 10 رقم باشد.',
+            'gender.required'        => 'لطفاً جنسیت را انتخاب کنید.',
+            'gender.in'              => 'جنسیت باید یکی از گزینه‌های "مرد" یا "زن" باشد.',
+            'password.min'           => 'کلمه عبور باید حداقل 6 کاراکتر باشد.',
         ]);
 
         try {
-            // 👇 ذخیره اطلاعات منشی در جدول `secretaries`
+            // ذخیره اطلاعات منشی در جدول `secretaries`
             $secretary = Secretary::create([
                 'doctor_id'     => $doctorId,
                 'clinic_id'     => $clinicId,
@@ -92,10 +106,10 @@ class SecretaryManagementController extends Controller
                 'mobile'        => $request->mobile,
                 'national_code' => $request->national_code,
                 'gender'        => $request->gender,
-                'password'      => Hash::make($request->password),
+                'password'      => $request->password ? Hash::make($request->password) : null,
             ]);
 
-            // 👇 ذخیره دسترسی‌های پیش‌فرض برای منشی جدید در جدول `secretary_permissions`
+            // ذخیره دسترسی‌های پیش‌فرض برای منشی جدید در جدول `secretary_permissions`
             \App\Models\SecretaryPermission::create([
                 'doctor_id'    => $doctorId,
                 'secretary_id' => $secretary->id,
@@ -174,12 +188,13 @@ class SecretaryManagementController extends Controller
     {
         $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
 
-        // اعتبارسنجی با شرط صحیح
+        // اعتبارسنجی با پیام‌های فارسی
         $request->validate([
-            'first_name'    => 'required',
-            'last_name'     => 'required',
+            'first_name'    => 'required|string|max:255',
+            'last_name'     => 'required|string|max:255',
             'mobile'        => [
                 'required',
+                'regex:/^09[0-9]{9}$/', // فرمت شماره موبایل ایرانی
                 function ($attribute, $value, $fail) use ($id, $selectedClinicId) {
                     $exists = Secretary::where('mobile', $value)
                         ->where('id', '!=', $id)
@@ -197,6 +212,7 @@ class SecretaryManagementController extends Controller
             ],
             'national_code' => [
                 'required',
+                'digits:10', // کد ملی باید 10 رقمی باشد
                 function ($attribute, $value, $fail) use ($id, $selectedClinicId) {
                     $exists = Secretary::where('national_code', $value)
                         ->where('id', '!=', $id)
@@ -212,7 +228,22 @@ class SecretaryManagementController extends Controller
                     }
                 },
             ],
-            'gender'        => 'required',
+            'gender'        => 'required|string|in:male,female',
+            'password'      => 'nullable|min:6', // کلمه عبور اختیاری است
+        ], [
+            'first_name.required'    => 'لطفاً نام را وارد کنید.',
+            'first_name.string'      => 'نام باید یک رشته متنی باشد.',
+            'first_name.max'         => 'نام نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+            'last_name.required'     => 'لطفاً نام خانوادگی را وارد کنید.',
+            'last_name.string'       => 'نام خانوادگی باید یک رشته متنی باشد.',
+            'last_name.max'          => 'نام خانوادگی نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+            'mobile.required'        => 'لطفاً شماره موبایل را وارد کنید.',
+            'mobile.regex'           => 'شماره موبایل باید با 09 شروع شود و 11 رقم باشد.',
+            'national_code.required' => 'لطفاً کد ملی را وارد کنید.',
+            'national_code.digits'   => 'کد ملی باید دقیقاً 10 رقم باشد.',
+            'gender.required'        => 'لطفاً جنسیت را انتخاب کنید.',
+            'gender.in'              => 'جنسیت باید یکی از گزینه‌های "مرد" یا "زن" باشد.',
+            'password.min'           => 'کلمه عبور باید حداقل 6 کاراکتر باشد.',
         ]);
 
         // پیدا کردن منشی برای ویرایش
@@ -265,5 +296,4 @@ class SecretaryManagementController extends Controller
 
         return response()->json(['message' => 'منشی با موفقیت حذف شد', 'secretaries' => $secretaries]);
     }
-
 }

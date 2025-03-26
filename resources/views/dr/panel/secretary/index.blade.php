@@ -3,18 +3,85 @@
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/profile/subuser.css') }}" rel="stylesheet" />
+ <style>
+  .field-wrapper {
+    position: relative;
+  }
+
+  .field-wrapper.has-error .label-top-input-special-takhasos {
+    position: absolute;
+    bottom: 56px; /* موقعیت پیش‌فرض برای لیبل‌ها در صورت وجود خطا */
+  }
+
+  .field-wrapper.has-error .error-message {
+    display: block;
+  }
+
+  /* اگر ردیف اول خطا داشته باشد، لیبل‌های هر دو فیلد (نام و نام خانوادگی) جابه‌جا شوند */
+  .upper-row.upper-row-error .field-first_name .label-top-input-special-takhasos,
+  .upper-row.upper-row-error .field-last_name .label-top-input-special-takhasos {
+    position: absolute;
+    bottom: 56px !important;
+  }
+
+  /* تنظیم موقعیت لیبل‌های پایینی فقط وقتی هر دو فیلد بالایی (نام و نام خانوادگی) خطا داشته باشند */
+  .both-upper-fields-error .field-row .field-national_code .label-top-input-special-takhasos {
+    position: absolute;
+    bottom: 58px !important;
+  }
+
+  .both-upper-fields-error .field-row .field-gender .sex-label {
+    position: absolute;
+    bottom: 58px !important;
+  }
+
+  .both-upper-fields-error .field-mobile .mobile-label {
+    position: absolute;
+    bottom: 56px !important;
+  }
+
+  .both-upper-fields-error .field-password .password-label {
+    position: absolute;
+    bottom: 32px !important;
+  }
+
+  /* تنظیم موقعیت لیبل‌های پایینی بر اساس خطاهای دیگر */
+  .field-national_code.has-error ~ .field-gender .sex-label {
+    position: absolute;
+    bottom: 58px !important;
+  }
+
+  .field-national_code.has-error ~ .field-mobile .mobile-label,
+  .field-gender.has-error ~ .field-mobile .mobile-label {
+    position: absolute;
+    bottom: 56px !important;
+  }
+
+  .field-national_code.has-error ~ .field-password .password-label,
+  .field-gender.has-error ~ .field-password .password-label,
+  .field-mobile.has-error ~ .field-password .password-label {
+    position: absolute;
+    bottom: 32px !important;
+  }
+
+  /* تنظیم موقعیت لیبل کلمه عبور در صورت وجود خطا در خودش */
+  .field-password.has-error .password-label {
+    position: absolute;
+    bottom: 32px !important;
+  }
+</style>
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
 @endsection
 @section('content')
-@section('bread-crumb-title', ' مدیریت منشی ')
-<div class="modal fade " id="addSecretaryModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+@section('bread-crumb-title', 'مدیریت منشی')
+<div class="modal fade" id="addSecretaryModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
   aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered " role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content border-radius-6">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle"> افزودن منشی </h5>
+        <h5 class="modal-title" id="exampleModalLongTitle">افزودن منشی</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
@@ -24,62 +91,44 @@
           <form id="add-secretary-form" method="post">
             @csrf
             <div class="d-flex flex-column mt-2">
-              <div class="position-relative d-flex gap-4 w-100">
-                <div class="position-relative w-100">
-                  <label class="label-top-input-special-takhasos">نام: </label>
+              <div class="position-relative d-flex gap-4 w-100 upper-row">
+                <div class="position-relative w-100 field-wrapper field-first_name">
+                  <label class="label-top-input-special-takhasos">نام:</label>
                   <input type="text" name="first_name" class="form-control h-50 w-100 position-relative">
                   <small class="text-danger error-first_name mt-1"></small>
-
                 </div>
-                <div class="position-relative w-100">
-                  <label class="label-top-input-special-takhasos">نام خانوادگی: </label>
-                  <input type="text" name="last_name" class="form-control h-50 w-100 ">
+                <div class="position-relative w-100 field-wrapper field-last_name">
+                  <label class="label-top-input-special-takhasos">نام خانوادگی:</label>
+                  <input type="text" name="last_name" class="form-control h-50 w-100">
                   <small class="text-danger error-last_name mt-1"></small>
-
                 </div>
               </div>
-              <div class="d-flex
-                 justify-content-between gap-4 mt-4">
-                <div class="form-group position-relative w-100 hide-show-input-edit">
-                  <label class="label-top-input-special-takhasos"> کدملی: </label>
+              <div class="d-flex justify-content-between gap-4 mt-4 field-row">
+                <div class="form-group position-relative w-100 hide-show-input-edit field-wrapper field-national_code">
+                  <label class="label-top-input-special-takhasos">کدملی:</label>
                   <input type="text" name="national_code" class="form-control h-50 w-100">
                   <small class="text-danger error-national_code mt-1"></small>
-
                 </div>
-                <div class="form-group position-relative w-100 hide-show-input-edit">
-                  <label class="label-top-input-special-takhasos">جنسیت : </label>
+                <div class="form-group position-relative w-100 hide-show-input-edit field-wrapper field-gender">
+                  <label class="label-top-input-special-takhasos sex-label">جنسیت:</label>
                   <select name="gender" class="form-control h-50 w-100">
                     <option value="male">مرد</option>
                     <option value="female">زن</option>
                   </select>
                   <small class="text-danger error-gender mt-1"></small>
-
                 </div>
               </div>
             </div>
-
-            <div class="w-100 position-relative mt-4">
-              <label class="label-top-input-special-takhasos"> شماره موبایل: </label>
+            <div class="w-100 position-relative mt-4 field-wrapper field-mobile">
+              <label class="label-top-input-special-takhasos mobile-label">شماره موبایل:</label>
               <input name="mobile" type="text" class="form-control h-50 w-100">
               <small class="text-danger error-mobile mt-1"></small>
-
             </div>
-            <div class="w-100 position-relative mt-4">
-              <label class="label-top-input-special-takhasos password-label"> کلمه عبور(اختیاری): </label>
+            <div class="w-100 position-relative mt-4 field-wrapper field-password">
+              <label class="label-top-input-special-takhasos password-label">کلمه عبور(اختیاری):</label>
               <input type="password" name="password" class="form-control h-50 w-100">
+              <small class="text-danger error-password mt-1"></small>
             </div>
-            <script>
-              $(document).ready(function() {
-                $('#full-day-vacation-edit').change(function() {
-                  if ($(this).is(':checked')) {
-                    $('.hide-show-input-edit').addClass('d-none');
-                  } else {
-                    $('.hide-show-input-edit').removeClass('d-none');
-                  }
-                });
-              });
-            </script>
-
             <div class="w-100 mt-2">
               <button type="submit"
                 class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
@@ -93,12 +142,12 @@
     </div>
   </div>
 </div>
-<div class="modal fade " id="editSecretaryModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+<div class="modal fade" id="editSecretaryModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
   aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered " role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content border-radius-6">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle"> ویرایش منشی </h5>
+        <h5 class="modal-title" id="exampleModalLongTitle">ویرایش منشی</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
@@ -109,28 +158,27 @@
             @csrf
             <input type="hidden" name="id" id="edit-secretary-id">
             <div class="d-flex flex-column mt-2">
-              <div class="position-relative d-flex gap-4 w-100">
-                <div class="position-relative w-100">
-                  <label class="label-top-input-special-takhasos">نام: </label>
-                  <input type="text" name="first_name" id="edit-first-name" class="form-control h-50 w-100 ">
+              <div class="position-relative d-flex gap-4 w-100 upper-row">
+                <div class="position-relative w-100 field-wrapper field-first_name">
+                  <label class="label-top-input-special-takhasos">نام:</label>
+                  <input type="text" name="first_name" id="edit-first-name" class="form-control h-50 w-100">
                   <small class="text-danger error-first_name mt-1"></small>
                 </div>
-                <div class="position-relative w-100">
-                  <label class="label-top-input-special-takhasos">نام خانوادگی: </label>
-                  <input type="text" name="last_name" id="edit-last-name" class="form-control h-50 w-100 ">
+                <div class="position-relative w-100 field-wrapper field-last_name">
+                  <label class="label-top-input-special-takhasos">نام خانوادگی:</label>
+                  <input type="text" name="last_name" id="edit-last-name" class="form-control h-50 w-100">
                   <small class="text-danger error-last_name mt-1"></small>
                 </div>
               </div>
-              <div class="d-flex
-         justify-content-between gap-4 mt-4">
-                <div class="form-group position-relative w-100 hide-show-input-edit">
-                  <label class="label-top-input-special-takhasos"> کدملی: </label>
+              <div class="d-flex justify-content-between gap-4 mt-4 field-row">
+                <div class="form-group position-relative w-100 hide-show-input-edit field-wrapper field-national_code">
+                  <label class="label-top-input-special-takhasos">کدملی:</label>
                   <input type="text" name="national_code" id="edit-national-code"
                     class="form-control h-50 w-100">
                   <small class="text-danger error-national_code mt-1"></small>
                 </div>
-                <div class="form-group position-relative w-100 hide-show-input-edit">
-                  <label class="label-top-input-special-takhasos">جنسیت : </label>
+                <div class="form-group position-relative w-100 hide-show-input-edit field-wrapper field-gender">
+                  <label class="label-top-input-special-takhasos sex-label">جنسیت:</label>
                   <select name="gender" id="edit-gender" class="form-control h-50 w-100">
                     <option value="male">مرد</option>
                     <option value="female">زن</option>
@@ -139,29 +187,16 @@
                 </div>
               </div>
             </div>
-
-            <div class="w-100 position-relative mt-4">
-              <label class="label-top-input-special-takhasos"> شماره موبایل: </label>
+            <div class="w-100 position-relative mt-4 field-wrapper field-mobile">
+              <label class="label-top-input-special-takhasos mobile-label">شماره موبایل:</label>
               <input type="text" name="mobile" id="edit-mobile" class="form-control h-50 w-100">
               <small class="text-danger error-mobile mt-1"></small>
-
             </div>
-            <div class="w-100 position-relative mt-4">
-              <label class="label-top-input-special-takhasos password-label"> کلمه عبور(اختیاری): </label>
-              <input type="text" name="password" id="edit-password" class="form-control h-50 w-100">
+            <div class="w-100 position-relative mt-4 field-wrapper field-password">
+              <label class="label-top-input-special-takhasos password-label">کلمه عبور(اختیاری):</label>
+              <input type="password" name="password" id="edit-password" class="form-control h-50 w-100">
+              <small class="text-danger error-password mt-1"></small>
             </div>
-            <script>
-              $(document).ready(function() {
-                $('#full-day-vacation-edit').change(function() {
-                  if ($(this).is(':checked')) {
-                    $('.hide-show-input-edit').addClass('d-none');
-                  } else {
-                    $('.hide-show-input-edit').removeClass('d-none');
-                  }
-                });
-              });
-            </script>
-
             <div class="w-100 mt-2">
               <button type="submit"
                 class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
@@ -176,31 +211,29 @@
   </div>
 </div>
 <div class="subuser-content w-100 d-flex justify-content-center mt-4">
-
   <div class="subuser-content-wrapper p-3">
     <div class="w-100 mt-3 d-flex justify-content-end">
-      <button class="btn btn-primary h-50 add-secretary-btn">افزودن منشی
-        جدید</button>
+      <button class="btn btn-primary h-50 add-secretary-btn">افزودن منشی جدید</button>
     </div>
     <div class="p-3">
-      <h4 class="text-dark font-weight-bold">لیست منشی ها </h4>
+      <h4 class="text-dark font-weight-bold">لیست منشی‌ها</h4>
     </div>
     <div class="subuser-cards mt-4">
       @if (count($secretaries) > 0)
         @foreach ($secretaries as $secretary)
           <div class="subuser-card p-3 w-100 d-flex justify-content-between align-items-end">
             <div>
-              <span class="d-block font-weight-bold text-dark"> {{ $secretary->first_name }}
+              <span class="d-block font-weight-bold text-dark">{{ $secretary->first_name }}
                 {{ $secretary->last_name }}</span>
               <span class="font-size-13 font-weight-bold">
                 شماره موبایل: <span>{{ $secretary->mobile }}</span>
               </span>
               <span class="font-size-13 mx-2 font-weight-bold">
-                کدملی:{{ $secretary->national_code }}
+                کدملی: {{ $secretary->national_code }}
               </span>
             </div>
             <div>
-              <div class="d-flex  gap-4">
+              <div class="d-flex gap-4">
                 <button data-toggle="modal" data-target="#exampleModalCenterEditSubuser"
                   class="btn btn-light btn-sm rounded-circle edit-btn" data-id="{{ $secretary->id }}">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
@@ -213,7 +246,6 @@
                       fill="#22282F"></path>
                   </svg>
                 </button>
-
                 <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="{{ $secretary->id }}">
                   <svg width="23" height="23" viewBox="0 0 24 24" fill="none"
                     xmlns="http://www.w3.org/2000/svg" class="cursor-pointer w-5 hover:!text-red-500">
@@ -222,8 +254,6 @@
                       fill="#000"></path>
                   </svg>
                 </button>
-
-
               </div>
             </div>
           </div>
@@ -231,10 +261,7 @@
       @else
         <div class="alert alert-info w-100 d-flex justify-content-center align-items-center">شما منشی فعالی ندارید
         </div>
-
       @endif
-
-
     </div>
   </div>
 </div>
@@ -244,8 +271,7 @@
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-  var updateStatusAppointmentUrl =
-    "{{ route('updateStatusAppointment', ':id') }}";
+  var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
 </script>
 <script>
   $(document).ready(function() {
@@ -315,6 +341,7 @@
       window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
     });
   });
+
   $(document).on('click', '.add-secretary-btn', function() {
     const modal = $('#addSecretaryModal');
     if (modal.length) {
@@ -330,9 +357,7 @@
       container.append(
         `<div class="alert alert-info w-100 d-flex justify-content-center align-items-center">
       شما منشی فعالی ندارید
-      </div>
-
-      `
+      </div>`
       );
     } else {
       secretaries.forEach(secretary => {
@@ -374,74 +399,66 @@
   }
 
   $(document).ready(function() {
-    $('#add-secretary-form').on('submit', function(e) {
-      e.preventDefault();
+ $('#add-secretary-form').on('submit', function(e) {
+  e.preventDefault();
 
-      const form = $(this);
-      const submitButton = form.find('button[type="submit"]');
-      const loader = submitButton.find('.loader');
-      const buttonText = submitButton.find('.button_text');
+  const form = $(this);
+  const submitButton = form.find('button[type="submit"]');
+  const loader = submitButton.find('.loader');
+  const buttonText = submitButton.find('.button_text');
 
-      // پنهان کردن متن دکمه و نمایش لودینگ
-      buttonText.hide();
-      loader.show();
+  // پنهان کردن متن دکمه و نمایش لودینگ
+  buttonText.hide();
+  loader.show();
 
-      // پاک کردن پیام‌های خطای قبلی
-      form.find('.text-danger').text('');
+  // پاک کردن پیام‌های خطای قبلی و کلاس‌های خطا
+  form.find('.text-danger').text('');
+  form.find('.field-wrapper').removeClass('has-error');
+  form.removeClass('both-upper-fields-error');
+  form.find('.upper-row').removeClass('upper-row-error');
 
-      $.ajax({
-        url: "{{ route('dr-secretary-store') }}",
-        method: 'POST',
-        data: form.serialize() + '&selectedClinicId=' + localStorage.getItem('selectedClinicId'),
+  $.ajax({
+    url: "{{ route('dr-secretary-store') }}",
+    method: 'POST',
+    data: form.serialize() + '&selectedClinicId=' + localStorage.getItem('selectedClinicId'),
+    success: function(response) {
+      toastr.success('منشی با موفقیت اضافه شد!');
+      $('#addSecretaryModal').modal('hide');
+      $('body').removeClass('modal-open'); // حذف کلاس جلوگیری از اسکرول
+      $('.modal-backdrop').remove();
+      updateSecretaryList(response.secretaries); // بارگذاری مجدد صفحه
+    },
+    error: function(xhr) {
+      if (xhr.status === 422) {
+        const errors = xhr.responseJSON.errors;
 
-        success: function(response) {
-          toastr.success('منشی با موفقیت اضافه شد!');
+        // نمایش پیام‌های خطا و اضافه کردن کلاس has-error
+        Object.keys(errors).forEach(function(key) {
+          form.find(`.error-${key}`).text(errors[key][0]);
+          form.find(`.field-${key}`).addClass('has-error');
+        });
 
-          $('#addSecretaryModal').modal('hide');
-          $('body').removeClass('modal-open'); // حذف کلاس جلوگیری از اسکرول
-          $('.modal-backdrop').remove();
-          updateSecretaryList(response.secretaries); // بارگذاری مجدد صفحه
+        // بررسی اینکه آیا یکی از فیلدهای first_name یا last_name خطا دارد
+        const hasFirstNameError = form.find('.field-first_name').hasClass('has-error');
+        const hasLastNameError = form.find('.field-last_name').hasClass('has-error');
+        if (hasFirstNameError || hasLastNameError) {
+          form.find('.upper-row').addClass('upper-row-error');
+        }
 
-        },
-        error: function(xhr) {
-          if (xhr.status === 422) {
-            const errors = xhr.responseJSON.errors;
-            // نمایش پیام‌های خطا زیر فیلدها
-            $('.label-top-input-special-takhasos').css({
-              'position': '',
-              'bottom': ''
-            });
-
-            // اعمال استایل فقط در صورت وجود خطا
-            Object.keys(errors).forEach(function(key) {
-              form.find(`.error-${key}`).text(errors[key][0]);
-
-              // پیدا کردن لیبل مرتبط با فیلد
-              const relatedLabel = form.find(`input[name="${key}"], select[name="${key}"]`).siblings(
-                '.label-top-input-special-takhasos');
-
-              if (relatedLabel.length > 0) {
-                // اعمال استایل برای خطاها
-                relatedLabel.css({
-                  'position': 'absolute',
-                  'bottom': relatedLabel.hasClass('password-label') ? '32px' : '56px'
-                });
-              }
-            });
-
-          } else {
-            toastr.error('خطا در ذخیره اطلاعات!');
-
-          }
-        },
-        complete: function() {
-          buttonText.show();
-          loader.hide();
-        },
-      });
-    });
-
-
+        // بررسی اینکه آیا هر دو فیلد first_name و last_name خطا دارند
+        if (hasFirstNameError && hasLastNameError) {
+          form.addClass('both-upper-fields-error');
+        }
+      } else {
+        toastr.error('خطا در ذخیره اطلاعات!');
+      }
+    },
+    complete: function() {
+      buttonText.show();
+      loader.hide();
+    },
+  });
+});
     $(document).on('click', '.edit-btn', function() {
       const id = $(this).data('id');
       const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
@@ -453,9 +470,9 @@
           $('#edit-secretary-id').val(response.id);
           $('#edit-first-name').val(response.first_name);
           $('#edit-last-name').val(response.last_name);
-          $('#edit-email').val(response.email);
           $('#edit-mobile').val(response.mobile);
           $('#edit-national-code').val(response.national_code);
+          $('#edit-gender').val(response.gender);
           $('#editSecretaryModal').modal('show');
         }
       ).fail(function() {
@@ -463,41 +480,71 @@
       });
     });
 
+ $('#edit-secretary-form').on('submit', function(e) {
+  e.preventDefault();
+  const id = $('#edit-secretary-id').val();
+  const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
+  const form = $(this);
+  const submitButton = form.find('button[type="submit"]');
+  const loader = submitButton.find('.loader');
+  const buttonText = submitButton.find('.button_text');
 
-    $('#edit-secretary-form').on('submit', function(e) {
-      e.preventDefault();
-      const id = $('#edit-secretary-id').val();
-      const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
-      const form = $(this);
-      const submitButton = form.find('button[type="submit"]');
-      const loader = submitButton.find('.loader');
-      const buttonText = submitButton.find('.button_text');
+  buttonText.hide();
+  loader.show();
 
-      buttonText.hide();
-      loader.show();
+  // پاک کردن پیام‌های خطای قبلی و کلاس‌های خطا
+  form.find('.text-danger').text('');
+  form.find('.field-wrapper').removeClass('has-error');
+  form.removeClass('both-upper-fields-error');
+  form.find('.upper-row').removeClass('upper-row-error');
 
-      const formData = form.serialize() + '&selectedClinicId=' + selectedClinicId;
+  const formData = form.serialize() + '&selectedClinicId=' + selectedClinicId;
 
-      $.ajax({
-        url: "{{ route('dr-secretary-update', ':id') }}".replace(':id', id),
-        method: 'POST',
-        data: formData,
-        success: function(response) {
-          toastr.success('منشی با موفقیت ویرایش شد!');
-          buttonText.show();
-          loader.hide();
-          $('#editSecretaryModal').modal('hide');
-          $('body').removeClass('modal-open');
-          $('.modal-backdrop').remove();
-          updateSecretaryList(response.secretaries);
-        },
-        error: function() {
-          buttonText.show();
-          loader.hide();
-          toastr.error('خطا در ویرایش منشی!');
-        },
-      });
-    });
+  $.ajax({
+    url: "{{ route('dr-secretary-update', ':id') }}".replace(':id', id),
+    method: 'POST',
+    data: formData,
+    success: function(response) {
+      toastr.success('منشی با موفقیت ویرایش شد!');
+      buttonText.show();
+      loader.hide();
+      $('#editSecretaryModal').modal('hide');
+      $('body').removeClass('modal-open');
+      $('.modal-backdrop').remove();
+      updateSecretaryList(response.secretaries);
+    },
+    error: function(xhr) {
+      if (xhr.status === 422) {
+        const errors = xhr.responseJSON.errors;
+
+        // نمایش پیام‌های خطا و اضافه کردن کلاس has-error
+        Object.keys(errors).forEach(function(key) {
+          form.find(`.error-${key}`).text(errors[key][0]);
+          form.find(`.field-${key}`).addClass('has-error');
+        });
+
+        // بررسی اینکه آیا یکی از فیلدهای first_name یا last_name خطا دارد
+        const hasFirstNameError = form.find('.field-first_name').hasClass('has-error');
+        const hasLastNameError = form.find('.field-last_name').hasClass('has-error');
+        if (hasFirstNameError || hasLastNameError) {
+          form.find('.upper-row').addClass('upper-row-error');
+        }
+
+        // بررسی اینکه آیا هر دو فیلد first_name و last_name خطا دارند
+        if (hasFirstNameError && hasLastNameError) {
+          form.addClass('both-upper-fields-error');
+        }
+      } else {
+        toastr.error('خطا در ویرایش منشی!');
+      }
+    },
+    complete: function() {
+      buttonText.show();
+      loader.hide();
+    },
+  });
+});
+
     $(document).on('click', '.delete-btn', function() {
       const id = $(this).data('id');
       const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
@@ -530,7 +577,6 @@
         }
       });
     });
-
   });
 </script>
 @endsection
