@@ -27,20 +27,22 @@ class DoctorNoteEdit extends Component
 
     public function update()
     {
+
         $validator = Validator::make([
-            'clinic_id' => $this->clinic_id,
-            'appointment_type' => $this->appointment_type,
-            'notes' => $this->notes,
-        ], [
-            'clinic_id' => 'nullable|exists:clinics,id',
-            'appointment_type' => 'required|in:in_person,online_phone,online_text',
-            'notes' => 'nullable|string|max:1000',
-        ], [
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
-            'appointment_type.required' => 'نوع نوبت الزامی است.',
-            'appointment_type.in' => 'نوع نوبت باید یکی از گزینه‌های حضوری، تلفنی یا متنی باشد.',
-            'notes.max' => 'یادداشت نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد.',
-        ]);
+                   'clinic_id' => $this->clinic_id,
+                   'appointment_type' => $this->appointment_type,
+                   'notes' => $this->notes,
+               ], [
+                   'clinic_id' => 'nullable|exists:clinics,id',
+                   'appointment_type' => 'required|in:in_person,online_phone,online_text,online_video',
+                   'notes' => 'nullable|string|max:1000',
+               ], [
+                   'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+                   'appointment_type.required' => 'نوع نوبت الزامی است.',
+                   'appointment_type.in' => 'نوع نوبت باید یکی از گزینه‌های حضوری، تلفنی ویدیویی یا متنی باشد.',
+                   'notes.max' => 'یادداشت نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد.',
+               ]);
+
 
         if ($validator->fails()) {
             $this->dispatch('show-alert', type: 'error', message: $validator->errors()->first());

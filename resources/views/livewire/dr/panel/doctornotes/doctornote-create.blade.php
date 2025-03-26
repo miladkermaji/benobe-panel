@@ -24,6 +24,7 @@
                             <option value="in_person">حضوری</option>
                             <option value="online_phone">تلفنی</option>
                             <option value="online_text">متنی</option>
+                            <option value="online_video">ویدیویی</option>
                         </select>
                     </div>
                 </div>

@@ -55,6 +55,7 @@
                                                 @case('in_person') حضوری @break
                                                 @case('online_phone') تلفنی @break
                                                 @case('online_text') متنی @break
+                                                @case('online_video') ویدیویی @break
                                             @endswitch
                                         </td>
                                         <td class="align-middle">{{ $item->clinic ? $item->clinic->name : 'ندارد' }}</td>
