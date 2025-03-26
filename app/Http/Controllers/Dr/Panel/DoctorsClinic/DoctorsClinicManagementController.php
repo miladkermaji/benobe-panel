@@ -61,6 +61,7 @@ class DoctorsClinicManagementController extends Controller
 
         return view('dr.panel.doctors-clinic.index', compact('provinces', 'cities'));
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -73,10 +74,20 @@ class DoctorsClinicManagementController extends Controller
             'postal_code'     => 'nullable|string',
             'description'     => 'nullable|string',
         ], [
-            'phone_numbers.required'   => 'وارد کردن شماره موبایل الزامی است.',
+            'name.required'            => 'وارد کردن نام مطب الزامی است.',
+            'name.string'              => 'نام مطب باید یک رشته معتبر باشد.',
+            'name.max'                 => 'نام مطب نباید بیشتر از 255 کاراکتر باشد.',
+            'phone_numbers.required'   => 'وارد کردن حداقل یک شماره موبایل الزامی است.',
             'phone_numbers.*.required' => 'وارد کردن شماره موبایل الزامی است.',
             'phone_numbers.*.string'   => 'شماره موبایل باید یک رشته معتبر باشد.',
             'phone_numbers.*.max'      => 'شماره موبایل نباید بیشتر از 15 کاراکتر باشد.',
+            'address.string'           => 'آدرس باید یک رشته معتبر باشد.',
+            'province_id.required'     => 'انتخاب استان الزامی است.',
+            'province_id.exists'       => 'استان انتخاب‌شده معتبر نیست.',
+            'city_id.required'         => 'انتخاب شهر الزامی است.',
+            'city_id.exists'           => 'شهر انتخاب‌شده معتبر نیست.',
+            'postal_code.string'       => 'کد پستی باید یک رشته معتبر باشد.',
+            'description.string'       => 'توضیحات باید یک رشته معتبر باشد.',
         ]);
 
         Clinic::create([
@@ -105,10 +116,20 @@ class DoctorsClinicManagementController extends Controller
             'postal_code'     => 'nullable|string',
             'description'     => 'nullable|string',
         ], [
-            'phone_numbers.required'   => 'وارد کردن شماره موبایل الزامی است.',
+            'name.required'            => 'وارد کردن نام مطب الزامی است.',
+            'name.string'              => 'نام مطب باید یک رشته معتبر باشد.',
+            'name.max'                 => 'نام مطب نباید بیشتر از 255 کاراکتر باشد.',
+            'phone_numbers.required'   => 'وارد کردن حداقل یک شماره موبایل الزامی است.',
             'phone_numbers.*.required' => 'وارد کردن شماره موبایل الزامی است.',
             'phone_numbers.*.string'   => 'شماره موبایل باید یک رشته معتبر باشد.',
             'phone_numbers.*.max'      => 'شماره موبایل نباید بیشتر از 15 کاراکتر باشد.',
+            'address.string'           => 'آدرس باید یک رشته معتبر باشد.',
+            'province_id.required'     => 'انتخاب استان الزامی است.',
+            'province_id.exists'       => 'استان انتخاب‌شده معتبر نیست.',
+            'city_id.required'         => 'انتخاب شهر الزامی است.',
+            'city_id.exists'           => 'شهر انتخاب‌شده معتبر نیست.',
+            'postal_code.string'       => 'کد پستی باید یک رشته معتبر باشد.',
+            'description.string'       => 'توضیحات باید یک رشته معتبر باشد.',
         ]);
 
         $clinic = Clinic::findOrFail($id);
@@ -153,16 +174,17 @@ class DoctorsClinicManagementController extends Controller
 
         return response()->json(['message' => 'مطب با موفقیت حذف شد']);
     }
+
     public function gallery()
     {
         return view("dr.panel.doctors-clinic.gallery");
-
     }
+
     public function medicalDoc()
     {
         return view("dr.panel.doctors-clinic.medicalDoc");
-
     }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -172,15 +194,10 @@ class DoctorsClinicManagementController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     */
-
-    /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
         //
     }
-
 }

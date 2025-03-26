@@ -448,7 +448,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: "{{ route('dr-clinic-delete', ':id') }}".replace(':id', clinicId),
+            url: "{{ route('dr-clinic-destroy', ':id') }}".replace(':id', clinicId),
             method: 'DELETE',
             data: {
               _token: $('meta[name="csrf-token"]').attr('content'),

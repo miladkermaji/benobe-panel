@@ -195,9 +195,6 @@
               class="item-li i-user__inforamtion {{ Request::routeIs('dr-secretary-management') ? 'is-active' : '' }}">
               <a href="{{ route('dr-secretary-management') }}">مدیریت منشی‌ها</a>
             </li>
-            <li class="item-li i-user__inforamtion">
-              <a href="#">منشی‌های غیرفعال</a>
-            </li>
           </ul>
         </li>
         <li
