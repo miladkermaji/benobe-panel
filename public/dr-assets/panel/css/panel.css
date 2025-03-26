@@ -936,9 +936,7 @@ button {
     opacity: 0.5; /* کم‌رنگ کردن آیتم */
     cursor: not-allowed; /* تغییر شکل مکان‌نما */
 }
-.myPanelOption {
-    display: none;
-}
+
 /* استایل‌های جدول */
 .table-modern th,
 .table-modern td {
