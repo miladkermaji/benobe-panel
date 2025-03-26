@@ -1,13 +1,65 @@
+/* استایل‌های جدید در اینجا اضافه شده‌اند */
 .consult-term-content-wrapper {
- background-color: #fff;
- border-radius: 10px;
- box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
 }
-.font-size-20 {
- font-size: 20px !important;
+.top-logo img {
+    max-width: 110px;
+    margin-bottom: 2rem;
 }
-@media only screen and (max-width: 991px) {
- .consult-term-content-wrapper {
-  width: 97% !important;
- }
+.section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.5rem;
+}
+.rule-item {
+    margin-bottom: 1.5rem;
+}
+.rule-item strong {
+    font-size: 1.1rem;
+    color: #34495e;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.rule-item p {
+    font-size: 1rem;
+    color: #7f8c8d;
+    line-height: 1.8;
+    margin: 0;
+}
+.intro-text {
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+}
+@media (max-width: 768px) {
+    .consult-term-content-wrapper {
+        padding: 1.5rem;
+        margin: 0 10px;
+    }
+    .section-title {
+        font-size: 1.5rem;
+    }
+    .rule-item strong {
+        font-size: 1rem;
+    }
+    .rule-item p {
+        font-size: 0.95rem;
+    }
+}
+@media (max-width: 576px) {
+    .consult-term-content-wrapper {
+        padding: 1rem;
+    }
+    .top-logo img {
+        max-width: 120px;
+    }
 }
