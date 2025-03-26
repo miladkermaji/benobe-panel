@@ -152,15 +152,6 @@
             <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-wallet-charge') ? 'is-active' : '' }}">
               <a href="{{ route('dr-wallet-charge') }}">شارژ کیف‌پول</a>
             </li>
-            <li class="item-li i-user__inforamtion">
-              <a href="#">تراکنش‌ها</a>
-            </li>
-            <li class="item-li i-user__inforamtion">
-              <a href="#">تسویه‌حساب‌ها</a>
-            </li>
-            <li class="item-li i-user__inforamtion">
-              <a href="#">مدیریت تخفیف‌ها</a>
-            </li>
           </ul>
         </li>
         <!-- ارتباط با بیماران (جدید) -->

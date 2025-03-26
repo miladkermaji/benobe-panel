@@ -28,6 +28,12 @@ class WalletChargeComponent extends Component
         'amount' => 'required|integer|min:1000',
     ];
 
+    protected $messages = [
+        'amount.required' => 'لطفاً مبلغ شارژ را وارد کنید.',
+        'amount.integer'  => 'مبلغ شارژ باید یک عدد صحیح باشد.',
+        'amount.min'      => 'مبلغ شارژ باید حداقل ۱,۰۰۰ تومان باشد.',
+    ];
+
     public function mount()
     {
         $this->amount        = 0;
@@ -46,9 +52,9 @@ class WalletChargeComponent extends Component
         $availableAmount = $wallet->balance;
 
         if (session('success')) {
-            $this->dispatch('toast', message: session('success'));
+            $this->dispatch('toast', message: session('success'), type: 'success');
         } elseif (session('error')) {
-            $this->dispatch('toast', message: session('error'));
+            $this->dispatch('toast', message: session('error'), type: 'error');
         }
 
         return view('livewire.dr.panel.payment.wallet-charge-component', [
@@ -79,6 +85,14 @@ class WalletChargeComponent extends Component
 
         try {
             $activeGateway = \App\Models\PaymentGateway::active()->first();
+
+            // بررسی وجود درگاه پرداخت
+            if (!$activeGateway) {
+                $this->isLoading = false;
+                $this->dispatch('toast', message: 'درگاه پرداخت فعالی یافت نشد. لطفاً با پشتیبانی تماس بگیرید.', type: 'error');
+                return;
+            }
+
             Log::info('Attempting payment with gateway:', [
                 'gateway'  => $activeGateway->name,
                 'settings' => $activeGateway->settings,
@@ -121,7 +135,7 @@ class WalletChargeComponent extends Component
                 'trace'   => $e->getTraceAsString(),
             ]);
             $this->isLoading = false;
-            $this->dispatch('toast', message: 'خطایی در فرآیند پرداخت رخ داد: ' . $e->getMessage());
+            $this->dispatch('toast', message: 'خطایی در فرآیند پرداخت رخ داد: ' . $e->getMessage(), type: 'error');
         }
 
         $this->reset(['amount', 'displayAmount']);
@@ -163,9 +177,9 @@ class WalletChargeComponent extends Component
 
         if ($transaction) {
             $transaction->delete();
-            $this->dispatch('toast', message: 'تراکنش با موفقیت حذف شد.');
+            $this->dispatch('toast', message: 'تراکنش با موفقیت حذف شد.', type: 'success');
         } else {
-            $this->dispatch('toast', message: 'تراکنش یافت نشد!');
+            $this->dispatch('toast', message: 'تراکنش یافت نشد!', type: 'error');
         }
     }
 

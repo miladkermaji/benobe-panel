@@ -13,13 +13,16 @@ class PaymentSettingComponent extends Component
 {
     public $visit_fee = 20000; // پیش‌فرض 20 هزار تومان
     public $card_number;
+    public $availableAmount;
     public $requests = [];
+
+
     public function mount()
     {
         $doctorId = Auth::guard('doctor')->user()->id;
         $settings = DoctorPaymentSetting::where('doctor_id', $doctorId)->first();
 
-        if (! $settings) {
+        if (!$settings) {
             DoctorPaymentSetting::create([
                 'doctor_id'   => $doctorId,
                 'visit_fee'   => $this->visit_fee,
@@ -45,6 +48,7 @@ class PaymentSettingComponent extends Component
             'formatted_visit_fee' => number_format($this->visit_fee), // فرمت‌شده برای نمایش
         ]);
     }
+
     public function deleteRequest($requestId)
     {
         $doctorId    = Auth::guard('doctor')->user()->id;
@@ -52,20 +56,21 @@ class PaymentSettingComponent extends Component
 
         if ($transaction) {
             $transaction->delete(); // حذف نرم
-            $this->dispatch('toast', message: 'درخواست با موفقیت حذف شد.');
+            $this->dispatch('toast', message: 'درخواست با موفقیت حذف شد.', type: 'success');
         } else {
-            $this->dispatch('toast', message: 'درخواست یافت نشد!');
+            $this->dispatch('toast', message: 'درخواست یافت نشد!', type: 'error');
         }
 
         $this->loadData();
     }
+
     public function requestSettlement()
     {
         $doctorId = Auth::guard('doctor')->user()->id;
         $settings = DoctorPaymentSetting::where('doctor_id', $doctorId)->first();
 
         if (empty($this->card_number)) {
-            $this->dispatch('toast', message: 'لطفاً شماره کارت را وارد کنید.');
+            $this->dispatch('toast', message: 'لطفاً شماره کارت را وارد کنید.', type: 'error');
             return;
         }
 
@@ -74,15 +79,14 @@ class PaymentSettingComponent extends Component
             ->whereIn('status', ['pending', 'approved'])
             ->exists();
         if ($existingRequest) {
-            $this->dispatch('toast', message: 'شما یک درخواست تسویه فعال دارید. لطفاً منتظر پردازش باشید.');
+            $this->dispatch('toast', message: 'شما یک درخواست تسویه فعال دارید. لطفاً منتظر پردازش باشید.', type: 'error');
             return;
         }
 
         $availableAmount = DoctorWallet::where('doctor_id', $doctorId)
-
             ->sum('balance');
         if ($availableAmount <= 0) {
-            $this->dispatch('toast', message: 'مبلغ قابل برداشت وجود ندارد.');
+            $this->dispatch('toast', message: 'مبلغ قابل برداشت وجود ندارد.', type: 'error');
             return;
         }
 
@@ -101,8 +105,9 @@ class PaymentSettingComponent extends Component
             ->where('status', 'available')
             ->update(['status' => 'requested']);
 
-        $this->dispatch('toast', message: 'درخواست تسویه حساب با موفقیت ثبت شد.');
+        $this->dispatch('toast', message: 'درخواست تسویه حساب با موفقیت ثبت شد.', type: 'success');
     }
+
     protected function loadData()
     {
         $doctorId       = Auth::guard('doctor')->user()->id;
