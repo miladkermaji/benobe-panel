@@ -960,3 +960,83 @@ button {
    background: linear-gradient(to right, #4b5eaa, #8b5cf6) !important;
     color: white !important;
 }
+
+
+
+/* 
+radio button styles customized */
+/* استایل کلی برای رادیوباتن‌ها */
+.ant-radio-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* مخفی کردن رادیوباتن پیش‌فرض */
+.ant-radio input[type="radio"] {
+    display: none;
+}
+
+/* استایل دایره خارجی رادیوباتن */
+.ant-radio .ant-radio-inner {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d9d9d9;
+    border-radius: 50%;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+/* دایره داخلی وقتی انتخاب شده */
+.ant-radio input[type="radio"]:checked + .ant-radio-inner {
+    border-color: #007bff;
+    background-color: #007bff;
+}
+
+/* نقطه وسط وقتی انتخاب شده */
+.ant-radio input[type="radio"]:checked + .ant-radio-inner::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background-color: #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.2s ease;
+}
+
+/* افکت هاور */
+.ant-radio-wrapper:hover .ant-radio-inner {
+    border-color: #40c4ff;
+}
+
+/* متن کنار رادیوباتن */
+.ant-radio-wrapper span:not(.ant-radio-inner) {
+    margin-right: 8px;
+    font-size: 14px;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+/* تغییر رنگ متن وقتی هاور می‌کنه */
+.ant-radio-wrapper:hover span:not(.ant-radio-inner) {
+    color: #007bff;
+}
+
+/* حالت غیرفعال (اختیاری) */
+.ant-radio-wrapper.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ant-radio-wrapper.disabled .ant-radio-inner {
+    border-color: #d9d9d9;
+    background-color: #f5f5f5;
+}
+/* radio button styles customized */ 

@@ -3,7 +3,7 @@
 namespace App\Livewire\Dr\Panel\Insurance;
 
 use App\Models\Insurance;
-use GuzzleHttp\Psr7\Request;
+use App\Models\DoctorInsurance;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -17,86 +17,161 @@ class InsuranceComponent extends Component
     public $appointment_price;
     public $insurance_percent;
     public $final_price;
-    public $selectedClinicId; // متغیر جدید برای کلینیک انتخاب‌شده
+    public $selectedClinicId;
 
     protected $rules = [
         'name'               => 'required|string|max:255',
-        'calculation_method' => 'required|in:0,1,2',
+        'calculation_method' => 'required|in:0,1,2,3,4',
         'appointment_price'  => 'nullable|integer',
-        'insurance_percent'  => 'nullable|integer',
+        'insurance_percent'  => 'nullable|integer|min:0|max:100',
         'final_price'        => 'nullable|integer',
+    ];
+
+    protected $messages = [
+        'name.required'              => 'نام بیمه الزامی است.',
+        'name.string'                => 'نام بیمه باید یک رشته متنی باشد.',
+        'name.max'                   => 'نام بیمه نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+        'calculation_method.required' => 'روش محاسبه الزامی است.',
+        'calculation_method.in'       => 'روش محاسبه انتخاب‌شده معتبر نیست.',
+        'appointment_price.integer'   => 'مبلغ نوبت باید یک عدد صحیح باشد.',
+        'insurance_percent.integer'   => 'درصد سهم بیمه باید یک عدد صحیح باشد.',
+        'insurance_percent.min'       => 'درصد سهم بیمه نمی‌تواند منفی باشد.',
+        'insurance_percent.max'       => 'درصد سهم بیمه نمی‌تواند بیشتر از ۱۰۰ باشد.',
+        'final_price.integer'         => 'مبلغ نهایی باید یک عدد صحیح باشد.',
     ];
 
     public function mount()
     {
-        // گرفتن selectedClinicId از سشن یا URL
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
-        // ذخیره توی سشن برای استفاده بعدی
         session(['selectedClinicId' => $this->selectedClinicId]);
     }
 
     public function render()
     {
-        $query = Insurance::where('doctor_id', Auth::guard('doctor')->user()->id)
-            ->where('calculation_method', $this->calculation_method);
+        $query = Insurance::query();
 
-        // شرط برای clinic_id
+        if (Auth::guard('doctor')->check()) {
+            $doctorId = Auth::guard('doctor')->user()->id;
+            $query->whereHas('doctors', function ($q) use ($doctorId) {
+                $q->where('doctor_id', $doctorId);
+            });
+        } elseif (Auth::guard('manager')->check()) {
+            $segments = request()->segments();
+            $doctorId = end($segments);
+            if (!is_numeric($doctorId)) {
+                $this->dispatch('toast', message: 'لطفاً ابتدا یک دکتر را انتخاب کنید.', type: 'error');
+                $this->insurances = collect();
+                return view('livewire.dr.panel.insurance.insurance-component');
+            }
+            $query->whereHas('doctors', function ($q) use ($doctorId) {
+                $q->where('doctor_id', $doctorId);
+            });
+        } else {
+            $this->dispatch('toast', message: 'لطفاً ابتدا وارد سیستم شوید.', type: 'error');
+            $this->insurances = collect();
+            return view('livewire.dr.panel.insurance.insurance-component');
+        }
+
         if ($this->selectedClinicId === 'default') {
             $query->whereNull('clinic_id');
-        } elseif (Auth::guard('manager')->check()) {
-            // Get the last segment of the current URL
-            $id = last(request()->segments());
-            $query->where('doctor_id', $id);
-
         } else {
             $query->where('clinic_id', $this->selectedClinicId);
         }
 
+        $query->where('calculation_method', $this->calculation_method);
         $this->insurances = $query->get();
+
         return view('livewire.dr.panel.insurance.insurance-component');
     }
 
     public function store()
     {
-        // Validate the incoming data
         $data = $this->validate();
 
-        // Handle calculation method logic
+        // تنظیم و محاسبه بر اساس روش انتخاب‌شده
         switch ($data['calculation_method']) {
-            case '0':
+            case '0': // مبلغ ثابت
+                if (!$data['final_price']) {
+                    $this->addError('final_price', 'مبلغ نهایی برای این روش الزامی است.');
+                    return;
+                }
+                $data['appointment_price'] = null;
                 $data['insurance_percent'] = null;
-                $data['appointment_price'] = null;
                 break;
-            case '1':
-                $data['final_price']       = null;
-                $data['appointment_price'] = null;
+
+            case '1': // درصد از مبلغ نوبت
+                if (!$data['appointment_price']) {
+                    $this->addError('appointment_price', 'مبلغ نوبت برای این روش الزامی است.');
+                    return;
+                }
+                if (!$data['insurance_percent']) {
+                    $this->addError('insurance_percent', 'درصد سهم بیمه برای این روش الزامی است.');
+                    return;
+                }
+                $data['final_price'] = $data['appointment_price'] * (1 - $data['insurance_percent'] / 100);
                 break;
-            case '2':
-                $data['final_price'] = null;
+
+            case '2': // مبلغ ثابت + درصد
+                if (!$data['final_price']) {
+                    $this->addError('final_price', 'مبلغ نهایی برای این روش الزامی است.');
+                    return;
+                }
+                if (!$data['insurance_percent']) {
+                    $this->addError('insurance_percent', 'درصد سهم بیمه برای این روش الزامی است.');
+                    return;
+                }
+                $data['appointment_price'] = $data['appointment_price'] ?? null; // اختیاری
+                break;
+
+            case '3': // فقط برای آمارگیری
+                $data['appointment_price'] = $data['appointment_price'] ?? null;
+                $data['insurance_percent'] = $data['insurance_percent'] ?? null;
+                $data['final_price'] = $data['final_price'] ?? null;
+                break;
+
+            case '4': // پویا (مثال: درصد از نوبت + حداقل مبلغ)
+                $data['appointment_price'] = $data['appointment_price'] ?? null;
+                $data['insurance_percent'] = $data['insurance_percent'] ?? null;
+                $data['final_price'] = $data['final_price'] ?? null;
+                if ($data['appointment_price'] && $data['insurance_percent']) {
+                    $calculated = $data['appointment_price'] * (1 - $data['insurance_percent'] / 100);
+                    $data['final_price'] = $data['final_price'] ? max($data['final_price'], $calculated) : $calculated;
+                }
                 break;
         }
 
-        // Set the doctor_id based on the authentication context
-        if (Auth::guard('manager')->check()) {
-            // If a manager is logged in, get the ID from the URL
-            $CurrentUrl        = $_SERVER['HTTP_REFERER'];
-            $doctorId          = explode("/", $CurrentUrl)[7];
-            $data['doctor_id'] = $doctorId; // Ensure this is the correct segment
-        } else {
-            // If a doctor is logged in, use their ID
+        if (Auth::guard('doctor')->check()) {
             $data['doctor_id'] = Auth::guard('doctor')->user()->id;
+        } elseif (Auth::guard('manager')->check()) {
+            $segments = request()->segments();
+            $doctorId = end($segments);
+            if (!is_numeric($doctorId)) {
+                $this->dispatch('toast', message: 'لطفاً ابتدا یک دکتر را انتخاب کنید.', type: 'error');
+                return;
+            }
+            $data['doctor_id'] = $doctorId;
+        } else {
+            $this->dispatch('toast', message: 'لطفاً ابتدا وارد سیستم شوید.', type: 'error');
+            return;
         }
 
-        // Set clinic_id based on selectedClinicId
         $data['clinic_id'] = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
 
-        // Create the Insurance record
-        Insurance::create($data);
+        $insurance = Insurance::create([
+            'clinic_id' => $data['clinic_id'],
+            'name' => $data['name'],
+            'calculation_method' => $data['calculation_method'],
+            'appointment_price' => $data['appointment_price'],
+            'insurance_percent' => $data['insurance_percent'],
+            'final_price' => $data['final_price'],
+        ]);
 
-        // Dispatch a success message
+        DoctorInsurance::create([
+            'doctor_id' => $data['doctor_id'],
+            'insurance_id' => $insurance->id,
+        ]);
+
         $this->dispatch('toast', message: 'بیمه جدید با موفقیت اضافه شد.');
-
-        // Reset fields after submission
         $this->resetFields();
     }
 
@@ -109,33 +184,48 @@ class InsuranceComponent extends Component
     public function delete($id)
     {
         $insuranceId = is_array($id) ? $id['id'] : $id;
-        $insurance   = Insurance::where('doctor_id', Auth::guard('doctor')->user()->id)
-            ->where('id', $insuranceId);
+        $query = Insurance::where('id', $insuranceId);
 
-        // شرط برای clinic_id موقع حذف
-        if ($this->selectedClinicId === 'default') {
-            $insurance->whereNull('clinic_id');
+        if (Auth::guard('doctor')->check()) {
+            $doctorId = Auth::guard('doctor')->user()->id;
+            $query->whereHas('doctors', function ($q) use ($doctorId) {
+                $q->where('doctor_id', $doctorId);
+            });
         } elseif (Auth::guard('manager')->check()) {
-            // If a manager is logged in, get the ID from the URL
-            $CurrentUrl = $_SERVER['HTTP_REFERER'];
-            $doctorId   = explode("/", $CurrentUrl)[7];
-            $insurance->where('doctor_id', $doctorId);
-            // Ensure this is the correct segment
+            $segments = request()->segments();
+            $doctorId = end($segments);
+            if (!is_numeric($doctorId)) {
+                $this->dispatch('toast', message: 'لطفاً ابتدا یک دکتر را انتخاب کنید.', type: 'error');
+                return;
+            }
+            $query->whereHas('doctors', function ($q) use ($doctorId) {
+                $q->where('doctor_id', $doctorId);
+            });
         } else {
-            $insurance->where('clinic_id', $this->selectedClinicId);
+            $this->dispatch('toast', message: 'لطفاً ابتدا وارد سیستم شوید.', type: 'error');
+            return;
         }
 
-        $insurance->firstOrFail()->delete();
+        if ($this->selectedClinicId === 'default') {
+            $query->whereNull('clinic_id');
+        } else {
+            $query->where('clinic_id', $this->selectedClinicId);
+        }
+
+        $insurance = $query->firstOrFail();
+        DoctorInsurance::where('insurance_id', $insurance->id)->delete();
+        $insurance->delete();
+
         $this->dispatch('toast', message: 'بیمه با موفقیت حذف شد.');
     }
 
     private function resetFields()
     {
-        $this->insurance_id       = null;
-        $this->name               = '';
+        $this->insurance_id = null;
+        $this->name = '';
         $this->calculation_method = "0";
-        $this->appointment_price  = null;
-        $this->insurance_percent  = null;
-        $this->final_price        = null;
+        $this->appointment_price = null;
+        $this->insurance_percent = null;
+        $this->final_price = null;
     }
 }
