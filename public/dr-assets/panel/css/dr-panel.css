@@ -65,3 +65,29 @@ select {
     border: 2px solid red;
     animation: shake 0.5s infinite;
 }
+.provider-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.provider-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content {
+    border-radius: 10px !important;
+}
+
+.form-control:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(to right, #4b5eaa, #8b5cf6);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(to right, #3b4e9a, #7b4ce6);
+}
