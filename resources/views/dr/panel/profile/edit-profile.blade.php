@@ -44,11 +44,11 @@
           </div>
         </div>
         <div class="show-profile-badge">
-          <a href="">
+          <a href="" class="d-flex">
 
             <img src="{{ asset('dr-assets/icons/eye.svg') }}" alt="" srcset="">
 
-            <span>مشاهده پروفایل</span>
+            <span class="mx-1">مشاهده پروفایل</span>
           </a>
         </div>
       </div>
@@ -136,7 +136,7 @@
           </div>
           <div class="modal-body position-relative">
             <div id="mobileInputStep1">
-              <label class="label-top-input">شماره موبایل جدید</label>
+              <label class="label-top-input-modal">شماره موبایل جدید</label>
               <input type="text" id="newMobileNumber" maxlength="11" class="form-control w-100 h-50 text-right"
                 name="mobile">
               <div class="d-flex mt-2">
@@ -501,7 +501,8 @@
                     id="password" name="password" placeholder="رمز عبور"
                     {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
 
-                  <img src="{{ asset('dr-assets/icons/hide-pass.svg') }}" alt="">
+                  <img onclick="togglePassword('password')" class="show-pass"
+                    src="{{ asset('dr-assets/icons/hide-pass.svg') }}" alt="">
 
                 </div>
                 <div class="w-100">
@@ -509,7 +510,8 @@
                   <input type="password" class="form-control h-50 w-100 border-radius-6 mt-3 col-12 position-relative"
                     id="password_confirmation" name="password_confirmation" placeholder="تکرار رمز عبور"
                     {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
-                  <img src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="">
+                  <img onclick="togglePassword('password_confirmation')" class="hide-pass"
+                    src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="">
                 </div>
               </div>
               <div class="w-100 mt-3">
@@ -611,12 +613,23 @@
 </div>
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/profile/edit-profile.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
+
+  function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const icon = input.nextElementSibling; // آیکون کنار ورودی
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.src = 'http://127.0.0.1:8000/dr-assets/icons/hide-pass.svg'; // تغییر به آیکون "نمایش"
+    } else {
+      input.type = 'password';
+      icon.src = 'http://127.0.0.1:8000/dr-assets/icons/show-pass.svg'; // تغییر به آیکون "مخفی"
+    }
+  }
 </script>
 @include('dr.panel.profile.option.profile-option')
 

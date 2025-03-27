@@ -48,6 +48,22 @@
  font-size: 12px;
  top: inherit;
 }
+.label-top-input-modal {
+ min-height: 10px;
+ min-width: 20px;
+ background-color: #fff;
+ box-shadow:
+  rgba(27, 31, 35, 0.04) 0px 1px 0px,
+  rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
+ border-radius: 4px;
+ position: absolute;
+ z-index: 2;
+ padding: 2px;
+ font-weight: bold;
+ right: 18px;
+ font-size: 12px;
+ top: 0;
+}
 .label-top-input-special {
  min-height: 10px;
  min-width: 20px;
@@ -202,4 +218,18 @@ input {
  .help-svg {
   display: none !important;
  }
+}
+.show-pass {
+  position: absolute;
+  right: 536px;
+  top: 114px;
+  z-index: 500;
+  left: inherit;
+  bottom: inherit;
+}
+.hide-pass {
+  position: absolute;
+  left: 22px;
+  top: 114px;
+  z-index: 500;
 }

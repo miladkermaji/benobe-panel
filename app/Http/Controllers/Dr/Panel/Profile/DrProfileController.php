@@ -43,6 +43,8 @@ class DrProfileController extends Controller
 
         $request->validate([
             'photo' => 'image',
+        ], [
+            'photo.image' => 'فایل انتخاب شده باید یک تصویر باشد.',
         ]);
 
         try {
@@ -88,7 +90,7 @@ class DrProfileController extends Controller
         $doctor                   = $this->getAuthenticatedDoctor();
         $currentSpecialty         = DoctorSpecialty::where('doctor_id', $doctor->id)->first();
         $specialtyName            = $currentSpecialty->specialty_title ?? 'نامشخص';
-        $doctor_specialties              = DoctorSpecialty::where('doctor_id', $doctor->id)->get();
+        $doctor_specialties       = DoctorSpecialty::where('doctor_id', $doctor->id)->get();
         $doctorSpecialties        = DoctorSpecialty::where('doctor_id', $doctor->id)->get();
         $existingSpecialtiesCount = DoctorSpecialty::where('doctor_id', $doctor->id)->count();
         $doctorSpecialtyId        = DoctorSpecialty::where('doctor_id', $doctor->id)->first();
@@ -96,7 +98,7 @@ class DrProfileController extends Controller
             ->orderBy('sort_order')
             ->get();
         $messengers         = $doctor->messengers;
-        $specialties    = Specialty::getOptimizedList();
+        $specialties        = Specialty::getOptimizedList();
         $incompleteSections = $doctor->getIncompleteProfileSections();
 
         return view("dr.panel.profile.edit-profile", compact([
@@ -209,6 +211,10 @@ class DrProfileController extends Controller
                     }
                 },
             ],
+        ], [
+            'uuid.string'    => 'شناسه باید یک رشته باشد.',
+            'uuid.unique'    => 'این شناسه قبلاً استفاده شده است.',
+            'uuid.regex'     => 'شناسه فقط می‌تواند شامل حروف، اعداد، خط تیره و زیرخط باشد.',
         ]);
 
         if ($validator->fails()) {
@@ -275,8 +281,15 @@ class DrProfileController extends Controller
             ],
             'secure_call'    => 'nullable|boolean',
         ], [
-            'ita_phone.regex'      => 'شماره موبایل ایتا را به درستی وارد کنید.',
-            'whatsapp_phone.regex' => 'شماره موبایل واتس‌اپ را به درستی وارد کنید.',
+            'ita_phone.string'      => 'شماره موبایل ایتا باید یک رشته باشد.',
+            'ita_phone.max'         => 'شماره موبایل ایتا نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.',
+            'ita_phone.regex'       => 'شماره موبایل ایتا را به درستی وارد کنید.',
+            'ita_username.string'   => 'نام کاربری ایتا باید یک رشته باشد.',
+            'ita_username.max'      => 'نام کاربری ایتا نمی‌تواند بیشتر از ۱۰۰ کاراکتر باشد.',
+            'whatsapp_phone.string' => 'شماره موبایل واتس‌اپ باید یک رشته باشد.',
+            'whatsapp_phone.max'    => 'شماره موبایل واتس‌اپ نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.',
+            'whatsapp_phone.regex'  => 'شماره موبایل واتس‌اپ را به درستی وارد کنید.',
+            'secure_call.boolean'   => 'وضعیت تماس امن باید یک مقدار بولین باشد.',
         ]);
 
         $doctor->messengers()->updateOrCreate(
@@ -316,8 +329,12 @@ class DrProfileController extends Controller
             'static_password_enabled' => 'required|boolean',
             'password'                => 'required_if:static_password_enabled,true|string|min:6|confirmed',
         ], [
-            'password.required_if' => 'رمز عبور الزامی است.',
-            'password.confirmed'   => 'تکرار رمز عبور با رمز عبور اصلی مطابقت ندارد.',
+            'static_password_enabled.required' => 'وضعیت رمز عبور ثابت الزامی است.',
+            'static_password_enabled.boolean'  => 'وضعیت رمز عبور ثابت باید یک مقدار بولین باشد.',
+            'password.required_if'             => 'رمز عبور الزامی است.',
+            'password.string'                  => 'رمز عبور باید یک رشته باشد.',
+            'password.min'                     => 'رمز عبور باید حداقل ۶ کاراکتر باشد.',
+            'password.confirmed'               => 'تکرار رمز عبور با رمز عبور اصلی مطابقت ندارد.',
         ]);
 
         if ($validator->fails()) {
@@ -361,6 +378,12 @@ class DrProfileController extends Controller
         $request->validate([
             'two_factor_enabled' => 'required|boolean',
             'two_factor_secret'  => $request->two_factor_enabled ? 'required|string|min:6' : 'nullable',
+        ], [
+            'two_factor_enabled.required' => 'وضعیت احراز هویت دو مرحله‌ای الزامی است.',
+            'two_factor_enabled.boolean'  => 'وضعیت احراز هویت دو مرحله‌ای باید یک مقدار بولین باشد.',
+            'two_factor_secret.required'  => 'رمز احراز هویت دو مرحله‌ای الزامی است.',
+            'two_factor_secret.string'    => 'رمز احراز هویت دو مرحله‌ای باید یک رشته باشد.',
+            'two_factor_secret.min'       => 'رمز احراز هویت دو مرحله‌ای باید حداقل ۶ کاراکتر باشد.',
         ]);
 
         $doctor                            = $this->getAuthenticatedDoctor();
@@ -508,6 +531,14 @@ class DrProfileController extends Controller
                     }
                 },
             ],
+        ], [
+            'otp.required'      => 'کد تأیید الزامی است.',
+            'otp.array'         => 'کد تأیید باید به صورت آرایه باشد.',
+            'otp.*.required'    => 'هر رقم کد تأیید الزامی است.',
+            'otp.*.numeric'     => 'هر رقم کد تأیید باید عددی باشد.',
+            'otp.*.digits'      => 'هر رقم کد تأیید باید یک رقمی باشد.',
+            'mobile.required'   => 'شماره موبایل الزامی است.',
+            'mobile.regex'      => 'شماره موبایل نامعتبر است.',
         ]);
 
         if ($validator->fails()) {
@@ -526,7 +557,7 @@ class DrProfileController extends Controller
         if (! $otp) {
             return response()->json([
                 'success' => false,
-                'message' => 'کد تایید منقضی شده است',
+                'message' => 'کد تأیید منقضی شده است',
             ], 422);
         }
 
@@ -534,7 +565,7 @@ class DrProfileController extends Controller
         if ($otp->otp_code !== $otpCode) {
             return response()->json([
                 'success' => false,
-                'message' => 'کد تایید صحیح نمی‌باشد',
+                'message' => 'کد تأیید صحیح نمی‌باشد',
             ], 422);
         }
 

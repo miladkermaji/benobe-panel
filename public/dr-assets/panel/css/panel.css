@@ -1040,3 +1040,6 @@ radio button styles customized */
     background-color: #f5f5f5;
 }
 /* radio button styles customized */ 
+img{
+    display: inline !important;
+}

@@ -2,6 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="icon" type="image/x-icon" href="{{ asset('app-assets/logos/favicon.ico') }}">
+@vite(['resources/js/app.js', 'resources/css/app.css'])
 
 <link href="{{ asset('dr-assets/panel/css/bootstrap.min.css') }}" rel="stylesheet">
 <script src="{{ asset('dr-assets/panel/js/home/bootstrap/bootstrap.popper.min.js') }}"></script>
@@ -28,4 +29,3 @@
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastr/toastr.min.css') }}">
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/global-loader.css') }}">
 {{-- tom select --}}
-@vite(['resources/js/app.js', 'resources/css/app.css'])
