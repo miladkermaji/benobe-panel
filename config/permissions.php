@@ -4,7 +4,7 @@ return [
     'dashboard' => [
         'title' => 'داشبورد',
         'icon' => 'i-dashboard',
-        'routes' => ['dr-panel'],
+        'routes' => ['dr-panel' => 'داشبورد'],
     ],
     'appointments' => [
         'title' => 'نوبت اینترنتی',
@@ -35,7 +35,7 @@ return [
     'services' => [
         'title' => 'خدمات',
         'icon' => 'i-checkout__request',
-        'routes' => ['dr.panel.doctor-services.index'],
+        'routes' => ['dr.panel.doctor-services.index' => 'خدمات'],
     ],
     'prescription' => [
         'title' => 'نسخه الکترونیک',
@@ -66,7 +66,7 @@ return [
     'patient_records' => [
         'title' => 'پرونده الکترونیک',
         'icon' => 'i-checkout__request',
-        'routes' => ['dr-patient-records'],
+        'routes' => ['dr-patient-records' => 'پرونده الکترونیک'],
     ],
     'secretary_management' => [
         'title' => 'منشی',
@@ -86,12 +86,12 @@ return [
     'insurance' => [
         'title' => 'بیمه‌ها',
         'icon' => 'i-checkout__request',
-        'routes' => ['dr-bime'],
+        'routes' => ['dr-bime' => 'بیمه'],
     ],
     'permissions' => [
         'title' => 'دسترسی‌ها',
         'icon' => 'i-checkout__request',
-        'routes' => ['dr-secretary-permissions'],
+        'routes' => ['dr-secretary-permissions' => 'سطح دسترسی منشی'],
     ],
     'profile' => [
         'title' => 'حساب کاربری',
