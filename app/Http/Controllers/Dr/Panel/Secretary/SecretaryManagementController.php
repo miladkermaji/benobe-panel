@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dr\Panel\Secretary;
 
 use App\Http\Controllers\Dr\Controller;
 use App\Models\Secretary;
+use App\Models\Doctor; // اضافه کردن مدل Doctor
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -17,10 +18,8 @@ class SecretaryManagementController extends Controller
 
         $secretaries = Secretary::where('doctor_id', $doctorId)
             ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                // اگر کلینیک خاص انتخاب شد
                 $query->where('clinic_id', $selectedClinicId);
             }, function ($query) {
-                // اگر گزینه "default" انتخاب شد (عمومی و بدون کلینیک)
                 $query->whereNull('clinic_id');
             })
             ->get();
@@ -34,11 +33,10 @@ class SecretaryManagementController extends Controller
 
     public function store(Request $request)
     {
-        // دریافت شناسه دکتر و کلینیک
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $clinicId = $request->selectedClinicId === 'default' ? null : $request->selectedClinicId;
 
-        // اعتبارسنجی داده‌های ورودی با پیام‌های فارسی
+        // اعتبارسنجی داده‌های ورودی
         $request->validate([
             'first_name'    => 'required|string|max:255',
             'last_name'     => 'required|string|max:255',
@@ -46,7 +44,8 @@ class SecretaryManagementController extends Controller
                 'required',
                 'regex:/^09[0-9]{9}$/', // فرمت شماره موبایل ایرانی
                 function ($attribute, $value, $fail) use ($doctorId, $clinicId) {
-                    $exists = Secretary::where('mobile', $value)
+                    // بررسی تکراری بودن در جدول secretaries
+                    $existsInSecretaries = Secretary::where('mobile', $value)
                         ->where('doctor_id', $doctorId)
                         ->where(function ($query) use ($clinicId) {
                             if ($clinicId) {
@@ -55,14 +54,20 @@ class SecretaryManagementController extends Controller
                                 $query->whereNull('clinic_id');
                             }
                         })->exists();
-                    if ($exists) {
+                    if ($existsInSecretaries) {
                         $fail('این شماره موبایل قبلاً برای این دکتر یا کلینیک ثبت شده است.');
+                    }
+
+                    // بررسی وجود شماره در جدول doctors
+                    $existsInDoctors = Doctor::where('mobile', $value)->exists();
+                    if ($existsInDoctors) {
+                        $fail('این شماره موبایل متعلق به یک دکتر است و نمی‌تواند برای منشی استفاده شود.');
                     }
                 },
             ],
             'national_code' => [
                 'required',
-                'digits:10', // کد ملی باید 10 رقمی باشد
+                'digits:10',
                 function ($attribute, $value, $fail) use ($doctorId, $clinicId) {
                     $exists = Secretary::where('national_code', $value)
                         ->where('doctor_id', $doctorId)
@@ -79,7 +84,7 @@ class SecretaryManagementController extends Controller
                 },
             ],
             'gender'        => 'required|string|in:male,female',
-            'password'      => 'nullable|min:6', // کلمه عبور اختیاری است
+            'password'      => 'nullable|min:6',
         ], [
             'first_name.required'    => 'لطفاً نام را وارد کنید.',
             'first_name.string'      => 'نام باید یک رشته متنی باشد.',
@@ -97,7 +102,6 @@ class SecretaryManagementController extends Controller
         ]);
 
         try {
-            // ذخیره اطلاعات منشی در جدول `secretaries`
             $secretary = Secretary::create([
                 'doctor_id'     => $doctorId,
                 'clinic_id'     => $clinicId,
@@ -109,7 +113,6 @@ class SecretaryManagementController extends Controller
                 'password'      => $request->password ? Hash::make($request->password) : null,
             ]);
 
-            // ذخیره دسترسی‌های پیش‌فرض برای منشی جدید در جدول `secretary_permissions`
             \App\Models\SecretaryPermission::create([
                 'doctor_id'    => $doctorId,
                 'secretary_id' => $secretary->id,
@@ -148,7 +151,6 @@ class SecretaryManagementController extends Controller
                 'has_access'   => true,
             ]);
 
-            // برگرداندن منشی‌های فعلی
             $secretaries = Secretary::where('doctor_id', $doctorId)
                 ->where(function ($query) use ($clinicId) {
                     if ($clinicId) {
@@ -188,15 +190,15 @@ class SecretaryManagementController extends Controller
     {
         $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
 
-        // اعتبارسنجی با پیام‌های فارسی
         $request->validate([
             'first_name'    => 'required|string|max:255',
             'last_name'     => 'required|string|max:255',
             'mobile'        => [
                 'required',
-                'regex:/^09[0-9]{9}$/', // فرمت شماره موبایل ایرانی
+                'regex:/^09[0-9]{9}$/',
                 function ($attribute, $value, $fail) use ($id, $selectedClinicId) {
-                    $exists = Secretary::where('mobile', $value)
+                    // بررسی تکراری بودن در جدول secretaries
+                    $existsInSecretaries = Secretary::where('mobile', $value)
                         ->where('id', '!=', $id)
                         ->where(function ($query) use ($selectedClinicId) {
                             if ($selectedClinicId !== 'default') {
@@ -205,14 +207,20 @@ class SecretaryManagementController extends Controller
                                 $query->whereNull('clinic_id');
                             }
                         })->exists();
-                    if ($exists) {
+                    if ($existsInSecretaries) {
                         $fail('این شماره موبایل قبلاً برای این کلینیک یا دکتر ثبت شده است.');
+                    }
+
+                    // بررسی وجود شماره در جدول doctors
+                    $existsInDoctors = Doctor::where('mobile', $value)->exists();
+                    if ($existsInDoctors) {
+                        $fail('این شماره موبایل متعلق به یک دکتر است و نمی‌تواند برای منشی استفاده شود.');
                     }
                 },
             ],
             'national_code' => [
                 'required',
-                'digits:10', // کد ملی باید 10 رقمی باشد
+                'digits:10',
                 function ($attribute, $value, $fail) use ($id, $selectedClinicId) {
                     $exists = Secretary::where('national_code', $value)
                         ->where('id', '!=', $id)
@@ -229,7 +237,7 @@ class SecretaryManagementController extends Controller
                 },
             ],
             'gender'        => 'required|string|in:male,female',
-            'password'      => 'nullable|min:6', // کلمه عبور اختیاری است
+            'password'      => 'nullable|min:6',
         ], [
             'first_name.required'    => 'لطفاً نام را وارد کنید.',
             'first_name.string'      => 'نام باید یک رشته متنی باشد.',
@@ -246,10 +254,8 @@ class SecretaryManagementController extends Controller
             'password.min'           => 'کلمه عبور باید حداقل 6 کاراکتر باشد.',
         ]);
 
-        // پیدا کردن منشی برای ویرایش
         $secretary = Secretary::findOrFail($id);
 
-        // به‌روزرسانی اطلاعات
         $secretary->update([
             'first_name'    => $request->first_name,
             'last_name'     => $request->last_name,
@@ -259,7 +265,6 @@ class SecretaryManagementController extends Controller
             'password'      => $request->password ? Hash::make($request->password) : $secretary->password,
         ]);
 
-        // بازگردانی لیست منشی‌های به‌روزرسانی‌شده با فیلتر صحیح
         $secretaries = Secretary::where('doctor_id', $secretary->doctor_id)
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId !== 'default') {
