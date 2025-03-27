@@ -205,9 +205,17 @@
         </td>
         <td class="text-center">
             <div class="dropdown d-inline-block position-relative">
-                <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
-                    <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
-                </button>
+              <button 
+    class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" 
+    type="button"
+>
+    <img 
+        src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" 
+        width="20" 
+        height="20" 
+        alt="More options"
+    >
+</button>
                 <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
                     <li class=" ${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
@@ -314,9 +322,17 @@
         </td>
         <td class="text-center">
             <div class="dropdown d-inline-block position-relative">
-                <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
-                    <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
-                </button>
+               <button 
+    class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" 
+    type="button"
+>
+    <img 
+        src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" 
+        width="20" 
+        height="20" 
+        alt="More options"
+    >
+</button>
                 <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
                     <li class=" ${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
@@ -513,9 +529,17 @@
                             </td>
                             <td class="text-center">
                                 <div class="dropdown d-inline-block position-relative">
-                                    <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
-                                        <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
-                                    </button>
+                                    <button 
+    class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" 
+    type="button"
+>
+    <img 
+        src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" 
+        width="20" 
+        height="20" 
+        alt="More options"
+    >
+</button>
                                     
                                     <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
                                         <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">لغو نوبت</a></li>
@@ -1767,9 +1791,17 @@
 </td>
                                 <td class="text-center">
                                     <div class="dropdown d-inline-block position-relative">
-                                        <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
-                                            <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
-                                        </button>
+                                       <button 
+    class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" 
+    type="button"
+>
+    <img 
+        src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" 
+        width="20" 
+        height="20" 
+        alt="More options"
+    >
+</button>
                                         <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
                                             <li class="${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
