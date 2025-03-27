@@ -13,9 +13,20 @@ class HeaderComponent extends Component
 
     public function mount()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
-        $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
-            ->sum('balance');
+        if (Auth::guard('doctor')->check()) {
+            // User is a doctor
+            $doctorId = Auth::guard('doctor')->user()->id;
+            $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
+                ->sum('balance');
+        } elseif (Auth::guard('secretary')->check()) {
+            // User is a secretary
+            $secretary = Auth::guard('secretary')->user();
+            $doctorId = $secretary->doctor_id; // Get the doctor ID associated with the secretary
+            if ($doctorId) {
+                $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
+                    ->sum('balance');
+            }
+        }
     }
 
     public function render()
