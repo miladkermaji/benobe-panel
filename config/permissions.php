@@ -3,117 +3,140 @@
 return [
     'dashboard' => [
         'title' => 'داشبورد',
-        'icon' => 'i-dashboard', // کلاس آیکون برای داشبورد
-        'routes' => ['dr-panel' => 'داشبورد'],
+        'icon' => 'i-dashboard',
+        'routes' => ['dr-panel'],
     ],
     'appointments' => [
-        'title' => 'نوبت‌دهی',
-        'icon' => 'i-courses', // کلاس آیکون برای نوبت‌دهی
+        'title' => 'نوبت اینترنتی',
+        'icon' => 'i-courses',
         'routes' => [
             'dr-appointments' => 'مراجعین من',
             'dr-workhours' => 'ساعت کاری',
-            'dr-mySpecialDays' => 'روزهای خاص من',
+            'dr.panel.doctornotes.index' => 'توضیحات نوبت',
+            'dr-mySpecialDays' => 'روزهای خاص',
             'dr-manual_nobat_setting' => 'تنظیمات نوبت دستی',
             'dr-manual_nobat' => 'ثبت نوبت دستی',
-            'dr-scheduleSetting' => 'تنظیمات نوبت‌دهی',
+            'dr-scheduleSetting' => 'تنظیمات نوبت',
+            'dr-vacation' => 'تعطیلات',
+            'doctor-blocking-users.index' => 'کاربران مسدود',
         ],
     ],
     'consult' => [
-        'title' => 'مشاوره آنلاین',
-        'icon' => 'i-moshavere', // کلاس آیکون برای مشاوره
+        'title' => 'مشاوره',
+        'icon' => 'i-moshavere',
         'routes' => [
             'dr-moshavere_setting' => 'برنامه‌ریزی مشاوره',
-            'dr-moshavere_waiting' => 'گزارش مشاوره‌ها',
+            'dr-moshavere_waiting' => 'گزارش مشاوره',
+            'dr.panel.doctornotes.index' => 'توضیحات نوبت',
+            'dr-mySpecialDays-counseling' => 'روزهای خاص',
             'consult-term.index' => 'قوانین مشاوره',
-            'dr-mySpecialDays-counseling' => 'روزهای خاص مشاوره',
         ],
     ],
-    'dr-services' => [
-        'title' => 'خدمات دکتر',
-        'icon' => 'i-checkout__request', // کلاس آیکون برای بیمه
-        'routes' => [
-            'dr-services.index' => 'خدمات دکتر'
-        ],
+    'services' => [
+        'title' => 'خدمات',
+        'icon' => 'i-checkout__request',
+        'routes' => ['dr.panel.doctor-services.index'],
     ],
     'prescription' => [
         'title' => 'نسخه الکترونیک',
-        'icon' => 'i-banners', // کلاس آیکون برای نسخه الکترونیک
+        'icon' => 'i-banners',
         'routes' => [
-            'prescription.index' => 'نسخه‌های ثبت‌شده',
+            'dr-patient-records' => 'پرونده پزشکی',
+            'prescription.index' => 'نسخه‌های ثبت شده',
             'providers.index' => 'بیمه‌های من',
-            'favorite.templates.index' => 'نسخه‌های پر استفاده',
-            'templates.favorite.service.index' => 'اقلام پر استفاده',
+            'favorite.templates.index' => 'نسخه پراستفاده',
+            'templates.favorite.service.index' => 'اقلام پراستفاده',
         ],
     ],
     'financial_reports' => [
         'title' => 'گزارش مالی',
-        'icon' => 'i-my__peyments', // کلاس آیکون برای گزارش مالی
+        'icon' => 'i-my__peyments',
         'routes' => [
-            'dr-payment-setting' => 'تنظیمات پرداخت',
-            'dr-wallet-charge' => ' شارژ کیف پول',
+            'dr-payment-setting' => 'پرداخت',
+            'dr-wallet-charge' => 'شارژ کیف‌پول',
+        ],
+    ],
+    'communication' => [
+        'title' => 'ارتباط با بیماران',
+        'icon' => 'i-users',
+        'routes' => [
+            'dr.panel.send-message' => 'ارسال پیام',
         ],
     ],
     'patient_records' => [
         'title' => 'پرونده الکترونیک',
-        'icon' => 'i-checkout__request', // کلاس آیکون برای پرونده
-        'routes' => [
-            'dr-patient-records' => 'پرونده بیماران',
-        ],
+        'icon' => 'i-checkout__request',
+        'routes' => ['dr-patient-records'],
     ],
     'secretary_management' => [
-        'title' => 'مدیریت منشی‌ها',
-        'icon' => 'i-user__secratary', // کلاس آیکون برای مدیریت منشی
+        'title' => 'منشی',
+        'icon' => 'i-user__secratary',
         'routes' => [
             'dr-secretary-management' => 'مدیریت منشی‌ها',
         ],
     ],
     'clinic_management' => [
-        'title' => 'مدیریت مطب',
-        'icon' => 'i-clinic', // کلاس آیکون برای مدیریت مطب
+        'title' => 'مطب',
+        'icon' => 'i-clinic',
         'routes' => [
             'dr-clinic-management' => 'مدیریت مطب',
-            'dr-office-gallery' => 'گالری تصاویر',
-            'dr-office-medicalDoc' => 'مدارک من',
+            'dr.panel.clinics.medical-documents' => 'مدارک من',
         ],
     ],
     'insurance' => [
         'title' => 'بیمه‌ها',
-        'icon' => 'i-checkout__request', // کلاس آیکون برای بیمه
-        'routes' => [
-            'dr-bime' => 'بیمه'
-        ],
+        'icon' => 'i-checkout__request',
+        'routes' => ['dr-bime'],
     ],
-/*     'permissions' => [
+    'permissions' => [
         'title' => 'دسترسی‌ها',
-        'icon' => 'i-checkout__request', // کلاس آیکون برای دسترسی‌ها
-        'routes' => [
-            'dr-secretary-permissions'
-        ],
-    ], */
-/*     'profile' => [
+        'icon' => 'i-checkout__request',
+        'routes' => ['dr-secretary-permissions'],
+    ],
+    'profile' => [
         'title' => 'حساب کاربری',
-        'icon' => 'i-users', // کلاس آیکون برای حساب کاربری
+        'icon' => 'i-users',
         'routes' => [
-            'dr-edit-profile' => 'ویرایش پروفایل',
+            'dr-edit-profile' => 'حساب کاربری',
             'my-dr-appointments' => 'نوبت‌های من',
             'dr-edit-profile-security' => 'امنیت',
             'dr-edit-profile-upgrade' => 'ارتقا حساب',
             'dr-my-performance' => 'عملکرد و رتبه من',
             'dr-subuser' => 'کاربران زیرمجموعه',
         ],
-    ], */
+    ],
+    'advanced_settings' => [
+        'title' => 'تنظیمات پیشرفته',
+        'icon' => 'i-users',
+        'routes' => [
+            '#' => 'تنظیمات پیام‌رسان‌ها',
+            '#' => 'تنظیمات اعلان‌ها',
+            '#' => 'پشتیبان‌گیری',
+        ],
+    ],
     'messages' => [
-        'title' => 'پیام‌ها',
-        'icon' => 'i-comments', // کلاس آیکون برای پیام‌ها
+        'title' => 'پیام',
+        'icon' => 'i-comments',
         'routes' => [
             'dr-panel-tickets' => 'تیکت‌ها',
+            '#' => 'صفحه گفتگو',
         ],
     ],
     'statistics' => [
-        'title' => 'آمار و نمودار',
-        'icon' => 'i-transactions', // کلاس آیکون برای آمار
+        'title' => 'گزارش‌ها و آمار',
+        'icon' => 'i-transactions',
         'routes' => [
-            'dr-my-performance-chart' => 'آمار و نمودار'
+            'dr-my-performance-chart' => 'آمار و نمودار',
+            '#' => 'گزارش نوبت‌های لغو شده',
+            '#' => 'تحلیل داده‌ها',
+        ],
+    ],
+    'content_management' => [
+        'title' => 'مدیریت محتوا',
+        'icon' => 'i-users',
+        'routes' => [
+            '#' => 'مدیریت بلاگ',
+            '#' => 'نظرات بیماران',
         ],
     ],
 ];
