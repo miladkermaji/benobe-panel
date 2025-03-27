@@ -32,7 +32,7 @@ return [
         'title' => 'خدمات دکتر',
         'icon' => 'i-checkout__request', // کلاس آیکون برای بیمه
         'routes' => [
-            'dr-services.index' =>'خدمات دکتر'
+            'dr-services.index' => 'خدمات دکتر'
         ],
     ],
     'prescription' => [
@@ -80,7 +80,7 @@ return [
         'title' => 'بیمه‌ها',
         'icon' => 'i-checkout__request', // کلاس آیکون برای بیمه
         'routes' => [
-            'dr-bime' =>'بیمه'
+            'dr-bime' => 'بیمه'
         ],
     ],
 /*     'permissions' => [
@@ -113,7 +113,7 @@ return [
         'title' => 'آمار و نمودار',
         'icon' => 'i-transactions', // کلاس آیکون برای آمار
         'routes' => [
-            'dr-my-performance-chart' =>'آمار و نمودار'
+            'dr-my-performance-chart' => 'آمار و نمودار'
         ],
     ],
 ];
