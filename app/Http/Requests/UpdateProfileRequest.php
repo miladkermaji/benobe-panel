@@ -19,14 +19,16 @@ class UpdateProfileRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules()
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'national_code' => 'nullable|string|max:10',
-            'license_number' => 'nullable|string|max:20',
-            'description' => 'nullable|string',
+            'first_name'     => 'sometimes|string|max:255',
+            'last_name'      => 'sometimes|string|max:255',
+            'national_code'  => 'sometimes|string|max:10',
+            'license_number' => 'sometimes|string|max:255',
+            'description'    => 'nullable|string',
+            'province_id'    => 'nullable|exists:zone,id,level,1', // فقط استان‌ها (level=1)
+            'city_id'        => 'nullable|exists:zone,id,level,2', // فقط شهرها (level=2)
         ];
     }
 }

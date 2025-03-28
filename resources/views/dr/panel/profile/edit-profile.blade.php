@@ -6,7 +6,6 @@
     .myPanelOption {
       display: none;
     }
-
   </style>
 @endsection
 @section('site-header')
@@ -108,7 +107,33 @@
 
               </button>
             </div>
-            <div class="mt-3">
+            <div class="mt-4 position-relative">
+              <label for="province_id" class="label-top-input-city">استان</label>
+              <select name="province_id" id="province_id"
+                class="form-control h-50 w-100 border-radius-6 mt-3 tom-select" autocomplete="off">
+                <option value="">انتخاب استان</option>
+                @foreach (\App\Models\Zone::provinces()->get() as $province)
+                  <option value="{{ $province->id }}"
+                    {{ Auth::guard('doctor')->user()->province_id == $province->id ? 'selected' : '' }}>
+                    {{ $province->name }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+            <div class="mt-4 position-relative">
+              <label for="city_id" class="label-top-input-city">شهر</label>
+              <select name="city_id" id="city_id" class="form-control h-50 w-100 border-radius-6 mt-3 tom-select"
+                autocomplete="off">
+                <option value="">ابتدا یک استان انتخاب کنید</option>
+                @if (Auth::guard('doctor')->user()->city_id)
+                  @php
+                    $city = \App\Models\Zone::find(Auth::guard('doctor')->user()->city_id);
+                  @endphp
+                  <option value="{{ $city->id }}" selected>{{ $city->name }}</option>
+                @endif
+              </select>
+            </div>
+            <div class="mt-4">
               <label for="name" class="font-weight-bold font-size-13"> بیوگرافی و توضیحات</label>
               <textarea class="ckeditor form-control" name="description" class="form-control" id="description">
             {{ trim(Auth::guard('doctor')->user()->bio ?? '') }}
@@ -619,6 +644,85 @@
 <script src="{{ asset('dr-assets/panel/js/profile/edit-profile.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
+// تابع کمکی برای مقداردهی اولیه Tom Select
+function initializeTomSelect(elementId, options = {}) {
+    const selectElement = document.getElementById(elementId);
+    if (selectElement && !selectElement.tomSelect) {
+        return new TomSelect(`#${elementId}`, {
+            direction: 'rtl',
+            placeholder: options.placeholder || 'انتخاب کنید',
+            allowEmptyOption: true,
+            maxOptions: null,
+            ...options
+        });
+    }
+    return selectElement ? selectElement.tomSelect : null;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // مقداردهی اولیه Tom Select برای استان و شهر و ذخیره نمونه‌ها
+    const provinceTomSelect = initializeTomSelect('province_id', { placeholder: 'انتخاب استان' });
+    const cityTomSelect = initializeTomSelect('city_id', { placeholder: 'انتخاب شهر' });
+
+    // بررسی وجود نمونه‌ها
+    if (!provinceTomSelect || !cityTomSelect) {
+        console.error('خطا در مقداردهی Tom Select برای استان یا شهر');
+        return;
+    }
+
+    const provinceSelect = document.getElementById('province_id');
+
+    // مدیریت تغییر در انتخاب استان
+    provinceSelect.addEventListener('change', function() {
+        const provinceId = this.value;
+
+        if (provinceId) {
+            fetch(`{{ route('dr-get-cities') }}?province_id=${provinceId}`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    cityTomSelect.clear();
+                    cityTomSelect.clearOptions();
+                    cityTomSelect.addOption({ value: '', text: 'انتخاب شهر' });
+                    data.cities.forEach(city => {
+                        cityTomSelect.addOption({ value: city.id, text: city.name });
+                    });
+                    cityTomSelect.enable();
+                    cityTomSelect.refreshOptions();
+                } else {
+                    toastr.error(data.message || 'خطا در بارگذاری شهرها');
+                    cityTomSelect.clear();
+                    cityTomSelect.clearOptions();
+                    cityTomSelect.addOption({ value: '', text: 'خطا در بارگذاری' });
+                    cityTomSelect.disable();
+                }
+            })
+            .catch(error => {
+                toastr.error('خطا در ارتباط با سرور');
+                cityTomSelect.clear();
+                cityTomSelect.clearOptions();
+                cityTomSelect.addOption({ value: '', text: 'خطا در بارگذاری' });
+                cityTomSelect.disable();
+            });
+        } else {
+            cityTomSelect.clear();
+            cityTomSelect.clearOptions();
+            cityTomSelect.addOption({ value: '', text: 'ابتدا یک استان انتخاب کنید' });
+            cityTomSelect.disable();
+        }
+    });
+
+    // لود اولیه شهرها اگر استان از قبل انتخاب شده باشد
+    if (provinceSelect.value) {
+        provinceSelect.dispatchEvent(new Event('change'));
+    }
+});
 </script>
 @include('dr.panel.profile.option.profile-option')
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dr\Panel\Profile;
 
 use Carbon\Carbon;
 use App\Models\Otp;
+use App\Models\Zone;
 use App\Models\Doctor;
 use App\Models\Specialty;
 use Illuminate\Support\Str;
@@ -366,7 +367,19 @@ class DrProfileController extends Controller
             ], 500);
         }
     }
+    public function getCities(Request $request)
+    {
+        $provinceId = $request->query('province_id');
+        if (!$provinceId) {
+            return response()->json(['success' => false, 'message' => 'شناسه استان الزامی است'], 400);
+        }
 
+        $cities = Zone::where('parent_id', $provinceId)->get(['id', 'name']);
+        return response()->json([
+            'success' => true,
+            'cities' => $cities
+        ]);
+    }
     public function updateTwoFactorAuth(Request $request)
     {
         $key      = 'update_two_factor_auth_' . $request->ip();
@@ -404,7 +417,7 @@ class DrProfileController extends Controller
 
     public function update_profile(UpdateProfileRequest $request)
     {
-        $key      = 'update_profile_' . $request->ip();
+        $key = 'update_profile_' . $request->ip();
         $response = $this->checkRateLimit($key);
         if ($response) {
             return $response;
@@ -418,6 +431,8 @@ class DrProfileController extends Controller
                 'national_code'  => $request->national_code,
                 'license_number' => $request->license_number,
                 'bio'            => $request->description,
+                'province_id'    => $request->province_id,
+                'city_id'        => $request->city_id,
             ]);
 
             $this->updateProfileCompletion($doctor);

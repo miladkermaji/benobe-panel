@@ -491,6 +491,9 @@ Route::prefix('dr')
             Route::get('activation/consult/help', [ConsultRulesController::class, 'help'])->middleware('secretary.permission:consult')->name('activation.consult.help');
             Route::get('activation/consult/messengers', [ConsultRulesController::class, 'messengers'])->middleware('secretary.permission:consult')->name('activation.consult.messengers');
             Route::get('my-performance/', [MyPerformanceController::class, 'index'])->middleware('secretary.permission:statistics')->name('dr-my-performance');
+
+            Route::get('/dr/my-performance/data', [MyPerformanceController::class, 'getPerformanceData'])->name('dr-my-performance-data');
+
             Route::get('my-performance/doctor-chart', [MyPerformanceController::class, 'chart'])->middleware('secretary.permission:statistics')->name('dr-my-performance-chart');
             Route::get('my-performance/chart-data', [MyPerformanceController::class, 'getChartData'])
                 ->name('dr-my-performance-chart-data');
@@ -589,6 +592,9 @@ Route::prefix('dr')
                 Route::get('sub-users/edit/{id}', [SubUserController::class, 'edit'])->name('dr-sub-users-edit');
                 Route::post('sub-users/update/{id}', [SubUserController::class, 'update'])->name('dr-sub-users-update');
                 Route::delete('sub-users/delete/{id}', [SubUserController::class, 'destroy'])->name('dr-sub-users-delete');
+
+                Route::get('/dr/get-cities', [DrProfileController::class, 'getCities'])->name('dr-get-cities')->middleware('auth:doctor');
+
             });
 
 
