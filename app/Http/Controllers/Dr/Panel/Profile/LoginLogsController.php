@@ -16,6 +16,8 @@ class LoginLogsController extends Controller
             return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
 
+        
+
         // دریافت لاگ‌های دکتر و منشی برای بارگذاری اولیه صفحه
         $doctorLogs = LoginLog::where('doctor_id', $doctor->id)->orderBy('login_at', 'desc')->paginate(5);
         $secretaryIds = $doctor->secretaries ? $doctor->secretaries->pluck('id')->toArray() : [];

@@ -8,6 +8,8 @@
     .myPanelOption {
       display: none;
     }
+
+  
   </style>
 @endsection
 
@@ -20,32 +22,33 @@
 
 <div class="subuser-content d-flex w-100 justify-content-center">
   <div class="subuser-content-wrapper">
-
     <!-- تاریخچه ورود منشی -->
     <div class="card">
-      <div class="card-header">📜 تاریخچه ورود منشی</div>
+      <div class="card-header">
+        <span>📜 تاریخچه ورود منشی</span>
+      </div>
       <div class="card-body" id="secretaryLogsContainer">
         @include('dr.panel.profile.partials.secretary_logs')
       </div>
     </div>
 
+    <!-- تاریخچه ورود دکتر -->
     <div class="card">
-      <div class="card-header">📜 تاریخچه ورود دکتر</div>
+      <div class="card-header">
+        <span>📜 تاریخچه ورود دکتر</span>
+      </div>
       <div class="card-body" id="doctorLogsContainer">
         @include('dr.panel.profile.partials.doctor_logs')
       </div>
     </div>
-
-
   </div>
 </div>
 @endsection
 
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   $(document).ready(function() {
     function loadLogs(page = 1) {
@@ -104,7 +107,7 @@
         url: "{{ route('dr-get-doctor-logs') }}?page=" + page,
         type: 'GET',
         success: function(response) {
-          $('#doctorLogsContainer').html(response.doctorLogsHtml); // تغییر نام متغیر به `doctorLogsHtml`
+          $('#doctorLogsContainer').html(response.doctorLogsHtml);
         }
       });
     }
@@ -114,8 +117,7 @@
         url: "{{ route('dr-get-secretary-logs') }}?page=" + page,
         type: 'GET',
         success: function(response) {
-          $('#secretaryLogsContainer').html(response
-          .secretaryLogsHtml); // تغییر نام متغیر به `secretaryLogsHtml`
+          $('#secretaryLogsContainer').html(response.secretaryLogsHtml);
         }
       });
     }
@@ -132,12 +134,9 @@
       e.preventDefault();
       let page = $(this).attr('href').split('page=')[1];
       loadSecretaryLogs(page);
-
     });
   });
 </script>
-
-
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";

@@ -1,4 +1,5 @@
 @extends('dr.panel.layouts.master')
+
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
@@ -7,52 +8,65 @@
   <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
     rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/bime/bime.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/profile/upgrade.css') }}" rel="stylesheet" />
   <style>
     .myPanelOption {
       display: none;
     }
   </style>
 @endsection
+
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
 @endsection
+
 @section('content')
-@section('bread-crumb-title', ' ارتقا حساب کربری ')
+@section('bread-crumb-title', 'ارتقا حساب کاربری')
+
 <div class="main-content">
-  <div class="container-fluid bg-white p-2">
+  <div class="container-fluid">
     <div class="user-panel-content">
-      <div class="">
-        <div class="card-header font-weight-bold"><span>ارتقاء حساب کاربری</span></div>
+      <div>
+        <div class="card-header">
+          <span>ارتقاء حساب کاربری</span>
+        </div>
         <div class="card-body">
           <div class="alert bg-light-blue">
-            <strong><i class="mdi mdi-information"></i> ارتقاء حساب کاربری!</strong>
-            <p>پزشک محترم سلام<br>
-              با ارتقا حساب کاربری خود میتوانید از خدمات ویژه سایت جهت ارائه خدمات بیشتر به کاربران به شرح زیر بهره مند
+            <strong>
+              <i class="mdi mdi-information"></i> ارتقاء حساب کاربری!
+            </strong>
+            <p>
+              پزشک محترم سلام<br>
+              با ارتقا حساب کاربری خود می‌توانید از خدمات ویژه سایت جهت ارائه خدمات بیشتر به کاربران به شرح زیر بهره‌مند
               گردید:
-              <br>
             </p>
-            <ul style="list-style: inside">
+            <ul>
               <li>دریافت تیک آبی و نمایش در لیست پزشکان تایید شده</li>
               <li>نمایش در بالای نتایج جستجو</li>
               <li>نمایش در لیست پزشکان برتر در صفحه اصلی سایت</li>
               <li>نمایش در لیست پزشکان پیشنهادی در صفحات داخلی</li>
             </ul>
-            <p></p>
           </div>
-          <div class="tarifms"><i class="fa fa-calendar"></i> <strong>مدت زمان نمایش:</strong> 90 روز</div>
-          <div class="tarifms"><i class="mdi mdi-phone"></i> <strong>هزینه</strong> 780,000 تومان</div>
+          <div class="tarifms">
+            <i class="fa fa-calendar"></i>
+            <strong>مدت زمان نمایش:</strong> 90 روز
+          </div>
+          <div class="tarifms">
+            <i class="mdi mdi-phone"></i>
+            <strong>هزینه:</strong> 780,000 تومان
+          </div>
           <div class="clrfix mb-3" style="float: right; width: 100%; margin-top: 20px">
             <form action="{{ route('doctor.upgrade.pay') }}" method="POST">
               @csrf
-              <button type="submit" class="btn btn-primary text-white h-50">
+              <button type="submit" class="btn btn-primary text-white h-50 mt-3">
                 <i class="fa fa-credit-card"></i> پرداخت و ارتقاء حساب کاربری
               </button>
             </form>
-
-
           </div>
         </div>
       </div>
+
+      <!-- جدول -->
       <div class="table-responsive w-100">
         <table class="table table-bordered table-striped">
           <thead>
@@ -77,7 +91,6 @@
                     <span class="text-danger">نامشخص</span>
                   @endif
                 </td>
-
                 <td>{{ $payment->payment_reference }}</td>
                 <td>
                   @if (!empty($payment->expires_at))
@@ -100,8 +113,6 @@
               </tr>
             @endforelse
           </tbody>
-
-
         </table>
       </div>
 
@@ -109,11 +120,11 @@
       <div class="d-flex justify-content-center mt-3">
         {{ $payments->links('pagination::bootstrap-4') }}
       </div>
-
     </div>
   </div>
 </div>
 @endsection
+
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
@@ -121,12 +132,11 @@
 <script src="{{ asset('dr-assets/panel/js/bime/bime.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-  var updateStatusAppointmentUrl =
-    "{{ route('updateStatusAppointment', ':id') }}";
+  var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
   $(function() {
-    $('.card').css({
+    $('.card-body').css({
       'width': '100%',
-      'height': '500px'
+      'height': 'auto' /* حذف ارتفاع ثابت */
     });
   });
 </script>
