@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\DoctorAppointmentConfig;
@@ -21,7 +22,12 @@ use Morilog\Jalali\Jalalian;
 
 class Doctor extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, TwoFactorAuthenticatable, Sluggable;
+    use HasApiTokens;
+    use HasFactory;
+    use HasProfilePhoto;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
+    use Sluggable;
 
     protected $table    = "doctors";
     protected $fillable = [
@@ -90,7 +96,7 @@ class Doctor extends Authenticatable
             ],
         ];
     }
-public function appointmentConfig()
+    public function appointmentConfig()
     {
         return $this->hasOne(DoctorAppointmentConfig::class);
     }
@@ -155,7 +161,10 @@ public function appointmentConfig()
     {
         return $this->hasMany(DoctorMessenger::class);
     }
-
+    public function getSpecialtyNameAttribute()
+    {
+        return $this->specialty ? $this->specialty->name : 'نامشخص';
+    }
     public function Specialty()
     {
         return $this->belongsTo(Specialty::class, 'specialty_id');
@@ -233,7 +242,7 @@ public function appointmentConfig()
         return $this->hasMany(DoctorWorkSchedule::class, 'doctor_id')->where('is_working', true);
     }
 
-   
+
 
     public function reviews()
     {
