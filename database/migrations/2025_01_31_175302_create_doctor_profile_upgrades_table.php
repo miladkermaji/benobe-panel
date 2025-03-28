@@ -17,6 +17,9 @@ return new class extends Migration {
             $table->timestamp('paid_at')->nullable(); // تاریخ پرداخت
             $table->timestamp('expires_at')->nullable(); // تاریخ انقضا
             $table->timestamps();
+            
+$table->softDeletes();
+
         });
     }
 
