@@ -282,7 +282,7 @@
               <a href="{{ route('dr-panel-tickets') }}">تیکت‌ها</a>
             </li>
             <li class="item-li i-comments">
-              <a href="#">صفحه گفتگو</a>
+              <a href="https://emr-benobe.ir/profile/doctor/{{ $user->slug }}">صفحه گفتگو</a>
             </li>
           </ul>
         </li>
