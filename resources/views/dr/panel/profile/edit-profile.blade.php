@@ -619,18 +619,6 @@
 <script src="{{ asset('dr-assets/panel/js/profile/edit-profile.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-
-  function togglePassword(inputId) {
-    const input = document.getElementById(inputId);
-    const icon = input.nextElementSibling; // آیکون کنار ورودی
-    if (input.type === 'password') {
-      input.type = 'text';
-      icon.src = 'http://127.0.0.1:8000/dr-assets/icons/hide-pass.svg'; // تغییر به آیکون "نمایش"
-    } else {
-      input.type = 'password';
-      icon.src = 'http://127.0.0.1:8000/dr-assets/icons/show-pass.svg'; // تغییر به آیکون "مخفی"
-    }
-  }
 </script>
 @include('dr.panel.profile.option.profile-option')
 
