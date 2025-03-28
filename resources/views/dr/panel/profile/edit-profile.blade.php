@@ -6,6 +6,7 @@
     .myPanelOption {
       display: none;
     }
+
   </style>
 @endsection
 @section('site-header')
