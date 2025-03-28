@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Carbon\Carbon;
@@ -11,7 +12,7 @@ class DoctorProfileUpgrade extends Model
 {
     use HasFactory;
 
-use SoftDeletes;
+    use SoftDeletes;
 
     protected $table = 'doctor_profile_upgrades';
 
