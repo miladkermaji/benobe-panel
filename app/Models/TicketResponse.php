@@ -1,10 +1,11 @@
 <?php
 namespace App\Models;
 
-use App\Models\Doctor;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Doctor;
+use App\Models\Admin\Manager;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TicketResponse extends Model
 {
@@ -13,6 +14,7 @@ class TicketResponse extends Model
     protected $fillable = [
         'ticket_id',
         'doctor_id',
+        'manager_id',
         'user_id',
         'message',
     ];
@@ -30,5 +32,9 @@ class TicketResponse extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+     public function manager()
+    {
+        return $this->belongsTo(Manager::class, 'manager_id');
     }
 }

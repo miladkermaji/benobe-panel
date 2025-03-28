@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ticket_id')->constrained('tickets')->onDelete('cascade'); // ارتباط با تیکت
             $table->foreignId('doctor_id')->nullable()->constrained('doctors')->onDelete('cascade'); // پاسخ‌دهنده پزشک
+            $table->foreignId('manager_id')->nullable()->constrained('managers')->onDelete('cascade'); // پاسخ‌دهنده پزشک
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade'); // پاسخ‌دهنده کاربر
             $table->text('message'); // متن پاسخ
             $table->timestamps();
