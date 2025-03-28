@@ -37,14 +37,14 @@ class MyPerformanceController extends Controller
         $cityStatus = !empty($doctor->city);
 
         // بررسی وضعیت ویزیت آنلاین
-        $onlineVisitEnabled = $doctor->online_visit_enabled ?? false;
+        $onlineVisitEnabled = $doctor->appointmentConfig->auto_scheduling ?? false;
 
         // تعداد نظرات (فرضی)
         $reviewsCount = $doctor->reviews()->count() ?? 0;
         $hasEnoughReviews = $reviewsCount >= 150;
 
         // وضعیت آنلاین بودن
-        $isOnline = $doctor->is_online ?? false;
+        $isOnline = $doctor->appointmentConfig->auto_scheduling ?? false;
 
         // نوبت‌دهی حضوری برای امروز
         $hasInPersonAppointmentsToday = Appointment::where('doctor_id', $doctor->id)
@@ -127,6 +127,7 @@ class MyPerformanceController extends Controller
             'clinics' => $clinicsData,
         ]);
     }
+
     /**
      * متدهای کمکی برای محاسبات (فرضی - باید منطق خودتون رو اعمال کنید)
      */

@@ -5,7 +5,6 @@
   <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/my-performance/my-performance.css') }}" rel="stylesheet" />
   <style>
-
   </style>
 @endsection
 
@@ -72,15 +71,14 @@
       url: "{{ route('dr-my-performance-data') }}",
       type: 'GET',
       success: function(response) {
-
         // پر کردن هدر
         $('#doctor-name').text(response.doctor_name);
-        $('#performance-score').text(response.performance_score);
+        $('#performance-score').text('در حال محاسبه...'); // مقدار موقت تا محاسبه کامل بشه
 
         // پر کردن کارت‌ها
         const cardsContainer = $('#performance-cards');
         cardsContainer.empty(); // پاک کردن لودینگ
-        
+
         const cards = [{
             icon: response.city_status ? 'tick' : 'cancle',
             title: `شهر محل طبابت شما ${response.city.name} تشخیص داده شده است.`,
@@ -96,15 +94,17 @@
             icon: response.online_visit_enabled ? 'tick' : 'cancle',
             title: response.online_visit_enabled ? 'ویزیت آنلاین شما فعال است.' :
               'ویزیت آنلاین خود را فعال کنید',
-            content: `
-              📈 یکی از <b>مهم‌ترین شاخص‌های رشد رتبه در به نوبه</b> فعال بودن ویزیت آنلاین درمانگران است.<br>
-              با ارائه یک راه ارتباطی گفتگوی آنلاین، به بیماران فرصت مشورت و ویزیت غیر حضوری را بدهید.<br><br>
-              بسیاری از مشاوره‌های پزشکی برای شروع یا پیگیری روند درمان نیازی به مراجعه حضوری ندارند.<br>
-              👈 <a class="mt-2 text-primary" href="{{ route('activation.consult.rules') }}" target="_blank" style="font-weight: bold; text-decoration: underline; font-size: 1.2em;">
-                برای فعالسازی ویزیت آنلاین خود کلیک کنید.
-              </a><br><br>
-              امکان غیر فعال کردن ویزیت آنلاین هرزمان که تمایل داشتید از طریق همین پنل میسر هست.
-            `
+            content: response.online_visit_enabled ?
+              'ویزیت آنلاین شما با موفقیت فعال است و بیماران می‌توانند از خدمات غیرحضوری شما استفاده کنند.' :
+              `
+      📈 یکی از <b>مهم‌ترین شاخص‌های رشد رتبه در به نوبه</b> فعال بودن ویزیت آنلاین درمانگران است.<br>
+      با ارائه یک راه ارتباطی گفتگوی آنلاین، به بیماران فرصت مشورت و ویزیت غیر حضوری را بدهید.<br><br>
+      بسیاری از مشاوره‌های پزشکی برای شروع یا پیگیری روند درمان نیازی به مراجعه حضوری ندارند.<br>
+      👈 <a class="mt-2 text-primary" href="{{ route('activation.consult.rules') }}" target="_blank" style="font-weight: bold; text-decoration: underline; font-size: 1.2em;">
+        برای فعالسازی ویزیت آنلاین خود کلیک کنید.
+      </a><br><br>
+      امکان غیر فعال کردن ویزیت آنلاین هرزمان که تمایل داشتید از طریق همین پنل میسر هست.
+    `
           },
           {
             icon: response.has_enough_reviews ? 'tick' : 'cancle',
@@ -367,6 +367,7 @@
           }
         ];
 
+        // رندر کارت‌ها
         cards.forEach(card => {
           const cardHtml = `
             <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -390,6 +391,16 @@
           `;
           cardsContainer.append(cardHtml);
         });
+
+        // محاسبه امتیاز عملکرد بر اساس تعداد تیک‌ها
+        const tickCount = cards.filter(card => card.icon === 'tick').length;
+        const scorePerTick = 10; // هر تیک 10 امتیاز
+        const totalPossibleScore = tickCount * scorePerTick;
+        const maxScore = 100; // حداکثر امتیاز ممکن
+        const performanceScore = Math.min(totalPossibleScore, maxScore); // محدود کردن به 100
+
+        // به‌روزرسانی امتیاز در UI
+        $('#performance-score').text(performanceScore);
       },
       error: function() {
         Swal.fire({

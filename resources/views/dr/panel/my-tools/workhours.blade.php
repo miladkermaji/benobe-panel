@@ -1094,73 +1094,69 @@
     toastr.success('حذف موفقیت‌آمیز');
     initializeTimepicker();
   }
-  $(document).ready(function() {
-    // تابع ذخیره‌سازی برنامه کاری
-    function saveWorkSchedule() {
-      const data = {
-        auto_scheduling: $('#appointment-toggle').is(':checked'),
-        calendar_days: parseInt($('input[name="calendar_days"]').val()) || 30,
-        online_consultation: $('#posible-appointments').is(':checked'),
-        holiday_availability: $('#posible-appointments-inholiday').is(':checked'),
-        days: {},
-        selectedClinicId: localStorage.getItem('selectedClinicId'),
+
+  function saveWorkSchedule() {
+    const data = {
+      auto_scheduling: $('#appointment-toggle').is(':checked'),
+      calendar_days: parseInt($('input[name="calendar_days"]').val()) || 30,
+      online_consultation: $('#posible-appointments').is(':checked'),
+      holiday_availability: $('#posible-appointments-inholiday').is(':checked'),
+      days: {},
+      selectedClinicId: localStorage.getItem('selectedClinicId'),
+    };
+
+    const days = ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday"];
+    days.forEach(day => {
+      const isChecked = $(`#${day}`).is(':checked');
+      const workHours = collectSlots(day);
+      data.days[day] = {
+        is_working: isChecked,
+        slots: workHours
       };
+    });
 
-      // تمام روزها را بررسی می‌کنیم، نه فقط روزهایی که تیک دارند
-      const days = ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday"];
-      days.forEach(day => {
-        const isChecked = $(`#${day}`).is(':checked');
-        const workHours = collectSlots(day); // جمع‌آوری اسلات‌ها حتی اگر تیک نداشته باشد
-        data.days[day] = {
-          is_working: isChecked,
-          slots: workHours // به‌جای work_hours مستقیم، اسلات‌ها را ارسال می‌کنیم
-        };
-      });
-
-      $.ajax({
-        url: "{{ route('dr-save-work-schedule') }}",
-        method: 'POST',
-        data: JSON.stringify(data),
-        contentType: 'application/json',
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-          toastr.success('تنظیمات ساعات کاری با موفقیت ذخیره شد.');
-          if (response.workSchedules && Array.isArray(response.workSchedules)) {
-            response.workSchedules.forEach(schedule => {
-              updateDayUI(schedule);
-            });
-          }
-        },
-        error: function(xhr) {
-          toastr.error(xhr.responseJSON?.message || 'خطا در ذخیره‌سازی ساعات کاری.');
-        }
-      });
-    }
-
-
-    // تابع جمع‌آوری برنامه کاری‌ها
-    function collectSlots(day) {
-      const slots = [];
-      $(`#morning-${day}-details .form-row`).each(function() {
-        const startTime = $(this).find('.start-time').val();
-        const endTime = $(this).find('.end-time').val();
-        const maxAppointments = $(this).find('.max-appointments').val();
-
-        if (startTime && endTime) { // فقط اسلات‌هایی که زمان شروع و پایان دارند
-          slots.push({
-            start_time: startTime,
-            end_time: endTime,
-            max_appointments: maxAppointments || 1
+    return $.ajax({ // Return the promise
+      url: "{{ route('dr-save-work-schedule') }}",
+      method: 'POST',
+      data: JSON.stringify(data),
+      contentType: 'application/json',
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      success: function(response) {
+        toastr.success('تنظیمات ساعات کاری با موفقیت ذخیره شد.');
+        if (response.workSchedules && Array.isArray(response.workSchedules)) {
+          response.workSchedules.forEach(schedule => {
+            updateDayUI(schedule);
           });
         }
-      });
-      return slots;
-    }
-    // گوش دادن به رویداد کلیک برای ذخیره‌سازی
-    $('#save-work-schedule').on('click', saveWorkSchedule);
-  });
+      },
+      error: function(xhr) {
+        toastr.error(xhr.responseJSON?.message || 'خطا در ذخیره‌سازی ساعات کاری.');
+      }
+    });
+  }
+
+
+  // تابع جمع‌آوری برنامه کاری‌ها
+  function collectSlots(day) {
+    const slots = [];
+    $(`#morning-${day}-details .form-row`).each(function() {
+      const startTime = $(this).find('.start-time').val();
+      const endTime = $(this).find('.end-time').val();
+      const maxAppointments = $(this).find('.max-appointments').val();
+
+      if (startTime && endTime) { // فقط اسلات‌هایی که زمان شروع و پایان دارند
+        slots.push({
+          start_time: startTime,
+          end_time: endTime,
+          max_appointments: maxAppointments || 1
+        });
+      }
+    });
+    return slots;
+  }
+
   $(document).on('click', '.close, .btn-secondary', function() {
     $(this).closest('.modal').modal('hide');
     // بستن مدال
@@ -1239,6 +1235,21 @@
     $('.loading-overlay').remove();
   }
   $(document).ready(function() {
+    $('#save-work-schedule').on('click', function() {
+      const submitButton = this;
+      const loader = submitButton.querySelector('.loader');
+      const buttonText = submitButton.querySelector('.button_text');
+      buttonText.style.display = 'none';
+      loader.style.display = 'block';
+
+      saveWorkSchedule().then(() => {
+        buttonText.style.display = 'block';
+        loader.style.display = 'none';
+      }).catch(() => {
+        buttonText.style.display = 'block';
+        loader.style.display = 'none';
+      });
+    });
     $('#appointment-toggle').on('change', function() {
       // Multiple methods to ensure boolean conversion
       const isAutoSchedulingEnabled = Boolean($(this).is(':checked'));
@@ -1267,43 +1278,8 @@
       });
     });
   });
-  $(document).ready(function() {
-    // تابع ذخیره‌سازی برنامه کاری
-    // تابع جمع‌آوری برنامه کاری‌ها
-    function collectSlots(day) {
-      const slots = [];
-      $(`#morning-${day}-details .form-row`).each(function() {
-        const $row = $(this);
-        const startTime = $row.find('.start-time').val();
-        const endTime = $row.find('.end-time').val();
-        const maxAppointments = $row.find('.max-appointments').val() || 1;
-        // فقط اضافه کردن برنامه کاری‌های با زمان شروع و پایان
-        if (startTime && endTime) {
-          slots.push({
-            start_time: startTime,
-            end_time: endTime,
-            max_appointments: parseInt(maxAppointments)
-          });
-        }
-      });
-      return slots;
-    }
-    $('#save-work-schedule').on('click', function() {
-      const submitButton = this;
-      const loader = submitButton.querySelector('.loader');
-      const buttonText = submitButton.querySelector('.button_text');
-      buttonText.style.display = 'none';
-      loader.style.display = 'block';
 
-      saveWorkSchedule().then(() => {
-        buttonText.style.display = 'block';
-        loader.style.display = 'none';
-      }).catch(() => {
-        buttonText.style.display = 'block';
-        loader.style.display = 'none';
-      });
-    });
-  });
+
 
   function getPersianDayName(day) {
     const dayNames = {

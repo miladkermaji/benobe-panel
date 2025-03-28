@@ -78,8 +78,8 @@
       </div>
       <hr>
       @if (isset($_GET['activation-path']) && $_GET['activation-path'] == true)
-        <div class="w-100">
-          <button class="btn btn-outline-primary w-100 h-50" tabindex="0" type="button" id=":rs:"
+        <div class="w-100 mt-3">
+          <button class="btn btn-success w-100 h-50" tabindex="0" type="button" id=":rs:"
             data-toggle="modal" data-target="#activation-modal">پایان فعالسازی<span></span></button>
         </div>
         <div class="modal fade" id="activation-modal" tabindex="-1" role="dialog"
@@ -101,7 +101,7 @@
                     پایین‌تری
                     قرار می‌گیرد.</p>
                   <p>برای هر گونه سوال یا توضیح بیشتر، لطفا با ما <a style="color: blue"
-                      href="https://newsupport.paziresh24.com/new-ticket/?department=4&amp;product=9">ارتباط</a> بگیرید.
+                      href="https://emr-benobe.ir/about">ارتباط</a> بگیرید.
                     تیم ما
                     اینجاست تا از شما در هر مرحله حمایت کند.</p>
                 </div>
