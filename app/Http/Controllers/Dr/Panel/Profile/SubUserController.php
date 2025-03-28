@@ -15,8 +15,6 @@ class SubUserController extends Controller
     {
         $doctorId = Auth::guard('doctor')->id();
         $subUsers = SubUser::with('user')->where('doctor_id', $doctorId)->get();
-
-        // دریافت کاربرانی که هنوز به عنوان ساب‌یوزر ثبت نشده‌اند
         $users = User::all();
 
         return view('dr.panel.profile.subuser', compact('subUsers', 'users'));
@@ -26,6 +24,9 @@ class SubUserController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
+        ], [
+            'user_id.required' => 'لطفاً یک کاربر را انتخاب کنید.',
+            'user_id.exists'   => 'کاربر انتخاب‌شده در سیستم وجود ندارد.',
         ]);
 
         if ($validator->fails()) {
@@ -51,19 +52,18 @@ class SubUserController extends Controller
             'message'  => 'کاربر زیرمجموعه با موفقیت اضافه شد!',
             'subUsers' => SubUser::where('doctor_id', $doctorId)->with('user')->get(),
             'users'    => User::all(),
-
         ]);
     }
 
     public function edit($id)
     {
         $subUser = SubUser::with('user')->findOrFail($id);
-        $users   = User::all(); // لیست تمام کاربران برای نمایش در سلکت
+        $users   = User::all();
 
         return response()->json([
             'id'      => $subUser->id,
             'user_id' => $subUser->user_id,
-            'users'   => $users, // این مقدار در فرانت‌اند استفاده می‌شود
+            'users'   => $users,
         ]);
     }
 
@@ -73,6 +73,9 @@ class SubUserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
+        ], [
+            'user_id.required' => 'لطفاً یک کاربر را انتخاب کنید.',
+            'user_id.exists'   => 'کاربر انتخاب‌شده در سیستم وجود ندارد.',
         ]);
 
         if ($validator->fails()) {
@@ -98,7 +101,6 @@ class SubUserController extends Controller
             'message'  => 'کاربر زیرمجموعه با موفقیت ویرایش شد!',
             'subUsers' => SubUser::where('doctor_id', $subUser->doctor_id)->with('user')->get(),
             'users'    => User::all(),
-
         ]);
     }
 

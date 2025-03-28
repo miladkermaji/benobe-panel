@@ -4,331 +4,324 @@
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/profile/subuser.css') }}" rel="stylesheet" />
-  <style>
-    .myPanelOption {
-      display: none;
-    }
-  </style>
 @endsection
 
-@section('site-header', 'به نوبه | پنل دکتر')
+@section('site-header')
+  {{ 'به نوبه | پنل دکتر' }}
+@endsection
 
 @section('content')
-@section('bread-crumb-title', ' مدیریت کاربران زیرمجموعه ')
-<!-- Modal افزودن -->
-<div class="modal fade" id="addSubUserModal" tabindex="-1" role="dialog">
+@section('bread-crumb-title', 'مدیریت کاربران زیرمجموعه')
+
+<!-- مودال افزودن کاربر زیرمجموعه -->
+<div class="modal fade" id="addSubUserModal" tabindex="-1" role="dialog" aria-labelledby="addSubUserModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content border-radius-6">
       <div class="modal-header">
-        <h5 class="modal-title">افزودن کاربر</h5>
-        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        <h5 class="modal-title" id="addSubUserModalTitle">افزودن کاربر زیرمجموعه</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
       </div>
       <div class="modal-body">
-        <form id="add-subuser-form">
+        <form id="add-subuser-form" method="post">
           @csrf
-          <div class="form-group position-relative">
+          <div class="w-100 position-relative mt-4 field-wrapper field-user_id">
             <label class="label-top-input-special-takhasos">انتخاب کاربر:</label>
-            <select name="user_id" id="user-select" class="form-control h-50 mb-3">
+            <select name="user_id" id="user-select" class="form-control h-50 w-100">
               @foreach ($users as $user)
-                <option value="{{ $user->id }}">{{ $user->first_name }} {{ $user->last_name }} --
-                  {{ $user->national_code }}
-                </option>
+                <option value="{{ $user->id }}">{{ $user->first_name }} {{ $user->last_name }} -- {{ $user->national_code }}</option>
               @endforeach
             </select>
+            <small class="text-danger error-user_id mt-1"></small>
           </div>
-          <button type="submit" class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
-            <span class="button_text">ذخیره</span>
-            <div class="loader"></div>
-          </button>
+          <div class="w-100 mt-2">
+            <button type="submit" class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+              <span class="button_text">ذخیره تغییرات</span>
+              <div class="loader"></div>
+            </button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal ویرایش -->
-<div class="modal fade" id="editSubUserModal" tabindex="-1" role="dialog">
+<!-- مودال ویرایش کاربر زیرمجموعه -->
+<div class="modal fade" id="editSubUserModal" tabindex="-1" role="dialog" aria-labelledby="editSubUserModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content border-radius-6">
       <div class="modal-header">
-        <h5 class="modal-title">ویرایش کاربر</h5>
-        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        <h5 class="modal-title" id="editSubUserModalTitle">ویرایش کاربر زیرمجموعه</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
       </div>
       <div class="modal-body">
-        <form id="edit-subuser-form">
+        <form id="edit-subuser-form" method="post">
           @csrf
           <input type="hidden" name="id" id="edit-subuser-id">
-          <div class="form-group position-relative">
+          <div class="w-100 position-relative mt-4 field-wrapper field-user_id">
             <label class="label-top-input-special-takhasos">انتخاب کاربر:</label>
-            <select name="user_id" id="edit-user-select" class="form-control h-50 mb-3"></select>
+            <select name="user_id" id="edit-user-select" class="form-control h-50 w-100"></select>
+            <small class="text-danger error-user_id mt-1"></small>
           </div>
-          <button type="submit" class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
-            <span class="button_text">ذخیره</span>
-            <div class="loader"></div>
-          </button>
+          <div class="w-100 mt-2">
+            <button type="submit" class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+              <span class="button_text">ذخیره تغییرات</span>
+              <div class="loader"></div>
+            </button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
-<div class="subuser-content w-100 d-flex justify-content-center mt-4">
-  <div class="subuser-content-wrapper p-3">
-    <div class="w-100 mt-3 d-flex justify-content-end">
-      <button class="btn btn-primary h-50 add-subuser-btn">افزودن کاربر جدید</button>
-    </div>
 
+<!-- بخش محتوا با جدول بوت‌استرپ -->
+<div class="subuser-content w-100 d-flex justify-content-center mt-4">
+  <div class="subuser-content-wrapper p-3 w-100">
+    <div class="w-100 d-flex justify-content-end">
+      <button class="btn btn-primary h-50 add-subuser-btn" id="add-subuser-btn">افزودن کاربر جدید</button>
+    </div>
     <div class="p-3">
       <h4 class="text-dark font-weight-bold">لیست کاربران زیرمجموعه</h4>
     </div>
-
-    <div class="subuser-cards mt-4">
-      @foreach ($subUsers as $subUser)
-        <div class="subuser-card p-3 w-100 d-flex justify-content-between align-items-end"
-          data-id="{{ $subUser->id }}">
-          <div>
-            <span class="d-block font-weight-bold text-dark">
-              {{ $subUser->user->first_name }} {{ $subUser->user->last_name . '--' . $subUser->user->national_code }}
-            </span>
-            <span class="font-size-13 font-weight-bold">
-              شماره موبایل: <span>{{ $subUser->user->mobile }}</span>
-              کد ملی: <span>{{ $subUser->user->national_code }}</span>
-            </span>
-          </div>
-          <div>
-            <div class="d-flex gap-4">
-              <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="{{ $subUser->id }}"><img
-                  src="{{ asset('dr-assets/icons/edit.svg') }}" alt="" srcset=""></button>
-              <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="{{ $subUser->id }}"><img
-                  src="{{ asset('dr-assets/icons/trash.svg') }}" alt="" srcset=""></button>
-            </div>
-          </div>
-        </div>
-      @endforeach
+    <div class="mt-2">
+      <table class="table table-modern table-striped table-bordered table-hover" id="subuser-list">
+        <thead>
+          <tr>
+            <th>ردیف</th>
+            <th>نام و نام خانوادگی</th>
+            <th>شماره موبایل</th>
+            <th>کدملی</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse ($subUsers as $index => $subUser)
+            <tr>
+              <td>{{ $index + 1 }}</td>
+              <td>{{ $subUser->user->first_name }} {{ $subUser->user->last_name }}</td>
+              <td>{{ $subUser->user->mobile }}</td>
+              <td>{{ $subUser->user->national_code }}</td>
+              <td>
+                <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="{{ $subUser->id }}" title="ویرایش">
+                  <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                </button>
+                <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="{{ $subUser->id }}" title="حذف">
+                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                </button>
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="5" class="text-center">شما کاربر زیرمجموعه‌ای ندارید</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
-
-
-
 @endsection
 
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('dr-assets/js/select2/select2.js') }}"></script> <!-- اسکریپت TomSelect -->
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-  var updateStatusAppointmentUrl =
-    "{{ route('updateStatusAppointment', ':id') }}";
+  var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
 </script>
 <script>
-  $(document).on('click', '.add-subuser-btn', function() {
-    $('#addSubUserModal').modal('show');
-  });
   $(document).ready(function() {
-    new TomSelect("#user-select", {
-      create: false,
-      plugins: ['clear_button']
-    });
-  })
-
-  function updateTomSelectList() {
-    // اگر قبلاً TomSelect مقداردهی شده، ابتدا آن را حذف کنیم
-    if ($("#user-select").data("tomselect")) {
-      $("#user-select")[0].tomselect.destroy();
-    }
-
-    if ($("#edit-user-select").data("tomselect")) {
-      $("#edit-user-select")[0].tomselect.destroy();
-    }
-
-    // مقداردهی مجدد بدون حذف مقادیر موجود
+    // مقداردهی اولیه TomSelect برای مودال افزودن
     new TomSelect("#user-select", {
       create: false,
       plugins: ['clear_button']
     });
 
-    new TomSelect("#edit-user-select", {
-      create: false
+    $('#add-subuser-btn').on('click', function() {
+      $('#addSubUserModal').modal('show');
     });
-  }
 
+    function updateSubUserList(subUsers) {
+      const container = $('#subuser-list tbody');
+      container.empty();
 
-
-
-
-
-  function updateSubUserList(subUsers) {
-    if (!subUsers || !Array.isArray(subUsers)) {
-      return;
-    }
-
-    $('.subuser-cards').empty();
-    subUsers.forEach(subUser => {
-      $('.subuser-cards').append(`
-            <div class="subuser-card p-3 w-100 d-flex justify-content-between align-items-end" data-id="${subUser.id}">
-                <div>
-                    <span class="d-block font-weight-bold text-dark">${subUser.user.first_name} ${subUser.user.last_name}--${subUser.user.national_code}</span>
-                    <span class="font-size-13 font-weight-bold">شماره موبایل: <span>${subUser.user.mobile}</span></span>
-                    <span class="font-size-13 font-weight-bold"> کد ملی: <span>${subUser.user.national_code}</span></span>
-                </div>
-                <div>
-                    <div class="d-flex gap-4">
-                        <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${subUser.id}"><img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="" srcset=""></button>
-                        <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${subUser.id}"><img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="" srcset=""></button>
-                    </div>
-                </div>
-            </div>
-        `);
-    });
-  }
-
-
-
-
-
-  $('#add-subuser-form').on('submit', function(e) {
-    e.preventDefault();
-    let form = $(this);
-    let button = form.find('button');
-    let loader = button.find('.loader');
-    let buttonText = button.find('.button_text');
-
-    buttonText.hide();
-    loader.show();
-
-    $.ajax({
-      url: "{{ route('dr-sub-users-store') }}",
-      method: "POST",
-      data: form.serialize(),
-      success: function(response) {
-        if (response.message) {
-          toastr.success(response.message);
-
-        }
-        $('#addSubUserModal').modal('hide');
-        updateSubUserList(response.subUsers);
-      },
-      error: function(xhr) {
-        if (xhr.responseJSON && xhr.responseJSON.error) {
-          toastr.error(xhr.responseJSON.error);
-
-        } else {
-          toastr.error('خطایی رخ داده است!');
-
-        }
-      },
-      complete: function() {
-        buttonText.show();
-        loader.hide();
-      }
-    });
-  });
-
-
-
-  $('#edit-subuser-form').on('submit', function(e) {
-    e.preventDefault();
-    let id = $('#edit-subuser-id').val();
-    let form = $(this);
-    let button = form.find('button');
-    let loader = button.find('.loader');
-    let buttonText = button.find('.button_text');
-
-    buttonText.hide();
-    loader.show();
-
-    $.ajax({
-      url: "{{ route('dr-sub-users-update', ':id') }}".replace(':id', id),
-      method: "POST",
-      data: form.serialize(),
-      success: function(response) {
-        if (response.message) {
-          toastr.success(response.message);
-
-        }
-        $('#editSubUserModal').modal('hide');
-        updateSubUserList(response.subUsers);
-      },
-      error: function(xhr) {
-        if (xhr.responseJSON && xhr.responseJSON.error) {
-          toastr.error(xhr.responseJSON.error);
-
-        } else {
-          toastr.error('خطایی در بروزرسانی رخ داد!');
-
-        }
-      },
-      complete: function() {
-        buttonText.show();
-        loader.hide();
-      }
-    });
-  });
-
-
-
-
-  $(document).on('click', '.delete-btn', function() {
-    let id = $(this).data('id');
-    Swal.fire({
-      title: 'آیا مطمئن هستید؟',
-      text: 'این عملیات قابل بازگشت نیست!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'بله',
-      cancelButtonText: 'لغو',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        $.ajax({
-          url: "{{ route('dr-sub-users-delete', ':id') }}".replace(':id', id),
-          method: 'DELETE',
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          },
-          success: function(response) {
-            toastr.success('کاربر حذف شد!')
-            updateSubUserList(response.subUsers);
-          }
+      if (subUsers.length === 0) {
+        container.append(
+          `<tr><td colspan="5" class="text-center">شما کاربر زیرمجموعه‌ای ندارید</td></tr>`
+        );
+      } else {
+        subUsers.forEach((subUser, index) => {
+          const row = `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${subUser.user.first_name} ${subUser.user.last_name}</td>
+              <td>${subUser.user.mobile}</td>
+              <td>${subUser.user.national_code}</td>
+              <td>
+                <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${subUser.id}" title="ویرایش">
+                  <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                </button>
+                <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${subUser.id}" title="حذف">
+                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                </button>
+              </td>
+            </tr>`;
+          container.append(row);
         });
       }
-    });
-  });
+    }
 
-  $(document).on('click', '.edit-btn', function() {
-    let id = $(this).data('id');
+    $('#add-subuser-form').on('submit', function(e) {
+      e.preventDefault();
+      const form = $(this);
+      const submitButton = form.find('button[type="submit"]');
+      const loader = submitButton.find('.loader');
+      const buttonText = submitButton.find('.button_text');
 
-    // دریافت اطلاعات کاربر از سرور
-    $.get("{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id), function(response) {
-      $('#edit-subuser-id').val(response.id);
+      buttonText.hide();
+      loader.show();
 
-      // از بین بردن مقدار قبلی Tom Select
-      if (window.editUserSelect) {
-        window.editUserSelect.destroy();
-      }
+      form.find('.text-danger').text('');
+      form.find('.field-wrapper').removeClass('has-error');
 
-      // مقداردهی مجدد Tom Select
-      $('#edit-user-select').html('');
-      response.users.forEach(user => {
-        let selected = user.id === response.user_id ? 'selected' : '';
-        $('#edit-user-select').append(
-          `<option value="${user.id}" ${selected}>${user.first_name} ${user.last_name} -- ${user.national_code}</option>`
-        );
+      $.ajax({
+        url: "{{ route('dr-sub-users-store') }}",
+        method: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+          toastr.success('کاربر زیرمجموعه با موفقیت اضافه شد!');
+          $('#addSubUserModal').modal('hide');
+          $('body').removeClass('modal-open');
+          $('.modal-backdrop').remove();
+          updateSubUserList(response.subUsers);
+        },
+        error: function(xhr) {
+          if (xhr.status === 422) {
+            const errors = xhr.responseJSON.errors;
+            Object.keys(errors).forEach(function(key) {
+              form.find(`.error-${key}`).text(errors[key][0]);
+              form.find(`.field-${key}`).addClass('has-error');
+            });
+          } else {
+            toastr.error('خطا در ذخیره اطلاعات!');
+          }
+        },
+        complete: function() {
+          buttonText.show();
+          loader.hide();
+        },
       });
-
-      window.editUserSelect = new TomSelect("#edit-user-select", {
-        create: false
-      });
-
-      // باز کردن مودال
-      $('#editSubUserModal').modal('show');
     });
-  });
 
+    $(document).on('click', '.edit-btn', function() {
+      const id = $(this).data('id');
 
-  // حذف کلاس‌های اضافی `modal-backdrop` هنگام بستن مودال
-  $('.modal').on('hidden.bs.modal', function() {
-    $('body').removeClass('modal-open');
-    $('.modal-backdrop').remove();
+      $.get("{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id), function(response) {
+        $('#edit-subuser-id').val(response.id);
+
+        // از بین بردن TomSelect قبلی
+        if ($("#edit-user-select").data("tomselect")) {
+          $("#edit-user-select")[0].tomselect.destroy();
+        }
+
+        // پر کردن گزینه‌ها
+        $('#edit-user-select').html('');
+        response.users.forEach(user => {
+          const selected = user.id === response.user_id ? 'selected' : '';
+          $('#edit-user-select').append(
+            `<option value="${user.id}" ${selected}>${user.first_name} ${user.last_name} -- ${user.national_code}</option>`
+          );
+        });
+
+        // مقداردهی مجدد TomSelect
+        new TomSelect("#edit-user-select", {
+          create: false,
+          plugins: ['clear_button']
+        });
+
+        $('#editSubUserModal').modal('show');
+      }).fail(function() {
+        toastr.error('خطا در دریافت اطلاعات کاربر!');
+      });
+    });
+
+    $('#edit-subuser-form').on('submit', function(e) {
+      e.preventDefault();
+      const id = $('#edit-subuser-id').val();
+      const form = $(this);
+      const submitButton = form.find('button[type="submit"]');
+      const loader = submitButton.find('.loader');
+      const buttonText = submitButton.find('.button_text');
+
+      buttonText.hide();
+      loader.show();
+
+      form.find('.text-danger').text('');
+      form.find('.field-wrapper').removeClass('has-error');
+
+      $.ajax({
+        url: "{{ route('dr-sub-users-update', ':id') }}".replace(':id', id),
+        method: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+          toastr.success('کاربر زیرمجموعه با موفقیت ویرایش شد!');
+          $('#editSubUserModal').modal('hide');
+          $('body').removeClass('modal-open');
+          $('.modal-backdrop').remove();
+          updateSubUserList(response.subUsers);
+        },
+        error: function(xhr) {
+          if (xhr.status === 422) {
+            const errors = xhr.responseJSON.errors;
+            Object.keys(errors).forEach(function(key) {
+              form.find(`.error-${key}`).text(errors[key][0]);
+              form.find(`.field-${key}`).addClass('has-error');
+            });
+          } else {
+            toastr.error('خطا در ویرایش کاربر!');
+          }
+        },
+        complete: function() {
+          buttonText.show();
+          loader.hide();
+        },
+      });
+    });
+
+    $(document).on('click', '.delete-btn', function() {
+      const id = $(this).data('id');
+
+      Swal.fire({
+        title: 'آیا مطمئن هستید؟',
+        text: 'این عمل قابل بازگشت نیست!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'بله',
+        cancelButtonText: 'لغو',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: "{{ route('dr-sub-users-delete', ':id') }}".replace(':id', id),
+            method: 'DELETE',
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+              toastr.success('کاربر زیرمجموعه با موفقیت حذف شد!');
+              updateSubUserList(response.subUsers);
+            },
+            error: function() {
+              toastr.error('خطا در حذف کاربر!');
+            },
+          });
+        }
+      });
+    });
   });
 </script>
 @endsection

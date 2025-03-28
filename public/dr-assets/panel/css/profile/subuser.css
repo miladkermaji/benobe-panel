@@ -1,17 +1,55 @@
 .subuser-content-wrapper {
- width: 900px;
- background-color: #fff;
- border-radius: 10px;
- box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    width: 900px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 .subuser-card {
- border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
 }
 .card-body {
- letter-spacing: 0 !important;
+    letter-spacing: 0 !important;
 }
 @media only screen and (max-width: 991px) {
- .subuser-content-wrapper {
-  width: 97% !important;
- }
+    .subuser-content-wrapper {
+        width: 97% !important;
+    }
+}
+.field-wrapper {
+    position: relative;
+}
+
+.field-wrapper.has-error .label-top-input-special-takhasos {
+    position: absolute;
+    bottom: 56px;
+}
+
+.field-wrapper.has-error .error-message {
+    display: block;
+}
+
+/* استایل‌های جدول */
+.table-modern th,
+.table-modern td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.table-modern .btn-sm {
+    padding: 5px;
+    margin: 0 2px;
+}
+
+.table-modern {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table-modern thead {
+    background-color: #007bff;
+    color: white;
+}
+.myPanelOption{
+  display: none;
 }
