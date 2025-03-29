@@ -596,6 +596,7 @@ Route::prefix('dr')
                 Route::get('/dr/get-cities', [DrProfileController::class, 'getCities'])->name('dr-get-cities')->middleware('auth:doctor');
 
             });
+            
 
 
         });
