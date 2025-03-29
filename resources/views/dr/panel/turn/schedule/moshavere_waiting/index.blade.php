@@ -179,13 +179,15 @@
     <div class="d-flex align-items-center m-2 gap-4">
       <div class="turning_filterWrapper__2cOOi">
         <div class="dropdown">
-          <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" aria-haspopup="true"
-            aria-expanded="true">
-            <svg xmlns="http://www.w3.org/2000/svg" id="dropIcon" width="20" height="20"
-              viewBox="0 0 24 24" fill="none">
-              <path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z" fill="#000" />
-            </svg>
-            <input class="form-check-input" type="checkbox" value="" id="select-all">
+          <button
+            class="flex items-center justify-center bg-transparent border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors bg-light w-12 h-8 focus:outline-none dropdown-toggle"
+            type="button" id="dropdownMenuButton" aria-haspopup="true" aria-expanded="true"
+            onclick="toggleDropdown()">
+            <!-- چک‌باکس -->
+            <input class="w-4 h-4 text-blue-600 border-none focus:ring-0 bg-transparent cursor-pointer"
+              type="checkbox" value="" id="select-all">
+            <!-- فاصله بین چک‌باکس و آیکون -->
+            <span class="w-2"></span>
           </button>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <ul class="dropdown-list" style="list-style-type: none; padding: 0; margin: 0;">
