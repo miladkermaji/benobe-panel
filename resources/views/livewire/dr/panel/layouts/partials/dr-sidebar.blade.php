@@ -303,8 +303,6 @@
             <li class="item-li {{ Request::routeIs('dr-my-performance-chart') ? 'is-active' : '' }}">
               <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
             </li>
-            <li class="item-li"><a href="#">گزارش نوبت‌های لغو شده</a></li>
-            <li class="item-li"><a href="#">تحلیل داده‌ها</a></li>
           </ul>
         </li>
         <!-- مدیریت محتوا (جدید) -->

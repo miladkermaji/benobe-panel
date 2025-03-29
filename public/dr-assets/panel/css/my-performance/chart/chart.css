@@ -5,31 +5,74 @@
   width: 1200px;
 }*/
 canvas {
- font-family: IRANSans !important;
- width: 100%;
- height: 400px; /* یا هر ارتفاع دیگری که مناسب است */
+    font-family: IRANSans !important;
+    width: 100%;
+    height: 400px; /* یا هر ارتفاع دیگری که مناسب است */
 }
 
 @media only screen and (max-width: 768px) {
- canvas {
-  width: 100% !important;
- }
+    canvas {
+        width: 100% !important;
+    }
 }
 .chart-container {
-  height: 350px;
-  width: 90%;
-  margin-bottom: 30px;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 15px;
-  background-color: #ffffff;
+    height: 350px;
+    margin-bottom: 30px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    background-color: #ffffff;
 }
 
 .section-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 15px;
-  text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+:root {
+    --chart-bg: #ffffff;
+    --chart-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --chart-border-radius: 12px;
+    --primary-color: #007bff;
+}
+
+.chart-content {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 10px;
+}
+
+.chart-container {
+    background: var(--chart-bg);
+    border-radius: var(--chart-border-radius);
+    box-shadow: var(--chart-shadow);
+    padding: 20px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.chart-container {
+    width: 100% !important;
 }

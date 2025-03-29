@@ -270,29 +270,15 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
             ->get();
 
-        $averageDurationByMonth = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition)
-            ->whereNotNull('duration')
-            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
-                     AVG(duration) as average_duration")
-            ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-            ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
-            ->get();
 
-        Log::info('نتایج داده‌های نمودار:', [
-            'appointments'             => $appointments->toArray(),
-            'monthlyIncome'            => $monthlyIncome->toArray(),
-            'newPatients'              => $newPatients->toArray(),
-            'appointmentStatusByMonth' => $appointmentStatusByMonth->toArray(),
-            'averageDurationByMonth'   => $averageDurationByMonth->toArray(),
-        ]);
+    
 
         return response()->json([
             'appointments'             => $appointments->isEmpty() ? [] : $appointments,
             'monthlyIncome'            => $monthlyIncome->isEmpty() ? [] : $monthlyIncome,
             'newPatients'              => $newPatients->isEmpty() ? [] : $newPatients,
             'appointmentStatusByMonth' => $appointmentStatusByMonth->isEmpty() ? [] : $appointmentStatusByMonth,
-            'averageDurationByMonth'   => $averageDurationByMonth->isEmpty() ? [] : $averageDurationByMonth,
+            
         ]);
     }
 }
