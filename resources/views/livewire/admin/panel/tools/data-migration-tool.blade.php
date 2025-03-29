@@ -346,7 +346,6 @@
    Livewire.on('toast', (message, options = {}) => {
     toastr[options.type || 'info'](message, null, {
      timeOut: options.duration || 5000,
-     closeButton: true,
      tapToDismiss: false,
      escapeHtml: false
     });
@@ -379,5 +378,28 @@
     }
    });
   });
+  document.addEventListener('livewire:init', () => {
+    Livewire.on('showDuplicateConfirm', (data) => {
+        Swal.fire({
+            title: 'رکورد تکراری شناسایی شد',
+            html: `رکورد با شناسه ${data.id} در جدول ${data.table} از قبل وجود دارد. چه عملیاتی انجام شود؟`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'جایگزین کن',
+            cancelButtonText: 'رد کن',
+            showDenyButton: true,
+            denyButtonText: 'برای همه موارد تکراری جایگزین کن',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Livewire.dispatch('handleDuplicateResponse', {action: 'replace'});
+            } else if (result.isDenied) {
+                Livewire.dispatch('handleDuplicateResponse', {action: 'replace-all'});
+            } else {
+                Livewire.dispatch('handleDuplicateResponse', {action: 'skip'});
+            }
+        });
+    });
+});
  </script>
 </div>
