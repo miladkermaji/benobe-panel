@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Tools\PaymentGateways;
 
 use Illuminate\Support\Facades\Cache;
@@ -94,7 +95,6 @@ class GatewayList extends Component
             ->orWhere('name', 'like', '%' . $this->search . '%')
             ->paginate($this->perPage) // مطمئن شو که paginate فراخوانی شده
         : null;
-
         return view('livewire.admin.panel.tools.payment-gateways.gateway-list', [
             'gateways' => $gateways,
         ]);

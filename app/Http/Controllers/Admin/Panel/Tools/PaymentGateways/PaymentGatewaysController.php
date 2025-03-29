@@ -159,4 +159,10 @@ class PaymentGatewaysController extends Controller
 
         return redirect()->route('admin.panel.tools.payment_gateways.index')->with('success', 'درگاه با موفقیت حذف شد.');
     }
+    public function create()
+    {
+        
+return view('admin.panel.tools.payment_gateways.create');
+
+    }
 }

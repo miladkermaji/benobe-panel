@@ -14,6 +14,13 @@
      <input type="text" wire:model.live="search" class="form-control rounded-pill ps-5 pe-3"
       placeholder="جستجو در پنل‌ها...">
     </div>
+      <a href="{{ route('admin.panel.tools.sms_gateways.create') }}"
+          class="btn btn-success rounded-pill px-3 py-1 d-flex align-items-center gap-2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          <span>پنل جدید</span>
+        </a>
     <span class="badge bg-white text-primary rounded-pill px-3 py-1 fw-medium">
      {{ $readyToLoad ? $gateways->total() : 0 }} پنل
     </span>

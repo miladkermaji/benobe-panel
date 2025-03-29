@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin\Panel\Tools\SmsGateway;
 
 use App\Http\Controllers\Admin\Controller;
@@ -16,5 +17,11 @@ class SmsGatewayController extends Controller
     {
         $gateway = SmsGateway::where('name', $name)->firstOrFail();
         return view('admin.panel.tools.sms-gateway.edit', compact('gateway'));
+    }
+    public function create()
+    {
+
+        return view('admin.panel.tools.sms-gateway.create');
+
     }
 }

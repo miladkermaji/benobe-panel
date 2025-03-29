@@ -203,6 +203,9 @@ Route::prefix('admin')
             Route::get('/file-manager', [FileManagerController::class, 'index'])->name('admin.panel.tools.file-manager')->middleware('auth:manager');
             Route::prefix('payment_gateways/')->group(function () {
                 Route::get('/', [PaymentGatewaysController::class, 'index'])->name('admin.panel.tools.payment_gateways.index');
+
+                Route::get('/create', [PaymentGatewaysController::class, 'create'])->name('admin.panel.tools.payment_gateways.create');
+
                 Route::get('/edit/{name}', [PaymentGatewaysController::class, 'edit'])->name('admin.panel.tools.payment_gateways.edit');
                 Route::put('/payment-gateways/{name}', [PaymentGatewaysController::class, 'update'])->name('admin.payment_gateways.update');
                 Route::post('/payment-gateways/toggle', [PaymentGatewaysController::class, 'toggle'])->name('admin.payment_gateways.toggle');
@@ -211,6 +214,9 @@ Route::prefix('admin')
             Route::prefix('sms_gateway')->group(function () {
                 Route::get('/', [SmsGatewayController::class, 'index'])->name('admin.panel.tools.sms-gateways.index');
                 Route::get('/edit/{name}', [SmsGatewayController::class, 'edit'])->name('admin.panel.tools.sms-gateways.edit');
+
+                Route::get('/create', [SmsGatewayController::class, 'create'])->name('admin.panel.tools.sms_gateways.create');
+
             });
             // روت Telescope با UI پیش‌فرض
             Route::get('/telescope', '\Laravel\Telescope\Http\Controllers\HomeController@index')->name('admin.panel.tools.telescope');
@@ -596,7 +602,7 @@ Route::prefix('dr')
                 Route::get('/dr/get-cities', [DrProfileController::class, 'getCities'])->name('dr-get-cities')->middleware('auth:doctor');
 
             });
-            
+
 
 
         });
