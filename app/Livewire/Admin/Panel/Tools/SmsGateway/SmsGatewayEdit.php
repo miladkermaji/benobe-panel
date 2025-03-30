@@ -24,7 +24,7 @@ class SmsGatewayEdit extends Component
         $this->gateway = $gateway;
         $this->title = $gateway->title;
         $this->is_active = $gateway->is_active;
-        $this->settings = $gateway->settings;
+        $this->settings = stripslashes($gateway->settings);
     }
 
     public function update()
