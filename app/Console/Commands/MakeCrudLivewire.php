@@ -96,21 +96,40 @@ class MakeCrudLivewire extends Command
     {
         $modelLower = Str::lower($model);
         $modelPlural = Str::plural($modelLower);
+        $prefixLower = Str::lower($namespacePrefix);
+
+        // مسیر ویوهای Livewire
+        $livewireViewPath = resource_path("views/livewire/{$prefixLower}/panel/{$modelPlural}");
 
         // ساخت کامپوننت List
         $this->call('make:livewire', [
-         'name' => "{$namespacePrefix}.Panel.{$modelPlural}.{$model}List",
+            'name' => "{$namespacePrefix}.Panel.{$modelPlural}.{$model}List",
         ]);
+        // حذف ویوی پیش‌فرض
+        $defaultListView = "{$livewireViewPath}/" . Str::camel("{$model}-list") . ".blade.php";
+        if (File::exists($defaultListView)) {
+            File::delete($defaultListView);
+        }
 
         // ساخت کامپوننت Create
         $this->call('make:livewire', [
-         'name' => "{$namespacePrefix}.Panel.{$modelPlural}.{$model}Create",
+            'name' => "{$namespacePrefix}.Panel.{$modelPlural}.{$model}Create",
         ]);
+        // حذف ویوی پیش‌فرض
+        $defaultCreateView = "{$livewireViewPath}/" . Str::camel("{$model}-create") . ".blade.php";
+        if (File::exists($defaultCreateView)) {
+            File::delete($defaultCreateView);
+        }
 
         // ساخت کامپوننت Edit
         $this->call('make:livewire', [
-         'name' => "{$namespacePrefix}.Panel.{$modelPlural}.{$model}Edit",
+            'name' => "{$namespacePrefix}.Panel.{$modelPlural}.{$model}Edit",
         ]);
+        // حذف ویوی پیش‌فرض
+        $defaultEditView = "{$livewireViewPath}/" . Str::camel("{$model}-edit") . ".blade.php";
+        if (File::exists($defaultEditView)) {
+            File::delete($defaultEditView);
+        }
 
         // جایگزینی محتوای کامپوننت‌ها
         $this->replaceLivewireStubs($model, $namespacePrefix);
@@ -154,68 +173,82 @@ class MakeCrudLivewire extends Command
         File::put($editPath, $editStub);
     }
 
-    protected function createViews($model, $prefix)
-    {
-        $modelLower = Str::lower($model);
-        $modelPlural = Str::plural($modelLower);
-        $prefixLower = Str::lower($prefix); // پیشوند همیشه lowercase
+   protected function createViews($model, $prefix)
+{
+    $modelLower = Str::lower($model);
+    $modelPlural = Str::plural($modelLower);
+    $prefixLower = Str::lower($prefix);
 
-        // ویوهای کنترلر
-        $viewPath = resource_path("views/{$prefixLower}/panel/{$modelPlural}");
-        File::ensureDirectoryExists($viewPath);
+    // ویوهای کنترلر
+    $viewPath = resource_path("views/{$prefixLower}/panel/{$modelPlural}");
+    File::ensureDirectoryExists($viewPath);
 
-        $indexStub = File::get(base_path('stubs/view.index.stub'));
-        $indexStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
-            $indexStub
-        );
-        File::put("{$viewPath}/index.blade.php", $indexStub);
+    $indexStub = File::get(base_path('stubs/view.index.stub'));
+    $indexStub = str_replace(
+        ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
+        [$prefixLower, $modelPlural, $modelLower],
+        $indexStub
+    );
+    File::put("{$viewPath}/index.blade.php", $indexStub);
 
-        $createStub = File::get(base_path('stubs/view.create.stub'));
-        $createStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
-            $createStub
-        );
-        File::put("{$viewPath}/create.blade.php", $createStub);
+    $createStub = File::get(base_path('stubs/view.create.stub'));
+    $createStub = str_replace(
+        ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
+        [$prefixLower, $modelPlural, $modelLower],
+        $createStub
+    );
+    File::put("{$viewPath}/create.blade.php", $createStub);
 
-        $editStub = File::get(base_path('stubs/view.edit.stub'));
-        $editStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
-            $editStub
-        );
-        File::put("{$viewPath}/edit.blade.php", $editStub);
+    $editStub = File::get(base_path('stubs/view.edit.stub'));
+    $editStub = str_replace(
+        ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
+        [$prefixLower, $modelPlural, $modelLower],
+        $editStub
+    );
+    File::put("{$viewPath}/edit.blade.php", $editStub);
 
-        // ویوهای Livewire
-        $livewireViewPath = resource_path("views/livewire/{$prefixLower}/panel/{$modelPlural}");
-        File::ensureDirectoryExists($livewireViewPath);
+    // ویوهای Livewire
+    $livewireViewPath = resource_path("views/livewire/{$prefixLower}/panel/{$modelPlural}");
+    File::ensureDirectoryExists($livewireViewPath);
 
-        $listViewStub = File::get(base_path('stubs/livewire.view.list.stub'));
-        $listViewStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
-            $listViewStub
-        );
-        File::put("{$livewireViewPath}/{$modelLower}-list.blade.php", $listViewStub);
-
-        $createViewStub = File::get(base_path('stubs/livewire.view.create.stub')); // الگوی جدید
-        $createViewStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
-            $createViewStub
-        );
-        File::put("{$livewireViewPath}/{$modelLower}-create.blade.php", $createViewStub);
-
-        $editViewStub = File::get(base_path('stubs/livewire.view.edit.stub')); // الگوی جدید
-        $editViewStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
-            $editViewStub
-        );
-        File::put("{$livewireViewPath}/{$modelLower}-edit.blade.php", $editViewStub);
+    // حذف فایل‌های camelCase احتمالی
+    $camelCaseFiles = [
+        Str::camel("{$modelLower}-list") . ".blade.php",
+        Str::camel("{$modelLower}-create") . ".blade.php",
+        Str::camel("{$modelLower}-edit") . ".blade.php",
+    ];
+    foreach ($camelCaseFiles as $file) {
+        $filePath = "{$livewireViewPath}/{$file}";
+        if (File::exists($filePath)) {
+            File::delete($filePath);
+        }
     }
+
+    // ساخت ویوهای kebab-case
+    $listViewStub = File::get(base_path('stubs/livewire.view.list.stub'));
+    $listViewStub = str_replace(
+        ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
+        [$prefixLower, $modelPlural, $modelLower],
+        $listViewStub
+    );
+    File::put("{$livewireViewPath}/{$modelLower}-list.blade.php", $listViewStub);
+
+    $createViewStub = File::get(base_path('stubs/livewire.view.create.stub'));
+    $createViewStub = str_replace(
+        ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
+        [$prefixLower, $modelPlural, $modelLower],
+        $createViewStub
+    );
+    File::put("{$livewireViewPath}/{$modelLower}-create.blade.php", $createViewStub);
+
+    $editViewStub = File::get(base_path('stubs/livewire.view.edit.stub'));
+    $editViewStub = str_replace(
+        ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
+        [$prefixLower, $modelPlural, $modelLower],
+        $editViewStub
+    );
+    File::put("{$livewireViewPath}/{$modelLower}-edit.blade.php", $editViewStub);
+}
 
     protected function appendRoutes($model, $prefix)
     {
