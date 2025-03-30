@@ -70,7 +70,6 @@
             <li class="item-li"><a href="{{ route('admin.panel.usergroups.index') }}">گروه‌های کاربری</a></li>
             <li class="item-li"><a href="#">مدیریت نقش‌ها و دسترسی‌ها</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.userblockings.index') }}">کاربران مسدود</a></li>
-            <li class="item-li"><a href="#">کاربران غیرفعال</a></li>
             <li class="item-li"><a href="#">کاربران زیرمجموعه</a></li> <!-- جدید -->
           </ul>
         </li>
