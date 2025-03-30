@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Bannertexts;
 
 use App\Models\BannerText;
@@ -81,7 +82,7 @@ class BannerTextEdit extends Component
         }
 
         // فیلتر کردن مقادیر خالی از switch_words
-        $filteredSwitchWords = array_filter($this->switch_words, fn($word) => trim($word) !== '');
+        $filteredSwitchWords = array_filter($this->switch_words, fn ($word) => trim($word) !== '');
 
         $this->bannertext->update([
             'main_text'       => $this->main_text,

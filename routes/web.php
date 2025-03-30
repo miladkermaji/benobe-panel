@@ -89,6 +89,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('usergroups')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'index'])->name('admin.panel.usergroups.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'create'])->name('admin.panel.usergroups.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'edit'])->name('admin.panel.usergroups.edit');
+        });
+
         Route::prefix('footercontents')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'index'])->name('admin.panel.footercontents.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'create'])->name('admin.panel.footercontents.create');

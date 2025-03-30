@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Bannertexts;
 
 use App\Models\BannerText;

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin\Panel\Dashboard;
 
 use App\Http\Controllers\Admin\Controller;

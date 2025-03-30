@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\ImagingCenters;
 
 use App\Models\Doctor;
@@ -10,13 +11,32 @@ use Livewire\Component;
 class ImagingCenterEdit extends Component
 {
     public $imaging_center;
-    public $doctor_id, $name, $address, $secretary_phone, $phone_number, $postal_code;
-    public $province_id, $city_id, $is_main_center, $start_time, $end_time;
-    public $description, $latitude, $longitude, $service_fee, $payment_methods;
-    public $is_active, $working_days = [], $gallery = [], $documents = [], $phone_numbers = [];
+    public $doctor_id;
+    public $name;
+    public $address;
+    public $secretary_phone;
+    public $phone_number;
+    public $postal_code;
+    public $province_id;
+    public $city_id;
+    public $is_main_center;
+    public $start_time;
+    public $end_time;
+    public $description;
+    public $latitude;
+    public $longitude;
+    public $service_fee;
+    public $payment_methods;
+    public $is_active;
+    public $working_days = [];
+    public $gallery = [];
+    public $documents = [];
+    public $phone_numbers = [];
     public $location_confirmed;
 
-    public $doctors = [], $provinces = [], $cities = [];
+    public $doctors = [];
+    public $provinces = [];
+    public $cities = [];
 
     public function mount($id)
     {

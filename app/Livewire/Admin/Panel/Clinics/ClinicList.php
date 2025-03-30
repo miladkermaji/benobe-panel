@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Clinics;
 
 use App\Models\Clinic;

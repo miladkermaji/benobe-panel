@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Tools\SiteMap;
 
 use Livewire\Component;
@@ -97,14 +98,14 @@ class SitemapManager extends Component
     }
 
     /* this run on server */
-/*     public function crawlSite()
-    {
-        $this->isCrawling = true;
-        $this->crawlProgress = 0;
-        CrawlLog::truncate();
-        CrawlSiteForSitemap::dispatch(); // نگه داشتن حالت غیرهمزمان
-        $this->dispatch('show-alert', type: 'info', message: 'پیمایش سایت در پس‌زمینه شروع شد.');
-    } */
+    /*     public function crawlSite()
+        {
+            $this->isCrawling = true;
+            $this->crawlProgress = 0;
+            CrawlLog::truncate();
+            CrawlSiteForSitemap::dispatch(); // نگه داشتن حالت غیرهمزمان
+            $this->dispatch('show-alert', type: 'info', message: 'پیمایش سایت در پس‌زمینه شروع شد.');
+        } */
 
     public function stopCrawl()
     {

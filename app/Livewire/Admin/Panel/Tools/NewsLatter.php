@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Tools;
 
 use App\Models\Admin\Tools\NewsLetter;

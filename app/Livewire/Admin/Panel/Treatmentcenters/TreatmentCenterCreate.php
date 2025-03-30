@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\TreatmentCenters;
 
 use App\Models\Doctor;
@@ -9,12 +10,23 @@ use Livewire\Component;
 
 class TreatmentCenterCreate extends Component
 {
-    public $doctor_id, $name, $address, $phone_number;
-    public $province_id, $city_id, $is_main_center = false, $start_time, $end_time;
-    public $description, $consultation_fee, $payment_methods;
+    public $doctor_id;
+    public $name;
+    public $address;
+    public $phone_number;
+    public $province_id;
+    public $city_id;
+    public $is_main_center = false;
+    public $start_time;
+    public $end_time;
+    public $description;
+    public $consultation_fee;
+    public $payment_methods;
     public $is_active = true;
 
-    public $doctors = [], $provinces = [], $cities = [];
+    public $doctors = [];
+    public $provinces = [];
+    public $cities = [];
 
     public function mount()
     {

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\TreatmentCenters;
 
 use App\Models\TreatmentCenter;
@@ -85,9 +86,9 @@ class TreatmentCenterList extends Component
         return TreatmentCenter::where('name', 'like', '%' . $this->search . '%')
             ->orWhere('description', 'like', '%' . $this->search . '%')
             ->with([
-                'doctor'   => fn($query)   => $query->select('id', 'first_name', 'last_name'),
-                'province' => fn($query) => $query->select('id', 'name'),
-                'city'     => fn($query)     => $query->select('id', 'name'),
+                'doctor'   => fn ($query) => $query->select('id', 'first_name', 'last_name'),
+                'province' => fn ($query) => $query->select('id', 'name'),
+                'city'     => fn ($query) => $query->select('id', 'name'),
             ])
             ->paginate($this->perPage);
     }

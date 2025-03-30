@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin\Panel\Tools\Redirect;
 
 use App\Http\Controllers\Admin\Controller;

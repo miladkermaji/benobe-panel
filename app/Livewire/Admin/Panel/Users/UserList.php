@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Users;
 
 use App\Models\User;

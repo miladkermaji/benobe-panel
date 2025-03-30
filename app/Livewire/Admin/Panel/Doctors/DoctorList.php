@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\doctors;
 
 use App\Models\Doctor;

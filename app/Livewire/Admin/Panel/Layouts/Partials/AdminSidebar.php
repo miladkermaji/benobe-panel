@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Layouts\Partials;
 
 use Illuminate\Support\Facades\Auth;

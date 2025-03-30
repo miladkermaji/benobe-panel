@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\TreatmentCenters;
 
 use App\Models\TreatmentCenter;

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\FooterContents;
 
 use App\Models\FooterContent;
@@ -12,8 +13,17 @@ class FooterContentEdit extends Component
     use WithFileUploads;
 
     public $footerContent;
-    public $section, $title, $description, $link_url, $link_text, $icon, $image, $order, $is_active;
-    public $current_icon, $current_image;
+    public $section;
+    public $title;
+    public $description;
+    public $link_url;
+    public $link_text;
+    public $icon;
+    public $image;
+    public $order;
+    public $is_active;
+    public $current_icon;
+    public $current_image;
 
     public function mount($id)
     {

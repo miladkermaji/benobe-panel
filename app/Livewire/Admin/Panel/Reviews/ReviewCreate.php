@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Reviews;
 
 use App\Models\Review;
@@ -10,7 +11,11 @@ class ReviewCreate extends Component
 {
     use WithFileUploads;
 
-    public $name, $comment, $image, $rating = 0, $is_approved = false;
+    public $name;
+    public $comment;
+    public $image;
+    public $rating = 0;
+    public $is_approved = false;
 
     public function store()
     {

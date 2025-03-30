@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Users;
 
 use App\Models\User;
@@ -37,9 +38,9 @@ class UserCreate extends Component
 
     public function updatedZoneProvinceId($value)
     {
-        $this->cities       = Zone::where('level', 2)->where('parent_id', $value)->get();
+        $this->cities = Zone::where('level', 2)->where('parent_id', $value)->get();
         $this->zone_city_id = null;
-        $this->dispatch('refresh-select2', cities: $this->cities->toArray());
+        $this->dispatch('refresh-select2', ['cities' => $this->cities]);
     }
 
     public function getPhotoPreviewProperty()

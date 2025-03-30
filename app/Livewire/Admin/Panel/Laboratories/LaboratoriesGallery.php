@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Laboratories;
 
 use App\Models\Laboratory;

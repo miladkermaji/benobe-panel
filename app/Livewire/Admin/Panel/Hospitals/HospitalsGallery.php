@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Hospitals;
 
 use App\Models\Hospital;

@@ -3,12 +3,12 @@
 
 @endsection
 @section('site-header')
- {{ 'به نوبه | پنل مدیریت' }}
+  {{ 'به نوبه | پنل مدیریت' }}
 @endsection
 @section('content')
 @section('bread-crumb-title', ' قالب ایمیل')
 @section('scripts')
 
- @livewire('admin.panel.tools.news-latter')
+  @livewire('admin.panel.tools.news-latter')
 
 @endsection

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\ImagingCenters;
 
 use App\Models\ImagingCenter;
@@ -87,9 +88,9 @@ class ImagingCenterList extends Component
         return ImagingCenter::where('name', 'like', '%' . $this->search . '%')
             ->orWhere('description', 'like', '%' . $this->search . '%')
             ->with([
-                'doctor'   => fn($query)   => $query->select('id', 'first_name', 'last_name'),
-                'province' => fn($query) => $query->select('id', 'name'),
-                'city'     => fn($query)     => $query->select('id', 'name'),
+                'doctor'   => fn ($query) => $query->select('id', 'first_name', 'last_name'),
+                'province' => fn ($query) => $query->select('id', 'name'),
+                'city'     => fn ($query) => $query->select('id', 'name'),
                 'galleries',
             ])
             ->paginate($this->perPage);

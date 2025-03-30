@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Tools\Telescope;
 
 use Illuminate\Support\Facades\DB;

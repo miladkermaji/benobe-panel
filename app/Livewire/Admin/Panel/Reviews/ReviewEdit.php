@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Reviews;
 
 use App\Models\Review;
@@ -12,7 +13,12 @@ class ReviewEdit extends Component
     use WithFileUploads;
 
     public $review;
-    public $name, $comment, $image, $rating, $is_approved, $current_image;
+    public $name;
+    public $comment;
+    public $image;
+    public $rating;
+    public $is_approved;
+    public $current_image;
 
     public function mount($id)
     {

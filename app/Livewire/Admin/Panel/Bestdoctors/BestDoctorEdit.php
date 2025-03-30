@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Bestdoctors;
 
 use App\Models\BestDoctor;

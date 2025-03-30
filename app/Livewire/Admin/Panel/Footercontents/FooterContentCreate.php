@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\FooterContents;
 
 use App\Models\FooterContent;
@@ -10,7 +11,15 @@ class FooterContentCreate extends Component
 {
     use WithFileUploads;
 
-    public $section, $title, $description, $link_url, $link_text, $icon, $image, $order = 0, $is_active = true;
+    public $section;
+    public $title;
+    public $description;
+    public $link_url;
+    public $link_text;
+    public $icon;
+    public $image;
+    public $order = 0;
+    public $is_active = true;
 
     public function store()
     {

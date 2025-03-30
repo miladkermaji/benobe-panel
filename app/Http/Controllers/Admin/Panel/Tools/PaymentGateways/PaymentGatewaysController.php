@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin\Panel\Tools\PaymentGateways;
 
 use App\Http\Controllers\Admin\Controller;
@@ -161,8 +162,8 @@ class PaymentGatewaysController extends Controller
     }
     public function create()
     {
-        
-return view('admin.panel.tools.payment_gateways.create');
+
+        return view('admin.panel.tools.payment_gateways.create');
 
     }
 }

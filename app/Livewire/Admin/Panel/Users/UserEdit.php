@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Users;
 
 use App\Models\User;
 use App\Models\Zone;
+use Livewire\Component;
+use Morilog\Jalali\Jalalian;
+use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Livewire\Component;
-use Livewire\WithFileUploads;
-use Morilog\Jalali\Jalalian;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class UserEdit extends Component
 {
@@ -53,14 +55,14 @@ class UserEdit extends Component
 
     public function updatedZoneProvinceId($value)
     {
-        $this->cities       = Zone::where('level', 2)->where('parent_id', $value)->get();
+        $this->cities = Zone::where('level', 2)->where('parent_id', $value)->get();
         $this->zone_city_id = null;
-        $this->dispatch('refresh-select2', cities: $this->cities->toArray());
+        $this->dispatch('refresh-select2', ['cities' => $this->cities]);
     }
 
     public function getPhotoPreviewProperty()
     {
-        return $this->photo instanceof \Livewire\TemporaryUploadedFile
+        return $this->photo instanceof TemporaryUploadedFile
         ? $this->photo->temporaryUrl()
         : ($this->user->profile_photo_path
             ? Storage::url($this->user->profile_photo_path)

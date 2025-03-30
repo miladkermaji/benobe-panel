@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire;
 
 use App\Models\Admin\Manager;
@@ -79,7 +80,7 @@ class AdminDashboard extends Component
             ->toArray();
 
         $this->clinicActivityLabels = collect(array_keys($this->clinicActivity))
-            ->map(fn($id) => 'کلینیک ' . $id)
+            ->map(fn ($id) => 'کلینیک ' . $id)
             ->all();
     }
 

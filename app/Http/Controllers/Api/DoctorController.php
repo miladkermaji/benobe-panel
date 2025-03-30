@@ -1,15 +1,17 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Appointment;
-use App\Models\BestDoctor;
-use App\Models\UserDoctorLike;
 use Carbon\Carbon;
+use App\Models\BestDoctor;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
+use App\Models\UserDoctorLike;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class DoctorController extends Controller
 {
@@ -88,7 +90,7 @@ class DoctorController extends Controller
 
             // فرمت کردن داده‌ها
             $formattedDoctors = $likedDoctors->map(function ($doctor) {
-                $like = UserDoctorLike::where('user_id', auth()->id())
+                $like = UserDoctorLike::where('user_id', Auth::guard('user')->user()->id)
                     ->where('doctor_id', $doctor->id)
                     ->first();
 
@@ -149,14 +151,14 @@ class DoctorController extends Controller
                     'doctor'       => function ($query) {
                         $query->select('id', 'first_name', 'last_name', 'specialty_id', 'profile_photo_path', 'province_id')
                             ->with([
-                                'specialty'     => fn($query)     => $query->select('id', 'name'),
-                                'province'      => fn($query)      => $query->select('id', 'name'),
-                                'workSchedules' => fn($query) => $query->where('is_working', true),
+                                'specialty'     => fn ($query) => $query->select('id', 'name'),
+                                'province'      => fn ($query) => $query->select('id', 'name'),
+                                'workSchedules' => fn ($query) => $query->where('is_working', true),
                                 'appointmentConfig',
                             ]);
                     },
-                    'hospital'     => fn($query)     => $query->select('id', 'name'),
-                    'appointments' => fn($query) => $query->where('appointments.status', 'scheduled'),
+                    'hospital'     => fn ($query) => $query->select('id', 'name'),
+                    'appointments' => fn ($query) => $query->where('appointments.status', 'scheduled'),
                 ])
                 ->select('id', 'doctor_id', 'hospital_id', 'star_rating')
                 ->when($limit !== null, function ($query) use ($limit) {
@@ -165,7 +167,7 @@ class DoctorController extends Controller
                 ->orderBy('star_rating', 'desc')
                 ->get()
                 ->groupBy('doctor_id')
-                ->map(fn($group) => $group->first());
+                ->map(fn ($group) => $group->first());
 
             // فرمت کردن داده‌ها
             $formattedDoctors = $bestDoctors->map(function ($bestDoctor) {
@@ -210,29 +212,29 @@ class DoctorController extends Controller
         }
     }
 
-  /**
-     * گرفتن لیست پزشکان جدید
-     *
-     * @queryParam limit integer تعداد آیتم‌ها (اختیاری، اگر نباشد همه برگردانده می‌شود)
-     * @response 200 {
-     *   "status": "success",
-     *   "data": [
-     *     {
-     *       "id": 1,
-     *       "name": "میلاد کرمانجی",
-     *       "specialty": "کارشناسی ارشد علوم تغذیه",
-     *       "profile_photo_url": "http://127.0.0.1:8000/admin-assets/images/default-avatar.png",
-     *       "created_at": "1403/12/28",
-     *       "province": "دیواندره"
-     *     }
-     *   ]
-     * }
-     * @response 500 {
-     *   "status": "error",
-     *   "message": "خطای سرور",
-     *   "data": null
-     * }
-     */
+    /**
+       * گرفتن لیست پزشکان جدید
+       *
+       * @queryParam limit integer تعداد آیتم‌ها (اختیاری، اگر نباشد همه برگردانده می‌شود)
+       * @response 200 {
+       *   "status": "success",
+       *   "data": [
+       *     {
+       *       "id": 1,
+       *       "name": "میلاد کرمانجی",
+       *       "specialty": "کارشناسی ارشد علوم تغذیه",
+       *       "profile_photo_url": "http://127.0.0.1:8000/admin-assets/images/default-avatar.png",
+       *       "created_at": "1403/12/28",
+       *       "province": "دیواندره"
+       *     }
+       *   ]
+       * }
+       * @response 500 {
+       *   "status": "error",
+       *   "message": "خطای سرور",
+       *   "data": null
+       * }
+       */
     public function getNewDoctors(Request $request)
     {
         try {
@@ -243,17 +245,17 @@ class DoctorController extends Controller
             $newDoctors = Cache::remember('new_doctors_' . ($limit ?? 'all'), 300, function () use ($limit) {
                 return \App\Models\Doctor::where('status', true)
                     ->with([
-                        'specialty' => fn($query) => $query->select('id', 'name'),
-                        'province'  => fn($query) => $query->select('id', 'name'),
+                        'specialty' => fn ($query) => $query->select('id', 'name'),
+                        'province'  => fn ($query) => $query->select('id', 'name'),
                     ])
                     ->orderBy('created_at', 'desc')
-                    ->when($limit, fn($query) => $query->limit($limit))
+                    ->when($limit, fn ($query) => $query->limit($limit))
                     ->get(['id', 'first_name', 'last_name', 'specialty_id', 'profile_photo_path', 'province_id', 'created_at']);
             });
 
             // فرمت کردن داده‌ها با تبدیل تاریخ شمسی
             $formattedDoctors = $newDoctors->map(function ($doctor) {
-                $jalaliDate = $doctor->created_at 
+                $jalaliDate = $doctor->created_at
                     ? \Morilog\Jalali\Jalalian::fromCarbon(Carbon::parse($doctor->created_at))->format('Y/m/d')
                     : '---';
 

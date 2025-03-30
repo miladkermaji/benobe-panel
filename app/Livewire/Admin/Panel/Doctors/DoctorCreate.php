@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Doctors;
 
 use App\Models\Doctor;
@@ -36,12 +37,11 @@ class DoctorCreate extends Component
         $this->provinces = Zone::where('level', 1)->get();
         $this->cities    = [];
     }
-
     public function updatedZoneProvinceId($value)
     {
-        $this->cities       = Zone::where('level', 2)->where('parent_id', $value)->get();
+        $this->cities = Zone::where('level', 2)->where('parent_id', $value)->get();
         $this->zone_city_id = null;
-        $this->dispatch('refresh-select2', cities: $this->cities->toArray());
+        $this->dispatch('refresh-select2', ['cities' => $this->cities]);
     }
 
     public function getPhotoPreviewProperty()

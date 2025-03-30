@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 
-
 class SmsGatewayCreate extends Component
 {
     public $name;
@@ -65,4 +64,3 @@ class SmsGatewayCreate extends Component
         return view('livewire.admin.panel.tools.sms-gateway.sms-gateway-create');
     }
 }
-

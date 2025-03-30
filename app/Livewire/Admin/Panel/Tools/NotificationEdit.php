@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Tools;
 
 use App\Jobs\Admin\Panel\Tools\SendNotificationSms;
@@ -14,8 +15,15 @@ use Morilog\Jalali\Jalalian;
 class NotificationEdit extends Component
 {
     public $notificationId;
-    public $title, $message, $type, $target_group, $single_phone, $selected_recipients = [];
-    public $is_active, $start_at, $end_at;
+    public $title;
+    public $message;
+    public $type;
+    public $target_group;
+    public $single_phone;
+    public $selected_recipients = [];
+    public $is_active;
+    public $start_at;
+    public $end_at;
     public $target_mode;
 
     public function mount($id)
@@ -40,7 +48,7 @@ class NotificationEdit extends Component
             $this->single_phone = $recipients->first()->mobile;
         } elseif ($recipients->count() > 0 && ! $notification->target_group) {
             $this->target_mode         = 'multiple';
-            $this->selected_recipients = $recipients->map(fn($r) => "{$r->recipient_type}:{$r->recipient_id}")->toArray();
+            $this->selected_recipients = $recipients->map(fn ($r) => "{$r->recipient_type}:{$r->recipient_id}")->toArray();
         } else {
             $this->target_mode = 'group';
         }
@@ -231,9 +239,9 @@ class NotificationEdit extends Component
     public function render()
     {
         $allRecipients = collect()
-            ->merge(User::all()->map(fn($u) => ['id' => "App\\Models\\User:{$u->id}", 'text' => $u->first_name . ' ' . $u->last_name . ' (بیمار)']))
-            ->merge(Doctor::all()->map(fn($d) => ['id' => "App\\Models\\Doctor:{$d->id}", 'text' => $d->name . ' (پزشک)']))
-            ->merge(Secretary::all()->map(fn($s) => ['id' => "App\\Models\\Secretary:{$s->id}", 'text' => $s->name . ' (منشی)']));
+            ->merge(User::all()->map(fn ($u) => ['id' => "App\\Models\\User:{$u->id}", 'text' => $u->first_name . ' ' . $u->last_name . ' (بیمار)']))
+            ->merge(Doctor::all()->map(fn ($d) => ['id' => "App\\Models\\Doctor:{$d->id}", 'text' => $d->name . ' (پزشک)']))
+            ->merge(Secretary::all()->map(fn ($s) => ['id' => "App\\Models\\Secretary:{$s->id}", 'text' => $s->name . ' (منشی)']));
 
         return view('livewire.admin.panel.tools.notification-edit', [
             'allRecipients' => $allRecipients,

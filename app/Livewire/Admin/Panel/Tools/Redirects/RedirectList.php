@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Tools\Redirects;
 
 use App\Models\Admin\Panel\Tools\Redirect;

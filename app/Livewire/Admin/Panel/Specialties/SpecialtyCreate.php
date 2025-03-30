@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Panel\Specialties;
 
 use App\Models\Specialty;

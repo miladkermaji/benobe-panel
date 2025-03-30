@@ -4,5 +4,5 @@
 @section('bread-crumb-title', 'ابزار مهاجرت داده‌ها')
 
 @section('content')
- @livewire('admin.panel.tools.data-migration-tool')
+  @livewire('admin.panel.tools.data-migration-tool')
 @endsection
