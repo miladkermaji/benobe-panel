@@ -62,7 +62,8 @@
                     <td>
                       <button class="btn btn-outline-danger btn-sm delete-message-btn rounded-circle"
                         onclick="deleteMessage({{ $message->id }}, this)">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24"
+                          fill="none" stroke="currentColor" stroke-width="2">
                           <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                         </svg>
                       </button>
@@ -107,13 +108,13 @@
               </select>
             </div>
             <div class="form-group position-relative mb-4 mt-3" id="specificRecipientField" style="display: none;">
-              <label class="label-top-input-special-takhasos fw-bold" for="specificRecipient">شماره موبایل گیرنده</label>
+              <label class="label-top-input-special-takhasos fw-bold" for="specificRecipient">شماره موبایل
+                گیرنده</label>
               <input type="text" id="specificRecipient" name="specific_recipient" class="form-control h-50 shadow-sm"
                 placeholder="09123456789">
             </div>
             <div class="mt-2 w-100">
-              <button type="submit"
-                class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center"
+              <button type="submit" class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center"
                 style="background: linear-gradient(to right, #2ecc71, #27ae60); border: none;">
                 <span class="button_text">ارسال</span>
                 <div class="loader" style="display: none;"></div>
@@ -351,7 +352,8 @@
                         <td>${recipientText}</td>
                         <td>
                             <button class="btn btn-outline-danger btn-sm delete-message-btn rounded-circle" onclick="deleteMessage(${message.id}, this)">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                 <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+     stroke="currentColor" stroke-width="2">
                                     <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                                 </svg>
                             </button>
