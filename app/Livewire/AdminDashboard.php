@@ -86,8 +86,6 @@ class AdminDashboard extends Component
 
     public function render()
     {
-        return view('livewire.admin-dashboard')
-            ->extends('admin.panel.layouts.master')
-            ->section('content');
+        return view('livewire.admin-dashboard');
     }
 }
