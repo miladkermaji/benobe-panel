@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin\Panel\Tools\SiteMap;
 
 use App\Http\Controllers\Admin\Controller;
@@ -14,7 +15,7 @@ class SitemapSettingsController extends Controller
         if (! $settings) {
             $settings = SitemapSetting::create([
                 'base_url'               => 'https://emr-benobe.ir', // پیش‌فرض دلخواه
-                'maximum_depth'          => 10,
+                'maximum_depth'          => 1000,
                 'total_crawl_limit'      => 100,
                 'delay_between_requests' => 1000,
                 'ignore_robots'          => true,
