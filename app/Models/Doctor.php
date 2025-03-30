@@ -2,23 +2,24 @@
 
 namespace App\Models;
 
-use App\Models\DoctorAppointmentConfig;
-use App\Models\Doctors\DoctorManagement\DoctorTariff;
+use App\Models\Zone;
+use App\Models\SubUser;
 use App\Models\DoctorTag;
-use App\Models\DoctorWorkSchedule;
 use App\Models\Secretary;
 use App\Models\Specialty;
+use Morilog\Jalali\Jalalian;
 use App\Models\UserDoctorLike;
-use App\Models\Zone;
+use Laravel\Sanctum\HasApiTokens;
+use App\Models\DoctorWorkSchedule;
+use Laravel\Jetstream\HasProfilePhoto;
+use App\Models\DoctorAppointmentConfig;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Notifications\Notifiable;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use App\Models\Doctors\DoctorManagement\DoctorTariff;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
-use Laravel\Sanctum\HasApiTokens;
-use Morilog\Jalali\Jalalian;
 
 class Doctor extends Authenticatable
 {
@@ -145,7 +146,11 @@ class Doctor extends Authenticatable
     {
         return $this->belongsTo(Zone::class, 'city_id');
     }
-
+    // رابطه با کاربران زیرمجموعه
+    public function subUsers()
+    {
+        return $this->hasMany(SubUser::class);
+    }
     public function academicDegree()
     {
         return $this->belongsTo(AcademicDegree::class, 'academic_degree_id');
