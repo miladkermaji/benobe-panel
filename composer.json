@@ -27,6 +27,7 @@
         "predis/predis": "^2.3",
         "shetabit/payment": "^6.1",
         "spatie/crawler": "^8.4",
+        "spatie/laravel-permission": "^6.16",
         "spatie/laravel-sitemap": "^7.3",
         "tymon/jwt-auth": "^2.2"
     },
