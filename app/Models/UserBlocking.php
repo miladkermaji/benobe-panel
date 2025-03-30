@@ -1,22 +1,36 @@
 <?php
+
 namespace App\Models;
 
-use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Admin\Manager;
 use Illuminate\Database\Eloquent\Model;
 
 class UserBlocking extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id',
         'doctor_id',
+        'manager_id',
         'clinic_id',
         'blocked_at',
         'unblocked_at',
         'reason',
         'status',
+        'is_notified',
+    ];
+
+    // تعریف فیلدهای تاریخ برای تبدیل خودکار به Carbon
+    protected $dates = [
+        'blocked_at',
+        'unblocked_at',
+    ];
+
+    // یا استفاده از casts در لاراول 9 و بالاتر
+    protected $casts = [
+        'blocked_at' => 'datetime',
+        'unblocked_at' => 'datetime',
+        'status' => 'boolean',
+        'is_notified' => 'boolean',
     ];
 
     public function user()
@@ -29,4 +43,13 @@ class UserBlocking extends Model
         return $this->belongsTo(Doctor::class);
     }
 
+    public function manager()
+    {
+        return $this->belongsTo(Manager::class);
+    }
+
+    public function clinic()
+    {
+        return $this->belongsTo(Clinic::class);
+    }
 }

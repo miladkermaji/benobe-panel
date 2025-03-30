@@ -89,6 +89,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('userblockings')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'index'])->name('admin.panel.userblockings.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'create'])->name('admin.panel.userblockings.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'edit'])->name('admin.panel.userblockings.edit');
+        });
+
         Route::prefix('usergroups')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'index'])->name('admin.panel.usergroups.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'create'])->name('admin.panel.usergroups.create');
