@@ -3,6 +3,7 @@
 namespace App\CrawlObservers;
 
 use Psr\Http\Message\UriInterface;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Psr\Http\Message\ResponseInterface;
 use App\Models\Admin\Panel\Tools\CrawlLog;
@@ -19,14 +20,14 @@ class SitemapCrawler extends CrawlObserver
             'url' => $urlString,
             'status' => 'pending',
         ]);
-        \Log::info('Will crawl: ' . $urlString . ' - Link text: ' . ($linkText ?? 'No link text'));
+        Log::info('Will crawl: ' . $urlString . ' - Link text: ' . ($linkText ?? 'No link text'));
     }
 
     public function crawled(UriInterface $url, ResponseInterface $response, ?UriInterface $foundOnUrl = null, ?string $linkText = null): void
     {
         $urlString = (string) $url;
         $log = CrawlLog::where('url', $urlString)->firstOrFail();
-        \Log::info('Crawling: ' . $urlString . ' - Status: ' . $response->getStatusCode() . ' - Found on: ' . ($foundOnUrl ? (string) $foundOnUrl : 'None'));
+        Log::info('Crawling: ' . $urlString . ' - Status: ' . $response->getStatusCode() . ' - Found on: ' . ($foundOnUrl ? (string) $foundOnUrl : 'None'));
         if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 400) { // فقط کدهای موفق (200-399)
             SitemapUrl::updateOrCreate(
                 ['url' => $urlString],
@@ -53,7 +54,7 @@ class SitemapCrawler extends CrawlObserver
     {
         $urlString = (string) $url;
         $log = CrawlLog::where('url', $urlString)->firstOrFail();
-        \Log::error('Crawl failed for: ' . $urlString . ' - Error: ' . $requestException->getMessage() . ' - Found on: ' . ($foundOnUrl ? (string) $foundOnUrl : 'None'));
+        Log::error('Crawl failed for: ' . $urlString . ' - Error: ' . $requestException->getMessage() . ' - Found on: ' . ($foundOnUrl ? (string) $foundOnUrl : 'None'));
         $log->update([
             'status' => 'failed',
             'message' => $requestException->getMessage(),

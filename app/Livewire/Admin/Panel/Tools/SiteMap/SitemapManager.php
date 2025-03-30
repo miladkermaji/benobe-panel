@@ -1,12 +1,13 @@
 <?php
 namespace App\Livewire\Admin\Panel\Tools\SiteMap;
 
-use App\Jobs\Admin\Panel\Tools\CrawlSiteForSitemap;
-use App\Models\Admin\Panel\Tools\CrawlLog;
-use App\Models\Admin\Panel\Tools\SitemapUrl;
 use Livewire\Component;
 use Spatie\Sitemap\Sitemap;
+use Illuminate\Support\Facades\Log;
+use App\Models\Admin\Panel\Tools\CrawlLog;
+use App\Models\Admin\Panel\Tools\SitemapUrl;
 use Spatie\Sitemap\Tags\Url as SitemapUrlTag;
+use App\Jobs\Admin\Panel\Tools\CrawlSiteForSitemap;
 
 class SitemapManager extends Component
 {
@@ -147,7 +148,7 @@ class SitemapManager extends Component
         $this->crawlProgress = $total > 0 ? ($processed / $total) * 100 : 0;
         $this->crawlLogs     = CrawlLog::orderBy('created_at', 'desc')->get()->toArray();
 
-        \Log::info('Crawl Progress Update - Total: ' . $total . ' - Processed: ' . $processed . ' - Crawled: ' . $crawled . ' - Pending: ' . ($total - $processed) . ' - Progress: ' . $this->crawlProgress);
+        Log::info('Crawl Progress Update - Total: ' . $total . ' - Processed: ' . $processed . ' - Crawled: ' . $crawled . ' - Pending: ' . ($total - $processed) . ' - Progress: ' . $this->crawlProgress);
 
         if ($this->crawlProgress >= 100 && $this->isCrawling) {
             $this->isCrawling = false;
