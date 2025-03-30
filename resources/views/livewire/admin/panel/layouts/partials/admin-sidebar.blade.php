@@ -43,7 +43,6 @@
       <li class="item-li"><a href="{{ route('admin.tools.data-migration.index') }}">انتقال داده‌ها</a></li>
       <li class="item-li"><a href="{{ route('admin.panel.tools.payment_gateways.index') }}">درگاه پرداخت</a></li>
       <li class="item-li"><a href="{{ route('admin.panel.tools.sms-gateways.index') }}">پیامک</a></li>
-      <li class="item-li"><a href="#">پیامک گروهی</a></li>
       <li class="item-li"><a href="{{ route('admin.panel.tools.telescope') }}">تلسکوپ</a></li>
       <li class="item-li"><a href="{{ route('admin.panel.tools.redirects.index') }}">ابزار ریدایرکت</a></li>
       <li class="item-li"><a href="{{ route('admin.tools.sitemap.index') }}">نقشه سایت</a></li>
@@ -51,10 +50,6 @@
       <li class="item-li"><a href="{{ route('admin.panel.tools.mail-template.index') }}">قالب ایمیل</a></li>
       <li class="item-li"><a href="{{ route('admin.tools.news-latter.index') }}">خبرنامه</a></li>
       <li class="item-li"><a href="{{ route('admin.panel.tools.notifications.index') }}">مدیریت اعلان‌ها</a></li>
-      <li class="item-li"><a href="#">تحلیل گوگل آنالیتیکس</a></li>
-      <li class="item-li"><a href="#">تنظیمات چت آنلاین</a></li>
-      <li class="item-li"><a href="#">احراز هویت دو مرحله‌ای</a></li>
-      <li class="item-li"><a href="#">لاگ فعالیت‌ها</a></li>
      </ul>
     </li>
     <!-- مدیریت کاربران -->
