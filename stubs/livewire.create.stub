@@ -5,12 +5,27 @@ namespace {{namespace}};
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 use App\Models\{{model}};
+use Livewire\WithFileUploads;
 
 class {{class}} extends Component
 {
+    use WithFileUploads;
+
     public $name;
     public $description;
     public $status = true;
+    public $photo;
+    public $photoPreview;
+
+    public function mount()
+    {
+        $this->photoPreview = asset('default-avatar.png'); // پیش‌فرض
+    }
+
+    public function updatedPhoto()
+    {
+        $this->photoPreview = $this->photo->temporaryUrl();
+    }
 
     public function store()
     {
@@ -18,10 +33,12 @@ class {{class}} extends Component
             'name' => $this->name,
             'description' => $this->description,
             'status' => $this->status,
+            'photo' => $this->photo,
         ], [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
             'status' => 'required|boolean',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -29,11 +46,17 @@ class {{class}} extends Component
             return;
         }
 
-        {{model}}::create([
+        $data = [
             'name' => $this->name,
             'description' => $this->description,
             'status' => $this->status,
-        ]);
+        ];
+
+        if ($this->photo) {
+            $data['photo'] = $this->photo->store('photos', 'public');
+        }
+
+        {{model}}::create($data);
 
         $this->dispatch('show-alert', type: 'success', message: '{{modelLower}} با موفقیت ایجاد شد!');
         return redirect()->route('{{prefix}}.panel.{{modelPlural}}.index');
