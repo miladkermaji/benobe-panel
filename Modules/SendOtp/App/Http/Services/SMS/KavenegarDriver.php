@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\SendOtp\App\Http\Services\SMS;
 
 use Kavenegar\KavenegarApi;
@@ -36,21 +37,21 @@ class KavenegarDriver implements SmsDriverInterface
         }
     }
 
-   public function sendMessage($message, $senderNumber, $recipientNumbers)
-{
-    try {
-        $receptors = is_array($recipientNumbers) ? $recipientNumbers : [$recipientNumbers];
-        Log::info('درخواست ارسال به کاوه‌نگار', [
-            'sender'    => $senderNumber,
-            'receptors' => $receptors,
-            'message'   => $message,
-        ]);
-        $result = $this->api->Send($senderNumber, $receptors, $message);
-        Log::info('Kavenegar message sent', ['result' => $result]);
-        return json_encode($result);
-    } catch (\Exception $e) {
-        Log::error('Kavenegar message error', ['error' => $e->getMessage()]);
-        return json_encode(['error' => $e->getMessage()]);
+    public function sendMessage($message, $senderNumber, $recipientNumbers)
+    {
+        try {
+            $receptors = is_array($recipientNumbers) ? $recipientNumbers : [$recipientNumbers];
+            Log::info('درخواست ارسال به کاوه‌نگار', [
+                'sender'    => $senderNumber,
+                'receptors' => $receptors,
+                'message'   => $message,
+            ]);
+            $result = $this->api->Send($senderNumber, $receptors, $message);
+            Log::info('Kavenegar message sent', ['result' => $result]);
+            return json_encode($result);
+        } catch (\Exception $e) {
+            Log::error('Kavenegar message error', ['error' => $e->getMessage()]);
+            return json_encode(['error' => $e->getMessage()]);
+        }
     }
-}
 }

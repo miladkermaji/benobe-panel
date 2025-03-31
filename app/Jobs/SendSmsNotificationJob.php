@@ -41,12 +41,6 @@ class SendSmsNotificationJob implements ShouldQueue
             $chunks = array_chunk($this->recipients, 10);
             $delay = 0;
 
-            $jalaliSendDateTime = $this->sendDateTime
-                ? \Morilog\Jalali\Jalalian::fromDateTime(
-                    \Carbon\Carbon::parse($this->sendDateTime)
-                )->format('Y/m/d H:i:s')
-                : \Morilog\Jalali\Jalalian::now()->format('Y/m/d H:i:s');
-
             $activeGateway = SmsGateway::where('is_active', true)->first();
             $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
 
@@ -55,29 +49,36 @@ class SendSmsNotificationJob implements ShouldQueue
                     $user = User::where('mobile', $recipient)->first();
                     $userFullName = $user ? ($user->first_name . ' ' . $user->last_name) : 'کاربر گرامی';
 
-                    $smsService = new MessageService(
-                        SmsService::createMessage(
-                            $this->message,
-                            [$recipient],
-                            null,
-                            $jalaliSendDateTime
-                        )
-                    );
+                    // تشخیص نوع پیام (OTP یا معمولی)
+                    $isOtp = $this->templateId && !empty($this->params);
 
-                    // تنظیم مستقیم پراپرتی‌ها
-                    if ($gatewayName === 'pishgamrayan' && $this->templateId) {
-                        $smsService->message->otpId = $this->templateId;
-                        $smsService->message->parameters = $this->params;
+                    if ($isOtp) {
+                        // ارسال به صورت OTP
+                        $smsService = new MessageService(
+                            SmsService::createOtp(
+                                $this->params,
+                                [$recipient],
+                                $this->templateId,
+                                $this->sendDateTime
+                            )
+                        );
                     } else {
-                        $smsService->message->otpId = null;
-                        $smsService->message->parameters = [];
+                        // ارسال پیام معمولی
+                        $smsService = new MessageService(
+                            SmsService::createMessage(
+                                $this->message,
+                                [$recipient],
+                                null,
+                                $this->sendDateTime
+                            )
+                        );
                     }
 
                     $response = $smsService->send();
 
-                    Log::info('پیامک با موفقیت ارسال شد', [
+                    Log::info('پیامک ارسال شد', [
                         'recipient' => $recipient,
-                        'message' => $this->message,
+                        'type' => $isOtp ? 'OTP' : 'معمولی',
                         'template_id' => $this->templateId,
                         'gateway' => $gatewayName,
                         'response' => $response,
