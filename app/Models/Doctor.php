@@ -267,6 +267,10 @@ class Doctor extends Authenticatable
     {
         return $this->hasMany(DoctorTag::class);
     }
+     public function comments()
+    {
+        return $this->hasMany(DoctorComment::class);
+    }
 
     public function insurances()
     {
