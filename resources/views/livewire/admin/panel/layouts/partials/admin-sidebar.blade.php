@@ -91,11 +91,8 @@
             <li class="item-li"><a href="{{ route('admin.panel.bestdoctors.index') }}"> پزشک برتر</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.doctordocuments.index') }}">تأیید مدارک</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.doctorspecialties.index') }}">تخصص های پزشک</a></li>
-            <li class="item-li"><a href="#">برنامه کاری پزشکان</a></li>
-            <li class="item-li"><a href="#">پروفایل پزشکان</a></li>
             <li class="item-li"><a href="#">نظرات بیماران</a></li>
-            <li class="item-li"><a href="#">پزشکان غیرفعال</a></li>
-            <li class="item-li"><a href="#">ارتقا حساب پزشکان</a></li> <!-- جدید -->
+            <li class="item-li"><a href="#">ارتقا حساب پزشکان</a></li> 
           </ul>
         </li>
         <!-- مدیریت منشی‌ها -->

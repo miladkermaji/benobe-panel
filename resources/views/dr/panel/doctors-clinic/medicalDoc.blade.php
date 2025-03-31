@@ -17,3 +17,6 @@
     @section('bread-crumb-title', 'مدارک من')
     @livewire('dr.panel.doctors.doctor-documents', ['doctorId' => $doctorId])
 @endsection
+@section('scripts')
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+@endsection
