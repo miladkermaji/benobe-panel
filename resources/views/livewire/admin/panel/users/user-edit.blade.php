@@ -162,14 +162,12 @@
     .form-label {
       position: absolute;
       top: -25px;
-      /* همیشه بالا باشه */
       right: 15px;
       color: #374151;
       font-size: 12px;
       background: #ffffff;
       padding: 0 5px;
       transition: none;
-      /* حذف انیمیشن */
       pointer-events: none;
     }
 
@@ -294,26 +292,23 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // مقداردهی اولیه Select2
       // تابع برای مقداردهی اولیه یا به‌روزرسانی Select2
       function initializeSelect2() {
         $('#zone_province_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
-
           width: '100%'
         });
 
         $('#zone_city_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
-
-          width: '100%',
-          data: [{
-            id: '',
-            text: 'انتخاب کنید'
-          }]
+          width: '100%'
         });
+
+        // تنظیم مقادیر اولیه هنگام لود صفحه
+        $('#zone_province_id').val(@json($zone_province_id)).trigger('change');
+        $('#zone_city_id').val(@json($zone_city_id)).trigger('change');
       }
 
       // بارگذاری اولیه
@@ -326,7 +321,6 @@
         $('#zone_city_id').empty().select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
-
           width: '100%',
           data: [{
               id: '',
@@ -338,6 +332,8 @@
             }))
           ]
         });
+        // تنظیم مقدار انتخاب‌شده شهر بعد از رفرش
+        $('#zone_city_id').val(@json($zone_city_id)).trigger('change');
       });
 
       // همگام‌سازی با Livewire
@@ -348,6 +344,7 @@
       $('#zone_city_id').on('change', function() {
         @this.set('zone_city_id', $(this).val());
       });
+
       // دیت‌پیکر JalaliDatePicker
       jalaliDatepicker.startWatch({
         minDate: "attr",
@@ -371,6 +368,11 @@
       // نمایش توستر
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
+      });
+
+      // بازسازی Select2 بعد از هر آپدیت Livewire
+      document.addEventListener('livewire:updated', function() {
+        initializeSelect2();
       });
     });
   </script>

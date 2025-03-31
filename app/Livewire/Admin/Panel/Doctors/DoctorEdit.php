@@ -35,27 +35,34 @@ class DoctorEdit extends Component
     public $provinces = [];
     public $cities    = [];
 
-    public function mount($id)
-    {
-        $this->doctor        = Doctor::findOrFail($id);
-        $this->first_name    = $this->doctor->first_name;
-        $this->last_name     = $this->doctor->last_name;
-        $this->email         = $this->doctor->email;
-        $this->mobile        = $this->doctor->mobile;
-        $this->national_code = $this->doctor->national_code;
-        $this->date_of_birth = $this->doctor->date_of_birth
+   public function mount($id)
+{
+    $this->doctor = Doctor::findOrFail($id);
+    $this->first_name = $this->doctor->first_name;
+    $this->last_name = $this->doctor->last_name;
+    $this->email = $this->doctor->email;
+    $this->mobile = $this->doctor->mobile;
+    $this->national_code = $this->doctor->national_code;
+    $this->date_of_birth = $this->doctor->date_of_birth
         ? Jalalian::fromCarbon(\Carbon\Carbon::parse($this->doctor->date_of_birth))->format('Y/m/d')
         : null;
-        $this->sex              = $this->doctor->sex;
-        $this->status           = $this->doctor->status;
-        $this->zone_province_id = $this->doctor->zone_province_id;
-        $this->zone_city_id     = $this->doctor->zone_city_id;
-        $this->appointment_fee  = $this->doctor->appointment_fee;
-        $this->visit_fee        = $this->doctor->visit_fee;
+    $this->sex = $this->doctor->sex;
+    $this->status = $this->doctor->status;
+    $this->zone_province_id = $this->doctor->province->id;
+    $this->zone_city_id = $this->doctor->city->id;
+    $this->appointment_fee = $this->doctor->appointment_fee;
+    $this->visit_fee = $this->doctor->visit_fee;
 
-        $this->provinces = Zone::where('level', 1)->get();
-        $this->cities    = Zone::where('level', 2)->where('parent_id', $this->zone_province_id)->get();
-    }
+    // دیباگ
+    Log::info('Doctor Data Loaded', [
+        'id' => $id,
+        'zone_province_id' => $this->doctor->zone_province_id,
+        'zone_city_id' => $this->doctor->zone_city_id,
+    ]);
+
+    $this->provinces = Zone::where('level', 1)->get();
+    $this->cities = Zone::where('level', 2)->where('parent_id', $this->zone_province_id)->get();
+}
 
     public function updatedZoneProvinceId($value)
     {

@@ -217,12 +217,10 @@
     }
 
     @keyframes bounce {
-
       0%,
       100% {
         transform: translateY(0);
       }
-
       50% {
         transform: translateY(-5px);
       }
@@ -291,72 +289,91 @@
     }
   </style>
 
-  <script>
+<script>
     document.addEventListener('livewire:init', function() {
-      function initializeSelect2() {
-        $('#zone_province_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%'
-        });
-        $('#zone_city_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%',
-          data: [{
-            id: '',
-            text: 'انتخاب کنید'
-          }]
-        });
-      }
-      initializeSelect2();
+        function initializeSelect2() {
+            $('#zone_province_id').select2({
+                dir: 'rtl',
+                placeholder: 'انتخاب کنید',
+                width: '100%'
+            });
+            $('#zone_city_id').select2({
+                dir: 'rtl',
+                placeholder: 'انتخاب کنید',
+                width: '100%'
+            });
 
-      Livewire.on('refresh-select2', (event) => {
-        const cities = event.cities || [];
-        $('#zone_city_id').select2('destroy');
-        $('#zone_city_id').empty().select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%',
-          data: [{
-              id: '',
-              text: 'انتخاب کنید'
-            },
-            ...cities.map(city => ({
-              id: city.id,
-              text: city.name
-            }))
-          ]
-        });
-      });
+            // تنظیم مقادیر اولیه هنگام لود صفحه
+            const provinceId = @json($zone_province_id);
+            const cityId = @json($zone_city_id);
 
-      $('#zone_province_id').on('change', function() {
-        @this.set('zone_province_id', $(this).val());
-      });
-      $('#zone_city_id').on('change', function() {
-        @this.set('zone_city_id', $(this).val());
-      });
+            console.log('Initial province_id:', provinceId);
+            console.log('Initial city_id:', cityId);
 
-      jalaliDatepicker.startWatch({
-        minDate: "attr",
-        maxDate: "attr",
-        showTodayBtn: true,
-        showEmptyBtn: true,
-        time: false,
-        dateFormatter: function(unix) {
-          return new Date(unix).toLocaleDateString('fa-IR', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-          });
+            $('#zone_province_id').val(provinceId || '').trigger('change');
+            $('#zone_city_id').val(cityId || '').trigger('change');
         }
-      });
 
+        // اجرای اولیه Select2
+        initializeSelect2();
 
+        // رفرش Select2 وقتی شهرها تغییر می‌کنند
+        Livewire.on('refresh-select2', (event) => {
+            const cities = event.cities || [];
+            $('#zone_city_id').select2('destroy');
+            $('#zone_city_id').empty().select2({
+                dir: 'rtl',
+                placeholder: 'انتخاب کنید',
+                width: '100%',
+                data: [{
+                    id: '',
+                    text: 'انتخاب کنید'
+                },
+                ...cities.map(city => ({
+                    id: city.id,
+                    text: city.name
+                }))]
+            });
+            const cityId = @json($zone_city_id);
+            console.log('Refreshed city_id:', cityId);
+            $('#zone_city_id').val(cityId || '').trigger('change');
+        });
 
-      Livewire.on('show-alert', (event) => {
-        toastr[event.type](event.message);
-      });
+        // همگام‌سازی با تغییرات کاربر
+        $('#zone_province_id').on('change', function() {
+            @this.set('zone_province_id', $(this).val());
+        });
+        $('#zone_city_id').on('change', function() {
+            @this.set('zone_city_id', $(this).val());
+        });
+
+        // دیت‌پیکر JalaliDatePicker
+        jalaliDatepicker.startWatch({
+            minDate: "attr",
+            maxDate: "attr",
+            showTodayBtn: true,
+            showEmptyBtn: true,
+            time: false,
+            dateFormatter: function(unix) {
+                return new Date(unix).toLocaleDateString('fa-IR', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+        });
+
+        document.getElementById('date_of_birth').addEventListener('change', function() {
+            @this.set('date_of_birth', this.value);
+        });
+
+        Livewire.on('show-alert', (event) => {
+            toastr[event.type](event.message);
+        });
+
+        document.addEventListener('livewire:updated', function () {
+            initializeSelect2();
+        });
     });
-  </script>
+</script>
 </div>

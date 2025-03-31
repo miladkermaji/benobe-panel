@@ -221,9 +221,17 @@
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
+
+        // تنظیم مقادیر اولیه هنگام لود صفحه
+        $('#user_id').val(@json($user_id)).trigger('change');
+        $('#doctor_id').val(@json($doctor_id)).trigger('change');
+        $('#clinic_id').val(@json($clinic_id)).trigger('change');
       }
+
+      // اجرای اولیه Select2
       initializeSelect2();
 
+      // همگام‌سازی با تغییرات کاربر
       $('#user_id').on('change', function() {
         @this.set('user_id', $(this).val());
       });
@@ -234,6 +242,7 @@
         @this.set('clinic_id', $(this).val());
       });
 
+      // دیت‌پیکر JalaliDatePicker
       jalaliDatepicker.startWatch({
         minDate: "attr",
         maxDate: "attr",
@@ -256,8 +265,14 @@
         @this.set('unblocked_at', this.value);
       });
 
+      // نمایش توستر
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
+      });
+
+      // بازسازی Select2 بعد از هر آپدیت Livewire
+      document.addEventListener('livewire:updated', function () {
+        initializeSelect2();
       });
     });
   </script>

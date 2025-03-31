@@ -90,6 +90,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('doctorspecialties')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorSpecialty\DoctorSpecialtyController::class, 'index'])->name('admin.panel.doctorspecialties.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorSpecialty\DoctorSpecialtyController::class, 'create'])->name('admin.panel.doctorspecialties.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorSpecialty\DoctorSpecialtyController::class, 'edit'])->name('admin.panel.doctorspecialties.edit');
+        });
+
         Route::prefix('doctordocuments')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'index'])->name('admin.panel.doctordocuments.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'create'])->name('admin.panel.doctordocuments.create');

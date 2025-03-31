@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Doctor;
@@ -39,5 +40,11 @@ class DoctorSpecialty extends Model
     public function specialty()
     {
         return $this->belongsTo(Specialty::class);
+    }
+    public function academicDegree()
+    {
+
+        return $this->belongsTo(AcademicDegree::class);
+
     }
 }
