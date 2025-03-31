@@ -121,14 +121,17 @@
               </tbody>
             </table>
           </div>
-          <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
-            <div class="text-muted">نمایش {{ $doctorNotes ? $doctorNotes->firstItem() : 0 }} تا
-              {{ $doctorNotes ? $doctorNotes->lastItem() : 0 }} از {{ $doctorNotes ? $doctorNotes->total() : 0 }} ردیف
-            </div>
-            @if ($doctorNotes && $doctorNotes->hasPages())
-              {{ $doctorNotes->links('livewire::bootstrap') }}
-            @endif
-          </div>
+       <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
+    @if($readyToLoad)
+        <div class="text-muted">
+            نمایش {{ $doctorNotes->firstItem() }} تا {{ $doctorNotes->lastItem() }} 
+            از {{ $doctorNotes->total() }} ردیف
+        </div>
+        @if($doctorNotes->hasPages())
+            {{ $doctorNotes->links('livewire::bootstrap') }}
+        @endif
+    @endif
+</div>
         </div>
       </div>
     </div>
