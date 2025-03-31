@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\Auth\TwoFactor;
 use App\Livewire\Dr\Auth\DoctorLogout;
+use Illuminate\Support\Facades\Storage;
 use App\Livewire\Admin\Auth\LoginConfirm;
 use App\Livewire\Dr\Auth\DoctorTwoFactor;
 use App\Livewire\Admin\Auth\LoginRegister;
@@ -89,6 +90,23 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('doctordocuments')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'index'])->name('admin.panel.doctordocuments.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'create'])->name('admin.panel.doctordocuments.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'edit'])->name('admin.panel.doctordocuments.edit');
+        });
+
+        Route::get('/preview-document/{path}', function ($path) {
+            $filePath = 'doctor_documents/' . $path;
+            if (Storage::disk('public')->exists($filePath)) {
+                $fullPath = Storage::disk('public')->path($filePath);
+                return response()->file($fullPath, [
+                    'Content-Disposition' => 'inline',
+                ]);
+            }
+            abort(404);
+        })->name('preview.document');
+
         Route::prefix('subusers')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\SubUser\SubUserController::class, 'index'])->name('admin.panel.subusers.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\SubUser\SubUserController::class, 'create'])->name('admin.panel.subusers.create');

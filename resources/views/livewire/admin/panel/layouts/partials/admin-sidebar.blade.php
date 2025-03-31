@@ -89,7 +89,7 @@
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.doctors.index') }}">لیست پزشکان</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.bestdoctors.index') }}"> پزشک برتر</a></li>
-            <li class="item-li"><a href="#">تأیید مدارک</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.doctordocuments.index') }}">تأیید مدارک</a></li>
             <li class="item-li"><a href="#">مدیریت تخصص‌ها</a></li>
             <li class="item-li"><a href="#">برنامه کاری پزشکان</a></li>
             <li class="item-li"><a href="#">پروفایل پزشکان</a></li>

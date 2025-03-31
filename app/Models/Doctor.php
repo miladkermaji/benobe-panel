@@ -8,6 +8,7 @@ use App\Models\DoctorTag;
 use App\Models\Secretary;
 use App\Models\Specialty;
 use Morilog\Jalali\Jalalian;
+use App\Models\DoctorDocument;
 use App\Models\UserDoctorLike;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\DoctorWorkSchedule;
@@ -203,7 +204,10 @@ class Doctor extends Authenticatable
     {
         return $this->hasMany(Secretary::class, 'doctor_id');
     }
-
+    public function documents()
+    {
+        return $this->hasMany(DoctorDocument::class, 'doctor_id');
+    }
     public function getIncompleteProfileSections(): array
     {
         $incompleteSections = [];
