@@ -89,16 +89,7 @@ class SmsService implements MessageInterface
 
         return $smsService;
     }
-    public static function createOtp($parameters, $recipients, $otpId = null, $sendDateTime = null)
-    {
-        return new static(
-            
-            $recipients,
-            $otpId,
-            $parameters,
-            $sendDateTime
-        );
-    }
+
     public function fire()
     {
     }
