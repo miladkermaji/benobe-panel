@@ -92,7 +92,7 @@ class DoctorNoteList extends Component
     {
         $items = $this->readyToLoad ? $this->getDoctorNotesQuery() : null;
 
-        return view('livewire.dr.panel.doctornotes.doctornote-list', [
+        return view('livewire.dr.panel.doctor-notes.doctor-note-list', [
             'doctorNotes' => $items,
         ]);
     }

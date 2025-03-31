@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Doctornotes;
+namespace App\Livewire\Dr\Panel\DoctorNotes;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
@@ -55,6 +55,6 @@ class DoctorNoteCreate extends Component
 
     public function render()
     {
-        return view('livewire.dr.panel.doctornotes.doctornote-create');
+        return view('livewire.dr.panel.doctor-notes.doctor-note-create');
     }
 }

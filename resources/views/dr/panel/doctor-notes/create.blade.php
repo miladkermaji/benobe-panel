@@ -14,8 +14,8 @@
 @endsection
 
 @section('content')
-@section('bread-crumb-title', 'ویرایش توضیحات')
-@livewire('dr.panel.doctornotes.doctornote-edit', ['id' => $id])
+@section('bread-crumb-title', 'افزودن توضیحات جدید')
+@livewire('dr.panel.doctor-notes.doctor-note-create')
 @section('scripts')
 
 

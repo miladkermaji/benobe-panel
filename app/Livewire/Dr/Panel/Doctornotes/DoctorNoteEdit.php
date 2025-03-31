@@ -61,6 +61,6 @@ class DoctorNoteEdit extends Component
 
     public function render()
     {
-        return view('livewire.dr.panel.doctornotes.doctornote-edit');
+        return view('livewire.dr.panel.doctor-notes.doctor-note-edit');
     }
 }

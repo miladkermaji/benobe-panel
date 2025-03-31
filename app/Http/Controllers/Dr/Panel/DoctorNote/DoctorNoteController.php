@@ -8,16 +8,16 @@ class DoctorNoteController extends Controller
 {
     public function index()
     {
-        return view('dr.panel.doctornotes.index');
+        return view('dr.panel.doctor-notes.index');
     }
 
     public function create()
     {
-        return view('dr.panel.doctornotes.create');
+        return view('dr.panel.doctor-notes.create');
     }
 
     public function edit($id)
     {
-        return view('dr.panel.doctornotes.edit', compact('id'));
+        return view('dr.panel.doctor-notes.edit', compact('id'));
     }
 }

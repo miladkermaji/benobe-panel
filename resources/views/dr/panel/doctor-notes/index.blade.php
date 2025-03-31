@@ -15,7 +15,7 @@
 
 @section('content')
 @section('bread-crumb-title', 'مدیریت توضیحات')
-@livewire('dr.panel.doctornotes.doctornote-list')
+@livewire('dr.panel.doctor-notes.doctor-note-list')
 @section('scripts')
 
 
