@@ -281,7 +281,7 @@
                 <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${clinic.id}" title="حذف">
                   <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
                 </button>
-                <a href="/dr/panel/clinics/${clinic.id}/gallery" class="btn btn-light btn-sm rounded-circle gallery-btn" data-id="${clinic.id}" title="گالری تصاویر">
+                <a href="{{ route('dr.panel.clinics.gallery', $clinic->id) }}" class="btn btn-light btn-sm rounded-circle gallery-btn" data-id="${clinic.id}" title="گالری تصاویر">
                   <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M4 16v4h4M4 20l4-4M20 8v-4h-4M20 4l-4 4M4 4v4M4 4h4M20 20v-4h-4M20 20l-4-4"></path>
                   </svg>
