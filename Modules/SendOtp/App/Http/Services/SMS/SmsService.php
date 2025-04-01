@@ -50,6 +50,7 @@ class SmsService implements MessageInterface
         if ($gatewayName === 'pishgamrayan') {
             $formattedParameters = $parameters; // پارامترها برای پیشگام رایان همون شکلی که هستن
             $smsService->setOtpId($otpId); // تنظیم otpId برای پیشگام رایان
+            $smsService->setMessage($parameters[0] ?? ''); // اضافه کردن این خط
         } else {
             // برای بقیه پنل‌ها، فقط کد رو به عنوان پیام ساده بفرست
             $formattedParameters = ['message' => $parameters[0] ?? '']; // پیام ساده

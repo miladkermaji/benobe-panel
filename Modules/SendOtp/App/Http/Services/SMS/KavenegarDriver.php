@@ -10,15 +10,15 @@ class KavenegarDriver implements SmsDriverInterface
 {
     protected $api;
 
-    public function __construct()
-    {
-        $apiKey = env('KAVENEGAR_API_KEY', '');
-        if (empty($apiKey)) {
-            Log::error('Kavenegar API Key is not set in .env');
-            throw new \Exception('Kavenegar API Key is missing');
-        }
-        $this->api = new KavenegarApi($apiKey);
+ public function __construct()
+{
+    $apiKey = "382B443375422F4465705375364E753136496C417154513951484D6844766E35456B6C68434B4C5A726A493D"; // مقدار مستقیم
+    if (empty($apiKey)) {
+        Log::error('Kavenegar API Key is not set in .env');
+        throw new \Exception('Kavenegar API Key is missing');
     }
+    $this->api = new KavenegarApi($apiKey);
+}
 
     public function send($otpId, $parameters, $senderNumber, $recipientNumbers)
     {

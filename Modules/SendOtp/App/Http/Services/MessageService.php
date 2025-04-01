@@ -20,29 +20,51 @@ class MessageService
         $this->message = $message;
     }
 
-    public function send()
-    {
-        $activeGateway = SmsGateway::where('is_active', true)->first();
-        $driver = $activeGateway ? $this->getDriver($activeGateway->name) : new PishgamRayanDriver();
+  public function send()
+{
+    $activeGateway = SmsGateway::where('is_active', true)->first();
+    $driver = $activeGateway ? $this->getDriver($activeGateway->name) : new PishgamRayanDriver();
 
-        // چک کن که آیا پارامترها شامل کد OTP هست یا نه
-        $isOtpRequest = $this->message->getOtpId() || (isset($this->message->getParameters()[0]) && is_numeric($this->message->getParameters()[0]));
+    Log::info('بررسی مقادیر قبل از ارسال', [
+        'otpId' => $this->message->getOtpId(),
+        'message' => $this->message->getMessage(),
+        'parameters' => $this->message->getParameters(),
+        'senderNumber' => $this->message->getSenderNumber(),
+        'recipients' => $this->message->getRecipientNumbers()
+    ]);
 
-        if ($isOtpRequest) {
-            return $driver->send(
-                $this->message->getOtpId(),
-                $this->message->getParameters(),
-                $this->message->getSenderNumber(),
-                $this->message->getRecipientNumbers()
-            );
-        }
-
-        return $driver->sendMessage(
-            $this->message->getMessage(),
+    if ($this->message->getOtpId()) {
+        return $driver->send(
+            $this->message->getOtpId(),
+            $this->message->getParameters(),
             $this->message->getSenderNumber(),
             $this->message->getRecipientNumbers()
         );
     }
+
+    // اگه otpId نبود، پیام پیش‌فرض بساز
+    $messageContent = $this->message->getMessage();
+    if (empty($messageContent) && $this->message->getParameters()) {
+        // چک کن که parameters یه آرایه ассоциатив هست یا نه
+        $params = $this->message->getParameters();
+        $code = $params['message'] ?? $params[0] ?? ''; // اول کلید 'message' رو چک کن، بعد ایندکس 0
+        $messageContent = "کد تایید شما: $code - به نوبه";
+    }
+
+    $response = $driver->sendMessage(
+        $messageContent ?: $this->message->getMessage() ?: 'پیام پیش‌فرض',
+        $this->message->getSenderNumber(),
+        $this->message->getRecipientNumbers()
+    );
+
+    // لاگ اضافه برای بررسی پاسخ کامل
+    Log::info('پاسخ کامل کاوه‌نگار', [
+        'response' => $response,
+        'message_sent' => $messageContent
+    ]);
+
+    return $response;
+}
 
     protected function getDriver($driverName)
     {
