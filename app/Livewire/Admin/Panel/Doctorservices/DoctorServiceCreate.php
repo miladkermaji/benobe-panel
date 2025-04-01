@@ -92,6 +92,6 @@ class DoctorServiceCreate extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.doctorservices.doctorservice-create');
+        return view('livewire.admin.panel.doctor-services.doctor-service-create');
     }
 }

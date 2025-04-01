@@ -67,10 +67,11 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.users.index') }}">لیست کاربران</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.usergroups.index') }}">گروه‌های کاربری</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.user-groups.index') }}">گروه‌های کاربری</a></li>
             <li class="item-li"><a href="#">مدیریت نقش‌ها و دسترسی‌ها</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.userblockings.index') }}">کاربران مسدود</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.subusers.index') }}">کاربران زیرمجموعه</a></li> <!-- جدید -->
+            <li class="item-li"><a href="{{ route('admin.panel.user-blockings.index') }}">کاربران مسدود</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.sub-users.index') }}">کاربران زیرمجموعه</a></li>
+            <!-- جدید -->
           </ul>
         </li>
         <!-- مدیریت پزشکان -->
@@ -88,11 +89,11 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.doctors.index') }}">لیست پزشکان</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.bestdoctors.index') }}"> پزشک برتر</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.doctordocuments.index') }}">تأیید مدارک</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.doctorspecialties.index') }}">تخصص های پزشک</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.doctorcomments.index') }}">نظرات بیماران</a></li>
-            <li class="item-li"><a href="#">ارتقا حساب پزشکان</a></li> 
+            <li class="item-li"><a href="{{ route('admin.panel.best-doctors.index') }}"> پزشک برتر</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.doctor-documents.index') }}">تأیید مدارک</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.doctor-specialties.index') }}">تخصص های پزشک</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.doctor-comments.index') }}">نظرات بیماران</a></li>
+            <li class="item-li"><a href="#">ارتقا حساب پزشکان</a></li>
           </ul>
         </li>
         <!-- مدیریت منشی‌ها -->
@@ -229,7 +230,8 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('admin.panel.treatmentcenters.index') }}"> مدیریت درمانگاه</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.treatment-centers.index') }}"> مدیریت درمانگاه</a>
+            </li>
           </ul>
         </li>
         <li class="item-li i-courses">
@@ -263,7 +265,7 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.services.index') }}">لیست خدمات</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.doctorservices.index') }}"> خدمات پزشکان</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.doctor-services.index') }}"> خدمات پزشکان</a></li>
           </ul>
         </li>
         <!-- نسخه الکترونیک -->
@@ -385,8 +387,8 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.menus.index') }}">منوها</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.bannertexts.index') }}">بنر صفحه اصلی</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.footercontents.index') }}">فوتر</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.banner-texts.index') }}">بنر صفحه اصلی</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.footer-contents.index') }}">فوتر</a></li>
             <li class="item-li"><a href="#">تنظیمات عمومی</a></li>
             <li class="item-li"><a href="#">مدیریت صفحات</a></li>
             <li class="item-li"><a href="#">تنظیمات SEO</a></li>

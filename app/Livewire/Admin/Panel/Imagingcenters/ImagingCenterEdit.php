@@ -117,6 +117,6 @@ class ImagingCenterEdit extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.imagingcenters.imagingcenter-edit');
+        return view('livewire.admin.panel.imaging-centers.imaging-center-edit');
     }
 }

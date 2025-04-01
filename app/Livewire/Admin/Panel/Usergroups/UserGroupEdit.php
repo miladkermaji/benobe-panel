@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Panel\usergroups;
+namespace App\Livewire\Admin\Panel\UserGroups;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
@@ -53,11 +53,11 @@ class UserGroupEdit extends Component
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'گروه کاربری با موفقیت به‌روزرسانی شد!');
-        return redirect()->route('admin.panel.usergroups.index');
+        return redirect()->route('admin.panel.user-groups.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.panel.usergroups.usergroup-edit');
+        return view('livewire.admin.panel.user-groups.user-group-edit');
     }
 }

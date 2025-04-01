@@ -71,7 +71,7 @@ class SubUserList extends Component
             ->get()
             : collect();
 
-        return view('livewire.admin.panel.subusers.subuser-list', [
+        return view('livewire.admin.panel.sub-users.sub-user-list', [
             'doctors' => $doctors,
         ]);
     }

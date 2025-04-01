@@ -1,17 +1,17 @@
-.subuser-content-wrapper {
+.sub-user-content-wrapper {
     width: 900px;
     background-color: #fff;
     border-radius: 10px;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
-.subuser-card {
+.sub-user-card {
     border-bottom: 1px solid #ddd;
 }
 .card-body {
     letter-spacing: 0 !important;
 }
 @media only screen and (max-width: 991px) {
-    .subuser-content-wrapper {
+    .sub-user-content-wrapper {
         width: 97% !important;
     }
 }
@@ -50,6 +50,6 @@
     background-color: #007bff;
     color: white;
 }
-.myPanelOption{
-  display: none;
+.myPanelOption {
+    display: none;
 }

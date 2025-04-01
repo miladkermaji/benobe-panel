@@ -1,164 +1,164 @@
 th,
 td {
- text-wrap: nowrap !important;
+    text-wrap: nowrap !important;
 }
-.subuser-content-wrapper {
- background-color: #fff;
- border-radius: 10px;
- box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+.sub-user-content-wrapper {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
-.subuser-card {
- border-bottom: 1px solid #ddd;
+.sub-user-card {
+    border-bottom: 1px solid #ddd;
 }
 
 .card-body {
- letter-spacing: 0 !important;
+    letter-spacing: 0 !important;
 }
 
 @media only screen and (max-width: 991px) {
- .subuser-content-wrapper {
-  width: 97% !important;
- }
+    .sub-user-content-wrapper {
+        width: 97% !important;
+    }
 }
-  /* استایل‌های کلی صفحه */
-    .subuser-content {
-      padding: 20px;
-    }
+/* استایل‌های کلی صفحه */
+.sub-user-content {
+    padding: 20px;
+}
 
-    .subuser-content-wrapper {
-      max-width: 1400px; /* افزایش عرض */
-      width: 100%;
-    }
+.sub-user-content-wrapper {
+    max-width: 1400px; /* افزایش عرض */
+    width: 100%;
+}
 
-    /* استایل کارت‌ها */
-    .card {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-      background-color: #fff;
-      overflow: hidden;
-    }
+/* استایل کارت‌ها */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    background-color: #fff;
+    overflow: hidden;
+}
 
-    .card-header {
-      background-color: #f8f9fa;
-      padding: 15px 20px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
-      border-bottom: 1px solid #e9ecef;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+.card-header {
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* استایل جدول */
+.table {
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.table thead th {
+    background-color: #f1f3f5;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 15px;
+    border-bottom: 2px solid #dee2e6;
+    text-align: right;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table tbody td {
+    padding: 12px 15px;
+    font-size: 13px;
+    color: #6c757d;
+    border-bottom: 1px solid #e9ecef;
+    text-align: right;
+}
+
+/* دکمه حذف */
+.btn-light.btn-sm {
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-light.btn-sm:hover {
+    background-color: #f1f3f5;
+}
+
+.btn-light.btn-sm img {
+    width: 16px;
+    height: 16px;
+}
+
+/* پیجینیشن */
+.pagination-links {
+    margin-top: 20px;
+}
+
+.pagination-links .pagination {
+    justify-content: center;
+}
+
+.pagination-links .page-link {
+    border-radius: 6px;
+    margin: 0 3px;
+    color: #007bff;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.pagination-links .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #007bff;
+}
+
+.pagination-links .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+/* پاسخگویی برای موبایل */
+@media (max-width: 768px) {
+    .sub-user-content-wrapper {
+        padding: 0 10px;
     }
 
     .card-body {
-      padding: 20px;
-    }
-
-    /* استایل جدول */
-    .table {
-      margin-bottom: 0;
-      border-collapse: separate;
-      border-spacing: 0;
-      width: 100%;
-    }
-
-    .table thead th {
-      background-color: #f1f3f5;
-      color: #495057;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 12px 15px;
-      border-bottom: 2px solid #dee2e6;
-      text-align: right;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-
-    .table tbody tr {
-      transition: background-color 0.2s ease;
-    }
-
-    .table tbody tr:hover {
-      background-color: #f8f9fa;
-    }
-
-    .table tbody td {
-      padding: 12px 15px;
-      font-size: 13px;
-      color: #6c757d;
-      border-bottom: 1px solid #e9ecef;
-      text-align: right;
-    }
-
-    /* دکمه حذف */
-    .btn-light.btn-sm {
-      padding: 5px 10px;
-      border-radius: 6px;
-      transition: background-color 0.2s ease;
-    }
-
-    .btn-light.btn-sm:hover {
-      background-color: #f1f3f5;
-    }
-
-    .btn-light.btn-sm img {
-      width: 16px;
-      height: 16px;
-    }
-
-    /* پیجینیشن */
-    .pagination-links {
-      margin-top: 20px;
-    }
-
-    .pagination-links .pagination {
-      justify-content: center;
-    }
-
-    .pagination-links .page-link {
-      border-radius: 6px;
-      margin: 0 3px;
-      color: #007bff;
-      border: 1px solid #dee2e6;
-      transition: all 0.2s ease;
-    }
-
-    .pagination-links .page-link:hover {
-      background-color: #e9ecef;
-      border-color: #007bff;
-    }
-
-    .pagination-links .page-item.active .page-link {
-      background-color: #007bff;
-      border-color: #007bff;
-      color: #fff;
-    }
-
-    /* پاسخگویی برای موبایل */
-    @media (max-width: 768px) {
-      .subuser-content-wrapper {
-        padding: 0 10px;
-      }
-
-      .card-body {
         overflow-x: auto; /* اسکرول افقی برای جدول */
-      }
+    }
 
-      .table {
+    .table {
         min-width: 700px; /* حداقل عرض جدول برای جلوگیری از به‌هم‌ریختگی */
-      }
+    }
 
-      .card-header {
+    .card-header {
         font-size: 16px;
-      }
+    }
 
-      .table thead th,
-      .table tbody td {
+    .table thead th,
+    .table tbody td {
         font-size: 12px;
         padding: 10px;
-      }
     }
+}

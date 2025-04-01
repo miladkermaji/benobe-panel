@@ -99,7 +99,7 @@ class ImagingCenterList extends Component
     public function render()
     {
         $items = $this->readyToLoad ? $this->getImagingCentersQuery() : null;
-        return view('livewire.admin.panel.imagingcenters.imagingcenter-list', [
+        return view('livewire.admin.panel.imaging-centers.imaging-center-list', [
             'imaging_centers' => $items,
         ]);
     }

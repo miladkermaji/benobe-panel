@@ -90,11 +90,11 @@ class TreatmentCenterEdit extends Component
         $this->center->update($validator->validated());
 
         $this->dispatch('show-alert', type: 'success', message: 'درمانگاه با موفقیت به‌روزرسانی شد!');
-        return redirect()->route('admin.panel.treatmentcenters.index');
+        return redirect()->route('admin.panel.treatment-centers.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.panel.treatmentcenters.treatmentcenters-edit');
+        return view('livewire.admin.panel.treatment-centers.treatment-centers-edit');
     }
 }

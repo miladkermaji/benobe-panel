@@ -69,11 +69,11 @@ class DoctorDocumentEdit extends Component
         $this->document->update($data);
 
         $this->dispatch('show-alert', type: 'success', message: 'مدرک با موفقیت به‌روزرسانی شد!');
-        return redirect()->route('admin.panel.doctordocuments.index');
+        return redirect()->route('admin.panel.doctor-documents.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.panel.doctordocuments.doctordocument-edit');
+        return view('livewire.admin.panel.doctor-documents.doctor-document-edit');
     }
 }

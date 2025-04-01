@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Panel\usergroups;
+namespace App\Livewire\Admin\Panel\UserGroups;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -95,7 +95,7 @@ class UserGroupList extends Component
     {
         $items = $this->readyToLoad ? $this->getusergroupsQuery() : null;
 
-        return view('livewire.admin.panel.usergroups.usergroup-list', [
+        return view('livewire.admin.panel.user-groups.user-group-list', [
             'usergroups' => $items,
         ]);
     }

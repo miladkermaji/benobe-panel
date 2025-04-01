@@ -107,6 +107,6 @@ class DoctorServiceEdit extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.doctorservices.doctorservice-edit');
+        return view('livewire.admin.panel.doctor-services.doctor-service-edit');
     }
 }

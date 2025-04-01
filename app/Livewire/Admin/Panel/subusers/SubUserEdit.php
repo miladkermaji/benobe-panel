@@ -50,8 +50,8 @@ class SubUserEdit extends Component
                 'type' => 'success',
                 'message' => 'کاربر زیرمجموعه با موفقیت به‌روزرسانی شد!'
             ]);
-            
-            return redirect()->route('admin.panel.subusers.index');
+
+            return redirect()->route('admin.panel.sub-users.index');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->dispatch('show-alert', [
@@ -72,6 +72,6 @@ class SubUserEdit extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.subusers.subuser-edit');
+        return view('livewire.admin.panel.sub-users.sub-user-edit');
     }
 }

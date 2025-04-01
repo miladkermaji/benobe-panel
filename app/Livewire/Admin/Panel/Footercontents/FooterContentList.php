@@ -97,6 +97,6 @@ class FooterContentList extends Component
     public function render()
     {
         $footer_contents = $this->getFooterContentsQuery();
-        return view('livewire.admin.panel.footercontents.footercontent-list', compact('footer_contents'));
+        return view('livewire.admin.panel.footer-contents.footer-content-list', compact('footer_contents'));
     }
 }

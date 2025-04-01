@@ -98,7 +98,7 @@ class BestDoctorList extends Component
     public function render()
     {
         $bestdoctors = $this->readyToLoad ? $this->getBestDoctors() : null;
-        return view('livewire.admin.panel.bestdoctors.bestdoctor-list', [
+        return view('livewire.admin.panel.best-doctors.best-doctor-list', [
             'bestdoctors' => $bestdoctors,
         ]);
     }

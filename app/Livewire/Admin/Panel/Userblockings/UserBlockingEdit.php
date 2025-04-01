@@ -102,11 +102,11 @@ class UserBlockingEdit extends Component
         }
 
         $this->dispatch('show-alert', type: 'success', message: 'اطلاعات مسدودیت با موفقیت به‌روزرسانی شد!');
-        return redirect()->route('admin.panel.userblockings.index');
+        return redirect()->route('admin.panel.user-blockings.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.panel.userblockings.userblocking-edit');
+        return view('livewire.admin.panel.user-blockings.user-blocking-edit');
     }
 }

@@ -8,16 +8,16 @@ class FooterContentController extends Controller
 {
     public function index()
     {
-        return view('admin.panel.footercontents.index');
+        return view('admin.panel.footer-contents.index');
     }
 
     public function create()
     {
-        return view('admin.panel.footercontents.create');
+        return view('admin.panel.footer-contents.create');
     }
 
     public function edit($id)
     {
-        return view('admin.panel.footercontents.edit', compact('id'));
+        return view('admin.panel.footer-contents.edit', compact('id'));
     }
 }

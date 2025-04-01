@@ -41,12 +41,12 @@ class DoctorCommentCreate extends Component
         DoctorComment::create($validated);
 
         $this->dispatch('show-alert', type: 'success', message: 'نظر با موفقیت ثبت شد!');
-        return redirect()->route('admin.panel.doctorcomments.index');
+        return redirect()->route('admin.panel.doctor-comments.index');
     }
 
     public function render()
     {
         $this->dispatch('reinit-select2');
-        return view('livewire.admin.panel.doctorcomments.doctorcomment-create');
+        return view('livewire.admin.panel.doctor-comments.doctor-comment-create');
     }
 }

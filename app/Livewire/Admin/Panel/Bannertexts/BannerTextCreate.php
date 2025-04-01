@@ -80,11 +80,11 @@ class BannerTextCreate extends Component
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'بنر با موفقیت ایجاد شد!');
-        return redirect()->route('admin.panel.bannertexts.index');
+        return redirect()->route('admin.panel.banner-texts.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.panel.bannertexts.bannertext-create');
+        return view('livewire.admin.panel.banner-texts.banner-text-create');
     }
 }

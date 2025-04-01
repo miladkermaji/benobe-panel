@@ -65,6 +65,6 @@ class TreatmentCentersGallery extends Component
     public function render()
     {
         $galleries = $this->treatmentCenter->galleries ?? collect();
-        return view('livewire.admin.panel.treatmentcenters.treatmentcenters-gallery', compact('galleries'));
+        return view('livewire.admin.panel.treatment-centers.treatment-centers-gallery', compact('galleries'));
     }
 }

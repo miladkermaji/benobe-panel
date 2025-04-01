@@ -8,16 +8,16 @@ class DoctorServiceController extends Controller
 {
     public function index()
     {
-        return view('admin.panel.doctorservices.index');
+        return view('admin.panel.doctor-services.index');
     }
 
     public function create()
     {
-        return view('admin.panel.doctorservices.create');
+        return view('admin.panel.doctor-services.create');
     }
 
     public function edit($id)
     {
-        return view('admin.panel.doctorservices.edit', compact('id'));
+        return view('admin.panel.doctor-services.edit', compact('id'));
     }
 }

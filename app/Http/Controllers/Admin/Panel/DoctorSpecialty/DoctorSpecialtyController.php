@@ -8,16 +8,16 @@ class DoctorSpecialtyController extends Controller
 {
     public function index()
     {
-        return view('admin.panel.doctorspecialties.index');
+        return view('admin.panel.doctor-specialties.index');
     }
 
     public function create()
     {
-        return view('admin.panel.doctorspecialties.create');
+        return view('admin.panel.doctor-specialties.create');
     }
 
     public function edit($id)
     {
-        return view('admin.panel.doctorspecialties.edit', compact('id'));
+        return view('admin.panel.doctor-specialties.edit', compact('id'));
     }
 }

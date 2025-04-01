@@ -96,6 +96,6 @@ class TreatmentCenterList extends Component
     public function render()
     {
         $centers = $this->readyToLoad ? $this->getTreatmentCentersQuery() : null;
-        return view('livewire.admin.panel.treatmentcenters.treatmentcenters-list', ['treatmentCenters' => $centers]);
+        return view('livewire.admin.panel.treatment-centers.treatment-centers-list', ['treatmentCenters' => $centers]);
     }
 }

@@ -51,7 +51,7 @@
       <table class="table table-bordered w-100 m-0">
         <tbody>
           @foreach ($service->children as $child)
-            @include('livewire.dr.panel.doctorservices.doctor-service-dropdown', [
+            @include('livewire.dr.panel.doctor-services.doctor-service-dropdown', [
                 'service' => $child,
                 'level' => $level + 1,
                 'index' => $index . '.' . ($loop->index + 1),

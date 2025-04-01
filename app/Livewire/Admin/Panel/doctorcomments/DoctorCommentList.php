@@ -151,7 +151,7 @@ class DoctorCommentList extends Component
         foreach ($doctors as $doctor) {
             $doctor->comments = $this->getDoctorComments($doctor->id);
         }
-        return view('livewire.admin.panel.doctorcomments.doctorcomment-list', [
+        return view('livewire.admin.panel.doctor-comments.doctor-comment-list', [
             'doctors' => $doctors,
         ]);
     }

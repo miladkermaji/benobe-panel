@@ -8,16 +8,16 @@ class BannerTextController extends Controller
 {
     public function index()
     {
-        return view('admin.panel.bannertexts.index');
+        return view('admin.panel.banner-texts.index');
     }
 
     public function create()
     {
-        return view('admin.panel.bannertexts.create');
+        return view('admin.panel.banner-texts.create');
     }
 
     public function edit($id)
     {
-        return view('admin.panel.bannertexts.edit', compact('id'));
+        return view('admin.panel.banner-texts.edit', compact('id'));
     }
 }

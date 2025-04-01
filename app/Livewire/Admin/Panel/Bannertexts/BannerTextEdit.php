@@ -21,10 +21,10 @@ class BannerTextEdit extends Component
     public function mount($id)
     {
         $this->bannertext      = BannerText::findOrFail($id);
-        $this->main_text       = $this->bannertext->main_text;
-        $this->switch_words    = $this->bannertext->switch_words ?? [''];
-        $this->switch_interval = $this->bannertext->switch_interval;
-        $this->status          = $this->bannertext->status;
+        $this->main_text       = $this->banner-text->main_text;
+        $this->switch_words    = $this->banner-text->switch_words ?? [''];
+        $this->switch_interval = $this->banner-text->switch_interval;
+        $this->status          = $this->banner-text->status;
     }
 
     public function addSwitchWord()
@@ -73,7 +73,7 @@ class BannerTextEdit extends Component
             return;
         }
 
-        $imagePath = $this->bannertext->image_path;
+        $imagePath = $this->banner-text->image_path;
         if ($this->image) {
             if ($imagePath && \Storage::disk('public')->exists($imagePath)) {
                 \Storage::disk('public')->delete($imagePath);
@@ -84,7 +84,7 @@ class BannerTextEdit extends Component
         // فیلتر کردن مقادیر خالی از switch_words
         $filteredSwitchWords = array_filter($this->switch_words, fn ($word) => trim($word) !== '');
 
-        $this->bannertext->update([
+        $this->banner-text->update([
             'main_text'       => $this->main_text,
             'switch_words'    => ! empty($filteredSwitchWords) ? $filteredSwitchWords : null,
             'switch_interval' => $this->switch_interval,
@@ -93,11 +93,11 @@ class BannerTextEdit extends Component
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'بنر با موفقیت به‌روزرسانی شد!');
-        return redirect()->route('admin.panel.bannertexts.index');
+        return redirect()->route('admin.panel.banner-texts.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.panel.bannertexts.bannertext-edit');
+        return view('livewire.admin.panel.banner-texts.banner-text-edit');
     }
 }

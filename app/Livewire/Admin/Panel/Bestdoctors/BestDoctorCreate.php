@@ -66,6 +66,6 @@ class BestDoctorCreate extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.bestdoctors.bestdoctor-create');
+        return view('livewire.admin.panel.best-doctors.best-doctor-create');
     }
 }

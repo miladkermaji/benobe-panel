@@ -8,16 +8,16 @@ class BestDoctorController extends Controller
 {
     public function index()
     {
-        return view('admin.panel.bestdoctors.index');
+        return view('admin.panel.best-doctors.index');
     }
 
     public function create()
     {
-        return view('admin.panel.bestdoctors.create');
+        return view('admin.panel.best-doctors.create');
     }
 
     public function edit($bestdoctorId)
     {
-        return view('admin.panel.bestdoctors.edit', compact('bestdoctorId'));
+        return view('admin.panel.best-doctors.edit', compact('bestdoctorId'));
     }
 }

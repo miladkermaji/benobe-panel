@@ -104,7 +104,7 @@ class BannerTextList extends Component
     {
         $items = $this->readyToLoad ? $this->getbannertextsQuery() : null;
 
-        return view('livewire.admin.panel.bannertexts.bannertext-list', [
+        return view('livewire.admin.panel.banner-texts.banner-text-list', [
             'bannertexts' => $items,
         ]);
     }

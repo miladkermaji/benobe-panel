@@ -83,11 +83,11 @@ class FooterContentEdit extends Component
         $this->footerContent->update($data);
 
         $this->dispatch('show-alert', type: 'success', message: 'آیتم فوتر با موفقیت به‌روزرسانی شد!');
-        return redirect()->route('admin.panel.footercontents.index');
+        return redirect()->route('admin.panel.footer-contents.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.panel.footercontents.footercontent-edit');
+        return view('livewire.admin.panel.footer-contents.footer-content-edit');
     }
 }

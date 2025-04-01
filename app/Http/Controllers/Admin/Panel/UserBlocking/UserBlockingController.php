@@ -8,16 +8,16 @@ class UserBlockingController extends Controller
 {
     public function index()
     {
-        return view('admin.panel.userblockings.index');
+        return view('admin.panel.user-blockings.index');
     }
 
     public function create()
     {
-        return view('admin.panel.userblockings.create');
+        return view('admin.panel.user-blockings.create');
     }
 
     public function edit($id)
     {
-        return view('admin.panel.userblockings.edit', compact('id'));
+        return view('admin.panel.user-blockings.edit', compact('id'));
     }
 }

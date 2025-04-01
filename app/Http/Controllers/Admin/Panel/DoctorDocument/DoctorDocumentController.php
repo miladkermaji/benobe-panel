@@ -8,16 +8,16 @@ class DoctorDocumentController extends Controller
 {
     public function index()
     {
-        return view('admin.panel.doctordocuments.index');
+        return view('admin.panel.doctor-documents.index');
     }
 
     public function create()
     {
-        return view('admin.panel.doctordocuments.create');
+        return view('admin.panel.doctor-documents.create');
     }
 
     public function edit($id)
     {
-        return view('admin.panel.doctordocuments.edit', compact('id'));
+        return view('admin.panel.doctor-documents.edit', compact('id'));
     }
 }

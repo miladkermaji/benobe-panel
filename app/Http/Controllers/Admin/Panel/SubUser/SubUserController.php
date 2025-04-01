@@ -8,16 +8,16 @@ class SubUserController extends Controller
 {
     public function index()
     {
-        return view('admin.panel.subusers.index');
+        return view('admin.panel.sub-users.index');
     }
 
     public function create()
     {
-        return view('admin.panel.subusers.create');
+        return view('admin.panel.sub-users.create');
     }
 
     public function edit($id)
     {
-        return view('admin.panel.subusers.edit', compact('id'));
+        return view('admin.panel.sub-users.edit', compact('id'));
     }
 }

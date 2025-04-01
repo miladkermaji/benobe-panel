@@ -96,7 +96,7 @@ class DoctorServiceList extends Component
     {
         $items = $this->readyToLoad ? $this->getDoctorServicesQuery() : null;
 
-        return view('livewire.admin.panel.doctorservices.doctorservice-list', [
+        return view('livewire.admin.panel.doctor-services.doctor-service-list', [
             'doctorservices' => $items,
         ]);
     }

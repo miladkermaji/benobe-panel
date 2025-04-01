@@ -8,16 +8,16 @@ class DoctorCommentController extends Controller
 {
     public function index()
     {
-        return view('admin.panel.doctorcomments.index');
+        return view('admin.panel.doctor-comments.index');
     }
 
     public function create()
     {
-        return view('admin.panel.doctorcomments.create');
+        return view('admin.panel.doctor-comments.create');
     }
 
     public function edit($id)
     {
-        return view('admin.panel.doctorcomments.edit', compact('id'));
+        return view('admin.panel.doctor-comments.edit', compact('id'));
     }
 }

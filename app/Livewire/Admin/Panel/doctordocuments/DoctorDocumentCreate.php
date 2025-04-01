@@ -51,11 +51,11 @@ class DoctorDocumentCreate extends Component
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'مدرک با موفقیت ثبت شد!');
-        return redirect()->route('admin.panel.doctordocuments.index');
+        return redirect()->route('admin.panel.doctor-documents.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.panel.doctordocuments.doctordocument-create');
+        return view('livewire.admin.panel.doctor-documents.doctor-document-create');
     }
 }

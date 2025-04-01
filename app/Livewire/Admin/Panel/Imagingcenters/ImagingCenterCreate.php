@@ -114,6 +114,6 @@ class ImagingCenterCreate extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.imagingcenters.imagingcenter-create');
+        return view('livewire.admin.panel.imaging-centers.imaging-center-create');
     }
 }

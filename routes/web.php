@@ -90,22 +90,22 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
-    Route::prefix('doctorcomments')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorComment\DoctorCommentController::class, 'index'])->name('admin.panel.doctorcomments.index');
-        Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorComment\DoctorCommentController::class, 'create'])->name('admin.panel.doctorcomments.create');
-        Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorComment\DoctorCommentController::class, 'edit'])->name('admin.panel.doctorcomments.edit');
-    });
+        Route::prefix('doctor-comments')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorComment\DoctorCommentController::class, 'index'])->name('admin.panel.doctor-comments.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorComment\DoctorCommentController::class, 'create'])->name('admin.panel.doctor-comments.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorComment\DoctorCommentController::class, 'edit'])->name('admin.panel.doctor-comments.edit');
+        });
 
-Route::prefix('doctorspecialties')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorSpecialty\DoctorSpecialtyController::class, 'index'])->name('admin.panel.doctorspecialties.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorSpecialty\DoctorSpecialtyController::class, 'create'])->name('admin.panel.doctorspecialties.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorSpecialty\DoctorSpecialtyController::class, 'edit'])->name('admin.panel.doctorspecialties.edit');
-});
+        Route::prefix('doctor-specialties')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorSpecialty\DoctorSpecialtyController::class, 'index'])->name('admin.panel.doctor-specialties.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorSpecialty\DoctorSpecialtyController::class, 'create'])->name('admin.panel.doctor-specialties.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorSpecialty\DoctorSpecialtyController::class, 'edit'])->name('admin.panel.doctor-specialties.edit');
+        });
 
-        Route::prefix('doctordocuments')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'index'])->name('admin.panel.doctordocuments.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'create'])->name('admin.panel.doctordocuments.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'edit'])->name('admin.panel.doctordocuments.edit');
+        Route::prefix('doctor-documents')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'index'])->name('admin.panel.doctor-documents.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'create'])->name('admin.panel.doctor-documents.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorDocument\DoctorDocumentController::class, 'edit'])->name('admin.panel.doctor-documents.edit');
         });
 
         Route::get('/preview-document/{path}', function ($path) {
@@ -119,28 +119,28 @@ Route::prefix('doctorspecialties')->group(function () {
             abort(404);
         })->name('preview.document');
 
-        Route::prefix('subusers')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\SubUser\SubUserController::class, 'index'])->name('admin.panel.subusers.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\SubUser\SubUserController::class, 'create'])->name('admin.panel.subusers.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\SubUser\SubUserController::class, 'edit'])->name('admin.panel.subusers.edit');
+        Route::prefix('sub-users')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\SubUser\SubUserController::class, 'index'])->name('admin.panel.sub-users.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\SubUser\SubUserController::class, 'create'])->name('admin.panel.sub-users.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\SubUser\SubUserController::class, 'edit'])->name('admin.panel.sub-users.edit');
         });
 
-        Route::prefix('userblockings')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'index'])->name('admin.panel.userblockings.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'create'])->name('admin.panel.userblockings.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'edit'])->name('admin.panel.userblockings.edit');
+        Route::prefix('user-blockings')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'index'])->name('admin.panel.user-blockings.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'create'])->name('admin.panel.user-blockings.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'edit'])->name('admin.panel.user-blockings.edit');
         });
 
-        Route::prefix('usergroups')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'index'])->name('admin.panel.usergroups.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'create'])->name('admin.panel.usergroups.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'edit'])->name('admin.panel.usergroups.edit');
+        Route::prefix('user-groups')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'index'])->name('admin.panel.user-groups.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'create'])->name('admin.panel.user-groups.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\UserGroup\UserGroupController::class, 'edit'])->name('admin.panel.user-groups.edit');
         });
 
-        Route::prefix('footercontents')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'index'])->name('admin.panel.footercontents.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'create'])->name('admin.panel.footercontents.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'edit'])->name('admin.panel.footercontents.edit');
+        Route::prefix('footer-contents')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'index'])->name('admin.panel.footer-contents.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'create'])->name('admin.panel.footer-contents.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\FooterContent\FooterContentController::class, 'edit'])->name('admin.panel.footer-contents.edit');
         });
 
         Route::prefix('reviews')->group(function () {
@@ -157,11 +157,11 @@ Route::prefix('doctorspecialties')->group(function () {
         });
 
         Route::prefix('treatmentcenters')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'index'])->name('admin.panel.treatmentcenters.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'create'])->name('admin.panel.treatmentcenters.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'edit'])->name('admin.panel.treatmentcenters.edit');
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'index'])->name('admin.panel.treatment-centers.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'create'])->name('admin.panel.treatment-centers.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'edit'])->name('admin.panel.treatment-centers.edit');
             Route::get('/gallery/{id}', [\App\Http\Controllers\Admin\Panel\TreatmentCenter\TreatmentCenterController::class, 'gallery'])
-                ->name('admin.panel.treatmentcenters.gallery');
+                ->name('admin.panel.treatment-centers.gallery');
         });
 
         Route::prefix('clinics')->group(function () {
@@ -185,10 +185,10 @@ Route::prefix('doctorspecialties')->group(function () {
             Route::get('/edit/{id}/gallery', [\App\Http\Controllers\Admin\Panel\Hospital\HospitalController::class, 'gallery'])->name('admin.panel.hospitals.gallery');
         });
 
-        Route::prefix('doctorservices')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'index'])->name('admin.panel.doctorservices.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'create'])->name('admin.panel.doctorservices.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'edit'])->name('admin.panel.doctorservices.edit');
+        Route::prefix('doctor-services')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'index'])->name('admin.panel.doctor-services.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'create'])->name('admin.panel.doctor-services.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorService\DoctorServiceController::class, 'edit'])->name('admin.panel.doctor-services.edit');
         });
 
         Route::prefix('services')->group(function () {
@@ -203,10 +203,10 @@ Route::prefix('doctorspecialties')->group(function () {
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Specialty\SpecialtyController::class, 'edit'])->name('admin.panel.specialties.edit');
         });
 
-        Route::prefix('bestdoctors')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'index'])->name('admin.panel.bestdoctors.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'create'])->name('admin.panel.bestdoctors.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'edit'])->name('admin.panel.bestdoctors.edit');
+        Route::prefix('best-doctors')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'index'])->name('admin.panel.best-doctors.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'create'])->name('admin.panel.best-doctors.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\BestDoctor\BestDoctorController::class, 'edit'])->name('admin.panel.best-doctors.edit');
         });
 
         Route::prefix('zones')->group(function () {
@@ -221,9 +221,9 @@ Route::prefix('doctorspecialties')->group(function () {
         });
 
         Route::prefix('bannertexts')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'index'])->name('admin.panel.bannertexts.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'create'])->name('admin.panel.bannertexts.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'edit'])->name('admin.panel.bannertexts.edit');
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'index'])->name('admin.panel.banner-texts.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'create'])->name('admin.panel.banner-texts.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\BannerText\BannerTextController::class, 'edit'])->name('admin.panel.banner-texts.edit');
         });
 
         Route::prefix('menus')->group(function () {

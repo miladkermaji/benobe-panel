@@ -66,6 +66,6 @@ class ImagingCentersGallery extends Component
     public function render()
     {
         $galleries = $this->imaging_center->galleries ?? collect();
-        return view('livewire.admin.panel.imagingcenters.imagingcenters-gallery', compact('galleries'));
+        return view('livewire.admin.panel.imaging-centers.imaging-centers-gallery', compact('galleries'));
     }
 }

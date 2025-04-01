@@ -129,7 +129,7 @@ class DoctorSpecialtyList extends Component
     {
         $doctors = $this->readyToLoad ? $this->getDoctors() : [];
 
-        return view('livewire.admin.panel.doctorspecialties.doctorspecialty-list', [
+        return view('livewire.admin.panel.doctor-specialties.doctor-specialty-list', [
             'doctors' => $doctors,
         ]);
     }

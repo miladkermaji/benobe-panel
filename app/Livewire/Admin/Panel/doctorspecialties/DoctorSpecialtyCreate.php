@@ -79,11 +79,11 @@ class DoctorSpecialtyCreate extends Component
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'تخصص پزشک با موفقیت ایجاد شد!');
-        return redirect()->route('admin.panel.doctorspecialties.index');
+        return redirect()->route('admin.panel.doctor-specialties.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.panel.doctorspecialties.doctorspecialty-create');
+        return view('livewire.admin.panel.doctor-specialties.doctor-specialty-create');
     }
 }

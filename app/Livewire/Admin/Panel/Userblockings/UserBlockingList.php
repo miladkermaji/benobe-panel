@@ -149,7 +149,7 @@ class UserBlockingList extends Component
     {
         $items = $this->readyToLoad ? $this->getUserBlockingsQuery() : null;
 
-        return view('livewire.admin.panel.userblockings.userblocking-list', [
+        return view('livewire.admin.panel.user-blockings.user-blocking-list', [
             'userBlockings' => $items,
         ]);
     }

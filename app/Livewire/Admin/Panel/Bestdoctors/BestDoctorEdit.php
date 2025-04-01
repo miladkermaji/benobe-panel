@@ -23,11 +23,11 @@ class BestDoctorEdit extends Component
     {
         $this->bestdoctor = BestDoctor::findOrFail($bestdoctorId);
 
-        $this->doctor_id       = $this->bestdoctor->doctor_id;
-        $this->hospital_id     = $this->bestdoctor->hospital_id;
-        $this->best_doctor     = $this->bestdoctor->best_doctor;
-        $this->best_consultant = $this->bestdoctor->best_consultant;
-        $this->status          = $this->bestdoctor->status;
+        $this->doctor_id       = $this->best_doctor->doctor_id;
+        $this->hospital_id     = $this->best_doctor->hospital_id;
+        $this->best_doctor     = $this->best_doctor->best_doctor;
+        $this->best_consultant = $this->best_doctor->best_consultant;
+        $this->status          = $this->best_doctor->status;
 
         $this->doctors   = Doctor::all();
         $this->hospitals = Hospital::all();
@@ -39,7 +39,7 @@ class BestDoctorEdit extends Component
             'doctor_id'       => [
                 'required',
                 'exists:doctors,id',
-                "unique:best_doctors,doctor_id,{$this->bestdoctor->id},id,hospital_id," . ($this->hospital_id ?? 'NULL'),
+                "unique:best_doctors,doctor_id,{$this->best_doctor->id},id,hospital_id," . ($this->hospital_id ?? 'NULL'),
             ],
             'hospital_id'     => 'nullable|exists:hospitals,id',
             'best_doctor'     => 'boolean',
@@ -52,17 +52,17 @@ class BestDoctorEdit extends Component
             'hospital_id.exists' => 'بیمارستان انتخاب‌شده معتبر نیست.',
         ]);
 
-        $this->bestdoctor->doctor_id       = $this->doctor_id;
-        $this->bestdoctor->hospital_id     = $this->hospital_id;
-        $this->bestdoctor->best_doctor     = $this->best_doctor ?? false;
-        $this->bestdoctor->best_consultant = $this->best_consultant ?? false;
-        $this->bestdoctor->status          = $this->status ?? false;
-        $updated                           = $this->bestdoctor->save();
+        $this->best_doctor->doctor_id       = $this->doctor_id;
+        $this->best_doctor->hospital_id     = $this->hospital_id;
+        $this->best_doctor->best_doctor     = $this->best_doctor ?? false;
+        $this->best_doctor->best_consultant = $this->best_consultant ?? false;
+        $this->best_doctor->status          = $this->status ?? false;
+        $updated                           = $this->best_doctor->save();
 
         if ($updated) {
             $this->dispatch('show-alert', type: 'success', message: 'بهترین پزشک با موفقیت ویرایش شد!');
             $this->dispatch('refresh-index');
-            return redirect()->route('admin.panel.bestdoctors.index');
+            return redirect()->route('admin.panel.best_doctors.index');
         } else {
             $this->dispatch('show-alert', type: 'error', message: 'خطا در ذخیره‌سازی رخ داد!');
         }
@@ -70,6 +70,6 @@ class BestDoctorEdit extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.bestdoctors.bestdoctor-edit');
+        return view('livewire.admin.panel.best-doctors.best-doctor-edit');
     }
 }

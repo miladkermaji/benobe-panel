@@ -147,7 +147,7 @@ class DoctorDocumentList extends Component
     {
         $doctors = $this->readyToLoad ? $this->getDoctors() : [];
 
-        return view('livewire.admin.panel.doctordocuments.doctordocument-list', [
+        return view('livewire.admin.panel.doctor-documents.doctor-document-list', [
             'doctors' => $doctors,
         ]);
     }
