@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Livewire\Dr\Panel\DoctorServices;
 
 use Livewire\Component;
