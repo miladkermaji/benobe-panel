@@ -20,34 +20,29 @@ class MessageService
         $this->message = $message;
     }
 
-public function send()
-{
-    $activeGateway = SmsGateway::where('is_active', true)->first();
-    $driver = $activeGateway ? $this->getDriver($activeGateway->name) : new PishgamRayanDriver();
+    public function send()
+    {
+        $activeGateway = SmsGateway::where('is_active', true)->first();
+        $driver = $activeGateway ? $this->getDriver($activeGateway->name) : new PishgamRayanDriver();
 
-    Log::info('بررسی مقادیر قبل از ارسال', [
-        'otpId' => $this->message->getOtpId(),
-        'message' => $this->message->getMessage(),
-        'parameters' => $this->message->getParameters(),
-        'senderNumber' => $this->message->getSenderNumber(),
-        'recipients' => $this->message->getRecipientNumbers()
-    ]);
+        // چک کن که آیا پارامترها شامل کد OTP هست یا نه
+        $isOtpRequest = $this->message->getOtpId() || (isset($this->message->getParameters()[0]) && is_numeric($this->message->getParameters()[0]));
 
-    if ($this->message->getOtpId()) {
-        return $driver->send(
-            $this->message->getOtpId(),
-            $this->message->getParameters(),
+        if ($isOtpRequest) {
+            return $driver->send(
+                $this->message->getOtpId(),
+                $this->message->getParameters(),
+                $this->message->getSenderNumber(),
+                $this->message->getRecipientNumbers()
+            );
+        }
+
+        return $driver->sendMessage(
+            $this->message->getMessage(),
             $this->message->getSenderNumber(),
             $this->message->getRecipientNumbers()
         );
     }
-
-    return $driver->sendMessage(
-        $this->message->getMessage(),
-        $this->message->getSenderNumber(),
-        $this->message->getRecipientNumbers()
-    );
-}
 
     protected function getDriver($driverName)
     {
