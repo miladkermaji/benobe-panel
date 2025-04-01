@@ -181,15 +181,17 @@
         </thead>
         <tbody>
           @forelse ($clinics as $index => $clinic)
-            <tr>
+      <tr>
               <td>{{ $index + 1 }}</td>
               <td>{{ $clinic->name }}</td>
-              <td>{{ $clinic->province->name }}</td>
-              <td>{{ $clinic->city->name }}</td>
+              <td>{{ optional($clinic->province)->name ?? 'نامشخص' }}</td>
+              <td>{{ optional($clinic->city)->name ?? 'نامشخص' }}</td>
               <td>{{ $clinic->address ?? 'نامشخص' }}</td>
               <td>{{ $clinic->description ?? '---' }}</td>
-              <td><span
-                  class="{{ $clinic->is_active ? 'text-success' : 'text-danger' }}">{{ $clinic->is_active ? 'تایید شده' : 'تایید نشده' }}</span>
+              <td>
+                <span class="{{ $clinic->is_active ? 'text-success' : 'text-danger' }}">
+                  {{ $clinic->is_active ? 'تایید شده' : 'تایید نشده' }}
+                </span>
               </td>
               <td>
                 <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="{{ $clinic->id }}"
@@ -208,12 +210,11 @@
                     <path d="M4 16v4h4M4 20l4-4M20 8v-4h-4M20 4l-4 4M4 4v4M4 4h4M20 20v-4h-4M20 20l-4-4"></path>
                   </svg>
                 </a>
-
               </td>
             </tr>
           @empty
             <tr>
-              <td colspan="5" class="text-center">هیچ مطبی یافت نشد</td>
+              <td colspan="8" class="text-center">هیچ مطبی یافت نشد</td>
             </tr>
           @endforelse
         </tbody>
@@ -261,15 +262,15 @@
       const container = $('#clinic-list tbody');
       container.empty();
       if (response.clinics.length === 0) {
-        container.append('<tr><td colspan="5" class="text-center">مطب فعالی ندارید.</td></tr>');
+        container.append('<tr><td colspan="8" class="text-center">مطب فعالی ندارید.</td></tr>');
       } else {
         response.clinics.forEach(function(clinic, index) {
           const clinicRow = `
             <tr>
               <td>${index + 1}</td>
               <td>${clinic.name}</td>
-              <td>${clinic.province.name}</td>
-              <td>${clinic.city.name}</td>
+              <td>${clinic.province?.name ?? 'نامشخص'}</td>
+              <td>${clinic.city?.name ?? 'نامشخص'}</td>
               <td>${clinic.address ?? 'نامشخص'}</td>
               <td>${clinic.description ?? '---'}</td>
               <td><span class="${clinic.is_active ? 'text-success' : 'text-danger'}">${clinic.is_active ? 'تایید شده' : 'تایید نشده'}</span></td>
@@ -280,13 +281,11 @@
                 <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${clinic.id}" title="حذف">
                   <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
                 </button>
-                <a href="{{ route('dr.panel.clinics.gallery', $clinic->id) }}" class="btn btn-light btn-sm rounded-circle gallery-btn" data-id="${clinic.id}" title="گالری تصاویر">
-                   <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
-     stroke="currentColor" stroke-width="2">
+                <a href="/dr/panel/clinics/${clinic.id}/gallery" class="btn btn-light btn-sm rounded-circle gallery-btn" data-id="${clinic.id}" title="گالری تصاویر">
+                  <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M4 16v4h4M4 20l4-4M20 8v-4h-4M20 4l-4 4M4 4v4M4 4h4M20 20v-4h-4M20 20l-4-4"></path>
                   </svg>
                 </a>
-                
               </td>
             </tr>`;
           container.append(clinicRow);

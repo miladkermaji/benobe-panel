@@ -14,37 +14,33 @@ class DoctorsClinicManagementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+   public function index(Request $request)
+{
+    $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
-        // بازیابی مطب‌ها با اطلاعات شهر و استان
-        $clinics = Clinic::where('doctor_id', $doctorId)
-            ->with(['city', 'province'])
-            ->get();
-        // بازیابی و کش کردن اطلاعات استان‌ها و شهرها
-        $zones = Cache::remember('zones', 86400, function () {
-            return Zone::where('status', 1)
-                ->orderBy('sort')
-                ->get(['id', 'name', 'parent_id', 'level']);
-        });
+    $clinics = Clinic::where('doctor_id', $doctorId)
+        ->with(['city', 'province'])
+        ->get();
 
-        // دسته‌بندی اطلاعات به استان و شهر
-        $provinces = $zones->where('level', 1);                       // سطح 1 => استان‌ها
-        $cities    = $zones->where('level', 2)->groupBy('parent_id'); // سطح 2 => شهرها
+    $zones = Cache::remember('zones', 86400, function () {
+        return Zone::where('status', 1)
+            ->orderBy('sort')
+            ->get(['id', 'name', 'parent_id', 'level']);
+    });
 
-        // پاسخ به درخواست‌های Ajax
-        if ($request->ajax()) {
-            return response()->json([
-                'clinics'   => $clinics,
-                'provinces' => $provinces,
-                'cities'    => $cities,
-            ]);
-        }
+    $provinces = $zones->where('level', 1);
+    $cities = $zones->where('level', 2)->groupBy('parent_id');
 
-        // ارسال داده‌ها به ویو
-        return view('dr.panel.doctors-clinic.index', compact('clinics', 'provinces', 'cities'));
+    if ($request->ajax()) {
+        return response()->json([
+            'clinics' => $clinics,
+            'provinces' => $provinces,
+            'cities' => $cities,
+        ]);
     }
+
+    return view('dr.panel.doctors-clinic.index', compact('clinics', 'provinces', 'cities'));
+}
 
     public function getProvincesAndCities()
     {
@@ -175,10 +171,11 @@ class DoctorsClinicManagementController extends Controller
         return response()->json(['message' => 'مطب با موفقیت حذف شد']);
     }
 
-    public function gallery($id)
-    {
-        return view("dr.panel.doctors-clinic.gallery",compact('id'));
-    }
+  public function gallery($id)
+{
+    $clinic = Clinic::findOrFail($id); // Get the clinic first
+    return view("dr.panel.doctors-clinic.gallery", compact('clinic'));
+}
 
  
 public function medicalDoc()
