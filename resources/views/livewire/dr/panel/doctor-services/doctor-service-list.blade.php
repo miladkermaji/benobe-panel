@@ -57,7 +57,7 @@
             <tbody>
               @if ($readyToLoad)
                 @forelse ($doctorServices as $index => $item)
-                  @include('livewire.dr.panel.doctorservices.doctor-service-tree', [
+                  @include('livewire.dr.panel.doctor-services.doctor-service-tree', [
                       'service' => $item,
                       'level' => 0,
                       'index' => $doctorServices->firstItem() + $index,
