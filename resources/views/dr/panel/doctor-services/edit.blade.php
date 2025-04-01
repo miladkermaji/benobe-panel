@@ -2,8 +2,7 @@
 
 @section('styles')
   <link type="text/css" href="{{ asset('Dr-assets/css/panel/doctorservice/doctorservice.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/panel.css') }}">
-
+   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
 @endsection
 
 @section('site-header')
@@ -11,8 +10,8 @@
 @endsection
 
 @section('content')
-@section('bread-crumb-title', 'مدیریت توضیحات')
-@livewire('dr.panel.doctorservices.doctorservice-list')
+@section('bread-crumb-title', 'ویرایش خدمات')
+@livewire('dr.panel.doctor-services.doctor-service-edit', ['id' => $id])
 @section('scripts')
 
 

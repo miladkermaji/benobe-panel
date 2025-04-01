@@ -2,7 +2,8 @@
 
 @section('styles')
   <link type="text/css" href="{{ asset('Dr-assets/css/panel/doctorservice/doctorservice.css') }}" rel="stylesheet" />
-   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/panel.css') }}">
+
 @endsection
 
 @section('site-header')
@@ -10,8 +11,8 @@
 @endsection
 
 @section('content')
-@section('bread-crumb-title', 'افزودن خدمات جدید')
-@livewire('dr.panel.doctorservices.doctorservice-create')
+@section('bread-crumb-title', 'مدیریت توضیحات')
+@livewire('dr.panel.doctor-services.doctor-service-list')
 @section('scripts')
 
 

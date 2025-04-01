@@ -10,8 +10,8 @@
 @endsection
 
 @section('content')
-@section('bread-crumb-title', 'ویرایش خدمات')
-@livewire('dr.panel.doctorservices.doctorservice-edit', ['id' => $id])
+@section('bread-crumb-title', 'افزودن خدمات جدید')
+@livewire('dr.panel.doctor-services.doctor-service-create')
 @section('scripts')
 
 

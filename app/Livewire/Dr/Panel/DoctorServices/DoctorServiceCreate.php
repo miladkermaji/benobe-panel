@@ -4,15 +4,15 @@
 namespace App\Livewire\Dr\Panel\DoctorServices;
 
 use Livewire\Component;
-use Illuminate\Support\Facades\Validator;
 use App\Models\DoctorService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
-class DoctorServiceEdit extends Component
+class DoctorServiceCreate extends Component
 {
-    public $doctorService;
     public $name;
     public $description;
-    public $status;
+    public $status = true;
     public $duration;
     public $price;
     public $discount;
@@ -20,18 +20,6 @@ class DoctorServiceEdit extends Component
     public $showDiscountModal = false;
     public $discountPercent = 0;
     public $discountAmount = 0;
-
-    public function mount($id)
-    {
-        $this->doctorService = DoctorService::findOrFail($id);
-        $this->name = $this->doctorService->name;
-        $this->description = $this->doctorService->description;
-        $this->status = $this->doctorService->status;
-        $this->duration = $this->doctorService->duration;
-        $this->price = $this->doctorService->price;
-        $this->discount = $this->doctorService->discount;
-        $this->parent_id = $this->doctorService->parent_id;
-    }
 
     public function openDiscountModal()
     {
@@ -69,7 +57,7 @@ class DoctorServiceEdit extends Component
         $this->showDiscountModal = false;
     }
 
-    public function update()
+    public function store()
     {
         $validator = Validator::make([
             'name' => $this->name,
@@ -102,7 +90,7 @@ class DoctorServiceEdit extends Component
             'discount.numeric' => 'تخفیف باید یک عدد باشد.',
             'discount.min' => 'تخفیف نمی‌تواند منفی باشد.',
             'discount.max' => 'تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد.',
-            'parent_id.exists' => 'خدمت مادر انتخاب‌شده معتبر نیست.',
+            'parent_id.exists' => 'سرویس مادر انتخاب‌شده معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -110,7 +98,8 @@ class DoctorServiceEdit extends Component
             return;
         }
 
-        $this->doctorService->update([
+        DoctorService::create([
+            'doctor_id' => Auth::guard('doctor')->user()->id,
             'name' => $this->name,
             'description' => $this->description,
             'status' => $this->status,
@@ -120,13 +109,13 @@ class DoctorServiceEdit extends Component
             'parent_id' => $this->parent_id,
         ]);
 
-        $this->dispatch('show-alert', type: 'success', message: 'خدمت با موفقیت به‌روزرسانی شد!');
+        $this->dispatch('show-alert', type: 'success', message: 'سرویس با موفقیت ایجاد شد!');
         return redirect()->route('dr.panel.doctor-services.index');
     }
 
     public function render()
     {
         $parentServices = DoctorService::whereNull('parent_id')->get();
-        return view('livewire.dr.panel.doctorservices.doctorservice-edit', compact('parentServices'));
+        return view('livewire.dr.panel.doctor-services.doctor-service-create', compact('parentServices'));
     }
 }
