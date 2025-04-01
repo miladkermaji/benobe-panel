@@ -577,7 +577,7 @@
       // نمایش فرم با حذف d-none و اضافه کردن کلاس‌های لازم
       $('.patient-information-content').removeClass('d-none'); // حذف d-none برای نمایش
       $('.patient-information-content').addClass(
-      'd-flex justify-content-center'); // اضافه کردن کلاس‌های مورد نیاز
+        'd-flex justify-content-center'); // اضافه کردن کلاس‌های مورد نیاز
 
       // پاک کردن نتایج جستجو
       $('#search-results-body').empty();

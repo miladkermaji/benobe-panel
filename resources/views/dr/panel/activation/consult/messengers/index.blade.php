@@ -17,7 +17,7 @@
 <div class="workhours-content w-100 d-flex justify-content-center mt-4">
   <div class="workhours-wrapper-content consult-wrapper p-3">
     <div class="">
-          <div class="drop-toggle-styles messangers-data-drop-toggle">
+      <div class="drop-toggle-styles messangers-data-drop-toggle">
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="alert alert-warning mt-2 text-center">
@@ -119,7 +119,7 @@
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl =
     "{{ route('updateStatusAppointment', ':id') }}";
-      document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('messengersForm');
     const submitButton = form.querySelector('button[type="submit"]');
     const buttonText = submitButton.querySelector('.button_text');
@@ -152,7 +152,7 @@
           // نمایش پیام موفقیت یا خطا
           if (data.success) {
             toastr.success(data.message);
-            location.href="{{ route('dr-workhours', 'activation-path=true') }}"
+            location.href = "{{ route('dr-workhours', 'activation-path=true') }}"
 
           } else {
             toastr.error(data.message || "خطا در به‌روزرسانی اطلاعات");

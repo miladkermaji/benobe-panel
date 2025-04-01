@@ -108,13 +108,14 @@
           </div>
         </div>
         <div class="d-flex">
-          <a href="#"
-            rel="noreferrer" class="d-flex align-items-center w-100 p-3 px-0">
+          <a href="#" rel="noreferrer" class="d-flex align-items-center w-100 p-3 px-0">
             <div class="d-flex align-items-center justify-content-center w-12 ">
 
               <img class="btn-show-details" src="{{ asset('dr-assets/icons/location.svg') }}" alt="">
 
-            </div><span class="text-sm line-clamp-2" data-testid="location__address">  {{ $appointment->doctor->city->name ?? 'نامشخص' }} ،{{ $appointment->doctor->province->name ?? 'نامشخص' }}</span>
+            </div><span class="text-sm line-clamp-2" data-testid="location__address">
+              {{ $appointment->doctor->city->name ?? 'نامشخص' }}
+              ،{{ $appointment->doctor->province->name ?? 'نامشخص' }}</span>
           </a>
         </div>
         <div class="p-3">
@@ -153,56 +154,56 @@
 </div>
 @endsection
 @section('scripts')
-  <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-  <script>
-    var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-    var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
+<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script>
+  var appointmentsSearchUrl = "{{ route('search.appointments') }}";
+  var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
 
-    $(document).ready(function() {
-      $('.btn-show-details').addClass('cursor-pointer');
+  $(document).ready(function() {
+    $('.btn-show-details').addClass('cursor-pointer');
 
-      // Toggle details on button click
-      $(document).on('click', '.btn-show-details', function(event) {
-        event.stopPropagation();
-        $('.drop-side-details-content').toggleClass('d-none');
-      });
-
-      // Hide details when clicking outside
-      $(document).on('click', function(event) {
-        if (!$('.drop-side-details-content').has(event.target).length) {
-          $('.drop-side-details-content').addClass('d-none');
-        }
-      });
-
-      // Share functionality
-      $(document).on('click', '.share-appointment', function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        // لینک اشتراک‌گذاری (می‌تونید این رو داینامیک کنید)
-        const shareUrl = 'https://emr-benobe.ir/profile/doctor/mylad-krmangy'; // این رو می‌تونید داینامیک کنید
-        const shareData = {
-          title: 'نوبت پزشکی',
-          text: 'جزئیات نوبت من در به نوبه',
-          url: shareUrl,
-        };
-
-        // بررسی پشتیبانی از navigator.share
-        if (navigator.share) {
-          navigator.share(shareData)
-            .then(() => console.log('اشتراک‌گذاری موفق'))
-            .catch((error) => console.log('خطا در اشتراک‌گذاری:', error));
-        } else {
-          // برای دسکتاپ: کپی کردن لینک و نمایش اعلان
-          navigator.clipboard.writeText(shareUrl).then(() => {
-            alert('لینک نوبت در کلیپ‌بورد کپی شد: ' + shareUrl);
-          }).catch((error) => {
-            console.log('خطا در کپی کردن لینک:', error);
-            alert('لطفاً لینک را به‌صورت دستی کپی کنید: ' + shareUrl);
-          });
-        }
-      });
+    // Toggle details on button click
+    $(document).on('click', '.btn-show-details', function(event) {
+      event.stopPropagation();
+      $('.drop-side-details-content').toggleClass('d-none');
     });
-  </script>
+
+    // Hide details when clicking outside
+    $(document).on('click', function(event) {
+      if (!$('.drop-side-details-content').has(event.target).length) {
+        $('.drop-side-details-content').addClass('d-none');
+      }
+    });
+
+    // Share functionality
+    $(document).on('click', '.share-appointment', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // لینک اشتراک‌گذاری (می‌تونید این رو داینامیک کنید)
+      const shareUrl = 'https://emr-benobe.ir/profile/doctor/mylad-krmangy'; // این رو می‌تونید داینامیک کنید
+      const shareData = {
+        title: 'نوبت پزشکی',
+        text: 'جزئیات نوبت من در به نوبه',
+        url: shareUrl,
+      };
+
+      // بررسی پشتیبانی از navigator.share
+      if (navigator.share) {
+        navigator.share(shareData)
+          .then(() => console.log('اشتراک‌گذاری موفق'))
+          .catch((error) => console.log('خطا در اشتراک‌گذاری:', error));
+      } else {
+        // برای دسکتاپ: کپی کردن لینک و نمایش اعلان
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert('لینک نوبت در کلیپ‌بورد کپی شد: ' + shareUrl);
+        }).catch((error) => {
+          console.log('خطا در کپی کردن لینک:', error);
+          alert('لطفاً لینک را به‌صورت دستی کپی کنید: ' + shareUrl);
+        });
+      }
+    });
+  });
+</script>
 @endsection

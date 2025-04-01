@@ -22,7 +22,7 @@
 <script src="{{ asset('dr-assets/panel/js/toastr/toastr.min.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/global-loader.js') }}"></script>
 <script>
-   function initializeTimepicker() {
+  function initializeTimepicker() {
 
     const DOMElement = $(".timepicker-ui");
 

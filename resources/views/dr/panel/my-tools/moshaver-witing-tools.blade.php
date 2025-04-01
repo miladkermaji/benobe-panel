@@ -109,6 +109,7 @@
         return '<span class="font-weight-bold text-dark">نامشخص</span>';
     }
   }
+
   function getAppointmentType(type) {
     switch (type) {
       case 'in_person':
@@ -123,6 +124,7 @@
         return '<span class="font-weight-bold text-dark">نامشخص</span>';
     }
   }
+
   function getPaymentStatus(status) {
     switch (status) {
       case 'pending':

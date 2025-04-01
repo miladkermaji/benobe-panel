@@ -57,12 +57,15 @@
                       @case('pending')
                         <span class="badge bg-primary">در انتظار</span>
                       @break
+
                       @case('available')
                         <span class="badge bg-success">قابل برداشت</span>
                       @break
+
                       @case('requested')
                         <span class="badge bg-warning">درخواست‌شده</span>
                       @break
+
                       @case('paid')
                         <span class="badge bg-info">پرداخت‌شده</span>
                       @break
@@ -73,9 +76,11 @@
                       @case('online')
                         مشاوره آنلاین
                       @break
+
                       @case('in_person')
                         نوبت حضوری
                       @break
+
                       @case('charge')
                         شارژ کیف پول
                       @break
@@ -154,4 +159,4 @@
       });
     </script>
   </div>
-</div>
+  </div>

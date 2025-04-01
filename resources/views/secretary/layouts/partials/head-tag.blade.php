@@ -1,14 +1,14 @@
 <!-- strart meta tag -->
 <meta charSet="utf-8" />
 <meta name="viewport"
- content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+  content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
 <meta name="description"
- content="به نوبه سامانه نوبت دهی بهترین پزشکان متخصص و مراکز درمانی کشور می باشد،‌ شما میتوانید به راحتی از پزشک مورد نظرتون نوبت و مشاوره آنلاین بگیرید.">
+  content="به نوبه سامانه نوبت دهی بهترین پزشکان متخصص و مراکز درمانی کشور می باشد،‌ شما میتوانید به راحتی از پزشک مورد نظرتون نوبت و مشاوره آنلاین بگیرید.">
 <link rel="canonical" href="https://benobe.ir/" />
 <meta name="robots" content="index, follow" />
 <meta property="og:title" content="به نوبه | نوبت دهی اینترنتی و مشاوره آنلاین پزشکان">
 <meta property="og:description"
- content="به نوبه سامانه نوبت دهی بهترین پزشکان متخصص و مراکز درمانی کشور می باشد،‌ شما میتوانید به راحتی از پزشک مورد نظرتون نوبت و مشاوره آنلاین بگیرید.">
+  content="به نوبه سامانه نوبت دهی بهترین پزشکان متخصص و مراکز درمانی کشور می باشد،‌ شما میتوانید به راحتی از پزشک مورد نظرتون نوبت و مشاوره آنلاین بگیرید.">
 <meta property="og:site_name" content="به نوبه | نوبت دهی اینترنتی و مشاوره آنلاین پزشکان">
 <meta property="og:url" content="">
 <meta property="og:type" content="div">
@@ -33,14 +33,14 @@
 <meta name="google" content="notranslate" />
 <!--  Meta  -->
 <meta name="keywords"
- content="به نوبه نوبت دهی اینترنتی و مشاوره آنلاین پزشکان
+  content="به نوبه نوبت دهی اینترنتی و مشاوره آنلاین پزشکان
     نوبت دهی آنلاین پزشکان ، نوبت اینترنتی دکتر ، نوبت دهی مطب ها ، نوبت دهی مطب های پزشکی ، نوبت مطب سنندج ، نوبت دهی پزشکان کردستان ، نوبت دهی دکتر سنندج ، نوبت دهی بیمارستان کردستان ، نوبت دهی کلینیک و درمانگاه ، نوبت دکتر ، نوبت دهی به نوبه ، سامانه نوبت دهی به نوبه ، benobe ، نوبت بیمارستان سنندج ، نوبت دهی ، مشاوره تلفنی با پزشک کردستان، مشاوره آنلاین دکتر، آدرس دکتر سنندج benobe ،‌ژین ، نوبت دهی ژین ،zhin724 ، نوبت دهی و مشاوره پزشکان">
 <!-- end meta tag -->
 <!-- font awesom -->
 
 <link rel="stylesheet" href="{{ asset('app-assets/font-awesome/all.min.css') }}"
- integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
- crossorigin="anonymous" referrerpolicy="no-referrer" />
+  integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
 <!-- font awesom -->
 <!-- site icon -->
 <link rel="shortcut icon" href="{{ asset('app-assets/images/favicon.ico') }}">

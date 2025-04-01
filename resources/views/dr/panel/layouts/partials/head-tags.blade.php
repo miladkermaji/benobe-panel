@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/responsive_768.css') }}" media="(max-width:768px)">
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/font.css') }}">
 <link type="text/css" href="{{ asset('admin-assets/panel/jalali-datepicker/jalalidatepicker.min.css') }}"
- rel="stylesheet" />
+  rel="stylesheet" />
 
 {{-- tom select --}}
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastify/toastify.min.css') }}">

@@ -115,7 +115,7 @@
         type: 'GET',
         success: function(response) {
           $('#secretaryLogsContainer').html(response
-          .secretaryLogsHtml); // تغییر نام متغیر به `secretaryLogsHtml`
+            .secretaryLogsHtml); // تغییر نام متغیر به `secretaryLogsHtml`
         }
       });
     }

@@ -367,10 +367,11 @@
       window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
     });
   });
- $('#add-secretary-btn').on('click', function() {
-      $('#addSecretaryModal').modal('show');
+  $('#add-secretary-btn').on('click', function() {
+    $('#addSecretaryModal').modal('show');
 
-    });
+  });
+
   function updateSecretaryList(secretaries) {
     const container = $('#secretary-list tbody');
     container.empty(); // پاک کردن لیست قبلی

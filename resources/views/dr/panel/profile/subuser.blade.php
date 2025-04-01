@@ -14,7 +14,8 @@
 @section('bread-crumb-title', 'مدیریت کاربران زیرمجموعه')
 
 <!-- مودال افزودن کاربر زیرمجموعه -->
-<div class="modal fade" id="addSubUserModal" tabindex="-1" role="dialog" aria-labelledby="addSubUserModalTitle" aria-hidden="true">
+<div class="modal fade" id="addSubUserModal" tabindex="-1" role="dialog" aria-labelledby="addSubUserModalTitle"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content border-radius-6">
       <div class="modal-header">
@@ -30,13 +31,15 @@
             <label class="label-top-input-special-takhasos">انتخاب کاربر:</label>
             <select name="user_id" id="user-select" class="form-control h-50 w-100">
               @foreach ($users as $user)
-                <option value="{{ $user->id }}">{{ $user->first_name }} {{ $user->last_name }} -- {{ $user->national_code }}</option>
+                <option value="{{ $user->id }}">{{ $user->first_name }} {{ $user->last_name }} --
+                  {{ $user->national_code }}</option>
               @endforeach
             </select>
             <small class="text-danger error-user_id mt-1"></small>
           </div>
           <div class="w-100 mt-2">
-            <button type="submit" class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+            <button type="submit"
+              class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -48,7 +51,8 @@
 </div>
 
 <!-- مودال ویرایش کاربر زیرمجموعه -->
-<div class="modal fade" id="editSubUserModal" tabindex="-1" role="dialog" aria-labelledby="editSubUserModalTitle" aria-hidden="true">
+<div class="modal fade" id="editSubUserModal" tabindex="-1" role="dialog" aria-labelledby="editSubUserModalTitle"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content border-radius-6">
       <div class="modal-header">
@@ -67,7 +71,8 @@
             <small class="text-danger error-user_id mt-1"></small>
           </div>
           <div class="w-100 mt-2">
-            <button type="submit" class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+            <button type="submit"
+              class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -106,10 +111,12 @@
               <td>{{ $subUser->user->mobile }}</td>
               <td>{{ $subUser->user->national_code }}</td>
               <td>
-                <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="{{ $subUser->id }}" title="ویرایش">
+                <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="{{ $subUser->id }}"
+                  title="ویرایش">
                   <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
                 </button>
-                <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="{{ $subUser->id }}" title="حذف">
+                <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="{{ $subUser->id }}"
+                  title="حذف">
                   <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
                 </button>
               </td>

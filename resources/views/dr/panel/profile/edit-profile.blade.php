@@ -644,85 +644,104 @@
 <script src="{{ asset('dr-assets/panel/js/profile/edit-profile.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-// تابع کمکی برای مقداردهی اولیه Tom Select
-function initializeTomSelect(elementId, options = {}) {
+  // تابع کمکی برای مقداردهی اولیه Tom Select
+  function initializeTomSelect(elementId, options = {}) {
     const selectElement = document.getElementById(elementId);
     if (selectElement && !selectElement.tomSelect) {
-        return new TomSelect(`#${elementId}`, {
-            direction: 'rtl',
-            placeholder: options.placeholder || 'انتخاب کنید',
-            allowEmptyOption: true,
-            maxOptions: null,
-            ...options
-        });
+      return new TomSelect(`#${elementId}`, {
+        direction: 'rtl',
+        placeholder: options.placeholder || 'انتخاب کنید',
+        allowEmptyOption: true,
+        maxOptions: null,
+        ...options
+      });
     }
     return selectElement ? selectElement.tomSelect : null;
-}
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // مقداردهی اولیه Tom Select برای استان و شهر و ذخیره نمونه‌ها
-    const provinceTomSelect = initializeTomSelect('province_id', { placeholder: 'انتخاب استان' });
-    const cityTomSelect = initializeTomSelect('city_id', { placeholder: 'انتخاب شهر' });
+    const provinceTomSelect = initializeTomSelect('province_id', {
+      placeholder: 'انتخاب استان'
+    });
+    const cityTomSelect = initializeTomSelect('city_id', {
+      placeholder: 'انتخاب شهر'
+    });
 
     // بررسی وجود نمونه‌ها
     if (!provinceTomSelect || !cityTomSelect) {
-        console.error('خطا در مقداردهی Tom Select برای استان یا شهر');
-        return;
+      console.error('خطا در مقداردهی Tom Select برای استان یا شهر');
+      return;
     }
 
     const provinceSelect = document.getElementById('province_id');
 
     // مدیریت تغییر در انتخاب استان
     provinceSelect.addEventListener('change', function() {
-        const provinceId = this.value;
+      const provinceId = this.value;
 
-        if (provinceId) {
-            fetch(`{{ route('dr-get-cities') }}?province_id=${provinceId}`, {
-                method: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    cityTomSelect.clear();
-                    cityTomSelect.clearOptions();
-                    cityTomSelect.addOption({ value: '', text: 'انتخاب شهر' });
-                    data.cities.forEach(city => {
-                        cityTomSelect.addOption({ value: city.id, text: city.name });
-                    });
-                    cityTomSelect.enable();
-                    cityTomSelect.refreshOptions();
-                } else {
-                    toastr.error(data.message || 'خطا در بارگذاری شهرها');
-                    cityTomSelect.clear();
-                    cityTomSelect.clearOptions();
-                    cityTomSelect.addOption({ value: '', text: 'خطا در بارگذاری' });
-                    cityTomSelect.disable();
-                }
-            })
-            .catch(error => {
-                toastr.error('خطا در ارتباط با سرور');
-                cityTomSelect.clear();
-                cityTomSelect.clearOptions();
-                cityTomSelect.addOption({ value: '', text: 'خطا در بارگذاری' });
-                cityTomSelect.disable();
-            });
-        } else {
+      if (provinceId) {
+        fetch(`{{ route('dr-get-cities') }}?province_id=${provinceId}`, {
+            method: 'GET',
+            headers: {
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+              'Accept': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              cityTomSelect.clear();
+              cityTomSelect.clearOptions();
+              cityTomSelect.addOption({
+                value: '',
+                text: 'انتخاب شهر'
+              });
+              data.cities.forEach(city => {
+                cityTomSelect.addOption({
+                  value: city.id,
+                  text: city.name
+                });
+              });
+              cityTomSelect.enable();
+              cityTomSelect.refreshOptions();
+            } else {
+              toastr.error(data.message || 'خطا در بارگذاری شهرها');
+              cityTomSelect.clear();
+              cityTomSelect.clearOptions();
+              cityTomSelect.addOption({
+                value: '',
+                text: 'خطا در بارگذاری'
+              });
+              cityTomSelect.disable();
+            }
+          })
+          .catch(error => {
+            toastr.error('خطا در ارتباط با سرور');
             cityTomSelect.clear();
             cityTomSelect.clearOptions();
-            cityTomSelect.addOption({ value: '', text: 'ابتدا یک استان انتخاب کنید' });
+            cityTomSelect.addOption({
+              value: '',
+              text: 'خطا در بارگذاری'
+            });
             cityTomSelect.disable();
-        }
+          });
+      } else {
+        cityTomSelect.clear();
+        cityTomSelect.clearOptions();
+        cityTomSelect.addOption({
+          value: '',
+          text: 'ابتدا یک استان انتخاب کنید'
+        });
+        cityTomSelect.disable();
+      }
     });
 
     // لود اولیه شهرها اگر استان از قبل انتخاب شده باشد
     if (provinceSelect.value) {
-        provinceSelect.dispatchEvent(new Event('change'));
+      provinceSelect.dispatchEvent(new Event('change'));
     }
-});
+  });
 </script>
 @include('dr.panel.profile.option.profile-option')
 

@@ -79,8 +79,8 @@
       <hr>
       @if (isset($_GET['activation-path']) && $_GET['activation-path'] == true)
         <div class="w-100 mt-3">
-          <button class="btn btn-success w-100 h-50" tabindex="0" type="button" id=":rs:"
-            data-toggle="modal" data-target="#activation-modal">پایان فعالسازی<span></span></button>
+          <button class="btn btn-success w-100 h-50" tabindex="0" type="button" id=":rs:" data-toggle="modal"
+            data-target="#activation-modal">پایان فعالسازی<span></span></button>
         </div>
         <div class="modal fade" id="activation-modal" tabindex="-1" role="dialog"
           aria-labelledby="activation-modal-label" aria-hidden="true">

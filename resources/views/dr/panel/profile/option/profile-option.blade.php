@@ -952,71 +952,74 @@
         });
     });
   });
-document.getElementById("staticPasswordForm").addEventListener('submit', function(e) {
-  e.preventDefault();
-  const form = this;
-  const submitButton = form.querySelector('button[type="submit"]');
-  const loader = submitButton.querySelector('.loader');
-  const buttonText = submitButton.querySelector('.button_text');
+  document.getElementById("staticPasswordForm").addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const loader = submitButton.querySelector('.loader');
+    const buttonText = submitButton.querySelector('.button_text');
 
-  buttonText.style.display = 'none';
-  loader.style.display = 'block';
+    buttonText.style.display = 'none';
+    loader.style.display = 'block';
 
-  fetch(form.action, {
-    method: form.method,
-    body: new FormData(form),
-    headers: {
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-      'X-Requested-With': 'XMLHttpRequest'
-    }
-  })
-    .then(response => {
-      return response.json().then(data => {
-        if (!response.ok) {
-          throw { status: response.status, data: data };
+    fetch(form.action, {
+        method: form.method,
+        body: new FormData(form),
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'X-Requested-With': 'XMLHttpRequest'
         }
-        return data;
+      })
+      .then(response => {
+        return response.json().then(data => {
+          if (!response.ok) {
+            throw {
+              status: response.status,
+              data: data
+            };
+          }
+          return data;
+        });
+      })
+      .then(data => {
+        buttonText.style.display = 'block';
+        loader.style.display = 'none';
+        if (data.success) {
+          toastr.success(data.message || "تنظیمات با موفقیت به‌روزرسانی شد");
+        } else {
+          toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
+        }
+      })
+      .catch(error => {
+        buttonText.style.display = 'block';
+        loader.style.display = 'none';
+        if (error.status === 422 && error.data.errors) {
+          handleValidationErrors(error.data.errors, error.data.message);
+        } else {
+          toastr.error(error.data?.message || 'خطا در برقراری ارتباط با سرور');
+        }
       });
-    })
-    .then(data => {
-      buttonText.style.display = 'block';
-      loader.style.display = 'none';
-      if (data.success) {
-        toastr.success(data.message || "تنظیمات با موفقیت به‌روزرسانی شد");
-      } else {
-        toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
-      }
-    })
-    .catch(error => {
-      buttonText.style.display = 'block';
-      loader.style.display = 'none';
-      if (error.status === 422 && error.data.errors) {
-        handleValidationErrors(error.data.errors, error.data.message);
-      } else {
-        toastr.error(error.data?.message || 'خطا در برقراری ارتباط با سرور');
+  });
+
+  function handleValidationErrors(errors, message) {
+    clearPreviousErrors();
+    Object.keys(errors).forEach(field => {
+      const inputElement = document.querySelector(`[name="${field}"]`);
+      if (inputElement) {
+        const errorElement = document.createElement('div');
+        errorElement.className = 'text-danger validation-error mt-1 font-size-13';
+        errorElement.textContent = errors[field][0];
+        inputElement.classList.add('is-invalid');
+        inputElement.parentNode.insertBefore(errorElement, inputElement.nextSibling);
       }
     });
-});
+    toastr.error(message || "لطفاً خطاهای فرم را بررسی کنید.");
+  }
 
-function handleValidationErrors(errors, message) {
-  clearPreviousErrors();
-  Object.keys(errors).forEach(field => {
-    const inputElement = document.querySelector(`[name="${field}"]`);
-    if (inputElement) {
-      const errorElement = document.createElement('div');
-      errorElement.className = 'text-danger validation-error mt-1 font-size-13';
-      errorElement.textContent = errors[field][0];
-      inputElement.classList.add('is-invalid');
-      inputElement.parentNode.insertBefore(errorElement, inputElement.nextSibling);
-    }
-  });
-  toastr.error(message || "لطفاً خطاهای فرم را بررسی کنید.");
-}
-
-function clearPreviousErrors() {
-  document.querySelectorAll('.validation-error').forEach(el => el.remove());
-  document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-}
+  function clearPreviousErrors() {
+    document.querySelectorAll('.validation-error').forEach(el => el.remove());
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+  }
   document.addEventListener('DOMContentLoaded', function() {
     const toggleSwitch = document.querySelector('input[name="static_password_enabled"]');
     const passwordInput = document.querySelector('input[name="password"]');

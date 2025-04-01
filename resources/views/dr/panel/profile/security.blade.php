@@ -8,8 +8,6 @@
     .myPanelOption {
       display: none;
     }
-
-  
   </style>
 @endsection
 

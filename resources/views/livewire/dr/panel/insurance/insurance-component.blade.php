@@ -71,11 +71,12 @@
               @enderror
             </div>
 
-          <!-- روش 1: درصد از مبلغ نوبت -->
+            <!-- روش 1: درصد از مبلغ نوبت -->
           @elseif ($calculation_method === '1')
             <div class="col-lg-3">
               <label>مبلغ نوبت (تومان):</label>
-              <input wire:model.defer="appointment_price" type="number" class="form-control h-50" placeholder="فقط عدد">
+              <input wire:model.defer="appointment_price" type="number" class="form-control h-50"
+                placeholder="فقط عدد">
               @error('appointment_price')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
@@ -88,7 +89,7 @@
               @enderror
             </div>
 
-          <!-- روش 2: مبلغ ثابت + درصد -->
+            <!-- روش 2: مبلغ ثابت + درصد -->
           @elseif ($calculation_method === '2')
             <div class="col-lg-3">
               <label>مبلغ نهایی (تومان):</label>
@@ -105,11 +106,12 @@
               @enderror
             </div>
 
-          <!-- روش 3: فقط آمار -->
+            <!-- روش 3: فقط آمار -->
           @elseif ($calculation_method === '3')
             <div class="col-lg-3">
               <label>مبلغ نوبت (تومان، اختیاری):</label>
-              <input wire:model.defer="appointment_price" type="number" class="form-control h-50" placeholder="فقط عدد">
+              <input wire:model.defer="appointment_price" type="number" class="form-control h-50"
+                placeholder="فقط عدد">
               @error('appointment_price')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
@@ -122,11 +124,12 @@
               @enderror
             </div>
 
-          <!-- روش 4: پویا -->
+            <!-- روش 4: پویا -->
           @elseif ($calculation_method === '4')
             <div class="col-lg-2">
               <label>مبلغ نوبت (تومان، اختیاری):</label>
-              <input wire:model.defer="appointment_price" type="number" class="form-control h-50" placeholder="فقط عدد">
+              <input wire:model.defer="appointment_price" type="number" class="form-control h-50"
+                placeholder="فقط عدد">
               @error('appointment_price')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
@@ -227,14 +230,16 @@
               <td>{{ $insurance->final_price ? number_format($insurance->final_price) : '-' }} تومان</td>
             @endif
             <td>
-              <button wire:click="confirmDelete({{ $insurance->id }})" class="btn btn-sm btn-light rounded-circle" title="حذف">
+              <button wire:click="confirmDelete({{ $insurance->id }})" class="btn btn-sm btn-light rounded-circle"
+                title="حذف">
                 <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
               </button>
             </td>
           </tr>
         @empty
           <tr>
-            <td colspan="{{ $calculation_method === '0' || $calculation_method === '2' ? 4 : 6 }}" class="text-center">موردی ثبت نشده است</td>
+            <td colspan="{{ $calculation_method === '0' || $calculation_method === '2' ? 4 : 6 }}"
+              class="text-center">موردی ثبت نشده است</td>
           </tr>
         @endforelse
       </tbody>
@@ -261,7 +266,9 @@
         }).then((result) => {
           if (result.isConfirmed) {
             const insuranceId = typeof id === 'object' ? id.id : id;
-            Livewire.dispatch('delete', { id: insuranceId });
+            Livewire.dispatch('delete', {
+              id: insuranceId
+            });
           }
         });
       });

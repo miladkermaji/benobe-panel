@@ -61,23 +61,21 @@
                       <div class="d-flex justify-content-start w-100">
                         <label for="name" class="label-top-input"> شروع</label>
 
-                        <input type="text"
-                          class="form-control h-50 text-center cursor-pointer" placeholder="1404/05/08" data-jdp=""
-                          readonly="">
+                        <input type="text" class="form-control h-50 text-center cursor-pointer"
+                          placeholder="1404/05/08" data-jdp="" readonly="">
                       </div>
 
-                    
+
                     </button>
                     <button class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50  w-100 ">
                       <div class="d-flex justify-content-start w-100">
                         <label for="name" class="label-top-input"> پایان</label>
 
-                        <input type="text"
-                          class="form-control h-50 text-center cursor-pointer" placeholder="1404/05/08" data-jdp=""
-                          readonly="">
+                        <input type="text" class="form-control h-50 text-center cursor-pointer"
+                          placeholder="1404/05/08" data-jdp="" readonly="">
                       </div>
 
-                     
+
                     </button>
                   </div>
                   <div class="border d-flex justify-content-between p-2-5 border-radius-6 mt-3" id="top-modal-div">

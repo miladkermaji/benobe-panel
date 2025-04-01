@@ -238,7 +238,7 @@
       window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
     });
 
-   
+
   });
 
   // ثبت کاربر مسدود
