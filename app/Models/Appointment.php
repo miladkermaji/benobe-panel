@@ -1,8 +1,9 @@
 <?php
 namespace App\Models;
 
-use App\Models\Specialty;
 use App\Models\User;
+use App\Models\Specialty;
+use Morilog\Jalali\Jalalian;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -58,5 +59,24 @@ class Appointment extends Model
     public function pattern()
     {
         return $this->belongsTo(AppointmentPattern::class);
+    }
+    public function getJalaliAppointmentDateAttribute()
+    {
+        return Jalalian::fromCarbon($this->appointment_date)->format('Y/m/d');
+    }
+
+    // Accessor برای وضعیت پرداخت (اگر وجود داشته باشه)
+    public function getPaymentStatusLabelAttribute()
+    {
+        switch ($this->payment_status) {
+            case 'paid':
+                return 'پرداخت شده';
+            case 'unpaid':
+                return 'پرداخت نشده';
+            case 'pending':
+                return 'در انتظار پرداخت';
+            default:
+                return 'نامشخص';
+        }
     }
 }

@@ -90,13 +90,18 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('appointments')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Appointment\AppointmentController::class, 'index'])->name('admin.panel.appointments.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Appointment\AppointmentController::class, 'create'])->name('admin.panel.appointments.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Appointment\AppointmentController::class, 'edit'])->name('admin.panel.appointments.edit');
+        });
+
         Route::prefix('secretaries')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'index'])->name('admin.panel.secretaries.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'create'])->name('admin.panel.secretaries.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'edit'])->name('admin.panel.secretaries.edit');
 
             Route::get('/secreteries-permissions', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'adminSecretaryPermission'])->name('admin.panel.secretaries.secreteries-permission');
-
         });
 
         Route::prefix('doctor-comments')->group(function () {

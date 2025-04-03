@@ -128,7 +128,7 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('dr-appointments') }}">لیست نوبت‌ها</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.appointments.index') }}">لیست نوبت‌ها</a></li>
             <li class="item-li"><a href="{{ route('dr-manual_nobat') }}">نوبت‌دهی دستی</a></li>
             <li class="item-li"><a href="#">نوبت‌دهی هوشمند</a></li>
             <li class="item-li"><a href="#">نوبت‌های گروهی</a></li>
