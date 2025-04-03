@@ -1,22 +1,36 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SecretaryPermission extends Model
 {
-    use HasFactory;
-
-    protected $fillable = ['doctor_id', 'secretary_id', 'clinic_id', 'permissions', 'has_access'];
-
-    protected $casts = [
-        'permissions' => 'array', // این فیلد به صورت JSON ذخیره می‌شود
+    protected $fillable = [
+        'secretary_id',
+        'doctor_id',
+        'clinic_id',
+        'permissions',
+        'has_access',
     ];
 
-    // متد بررسی دسترسی
-    public function hasPermission($key)
+    protected $casts = [
+        'permissions' => 'array',
+        'has_access' => 'boolean',
+    ];
+
+    public function secretary()
     {
-        return in_array($key, $this->permissions ?? []);
+        return $this->belongsTo(Secretary::class);
+    }
+
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
+
+    public function clinic()
+    {
+        return $this->belongsTo(Clinic::class);
     }
 }

@@ -1,44 +1,41 @@
 <?php
+
 namespace App\Models;
 
-use App\Models\SecretaryPermission;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 
-class Secretary extends Authenticatable
+class Secretary extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'doctor_id',
-        'clinic_id',
         'first_name',
         'last_name',
-        'email',
         'mobile',
         'national_code',
         'gender',
-        'address',
-        'birth_date',
-        'profile_photo_path',
+        'email',
         'password',
+        'doctor_id',
+        'clinic_id',
         'is_active',
+        'profile_photo_path',
     ];
 
-    // کست کردن فیلدها
-    protected $hidden = ['password'];
-    protected $casts  = [
-        'is_active'  => 'boolean',
-        'birth_date' => 'date',
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
-    // ارتباط با مدل دکتر
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);
     }
+
+    public function clinic()
+    {
+        return $this->belongsTo(Clinic::class);
+    }
+
     public function permissions()
     {
-        return $this->hasOne(SecretaryPermission::class, 'secretary_id', 'id');
+        return $this->hasMany(SecretaryPermission::class);
     }
 }

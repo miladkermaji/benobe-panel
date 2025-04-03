@@ -110,7 +110,7 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('dr-secretary-management') }}">لیست منشی‌ها</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.secretaries.index') }}">لیست منشی‌ها</a></li>
             <li class="item-li"><a href="{{ route('dr-secretary-permissions') }}">دسترسی‌های منشی</a></li>
             <li class="item-li"><a href="#">منشی‌های غیرفعال</a></li>
           </ul>
