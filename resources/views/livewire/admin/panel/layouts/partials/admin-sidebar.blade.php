@@ -130,7 +130,7 @@
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.appointments.index') }}">لیست نوبت‌ها</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.manual-appointments.index') }}">نوبت‌دهی دستی</a></li>
-            <li class="item-li"><a href="{{ route('dr-scheduleSetting') }}">تنظیمات نوبت‌دهی</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.manual-appointment-settings.index') }}">تنظیمات نوبت‌دهی</a></li>
             <li class="item-li"><a href="{{ route('dr-vacation') }}">تعطیلات</a></li>
             <li class="item-li"><a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a></li>
             <li class="item-li"><a href="{{ route('dr-turnsCatByDays') }}">دسته‌بندی نوبت‌ها</a></li>

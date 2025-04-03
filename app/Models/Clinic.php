@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Doctor;
@@ -70,5 +71,9 @@ class Clinic extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+    public function manualAppointmentSettings()
+    {
+        return $this->hasMany(ManualAppointmentSetting::class);
     }
 }

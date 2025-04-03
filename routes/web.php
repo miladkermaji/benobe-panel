@@ -90,6 +90,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('manual-appointment-settings')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\ManualAppointmentSetting\ManualAppointmentSettingController::class, 'index'])->name('admin.panel.manual-appointment-settings.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\ManualAppointmentSetting\ManualAppointmentSettingController::class, 'create'])->name('admin.panel.manual-appointment-settings.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\ManualAppointmentSetting\ManualAppointmentSettingController::class, 'edit'])->name('admin.panel.manual-appointment-settings.edit');
+        });
+
         Route::prefix('manual-appointments')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\ManualAppointment\ManualAppointmentController::class, 'index'])->name('admin.panel.manual-appointments.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\ManualAppointment\ManualAppointmentController::class, 'create'])->name('admin.panel.manual-appointments.create');
