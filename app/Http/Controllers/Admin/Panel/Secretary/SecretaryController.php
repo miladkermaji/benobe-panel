@@ -20,4 +20,8 @@ class SecretaryController extends Controller
     {
         return view('admin.panel.secretaries.edit', compact('id'));
     }
+     public function adminSecretaryPermission()
+    {
+     return view('admin.panel.secretaries.secretaries-permissions');
+    }
 }

@@ -132,7 +132,7 @@ class Doctor extends Authenticatable
     {
         return $this->hasMany(Clinic::class);
     }
-
+   
     public function province()
     {
         return $this->belongsTo(Zone::class, 'province_id');
@@ -267,7 +267,7 @@ class Doctor extends Authenticatable
     {
         return $this->hasMany(DoctorTag::class);
     }
-     public function comments()
+    public function comments()
     {
         return $this->hasMany(DoctorComment::class);
     }

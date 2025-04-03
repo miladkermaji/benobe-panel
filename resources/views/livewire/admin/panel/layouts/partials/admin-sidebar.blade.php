@@ -111,8 +111,7 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.secretaries.index') }}">لیست منشی‌ها</a></li>
-            <li class="item-li"><a href="{{ route('dr-secretary-permissions') }}">دسترسی‌های منشی</a></li>
-            <li class="item-li"><a href="#">منشی‌های غیرفعال</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.secretaries.secreteries-permission') }}">دسترسی‌های منشی</a></li>
           </ul>
         </li>
         <!-- مدیریت نوبت‌ها -->

@@ -186,6 +186,7 @@ class SecretaryManagementController extends Controller
         return response()->json($secretary);
     }
 
+
     public function update(Request $request, $id)
     {
         $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
@@ -301,4 +302,5 @@ class SecretaryManagementController extends Controller
 
         return response()->json(['message' => 'منشی با موفقیت حذف شد', 'secretaries' => $secretaries]);
     }
+   
 }

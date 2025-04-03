@@ -211,8 +211,9 @@
           </thead>
           <tbody>
             @forelse ($secretaries as $secretary)
-              @php
-                $savedPermissions = json_decode($secretary->permissions->permissions ?? '[]', true);
+           @php
+                $permission = $secretary->permissions->firstWhere('clinic_id', $secretary->clinic_id);
+                $savedPermissions = $permission ? json_decode($permission->permissions ?? '[]', true) : [];
                 $savedPermissions = is_array($savedPermissions) ? $savedPermissions : [];
               @endphp
               <tr>

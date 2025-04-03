@@ -34,8 +34,8 @@ class Secretary extends Model
         return $this->belongsTo(Clinic::class);
     }
 
-    public function permissions()
-    {
-        return $this->hasMany(SecretaryPermission::class);
-    }
+ public function permissions()
+{
+    return $this->hasMany(SecretaryPermission::class, 'secretary_id');
+}
 }

@@ -90,17 +90,20 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
-    Route::prefix('secretaries')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'index'])->name('admin.panel.secretaries.index');
-        Route::get('/create', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'create'])->name('admin.panel.secretaries.create');
-        Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'edit'])->name('admin.panel.secretaries.edit');
-    });
+        Route::prefix('secretaries')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'index'])->name('admin.panel.secretaries.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'create'])->name('admin.panel.secretaries.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'edit'])->name('admin.panel.secretaries.edit');
 
-Route::prefix('doctor-comments')->group(function () {
+            Route::get('/secreteries-permissions', [\App\Http\Controllers\Admin\Panel\Secretary\SecretaryController::class, 'adminSecretaryPermission'])->name('admin.panel.secretaries.secreteries-permission');
+
+        });
+
+        Route::prefix('doctor-comments')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorComment\DoctorCommentController::class, 'index'])->name('admin.panel.doctor-comments.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorComment\DoctorCommentController::class, 'create'])->name('admin.panel.doctor-comments.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorComment\DoctorCommentController::class, 'edit'])->name('admin.panel.doctor-comments.edit');
-});
+        });
 
         Route::prefix('doctor-specialties')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorSpecialty\DoctorSpecialtyController::class, 'index'])->name('admin.panel.doctor-specialties.index');
