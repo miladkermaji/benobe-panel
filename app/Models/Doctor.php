@@ -108,6 +108,10 @@ class Doctor extends Authenticatable
     {
         return $this->hasOne(DoctorCounselingConfig::class);
     }
+    public function doctorHolidays()
+    {
+        return $this->hasMany(DoctorHoliday::class, 'doctor_id');
+    }
     public function getProfilePhotoUrlAttribute()
     {
         return $this->profile_photo_path
@@ -132,7 +136,7 @@ class Doctor extends Authenticatable
     {
         return $this->hasMany(Clinic::class);
     }
-   
+
     public function province()
     {
         return $this->belongsTo(Zone::class, 'province_id');

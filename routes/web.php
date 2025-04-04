@@ -90,6 +90,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('doctor-holidays')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorHoliday\DoctorHolidayController::class, 'index'])->name('admin.panel.doctor-holidays.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorHoliday\DoctorHolidayController::class, 'create'])->name('admin.panel.doctor-holidays.create');
+            Route::get('edit/{id}/{date?}', [\App\Http\Controllers\Admin\Panel\DoctorHoliday\DoctorHolidayController::class, 'edit'])->name('admin.panel.doctor-holidays.edit');
+        });
+
         Route::prefix('manual-appointment-settings')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\ManualAppointmentSetting\ManualAppointmentSettingController::class, 'index'])->name('admin.panel.manual-appointment-settings.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\ManualAppointmentSetting\ManualAppointmentSettingController::class, 'create'])->name('admin.panel.manual-appointment-settings.create');
