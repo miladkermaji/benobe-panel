@@ -66,11 +66,10 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('admin.panel.users.index') }}">لیست کاربران</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.user-groups.index') }}">گروه‌های کاربری</a></li>
             <li class="item-li"><a href="#">مدیریت نقش‌ها و دسترسی‌ها</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.user-blockings.index') }}">کاربران مسدود</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.sub-users.index') }}">کاربران زیرمجموعه</a></li>
+           
             <!-- جدید -->
           </ul>
         </li>
@@ -111,7 +110,8 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.secretaries.index') }}">لیست منشی‌ها</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.secretaries.secreteries-permission') }}">دسترسی‌های منشی</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.secretaries.secreteries-permission') }}">دسترسی‌های
+                منشی</a></li>
           </ul>
         </li>
         <!-- مدیریت نوبت‌ها -->
@@ -130,7 +130,8 @@
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.appointments.index') }}">لیست نوبت‌ها</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.manual-appointments.index') }}">نوبت‌دهی دستی</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.manual-appointment-settings.index') }}">تنظیمات نوبت‌دهی</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.manual-appointment-settings.index') }}">تنظیمات
+                نوبت‌دهی</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.doctor-holidays.index') }}">تعطیلات</a></li>
           </ul>
         </li>
@@ -148,11 +149,9 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="#">لیست بیماران</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.users.index') }}">لیست بیماران</a></li>
+             <li class="item-li"><a href="{{ route('admin.panel.sub-users.index') }}">کاربران زیرمجموعه</a></li>
             <li class="item-li"><a href="{{ route('dr-patient-records') }}">پرونده پزشکی</a></li>
-            <li class="item-li"><a href="#">تاریخچه نوبت‌ها</a></li>
-            <li class="item-li"><a href="#">اطلاعات تماس</a></li>
-            <li class="item-li"><a href="#">بیماران غیرفعال</a></li>
           </ul>
         </li>
         <!-- مدیریت fdlhvsjhk -->
