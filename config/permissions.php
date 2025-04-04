@@ -105,15 +105,7 @@ return [
             'dr-subuser' => 'کاربران زیرمجموعه',
         ],
     ],
-    'advanced_settings' => [
-        'title' => 'تنظیمات پیشرفته',
-        'icon' => 'i-users',
-        'routes' => [
-            '#' => 'تنظیمات پیام‌رسان‌ها',
-            '#' => 'تنظیمات اعلان‌ها',
-            '#' => 'پشتیبان‌گیری',
-        ],
-    ],
+
     'messages' => [
         'title' => 'پیام',
         'icon' => 'i-comments',
@@ -126,17 +118,7 @@ return [
         'title' => 'گزارش‌ها و آمار',
         'icon' => 'i-transactions',
         'routes' => [
-            'dr-my-performance-chart' => 'آمار و نمودار',
-            '#' => 'گزارش نوبت‌های لغو شده',
-            '#' => 'تحلیل داده‌ها',
+            'dr-my-performance-chart' => 'آمار و نمودار'
         ],
-    ],
-    'content_management' => [
-        'title' => 'مدیریت محتوا',
-        'icon' => 'i-users',
-        'routes' => [
-            '#' => 'مدیریت بلاگ',
-            '#' => 'نظرات بیماران',
-        ],
-    ],
+    ]
 ];

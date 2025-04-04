@@ -132,8 +132,6 @@
             <li class="item-li"><a href="{{ route('admin.panel.manual-appointments.index') }}">نوبت‌دهی دستی</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.manual-appointment-settings.index') }}">تنظیمات نوبت‌دهی</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.doctor-holidays.index') }}">تعطیلات</a></li>
-            <li class="item-li"><a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a></li>
-            <li class="item-li"><a href="{{ route('dr-turnsCatByDays') }}">دسته‌بندی نوبت‌ها</a></li>
           </ul>
         </li>
         <!-- مدیریت بیماران -->
