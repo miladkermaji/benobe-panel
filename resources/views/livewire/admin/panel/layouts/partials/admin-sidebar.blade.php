@@ -203,10 +203,9 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.clinics.index') }}"> مدیریت کلینیک</a></li>
-            <li class="item-li"><a href="#">مدیریت هزینه‌ها</a></li>
+            <li class="item-li"><a href="#"> بیعانه</a></li>
             <li class="item-li"><a href="#">مدت زمان ویزیت</a></li>
             <li class="item-li"><a href="#">ساعات کاری</a></li>
-            <li class="item-li"><a href="#">مدارک پزشکی</a></li>
           </ul>
         </li>
         <!-- مدیریت کلینیک‌ها -->
