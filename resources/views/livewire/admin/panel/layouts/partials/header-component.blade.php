@@ -3,7 +3,7 @@
         <span class="bars"></span>
     </div>
     <div class="header__left d-flex flex-end item-center margin-top-2">
-        <div class="d-flex notif-option">
+        <div class="d-flex notif-option mx-3">
             <div>
                 <span class="bell-red-badge"></span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" height="24px" role="img">
@@ -17,18 +17,7 @@
                         stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></path>
                 </svg>
             </div>
-            <div class="mx-4 cursor-pointer d-flex" onclick="location.href='{{ route('dr-wallet-charge') }}'">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="24px" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round"
-                    class="plasmic-default__svg plasmic_all__FLoMj PlasmicQuickAccessWallet_svg__4uUbY lucide lucide-wallet"
-                    viewBox="0 0 24 24" role="img">
-                    <path
-                        d="M19 7V4a1 1 0 00-1-1H5a2 2 0 000 4h15a1 1 0 011 1v4h-3a2 2 0 000 4h3a1 1 0 001-1v-2a1 1 0 00-1-1">
-                    </path>
-                    <path d="M3 5v14a2 2 0 002 2h15a1 1 0 001-1v-4"></path>
-                </svg>
-                <span>{{ number_format($walletBalance) }} تومان</span>
-            </div>
+           
         </div>
         <!-- تغییر لینک لاگ‌اوت به نویگیشن Livewire -->
         <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('admin.auth.logout') }}' })"

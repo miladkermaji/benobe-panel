@@ -20,7 +20,7 @@ class ManagersTableSeeder extends Seeder
             'mobile' => '09182718639',
             'national_code' => null,
             'gender' => null, // تغییر از 'sex' به 'gender'
-            'status' => '0',
+            'status' => '1',
             'email_verified_at' => null,
             'password' => '$2y$12$Gg8C1uOPiN/l/g/JsOk.pOiILYO08pzj5GMbOnkT.PY.Sjn6to.6O',
             'avatar' => null,

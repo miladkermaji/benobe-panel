@@ -139,6 +139,10 @@ class Doctor extends Authenticatable
     {
         return $this->hasMany(Clinic::class);
     }
+    public function walletTransactions()
+    {
+        return $this->hasMany(DoctorWalletTransaction::class);
+    }
 
     public function province()
     {

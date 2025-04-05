@@ -90,6 +90,12 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
+        Route::prefix('doctor-wallets')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'index'])->name('admin.panel.doctor-wallets.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'create'])->name('admin.panel.doctor-wallets.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'edit'])->name('admin.panel.doctor-wallets.edit');
+        });
+
         Route::prefix('transactions')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Transaction\TransactionController::class, 'index'])->name('admin.panel.transactions.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Transaction\TransactionController::class, 'create'])->name('admin.panel.transactions.create');

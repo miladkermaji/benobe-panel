@@ -3,7 +3,7 @@
 namespace App\Livewire\Dr\Panel\Payment;
 
 use App\Models\DoctorWallet;
-use App\Models\Transaction;
+use App\Models\DoctorWalletTransaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -44,8 +44,7 @@ class WalletChargeComponent extends Component
     public function render()
     {
         $doctorId     = Auth::guard('doctor')->user()->id;
-        $transactions = Transaction::where('transactable_type', 'App\Models\Doctor')
-            ->where('transactable_id', $doctorId)
+        $transactions = DoctorWalletTransaction::where('doctor_id', $doctorId)
             ->latest()
             ->take(10)
             ->get();
@@ -82,12 +81,7 @@ class WalletChargeComponent extends Component
                 return;
             }
 
-            Log::info('Attempting payment with gateway:', [
-                'gateway'  => $activeGateway->name,
-                'settings' => $activeGateway->settings,
-                'amount'   => $this->amount,
-                'callback' => $callbackUrl,
-            ]);
+       
 
             $paymentResponse = $this->paymentService->pay(
                 $this->amount,
@@ -99,11 +93,6 @@ class WalletChargeComponent extends Component
                 ]
             );
 
-            Log::info('Payment Response:', [
-                'response' => $paymentResponse,
-                'type'     => gettype($paymentResponse),
-                'class'    => is_object($paymentResponse) ? get_class($paymentResponse) : null,
-            ]);
 
             if ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
                 return $paymentResponse;
@@ -117,12 +106,7 @@ class WalletChargeComponent extends Component
                 throw new \Exception('پاسخ درگاه پرداخت نامعتبر است: نوع پاسخ پشتیبانی نمی‌شود.');
             }
         } catch (\Exception $e) {
-            Log::error('Payment Error Details:', [
-                'message' => $e->getMessage(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
+       
             $this->isLoading = false;
             $this->dispatch('toast', message: 'خطایی در فرآیند پرداخت رخ داد: ' . $e->getMessage(), type: 'error');
         }
@@ -138,9 +122,8 @@ class WalletChargeComponent extends Component
 
         if ($transaction) {
             $doctorId = Auth::guard('doctor')->user()->id;
-
-            // چک کردن اینکه تراکنش برای این دکتر و شارژ کیف‌پول باشه
             $meta = json_decode($transaction->meta, true);
+
             if (
                 $transaction->transactable_type === 'App\Models\Doctor' &&
                 $transaction->transactable_id === $doctorId &&
@@ -149,6 +132,17 @@ class WalletChargeComponent extends Component
                 $wallet = DoctorWallet::firstOrCreate(['doctor_id' => $doctorId], ['balance' => 0]);
                 $wallet->increment('balance', $transaction->amount);
 
+                // ثبت تراکنش در جدول DoctorWalletTransaction
+                DoctorWalletTransaction::create([
+                    'doctor_id'    => $doctorId,
+                    'amount'       => $transaction->amount,
+                    'status'       => 'paid',
+                    'type'         => 'wallet_charge',
+                    'description'  => 'شارژ کیف پول',
+                    'registered_at' => now(),
+                    'paid_at'      => now(),
+                ]);
+
                 return redirect()->route('doctor.wallet')->with('success', 'کیف‌پول شما با موفقیت شارژ شد.');
             }
 
@@ -156,22 +150,6 @@ class WalletChargeComponent extends Component
         }
 
         return redirect()->route('doctor.wallet')->with('error', 'پرداخت ناموفق بود.');
-    }
-
-    public function deleteTransaction($transactionId)
-    {
-        $doctorId    = Auth::guard('doctor')->user()->id;
-        $transaction = Transaction::where('transactable_type', 'App\Models\Doctor')
-            ->where('transactable_id', $doctorId)
-            ->where('id', $transactionId)
-            ->first();
-
-        if ($transaction) {
-            $transaction->delete();
-            $this->dispatch('toast', message: 'تراکنش با موفقیت حذف شد.', type: 'success');
-        } else {
-            $this->dispatch('toast', message: 'تراکنش یافت نشد!', type: 'error');
-        }
     }
 
     public function updatedDisplayAmount($value)

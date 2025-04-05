@@ -11,7 +11,6 @@ class InsuranceList extends Component
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-
     protected $listeners = ['deleteInsuranceConfirmed' => 'deleteInsurance'];
 
     public $perPage = 10;
@@ -32,6 +31,18 @@ class InsuranceList extends Component
     public function loadInsurances()
     {
         $this->readyToLoad = true;
+    }
+
+    public function confirmDelete($id)
+    {
+        $this->dispatch('confirm-delete', id: $id);
+    }
+
+    public function deleteInsurance($id)
+    {
+        $item = Insurance::findOrFail($id);
+        $item->delete();
+        $this->dispatch('show-alert', type: 'success', message: 'بیمه حذف شد!');
     }
 
     public function updatedSearch()
@@ -64,18 +75,6 @@ class InsuranceList extends Component
         $this->dispatch('show-alert', type: 'success', message: 'بیمه‌های انتخاب‌شده حذف شدند!');
     }
 
-    public function confirmDelete($id)
-    {
-        $this->dispatch('confirm-delete', id: $id);
-    }
-
-    public function deleteInsurance($id)
-    {
-        $item = Insurance::findOrFail($id);
-        $item->delete();
-        $this->dispatch('show-alert', type: 'success', message: 'بیمه حذف شد!');
-    }
-
     private function getInsurancesQuery()
     {
         return Insurance::where('name', 'like', '%' . $this->search . '%')
@@ -85,7 +84,6 @@ class InsuranceList extends Component
     public function render()
     {
         $items = $this->readyToLoad ? $this->getInsurancesQuery() : null;
-
         return view('livewire.admin.panel.insurances.insurance-list', [
             'insurances' => $items,
         ]);
