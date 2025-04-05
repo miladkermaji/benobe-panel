@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Secretary;
+use Illuminate\Support\Facades\DB;
 
 class TransactionList extends Component
 {
@@ -81,96 +82,97 @@ class TransactionList extends Component
         ->where(function ($query) {
             $query->where('first_name', 'like', '%' . $this->search . '%')
                   ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                  ->orWhere('mobile', 'like', '%' . $this->search . '%');
+                  ->orWhere('mobile', 'like', '%' . $this->search . '%')
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%']);
         })
         ->has('transactions');
     }
 
- public function render()
-{
-    // کوئری‌های اولیه برای موجودیت‌ها
-    $users = $this->readyToLoad ? $this->getEntitiesQuery(User::class, 'user')
-        ->paginate($this->perPage, ['*'], 'usersPage') : collect();
+    public function render()
+    {
+        // کوئری‌های اولیه برای موجودیت‌ها
+        $users = $this->readyToLoad ? $this->getEntitiesQuery(User::class, 'user')
+            ->paginate($this->perPage, ['*'], 'usersPage') : collect();
 
-    $doctors = $this->readyToLoad ? $this->getEntitiesQuery(Doctor::class, 'doctor')
-        ->paginate($this->perPage, ['*'], 'doctorsPage') : collect();
+        $doctors = $this->readyToLoad ? $this->getEntitiesQuery(Doctor::class, 'doctor')
+            ->paginate($this->perPage, ['*'], 'doctorsPage') : collect();
 
-    $secretaries = $this->readyToLoad ? $this->getEntitiesQuery(Secretary::class, 'secretary')
-        ->paginate($this->perPage, ['*'], 'secretariesPage') : collect();
+        $secretaries = $this->readyToLoad ? $this->getEntitiesQuery(Secretary::class, 'secretary')
+            ->paginate($this->perPage, ['*'], 'secretariesPage') : collect();
 
-    // پردازش کاربران
-    $users = $users->map(function ($entity) {
-        $key = 'user-' . $entity->id;
-        $currentPage = $this->entityPages[$key] ?? 1;
-        $transactions = $entity->transactions() // فقط تراکنش‌های این کاربر
-            ->where(function ($query) {
-                $query->where('gateway', 'like', '%' . $this->search . '%')
-                      ->orWhere('transaction_id', 'like', '%' . $this->search . '%');
-            })
-            ->forPage($currentPage, $this->transactionsPerPage)
-            ->get();
+        // پردازش کاربران
+        $users = $users->map(function ($entity) {
+            $key = 'user-' . $entity->id;
+            $currentPage = $this->entityPages[$key] ?? 1;
+            $transactions = $entity->transactions() // فقط تراکنش‌های این کاربر
+                ->where(function ($query) {
+                    $query->where('gateway', 'like', '%' . $this->search . '%')
+                          ->orWhere('transaction_id', 'like', '%' . $this->search . '%');
+                })
+                ->forPage($currentPage, $this->transactionsPerPage)
+                ->get();
 
-        return [
-            'entity' => $entity,
-            'type' => 'user',
-            'transactions' => $transactions,
-            'totalTransactions' => $entity->transactions()->count(), // تعداد کل تراکنش‌های این کاربر
-            'currentPage' => $currentPage,
-            'lastPage' => ceil($entity->transactions()->count() / $this->transactionsPerPage),
-        ];
-    });
+            return [
+                'entity' => $entity,
+                'type' => 'user',
+                'transactions' => $transactions,
+                'totalTransactions' => $entity->transactions()->count(), // تعداد کل تراکنش‌های این کاربر
+                'currentPage' => $currentPage,
+                'lastPage' => ceil($entity->transactions()->count() / $this->transactionsPerPage),
+            ];
+        });
 
-    // پردازش دکترها
-    $doctors = $doctors->map(function ($entity) {
-        $key = 'doctor-' . $entity->id;
-        $currentPage = $this->entityPages[$key] ?? 1;
-        $transactions = $entity->transactions() // فقط تراکنش‌های این دکتر
-            ->where(function ($query) {
-                $query->where('gateway', 'like', '%' . $this->search . '%')
-                      ->orWhere('transaction_id', 'like', '%' . $this->search . '%');
-            })
-            ->forPage($currentPage, $this->transactionsPerPage)
-            ->get();
+        // پردازش دکترها
+        $doctors = $doctors->map(function ($entity) {
+            $key = 'doctor-' . $entity->id;
+            $currentPage = $this->entityPages[$key] ?? 1;
+            $transactions = $entity->transactions() // فقط تراکنش‌های این دکتر
+                ->where(function ($query) {
+                    $query->where('gateway', 'like', '%' . $this->search . '%')
+                          ->orWhere('transaction_id', 'like', '%' . $this->search . '%');
+                })
+                ->forPage($currentPage, $this->transactionsPerPage)
+                ->get();
 
-        return [
-            'entity' => $entity,
-            'type' => 'doctor',
-            'transactions' => $transactions,
-            'totalTransactions' => $entity->transactions()->count(), // تعداد کل تراکنش‌های این دکتر
-            'currentPage' => $currentPage,
-            'lastPage' => ceil($entity->transactions()->count() / $this->transactionsPerPage),
-        ];
-    });
+            return [
+                'entity' => $entity,
+                'type' => 'doctor',
+                'transactions' => $transactions,
+                'totalTransactions' => $entity->transactions()->count(), // تعداد کل تراکنش‌های این دکتر
+                'currentPage' => $currentPage,
+                'lastPage' => ceil($entity->transactions()->count() / $this->transactionsPerPage),
+            ];
+        });
 
-    // پردازش منشی‌ها
-    $secretaries = $secretaries->map(function ($entity) {
-        $key = 'secretary-' . $entity->id;
-        $currentPage = $this->entityPages[$key] ?? 1;
-        $transactions = $entity->transactions() // فقط تراکنش‌های این منشی
-            ->where(function ($query) {
-                $query->where('gateway', 'like', '%' . $this->search . '%')
-                      ->orWhere('transaction_id', 'like', '%' . $this->search . '%');
-            })
-            ->forPage($currentPage, $this->transactionsPerPage)
-            ->get();
+        // پردازش منشی‌ها
+        $secretaries = $secretaries->map(function ($entity) {
+            $key = 'secretary-' . $entity->id;
+            $currentPage = $this->entityPages[$key] ?? 1;
+            $transactions = $entity->transactions() // فقط تراکنش‌های این منشی
+                ->where(function ($query) {
+                    $query->where('gateway', 'like', '%' . $this->search . '%')
+                          ->orWhere('transaction_id', 'like', '%' . $this->search . '%');
+                })
+                ->forPage($currentPage, $this->transactionsPerPage)
+                ->get();
 
-        return [
-            'entity' => $entity,
-            'type' => 'secretary',
-            'transactions' => $transactions,
-            'totalTransactions' => $entity->transactions()->count(), // تعداد کل تراکنش‌های این منشی
-            'currentPage' => $currentPage,
-            'lastPage' => ceil($entity->transactions()->count() / $this->transactionsPerPage),
-        ];
-    });
+            return [
+                'entity' => $entity,
+                'type' => 'secretary',
+                'transactions' => $transactions,
+                'totalTransactions' => $entity->transactions()->count(), // تعداد کل تراکنش‌های این منشی
+                'currentPage' => $currentPage,
+                'lastPage' => ceil($entity->transactions()->count() / $this->transactionsPerPage),
+            ];
+        });
 
-    return view('livewire.admin.panel.transactions.transaction-list', [
-        'users' => $users,
-        'doctors' => $doctors,
-        'secretaries' => $secretaries,
-        'totalUsers' => $this->getEntitiesQuery(User::class, 'user')->count(),
-        'totalDoctors' => $this->getEntitiesQuery(Doctor::class, 'doctor')->count(),
-        'totalSecretaries' => $this->getEntitiesQuery(Secretary::class, 'secretary')->count(),
-    ]);
-}
+        return view('livewire.admin.panel.transactions.transaction-list', [
+            'users' => $users,
+            'doctors' => $doctors,
+            'secretaries' => $secretaries,
+            'totalUsers' => $this->getEntitiesQuery(User::class, 'user')->count(),
+            'totalDoctors' => $this->getEntitiesQuery(Doctor::class, 'doctor')->count(),
+            'totalSecretaries' => $this->getEntitiesQuery(Secretary::class, 'secretary')->count(),
+        ]);
+    }
 }

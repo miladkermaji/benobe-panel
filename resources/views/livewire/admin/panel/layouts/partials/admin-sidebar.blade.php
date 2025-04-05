@@ -313,10 +313,6 @@
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.transactions.index') }}">تراکنش‌ها</a></li>
             <li class="item-li"><a href="{{ route('dr-wallet') }}">کیف‌پول</a></li>
-            <li class="item-li"><a href="{{ route('dr-wallet-charge') }}">شارژ کیف‌پول</a></li>
-            <li class="item-li"><a href="#">تسویه‌حساب‌ها</a></li>
-            <li class="item-li"><a href="{{ route('dr-payment-setting') }}">تنظیمات مالی</a></li>
-            <li class="item-li"><a href="#">مدیریت تخفیف‌ها</a></li>
           </ul>
         </li>
         <!-- ارتباط با بیماران -->
