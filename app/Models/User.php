@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Appointment;
@@ -61,7 +62,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Zone::class, 'zone_city_id');
     }
-
+    public function transactions()
+    {
+        return $this->morphMany(Transaction::class, 'transactable');
+    }
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

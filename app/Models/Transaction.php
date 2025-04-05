@@ -1,9 +1,10 @@
 <?php
 
-namespace Modules\Payment\App\Http\Models;
+namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Morilog\Jalali\Jalalian;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Transaction extends Model
 {
@@ -16,15 +17,20 @@ class Transaction extends Model
         'gateway',
         'status',
         'transaction_id',
-        'meta',
+        'meta'
     ];
 
     protected $casts = [
         'meta' => 'array',
     ];
 
+    // رابطه مورفیک
     public function transactable()
     {
         return $this->morphTo();
+    }
+    public function getJalaliCreatedAtAttribute()
+    {
+        return Jalalian::fromCarbon($this->created_at)->format('Y/m/d H:i');
     }
 }

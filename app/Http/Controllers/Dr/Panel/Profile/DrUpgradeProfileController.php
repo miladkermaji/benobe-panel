@@ -22,7 +22,7 @@ class DrUpgradeProfileController extends Controller
     public function index()
     {
         $doctor = Auth::guard('doctor')->user();
-        if (! $doctor) {
+        if (!$doctor) {
             abort(403, 'شما به این بخش دسترسی ندارید.');
         }
 
@@ -30,9 +30,9 @@ class DrUpgradeProfileController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // چک کردن نتیجه پرداخت
+        // چک کردن نتیجه پرداخت از سشن (بعد از ریدایرکت از درگاه)
         if (session('success')) {
-            $this->confirmPayment();
+            session()->flash('success', session('success'));
         } elseif (session('error')) {
             session()->flash('error', session('error'));
         }
@@ -42,17 +42,18 @@ class DrUpgradeProfileController extends Controller
 
     public function payForUpgrade(Request $request)
     {
-
         $doctor = Auth::guard('doctor')->user();
-        if (! $doctor) {
+        if (!$doctor) {
             return redirect()->back()->with('error', 'ابتدا وارد حساب خود شوید.');
         }
 
-        $amount      = 780000; // مقدار ثابت برای ارتقاء
+        $amount = 780000; // مقدار ثابت برای ارتقاء
         $callbackUrl = route('payment.callback');
 
+        // ارسال درخواست پرداخت به PaymentService
         $paymentResponse = $this->paymentService->pay($amount, $callbackUrl, [
             'doctor_id'   => $doctor->id,
+            'type'        => 'profile_upgrade', // اضافه کردن نوع برای شناسایی بهتر
             'description' => 'پرداخت برای ارتقاء حساب کاربری',
         ]);
 
@@ -70,28 +71,51 @@ class DrUpgradeProfileController extends Controller
     public function confirmPayment()
     {
         $doctor = Auth::guard('doctor')->user();
-        if (! $doctor) {
-            return;
+        if (!$doctor) {
+            return redirect()->route('dr-edit-profile-upgrade')->with('error', 'ابتدا وارد حساب خود شوید.');
         }
 
-        DoctorProfileUpgrade::create([
-            'doctor_id'         => $doctor->id,
-            'payment_reference' => 'TEMP_' . now()->timestamp, // این باید از verify برگرده، فعلاً موقت
-            'payment_status'    => 'paid',
-            'amount'            => 780000,
-            'days'              => 90,
-            'paid_at'           => now(),
-            'expires_at'        => now()->addDays(90),
-        ]);
+        // تأیید پرداخت از درگاه
+        $transaction = $this->paymentService->verify();
 
-        session()->flash('success', 'پرداخت شما با موفقیت انجام شد.');
+        if ($transaction) {
+            // چک کردن اینکه تراکنش برای این دکتر و ارتقاء پروفایل باشه
+            $meta = $transaction->meta ?? [];
+            if (
+                $transaction->transactable_type === 'App\Models\Doctor' &&
+                $transaction->transactable_id === $doctor->id &&
+                ($meta['type'] ?? '') === 'profile_upgrade'
+            ) {
+                // ثبت ارتقاء پروفایل
+                DoctorProfileUpgrade::create([
+                    'doctor_id'         => $doctor->id,
+                    'payment_reference' => $transaction->transaction_id, // شناسه واقعی از درگاه
+                    'payment_status'    => 'paid',
+                    'amount'            => $transaction->amount,
+                    'days'              => 90,
+                    'paid_at'           => now(),
+                    'expires_at'        => now()->addDays(90),
+                ]);
+
+                return redirect()->route('dr-edit-profile-upgrade')->with('success', 'پرداخت شما با موفقیت انجام شد و حساب شما ارتقاء یافت.');
+            }
+
+            return redirect()->route('dr-edit-profile-upgrade')->with('error', 'تراکنش یافت شد اما با ارتقاء حساب شما مطابقت ندارد.');
+        }
+
+        return redirect()->route('dr-edit-profile-upgrade')->with('error', 'تأیید پرداخت ناموفق بود.');
     }
 
     public function deletePayment($id)
     {
-        $payment = DoctorProfileUpgrade::find($id);
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            return response()->json(['success' => false, 'message' => 'ابتدا وارد حساب خود شوید.'], 403);
+        }
 
-        if (! $payment) {
+        $payment = DoctorProfileUpgrade::where('doctor_id', $doctor->id)->find($id);
+
+        if (!$payment) {
             return response()->json(['success' => false, 'message' => 'پرداخت یافت نشد!'], 404);
         }
 

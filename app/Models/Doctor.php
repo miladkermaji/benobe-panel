@@ -117,6 +117,9 @@ class Doctor extends Authenticatable
         return $this->profile_photo_path
         ? Storage::url($this->profile_photo_path)
         : asset('admin-assets/images/default-avatar.png');
+    }public function transactions()
+    {
+        return $this->morphMany(Transaction::class, 'transactable');
     }
 
     public function getJalaliCreatedAtAttribute()
