@@ -70,13 +70,14 @@ class LoginRegister extends Component
             return;
         }
 
+
         if ($loginAttempts->isLocked($formattedMobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile);
-            $formattedTime = $this->formatTime($remainingTime);
+            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile); // استفاده از متد جدید
             $this->addError('mobile', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
-            $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
             return;
         }
+
 
         $loginAttempts->incrementLoginAttempt($manager->id, $formattedMobile, '', '', $manager->id);
         session(['step1_completed' => true]);

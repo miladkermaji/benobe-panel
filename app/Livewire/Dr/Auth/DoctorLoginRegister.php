@@ -1,16 +1,18 @@
 <?php
+
 namespace App\Livewire\Dr\Auth;
 
-use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
-use App\Models\Doctor;
-use App\Models\LoginSession;
 use App\Models\Otp;
-use App\Models\Secretary;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use App\Models\Doctor;
 use Livewire\Component;
+use App\Models\Secretary;
+use Illuminate\Support\Str;
+use App\Models\LoginSession;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 
 class DoctorLoginRegister extends Component
 {
@@ -86,13 +88,14 @@ class DoctorLoginRegister extends Component
         }
 
         // چک کردن قفل شدن به دلیل تلاش زیاد
+
         if ($loginAttempts->isLocked($formattedMobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile);
-            $formattedTime = $this->formatTime($remainingTime);
+            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile); // استفاده از متد جدید
             $this->addError('mobile', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
-            $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
             return;
         }
+
 
         // ثبت تلاش ورود
         $loginAttempts->incrementLoginAttempt(
@@ -128,10 +131,10 @@ class DoctorLoginRegister extends Component
 
         // ارسال پیامک
         $messagesService = new MessageService(
-    SmsService::create(100253, $user->mobile, [$otpCode])
-);
-$response = $messagesService->send();
-\Log::info('SMS send response', ['response' => $response]);
+            SmsService::create(100253, $user->mobile, [$otpCode])
+        );
+        $response = $messagesService->send();
+        Log::info('SMS send response', ['response' => $response]);
         session(['current_step' => 2, 'otp_token' => $token]);
         $this->dispatch('otpSent', token: $token);
         $this->redirect(route('dr.auth.login-confirm-form', ['token' => $token]), navigate: true);

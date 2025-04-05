@@ -5,8 +5,9 @@ namespace App\Livewire\Admin\Auth;
 use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\LoginLog;
-use App\Models\Admin\Manager;
 use App\Models\LoginSession;
+use App\Models\Admin\Manager;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
@@ -78,14 +79,15 @@ class TwoFactor extends Component
             return;
         }
 
+
         if ($loginAttempts->isLocked($user->mobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($user->mobile);
-            $formattedTime = $this->formatTime($remainingTime);
-            $this->addError('twoFactorSecret', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید."); // خطا زیر اینپوت
-            $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime); // SweetAlert
-            \Log::info('Rate limit exceeded, remaining time: ' . $remainingTime);
+            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($user->mobile); // استفاده از متد جدید
+            $this->addError('twoFactorSecret', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
+            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($user->mobile));
+            Log::info('Rate limit exceeded, remaining time: ' . $loginAttempts->getRemainingLockTime($user->mobile));
             return;
         }
+
 
         if (!$user->two_factor_secret || !Hash::check($this->twoFactorSecret, $user->two_factor_secret)) {
             $loginAttempts->incrementLoginAttempt($user->id, $user->mobile, '', '', $user->id);

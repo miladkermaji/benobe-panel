@@ -1,15 +1,17 @@
 <?php
+
 namespace App\Livewire\Dr\Auth;
 
-use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
-use App\Models\Doctor;
-use App\Models\LoginLog;
-use App\Models\LoginSession;
-use App\Models\Secretary;
 use Carbon\Carbon;
+use App\Models\Doctor;
+use Livewire\Component;
+use App\Models\LoginLog;
+use App\Models\Secretary;
+use App\Models\LoginSession;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Livewire\Component;
+use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 
 class DoctorTwoFactor extends Component
 {
@@ -34,10 +36,10 @@ class DoctorTwoFactor extends Component
             ->first();
 
         if (! $loginSession) {
-            \Log::info('Mount: Invalid or expired token: ' . $token);
+            Log::info('Mount: Invalid or expired token: ' . $token);
             $this->redirect(route('dr.auth.login-register-form'), navigate: true);
         } else {
-            \Log::info('Mount: Valid token: ' . $token);
+            Log::info('Mount: Valid token: ' . $token);
         }
     }
 
@@ -67,7 +69,7 @@ class DoctorTwoFactor extends Component
 
         if (! $loginSession) {
             $this->addError('twoFactorSecret', 'دسترسی غیرمجاز یا توکن منقضی شده است. لطفاً دوباره وارد شوید.');
-            \Log::info('Redirecting to login due to invalid session');
+            Log::info('Redirecting to login due to invalid session');
             $this->redirect(route('dr.auth.login-register-form'), navigate: true);
             return;
         }
@@ -83,18 +85,19 @@ class DoctorTwoFactor extends Component
             return;
         }
 
+
         if ($loginAttempts->isLocked($user->mobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($user->mobile);
-            $formattedTime = $this->formatTime($remainingTime);
+            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($user->mobile); // استفاده از متد جدید
             $this->addError('twoFactorSecret', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
-            $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
-            \Log::info('Rate limit exceeded, remaining time: ' . $remainingTime);
+            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($user->mobile));
+            Log::info('Rate limit exceeded, remaining time: ' . $loginAttempts->getRemainingLockTime($user->mobile));
             return;
         }
 
-        \Log::info('Input: ' . $this->twoFactorSecret);
-        \Log::info('Stored two_factor_secret: ' . $user->two_factor_secret);
-        \Log::info('Hash check result: ' . (Hash::check($this->twoFactorSecret, $user->two_factor_secret) ? 'true' : 'false'));
+
+        Log::info('Input: ' . $this->twoFactorSecret);
+        Log::info('Stored two_factor_secret: ' . $user->two_factor_secret);
+        Log::info('Hash check result: ' . (Hash::check($this->twoFactorSecret, $user->two_factor_secret) ? 'true' : 'false'));
 
         if (! $user->two_factor_secret || ! Hash::check($this->twoFactorSecret, $user->two_factor_secret)) {
             $loginAttempts->incrementLoginAttempt(
@@ -105,7 +108,7 @@ class DoctorTwoFactor extends Component
                 null
             );
             $this->addError('twoFactorSecret', 'کد دو عاملی وارد شده صحیح نیست.');
-            \Log::info('Invalid two-factor code');
+            Log::info('Invalid two-factor code');
             return;
         }
 
@@ -135,7 +138,7 @@ class DoctorTwoFactor extends Component
         $loginAttempts->resetLoginAttempts($user->mobile);
         LoginSession::where('token', $this->token)->delete();
         $this->dispatch('loginSuccess');
-        \Log::info('Login successful, redirecting to panel');
+        Log::info('Login successful, redirecting to panel');
         $this->redirect($redirectRoute);
     }
 

@@ -63,13 +63,14 @@ class LoginUserPass extends Component
         $formattedMobile = '0' . $mobile;
         $loginAttempts = new LoginAttemptsService();
 
+
         if ($loginAttempts->isLocked($formattedMobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile);
-            $formattedTime = $this->formatTime($remainingTime); // فرمت کردن زمان
+            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile); // استفاده از متد جدید
             $this->addError('mobile', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
-            $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
             return;
         }
+
 
         $manager = Manager::where('mobile', $formattedMobile)->first();
 

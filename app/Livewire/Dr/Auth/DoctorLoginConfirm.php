@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Dr\Auth;
 
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
@@ -95,13 +96,14 @@ class DoctorLoginConfirm extends Component
         $loginAttempts = new LoginAttemptsService();
         $mobile        = $otp?->doctor?->mobile ?? $otp?->secretary?->mobile ?? $otp->login_id ?? 'unknown';
 
+
         if ($loginAttempts->isLocked($mobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($mobile);
-            $formattedTime = $this->formatTime($remainingTime);
+            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($mobile); // استفاده از متد جدید
             $this->addError('otpCode', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
-            $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($mobile)); // برای تایمر
             return;
         }
+
 
         if (! $otp) {
             $this->addError('otpCode', 'کد تأیید نامعتبر یا منقضی شده است.');
@@ -179,13 +181,14 @@ class DoctorLoginConfirm extends Component
         $loginAttempts = new LoginAttemptsService();
         $mobile        = $otp->doctor?->mobile ?? $otp->secretary?->mobile ?? $otp->login_id ?? 'unknown';
 
+
         if ($loginAttempts->isLocked($mobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($mobile);
-            $formattedTime = $this->formatTime($remainingTime);
+            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($mobile); // استفاده از متد جدید
             $this->addError('otpCode', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
-            $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($mobile));
             return;
         }
+
 
         $otpCode  = rand(1000, 9999);
         $newToken = Str::random(60);

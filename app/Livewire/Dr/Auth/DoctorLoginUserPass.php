@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Dr\Auth;
 
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
@@ -66,13 +67,14 @@ class DoctorLoginUserPass extends Component
         $formattedMobile = '0' . $mobile;
         $loginAttempts   = new LoginAttemptsService();
 
+
         if ($loginAttempts->isLocked($formattedMobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile);
-            $formattedTime = $this->formatTime($remainingTime);
+            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile); // استفاده از متد جدید
             $this->addError('mobile', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
-            $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
             return;
         }
+
 
         $doctor    = Doctor::where('mobile', $formattedMobile)->first();
         $secretary = Secretary::where('mobile', $formattedMobile)->first();
