@@ -95,7 +95,7 @@ class LoginConfirm extends Component
         $mobile = $otp?->manager?->mobile ?? $otp?->login_id ?? 'unknown';
 
         if ($loginAttempts->isLocked($mobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
+            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($mobile);
             $formattedTime = $this->formatTime($remainingTime);
             $this->addError('otpCode', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
             $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
@@ -162,7 +162,7 @@ class LoginConfirm extends Component
         $mobile = $otp->manager?->mobile ?? $otp->login_id ?? 'unknown';
 
         if ($loginAttempts->isLocked($mobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
+            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($mobile);
             $formattedTime = $this->formatTime($remainingTime);
             $this->addError('otpCode', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
             $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);

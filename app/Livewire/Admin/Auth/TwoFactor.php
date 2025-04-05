@@ -79,7 +79,7 @@ class TwoFactor extends Component
         }
 
         if ($loginAttempts->isLocked($user->mobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTime($user->mobile);
+            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($user->mobile);
             $formattedTime = $this->formatTime($remainingTime);
             $this->addError('twoFactorSecret', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید."); // خطا زیر اینپوت
             $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime); // SweetAlert

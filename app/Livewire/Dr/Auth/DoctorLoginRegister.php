@@ -87,7 +87,7 @@ class DoctorLoginRegister extends Component
 
         // چک کردن قفل شدن به دلیل تلاش زیاد
         if ($loginAttempts->isLocked($formattedMobile)) {
-            $remainingTime = $loginAttempts->getRemainingLockTime($formattedMobile);
+            $remainingTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile);
             $formattedTime = $this->formatTime($remainingTime);
             $this->addError('mobile', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
             $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
