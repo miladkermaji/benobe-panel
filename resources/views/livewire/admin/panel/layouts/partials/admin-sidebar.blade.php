@@ -204,8 +204,6 @@
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.clinics.index') }}"> مدیریت کلینیک</a></li>
             <li class="item-li"><a href="#"> بیعانه</a></li>
-            <li class="item-li"><a href="#">مدت زمان ویزیت</a></li>
-            <li class="item-li"><a href="#">ساعات کاری</a></li>
           </ul>
         </li>
         <!-- مدیریت کلینیک‌ها -->
