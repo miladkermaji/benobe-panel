@@ -90,17 +90,25 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
-    Route::prefix('insurances')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\Panel\Insurance\InsuranceController::class, 'index'])->name('admin.panel.insurances.index');
-        Route::get('/create', [\App\Http\Controllers\Admin\Panel\Insurance\InsuranceController::class, 'create'])->name('admin.panel.insurances.create');
-        Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Insurance\InsuranceController::class, 'edit'])->name('admin.panel.insurances.edit');
-    });
+        Route::prefix('doctor-insurances')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorInsurance\DoctorInsuranceController::class, 'index'])->name('admin.panel.doctor-insurances.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorInsurance\DoctorInsuranceController::class, 'create'])->name('admin.panel.doctor-insurances.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorInsurance\DoctorInsuranceController::class, 'edit'])->name('admin.panel.doctor-insurances.edit');
+        });
 
-Route::prefix('doctor-holidays')->group(function () {
+        Route::prefix('insurances')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Insurance\InsuranceController::class, 'index'])->name('admin.panel.insurances.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Insurance\InsuranceController::class, 'create'])->name('admin.panel.insurances.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Insurance\InsuranceController::class, 'edit'])->name('admin.panel.insurances.edit');
+        });
+
+
+
+        Route::prefix('doctor-holidays')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorHoliday\DoctorHolidayController::class, 'index'])->name('admin.panel.doctor-holidays.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorHoliday\DoctorHolidayController::class, 'create'])->name('admin.panel.doctor-holidays.create');
             Route::get('edit/{id}/{date?}', [\App\Http\Controllers\Admin\Panel\DoctorHoliday\DoctorHolidayController::class, 'edit'])->name('admin.panel.doctor-holidays.edit');
-});
+        });
 
         Route::prefix('manual-appointment-settings')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\ManualAppointmentSetting\ManualAppointmentSettingController::class, 'index'])->name('admin.panel.manual-appointment-settings.index');

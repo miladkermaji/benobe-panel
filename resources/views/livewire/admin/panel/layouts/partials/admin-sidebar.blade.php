@@ -294,7 +294,7 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.insurances.index') }}">لیست بیمه‌ها</a></li>
-            <li class="item-li"><a href="#">بیمه های دکتر</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.doctor-insurances.index') }}">بیمه های دکتر</a></li>
           </ul>
         </li>
         <!-- مدیریت مالی -->
@@ -312,7 +312,6 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="#">تراکنش‌ها</a></li>
-            <li class="item-li"><a href="#">صورت‌حساب‌ها</a></li>
             <li class="item-li"><a href="{{ route('dr-wallet') }}">کیف‌پول</a></li>
             <li class="item-li"><a href="{{ route('dr-wallet-charge') }}">شارژ کیف‌پول</a></li>
             <li class="item-li"><a href="#">تسویه‌حساب‌ها</a></li>
