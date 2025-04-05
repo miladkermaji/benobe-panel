@@ -25,7 +25,7 @@
           <div class="row g-4">
             <!-- پزشک -->
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="doctor_id" class="form-select select2" id="doctor_id">
+              <select wire:model="doctor_id" class="form-select select2" id="doctor_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($doctors as $doctor)
                   <option value="{{ $doctor->id }}">{{ $doctor->first_name . ' ' . $doctor->last_name }}</option>
@@ -39,7 +39,7 @@
 
             <!-- کلینیک -->
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="clinic_id" class="form-select select2" id="clinic_id">
+              <select wire:model="clinic_id" class="form-select select2" id="clinic_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($clinics as $clinic)
                   <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
@@ -53,7 +53,7 @@
 
             <!-- نام -->
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model.live="name" class="form-control" id="name"
+              <input type="text" wire:model="name" class="form-control" id="name"
                 placeholder="نام خدمت را وارد کنید" required>
               <label for="name" class="form-label">نام خدمت</label>
               @error('name')
@@ -63,7 +63,7 @@
 
             <!-- مدت زمان -->
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="number" wire:model.live="duration" class="form-control" id="duration"
+              <input type="number" wire:model="duration" class="form-control" id="duration"
                 placeholder="مدت زمان خدمت">
               <label for="duration" class="form-label">مدت زمان (دقیقه)</label>
               @error('duration')
@@ -73,7 +73,7 @@
 
             <!-- قیمت -->
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="number" wire:model.live="price" class="form-control" id="price" placeholder="قیمت خدمت"
+              <input type="number" wire:model="price" class="form-control" id="price" placeholder="قیمت خدمت"
                 step="0.01">
               <label for="price" class="form-label">قیمت</label>
               @error('price')
@@ -83,7 +83,7 @@
 
             <!-- تخفیف -->
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="number" wire:model.live="discount" class="form-control" id="discount"
+              <input type="number" wire:model="discount" class="form-control" id="discount"
                 placeholder="درصد تخفیف" step="0.01">
               <label for="discount" class="form-label">تخفیف (درصد، اختیاری)</label>
               @error('discount')
@@ -93,7 +93,7 @@
 
             <!-- توضیحات -->
             <div class="col-12 position-relative mt-5">
-              <textarea wire:model.live="description" class="form-control" id="description" rows="3" placeholder="توضیحات خدمت"></textarea>
+              <textarea wire:model="description" class="form-control" id="description" rows="3" placeholder="توضیحات خدمت"></textarea>
               <label for="description" class="form-label">توضیحات (اختیاری)</label>
               @error('description')
                 <span class="text-danger small">{{ $message }}</span>
@@ -103,7 +103,7 @@
             <!-- وضعیت -->
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">
-                <input class="form-check-input" type="checkbox" id="status" wire:model.live="status">
+                <input class="form-check-input" type="checkbox" id="status" wire:model="status">
                 <label class="form-check-label fw-medium" for="status">
                   وضعیت: <span
                     class="px-2 text-{{ $status ? 'success' : 'danger' }}">{{ $status ? 'فعال' : 'غیرفعال' }}</span>
@@ -116,7 +116,7 @@
 
             <!-- خدمت مادر -->
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="parent_id" class="form-select select2" id="parent_id">
+              <select wire:model="parent_id" class="form-select select2" id="parent_id">
                 <option value="">بدون زیرگروه</option>
                 @foreach ($parentServices as $service)
                   <option value="{{ $service->id }}">{{ $service->name }}</option>
@@ -146,15 +146,14 @@
   </div>
 
   <style>
+    /* استایل‌ها بدون تغییر باقی می‌مانند */
     .bg-gradient-primary {
       background: linear-gradient(90deg, #6b7280, #374151);
     }
-
     .card {
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
-
     .form-control,
     .form-select {
       border: 1px solid #e5e7eb;
@@ -166,14 +165,12 @@
       background: #fafafa;
       width: 100%;
     }
-
     .form-control:focus,
     .form-select:focus {
       border-color: #6b7280;
       box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
       background: #fff;
     }
-
     .form-label {
       position: absolute;
       top: -25px;
@@ -184,190 +181,146 @@
       padding: 0 5px;
       pointer-events: none;
     }
-
     .btn-primary {
       background: linear-gradient(90deg, #6b7280, #374151);
       border: none;
       color: white;
       font-weight: 600;
     }
-
     .btn-primary:hover {
       background: linear-gradient(90deg, #4b5563, #1f2937);
       transform: translateY(-2px);
     }
-
     .btn-outline-light {
       border-color: rgba(255, 255, 255, 0.8);
     }
-
     .btn-outline-light:hover {
       background: rgba(255, 255, 255, 0.15);
       transform: translateY(-2px);
     }
-
     .form-check-input {
       margin-top: 0;
       height: 20px;
       width: 20px;
       vertical-align: middle;
     }
-
     .form-check-label {
       margin-right: 25px;
       line-height: 1.5;
       vertical-align: middle;
     }
-
     .form-check-input:checked {
       background-color: #6b7280;
       border-color: #6b7280;
     }
-
     .animate-bounce {
       animation: bounce 1s infinite;
     }
-
     @keyframes bounce {
-
       0%,
       100% {
         transform: translateY(0);
       }
-
       50% {
         transform: translateY(-5px);
       }
     }
-
     .text-shadow {
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
-
-
-
+    .select2-container {
+      width: 100% !important;
+    }
     .select2-container--default .select2-selection--single {
       height: 48px;
       border: 1px solid #e5e7eb;
       border-radius: 8px;
       background: #fafafa;
     }
-
     .select2-container--default .select2-selection--single .select2-selection__rendered {
       line-height: 46px;
       padding-right: 15px;
-      color: #000 !important;
     }
-
     .select2-container--default .select2-selection--single .select2-selection__arrow {
       height: 46px;
     }
-
     .select2-dropdown {
       z-index: 1050 !important;
       border: 1px solid #e5e7eb;
       border-radius: 8px;
     }
-
-    .select2-results__option {
-      color: #000 !important;
-    }
   </style>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      if (typeof jQuery === 'undefined') {
-        console.error('jQuery لود نشده است.');
-        return;
-      }
-      if (typeof jQuery.fn.select2 === 'undefined') {
-        console.error('Select2 لود نشده است.');
-        return;
-      }
+ <script>
+    document.addEventListener('livewire:init', function() {
+        function initializeSelect2() {
+            $('#doctor_id').select2({
+                dir: 'rtl',
+                placeholder: 'انتخاب کنید',
+                width: '100%',
+                dropdownAutoWidth: true,
+            });
+            $('#clinic_id').select2({
+                dir: 'rtl',
+                placeholder: 'انتخاب کنید',
+                width: '100%'
+            });
+            $('#parent_id').select2({
+                dir: 'rtl',
+                placeholder: 'انتخاب کنید',
+                width: '100%'
+            });
 
-      function initializeSelect2() {
-        $('#doctor_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%',
-          dropdownAutoWidth: true,
-        });
-        $('#clinic_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%'
-        });
-        $('#parent_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%'
-        });
+            // تنظیم مقادیر اولیه هنگام لود صفحه
+            const doctorId = @json($this->doctor_id);
+            const clinicId = @json($this->clinic_id);
+            const parentId = @json($this->parent_id);
 
-        $('#doctor_id').on('change', function() {
-          const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
-          @this.set('doctor_id', value);
-          console.log('doctor_id set to:', value); // دیباگ
-        });
-        $('#clinic_id').on('change', function() {
-          @this.set('clinic_id', $(this).val());
-        });
-        $('#parent_id').on('change', function() {
-          @this.set('parent_id', $(this).val());
-        });
+            $('#doctor_id').val(doctorId || '').trigger('change');
+            $('#clinic_id').val(clinicId || '').trigger('change');
+            $('#parent_id').val(parentId || '').trigger('change');
+        }
 
-        // دیباگ باز و بسته شدن
-        $('#doctor_id').on('select2:open', function() {
-          console.log('Select2 opened');
-        });
-        $('#doctor_id').on('select2:close', function() {
-          console.log('Select2 closed');
-        });
-      }
-
-      initializeSelect2();
-
-      Livewire.hook('morph.updated', () => {
-        console.log('DOM updated by Livewire'); // دیباگ آپدیت DOM
-        const wasOpen = $('#doctor_id').select2('isOpen'); // چک می‌کنیم سلکت باز بوده یا نه
-        const currentValue = $('#doctor_id').val(); // مقدار فعلی رو نگه می‌داریم
-
-        $('#doctor_id').select2('destroy');
-        $('#clinic_id').select2('destroy');
-        $('#parent_id').select2('destroy');
+        // اجرای اولیه Select2
         initializeSelect2();
 
-        const doctorValue = @json($this->doctor_id);
-        const clinicValue = @json($this->clinic_id);
-        const parentValue = @json($this->parent_id);
+        // همگام‌سازی با تغییرات کاربر
+        $('#doctor_id').on('change', function() {
+            const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
+            @this.set('doctor_id', value);
+        });
+        $('#clinic_id').on('change', function() {
+            const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
+            @this.set('clinic_id', value);
+        });
+        $('#parent_id').on('change', function() {
+            const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
+            @this.set('parent_id', value);
+        });
 
-        // مقدار فعلی یا مقدار سرور رو ست می‌کنیم
-        if (currentValue && currentValue !== '') {
-          $('#doctor_id').val(currentValue).trigger('change');
-        } else if (doctorValue) {
-          $('#doctor_id').val(doctorValue).trigger('change');
-        } else {
-          $('#doctor_id').val('').trigger('change');
-        }
+        Livewire.on('show-alert', (event) => {
+            toastr[event.type](event.message);
+        });
 
-        if (clinicValue) $('#clinic_id').val(clinicValue).trigger('change');
-        if (parentValue) $('#parent_id').val(parentValue).trigger('change');
+        Livewire.on('redirect-after-delay', () => {
+            setTimeout(() => {
+                window.location.href = "{{ route('admin.panel.doctor-services.index') }}";
+            }, 3000);
+        });
 
-        // اگه سلکت باز بود، دوباره بازش می‌کنیم
-        if (wasOpen) {
-          $('#doctor_id').select2('open');
-          console.log('Reopened Select2 after update');
-        }
-      });
-
-      Livewire.on('show-alert', (event) => {
-        toastr[event.type](event.message);
-      });
-
-      Livewire.on('redirect-after-delay', () => {
-        setTimeout(() => {
-          window.location.href = "{{ route('admin.panel.doctor-services.index') }}";
-        }, 3000); // ریدایرکت بعد از ۳ ثانیه
-      });
+        // رفرش Select2 بعد از هر آپدیت Livewire
+        document.addEventListener('livewire:updated', function () {
+            // فقط در صورتی که Select2 قبلاً initialize شده باشد
+            if ($('#doctor_id').hasClass('select2-hidden-accessible')) {
+                const doctorId = @json($this->doctor_id);
+                const clinicId = @json($this->clinic_id);
+                const parentId = @json($this->parent_id);
+                
+                $('#doctor_id').val(doctorId || '').trigger('change');
+                $('#clinic_id').val(clinicId || '').trigger('change');
+                $('#parent_id').val(parentId || '').trigger('change');
+            }
+        });
     });
   </script>
 </div>

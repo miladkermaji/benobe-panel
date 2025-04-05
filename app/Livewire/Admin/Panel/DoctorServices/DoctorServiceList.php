@@ -14,11 +14,12 @@ class DoctorServiceList extends Component
 
     protected $listeners = ['deleteDoctorServiceConfirmed' => 'deleteDoctorService'];
 
-    public $perPage                = 10;
-    public $search                 = '';
-    public $readyToLoad            = false;
-    public $selectedDoctorServices = [];
-    public $selectAll              = false;
+    public $perPage = 10; // پیجینیشن اصلی صفحه (در صورت نیاز)
+    public $servicesPerPage = 5; // پیجینیشن محلی برای خدمات هر پزشک
+    public $search = '';
+    public $readyToLoad = false;
+    public $expandedDoctors = [];
+    public $doctorPages = []; // آرایه برای ذخیره صفحه فعلی خدمات برای هر پزشک
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -27,6 +28,7 @@ class DoctorServiceList extends Component
     public function mount()
     {
         $this->perPage = max($this->perPage, 1);
+        $this->servicesPerPage = max($this->servicesPerPage, 1);
     }
 
     public function loadDoctorServices()
@@ -34,10 +36,27 @@ class DoctorServiceList extends Component
         $this->readyToLoad = true;
     }
 
+    public function toggleDoctor($doctorId)
+    {
+        if (in_array($doctorId, $this->expandedDoctors)) {
+            $this->expandedDoctors = array_diff($this->expandedDoctors, [$doctorId]);
+        } else {
+            $this->expandedDoctors[] = $doctorId;
+            if (!isset($this->doctorPages[$doctorId])) {
+                $this->doctorPages[$doctorId] = 1;
+            }
+        }
+    }
+
+    public function setDoctorPage($doctorId, $page)
+    {
+        $this->doctorPages[$doctorId] = max(1, $page);
+    }
+
     public function toggleStatus($id)
     {
         $item = DoctorService::findOrFail($id);
-        $item->update(['status' => ! $item->status]);
+        $item->update(['status' => !$item->status]);
         $this->dispatch('show-alert', type: $item->status ? 'success' : 'info', message: $item->status ? 'فعال شد!' : 'غیرفعال شد!');
     }
 
@@ -56,48 +75,41 @@ class DoctorServiceList extends Component
     public function updatedSearch()
     {
         $this->resetPage();
-    }
-
-    public function updatedSelectAll($value)
-    {
-        $currentPageIds               = $this->getDoctorServicesQuery()->pluck('id')->toArray();
-        $this->selectedDoctorServices = $value ? $currentPageIds : [];
-    }
-
-    public function updatedSelectedDoctorServices()
-    {
-        $currentPageIds  = $this->getDoctorServicesQuery()->pluck('id')->toArray();
-        $this->selectAll = ! empty($this->selectedDoctorServices) && count(array_diff($currentPageIds, $this->selectedDoctorServices)) === 0;
-    }
-
-    public function deleteSelected()
-    {
-        if (empty($this->selectedDoctorServices)) {
-            $this->dispatch('show-alert', type: 'warning', message: 'هیچ خدمت پزشکی انتخاب نشده است.');
-            return;
-        }
-
-        DoctorService::whereIn('id', $this->selectedDoctorServices)->delete();
-        $this->selectedDoctorServices = [];
-        $this->selectAll              = false;
-        $this->dispatch('show-alert', type: 'success', message: 'خدمات پزشکی انتخاب‌شده حذف شدند!');
+        $this->doctorPages = []; // ریست کردن پیجینیشن محلی هنگام جستجو
     }
 
     private function getDoctorServicesQuery()
     {
         return DoctorService::with(['doctor', 'parent'])
-            ->where('name', 'like', '%' . $this->search . '%')
-            ->orWhere('description', 'like', '%' . $this->search . '%')
-            ->orderBy('name')
-            ->paginate($this->perPage);
+            ->where(function ($query) {
+                $query->whereHas('doctor', function ($q) {
+                    $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%']);
+                })
+                ->orWhere('name', 'like', '%' . $this->search . '%')
+                ->orWhere('description', 'like', '%' . $this->search . '%');
+            })
+            ->orderBy('id', 'desc');
     }
 
     public function render()
     {
-        $items = $this->readyToLoad ? $this->getDoctorServicesQuery() : null;
+        $doctors = $this->readyToLoad ? $this->getDoctorServicesQuery()
+            ->get()
+            ->groupBy('doctor_id')
+            ->map(function ($services, $doctorId) {
+                $currentPage = $this->doctorPages[$doctorId] ?? 1;
+                $paginatedServices = $services->forPage($currentPage, $this->servicesPerPage);
+                return [
+                    'doctor' => $services->first()->doctor,
+                    'services' => $paginatedServices->values(),
+                    'totalServices' => $services->count(),
+                    'currentPage' => $currentPage,
+                    'lastPage' => ceil($services->count() / $this->servicesPerPage),
+                ];
+            }) : [];
 
         return view('livewire.admin.panel.doctor-services.doctor-service-list', [
-            'doctorservices' => $items,
+            'doctors' => $doctors,
         ]);
     }
 }
