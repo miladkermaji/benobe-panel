@@ -1,7 +1,7 @@
 @extends('{{prefix}}.panel.layouts.master')
 
 @section('styles')
-    <link type="text/css" href="{{ asset('{{prefix}}-assets/css/panel/{{model}}/{{model}}.css') }}" rel="stylesheet" />
+    <link type="text/css" href="{{ asset('{{prefix}}-assets/css/panel/{{modelKebab}}/{{modelKebab}}.css') }}" rel="stylesheet" />
 @endsection
 
 @section('site-header')
@@ -9,6 +9,6 @@
 @endsection
 
 @section('content')
-    @section('bread-crumb-title', 'مدیریت {{modelPlural}}')
-    @livewire('{{prefix}}.panel.{{modelPlural}}.{{model}}-list')
+    @section('bread-crumb-title', 'لیست {{modelPlural}}')
+    @livewire('{{prefix}}.panel.{{modelPluralKebab}}.{{modelKebab}}-list')
 @endsection
