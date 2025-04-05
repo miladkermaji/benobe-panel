@@ -15,18 +15,20 @@ class MakeCrudLivewire extends Command
     {
         $model = $this->argument('model');
         $prefix = $this->argument('prefix');
-        $namespacePrefix = ucfirst($prefix); // Admin or Dr
+        $namespacePrefix = Str::studly($prefix); // Admin or Dr
 
         // مسیرها و نام‌ها
         $modelLower = Str::lower($model);
+        $modelKebab = Str::kebab($model);
         $modelPlural = Str::plural($modelLower);
+        $modelPluralKebab = Str::kebab(Str::plural($model));
         $modelStudly = Str::studly($model);
 
         // بررسی وجود مدل و ساخت آن در صورت نیاز
         $this->createModelIfNotExists($model, $namespacePrefix);
 
         // ساخت کنترلر
-        $this->createController($model, $namespacePrefix);
+        $this->createController($model, $namespacePrefix, $modelKebab, $modelPluralKebab);
 
         // ساخت فایل‌های Livewire
         $this->createLivewireComponents($model, $namespacePrefix);
@@ -71,21 +73,39 @@ class MakeCrudLivewire extends Command
 
             // ساخت مایگریشن
             $this->call('make:migration', [
-             'name' => "create_" . Str::plural(Str::lower($model)) . "_table",
-             '--create' => Str::plural(Str::lower($model)),
+                'name' => "create_" . Str::plural(Str::snake($model)) . "_table",
+                '--create' => Str::plural(Str::snake($model)),
             ]);
         } else {
             $this->info("Model {$model} already exists somewhere in app/Models. Skipping model and migration creation.");
         }
     }
 
-    protected function createController($model, $namespacePrefix)
+    protected function createController($model, $namespacePrefix, $modelKebab, $modelPluralKebab)
     {
         $controllerPath = app_path("Http/Controllers/{$namespacePrefix}/Panel/{$model}/{$model}Controller.php");
         $stub = File::get(base_path('stubs/controller.crud.stub'));
         $stub = str_replace(
-            ['{{namespace}}', '{{namespacePrefix}}', '{{class}}', '{{modelLower}}', '{{prefix}}', '{{modelPlural}}'],
-            ["App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}", $namespacePrefix, "{$model}Controller", Str::lower($model), Str::lower($namespacePrefix), Str::plural(Str::lower($model))],
+            [
+                '{{namespace}}',
+                '{{namespacePrefix}}',
+                '{{class}}',
+                '{{modelLower}}',
+                '{{prefix}}',
+                '{{modelPlural}}',
+                '{{modelKebab}}',
+                '{{modelPluralKebab}}'
+            ],
+            [
+                "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}",
+                $namespacePrefix,
+                "{$model}Controller",
+                Str::lower($model),
+                Str::kebab($namespacePrefix),
+                Str::plural(Str::lower($model)),
+                $modelKebab,
+                $modelPluralKebab
+            ],
             $stub
         );
         File::ensureDirectoryExists(dirname($controllerPath));
@@ -95,15 +115,17 @@ class MakeCrudLivewire extends Command
     protected function createLivewireComponents($model, $namespacePrefix)
     {
         $modelLower = Str::lower($model);
+        $modelKebab = Str::kebab($model);
         $modelPlural = Str::plural($modelLower);
-        $prefixLower = Str::lower($namespacePrefix);
+        $modelPluralKebab = Str::kebab(Str::plural($model));
+        $prefixKebab = Str::kebab($namespacePrefix);
 
         // مسیر فایل‌های PHP لایووایر
-        $livewirePath = app_path("Livewire/{$namespacePrefix}/Panel/{$modelPlural}");
+        $livewirePath = app_path("Livewire/{$namespacePrefix}/Panel/{$model}");
         File::ensureDirectoryExists($livewirePath);
 
         // مسیر ویوهای Livewire
-        $livewireViewPath = resource_path("views/livewire/{$prefixLower}/panel/{$modelPlural}");
+        $livewireViewPath = resource_path("views/livewire/{$prefixKebab}/panel/{$modelPluralKebab}");
         File::ensureDirectoryExists($livewireViewPath);
 
         // حذف هرگونه فایل camelCase احتمالی
@@ -127,20 +149,22 @@ class MakeCrudLivewire extends Command
     protected function replaceLivewireStubs($model, $namespacePrefix)
     {
         $modelLower = Str::lower($model);
+        $modelKebab = Str::kebab($model);
         $modelPlural = Str::plural($modelLower);
+        $modelPluralKebab = Str::kebab(Str::plural($model));
         $modelStudly = Str::studly($model);
-        $prefixLower = Str::lower($namespacePrefix);
+        $prefixKebab = Str::kebab($namespacePrefix);
 
         // مسیر فایل‌های PHP لایووایر
-        $livewirePath = app_path("Livewire/{$namespacePrefix}/Panel/{$modelPlural}");
+        $livewirePath = app_path("Livewire/{$namespacePrefix}/Panel/{$model}");
         File::ensureDirectoryExists($livewirePath);
 
         // List Component
         $listPath = "{$livewirePath}/{$model}List.php";
         $listStub = File::get(base_path('stubs/livewire.list.stub'));
         $listStub = str_replace(
-            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelPlural}}', '{{namespacePrefix}}', '{{prefix}}'],
-            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPlural}", "{$model}List", $modelStudly, $modelLower, $modelPlural, $namespacePrefix, $prefixLower],
+            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelKebab}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{namespacePrefix}}', '{{prefix}}'],
+            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$model}", "{$model}List", $modelStudly, $modelLower, $modelKebab, $modelPlural, $modelPluralKebab, $namespacePrefix, $prefixKebab],
             $listStub
         );
         File::put($listPath, $listStub);
@@ -150,8 +174,8 @@ class MakeCrudLivewire extends Command
         $createPath = "{$livewirePath}/{$model}Create.php";
         $createStub = File::get(base_path('stubs/livewire.create.stub'));
         $createStub = str_replace(
-            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelPlural}}', '{{namespacePrefix}}', '{{prefix}}'],
-            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPlural}", "{$model}Create", $modelStudly, $modelLower, $modelPlural, $namespacePrefix, $prefixLower],
+            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelKebab}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{namespacePrefix}}', '{{prefix}}'],
+            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$model}", "{$model}Create", $modelStudly, $modelLower, $modelKebab, $modelPlural, $modelPluralKebab, $namespacePrefix, $prefixKebab],
             $createStub
         );
         File::put($createPath, $createStub);
@@ -161,8 +185,8 @@ class MakeCrudLivewire extends Command
         $editPath = "{$livewirePath}/{$model}Edit.php";
         $editStub = File::get(base_path('stubs/livewire.edit.stub'));
         $editStub = str_replace(
-            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelPlural}}', '{{namespacePrefix}}', '{{prefix}}'],
-            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPlural}", "{$model}Edit", $modelStudly, $modelLower, $modelPlural, $namespacePrefix, $prefixLower],
+            ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelKebab}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{namespacePrefix}}', '{{prefix}}'],
+            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$model}", "{$model}Edit", $modelStudly, $modelLower, $modelKebab, $modelPlural, $modelPluralKebab, $namespacePrefix, $prefixKebab],
             $editStub
         );
         File::put($editPath, $editStub);
@@ -172,17 +196,19 @@ class MakeCrudLivewire extends Command
     protected function createViews($model, $prefix)
     {
         $modelLower = Str::lower($model);
+        $modelKebab = Str::kebab($model);
         $modelPlural = Str::plural($modelLower);
-        $prefixLower = Str::lower($prefix);
+        $modelPluralKebab = Str::kebab(Str::plural($model));
+        $prefixKebab = Str::kebab($prefix);
 
         // ویوهای کنترلر
-        $viewPath = resource_path("views/{$prefixLower}/panel/{$modelPlural}");
+        $viewPath = resource_path("views/{$prefixKebab}/panel/{$modelPluralKebab}");
         File::ensureDirectoryExists($viewPath);
 
         $indexStub = File::get(base_path('stubs/view.index.stub'));
         $indexStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
+            ['{{prefix}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{modelKebab}}'],
+            [$prefixKebab, $modelPlural, $modelPluralKebab, $modelKebab],
             $indexStub
         );
         File::put("{$viewPath}/index.blade.php", $indexStub);
@@ -190,8 +216,8 @@ class MakeCrudLivewire extends Command
 
         $createStub = File::get(base_path('stubs/view.create.stub'));
         $createStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
+            ['{{prefix}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{modelKebab}}'],
+            [$prefixKebab, $modelPlural, $modelPluralKebab, $modelKebab],
             $createStub
         );
         File::put("{$viewPath}/create.blade.php", $createStub);
@@ -199,15 +225,15 @@ class MakeCrudLivewire extends Command
 
         $editStub = File::get(base_path('stubs/view.edit.stub'));
         $editStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
+            ['{{prefix}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{modelKebab}}'],
+            [$prefixKebab, $modelPlural, $modelPluralKebab, $modelKebab],
             $editStub
         );
         File::put("{$viewPath}/edit.blade.php", $editStub);
         $this->info("Created controller view: {$viewPath}/edit.blade.php");
 
         // ویوهای Livewire
-        $livewireViewPath = resource_path("views/livewire/{$prefixLower}/panel/{$modelPlural}");
+        $livewireViewPath = resource_path("views/livewire/{$prefixKebab}/panel/{$modelPluralKebab}");
         File::ensureDirectoryExists($livewireViewPath);
 
         // حذف فایل‌های camelCase احتمالی
@@ -227,38 +253,40 @@ class MakeCrudLivewire extends Command
         // ساخت ویوهای kebab-case
         $listViewStub = File::get(base_path('stubs/livewire.view.list.stub'));
         $listViewStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
+            ['{{prefix}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{modelKebab}}'],
+            [$prefixKebab, $modelPlural, $modelPluralKebab, $modelKebab],
             $listViewStub
         );
-        File::put("{$livewireViewPath}/{$modelLower}-list.blade.php", $listViewStub);
-        $this->info("Created Livewire view: {$livewireViewPath}/{$modelLower}-list.blade.php");
+        File::put("{$livewireViewPath}/{$modelKebab}-list.blade.php", $listViewStub);
+        $this->info("Created Livewire view: {$livewireViewPath}/{$modelKebab}-list.blade.php");
 
         $createViewStub = File::get(base_path('stubs/livewire.view.create.stub'));
         $createViewStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
+            ['{{prefix}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{modelKebab}}'],
+            [$prefixKebab, $modelPlural, $modelPluralKebab, $modelKebab],
             $createViewStub
         );
-        File::put("{$livewireViewPath}/{$modelLower}-create.blade.php", $createViewStub);
-        $this->info("Created Livewire view: {$livewireViewPath}/{$modelLower}-create.blade.php");
+        File::put("{$livewireViewPath}/{$modelKebab}-create.blade.php", $createViewStub);
+        $this->info("Created Livewire view: {$livewireViewPath}/{$modelKebab}-create.blade.php");
 
         $editViewStub = File::get(base_path('stubs/livewire.view.edit.stub'));
-        $editStub = str_replace(
-            ['{{prefix}}', '{{modelPlural}}', '{{model}}'],
-            [$prefixLower, $modelPlural, $modelLower],
+        $editViewStub = str_replace(
+            ['{{prefix}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{modelKebab}}'],
+            [$prefixKebab, $modelPlural, $modelPluralKebab, $modelKebab],
             $editViewStub
         );
-        File::put("{$livewireViewPath}/{$modelLower}-edit.blade.php", $editStub);
-        $this->info("Created Livewire view: {$livewireViewPath}/{$modelLower}-edit.blade.php");
+        File::put("{$livewireViewPath}/{$modelKebab}-edit.blade.php", $editViewStub);
+        $this->info("Created Livewire view: {$livewireViewPath}/{$modelKebab}-edit.blade.php");
     }
 
     protected function appendRoutes($model, $prefix)
     {
         $modelLower = Str::lower($model);
+        $modelKebab = Str::kebab($model);
         $modelPlural = Str::plural($modelLower);
-        $namespacePrefix = ucfirst($prefix); // برای namespace همچنان ucfirst
-        $prefixLower = Str::lower($prefix); // برای route lowercase
+        $modelPluralKebab = Str::kebab(Str::plural($model));
+        $namespacePrefix = Str::studly($prefix);
+        $prefixKebab = Str::kebab($prefix);
 
         $webFile = base_path('routes/web.php');
         if (!File::exists($webFile)) {
@@ -268,43 +296,47 @@ class MakeCrudLivewire extends Command
         $webContent = File::get($webFile);
 
         $fullNamespace = "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}\\{$model}Controller";
-        $routeContent = "    Route::prefix('$modelPlural')->group(function () {\n" .
-                        "        Route::get('/', [\\{$fullNamespace}::class, 'index'])->name('{$prefixLower}.panel.{$modelPlural}.index');\n" .
-                        "        Route::get('/create', [\\{$fullNamespace}::class, 'create'])->name('{$prefixLower}.panel.{$modelPlural}.create');\n" .
-                        "        Route::get('/edit/{id}', [\\{$fullNamespace}::class, 'edit'])->name('{$prefixLower}.panel.{$modelPlural}.edit');\n" .
+        $routeContent = "    Route::prefix('{$modelPluralKebab}')->group(function () {\n" .
+                        "        Route::get('/', [\\{$fullNamespace}::class, 'index'])->name('{$prefixKebab}.panel.{$modelPluralKebab}.index');\n" .
+                        "        Route::get('/create', [\\{$fullNamespace}::class, 'create'])->name('{$prefixKebab}.panel.{$modelPluralKebab}.create');\n" .
+                        "        Route::get('/edit/{id}', [\\{$fullNamespace}::class, 'edit'])->name('{$prefixKebab}.panel.{$modelPluralKebab}.edit');\n" .
                         "    });\n";
 
-        $groupPattern = "/Route::prefix\s*\(\s*'$prefixLower'\s*\)\s*(?:\r?\n\s*)?->namespace\s*\(\s*'$namespacePrefix'\s*\)\s*(?:->middleware\s*\(\s*'[a-zA-Z:]+'\s*\)\s*(?:\r?\n\s*)?)?->group\s*\(\s*function\s*\(\s*\)\s*\{(.*?)\}\s*\);/s";
+        $groupPattern = "/Route::prefix\s*\(\s*'$prefixKebab'\s*\)\s*(?:\r?\n\s*)?->namespace\s*\(\s*'$namespacePrefix'\s*\)\s*(?:->middleware\s*\(\s*'[a-zA-Z:]+'\s*\)\s*(?:\r?\n\s*)?)?->group\s*\(\s*function\s*\(\s*\)\s*\{(.*?)\}\s*\);/s";
 
         if (preg_match($groupPattern, $webContent, $matches)) {
             $groupContent = $matches[1];
-            if (strpos($groupContent, "Route::prefix('$modelPlural')->group(function () {") === false) {
+            if (strpos($groupContent, "Route::prefix('{$modelPluralKebab}')->group(function () {") === false) {
                 $newGroupContent = "\n" . $routeContent . "\n" . trim($groupContent);
-                $replacement = "Route::prefix('$prefixLower')\n    ->namespace('$namespacePrefix')\n";
-                if ($prefixLower === 'admin') {
+                $replacement = "Route::prefix('$prefixKebab')\n    ->namespace('$namespacePrefix')\n";
+                if ($prefixKebab === 'admin') {
                     $replacement .= "    ->middleware('manager')\n";
                 }
                 $replacement .= "    ->group(function () {{$newGroupContent}\n});";
 
                 $webContent = preg_replace($groupPattern, $replacement, $webContent);
                 File::put($webFile, $webContent);
-                $this->info("Routes for $modelPlural prepended to $prefixLower group successfully.");
+                $this->info("Routes for $modelPluralKebab prepended to $prefixKebab group successfully.");
             } else {
-                $this->info("Routes for $modelPlural already exist in $prefixLower group. Skipping.");
+                $this->info("Routes for $modelPluralKebab already exist in $prefixKebab group. Skipping.");
             }
         } else {
-            $this->error("Could not find $prefixLower group in routes/web.php.");
+            $this->error("Could not find $prefixKebab group in routes/web.php.");
         }
     }
 
-
     protected function createCssFile($model, $prefix)
     {
-        $modelLower = Str::lower($model);
-        $prefixLower = Str::lower($prefix); // پیشوند lowercase
-        $cssPath = public_path("{$prefixLower}-assets/css/panel/{$modelLower}");
+        $modelKebab = Str::kebab($model);
+        $prefixKebab = Str::kebab($prefix);
+        $cssPath = public_path("{$prefixKebab}-assets/css/panel/{$modelKebab}");
         File::ensureDirectoryExists($cssPath);
         $cssStub = File::get(base_path('stubs/css.stub'));
-        File::put("{$cssPath}/{$modelLower}.css", $cssStub);
+        $cssStub = str_replace(
+            ['{{modelKebab}}'],
+            [$modelKebab],
+            $cssStub
+        );
+        File::put("{$cssPath}/{$modelKebab}.css", $cssStub);
     }
 }

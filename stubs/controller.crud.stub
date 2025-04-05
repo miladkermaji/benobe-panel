@@ -8,16 +8,16 @@ class {{class}} extends Controller
 {
     public function index()
     {
-        return view('{{prefix}}.panel.{{modelPlural}}.index');
+        return view('{{prefix}}.panel.{{modelPluralKebab}}.index');
     }
 
     public function create()
     {
-        return view('{{prefix}}.panel.{{modelPlural}}.create');
+        return view('{{prefix}}.panel.{{modelPluralKebab}}.create');
     }
 
     public function edit($id)
     {
-        return view('{{prefix}}.panel.{{modelPlural}}.edit', compact('id'));
+        return view('{{prefix}}.panel.{{modelPluralKebab}}.edit', compact('id'));
     }
 }
