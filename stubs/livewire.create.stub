@@ -11,9 +11,7 @@ class {{class}} extends Component
 {
     use WithFileUploads;
 
-    public $name;
-    public $description;
-    public $status = true;
+    public $form = [];
     public $photo;
     public $photoPreview;
 
@@ -29,28 +27,22 @@ class {{class}} extends Component
 
     public function store()
     {
-        $validator = Validator::make([
-            'name' => $this->name,
-            'description' => $this->description,
-            'status' => $this->status,
-            'photo' => $this->photo,
-        ], [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-            'status' => 'required|boolean',
-            'photo' => 'nullable|image|max:2048',
-        ]);
+        $validator = Validator::make(
+            array_merge($this->form, ['photo' => $this->photo]),
+            [
+                'form.name' => 'required|string|max:255',
+                'form.description' => 'nullable|string|max:500',
+                'form.status' => 'required|boolean',
+                'photo' => 'nullable|image|max:2048',
+            ]
+        );
 
         if ($validator->fails()) {
             $this->dispatch('show-alert', type: 'error', message: $validator->errors()->first());
             return;
         }
 
-        $data = [
-            'name' => $this->name,
-            'description' => $this->description,
-            'status' => $this->status,
-        ];
+        $data = $this->form;
 
         if ($this->photo) {
             $data['photo'] = $this->photo->store('photos', 'public');
@@ -59,11 +51,11 @@ class {{class}} extends Component
         {{model}}::create($data);
 
         $this->dispatch('show-alert', type: 'success', message: '{{modelLower}} با موفقیت ایجاد شد!');
-        return redirect()->route('{{prefix}}.panel.{{modelPlural}}.index');
+        return redirect()->route('{{prefix}}.panel.{{modelPluralKebab}}.index');
     }
 
     public function render()
     {
-        return view('livewire.{{prefix}}.panel.{{modelPlural}}.{{modelLower}}-create');
+        return view('livewire.{{prefix}}.panel.{{modelPluralKebab}}.{{modelKebab}}-create');
     }
 }

@@ -5,6 +5,7 @@ namespace {{namespace}};
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\{{model}};
+use Illuminate\Support\Facades\DB;
 
 class {{class}} extends Component
 {
@@ -12,33 +13,20 @@ class {{class}} extends Component
 
     protected $paginationTheme = 'bootstrap';
 
-    protected $listeners = ['delete{{model}}Confirmed' => 'delete{{model}}'];
-
-    public $perPage = 10;
     public $search = '';
     public $readyToLoad = false;
-    public $selected{{modelPlural}} = [];
-    public $selectAll = false;
+    public $perPage = 10;
 
     protected $queryString = [
         'search' => ['except' => ''],
+        'page' => ['except' => 1],
     ];
+
+    protected $listeners = ['delete{{model}}Confirmed' => 'delete{{model}}'];
 
     public function mount()
     {
-        $this->perPage = max($this->perPage, 1);
-    }
-
-    public function load{{modelPlural}}()
-    {
         $this->readyToLoad = true;
-    }
-
-    public function toggleStatus($id)
-    {
-        $item = {{model}}::findOrFail($id);
-        $item->update(['status' => !$item->status]);
-        $this->dispatch('show-alert', type: $item->status ? 'success' : 'info', message: $item->status ? 'فعال شد!' : 'غیرفعال شد!');
     }
 
     public function confirmDelete($id)
@@ -58,44 +46,21 @@ class {{class}} extends Component
         $this->resetPage();
     }
 
-    public function updatedSelectAll($value)
-    {
-        $currentPageIds = $this->get{{modelPlural}}Query()->pluck('id')->toArray();
-        $this->selected{{modelPlural}} = $value ? $currentPageIds : [];
-    }
-
-    public function updatedSelected{{modelPlural}}()
-    {
-        $currentPageIds = $this->get{{modelPlural}}Query()->pluck('id')->toArray();
-        $this->selectAll = !empty($this->selected{{modelPlural}}) && count(array_diff($currentPageIds, $this->selected{{modelPlural}})) === 0;
-    }
-
-    public function deleteSelected()
-    {
-        if (empty($this->selected{{modelPlural}})) {
-            $this->dispatch('show-alert', type: 'warning', message: 'هیچ {{modelLower}} انتخاب نشده است.');
-            return;
-        }
-
-        {{model}}::whereIn('id', $this->selected{{modelPlural}})->delete();
-        $this->selected{{modelPlural}} = [];
-        $this->selectAll = false;
-        $this->dispatch('show-alert', type: 'success', message: '{{modelPlural}} انتخاب‌شده حذف شدند!');
-    }
-
     private function get{{modelPlural}}Query()
     {
-        return {{model}}::where('name', 'like', '%' . $this->search . '%')
-            ->orWhere('description', 'like', '%' . $this->search . '%')
-            ->paginate($this->perPage);
+        return {{model}}::where(function ($query) {
+            $query->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('description', 'like', '%' . $this->search . '%')
+                  ->orWhereRaw("CONCAT(name, ' ', description) LIKE ?", ['%' . $this->search . '%']);
+        })->paginate($this->perPage);
     }
 
     public function render()
     {
-        $items = $this->readyToLoad ? $this->get{{modelPlural}}Query() : null;
+        $items = $this->readyToLoad ? $this->get{{modelPlural}}Query() : collect();
 
-        return view('livewire.{{prefix}}.panel.{{modelPlural}}.{{modelLower}}-list', [
-            '{{modelPlural}}' => $items,
+        return view('livewire.{{prefix}}.panel.{{modelPluralKebab}}.{{modelKebab}}-list', [
+            '{{modelPluralKebab}}' => $items,
         ]);
     }
 }
