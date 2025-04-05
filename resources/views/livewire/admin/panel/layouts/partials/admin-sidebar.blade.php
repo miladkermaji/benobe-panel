@@ -353,7 +353,7 @@
             <li class="item-li"><a href="{{ route('admin.panel.menus.index') }}">منوها</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.banner-texts.index') }}">بنر صفحه اصلی</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.footer-contents.index') }}">فوتر</a></li>
-            <li class="item-li"><a href="#">تنظیمات عمومی</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.setting.index') }}">تنظیمات عمومی</a></li>
             <li class="item-li"><a href="#">مدیریت صفحات</a></li>
             <li class="item-li"><a href="#">تنظیمات SEO</a></li>
             <li class="item-li"><a href="#">تنظیمات اعلان‌ها</a></li>

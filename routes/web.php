@@ -22,6 +22,7 @@ use App\Http\Controllers\Dr\Panel\Tickets\TicketsController;
 use App\Http\Controllers\Dr\Panel\Turn\DrScheduleController;
 use App\Http\Controllers\Dr\Panel\Profile\DrProfileController;
 use App\Http\Controllers\Dr\Panel\Profile\LoginLogsController;
+use App\Http\Controllers\Admin\Panel\Setting\SettingController;
 use App\Http\Controllers\Dr\Panel\Tickets\TicketResponseController;
 use App\Http\Controllers\Admin\Panel\Profile\AdminProfileController;
 use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapController;
@@ -100,6 +101,11 @@ Route::prefix('admin')
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Blogs\BlogsController::class, 'index'])->name('admin.panel.blogs.index');
 
         });
+
+Route::prefix('setting/')->group(function () {
+    Route::get('/', [SettingController::class, 'index'])->name('admin.panel.setting.index');
+    Route::get('/change-logo', [SettingController::class, 'change_logo'])->name('admin.panel.setting.change-logo');
+});
 
 
         Route::prefix('transactions')->group(function () {
