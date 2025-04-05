@@ -93,15 +93,16 @@
       window.Livewire.navigate(event.url);
     });
 
-    function formatTime(seconds) {
-      if (isNaN(seconds) || seconds < 0) return '0 دقیقه';
-      const minutes = Math.floor(seconds / 60);
-      if (minutes > 59) {
+   function formatTime(seconds) {
+    if (isNaN(seconds) || seconds < 0) return '0 دقیقه';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes > 59) {
         const hours = Math.floor(minutes / 60);
-        return `${hours} ساعت`;
-      }
-      return `${minutes} دقیقه`;
+        const remainingMinutes = minutes % 60;
+        return remainingMinutes > 0 ? `${hours} ساعت و ${remainingMinutes} دقیقه` : `${hours} ساعت`;
     }
+    return `${minutes} دقیقه`;
+}
 
     document.addEventListener('livewire:initialized', () => {
       document.querySelector('input[wire\\:model="mobile"]').focus();

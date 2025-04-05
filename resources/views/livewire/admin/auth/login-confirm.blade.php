@@ -300,7 +300,8 @@
       const minutes = Math.floor(seconds / 60);
       if (minutes > 59) {
         const hours = Math.floor(minutes / 60);
-        return `${hours} ساعت`;
+        const remainingMinutes = minutes % 60;
+        return remainingMinutes > 0 ? `${hours} ساعت و ${remainingMinutes} دقیقه` : `${hours} ساعت`;
       }
       return `${minutes} دقیقه`;
     }
