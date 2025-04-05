@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-    @section('bread-crumb-title', 'افزودن {{model}} جدید')
+    @section('bread-crumb-title', 'افزودن {{modelPlural}} جدید')
     @livewire('{{prefix}}.panel.{{modelPluralKebab}}.{{modelKebab}}-create')
 
 @endsection

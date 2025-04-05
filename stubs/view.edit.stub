@@ -9,6 +9,6 @@
 @endsection
 
 @section('content')
-    @section('bread-crumb-title', 'ویرایش {{model}}')
+    @section('bread-crumb-title', 'ویرایش {{modelPlural}}')
     @livewire('{{prefix}}.panel.{{modelPluralKebab}}.{{modelKebab}}-edit', ['id' => $id])
 @endsection
