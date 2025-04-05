@@ -94,10 +94,13 @@
     });
 
     function formatTime(seconds) {
-      if (isNaN(seconds) || seconds < 0) return '0 دقیقه و 0 ثانیه';
+      if (isNaN(seconds) || seconds < 0) return '0 دقیقه';
       const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = seconds % 60;
-      return `${minutes} دقیقه و ${remainingSeconds} ثانیه`;
+      if (minutes > 59) {
+        const hours = Math.floor(minutes / 60);
+        return `${hours} ساعت`;
+      }
+      return `${minutes} دقیقه`;
     }
 
     document.addEventListener('livewire:initialized', () => {

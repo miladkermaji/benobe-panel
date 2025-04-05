@@ -49,7 +49,6 @@
 
 @push('scripts')
   <script>
-    // تعریف متغیرها فقط یک بار در اسکوپ سراسری
     window.timerState = window.timerState || {
       interval: null,
       rateLimitTimerInterval: null,
@@ -69,7 +68,6 @@
       const storedToken = storedData.token;
       const now = new Date().getTime();
 
-      // تصمیم‌گیری برای استفاده از مقدار سرور یا localStorage
       if (!storedCountDownDate || storedToken !== token || storedCountDownDate <= now) {
         window.timerState.otpCountDownDate = countDownDate || (new Date().getTime() + 120000);
         window.timerState.isTimerRunning = true;
@@ -97,7 +95,7 @@
 
       if (window.timerState.isTimerRunning) {
         timerElement.classList.remove('d-none');
-        progressBarContainer.style.display = 'block'; // فقط وقتی تایمر فعاله نشون بده
+        progressBarContainer.style.display = 'block';
         resendSection.style.display = 'none';
         progressBar.style.width = window.timerState.lastPercentage + '%';
         progressBar.style.backgroundColor = window.timerState.lastPercentage > 50 ? '#28a745' : (window.timerState
@@ -298,13 +296,15 @@
     });
 
     function formatTime(seconds) {
-      if (isNaN(seconds) || seconds < 0) return '0 دقیقه و 0 ثانیه';
+      if (isNaN(seconds) || seconds < 0) return '0 دقیقه';
       const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = seconds % 60;
-      return `${minutes} دقیقه و ${remainingSeconds} ثانیه`;
+      if (minutes > 59) {
+        const hours = Math.floor(minutes / 60);
+        return `${hours} ساعت`;
+      }
+      return `${minutes} دقیقه`;
     }
 
-    // بررسی وضعیت تایمر بعد از رفرش صفحه
     document.addEventListener('DOMContentLoaded', () => {
       const storedData = JSON.parse(localStorage.getItem('otpTimerData') || '{}');
       const storedCountDownDate = storedData.countDownDate;
@@ -320,7 +320,6 @@
       setupOtpInputs();
     });
 
-    // جلوگیری از ریست لحظه‌ای با wire:ignore
     document.addEventListener('livewire:init', () => {
       const timerElement = document.getElementById('timer');
       const progressBarContainer = document.getElementById('progress-bar-container');
