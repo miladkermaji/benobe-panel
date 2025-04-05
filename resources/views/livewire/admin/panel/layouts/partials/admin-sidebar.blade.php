@@ -293,8 +293,8 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('dr-bime') }}">لیست بیمه‌ها</a></li>
-            <li class="item-li"><a href="#">افزودن بیمه</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.insurances.index') }}">لیست بیمه‌ها</a></li>
+            <li class="item-li"><a href="#">بیمه های دکتر</a></li>
           </ul>
         </li>
         <!-- مدیریت مالی -->
