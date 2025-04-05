@@ -96,6 +96,12 @@ Route::prefix('admin')
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'edit'])->name('admin.panel.doctor-wallets.edit');
         });
 
+        Route::prefix('blogs')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Blogs\BlogsController::class, 'index'])->name('admin.panel.blogs.index');
+
+        });
+
+
         Route::prefix('transactions')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Transaction\TransactionController::class, 'index'])->name('admin.panel.transactions.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Transaction\TransactionController::class, 'create'])->name('admin.panel.transactions.create');

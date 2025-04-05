@@ -1,0 +1,85 @@
+.blogs-content {
+    max-width: 1400px; /* عرض بیشتر */
+    margin: 0 auto;
+}
+.blogs-content .card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+}
+.blogs-content .card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+.blogs-content .card-img-top {
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+.blogs-content .card:hover .card-img-top {
+    transform: scale(1.08);
+}
+.blogs-content .card-body {
+    padding: 25px;
+}
+.blogs-content .card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+.blogs-content .card-date {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+.blogs-content .btn-primary {
+    background: #1e90ff;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.blogs-content .btn-primary:hover {
+    background: #1565c0;
+    transform: translateY(-2px);
+}
+.blogs-content .btn-outline-secondary {
+    border-radius: 30px;
+    padding: 10px 25px;
+    color: #34495e;
+    border-color: #34495e;
+}
+.blogs-content .btn-outline-secondary:hover {
+    background: #34495e;
+    color: #fff;
+}
+.pagination .page-link {
+    border-radius: 50%;
+    margin: 0 5px;
+    color: #1e90ff;
+}
+.pagination .page-item.active .page-link {
+    background: #1e90ff;
+    border-color: #1e90ff;
+    color: #fff;
+}
+@media (max-width: 768px) {
+    .blogs-content .card-img-top {
+        height: 200px;
+    }
+    .blogs-content .card-title {
+        font-size: 1.1rem;
+    }
+    .blogs-content .card-body {
+        padding: 20px;
+    }
+}
+.col-12{
+  max-width: 600px !important;
+}
