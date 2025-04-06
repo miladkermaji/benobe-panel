@@ -9,7 +9,79 @@
     rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/turn/schedule/manual_nobat/manual_nobat.css') }}"
     rel="stylesheet" />
+  <style>
+    /* استایل‌های جدید برای نتایج جستجو */
+    #search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1000;
+      padding: 10px;
+      display: none;
+    }
 
+    .search-result-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .search-result-card:hover {
+      background: #e9ecef;
+    }
+
+    .search-result-info {
+      flex-grow: 1;
+    }
+
+    .search-result-info p {
+      margin: 0;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .search-result-info .name {
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    .search-result-action {
+      margin-left: 10px;
+    }
+
+    .search-result-action button {
+      padding: 5px 10px;
+      font-size: 12px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .search-result-action button:hover {
+      background: #0056b3;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 10px;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -20,28 +92,16 @@
 <div class="calendar-and-add-sick-section p-3">
   <div class="d-flex justify-content-center gap-10 align-items-center c-a-wrapper">
     <div>
-      <div class="turning_search-wrapper__loGVc">
+      <div class="turning_search-wrapper__loGVc position-relative">
         <input type="text" id="search-input" class="my-form-control"
           placeholder="نام بیمار، شماره موبایل یا کد ملی ...">
-        <div id="search-results" class="table-responsive border mb-0">
-          <table class="table table-light table-hover table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>نام</th>
-                <th>نام خانوادگی</th>
-                <th>شماره موبایل</th>
-                <th>کد ملی</th>
-              </tr>
-            </thead>
-            <tbody id="search-results-body">
-            </tbody>
-          </table>
+        <div id="search-results" class="search-results">
+          <div id="search-results-body"></div>
         </div>
       </div>
     </div>
     <div class="btn-425-left">
-      <button class="btn btn-primary h-50 fs-13" data-toggle="modal" data-target="#addNewPatientModal"
-        data-toggle="modal" data-target="#addNewPatientModal">افزودن
+      <button class="btn btn-primary h-50 fs-13" data-toggle="modal" data-target="#addNewPatientModal">افزودن
         بیمار</button>
       <!-- فرم افزودن بیمار -->
       <div class="modal fade" id="addNewPatientModal" tabindex="-1" role="dialog" aria-labelledby="addNewPatientLabel"
@@ -53,7 +113,7 @@
               <div class="modal-header">
                 <h5 class="modal-title" id="addNewPatientLabel">افزودن بیمار جدید</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
+                  <span aria-hidden="true">×</span>
                 </button>
               </div>
               <div class="modal-body">
@@ -149,13 +209,12 @@
           <div class="mt-3 position-relative timepicker-ui w-100">
             <label class="label-top-input-special-takhasos"> ساعت مراجعه:</label>
             <input type="text"
-              class="form-control w-100  h-50 timepicker-ui-input text-end font-weight-bold font-size-13"
+              class="form-control w-100 h-50 timepicker-ui-input text-end font-weight-bold font-size-13"
               id="appointment-time" value="00:00" style="width: 100% !important">
           </div>
           <div class="mt-3 position-relative">
             <label class="label-top-input-special-takhasos"> توضیحات : </label>
-            <textarea id="description" name="description" class="form-control h-50" id="" cols="30"
-              rows="10"></textarea>
+            <textarea id="description" name="description" class="form-control h-50" cols="30" rows="10"></textarea>
           </div>
           <div class="mt-3 position-relative mb-3 w-100">
             <button type="submit" id="submit-button"
@@ -171,7 +230,7 @@
             <div class="modal-content border-radius-6">
               <div class="my-modal-header p-3">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
+                  <span aria-hidden="true">×</span>
                 </button>
               </div>
               <div class="modal-body">
@@ -192,7 +251,7 @@
           <div class="row w-100">
             <div class="w-100 d-flex justify-content-center">
               <div class="table-responsive">
-                <table class="table table-bordered table-striped">
+                <table class="table table-light table-hover">
                   <thead>
                     <tr>
                       <th>ردیف</th>
@@ -245,7 +304,7 @@
         <div class="modal-header">
           <h5 class="modal-title" id="editPatientLabel">ویرایش بیمار</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">×</span>
           </button>
         </div>
         <div class="modal-body">
@@ -313,11 +372,10 @@
     $('.card').css({
       'width': '850px',
       'height': '100%'
-    })
+    });
   });
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-  var updateStatusAppointmentUrl =
-    "{{ route('updateStatusAppointment', ':id') }}";
+  var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
 </script>
 <script>
   $(document).ready(function() {
@@ -379,10 +437,10 @@
       $('.my-dropdown-menu').addClass('d-none');
       dropdownOpen = false;
 
-      // ریلود صفحه با پارامتر جدید
       window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
     });
   });
+
   $(document).ready(function() {
     // AJAX search functionality
     $('#search-input').on('input', function() {
@@ -400,35 +458,40 @@
             if (response.length > 0) {
               response.forEach(function(user) {
                 resultsHtml += `
-    <tr class="search-result-item" data-user-id="${user.id}" data-first-name="${user.first_name}" data-last-name="${user.last_name}" data-mobile="${user.mobile}" data-national-code="${user.national_code}">
-    <td>${user.first_name}</td>
-    <td>${user.last_name}</td>
-    <td>${user.mobile}</td>
-    <td>${user.national_code}</td>
-    </tr>`;
+                    <div class="search-result-card" data-user-id="${user.id}" 
+                         data-first-name="${user.first_name}" 
+                         data-last-name="${user.last_name}" 
+                         data-mobile="${user.mobile}" 
+                         data-national-code="${user.national_code}">
+                      <div class="search-result-info">
+                        <p class="name">${user.first_name} ${user.last_name}</p>
+                        <p>موبایل: ${user.mobile}</p>
+                        <p>کد ملی: ${user.national_code}</p>
+                      </div>
+                      <div class="search-result-action">
+                        <button>انتخاب</button>
+                      </div>
+                    </div>`;
               });
             } else {
-              resultsHtml = '<tr><td colspan="4" class="text-center">نتیجه‌ای یافت نشد</td></tr>';
+              resultsHtml = '<div class="no-results">نتیجه‌ای یافت نشد</div>';
             }
             $('#search-results-body').html(resultsHtml);
-            $('#search-results-body').html(resultsHtml);
-            // نمایش جدول در صورت وجود نتایج
-            if (resultsHtml.trim() !== '') {
-              $('#search-results').css('display', 'block'); // جدول را نمایش می‌دهد
-            } else {
-              $('#search-results').css('display', 'none'); // در صورت خالی بودن نتایج، جدول را مخفی می‌کند
-            }
+            $('#search-results').css('display', 'block');
           },
           error: function() {
             toastr.error('خطا در جستجو!');
+            $('#search-results').css('display', 'none');
           }
         });
       } else {
-        $('#search-results-body').empty(); // پاک کردن جدول
+        $('#search-results-body').empty();
+        $('#search-results').css('display', 'none');
       }
     });
+
     // Insert selected user data into the form fields and search input
-    $(document).on('click', '.search-result-item', function() {
+    $(document).on('click', '.search-result-card', function() {
       $('#search-results').css('display', 'none');
 
       const userId = $(this).data('user-id');
@@ -436,47 +499,55 @@
       const lastName = $(this).data('last-name');
       const mobile = $(this).data('mobile');
       const nationalCode = $(this).data('national-code');
+
       // پر کردن فیلدهای فرم
       $('#user-id').val(userId);
       $('input[name="fristname"]').val(firstName);
       $('input[name="lastname"]').val(lastName);
       $('input[name="mobile"]').val(mobile);
       $('input[name="codemeli"]').val(nationalCode);
+
       // نمایش فرم اطلاعات بیمار
       $('.my-patient-content').removeClass('d-none');
+
       // پاک کردن نتایج جستجو
       $('#search-results-body').empty();
       $('#search-input').val('');
     });
+
     // Hide patient information section initially
     $('.my-patient-content').addClass('d-none');
   });
+
   $(document).on('show.bs.modal', '.modal', function() {
-    $("#search-results").addClass('d-none')
+    $("#search-results").addClass('d-none');
   });
   $(document).on('hide.bs.modal', '.modal', function() {
-    $("#search-results").removeClass('d-none')
+    $("#search-results").removeClass('d-none');
   });
 </script>
 <script>
   // نمونه استفاده
   function addRowToTable(data) {
-    // تبدیل تاریخ میلادی به شمسی
     const jalaliDate = moment(data.appointment_date, 'YYYY-MM-DD').format('jYYYY/jMM/jDD');
     const newRow = `
-    <tr>
-    <td>${data.id || '---'}</td>
-    <td>${data.user?.first_name || '---'} ${data.user?.last_name || '---'}</td>
-    <td>${data.user?.mobile || '---'}</td>
-    <td>${data.user?.national_code || '---'}</td>
-    <td>${jalaliDate || '---'}</td>
-    <td>${data.appointment_time || '---'}</td>
-    <td>${data.description || '---'}</td>
-    <td>
-    <button class="btn btn-sm btn-light edit-btn rounded-circle" data-id="${data.id}"><img src="{{ asset('dr-assets/icons/edit.svg') }}"></button>
-    <button class="btn btn-sm btn-light delete-btn rounded-circle" data-id="${data.id}"><img src="{{ asset('dr-assets/icons/trash.svg') }}"></button>
-    </td>
-    </tr>`;
+        <tr>
+          <td>${data.id || '---'}</td>
+          <td>${data.user?.first_name || '---'} ${data.user?.last_name || '---'}</td>
+          <td>${data.user?.mobile || '---'}</td>
+          <td>${data.user?.national_code || '---'}</td>
+          <td>${jalaliDate || '---'}</td>
+          <td>${data.appointment_time || '---'}</td>
+          <td>${data.description || '---'}</td>
+          <td>
+            <button class="btn btn-sm btn-light edit-btn rounded-circle" data-id="${data.id}">
+              <img src="{{ asset('dr-assets/icons/edit.svg') }}">
+            </button>
+            <button class="btn btn-sm btn-light delete-btn rounded-circle" data-id="${data.id}">
+              <img src="{{ asset('dr-assets/icons/trash.svg') }}">
+            </button>
+          </td>
+        </tr>`;
     $('#result_nobat').append(newRow);
   }
 
@@ -486,7 +557,6 @@
       method: 'GET',
       data: {
         selectedClinicId: localStorage.getItem('selectedClinicId')
-
       },
       success: function(response) {
         if (response.success && response.data) {
@@ -503,6 +573,7 @@
       }
     });
   }
+
   $(document).ready(function() {
     // ثبت فرم
     $('#manual-appointment-form').on('submit', function(e) {
@@ -514,12 +585,11 @@
       const data = {
         user_id: $('#user-id').val(),
         doctor_id: $('#doctor-id').val(),
-        appointment_date: $('#selected-date').val(), // اگر باید text باشه، اصلاح کنید
+        appointment_date: $('#selected-date').val(),
         appointment_time: $('#appointment-time').val(),
         description: $('#description').val(),
       };
 
-      // بررسی خالی نبودن فیلدها
       if (!data.user_id || !data.doctor_id || !data.appointment_date || !data.appointment_time) {
         toastr.error('لطفاً تمام فیلدهای ضروری را تکمیل کنید!');
         return;
@@ -540,17 +610,17 @@
         },
         success: function(response) {
           toastr.success(response.message || 'نوبت با موفقیت ثبت شد!');
-          form.reset(); // ریست کردن فرم
-          $('.patient-information-content').removeClass('d-flex'); // حذف کلاس d-flex
-          $('.patient-information-content').addClass('d-none'); // اضافه کردن d-none برای پنهان کردن
-          loadAppointments(); // به‌روزرسانی لیست
+          form.reset();
+          $('.patient-information-content').removeClass('d-flex');
+          $('.patient-information-content').addClass('d-none');
+          loadAppointments();
         },
         error: function(xhr) {
           const errors = xhr.responseJSON.errors || {};
           let errorMessages = Object.values(errors).map(errArray => errArray[0]).join(' - ');
           toastr.error(errorMessages || xhr.responseJSON.message);
-          $('.patient-information-content').removeClass('d-flex'); // حذف کلاس d-flex
-          $('.patient-information-content').addClass('d-none'); // پنهان کردن در صورت خطا
+          $('.patient-information-content').removeClass('d-flex');
+          $('.patient-information-content').addClass('d-none');
         },
         complete: function() {
           buttonText.style.display = 'block';
@@ -567,26 +637,22 @@
       const mobile = $(this).data('mobile');
       const nationalCode = $(this).data('national-code');
 
-      // پر کردن فیلدهای فرم
       $('#user-id').val(userId);
-      $('input[name="fristname"]').val(firstName); // اگر باید firstname باشه، اصلاح کنید
+      $('input[name="fristname"]').val(firstName);
       $('input[name="lastname"]').val(lastName);
       $('input[name="mobile"]').val(mobile);
       $('input[name="codemeli"]').val(nationalCode);
 
-      // نمایش فرم با حذف d-none و اضافه کردن کلاس‌های لازم
-      $('.patient-information-content').removeClass('d-none'); // حذف d-none برای نمایش
-      $('.patient-information-content').addClass(
-        'd-flex justify-content-center'); // اضافه کردن کلاس‌های مورد نیاز
+      $('.patient-information-content').removeClass('d-none');
+      $('.patient-information-content').addClass('d-flex justify-content-center');
 
-      // پاک کردن نتایج جستجو
       $('#search-results-body').empty();
       $('#search-input').val('');
       $('#search-results').css('display', 'none');
     });
-  });;
+  });
+
   $(document).ready(function() {
-    // افزودن کاربر جدید و ثبت نوبت
     loadAppointments();
     $(document).on('click', '.delete-btn', function() {
       const id = $(this).data('id');
@@ -610,7 +676,7 @@
             success: function(response) {
               if (response.success) {
                 toastr.success('نوبت با موفقیت حذف شد!');
-                loadAppointments(); // بازخوانی لیست
+                loadAppointments();
               } else {
                 toastr.error('خطا در حذف نوبت!');
               }
@@ -622,20 +688,18 @@
         }
       });
     });
+
     $(document).on('click', '.edit-btn', function() {
       const appointmentId = $(this).data('id');
-      // درخواست AJAX برای دریافت اطلاعات نوبت
       $.ajax({
         url: "{{ route('manual-appointments.edit', ':id') }}".replace(':id', appointmentId),
         method: 'GET',
         data: {
           selectedClinicId: localStorage.getItem('selectedClinicId')
-
         },
         success: function(response) {
           if (response.success) {
             const appointment = response.data;
-            // مقداردهی فیلدهای مودال
             $('#edit-appointment-id').val(appointment.id);
             $('#edit-first-name').val(appointment.user.first_name);
             $('#edit-last-name').val(appointment.user.last_name);
@@ -645,7 +709,6 @@
               'jYYYY/jMM/jDD'));
             $('#edit-appointment-time').val(appointment.appointment_time.substring(0, 5));
             $('#edit-description').val(appointment.description);
-            // نمایش مودال
             $('#editPatientModal').modal('show');
           } else {
             toastr.error('خطا در دریافت اطلاعات نوبت!');
@@ -656,14 +719,14 @@
         }
       });
     });
+
     $('#edit-patient-form').on('submit', function(e) {
       e.preventDefault();
       const form = $(this);
       const submitButton = form.find('button[type="submit"]');
       const loader = submitButton.find('.loader');
-      const buttonText = submitButton.find('.button_text');
+      const buttonText = submitButton.find('.bblesbutton_text');
 
-      // پاک کردن خطاهای قبلی
       form.find('small.text-danger').text('');
 
       buttonText.hide();
@@ -694,14 +757,13 @@
           if (response.success) {
             toastr.success(response.message);
             $('#editPatientModal').modal('hide');
-            loadAppointments(); // به‌روزرسانی لیست نوبت‌ها
+            loadAppointments();
           } else {
             toastr.error(response.message);
           }
         },
         error: function(xhr) {
           const errors = xhr.responseJSON?.errors || [];
-          // نگاشت خطاها به فیلدها بر اساس پیام‌ها
           const errorMapping = {
             'نام بیمار الزامی است.': 'first_name',
             'نام خانوادگی بیمار الزامی است.': 'last_name',
@@ -728,25 +790,7 @@
         },
       });
     });
-    // اضافه کردن ردیف به جدول
-    function addRowToTable(data) {
-      const jalaliDate = moment(data.appointment_date, 'YYYY-MM-DD').format('jYYYY/jMM/jDD'); // تبدیل تاریخ به شمسی
-      const newRow = `
-    <tr>
-    <td>${data.id || '---'}</td>
-    <td>${data.user?.first_name || '---'} ${data.user?.last_name || '---'}</td>
-    <td>${data.user?.mobile || '---'}</td>
-    <td>${data.user?.national_code || '---'}</td>
-    <td>${jalaliDate || '---'}</td>
-    <td>${data.appointment_time || '---'}</td>
-    <td>${data.description || '---'}</td>
-    <td>
-    <button class="btn btn-sm btn-warning edit-btn" data-id="${data.id}">ویرایش</button>
-    <button class="btn btn-sm btn-danger delete-btn" data-id="${data.id}">حذف</button>
-    </td>
-    </tr>`;
-      $('#result_nobat').append(newRow);
-    }
+
     $('#add-new-patient-form').on('submit', function(e) {
       e.preventDefault();
       const form = $(this);
@@ -754,7 +798,6 @@
       const loader = submitButton.find('.loader');
       const buttonText = submitButton.find('.button_text');
 
-      // پاک کردن خطاهای قبلی
       form.find('small.text-danger').text('');
 
       buttonText.hide();
@@ -779,7 +822,6 @@
         },
         error: function(xhr) {
           const errors = xhr.responseJSON?.errors || [];
-          // نگاشت خطاها به فیلدها بر اساس پیام‌ها
           const errorMapping = {
             'نام بیمار الزامی است.': 'first_name',
             'نام خانوادگی بیمار الزامی است.': 'last_name',
@@ -790,6 +832,8 @@
           };
 
           errors.forEach(function(errorMsg) {
+            toastr.error(errorMsg);
+
             const field = errorMapping[errorMsg];
             if (field) {
               form.find(`.error-${field}`).text(errorMsg);
@@ -806,7 +850,7 @@
         }
       });
     });
-    // حذف نوبت
+
     $(document).on('click', '.delete-btn', function() {
       const id = $(this).data('id');
       Swal.fire({
@@ -832,7 +876,7 @@
             success: function(response) {
               if (response.success) {
                 toastr.success(response.message);
-                loadAppointments(); // جدول را مجدداً بارگذاری کنید.
+                loadAppointments();
               } else {
                 toastr.error(response.message);
               }
@@ -843,11 +887,6 @@
           });
         }
       });
-    });
-    // ویرایش نوبت
-    $(document).on('click', '.edit-btn', function() {
-      const id = $(this).data('id');
-      // منطق ویرایش را اینجا اضافه کنید
     });
   });
 </script>
