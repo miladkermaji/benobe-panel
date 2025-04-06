@@ -547,7 +547,9 @@ table th {
     -webkit-box-pack: center;
     justify-content: center;
 }
-
+svg{
+    display: inline !important;
+}
 .mlg-15 {
     margin-left: 15px;
 }
