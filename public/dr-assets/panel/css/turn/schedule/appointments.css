@@ -5,13 +5,7 @@
  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
-.bell-red-badge {
- width: 8px;
- height: 8px;
- background-color: red;
- border-radius: 50%;
- position: absolute;
-}
+
 
 @media screen and (max-width: 1290px) {
 
