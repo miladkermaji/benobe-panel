@@ -23,12 +23,13 @@ class MakeCrudLivewire extends Command
         $modelPlural = Str::plural($modelLower);
         $modelPluralKebab = Str::kebab(Str::plural($model));
         $modelStudly = Str::studly($model);
+        $modelPluralStudly = Str::studly(Str::plural($model)); // مثلاً DoctorComments
 
         // بررسی وجود مدل و ساخت آن در صورت نیاز
         $this->createModelIfNotExists($model, $namespacePrefix);
 
         // ساخت کنترلر
-        $this->createController($model, $namespacePrefix, $modelKebab, $modelPluralKebab);
+        $this->createController($model, $namespacePrefix, $modelKebab, $modelPluralKebab, $modelPluralStudly);
 
         // ساخت فایل‌های Livewire
         $this->createLivewireComponents($model, $namespacePrefix);
@@ -81,9 +82,9 @@ class MakeCrudLivewire extends Command
         }
     }
 
-    protected function createController($model, $namespacePrefix, $modelKebab, $modelPluralKebab)
+    protected function createController($model, $namespacePrefix, $modelKebab, $modelPluralKebab, $modelPluralStudly)
     {
-        $controllerPath = app_path("Http/Controllers/{$namespacePrefix}/Panel/{$model}/{$model}Controller.php");
+        $controllerPath = app_path("Http/Controllers/{$namespacePrefix}/Panel/{$modelPluralStudly}/{$model}Controller.php");
         $stub = File::get(base_path('stubs/controller.crud.stub'));
         $stub = str_replace(
             [
@@ -97,18 +98,18 @@ class MakeCrudLivewire extends Command
                 '{{modelPluralKebab}}'
             ],
             [
-                "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}",
+                "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$modelPluralStudly}",
                 $namespacePrefix,
                 "{$model}Controller",
                 Str::lower($model),
                 Str::kebab($namespacePrefix),
                 Str::plural(Str::lower($model)),
-                $modelKebab,
+                $modelKebab, // برای ویوها مفرد استفاده میشه
                 $modelPluralKebab
             ],
             $stub
         );
-        File::ensureDirectoryExists(dirname($controllerPath));
+        File::ensureDirectoryExists(app_path("Http/Controllers/{$namespacePrefix}/Panel/{$modelPluralStudly}"));
         File::put($controllerPath, $stub);
     }
 
@@ -118,29 +119,16 @@ class MakeCrudLivewire extends Command
         $modelKebab = Str::kebab($model);
         $modelPlural = Str::plural($modelLower);
         $modelPluralKebab = Str::kebab(Str::plural($model));
+        $modelPluralStudly = Str::studly(Str::plural($model)); // مثلاً DoctorComments
         $prefixKebab = Str::kebab($namespacePrefix);
 
         // مسیر فایل‌های PHP لایووایر
-        $livewirePath = app_path("Livewire/{$namespacePrefix}/Panel/{$model}");
+        $livewirePath = app_path("Livewire/{$namespacePrefix}/Panel/{$modelPluralStudly}");
         File::ensureDirectoryExists($livewirePath);
 
         // مسیر ویوهای Livewire
         $livewireViewPath = resource_path("views/livewire/{$prefixKebab}/panel/{$modelPluralKebab}");
         File::ensureDirectoryExists($livewireViewPath);
-
-        // حذف هرگونه فایل camelCase احتمالی
-        $camelCaseFiles = [
-            Str::camel("{$modelLower}-list") . ".blade.php",
-            Str::camel("{$modelLower}-create") . ".blade.php",
-            Str::camel("{$modelLower}-edit") . ".blade.php",
-        ];
-        foreach ($camelCaseFiles as $file) {
-            $filePath = "{$livewireViewPath}/{$file}";
-            if (File::exists($filePath)) {
-                File::delete($filePath);
-                $this->info("Deleted camelCase file: {$filePath}");
-            }
-        }
 
         // جایگزینی محتوای کامپوننت‌ها
         $this->replaceLivewireStubs($model, $namespacePrefix);
@@ -153,40 +141,41 @@ class MakeCrudLivewire extends Command
         $modelPlural = Str::plural($modelLower);
         $modelPluralKebab = Str::kebab(Str::plural($model));
         $modelStudly = Str::studly($model);
+        $modelPluralStudly = Str::studly(Str::plural($model)); // مثلاً DoctorComments
         $prefixKebab = Str::kebab($namespacePrefix);
 
         // مسیر فایل‌های PHP لایووایر
-        $livewirePath = app_path("Livewire/{$namespacePrefix}/Panel/{$model}");
+        $livewirePath = app_path("Livewire/{$namespacePrefix}/Panel/{$modelPluralStudly}");
         File::ensureDirectoryExists($livewirePath);
 
         // List Component
-        $listPath = "{$livewirePath}/{$model}List.php";
+        $listPath = "{$livewirePath}/{$modelPluralStudly}List.php";
         $listStub = File::get(base_path('stubs/livewire.list.stub'));
         $listStub = str_replace(
             ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelKebab}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{namespacePrefix}}', '{{prefix}}'],
-            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$model}", "{$model}List", $modelStudly, $modelLower, $modelKebab, $modelPlural, $modelPluralKebab, $namespacePrefix, $prefixKebab],
+            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPluralStudly}", "{$modelPluralStudly}List", $modelStudly, $modelLower, $modelKebab, $modelPlural, $modelPluralKebab, $namespacePrefix, $prefixKebab],
             $listStub
         );
         File::put($listPath, $listStub);
         $this->info("Created Livewire component: {$listPath}");
 
         // Create Component
-        $createPath = "{$livewirePath}/{$model}Create.php";
+        $createPath = "{$livewirePath}/{$modelPluralStudly}Create.php";
         $createStub = File::get(base_path('stubs/livewire.create.stub'));
         $createStub = str_replace(
             ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelKebab}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{namespacePrefix}}', '{{prefix}}'],
-            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$model}", "{$model}Create", $modelStudly, $modelLower, $modelKebab, $modelPlural, $modelPluralKebab, $namespacePrefix, $prefixKebab],
+            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPluralStudly}", "{$modelPluralStudly}Create", $modelStudly, $modelLower, $modelKebab, $modelPlural, $modelPluralKebab, $namespacePrefix, $prefixKebab],
             $createStub
         );
         File::put($createPath, $createStub);
         $this->info("Created Livewire component: {$createPath}");
 
         // Edit Component
-        $editPath = "{$livewirePath}/{$model}Edit.php";
+        $editPath = "{$livewirePath}/{$modelPluralStudly}Edit.php";
         $editStub = File::get(base_path('stubs/livewire.edit.stub'));
         $editStub = str_replace(
             ['{{namespace}}', '{{class}}', '{{model}}', '{{modelLower}}', '{{modelKebab}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{namespacePrefix}}', '{{prefix}}'],
-            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$model}", "{$model}Edit", $modelStudly, $modelLower, $modelKebab, $modelPlural, $modelPluralKebab, $namespacePrefix, $prefixKebab],
+            ["App\\Livewire\\{$namespacePrefix}\\Panel\\{$modelPluralStudly}", "{$modelPluralStudly}Edit", $modelStudly, $modelLower, $modelKebab, $modelPlural, $modelPluralKebab, $namespacePrefix, $prefixKebab],
             $editStub
         );
         File::put($editPath, $editStub);
@@ -236,21 +225,7 @@ class MakeCrudLivewire extends Command
         $livewireViewPath = resource_path("views/livewire/{$prefixKebab}/panel/{$modelPluralKebab}");
         File::ensureDirectoryExists($livewireViewPath);
 
-        // حذف فایل‌های camelCase احتمالی
-        $camelCaseFiles = [
-            Str::camel("{$modelLower}-list") . ".blade.php",
-            Str::camel("{$modelLower}-create") . ".blade.php",
-            Str::camel("{$modelLower}-edit") . ".blade.php",
-        ];
-        foreach ($camelCaseFiles as $file) {
-            $filePath = "{$livewireViewPath}/{$file}";
-            if (File::exists($filePath)) {
-                File::delete($filePath);
-                $this->info("Deleted camelCase file: {$filePath}");
-            }
-        }
-
-        // ساخت ویوهای kebab-case
+        // ساخت ویوهای kebab-case با نام مفرد
         $listViewStub = File::get(base_path('stubs/livewire.view.list.stub'));
         $listViewStub = str_replace(
             ['{{prefix}}', '{{modelPlural}}', '{{modelPluralKebab}}', '{{modelKebab}}'],
@@ -287,6 +262,7 @@ class MakeCrudLivewire extends Command
         $modelPluralKebab = Str::kebab(Str::plural($model));
         $namespacePrefix = Str::studly($prefix);
         $prefixKebab = Str::kebab($prefix);
+        $modelPluralStudly = Str::studly(Str::plural($model)); // مثلاً DoctorComments
 
         $webFile = base_path('routes/web.php');
         if (!File::exists($webFile)) {
@@ -295,7 +271,7 @@ class MakeCrudLivewire extends Command
         }
         $webContent = File::get($webFile);
 
-        $fullNamespace = "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$model}\\{$model}Controller";
+        $fullNamespace = "App\\Http\\Controllers\\{$namespacePrefix}\\Panel\\{$modelPluralStudly}\\{$model}Controller";
         $routeContent = "    Route::prefix('{$modelPluralKebab}')->group(function () {\n" .
                         "        Route::get('/', [\\{$fullNamespace}::class, 'index'])->name('{$prefixKebab}.panel.{$modelPluralKebab}.index');\n" .
                         "        Route::get('/create', [\\{$fullNamespace}::class, 'create'])->name('{$prefixKebab}.panel.{$modelPluralKebab}.create');\n" .
