@@ -282,6 +282,9 @@
             <li class="item-li i-tickets {{ Request::routeIs('dr-panel-tickets') ? 'is-active' : '' }}">
               <a href="{{ route('dr-panel-tickets') }}">تیکت‌ها</a>
             </li>
+            <li class="item-li i-tickets {{ Request::routeIs('dr-panel-tickets') ? 'is-active' : '' }}">
+              <a href="{{ route('dr.panel.doctor-comments.index') }}">مدیریت نظرات</a>
+            </li>
             <li class="item-li i-comments">
               <a href="https://emr-benobe.ir/profile/doctor/{{ $user->slug }}">صفحه گفتگو</a>
             </li>

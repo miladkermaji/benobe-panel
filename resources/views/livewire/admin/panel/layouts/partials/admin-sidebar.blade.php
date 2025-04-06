@@ -354,8 +354,6 @@
             <li class="item-li"><a href="{{ route('admin.panel.banner-texts.index') }}">بنر صفحه اصلی</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.footer-contents.index') }}">فوتر</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.setting.index') }}">تنظیمات عمومی</a></li>
-            <li class="item-li"><a href="#">مدیریت صفحات</a></li>
-            <li class="item-li"><a href="#">تنظیمات SEO</a></li>
             <li class="item-li"><a href="#">تنظیمات اعلان‌ها</a></li>
             <li class="item-li"><a href="#">پشتیبان‌گیری</a></li>
             <li class="item-li"><a href="#">تنظیمات زبان</a></li>
@@ -377,9 +375,7 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="#">گزارش فعالیت کاربران</a></li>
-            <li class="item-li"><a href="#">گزارش نوبت‌ها</a></li>
             <li class="item-li"><a href="#">گزارش مالی</a></li>
-            <li class="item-li"><a href="{{ route('dr-my-performance') }}">عملکرد من</a></li>
             <li class="item-li"><a href="#">آمار بازدید سایت</a></li>
             <li class="item-li"><a href="#">تحلیل داده‌ها</a></li>
             <li class="item-li"><a href="#">نمودارهای آماری</a></li>
