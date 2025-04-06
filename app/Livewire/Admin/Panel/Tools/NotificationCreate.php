@@ -143,17 +143,18 @@ class NotificationCreate extends Component
             $notification->recipients()->create([
                 'recipient_type' => 'phone',
                 'recipient_id'   => null,
-                'mobile'         => $this->single_phone,
+                'phone_number'   => $this->single_phone, // تغییر به phone_number
             ]);
             $recipientNumbers = [$this->single_phone];
         } elseif ($this->target_mode === 'multiple') {
             foreach ($this->selected_recipients as $recipient) {
                 [$type, $id] = explode(':', $recipient);
+                $model = $type::find($id);
                 $notification->recipients()->create([
                     'recipient_type' => $type,
                     'recipient_id'   => $id,
+                    'phone_number'   => $model->mobile ?? null, // تغییر به phone_number
                 ]);
-                $model = $type::find($id);
                 if ($model && $model->mobile) {
                     $recipientNumbers[] = $model->mobile;
                 }
@@ -169,6 +170,7 @@ class NotificationCreate extends Component
                 $notification->recipients()->create([
                     'recipient_type' => $recipient->getMorphClass(),
                     'recipient_id'   => $recipient->id,
+                    'phone_number'   => $recipient->mobile ?? null, // تغییر به phone_number
                 ]);
                 if ($recipient->mobile) {
                     $recipientNumbers[] = $recipient->mobile;
@@ -181,8 +183,6 @@ class NotificationCreate extends Component
             'is_active'         => $this->is_active,
         ]);
 
-        // اضافه کردن ارسال پیامک به صف
-        // توی متد store
         // اضافه کردن ارسال پیامک به صف
         if (! empty($recipientNumbers) && $this->is_active) {
             $chunks      = array_chunk($recipientNumbers, 10);

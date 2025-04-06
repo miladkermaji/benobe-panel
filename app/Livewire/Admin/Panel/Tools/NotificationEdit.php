@@ -2,15 +2,16 @@
 
 namespace App\Livewire\Admin\Panel\Tools;
 
-use App\Jobs\Admin\Panel\Tools\SendNotificationSms;
-use App\Models\Doctor;
-use App\Models\Notification;
-use App\Models\Secretary;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Doctor;
 use Livewire\Component;
+use App\Models\Secretary;
+use App\Models\Notification;
 use Morilog\Jalali\Jalalian;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use App\Jobs\Admin\Panel\Tools\SendNotificationSms;
 
 class NotificationEdit extends Component
 {
@@ -36,16 +37,16 @@ class NotificationEdit extends Component
         $this->target_group   = $notification->target_group;
         $this->is_active      = $notification->is_active;
         $this->start_at       = $notification->start_at
-        ? Jalalian::fromCarbon(\Carbon\Carbon::parse($notification->start_at))->format('Y/m/d H:i:s')
-        : null;
+            ? Jalalian::fromCarbon(\Carbon\Carbon::parse($notification->start_at))->format('Y/m/d H:i:s')
+            : null;
         $this->end_at = $notification->end_at
-        ? Jalalian::fromCarbon(\Carbon\Carbon::parse($notification->end_at))->format('Y/m/d H:i:s')
-        : null;
+            ? Jalalian::fromCarbon(\Carbon\Carbon::parse($notification->end_at))->format('Y/m/d H:i:s')
+            : null;
 
         $recipients = $notification->recipients;
-        if ($recipients->count() === 1 && $recipients->first()->mobile) {
+        if ($recipients->count() === 1 && $recipients->first()->phone_number) { // تغییر به phone_number
             $this->target_mode  = 'single';
-            $this->single_phone = $recipients->first()->mobile;
+            $this->single_phone = $recipients->first()->phone_number; // تغییر به phone_number
         } elseif ($recipients->count() > 0 && ! $notification->target_group) {
             $this->target_mode         = 'multiple';
             $this->selected_recipients = $recipients->map(fn ($r) => "{$r->recipient_type}:{$r->recipient_id}")->toArray();
@@ -155,7 +156,7 @@ class NotificationEdit extends Component
             'is_active'    => $this->is_active,
             'start_at'     => $startAtMiladi,
             'end_at'       => $endAtMiladi,
-            'created_by'   => auth()->id(),
+            'created_by'   => Auth::guard('manager')->user()->id,
         ];
 
         $notification->update($notificationData);
@@ -165,19 +166,20 @@ class NotificationEdit extends Component
 
         if ($this->target_mode === 'single') {
             $notification->recipients()->create([
-                'recipient_type' => 'phone', // اصلاح شده
+                'recipient_type' => 'phone',
                 'recipient_id'   => null,
-                'mobile'         => $this->single_phone,
+                'phone_number'   => $this->single_phone, // تغییر به phone_number
             ]);
             $recipientNumbers = [$this->single_phone];
         } elseif ($this->target_mode === 'multiple') {
             foreach ($this->selected_recipients as $recipient) {
                 [$type, $id] = explode(':', $recipient);
+                $model = $type::find($id);
                 $notification->recipients()->create([
                     'recipient_type' => $type,
                     'recipient_id'   => $id,
+                    'phone_number'   => $model->mobile ?? null, // تغییر به phone_number
                 ]);
-                $model = $type::find($id);
                 if ($model && $model->mobile) {
                     $recipientNumbers[] = $model->mobile;
                 }
@@ -193,6 +195,7 @@ class NotificationEdit extends Component
                 $notification->recipients()->create([
                     'recipient_type' => $recipient->getMorphClass(),
                     'recipient_id'   => $recipient->id,
+                    'phone_number'   => $recipient->mobile ?? null, // تغییر به phone_number
                 ]);
                 if ($recipient->mobile) {
                     $recipientNumbers[] = $recipient->mobile;
@@ -245,6 +248,6 @@ class NotificationEdit extends Component
 
         return view('livewire.admin.panel.tools.notification-edit', [
             'allRecipients' => $allRecipients,
-        ])->layout('layouts.admin');
+        ]);
     }
 }
