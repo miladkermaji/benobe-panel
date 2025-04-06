@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Livewire\Admin\Panel\DoctorComments;
+namespace App\Livewire\Dr\Panel\DoctorComments;
 
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\DoctorComment;
 use App\Models\Doctor;
 
-class DoctorCommentList extends Component
+class DoctorCommentsList extends Component
 {
     use WithPagination;
 
@@ -18,13 +18,11 @@ class DoctorCommentList extends Component
         'replySubmitted' => 'saveReply'
     ];
 
-    public $perPage = 10; // برای پیجینیشن اصلی پزشکان
-    public $perPageComments = 5; // برای پیجینیشن نظرات هر پزشک
+    public $perPage = 10;
     public $search = '';
     public $readyToLoad = false;
     public $selectedDoctorComments = [];
-    public $selectAll = [];
-    public $expandedDoctors = [];
+    public $selectAll = false;
     public $replyText = [];
     public $replyingTo = null;
 
@@ -35,21 +33,7 @@ class DoctorCommentList extends Component
     public function mount()
     {
         $this->perPage = max($this->perPage, 1);
-        $this->perPageComments = max($this->perPageComments, 1);
-    }
-
-    public function loadDoctorComments()
-    {
         $this->readyToLoad = true;
-    }
-
-    public function toggleDoctor($doctorId)
-    {
-        if (in_array($doctorId, $this->expandedDoctors)) {
-            $this->expandedDoctors = array_diff($this->expandedDoctors, [$doctorId]);
-        } else {
-            $this->expandedDoctors[] = $doctorId;
-        }
     }
 
     public function toggleStatus($id)
@@ -108,70 +92,49 @@ class DoctorCommentList extends Component
 
         DoctorComment::whereIn('id', $this->selectedDoctorComments)->delete();
         $this->selectedDoctorComments = [];
-        $this->selectAll = [];
+        $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'نظرات انتخاب‌شده حذف شدند!');
     }
 
     public function updatedSearch()
     {
         $this->resetPage();
-        $this->expandedDoctors = []; // بستن همه تاشوها بعد جستجو
     }
 
-    public function updatedSelectAll($value, $doctorId)
+    public function updatedSelectAll($value)
     {
-        $doctorComments = $this->getDoctorComments($doctorId);
-        $commentIds = $doctorComments->pluck('id')->toArray();
-        if ($value) {
-            $this->selectedDoctorComments = array_unique(array_merge($this->selectedDoctorComments, $commentIds));
-        } else {
-            $this->selectedDoctorComments = array_diff($this->selectedDoctorComments, $commentIds);
-        }
+        $comments = $this->getCommentsQuery();
+        $commentIds = $comments->pluck('id')->toArray();
+        $this->selectedDoctorComments = $value ? $commentIds : [];
     }
 
     public function updatedSelectedDoctorComments()
     {
-        foreach ($this->doctors as $doctor) {
-            $doctorComments = $this->getDoctorComments($doctor->id);
-            $commentIds = $doctorComments->pluck('id')->toArray();
-            $this->selectAll[$doctor->id] = !empty($this->selectedDoctorComments) &&
-                count(array_diff($commentIds, $this->selectedDoctorComments)) === 0;
-        }
+        $comments = $this->getCommentsQuery();
+        $commentIds = $comments->pluck('id')->toArray();
+        $this->selectAll = !empty($this->selectedDoctorComments) && count(array_diff($commentIds, $this->selectedDoctorComments)) === 0;
     }
 
-    public function getDoctorComments($doctorId)
+    private function getCommentsQuery()
     {
-        return DoctorComment::where('doctor_id', $doctorId)
+        return DoctorComment::with('doctor')
             ->where(function ($query) {
                 $query->where('user_name', 'like', '%' . $this->search . '%')
-                      ->orWhere('comment', 'like', '%' . $this->search . '%');
+                      ->orWhere('comment', 'like', '%' . $this->search . '%')
+                      ->orWhereHas('doctor', function ($q) {
+                          $q->where('first_name', 'like', '%' . $this->search . '%')
+                            ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                      });
             })
             ->orderBy('created_at', 'desc')
-            ->paginate($this->perPageComments, ['*'], "comments_page_{$doctorId}");
-    }
-
-    public function getDoctorsProperty()
-    {
-        return Doctor::where(function ($query) {
-            $query->where('first_name', 'like', '%' . $this->search . '%')
-                  ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                  ->orWhereHas('comments', function ($q) {
-                      $q->where('user_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('comment', 'like', '%' . $this->search . '%');
-                  });
-        })
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate($this->perPage);
     }
 
     public function render()
     {
-        $doctors = $this->readyToLoad ? $this->doctors : [];
-        foreach ($doctors as $doctor) {
-            $doctor->comments = $this->getDoctorComments($doctor->id);
-        }
-        return view('livewire.admin.panel.doctor-comments.doctor-comment-list', [
-            'doctors' => $doctors,
+        $comments = $this->readyToLoad ? $this->getCommentsQuery() : collect();
+        return view('livewire.dr.panel.doctor-comments.doctor-comment-list', [
+            'comments' => $comments,
         ]);
     }
 }

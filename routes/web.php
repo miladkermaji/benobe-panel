@@ -102,10 +102,10 @@ Route::prefix('admin')
 
         });
 
-Route::prefix('setting/')->group(function () {
-    Route::get('/', [SettingController::class, 'index'])->name('admin.panel.setting.index');
-    Route::get('/change-logo', [SettingController::class, 'change_logo'])->name('admin.panel.setting.change-logo');
-});
+        Route::prefix('setting/')->group(function () {
+            Route::get('/', [SettingController::class, 'index'])->name('admin.panel.setting.index');
+            Route::get('/change-logo', [SettingController::class, 'change_logo'])->name('admin.panel.setting.change-logo');
+        });
 
 
         Route::prefix('transactions')->group(function () {
@@ -385,7 +385,9 @@ Route::prefix('setting/')->group(function () {
 Route::prefix('dr')
     ->namespace('Dr')
     ->group(function () {
-
+        Route::prefix('doctor-comments')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorComments\DoctorCommentController::class, 'index'])->name('dr.panel.doctor-comments.index');
+        });
 
         Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {
             Route::get('/', [DrPanelController::class, 'index'])->middleware('secretary.permission:dashboard')->name('dr-panel');

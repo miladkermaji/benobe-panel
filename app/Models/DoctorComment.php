@@ -15,6 +15,7 @@ class DoctorComment extends Model
         'user_phone',
         'comment',
         'status',
+        'reply',
         'ip_address',
     ];
 

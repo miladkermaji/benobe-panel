@@ -77,7 +77,7 @@
                         <th class="align-middle">شماره تماس</th>
                         <th class="align-middle">نظر</th>
                         <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
-                        <th class="text-center align-middle" style="width: 150px;">عملیات</th>
+                        <th class="text-center align-middle" style="width: 200px;">عملیات</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -90,7 +90,14 @@
                           <td class="text-center align-middle">{{ $doctor->comments->firstItem() + $index }}</td>
                           <td class="align-middle">{{ $comment->user_name }}</td>
                           <td class="align-middle">{{ $comment->user_phone ?? 'ثبت نشده' }}</td>
-                          <td class="align-middle">{{ Str::limit($comment->comment, 50) }}</td>
+                          <td class="align-middle">
+                            {{ Str::limit($comment->comment, 50) }}
+                            @if ($comment->reply)
+                              <div class="mt-2 p-2 bg-success rounded">
+                                <strong>پاسخ:</strong> {{ Str::limit($comment->reply, 50) }}
+                              </div>
+                            @endif
+                          </td>
                           <td class="text-center align-middle">
                             <button wire:click="toggleStatus({{ $comment->id }})"
                               class="badge {{ $comment->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer px-3 py-1">
@@ -107,6 +114,14 @@
                                     d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                                 </svg>
                               </a>
+                              <button wire:click="toggleReply({{ $comment->id }})"
+                                class="btn btn-gradient-info rounded-pill px-3" title="پاسخ">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2">
+                                  <path
+                                    d="M21 11.5a8.38 8.38 0 01-11.9 7.6L3 21l1.9-5.7a8.38 8.38 0 017.6-11.9A8.38 8.38 0 0121 11.5z" />
+                                </svg>
+                              </button>
                               <button wire:click="confirmDelete({{ $comment->id }})"
                                 class="btn btn-gradient-danger rounded-pill px-3">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -116,6 +131,14 @@
                                 </svg>
                               </button>
                             </div>
+                            @if ($replyingTo === $comment->id)
+                              <div class="mt-2">
+                                <textarea wire:model.live="replyText.{{ $comment->id }}" class="form-control mb-2" rows="2"
+                                  placeholder="پاسخ خود را بنویسید..."></textarea>
+                                <button wire:click="saveReply({{ $comment->id }})"
+                                  class="btn btn-gradient-success rounded-pill">ارسال پاسخ</button>
+                              </div>
+                            @endif
                           </td>
                         </tr>
                       @empty
@@ -179,6 +202,11 @@
 
     .btn-gradient-danger {
       background: linear-gradient(90deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .btn-gradient-info {
+      background: linear-gradient(90deg, #0ea5e9, #0369a1);
       color: white;
     }
 
