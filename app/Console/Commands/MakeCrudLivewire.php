@@ -126,7 +126,7 @@ class MakeCrudLivewire extends Command
 
         // مسیر ویوهای Livewire
         $livewireViewPath = resource_path("views/livewire/{$prefixKebab}/panel/{$modelPluralKebab}");
-        File::ensureDirectoryExists($livewireViewPath."s");
+        File::ensureDirectoryExists($livewireViewPath);
 
         // حذف هرگونه فایل camelCase احتمالی
         $camelCaseFiles = [
