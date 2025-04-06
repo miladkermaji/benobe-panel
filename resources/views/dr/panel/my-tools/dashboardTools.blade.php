@@ -1,12 +1,9 @@
 <script>
   /* drop select option */
-
   $(document).ready(function() {
     let dropdownOpen = false;
-
     let selectedClinic = localStorage.getItem('selectedClinic');
     let selectedClinicId = localStorage.getItem('selectedClinicId');
-
     if (selectedClinic && selectedClinicId) {
       $('.dropdown-label').text(selectedClinic);
       $('.option-card').each(function() {
@@ -19,7 +16,6 @@
       localStorage.setItem('selectedClinic', 'ویزیت آنلاین به نوبه');
       localStorage.setItem('selectedClinicId', 'default');
     }
-
     // **بررسی کلینیک‌های غیرفعال و اضافه کردن افکت هشدار**
     function checkInactiveClinics() {
       var hasInactiveClinics = $('.option-card[data-active="0"]').length > 0;
@@ -29,22 +25,17 @@
         $('.dropdown-trigger').removeClass('warning');
       }
     }
-
     checkInactiveClinics(); // اجرای بررسی هنگام بارگذاری صفحه
-
     // باز و بسته کردن دراپ‌داون
     $('.dropdown-trigger').on('click', function(event) {
-
       event.stopPropagation();
       dropdownOpen = !dropdownOpen;
       $(this).toggleClass('border border-primary');
       $('.my-dropdown-menu').toggleClass('d-none');
-
       setTimeout(() => {
         dropdownOpen = $('.my-dropdown-menu').is(':visible');
       }, 100);
     });
-
     // بستن دراپ‌داون هنگام کلیک بیرون
     $(document).on('click', function() {
       if (dropdownOpen) {
@@ -53,28 +44,21 @@
         dropdownOpen = false;
       }
     });
-
     // جلوگیری از بسته شدن هنگام کلیک روی منوی دراپ‌داون
     $('.my-dropdown-menu').on('click', function(event) {
       event.stopPropagation();
     });
-
     $('.option-card').on('click', function() {
       let currentDate = moment().format('YYYY-MM-DD');
       let persianDate = moment(currentDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
-
-
       var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
-
       $('.option-card').removeClass('card-active');
       $(this).addClass('card-active');
-
       $('.dropdown-label').text(selectedText);
       // Update local storage
       localStorage.setItem('selectedClinic', selectedText);
       localStorage.setItem('selectedClinicId', selectedId);
-
       checkInactiveClinics();
       handleDateSelection(persianDate, selectedId);
       loadAppointments(persianDate, selectedId)
@@ -84,7 +68,6 @@
     });
   });
   /* drop select option */
-
   const appointmentsTableBody = $('.table tbody'); // بخش <tbody> جدول
   // لودینگ به جدول اضافه کنیم
   let loadingIndicator = `<tr id="loading-row w-100">
@@ -128,43 +111,26 @@
   // مخفی کردن لودینگ بعد از دریافت داده‌ها
   function loadCalendar(date) {
     calendar.empty();
+    let todayExists = false;
     for (let i = 0; i < days; i++) {
       const current = moment(date).add(i, 'days');
       const persianDate = current.locale('fa').format('dddd');
-      const persianFormattedDate = current.locale('fa').format('YYYY-MM-DD'); // فرمت استاندارد برای ارسال به سرور
+      const persianFormattedDate = current.locale('fa').format('YYYY-MM-DD');
       const isActive = current.isSame(moment(), 'day') ? 'my-active' : '';
-      const card =
-        ` <div class="calendar-card btn btn-light ${isActive}" data-date="${persianFormattedDate}"> 
-         <div class="day-name">${persianDate}</div> 
-         <div class="date">${current.locale('fa').format('D MMMM YYYY')}</div> 
-       </div>`;
+      if (isActive) todayExists = persianFormattedDate; // ذخیره تاریخ امروز
+      const card = `
+        <div class="calendar-card btn btn-light ${isActive}" data-date="${persianFormattedDate}">
+          <div class="day-name">${persianDate}</div>
+          <div class="date">${current.locale('fa').format('D MMMM YYYY')}</div>
+        </div>`;
       calendar.append(card);
     }
-    // اضافه کردن رویداد کلیک به تاریخ‌های تقویم
-
-  }
-
-  function animateAndLoadCalendar(direction) {
-    const animation = {
-      left: direction === 'next' ? '-100%' : '100%',
-      opacity: 0
-    };
-    calendar.animate(animation, 300, function() {
-      if (direction === 'next') {
-        currentDate = moment(currentDate).add(days, 'days').format('YYYY-MM-DD');
-      } else {
-        currentDate = moment(currentDate).subtract(days, 'days').format('YYYY-MM-DD');
-      }
-      loadCalendar(currentDate);
-      calendar.css({
-        left: direction === 'next' ? '100%' : '-100%',
-        opacity: 0
-      });
-      calendar.animate({
-        left: '0%',
-        opacity: 1
-      }, 300);
-    });
+    // در اولین لود، تاریخ امروز رو انتخاب کن
+    if (todayExists && !$('.calendar-card.my-active').length) {
+      $('.calendar-card[data-date="' + todayExists + '"]').addClass('my-active');
+      handleDateSelection(todayExists, selectedClinicId);
+      loadAppointments(todayExists, selectedClinicId);
+    }
   }
   // تابع بارگذاری نوبت‌ها با شناسه کلینیک جدید
   function loadAppointments(selectedDate, clinicId) {
@@ -257,27 +223,12 @@
       }
     });
   }
-  $(document).ready(function() {
-
-    $('#next').click(function() {
-      animateAndLoadCalendar('next');
-    });
-    $('#prev').click(function() {
-      animateAndLoadCalendar('prev');
-    });
-
-
-
-    loadCalendar(currentDate); // بارگذاری اولیه تقویم
-  });
   $(document).on("click", ".cancel-appointment", function() {
     let appointmentId = $(this).closest("tr").data("id");
   });
-
   $(document).on("click", ".move-appointment", function() {
     let appointmentId = $(this).closest("tr").data("id");
   });
-
   $(document).on("click", ".block-user", function() {
     let userId = $(this).closest("tr").data("user-id");
   });
@@ -309,7 +260,6 @@
         <td>${nationalCode}</td> 
         <td>${getPrescriptionStatus(appointment.status)}</td>
                 <td>${getPaymentStatus(appointment.payment_status)}</td>
-
         <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
         <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
         <td>${appointment.appointment_time}</td>
@@ -407,13 +357,17 @@
       calendar.append(card);
     }
     // افزودن رویداد کلیک به کارت‌های تقویم
-    $('.calendar-card').on('click', function() {
+    calendar.on('click', '.calendar-card', function() {
       const selectedDate = $(this).attr('data-date');
-      selectedClinicId = localStorage.getItem('selectedClinicId')
+      selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
+      // حذف استایل انتخاب قبلی و اضافه کردن به کارت جدید
       $('.calendar-card').removeClass('my-active');
       $(this).addClass('my-active');
+      // فراخوانی توابع برای آپدیت نوبت‌ها
       handleDateSelection(selectedDate, selectedClinicId);
-      loadAppointments(selectedDate, selectedClinicId)
+      loadAppointments(selectedDate, selectedClinicId);
+      // بستن مودال
+      $('#calendarModal').modal('hide');
     });
     // در اولین لود صفحه، داده‌های امروز را نمایش دهیم
     if (todayExists) {
@@ -421,53 +375,14 @@
       handleDateSelection(todayExists, localStorage.getItem('selectedClinicId'));
     }
   }
-
-  function animateAndLoadCalendar(direction) {
-    const animation = {
-      left: direction === 'next' ? '-100%' : '100%',
-      opacity: 0
-    };
-    calendar.animate(animation, 300, function() {
-      currentDate = moment(currentDate).add(direction === 'next' ? days : -days, 'days').format('YYYY-MM-DD');
-      loadCalendar(currentDate);
-      calendar.css({
-        left: direction === 'next' ? '100%' : '-100%',
-        opacity: 0
-      });
-      calendar.animate({
-        left: '0%',
-        opacity: 1
-      }, 300);
-    });
-  }
   // نمایش لودینگ قبل از ارسال درخواست AJAX
-  $(document).ready(function() {
-    let currentDate = moment().format('YYYY-MM-DD');
-    const days = 14;
-    const calendar = $('#calendar');
-    const appointmentsTableBody = $('.table tbody'); // بخش <tbody> جدول
-
-
-
-
-
-
-
-
-
-    $('#next').click(() => animateAndLoadCalendar('next'));
-    $('#prev').click(() => animateAndLoadCalendar('prev'));
-    loadCalendar(currentDate); // بارگذاری اولیه تقویم
-  });
   $(document).ready(function() {
     let currentDate = moment().format('YYYY-MM-DD'); // مقدار پیش‌فرض (امروز)
     let persianDate = moment(currentDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
-
     let isInitialLoad = true; // بررسی اولین بارگذاری صفحه
     function searchPatients(query) {
       let selectedDate = currentDate;
       let spanTextDate = $('.selectDate_datepicker__xkZeS span').text();
-
       let requestData = {
         date: spanTextDate,
         selectedClinicId: localStorage.getItem('selectedClinicId')
@@ -506,7 +421,6 @@
               const buttonDisabled = isAttended ? 'disabled' : '';
               const dropdownItemDisabled = (appointment.status === 'attended' || appointment.status ===
                 'cancelled') ? 'disabled' : '';
-
               let appointmentHTML = `
                         <tr>
                             <td><input type="checkbox" class="row-checkbox"></td>
@@ -516,7 +430,6 @@
                             <td>${patient.national_code ? patient.national_code : 'نامشخص'}</td>
                             <td>${getPrescriptionStatus(appointment.status)}</td>
         <td>${getPaymentStatus(appointment.payment_status)}</td>
-
                             <td>${insurance}</td>
                             <td>${appointmentDate}</td>
                             <td>${appointment.appointment_time}</td>
@@ -540,7 +453,6 @@
         alt="More options"
     >
 </button>
-                                    
                                     <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
                                         <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">لغو نوبت</a></li>
                                         <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark move-appointment" data-date="${appointment.appointment_date}" href="#" data-id="${appointment.id}">جابجایی نوبت</a></li>
@@ -573,24 +485,19 @@
         }
       });
     }
-
     // 📌 **وقتی در اینپوت جستجو تایپ شد**
     $(".my-form-control").on("input", function() {
       let searchText = $(this).val().trim();
-
       searchPatients(searchText);
     });
     // 📌 **بارگذاری اولیه لیست نوبت‌های امروز**
     searchPatients("");
   });
-
   /*  manage appointment cansle reschedule blockusers */
   $(document).on("click", ".cancel-appointment", function(e) {
     e.preventDefault();
-
     let appointmentId = $(this).data("id"); // دریافت ID نوبت
     let row = $(this).closest("tr"); // گرفتن ردیف مربوط به نوبت
-
     Swal.fire({
       title: "آیا از لغو این نوبت اطمینان دارید؟",
       text: "این نوبت لغو شده اما حذف نخواهد شد.",
@@ -627,7 +534,6 @@
               icon: "success", // ✅ اینجا باید "success" باشد
               confirmButtonColor: "#3085d6"
             });
-
             // حذف ردیف از جدول (بدون حذف از دیتابیس)
             row.fadeOut(300, function() {
               row.remove();
@@ -648,12 +554,9 @@
   $(document).on("click", ".custom-dropdown-trigger", function(e) {
     e.preventDefault();
     e.stopPropagation();
-
     let dropdownMenu = $(this).siblings(".dropdown-menu");
-
     // بستن همه منوهای دیگر
     $(".dropdown-menu").not(dropdownMenu).removeClass("show");
-
     // نمایش یا مخفی کردن منوی مربوط به دکمه کلیک شده
     dropdownMenu.toggleClass("show");
   });
@@ -669,7 +572,6 @@
   $(document).on('click', '.move-appointment', function() {
     let appointmentId = $(this).data('id'); // دریافت ID نوبت
     let oldDate = $(this).data('date'); // دریافت تاریخ نوبت از data-date
-
     if (!appointmentId || !oldDate) {
       Swal.fire("خطا", "امکان دریافت اطلاعات نوبت وجود ندارد.", "error");
       return;
@@ -677,11 +579,9 @@
     // مقدار را در مودال ذخیره کن
     $("#rescheduleModal").attr("data-appointment-id", appointmentId);
     $("#rescheduleModal").attr("data-old-date", oldDate);
-
     // مقداردهی لیست سال و ماه
     let year = moment(oldDate, 'YYYY-MM-DD').jYear();
     let month = moment(oldDate, 'YYYY-MM-DD').jMonth() + 1;
-
     // نمایش مودال و تولید تقویم
     $('#rescheduleModal').modal('show');
     generateRescheduleCalendar(year, month);
@@ -689,28 +589,22 @@
   });
 </script>
 @endsection
-
 <script>
   let selectedDay = null;
 
-
   function updateWorkhours() {
     let selectedDate = $("#selectedDate").val();
-
     let workHours = [];
-
     $(".work-hour-slot").each(function() {
       let start = $(this).find(".work-start-time").val();
       let end = $(this).find(".work-end-time").val();
       let maxAppointments = $(this).find(".work-max-appointments").val();
-
       workHours.push({
         start,
         end,
         max_appointments: maxAppointments
       });
     });
-
     $.ajax({
       url: "{{ route('doctor.update_work_schedule') }}",
       method: "POST",
@@ -731,21 +625,19 @@
         Swal.fire("خطا", "مشکلی در ذخیره تغییرات وجود دارد.", "error");
       }
     });
-
   }
 
   function attachDayClickEvents() {
     $('.calendar-day').not('.empty').off('click').on('click', function() {
+
       const selectedDayElement = $(this);
       const persianDate = selectedDayElement.data('date');
       const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
-
       // پاک کردن محتوای قبلی مودال
       $('#dateModal').find('.modal-body').html(
         '<div class="text-center py-3"><span>در حال بارگذاری...</span></div>');
       $('#dateModal').data('selectedDayElement', selectedDayElement);
       $('#dateModal').data('selectedDate', gregorianDate);
-
       $.ajax({
         url: "{{ route('doctor.get_holiday_status') }}",
         method: 'POST',
@@ -760,11 +652,9 @@
           Swal.fire('خطا', 'مشکلی در ارتباط با سرور وجود دارد.', 'error');
         }
       });
-
       $('#dateModal').modal('show');
     });
   }
-
 
   function populateSelectBoxes() {
     const yearSelect = $('#year');
@@ -789,6 +679,98 @@
       generateCalendar(yearSelect.val(), monthSelect.val());
     });
   }
+
+  // تابع تولید تقویم
+function generateCalendar(year, month) {
+    const calendarBody = $('#calendar-body');
+    calendarBody.empty(); // پاک کردن تقویم قبلی
+
+    const firstDayOfMonth = moment(`${year}/${month}/01`, 'jYYYY/jMM/jDD').locale('fa');
+    const daysInMonth = firstDayOfMonth.jDaysInMonth();
+    let firstDayWeekday = firstDayOfMonth.weekday();
+    const today = moment().locale('fa');
+
+    // افزودن روزهای خالی
+    for (let i = 0; i < firstDayWeekday; i++) {
+      calendarBody.append('<div class="calendar-day empty"></div>');
+    }
+
+    // افزودن روزهای ماه
+    for (let day = 1; day <= daysInMonth; day++) {
+      const currentDay = firstDayOfMonth.clone().add(day - 1, 'days');
+      const persianDate = currentDay.format('jYYYY/jMM/jDD');
+      const gregorianDate = currentDay.format('YYYY-MM-DD');
+      const isToday = currentDay.isSame(today, 'day');
+      const dayClass = `calendar-day ${isToday ? 'active' : ''}`;
+      const dayElement = `
+        <div class="${dayClass}" data-date="${persianDate}" data-gregorian-date="${gregorianDate}">
+          <span>${currentDay.format('jD')}</span>
+        </div>`;
+      calendarBody.append(dayElement);
+    }
+
+    // حذف رویدادهای قبلی و اتصال رویداد جدید
+    $('.calendar-day').not('.empty').off('click').on('click', function() {
+      const persianDate = $(this).data('date');
+      const gregorianDate = $(this).data('gregorian-date');
+
+      // به‌روزرسانی تاریخ انتخاب‌شده
+      $('#selectedDate').val(gregorianDate);
+      $('.selectDate_datepicker__xkZeS span.mx-1').text(persianDate);
+
+      // بستن مودال
+      closeModal();
+
+      // بررسی وضعیت تعطیلات و لود نوبت‌ها
+      $.ajax({
+        url: "{{ route('doctor.get_holiday_status') }}",
+        method: "POST",
+        data: {
+          date: gregorianDate,
+          _token: '{{ csrf_token() }}',
+          selectedClinicId: localStorage.getItem('selectedClinicId')
+        },
+        success: function(response) {
+          if (!response.is_holiday) {
+            getWorkHours(gregorianDate);
+          } else {
+            $("#workHoursContainer").empty();
+            $("#updateWorkHours").hide();
+            $(".not-appointment").removeClass("d-none");
+            $(".having-nobat-for-this-day").addClass("d-none");
+          }
+          handleDateSelection(persianDate, localStorage.getItem('selectedClinicId'));
+          $('.my-form-control').val(''); // پاک کردن فیلد جستجو
+        },
+        error: function() {
+          Swal.fire('خطا', 'مشکلی در ارتباط وجود دارد.', 'error');
+        }
+      });
+    });
+
+    // به‌روزرسانی استایل تعطیلات
+    loadHolidayStyles();
+  }
+
+  // تابع بستن مودال
+  function closeModal() {
+    const $modal = $('#calendarModal');
+    $modal.modal('hide');
+
+    // حذف بک‌دراپ و کلاس‌های اضافی بعد از بسته شدن کامل مودال
+    $modal.on('hidden.bs.modal', function() {
+      $('.modal-backdrop').remove();
+      $('body').removeClass('modal-open');
+    });
+  }
+$('.selectDate_datepicker__xkZeS').on('click', function() {
+
+    $('#calendarModal').modal({
+        backdrop: true, // فعال کردن بک‌دراپ (پیش‌فرض true است)
+        keyboard: true // امکان بستن با کلید ESC
+    });
+});
+ 
 
   function populateRescheduleSelectBoxes() {
     const yearSelect = $('#year-reschedule');
@@ -822,17 +804,14 @@
   function generateRescheduleCalendar(year, month) {
     const rescheduleCalendarBody = $('#calendar-reschedule');
     rescheduleCalendarBody.empty();
-
     const today = moment().startOf('day').locale('fa');
     const firstDayOfMonth = moment(`${year}-${month}-01`, 'jYYYY-jMM-jDD').locale('fa').startOf('month');
     const daysInMonth = firstDayOfMonth.jDaysInMonth();
     const firstDayWeekday = firstDayOfMonth.weekday();
-
     // افزودن روزهای خالی
     for (let i = 0; i < firstDayWeekday; i++) {
       rescheduleCalendarBody.append('<div class="calendar-day empty"></div>');
     }
-
     // ایجاد روزهای ماه
     for (let day = 1; day <= daysInMonth; day++) {
       const currentDay = firstDayOfMonth.clone().add(day - 1, 'days');
@@ -844,7 +823,6 @@
             </div>
         `);
     }
-
     attachRescheduleDayClickEvents();
   }
 
@@ -854,12 +832,9 @@
       const gregorianDate = moment(selectedDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
       const today = moment().format('YYYY-MM-DD');
       const isHoliday = $(this).hasClass('holiday');
-
       $('#calendar-reschedule .calendar-day').removeClass('active');
       $(this).addClass('active');
-
       const hasAppointment = $(this).find('.my-badge-success').length > 0;
-
       if (gregorianDate < today) {
         Swal.fire('خطا', 'نمی‌توانید نوبت‌ها را به تاریخ‌های گذشته منتقل کنید.', 'error');
       } else if (isHoliday) {
@@ -877,17 +852,14 @@
         }).then((result) => {
           if (result.isConfirmed) {
             let oldDate = $('#dateModal').data('selectedDate'); // مقدار از `dateModal`
-
             if (!oldDate) {
               // اگر `dateModal` مقدار نداشت، از `rescheduleModal` بگیر
               oldDate = $("#rescheduleModal").data("old-date");
             }
-
             if (!oldDate) {
               Swal.fire("خطا", "تاریخ نوبت قبلی یافت نشد!", "error");
               return;
             }
-
             $.ajax({
               url: "{{ route('doctor.reschedule_appointment') }}",
               method: 'POST',
@@ -910,7 +882,6 @@
                 if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
                   errorMessage = xhr.responseJSON.message; // دریافت پیام خطای سرور
                 }
-
                 Swal.fire('خطا', errorMessage, 'error');
               }
             });
@@ -918,10 +889,7 @@
         });
       }
     });
-
   }
-
-
   const appointmentsCountUrl = "{{ route('appointments.count') }}";
 
   function loadAppointmentsCount() {
@@ -938,7 +906,6 @@
             const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
             const appointment = response.data.find(a => a.appointment_date === gregorianDate);
             $(this).find('.my-badge-success').remove();
-
           });
         }
       }
@@ -1024,12 +991,10 @@
     // ابتدا پاک کردن محتوای مودال
     const modalBody = $('#dateModal .modal-body');
     modalBody.empty();
-
     if (!response || !response.status) {
       modalBody.html('<div class="alert alert-danger">خطایی در دریافت اطلاعات رخ داده است.</div>');
       return;
     }
-
     // بررسی وضعیت تعطیلی
     if (response.is_holiday) {
       modalBody.html(`
@@ -1066,7 +1031,6 @@
                 شما برای این روز نوبت فعالی ندارید. آیا می‌خواهید این روز را تعطیل کنید؟
             </div>
                <div id="workHoursContainer">
-
             </div>
             <button id="updateWorkHours" onclick="updateWorkhours()" class="btn btn-primary w-100 h-50 mt-3" style="display: none;">
               بروزرسانی ساعات کاری
@@ -1078,7 +1042,6 @@
         `);
     }
   }
-
   const toggleHolidayUrl = "{{ route('doctor.toggle_holiday') }}";
   const getHolidaysUrl = "{{ route('doctor.get_holidays') }}";
   // بارگذاری استایل روزهای تعطیل هنگام لود صفحه
@@ -1113,11 +1076,9 @@
       data: {
         selectedClinicId: localStorage.getItem('selectedClinicId')
       },
-
       success: function(response) {
         if (response.status) {
           const nextAvailableDate = response.date;
-
           Swal.fire({
             title: 'اولین نوبت خالی',
             html: `آیا می‌خواهید به تاریخ ${moment(nextAvailableDate, 'YYYY-MM-DD').locale('fa').format('jD jMMMM jYYYY')} منتقل شوید؟`,
@@ -1143,7 +1104,6 @@
                       text: `نوبت به تاریخ ${moment(nextAvailableDate, 'YYYY-MM-DD').locale('fa').format('jD jMMMM jYYYY')} منتقل شد.`,
                       icon: 'success'
                     });
-
                     // بروزرسانی تقویم
                     loadAppointmentsCount();
                     loadHolidayStyles();
@@ -1152,7 +1112,6 @@
                   }
                 },
                 error: function(xhr) {
-
                   Swal.fire('خطا', 'مشکلی در ارتباط با سرور وجود دارد.', 'error');
                 }
               });
@@ -1167,8 +1126,6 @@
       }
     });
   }
-
-
   // اضافه کردن event listener به دکمه
   function getWorkHours(selectedDate) {
     $.ajax({
@@ -1180,14 +1137,12 @@
       },
       success: function(response) {
         $("#workHoursContainer").empty();
-
         if (response.status && response.work_hours.length > 0) {
           response.work_hours.forEach((slot, index) => {
             $("#workHoursContainer").append(`
                         <h6 class="font-weight-bold">برنامه کاری</h6>
                         <div class="p-3 border mt-2">
                           <input type="hidden" id="selectedDate" value="${selectedDate}">
-
                             <div class="work-hour-slot d-flex justify-content-center gap-4">
                                 <div class="position-relative">
                                     <label class="label-top-input-special-takhasos">شروع:</label>
@@ -1205,7 +1160,6 @@
                         </div>
                     `);
           });
-
           $("#updateWorkHours").show();
         } else {
           $("#workHoursContainer").append(
@@ -1219,7 +1173,6 @@
       }
     });
   }
-
   $('#goToFirstAvailableDashboard').on('click', function() {
     $.ajax({
       url: "{{ route('doctor.get_next_available_date') }}",
@@ -1231,7 +1184,6 @@
         if (response.status) {
           const nextAvailableDate = response.date;
           let oldDates = [];
-
           // دریافت تاریخ‌ها از آرایه selectedAppointments
           let selected = getSelectedAppointments();
           if (selected.length > 0) {
@@ -1240,7 +1192,6 @@
             let oldDate = $('#dateModal').data('selectedDate') || $("#rescheduleModal").data("old-date");
             if (oldDate) oldDates.push(oldDate);
           }
-
           Swal.fire({
             title: `اولین نوبت خالی (${moment(nextAvailableDate, 'YYYY-MM-DD').locale('fa').format('jD jMMMM jYYYY')})`,
             text: `آیا می‌خواهید نوبت‌ها از تاریخ(های) ${oldDates.map(date => moment(date, 'YYYY-MM-DD').locale('fa').format('jD jMMMM jYYYY')).join(', ')} به تاریخ ${moment(nextAvailableDate, 'YYYY-MM-DD').locale('fa').format('jD jMMMM jYYYY')} منتقل شوند؟`,
@@ -1254,8 +1205,6 @@
                 $.ajax({
                   url: "{{ route('doctor.update_first_available_appointment') }}",
                   method: 'POST',
-
-
                   data: {
                     old_date: oldDate,
                     new_date: nextAvailableDate,
@@ -1285,31 +1234,50 @@
       },
     });
   });
-
   $(document).ready(function() {
-
     loadAppointmentsCount();
-    $('#prev-month').click(function() {
+    // فراخوانی اولیه تقویم
+    const currentYear = moment().jYear();
+    const currentMonth = moment().jMonth() + 1;
+    populateSelectBoxes();
+    generateCalendar(currentYear, currentMonth);
+
+    // مدیریت کلیک روی دکمه‌های قبلی و بعدی
+    $('#prev-month').off('click').on('click', function() {
       const yearSelect = $('#year');
       const monthSelect = $('#month');
-      const currentMonth = parseInt(monthSelect.val());
+      let currentMonth = parseInt(monthSelect.val());
+      let currentYear = parseInt(yearSelect.val());
       if (currentMonth === 1) {
-        yearSelect.val(parseInt(yearSelect.val()) - 1).change();
-        monthSelect.val(12).change();
+        currentMonth = 12;
+        currentYear -= 1;
       } else {
-        monthSelect.val(currentMonth - 1).change();
+        currentMonth -= 1;
       }
+      yearSelect.val(currentYear);
+      monthSelect.val(currentMonth);
+      generateCalendar(currentYear, currentMonth);
     });
-    $('#next-month').click(function() {
+
+    $('#next-month').off('click').on('click', function() {
       const yearSelect = $('#year');
       const monthSelect = $('#month');
-      const currentMonth = parseInt(monthSelect.val());
+      let currentMonth = parseInt(monthSelect.val());
+      let currentYear = parseInt(yearSelect.val());
       if (currentMonth === 12) {
-        yearSelect.val(parseInt(yearSelect.val()) + 1).change();
-        monthSelect.val(1).change();
+        currentMonth = 1;
+        currentYear += 1;
       } else {
-        monthSelect.val(currentMonth + 1).change();
+        currentMonth += 1;
       }
+      yearSelect.val(currentYear);
+      monthSelect.val(currentMonth);
+      generateCalendar(currentYear, currentMonth);
+    });
+    $('#year, #month').off('change').on('change', function() {
+      const year = parseInt($('#year').val());
+      const month = parseInt($('#month').val());
+      generateCalendar(year, month);
     });
     populateSelectBoxes();
     $(document).on('click', '.cancle-btn-appointment', function() {
@@ -1347,17 +1315,14 @@
         }
       });
     });
-
     // Modal for Appointment Reschedule
     $(document).on('click', '#confirmReschedule', function() {
       const oldDate = $('#dateModal').data('selectedDate');
       const newDate = $('#calendar-reschedule .calendar-day.active').data('date');
-
       if (!newDate) {
         Swal.fire('خطا', 'لطفاً یک روز جدید انتخاب کنید.', 'error');
         return;
       }
-
       $.ajax({
         url: "{{ route('doctor.reschedule_appointment') }}",
         method: 'POST',
@@ -1382,22 +1347,16 @@
         }
       });
     });
-
     $(document).on('click', '.btn-reschedule', function() {
       const selectedDate = $('#dateModal').data('selectedDate');
       $('#rescheduleModal').modal('show'); // باز کردن مودال جابجایی نوبت‌ها
-
       // تولید تقویم برای جابجایی
       const year = moment(selectedDate, 'YYYY-MM-DD').jYear();
       const month = moment(selectedDate, 'YYYY-MM-DD').jMonth() + 1;
-
       generateRescheduleCalendar(year, month);
       populateRescheduleSelectBoxes();
     });
-
     $('.btn-reschedule').on('click', function() {
-
-
       $('#rescheduleModal').modal('show');
       const selectedDate = $('#dateModal').data('selectedDate');
       const year = moment(selectedDate, 'YYYY-MM-DD').jYear();
@@ -1454,12 +1413,10 @@
                 error: function(xhr) {
                   // پیام خطای سفارشی
                   let errorMessage = 'مشکلی در ارتباط با سرور رخ داده است.';
-
                   if (xhr.status === 400) {
                     // متن ثابت برای خطای 400
                     errorMessage = 'امکان جابجایی نوبت‌ها به گذشته وجود ندارد.';
                   }
-
                   // نمایش پیام خطا در سوئیت الرت
                   Swal.fire('خطا', errorMessage, 'error');
                 }
@@ -1473,7 +1430,6 @@
       const yearSelect = $('#year-reschedule');
       const monthSelect = $('#month-reschedule');
       const currentMonth = parseInt(monthSelect.val());
-
       if (this.id === 'prev-month-reschedule' && currentMonth === 1) {
         yearSelect.val(parseInt(yearSelect.val()) - 1).change();
         monthSelect.val(12).change();
@@ -1483,18 +1439,17 @@
       } else {
         monthSelect.val(this.id === 'prev-month-reschedule' ? currentMonth - 1 : currentMonth + 1).change();
       }
-
       // همگام‌سازی سلکت باکس‌ها با تقویم
       const newMonth = parseInt(monthSelect.val());
       const newYear = parseInt(yearSelect.val());
       generateRescheduleCalendar(newYear, newMonth);
-
       // تنظیم مقدار انتخاب‌شده در سلکت باکس
       monthSelect.val(newMonth);
       yearSelect.val(newYear);
     });
-
     $('.calendar-day').not('.empty').on('click', function() {
+      $('#calendarModal').modal('hide');
+
       const selectedDayElement = $(this);
       const persianDate = selectedDayElement.data('date');
       const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
@@ -1534,7 +1489,6 @@
           else if (response.data.length > 0) {
             $('.having-nobat-for-this-day').removeClass('d-none');
             // نمایش اطلاعات نوبت‌ها
-
             $('.having-nobat-for-this-day .alert').html(`
             پزشک گرامی شما برای این روز نوبت فعال دارید.
             <div class="w-100 d-flex justify-content-between gap-4 mt-3">
@@ -1566,13 +1520,11 @@
           $(document).on('click', '.close-modal', function() {
             $('#dateModal').modal('hide');
           });
-
           // اضافه کردن event listener برای دکمه‌ها
           $(document).off('click', '#confirmHolidayButton, #confirmUnHolidayButton');
           $(document).on('click', '#confirmHolidayButton, #confirmUnHolidayButton', function() {
             const selectedDate = $('#dateModal').data('selectedDate');
             const selectedDayElement = $('#dateModal').data('selectedDayElement');
-
             $.ajax({
               url: "{{ route('doctor.toggle_holiday') }}",
               method: 'POST',
@@ -1603,7 +1555,6 @@
               }
             });
           });
-
         },
         error: function() {
           Swal.fire('خطا', 'مشکلی در ارتباط با سرور وجود دارد.', 'error');
@@ -1611,7 +1562,6 @@
       });
       $('#dateModal').modal('show');
     });
-
     // تابع برای بروزرسانی محتوای مودال
     // فراخوانی هنگام بارگذاری صفحه
     loadHolidayStyles();
@@ -1623,6 +1573,7 @@
       $("#selectedDate").val(gregorianDate); // ذخیره تاریخ میلادی در فیلد مخفی
       $("#selectedDate").val(gregorianDate); // ذخیره تاریخ میلادی در فیلد مخفی
       handleDateSelection(persianDate, localStorage.getItem('selectedClinicId'));
+      $('#calendarModal').modal('hide');
       // بررسی تعطیل بودن روز
       $.ajax({
         url: "{{ route('doctor.get_holiday_status') }}",
@@ -1650,21 +1601,16 @@
         }
       });
     });
-
-
     $(document).on("click", ".block-user", function(e) {
       e.preventDefault();
-
       let row = $(this).closest("tr"); // گرفتن ردیف مربوطه
       let userId = $(this).data("user-id"); // دریافت ID کاربر
       let mobile = $(this).data("mobile"); // دریافت ID کاربر
       let userName = $(this).data("user-name"); // دریافت نام کاربر
-
       if (!userId) {
         Swal.fire("خطا!", "شناسه کاربر نامعتبر است.", "error");
         return;
       }
-
       Swal.fire({
         title: "مسدود کردن کاربر",
         text: `آیا مطمئن هستید که می‌خواهید کاربر "${userName}" را مسدود کنید؟`,
@@ -1707,7 +1653,6 @@
               Swal.fire("موفقیت!", response.message, "success");
             },
             error: function(xhr) {
-
               let errorMessage = "مشکلی در ارتباط با سرور رخ داده است.";
               if (xhr.responseJSON && xhr.responseJSON.message) {
                 errorMessage = xhr.responseJSON.message;
@@ -1720,27 +1665,23 @@
     });
   });
   $(document).ready(function() {
-    $(document).ready(function() {
-      $(".dropdown-item").click(function(e) {
-        e.preventDefault();
-
-        let statusFilter = ""; // مقدار فیلتر `status`
-        let filterType = $(this).attr("id"); // دریافت ID گزینه‌ی انتخاب‌شده
-
-        // بررسی مقدار `filterType` و تعیین مقدار `statusFilter`
-        if (filterType === "scheduled-appointments") {
-          statusFilter = "scheduled";
-        } else if (filterType === "cancelled-appointments") {
-          statusFilter = "cancelled";
-        } else if (filterType === "attended-appointments") {
-          statusFilter = "attended";
-        } else if (filterType === "missed-appointments") {
-          statusFilter = "missed";
-        }
-
-        // نمایش لودینگ در جدول
-        let appointmentsTableBody = $(".table tbody");
-        appointmentsTableBody.html(`
+    $(".dropdown-item").click(function(e) {
+      e.preventDefault();
+      let statusFilter = ""; // مقدار فیلتر `status`
+      let filterType = $(this).attr("id"); // دریافت ID گزینه‌ی انتخاب‌شده
+      // بررسی مقدار `filterType` و تعیین مقدار `statusFilter`
+      if (filterType === "scheduled-appointments") {
+        statusFilter = "scheduled";
+      } else if (filterType === "cancelled-appointments") {
+        statusFilter = "cancelled";
+      } else if (filterType === "attended-appointments") {
+        statusFilter = "attended";
+      } else if (filterType === "missed-appointments") {
+        statusFilter = "missed";
+      }
+      // نمایش لودینگ در جدول
+      let appointmentsTableBody = $(".table tbody");
+      appointmentsTableBody.html(`
             <tr>
                 <td colspan="10" class="text-center py-3">
                     <div class="spinner-border text-primary" role="status">
@@ -1749,27 +1690,24 @@
                 </td>
             </tr>
         `);
-
-        // ارسال درخواست AJAX برای دریافت نوبت‌های فیلتر شده
-        $.ajax({
-          url: "{{ route('doctor.appointments.filter') }}",
-          method: "GET",
-          data: {
-            status: statusFilter,
-            selectedClinicId: localStorage.getItem('selectedClinicId') // فقط مقدار `status` ارسال شود
-          },
-          success: function(response) {
-            appointmentsTableBody.html("");
-
-            if (response.appointments.length > 0) {
-              response.appointments.forEach(function(appointment) {
-                let patient = appointment.patient || {};
-                let insurance = appointment.insurance ? appointment.insurance.name : 'ندارد';
-                let appointmentDate = appointment.appointment_date ?
-                  moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD') :
-                  'نامشخص';
-
-                let appointmentHTML = `
+      // ارسال درخواست AJAX برای دریافت نوبت‌های فیلتر شده
+      $.ajax({
+        url: "{{ route('doctor.appointments.filter') }}",
+        method: "GET",
+        data: {
+          status: statusFilter,
+          selectedClinicId: localStorage.getItem('selectedClinicId') // فقط مقدار `status` ارسال شود
+        },
+        success: function(response) {
+          appointmentsTableBody.html("");
+          if (response.appointments.length > 0) {
+            response.appointments.forEach(function(appointment) {
+              let patient = appointment.patient || {};
+              let insurance = appointment.insurance ? appointment.insurance.name : 'ندارد';
+              let appointmentDate = appointment.appointment_date ?
+                moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD') :
+                'نامشخص';
+              let appointmentHTML = `
                             <tr>
                              <td><input type="checkbox" class="row-checkbox"></td>
                                 <td>${patient.first_name ? patient.first_name : 'نامشخص'} 
@@ -1778,7 +1716,6 @@
                                 <td>${patient.national_code ? patient.national_code : 'نامشخص'}</td>
                                 <td>${getPrescriptionStatus(appointment.status)}</td>
         <td>${getPaymentStatus(appointment.payment_status)}</td>
-
                                 <td>${insurance}</td>
                                 <td>${appointmentDate}</td>
                                 <td>${appointment.appointment_time}</td>
@@ -1806,7 +1743,6 @@
                                             <li class="${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
             }" href="#" data-id="${appointment.id}"><a class="dropdown-item text-dark cancel-appointment">لغو نوبت</a></li>
-                                            
                                             <li class=" ${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
             }"><a class="dropdown-item text-dark move-appointment" data-date="${appointment.appointment_date}" href="#" data-id="${appointment.id}">جابجایی نوبت</a></li>
@@ -1815,25 +1751,23 @@
                                     </div>
                                 </td>
                             </tr>`;
-
-                appointmentsTableBody.append(appointmentHTML);
-              });
-            } else {
-              appointmentsTableBody.html(`
+              appointmentsTableBody.append(appointmentHTML);
+            });
+          } else {
+            appointmentsTableBody.html(`
                         <tr>
                             <td colspan="10" class="text-center py-3">هیچ نوبتی برای این فیلتر وجود ندارد.</td>
                         </tr>
                     `);
-            }
-          },
-          error: function() {
-            appointmentsTableBody.html(`
+          }
+        },
+        error: function() {
+          appointmentsTableBody.html(`
                     <tr>
                         <td colspan="10" class="text-center py-3 text-danger">خطا در دریافت نوبت‌ها.</td>
                     </tr>
                 `);
-          }
-        });
+        }
       });
     });
   });
@@ -1841,20 +1775,13 @@
   function getSelectedAppointments() {
     let selected = [];
     let checkboxes = $('.row-checkbox:checked');
-
     checkboxes.each(function() {
       let checkbox = $(this);
       let row = checkbox.closest('tr');
       let appointmentId = row.find('.btn-end-visit').attr('data-appointment-id'); // ID از دکمه
-
-
-
       if (!appointmentId) {
         console.error('No data-appointment-id found in row or button:', row);
       }
-
-
-
       selected.push({
         id: appointmentId,
         status: row.find('td:nth-child(5)').text().trim(),
@@ -1865,7 +1792,6 @@
     });
     return selected;
   }
-
   $(document).ready(function() {
     const selectAllCheckbox = $('#select-all');
     const rowCheckboxes = $('.row-checkbox');
@@ -1875,34 +1801,24 @@
       e.stopPropagation();
       $('.row-checkbox').prop('checked', $(this).prop('checked'));
     });
-
-
-
-
     // ✅ لغو نوبت گروهی
     $('#cancel-appointments-btn').click(function() {
       let selected = getSelectedAppointments();
-
-
       if (!Array.isArray(selected) || !selected.length) {
         Swal.fire('هشدار', 'نوبتی انتخاب نشده!', 'warning');
         return; // اینجا return رو جدا گذاشتم برای وضوح
       }
-
       const hasAttended = selected.some(appointment => appointment.status === 'attended');
       if (hasAttended) {
         return Swal.fire('خطا', 'نمی‌توانید نوبت‌های ویزیت‌شده را لغو کنید!', 'error');
       }
-
       const date = selected[0].date;
       const appointmentIds = selected
         .map(app => app.id)
         .filter(id => id !== undefined && id !== null && Number.isInteger(Number(id)));
-
       if (!appointmentIds.length) {
         return Swal.fire('خطا', 'هیچ شناسه نوبتی معتبر انتخاب نشده است!', 'error');
       }
-
       Swal.fire({
         title: 'لغو نوبت‌ها؟',
         text: `${appointmentIds.length} نوبت لغو می‌شود.`,
@@ -1944,25 +1860,22 @@
         }
       });
     });
-
     // ✅ جابجایی نوبت گروهی با استفاده از مودال تقویم شما
     $('#move-appointments-btn').click(function() {
       let selected = getSelectedAppointments();
       if (!selected.length) {
         return Swal.fire('هشدار', 'نوبتی انتخاب نشده!', 'warning');
       }
-
       // چک کردن اینکه آیا نوبت ویزیت‌شده وجود داره
       const hasAttended = selected.some(appointment => appointment.status === 'attended');
       if (hasAttended) {
         return Swal.fire('خطا', 'نمی‌توانید نوبت‌های ویزیت‌شده را جابجا کنید!', 'error');
       }
-
       $('#rescheduleModal').modal('show');
       generateRescheduleCalendar(moment().jYear(), moment().jMonth() + 1);
       populateRescheduleSelectBoxes();
-
       $('#calendar-reschedule .calendar-day').not('.empty').off('click').on('click', function() {
+
         const newDate = $(this).data('date');
         const gregorianDate = moment(newDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
         const today = moment().format('YYYY-MM-DD');
@@ -1971,7 +1884,6 @@
           Swal.fire('خطا', 'امکان جابجایی نوبت به این تاریخ وجود ندارد.', 'error');
           return;
         }
-
         Swal.fire({
           title: `جابجایی نوبت‌ها به ${moment(newDate, 'jYYYY-jMM-jDD').locale('fa').format('jD jMMMM jYYYY')}؟`,
           icon: 'question',
@@ -1981,7 +1893,6 @@
         }).then((result) => {
           if (result.isConfirmed) {
             let oldDates = selected.map(item => item.date);
-
             oldDates.forEach(oldDate => {
               $.ajax({
                 url: "{{ route('doctor.reschedule_appointment') }}",
@@ -2015,13 +1926,10 @@
         });
       });
     });
-
-
     // ✅ مسدود کردن گروهی کاربران
     $('#block-users-btn').click(function() {
       let selected = getSelectedAppointments();
       if (!selected.length) return Swal.fire('هشدار', 'کاربری انتخاب نشده!', 'warning');
-
       Swal.fire({
         title: 'مسدود کردن کاربران؟',
         input: 'textarea',
@@ -2046,9 +1954,7 @@
               Swal.fire('خطا', response.message, 'error');
             }
           }).fail(function(xhr) {
-
             Swal.fire('خطا', xhr.responseJSON.message, 'error');
-
           });
         }
       });
@@ -2061,14 +1967,11 @@
       $('#endVisitModalCenter').data('appointment-id', appointmentId);
       $('#endVisitModalCenter').modal('show');
     });
-
     $('#endVisitModalCenter .btn-primary').on('click', function(e) {
       e.preventDefault();
-
       const appointmentId = $('#endVisitModalCenter').data('appointment-id');
       const description = $('#endVisitModalCenter textarea').val();
       const csrfToken = $('meta[name="csrf-token"]').attr('content');
-
       $.ajax({
         url: "{{ route('doctor.end-visit', ':id') }}".replace(':id', appointmentId),
         method: 'POST',
@@ -2094,31 +1997,24 @@
               Swal.fire('خطا', 'دکمه پایان ویزیت پیدا نشد.', 'error');
               return;
             }
-
             const row = endVisitButton.closest('tr');
             if (row.length === 0) {
               console.error('ردیف والد دکمه پیدا نشد:', appointmentId);
               Swal.fire('خطا', 'ردیف جدول پیدا نشد.', 'error');
               return;
             }
-
             // به‌روزرسانی وضعیت در جدول
             row.find('td:nth-child(5)').html(
               '<span class="font-weight-bold text-primary">ویزیت شده</span>');
-
             // غیرفعال کردن دکمه "پایان ویزیت"
             endVisitButton.prop('disabled', true).addClass('disabled');
-
             // غیرفعال کردن گزینه‌های "لغو نوبت" و "جابجایی نوبت" در دراپ‌داون
             row.find('.cancel-appointment').closest('li').addClass('disabled');
             row.find('.move-appointment').closest('li').addClass('disabled');
-
             // بستن مودال
             $('#endVisitModalCenter').modal('hide');
-
             // پاک کردن textarea
             $('#endVisitModalCenter textarea').val('');
-
             // نمایش پیام موفقیت
             Swal.fire('موفقیت', response.message, 'success');
           } else {

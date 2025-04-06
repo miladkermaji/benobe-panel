@@ -547,6 +547,9 @@ table th {
     -webkit-box-pack: center;
     justify-content: center;
 }
+#calendarModal .modal-body{
+    padding: 0 !important;
+}
 svg{
     display: inline !important;
 }

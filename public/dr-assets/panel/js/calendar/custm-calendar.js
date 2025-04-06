@@ -1,172 +1,194 @@
-document.addEventListener('DOMContentLoaded', function () {
- const calendarBody = document.getElementById('calendar-body');
- const today = moment().startOf('day').locale('fa').format('jYYYY/jMM/jDD');
- const selectedDateSpan = document.querySelector('.turning_selectDate__MLRSb span:first-child');
- const calendarButton = document.querySelector('.selectDate_datepicker__xkZeS');
- const calendarModal = document.getElementById('calendarModal');
- calendarButton.onclick = null;
- let modalInstance = null;
- calendarButton.removeEventListener('click', handleCalendarButtonClick);
- function handleCalendarButtonClick(e) {
-  e.preventDefault();
-  e.stopPropagation();
+document.addEventListener("DOMContentLoaded", function () {
+    const calendarBody = document.getElementById("calendar-body");
+    const today = moment().startOf("day").locale("fa").format("jYYYY/jMM/jDD");
+    const selectedDateSpan = document.querySelector(
+        ".turning_selectDate__MLRSb span:first-child"
+    );
+    const calendarButton = document.querySelector(
+        ".selectDate_datepicker__xkZeS"
+    );
+    const calendarModal = document.getElementById("calendarModal");
+    calendarButton.onclick = null;
+    let modalInstance = null;
+    calendarButton.removeEventListener("click", handleCalendarButtonClick);
 
-  // اگر مودال قبلاً ساخته شده، از آن استفاده کن
-  if (!modalInstance) {
-   modalInstance = new bootstrap.Modal(calendarModal, {
-    backdrop: 'static', // جلوگیری از بستن مودال با کلیک خارج از آن
-    keyboard: false
-   });
-  }
+    function handleCalendarButtonClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-  // بستن backdrop‌های قبلی
-  const existingBackdrops = document.querySelectorAll('.modal-backdrop');
-  existingBackdrops.forEach(backdrop => backdrop.remove());
-  document.body.classList.remove('modal-open');
+        if (!modalInstance) {
+            modalInstance = new bootstrap.Modal(calendarModal, {
+                backdrop: "static",
+                keyboard: false,
+            });
+        }
 
-  // نمایش مودال
-  modalInstance.show();
- }
+        const existingBackdrops = document.querySelectorAll(".modal-backdrop");
+        existingBackdrops.forEach((backdrop) => backdrop.remove());
+        document.body.classList.remove("modal-open");
 
- // اضافه کردن رویداد جدید
- calendarButton.addEventListener('click', handleCalendarButtonClick);
- selectedDateSpan.textContent = today;
- function generateCalendar(year, month) {
-  // پاک کردن محتوای قبلی
-  calendarBody.innerHTML = '';
-
-  // تنظیمات moment برای تاریخ شمسی
-  const firstDayOfMonth = moment(`${year}/${month}/01`, 'jYYYY/jMM/jDD').locale('fa');
-  const daysInMonth = firstDayOfMonth.jDaysInMonth();
-  let firstDayWeekday = firstDayOfMonth.weekday();
-  const today = moment().locale('fa');
-  // پر کردن روزهای خالی قبل از اولین روز ماه
-  for (let i = 0; i < firstDayWeekday; i++) {
-   const emptyDay = document.createElement('div');
-   emptyDay.classList.add('calendar-day', 'empty');
-   calendarBody.appendChild(emptyDay);
-  }
-
-  // ایجاد روزهای ماه
-  for (let day = 1; day <= daysInMonth; day++) {
-   const currentDay = firstDayOfMonth.clone().add(day - 1, 'days');
-   const dayElement = document.createElement('div');
-
-   dayElement.classList.add('calendar-day');
-   dayElement.setAttribute('data-date', currentDay.format('jYYYY/jMM/jDD'));
-
-   // اضافه کردن کلاس جمعه
-   if (currentDay.day() === 5) {
-    dayElement.classList.add('friday');
-   }
-   if (currentDay.isSame(today, 'day')) {
-    dayElement.classList.add('active');
-   }
-   // اضافه کردن متن روز
-   dayElement.innerHTML = `<span>${currentDay.format('jD')}</span>`;
-
-   // اضافه کردن رویداد کلیک
-   dayElement.addEventListener('click', function () {
-    const selectedDate = this.getAttribute('data-date');
-    if (modalInstance) {
-     modalInstance.hide();
+        modalInstance.show();
     }
-    // بستن مودال با استفاده از بوت‌استرپ
-    $('#calendarModal').modal('hide');
 
-    // تنظیم مقدار اسپن
-    selectedDateSpan.textContent = selectedDate;
+    calendarButton.addEventListener("click", handleCalendarButtonClick);
+    selectedDateSpan.textContent = today;
 
-    // اطمینان از بسته شدن کامل مودال
-    setTimeout(() => {
-     const existingBackdrops = document.querySelectorAll('.modal-backdrop');
-     existingBackdrops.forEach(backdrop => backdrop.remove());
-     document.body.classList.remove('modal-open');
-    }, 300);
-   });
+    function generateCalendar(year, month) {
+        calendarBody.innerHTML = "";
 
-   calendarBody.appendChild(dayElement);
-  }
- }
+        const firstDayOfMonth = moment(
+            `${year}/${month}/01`,
+            "jYYYY/jMM/jDD"
+        ).locale("fa");
+        const daysInMonth = firstDayOfMonth.jDaysInMonth();
+        let firstDayWeekday = firstDayOfMonth.weekday();
+        const today = moment().locale("fa");
 
- // تابع برای پر کردن selectbox های سال و ماه
- function populateSelectBoxes() {
-  const yearSelect = document.getElementById('year');
-  const monthSelect = document.getElementById('month');
+        for (let i = 0; i < firstDayWeekday; i++) {
+            const emptyDay = document.createElement("div");
+            emptyDay.classList.add("calendar-day", "empty");
+            calendarBody.appendChild(emptyDay);
+        }
 
-  const currentYear = moment().jYear();
-  const currentMonth = moment().jMonth() + 1;
+        for (let day = 1; day <= daysInMonth; day++) {
+            const currentDay = firstDayOfMonth.clone().add(day - 1, "days");
+            const dayElement = document.createElement("div");
 
-  // پر کردن سال‌ها
-  for (let year = currentYear - 10; year <= currentYear + 10; year++) {
-   const option = document.createElement('option');
-   option.value = year;
-   option.textContent = year;
-   yearSelect.appendChild(option);
-  }
+            dayElement.classList.add("calendar-day");
+            dayElement.setAttribute(
+                "data-date",
+                currentDay.format("jYYYY/jMM/jDD")
+            );
 
-  // پر کردن ماه‌ها
-  const persianMonths = [
-   "فروردین", "اردیبهشت", "خرداد", "تیر",
-   "مرداد", "شهریور", "مهر", "آبان",
-   "آذر", "دی", "بهمن", "اسفند"
-  ];
+            if (currentDay.day() === 5) {
+                dayElement.classList.add("friday");
+            }
+            if (currentDay.isSame(today, "day")) {
+                dayElement.classList.add("active");
+            }
 
-  for (let month = 1; month <= 12; month++) {
-   const option = document.createElement('option');
-   option.value = month;
-   option.textContent = persianMonths[month - 1];
-   monthSelect.appendChild(option);
-  }
+            dayElement.innerHTML = `<span>${currentDay.format("jD")}</span>`;
 
-  // تنظیم مقادیر پیش فرض
-  yearSelect.value = currentYear;
-  monthSelect.value = currentMonth;
+            dayElement.addEventListener("click", function () {
+                const selectedDate = this.getAttribute("data-date");
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+                $("#calendarModal").modal("hide");
 
-  // رویداد تغییر سال
-  yearSelect.addEventListener('change', function () {
-   generateCalendar(yearSelect.value, monthSelect.value);
-  });
+                selectedDateSpan.textContent = selectedDate;
 
-  // رویداد تغییر ماه
-  monthSelect.addEventListener('change', function () {
-   generateCalendar(yearSelect.value, monthSelect.value);
-  });
- }
+                setTimeout(() => {
+                    const existingBackdrops =
+                        document.querySelectorAll(".modal-backdrop");
+                    existingBackdrops.forEach((backdrop) => backdrop.remove());
+                    document.body.classList.remove("modal-open");
+                }, 300);
+            });
 
- // دکمه ماه قبل
- document.getElementById('prev-month').addEventListener('click', function () {
-  const yearSelect = document.getElementById('year');
-  const monthSelect = document.getElementById('month');
-  const currentMonth = parseInt(monthSelect.value);
+            calendarBody.appendChild(dayElement);
+        }
+    }
 
-  if (currentMonth === 1) {
-   yearSelect.value = parseInt(yearSelect.value) - 1;
-   monthSelect.value = 12;
-  } else {
-   monthSelect.value = currentMonth - 1;
-  }
+    function populateSelectBoxes() {
+        const yearSelect = document.getElementById("year");
+        const monthSelect = document.getElementById("month");
 
-  generateCalendar(yearSelect.value, monthSelect.value);
- });
+        const currentYear = moment().jYear();
+        const currentMonth = moment().jMonth() + 1;
 
- // دکمه ماه بعد
- document.getElementById('next-month').addEventListener('click', function () {
-  const yearSelect = document.getElementById('year');
-  const monthSelect = document.getElementById('month');
-  const currentMonth = parseInt(monthSelect.value);
+        yearSelect.innerHTML = "";
+        for (let year = currentYear - 10; year <= currentYear + 10; year++) {
+            const option = document.createElement("option");
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+        }
 
-  if (currentMonth === 12) {
-   yearSelect.value = parseInt(yearSelect.value) + 1;
-   monthSelect.value = 1;
-  } else {
-   monthSelect.value = currentMonth + 1;
-  }
+        const persianMonths = [
+            "فروردین",
+            "اردیبهشت",
+            "خرداد",
+            "تیر",
+            "مرداد",
+            "شهریور",
+            "مهر",
+            "آبان",
+            "آذر",
+            "دی",
+            "بهمن",
+            "اسفند",
+        ];
 
-  generateCalendar(yearSelect.value, monthSelect.value);
- });
+        monthSelect.innerHTML = "";
+        for (let month = 1; month <= 12; month++) {
+            const option = document.createElement("option");
+            option.value = month;
+            option.textContent = persianMonths[month - 1];
+            monthSelect.appendChild(option);
+        }
 
- // اجرای اولیه
- populateSelectBoxes();
- generateCalendar(moment().jYear(), moment().jMonth() + 1);
+        yearSelect.value = currentYear;
+        monthSelect.value = currentMonth;
+
+        yearSelect.addEventListener("change", function () {
+            generateCalendar(
+                parseInt(yearSelect.value),
+                parseInt(monthSelect.value)
+            );
+        });
+
+        monthSelect.addEventListener("change", function () {
+            generateCalendar(
+                parseInt(yearSelect.value),
+                parseInt(monthSelect.value)
+            );
+        });
+    }
+
+/*     // دکمه ماه قبل
+    document
+        .getElementById("prev-month")
+        .addEventListener("click", function () {
+            const yearSelect = document.getElementById("year");
+            const monthSelect = document.getElementById("month");
+            let currentMonth = parseInt(monthSelect.value);
+            let currentYear = parseInt(yearSelect.value);
+
+            if (currentMonth === 1) {
+                currentYear -= 1;
+                currentMonth = 12;
+            } else {
+                currentMonth -= 1;
+            }
+
+            yearSelect.value = currentYear;
+            monthSelect.value = currentMonth;
+            generateCalendar(currentYear, currentMonth);
+        });
+
+    // دکمه ماه بعد
+    document
+        .getElementById("next-month")
+        .addEventListener("click", function () {
+            const yearSelect = document.getElementById("year");
+            const monthSelect = document.getElementById("month");
+            let currentMonth = parseInt(monthSelect.value);
+            let currentYear = parseInt(yearSelect.value);
+
+            if (currentMonth === 12) {
+                currentYear += 1;
+                currentMonth = 1;
+            } else {
+                currentMonth += 1;
+            }
+
+            yearSelect.value = currentYear;
+            monthSelect.value = currentMonth;
+            generateCalendar(currentYear, currentMonth);
+        }); */
+
+    // اجرای اولیه
+    populateSelectBoxes();
+    generateCalendar(moment().jYear(), moment().jMonth() + 1);
 });
