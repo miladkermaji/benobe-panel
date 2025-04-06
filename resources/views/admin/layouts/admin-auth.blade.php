@@ -68,40 +68,21 @@
 
  @livewireScripts
  <script>
-  // مطمئن شو toastr لود شده باشه
-  if (typeof toastr !== 'undefined') {
-   // شیء سراسری برای مدیریت توسترها
-   window.toastrState = window.toastrState || {
-    successShown: false,
-    errorShown: false
-   };
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof toastr !== 'undefined') {
+        toastr.options = {
+          timeOut: 10000,
+          progressBar: true,
+          positionClass: 'toast-top-right',
+          preventDuplicates: true,
+        };
+      }
+    });
 
-   // ذخیره توابع اصلی toastr
-   const originalToastrSuccess = toastr.success;
-   const originalToastrError = toastr.error;
-
-   // بازنویسی تابع toastr.success
-   toastr.success = function(message, title, options) {
-    if (!window.toastrState.successShown) {
-     originalToastrSuccess.call(this, message, title, options);
-     window.toastrState.successShown = true;
-    }
-   };
-
-   // بازنویسی تابع toastr.error
-   toastr.error = function(message, title, options) {
-    if (!window.toastrState.errorShown) {
-     originalToastrError.call(this, message, title, options);
-     window.toastrState.errorShown = true;
-    }
-   };
-  }
-
-  // مدیریت otpSent برای ریست تایمر (مثل قبل)
-  Livewire.on('otpSent', (data) => {
-   localStorage.removeItem('otpTimerData');
-  });
- </script>
+    Livewire.on('otpSent', (data) => {
+      localStorage.removeItem('otpTimerData');
+    });
+  </script>
  @stack('scripts')
 </body>
 

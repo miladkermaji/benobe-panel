@@ -47,7 +47,7 @@
   @vite(['resources/js/app.js', 'resources/css/app.css'])
 
   <!-- Scripts -->
-  <script src="{{ asset('dr-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
+  <script src="{{ asset('dr-assets/panel/js/sweetalert2/sweetalert2.js') }}" defer></script>
   @livewireStyles
 </head>
 
@@ -59,45 +59,26 @@
   </main>
 
   <!-- Scripts -->
-  <script src="{{ asset('dr-assets/js/jquery/jquery.min.js') }}"></script>
-  <script src="{{ asset('dr-assets/js/bootstrap/bootstrap.min.js') }}"></script>
-  <script src="{{ asset('dr-assets/js/bootstrap/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ asset('dr-assets/js/main.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/toastr/toastr.min.js') }}"></script>
-  <script src="{{ asset('dr-assets/js/login.js') }}"></script>
+  <script src="{{ asset('dr-assets/js/jquery/jquery.min.js') }}" defer></script>
+  <script src="{{ asset('dr-assets/js/bootstrap/bootstrap.min.js') }}" defer></script>
+  <script src="{{ asset('dr-assets/js/bootstrap/bootstrap.bundle.min.js') }}" defer></script>
+  <script src="{{ asset('dr-assets/js/main.js') }}" defer></script>
+  <script src="{{ asset('dr-assets/panel/js/toastr/toastr.min.js') }}" defer></script>
+  <script src="{{ asset('dr-assets/js/login.js') }}" defer></script>
 
   @livewireScripts
   <script>
-    // مطمئن شو toastr لود شده باشه
-    if (typeof toastr !== 'undefined') {
-      // شیء سراسری برای مدیریت توسترها
-      window.toastrState = window.toastrState || {
-        successShown: false,
-        errorShown: false
-      };
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof toastr !== 'undefined') {
+        toastr.options = {
+          timeOut: 10000,
+          progressBar: true,
+          positionClass: 'toast-top-right',
+          preventDuplicates: true,
+        };
+      }
+    });
 
-      // ذخیره توابع اصلی toastr
-      const originalToastrSuccess = toastr.success;
-      const originalToastrError = toastr.error;
-
-      // بازنویسی تابع toastr.success
-      toastr.success = function(message, title, options) {
-        if (!window.toastrState.successShown) {
-          originalToastrSuccess.call(this, message, title, options);
-          window.toastrState.successShown = true;
-        }
-      };
-
-      // بازنویسی تابع toastr.error
-      toastr.error = function(message, title, options) {
-        if (!window.toastrState.errorShown) {
-          originalToastrError.call(this, message, title, options);
-          window.toastrState.errorShown = true;
-        }
-      };
-    }
-
-    // مدیریت otpSent برای ریست تایمر (مثل قبل)
     Livewire.on('otpSent', (data) => {
       localStorage.removeItem('otpTimerData');
     });
