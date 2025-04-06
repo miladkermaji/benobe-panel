@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Dr\Controller;
 use App\Models\DoctorAppointmentConfig;
-use Auth;
-use Illuminate\Http\Request;
 
 class DurationController extends Controller
 {

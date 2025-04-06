@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours;
 
-use App\Http\Controllers\Dr\Controller;
 use App\Models\Clinic;
-use App\Models\DoctorAppointmentConfig;
-use App\Models\DoctorWorkSchedule;
-use Auth;
 use Illuminate\Http\Request;
+use App\Models\DoctorWorkSchedule;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Dr\Controller;
+use App\Models\DoctorAppointmentConfig;
 
 class ActivationWorkhoursController extends Controller
 {
@@ -30,6 +31,17 @@ class ActivationWorkhoursController extends Controller
         ]);
 
         $appointmentDuration = DoctorAppointmentConfig::where('clinic_id', $request->clinic_id)->first()->appointment_duration;
+        Log::info("Appointment Duration for clinic_id {$request->clinic_id}: {$appointmentDuration}");
+
+        $dayTranslations = [
+            'saturday'  => 'شنبه',
+            'sunday'    => 'یکشنبه',
+            'monday'    => 'دوشنبه',
+            'tuesday'   => 'سه‌شنبه',
+            'wednesday' => 'چهارشنبه',
+            'thursday'  => 'پنجشنبه',
+            'friday'    => 'جمعه',
+        ];
 
         foreach ($request->day as $day) {
             $schedule = DoctorWorkSchedule::firstOrNew([
@@ -45,35 +57,47 @@ class ActivationWorkhoursController extends Controller
                 $start = \Carbon\Carbon::createFromFormat('H:i', $hour['start']);
                 $end   = \Carbon\Carbon::createFromFormat('H:i', $hour['end']);
 
-                // بررسی همه شرایط زمانی:
+                foreach ($existingHours as $existing) {
+                    $existingStart = \Carbon\Carbon::createFromFormat('H:i', $existing['start']);
+                    $existingEnd   = \Carbon\Carbon::createFromFormat('H:i', $existing['end']);
+
+                    if ($end->lessThanOrEqualTo($existingStart) || $start->greaterThanOrEqualTo($existingEnd)) {
+                        continue;
+                    } else {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "بازه زمانی {$hour['start']} تا {$hour['end']} با بازه موجود {$existing['start']} تا {$existing['end']} برای روز {$dayTranslations[$day]} تداخل دارد."
+                        ], 422);
+                    }
+                }
+
+                // محاسبه اختلاف زمان
+                $diffInMinutes = $start->diffInMinutes($end); // ترتیب رو عوض کردیم: start -> end
                 if ($end->lessThan($start)) {
-                    // اگر زمان پایان کوچکتر از شروع بود (عبور از نیمه‌شب)
-                    $end = $end->addDay(); // روز بعد برای زمان پایان
+                    // اگر زمان پایان قبل از شروع باشه (عبور از نیمه‌شب)
+                    $endForCalc = $end->copy()->addDay();
+                    $diffInMinutes = $start->diffInMinutes($endForCalc);
                 }
 
-                // محاسبه دقیق اختلاف دقیقه‌ها
-                $diffInMinutes = $end->diffInMinutes($start);
-
-                // اطمینان از مثبت بودن اختلاف (اگر باز هم مشکلی بود)
-                if ($diffInMinutes < 0) {
-                    $diffInMinutes = 1440 - $start->diffInMinutes($end->copy()->subDay());
-                }
+                Log::info("Diff in minutes for {$hour['start']} to {$hour['end']}: {$diffInMinutes}");
 
                 $maxAppointments = intdiv($diffInMinutes, $appointmentDuration);
+                Log::info("Max appointments for {$hour['start']} to {$hour['end']}: {$maxAppointments}");
 
                 $newHours[] = [
                     'start'            => $hour['start'],
                     'end'              => $hour['end'],
-                    'max_appointments' => max($maxAppointments, 0), // اطمینان از عدم منفی بودن
+                    'max_appointments' => $maxAppointments, // مستقیماً مقدار رو ذخیره می‌کنیم
                 ];
             }
 
-            // ترکیب و حذف ساعات تکراری
             $mergedHours = array_merge($existingHours, $newHours);
-            $uniqueHours = collect($mergedHours)->unique()->values()->toArray();
+            $uniqueHours = collect($mergedHours)->unique(function ($item) {
+                return $item['start'] . '-' . $item['end'];
+            })->values()->toArray();
 
             $schedule->is_working = true;
-            $schedule->work_hours = json_encode($uniqueHours, JSON_UNESCAPED_UNICODE); // ذخیره به صورت JSON
+            $schedule->work_hours = json_encode($uniqueHours, JSON_UNESCAPED_UNICODE);
             $schedule->save();
         }
 

@@ -392,70 +392,69 @@
       return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
     }
 
-    document.getElementById('workingHoursForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+   document.getElementById('workingHoursForm').addEventListener('submit', function(e) {
+  e.preventDefault();
 
-      const startTime = formatTime(document.getElementById('startTime').value.trim());
-      const endTime = formatTime(document.getElementById('endTime').value.trim());
+  const startTime = formatTime(document.getElementById('startTime').value.trim());
+  const endTime = formatTime(document.getElementById('endTime').value.trim());
 
-      const selectedDays = Array.from(document.querySelectorAll('.badge-time-styles.active-hours'))
-        .map(badge => badge.getAttribute('data-day'));
+  const selectedDays = Array.from(document.querySelectorAll('.badge-time-styles.active-hours'))
+    .map(badge => badge.getAttribute('data-day'));
 
-      if (!selectedDays || selectedDays.length === 0) {
-        toastr.error('لطفاً حداقل یک روز را انتخاب کنید.');
-        return;
+  if (!selectedDays || selectedDays.length === 0) {
+    toastr.error('لطفاً حداقل یک روز را انتخاب کنید.');
+    return;
+  }
+
+  if (!startTime || !endTime) {
+    toastr.error('لطفاً ساعات کاری را وارد کنید.');
+    return;
+  }
+
+  if (endTime <= startTime) {
+    toastr.error('زمان پایان باید بعد از زمان شروع باشد.');
+    return;
+  }
+
+  const workHours = [{
+    start: startTime,
+    end: endTime
+  }];
+
+  const formData = {
+    doctor_id: "{{ $doctorId }}",
+    clinic_id: "{{ $clinicId }}",
+    day: selectedDays,
+    work_hours: workHours,
+    _token: "{{ csrf_token() }}"
+  };
+
+  $.ajax({
+    url: "{{ route('activation.workhours.store') }}",
+    method: "POST",
+    data: formData,
+    beforeSend: function() {
+      $('#saveButton').html(
+        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> در حال ذخیره...'
+      ).prop('disabled', true);
+    },
+    success: function(response) {
+      toastr.success(response.message);
+      loadWorkHours(selectedDays);
+    },
+    error: function(xhr) {
+      const response = xhr.responseJSON;
+      if (response && response.message) {
+        toastr.error(response.message); // نمایش پیام خطای سرور با toastr
+      } else {
+        toastr.error('مشکلی در ذخیره ساعات کاری رخ داد.');
       }
-
-      if (!startTime || !endTime) {
-        toastr.error('لطفاً ساعات کاری را وارد کنید.');
-        return;
-      }
-
-      if (endTime <= startTime) {
-        toastr.error('زمان پایان باید بعد از زمان شروع باشد.');
-        return;
-      }
-
-      const workHours = [{
-        start: startTime,
-        end: endTime
-      }];
-
-      const formData = {
-        doctor_id: "{{ $doctorId }}",
-        clinic_id: "{{ $clinicId }}",
-        day: selectedDays,
-        work_hours: workHours,
-        _token: "{{ csrf_token() }}"
-      };
-
-      $.ajax({
-        url: "{{ route('activation.workhours.store') }}",
-        method: "POST",
-        data: formData,
-        beforeSend: function() {
-          $('#saveButton').html(
-            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> در حال ذخیره...'
-          ).prop('disabled', true);
-        },
-        success: function(response) {
-
-          toastr.success(response.message);
-
-          loadWorkHours(selectedDays);
-        },
-        error: function(xhr) {
-          const errors = xhr.responseJSON.errors;
-          for (let field in errors) {
-            toastr.success(errors[field].join(", "));
-
-          }
-        },
-        complete: function() {
-          $('#saveButton').html('افزودن').prop('disabled', false);
-        }
-      });
-    });
+    },
+    complete: function() {
+      $('#saveButton').html('افزودن').prop('disabled', false);
+    }
+  });
+});
   </script>
 
 

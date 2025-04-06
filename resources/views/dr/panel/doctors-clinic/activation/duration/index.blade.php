@@ -16,6 +16,14 @@
 </head>
 
 <body dir="rtl">
+  <!-- لودینگ کلی سایت -->
+  <div id="global-loader">
+    <div class="loader-backdrop"></div> <!-- بک‌دراپ -->
+    <div class="loader-content">
+      <div class="spinner"></div> <!-- انیمیشن لودینگ -->
+      <p>لطفا منتظر بمانید...</p>
+    </div>
+  </div>
   <header class="bg-light text-dark p-3 my-shodow w-100 d-flex align-items-center">
     <div class="back w-50">
       <a href="{{ route('doctors.clinic.cost', $clinicId) }}" class="btn btn-light">
@@ -159,82 +167,230 @@
       </div>
     </div>
   </div>
-
+  <!-- مودال برای افزودن زمان جدید -->
+  <div class="modal fade" id="addDurationModal" tabindex="-1" aria-labelledby="addDurationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addDurationModalLabel">انتخاب مدت زمان نوبت</h5>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body d-flex justify-content-center align-items-center">
+          <button type="button" class="btn btn-outline-secondary mx-2" id="decreaseDuration">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="feather feather-minus">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+          <span id="durationValue" class="mx-3 font-weight-bold">15</span>
+          <button type="button" class="btn btn-outline-secondary mx-2" id="increaseDuration">
+            <svg class="feather feather-plus" xmlns="http://www.w3.org/2000/svg" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              viewBox="0 0 24 24" height="20px" width="20px" role="img" type="button"
+              aria-haspopup="dialog" aria-expanded="false" aria-controls="radix-:r7:" data-state="closed">
+              <path d="M5 12h14m-7-7v14"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary w-100" id="addDurationButton">افزودن</button>
+        </div>
+      </div>
+    </div>
+  </div>
   @include('dr.panel.layouts.partials.scripts')
   <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
   <script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const badgeElements = document.querySelectorAll('.badge-time-styles');
-      const appointmentInput = document.getElementById('appointment_duration');
-      const saveButton = document.getElementById('saveButton');
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const appointmentInput = document.getElementById("appointment_duration");
+    const saveButton = document.getElementById("saveButton");
+    const plusButton = document.querySelector(".badge-time-styles-plus");
+    const durationContainer = document.querySelector(".my-768px-styles-day-and-times");
 
-      //  انتخاب و حذف انتخاب زمان
-      badgeElements.forEach(element => {
-        element.addEventListener('click', function() {
-          const selectedDuration = this.textContent.trim().replace(' دقیقه', '');
+    // متغیر برای ذخیره مقدار زمان در مودال
+    let durationValue = 15; // مقدار اولیه
 
-          // بررسی اینکه این گزینه قبلاً انتخاب شده یا نه
-          if (appointmentInput.value === selectedDuration) {
-            appointmentInput.value = ""; // حذف انتخاب
-            this.classList.remove('selected'); // استایل غیرفعال کردن
-          } else {
-            appointmentInput.value = selectedDuration;
+    // تابع برای تبدیل دقیقه به ساعت و دقیقه
+    const formatDuration = (minutes) => {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      if (hours > 0 && remainingMinutes > 0) {
+        return `${hours} ساعت و ${remainingMinutes} دقیقه`;
+      } else if (hours > 0) {
+        return `${hours} ساعت`;
+      }
+      return `${minutes} دقیقه`;
+    };
 
-            // حذف کلاس انتخاب از بقیه گزینه‌ها
-            badgeElements.forEach(el => el.classList.remove('selected'));
-            this.classList.add('selected');
+    // تابع برای استخراج مقدار عددی از متن (برای مقایسه)
+    const parseDuration = (text) => {
+      return parseInt(text.replace(/[^0-9]/g, ""), 10);
+    };
+
+    // تابع برای ساخت SVG
+    const createCheckmarkSVG = () => {
+      const svgWrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svgWrapper.setAttribute("width", "16");
+      svgWrapper.setAttribute("height", "16");
+      svgWrapper.setAttribute("viewBox", "0 0 16 16");
+      svgWrapper.setAttribute("fill", "#7c82fc");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("fill-rule", "evenodd");
+      path.setAttribute("clip-rule", "evenodd");
+      path.setAttribute(
+        "d",
+        "M13.8405 3.44714C14.1458 3.72703 14.1664 4.20146 13.8865 4.5068L6.55319 12.5068C6.41496 12.6576 6.22113 12.7454 6.01662 12.7498C5.8121 12.7543 5.61464 12.675 5.47 12.5303L2.13666 9.197C1.84377 8.90411 1.84377 8.42923 2.13666 8.13634C2.42956 7.84345 2.90443 7.84345 3.19732 8.13634L5.97677 10.9158L12.7808 3.49321C13.0607 3.18787 13.5351 3.16724 13.8405 3.44714Z"
+      );
+      svgWrapper.appendChild(path);
+      return svgWrapper;
+    };
+
+    // تابع برای مدیریت انتخاب زمان
+    const handleBadgeClick = (badge) => {
+      const selectedDurationText = badge.textContent.trim();
+      const selectedDuration = parseDuration(selectedDurationText); // مقدار عددی (دقیقه)
+
+      // بررسی اینکه این گزینه قبلاً انتخاب شده یا نه
+      if (parseInt(appointmentInput.value) === selectedDuration) {
+        appointmentInput.value = ""; // حذف انتخاب
+        badge.classList.remove("selected"); // استایل غیرفعال کردن
+        badge.classList.remove("active-hours"); // حذف کلاس active-hours
+        const existingSVG = badge.querySelector("svg"); // بررسی وجود SVG
+        if (existingSVG) {
+          existingSVG.remove(); // حذف SVG
+        }
+      } else {
+        appointmentInput.value = selectedDuration; // ذخیره مقدار به‌صورت دقیقه
+
+        // حذف کلاس انتخاب و SVG از بقیه گزینه‌ها
+        document.querySelectorAll(".badge-time-styles").forEach((el) => {
+          el.classList.remove("selected");
+          el.classList.remove("active-hours");
+          const existingSVG = el.querySelector("svg");
+          if (existingSVG) {
+            existingSVG.remove();
           }
         });
-      });
 
-      //  ثبت فرم و بررسی خطا در انتخاب نوبت
-      document.getElementById('workingHoursForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+        // اضافه کردن کلاس و SVG به گزینه انتخاب‌شده
+        badge.classList.add("selected");
+        badge.classList.add("active-hours");
+        badge.appendChild(createCheckmarkSVG());
+      }
+    };
 
-        if (!appointmentInput.value) {
-          toastr.error("لطفاً یک مدت زمان برای نوبت انتخاب کنید.");
-          return;
-        }
-
-        const form = e.target;
-        const formData = new FormData(form);
-
-        saveButton.disabled = true;
-        saveButton.innerHTML = `
-      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-      در حال ثبت...
-    `;
-
-        try {
-          const response = await fetch("{{ route('duration.store') }}", {
-            method: "POST",
-            headers: {
-              "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
-            },
-            body: formData,
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            toastr.success(data.message);
-            location.href = "{{ route('activation.workhours.index', $clinicId) }}";
-          } else {
-            toastr.error(data.message || "مشکلی در ذخیره اطلاعات رخ داد.");
-          }
-        } catch (error) {
-          toastr.error("خطا در ارتباط با سرور.");
-        } finally {
-          saveButton.disabled = false;
-          saveButton.innerHTML = "ثبت ساعت کاری";
-        }
-      });
+    // استفاده از Event Delegation برای مدیریت کلیک روی زمان‌ها
+    durationContainer.addEventListener("click", function (e) {
+      const badge = e.target.closest(".badge-time-styles");
+      if (badge) {
+        handleBadgeClick(badge);
+      }
     });
-  </script>
+
+    // نمایش مودال هنگام کلیک روی دکمه پلاس
+    plusButton.addEventListener("click", function () {
+      // باز کردن مودال با استفاده از jQuery
+      $("#addDurationModal").modal("show");
+
+      // ریست کردن مقدار زمان به مقدار اولیه (اختیاری)
+      durationValue = 15;
+      document.getElementById("durationValue").textContent = formatDuration(durationValue);
+    });
+
+    // افزایش و کاهش زمان در مودال
+    document.getElementById("increaseDuration").addEventListener("click", function () {
+      durationValue += 5; // افزایش با گام 5 دقیقه
+      if (durationValue > 120) durationValue = 120; // حداکثر 120 دقیقه
+      document.getElementById("durationValue").textContent = formatDuration(durationValue);
+    });
+
+    document.getElementById("decreaseDuration").addEventListener("click", function () {
+      durationValue -= 5; // کاهش با گام 5 دقیقه
+      if (durationValue < 5) durationValue = 5; // حداقل 5 دقیقه
+      document.getElementById("durationValue").textContent = formatDuration(durationValue);
+    });
+
+    // افزودن زمان جدید به لیست هنگام کلیک روی دکمه افزودن
+    document.getElementById("addDurationButton").addEventListener("click", function () {
+      const newDuration = durationValue;
+
+      // بررسی اینکه آیا این زمان قبلاً وجود دارد یا نه
+      const existingBadges = Array.from(document.querySelectorAll(".badge-time-styles")).map((badge) =>
+        parseDuration(badge.textContent.trim())
+      );
+      if (existingBadges.includes(newDuration)) {
+        toastr.warning("این مدت زمان قبلاً وجود دارد.");
+        return;
+      }
+
+      // ایجاد یک badge جدید
+      const newBadgeDiv = document.createElement("div");
+      newBadgeDiv.setAttribute("tabindex", "0");
+      newBadgeDiv.setAttribute("role", "button");
+      newBadgeDiv.innerHTML = `
+        <span class="badge-time-styles">${formatDuration(newDuration)}</span>
+        <span></span>
+      `;
+
+      // اضافه کردن badge جدید به لیست
+      durationContainer.appendChild(newBadgeDiv);
+
+      // بستن مودال با jQuery
+      $("#addDurationModal").modal("hide");
+
+      // نمایش پیام موفقیت
+      toastr.success("مدت زمان جدید با موفقیت اضافه شد.");
+    });
+
+    // ثبت فرم و بررسی خطا در انتخاب نوبت
+    document.getElementById("workingHoursForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!appointmentInput.value) {
+        toastr.error("لطفاً یک مدت زمان برای نوبت انتخاب کنید.");
+        return;
+      }
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      saveButton.disabled = true;
+      saveButton.innerHTML = `
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        در حال ثبت...
+      `;
+
+      try {
+        const response = await fetch("{{ route('duration.store') }}", {
+          method: "POST",
+          headers: {
+            "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value,
+          },
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          toastr.success(data.message);
+          location.href = "{{ route('activation.workhours.index', $clinicId) }}";
+        } else {
+          toastr.error(data.message || "مشکلی در ذخیره اطلاعات رخ داد.");
+        }
+      } catch (error) {
+        toastr.error("خطا در ارتباط با سرور.");
+      } finally {
+        saveButton.disabled = false;
+        saveButton.innerHTML = "ثبت ساعت کاری";
+      }
+    });
+  });
+</script>
 
 
 </body>
 
 </html>
-c
