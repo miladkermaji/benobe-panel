@@ -4,6 +4,7 @@ namespace {{namespace}};
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use App\Models\{{model}};
 use Livewire\WithFileUploads;
 
