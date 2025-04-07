@@ -69,14 +69,6 @@
             <li class="btn border w-100 bg-light-blue border-radius-4"><span>کل نوبت ها</span></li>
             <li class="btn border w-100 border-radius-4"><span>نوبت های مطب</span></li>
             <li class="btn border w-100 border-radius-4"><span>نوبت های آنلاین</span></li>
-
-            @foreach ($clinics as $clinic)
-              <li class="btn border w-100 btn-primary border-radius-4"
-                onclick="window.location.href='{{ route('activation-doctor-clinic', $clinic->id) }}'">
-                <span>+</span>
-                <span>فعالسازی نوبت‌دهی مطب {{ $clinic->name }}</span>
-              </li>
-            @endforeach
           </ul>
         </div>
 
@@ -197,7 +189,6 @@
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl =
