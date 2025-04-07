@@ -166,6 +166,6 @@
 
   });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/jalali-moment/dist/jalali-moment.browser.js"></script>
+<script src="{{ asset('dr-assets/panel/js/jalali-moment/dist/jalali-moment.browser.js') }}"></script>
 @include('dr.panel.my-tools.mySpecialDay')
 @endsection
