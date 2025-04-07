@@ -645,6 +645,7 @@
 <script src="{{ asset('dr-assets/panel/js/profile/edit-profile.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
+
   // تابع کمکی برای مقداردهی اولیه Tom Select
   function initializeTomSelect(elementId, options = {}) {
     const selectElement = document.getElementById(elementId);
@@ -661,7 +662,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    // مقداردهی اولیه Tom Select برای استان و شهر و ذخیره نمونه‌ها
+    // مقداردهی اولیه Tom Select برای استان و شهر
     const provinceTomSelect = initializeTomSelect('province_id', {
       placeholder: 'انتخاب استان'
     });
@@ -669,13 +670,14 @@
       placeholder: 'انتخاب شهر'
     });
 
-    // بررسی وجود نمونه‌ها
     if (!provinceTomSelect || !cityTomSelect) {
       console.error('خطا در مقداردهی Tom Select برای استان یا شهر');
       return;
     }
 
     const provinceSelect = document.getElementById('province_id');
+    const doctorProvinceId = '{{ Auth::guard('doctor')->user()->province_id }}';
+    const doctorCityId = '{{ Auth::guard('doctor')->user()->city_id }}';
 
     // مدیریت تغییر در انتخاب استان
     provinceSelect.addEventListener('change', function() {
@@ -706,6 +708,11 @@
               });
               cityTomSelect.enable();
               cityTomSelect.refreshOptions();
+
+              // اگر تغییر دستی بود، شهر رو خالی کن
+              if (provinceId !== doctorProvinceId) {
+                cityTomSelect.setValue('');
+              }
             } else {
               toastr.error(data.message || 'خطا در بارگذاری شهرها');
               cityTomSelect.clear();
@@ -738,12 +745,44 @@
       }
     });
 
-    // لود اولیه شهرها اگر استان از قبل انتخاب شده باشد
-    if (provinceSelect.value) {
-      provinceSelect.dispatchEvent(new Event('change'));
+    // لود اولیه شهرها بر اساس استان دکتر
+    if (doctorProvinceId) {
+      fetch(`{{ route('dr-get-cities') }}?province_id=${doctorProvinceId}`, {
+          method: 'GET',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            cityTomSelect.clear();
+            cityTomSelect.clearOptions();
+            cityTomSelect.addOption({
+              value: '',
+              text: 'انتخاب شهر'
+            });
+            data.cities.forEach(city => {
+              cityTomSelect.addOption({
+                value: city.id,
+                text: city.name
+              });
+            });
+            cityTomSelect.enable();
+            cityTomSelect.refreshOptions();
+
+            // تنظیم شهر پیش‌فرض بر اساس دیتابیس
+            if (doctorCityId) {
+              cityTomSelect.setValue(doctorCityId);
+            }
+          }
+        })
+        .catch(error => {
+          console.error('خطا در لود اولیه شهرها:', error);
+        });
     }
   });
 </script>
 @include('dr.panel.profile.option.profile-option')
-
 @endsection
