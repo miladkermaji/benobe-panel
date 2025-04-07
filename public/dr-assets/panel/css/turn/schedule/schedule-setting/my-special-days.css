@@ -391,7 +391,6 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   display: flex;
   gap: 1rem;
-  flex-wrap: wrap; /* ریسپانسیو */
   justify-content: space-between;
   margin-bottom: 1rem;
 }
