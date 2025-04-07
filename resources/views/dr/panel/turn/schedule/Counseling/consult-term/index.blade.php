@@ -13,7 +13,7 @@
 @section('content')
 @section('bread-crumb-title', 'قوانین و مقررات')
 
-<div class="consult-term-content mt-2 w-100 d-flex justify-content-center">
+<div class="consult-term-content  w-100 d-flex justify-content-center">
   <div class="consult-term-content-wrapper">
     <div class="top-logo w-100 d-flex justify-content-center">
       <img src="{{ asset('app-assets/logos/benobe.svg') }}" alt="benobe-logo">
