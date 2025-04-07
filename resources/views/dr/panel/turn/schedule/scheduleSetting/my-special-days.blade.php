@@ -87,7 +87,6 @@
         </button>
       </div>
       <div class="modal-body">
-        <p class="font-weight-bold">لطفا یک روز جدید را انتخاب کنید:</p>
         <div class="calendar-header w-100 d-flex justify-content-between align-items-center gap-4">
           <div class="">
             <button id="prev-month-reschedule" class="btn btn-light">
@@ -140,6 +139,27 @@
         </div>
         <div id="calendar-reschedule" class="calendar-body"></div>
       </div>
+    </div>
+  </div>
+  
+</div>
+<div class="calendar-legend mt-4">
+  <div class="d-flex flex-wrap justify-content-center gap-3">
+    <div class="legend-item d-flex align-items-center">
+      <div class="legend-color bg-primary"></div>
+      <span class="legend-text">امروز</span>
+    </div>
+    <div class="legend-item d-flex align-items-center">
+      <div class="legend-color bg-success"></div>
+      <span class="legend-text">روز با نوبت</span>
+    </div>
+    <div class="legend-item d-flex align-items-center">
+      <div class="legend-color bg-danger"></div>
+      <span class="legend-text">روز تعطیل</span>
+    </div>
+    <div class="legend-item d-flex align-items-center">
+      <div class="legend-color holiday-dot"></div>
+      <span class="legend-text">نشانگر تعطیلی</span>
     </div>
   </div>
 </div>

@@ -377,18 +377,21 @@
 
       },
       success: function(response) {
-        if (response.status) {
-          $('.calendar-day').each(function() {
-            const persianDate = $(this).data('date');
-            const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
-            const appointment = response.data.find(a => a.appointment_date === gregorianDate);
-            $(this).find('.my-badge-success').remove();
-            if (appointment) {
-              $(this).append(`<span class="my-badge-success">${appointment.appointment_count}</span>`);
-            }
-          });
-        }
+      if (response.status) {
+        $('.calendar-day').each(function() {
+          const persianDate = $(this).data('date');
+          const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
+          const appointment = response.data.find(a => a.appointment_date === gregorianDate);
+          // حذف کلاس قبلی و بج
+          $(this).removeClass('has-appointment');
+          $(this).find('.my-badge-success').remove();
+          // اضافه کردن کلاس برای روزهایی که نوبت دارند
+          if (appointment) {
+            $(this).addClass('has-appointment');
+          }
+        });
       }
+    }
     });
   }
 
@@ -433,10 +436,12 @@
             const persianDate = $(this).data('date');
             const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
             const appointment = response.data.find(a => a.appointment_date === gregorianDate);
-            // حذف استایل قبلی
+            // حذف کلاس قبلی و بج
+            $(this).removeClass('has-appointment');
             $(this).find('.my-badge-success').remove();
+            // اضافه کردن کلاس برای روزهایی که نوبت دارند
             if (appointment) {
-              $(this).append(`<span class="my-badge-success">${appointment.appointment_count}</span>`);
+              $(this).addClass('has-appointment');
             }
           });
         }

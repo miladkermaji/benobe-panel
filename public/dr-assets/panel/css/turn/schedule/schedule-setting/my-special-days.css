@@ -26,11 +26,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 18px; /* کمی کوچکتر و منظم‌تر */
-  background: #fff;
+  padding: 4px;
   border-radius: 12px 12px 0 0;
   border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.02);
 }
 
 .calendar-body {
@@ -289,3 +287,576 @@ body {
     background-size: 10px;
   }
 }
+
+
+
+
+/* new styles */
+/* Modal body styling */
+.modal-body {
+  padding: 2rem; /* پدینگ بیشتر برای فضای باز */
+  background: #ffffff; /* پس‌زمینه سفید خالص */
+  border-radius: 0 0 14px 14px; /* هماهنگی با گوشه‌های مودال */
+  direction: rtl; /* راست‌چین برای زبان پارسی */
+}
+
+/* متن‌های داخل مودال */
+.modal-body p,
+.modal-body .alert {
+  font-size: 1rem; /* اندازه فونت مناسب */
+  font-weight: 500; /* کمی سنگین‌تر برای خوانایی */
+  color: #1e3a8a; /* رنگ آبی تیره شیک */
+  margin-bottom: 1.5rem; /* فاصله زیر متن */
+  padding: 1rem; /* پدینگ داخلی برای زیبایی */
+  background: #f8fafc; /* پس‌زمینه روشن و ملایم */
+  border-radius: 10px; /* گوشه‌های گرد */
+  border: 1px solid #e0e7ff; /* حاشیه ظریف */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* سایه نرم */
+  transition: all 0.3s ease;
+}
+
+.modal-body .alert:hover {
+  background: #eef2ff; /* تغییر رنگ در هاور */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+/* دکمه‌ها در مودال */
+.modal-body .btn {
+  padding: 0.875rem 1.5rem; /* پدینگ متعادل */
+  font-size: 1rem; /* فونت خوانا */
+  font-weight: 600; /* وزن فونت برای جلوه حرفه‌ای */
+  border-radius: 10px; /* گوشه‌های گردتر */
+  transition: all 0.3s ease;
+  width: 100%; /* عرض کامل */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* سایه ظریف */
+}
+
+.modal-body .btn-primary {
+  background: #3b82f6; /* آبی جذاب */
+  border: none;
+  color: #ffffff;
+}
+
+.modal-body .btn-primary:hover {
+  background: #2563eb; /* تیره‌تر در هاور */
+  transform: translateY(-2px); /* افکت بالا آمدن */
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+}
+
+.modal-body .btn-danger {
+  background: #ef4444; /* قرمز شیک */
+  border: none;
+  color: #ffffff;
+}
+
+.modal-body .btn-danger:hover {
+  background: #dc2626; /* تیره‌تر در هاور */
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+}
+
+.modal-body .btn-secondary {
+  background: #6b7280; /* خاکستری مدرن */
+  border: none;
+  color: #ffffff;
+}
+
+.modal-body .btn-secondary:hover {
+  background: #4b5563; /* تیره‌تر در هاور */
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(107, 114, 128, 0.3);
+}
+
+/* چیدمان دکمه‌ها */
+.modal-body .d-flex {
+  display: flex;
+  gap: 1rem; /* فاصله بین دکمه‌ها */
+  justify-content: space-between;
+}
+
+/* استایل ساعات کاری */
+.modal-body #workHoursContainer h6 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+  text-align: right;
+}
+
+.modal-body .work-hour-slot {
+  background: #f9fafb; /* پس‌زمینه روشن */
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e0e7ff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap; /* ریسپانسیو */
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.modal-body .work-hour-slot label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e40af;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.modal-body .work-hour-slot input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #dbeafe;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #1f2937;
+  background: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.modal-body .work-hour-slot input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+  outline: none;
+}
+
+/* پیام خطا یا اطلاع‌رسانی */
+.modal-body .text-danger {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #dc2626;
+  text-align: center;
+  padding: 1rem;
+  background: #fef2f2;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .modal-body .btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .modal-body .work-hour-slot {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .modal-body .work-hour-slot input {
+    padding: 0.65rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-body p,
+  .modal-body .alert {
+    font-size: 0.9rem;
+    padding: 0.75rem;
+  }
+
+  .modal-body .btn {
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .modal-body #workHoursContainer h6 {
+    font-size: 1rem;
+  }
+
+  .modal-body .work-hour-slot label {
+    font-size: 0.85rem;
+  }
+
+  .modal-body .work-hour-slot input {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+  }
+}
+/* استایل کلی مودال جابجایی */
+#rescheduleModal .modal-content {
+  border-radius: 16px; /* گوشه‌های گردتر */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); /* سایه عمیق‌تر */
+  background: #ffffff;
+}
+
+#rescheduleModal .modal-header {
+  background: linear-gradient(145deg, #f9fafb, #e0e7ff); /* گرادیان ملایم */
+  border-bottom: 2px solid #dbeafe;
+  padding: 1.25rem 1.75rem;
+  border-radius: 16px 16px 0 0;
+}
+
+#rescheduleModal .modal-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+/* استایل بدنه مودال */
+#rescheduleModal .modal-body {
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 0 0 16px 16px;
+  direction: rtl;
+}
+
+/* متن داخل مودال */
+#rescheduleModal .modal-body p {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e0e7ff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+#rescheduleModal .modal-body p:hover {
+  background: #eef2ff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+/* هدر تقویم داخل مودال */
+#rescheduleModal .calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  gap: 1rem;
+}
+
+/* دکمه‌های قبلی و بعدی */
+#rescheduleModal .btn.btn-light {
+  border-radius: 50%;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  border: 2px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+#rescheduleModal .btn.btn-light:hover {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  transform: rotate(10deg);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+#rescheduleModal .btn.btn-light svg {
+  width: 20px;
+  height: 20px;
+}
+
+#rescheduleModal .btn.btn-light svg path {
+  stroke: #1e40af;
+  transition: all 0.3s ease;
+}
+
+#rescheduleModal .btn.btn-light:hover svg path {
+  stroke: #ffffff;
+}
+
+/* سلکت‌باکس‌ها */
+#rescheduleModal .form-select {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem; /* فضای کافی برای آیکون */
+  border-radius: 10px;
+  border: 2px solid #bfdbfe;
+  background: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e40af;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  appearance: none; /* حذف استایل پیش‌فرض مرورگر */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#1e40af"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>');
+  background-repeat: no-repeat;
+  background-position: left 0.75rem center;
+  background-size: 16px;
+}
+
+#rescheduleModal .form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+  outline: none;
+}
+
+#rescheduleModal .form-select:hover {
+  background-color: #f9fafb;
+  border-color: #3b82f6;
+}
+
+/* دکمه "برو به اولین نوبت خالی" */
+#rescheduleModal #goToFirstAvailable {
+  background: #10b981; /* سبز جذاب */
+  border: none;
+  padding: 0.875rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+}
+
+#rescheduleModal #goToFirstAvailable:hover {
+  background: #059669; /* تیره‌تر در هاور */
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+/* تقویم داخل مودال */
+#rescheduleModal .calendar-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+#rescheduleModal .calendar-day-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: center;
+  color: #1e293b;
+  padding: 0.75rem 0;
+  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+}
+
+#rescheduleModal .calendar-day-name:hover {
+  background: #dbeafe;
+  transform: scale(1.03);
+  color: #2b6cb0;
+}
+
+#rescheduleModal .calendar-day {
+  text-align: center;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  aspect-ratio: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2d3748;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+#rescheduleModal .calendar-day:hover {
+  background-color: #dbeafe;
+  border-color: #4299e1;
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+#rescheduleModal .calendar-day.active {
+  background-color: #2b6cb0;
+  color: #fff;
+  border-color: #2c5282;
+  animation: pulse 0.5s ease;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+  #rescheduleModal .modal-body {
+    padding: 1.5rem;
+  }
+
+  #rescheduleModal .calendar-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  #rescheduleModal .form-select {
+    padding: 0.65rem 2rem 0.65rem 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  #rescheduleModal #goToFirstAvailable {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  #rescheduleModal .calendar-day {
+    font-size: 0.9rem;
+    aspect-ratio: 1.2;
+  }
+
+  #rescheduleModal .calendar-day-name {
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+  }
+}
+
+@media (max-width: 425px) {
+  #rescheduleModal .modal-body {
+    padding: 1rem;
+  }
+
+
+  #rescheduleModal .form-select {
+    font-size: 0.9rem;
+    padding: 0.5rem 1.5rem 0.5rem 0.5rem;
+    background-size: 14px;
+  }
+
+  #rescheduleModal #goToFirstAvailable {
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  #rescheduleModal .calendar-day {
+    font-size: 0.85rem;
+    aspect-ratio: 1.1;
+  }
+
+  #rescheduleModal .calendar-day-name {
+    font-size: 0.85rem;
+    padding: 0.4rem 0;
+  }
+}
+/* استایل برای روزهایی که نوبت دارند */
+.calendar-day.has-appointment {
+  background-color: #d1fae5; /* سبز خیلی کم‌رنگ */
+  border-color: #6ee7b7; /* حاشیه سبز ملایم */
+  transition: all 0.3s ease;
+}
+
+/* اطمینان از اینکه استایل active یا holiday اولویت داره */
+.calendar-day.active {
+  background-color: #2b6cb0 !important;
+  color: #fff !important;
+  border-color: #2c5282 !important;
+}
+
+.calendar-day.holiday {
+  background-color: #f1f5f9 !important; /* رنگ تعطیلات */
+  border-color: #e2e8f0 !important;
+}
+
+/* استایل برای تقویم مودال جابجایی */
+#calendar-reschedule .calendar-day.has-appointment {
+  background-color: #d1fae5;
+  border-color: #6ee7b7;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+  .calendar-day.has-appointment {
+    background-color: #d1fae5;
+    border-color: #6ee7b7;
+  }
+
+  #calendar-reschedule .calendar-day.has-appointment {
+    background-color: #d1fae5;
+    border-color: #6ee7b7;
+  }
+}
+
+@media (max-width: 425px) {
+  .calendar-day.has-appointment {
+    background-color: #d1fae5;
+    border-color: #6ee7b7;
+  }
+
+  #calendar-reschedule .calendar-day.has-appointment {
+    background-color: #d1fae5;
+    border-color: #6ee7b7;
+  }
+}
+/* استایل راهنمای تقویم */
+.calendar-legend {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.legend-item {
+  margin: 0 0.5rem;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  display: inline-block;
+}
+
+.legend-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.holiday-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  position: relative;
+  margin-left: 0.75rem;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+  .calendar-legend {
+    padding: 0.75rem;
+  }
+  
+  .legend-text {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .calendar-legend {
+    padding: 0.5rem;
+  }
+  
+  .legend-color {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .legend-text {
+    font-size: 0.8rem;
+  }
+  
+  .holiday-dot {
+    width: 6px;
+    height: 6px;
+  }
+}
+/* new styles */
