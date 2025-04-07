@@ -12,6 +12,9 @@
  z-index: 2;
  left: inherit;
 }
+.myPanelOption{
+  display: none;
+}
 .font-medium {
  font-size: 15px !important;
 }

@@ -4,7 +4,9 @@ body {
   font-family: 'Vazir', sans-serif;
   overflow-x: hidden;
 }
-
+.myPanelOption{
+  display: none;
+}
 /* استایل کلی صفحه */
 .consult-term-content {
   max-width: 1100px; /* عرض بهینه‌تر */
