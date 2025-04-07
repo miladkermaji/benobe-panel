@@ -178,7 +178,7 @@
           <button
             class="flex items-center justify-center bg-transparent border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors bg-light w-12 h-8 focus:outline-none dropdown-toggle"
             type="button" id="dropdownMenuButton" aria-haspopup="true" aria-expanded="true"
-            onclick="toggleDropdown()">
+            >
             <!-- چک‌باکس -->
             <input class="w-4 h-4 text-blue-600 border-none focus:ring-0 bg-transparent cursor-pointer"
               type="checkbox" value="" id="select-all">

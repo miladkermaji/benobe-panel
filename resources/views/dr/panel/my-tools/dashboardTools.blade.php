@@ -163,9 +163,9 @@
         <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
         <td>${appointment.appointment_time}</td>
         <td>
-            <button class="btn btn-outline-info btn-end-visit ${
+            <button class="btn btn-outline-info btn-end-visit" data-appointment-id="${appointment.id}" ${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
-            }" data-appointment-id="${appointment.id}">
+            }>
                 پایان ویزیت
             </button>
         </td>
@@ -264,9 +264,9 @@
         <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
         <td>${appointment.appointment_time}</td>
         <td>
-            <button class="btn btn-outline-info btn-end-visit ${
+            <button class="btn btn-outline-info btn-end-visit" data-appointment-id="${appointment.id}" ${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
-            }" data-appointment-id="${appointment.id}">
+            }>
                 پایان ویزیت
             </button>
         </td>
@@ -681,7 +681,7 @@
   }
 
   // تابع تولید تقویم
-function generateCalendar(year, month) {
+  function generateCalendar(year, month) {
     const calendarBody = $('#calendar-body');
     calendarBody.empty(); // پاک کردن تقویم قبلی
 
@@ -763,14 +763,58 @@ function generateCalendar(year, month) {
       $('body').removeClass('modal-open');
     });
   }
-$('.selectDate_datepicker__xkZeS').on('click', function() {
+  $('.selectDate_datepicker__xkZeS').on('click', function() {
 
     $('#calendarModal').modal({
-        backdrop: true, // فعال کردن بک‌دراپ (پیش‌فرض true است)
-        keyboard: true // امکان بستن با کلید ESC
+      backdrop: true, // فعال کردن بک‌دراپ (پیش‌فرض true است)
+      keyboard: true // امکان بستن با کلید ESC
     });
-});
- 
+  });
+
+  function animateAndLoadCalendar(direction) {
+    const animation = {
+      left: direction === 'next' ? '-100%' : '100%',
+      opacity: 0
+    };
+    calendar.animate(animation, 300, function() {
+      if (direction === 'next') {
+        currentDate = moment(currentDate).add(days, 'days').format('YYYY-MM-DD');
+      } else {
+        currentDate = moment(currentDate).subtract(days, 'days').format('YYYY-MM-DD');
+      }
+      loadCalendar(currentDate);
+      calendar.css({
+        left: direction === 'next' ? '100%' : '-100%',
+        opacity: 0
+      });
+      calendar.animate({
+        left: '0%',
+        opacity: 1
+      }, 300);
+    });
+  }
+   $(document).ready(function() {
+    let currentDate = moment().format('YYYY-MM-DD');
+    const days = 14;
+    const calendar = $('#calendar');
+    const appointmentsTableBody = $('.table tbody'); // بخش <tbody> جدول
+    $('#next').click(() => animateAndLoadCalendar('next'));
+    $('#prev').click(() => animateAndLoadCalendar('prev'));
+    loadCalendar(currentDate); // بارگذاری اولیه تقویم
+  });
+  $(document).ready(function() {
+
+    $('#next').click(function() {
+      animateAndLoadCalendar('next');
+    });
+    $('#prev').click(function() {
+      animateAndLoadCalendar('prev');
+    });
+
+
+
+    loadCalendar(currentDate); // بارگذاری اولیه تقویم
+  });
 
   function populateRescheduleSelectBoxes() {
     const yearSelect = $('#year-reschedule');
