@@ -9,6 +9,9 @@
     rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/turn/schedule/manual_nobat/manual_nobat.css') }}"
     rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/turn/schedule/manual_nobat/manual_nobat_setting.css') }}"
+    rel="stylesheet" />
+
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -22,7 +25,7 @@
       <div class="row no-gutters font-size-13 margin-bottom-10">
         <div class="user-panel-content w-100">
           <div class="p-3 w-100 d-flex justify-content-center">
-            <div class="card clrfix" style="width: 850px;height: 100%;">
+            <div class="" style="width: 850px;height: 100%;">
               <div class="card-header"> تنظیمات تایید دو مرحله ای نوبت‌های دستی</div>
               <div class="card-body">
                 <div class="alert alert-info">

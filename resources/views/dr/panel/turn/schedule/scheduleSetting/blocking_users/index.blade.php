@@ -148,7 +148,6 @@
                 placeholder="1403/01/10" data-jdp>
             </div>
             <div class="form-group position-relative">
-              <label class="label-top-input-special-takhasos" for="reason">دلیل مسدودیت</label>
               <textarea id="reason" name="reason" class="form-control h-50 mb-3" placeholder="دلیل مسدودیت را وارد کنید"></textarea>
             </div>
             <div class="mt-2 w-100">
@@ -277,9 +276,13 @@
       },
       error: function(xhr) {
         const response = xhr.responseJSON;
+       
+          toastr.error(response.error);
+        
         if (xhr.status === 422 && response.errors) {
           for (const field in response.errors) {
             toastr.error(response.errors[field][0]);
+
           }
         } else if (response && response.message) {
           toastr.error(response.message);
