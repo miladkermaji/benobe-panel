@@ -1,108 +1,151 @@
-<div id="global-loader" class="global-loader">
-    <div class="loader-backdrop"></div>
-    <div class="loader-content">
-        <div class="spinner">
-            <svg class="spinner-svg" viewBox="0 0 50 50">
-                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
-            </svg>
-        </div>
-        <p class="loader-text">لطفاً صبر کنید...</p>
+    <!-- لودینگ کلی سایت -->
+    <div id="global-loader">
+      <div class="loader-backdrop"></div> <!-- بک‌دراپ -->
+      <div class="loader-content text-center">
+        <div class="spinner"></div> <!-- انیمیشن لودینگ -->
+        <p>منتظر بمانید ....</p>
+      </div>
     </div>
-</div>
 
-@push('styles')
-    <style>
-        .global-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
+    @push('styles')
+      <style>
+        /* Backdrop with a modern semi-transparent look */
         .loader-backdrop {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 25, 47, 0.8); /* رنگ تیره و شیک */
-            z-index: 1;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(20, 30, 40, 0.7);
+          /* Darker, modern tone */
+          z-index: 9998;
+          backdrop-filter: blur(2px);
+          /* Subtle blur for sleekness */
         }
 
+        /* Smaller, centered, and modern loader content */
         .loader-content {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            padding: 25px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: #1a1a1a;
+          /* Dark background for a modern feel */
+          padding: 20px;
+          /* Reduced padding */
+          border-radius: 12px;
+          text-align: center;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+          /* Softer shadow */
+          z-index: 9999;
+          width: 150px;
+          /* Smaller width */
+          animation: slideIn 0.4s ease-out;
+          /* Quick, modern entrance */
         }
 
-        .spinner-svg {
-            width: 50px;
-            height: 50px;
-            animation: rotate 1.5s linear infinite;
+        /* Smaller, futuristic spinner */
+        .spinner {
+          width: 40px;
+          /* Reduced size */
+          height: 40px;
+          border: 4px solid rgba(255, 255, 255, 0.1);
+          /* Faint base */
+          border-top: 4px solid #00ddeb;
+          /* Neon cyan */
+          border-left: 4px solid #ff007a;
+          /* Neon pink */
+          border-radius: 50%;
+          animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+          /* Bouncy spin */
+          margin: 0 auto 10px;
+          /* Less margin */
+          position: relative;
         }
 
-        .spinner-svg .path {
-            stroke: #6366f1; /* رنگ بنفش شیک */
-            stroke-linecap: round;
-            animation: dash 1.5s ease-in-out infinite;
+        /* Glowing effect for the spinner */
+        .spinner::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 30px;
+          height: 30px;
+          background: radial-gradient(circle, rgba(0, 221, 235, 0.3), transparent);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          animation: glow 1.2s infinite ease-in-out;
         }
 
-        @keyframes rotate {
-            100% {
-                transform: rotate(360deg);
-            }
+        /* Modern text styling */
+        .loader-content p {
+          margin: 0;
+          font-size: 14px;
+          /* Smaller text */
+          color: #ffffff;
+          /* White for contrast */
+          font-weight: 400;
+          letter-spacing: 0.5px;
+          /* Slight spacing for elegance */
+          opacity: 0.9;
         }
 
-        @keyframes dash {
-            0% {
-                stroke-dasharray: 1, 150;
-                stroke-dashoffset: 0;
-            }
-            50% {
-                stroke-dasharray: 90, 150;
-                stroke-dashoffset: -35;
-            }
-            100% {
-                stroke-dasharray: 90, 150;
-                stroke-dashoffset: -124;
-            }
+        /* Spin animation with a modern twist */
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+
+          100% {
+            transform: rotate(360deg);
+          }
         }
 
-        .loader-text {
-            margin: 0;
-            font-size: 16px;
-            color: #1f2937; /* خاکستری تیره */
-            font-weight: 500;
-            font-family: 'Vazir', sans-serif; /* فونت فارسی شیک */
+        /* Glow animation */
+        @keyframes glow {
+          0% {
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 0.8;
+          }
+
+          50% {
+            transform: translate(-50%, -50%) scale(1.1);
+            opacity: 0.4;
+          }
+
+          100% {
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 0.8;
+          }
         }
 
-        .global-loader.hidden {
+        /* Slide-in animation for the loader */
+        @keyframes slideIn {
+          0% {
             opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.4s ease;
-        }
-    </style>
-@endpush
+            transform: translate(-50%, -70%);
+          }
 
-@push('scripts')
-    <script>
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+
+        /* Hide loader when done */
+        .hidden {
+          display: none !important;
+        }
+      </style>
+    @endpush
+
+    @push('scripts')
+      <script>
         document.addEventListener("DOMContentLoaded", () => {
-            window.addEventListener("load", () => {
-                const loader = document.getElementById("global-loader");
-                setTimeout(() => loader.classList.add("hidden"), 500); // تأخیر برای زیبایی
-            });
+          window.addEventListener("load", () => {
+            const loader = document.getElementById("global-loader");
+            setTimeout(() => loader.classList.add("hidden"), 500); // تأخیر برای زیبایی
+          });
         });
-    </script>
-@endpush
+      </script>
+    @endpush

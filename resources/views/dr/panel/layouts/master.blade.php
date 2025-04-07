@@ -22,14 +22,8 @@
 <body>
   @include('dr.panel.layouts.partials.sidebar')
   <div class="content">
-    <!-- لودینگ کلی سایت -->
-    <div id="global-loader">
-      <div class="loader-backdrop"></div> <!-- بک‌دراپ -->
-      <div class="loader-content">
-        <div class="spinner"></div> <!-- انیمیشن لودینگ -->
-        <p>لطفا منتظر بمانید...</p>
-      </div>
-    </div>
+    <x-global-loader />
+
 
     @include('dr.panel.layouts.partials.header')
     <div class="top-dr-panel d-flex justify-content-between w-100 align-items-start">
