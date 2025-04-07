@@ -26,14 +26,14 @@
     <x-global-loader />
     @include('admin.panel.layouts.partials.header')
     <div class="top-dr-panel d-flex justify-content-between w-100 align-items-start">
-      <div class="p-3 bg-white">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb bg-white">
-            <li class="breadcrumb-item"><a href="#">پنل مدیریت</a></li>
-            <li class="breadcrumb-item active" aria-current="page"> @yield('bread-crumb-title')</li>
-          </ol>
-        </nav>
-      </div>
+   <div class="p-3 bg-white stylish-breadcrumb">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-white mb-0">
+      <li class="breadcrumb-item"><a href="#">پنل مدیریت</a></li>
+      <li class="breadcrumb-item active" aria-current="page">@yield('bread-crumb-title')</li>
+    </ol>
+  </nav>
+</div>
     </div>
     @yield('content')
     @livewireScripts

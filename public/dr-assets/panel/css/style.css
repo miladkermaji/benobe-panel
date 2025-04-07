@@ -2155,3 +2155,81 @@ span.tagRemove:hover {
 }
 /* تنظیمات منوها */
 /* جلوگیری از به‌هم‌ریختگی در منوهای بازشو */
+/* breadcrub styles */
+/* Container styling with lighter shadow */
+.stylish-breadcrumb {
+  padding: 1rem 1.5rem; /* Consistent padding */
+  background: #ffffff; /* Pure white for cleanliness */
+  border-radius: 10px; /* Slightly smaller radius */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03); /* Lighter, subtler shadow */
+  transition: box-shadow 0.3s ease; /* Smooth transition */
+}
+
+.stylish-breadcrumb:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Slightly stronger on hover */
+}
+
+/* Breadcrumb list for better alignment */
+.breadcrumb {
+  background: transparent !important; /* No background */
+  padding: 0;
+  margin: 0; /* No extra margins */
+  display: flex; /* Flexbox for perfect alignment */
+  align-items: center; /* Vertically centered items */
+  font-family: 'Vazir', sans-serif; /* Persian font */
+}
+
+/* Breadcrumb items */
+.breadcrumb-item {
+  font-size: 14px; /* Slightly smaller for elegance */
+  color: #6b7280; /* Soft gray */
+  line-height: 1.5; /* Better vertical alignment */
+}
+
+/* Links in breadcrumb */
+.breadcrumb-item a {
+  color: #2563eb; /* Clean blue */
+  text-decoration: none;
+  font-weight: 500;
+  padding: 2px 6px; /* Subtle padding for clickable area */
+  border-radius: 4px; /* Rounded edges */
+  transition: all 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+  color: #1e40af; /* Darker blue on hover */
+  background: rgba(37, 99, 235, 0.1); /* Light background on hover */
+}
+
+/* Active item */
+.breadcrumb-item.active {
+  color: #1f2937; /* Dark gray for contrast */
+  font-weight: 600;
+}
+
+/* Separator with cleaner spacing */
+.breadcrumb-item + Nossa.breadcrumb-item::before {
+  content: '›'; /* Sleek arrow */
+  color: #9ca3af; /* Lighter gray */
+  font-size: 16px;
+  margin: 0 6px; /* Tighter, balanced spacing */
+  vertical-align: middle;
+}
+
+/* Animation for a polished entrance */
+.breadcrumb-item {
+  animation: slideIn 0.4s ease-out;
+}
+
+/* Slide-in animation */
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(10px); /* Slide from right (RTL-friendly) */
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+/* breadcrub styles */
