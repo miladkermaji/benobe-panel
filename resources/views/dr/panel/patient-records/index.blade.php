@@ -3,6 +3,7 @@
   <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/tickets/tickets.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/patient-records/patient-records.css') }}" rel="stylesheet" />
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
