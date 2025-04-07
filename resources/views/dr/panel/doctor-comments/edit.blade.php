@@ -12,3 +12,6 @@
     @section('bread-crumb-title', 'ویرایش doctorcomments')
     @livewire('dr.panel.doctor-comments.doctor-comments-edit', ['id' => $id])
 @endsection
+@section('scripts')
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+@endsection

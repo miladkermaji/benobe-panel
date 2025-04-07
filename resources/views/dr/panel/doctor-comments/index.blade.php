@@ -17,3 +17,6 @@
     @section('bread-crumb-title', 'لیست نظرات')
     @livewire('dr.panel.doctor-comments.doctor-comments-list')
 @endsection
+@section('scripts')
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+@endsection

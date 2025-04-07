@@ -1,164 +1,170 @@
-th,
-td {
-    text-wrap: nowrap !important;
-}
-.sub-user-content-wrapper {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-}
-
-.sub-user-card {
-    border-bottom: 1px solid #ddd;
-}
-
-.card-body {
-    letter-spacing: 0 !important;
-}
-
-@media only screen and (max-width: 991px) {
-    .sub-user-content-wrapper {
-        width: 97% !important;
-    }
-}
-/* استایل‌های کلی صفحه */
-.sub-user-content {
-    padding: 20px;
-}
-
-.sub-user-content-wrapper {
-    max-width: 1400px; /* افزایش عرض */
-    width: 100%;
-}
-
-/* استایل کارت‌ها */
-.card {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
-    background-color: #fff;
-    overflow: hidden;
-}
-
-.card-header {
-    background-color: #f8f9fa;
-    padding: 15px 20px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    border-bottom: 1px solid #e9ecef;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.card-body {
-    padding: 20px;
-}
-
-/* استایل جدول */
-.table {
-    margin-bottom: 0;
-    border-collapse: separate;
-    border-spacing: 0;
-    width: 100%;
-}
-
-.table thead th {
-    background-color: #f1f3f5;
-    color: #495057;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 12px 15px;
-    border-bottom: 2px solid #dee2e6;
-    text-align: right;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-
-.table tbody tr {
-    transition: background-color 0.2s ease;
-}
-
-.table tbody tr:hover {
-    background-color: #f8f9fa;
-}
-
-.table tbody td {
-    padding: 12px 15px;
-    font-size: 13px;
-    color: #6c757d;
-    border-bottom: 1px solid #e9ecef;
-    text-align: right;
-}
-
-/* دکمه حذف */
-.btn-light.btn-sm {
-    padding: 5px 10px;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
-}
-
-.btn-light.btn-sm:hover {
-    background-color: #f1f3f5;
-}
-
-.btn-light.btn-sm img {
-    width: 16px;
-    height: 16px;
-}
-
-/* پیجینیشن */
-.pagination-links {
-    margin-top: 20px;
-}
-
-.pagination-links .pagination {
-    justify-content: center;
-}
-
-.pagination-links .page-link {
-    border-radius: 6px;
-    margin: 0 3px;
-    color: #007bff;
-    border: 1px solid #dee2e6;
-    transition: all 0.2s ease;
-}
-
-.pagination-links .page-link:hover {
-    background-color: #e9ecef;
-    border-color: #007bff;
-}
-
-.pagination-links .page-item.active .page-link {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: #fff;
-}
-
-/* پاسخگویی برای موبایل */
-@media (max-width: 768px) {
-    .sub-user-content-wrapper {
-        padding: 0 10px;
+:root {
+      --primary: #007bff;
+      --secondary: #6c757d;
+      --success: #28a745;
+      --danger: #dc3545;
+      --bg-light: #f8f9fa;
+      --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+      --border-radius: 16px;
     }
 
-    .card-body {
-        overflow-x: auto; /* اسکرول افقی برای جدول */
+    .subuser-content {
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #f0f4f8 0%, #ffffff 100%);
+      min-height: 100vh;
     }
 
-    .table {
-        min-width: 700px; /* حداقل عرض جدول برای جلوگیری از به‌هم‌ریختگی */
+    .subuser-content-wrapper {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .card {
+      border: none;
+      border-radius: var(--border-radius);
+      background: #fff;
+      box-shadow: var(--shadow);
+      margin-bottom: 40px;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
     }
 
     .card-header {
-        font-size: 16px;
+      background: linear-gradient(90deg, var(--primary) 0%, #0056b3 100%);
+      color: #fff;
+      padding: 20px;
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: none;
     }
 
-    .table thead th,
+    .card-body {
+      padding: 25px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 10px;
+    }
+
+    .table thead th {
+      background: var(--bg-light);
+      color: var(--secondary);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 15px;
+      text-align: right;
+      border-bottom: none;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .table tbody tr {
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
     .table tbody td {
+      padding: 15px;
+      font-size: 14px;
+      color: #333;
+      vertical-align: middle;
+      border: none;
+      text-align: right;
+    }
+
+    .status-online {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .status-offline {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .btn-delete {
+      background: #f8d7da;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+
+    .btn-delete:hover {
+      background: var(--danger);
+    }
+
+    .btn-delete img {
+      width: 18px;
+      height: 18px;
+      filter: invert(20%);
+    }
+
+    .pagination-links {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .pagination .page-link {
+      border-radius: 8px;
+      margin: 0 5px;
+      color: var(--primary);
+      border: 1px solid #e0e0e0;
+      padding: 8px 14px;
+      transition: all 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .pagination .page-item.active .page-link {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .subuser-content {
+        padding: 20px 10px;
+      }
+
+      .card-header {
+        font-size: 18px;
+      }
+
+      .table thead th,
+      .table tbody td {
         font-size: 12px;
         padding: 10px;
+      }
+
+      .btn-delete {
+        padding: 6px 10px;
+      }
     }
-}

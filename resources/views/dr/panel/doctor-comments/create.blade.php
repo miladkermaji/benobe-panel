@@ -13,3 +13,6 @@
     @livewire('dr.panel.doctor-comments.doctor-comments-create')
 
 @endsection
+@section('scripts')
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+@endsection
