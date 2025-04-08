@@ -424,7 +424,7 @@ Route::prefix('dr')
 
             Route::post('/appointments/update-date/{id}', [DrPanelController::class, 'updateAppointmentDate'])
                 ->name('updateAppointmentDate');
-            Route::prefix('doctornotes')->group(function () {
+            Route::prefix('doctor-notes')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'index'])->name('dr.panel.doctornotes.index');
                 Route::get('/create', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'create'])->name('dr.panel.doctornotes.create');
                 Route::get('/edit/{id}', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'edit'])->name('dr.panel.doctornotes.edit');
