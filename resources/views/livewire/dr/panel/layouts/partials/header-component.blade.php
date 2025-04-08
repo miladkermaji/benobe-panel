@@ -35,7 +35,7 @@
                       {{ $recipient->notification->title }}</p>
                     <p class="mb-0 text-gray-600" style="font-size: 14px;">{{ $recipient->notification->message }}</p>
                   </div>
-                  <button wire:click="markAsRead({{ $recipient->id }})" class="btn btn-sm btn-read rounded-circle p-2">
+                  <button wire:click="markAsRead({{ $recipient->id }})" class="btn-read rounded-circle p-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
                       viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                       stroke-linejoin="round">
