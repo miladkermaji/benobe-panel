@@ -1311,3 +1311,271 @@ img {
 .ant-radio-wrapper:hover .ant-radio-inner {
     border-color: #60a5fa;
 }
+
+
+
+
+
+
+
+
+/* سرستون‌های جدول */
+.table thead th {
+    background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%); /* گرادیانت تیره و شیک */
+    color: #ecf0f1;
+    font-weight: 700;
+    padding: 16px;
+    text-align: center;
+    border-bottom: none;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* ردیف‌های جدول */
+.table tbody tr {
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.table tbody tr:hover {
+    background: #f6f8fa;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* سلول‌های جدول */
+.table td {
+    padding: 14px 16px;
+    color: #2d3748;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    vertical-align: middle;
+}
+
+/* چک‌باکس‌ها در جدول */
+.table td input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #6b7280;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.table td input[type="checkbox"]:checked {
+    accent-color: #6366f1; /* رنگ بنفش مدرن */
+}
+
+/* دکمه‌های داخل جدول */
+.btn-table {
+    padding: 8px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-outline-info.btn-table {
+    border: 2px solid #6366f1;
+    color: #6366f1;
+    background: transparent;
+}
+
+.btn-outline-info.btn-table:hover:not(:disabled) {
+    background: linear-gradient(45deg, #6366f1, #8b5cf6);
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+    transform: scale(1.05);
+}
+
+.btn-outline-info.btn-table:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #d1d5db;
+    color: #d1d5db;
+}
+
+/* افکت موج هنگام کلیک */
+.btn-table::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn-table:active::after {
+    width: 200px;
+    height: 200px;
+}
+
+/* دکمه‌های دراپ‌داون */
+.custom-dropdown-trigger {
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.custom-dropdown-trigger:hover {
+    background: #eef2f8;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.dropdown-menu {
+    border-radius: 12px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    padding: 10px 0;
+    min-width: 180px;
+    animation: slideDown 0.3s ease-out;
+}
+
+.dropdown-item {
+    padding: 10px 20px;
+    font-size: 13px;
+    color: #374151;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(90deg, #eef2f8, #e0e7ff);
+    color: #4f46e5;
+    padding-left: 24px; /* جابجایی ظریف به چپ */
+}
+
+/* انیمیشن برای دراپ‌داون */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* غیرفعال کردن آیتم‌ها */
+.dropdown-menu li.disabled .dropdown-item {
+    color: #9ca3af;
+    background: #f9fafb;
+    pointer-events: none;
+}
+
+/* دکمه‌های عملیاتی بالای جدول */
+.nobat-option .btn {
+    padding: 10px 16px;
+    font-size: 13px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+    border: none;
+    color: #4b5563;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+.nobat-option .btn:hover {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25);
+    transform: translateY(-3px);
+}
+
+.nobat-option .btn svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+.nobat-option .btn:hover svg {
+    transform: scale(1.1);
+    fill: #fff; /* رنگ آیکون در حالت هاور */
+}
+
+/* استایل وضعیت‌ها */
+.text-danger {
+    color: #ef4444 !important;
+    font-weight: 700;
+    background: linear-gradient(90deg, #fef2f2, #fee2e2);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.text-primary {
+    color: #6366f1 !important;
+    font-weight: 700;
+    background: linear-gradient(90deg, #eef2ff, #e0e7ff);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+/* واکنش‌گرایی */
+@media screen and (max-width: 991px) {
+    .table thead th {
+        font-size: 12px;
+        padding: 12px;
+    }
+
+    .table td {
+        font-size: 11px;
+        padding: 10px;
+    }
+
+    .btn-table {
+        padding: 6px 14px;
+        font-size: 11px;
+    }
+
+    .nobat-option .btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .table {
+        font-size: 11px;
+        border-radius: 10px;
+    }
+
+    .nobat-option {
+        flex-direction: column;
+        gap: 10px !important;
+        position: static;
+        padding: 12px;
+    }
+
+    .nobat-option .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+
+    .dropdown-menu {
+        min-width: 100%;
+    }
+}
