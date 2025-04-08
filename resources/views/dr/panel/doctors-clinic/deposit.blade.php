@@ -33,7 +33,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 32px;
     }
 
     .header h1 {
@@ -222,7 +221,7 @@
 <div class="container">
   <div class="header">
     <h1>مدیریت بیعانه‌ها</h1>
-    <button class="btn btn-primary" id="addDepositBtn">افزودن بیعانه جدید</button>
+    <button class="btn btn-primary h-50" id="addDepositBtn">افزودن بیعانه جدید</button>
   </div>
   <div class="card">
     <table class="table table-light">

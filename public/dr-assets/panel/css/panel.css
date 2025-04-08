@@ -1051,13 +1051,10 @@ img {
   padding: 1.25rem; /* کمی کوچکتر برای تناسب */
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03); /* سایه خیلی سبک‌تر */
   transition: box-shadow 0.3s ease;
 }
 
-.myPanelOption:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* سایه کمتر در هاور */
-}
+
 
 /* Tooltip icon (unchanged but included for context) */
 .my-tooltip {

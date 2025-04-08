@@ -583,13 +583,13 @@ svg {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* سایه شیک و نرم */
-    border-left: 1px solid #e8ecef;
+    box-shadow: var(--shadow); /* سایه شیک و نرم */
+   
 }
 
 .sidebar__nav.is-active {
     right: -170px;
-    transition: all 200ms ease;
+    transition: all 250ms ease;
 }
 
 .padding-12-30 {
@@ -612,7 +612,7 @@ svg {
 
 .sidebar__nav ul li a {
     font-size: 14.5px;
-    font-weight: 600;
+    font-weight: 700;
     width: 100%;
     margin: 5px 0;
     padding: 10px 50px;
@@ -620,9 +620,9 @@ svg {
     border-radius: 8px;
     display: flex;
     justify-content: start;
-    color: #4a5568;
+    color: #212121;
     align-items: center;
-    transition: all 0.3s ease;
+    transition: all 0.8s ease;
 }
 
 .sidebar__nav ul li.is-active a {
@@ -2158,6 +2158,7 @@ span.tagRemove:hover {
     top: 0;
     z-index: 10;
     background: inherit;
+    padding-bottom: 18px;
 }
 
 /* بخش اسکرول‌پذیر */
@@ -2183,13 +2184,9 @@ span.tagRemove:hover {
     padding: 1rem 1.5rem; /* Consistent padding */
     background: #ffffff; /* Pure white for cleanliness */
     border-radius: 10px; /* Slightly smaller radius */
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03); /* Lighter, subtler shadow */
     transition: box-shadow 0.3s ease; /* Smooth transition */
 }
 
-.stylish-breadcrumb:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Slightly stronger on hover */
-}
 
 /* Breadcrumb list for better alignment */
 .breadcrumb {
