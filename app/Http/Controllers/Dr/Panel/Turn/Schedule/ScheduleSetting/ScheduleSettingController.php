@@ -461,10 +461,7 @@ class ScheduleSettingController extends Controller
                 ]
             );
 
-            // اگر روز کاری غیرفعال باشد، `work_hours` را خالی کنیم
-            if (! $isWorking) {
-                $workSchedule->update(['work_hours' => json_encode([])]);
-            }
+    
 
             return response()->json([
                 'message' => $isWorking ? 'روز کاری با موفقیت فعال شد' : 'روز کاری با موفقیت غیرفعال شد',
