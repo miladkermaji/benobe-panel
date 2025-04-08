@@ -192,7 +192,6 @@ textarea {
     padding: 20px 28px;
     box-shadow: var(--shadow);
     border-bottom-right-radius: 0 !important;
-    margin-bottom: 32px;
 }
 
 .border-2 {
@@ -1052,7 +1051,7 @@ svg {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 32px;
+    margin-bottom: 10px;
 }
 .header__logo {
     height: 44px;
