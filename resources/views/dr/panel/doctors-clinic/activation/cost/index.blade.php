@@ -13,15 +13,11 @@
   <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/activation/index.css') }}">
   <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/clinic/cost/cost.css') }}">
   <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastify/toastify.min.css') }}">
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- فونت آیکون -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
   @include('dr.panel.my-tools.loader-btn')
 </head>
 
 <body dir="rtl">
+  <x-global-loader />
   <header class="bg-light text-dark p-3 my-shodow w-100 d-flex align-items-center">
     <div class="back w-50">
       <a href="{{ route('activation-doctor-clinic', $clinicId) }}" class="btn btn-light">
@@ -114,6 +110,15 @@
                 <input type="text" name="custom_price" id="customPrice" class="form-control mt-3 h-50 d-none"
                   placeholder="مبلغ دلخواه را وارد کنید">
               </div>
+              <!-- بعد از <form id="depositForm"> این بخش رو اضافه کن -->
+              <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="noDeposit" name="no_deposit" value="1">
+                  <label class="form-check-label" for="noDeposit">
+                    بدون بیعانه (اختیاری)
+                  </label>
+                </div>
+              </div>
               <div class="alert alert-warning text-center" role="alert">
                 جهت دریافت مبالغ پرداختی بیعانه بیماران لطفا پس از تکمیل ثبت نام، در قسمت تنظیمات پرداخت، شماره کارت خود
                 را وارد
@@ -168,8 +173,22 @@
   </div>
   @include('dr.panel.layouts.partials.scripts')
   <script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+    document.getElementById('noDeposit').addEventListener('change', function() {
+      const depositSelect = document.getElementById('depositAmount');
+      const customPriceInput = document.getElementById('customPrice');
+
+      if (this.checked) {
+        depositSelect.disabled = true;
+        customPriceInput.disabled = true;
+        depositSelect.value = ""; // خالی کردن مقدار
+        customPriceInput.classList.add('d-none');
+      } else {
+        depositSelect.disabled = false;
+        customPriceInput.disabled = false;
+      }
+    });
+
     function loadDeposits() {
       fetch("{{ route('cost.list', ['clinic_id' => $clinicId]) }}")
         .then(response => response.json())
@@ -179,15 +198,17 @@
 
           if (data.length > 0) {
             data.forEach(item => {
-              const formattedAmount = formatNumber(item.deposit_amount); // فرمت سه‌رقمی
+              const displayText = item.deposit_amount > 0 ?
+                `مبلغ بیعانه برای هر نوبت ${formatNumber(item.deposit_amount)} تومان` :
+                'بدون بیعانه';
               const depositItem = `
-            <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-2">
-                <span> مبلغ بیعانه برای هر نوبت ${formattedAmount} تومان</span>
-                <button type="button" class="btn btn-light btn-sm" onclick="deleteDeposit(${item.id})">
-                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                </button>
-            </div>
-        `;
+                        <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-2">
+                            <span>${displayText}</span>
+                            <button type="button" class="btn btn-light btn-sm" onclick="deleteDeposit(${item.id})">
+                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                            </button>
+                        </div>
+                    `;
               depositList.insertAdjacentHTML('beforeend', depositItem);
             });
           } else {
@@ -247,10 +268,16 @@
     function validateDepositAmount() {
       const depositSelect = document.getElementById('depositAmount');
       const customPriceInput = document.getElementById('customPrice');
+      const noDepositCheckbox = document.getElementById('noDeposit');
+
+      // اگه "بدون بیعانه" انتخاب شده باشه، نیازی به اعتبارسنجی مبلغ نیست
+      if (noDepositCheckbox.checked) {
+        return true;
+      }
 
       // بررسی اینکه آیا مقدار بیعانه انتخاب شده است یا خیر
       if (depositSelect.value === "") {
-        toastr.error("لطفاً مبلغ بیعانه را انتخاب کنید.");
+        toastr.error("لطفاً مبلغ بیعانه را انتخاب کنید یا گزینه 'بدون بیعانه' را فعال کنید.");
         return false;
       }
 
@@ -290,6 +317,12 @@
       const form = document.getElementById('depositForm');
       const formData = new FormData(form);
 
+      // اگه "بدون بیعانه" انتخاب شده، مقدار deposit_amount رو صفر بفرست
+      if (document.getElementById('noDeposit').checked) {
+        formData.set('deposit_amount', 0);
+        formData.set('is_custom_price', 0);
+      }
+
       fetch("{{ route('cost.store') }}", {
           method: "POST",
           headers: {
@@ -311,7 +344,7 @@
             Swal.fire({
               icon: "error",
               title: "خطا",
-              text: data.message, // نمایش پیام خطا از سرور
+              text: data.message,
             });
           }
         })

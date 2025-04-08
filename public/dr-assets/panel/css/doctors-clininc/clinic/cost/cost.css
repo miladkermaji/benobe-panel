@@ -1,28 +1,251 @@
+/* استایل‌های کلی */
+body {
+    font-family: 'Vazir', sans-serif; /* فرض می‌کنم فونت فارسی داری */
+    background-color: #f7f8fc;
+    direction: rtl;
+}
+
 .card {
- border-radius: 16px;
- box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    border: none;
+    background: #ffffff;
+    padding: 25px;
 }
 
 .btn-primary {
- background-color: #007bff;
- border-color: #007bff;
- border-radius: 8px;
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 12px;
+    padding: 12px 25px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #fff;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-primary:hover {
+    background-color: #0062cc;
+    border-color: #0062cc;
+    transform: translateY(-2px);
 }
 
 .btn-outline-secondary {
- border-radius: 8px;
+    border-radius: 12px;
+    padding: 12px 25px;
+    font-weight: 600;
+    font-size: 14px;
+    border: 2px solid #6c757d;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: #fff;
+    border-color: #6c757d;
 }
 
 .alert-info {
- background-color: #e9f7fe;
- border: 1px solid #bde5f8;
- color: #31708f;
+    background: linear-gradient(135deg, #e9f4ff 0%, #f2f9ff 100%);
+    border: 1px solid #d1e6ff;
+    color: #003f87;
+    border-radius: 12px;
+    padding: 15px 20px;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.05);
 }
 
-.form-select {
- border-radius: 8px;
- padding: 10px;
+.alert-warning {
+    background: linear-gradient(135deg, #fff4e6 0%, #fffcf0 100%);
+    border: 1px solid #ffe4c4;
+    color: #7a4f01;
+    border-radius: 12px;
+    padding: 15px 20px;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(255, 165, 0, 0.05);
 }
-.my-container-fluid-cost{
- max-width: 650px;
+
+.form-control, .form-select {
+    border-radius: 12px;
+    padding: 12px 15px;
+    border: 1px solid #e0e4e8;
+    background: #fafbfd;
+    font-size: 14px;
+    color: #333;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    background: #fff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+    outline: none;
+}
+.form-select:disabled {
+    background: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.my-container-fluid-cost {
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+/* استایل مودال */
+.modal.fade .modal-dialog {
+    transform: translateY(-50px);
+    transition: transform 0.3s ease-out;
+}
+.modal.show .modal-dialog {
+    transform: translateY(0);
+}
+
+.modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.modal-body {
+    padding: 25px;
+    font-size: 14px;
+    color: #333;
+}
+
+.modal-body ul li {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.modal-body .btn-outline-primary {
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-weight: 600;
+    border: 2px solid #007bff;
+    color: #007bff;
+    transition: all 0.3s ease;
+}
+.modal-body .btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* بک‌دراپ مودال */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.modal-backdrop.show {
+    opacity: 1;
+}
+
+/* استایل چک‌باکس */
+.checkbox-wrapper-1 *,
+.checkbox-wrapper-1 ::after,
+.checkbox-wrapper-1 ::before {
+    box-sizing: border-box;
+}
+
+.checkbox-wrapper-1 [type=checkbox].substituted {
+    margin: 0;
+    width: 0;
+    height: 0;
+    display: inline;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.checkbox-wrapper-1 [type=checkbox].substituted + label:before {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    height: 1.25em;
+    width: 1.25em;
+    margin-right: 0.5em;
+    border: 2px solid #6c757d;
+    border-radius: 6px;
+    background: #fff url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 9"><path fill="white" d="M2.5 4.5l2 2 3-3" stroke="white" stroke-width="1.5"/></svg>') no-repeat center;
+    background-size: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.checkbox-wrapper-1 [type=checkbox].substituted:checked + label:before {
+    background-color: #007bff;
+    border-color: #007bff;
+    background-size: 0.8em;
+}
+
+.checkbox-wrapper-1 [type=checkbox].substituted:enabled:hover + label:before {
+    border-color: #007bff;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+}
+
+.checkbox-wrapper-1 [type=checkbox].substituted:focus + label:before {
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.checkbox-wrapper-1 [type=checkbox].substituted:disabled + label:before {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkbox-wrapper-1 [type=checkbox].substituted + label {
+    font-size: 14px;
+    font-weight: 500;
+    color: dağılım #333;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.checkbox-wrapper-1 [type=checkbox].substituted:hover + label {
+    color: #007bff;
+}
+
+/* ریسپانسیو کردن */
+@media (max-width: 768px) {
+    .my-container-fluid-cost {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+    .card {
+        padding: 15px;
+    }
+    .btn-primary, .btn-outline-secondary {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .modal-dialog {
+        margin: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-content {
+        border-radius: 12px;
+    }
+    .modal-body {
+        padding: 15px;
+    }
+    .form-control, .form-select {
+        font-size: 13px;
+    }
+    .checkbox-wrapper-1 [type=checkbox].substituted + label:before {
+        height: 1.1em;
+        width: 1.1em;
+    }
+    .checkbox-wrapper-1 [type=checkbox].substituted + label {
+        font-size: 13px;
+    }
 }

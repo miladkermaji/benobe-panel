@@ -18,14 +18,7 @@
 </head>
 
 <body>
-  <!-- لودینگ کلی سایت -->
-  <div id="global-loader">
-    <div class="loader-backdrop"></div> <!-- بک‌دراپ -->
-    <div class="loader-content">
-      <div class="spinner"></div> <!-- انیمیشن لودینگ -->
-      <p>لطفا منتظر بمانید...</p>
-    </div>
-  </div>
+  <x-global-loader />
   <header class="bg-light text-dark p-3 my-shodow w-100 d-flex align-items-center">
     <div class="back w-50">
       <a href="{{ route('dr-panel') }}" class="btn btn-light">

@@ -41,8 +41,9 @@ class CostController extends Controller
         $request->validate([
             'clinic_id'       => 'required|exists:clinics,id',
             'doctor_id'       => 'required|exists:users,id',
-            'deposit_amount'  => 'nullable|numeric',
+            'deposit_amount'  => 'nullable|numeric|min:0', // تغییر به nullable و حداقل 0
             'is_custom_price' => 'required|boolean',
+            'no_deposit'      => 'nullable|boolean', // اضافه کردن فیلد جدید
         ]);
 
         // بررسی وجود بیعانه برای کلینیک و دکتر
@@ -54,11 +55,14 @@ class CostController extends Controller
             return response()->json(['success' => false, 'message' => 'شما قبلاً یک بیعانه برای این کلینیک ثبت کرده‌اید. لطفاً ابتدا آن را حذف کنید.']);
         }
 
+        // اگه "بدون بیعانه" انتخاب شده باشه یا مقدار صفر باشه
+        $depositAmount = $request->no_deposit || !$request->deposit_amount ? 0 : $request->deposit_amount;
+
         $setting = ClinicDepositSetting::create([
             'clinic_id'       => $request->clinic_id,
             'doctor_id'       => $request->doctor_id,
-            'deposit_amount'  => $request->deposit_amount,
-            'is_custom_price' => $request->is_custom_price,
+            'deposit_amount'  => $depositAmount,
+            'is_custom_price' => $request->is_custom_price && $depositAmount > 0, // فقط اگه مبلغ باشه
         ]);
 
         return response()->json(['success' => true, 'message' => 'تنظیمات بیعانه با موفقیت ذخیره شد.']);
