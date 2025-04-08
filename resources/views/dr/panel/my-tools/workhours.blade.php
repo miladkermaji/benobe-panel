@@ -364,7 +364,7 @@
             <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
             <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 end-time bg-white" id="morning-end-${day}" value="" name="end_time">
           </div>
-          <div class="form-group col-sm-3 position-relative">
+          <div class="form-group  position-relative">
             <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
             <input type="text" class="form-control h-50 text-center max-appointments bg-white" name="nobat-count" min="0" id="morning-patients-${day}" data-toggle="modal" data-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
           </div>
@@ -373,7 +373,7 @@
               <img src="${svgUrl}">
             </button>
           </div>
-          <div class="form-group col-sm-2 position-relative">
+          <div class="form-group  position-relative">
             <button class="btn btn-light btn-sm remove-row-btn" disabled data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
               <img src="${trashSvg}" alt="trash">
             </button>
@@ -644,7 +644,7 @@
           <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
           <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 end-time bg-white" id="morning-end-${day}" name="end_time" value="${end_time}" readonly ${end_time ? 'disabled' : ''}>
         </div>
-        <div class="form-group col-sm-3 position-relative">
+        <div class="form-group  position-relative">
           <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
           <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-toggle="modal" data-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly ${slot ? 'disabled' : ''}>
         </div>
@@ -653,7 +653,7 @@
                 <img src="${svgUrl}">
             </button>
           </div>
-        <div class="form-group col-sm-2 position-relative">
+        <div class="form-group  position-relative">
           <button class="btn btn-light btn-sm remove-row-btn" data-slot-id="${slotId || ''}" data-start-time="${start_time}" data-end-time="${end_time}" data-max-appointments="${max_appointments}" data-day="${day}">
             <img src="${trashSvg}">
           </button>
@@ -749,7 +749,7 @@
                         <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
                         <input id="morning-end-${day}" name="end_time" type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 end-time bg-white" value="${endTime}" readonly ${endTime ? 'disabled' : ''}>
                     </div>
-                    <div class="form-group col-sm-3 position-relative">
+                    <div class="form-group  position-relative">
                         <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
                         <input type="text" name="nobat-count" id="morning-patients-${day}"  class="form-control h-50 text-center max-appointments bg-white" value="${maxAppointments}" data-toggle="modal" data-target="#CalculatorModal" data-start-time="" data-end-time="" readonly ${maxAppointments ? 'disabled' : ''}>
                     </div>
@@ -764,7 +764,7 @@
                             <img src="${svgUrl}">
                         </button>
                     </div>
-                    <div class="form-group col-sm-2 position-relative">
+                    <div class="form-group  position-relative">
                         <button class="btn btn-light btn-sm remove-row-btn"
                             data-slot-id="${slot.id}"
                             data-start-time="${startTime}"
@@ -1008,7 +1008,7 @@
                     <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
                     <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 bg-white end-time" id="morning-end-${day}" value="" name="end_time">
                 </div>
-                <div class="form-group col-sm-3 position-relative">
+                <div class="form-group  position-relative">
                     <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
                     <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-toggle="modal" data-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
                 </div>
@@ -1017,7 +1017,7 @@
                 <img src="${svgUrl}">
             </button>
           </div>
-                <div class="form-group col-sm-2 position-relative">
+                <div class="form-group  position-relative">
                     <button class="btn btn-light btn-sm remove-row-btn" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="">
                         <img src="${trashSvg}">
                     </button>
@@ -1596,7 +1596,7 @@
                     <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
                     <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 end-time bg-white" value="" id="morning-end-${day}" name="end_time">
                 </div>
-                <div class="form-group col-sm-3 position-relative">
+                <div class="form-group  position-relative">
                     <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
                     <input type="text" class="form-control h-50 text-center max-appointments bg-white" data-day="${day}" name="nobat-count" id="morning-patients-${day}" data-start-time="" data-end-time="" value="" data-toggle="modal" data-target="#CalculatorModal" readonly>
                 </div>
@@ -1605,7 +1605,7 @@
                         <img src="${svgUrl}">
                     </button>
                 </div>
-                <div class="form-group col-sm-2 position-relative">
+                <div class="form-group  position-relative">
                     <button class="btn btn-light btn-sm remove-row-btn" data-day="${day}" disabled>
                         <img src="${trashSvg}">
                     </button>
@@ -1658,7 +1658,7 @@
             <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
             <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 bg-white end-time" id="morning-end-${day}" value="" name="end_time">
           </div>
-          <div class="form-group col-sm-3 position-relative">
+          <div class="form-group  position-relative">
             <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
            <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-toggle="modal" data-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
           </div>
@@ -1667,7 +1667,7 @@
                 <img src="${svgUrl}">
             </button>
           </div>
-          <div class="form-group col-sm-2 position-relative">
+          <div class="form-group  position-relative">
             <button class="btn btn-light btn-sm remove-row-btn" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
               <img src="${trashSvg}">
             </button>
@@ -1706,7 +1706,7 @@
             <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
             <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 bg-white end-time" id="morning-end-${day}" value="" name="end_time">
           </div>
-          <div class="form-group col-sm-3 position-relative">
+          <div class="form-group  position-relative">
             <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
            <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-toggle="modal" data-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
           </div>
@@ -1715,7 +1715,7 @@
                 <img src="${svgUrl}">
             </button>
           </div>
-          <div class="form-group col-sm-2 position-relative">
+          <div class="form-group  position-relative">
             <button class="btn btn-light btn-sm remove-row-btn" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
               <img src="${trashSvg}">
             </button>

@@ -101,7 +101,7 @@
                   <form action="" method="post">
                     <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع">
                     <div class="mt-2">
-                      <a class="text-decoration-underline" href="#" data-toggle="modal"
+                      <a class="text-decoration-none text-primary font-bold" href="#" data-toggle="modal"
                         data-target="#exampleModalCenterPaziresh">پذیرش
                         از مسیر ارجاع</a>
                     </div>

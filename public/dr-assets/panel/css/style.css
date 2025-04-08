@@ -578,7 +578,7 @@ svg {
     transition: all 200ms ease;
     right: 0;
     bottom: 0;
-    z-index: 212;
+    z-index: 4000 !important;
     top: -1px;
     overflow: hidden;
     display: flex;

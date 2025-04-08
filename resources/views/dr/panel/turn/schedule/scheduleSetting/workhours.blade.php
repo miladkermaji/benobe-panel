@@ -47,7 +47,7 @@
           </div>
           <div class="mt-4">
             <label class="text-dark font-weight-bold">روزهای کاری</label>
-            <div class="d-flex flex-wrap justify-content-start mt-3 gap-40 bg-light p-3 border-radius-4">
+            <div class="d-flex flex-wrap justify-content-start mt-3 gap-40 bg-light p-3 border-radius-4 day-contents">
               <x-my-check :isChecked="false" id="saturday" day="شنبه" />
               <x-my-check :isChecked="false" id="sunday" day="یکشنبه" />
               <x-my-check :isChecked="false" id="monday" day="دوشنبه" />
