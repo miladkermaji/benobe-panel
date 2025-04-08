@@ -177,11 +177,22 @@ textarea {
 .margin-bottom-0 {
     margin-bottom: 0 !important;
 }
-
+:root {
+    --primary: #3b82f6; /* Softer, modern blue */
+    --secondary: #f8fafc; /* Light gray for background */
+    --text: #1e293b; /* Darker, elegant text color */
+    --danger: #ef4444; /* Vibrant red */
+    --shadow: 0 6px 15px rgba(0, 0, 0, 0.05); /* Softer shadow */
+    --border-radius: 12px; /* More rounded corners */
+    --transition: all 0.3s ease; /* Smooth transitions */
+}
 .custom-border-bottom {
-    border-bottom: 1px solid #ddd;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px,
         rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+    padding: 20px 28px;
+    box-shadow: var(--shadow);
+    border-bottom-right-radius: 0 !important;
+    margin-bottom: 32px;
 }
 
 .border-2 {
@@ -547,10 +558,10 @@ table th {
     -webkit-box-pack: center;
     justify-content: center;
 }
-#calendarModal .modal-body{
+#calendarModal .modal-body {
     padding: 0 !important;
 }
-svg{
+svg {
     display: inline !important;
 }
 .mlg-15 {
@@ -558,7 +569,11 @@ svg{
 }
 .sidebar__nav {
     width: 250px;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); /* گرادیان نرم سفید به خاکستری روشن */
+    background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #f8fafc 100%
+    ); /* گرادیان نرم سفید به خاکستری روشن */
     height: 100vh;
     position: fixed;
     transition: all 200ms ease;
@@ -1029,7 +1044,16 @@ svg{
     margin-right: 80px;
     transition: all 200ms ease;
 }
-
+.header {
+    background: white;
+    padding: 20px 28px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
 .header__logo {
     height: 44px;
     width: 200px;
@@ -2129,7 +2153,6 @@ span.tagRemove:hover {
 
 /* استایل کلی سایدبار */
 
-
 /* بخش ثابت */
 .sidebar__fixed {
     position: sticky;
@@ -2158,78 +2181,78 @@ span.tagRemove:hover {
 /* breadcrub styles */
 /* Container styling with lighter shadow */
 .stylish-breadcrumb {
-  padding: 1rem 1.5rem; /* Consistent padding */
-  background: #ffffff; /* Pure white for cleanliness */
-  border-radius: 10px; /* Slightly smaller radius */
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03); /* Lighter, subtler shadow */
-  transition: box-shadow 0.3s ease; /* Smooth transition */
+    padding: 1rem 1.5rem; /* Consistent padding */
+    background: #ffffff; /* Pure white for cleanliness */
+    border-radius: 10px; /* Slightly smaller radius */
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03); /* Lighter, subtler shadow */
+    transition: box-shadow 0.3s ease; /* Smooth transition */
 }
 
 .stylish-breadcrumb:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Slightly stronger on hover */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Slightly stronger on hover */
 }
 
 /* Breadcrumb list for better alignment */
 .breadcrumb {
-  background: transparent !important; /* No background */
-  padding: 0;
-  margin: 0; /* No extra margins */
-  display: flex; /* Flexbox for perfect alignment */
-  align-items: center; /* Vertically centered items */
-  font-family: 'Vazir', sans-serif; /* Persian font */
+    background: transparent !important; /* No background */
+    padding: 0;
+    margin: 0; /* No extra margins */
+    display: flex; /* Flexbox for perfect alignment */
+    align-items: center; /* Vertically centered items */
+    font-family: "Vazir", sans-serif; /* Persian font */
 }
 
 /* Breadcrumb items */
 .breadcrumb-item {
-  font-size: 14px; /* Slightly smaller for elegance */
-  color: #6b7280; /* Soft gray */
-  line-height: 1.5; /* Better vertical alignment */
+    font-size: 14px; /* Slightly smaller for elegance */
+    color: #6b7280; /* Soft gray */
+    line-height: 1.5; /* Better vertical alignment */
 }
 
 /* Links in breadcrumb */
 .breadcrumb-item a {
-  color: #2563eb; /* Clean blue */
-  text-decoration: none;
-  font-weight: 500;
-  padding: 2px 6px; /* Subtle padding for clickable area */
-  border-radius: 4px; /* Rounded edges */
-  transition: all 0.2s ease;
+    color: #2563eb; /* Clean blue */
+    text-decoration: none;
+    font-weight: 500;
+    padding: 2px 6px; /* Subtle padding for clickable area */
+    border-radius: 4px; /* Rounded edges */
+    transition: all 0.2s ease;
 }
 
 .breadcrumb-item a:hover {
-  color: #1e40af; /* Darker blue on hover */
-  background: rgba(37, 99, 235, 0.1); /* Light background on hover */
+    color: #1e40af; /* Darker blue on hover */
+    background: rgba(37, 99, 235, 0.1); /* Light background on hover */
 }
 
 /* Active item */
 .breadcrumb-item.active {
-  color: #1f2937; /* Dark gray for contrast */
-  font-weight: 600;
+    color: #1f2937; /* Dark gray for contrast */
+    font-weight: 600;
 }
 
 /* Separator with cleaner spacing */
 .breadcrumb-item + Nossa.breadcrumb-item::before {
-  content: '›'; /* Sleek arrow */
-  color: #9ca3af; /* Lighter gray */
-  font-size: 16px;
-  margin: 0 6px; /* Tighter, balanced spacing */
-  vertical-align: middle;
+    content: "›"; /* Sleek arrow */
+    color: #9ca3af; /* Lighter gray */
+    font-size: 16px;
+    margin: 0 6px; /* Tighter, balanced spacing */
+    vertical-align: middle;
 }
 
 /* Animation for a polished entrance */
 .breadcrumb-item {
-  animation: slideIn 0.4s ease-out;
+    animation: slideIn 0.4s ease-out;
 }
 
 /* Slide-in animation */
 @keyframes slideIn {
-  0% {
-    opacity: 0;
-    transform: translateX(10px); /* Slide from right (RTL-friendly) */
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
+    0% {
+        opacity: 0;
+        transform: translateX(10px); /* Slide from right (RTL-friendly) */
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 /* breadcrub styles */

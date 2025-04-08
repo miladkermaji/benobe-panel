@@ -55,7 +55,7 @@
               <div
                 class="dropdown-trigger btn  h-40 w-300 bg-light-blue text-left d-flex justify-content-between align-items-center"
                 aria-haspopup="true" aria-expanded="false">
-                <div>
+                <div class="">
                   <span class="dropdown-label">ویزیت آنلاین به نوبه</span>
                 </div>
                 <div>
@@ -69,7 +69,7 @@
               </div>
               <div class="my-dropdown-menu d-none">
                 <div class="" aria-hidden="true">
-                  <div class="" aria-hidden="true">
+                  <div class="{{ Request::routeIs('doctors.clinic.deposit') ? 'd-none' : '' }}" aria-hidden="true">
                     <div class="d-flex align-items-center p-3 option-card card-active" data-id="default">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">

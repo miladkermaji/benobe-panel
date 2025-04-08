@@ -219,6 +219,11 @@
               class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.clinics.medical-documents') ? 'is-active' : '' }}">
               <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
             </li>
+            <!-- اضافه کردن گزینه "بیعانه" به سایدبار -->
+            <li
+              class="item-li i-checkout__request {{ Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }}">
+              <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
+            </li>
           </ul>
         </li>
         <li class="item-li i-checkout__request {{ Request::routeIs('dr-bime') ? 'is-active' : '' }}">

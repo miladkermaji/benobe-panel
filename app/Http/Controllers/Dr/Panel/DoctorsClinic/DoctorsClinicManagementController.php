@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic;
 
-use App\Http\Controllers\Dr\Controller;
-use App\Models\Clinic;
 use App\Models\Zone;
+use App\Models\Clinic;
 use Illuminate\Http\Request;
+use App\Models\ClinicDepositSetting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Controllers\Dr\Controller;
 
 class DoctorsClinicManagementController extends Controller
 {
@@ -177,28 +178,209 @@ class DoctorsClinicManagementController extends Controller
 
     public function gallery($id)
     {
-        return view("dr.panel.doctors-clinic.gallery",compact('id'));
+        return view("dr.panel.doctors-clinic.gallery", compact('id'));
     }
 
- 
-public function medicalDoc()
-{
-    $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-    return view("dr.panel.doctors-clinic.medicalDoc", compact('doctorId'));
-}
+
+    public function medicalDoc()
+    {
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        return view("dr.panel.doctors-clinic.medicalDoc", compact('doctorId'));
+    }
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function deposit(Request $request)
     {
-        //
+        try {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $selectedClinicId = $request->input('selectedClinicId', 'default');
+
+            $clinics = Clinic::where('doctor_id', $doctorId)->get();
+            $deposits = ClinicDepositSetting::where('doctor_id', $doctorId)
+                ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                    $query->where('clinic_id', $selectedClinicId);
+                }, function ($query) {
+                    $query->whereNull('clinic_id');
+                })
+                ->get();
+
+            return view('dr.panel.doctors-clinic.deposit', compact('clinics', 'deposits', 'selectedClinicId', 'doctorId'));
+        } catch (\Exception $e) {
+            return back()->with('error', 'خطا در بارگذاری اطلاعات: ' . $e->getMessage());
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function storeDeposit(Request $request)
     {
-        //
+        try {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $selectedClinicId = $request->input('selectedClinicId', 'default');
+
+            $validated = $request->validate([
+                'deposit_amount' => 'nullable|numeric|min:0',
+                'custom_price' => 'nullable|numeric|min:0',
+                'is_custom_price' => 'required|boolean',
+                'no_deposit' => 'nullable|boolean',
+            ], [
+                'deposit_amount.numeric' => 'مبلغ بیعانه باید عدد باشد.',
+                'deposit_amount.min' => 'مبلغ بیعانه نمی‌تواند منفی باشد.',
+                'custom_price.numeric' => 'مبلغ دلخواه باید عدد باشد.',
+                'custom_price.min' => 'مبلغ دلخواه نمی‌تواند منفی باشد.',
+                'is_custom_price.required' => 'نوع قیمت الزامی است.',
+            ]);
+
+            $clinicId = $selectedClinicId === 'default' ? null : $selectedClinicId;
+            if ($clinicId && !Clinic::where('id', $clinicId)->where('doctor_id', $doctorId)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'مطب انتخاب‌شده معتبر نیست یا متعلق به شما نیست.'
+                ], 422);
+            }
+
+            // بررسی وجود بیعانه قبلی برای این مطب و دکتر
+            $existingDeposit = ClinicDepositSetting::where('doctor_id', $doctorId)
+                ->where(function ($query) use ($clinicId) {
+                    if ($clinicId) {
+                        $query->where('clinic_id', $clinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->exists();
+
+            if ($existingDeposit) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'برای این مطب و پزشک قبلاً بیعانه ثبت شده است. لطفاً بیعانه موجود را ویرایش کنید.'
+                ], 422);
+            }
+
+            $noDeposit = isset($validated['no_deposit']) ? $validated['no_deposit'] : false;
+            $depositAmount = $noDeposit ? null :
+                ($validated['is_custom_price'] ? $validated['custom_price'] : $validated['deposit_amount']);
+
+            $deposit = ClinicDepositSetting::create([
+                'clinic_id' => $clinicId,
+                'doctor_id' => $doctorId,
+                'deposit_amount' => $depositAmount,
+                'is_custom_price' => $validated['is_custom_price'],
+                'refundable' => true,
+                'is_active' => true,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'بیعانه با موفقیت ثبت شد.',
+                'deposit' => $deposit
+            ], 201);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در اطلاعات ورودی.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ثبت بیعانه: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateDeposit(Request $request, $id)
+    {
+        try {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $selectedClinicId = $request->input('selectedClinicId', 'default');
+
+            $validated = $request->validate([
+                'deposit_amount' => 'nullable|numeric|min:0',
+                'custom_price' => 'nullable|numeric|min:0',
+                'is_custom_price' => 'required|boolean',
+                'no_deposit' => 'nullable|boolean',
+            ]);
+
+            $deposit = ClinicDepositSetting::where('id', $id)
+                ->where('doctor_id', $doctorId)
+                ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                    $query->where('clinic_id', $selectedClinicId);
+                }, function ($query) {
+                    $query->whereNull('clinic_id');
+                })
+                ->first();
+
+            if (!$deposit) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'بیعانه موردنظر یافت نشد یا متعلق به شما نیست.'
+                ], 404);
+            }
+
+            $noDeposit = isset($validated['no_deposit']) ? $validated['no_deposit'] : false;
+            $depositAmount = $noDeposit ? null :
+                ($validated['is_custom_price'] ? $validated['custom_price'] : $validated['deposit_amount']);
+
+            $deposit->update([
+                'deposit_amount' => $depositAmount,
+                'is_custom_price' => $validated['is_custom_price'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'بیعانه با موفقیت ویرایش شد.',
+                'deposit' => $deposit
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در اطلاعات ورودی.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ویرایش بیعانه: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroyDeposit(Request $request, $id)
+    {
+        try {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $selectedClinicId = $request->input('selectedClinicId', 'default');
+
+            $deposit = ClinicDepositSetting::where('id', $id)
+                ->where('doctor_id', $doctorId)
+                ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                    $query->where('clinic_id', $selectedClinicId);
+                }, function ($query) {
+                    $query->whereNull('clinic_id');
+                })
+                ->first();
+
+            if (!$deposit) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'بیعانه موردنظر یافت نشد یا متعلق به شما نیست.'
+                ], 404);
+            }
+
+            $deposit->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'بیعانه با موفقیت حذف شد.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در حذف بیعانه: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
