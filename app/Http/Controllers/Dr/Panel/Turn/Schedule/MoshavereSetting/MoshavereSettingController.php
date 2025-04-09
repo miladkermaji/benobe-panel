@@ -474,13 +474,29 @@ class MoshavereSettingController extends Controller
     public function saveAppointmentSettings(Request $request)
     {
         $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
-        $validated        = $request->validate([
+
+        $messages = [
+                'day.required' => 'لطفاً روز را انتخاب کنید.',
+                'day.in' => 'روز انتخاب شده معتبر نیست.',
+                'start_time.required' => 'لطفاً ساعت شروع را وارد کنید.',
+                'start_time.date_format' => 'فرمت ساعت شروع باید به صورت HH:MM باشد.',
+                'end_time.required' => 'لطفاً ساعت پایان را وارد کنید.',
+                'end_time.date_format' => 'فرمت ساعت پایان باید به صورت HH:MM باشد.',
+                'end_time.after' => 'ساعت پایان باید بعد از ساعت شروع باشد.',
+                'max_appointments.integer' => 'حداکثر تعداد نوبت‌ها باید عدد باشد.',
+                'max_appointments.min' => 'حداکثر تعداد نوبت‌ها باید حداقل ۱ باشد.',
+                'selected_days.required' => 'لطفاً روزهای انتخاب شده را مشخص کنید.',
+                'selected_days.in' => 'روز انتخاب شده معتبر نیست.',
+            ];
+
+        $validated = $request->validate([
             'day'              => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
             'start_time'       => 'required|date_format:H:i',
             'end_time'         => 'required|date_format:H:i|after:start_time',
             'max_appointments' => 'nullable|integer|min:1',
             'selected_days'    => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
-        ]);
+        ], $messages);
+
         try {
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             // تبدیل selected_days به آرایه

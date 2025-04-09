@@ -62,6 +62,19 @@ class DoctorsClinicManagementController extends Controller
 
         return view('dr.panel.doctors-clinic.index', compact('provinces', 'cities'));
     }
+    public function create()
+    {
+        $zones = Cache::remember('zones', 86400, function () {
+            return Zone::where('status', 1)
+                ->orderBy('sort')
+                ->get(['id', 'name', 'parent_id', 'level']);
+        });
+
+        $provinces = $zones->where('level', 1);
+        $cities = $zones->where('level', 2)->groupBy('parent_id');
+
+        return view('dr.panel.doctors-clinic.create', compact('provinces', 'cities'));
+    }
 
     public function store(Request $request)
     {
@@ -150,16 +163,16 @@ class DoctorsClinicManagementController extends Controller
     public function edit($id)
     {
         $clinic = Clinic::findOrFail($id);
+        $zones = Cache::remember('zones', 86400, function () {
+            return Zone::where('status', 1)
+                ->orderBy('sort')
+                ->get(['id', 'name', 'parent_id', 'level']);
+        });
 
-        return response()->json([
-            'id'            => $clinic->id,
-            'name'          => $clinic->name,
-            'phone_numbers' => json_decode($clinic->phone_numbers, true), // تبدیل به آرایه
-            'address'       => $clinic->address,
-            'description'   => $clinic->description,
-            'province_id'   => $clinic->province_id,
-            'city_id'       => $clinic->city_id,
-        ]);
+        $provinces = $zones->where('level', 1);
+        $cities = $zones->where('level', 2)->groupBy('parent_id');
+
+        return view('dr.panel.doctors-clinic.edit', compact('clinic', 'provinces', 'cities'));
     }
 
     public function getCitiesByProvince($provinceId)

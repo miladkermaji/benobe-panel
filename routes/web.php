@@ -658,6 +658,12 @@ Route::prefix('dr')
                 Route::get('medicalDoc', [DoctorsClinicManagementController::class, 'medicalDoc'])->middleware('secretary.permission:clinic_management')->name('dr-office-medicalDoc');
                 Route::get('/', [DoctorsClinicManagementController::class, 'index'])->middleware('secretary.permission:clinic_management')->name('dr-clinic-management');
 
+
+
+                Route::get('clinic/{id}/edit', [DoctorsClinicManagementController::class, 'edit'])->name('dr.panel.clinics.edit');
+
+
+
                 Route::get('/medical-documents', [DoctorsClinicManagementController::class, 'medicalDoc'])->name('dr.panel.clinics.medical-documents');
 
                 Route::get('/edit/{id}/gallery', [DoctorsClinicManagementController::class, 'gallery'])->name('dr.panel.clinics.gallery');
@@ -667,6 +673,8 @@ Route::prefix('dr')
 
                 Route::post('/update/{id}', [DoctorsClinicManagementController::class, 'update'])->middleware('secretary.permission:clinic_management')->name('dr-clinic-update');
                 Route::delete('/delete/{id}', [DoctorsClinicManagementController::class, 'destroy'])->middleware('secretary.permission:clinic_management')->name('dr-clinic-destroy');
+
+                Route::get('/create', [DoctorsClinicManagementController::class, 'create'])->name('dr.panel.clinics.create');
 
 
 

@@ -29,9 +29,7 @@
               <div class="input-group">
                 <input type="text" class="form-control h-50 mb-3  my-border-0" id="search-patient"
                   placeholder="جستجو...">
-                <div class="input-group-append">
-                  <button class="btn btn-primary h-50 w-100" type="button">جستجو</button>
-                </div>
+               
               </div>
             </div>
           </div>

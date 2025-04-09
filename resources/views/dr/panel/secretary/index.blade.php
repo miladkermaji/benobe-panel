@@ -11,7 +11,21 @@
       bottom: 56px;
       /* موقعیت پیش‌فرض برای لیبل‌ها در صورت وجود خطا */
     }
-
+  .label-top-input-special-takhasos {
+    min-height: 10px;
+    min-width: 20px;
+    background-color: #fff;
+    box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px,
+        rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 2;
+    padding: 2px;
+    font-weight: bold;
+    right: inherit;
+    font-size: 12px;
+    bottom: 58px;
+}
     .field-wrapper.has-error .error-message {
       display: block;
     }

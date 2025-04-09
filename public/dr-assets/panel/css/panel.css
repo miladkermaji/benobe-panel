@@ -656,7 +656,6 @@ button {
     position: relative;
     -ms-flex: 1 1 auto;
     flex: 1 1 auto;
-    padding: 1rem 2rem;
 }
 
 .password_toggle__AXK9v input:checked + label {
@@ -1239,11 +1238,7 @@ img {
     padding: 1.5rem 1.5rem 0;
 }
 
-.modal-body {
-    padding: 1.5rem;
-    font-size: 14px;
-    line-height: 1.75;
-}
+
 
 .modal-body .font-weight-bold {
     color: #1f2937;
@@ -1520,7 +1515,6 @@ img {
 .text-danger {
     color: #ef4444 !important;
     font-weight: 700;
-    background: linear-gradient(90deg, #fef2f2, #fee2e2);
     padding: 2px 8px;
     border-radius: 6px;
 }
@@ -1528,7 +1522,6 @@ img {
 .text-primary {
     color: #6366f1 !important;
     font-weight: 700;
-    background: linear-gradient(90deg, #eef2ff, #e0e7ff);
     padding: 2px 8px;
     border-radius: 6px;
 }
