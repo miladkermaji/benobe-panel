@@ -1,6 +1,6 @@
 <div>
   <div class="shadow-lg border-0 rounded-3 overflow-hidden">
-    <div class="card-header bg-primary font-weight-bold p-3">اضافه کردن تعرفه بر اساس شرکت بیمه</div>
+    <div class="card-header glass-header font-weight-bold p-3">اضافه کردن تعرفه بر اساس شرکت بیمه</div>
     <div class="card-body p-4">
       <h5>روش محاسبه:</h5>
       <div class="ant-radio-group ant-radio-group-outline mt-3">

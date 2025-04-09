@@ -5,169 +5,213 @@
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/tickets/tickets.css') }}" rel="stylesheet" />
   <style>
-    .myPanelOption {
-      display: none;
-    }
+    .myPanelOption { display: none; }
 
     .container {
-      background: #f8f9fa;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%);
       min-height: 100vh;
+      padding: 20px;
     }
 
     .card {
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
       background: #ffffff;
+      border: none;
+      overflow: hidden;
     }
 
     .card-header {
-      background: linear-gradient(135deg, #007bff, #0056b3);
-      border-radius: 12px 12px 0 0;
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+      border-radius: 16px 16px 0 0;
       padding: 1.5rem;
+      position: relative;
+    }
+
+    .card-header::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
     }
 
     .card-body {
-      padding: 2rem;
+      padding: 2.5rem;
+    }
+
+    /* Table Styling */
+    .table {
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
     }
 
     .table th {
-      background: #f1f3f5;
-      color: #333;
+      color: #2c3e50;
       width: 25%;
-      font-weight: 500;
+      font-weight: 600;
+      padding: 15px;
+      border-bottom: 2px solid #e9ecef;
     }
 
     .table td {
-      color: #555;
+      color: #34495e;
+      padding: 15px;
+      vertical-align: middle;
     }
 
     .badge {
-      padding: 0.5rem 1rem;
+      padding: 0.5em 1.2em;
       font-size: 0.9rem;
-      border-radius: 20px;
-    }
-
-    /* استایل مسنجر */
-    .response-list {
-      max-height: 400px;
-      overflow-y: auto;
-      padding: 1rem;
-      background: #f9f9f9;
-      border-radius: 8px;
-      border: 1px solid #e9ecef;
-    }
-
-    .response-card {
-      max-width: 70%;
-      margin-bottom: 1.5rem;
-      padding: 1rem;
-      border-radius: 12px;
-      position: relative;
+      border-radius: 50px;
+      font-weight: 500;
       transition: all 0.3s ease;
     }
 
+    .badge:hover {
+      transform: scale(1.05);
+    }
+
+    /* Response Section */
+    .response-list {
+      max-height: 450px;
+      overflow-y: auto;
+      padding: 1.5rem;
+      background: #fafbfc;
+      border-radius: 12px;
+      border: 1px solid #ebedf0;
+      scrollbar-width: thin;
+      scrollbar-color: #a0a9b2 #fafbfc;
+    }
+
+    .response-card {
+      max-width: 75%;
+      margin-bottom: 1.5rem;
+      padding: 1.2rem;
+      border-radius: 16px;
+      position: relative;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
     .response-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
     }
 
-    /* پاسخ‌های مدیر (سمت چپ، بنفش روشن) */
     .response-card.manager {
-      background: #e8d9ff;
-      color: #4b0082;
+      background: linear-gradient(135deg, #e9dfff 0%, #d8cfff 100%);
+      color: #5e2b97;
       margin-right: auto;
-      border-bottom-left-radius: 0;
+      border-bottom-left-radius: 4px;
     }
 
-    /* پاسخ‌های دکتر (سمت راست، آبی روشن) */
     .response-card.doctor {
-      background: #d6eaff;
-      color: #004085;
+      background: linear-gradient(135deg, #e3f0ff 0%, #d6eaff 100%);
+      color: #1e429f;
       margin-left: auto;
-      border-bottom-right-radius: 0;
+      border-bottom-right-radius: 4px;
       text-align: right;
     }
 
     .response-card strong {
-      display: block;
       font-size: 0.95rem;
-      margin-bottom: 0.5rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      display: block;
     }
 
     .response-card p {
       margin: 0;
       font-size: 1rem;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .response-card small {
-      display: block;
-      margin-top: 0.5rem;
+      margin-top: 0.6rem;
       font-size: 0.8rem;
-      color: #888;
+      color: #7f8c8d;
+      opacity: 0.8;
     }
 
-    /* فرم ارسال پاسخ */
+    /* Form Styling */
     .form-group {
+      margin-bottom: 1.8rem;
       position: relative;
-      margin-bottom: 1.5rem;
     }
 
     .form-group label {
-      font-weight: 500;
-      color: #444;
-      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.6rem;
       display: block;
     }
 
-    .form-control,
-    .form-control:focus {
-      border-radius: 8px;
-      border: 1px solid #ced4da;
-      box-shadow: none;
-      padding: 0.75rem;
-      height: 45px;
+    .form-control {
+      border-radius: 10px;
+      border: 1px solid #dfe6e9;
+      padding: 0.9rem 1.2rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #fff;
     }
 
     textarea.form-control {
-      height: 120px;
+      height: 140px;
       resize: none;
     }
 
+    .form-control:focus {
+      border-color: #4a90e2;
+      box-shadow: 0 0 8px rgba(74, 144, 226, 0.2);
+      outline: none;
+    }
+
     .form-group.has-error .form-control {
-      border-color: #dc3545;
+      border-color: #e74c3c;
     }
 
     .form-group.has-error .error-message {
       display: block;
-      color: #dc3545;
+      color: #e74c3c;
       font-size: 0.85rem;
-      margin-top: 0.25rem;
+      margin-top: 0.4rem;
     }
 
-    .error-message {
-      display: none;
-    }
+    .error-message { display: none; }
 
     .btn-custom {
-      background: linear-gradient(135deg, #007bff, #0056b3);
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
       border: none;
-      border-radius: 8px;
-      padding: 0.75rem 2rem;
-      font-weight: 500;
+      border-radius: 10px;
+      padding: 0.9rem 2.5rem;
+      font-weight: 600;
       transition: all 0.3s ease;
+      color: white;
     }
 
     .btn-custom:hover {
-      background: linear-gradient(135deg, #0056b3, #007bff);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, #357abd 0%, #4a90e2 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(74, 144, 226, 0.3);
+    }
+
+    .btn-custom:disabled {
+      background: #b0bec5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     .alert-warning {
-      border-radius: 8px;
-      background: #fff3cd;
-      color: #856404;
+      border-radius: 10px;
+      background: #fef5e7;
+      color: #d97706;
+      padding: 1rem;
+      border: 1px solid #fed7aa;
     }
   </style>
 @endsection
@@ -191,7 +235,6 @@
     <div class="card-body">
       <h5 class="text-dark font-weight-bold mb-4">اطلاعات تیکت</h5>
 
-      <!-- جدول اطلاعات تیکت -->
       <div class="table-responsive">
         <table class="table table-bordered">
           <tbody>
@@ -206,8 +249,7 @@
             <tr>
               <th>وضعیت</th>
               <td>
-                <span
-                  class="badge 
+                <span class="badge 
                   @if ($ticket->status == 'open') badge-success
                   @elseif ($ticket->status == 'pending') badge-warning
                   @elseif ($ticket->status == 'closed') badge-danger
@@ -235,10 +277,10 @@
         </table>
       </div>
 
-      <h5 class="mt-4 mb-3">پاسخ‌ها</h5>
+      <h5 class="mt-5 mb-3 text-dark font-weight-bold">پاسخ‌ها</h5>
       <div class="response-list">
         @forelse ($ticket->responses as $response)
-          <div class="response-card {{ $response->manager_id ? 'manager' : 'doctor' }} p-3 border mb-3">
+          <div class="response-card {{ $response->manager_id ? 'manager' : 'doctor' }} p-3 mb-3">
             <strong>
               @if ($response->manager_id)
                 {{ $response->manager ? 'مدیر: ' . $response->manager->first_name . ' ' . $response->manager->last_name : 'مدیر (نامشخص)' }}
@@ -252,26 +294,25 @@
             </small>
           </div>
         @empty
-          <div class="alert alert-info">هیچ پاسخی برای این تیکت ثبت نشده است.</div>
+          <div class="alert alert-info text-center">هیچ پاسخی برای این تیکت ثبت نشده است.</div>
         @endforelse
       </div>
 
-      <!-- فرم ارسال پاسخ -->
-      <form id="add-response-form" class="mt-4">
+      <form id="add-response-form" class="mt-5">
         @csrf
         <input type="hidden" id="ticket-id" value="{{ $ticket->id }}">
         <div class="form-group">
-          <label for="response-message" class="font-weight-bold">ارسال پاسخ</label>
-          <textarea class="form-control" id="response-message" placeholder="پاسخ خود را وارد کنید"></textarea>
-          <small class="error-message error-message"></small>
+          <label for="response-message">ارسال پاسخ</label>
+          <textarea class="form-control" id="response-message" placeholder="پاسخ خود را اینجا بنویسید..."></textarea>
+          <small class="error-message"></small>
         </div>
         <button type="submit" class="btn btn-custom w-100 d-flex justify-content-center align-items-center"
           id="save-response" @if ($ticket->status == 'closed') disabled @endif>
           <span class="button_text">ارسال پاسخ</span>
-          <div class="loader"></div>
+          <div class="loader" style="display: none; margin-right: 10px;"></div>
         </button>
         @if ($ticket->status == 'closed')
-          <div class="alert alert-warning mt-3">
+          <div class="alert alert-warning mt-3 text-center">
             این تیکت بسته شده است و امکان ارسال پاسخ وجود ندارد.
           </div>
         @endif
@@ -279,7 +320,6 @@
     </div>
   </div>
 </div>
-
 @endsection
 
 @section('scripts')
@@ -291,35 +331,32 @@
 </script>
 <script>
   $(document).ready(function() {
-    // اسکرول خودکار به پایین لیست پاسخ‌ها
-    const responseList = document.querySelector('.response-list');
+    const responseList = $('.response-list')[0];
     responseList.scrollTop = responseList.scrollHeight;
 
     $('#add-response-form').on('submit', function(e) {
       e.preventDefault();
-      let ticketId = $('#ticket-id').val();
-      let message = $('#response-message').val();
-      let button = $(this).find('button');
-      let loader = button.find('.loader');
-      const buttonText = button.find('.button_text');
+      const ticketId = $('#ticket-id').val();
+      const message = $('#response-message').val().trim();
+      const $button = $(this).find('#save-response');
+      const $loader = $button.find('.loader');
+      const $buttonText = $button.find('.button_text');
 
-      if (button.is(':disabled')) {
+      if ($button.is(':disabled')) {
         toastr.warning('این تیکت بسته شده است و نمی‌توانید پاسخ ارسال کنید!');
         return;
       }
 
-      buttonText.hide();
-      loader.show();
-      $('.error-message').text('');
-      $('.form-group').removeClass('has-error');
-
-      if (message.trim() === '') {
-        $('.error-message').text('لطفاً متن پاسخ را وارد کنید!');
+      if (!message) {
         $('.form-group').addClass('has-error');
-        buttonText.show();
-        loader.hide();
+        $('.error-message').text('لطفاً متن پاسخ را وارد کنید!');
         return;
       }
+
+      $buttonText.hide();
+      $loader.show();
+      $('.form-group').removeClass('has-error');
+      $('.error-message').text('');
 
       $.ajax({
         url: "{{ route('dr-panel-tickets.responses.store', ':id') }}".replace(':id', ticketId),
@@ -331,27 +368,29 @@
         success: function(response) {
           $('#response-message').val('');
           $('.response-list').append(`
-            <div class="response-card doctor p-3 border rounded mb-3">
+            <div class="response-card doctor p-3 mb-3 animate__animated animate__fadeIn">
               <strong>${response.user}</strong>
               <p>${response.message}</p>
               <small class="text-muted">${response.created_at}</small>
             </div>
           `);
           toastr.success("پاسخ شما با موفقیت ارسال شد!");
-          // اسکرول به پایین بعد از اضافه کردن پاسخ
-          responseList.scrollTop = responseList.scrollHeight;
+          responseList.scrollTo({
+            top: responseList.scrollHeight,
+            behavior: 'smooth'
+          });
         },
         error: function(xhr) {
           if (xhr.status === 422) {
-            $('.error-message').text(xhr.responseJSON.errors.message[0]);
             $('.form-group').addClass('has-error');
+            $('.error-message').text(xhr.responseJSON.errors.message[0]);
           } else {
             toastr.error("خطا در ارسال پاسخ!");
           }
         },
         complete: function() {
-          buttonText.show();
-          loader.hide();
+          $buttonText.show();
+          $loader.hide();
         }
       });
     });

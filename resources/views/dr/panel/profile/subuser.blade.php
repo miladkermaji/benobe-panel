@@ -136,21 +136,29 @@
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/js/select2/select2.js') }}"></script> <!-- اسکریپت TomSelect -->
+<script src="{{ asset('dr-assets/js/select2/select2.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
 </script>
 <script>
   $(document).ready(function() {
-    // مقداردهی اولیه TomSelect برای مودال افزودن
-    new TomSelect("#user-select", {
-      create: false,
-      plugins: ['clear_button']
+    // Initialize TomSelect once on page load
+    const addUserSelect = new TomSelect("#user-select", {
+        create: false,
+        plugins: ['clear_button'],
+        maxOptions: 50,
+        render: {
+            option: function(data, escape) {
+                return `<div>${escape(data.text)}</div>`;
+            }
+        }
     });
 
+    let editUserSelect;
+
     $('#add-subuser-btn').on('click', function() {
-      $('#addSubUserModal').modal('show');
+        $('#addSubUserModal').modal('show');
     });
 
     function updateSubUserList(subUsers) {
@@ -226,35 +234,50 @@
     });
 
     $(document).on('click', '.edit-btn', function() {
-      const id = $(this).data('id');
+        const id = $(this).data('id');
+        const $btn = $(this);
+        $btn.prop('disabled', true);
 
-      $.get("{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id), function(response) {
-        $('#edit-subuser-id').val(response.id);
-
-        // از بین بردن TomSelect قبلی
-        if ($("#edit-user-select").data("tomselect")) {
-          $("#edit-user-select")[0].tomselect.destroy();
-        }
-
-        // پر کردن گزینه‌ها
-        $('#edit-user-select').html('');
-        response.users.forEach(user => {
-          const selected = user.id === response.user_id ? 'selected' : '';
-          $('#edit-user-select').append(
-            `<option value="${user.id}" ${selected}>${user.first_name} ${user.last_name} -- ${user.national_code}</option>`
-          );
-        });
-
-        // مقداردهی مجدد TomSelect
-        new TomSelect("#edit-user-select", {
-          create: false,
-          plugins: ['clear_button']
-        });
-
+        // Show modal immediately with loading state
         $('#editSubUserModal').modal('show');
-      }).fail(function() {
-        toastr.error('خطا در دریافت اطلاعات کاربر!');
-      });
+        $('#edit-user-select').html('<option>در حال بارگذاری...</option>');
+
+        $.ajax({
+            url: "{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id),
+            method: 'GET',
+            cache: true,
+            success: function(response) {
+                $('#edit-subuser-id').val(response.id);
+
+                // Destroy existing TomSelect instance if exists
+                if (editUserSelect) {
+                    editUserSelect.destroy();
+                }
+
+                // Populate select options
+                const options = response.users.map(user => ({
+                    value: user.id,
+                    text: `${user.first_name} ${user.last_name} -- ${user.national_code}`,
+                    selected: user.id === response.user_id
+                }));
+
+                // Initialize new TomSelect instance
+                editUserSelect = new TomSelect("#edit-user-select", {
+                    options: options,
+                    items: [response.user_id],
+                    create: false,
+                    plugins: ['clear_button'],
+                    maxOptions: 50
+                });
+            },
+            error: function() {
+                toastr.error('خطا در دریافت اطلاعات کاربر!');
+                $('#editSubUserModal').modal('hide');
+            },
+            complete: function() {
+                $btn.prop('disabled', false);
+            }
+        });
     });
 
     $('#edit-subuser-form').on('submit', function(e) {

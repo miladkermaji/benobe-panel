@@ -3,7 +3,100 @@
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/my-performance/chart/chart.css') }}" rel="stylesheet" />
+  <style>
+    :root {
+      --chart-bg: #ffffff;
+      --chart-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --chart-border-radius: 16px;
+      --primary-color: #4a90e2;
+      --gradient-bg: linear-gradient(145deg, #f8fafc, #ffffff);
+      --text-color: #2d3748;
+      --hover-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    }
 
+    .chart-content {
+      padding: 30px;
+      max-width: 1440px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%);
+      border-radius: 20px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 25px;
+    }
+
+    .chart-container {
+      background: var(--gradient-bg);
+      border-radius: var(--chart-border-radius);
+      box-shadow: var(--chart-shadow);
+      padding: 25px;
+      height: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-container:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .chart-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), transparent);
+      opacity: 0.8;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 20px;
+      text-align: center;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(90deg, var(--primary-color), #7fbfff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      font-family: IRANSans, sans-serif !important;
+    }
+
+    @media only screen and (max-width: 768px) {
+      .chart-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .chart-container {
+        height: 380px;
+      }
+
+      .section-title {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
 @endsection
 
 @section('content')
@@ -12,7 +105,7 @@
   <div class="chart-grid">
     <!-- 📊 نمودار ۱: تعداد ویزیت‌ها به تفکیک وضعیت -->
     <div class="chart-container">
-      <h4 class="section-title">📊 تعداد ویزیت‌ها به تفکیک وضعیت</h4>
+      <h4 class="section-title">📊 تعداد ویزیت‌ها</h4>
       <canvas id="doctor-performance-chart"></canvas>
     </div>
 
@@ -34,15 +127,15 @@
       <canvas id="doctor-status-chart"></canvas>
     </div>
 
-    <!-- 🥧 نمودار ۵: درصد وضعیت نوبت‌ها (جدید - Pie Chart) -->
+    <!-- 🥧 نمودار ۵: درصد وضعیت نوبت‌ها -->
     <div class="chart-container">
-      <h4 class="section-title">🥧 درصد وضعیت نوبت‌ها</h4>
+      <h4 class="section-title">🥧 درصد نوبت‌ها</h4>
       <canvas id="doctor-status-pie-chart"></canvas>
     </div>
 
-    <!-- 📉 نمودار ۶: روند بیماران جدید (جدید - Line Chart) -->
+    <!-- 📉 نمودار ۶: روند بیماران جدید -->
     <div class="chart-container">
-      <h4 class="section-title">📉 روند بیماران جدید</h4>
+      <h4 class="section-title">📉 روند بیماران</h4>
       <canvas id="doctor-patient-trend-chart"></canvas>
     </div>
   </div>
@@ -73,22 +166,45 @@
           renderPatientTrendChart(response.newPatients);
         },
         error: function() {
-          alert('خطا در دریافت اطلاعات نمودارها');
+          toastr.error('خطا در دریافت اطلاعات نمودارها');
         }
       });
     }
 
-    // تنظیمات مشترک برای نمودارها
     const commonOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'top'
+          position: 'top',
+          labels: {
+            font: {
+              family: 'IRANSans',
+              size: 14,
+              weight: '500'
+            },
+            padding: 15,
+            color: '#2d3748'
+          }
         },
         tooltip: {
-          enabled: true
+          enabled: true,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleFont: {
+            family: 'IRANSans',
+            size: 14
+          },
+          bodyFont: {
+            family: 'IRANSans',
+            size: 12
+          },
+          padding: 10,
+          cornerRadius: 8
         }
+      },
+      animation: {
+        duration: 1200,
+        easing: 'easeOutQuart'
       }
     };
 
@@ -105,26 +221,45 @@
           datasets: [{
               label: 'برنامه‌ریزی‌شده',
               data: data.map(item => item.scheduled_count),
-              backgroundColor: '#36a2eb'
+              backgroundColor: '#60a5fa',
+              borderRadius: 6
             },
             {
               label: 'انجام‌شده',
               data: data.map(item => item.attended_count),
-              backgroundColor: '#4bc0c0'
+              backgroundColor: '#34d399',
+              borderRadius: 6
             },
             {
               label: 'غیبت',
               data: data.map(item => item.missed_count),
-              backgroundColor: '#ff6384'
+              backgroundColor: '#f87171',
+              borderRadius: 6
             },
             {
               label: 'لغو‌شده',
               data: data.map(item => item.cancelled_count),
-              backgroundColor: '#ff9f40'
+              backgroundColor: '#fbbf24',
+              borderRadius: 6
             }
           ]
         },
-        options: commonOptions
+        options: {
+          ...commonOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
       });
     }
 
@@ -141,16 +276,33 @@
           datasets: [{
               label: 'پرداخت‌شده',
               data: data.map(item => item.total_paid_income),
-              backgroundColor: '#4caf50'
+              backgroundColor: '#10b981',
+              borderRadius: 6
             },
             {
               label: 'پرداخت‌نشده',
               data: data.map(item => item.total_unpaid_income),
-              backgroundColor: '#f44336'
+              backgroundColor: '#ef4444',
+              borderRadius: 6
             }
           ]
         },
-        options: commonOptions
+        options: {
+          ...commonOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
       });
     }
 
@@ -167,10 +319,26 @@
           datasets: [{
             label: 'بیماران جدید',
             data: data.map(item => item.total_patients),
-            backgroundColor: '#ffce56'
+            backgroundColor: '#f59e0b',
+            borderRadius: 6
           }]
         },
-        options: commonOptions
+        options: {
+          ...commonOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
       });
     }
 
@@ -187,26 +355,45 @@
           datasets: [{
               label: 'برنامه‌ریزی‌شده',
               data: data.map(item => item.scheduled_count),
-              backgroundColor: '#42a5f5'
+              backgroundColor: '#60a5fa',
+              borderRadius: 6
             },
             {
               label: 'انجام‌شده',
               data: data.map(item => item.attended_count),
-              backgroundColor: '#66bb6a'
+              backgroundColor: '#34d399',
+              borderRadius: 6
             },
             {
               label: 'غیبت',
               data: data.map(item => item.missed_count),
-              backgroundColor: '#ef5350'
+              backgroundColor: '#f87171',
+              borderRadius: 6
             },
             {
               label: 'لغو‌شده',
               data: data.map(item => item.cancelled_count),
-              backgroundColor: '#ffb74d'
+              backgroundColor: '#fbbf24',
+              borderRadius: 6
             }
           ]
         },
-        options: commonOptions
+        options: {
+          ...commonOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
       });
     }
 
@@ -226,10 +413,20 @@
           labels: ['برنامه‌ریزی‌شده', 'انجام‌شده', 'غیبت', 'لغو‌شده'],
           datasets: [{
             data: [totalScheduled, totalAttended, totalMissed, totalCancelled],
-            backgroundColor: ['#42a5f5', '#66bb6a', '#ef5350', '#ffb74d']
+            backgroundColor: ['#60a5fa', '#34d399', '#f87171', '#fbbf24'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
           }]
         },
-        options: commonOptions
+        options: {
+          ...commonOptions,
+          plugins: {
+            ...commonOptions.plugins,
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
       });
     }
 
@@ -246,13 +443,33 @@
           datasets: [{
             label: 'بیماران جدید',
             data: data.map(item => item.total_patients),
-            borderColor: '#ff5722',
-            backgroundColor: 'rgba(255, 87, 34, 0.2)',
+            borderColor: '#f97316',
+            backgroundColor: 'rgba(249, 115, 22, 0.2)',
             fill: true,
-            tension: 0.4
+            tension: 0.4,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#f97316',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
           }]
         },
-        options: commonOptions
+        options: {
+          ...commonOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
       });
     }
 
