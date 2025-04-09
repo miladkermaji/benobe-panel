@@ -6,8 +6,7 @@
     <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
       <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
         wire:model.live="search" placeholder="جستجو در شهرها..." style="padding-right: 23px">
-      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3"
-        style="z-index: 5; top: 11px; right: 5px;">
+      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5;right: 5px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
           <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
         </svg>

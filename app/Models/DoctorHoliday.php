@@ -25,6 +25,12 @@ class DoctorHoliday extends Model
     {
         return $this->belongsTo(Clinic::class);
     }
+    public function getHolidayDatesAttribute($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        return json_decode($value ?? '[]', true); // اگه JSON یا null باشه، به آرایه تبدیل می‌شه
+    }
 
-   
 }

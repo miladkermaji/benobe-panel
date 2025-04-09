@@ -5,8 +5,7 @@
     <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
       <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
         wire:model.live="search" placeholder="جستجو بر اساس نام، نام خانوادگی یا کد ملی..." style="padding-right: 23px">
-      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3"
-        style="z-index: 5; top: 11px; right: 5px;">
+      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5;right: 5px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
           <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
         </svg>
@@ -33,8 +32,7 @@
                 wire:click="toggleDoctor({{ $data['doctor']->id }})">
                 <div class="d-flex align-items-center gap-3">
                   <img src="{{ $data['doctor']->profile_photo_url ?? asset('default-avatar.png') }}"
-                    class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;"
-                    alt="پروفایل پزشک">
+                    class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل پزشک">
                   <span class="fw-bold">{{ $data['doctor']->first_name . ' ' . $data['doctor']->last_name }}</span>
                   <span class="badge bg-label-primary">{{ $data['totalAppointments'] }} نوبت</span>
                 </div>
@@ -67,9 +65,12 @@
                         <tr>
                           <td class="text-center align-middle">
                             {{ ($data['currentPage'] - 1) * $appointmentsPerPage + $index + 1 }}</td>
-                          <td class="align-middle">{{ $appointment->user->first_name . ' ' . $appointment->user->last_name ?? 'نامشخص' }}</td>
+                          <td class="align-middle">
+                            {{ $appointment->user->first_name . ' ' . $appointment->user->last_name ?? 'نامشخص' }}</td>
                           <td class="align-middle">{{ $appointment->user->national_code ?? 'نامشخص' }}</td>
-                          <td class="align-middle">{{ \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}</td>
+                          <td class="align-middle">
+                            {{ \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
+                          </td>
                           <td class="align-middle">{{ $appointment->appointment_time }}</td>
                           <td class="text-center align-middle">
                             <button wire:click="toggleStatus({{ $appointment->id }})"
@@ -176,41 +177,52 @@
       background: linear-gradient(90deg, rgba(107, 114, 128, 0.9), rgba(55, 65, 81, 0.9));
       backdrop-filter: blur(10px);
     }
+
     .btn-gradient-success {
       background: linear-gradient(90deg, #10b981, #059669);
       color: white;
     }
+
     .btn-gradient-danger {
       background: linear-gradient(90deg, #ef4444, #dc2626);
       color: white;
     }
+
     .doctor-toggle {
       transition: all 0.3s ease;
     }
+
     .doctor-toggle:hover {
       background: #f9fafb;
     }
+
     .cursor-pointer {
       cursor: pointer;
     }
+
     .transition-transform {
       transition: transform 0.3s ease;
     }
+
     .rotate-180 {
       transform: rotate(180deg);
     }
+
     .bg-label-primary {
       background: #e5e7eb;
       color: #374151;
     }
+
     .bg-label-success {
       background: #d1fae5;
       color: #059669;
     }
+
     .bg-label-danger {
       background: #fee2e2;
       color: #dc2626;
     }
+
     .bg-label-warning {
       background: #fef3c7;
       color: #d97706;
@@ -235,7 +247,9 @@
           cancelButtonText: 'خیر'
         }).then((result) => {
           if (result.isConfirmed) {
-            Livewire.dispatch('deleteManualAppointmentConfirmed', { id: event.id });
+            Livewire.dispatch('deleteManualAppointmentConfirmed', {
+              id: event.id
+            });
           }
         });
       });

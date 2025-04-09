@@ -5,8 +5,7 @@
     <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
       <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
         wire:model.live="search" placeholder="جستجو در خدمات پزشکان..." style="padding-right: 23px">
-      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3"
-        style="z-index: 5; top: 11px; right: 5px;">
+      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5;right: 5px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
           <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
         </svg>
@@ -81,17 +80,18 @@
                             <div class="d-flex justify-content-center gap-2">
                               <a href="{{ route('admin.panel.doctor-services.edit', $item->id) }}"
                                 class="btn btn-gradient-success rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                  stroke-width="2">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2">
                                   <path
                                     d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                                 </svg>
                               </a>
                               <button wire:click="confirmDelete({{ $item->id }})"
                                 class="btn btn-gradient-danger rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                  stroke-width="2">
-                                  <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2">
+                                  <path
+                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                                 </svg>
                               </button>
                             </div>
@@ -101,8 +101,8 @@
                         <tr>
                           <td colspan="9" class="text-center py-5">
                             <div class="d-flex flex-column align-items-center justify-content-center">
-                              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" class="text-muted mb-3">
+                              <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" class="text-muted mb-3">
                                 <path d="M5 12h14M12 5l7 7-7 7" />
                               </svg>
                               <p class="text-muted fw-medium m-0">هیچ خدمتی یافت نشد.</p>

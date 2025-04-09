@@ -93,7 +93,11 @@ class DoctorHolidayList extends Component
 
         $dates = [];
         foreach ($holidays as $holiday) {
-            $holidayDates = $holiday->holiday_dates ?? [];
+            $holidayDates = $holiday->holiday_dates ?? []; // مطمئن می‌شیم آرایه باشه
+            if (!is_array($holidayDates)) {
+                $holidayDates = json_decode($holidayDates ?? '[]', true); // اگه JSON باشه، به آرایه تبدیل می‌شه
+            }
+
             foreach ($holidayDates as $date) {
                 $dates[] = [
                     'id' => $holiday->id,

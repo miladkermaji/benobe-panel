@@ -5,8 +5,7 @@
     <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
       <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
         wire:model.live="search" placeholder="جستجو در خدمات..." style="padding-right: 23px">
-      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3"
-        style="z-index: 5; top: 11px; right: 5px;">
+      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5;right: 5px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
           <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
         </svg>
@@ -121,80 +120,80 @@
       });
     });
   </script>
- <script>
-  $(document).ready(function() {
-    let dropdownOpen = false;
+  <script>
+    $(document).ready(function() {
+      let dropdownOpen = false;
 
-    let selectedClinic = localStorage.getItem('selectedClinic');
-    let selectedClinicId = localStorage.getItem('selectedClinicId');
+      let selectedClinic = localStorage.getItem('selectedClinic');
+      let selectedClinicId = localStorage.getItem('selectedClinicId');
 
-    if (selectedClinic && selectedClinicId) {
-      $('.dropdown-label').text(selectedClinic);
-      $('.option-card').each(function() {
-        if ($(this).attr('data-id') === selectedClinicId) {
-          $('.option-card').removeClass('card-active');
-          $(this).addClass('card-active');
+      if (selectedClinic && selectedClinicId) {
+        $('.dropdown-label').text(selectedClinic);
+        $('.option-card').each(function() {
+          if ($(this).attr('data-id') === selectedClinicId) {
+            $('.option-card').removeClass('card-active');
+            $(this).addClass('card-active');
+          }
+        });
+        Livewire.dispatch('clinicSelected', [selectedClinicId]); // ارسال به صورت آرایه
+      } else {
+        localStorage.setItem('selectedClinic', 'ویزیت آنلاین به نوبه');
+        localStorage.setItem('selectedClinicId', 'default');
+        Livewire.dispatch('clinicSelected', ['default']);
+      }
+
+      function checkInactiveClinics() {
+        var hasInactiveClinics = $('.option-card[data-active="0"]').length > 0;
+        if (hasInactiveClinics) {
+          $('.dropdown-trigger').addClass('warning');
+        } else {
+          $('.dropdown-trigger').removeClass('warning');
+        }
+      }
+
+      checkInactiveClinics();
+
+      $('.dropdown-trigger').on('click', function(event) {
+        event.stopPropagation();
+        dropdownOpen = !dropdownOpen;
+        $(this).toggleClass('border border-primary');
+        $('.my-dropdown-menu').toggleClass('d-none');
+        setTimeout(() => {
+          dropdownOpen = $('.my-dropdown-menu').is(':visible');
+        }, 100);
+      });
+
+      $(document).on('click', function() {
+        if (dropdownOpen) {
+          $('.dropdown-trigger').removeClass('border border-primary');
+          $('.my-dropdown-menu').addClass('d-none');
+          dropdownOpen = false;
         }
       });
-      Livewire.dispatch('clinicSelected', [selectedClinicId]); // ارسال به صورت آرایه
-    } else {
-      localStorage.setItem('selectedClinic', 'ویزیت آنلاین به نوبه');
-      localStorage.setItem('selectedClinicId', 'default');
-      Livewire.dispatch('clinicSelected', ['default']);
-    }
 
-    function checkInactiveClinics() {
-      var hasInactiveClinics = $('.option-card[data-active="0"]').length > 0;
-      if (hasInactiveClinics) {
-        $('.dropdown-trigger').addClass('warning');
-      } else {
-        $('.dropdown-trigger').removeClass('warning');
-      }
-    }
+      $('.my-dropdown-menu').on('click', function(event) {
+        event.stopPropagation();
+      });
 
-    checkInactiveClinics();
+      $('.option-card').on('click', function() {
+        var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+        var selectedId = $(this).attr('data-id');
 
-    $('.dropdown-trigger').on('click', function(event) {
-      event.stopPropagation();
-      dropdownOpen = !dropdownOpen;
-      $(this).toggleClass('border border-primary');
-      $('.my-dropdown-menu').toggleClass('d-none');
-      setTimeout(() => {
-        dropdownOpen = $('.my-dropdown-menu').is(':visible');
-      }, 100);
-    });
+        $('.option-card').removeClass('card-active');
+        $(this).addClass('card-active');
+        $('.dropdown-label').text(selectedText);
 
-    $(document).on('click', function() {
-      if (dropdownOpen) {
+        localStorage.setItem('selectedClinic', selectedText);
+        localStorage.setItem('selectedClinicId', selectedId);
+
+        checkInactiveClinics();
         $('.dropdown-trigger').removeClass('border border-primary');
         $('.my-dropdown-menu').addClass('d-none');
         dropdownOpen = false;
-      }
+
+        Livewire.dispatch('clinicSelected', [selectedId]); // ارسال به صورت آرایه
+      });
     });
-
-    $('.my-dropdown-menu').on('click', function(event) {
-      event.stopPropagation();
-    });
-
-    $('.option-card').on('click', function() {
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
-      var selectedId = $(this).attr('data-id');
-
-      $('.option-card').removeClass('card-active');
-      $(this).addClass('card-active');
-      $('.dropdown-label').text(selectedText);
-
-      localStorage.setItem('selectedClinic', selectedText);
-      localStorage.setItem('selectedClinicId', selectedId);
-
-      checkInactiveClinics();
-      $('.dropdown-trigger').removeClass('border border-primary');
-      $('.my-dropdown-menu').addClass('d-none');
-      dropdownOpen = false;
-
-      Livewire.dispatch('clinicSelected', [selectedId]); // ارسال به صورت آرایه
-    });
-  });
-</script>
+  </script>
 
 </div>
