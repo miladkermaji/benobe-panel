@@ -23,9 +23,20 @@ class FileManager extends Component
 
     protected $rules = [
         'newFolderName'   => 'required|string|max:255',
-        'filesToUpload.*' => 'file|max:10240', // حداکثر 10MB
+        'filesToUpload.*' => 'file|max:51200', // حداکثر 50MB
         'newName'         => 'required|string|max:255',
         'fileContent'     => 'nullable|string',
+    ];
+
+    protected $messages = [
+        'newFolderName.required'   => 'نام پوشه نمی‌تواند خالی باشد.',
+        'newFolderName.string'     => 'نام پوشه باید یک رشته متنی باشد.',
+        'newFolderName.max'        => 'نام پوشه نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+        'filesToUpload.*.file'     => 'فایل انتخاب‌شده معتبر نیست.',
+        'filesToUpload.*.max'      => 'حجم هر فایل نمی‌تواند بیشتر از ۵۰ مگابایت باشد.',
+        'newName.required'         => 'نام جدید نمی‌تواند خالی باشد.',
+        'newName.string'           => 'نام جدید باید یک رشته متنی باشد.',
+        'newName.max'              => 'نام جدید نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
     ];
 
     public function updatedFilesToUpload()
@@ -39,7 +50,7 @@ class FileManager extends Component
         $this->validateOnly('newFolderName');
         $path = $this->currentPath ? $this->currentPath . '/' . $this->newFolderName : $this->newFolderName;
 
-        if (! Storage::disk('public')->exists($path)) {
+        if (!Storage::disk('public')->exists($path)) {
             Storage::disk('public')->makeDirectory($path);
             File::create([
                 'name' => $this->newFolderName,
@@ -103,7 +114,7 @@ class FileManager extends Component
         $newPath = $this->currentPath ? $this->currentPath . '/' . $this->newName : $this->newName;
 
         if (Storage::disk('public')->exists($oldPath)) {
-            if (! Storage::disk('public')->exists($newPath)) {
+            if (!Storage::disk('public')->exists($newPath)) {
                 Storage::disk('public')->move($oldPath, $newPath);
                 $file = File::where('path', $oldPath)->first();
                 if ($file) {
@@ -196,18 +207,24 @@ class FileManager extends Component
     {
         $fullPath = $this->currentPath ? $this->currentPath : '';
 
-        // دریافت آیتم‌ها در مسیر فعلی
-        $items = File::where(function ($query) use ($fullPath) {
+        // کوئری اصلی برای دریافت آیتم‌ها
+        $query = File::where(function ($query) use ($fullPath) {
             $query->where('path', 'like', $fullPath . '/%')
                 ->whereRaw("CHAR_LENGTH(REPLACE(path, '$fullPath/', '')) - CHAR_LENGTH(REPLACE(REPLACE(path, '$fullPath/', ''), '/', '')) = 0");
         })
-            ->orWhere(function ($query) use ($fullPath) {
-                // اگر در مسیر روت هستیم، تمام پوشه‌ها و فایل‌های سطح اول را نمایش دهیم
-                if ($fullPath == '') {
-                    $query->whereRaw("CHAR_LENGTH(path) - CHAR_LENGTH(REPLACE(path, '/', '')) = 0");
-                }
-            })
-            ->orderBy('type', 'desc') // نمایش پوشه‌ها در ابتدا
+        ->orWhere(function ($query) use ($fullPath) {
+            if ($fullPath == '') {
+                $query->whereRaw("CHAR_LENGTH(path) - CHAR_LENGTH(REPLACE(path, '/', '')) = 0");
+            }
+        });
+
+        // اعمال فیلتر جستجو اگر مقدار $search وجود داشته باشد
+        if (!empty($this->search)) {
+            $query->where('name', 'like', '%' . $this->search . '%');
+        }
+
+        // اجرای کوئری و مرتب‌سازی
+        $items = $query->orderBy('type', 'desc') // نمایش پوشه‌ها در ابتدا
             ->orderBy('name')
             ->get()
             ->map(function ($file) {
@@ -229,5 +246,4 @@ class FileManager extends Component
             'emptyFolder' => $emptyFolder,
         ]);
     }
-
 }
