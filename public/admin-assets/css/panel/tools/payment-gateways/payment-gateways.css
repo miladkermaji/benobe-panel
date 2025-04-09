@@ -1,292 +1,334 @@
-.bg-gradient-header {
- background: linear-gradient(135deg, #6d28d9, #ec4899);
- transition: all 0.3s ease;
+/* هدر شیشه‌ای */
+.glass-header {
+    background: linear-gradient(
+        135deg,
+        rgba(31, 41, 55, 0.95),
+        rgba(55, 65, 81, 0.85)
+    );
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-radius: 16px;
+    transition: all 0.4s ease;
 }
 
-.bg-gradient-header:hover .header-icon {
- transform: scale(1.2);
+.glass-header:hover {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
 }
 
+.glass-header .header-icon {
+    transition: transform 0.3s ease;
+}
+
+.glass-header:hover .header-icon {
+    transform: scale(1.15) rotate(10deg);
+}
+
+/* اعلان */
 .alert-custom {
- background: #fef2f2;
- border-left: 5px solid #ef4444;
- color: #1f2937;
- border-radius: 8px;
+    background: #fff1f2;
+    border-left: 6px solid #f43f5e;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
 }
 
+.alert-custom:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* جستجو */
 .search-box {
- width: 320px;
- position: relative;
+    width: 340px;
+    position: relative;
 }
 
 .search-box input {
- background: #ffffff;
- color: #1f2937;
- border: 1px solid #d1d5db;
- box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
- transition: all 0.3s ease;
- font-size: 0.95rem;
- padding: 0.5rem 1rem 0.5rem 2.5rem;
+    background: #ffffff;
+    border: none;
+    border-radius: 9999px;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    font-size: 0.95rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
 }
 
 .search-box input:focus {
- border-color: #7c3aed;
- box-shadow: 0 0 12px rgba(124, 58, 237, 0.2);
- outline: none;
+    box-shadow: 0 0 0 4px rgba(31, 41, 55, 0.15);
+    outline: none;
 }
 
 .search-box input::placeholder {
- color: #9ca3af;
+    color: #9ca3af;
+    font-weight: 500;
 }
 
+/* کارت درگاه */
 .gateway-card {
- width: 340px;
- height: 180px;
- background: #fafafa;
- transition: transform 0.3s ease, box-shadow 0.3s ease;
- overflow: hidden;
+    width: 360px;
+    height: 200px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .gateway-card:hover {
- transform: translateY(-8px);
- box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
 
 .card-bg {
- position: absolute;
- top: 0;
- left: 0;
- width: 100%;
- height: 100%;
- opacity: 0.05;
- z-index: 0;
- transition: opacity 0.3s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.06;
+    transition: opacity 0.3s ease;
+    z-index: 0;
 }
 
 .bg-active {
- background: linear-gradient(45deg, #a7f3d0, #6ee7b7);
+    background: linear-gradient(45deg, #6ee7b7, #34d399);
 }
 
 .bg-inactive {
- background: linear-gradient(45deg, #fecaca, #f87171);
+    background: linear-gradient(45deg, #f87171, #fb7185);
 }
 
 .gateway-card:hover .card-bg {
- opacity: 0.1;
+    opacity: 0.12;
 }
 
 .gateway-logo {
- transition: transform 0.3s ease;
- z-index: 1;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    z-index: 1;
 }
 
 .gateway-card:hover .gateway-logo {
- transform: scale(1.1);
+    transform: scale(1.08);
 }
 
 .gateway-title {
- font-size: 1.1rem;
- transition: color 0.3s ease;
- z-index: 1;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    transition: color 0.3s ease;
+    z-index: 1;
 }
 
 .gateway-card:hover .gateway-title {
- color: #7c3aed;
+    color: #374151;
 }
 
+/* سوئیچ وضعیت */
 .status-switch {
- display: flex;
- align-items: center;
- justify-content: center;
- width: 36px;
- height: 36px;
- border-radius: 50%;
- cursor: pointer;
- transition: all 0.3s ease;
- z-index: 1;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1;
 }
 
 .status-switch.active {
- background: #10b981;
- box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
- color: white;
+    background: #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    color: white;
 }
 
 .status-switch.inactive {
- background: #f87171;
- box-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
- color: white;
+    background: #f87171;
+    box-shadow: 0 0 10px rgba(248, 113, 113, 0.4);
+    color: white;
 }
 
 .status-switch:hover {
- transform: scale(1.15);
+    transform: scale(1.1);
 }
 
 .status-icon {
- transition: transform 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 .status-switch:hover .status-icon {
- transform: rotate(20deg);
+    transform: rotate(15deg);
 }
 
+/* دکمه‌ها */
 .btn-custom {
- background: #7c3aed;
- color: white;
- border: none;
- transition: all 0.3s ease;
- box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
- font-size: 0.9rem;
+    background: linear-gradient(90deg, #374151, #4b5563);
+    color: white;
+    border: none;
+    border-radius: 9999px;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 3px 10px rgba(55, 65, 81, 0.2);
+    transition: all 0.3s ease;
 }
 
 .btn-custom:hover {
- background: #db2777;
- transform: translateY(-2px);
- box-shadow: 0 6px 16px rgba(219, 39, 119, 0.4);
+    background: linear-gradient(90deg, #1f2937, #374151);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(55, 65, 81, 0.3);
 }
 
 .btn-danger {
- background: #ef4444;
- border: none;
- transition: all 0.3s ease;
- box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
- font-size: 0.9rem;
+    background: linear-gradient(90deg, #f43f5e, #fb7185);
+    border: none;
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 3px 10px rgba(244, 63, 94, 0.2);
+    transition: all 0.3s ease;
 }
 
 .btn-danger:hover {
- background: #dc2626;
- transform: translateY(-2px);
- box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    background: linear-gradient(90deg, #e11d48, #f43f5e);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3);
 }
 
-.pagination-container {
- bottom: 20px;
- background: #fff;
+.btn-success {
+    background: linear-gradient(90deg, #10b981, #34d399);
+    border: none;
+    border-radius: 9999px;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
+    transition: all 0.3s ease;
+}
 
- padding: 10px;
- border-radius: 8px;
- box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
- z-index: 10;
- width: 100%;
+.btn-success:hover {
+    background: linear-gradient(90deg, #059669, #10b981);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+/* صفحه‌بندی */
+.pagination-container {
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-top: 2rem;
 }
 
 .pagination .page-item.active .page-link {
- background-color: #7c3aed;
- border-color: #7c3aed;
- color: white;
+    background: #374151;
+    border-color: #374151;
+    color: white;
+    border-radius: 8px;
 }
 
 .pagination .page-link {
- color: #6b7280;
- transition: all 0.3s ease;
+    color: #6b7280;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
 }
 
 .pagination .page-link:hover {
- background-color: #f3f4f6;
- color: #7c3aed;
+    background: #f3f4f6;
+    color: #374151;
+    border-color: #d1d5db;
 }
 
+/* انیمیشن‌ها */
+.animate-pulse {
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.animate__zoomIn {
+    animation: zoomIn 0.5s ease;
+}
+
+@keyframes zoomIn {
+    0% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ریسپانسیو */
 @media (max-width: 768px) {
- .gateway-card {
-  width: 100%;
-  max-width: 360px;
-  height: 160px;
- }
+    .gateway-card {
+        width: 100%;
+        max-width: 340px;
+        height: 180px;
+    }
 
- .gateway-list {
-  justify-content: center;
- }
+    .search-box {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
 
- .bg-gradient-header h2 {
-  font-size: 1.5rem;
- }
+    .glass-header h2 {
+        font-size: 1.5rem;
+    }
 
- .status-switch {
-  width: 32px;
-  height: 32px;
- }
+    .status-switch {
+        width: 36px;
+        height: 36px;
+    }
 
- .btn-custom,
- .btn-danger {
-  font-size: 0.85rem;
-  padding: 0.5rem 1rem;
- }
+    .btn-custom,
+    .btn-danger,
+    .btn-success {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+    }
 
- .search-box {
-  width: 100%;
- }
+    .gateway-title {
+        font-size: 1.1rem;
+    }
+
+    .gateway-logo {
+        width: 48px;
+        height: 48px;
+    }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
- .gateway-card {
-  width: 300px;
-  height: 170px;
- }
-}
-.bg-gradient-primary {
- background: linear-gradient(135deg, #6b7280, #1f2937);
-}
+    .gateway-card {
+        width: 320px;
+        height: 190px;
+    }
 
-.card {
- transition: box-shadow 0.3s ease;
-}
-
-.card:hover {
- box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-}
-
-.gateway-logo {
- transition: transform 0.3s ease;
-}
-
-.gateway-logo:hover {
- transform: scale(1.1);
-}
-
-.form-check-input:checked {
- background-color: #10b981;
- border-color: #10b981;
-}
-
-.btn-primary {
- background: #7c3aed;
- border: none;
- transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
- background: #5b21b6;
- transform: translateY(-2px);
- box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-}
-
-.btn-outline-light {
- transition: all 0.3s ease;
-}
-
-.btn-outline-light:hover {
- background: #ffffff;
- color: #1f2937;
-}
-
-@media (max-width: 768px) {
- .card-body {
-  padding: 2rem;
- }
-
- .gateway-logo {
-  width: 36px;
-  height: 36px;
- }
-
- .btn-primary,
- .btn-outline-light {
-  font-size: 0.9rem;
-  padding: 0.5rem 1.5rem;
- }
-
- textarea {
-  font-size: 0.85rem;
- 
- }
+    .search-box {
+        width: 300px;
+    }
 }

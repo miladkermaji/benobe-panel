@@ -25,7 +25,8 @@
   <div class="subuser-content-wrapper p-3 w-100">
     <div class="w-100 d-flex justify-content-end">
       <a href="{{ route('dr.panel.clinics.create') }}"
-        class="btn btn-primary h-50 d-flex justify-content-center align-items-center" id="add-clinic-btn">افزودن مطب
+        class="btn btn-primary h-50 d-flex justify-content-center align-items-center text-white"
+        id="add-clinic-btn">افزودن مطب
         جدید</a>
     </div>
     <div class="p-3">

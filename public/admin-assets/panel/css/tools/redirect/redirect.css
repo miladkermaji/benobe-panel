@@ -1,170 +1,306 @@
+/* هدر شیشه‌ای */
 .glass-header {
-   background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(124, 58, 237, 0.85));
-   backdrop-filter: blur(10px);
-   border: 1px solid rgba(255, 255, 255, 0.2);
-   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-   transition: all 0.3s ease;
-  }
+ background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.85));
+ backdrop-filter: blur(15px);
+ border: 1px solid rgba(255, 255, 255, 0.1);
+ box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+ border-radius: 16px;
+ transition: all 0.4s ease;
+ padding: 1.5rem;
+}
 
-  .glass-header h1 {
-   color: #ffffff;
-   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  }
+.glass-header:hover {
+ box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+ transform: translateY(-3px);
+}
 
-  .input-group {
-   position: relative;
-  }
+.glass-header h1 {
+ color: #ffffff;
+ font-weight: 500;
+ font-size: 1.75rem;
+ text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+ margin: 0;
+}
 
-  .form-control {
-   border-radius: 8px !important;
-   border: 1px solid #e5e7eb;
-   transition: all 0.3s ease;
-   padding-left: 2.5rem;
-   height: 38px;
-  }
+/* ورودی جستجو */
+.input-group {
+ position: relative;
+ max-width: 420px;
+}
 
-  .form-control:focus {
-   border-color: #4f46e5;
-   box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
-  }
+.form-control {
+ background: #ffffff;
+ border: none;
+ border-radius: 12px;
+ padding: 0.75rem 1rem 0.75rem 2.5rem;
+ font-size: 0.95rem;
+ box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+ transition: all 0.3s ease;
+}
 
-  .form-control::placeholder {
-   color: #6b7280;
-  }
+.form-control:focus {
+ box-shadow: 0 0 0 4px rgba(31, 41, 55, 0.15);
+ outline: none;
+}
 
-  .search-icon {
-   z-index: 5;
-  }
+.form-control::placeholder {
+ color: #9ca3af;
+ font-weight: 500;
+}
 
-  .btn-gradient-danger {
-   background: linear-gradient(90deg, #f87171, #fca5a5);
-   border: none;
-   color: white;
-   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-   transition: all 0.3s ease;
-  }
+.search-icon {
+ position: absolute;
+ top: 50%;
+ left: 1rem;
+ transform: translateY(-50%);
+ z-index: 5;
+}
 
-  .btn-gradient-danger:hover:not(:disabled) {
-   background: linear-gradient(90deg, #ef4444, #f87171);
-   transform: translateY(-2px);
-   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
-  }
+/* دکمه‌ها */
+.btn-gradient-success {
+ background: linear-gradient(90deg, #10b981, #34d399);
+ border: none;
+ color: white;
+ border-radius: 9999px;
+ padding: 0.65rem 1.5rem;
+ font-size: 0.95rem;
+ font-weight: 500;
+ box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
+ transition: all 0.3s ease;
+}
 
-  .btn-gradient-danger:disabled {
-   background: rgba(255, 255, 255, 0.2);
-   cursor: not-allowed;
-  }
+.btn-gradient-success:hover {
+ background: linear-gradient(90deg, #059669, #10b981);
+ transform: translateY(-2px);
+ box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
 
-  .btn-gradient-success {
-   background: linear-gradient(90deg, #10b981, #34d399);
-   border: none;
-   color: white;
-   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-   transition: all 0.3s ease;
-  }
+.btn-gradient-danger {
+ background: linear-gradient(90deg, #f43f5e, #fb7185);
+ border: none;
+ color: white;
+ border-radius: 9999px;
+ padding: 0.65rem 1.5rem;
+ font-size: 0.95rem;
+ font-weight: 500;
+ box-shadow: 0 3px 10px rgba(244, 63, 94, 0.2);
+ transition: all 0.3s ease;
+}
 
-  .btn-gradient-success:hover {
-   background: linear-gradient(90deg, #059669, #10b981);
-   transform: translateY(-2px);
-   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
-  }
+.btn-gradient-danger:hover:not(:disabled) {
+ background: linear-gradient(90deg, #e11d48, #f43f5e);
+ transform: translateY(-2px);
+ box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3);
+}
 
-  .table {
-   width: 100% !important;
-   margin-bottom: 0;
-  }
+.btn-gradient-danger:disabled {
+ background: #e5e7eb;
+ color: #9ca3af;
+ cursor: not-allowed;
+ box-shadow: none;
+}
 
-  .table-bordered {
-   border: 1px solid #e5e7eb;
-  }
+.buttons-container {
+ display: flex;
+ gap: 1rem;
+ flex-wrap: wrap;
+ justify-content: flex-end;
+}
 
-  .table-bordered th,
-  .table-bordered td {
-   border: 1px solid #e5e7eb;
-   vertical-align: middle;
-  }
+/* جدول */
+.card {
+ background: #ffffff;
+ border-radius: 16px;
+ box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+ transition: all 0.3s ease;
+}
 
-  .table-hover tbody tr:hover {
-   background-color: #f9fafb;
-  }
+.card:hover {
+ box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
 
-  .bg-label-success {
-   background-color: #d1fae5;
-   color: #10b981;
-  }
+.table {
+ margin: 0;
+ border-collapse: separate;
+ border-spacing: 0;
+}
 
-  .bg-label-danger {
-   background-color: #fee2e2;
-   color: #ef4444;
-  }
+.table-bordered {
+ border: none;
+}
 
-  .cursor-pointer {
-   cursor: pointer;
-  }
+.table-bordered th,
+.table-bordered td {
+ border: none;
+ border-bottom: 1px solid #e5e7eb;
+ padding: 1rem;
+ vertical-align: middle;
+}
 
-  .rounded-pill {
-   border-radius: 50rem;
-  }
+.table-hover tbody tr:hover {
+ background: #f9fafb;
+ transition: background 0.2s ease;
+}
 
-  .form-check-input {
-   vertical-align: middle;
-   margin: 0;
-  }
+.table thead th {
+ background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.85));
+ color: #ffffff;
+ font-weight: 600;
+ border-bottom: none;
+}
 
-  /* تنظیم دکمه‌ها و تراز در سایزهای کوچک‌تر */
-  @media (max-width: 991px) {
+/* وضعیت */
+.bg-label-success {
+ background: #d1fae5;
+ color: #10b981;
+ border-radius: 9999px;
+ padding: 0.35rem 0.75rem;
+ font-weight: 500;
+ transition: all 0.3s ease;
+}
 
-   /* تبلت */
-   .buttons-container {
-    width: 100%;
-    margin-top: 1rem;
-    /* فاصله از بالا */
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-   }
+.bg-label-success:hover {
+ background: #a7f3d0;
+}
 
-   .btn {
-    width: 100%;
-    max-width: 250px;
-    /* حداکثر عرض دکمه‌ها */
-   }
+.bg-label-danger {
+ background: #fee2e2;
+ color: #f43f5e;
+ border-radius: 9999px;
+ padding: 0.35rem 0.75rem;
+ font-weight: 500;
+ transition: all 0.3s ease;
+}
 
-   .input-group {
-    max-width: 100%;
-    /* تنظیم عرض سرچ در تبلت */
-   }
-  }
+.bg-label-danger:hover {
+ background: #fecaca;
+}
 
-  @media (max-width: 767px) {
+.cursor-pointer {
+ cursor: pointer;
+}
 
-   /* موبایل */
-   .glass-header {
-    padding: 2rem;
-   }
+/* چک‌باکس */
+.form-check-input {
+ width: 1.25rem;
+ height: 1.25rem;
+ border-radius: 4px;
+ border: 1px solid #d1d5db;
+ transition: all 0.3s ease;
+}
 
-   .buttons-container {
-    width: 100%;
-    margin-top: 1.5rem;
-    /* فاصله بیشتر در موبایل */
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-   }
+.form-check-input:checked {
+ background-color: #374151;
+ border-color: #374151;
+}
 
-   .btn {
-    width: 100%;
-    max-width: 200px;
-   }
+/* دکمه‌های عملیات در جدول */
+.btn-gradient-success.rounded-pill,
+.btn-gradient-danger.rounded-pill {
+ padding: 0.5rem 1rem;
+}
 
-   .input-group {
-    max-width: 100%;
-    margin-top: 1rem;
-   }
+.btn-gradient-success.rounded-pill svg,
+.btn-gradient-danger.rounded-pill svg {
+ width: 18px;
+ height: 18px;
+}
 
-   h1.h3 {
-    font-size: 1.5rem;
-    text-align: center;
-    width: 100%;
-   }
-  }
+/* صفحه‌بندی */
+.pagination .page-item.active .page-link {
+ background: #374151;
+ border-color: #374151;
+ color: white;
+ border-radius: 8px;
+}
+
+.pagination .page-link {
+ color: #6b7280;
+ background: #ffffff;
+ border-radius: 8px;
+ border: 1px solid #e5e7eb;
+ transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+ background: #f3f4f6;
+ color: #374151;
+ border-color: #d1d5db;
+}
+
+/* متن خالی */
+.text-muted {
+ color: #6b7280;
+ font-weight: 500;
+}
+
+/* ریسپانسیو */
+@media (max-width: 991px) {
+ .glass-header {
+  padding: 1.25rem;
+ }
+
+ .buttons-container {
+  width: 100%;
+  margin-top: 1.5rem;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
+ }
+
+ .btn {
+  width: auto;
+  min-width: 150px;
+ }
+
+ .input-group {
+  max-width: 100%;
+  margin-top: 1rem;
+ }
+
+ h1.h3 {
+  font-size: 1.5rem;
+  text-align: center;
+  width: 100%;
+ }
+}
+
+@media (max-width: 767px) {
+ .glass-header {
+  padding: 1rem;
+ }
+
+ .buttons-container {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+ }
+
+ .btn {
+  width: 100%;
+  max-width: 200px;
+ }
+
+ .input-group {
+  margin-top: 1rem;
+ }
+
+ h1.h3 {
+  font-size: 1.35rem;
+ }
+
+ .table-responsive {
+  font-size: 0.9rem;
+ }
+
+ .btn-gradient-success.rounded-pill,
+ .btn-gradient-danger.rounded-pill {
+  padding: 0.4rem 0.75rem;
+ }
+
+ .btn-gradient-success.rounded-pill svg,
+ .btn-gradient-danger.rounded-pill svg {
+  width: 16px;
+  height: 16px;
+ }
+}

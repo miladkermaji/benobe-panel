@@ -14,7 +14,7 @@
         <h5 class="mb-0 fw-bold">تغییر لوگوی سایت</h5>
       </div>
       <a href="{{ route('admin.panel.setting.index') }}"
-        class="btn btn-outline-light btn-sm rounded-pill d-flex align-items-center gap-2 hover:shadow-md transition-all text-white">
+        class="btn btn-outline-light btn-sm rounded-pill d-flex align-items-center gap-2 text-white hover:shadow-md transition-all text-white">
         <svg width="16" style="transform: rotate(180deg)" height="16" viewBox="0 0 24 24" fill="#fff"
           stroke="currentColor" stroke-width="2">
           <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />

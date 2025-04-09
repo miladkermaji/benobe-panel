@@ -95,7 +95,7 @@
                 </span>
                 <div class="d-flex align-items-center gap-2">
                   <a href="{{ route('admin.panel.tools.sms-gateways.edit', $gateway->name) }}"
-                    class="btn btn-custom rounded-pill px-3 py-1 d-flex align-items-center gap-2">
+                    class="btn btn-custom rounded-pill px-3 py-1 d-flex align-items-center gap-2 text-white">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                       stroke-width="2">
                       <path

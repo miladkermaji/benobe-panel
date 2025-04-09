@@ -28,4 +28,6 @@
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/tom-select.bootstrap5.min.css') }}">
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastr/toastr.min.css') }}">
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/global-loader.css') }}">
+<link rel="stylesheet" href="{{ asset('admin-assets/css/my-form.css') }}">
+
 {{-- tom select --}}
