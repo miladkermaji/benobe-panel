@@ -6,7 +6,7 @@
       <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
         wire:model.live="search" placeholder="جستجو در اعلان‌ها..." style="padding-right: 23px">
       <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3"
-        style="z-index: 5; top: 11px; right: 5px;">
+        style="z-index: 5; right: 5px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
           <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
         </svg>
@@ -127,53 +127,8 @@
       </div>
     </div>
   </div>
+<link rel="stylesheet" href="{{ asset('admin-assets/panel/css/tools/notification/notifiation.css') }}">
 
-  <style>
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: white;
-      border: none;
-    }
-
-    .btn-gradient-success:hover {
-      background: linear-gradient(90deg, #059669, #047857);
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      color: white;
-      border: none;
-    }
-
-    .btn-gradient-danger:hover {
-      background: linear-gradient(90deg, #dc2626, #b91c1c);
-    }
-
-    .bg-label-info {
-      background-color: #e0f2fe;
-      color: #0ea5e9;
-    }
-
-    .bg-label-success {
-      background-color: #dcfce7;
-      color: #22c55e;
-    }
-
-    .bg-label-warning {
-      background-color: #fef3c7;
-      color: #f59e0b;
-    }
-
-    .bg-label-danger {
-      background-color: #fee2e2;
-      color: #ef4444;
-    }
-
-    .bg-label-secondary {
-      background-color: #f3f4f6;
-      color: #6b7280;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {

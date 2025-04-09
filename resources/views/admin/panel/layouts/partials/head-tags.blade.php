@@ -32,7 +32,12 @@
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/codemirror/5.65.16/codemirror.min.css') }}">
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/custom-datepicker/custom-datepicker.css') }}">
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/flatpickr/dist/flatpickr.min.css') }}">
-<link rel="stylesheet" href="{{ asset('admin-assets/css/my-form.css') }}">
+@php
+    $excludedRoutes = ['admin-panel', 'admin.tools.page-builder.index'];
+@endphp
 
+@unless (Request::routeIs($excludedRoutes))
+    <link rel="stylesheet" href="{{ asset('admin-assets/css/my-form.css') }}">
+@endunless
 {{-- tom select --}}
 @vite(['resources/js/app.js', 'resources/css/app.css'])

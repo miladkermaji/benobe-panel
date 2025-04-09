@@ -2,7 +2,8 @@
 
 @section('styles')
   <link type="text/css" href="{{ asset('admin-assets/css/panel/tools/redirects/redirects.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/site-mape/site-map-manager-setting.css') }}">
+  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/site-map/sitemap-manager.css') }}">
+
 @endsection
 
 @section('site-header')
@@ -10,6 +11,8 @@
 @endsection
 
 @section('content')
+@section('bread-crumb-title', ' تنظیمات نقشه سایت')
+
   <div class="container-fluid py-1" dir="rtl">
     <!-- هدر -->
     <div
@@ -19,7 +22,7 @@
       </div>
       <div class="buttons-container">
         <a href="{{ route('admin.tools.sitemap.index') }}"
-          class="btn btn-gradient-primary px-4 py-2 d-flex align-items-center gap-2">
+          class="btn btn-gradient-primary px-4 py-2 d-flex align-items-center gap-2 text-white">
           <svg width="16" height="16" style="transform: rotate(180deg)" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2">
             <path d="M15 19l-7-7 7-7" />

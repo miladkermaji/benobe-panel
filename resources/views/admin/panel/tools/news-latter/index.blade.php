@@ -6,7 +6,7 @@
   {{ 'به نوبه | پنل مدیریت' }}
 @endsection
 @section('content')
-@section('bread-crumb-title', ' قالب ایمیل')
+@section('bread-crumb-title', 'مدیریت خبر نامه')
 @section('scripts')
 
   @livewire('admin.panel.tools.news-latter')

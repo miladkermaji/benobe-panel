@@ -1,197 +1,368 @@
+/* کلیات */
+.container-fluid {
+ padding: 2rem;
+ background: #f4f6f9;
+}
+
+/* هدر شیشه‌ای */
 .glass-header {
-   background: linear-gradient(135deg, rgba(79, 70, 229, 0.9), rgba(124, 58, 237, 0.7));
-   backdrop-filter: blur(12px);
-   border: 1px solid rgba(255, 255, 255, 0.25);
-   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-   transition: all 0.3s ease;
-  }
+ background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.85));
+ backdrop-filter: blur(15px);
+ border: 1px solid rgba(255, 255, 255, 0.1);
+ box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+ border-radius: 16px;
+ padding: 1.5rem;
+ transition: all 0.4s ease;
+}
 
-  .glass-header:hover {
-   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-   transform: translateY(-3px);
-  }
+.glass-header:hover {
+ box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+ transform: translateY(-3px);
+}
 
-  .bg-gradient-light {
-   background: linear-gradient(135deg, #f9fafb, #eceff1);
-   border-bottom: 1px solid #e2e8f0;
-  }
+.glass-header h4 {
+ color: #ffffff;
+ font-size: 1.5rem;
+ font-weight: 600;
+ margin: 0;
+ letter-spacing: -0.025em;
+ text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
 
-  .input-modern {
-   border: 1px solid #d1d5db;
-   border-radius: 12px;
-   padding: 12px 16px;
-   font-size: 15px;
-   background: #ffffff;
-   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
-   transition: all 0.3s ease;
-   height: 48px;
-  }
+/* کارت‌ها */
+.card {
+ background: #ffffff;
+ border-radius: 16px;
+ box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+ transition: all 0.3s ease;
+ border: none;
+}
 
-  textarea.input-modern {
-   height: auto;
-   resize: vertical;
-   padding: 14px 16px;
-  }
+.card:hover {
+ box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+ transform: translateY(-2px);
+}
 
-  .input-modern:focus {
-   border-color: #4f46e5;
-   box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2), inset 0 2px 6px rgba(0, 0, 0, 0.05);
-   outline: none;
-  }
+.card-header {
+ background: linear-gradient(135deg, #f9fafb, #eceff1);
+ color: #1f2937;
+ font-weight: 600;
+ padding: 1.25rem 1.5rem;
+ border-bottom: 1px solid #e5e7eb;
+ border-radius: 16px 16px 0 0;
+}
 
-  .btn-gradient-primary {
-   background: linear-gradient(90deg, #4f46e5, #7c3aed);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
+/* فیلدهای ورودی */
+.input-modern {
+ background: #ffffff;
+ border: 1px solid #d1d5db;
+ border-radius: 12px;
+ padding: 0.75rem 1rem;
+ font-size: 0.95rem;
+ box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+ transition: all 0.3s ease;
+ height: 48px;
+}
 
-  .btn-gradient-primary:hover {
-   background: linear-gradient(90deg, #4338ca, #6b21a8);
-   transform: translateY(-2px);
-   box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
-  }
+.input-modern:focus {
+ border-color: #374151;
+ box-shadow: 0 0 0 4px rgba(55, 65, 81, 0.15);
+ background: #f9fafb;
+ outline: none;
+}
 
-  .btn-gradient-success {
-   background: linear-gradient(90deg, #10b981, #34d399);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
+textarea.input-modern {
+ height: auto;
+ min-height: 200px;
+ padding: 1rem;
+ resize: vertical;
+}
 
-  .btn-gradient-success:hover {
-   background: linear-gradient(90deg, #059669, #10b981);
-   transform: translateY(-2px);
-   box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
-  }
+/* گروه ورودی جستجو */
+.input-group-text {
+ background: #ffffff;
+ border: 1px solid #d1d5db;
+ border-left: none;
+ border-radius: 0 12px 12px 0;
+ padding: 0.75rem;
+ transition: all 0.3s ease;
+}
 
-  .btn-gradient-danger {
-   background: linear-gradient(90deg, #f87171, #fca5a5);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
+.input-group .input-modern {
+ border-right: none;
+ border-radius: 12px 0 0 12px;
+}
 
-  .btn-gradient-danger:hover:not(:disabled) {
-   background: linear-gradient(90deg, #ef4444, #f87171);
-   transform: translateY(-2px);
-   box-shadow: 0 6px 15px rgba(248, 113, 113, 0.3);
-  }
+/* دکمه‌ها */
+.btn-gradient-success {
+ background: linear-gradient(90deg, #10b981, #34d399);
+ border: none;
+ color: #ffffff;
+ border-radius: 16px;
+ padding: 0.75rem 1.5rem;
+ font-size: 1rem;
+ font-weight: 500;
+ box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
+ transition: all 0.3s ease;
+}
 
-  .btn-gradient-danger:disabled {
-   background: #d1d5db;
-   cursor: not-allowed;
-  }
+.btn-gradient-success:hover {
+ background: linear-gradient(90deg, #059669, #10b981);
+ transform: translateY(-2px);
+ box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
 
-  .btn-gradient-warning {
-   background: linear-gradient(90deg, #f59e0b, #fbbf24);
-   border: none;
-   color: white;
-   transition: all 0.3s ease;
-  }
+.btn-gradient-danger {
+ background: linear-gradient(90deg, #f43f5e, #fb7185);
+ border: none;
+ color: #ffffff;
+ border-radius: 16px;
+ padding: 0.75rem 1.5rem;
+ font-size: 1rem;
+ font-weight: 500;
+ box-shadow: 0 3px 10px rgba(244, 63, 94, 0.2);
+ transition: all 0.3s ease;
+}
 
-  .btn-gradient-warning:hover {
-   background: linear-gradient(90deg, #d97706, #f59e0b);
-   transform: translateY(-2px);
-   box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
-  }
+.btn-gradient-danger:hover:not(:disabled) {
+ background: linear-gradient(90deg, #e11d48, #f43f5e);
+ transform: translateY(-2px);
+ box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3);
+}
 
-  .bg-light {
-   background: #f9fafb;
-   border: 1px solid #e2e8f0;
-   border-radius: 12px;
-  }
+.btn-gradient-danger:disabled {
+ background: #e5e7eb;
+ color: #9ca3af;
+ cursor: not-allowed;
+ box-shadow: none;
+}
 
-  .table-bordered {
-   border: 1px solid #e2e8f0;
-   border-radius: 12px;
-   overflow: hidden;
-  }
+.btn-gradient-warning {
+ background: linear-gradient(90deg, #f59e0b, #fbbf24);
+ border: none;
+ color: #ffffff;
+ border-radius: 16px;
+ padding: 0.65rem 1.25rem;
+ font-size: 0.9rem;
+ font-weight: 500;
+ box-shadow: 0 3px 10px rgba(245, 158, 11, 0.2);
+ transition: all 0.3s ease;
+}
 
-  .table-bordered th,
-  .table-bordered td {
-   border: 1px solid #e2e8f0;
-  }
+.btn-gradient-warning:hover {
+ background: linear-gradient(90deg, #d97706, #f59e0b);
+ transform: translateY(-2px);
+ box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+}
 
-  .cursor-pointer {
-   cursor: pointer;
-  }
+.btn-gradient-primary {
+ background: linear-gradient(90deg, #374151, #4b5563);
+ border: none;
+ color: #ffffff;
+ border-radius: 16px;
+ padding: 0.65rem 1.25rem;
+ font-size: 0.9rem;
+ font-weight: 500;
+ box-shadow: 0 3px 10px rgba(55, 65, 81, 0.2);
+ transition: all 0.3s ease;
+}
 
-  .help-block {
-   background: #fef3c7;
-   padding: 16px;
-   border-radius: 12px;
-   color: #d97706;
-   font-size: 14px;
-   border: 1px solid #fde68a;
-   transition: all 0.3s ease;
-  }
+.btn-gradient-primary:hover {
+ background: linear-gradient(90deg, #1f2937, #374151);
+ transform: translateY(-2px);
+ box-shadow: 0 5px 15px rgba(55, 65, 81, 0.3);
+}
 
-  .help-block:hover {
-   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  }
+/* جدول */
+.table {
+ border-collapse: separate;
+ border-spacing: 0;
+ margin: 0;
+}
 
-  .rounded-xl {
-   border-radius: 1rem;
-  }
+.table thead th {
+ background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.85));
+ color: #ffffff;
+ font-weight: 600;
+ padding: 1rem;
+ border-bottom: none;
+}
 
-  .rounded-top-xl {
-   border-top-left-radius: 1rem;
-   border-top-right-radius: 1rem;
-  }
+.table td {
+ border-bottom: 1px solid #e5e7eb;
+ padding: 1rem;
+ vertical-align: middle;
+}
 
-  .text-sm {
-   font-size: 0.875rem;
-  }
+.table-hover tbody tr:hover {
+ background: #f9fafb;
+ transition: background 0.2s ease;
+}
 
-  .text-lg {
-   font-size: 1.125rem;
-  }
+/* چک‌باکس */
+input[type="checkbox"] {
+ width: 1.25rem;
+ height: 1.25rem;
+ border-radius: 4px;
+ border: 1px solid #d1d5db;
+ transition: all 0.3s ease;
+ cursor: pointer;
+}
 
-  .tracking-tight {
-   letter-spacing: -0.025em;
-  }
+input[type="checkbox"]:checked {
+ background-color: #374151;
+ border-color: #374151;
+}
 
-  @media (max-width: 992px) {
-   .glass-header {
-    padding: 20px;
-   }
+/* وضعیت‌ها */
+.badge {
+ padding: 0.5rem 1rem;
+ border-radius: 9999px;
+ font-weight: 500;
+ transition: all 0.3s ease;
+}
 
-   .btn {
-    margin-top: 10px;
-   }
-  }
+.bg-success {
+ background: #d1fae5;
+ color: #10b981;
+}
 
-  @media (max-width: 768px) {
- 
+.bg-success:hover {
+ background: #a7f3d0;
+}
 
-   .input-modern {
-    font-size: 14px;
-    padding: 10px 14px;
-    height: 44px;
-   }
+.bg-danger {
+ background: #fee2e2;
+ color: #f43f5e;
+}
 
-   .btn {
-    font-size: 14px;
-    padding: 10px;
-   }
+.bg-danger:hover {
+ background: #fecaca;
+}
 
+/* بخش راهنما */
+.help-block {
+ background: #fef3c7;
+ border: 1px solid #fde68a;
+ border-radius: 16px;
+ padding: 1.5rem;
+ color: #d97706;
+ font-size: 0.9rem;
+ transition: all 0.3s ease;
+ box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
 
-  }
+.help-block:hover {
+ box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+ transform: translateY(-2px);
+}
 
-  @media (max-width: 576px) {
-   .glass-header {
-    padding: 16px;
-   }
+/* انیمیشن‌ها */
+.animate__animated.animate__fadeIn {
+ animation: fadeIn 0.5s ease-out;
+}
 
-   .input-modern {
-    font-size: 13px;
-    padding: 8px 12px;
-    height: 40px;
-   }
+.animate__animated.animate__fadeInUp {
+ animation: fadeInUp 0.5s ease-out;
+}
 
-   .btn {
-    font-size: 13px;
-    padding: 8px;
-   }
-  }
+@keyframes fadeIn {
+ 0% { opacity: 0; }
+ 100% { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+ 0% { opacity: 0; transform: translateY(20px); }
+ 100% { opacity: 1; transform: translateY(0); }
+}
+
+/* استایل‌های متفرقه */
+.text-sm {
+ font-size: 0.875rem;
+}
+
+.text-lg {
+ font-size: 1.125rem;
+}
+
+.tracking-tight {
+ letter-spacing: -0.025em;
+}
+
+.cursor-pointer {
+ cursor: pointer;
+}
+
+/* ریسپانسیو */
+@media (max-width: 992px) {
+ .glass-header {
+  padding: 1.25rem;
+ }
+
+ .btn {
+  margin-top: 0.75rem;
+ }
+
+ .card-body {
+  padding: 1.25rem;
+ }
+}
+
+@media (max-width: 768px) {
+ .container-fluid {
+  padding: 1.5rem;
+ }
+
+ .input-modern {
+  font-size: 0.9rem;
+  padding: 0.65rem 0.9rem;
+  height: 44px;
+ }
+
+ .btn {
+  font-size: 0.9rem;
+  padding: 0.65rem 1.25rem;
+ }
+
+ .card-header {
+  padding: 1rem 1.25rem;
+ }
+
+ .table td,
+ .table th {
+  padding: 0.75rem;
+ }
+
+ .help-block {
+  padding: 1.25rem;
+ }
+}
+
+@media (max-width: 576px) {
+ .glass-header {
+  padding: 1rem;
+ }
+
+ .glass-header h4 {
+  font-size: 1.25rem;
+ }
+
+ .input-modern {
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+  height: 40px;
+ }
+
+ .btn {
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+ }
+
+ .card-body {
+  padding: 1rem;
+ }
+
+ .table-responsive {
+  font-size: 0.9rem;
+ }
+}

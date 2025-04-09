@@ -113,7 +113,7 @@ textarea::placeholder {
     color: #9ca3af;
     font-weight: 500;
 }
-form input:not([type=checkbox]){
+input:not([type=checkbox]){
   height: 50px !important;
 }
 /* سوئیچ وضعیت */

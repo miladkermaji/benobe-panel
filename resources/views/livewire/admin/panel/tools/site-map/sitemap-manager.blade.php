@@ -42,7 +42,7 @@
       </button>
       @if ($isGenerated)
         <a href="{{ route('admin.tools.sitemap.download') }}"
-          class="btn btn-gradient-primary px-4 py-2 d-flex align-items-center gap-2">
+          class="btn btn-gradient-primary px-4 py-2 d-flex align-items-center gap-2 text-white">
           <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2">
             <path d="M12 15V3m0 12l-4-4m4 4l4-4M4 19h16" />
