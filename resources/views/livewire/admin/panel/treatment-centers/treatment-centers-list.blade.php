@@ -144,58 +144,7 @@
     </div>
   </div>
 
-  <style>
-    .glass-header {
-      background: linear-gradient(135deg, rgba(79, 70, 229, 0.9), rgba(124, 58, 237, 0.7));
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    }
 
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #28a745, #34d058);
-      border: none;
-      color: white;
-    }
-
-    .btn-gradient-success:hover {
-      background: linear-gradient(90deg, #218838, #28a745);
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #dc3545, #ef4444);
-      border: none;
-      color: white;
-    }
-
-    .btn-gradient-danger:hover {
-      background: linear-gradient(90deg, #c82333, #dc3545);
-    }
-
-    .btn-gradient-info {
-      background: linear-gradient(90deg, #17a2b8, #20c9dc);
-      border: none;
-      color: white;
-    }
-
-    .btn-gradient-info:hover {
-      background: linear-gradient(90deg, #138496, #17a2b8);
-    }
-
-    .bg-label-success {
-      background-color: #d4edda;
-      color: #28a745;
-    }
-
-    .bg-label-danger {
-      background-color: #f8d7da;
-      color: #dc3545;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {
