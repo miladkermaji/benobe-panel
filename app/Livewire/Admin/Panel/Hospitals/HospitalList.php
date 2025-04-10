@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Livewire\Admin\Panel\Hospitals;
 
 use App\Models\Hospital;
@@ -11,14 +12,13 @@ class HospitalList extends Component
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-
     protected $listeners = ['deleteHospitalConfirmed' => 'deleteHospital'];
 
-    public $perPage           = 10;
-    public $search            = '';
-    public $readyToLoad       = false;
+    public $perPage = 10;
+    public $search = '';
+    public $readyToLoad = false;
     public $selectedHospitals = [];
-    public $selectAll         = false;
+    public $selectAll = false;
 
     protected $queryString = ['search' => ['except' => '']];
 
@@ -35,7 +35,7 @@ class HospitalList extends Component
     public function toggleStatus($id)
     {
         $hospital = Hospital::findOrFail($id);
-        $hospital->update(['is_active' => ! $hospital->is_active]);
+        $hospital->update(['is_active' => !$hospital->is_active]);
         $this->dispatch('show-alert', type: $hospital->is_active ? 'success' : 'info', message: $hospital->is_active ? 'فعال شد!' : 'غیرفعال شد!');
     }
 
@@ -58,14 +58,14 @@ class HospitalList extends Component
 
     public function updatedSelectAll($value)
     {
-        $currentPageIds          = $this->getHospitalsQuery()->pluck('id')->toArray();
+        $currentPageIds = $this->getHospitalsQuery()->pluck('id')->toArray();
         $this->selectedHospitals = $value ? $currentPageIds : [];
     }
 
     public function updatedSelectedHospitals()
     {
-        $currentPageIds  = $this->getHospitalsQuery()->pluck('id')->toArray();
-        $this->selectAll = ! empty($this->selectedHospitals) && count(array_diff($currentPageIds, $this->selectedHospitals)) === 0;
+        $currentPageIds = $this->getHospitalsQuery()->pluck('id')->toArray();
+        $this->selectAll = !empty($this->selectedHospitals) && count(array_diff($currentPageIds, $this->selectedHospitals)) === 0;
     }
 
     public function deleteSelected()
@@ -77,7 +77,7 @@ class HospitalList extends Component
 
         Hospital::whereIn('id', $this->selectedHospitals)->delete();
         $this->selectedHospitals = [];
-        $this->selectAll         = false;
+        $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'بیمارستان‌های انتخاب‌شده حذف شدند!');
     }
 
@@ -85,7 +85,7 @@ class HospitalList extends Component
     {
         return Hospital::where('name', 'like', '%' . $this->search . '%')
             ->orWhere('description', 'like', '%' . $this->search . '%')
-            ->with(['doctor', 'province', 'city'])
+            ->with(['province', 'city', 'doctors']) // رابطه معکوس
             ->paginate($this->perPage);
     }
 

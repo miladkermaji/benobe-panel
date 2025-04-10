@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Zone;
 use App\Models\SubUser;
+use App\Models\Hospital;
 use App\Models\DoctorTag;
 use App\Models\Secretary;
 use App\Models\Specialty;
@@ -287,5 +288,9 @@ class Doctor extends Authenticatable
     {
         return $this->belongsToMany(Insurance::class, 'doctor_insurance', 'doctor_id', 'insurance_id')
             ->withTimestamps();
+    }
+    public function hospital()
+    {
+        return $this->belongsTo(Hospital::class);
     }
 }

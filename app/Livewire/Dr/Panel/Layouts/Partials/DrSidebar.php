@@ -12,7 +12,7 @@ class DrSidebar extends Component
     public function mount()
     {
         if (Auth::guard('doctor')->check()) {
-            $this->specialtyName = optional(Auth::guard('doctor')->user())->specialty?->title ?? 'نامشخص';
+            $this->specialtyName = optional(Auth::guard('doctor')->user())->specialty?->name ?? 'نامشخص';
         } elseif (Auth::guard('secretary')->check()) {
             $this->specialtyName = 'منشی'; // Customize as needed
         }

@@ -1,15 +1,26 @@
 <?php
+
 namespace App\Models;
 
-use App\Models\Doctor;
 use App\Models\Zone;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Model;
+use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Hospital extends Model
 {
     use HasFactory;
 
+    use Sluggable;
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => ['name','id'],
+            ],
+        ];
+    }
     protected $fillable = [
         'doctor_id',
         'name',
@@ -79,5 +90,9 @@ class Hospital extends Model
     public function galleries()
     {
         return $this->hasMany(HospitalGallery::class);
+    }
+    public function doctors()
+    {
+        return $this->hasMany(Doctor::class, 'hospital_id');
     }
 }

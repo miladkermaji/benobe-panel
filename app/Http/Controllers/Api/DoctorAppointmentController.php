@@ -58,6 +58,7 @@ class DoctorAppointmentController extends Controller
                 'data'   => [
                     'doctor'            => [
                         'name'        => $doctor->full_name,
+                        'slug'        => $doctor->slug,
                         'specialty'   => $doctor->specialty ? $doctor->specialty->name : 'نامشخص',
                         'province'    => $doctor->province ? $doctor->province->name : null,
                         'city'        => $doctor->city ? $doctor->city->name : null,
@@ -106,7 +107,8 @@ class DoctorAppointmentController extends Controller
     {
         $data = [
             'next_available_slot' => null,
-            'clinics'             => [],
+            'next_available_datetime' => null,
+            'clinics' => [],
         ];
 
         foreach ($clinics as $clinic) {
@@ -118,17 +120,19 @@ class DoctorAppointmentController extends Controller
 
             if ($slotData['next_available_slot']) {
                 $data['clinics'][] = [
-                    'clinic_id'           => $clinic->id,
-                    'name'                => $clinic->name,
-                    'province'            => $clinic->province ? $clinic->province->name : null,
-                    'city'                => $clinic->city ? $clinic->city->name : null,
-                    'address'             => $clinic->address,
-                    'notes'               => $notes ? $notes->notes : 'ملاحظات خاصی برای این نوبت ثبت نشده است',
+                    'clinic_id' => $clinic->id,
+                    'name' => $clinic->name,
+                    'province' => $clinic->province ? $clinic->province->name : null,
+                    'city' => $clinic->city ? $clinic->city->name : null,
+                    'address' => $clinic->address,
+                    'notes' => $notes ? $notes->notes : 'ملاحظات خاصی برای این نوبت ثبت نشده است',
                     'next_available_slot' => $slotData['next_available_slot'],
-                    'slots'               => $slotData['slots'],
+                    'next_available_datetime' => $slotData['next_available_datetime'],
+                    'slots' => $slotData['slots'],
                 ];
-                if (! $data['next_available_slot'] || Carbon::parse($slotData['next_available_slot'])->lt(Carbon::parse($data['next_available_slot']))) {
+                if (!$data['next_available_datetime'] || Carbon::parse($slotData['next_available_datetime'])->lt(Carbon::parse($data['next_available_datetime']))) {
                     $data['next_available_slot'] = $slotData['next_available_slot'];
+                    $data['next_available_datetime'] = $slotData['next_available_datetime'];
                 }
             }
         }
@@ -146,7 +150,8 @@ class DoctorAppointmentController extends Controller
 
         return [
             'next_available_slot' => $slotData['next_available_slot'],
-            'clinic'              => [
+            'next_available_datetime' => $slotData['next_available_datetime'],
+            'clinic' => [
                 'clinic_id' => $clinic->id,
                 'name'      => $clinic->name,
                 'province'  => $clinic->province ? $clinic->province->name : null,
@@ -161,7 +166,7 @@ class DoctorAppointmentController extends Controller
     private function getOnlineAppointmentData($doctor)
     {
         $counselingConfig = DoctorCounselingConfig::where('doctor_id', $doctor->id)->first();
-        $fee              = $counselingConfig ? ($counselingConfig->price_15min ?? 100000) : 100000;
+        $fee = $counselingConfig ? ($counselingConfig->price_15min ?? 100000) : 100000;
 
         $onlineTypes = [
             ['type' => 'phone', 'name' => 'مشاوره تلفنی', 'fee' => $fee, 'appointment_type' => 'online_phone'],
@@ -175,12 +180,13 @@ class DoctorAppointmentController extends Controller
                 ->where('appointment_type', $type['appointment_type'])
                 ->first();
             $data['types'][] = [
-                'type'                => $type['type'],
-                'name'                => $type['name'],
-                'fee'                 => $type['fee'],
-                'notes'               => $notes ? $notes->notes : 'ملاحظات خاصی برای این نوع مشاوره ثبت نشده است',
+                'type' => $type['type'],
+                'name' => $type['name'],
+                'fee' => $type['fee'],
+                'notes' => $notes ? $notes->notes : 'ملاحظات خاصی برای این نوع مشاوره ثبت نشده است',
                 'next_available_slot' => $slotData['next_available_slot'],
-                'slots'               => $slotData['slots'],
+                'next_available_datetime' => $slotData['next_available_datetime'],
+                'slots' => $slotData['slots'],
             ];
         }
 
@@ -195,15 +201,13 @@ class DoctorAppointmentController extends Controller
         $daysOfWeek      = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         $currentDayIndex = $today->dayOfWeek;
 
-
-
         $appointmentConfig = $doctor->appointmentConfig;
         $calendarDays      = $appointmentConfig ? ($appointmentConfig->calendar_days ?? 30) : 30;
         $duration          = $appointmentConfig ? ($appointmentConfig->appointment_duration ?? 15) : 15;
 
         $schedules = $doctor->workSchedules;
         if ($schedules->isEmpty()) {
-            return ['next_available_slot' => null, 'slots' => [], 'max_appointments' => 0];
+            return ['next_available_slot' => null, 'next_available_datetime' => null, 'slots' => [], 'max_appointments' => 0];
         }
 
         $bookedAppointments = Appointment::where('doctor_id', $doctorId)
@@ -215,10 +219,10 @@ class DoctorAppointmentController extends Controller
             ->where('appointment_date', '>=', $today->toDateString())
             ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
             ->get();
-        Log::debug("GetNextAvailableSlot - Booked appointments: ", ['bookedAppointments' => $bookedAppointments->toArray()]);
 
         $slots             = [];
         $nextAvailableSlot = null;
+        $nextAvailableDateTime = null;
 
         for ($i = 0; $i < $calendarDays; $i++) {
             $checkDayIndex  = ($currentDayIndex + $i) % 7;
@@ -227,38 +231,23 @@ class DoctorAppointmentController extends Controller
             $jalaliDate     = Jalalian::fromCarbon($checkDate)->format('j F Y');
             $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
 
-            Log::debug("GetNextAvailableSlot - Checking date: {$checkDate->toDateString()}", [
-                'dayName' => $dayName,
-                'jalaliDate' => $jalaliDate,
-                'persianDayName' => $persianDayName,
-            ]);
-
             $dayAppointments = $bookedAppointments->get($checkDate->toDateString(), collect());
-            Log::debug("GetNextAvailableSlot - Day appointments for {$checkDate->toDateString()}: ", ['dayAppointments' => $dayAppointments->toArray()]);
-
             $activeSlots     = [];
             $inactiveSlots   = [];
 
             foreach ($schedules as $schedule) {
                 if ($schedule->day !== $dayName) {
-                    Log::debug("GetNextAvailableSlot - Skipping schedule for day {$schedule->day}, current day: {$dayName}");
                     continue;
                 }
 
                 $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
-                if (! is_array($workHours) || empty($workHours)) {
-                    Log::warning("GetNextAvailableSlot - Invalid work hours for schedule: ", ['schedule' => $schedule->toArray()]);
+                if (!is_array($workHours) || empty($workHours)) {
                     continue;
                 }
                 $workHour = $workHours[0];
-                Log::debug("GetNextAvailableSlot - Work hours: ", ['workHour' => $workHour]);
 
                 $startTime = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['start'], 'Asia/Tehran');
                 $endTime   = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['end'], 'Asia/Tehran');
-                Log::debug("GetNextAvailableSlot - Time range: ", [
-                    'startTime' => $startTime->toDateTimeString(),
-                    'endTime' => $endTime->toDateTimeString(),
-                ]);
 
                 $currentTime = $startTime->copy();
                 while ($currentTime->lessThan($endTime)) {
@@ -267,21 +256,11 @@ class DoctorAppointmentController extends Controller
 
                     $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
                         $dateOnly = Carbon::parse($appointment->appointment_date)->toDateString();
-                        // فقط بخش زمان رو از appointment_time بگیریم
                         $timeOnly = Carbon::parse($appointment->appointment_time)->format('H:i:s');
                         $combinedDateTime = $dateOnly . ' ' . $timeOnly;
-                        Log::debug("GetNextAvailableSlot - Combined date and time: ", ['combined' => $combinedDateTime]);
                         $apptStart = Carbon::parse($combinedDateTime, 'Asia/Tehran');
                         $apptEnd   = (clone $apptStart)->addMinutes($duration);
-                        $isOverlapping = $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
-                        Log::debug("GetNextAvailableSlot - Checking slot {$currentTime->format('H:i')} for overlap: ", [
-                            'appointment_start' => $apptStart->toDateTimeString(),
-                            'appointment_end' => $apptEnd->toDateTimeString(),
-                            'slot_start' => $currentTime->toDateTimeString(),
-                            'slot_end' => $nextTime->toDateTimeString(),
-                            'is_overlapping' => $isOverlapping,
-                        ]);
-                        return $isOverlapping;
+                        return $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
                     });
 
                     if ($checkDate->isToday()) {
@@ -289,8 +268,9 @@ class DoctorAppointmentController extends Controller
                             $inactiveSlots[] = $slotTime;
                         } else {
                             $activeSlots[] = $slotTime;
-                            if (! $nextAvailableSlot) {
+                            if (!$nextAvailableSlot) {
                                 $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                                $nextAvailableDateTime = $currentTime->toDateTimeString();
                             }
                         }
                     } else {
@@ -298,8 +278,9 @@ class DoctorAppointmentController extends Controller
                             $inactiveSlots[] = $slotTime;
                         } else {
                             $activeSlots[] = $slotTime;
-                            if (! $nextAvailableSlot) {
+                            if (!$nextAvailableSlot) {
                                 $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                                $nextAvailableDateTime = $currentTime->toDateTimeString();
                             }
                         }
                     }
@@ -308,7 +289,7 @@ class DoctorAppointmentController extends Controller
                 }
             }
 
-            if (! empty($activeSlots) || ! empty($inactiveSlots)) {
+            if (!empty($activeSlots) || !empty($inactiveSlots)) {
                 $slotData = [
                     'date'            => $jalaliDate,
                     'day_name'        => $persianDayName,
@@ -321,15 +302,11 @@ class DoctorAppointmentController extends Controller
             }
         }
 
-        Log::debug("GetNextAvailableSlot - Final result: ", [
-            'next_available_slot' => $nextAvailableSlot,
-            'slots' => $slots,
-        ]);
-
         return [
-            'next_available_slot' => $nextAvailableSlot,
-            'slots'               => $slots,
-            'max_appointments'    => $schedules->first()->appointment_settings[0]['max_appointments'] ?? 22,
+            'next_available_slot' => $nextAvailableSlot, // برای نمایش جلالی
+            'next_available_datetime' => $nextAvailableDateTime, // برای پردازش
+            'slots' => $slots,
+            'max_appointments' => $schedules->first()->appointment_settings[0]['max_appointments'] ?? 22,
         ];
     }
 
@@ -341,12 +318,6 @@ class DoctorAppointmentController extends Controller
         $daysOfWeek      = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         $currentDayIndex = $today->dayOfWeek;
 
-        Log::debug("GetNextAvailableOnlineSlot - Starting for doctor {$doctorId}, type {$type}", [
-            'today' => $today->toDateString(),
-            'now' => $now->toDateTimeString(),
-            'currentDayIndex' => $currentDayIndex,
-        ]);
-
         $counselingConfig = DoctorCounselingConfig::where('doctor_id', $doctorId)->first();
         $calendarDays     = $counselingConfig ? ($counselingConfig->calendar_days ?? 30) : 30;
         $duration         = $counselingConfig ? ($counselingConfig->appointment_duration ?? 15) : 15;
@@ -355,10 +326,9 @@ class DoctorAppointmentController extends Controller
             ->where('is_working', true)
             ->get();
         if ($schedules->isEmpty()) {
-            Log::warning("GetNextAvailableOnlineSlot - No schedules found for doctor {$doctorId}");
-            return ['next_available_slot' => null, 'slots' => []];
+            return ['next_available_slot' => null, 'next_available_datetime' => null, 'slots' => []];
         }
-        Log::debug("GetNextAvailableOnlineSlot - Schedules found: ", ['schedules' => $schedules->toArray()]);
+
         $bookedAppointments = CounselingAppointment::where('doctor_id', $doctorId)
             ->where('appointment_type', $type)
             ->where(function ($query) {
@@ -368,10 +338,10 @@ class DoctorAppointmentController extends Controller
             ->where('appointment_date', '>=', $today->toDateString())
             ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
             ->get();
-        Log::debug("GetNextAvailableOnlineSlot - Booked appointments: ", ['bookedAppointments' => $bookedAppointments->toArray()]);
 
         $slots             = [];
         $nextAvailableSlot = null;
+        $nextAvailableDateTime = null;
 
         for ($i = 0; $i < $calendarDays; $i++) {
             $checkDayIndex  = ($currentDayIndex + $i) % 7;
@@ -380,38 +350,23 @@ class DoctorAppointmentController extends Controller
             $jalaliDate     = Jalalian::fromCarbon($checkDate)->format('j F Y');
             $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
 
-            Log::debug("GetNextAvailableOnlineSlot - Checking date: {$checkDate->toDateString()}", [
-                'dayName' => $dayName,
-                'jalaliDate' => $jalaliDate,
-                'persianDayName' => $persianDayName,
-            ]);
-
             $dayAppointments = $bookedAppointments->get($checkDate->toDateString(), collect());
-            Log::debug("GetNextAvailableOnlineSlot - Day appointments for {$checkDate->toDateString()}: ", ['dayAppointments' => $dayAppointments->toArray()]);
-
             $activeSlots     = [];
             $inactiveSlots   = [];
 
             foreach ($schedules as $schedule) {
                 if ($schedule->day !== $dayName) {
-                    Log::debug("GetNextAvailableOnlineSlot - Skipping schedule for day {$schedule->day}, current day: {$dayName}");
                     continue;
                 }
 
                 $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
-                if (! is_array($workHours) || empty($workHours)) {
-                    Log::warning("GetNextAvailableOnlineSlot - Invalid work hours for schedule: ", ['schedule' => $schedule->toArray()]);
+                if (!is_array($workHours) || empty($workHours)) {
                     continue;
                 }
                 $workHour = $workHours[0];
-                Log::debug("GetNextAvailableOnlineSlot - Work hours: ", ['workHour' => $workHour]);
 
                 $startTime = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['start'], 'Asia/Tehran');
                 $endTime   = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['end'], 'Asia/Tehran');
-                Log::debug("GetNextAvailableOnlineSlot - Time range: ", [
-                    'startTime' => $startTime->toDateTimeString(),
-                    'endTime' => $endTime->toDateTimeString(),
-                ]);
 
                 $currentTime = $startTime->copy();
                 while ($currentTime->lessThan($endTime)) {
@@ -421,15 +376,7 @@ class DoctorAppointmentController extends Controller
                     $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
                         $apptStart = Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time, 'Asia/Tehran');
                         $apptEnd   = (clone $apptStart)->addMinutes($duration);
-                        $isOverlapping = $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
-                        Log::debug("GetNextAvailableOnlineSlot - Checking slot {$currentTime->format('H:i')} for overlap: ", [
-                            'appointment_start' => $apptStart->toDateTimeString(),
-                            'appointment_end' => $apptEnd->toDateTimeString(),
-                            'slot_start' => $currentTime->toDateTimeString(),
-                            'slot_end' => $nextTime->toDateTimeString(),
-                            'is_overlapping' => $isOverlapping,
-                        ]);
-                        return $isOverlapping;
+                        return $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
                     });
 
                     if ($checkDate->isToday()) {
@@ -437,8 +384,9 @@ class DoctorAppointmentController extends Controller
                             $inactiveSlots[] = $slotTime;
                         } else {
                             $activeSlots[] = $slotTime;
-                            if (! $nextAvailableSlot) {
+                            if (!$nextAvailableSlot) {
                                 $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                                $nextAvailableDateTime = $currentTime->toDateTimeString();
                             }
                         }
                     } else {
@@ -446,8 +394,9 @@ class DoctorAppointmentController extends Controller
                             $inactiveSlots[] = $slotTime;
                         } else {
                             $activeSlots[] = $slotTime;
-                            if (! $nextAvailableSlot) {
+                            if (!$nextAvailableSlot) {
                                 $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                                $nextAvailableDateTime = $currentTime->toDateTimeString();
                             }
                         }
                     }
@@ -456,7 +405,7 @@ class DoctorAppointmentController extends Controller
                 }
             }
 
-            if (! empty($activeSlots) || ! empty($inactiveSlots)) {
+            if (!empty($activeSlots) || !empty($inactiveSlots)) {
                 $slotData = [
                     'date'            => $jalaliDate,
                     'day_name'        => $persianDayName,
@@ -469,14 +418,10 @@ class DoctorAppointmentController extends Controller
             }
         }
 
-        Log::debug("GetNextAvailableOnlineSlot - Final result: ", [
-            'next_available_slot' => $nextAvailableSlot,
-            'slots' => $slots,
-        ]);
-
         return [
-            'next_available_slot' => $nextAvailableSlot,
-            'slots'               => $slots,
+            'next_available_slot' => $nextAvailableSlot, // برای نمایش جلالی
+            'next_available_datetime' => $nextAvailableDateTime, // برای پردازش
+            'slots' => $slots,
         ];
     }
 }

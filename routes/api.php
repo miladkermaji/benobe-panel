@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\DoctorController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WalletController;
 use App\Http\Controllers\Api\SubUserController;
+use App\Http\Controllers\Api\HospitalController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\SpecialtyController;
 use App\Http\Controllers\Api\AppointmentController;
@@ -125,4 +126,8 @@ Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('p
 Route::get('/appointments/payment/result', [AppointmentBookingController::class, 'paymentResult'])->name('appointment.payment.result');
 Route::prefix('doctors')->group(function () {
     Route::get('/{doctorId}/profile', [DoctorProfileController::class, 'getDoctorProfile'])->name('api.doctors.profile');
+});
+
+Route::prefix('hospital')->group(function () {
+    Route::get('/{slug}', [HospitalController::class, 'getHospitalDetails'])->name('api.hospital.details');
 });

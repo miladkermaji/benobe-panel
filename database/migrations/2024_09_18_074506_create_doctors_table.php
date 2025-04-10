@@ -1,14 +1,19 @@
 <?php
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class () extends Migration {
     public function up()
     {
         Schema::create('doctors', function (Blueprint $table) {
             $table->id();
+
+            $table->unsignedBigInteger('hospital_id')->nullable();
+            $table->foreign('hospital_id')->references('id')->on('hospitals')->onDelete('set null');
+
             $table->string('uuid')->nullable()->unique();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
