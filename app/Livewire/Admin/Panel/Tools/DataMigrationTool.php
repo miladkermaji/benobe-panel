@@ -40,7 +40,7 @@ class DataMigrationTool extends Component
     public $primaryKey = 'id';
 
     protected $rules = [
-     'oldTableFile' => 'required|file|mimes:sql,csv,txt|max:10240',
+     'oldTableFile' => 'required|file|mimes:sql,csv,txt|max:51200',
      'newTable' => 'required|string',
      'fieldMapping' => 'required|array|min:1',
 ];
@@ -48,7 +48,7 @@ class DataMigrationTool extends Component
     public function rules()
     {
         return [
-            'oldTableFile' => 'required|file|mimes:sql,csv,txt|max:10240',
+            'oldTableFile' => 'required|file|mimes:sql,csv,txt|max:51200',
             'newTable' => ['required', 'string', function ($attribute, $value, $fail) {
                 try {
                     if (!Schema::hasTable($value)) {
@@ -75,6 +75,8 @@ class DataMigrationTool extends Component
 
     public function mount()
     {
+        ini_set('max_execution_time', 300); // 5 دقیقه
+        ini_set('memory_limit', '256M'); // افزایش حافظه
         $this->loadDatabaseTables();
     }
 
@@ -89,37 +91,86 @@ class DataMigrationTool extends Component
             ->toArray();
     }
 
-    public function updatedOldTableFile()
-    {
-        $this->resetErrorBag('oldTableFile');
-        $this->validateOnly('oldTableFile');
 
-        $this->isUploading = true;
-        $this->uploadProgress = 0;
+  public function updatedOldTableFile()
+{
+    $this->resetErrorBag('oldTableFile');
+    $this->validateOnly('oldTableFile');
 
-        try {
-            $this->simulateUploadProgress();
-            $this->loadOldTableFields();
+    $this->isUploading = true;
+    $this->uploadProgress = 0;
 
-            if (!empty($this->newTable)) {
-                $this->loadNewTableFields();
-                $this->autoMapFields();
-            }
-        } catch (\Exception $e) {
-            $this->addError('oldTableFile', $this->formatErrorMessage($e->getMessage()));
-        } finally {
-            $this->isUploading = false;
+    try {
+        if (!$this->oldTableFile instanceof \Illuminate\Http\UploadedFile) {
+            throw new \Exception('فایل به درستی آپلود نشد.');
         }
+
+        $fileSize = $this->oldTableFile->getSize();
+        $path = $this->oldTableFile->store('temp-uploads', 'local');
+        $fullPath = Storage::disk('local')->path($path);
+
+        $this->oldTableFile = new \Illuminate\Http\UploadedFile(
+            $fullPath,
+            $this->oldTableFile->getClientOriginalName()
+        );
+
+        // نمایش پیشرفت آپلود
+        $this->simulateUploadProgress($fileSize);
+
+        $this->loadOldTableFields();
+
+        if (!empty($this->newTable)) {
+            $this->loadNewTableFields();
+            $this->autoMapFields();
+        }
+    } catch (\Exception $e) {
+        Log::error('Upload failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+        $this->addError('oldTableFile', $this->formatErrorMessage($e->getMessage()));
+    } finally {
+        $this->isUploading = false;
+    }
+}
+
+protected function simulateUploadProgress($fileSize)
+{
+    $chunkSize = 1024 * 1024; // 1MB
+    $totalChunks = max(1, ceil($fileSize / $chunkSize));
+    $handle = fopen($this->oldTableFile->getRealPath(), 'r');
+    $processedBytes = 0;
+
+    while (!feof($handle)) {
+        $chunk = fread($handle, $chunkSize);
+        $processedBytes += strlen($chunk);
+        $progress = min(100, (int)(($processedBytes / $fileSize) * 100));
+        
+        $this->uploadProgress = $progress;
+        $this->dispatch('uploadProgressUpdated', ['progress' => $progress]);
+        usleep(50000); // تاخیر برای رندر بهتر
     }
 
-    protected function simulateUploadProgress()
+    fclose($handle);
+}
+
+    protected function updateProgressBasedOnFile($fileSize)
     {
-        for ($i = 0; $i <= 100; $i += 10) {
-            $this->uploadProgress = $i;
+        $chunkSize = 1024 * 1024; // 1MB
+        $totalChunks = max(1, ceil($fileSize / $chunkSize));
+        $handle = fopen($this->oldTableFile->getRealPath(), 'r');
+        $processedBytes = 0;
+
+        while (!feof($handle)) {
+            $chunk = fread($handle, $chunkSize);
+            $processedBytes += strlen($chunk);
+            $progress = min(100, (int)(($processedBytes / $fileSize) * 100));
+
+            $this->uploadProgress = $progress;
             $this->dispatch('uploadProgressUpdated', ['progress' => $this->uploadProgress]);
-            usleep(100000);
+            usleep(50000);
         }
+
+        fclose($handle);
     }
+   
 
     public function updatedNewTable($value)
     {

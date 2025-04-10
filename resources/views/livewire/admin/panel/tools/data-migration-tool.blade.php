@@ -28,7 +28,7 @@
                 <path d="M5 12h14M12 5v14" />
               </svg>
             </span>
-            <input type="file" class="form-control input-modern border-0 shadow-sm" wire:model.defer="oldTableFile">
+            <input type="file" class="form-control input-modern border-0 shadow-sm" wire:model="oldTableFile">
           </div>
           @error('oldTableFile')
             <span class="text-danger text-sm mt-1">{{ $message }}</span>
@@ -330,17 +330,25 @@
           progressBar: true
         });
       });
+    Livewire.on('uploadProgressUpdated', (event) => {
+        console.log('Progress:', event.detail.progress); // برای دیباگ
+        const progress = event.detail.progress || 0;
+        const uploadProgressContainer = document.querySelector('.upload-progress');
+        const bar = uploadProgressContainer?.querySelector('.progress-bar');
 
-      Livewire.on('uploadProgressUpdated', (event) => {
-        const progress = event.detail?.progress ?? @this.uploadProgress;
-        const bar = document.querySelector('.upload-progress .progress-bar');
-        if (bar) {
-          bar.style.width = `${progress}%`;
-          bar.textContent = `${progress}%`;
-          bar.parentElement.style.display = 'block';
-          if (progress === 100) setTimeout(() => bar.parentElement.style.display = 'none', 2000);
+        if (bar && uploadProgressContainer) {
+            bar.style.width = `${progress}%`;
+            bar.textContent = `${progress}%`;
+            uploadProgressContainer.style.display = 'block';
+            if (progress >= 100) {
+                setTimeout(() => {
+                    uploadProgressContainer.style.display = 'none';
+                }, 1000);
+            }
+        } else {
+            console.error('Progress bar elements not found');
         }
-      });
+    });
 
       Livewire.on('progressUpdated', (event) => {
         const progress = event.detail?.progress ?? @this.progress;
