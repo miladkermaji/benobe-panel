@@ -53,7 +53,7 @@
 
 <body>
   <main class="min-h-screen">
-    <div class="login-wrapper d-flex w-100 justify-content-center align-items-center h-100vh">
+    <div class="login-wrapper d-flex  justify-content-center align-items-center h-100vh">
       {{ $slot }}
     </div>
   </main>

@@ -1,5 +1,5 @@
 <div class="justify-content-center align-items-center">
-  <div class="col-md-6 login-container position-relative">
+  <div class="login-container position-relative">
     <div class="login-card custom-rounded custom-shadow p-7">
       <div class="logo-wrapper w-100 d-flex justify-content-center">
         <img class="position-absolute mt-3 cursor-pointer" onclick="location.href='/'" width="85px"
