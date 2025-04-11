@@ -36,7 +36,7 @@
           @enderror
           <!-- پروگرس بار -->
           <div class="upload-progress mt-2"
-            style="display: {{ $isUploading || $uploadProgress > 0 ? 'block' : 'none' }};">
+            style="display: {{ $isUploading || $uploadProgress > 0 ? 'block' : 'none' }};direction:ltr;">
             <div class="progress-bar bg-primary text-white text-center"
               style="width: {{ $uploadProgress }}%; transition: width 0.3s ease-in-out;">
               {{ $uploadProgress }}%
@@ -103,9 +103,9 @@
           <!-- اندیکاتور لودینگ -->
           <div wire:loading wire:target="newTable" class="loading-indicator mt-2" style="display: none;">
             <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">در حال لود...</span>
+              <span class="visually-hidden"></span>
             </div>
-            <span class="ms-2 text-gray-700">در حال لود فیلدها...</span>
+            <span class="ms-2 text-gray-700"></span>
           </div>
         </div>
       </div>
