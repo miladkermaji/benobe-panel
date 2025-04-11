@@ -96,6 +96,7 @@ class DoctorLoginConfirm extends Component
 
         if (!$otp) {
             $this->addError('otpCode', 'کد تأیید نامعتبر یا منقضی شده است.');
+            $this->showResendButton = !$loginAttempts->isLocked($mobile);
             return;
         }
 
@@ -220,6 +221,18 @@ class DoctorLoginConfirm extends Component
 
     public function render()
     {
+        $loginSession = LoginSession::where('token', $this->token)
+            ->where('step', 2)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$loginSession) {
+            session(['current_step' => 1]);
+            $this->dispatch('otpExpired');
+            $this->redirect(route('dr.auth.login-register-form'), navigate: true);
+            return;
+        }
+
         return view('livewire.dr.auth.doctor-login-confirm', [
             'remainingTime' => $this->remainingTime,
             'countDownDate' => $this->countDownDate,

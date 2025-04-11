@@ -61,9 +61,7 @@
     };
 
     function startOtpTimer(countDownDate, token) {
-      if (window.timerState.otpInterval) {
-        clearInterval(window.timerState.otpInterval);
-      }
+      if (window.timerState.otpInterval) clearInterval(window.timerState.otpInterval);
 
       const storedData = JSON.parse(localStorage.getItem('otpTimerData') || '{}');
       const storedCountDownDate = storedData.countDownDate;
@@ -72,8 +70,6 @@
 
       if (!storedCountDownDate || storedToken !== token || storedCountDownDate <= now) {
         window.timerState.otpCountDownDate = countDownDate || (new Date().getTime() + 120000);
-        window.timerState.isOtpTimerRunning = true;
-        window.timerState.lastOtpPercentage = 100;
         window.timerState.currentToken = token;
         localStorage.setItem('otpTimerData', JSON.stringify({
           countDownDate: window.timerState.otpCountDownDate,
@@ -82,8 +78,9 @@
       } else {
         window.timerState.otpCountDownDate = Number(storedCountDownDate);
         window.timerState.currentToken = storedToken;
-        window.timerState.isOtpTimerRunning = true;
       }
+      window.timerState.isOtpTimerRunning = true;
+      window.timerState.lastOtpPercentage = 100;
 
       const totalDuration = 120000; // 2 دقیقه
       const timerElement = document.getElementById('timer');
@@ -93,14 +90,12 @@
 
       if (!timerElement || !progressBarContainer || !progressBar || !resendSection) return;
 
-      if (window.timerState.isOtpTimerRunning) {
-        timerElement.classList.remove('d-none');
-        progressBarContainer.style.display = 'block';
-        resendSection.style.display = 'none';
-        progressBar.style.width = window.timerState.lastOtpPercentage + '%';
-        progressBar.style.backgroundColor = window.timerState.lastOtpPercentage > 50 ? '#28a745' : (window.timerState
-          .lastOtpPercentage > 20 ? '#ffc107' : '#dc3545');
-      }
+      timerElement.classList.remove('d-none');
+      progressBarContainer.style.display = 'block';
+      resendSection.style.display = 'none';
+      progressBar.style.width = window.timerState.lastOtpPercentage + '%';
+      progressBar.style.backgroundColor = window.timerState.lastOtpPercentage > 50 ? '#28a745' : (window.timerState
+        .lastOtpPercentage > 20 ? '#ffc107' : '#dc3545');
 
       window.timerState.otpInterval = setInterval(() => {
         const now = new Date().getTime();
@@ -108,7 +103,6 @@
 
         if (isNaN(distance) || window.timerState.otpCountDownDate === null) {
           clearInterval(window.timerState.otpInterval);
-          window.timerState.otpInterval = null;
           window.timerState.isOtpTimerRunning = false;
           localStorage.removeItem('otpTimerData');
           return;
@@ -138,9 +132,7 @@
     }
 
     function startRateLimitTimer(remainingTime) {
-      if (window.timerState.rateLimitInterval) {
-        clearInterval(window.timerState.rateLimitInterval);
-      }
+      if (window.timerState.rateLimitInterval) clearInterval(window.timerState.rateLimitInterval);
 
       const storedData = JSON.parse(localStorage.getItem('rateLimitTimerData') || '{}');
       const storedCountDownDate = storedData.countDownDate;
@@ -156,10 +148,11 @@
       }
       window.timerState.isRateLimitTimerRunning = true;
 
+      const initialTimeText = formatConditionalTime(remainingTime); // فرمت اولیه قبل از باز شدن
       Swal.fire({
         icon: 'error',
         title: 'تلاش بیش از حد',
-        html: `<span id="remaining-time" style="font-weight: bold;">لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید</span>`,
+        html: `<span id="remaining-time" style="font-weight: bold;">لطفاً ${initialTimeText} دیگر تلاش کنید</span>`,
         timer: remainingTime * 1000,
         timerProgressBar: true,
         showConfirmButton: true,
@@ -174,9 +167,9 @@
 
             if (secondsLeft >= 0) {
               remainingTimeElement.innerHTML = `لطفاً ${formatConditionalTime(secondsLeft)} دیگر تلاش کنید`;
-              if (secondsLeft > 180) remainingTimeElement.style.color = '#16a34a'; // سبز
-              else if (secondsLeft > 60) remainingTimeElement.style.color = '#f59e0b'; // زرد
-              else remainingTimeElement.style.color = '#dc2626'; // قرمز
+              if (secondsLeft > 180) remainingTimeElement.style.color = '#16a34a';
+              else if (secondsLeft > 60) remainingTimeElement.style.color = '#f59e0b';
+              else remainingTimeElement.style.color = '#dc2626';
             }
             if (distance <= 0) {
               clearInterval(window.timerState.rateLimitInterval);
@@ -225,10 +218,11 @@
       }
     }
 
-    // Web OTP API برای پر کردن خودکار
+    // Web OTP API با مدیریت بهتر
     if ('OTPCredential' in window) {
       window.addEventListener('DOMContentLoaded', () => {
         const ac = new AbortController();
+        setTimeout(() => ac.abort(), 60000); // 60 ثانیه مهلت برای دریافت OTP
         navigator.credentials.get({
           otp: {
             transport: ['sms']
@@ -257,8 +251,8 @@
                   });
                 }
               });
+              ac.abort();
             }
-            ac.abort();
           });
         }).catch(err => {
           console.log('OTP retrieval failed:', err);
@@ -319,10 +313,6 @@
       window.Livewire.navigate(event.url);
     });
 
-    Livewire.on('updateShowResendButton', (data) => {
-      checkRateLimitAndShowResend();
-    });
-
     function formatConditionalTime(seconds) {
       if (isNaN(seconds) || seconds < 0) return '0 ثانیه';
       const hours = Math.floor(seconds / 3600);
@@ -343,6 +333,8 @@
         window.timerState.currentToken = storedOtpData.token;
         window.timerState.isOtpTimerRunning = true;
         startOtpTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
+      } else if (storedOtpData.countDownDate && storedOtpData.countDownDate <= now) {
+        checkRateLimitAndShowResend();
       }
       if (storedRateLimitData.countDownDate && storedRateLimitData.countDownDate > now) {
         window.timerState.rateLimitCountDownDate = Number(storedRateLimitData.countDownDate);
