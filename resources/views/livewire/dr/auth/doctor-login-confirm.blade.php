@@ -124,7 +124,10 @@
           progressBarContainer.style.display = 'none';
           resendSection.style.display = window.timerState.isRateLimitTimerRunning ? 'none' : 'block';
           Livewire.dispatch('updateShowResendButton', { show: !window.timerState.isRateLimitTimerRunning });
-          localStorage.removeItem('otpTimerData');
+          localStorage.setItem('otpTimerData', JSON.stringify({
+            countDownDate: window.timerState.otpCountDownDate,
+            token: window.timerState.currentToken
+          })); // نگه داشتن داده‌ها برای چک کردن بعد از رفرش
         } else {
           timerElement.innerHTML = `زمان باقی‌مانده: ${minutes} دقیقه و ${seconds} ثانیه`;
         }
@@ -319,22 +322,24 @@
       const storedRateLimitData = JSON.parse(localStorage.getItem('rateLimitTimerData') || '{}');
       const now = new Date().getTime();
 
+      // اگه هیچ داده‌ای توی localStorage نبود یا تایمر تموم شده و رفرش شده
       if (!storedOtpData.countDownDate && !storedRateLimitData.countDownDate) {
-        // اگه هیچ داده‌ای توی localStorage نبود (مثلاً کوکی‌ها پاک شده)، به استپ 1 برو
         window.Livewire.navigate('{{ route('dr.auth.login-register-form') }}');
         return;
       }
 
-      if (storedOtpData.countDownDate && storedOtpData.countDownDate > now) {
-        window.timerState.otpCountDownDate = Number(storedOtpData.countDownDate);
-        window.timerState.currentToken = storedOtpData.token;
-        window.timerState.isOtpTimerRunning = true;
-        startOtpTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
-      } else if (storedOtpData.countDownDate && storedOtpData.countDownDate <= now) {
-        const resendSection = document.getElementById('resend-otp');
-        if (resendSection && !window.timerState.isRateLimitTimerRunning) {
-          resendSection.style.display = 'block';
-          Livewire.dispatch('updateShowResendButton', { show: true });
+      if (storedOtpData.countDownDate) {
+        if (storedOtpData.countDownDate > now) {
+          window.timerState.otpCountDownDate = Number(storedOtpData.countDownDate);
+          window.timerState.currentToken = storedOtpData.token;
+          window.timerState.isOtpTimerRunning = true;
+          startOtpTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
+        } else {
+          // اگه تایمر تموم شده و صفحه رفرش شده، به استپ 1 برو
+          toastr.error('زمان کد تأیید به پایان رسیده است');
+          window.Livewire.navigate('{{ route('dr.auth.login-register-form') }}');
+          localStorage.removeItem('otpTimerData');
+          return;
         }
       }
 
