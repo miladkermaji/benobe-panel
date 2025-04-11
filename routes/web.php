@@ -360,6 +360,11 @@ Route::prefix('admin')
             Route::get('news-latter/', [NewsLatterController::class, 'index'])->name('admin.tools.news-latter.index');
             Route::get('/data-migration', [DataMigrationToolController::class, 'index'])
                 ->name('admin.tools.data-migration.index');
+
+            Route::get('data-migration/download-log/{filename}', [DataMigrationToolController::class, 'downloadLog'])
+                ->middleware('manager')
+                ->name('admin.tools.data-migration.download-log');
+
             Route::prefix('tools/')->group(function () {
                 Route::get('/page-builder', [PageBuilderController::class, 'index'])->name('admin.tools.page-builder.index');
                 Route::post('/page-builder/store', [PageBuilderController::class, 'store'])->name('admin.tools.page-builder.store');
