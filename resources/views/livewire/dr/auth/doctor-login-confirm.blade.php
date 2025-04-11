@@ -94,8 +94,7 @@
       progressBarContainer.style.display = 'block';
       resendSection.style.display = 'none';
       progressBar.style.width = window.timerState.lastOtpPercentage + '%';
-      progressBar.style.backgroundColor = window.timerState.lastOtpPercentage > 50 ? '#28a745' : (window.timerState
-        .lastOtpPercentage > 20 ? '#ffc107' : '#dc3545');
+      progressBar.style.backgroundColor = window.timerState.lastOtpPercentage > 50 ? '#28a745' : (window.timerState.lastOtpPercentage > 20 ? '#ffc107' : '#dc3545');
 
       window.timerState.otpInterval = setInterval(() => {
         const now = new Date().getTime();
@@ -123,7 +122,8 @@
           timerElement.innerHTML = '';
           timerElement.classList.add('d-none');
           progressBarContainer.style.display = 'none';
-          checkRateLimitAndShowResend();
+          resendSection.style.display = window.timerState.isRateLimitTimerRunning ? 'none' : 'block';
+          Livewire.dispatch('updateShowResendButton', { show: !window.timerState.isRateLimitTimerRunning });
           localStorage.removeItem('otpTimerData');
         } else {
           timerElement.innerHTML = `زمان باقی‌مانده: ${minutes} دقیقه و ${seconds} ثانیه`;
@@ -148,7 +148,7 @@
       }
       window.timerState.isRateLimitTimerRunning = true;
 
-      const initialTimeText = formatConditionalTime(remainingTime); // فرمت اولیه قبل از باز شدن
+      const initialTimeText = formatConditionalTime(remainingTime);
       Swal.fire({
         icon: 'error',
         title: 'تلاش بیش از حد',
@@ -176,7 +176,11 @@
               window.timerState.rateLimitInterval = null;
               window.timerState.isRateLimitTimerRunning = false;
               localStorage.removeItem('rateLimitTimerData');
-              checkRateLimitAndShowResend();
+              const resendSection = document.getElementById('resend-otp');
+              if (resendSection && !window.timerState.isOtpTimerRunning) {
+                resendSection.style.display = 'block';
+                Livewire.dispatch('updateShowResendButton', { show: true });
+              }
             }
           }, 1000);
         },
@@ -187,16 +191,6 @@
           }
         }
       });
-    }
-
-    function checkRateLimitAndShowResend() {
-      const resendSection = document.getElementById('resend-otp');
-      if (resendSection && !window.timerState.isRateLimitTimerRunning) {
-        resendSection.style.display = 'block';
-        Livewire.dispatch('updateShowResendButton', {
-          show: true
-        });
-      }
     }
 
     function setupOtpInputs() {
@@ -210,27 +204,23 @@
             if (value.length === 1 && index > 0) inputs[index - 1].focus();
           });
           input.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && e.target.value.length === 0 && index < inputs.length - 1) inputs[index +
-              1].focus();
+            if (e.key === 'Backspace' && e.target.value.length === 0 && index < inputs.length - 1) inputs[index + 1].focus();
           });
           input.addEventListener('focus', () => input.select());
         });
       }
     }
 
-    // Web OTP API با مدیریت بهتر
+    // Web OTP API برای دریافت واقعی کد
     if ('OTPCredential' in window) {
       window.addEventListener('DOMContentLoaded', () => {
         const ac = new AbortController();
-        setTimeout(() => ac.abort(), 60000); // 60 ثانیه مهلت برای دریافت OTP
         navigator.credentials.get({
-          otp: {
-            transport: ['sms']
-          },
+          otp: { transport: ['sms'] },
           signal: ac.signal
         }).then(otp => {
           Swal.fire({
-            title: 'پر کردن خودکار کد OTP',
+            title: 'دریافت کد OTP',
             text: `آیا می‌خواهید کد ${otp.code} به‌صورت خودکار وارد شود؟`,
             icon: 'question',
             showCancelButton: true,
@@ -243,20 +233,18 @@
               inputs.forEach((input, index) => {
                 if (code[index]) {
                   input.value = code[index];
-                  Livewire.dispatch('input', {
-                    target: {
-                      name: `otpCode.${index}`,
-                      value: code[index]
-                    }
-                  });
+                  Livewire.dispatch('input', { target: { name: `otpCode.${index}`, value: code[index] } });
                 }
               });
-              ac.abort();
             }
+            ac.abort();
           });
         }).catch(err => {
-          console.log('OTP retrieval failed:', err);
+          console.error('Failed to retrieve OTP:', err);
         });
+
+        // بعد از 60 ثانیه، اگه OTP نیومد، Abort کنه
+        setTimeout(() => ac.abort(), 60000);
       });
     }
 
@@ -275,13 +263,11 @@
         startOtpTimer(storedData.countDownDate, storedData.token);
       }
       setupOtpInputs();
-      checkRateLimitAndShowResend();
     });
 
     Livewire.on('otpResent', (data) => {
       toastr.success(data.message);
       startOtpTimer(data.countDownDate, data.token);
-      checkRateLimitAndShowResend();
     });
 
     Livewire.on('otpExpired', () => {
@@ -313,6 +299,11 @@
       window.Livewire.navigate(event.url);
     });
 
+    Livewire.on('updateShowResendButton', (data) => {
+      const resendSection = document.getElementById('resend-otp');
+      if (resendSection) resendSection.style.display = data.show ? 'block' : 'none';
+    });
+
     function formatConditionalTime(seconds) {
       if (isNaN(seconds) || seconds < 0) return '0 ثانیه';
       const hours = Math.floor(seconds / 3600);
@@ -328,14 +319,25 @@
       const storedRateLimitData = JSON.parse(localStorage.getItem('rateLimitTimerData') || '{}');
       const now = new Date().getTime();
 
+      if (!storedOtpData.countDownDate && !storedRateLimitData.countDownDate) {
+        // اگه هیچ داده‌ای توی localStorage نبود (مثلاً کوکی‌ها پاک شده)، به استپ 1 برو
+        window.Livewire.navigate('{{ route('dr.auth.login-register-form') }}');
+        return;
+      }
+
       if (storedOtpData.countDownDate && storedOtpData.countDownDate > now) {
         window.timerState.otpCountDownDate = Number(storedOtpData.countDownDate);
         window.timerState.currentToken = storedOtpData.token;
         window.timerState.isOtpTimerRunning = true;
         startOtpTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
       } else if (storedOtpData.countDownDate && storedOtpData.countDownDate <= now) {
-        checkRateLimitAndShowResend();
+        const resendSection = document.getElementById('resend-otp');
+        if (resendSection && !window.timerState.isRateLimitTimerRunning) {
+          resendSection.style.display = 'block';
+          Livewire.dispatch('updateShowResendButton', { show: true });
+        }
       }
+
       if (storedRateLimitData.countDownDate && storedRateLimitData.countDownDate > now) {
         window.timerState.rateLimitCountDownDate = Number(storedRateLimitData.countDownDate);
         window.timerState.isRateLimitTimerRunning = true;
