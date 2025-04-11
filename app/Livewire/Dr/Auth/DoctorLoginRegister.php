@@ -20,11 +20,10 @@ class DoctorLoginRegister extends Component
 
     public function mount()
     {
-        // چک کردن اینکه آیا کاربر (دکتر یا منشی) قبلاً لاگین کرده
         if (Auth::guard('doctor')->check()) {
             $this->redirect(route('dr-panel'));
         } elseif (Auth::guard('secretary')->check()) {
-            $this->redirect(route('dr-panel')); // فرض می‌کنم پنل منشی dr-panel باشه
+            $this->redirect(route('dr-panel'));
         } elseif (session('current_step') === 2) {
             $this->redirect(route('dr.auth.login-confirm-form', ['token' => session('otp_token')]), navigate: true);
         } elseif (session('current_step') === 3) {
@@ -38,7 +37,7 @@ class DoctorLoginRegister extends Component
         if (is_null($seconds) || $seconds < 0) {
             return '0 دقیقه و 0 ثانیه';
         }
-        $minutes          = floor($seconds / 60);
+        $minutes = floor($seconds / 60);
         $remainingSeconds = round($seconds % 60);
         return "$minutes دقیقه و $remainingSeconds ثانیه";
     }
@@ -56,25 +55,21 @@ class DoctorLoginRegister extends Component
             'mobile.regex'    => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
         ]);
 
-        $mobile          = preg_replace('/^(\+98|98|0)/', '', $this->mobile);
+        $mobile = preg_replace('/^(\+98|98|0)/', '', $this->mobile);
         $formattedMobile = '0' . $mobile;
 
-        // چک کردن هر دو مدل Doctor و Secretary
-        $doctor        = Doctor::where('mobile', $formattedMobile)->first();
-        $secretary     = Secretary::where('mobile', $formattedMobile)->first();
+        $doctor = Doctor::where('mobile', $formattedMobile)->first();
+        $secretary = Secretary::where('mobile', $formattedMobile)->first();
         $loginAttempts = new LoginAttemptsService();
 
-        // اگر هیچ کاربری پیدا نشد
         if (! $doctor && ! $secretary) {
             $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
             $this->addError('mobile', 'کاربری با این شماره تلفن وجود ندارد.');
             return;
         }
 
-        // انتخاب کاربر (دکتر یا منشی)
         $user = $doctor ?? $secretary;
 
-        // چک کردن وضعیت فعال بودن
         if ($user->status !== 1) {
             $loginAttempts->incrementLoginAttempt(
                 $user->id,
@@ -87,17 +82,12 @@ class DoctorLoginRegister extends Component
             return;
         }
 
-        // چک کردن قفل شدن به دلیل تلاش زیاد
-
         if ($loginAttempts->isLocked($formattedMobile)) {
-            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile); // استفاده از متد جدید
-            $this->addError('mobile', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
+            // اینجا دیگه addError رو حذف کردیم
             $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
             return;
         }
 
-
-        // ثبت تلاش ورود
         $loginAttempts->incrementLoginAttempt(
             $user->id,
             $formattedMobile,
@@ -108,28 +98,25 @@ class DoctorLoginRegister extends Component
         session(['step1_completed' => true]);
 
         $otpCode = rand(1000, 9999);
-        $token   = Str::random(60);
+        $token = Str::random(60);
 
-        // ثبت OTP بر اساس نوع کاربر
         Otp::create([
-            'token'        => $token,
-            'doctor_id'    => $doctor ? $user->id : null,
+            'token' => $token,
+            'doctor_id' => $doctor ? $user->id : null,
             'secretary_id' => $secretary ? $user->id : null,
-            'otp_code'     => $otpCode,
-            'login_id'     => $user->mobile,
-            'type'         => 0,
+            'otp_code' => $otpCode,
+            'login_id' => $user->mobile,
+            'type' => 0,
         ]);
 
-        // ثبت LoginSession بر اساس نوع کاربر
         LoginSession::create([
-            'token'        => $token,
-            'doctor_id'    => $doctor ? $user->id : null,
+            'token' => $token,
+            'doctor_id' => $doctor ? $user->id : null,
             'secretary_id' => $secretary ? $user->id : null,
-            'step'         => 2,
-            'expires_at'   => now()->addMinutes(10),
+            'step' => 2,
+            'expires_at' => now()->addMinutes(10),
         ]);
 
-        // ارسال پیامک
         $messagesService = new MessageService(
             SmsService::create(100253, $user->mobile, [$otpCode])
         );
