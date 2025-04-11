@@ -93,11 +93,17 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
-        Route::prefix('doctor-wallets')->group(function () {
+    Route::prefix('clinic-deposit-settings')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'index'])->name('admin.panel.clinic-deposit-settings.index');
+        Route::get('/create', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'create'])->name('admin.panel.clinic-deposit-settings.create');
+        Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'edit'])->name('admin.panel.clinic-deposit-settings.edit');
+    });
+
+Route::prefix('doctor-wallets')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'index'])->name('admin.panel.doctor-wallets.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'create'])->name('admin.panel.doctor-wallets.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'edit'])->name('admin.panel.doctor-wallets.edit');
-        });
+});
 
         Route::prefix('blogs')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Blogs\BlogsController::class, 'index'])->name('admin.panel.blogs.index');

@@ -282,6 +282,10 @@ class Doctor extends Authenticatable
     public function comments()
     {
         return $this->hasMany(DoctorComment::class);
+    } 
+    public function depositSettings()
+    {
+        return $this->hasMany(ClinicDepositSetting::class);
     }
 
     public function insurances()

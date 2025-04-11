@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('clinic_deposit_settings', function (Blueprint $table) {
             $table->id(); // کلید اصلی
             $table->unsignedBigInteger('doctor_id'); // شناسه پزشک
-            $table->unsignedBigInteger('clinic_id'); // شناسه مطب
+            $table->unsignedBigInteger('clinic_id')->nullable(); // شناسه مطب
             $table->decimal('deposit_amount', 10, 2)->nullable(); // مبلغ بیعانه
             $table->boolean('is_custom_price')->default(false); // آیا مبلغ دلخواه است؟
             $table->boolean('refundable')->default(true); // آیا مبلغ قابل استرداد است؟
