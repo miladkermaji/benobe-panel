@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Doctor;
 use App\Models\SmsTemplate;
@@ -39,137 +40,63 @@ class BlockingUsersController extends Controller
         return view('dr.panel.turn.schedule.scheduleSetting.blocking_users.index', compact('blockedUsers', 'messages'));
     }
 
-public function store(Request $request)
-{
-    $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-
-    $messages = [
-        'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
-        'mobile.exists' => 'شماره موبایل واردشده در سیستم ثبت نشده است.',
-        'blocked_at.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
-        'blocked_at.date' => 'تاریخ شروع مسدودیت معتبر نیست.',
-        'unblocked_at.date' => 'تاریخ پایان مسدودیت معتبر نیست.',
-        'unblocked_at.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
-        'reason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-    ];
-
-    try {
-        $validated = $request->validate([
-            'mobile' => 'required|exists:users,mobile',
-            'blocked_at' => 'required', // تغییر به string ساده، بدون فرض date
-            'unblocked_at' => 'nullable|after:blocked_at',
-            'reason' => 'nullable|string|max:255',
-            'selectedClinicId' => 'nullable|string',
-        ], $messages);
-
-        $clinicId = $request->input('selectedClinicId') === 'default' ? null : $request->input('selectedClinicId');
-        $user = User::where('mobile', $validated['mobile'])->first();
-
-        // تبدیل تاریخ جلالی به میلادی
-        // فرض می‌کنیم تاریخ به صورت '1404-01-10' یا '1404/01/10' است
-        $blockedAtInput = str_replace('/', '-', $validated['blocked_at']); // تبدیل جداکننده‌ها
-        $blockedAt = Jalalian::fromFormat('Y-m-d', $blockedAtInput)->toCarbon();
-
-        $unblockedAt = null;
-        if ($validated['unblocked_at']) {
-            $unblockedAtInput = str_replace('/', '-', $validated['unblocked_at']);
-            $unblockedAt = Jalalian::fromFormat('Y-m-d', $unblockedAtInput)->toCarbon();
+private function processDate($date, $fieldName)
+    {
+        if (empty($date)) {
+            return null;
         }
 
-        $isBlocked = UserBlocking::where('user_id', $user->id)
-            ->where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId)
-            ->where('status', 1)
-            ->exists();
-
-        if ($isBlocked) {
-            return response()->json(['success' => false, 'message' => 'این کاربر قبلاً در این کلینیک مسدود شده است.'], 422);
-        }
-
-        $blockingUser = UserBlocking::create([
-            'user_id' => $user->id,
-            'doctor_id' => $doctorId,
-            'clinic_id' => $clinicId,
-            'blocked_at' => $blockedAt,
-            'unblocked_at' => $unblockedAt,
-            'reason' => $validated['reason'] ?? null,
-            'status' => 1,
-        ]);
-
-        $doctor = Doctor::find($doctorId);
-        $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-        $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-
-        $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
-        $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-        $templateId = ($gatewayName === 'pishgamrayan') ? 100254 : null;
-
-        SendSmsNotificationJob::dispatch(
-            $message,
-            [$user->mobile],
-            $templateId,
-            [$doctorName]
-        )->delay(now()->addSeconds(5));
-
-        return response()->json([
-            'success' => true,
-            'message' => 'کاربر با موفقیت مسدود شد و پیامک در صف قرار گرفت.',
-            'blocking_user' => $blockingUser->load('user'),
-        ]);
-    } catch (\Exception $e) {
-     
-
-        return response()->json([
-            'success' => false,
-            'message' => 'خطا در ثبت کاربر مسدود.',
-            'error' => $e->getMessage(),
-        ], 500);
-    }
-}
-
-public function storeMultiple(Request $request)
-{
-    $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-    $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
-
-    $messages = [
-        'mobiles.required' => 'لطفاً حداقل یک شماره موبایل وارد کنید.',
-        'mobiles.*.exists' => 'یکی از شماره‌های موبایل واردشده در سیستم ثبت نشده است.',
-        'blocked_at.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
-        'blocked_at.date' => 'تاریخ شروع مسدودیت معتبر نیست.',
-        'unblocked_at.date' => 'تاریخ پایان مسدودیت معتبر نیست.',
-        'unblocked_at.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
-        'reason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-    ];
-
-    try {
-        $validated = $request->validate([
-            'mobiles' => 'required|array',
-            'mobiles.*' => 'exists:users,mobile',
-            'blocked_at' => 'required',
-            'unblocked_at' => 'nullable|after:blocked_at',
-            'reason' => 'nullable|string|max:255',
-        ], $messages);
-
-        // تبدیل تاریخ جلالی به میلادی
-        $blockedAtInput = str_replace('/', '-', $validated['blocked_at']);
-        $blockedAt = Jalalian::fromFormat('Y-m-d', $blockedAtInput)->toCarbon();
-
-        $unblockedAt = null;
-        if ($validated['unblocked_at']) {
-            $unblockedAtInput = str_replace('/', '-', $validated['unblocked_at']);
-            $unblockedAt = Jalalian::fromFormat('Y-m-d', $unblockedAtInput)->toCarbon();
-        }
-
-        $blockedUsers = [];
-        $alreadyBlocked = [];
-        $recipients = [];
-
-        foreach ($validated['mobiles'] as $mobile) {
-            $user = User::where('mobile', $mobile)->first();
-            if (!$user) {
-                continue;
+        // چک کردن فرمت میلادی (YYYY-MM-DD)
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            try {
+                return Carbon::createFromFormat('Y-m-d', $date);
+            } catch (\Exception $e) {
+                throw new \Exception("فرمت تاریخ $fieldName معتبر نیست: $date");
             }
+        }
+
+        // چک کردن فرمت جلالی (YYYY/MM/DD یا YYYY-MM-DD)
+        if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $date)) {
+            try {
+                $date = str_replace('/', '-', $date); // تبدیل جداکننده‌ها
+                return Jalalian::fromFormat('Y-m-d', $date)->toCarbon();
+            } catch (\Exception $e) {
+                throw new \Exception("فرمت تاریخ جلالی $fieldName معتبر نیست: $date");
+            }
+        }
+
+        throw new \Exception("فرمت تاریخ $fieldName ناشناخته است: $date");
+    }
+
+    public function store(Request $request)
+    {
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+
+        $messages = [
+            'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
+            'mobile.exists' => 'شماره موبایل واردشده در سیستم ثبت نشده است.',
+            'blocked_at.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
+            'blocked_at.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+            'unblocked_at.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+            'unblocked_at.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
+            'reason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+        ];
+
+        try {
+            $validated = $request->validate([
+                'mobile' => 'required|exists:users,mobile',
+                'blocked_at' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
+                'unblocked_at' => ['nullable', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blocked_at'],
+                'reason' => 'nullable|string|max:255',
+                'selectedClinicId' => 'nullable|string',
+            ], $messages);
+
+            $clinicId = $request->input('selectedClinicId') === 'default' ? null : $request->input('selectedClinicId');
+            $user = User::where('mobile', $validated['mobile'])->first();
+
+            // پردازش تاریخ‌ها
+            $blockedAt = $this->processDate($validated['blocked_at'], 'شروع مسدودیت');
+            $unblockedAt = $this->processDate($validated['unblocked_at'], 'پایان مسدودیت');
 
             $isBlocked = UserBlocking::where('user_id', $user->id)
                 ->where('doctor_id', $doctorId)
@@ -178,8 +105,7 @@ public function storeMultiple(Request $request)
                 ->exists();
 
             if ($isBlocked) {
-                $alreadyBlocked[] = $mobile;
-                continue;
+                return response()->json(['success' => false, 'message' => 'این کاربر قبلاً در این کلینیک مسدود شده است.'], 422);
             }
 
             $blockingUser = UserBlocking::create([
@@ -192,19 +118,6 @@ public function storeMultiple(Request $request)
                 'status' => 1,
             ]);
 
-            $blockedUsers[] = $blockingUser;
-            $recipients[] = $mobile;
-        }
-
-        if (empty($blockedUsers) && !empty($alreadyBlocked)) {
-            return response()->json(['success' => false, 'message' => 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.'], 422);
-        }
-
-        if (empty($blockedUsers)) {
-            return response()->json(['success' => false, 'message' => 'هیچ کاربری برای مسدود کردن پیدا نشد.'], 422);
-        }
-
-        if (!empty($recipients)) {
             $doctor = Doctor::find($doctorId);
             $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
             $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
@@ -215,28 +128,127 @@ public function storeMultiple(Request $request)
 
             SendSmsNotificationJob::dispatch(
                 $message,
-                $recipients,
+                [$user->mobile],
                 $templateId,
                 [$doctorName]
             )->delay(now()->addSeconds(5));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'کاربر با موفقیت مسدود شد و پیامک در صف قرار گرفت.',
+                'blocking_user' => $blockingUser->load('user'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ثبت کاربر مسدود.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'کاربران با موفقیت مسدود شدند و پیامک در صف قرار گرفت.',
-            'blocked_users' => $blockedUsers,
-            'already_blocked' => $alreadyBlocked,
-        ]);
-    } catch (\Exception $e) {
-      
-
-        return response()->json([
-            'success' => false,
-            'message' => 'خطا در ثبت کاربران مسدود.',
-            'error' => $e->getMessage(),
-        ], 500);
     }
-}
+
+    public function storeMultiple(Request $request)
+    {
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
+
+        $messages = [
+            'mobiles.required' => 'لطفاً حداقل یک شماره موبایل وارد کنید.',
+            'mobiles.*.exists' => 'یکی از شماره‌های موبایل واردشده در سیستم ثبت نشده است.',
+            'blocked_at.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
+            'blocked_at.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+            'unblocked_at.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+            'unblocked_at.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
+            'reason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+        ];
+
+        try {
+            $validated = $request->validate([
+                'mobiles' => 'required|array',
+                'mobiles.*' => 'exists:users,mobile',
+                'blocked_at' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
+                'unblocked_at' => ['nullable', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blocked_at'],
+                'reason' => 'nullable|string|max:255',
+            ], $messages);
+
+            // پردازش تاریخ‌ها
+            $blockedAt = $this->processDate($validated['blocked_at'], 'شروع مسدودیت');
+            $unblockedAt = $this->processDate($validated['unblocked_at'], 'پایان مسدودیت');
+
+            $blockedUsers = [];
+            $alreadyBlocked = [];
+            $recipients = [];
+
+            foreach ($validated['mobiles'] as $mobile) {
+                $user = User::where('mobile', $mobile)->first();
+                if (!$user) {
+                    continue;
+                }
+
+                $isBlocked = UserBlocking::where('user_id', $user->id)
+                    ->where('doctor_id', $doctorId)
+                    ->where('clinic_id', $clinicId)
+                    ->where('status', 1)
+                    ->exists();
+
+                if ($isBlocked) {
+                    $alreadyBlocked[] = $mobile;
+                    continue;
+                }
+
+                $blockingUser = UserBlocking::create([
+                    'user_id' => $user->id,
+                    'doctor_id' => $doctorId,
+                    'clinic_id' => $clinicId,
+                    'blocked_at' => $blockedAt,
+                    'unblocked_at' => $unblockedAt,
+                    'reason' => $validated['reason'] ?? null,
+                    'status' => 1,
+                ]);
+
+                $blockedUsers[] = $blockingUser;
+                $recipients[] = $mobile;
+            }
+
+            if (empty($blockedUsers) && !empty($alreadyBlocked)) {
+                return response()->json(['success' => false, 'message' => 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.'], 422);
+            }
+
+            if (empty($blockedUsers)) {
+                return response()->json(['success' => false, 'message' => 'هیچ کاربری برای مسدود کردن پیدا نشد.'], 422);
+            }
+
+            if (!empty($recipients)) {
+                $doctor = Doctor::find($doctorId);
+                $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
+
+                $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+                $templateId = ($gatewayName === 'pishgamrayan') ? 100254 : null;
+
+                SendSmsNotificationJob::dispatch(
+                    $message,
+                    $recipients,
+                    $templateId,
+                    [$doctorName]
+                )->delay(now()->addSeconds(5));
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'کاربران با موفقیت مسدود شدند و پیامک در صف قرار گرفت.',
+                'blocked_users' => $blockedUsers,
+                'already_blocked' => $alreadyBlocked,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ثبت کاربران مسدود.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
     public function updateStatus(Request $request)
     {
         try {

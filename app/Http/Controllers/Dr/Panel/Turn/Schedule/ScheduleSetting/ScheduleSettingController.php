@@ -1498,7 +1498,7 @@ $validated = $request->validate([
 
             return ! $appointmentQuery->exists();
         });
-
+       Log::info($nextAvailableDate);
         return response()->json([
             'status' => $nextAvailableDate ? true : false,
             'date'   => $nextAvailableDate ?? 'هیچ نوبت خالی یافت نشد.',

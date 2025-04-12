@@ -27,43 +27,43 @@
           <button class="btn btn-primary h-50" data-toggle="modal" data-target="#addUserModal">افزودن کاربر</button>
         </div>
         <div class="table-responsive">
-          <table id="blockedUsersTable" class="table table-striped table-bordered text-center">
-            <thead>
-              <tr>
-                <th>نام کاربر</th>
-                <th>شماره موبایل</th>
-                <th>تاریخ شروع</th>
-                <th>تاریخ پایان</th>
-                <th>دلیل</th>
-                <th>وضعیت</th>
-                <th>عملیات</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach ($blockedUsers as $blockedUser)
-                <tr data-id="{{ $blockedUser->id }}">
-                  <td>{{ $blockedUser->user->first_name }} {{ $blockedUser->user->last_name }}</td>
-                  <td>{{ $blockedUser->user->mobile }}</td>
-                  <td>{{ explode(' ', $blockedUser->blocked_at)[0] }}</td>
-                  <td>{{ explode(' ', $blockedUser->unblocked_at)[0] ?? '-' }}</td>
-                  <td>{{ $blockedUser->reason ?? 'بدون دلیل' }}</td>
-                  <td>
+         <table id="blockedUsersTable" class="table table-striped table-bordered text-center">
+    <thead>
+        <tr>
+            <th>نام کاربر</th>
+            <th>شماره موبایل</th>
+            <th>تاریخ شروع</th>
+            <th>تاریخ پایان</th>
+            <th>دلیل</th>
+            <th>وضعیت</th>
+            <th>عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($blockedUsers as $blockedUser)
+            <tr data-id="{{ $blockedUser->id }}">
+                <td>{{ $blockedUser->user->first_name }} {{ $blockedUser->user->last_name }}</td>
+                <td>{{ $blockedUser->user->mobile }}</td>
+                <td>{{ \Morilog\Jalali\Jalalian::fromDateTime($blockedUser->blocked_at)->format('Y/m/d') }}</td>
+                <td>{{ $blockedUser->unblocked_at ? \Morilog\Jalali\Jalalian::fromDateTime($blockedUser->unblocked_at)->format('Y/m/d') : '-' }}</td>
+                <td>{{ $blockedUser->reason ?? 'بدون دلیل' }}</td>
+                <td>
                     <span
-                      class="cursor-pointer font-weight-bold {{ $blockedUser->status == 1 ? 'text-danger' : 'text-success' }}"
-                      title="برای تغییر وضعیت کلیک کنید" data-toggle="tooltip" data-status="{{ $blockedUser->status }}"
-                      data-id="{{ $blockedUser->id }}" onclick="toggleStatus(this)">
-                      {{ $blockedUser->status == 1 ? 'مسدود' : 'آزاد' }}
+                        class="cursor-pointer font-weight-bold {{ $blockedUser->status == 1 ? 'text-danger' : 'text-success' }}"
+                        title="برای تغییر وضعیت کلیک کنید" data-toggle="tooltip" data-status="{{ $blockedUser->status }}"
+                        data-id="{{ $blockedUser->id }}" onclick="toggleStatus(this)">
+                        {{ $blockedUser->status == 1 ? 'مسدود' : 'آزاد' }}
                     </span>
-                  </td>
-                  <td>
+                </td>
+                <td>
                     <button class="rounded-circle btn btn-light btn-sm delete-user-btn">
-                      <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
+                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
                     </button>
-                  </td>
-                </tr>
-              @endforeach
-            </tbody>
-          </table>
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
         </div>
       </div>
     </div>
@@ -81,7 +81,6 @@
                 <th>عنوان پیام</th>
                 <th>متن پیام</th>
                 <th>تاریخ ارسال</th>
-                <th>گیرنده</th>
                 <th>عملیات</th>
               </tr>
             </thead>
@@ -91,18 +90,6 @@
                   <td>{{ $message->title }}</td>
                   <td>{{ $message->content }}</td>
                   <td>{{ \Morilog\Jalali\Jalalian::fromDateTime($message->created_at)->format('Y/m/d') }}</td>
-                  <td>
-                    @if ($message->recipient_type === 'all')
-                      همه کاربران
-                    @elseif ($message->recipient_type === 'blocked')
-                      کاربران مسدود
-                    @elseif ($message->recipient_type === 'specific' && $message->user)
-                      {{ $message->user->first_name . ' ' . $message->user->last_name }}
-                      ({{ $message->user->mobile }})
-                    @else
-                      نامشخص
-                    @endif
-                  </td>
                   <td>
                     <button class="btn btn-light btn-sm delete-message-btn rounded-circle"
                       onclick="deleteMessage({{ $message->id }}, this)">
@@ -301,59 +288,63 @@
 
 
   // اضافه کردن کاربر به جدول
-  function appendBlockedUser(user) {
+function appendBlockedUser(user) {
     const tableBody = $('#blockedUsersTable tbody');
     const statusText = user.status == 1 ? 'مسدود' : 'آزاد';
     const statusClass = user.status == 1 ? 'text-danger' : 'text-success';
 
+    // تبدیل تاریخ‌های میلادی به جلالی
+    const blockedAt = moment(user.blocked_at).locale('fa').format('jYYYY/jMM/jDD');
+    const unblockedAt = user.unblocked_at ? moment(user.unblocked_at).locale('fa').format('jYYYY/jMM/jDD') : '-';
+
     const newRow = `
-      <tr data-id="${user.id}">
-        <td>${user.user.first_name} ${user.user.last_name}</td>
-        <td>${user.user.mobile}</td>
-        <td>${user.blocked_at.split(' ')[0]}</td>
-        <td>${user.unblocked_at ? user.unblocked_at.split(' ')[0] : '-'}</td>
-        <td>${user.reason || 'بدون دلیل'}</td>
-        <td>
-          <span class="cursor-pointer font-weight-bold ${statusClass}" data-toggle="tooltip" data-status="${user.status}" data-id="${user.id}" onclick="toggleStatus(this)">
-            ${statusText}
-          </span>
-        </td>
-        <td>
-          <button class="rounded-circle btn btn-light btn-sm delete-user-btn">
-            <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
-          </button>
-        </td>
-      </tr>
+        <tr data-id="${user.id}">
+            <td>${user.user.first_name} ${user.user.last_name}</td>
+            <td>${user.user.mobile}</td>
+            <td>${blockedAt}</td>
+            <td>${unblockedAt}</td>
+            <td>${user.reason || 'بدون دلیل'}</td>
+            <td>
+                <span class="cursor-pointer font-weight-bold ${statusClass}" data-toggle="tooltip" data-status="${user.status}" data-id="${user.id}" onclick="toggleStatus(this)">
+                    ${statusText}
+                </span>
+            </td>
+            <td>
+                <button class="rounded-circle btn btn-light btn-sm delete-user-btn">
+                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
+                </button>
+            </td>
+        </tr>
     `;
     tableBody.append(newRow);
     $('[data-toggle="tooltip"]').tooltip();
-  }
+}
 
-  // بارگذاری کاربران مسدود
-  function loadBlockedUsers() {
+// بارگذاری کاربران مسدود
+function loadBlockedUsers() {
     const selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
     $.ajax({
-      url: "{{ route('doctor-blocking-users.index') }}",
-      method: "GET",
-      data: {
-        selectedClinicId: selectedClinicId
-      },
-      success: function(response) {
-        const tableBody = $('#blockedUsersTable tbody');
-        tableBody.empty();
-        if (response.blockedUsers.length === 0) {
-          tableBody.append('<tr><td colspan="7" class="text-center">هیچ کاربر مسدودی یافت نشد.</td></tr>');
-          return;
+        url: "{{ route('doctor-blocking-users.index') }}",
+        method: "GET",
+        data: {
+            selectedClinicId: selectedClinicId
+        },
+        success: function(response) {
+            const tableBody = $('#blockedUsersTable tbody');
+            tableBody.empty();
+            if (response.blockedUsers.length === 0) {
+                tableBody.append('<tr><td colspan="7" class="text-center">هیچ کاربر مسدودی یافت نشد.</td></tr>');
+                return;
+            }
+            response.blockedUsers.forEach(user => {
+                appendBlockedUser(user);
+            });
+        },
+        error: function() {
+            toastr.error("خطا در بارگذاری لیست کاربران!");
         }
-        response.blockedUsers.forEach(user => {
-          appendBlockedUser(user);
-        });
-      },
-      error: function() {
-        toastr.error("خطا در بارگذاری لیست کاربران!");
-      }
     });
-  }
+}
 
   // حذف کاربر مسدود
   $(document).on('click', '#blockedUsersTable .delete-user-btn', function(e) {
@@ -431,7 +422,6 @@
                         <td>${message.title}</td>
                         <td>${message.content}</td>
                         <td>${jalaliDate}</td>
-                        <td>${recipientText}</td>
                         <td>
                             <button class="btn btn-light btn-sm delete-message-btn rounded-circle" onclick="deleteMessage(${message.id}, this)">
                                 <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">

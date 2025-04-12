@@ -809,7 +809,7 @@
       }, 300);
     });
   }
-   $(document).ready(function() {
+  $(document).ready(function() {
     let currentDate = moment().format('YYYY-MM-DD');
     const days = 14;
     const calendar = $('#calendar');
@@ -1241,8 +1241,16 @@
         selectedClinicId: localStorage.getItem('selectedClinicId')
       },
       success: function(response) {
+
         if (response.status) {
           const nextAvailableDate = response.date;
+
+          // Validate nextAvailableDate (Gregorian YYYY-MM-DD)
+          if (!moment(nextAvailableDate, 'YYYY-MM-DD', true).isValid()) {
+            Swal.fire('خطا', 'تاریخ دریافت‌شده معتبر نیست.', 'error');
+            return;
+          }
+
           let oldDates = [];
           // دریافت تاریخ‌ها از آرایه selectedAppointments
           let selected = getSelectedAppointments();
@@ -1252,9 +1260,48 @@
             let oldDate = $('#dateModal').data('selectedDate') || $("#rescheduleModal").data("old-date");
             if (oldDate) oldDates.push(oldDate);
           }
+
+          // Convert and validate oldDates
+          oldDates = oldDates
+            .map(date => {
+              // Normalize separators (replace '/' with '-')
+              const normalizedDate = date.replace(/\//g, '-');
+              // Try parsing as Jalali (e.g., 1404-01-23)
+              if (/^14\d{2}-\d{2}-\d{2}$/.test(normalizedDate)) {
+                // Explicitly parse as Jalali
+                const jalaliMoment = moment.from(normalizedDate, 'fa', 'jYYYY-jMM-jDD');
+                if (jalaliMoment.isValid()) {
+                  // Convert to Gregorian
+                  const gregorianDate = jalaliMoment.clone().locale('en').format('YYYY-MM-DD');
+                  return gregorianDate;
+                }
+              }
+              // Try parsing as Gregorian (YYYY-MM-DD)
+              if (moment(normalizedDate, 'YYYY-MM-DD', true).isValid()) {
+                return normalizedDate;
+              }
+              return null; // Invalid date
+            })
+            .filter(date => date !== null);
+
+
+          if (oldDates.length === 0) {
+            Swal.fire('خطا', 'هیچ تاریخ معتبری برای جابجایی یافت نشد.', 'error');
+            return;
+          }
+
+          // Format dates for display (Jalali)
+          const formattedNextDate = moment(nextAvailableDate, 'YYYY-MM-DD').locale('fa').format(
+            'jD jMMMM jYYYY');
+          const formattedOldDates = oldDates.map(date => {
+            const jalaliDate = moment(date, 'YYYY-MM-DD').locale('fa').format('jD jMMMM jYYYY');
+            return jalaliDate;
+          });
+
+
           Swal.fire({
-            title: `اولین نوبت خالی (${moment(nextAvailableDate, 'YYYY-MM-DD').locale('fa').format('jD jMMMM jYYYY')})`,
-            text: `آیا می‌خواهید نوبت‌ها از تاریخ(های) ${oldDates.map(date => moment(date, 'YYYY-MM-DD').locale('fa').format('jD jMMMM jYYYY')).join(', ')} به تاریخ ${moment(nextAvailableDate, 'YYYY-MM-DD').locale('fa').format('jD jMMMM jYYYY')} منتقل شوند؟`,
+            title: `اولین نوبت خالی (${formattedNextDate})`,
+            text: `آیا می‌خواهید نوبت‌ها از تاریخ(های) ${formattedOldDates.join('، ')} به تاریخ ${formattedNextDate} منتقل شوند؟`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'بله، جابجا کن',
@@ -1266,7 +1313,7 @@
                   url: "{{ route('doctor.update_first_available_appointment') }}",
                   method: 'POST',
                   data: {
-                    old_date: oldDate,
+                    old_date: oldDate, // Gregorian YYYY-MM-DD
                     new_date: nextAvailableDate,
                     _token: '{{ csrf_token() }}',
                     selectedClinicId: localStorage.getItem('selectedClinicId')
@@ -1286,7 +1333,7 @@
             }
           });
         } else {
-          Swal.fire('اطلاع', response.message, 'info');
+          Swal.fire('اطلاع', response.message || 'هیچ نوبت خالی یافت نشد.', 'info');
         }
       },
       error: function() {
@@ -1662,6 +1709,7 @@
       });
     });
     $(document).on("click", ".block-user", function(e) {
+      
       e.preventDefault();
       let row = $(this).closest("tr"); // گرفتن ردیف مربوطه
       let userId = $(this).data("user-id"); // دریافت ID کاربر
@@ -1697,7 +1745,9 @@
               mobile: mobile,
               reason: result.value, // دلیل مسدودیت
               blocked_at: moment().format('YYYY-MM-DD'), // تاریخ شروع مسدودیت
-              unblocked_at: null, // نامحدود تا زمان آزادسازی
+              unblocked_at: null, // نامحدود تا زمان 
+              selectedClinicId: localStorage.getItem('selectedClinicId') // اضافه کردن برای هماهنگی
+
             },
             beforeSend: function() {
               Swal.fire({
@@ -1850,7 +1900,7 @@
       selected.push({
         id: appointmentId,
         status: row.find('td:nth-child(5)').text().trim(),
-        date: row.find('td:nth-child(7)').text().trim(),
+        date: row.find('td:nth-child(8)').text().trim(),
         mobile: row.find('td:nth-child(3)').text().trim(),
         row: row
       });

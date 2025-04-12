@@ -200,9 +200,7 @@
               <li>
                 <a href="#" id="attended-appointments" class="dropdown-item">ویزیت شده</a>
               </li>
-              <li>
-                <a href="#" id="missed-appointments" class="dropdown-item">ویزیت نشده</a>
-              </li>
+            
 
             </ul>
 
@@ -439,6 +437,8 @@
 </div>
 
 @section('scripts')
+<script src="{{ asset('dr-assets/panel/js/jalali-moment/dist/jalali-moment.browser.js') }}"></script>
+
   <script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
 
   @include('dr.panel.my-tools.dashboardTools')
