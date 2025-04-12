@@ -52,7 +52,7 @@ class DoctorLoginRegister extends Component
             ],
         ], [
             'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
-            'mobile.regex'    => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
+            'mobile.regex' => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
         ]);
 
         $mobile = preg_replace('/^(\+98|98|0)/', '', $this->mobile);
@@ -62,15 +62,17 @@ class DoctorLoginRegister extends Component
         $secretary = Secretary::where('mobile', $formattedMobile)->first();
         $loginAttempts = new LoginAttemptsService();
 
-        if (! $doctor && ! $secretary) {
+        // بررسی وجود کاربر
+        if (!$doctor && !$secretary) {
             $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
-            $this->addError('mobile', 'کاربری با این شماره تلفن وجود ندارد.');
+            $this->addError('mobile', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
 
         $user = $doctor ?? $secretary;
 
-        if ($user->status !== 1) {
+        // بررسی وضعیت کاربر
+        if ($user->status === 0) {
             $loginAttempts->incrementLoginAttempt(
                 $user->id,
                 $formattedMobile,
@@ -78,16 +80,17 @@ class DoctorLoginRegister extends Component
                 $secretary ? $secretary->id : null,
                 null
             );
-            $this->addError('mobile', 'حساب کاربری شما فعال نیست.');
+            $this->addError('mobile', 'حساب کاربری شما هنوز تأیید نشده است.');
             return;
         }
 
+        // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($formattedMobile)) {
-            // اینجا دیگه addError رو حذف کردیم
             $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
             return;
         }
 
+        // افزایش تعداد تلاش‌ها
         $loginAttempts->incrementLoginAttempt(
             $user->id,
             $formattedMobile,
@@ -95,8 +98,10 @@ class DoctorLoginRegister extends Component
             $secretary ? $secretary->id : null,
             null
         );
+
         session(['step1_completed' => true]);
 
+        // ارسال OTP
         $otpCode = rand(1000, 9999);
         $token = Str::random(60);
 

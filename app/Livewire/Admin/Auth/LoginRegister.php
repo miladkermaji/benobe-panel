@@ -3,9 +3,7 @@
 namespace App\Livewire\Admin\Auth;
 
 use App\Models\Otp;
-use App\Models\Doctor;
 use Livewire\Component;
-use App\Models\Secretary;
 use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use App\Models\Admin\Manager;
@@ -51,7 +49,7 @@ class LoginRegister extends Component
             ],
         ], [
             'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
-            'mobile.regex'    => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
+            'mobile.regex' => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
         ]);
 
         $mobile = preg_replace('/^(\+98|98|0)/', '', $this->mobile);
@@ -60,15 +58,17 @@ class LoginRegister extends Component
         $manager = Manager::where('mobile', $formattedMobile)->first();
         $loginAttempts = new LoginAttemptsService();
 
-        if (! $manager) {
+        // بررسی وجود کاربر
+        if (!$manager) {
             $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
-            $this->addError('mobile', 'کاربری با این شماره تلفن وجود ندارد.');
+            $this->addError('mobile', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
 
         $user = $manager;
 
-        if ($user->status !== 1) {
+        // بررسی وضعیت کاربر
+        if ($user->status === 0) {
             $loginAttempts->incrementLoginAttempt(
                 $user->id,
                 $formattedMobile,
@@ -76,17 +76,17 @@ class LoginRegister extends Component
                 null,
                 $manager ? $manager->id : null
             );
-            $this->addError('mobile', 'حساب کاربری شما فعال نیست.');
+            $this->addError('mobile', 'حساب کاربری شما هنوز تأیید نشده است.');
             return;
         }
 
+        // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($formattedMobile)) {
-            // اینجا دیگه addError رو حذف کردیم
             $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
             return;
         }
 
-
+        // افزایش تعداد تلاش‌ها
         $loginAttempts->incrementLoginAttempt(
             $user->id,
             $formattedMobile,
@@ -97,13 +97,13 @@ class LoginRegister extends Component
 
         session(['step1_completed' => true]);
 
+        // ارسال OTP
         $otpCode = rand(1000, 9999);
         $token = Str::random(60);
 
         Otp::create([
             'token' => $token,
             'manager_id' => $manager ? $user->id : null,
-            
             'otp_code' => $otpCode,
             'login_id' => $user->mobile,
             'type' => 0,
