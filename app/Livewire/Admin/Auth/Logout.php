@@ -29,7 +29,7 @@ class Logout extends Component
 
         session()->forget(['current_step', 'step1_completed', 'step3_completed', 'otp_token', 'manager_temp_login']);
         session()->flash('swal-success', 'شما با موفقیت از سایت خارج شدید');
-        $this->redirect(route('admin.auth.login-register-form'), navigate: true);
+        $this->redirect(route('admin.auth.login-register-form'));
     }
 
     public function render()

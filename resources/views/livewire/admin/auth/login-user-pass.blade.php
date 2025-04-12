@@ -5,7 +5,6 @@
         <div class="d-flex align-items-center">
           <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
           <span class="text-custom-gray px-1">کلمه عبور</span>
-
         </div>
         <a href="#" wire:click.prevent="goBack" class="back-link text-primary d-flex align-items-center"
           style="cursor: pointer;">
@@ -97,7 +96,12 @@
         }
       });
     });
-
+    Livewire.on('password-error', () => {
+      toastr.error('کلمه عبور اشتباه است.');
+    });
+    Livewire.on('password-success', () => {
+      toastr.error('موفقیت آمیز');
+    });
     Livewire.on('loginSuccess', () => {
       toastr.success('با موفقیت وارد شدید');
     });
@@ -123,7 +127,7 @@
     }
 
     document.addEventListener('livewire:initialized', () => {
-      document.querySelector('input[wire\\:model="mobile"]').focus();
+      document.querySelector('input[wire\\:model="password"]').focus();
     });
   </script>
 @endpush

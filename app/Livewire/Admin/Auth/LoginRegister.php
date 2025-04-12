@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Auth;
 
 use App\Models\Otp;
 use Livewire\Component;
+use App\Models\Secretary;
 use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use App\Models\Admin\Manager;
@@ -24,7 +25,7 @@ class LoginRegister extends Component
         } elseif (session('current_step') === 2) {
             $this->redirect(route('admin.auth.login-confirm-form', ['token' => session('otp_token')]), navigate: true);
         } elseif (session('current_step') === 3) {
-            $this->redirect(route('admin.auth.login-user-pass-form'), navigate: true);
+            $this->redirect(route('dr.auth.login-user-pass-form'), navigate: true);
         }
         session(['current_step' => 1]);
     }
@@ -87,6 +88,7 @@ class LoginRegister extends Component
         }
 
         // افزایش تعداد تلاش‌ها
+
         $loginAttempts->incrementLoginAttempt(
             $user->id,
             $formattedMobile,
@@ -95,7 +97,17 @@ class LoginRegister extends Component
             $manager ? $manager->id : null
         );
 
-        session(['step1_completed' => true]);
+
+        session(['step1_completed' => true, 'login_mobile' => $formattedMobile]);
+
+        // بررسی فعال بودن رمز عبور ثابت
+        if (($user->static_password_enabled ?? 0) === 1) {
+            session(['current_step' => 3]);
+            $this->redirect(route('admin.auth.login-user-pass-form'), navigate: true);
+            $this->dispatch('pass-form');
+
+            return;
+        }
 
         // ارسال OTP
         $otpCode = rand(1000, 9999);

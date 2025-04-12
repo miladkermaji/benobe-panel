@@ -118,11 +118,12 @@ class DoctorLoginUserPass extends Component
                 null
             );
             $this->addError('password', 'رمز عبور نادرست است یا حساب غیرفعال است.');
-        $this->dispatch('password-error');
+            $this->dispatch('password-error');
 
             return;
         }
-
+            $this->dispatch('password-success');
+          
         // بررسی احراز هویت دو مرحله‌ای
         if (($user->two_factor_secret_enabled ?? 0) === 1) {
             $token = Str::random(60);

@@ -2,7 +2,7 @@
   <div class="col-md-6 login-container position-relative">
     <div class="login-card custom-rounded custom-shadow p-7">
       <div class="logo-wrapper w-100 d-flex justify-content-center">
-        <img class="position-absolute cursor-pointer" onclick="location.href='/'" width="85px"
+        <img class="position-absolute  cursor-pointer" onclick="location.href='/'" width="85px"
           src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
       </div>
       <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
@@ -18,8 +18,8 @@
             <label class="text-custom-gray">شماره موبایل</label>
           </div>
           <input wire:model="mobile" dir="ltr"
-            class="form-control custom-rounded h-50 border-3 border-gray-300 @error('mobile') is-invalid @enderror" type="text"
-            placeholder="09181234567" maxlength="11" autofocus>
+            class="form-control custom-rounded h-50 border-3 border-gray-300 @error('mobile') is-invalid @enderror"
+            type="text" placeholder="09181234567" maxlength="11" autofocus>
           @error('mobile')
             <div class="invalid-feedback">{{ $message }}</div>
           @enderror
@@ -54,7 +54,8 @@
           timerInterval = setInterval(() => {
             remainingTime--;
             if (remainingTime >= 0) {
-              remainingTimeElement.innerHTML = `لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید`;
+              remainingTimeElement.innerHTML =
+                `لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید`;
               // تغییر رنگ بر اساس زمان باقی‌مونده
               if (remainingTime > 180) { // بیشتر از 3 دقیقه
                 remainingTimeElement.style.color = '#16a34a'; // سبز
@@ -83,7 +84,9 @@
       toastr.success('کد تأیید با موفقیت ارسال شد');
       localStorage.removeItem('otpTimerData');
     });
-
+    Livewire.on('pass-form', (data) => {
+      toastr.success('موفقیت آمیز');
+    });
     Livewire.on('navigateTo', (event) => {
       window.Livewire.navigate(event.url);
     });

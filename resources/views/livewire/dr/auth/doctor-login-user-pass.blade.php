@@ -99,6 +99,9 @@
     Livewire.on('password-error', () => {
       toastr.error('کلمه عبور اشتباه است.');
     });
+    Livewire.on('password-success', () => {
+      toastr.error('موفقیت آمیز');
+    });
     Livewire.on('loginSuccess', () => {
       toastr.success('با موفقیت وارد شدید');
     });
