@@ -71,7 +71,6 @@ use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettin
 Route::prefix('admin-panel/')->middleware('throttle:10,1')->group(function () {
     Route::get('login', LoginRegister::class)->name('admin.auth.login-register-form');
     Route::get('login-user-pass', LoginUserPass::class)->name('admin.auth.login-user-pass-form');
-    Route::get('two-factor/{token}', TwoFactor::class)->name('admin-two-factor');
     Route::get('login-confirm/{token}', LoginConfirm::class)->name('admin.auth.login-confirm-form');
     Route::get('login-resend-otp/{token}', LoginConfirm::class)->name('admin.auth.login-resend-otp'); // اضافه شده
     Route::get('logout', Logout::class)->name('admin.auth.logout');
@@ -81,7 +80,6 @@ Route::prefix('admin-panel/')->middleware('throttle:10,1')->group(function () {
 Route::prefix('dr/')->middleware('throttle:10,1')->group(function () {
     Route::get('login', DoctorLoginRegister::class)->name('dr.auth.login-register-form');
     Route::get('login-user-pass', DoctorLoginUserPass::class)->name('dr.auth.login-user-pass-form');
-    Route::get('two-factor/{token}', DoctorTwoFactor::class)->name('dr-two-factor');
     Route::get('login-confirm/{token}', DoctorLoginConfirm::class)->name('dr.auth.login-confirm-form');
     Route::get('login-resend-otp/{token}', DoctorLoginConfirm::class)->name('dr.auth.login-resend-otp');
     Route::get('logout', DoctorLogout::class)->name('dr.auth.logout');

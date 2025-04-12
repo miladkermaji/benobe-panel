@@ -1,6 +1,36 @@
 @import url("./../../fonts/yekan-bakh/stylesheet.css");
 @import url("./../../fonts/IRANSans/style.css");
+:root {
+  /* پالت رنگی اصلی */
+  --primary: #2E86C1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
+  --primary-light: #84CAF9; /* آبی روشن - در گرادیان‌ها */
+  --secondary: #1DEB3C; /* سبز - برای دکمه‌های ثانویه */
+  --secondary-hover: #15802A; /* سبز تیره‌تر برای هاور */
+  --background-light: #F0F8FF; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
+  --background-footer: #D4ECFD; /* آبی روشن‌تر - فوتر */
+  --background-card: #FFFFFF; /* سفید - کارت‌ها */
+  --text-primary: #000000; /* مشکی - متن اصلی */
+  --text-secondary: #707070; /* خاکستری - متن ثانویه */
+  --text-discount: #008000; /* سبز - قیمت با تخفیف */
+  --text-original: #FF0000; /* قرمز - قیمت اولیه */
+  --border-neutral: #E5E7EB; /* خاکستری روشن - حاشیه‌ها */
+  --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
+  --gradient-instagram-from: #F92CA7; /* گرادیان اینستاگرام - شروع */
+  --gradient-instagram-to: #6B1A93; /* گرادیان اینستاگرام - پایان */
+  --button-mobile: #4F9ACD; /* آبی متوسط - دکمه‌های موبایل */
+  --button-mobile-light: #A2CDEB; /* آبی روشن‌تر - دکمه‌های موبایل */
+  --support-section: #2E86C1; /* آبی - بخش پشتیبانی */
+  --support-text: #084D7C; /* آبی تیره - متن پشتیبانی */
 
+  /* شعاع گوشه‌ها (border-radius) */
+  --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
+  --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
+  --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
+  --radius-card: 1.125rem; /* 18px - کارت‌ها */
+  --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
+  --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
+  --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
+}
 /* Reset and Base Styles */
 * {
     direction: rtl;
@@ -12,7 +42,7 @@
 }
 
 body {
-    background: linear-gradient(135deg, #e0f2fe 0%, #e2e8f0 100%);
+    background: linear-gradient(135deg, var(--background-light) 0%, var(--background-footer) 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -28,24 +58,23 @@ body {
     font-family: "IRANSans", sans-serif;
     font-size: 1.15rem;
     font-weight: 500;
-    border: 1px solid #d1d5db;
-    background: #ffffff;
-    padding: 0.8rem 1.2rem;
-    border-radius: 16px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-neutral);
+    background: var(--background-card);
+    padding: 0.5rem 1.2rem;
+    border-radius: var(--radius-button-large);
     transition: all 0.3s ease;
 }
 
 .form-control:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 14px rgba(37, 99, 235, 0.3);
+    border-color: var(--primary);
+    box-shadow: 0 0 14px rgba(46, 134, 193, 0.3);
     outline: none;
     transform: scale(1.01);
 }
 
 input::placeholder {
     font-family: "IRANSans", sans-serif;
-    color: #9ca3af;
+    color: var(--text-secondary);
     font-size: 1rem;
     font-weight: 400;
 }
@@ -57,13 +86,13 @@ button {
 }
 
 .btn.custom-gradient {
-    background: linear-gradient(90deg, #2563eb 0%, #7dd3fc 100%);
-    color: #ffffff;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: var(--background-card);
     font-weight: 700;
     font-size: 1.1rem;
     padding: 0.9rem 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+    border-radius: var(--radius-button-large);
+    box-shadow: 0 5px 15px rgba(46, 134, 193, 0.3);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -71,27 +100,27 @@ button {
 }
 
 .btn.custom-gradient:hover {
-    background: linear-gradient(90deg, #7dd3fc 0%, #2563eb 100%);
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+    background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    box-shadow: 0 8px 20px rgba(46, 134, 193, 0.4);
     transform: translateY(-2px);
 }
 
 .btn.custom-gradient:active {
     transform: translateY(0);
-    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 3px 10px rgba(46, 134, 193, 0.2);
 }
 
 /* Custom Classes */
 .custom-shadow {
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 30px var(--shadow);
 }
 
 .custom-rounded {
-    border-radius: 20px;
+    border-radius: var(--radius-nav);
 }
 
 .text-custom-gray {
-    color: #374151;
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
@@ -108,8 +137,8 @@ button {
     width: 100%;
     min-width: 450px;
     max-width: 800px;
-    background: #ffffff;
-    border-radius: 20px;
+    background: var(--background-card);
+    border-radius: var(--radius-card);
     position: relative;
     overflow: hidden;
 }
@@ -150,30 +179,30 @@ button {
     height: 72px;
     font-size: 1.8rem;
     text-align: center;
-    border: 1px solid #d1d5db;
-    border-radius: 16px;
-    background: #f8fafc;
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button-large);
+    background: var(--background-light);
     padding: 0.8rem;
     transition: all 0.3s ease;
 }
 
 .otp-input:focus {
-    border-color: #2563eb;
-    background: #ffffff;
-    box-shadow: 0 0 14px rgba(37, 99, 235, 0.3);
+    border-color: var(--primary);
+    background: var(--background-card);
+    box-shadow: 0 0 14px rgba(46, 134, 193, 0.3);
     transform: scale(1.05);
 }
 
 /* Back Link */
 .back-link {
-    color: #2563eb;
+    color: var(--primary);
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
 }
 
 .back-link:hover {
-    color: #7dd3fc;
+    color: var(--primary-light);
     transform: translateX(-6px);
 }
 
@@ -194,7 +223,7 @@ button {
 
 /* Invalid Feedback */
 .invalid-feedback {
-    color: #dc2626;
+    color: var(--text-original);
     font-size: 0.95rem;
     margin-top: 0.6rem;
     font-weight: 500;
@@ -202,9 +231,9 @@ button {
 
 /* Loader Animation */
 .loader {
-    border: 4px solid #f8fafc;
-    border-top: 4px solid #2563eb;
-    border-radius: 50%;
+    border: 4px solid var(--background-light);
+    border-top: 4px solid var(--primary);
+    border-radius: var(--radius-circle);
     width: 28px;
     height: 28px;
     animation: spin 0.8s linear infinite;
@@ -221,7 +250,7 @@ button {
 
 /* Error Message */
 .error-message {
-    color: #dc2626;
+    color: var(--text-original);
     font-size: 0.95rem;
     margin-top: 0.6rem;
 }
@@ -247,8 +276,8 @@ button {
 
 .modal-content {
     border: none;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    border-radius: var(--radius-card);
+    box-shadow: 0 15px 35px var(--shadow);
     animation: popIn 0.6s ease;
 }
 
@@ -273,9 +302,9 @@ button {
 }
 
 .btn-danger {
-    background: #dc2626;
-    color: #ffffff;
-    border-radius: 16px;
+    background: var(--text-original);
+    color: var(--background-card);
+    border-radius: var(--radius-button-large);
     padding: 0.9rem 2.5rem;
     font-weight: 600;
     transition: all 0.3s ease;
@@ -288,18 +317,18 @@ button {
 }
 
 .btn-outline-primary {
-    border-color: #2563eb;
-    color: #2563eb;
-    border-radius: 16px;
+    border-color: var(--primary);
+    color: var(--primary);
+    border-radius: var(--radius-button-large);
     padding: 0.9rem 2.5rem;
     font-weight: 600;
     transition: all 0.3s ease;
 }
 
 .btn-outline-primary:hover {
-    background: #2563eb;
-    color: #ffffff;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+    background: var(--primary);
+    color: var(--background-card);
+    box-shadow: 0 8px 20px rgba(46, 134, 193, 0.4);
     transform: translateY(-2px);
 }
 
@@ -307,22 +336,22 @@ button {
 #progress-bar-container {
     width: 100%;
     height: 12px;
-    background-color: #e5e7eb;
-    border-radius: 12px;
+    background-color: var(--border-neutral);
+    border-radius: var(--radius-button);
     overflow: hidden;
     direction: ltr;
 }
 
 #progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+    background: linear-gradient(90deg, var(--secondary) 0%, var(--secondary-hover) 100%);
     transition: width 0.6s ease, background-color 0.6s ease;
 }
 
 /* Responsive Design */
 @media (max-width: 1024px) {
     .login-card {
-        max-width: 700px; /* عرض مناسب برای تبلت */
+        max-width: 700px;
         margin: 0 auto;
     }
 
@@ -337,11 +366,11 @@ button {
 
 @media (max-width: 500px) {
     body {
-        padding: 0.25rem; /* مارجین کمتر برای موبایل */
+        padding: 0.25rem;
     }
 
     .login-card {
-        min-width: 98vw; /* تمام‌صفحه */
+        min-width: 98vw;
         max-width: 98vw;
         margin: 0;
     }
@@ -352,7 +381,7 @@ button {
 
     .form-control {
         font-size: 1rem;
-        padding: 0.7rem 1rem;
+        padding: 0.5rem 1.2rem;
     }
 
     input::placeholder {
@@ -388,7 +417,6 @@ button {
 }
 
 @media (max-width: 425px) {
-    /* تنظیمات مشابه 500px برای موبایل‌های کوچک‌تر */
     .login-card {
         min-width: 98vw;
         max-width: 98vw;

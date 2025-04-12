@@ -18,17 +18,12 @@
             <label class="text-custom-gray">شماره موبایل</label>
           </div>
           <input wire:model="mobile" dir="ltr"
-            class="form-control custom-rounded custom-shadow h-50 @error('mobile') is-invalid @enderror" type="text"
-            placeholder="09181234567" maxlength="11" autofocus>
+            class="form-control custom-rounded h-50 border-3 border-gray-300 @error('mobile') is-invalid @enderror"
+            type="text" placeholder="09181234567" maxlength="11" autofocus>
           @error('mobile')
             <div class="invalid-feedback">{{ $message }}</div>
           @enderror
         </div>
-        <a href="#"
-          wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('dr.auth.login-user-pass-form') }}' })"
-          class="text-primary text-decoration-none mb-3 d-block fw-bold">
-          ورود با نام کاربری و کلمه عبور
-        </a>
         <button type="submit" wire:loading.attr="disabled"
           class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
           <span wire:loading.remove wire:target="loginRegister">ادامه</span>
@@ -59,7 +54,8 @@
           timerInterval = setInterval(() => {
             remainingTime--;
             if (remainingTime >= 0) {
-              remainingTimeElement.innerHTML = `لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید`;
+              remainingTimeElement.innerHTML =
+                `لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید`;
               // تغییر رنگ بر اساس زمان باقی‌مونده
               if (remainingTime > 180) { // بیشتر از 3 دقیقه
                 remainingTimeElement.style.color = '#16a34a'; // سبز
@@ -88,7 +84,9 @@
       toastr.success('کد تأیید با موفقیت ارسال شد');
       localStorage.removeItem('otpTimerData');
     });
-
+    Livewire.on('pass-form', (data) => {
+      toastr.success('موفقیت آمیز');
+    });
     Livewire.on('navigateTo', (event) => {
       window.Livewire.navigate(event.url);
     });

@@ -4,7 +4,8 @@
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
           <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
-          <span class="text-custom-gray px-1">ورود با نام کاربری</span>
+          <span class="text-custom-gray px-1">کلمه عبور</span>
+
         </div>
         <a href="#" wire:click.prevent="goBack" class="back-link text-primary d-flex align-items-center"
           style="cursor: pointer;">
@@ -14,18 +15,6 @@
         </a>
       </div>
       <form wire:submit.prevent="loginWithMobilePass">
-        <div class="mb-3">
-          <div class="d-flex align-items-center mb-2">
-            <img src="{{ asset('admin-assets/login/images/phone.svg') }}" alt="آیکون تلفن" class="me-2">
-            <label class="text-custom-gray">شماره موبایل</label>
-          </div>
-          <input wire:model="mobile" dir="ltr"
-            class="form-control custom-rounded custom-shadow h-50 @error('mobile') is-invalid @enderror" type="text"
-            placeholder="09181234567" maxlength="11" autofocus>
-          @error('mobile')
-            <div class="invalid-feedback">{{ $message }}</div>
-          @enderror
-        </div>
         <div class="mb-3">
           <div class="d-flex align-items-center mb-2">
             <img src="{{ asset('admin-assets/login/images/password.svg') }}" alt="آیکون رمز" class="me-2">
@@ -84,7 +73,8 @@
           timerInterval = setInterval(() => {
             remainingTime--;
             if (remainingTime >= 0) {
-              remainingTimeElement.innerHTML = `لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید`;
+              remainingTimeElement.innerHTML =
+                `لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید`;
               if (remainingTime > 180) {
                 remainingTimeElement.style.color = '#16a34a'; // سبز
               } else if (remainingTime > 60) {

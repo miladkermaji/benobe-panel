@@ -99,7 +99,16 @@ class DoctorLoginRegister extends Component
             null
         );
 
-        session(['step1_completed' => true]);
+        session(['step1_completed' => true, 'login_mobile' => $formattedMobile]);
+
+        // بررسی فعال بودن رمز عبور ثابت
+        if (($user->static_password_enabled ?? 0) === 1) {
+            session(['current_step' => 3]);
+            $this->redirect(route('dr.auth.login-user-pass-form'), navigate: true);
+            $this->dispatch('pass-form');
+
+            return;
+        }
 
         // ارسال OTP
         $otpCode = rand(1000, 9999);
