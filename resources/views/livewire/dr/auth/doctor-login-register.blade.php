@@ -2,10 +2,10 @@
   <div class="col-md-6 login-container position-relative">
     <div class="login-card custom-rounded custom-shadow p-7">
       <div class="logo-wrapper w-100 d-flex justify-content-center">
-        <img class="position-absolute mt-3 cursor-pointer" onclick="location.href='/'" width="85px"
+        <img class="position-absolute  cursor-pointer" onclick="location.href='/'" width="85px"
           src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
       </div>
-      <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
         <div class="d-flex align-items-center">
           <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
           <span class="text-custom-gray px-1 fw-bold">ورود کاربر</span>
