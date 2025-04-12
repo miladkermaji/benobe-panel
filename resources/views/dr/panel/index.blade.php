@@ -1,6 +1,7 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
+
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -345,7 +346,6 @@
         </button>
       </div>
       <div class="modal-body">
-        <p class="font-weight-bold">لطفا یک روز جدید را انتخاب کنید:</p>
         <div class="calendar-header w-100 d-flex justify-content-between align-items-center gap-4">
           <div class="">
             <button id="prev-month-reschedule" class="btn btn-light">
@@ -456,6 +456,24 @@
         // فرض کنید ID مودال شما "activation-modal" است
         $('#activation-modal').modal('show');
       }
+    });
+  </script>
+  <script>
+    $('#rescheduleModal').on('show.bs.modal', function () {
+      // Check if stylesheet is already loaded
+      if (!$('#rescheduleModalStyles').length) {
+        $('<link>', {
+          id: 'rescheduleModalStyles',
+          rel: 'stylesheet',
+          type: 'text/css',
+          href: '{{ asset("dr-assets/panel/css/reschedule.css") }}'
+        }).appendTo('head');
+      }
+    });
+
+    $('#rescheduleModal').on('hidden.bs.modal', function () {
+      // Optionally remove the stylesheet when modal is closed
+      $('#rescheduleModalStyles').remove();
     });
   </script>
 @endsection

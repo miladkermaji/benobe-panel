@@ -1645,7 +1645,11 @@ img {
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
-
+.btn-end-visit{
+    background-color: #4b5eaa !important;
+    border-color: #4b5eaa !important;
+    color: #fff !important;
+}
 /* Responsive Design */
 @media screen and (max-width: 768px) {
   #loading-row td {

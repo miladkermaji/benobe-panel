@@ -169,7 +169,9 @@
             <button class="btn btn-outline-info btn-end-visit" data-appointment-id="${appointment.id}" ${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
             }>
-                پایان ویزیت
+                ${
+                (appointment.status === 'attended') ? 'ویزیت شده' : 'پایان ویزیت'
+            }
             </button>
         </td>
         <td class="text-center">
@@ -270,7 +272,9 @@
             <button class="btn btn-outline-info btn-end-visit" data-appointment-id="${appointment.id}" ${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
             }>
-                پایان ویزیت
+                ${
+                (appointment.status === 'attended') ? 'ویزیت شده' : 'پایان ویزیت'
+            }
             </button>
         </td>
         <td class="text-center">
@@ -447,7 +451,9 @@
                                 <button class="btn btn-outline-info btn-end-visit ${buttonDisabled}" data-appointment-id="${appointment.id}" ${buttonDisabled}  ${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
             }>
-                                    پایان ویزیت
+                                     ${
+                (appointment.status === 'attended') ? 'ویزیت شده' : 'پایان ویزیت'
+            }
                                 </button>
                             </td>
                             <td class="text-center">
@@ -1780,7 +1786,9 @@
     <button class="btn btn-outline-info btn-end-visit" data-appointment-id="${appointment.id}"  ${
                 (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
             }>
-        پایان ویزیت
+        ${
+                (appointment.status === 'attended') ? 'ویزیت شده' : 'پایان ویزیت'
+            }
     </button>
 </td>
                                 <td class="text-center">
