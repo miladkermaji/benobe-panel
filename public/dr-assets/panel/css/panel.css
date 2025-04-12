@@ -951,7 +951,8 @@ button {
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-.table-modern thead,th {
+.table-modern thead,
+th {
     background: linear-gradient(to right, #4b5eaa, #8b5cf6);
     color: white !important;
 }
@@ -1041,176 +1042,169 @@ img {
     display: inline !important;
 }
 
-
-
-
-
 /* Container for the panel option with reduced shadow */
 .myPanelOption {
-  padding: 1.25rem; /* کمی کوچکتر برای تناسب */
-  background: #ffffff;
-  border-radius: 12px;
-  transition: box-shadow 0.3s ease;
+    padding: 1.25rem; /* کمی کوچکتر برای تناسب */
+    background: #ffffff;
+    border-radius: 12px;
+    transition: box-shadow 0.3s ease;
 }
-
-
 
 /* Tooltip icon (unchanged but included for context) */
 .my-tooltip {
-  margin: 0 0.75rem;
-  display: flex;
-  align-items: center;
+    margin: 0 0.75rem;
+    display: flex;
+    align-items: center;
 }
 
 .svg-help {
-  width: 18px;
-  height: 18px;
-  color: #4b5eaa;
-  cursor: help;
-  transition: transform 0.3s ease, color 0.3s ease;
+    width: 18px;
+    height: 18px;
+    color: #4b5eaa;
+    cursor: help;
+    transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .svg-help:hover {
-  transform: scale(1.1);
-  color: #3b82f6;
+    transform: scale(1.1);
+    color: #3b82f6;
 }
 
 /* Dropdown trigger button with slightly smaller size */
 .dropdown-trigger {
-  height: 42px; /* کمی کوچکتر */
-  width: 300px; /* عرض کمتر برای تناسب */
-  background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 0.875rem; /* پدینگ کمتر */
-  transition: all 0.3s ease;
+    height: 42px; /* کمی کوچکتر */
+    width: 300px; /* عرض کمتر برای تناسب */
+    background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.875rem; /* پدینگ کمتر */
+    transition: all 0.3s ease;
 }
 
 .dropdown-trigger:hover {
-  background: linear-gradient(135deg, #e2e8f0, #d1dae6);
-  border-color: #d1dae6;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, #e2e8f0, #d1dae6);
+    border-color: #d1dae6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Dropdown label */
 .dropdown-label {
-  font-size: 14px; /* کمی کوچکتر */
-  font-weight: 500;
-  color: #1f2937;
+    font-size: 14px; /* کمی کوچکتر */
+    font-weight: 500;
+    color: #1f2937;
 }
 
 /* Chevron icon */
 .chevron_bottom__M8fF9 {
-  width: 7px; /* کمی کوچکتر */
-  height: 11px;
-  fill: #6b7280;
-  transition: transform 0.3s ease;
+    width: 7px; /* کمی کوچکتر */
+    height: 11px;
+    fill: #6b7280;
+    transition: transform 0.3s ease;
 }
 
 .dropdown-trigger[aria-expanded="true"] .chevron_bottom__M8fF9 {
-  transform: rotate(270deg);
+    transform: rotate(270deg);
 }
 
 /* Dropdown menu with increased width and moved to left */
 .my-dropdown-menu {
-  width: 360px; /* عرض بیشتر */
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08); /* سایه نرم‌تر */
-  position: absolute;
-  top: 46px; /* کمی نزدیک‌تر به دکمه */
-  left: 0; /* به گوشه چپ صفحه */
-  z-index: 201;
-  padding: 0.375rem 0; /* پدینگ کمتر برای فشردگی */
-  animation: slideDown 0.3s ease-out;
+    width: 360px; /* عرض بیشتر */
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08); /* سایه نرم‌تر */
+    position: absolute;
+    top: 46px; /* کمی نزدیک‌تر به دکمه */
+    left: 0; /* به گوشه چپ صفحه */
+    z-index: 201;
+    padding: 0.375rem 0; /* پدینگ کمتر برای فشردگی */
+    animation: slideDown 0.3s ease-out;
 }
 
 /* Dropdown animation */
 @keyframes slideDown {
-  0% {
-    opacity: 0;
-    transform: translateY(-8px); /* حرکت کمتر برای کوچکتر شدن */
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    0% {
+        opacity: 0;
+        transform: translateY(-8px); /* حرکت کمتر برای کوچکتر شدن */
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Option card with smaller padding */
 .option-card {
-  display: flex;
-  align-items: center;
-  padding: 0.625rem 0.875rem; /* پدینگ کمتر */
-  margin: 0.2rem 0.375rem; /* حاشیه کمتر */
-  border-radius: 8px;
-  transition: background 0.2s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    padding: 0.625rem 0.875rem; /* پدینگ کمتر */
+    margin: 0.2rem 0.375rem; /* حاشیه کمتر */
+    border-radius: 8px;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .option-card:hover {
-  background: #f8fafc;
-  transform: translateX(2px);
-  cursor: pointer;
+    background: #f8fafc;
+    transform: translateX(2px);
+    cursor: pointer;
 }
 
 /* Active card */
 .card-active {
-  background: #e0e7ff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); /* سایه ظریف‌تر */
+    background: #e0e7ff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); /* سایه ظریف‌تر */
 }
 
 /* Icons in option card */
 .option-card svg {
-  width: 20px; /* کمی کوچکتر */
-  height: 20px;
-  fill: #4b5eaa;
+    width: 20px; /* کمی کوچکتر */
+    height: 20px;
+    fill: #4b5eaa;
 }
 
 /* Text in option card */
 .option-card .fs-15 {
-  font-size: 13px; /* کوچکتر و شیک‌تر */
-  font-weight: 600;
-  color: #1f2937;
+    font-size: 13px; /* کوچکتر و شیک‌تر */
+    font-weight: 600;
+    color: #1f2937;
 }
 
 .option-card .fs-13 {
-  font-size: 11px; /* کوچکتر */
-  font-weight: 400;
-  color: #6b7280;
+    font-size: 11px; /* کوچکتر */
+    font-weight: 400;
+    color: #6b7280;
 }
 
 /* Inactive clinic dot */
 .inactive-dot {
-  width: 7px; /* کمی کوچکتر */
-  height: 7px;
-  background: #ef4444;
-  border-radius: 50%;
-  position: absolute;
-  top: 50%;
-  right: 0.5rem;
-  transform: translateY(-50%);
-  box-shadow: 0 0 3px rgba(239, 68, 68, 0.5); /* هاله کمتر */
+    width: 7px; /* کمی کوچکتر */
+    height: 7px;
+    background: #ef4444;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+    box-shadow: 0 0 3px rgba(239, 68, 68, 0.5); /* هاله کمتر */
 }
 
 /* Activation button */
 .option-card .btn {
-  font-size: 11px; /* کوچکتر */
-  padding: 0.35rem 0.65rem; /* فشرده‌تر */
-  border-radius: 6px;
-  background: #2563eb;
-  color: #ffffff;
-  border: none;
-  transition: background 0.3s ease, transform 0.2s ease;
+    font-size: 11px; /* کوچکتر */
+    padding: 0.35rem 0.65rem; /* فشرده‌تر */
+    border-radius: 6px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .option-card .btn:hover {
-  background: #1e40af;
-  transform: translateY(-1px);
+    background: #1e40af;
+    transform: translateY(-1px);
 }
-
 
 /* کارت‌های بالای صفحه */
 .top-details-sicks-cards .rounded-lg {
@@ -1237,8 +1231,6 @@ img {
     border-bottom: none;
     padding: 1.5rem 1.5rem 0;
 }
-
-
 
 .modal-body .font-weight-bold {
     color: #1f2937;
@@ -1307,16 +1299,13 @@ img {
     border-color: #60a5fa;
 }
 
-
-
-
-
-
-
-
 /* سرستون‌های جدول */
 .table thead th {
-    background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%); /* گرادیانت تیره و شیک */
+    background: linear-gradient(
+        90deg,
+        #2c3e50 0%,
+        #34495e 100%
+    ); /* گرادیانت تیره و شیک */
     color: #ecf0f1;
     font-weight: 700;
     padding: 16px;
@@ -1401,7 +1390,7 @@ img {
 
 /* افکت موج هنگام کلیک */
 .btn-table::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1558,7 +1547,6 @@ img {
     .nobat-option {
         flex-direction: column;
         gap: 10px !important;
-        position: static;
         padding: 12px;
     }
 
@@ -1571,4 +1559,122 @@ img {
     .dropdown-menu {
         min-width: 100%;
     }
+}
+
+
+
+/* Loading Row */
+#loading-row {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: opacity 0.3s ease;
+}
+
+#loading-row td {
+  padding: 2rem 0; /* Increased padding for better spacing */
+}
+
+/* Loading Wrapper */
+.loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Custom Spinner */
+.spinner-custom {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e7ff; /* Light indigo background */
+  border-top: 4px solid #4b5eaa; /* Primary indigo color */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  position: relative;
+}
+
+.spinner-custom::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  background: #4b5eaa;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Spinner Animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.8); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* Loading Text */
+.loading-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  margin: 0;
+  opacity: 0.8;
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Fade In Animation for Text */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 0.8; transform: translateY(0); }
+}
+
+/* Visually Hidden (for Accessibility) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  #loading-row td {
+    padding: 1.5rem 0;
+  }
+
+  .spinner-custom {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+  }
+
+  .spinner-custom::before {
+    width: 10px;
+    height: 10px;
+  }
+
+  .loading-text {
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .spinner-custom {
+    width: 28px;
+    height: 28px;
+  }
+
+  .loading-text {
+    font-size: 12px;
+  }
 }

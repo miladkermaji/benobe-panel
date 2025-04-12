@@ -70,13 +70,16 @@
   /* drop select option */
   const appointmentsTableBody = $('.table tbody'); // بخش <tbody> جدول
   // لودینگ به جدول اضافه کنیم
-  let loadingIndicator = `<tr id="loading-row w-100">
-                                <td colspan="10" class="text-center py-3">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="sr-only">در حال بارگذاری...</span>
-                                    </div>
-                                </td>
-                            </tr>`;
+  let loadingIndicator = `<tr id="loading-row" class="w-100">
+  <td colspan="10" class="text-center py-4">
+    <div class="loading-wrapper">
+      <div class="spinner-custom" role="status">
+        <span class="visually-hidden">در حال بارگذاری...</span>
+      </div>
+      <p class="loading-text">لطفاً منتظر بمانید...</p>
+    </div>
+  </td>
+</tr>`;
 
   function getPrescriptionStatus(status) {
     switch (status) {
@@ -326,12 +329,16 @@
 
   function showLoading() {
     appointmentsTableBody.html(`
-            <tr id="loading-row w-100">
-                <td colspan="10" class="text-center py-3 w-100">
-                    <div class="spinner-border text-primary " role="status">
-                        <span class="sr-only w-100">در حال بارگذاری...</span>
-                    </div>
-                </td>
+          <tr id="loading-row" class="w-100">
+  <td colspan="10" class="text-center py-4">
+    <div class="loading-wrapper">
+      <div class="spinner-custom" role="status">
+        <span class="visually-hidden">در حال بارگذاری...</span>
+      </div>
+      <p class="loading-text">لطفاً منتظر بمانید...</p>
+    </div>
+  </td>
+</tr>
         `);
   }
 
@@ -397,13 +404,16 @@
         beforeSend: function() {
           if (!isInitialLoad) {
             $(".table tbody").html(`
-                    <tr>
-                        <td colspan="10" class="text-center py-3">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">در حال جستجو...</span>
-                            </div>
-                        </td>
-                    </tr>
+                    <tr id="loading-row" class="w-100">
+  <td colspan="10" class="text-center py-4">
+    <div class="loading-wrapper">
+      <div class="spinner-custom" role="status">
+        <span class="visually-hidden">در حال بارگذاری...</span>
+      </div>
+      <p class="loading-text">لطفاً منتظر بمانید...</p>
+    </div>
+  </td>
+</tr>
                 `);
           }
         },
@@ -1726,13 +1736,16 @@
       // نمایش لودینگ در جدول
       let appointmentsTableBody = $(".table tbody");
       appointmentsTableBody.html(`
-            <tr>
-                <td colspan="10" class="text-center py-3">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="sr-only">در حال بارگذاری...</span>
-                    </div>
-                </td>
-            </tr>
+           <tr id="loading-row" class="w-100">
+  <td colspan="10" class="text-center py-4">
+    <div class="loading-wrapper">
+      <div class="spinner-custom" role="status">
+        <span class="visually-hidden">در حال بارگذاری...</span>
+      </div>
+      <p class="loading-text">لطفاً منتظر بمانید...</p>
+    </div>
+  </td>
+</tr>
         `);
       // ارسال درخواست AJAX برای دریافت نوبت‌های فیلتر شده
       $.ajax({
