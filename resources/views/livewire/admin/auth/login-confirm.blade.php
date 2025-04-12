@@ -127,7 +127,7 @@
           localStorage.setItem('otpTimerData', JSON.stringify({
             countDownDate: window.timerState.otpCountDownDate,
             token: window.timerState.currentToken
-          })); // نگه داشتن داده‌ها برای چک کردن بعد از رفرش
+          }));
         } else {
           timerElement.innerHTML = `زمان باقی‌مانده: ${minutes} دقیقه و ${seconds} ثانیه`;
         }
@@ -172,7 +172,7 @@
               remainingTimeElement.innerHTML = `لطفاً ${formatConditionalTime(secondsLeft)} دیگر تلاش کنید`;
               if (secondsLeft > 180) remainingTimeElement.style.color = '#16a34a';
               else if (secondsLeft > 60) remainingTimeElement.style.color = '#f59e0b';
-              else remainingTimeElement.style.color = '#dc2626';
+              else remainingTimeElement.style.color = '#dc3546';
             }
             if (distance <= 0) {
               clearInterval(window.timerState.rateLimitInterval);
@@ -198,6 +198,7 @@
 
     function setupOtpInputs() {
       const inputs = document.querySelectorAll('.otp-input');
+      const submitButton = document.querySelector('button[type="submit"]');
       if (inputs.length > 0) {
         inputs[3].focus();
         inputs.forEach((input, index) => {
@@ -205,6 +206,11 @@
             const value = e.target.value.replace(/[^0-9]/g, '');
             e.target.value = value;
             if (value.length === 1 && index > 0) inputs[index - 1].focus();
+            // بررسی پر بودن تمام فیلدها
+            const allFilled = Array.from(inputs).every(inp => inp.value.length === 1);
+            if (allFilled && submitButton) {
+              submitButton.click();
+            }
           });
           input.addEventListener('keydown', (e) => {
             if (e.key === 'Backspace' && e.target.value.length === 0 && index < inputs.length - 1) inputs[index + 1].focus();
@@ -214,7 +220,6 @@
       }
     }
 
-    // Web OTP API برای دریافت واقعی کد
     if ('OTPCredential' in window) {
       window.addEventListener('DOMContentLoaded', () => {
         const ac = new AbortController();
@@ -239,6 +244,8 @@
                   Livewire.dispatch('input', { target: { name: `otpCode.${index}`, value: code[index] } });
                 }
               });
+              const submitButton = document.querySelector('button[type="submit"]');
+              if (submitButton) submitButton.click();
             }
             ac.abort();
           });
@@ -246,7 +253,6 @@
           console.error('Failed to retrieve OTP:', err);
         });
 
-        // بعد از 60 ثانیه، اگه OTP نیومد، Abort کنه
         setTimeout(() => ac.abort(), 60000);
       });
     }
@@ -322,7 +328,6 @@
       const storedRateLimitData = JSON.parse(localStorage.getItem('rateLimitTimerData') || '{}');
       const now = new Date().getTime();
 
-      // اگه هیچ داده‌ای توی localStorage نبود یا تایمر تموم شده و رفرش شده
       if (!storedOtpData.countDownDate && !storedRateLimitData.countDownDate) {
         window.Livewire.navigate('{{ route('admin.auth.login-register-form') }}');
         return;
@@ -335,7 +340,6 @@
           window.timerState.isOtpTimerRunning = true;
           startOtpTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
         } else {
-          // اگه تایمر تموم شده و صفحه رفرش شده، به استپ 1 برو
           toastr.error('زمان کد تأیید به پایان رسیده است');
           window.Livewire.navigate('{{ route('admin.auth.login-register-form') }}');
           localStorage.removeItem('otpTimerData');
