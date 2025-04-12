@@ -3,10 +3,13 @@
 namespace App\Livewire\Admin\Auth;
 
 use App\Models\Otp;
+use App\Models\Doctor;
 use Livewire\Component;
+use App\Models\Secretary;
 use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use App\Models\Admin\Manager;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
@@ -28,7 +31,6 @@ class LoginRegister extends Component
         session(['current_step' => 1]);
     }
 
-    // تابع جدید برای فرمت کردن زمان
     private function formatTime($seconds)
     {
         if (is_null($seconds) || $seconds < 0) {
@@ -45,11 +47,11 @@ class LoginRegister extends Component
             'mobile' => [
                 'required',
                 'string',
-                'regex:/^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/'
+                'regex:/^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/',
             ],
         ], [
             'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
-            'mobile.regex' => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
+            'mobile.regex'    => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
         ]);
 
         $mobile = preg_replace('/^(\+98|98|0)/', '', $this->mobile);
@@ -58,28 +60,41 @@ class LoginRegister extends Component
         $manager = Manager::where('mobile', $formattedMobile)->first();
         $loginAttempts = new LoginAttemptsService();
 
-        if (!$manager) {
+        if (! $manager) {
             $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
             $this->addError('mobile', 'کاربری با این شماره تلفن وجود ندارد.');
             return;
         }
 
-        if ($manager->status !== 1) {
-            $loginAttempts->incrementLoginAttempt($manager->id, $formattedMobile, '', '', $manager->id);
+        $user = $manager;
+
+        if ($user->status !== 1) {
+            $loginAttempts->incrementLoginAttempt(
+                $user->id,
+                $formattedMobile,
+                null,
+                null,
+                $manager ? $manager->id : null
+            );
             $this->addError('mobile', 'حساب کاربری شما فعال نیست.');
             return;
         }
 
-
         if ($loginAttempts->isLocked($formattedMobile)) {
-            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile); // استفاده از متد جدید
-            $this->addError('mobile', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
+            // اینجا دیگه addError رو حذف کردیم
             $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
             return;
         }
 
 
-        $loginAttempts->incrementLoginAttempt($manager->id, $formattedMobile, '', '', $manager->id);
+        $loginAttempts->incrementLoginAttempt(
+            $user->id,
+            $formattedMobile,
+            null,
+            null,
+            $manager ? $manager->id : null
+        );
+
         session(['step1_completed' => true]);
 
         $otpCode = rand(1000, 9999);
@@ -87,25 +102,25 @@ class LoginRegister extends Component
 
         Otp::create([
             'token' => $token,
-            'manager_id' => $manager->id,
+            'manager_id' => $manager ? $user->id : null,
+            
             'otp_code' => $otpCode,
-            'login_id' => $manager->mobile,
+            'login_id' => $user->mobile,
             'type' => 0,
         ]);
 
-        // اضافه کردن ردیف به LoginSession
         LoginSession::create([
             'token' => $token,
-            'manager_id' => $manager->id,
-            'step' => 2, // استپ 2 برای تأیید کد OTP
+            'manager_id' => $manager ? $user->id : null,
+            'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100253, $manager->mobile, [$otpCode])
+            SmsService::create(100253, $user->mobile, [$otpCode])
         );
-        $messagesService->send();
-
+        $response = $messagesService->send();
+        Log::info('SMS send response', ['response' => $response]);
         session(['current_step' => 2, 'otp_token' => $token]);
         $this->dispatch('otpSent', token: $token);
         $this->redirect(route('admin.auth.login-confirm-form', ['token' => $token]), navigate: true);

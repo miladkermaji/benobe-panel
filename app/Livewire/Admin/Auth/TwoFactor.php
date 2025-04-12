@@ -44,14 +44,23 @@ class TwoFactor extends Component
         $this->redirect(route('admin.auth.login-user-pass-form'), navigate: true);
     }
 
-    private function formatTime($seconds)
+    // تابع جدید برای فرمت کردن زمان مشابه سیستم OTP
+    private function formatConditionalTime($seconds)
     {
         if (is_null($seconds) || $seconds < 0) {
-            return '0 دقیقه و 0 ثانیه';
+            return '0 ثانیه';
         }
-        $minutes = floor($seconds / 60);
-        $remainingSeconds = round($seconds % 60);
-        return "$minutes دقیقه و $remainingSeconds ثانیه";
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $secs = $seconds % 60;
+
+        if ($hours > 0) {
+            return "$hours ساعت $minutes دقیقه $secs ثانیه";
+        } elseif ($minutes > 0) {
+            return "$minutes دقیقه $secs ثانیه";
+        } else {
+            return "$secs ثانیه";
+        }
     }
 
     public function twoFactorCheck()
@@ -65,7 +74,7 @@ class TwoFactor extends Component
 
         if (!$loginSession) {
             $this->addError('twoFactorSecret', 'دسترسی غیرمجاز یا توکن منقضی شده است. لطفاً دوباره وارد شوید.');
-            \Log::info('Redirecting to login due to invalid session');
+            Log::info('Redirecting to login due to invalid session');
             $this->redirect(route('admin.auth.login-register-form'), navigate: true);
             return;
         }
@@ -79,18 +88,15 @@ class TwoFactor extends Component
             return;
         }
 
-
+        // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($user->mobile)) {
-            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($user->mobile); // استفاده از متد جدید
-            $this->addError('twoFactorSecret', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
             $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($user->mobile));
             Log::info('Rate limit exceeded, remaining time: ' . $loginAttempts->getRemainingLockTime($user->mobile));
             return;
         }
 
-
         if (!$user->two_factor_secret || !Hash::check($this->twoFactorSecret, $user->two_factor_secret)) {
-            $loginAttempts->incrementLoginAttempt($user->id, $user->mobile, '', '', $user->id);
+            $loginAttempts->incrementLoginAttempt($user->id, $user->mobile, null, null, $user->id);
             $this->addError('twoFactorSecret', 'کد دو عاملی وارد شده صحیح نیست.');
             return;
         }

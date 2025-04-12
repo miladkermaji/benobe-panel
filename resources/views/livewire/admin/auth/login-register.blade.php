@@ -43,20 +43,44 @@
   <script>
     Livewire.on('rateLimitExceeded', (data) => {
       let remainingTime = Math.round(data.remainingTime);
+      let timerInterval; // تعریف متغیر interval در scope بالاتر
+
       Swal.fire({
         icon: 'error',
         title: 'تلاش بیش از حد',
-        html: `لطفاً <b id="remaining-time">${formatTime(remainingTime)}</b> دیگر صبر کنید.`,
+        html: `<span id="remaining-time" style="font-weight: bold;">لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید</span>`,
         timer: remainingTime * 1000,
         timerProgressBar: true,
+        showConfirmButton: true,
+        confirmButtonText: 'باشه',
+        allowOutsideClick: false,
         didOpen: () => {
           const remainingTimeElement = document.getElementById('remaining-time');
-          let timerInterval = setInterval(() => {
+          timerInterval = setInterval(() => {
             remainingTime--;
-            remainingTimeElement.innerHTML = formatTime(remainingTime);
-            if (remainingTime <= 0) clearInterval(timerInterval);
+            if (remainingTime >= 0) {
+              remainingTimeElement.innerHTML = `لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید`;
+              // تغییر رنگ بر اساس زمان باقی‌مونده
+              if (remainingTime > 180) { // بیشتر از 3 دقیقه
+                remainingTimeElement.style.color = '#16a34a'; // سبز
+              } else if (remainingTime > 60) { // بین 1 تا 3 دقیقه
+                remainingTimeElement.style.color = '#f59e0b'; // زرد
+              } else { // کمتر از 1 دقیقه
+                remainingTimeElement.style.color = '#dc2626'; // قرمز
+              }
+            }
+            if (remainingTime <= 0) {
+              clearInterval(timerInterval);
+              console.log('Timer cleared automatically when time reached zero');
+            }
           }, 1000);
         },
+        willClose: () => {
+          if (timerInterval) {
+            clearInterval(timerInterval);
+            console.log('Timer cleared on SweetAlert close');
+          }
+        }
       });
     });
 
@@ -69,15 +93,20 @@
       window.Livewire.navigate(event.url);
     });
 
-    function formatTime(seconds) {
-      if (isNaN(seconds) || seconds < 0) return '0 دقیقه';
-      const minutes = Math.floor(seconds / 60);
-      if (minutes > 59) {
-        const hours = Math.floor(minutes / 60);
-        const remainingMinutes = minutes % 60;
-        return remainingMinutes > 0 ? `${hours} ساعت و ${remainingMinutes} دقیقه` : `${hours} ساعت`;
+    // تابع جدید برای فرمت شرطی زمان
+    function formatConditionalTime(seconds) {
+      if (isNaN(seconds) || seconds < 0) return '0 ثانیه';
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+
+      if (hours > 0) {
+        return `${hours} ساعت ${minutes} دقیقه ${secs} ثانیه`;
+      } else if (minutes > 0) {
+        return `${minutes} دقیقه ${secs} ثانیه`;
+      } else {
+        return `${secs} ثانیه`;
       }
-      return `${minutes} دقیقه`;
     }
 
     document.addEventListener('livewire:initialized', () => {

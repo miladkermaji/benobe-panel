@@ -44,15 +44,23 @@ class LoginUserPass extends Component
         $this->redirect(route('admin.auth.login-register-form'), navigate: true);
     }
 
-    // تابع جدید برای فرمت کردن زمان
-    private function formatTime($seconds)
+    // تابع جدید برای فرمت کردن زمان مشابه سیستم OTP
+    private function formatConditionalTime($seconds)
     {
         if (is_null($seconds) || $seconds < 0) {
-            return '0 دقیقه و 0 ثانیه';
+            return '0 ثانیه';
         }
-        $minutes = floor($seconds / 60);
-        $remainingSeconds = round($seconds % 60);
-        return "$minutes دقیقه و $remainingSeconds ثانیه";
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $secs = $seconds % 60;
+
+        if ($hours > 0) {
+            return "$hours ساعت $minutes دقیقه $secs ثانیه";
+        } elseif ($minutes > 0) {
+            return "$minutes دقیقه $secs ثانیه";
+        } else {
+            return "$secs ثانیه";
+        }
     }
 
     public function loginWithMobilePass()
@@ -63,31 +71,28 @@ class LoginUserPass extends Component
         $formattedMobile = '0' . $mobile;
         $loginAttempts = new LoginAttemptsService();
 
-
+        // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($formattedMobile)) {
-            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($formattedMobile); // استفاده از متد جدید
-            $this->addError('mobile', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
             $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
             return;
         }
 
-
         $manager = Manager::where('mobile', $formattedMobile)->first();
 
         if (!$manager) {
-            $loginAttempts->incrementLoginAttempt(null, $formattedMobile, '', '', null);
+            $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
             $this->addError('mobile', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
 
         if ($manager->static_password_enabled !== 1) {
-            $loginAttempts->incrementLoginAttempt($manager->id, $formattedMobile, '', '', $manager->id);
+            $loginAttempts->incrementLoginAttempt($manager->id, $formattedMobile, null, null, $manager->id);
             $this->addError('mobile', 'شما قابلیت ورود با رمز عبور را فعال نکرده‌اید.');
             return;
         }
 
         if (!Hash::check($this->password, $manager->password) || $manager->status !== 1) {
-            $loginAttempts->incrementLoginAttempt($manager->id, $formattedMobile, '', '', $manager->id);
+            $loginAttempts->incrementLoginAttempt($manager->id, $formattedMobile, null, null, $manager->id);
             $this->addError('mobile', 'شماره موبایل یا رمز عبور نادرست است یا حساب غیرفعال است.');
             return;
         }

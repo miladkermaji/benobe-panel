@@ -24,18 +24,18 @@ class DoctorTwoFactor extends Component
 
     protected $messages = [
         'twoFactorSecret.required' => 'لطفاً کد دو عاملی را وارد کنید.',
-        'twoFactorSecret.min'      => 'کد دو عاملی باید حداقل 6 کاراکتر باشد.',
+        'twoFactorSecret.min' => 'کد دو عاملی باید حداقل 6 کاراکتر باشد.',
     ];
 
     public function mount($token)
     {
-        $this->token  = $token;
+        $this->token = $token;
         $loginSession = LoginSession::where('token', $token)
             ->where('step', 3)
             ->where('expires_at', '>', now())
             ->first();
 
-        if (! $loginSession) {
+        if (!$loginSession) {
             Log::info('Mount: Invalid or expired token: ' . $token);
             $this->redirect(route('dr.auth.login-register-form'), navigate: true);
         } else {
@@ -48,14 +48,23 @@ class DoctorTwoFactor extends Component
         $this->redirect(route('dr.auth.login-user-pass-form'), navigate: true);
     }
 
-    private function formatTime($seconds)
+    // تابع جدید برای فرمت کردن زمان مشابه سیستم OTP
+    private function formatConditionalTime($seconds)
     {
         if (is_null($seconds) || $seconds < 0) {
-            return '0 دقیقه و 0 ثانیه';
+            return '0 ثانیه';
         }
-        $minutes          = floor($seconds / 60);
-        $remainingSeconds = round($seconds % 60);
-        return "$minutes دقیقه و $remainingSeconds ثانیه";
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $secs = $seconds % 60;
+
+        if ($hours > 0) {
+            return "$hours ساعت $minutes دقیقه $secs ثانیه";
+        } elseif ($minutes > 0) {
+            return "$minutes دقیقه $secs ثانیه";
+        } else {
+            return "$secs ثانیه";
+        }
     }
 
     public function twoFactorCheck()
@@ -67,7 +76,7 @@ class DoctorTwoFactor extends Component
             ->where('expires_at', '>', now())
             ->first();
 
-        if (! $loginSession) {
+        if (!$loginSession) {
             $this->addError('twoFactorSecret', 'دسترسی غیرمجاز یا توکن منقضی شده است. لطفاً دوباره وارد شوید.');
             Log::info('Redirecting to login due to invalid session');
             $this->redirect(route('dr.auth.login-register-form'), navigate: true);
@@ -75,31 +84,28 @@ class DoctorTwoFactor extends Component
         }
 
         $loginAttempts = new LoginAttemptsService();
-        $user          = $loginSession->doctor_id
-        ? Doctor::where('id', $loginSession->doctor_id)->first()
-        : Secretary::where('id', $loginSession->secretary_id)->first();
+        $user = $loginSession->doctor_id
+            ? Doctor::where('id', $loginSession->doctor_id)->first()
+            : Secretary::where('id', $loginSession->secretary_id)->first();
 
-        if (! $user) {
+        if (!$user) {
             $this->addError('twoFactorSecret', 'کاربر یافت نشد.');
             $this->redirect(route('dr.auth.login-register-form'), navigate: true);
             return;
         }
 
-
+        // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($user->mobile)) {
-            $formattedTime = $loginAttempts->getRemainingLockTimeFormatted($user->mobile); // استفاده از متد جدید
-            $this->addError('twoFactorSecret', "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.");
             $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($user->mobile));
             Log::info('Rate limit exceeded, remaining time: ' . $loginAttempts->getRemainingLockTime($user->mobile));
             return;
         }
 
-
         Log::info('Input: ' . $this->twoFactorSecret);
         Log::info('Stored two_factor_secret: ' . $user->two_factor_secret);
         Log::info('Hash check result: ' . (Hash::check($this->twoFactorSecret, $user->two_factor_secret) ? 'true' : 'false'));
 
-        if (! $user->two_factor_secret || ! Hash::check($this->twoFactorSecret, $user->two_factor_secret)) {
+        if (!$user->two_factor_secret || !Hash::check($this->twoFactorSecret, $user->two_factor_secret)) {
             $loginAttempts->incrementLoginAttempt(
                 $user->id,
                 $user->mobile,
@@ -118,20 +124,20 @@ class DoctorTwoFactor extends Component
         if ($user instanceof Doctor) {
             Auth::guard('doctor')->login($user);
             $redirectRoute = route('dr-panel');
-            $userType      = 'doctor';
+            $userType = 'doctor';
         } else {
             Auth::guard('secretary')->login($user);
-            $redirectRoute = route('dr-panel'); // فرض می‌کنم پنل منشی dr-panel باشه
-            $userType      = 'secretary';
+            $redirectRoute = route('dr-panel');
+            $userType = 'secretary';
         }
 
         LoginLog::create([
-            'doctor_id'    => $user instanceof Doctor ? $user->id : null,
+            'doctor_id' => $user instanceof Doctor ? $user->id : null,
             'secretary_id' => $user instanceof Secretary ? $user->id : null,
-            'user_type'    => $userType,
-            'login_at'     => now(),
-            'ip_address'   => request()->ip(),
-            'device'       => request()->header('User-Agent'),
+            'user_type' => $userType,
+            'login_at' => now(),
+            'ip_address' => request()->ip(),
+            'device' => request()->header('User-Agent'),
             'login_method' => 'two_factor',
         ]);
 

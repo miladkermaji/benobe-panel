@@ -50,18 +50,18 @@
 @push('scripts')
   <script>
     window.timerState = window.timerState || {
-      interval: null,
-      rateLimitTimerInterval: null,
+      otpInterval: null,
+      rateLimitInterval: null,
       otpCountDownDate: null,
-      isTimerRunning: false,
-      lastPercentage: 0,
+      rateLimitCountDownDate: null,
+      isOtpTimerRunning: false,
+      isRateLimitTimerRunning: false,
+      lastOtpPercentage: 0,
       currentToken: null
     };
 
-    function startTimer(countDownDate, token) {
-      if (window.timerState.interval) {
-        clearInterval(window.timerState.interval);
-      }
+    function startOtpTimer(countDownDate, token) {
+      if (window.timerState.otpInterval) clearInterval(window.timerState.otpInterval);
 
       const storedData = JSON.parse(localStorage.getItem('otpTimerData') || '{}');
       const storedCountDownDate = storedData.countDownDate;
@@ -70,8 +70,6 @@
 
       if (!storedCountDownDate || storedToken !== token || storedCountDownDate <= now) {
         window.timerState.otpCountDownDate = countDownDate || (new Date().getTime() + 120000);
-        window.timerState.isTimerRunning = true;
-        window.timerState.lastPercentage = 100;
         window.timerState.currentToken = token;
         localStorage.setItem('otpTimerData', JSON.stringify({
           countDownDate: window.timerState.otpCountDownDate,
@@ -80,8 +78,9 @@
       } else {
         window.timerState.otpCountDownDate = Number(storedCountDownDate);
         window.timerState.currentToken = storedToken;
-        window.timerState.isTimerRunning = true;
       }
+      window.timerState.isOtpTimerRunning = true;
+      window.timerState.lastOtpPercentage = 100;
 
       const totalDuration = 120000; // 2 دقیقه
       const timerElement = document.getElementById('timer');
@@ -89,31 +88,21 @@
       const progressBar = document.getElementById('progress-bar');
       const resendSection = document.getElementById('resend-otp');
 
-      if (!timerElement || !progressBarContainer || !progressBar || !resendSection) {
-        return;
-      }
+      if (!timerElement || !progressBarContainer || !progressBar || !resendSection) return;
 
-      if (window.timerState.isTimerRunning) {
-        timerElement.classList.remove('d-none');
-        progressBarContainer.style.display = 'block';
-        resendSection.style.display = 'none';
-        progressBar.style.width = window.timerState.lastPercentage + '%';
-        progressBar.style.backgroundColor = window.timerState.lastPercentage > 50 ? '#28a745' : (window.timerState
-          .lastPercentage > 20 ? '#ffc107' : '#dc3545');
-      }
+      timerElement.classList.remove('d-none');
+      progressBarContainer.style.display = 'block';
+      resendSection.style.display = 'none';
+      progressBar.style.width = window.timerState.lastOtpPercentage + '%';
+      progressBar.style.backgroundColor = window.timerState.lastOtpPercentage > 50 ? '#28a745' : (window.timerState.lastOtpPercentage > 20 ? '#ffc107' : '#dc3545');
 
-      window.timerState.interval = setInterval(() => {
+      window.timerState.otpInterval = setInterval(() => {
         const now = new Date().getTime();
         const distance = window.timerState.otpCountDownDate - now;
 
         if (isNaN(distance) || window.timerState.otpCountDownDate === null) {
-          console.error('فاصله نامعتبر:', {
-            countDownDate: window.timerState.otpCountDownDate,
-            now
-          });
-          clearInterval(window.timerState.interval);
-          window.timerState.interval = null;
-          window.timerState.isTimerRunning = false;
+          clearInterval(window.timerState.otpInterval);
+          window.timerState.isOtpTimerRunning = false;
           localStorage.removeItem('otpTimerData');
           return;
         }
@@ -122,26 +111,89 @@
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
         const percentage = Math.max(0, (distance / totalDuration) * 100);
 
-        window.timerState.lastPercentage = percentage;
+        window.timerState.lastOtpPercentage = percentage;
         progressBar.style.width = percentage + '%';
         progressBar.style.backgroundColor = percentage > 50 ? '#28a745' : (percentage > 20 ? '#ffc107' : '#dc3545');
 
         if (distance <= 0) {
-          clearInterval(window.timerState.interval);
-          window.timerState.interval = null;
-          window.timerState.isTimerRunning = false;
+          clearInterval(window.timerState.otpInterval);
+          window.timerState.otpInterval = null;
+          window.timerState.isOtpTimerRunning = false;
           timerElement.innerHTML = '';
           timerElement.classList.add('d-none');
           progressBarContainer.style.display = 'none';
-          resendSection.style.display = 'block';
-          localStorage.removeItem('otpTimerData');
-          Livewire.dispatch('updateShowResendButton', {
-            show: true
-          });
+          resendSection.style.display = window.timerState.isRateLimitTimerRunning ? 'none' : 'block';
+          Livewire.dispatch('updateShowResendButton', { show: !window.timerState.isRateLimitTimerRunning });
+          localStorage.setItem('otpTimerData', JSON.stringify({
+            countDownDate: window.timerState.otpCountDownDate,
+            token: window.timerState.currentToken
+          })); // نگه داشتن داده‌ها برای چک کردن بعد از رفرش
         } else {
           timerElement.innerHTML = `زمان باقی‌مانده: ${minutes} دقیقه و ${seconds} ثانیه`;
         }
       }, 1000);
+    }
+
+    function startRateLimitTimer(remainingTime) {
+      if (window.timerState.rateLimitInterval) clearInterval(window.timerState.rateLimitInterval);
+
+      const storedData = JSON.parse(localStorage.getItem('rateLimitTimerData') || '{}');
+      const storedCountDownDate = storedData.countDownDate;
+      const now = new Date().getTime();
+
+      if (!storedCountDownDate || storedCountDownDate <= now) {
+        window.timerState.rateLimitCountDownDate = new Date().getTime() + (remainingTime * 1000);
+        localStorage.setItem('rateLimitTimerData', JSON.stringify({
+          countDownDate: window.timerState.rateLimitCountDownDate
+        }));
+      } else {
+        window.timerState.rateLimitCountDownDate = Number(storedCountDownDate);
+      }
+      window.timerState.isRateLimitTimerRunning = true;
+
+      const initialTimeText = formatConditionalTime(remainingTime);
+      Swal.fire({
+        icon: 'error',
+        title: 'تلاش بیش از حد',
+        html: `<span id="remaining-time" style="font-weight: bold;">لطفاً ${initialTimeText} دیگر تلاش کنید</span>`,
+        timer: remainingTime * 1000,
+        timerProgressBar: true,
+        showConfirmButton: true,
+        confirmButtonText: 'باشه',
+        allowOutsideClick: false,
+        didOpen: () => {
+          const remainingTimeElement = document.getElementById('remaining-time');
+          window.timerState.rateLimitInterval = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = window.timerState.rateLimitCountDownDate - now;
+            const secondsLeft = Math.round(distance / 1000);
+
+            if (secondsLeft >= 0) {
+              remainingTimeElement.innerHTML = `لطفاً ${formatConditionalTime(secondsLeft)} دیگر تلاش کنید`;
+              if (secondsLeft > 180) remainingTimeElement.style.color = '#16a34a';
+              else if (secondsLeft > 60) remainingTimeElement.style.color = '#f59e0b';
+              else remainingTimeElement.style.color = '#dc2626';
+            }
+            if (distance <= 0) {
+              clearInterval(window.timerState.rateLimitInterval);
+              window.timerState.rateLimitInterval = null;
+              window.timerState.isRateLimitTimerRunning = false;
+              localStorage.removeItem('rateLimitTimerData');
+              const resendSection = document.getElementById('resend-otp');
+              if (resendSection && !window.timerState.isOtpTimerRunning) {
+                resendSection.style.display = 'block';
+                Livewire.dispatch('updateShowResendButton', { show: true });
+              }
+            }
+          }, 1000);
+        },
+        willClose: () => {
+          if (window.timerState.rateLimitInterval) {
+            clearInterval(window.timerState.rateLimitInterval);
+            window.timerState.rateLimitInterval = null;
+          }
+        }
+      });
     }
 
     function setupOtpInputs() {
@@ -152,136 +204,98 @@
           input.addEventListener('input', (e) => {
             const value = e.target.value.replace(/[^0-9]/g, '');
             e.target.value = value;
-            if (value.length === 1 && index > 0) {
-              inputs[index - 1].focus();
-            }
+            if (value.length === 1 && index > 0) inputs[index - 1].focus();
           });
           input.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && e.target.value.length === 0 && index < inputs.length - 1) {
-              inputs[index + 1].focus();
-            }
+            if (e.key === 'Backspace' && e.target.value.length === 0 && index < inputs.length - 1) inputs[index + 1].focus();
           });
-          input.addEventListener('focus', () => {
-            input.select();
-          });
+          input.addEventListener('focus', () => input.select());
         });
       }
     }
 
+    // Web OTP API برای دریافت واقعی کد
+    if ('OTPCredential' in window) {
+      window.addEventListener('DOMContentLoaded', () => {
+        const ac = new AbortController();
+        navigator.credentials.get({
+          otp: { transport: ['sms'] },
+          signal: ac.signal
+        }).then(otp => {
+          Swal.fire({
+            title: 'دریافت کد OTP',
+            text: `آیا می‌خواهید کد ${otp.code} به‌صورت خودکار وارد شود؟`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'بله',
+            cancelButtonText: 'خیر'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              const inputs = document.querySelectorAll('.otp-input');
+              const code = otp.code.split('').reverse();
+              inputs.forEach((input, index) => {
+                if (code[index]) {
+                  input.value = code[index];
+                  Livewire.dispatch('input', { target: { name: `otpCode.${index}`, value: code[index] } });
+                }
+              });
+            }
+            ac.abort();
+          });
+        }).catch(err => {
+          console.error('Failed to retrieve OTP:', err);
+        });
+
+        // بعد از 60 ثانیه، اگه OTP نیومد، Abort کنه
+        setTimeout(() => ac.abort(), 60000);
+      });
+    }
+
     document.addEventListener('livewire:navigated', () => {
       setupOtpInputs();
-      if (window.timerState.otpCountDownDate && window.timerState.isTimerRunning) {
-        startTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
+      if (window.timerState.otpCountDownDate && window.timerState.isOtpTimerRunning) {
+        startOtpTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
       }
     });
 
     Livewire.on('initTimer', (data) => {
       const storedData = JSON.parse(localStorage.getItem('otpTimerData') || '{}');
       if (!storedData.countDownDate || storedData.token !== data.token) {
-        startTimer(data.countDownDate, data.token);
+        startOtpTimer(data.countDownDate, data.token);
       } else {
-        startTimer(storedData.countDownDate, storedData.token);
+        startOtpTimer(storedData.countDownDate, storedData.token);
       }
       setupOtpInputs();
-      const resendSection = document.getElementById('resend-otp');
-      if (resendSection) {
-        resendSection.style.display = data.showResendButton ? 'block' : 'none';
-      }
     });
 
     Livewire.on('otpResent', (data) => {
-      if (!window.otpResentToastShown) {
-        toastr.success(data.message);
-        window.otpResentToastShown = true;
-      }
-      startTimer(data.countDownDate, data.token);
-      const resendSection = document.getElementById('resend-otp');
-      if (resendSection) {
-        resendSection.style.display = 'none';
-      }
-      Livewire.dispatch('updateShowResendButton', {
-        show: false
-      });
+      toastr.success(data.message);
+      startOtpTimer(data.countDownDate, data.token);
     });
 
     Livewire.on('otpExpired', () => {
       toastr.error('توکن منقضی شده است');
       window.Livewire.navigate('{{ route('admin.auth.login-register-form') }}');
       localStorage.removeItem('otpTimerData');
-      if (window.timerState.interval) {
-        clearInterval(window.timerState.interval);
-        window.timerState.interval = null;
+      if (window.timerState.otpInterval) {
+        clearInterval(window.timerState.otpInterval);
+        window.timerState.otpInterval = null;
       }
-      window.timerState.isTimerRunning = false;
+      window.timerState.isOtpTimerRunning = false;
     });
 
     Livewire.on('rateLimitExceeded', (data) => {
-      let remainingTime = Math.round(data.remainingTime);
+      startRateLimitTimer(data.remainingTime);
       const errorElement = document.getElementById('otp-error');
-      if (errorElement) {
-        errorElement.innerHTML =
-          `شما بیش از حد تلاش کرده‌اید. لطفاً <span id="live-error-time">${formatTime(remainingTime)}</span> صبر کنید.`;
-        let errorTimer = remainingTime;
-        const errorInterval = setInterval(() => {
-          errorTimer--;
-          const liveErrorTime = document.getElementById('live-error-time');
-          if (liveErrorTime) {
-            liveErrorTime.innerHTML = formatTime(errorTimer);
-          }
-          if (errorTimer <= 0) clearInterval(errorInterval);
-        }, 1000);
-      }
-
-      Swal.fire({
-        icon: 'error',
-        title: 'تلاش بیش از حد',
-        html: `لطفاً <b id="remaining-time">${formatTime(remainingTime)}</b> دیگر صبر کنید.`,
-        timer: remainingTime * 1000,
-        timerProgressBar: true,
-        showConfirmButton: true,
-        confirmButtonText: 'باشه',
-        showCancelButton: true,
-        cancelButtonText: 'لغو',
-        allowOutsideClick: false,
-        didOpen: () => {
-          const remainingTimeElement = document.getElementById('remaining-time');
-          if (!remainingTimeElement) return;
-
-          let liveTimer = remainingTime;
-          if (window.timerState.rateLimitTimerInterval) {
-            clearInterval(window.timerState.rateLimitTimerInterval);
-          }
-          window.timerState.rateLimitTimerInterval = setInterval(() => {
-            liveTimer--;
-            remainingTimeElement.innerHTML = formatTime(liveTimer);
-            if (liveTimer <= 0) {
-              clearInterval(window.timerState.rateLimitTimerInterval);
-              window.timerState.rateLimitTimerInterval = null;
-              Swal.close();
-            }
-          }, 1000);
-        },
-        willClose: () => {
-          if (window.timerState.rateLimitTimerInterval) {
-            clearInterval(window.timerState.rateLimitTimerInterval);
-            window.timerState.rateLimitTimerInterval = null;
-          }
-        }
-      });
-
-      if (window.timerState.otpCountDownDate && window.timerState.isTimerRunning) {
-        startTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
-      }
+      if (errorElement) errorElement.innerHTML = '';
     });
 
     Livewire.on('loginSuccess', () => {
       toastr.success('با موفقیت وارد شدید');
       localStorage.removeItem('otpTimerData');
-      if (window.timerState.interval) {
-        clearInterval(window.timerState.interval);
-        window.timerState.interval = null;
-      }
-      window.timerState.isTimerRunning = false;
+      localStorage.removeItem('rateLimitTimerData');
+      if (window.timerState.otpInterval) clearInterval(window.timerState.otpInterval);
+      window.timerState.isOtpTimerRunning = false;
     });
 
     Livewire.on('navigateTo', (event) => {
@@ -290,49 +304,51 @@
 
     Livewire.on('updateShowResendButton', (data) => {
       const resendSection = document.getElementById('resend-otp');
-      if (resendSection && !window.timerState.isTimerRunning) {
-        resendSection.style.display = data.show ? 'block' : 'none';
-      }
+      if (resendSection) resendSection.style.display = data.show ? 'block' : 'none';
     });
 
-    function formatTime(seconds) {
-      if (isNaN(seconds) || seconds < 0) return '0 دقیقه';
-      const minutes = Math.floor(seconds / 60);
-      if (minutes > 59) {
-        const hours = Math.floor(minutes / 60);
-        const remainingMinutes = minutes % 60;
-        return remainingMinutes > 0 ? `${hours} ساعت و ${remainingMinutes} دقیقه` : `${hours} ساعت`;
-      }
-      return `${minutes} دقیقه`;
+    function formatConditionalTime(seconds) {
+      if (isNaN(seconds) || seconds < 0) return '0 ثانیه';
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      if (hours > 0) return `${hours} ساعت ${minutes} دقیقه ${secs} ثانیه`;
+      else if (minutes > 0) return `${minutes} دقیقه ${secs} ثانیه`;
+      else return `${secs} ثانیه`;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      const storedData = JSON.parse(localStorage.getItem('otpTimerData') || '{}');
-      const storedCountDownDate = storedData.countDownDate;
-      const storedToken = storedData.token;
+      const storedOtpData = JSON.parse(localStorage.getItem('otpTimerData') || '{}');
+      const storedRateLimitData = JSON.parse(localStorage.getItem('rateLimitTimerData') || '{}');
       const now = new Date().getTime();
 
-      if (storedCountDownDate && storedCountDownDate > now) {
-        window.timerState.otpCountDownDate = Number(storedCountDownDate);
-        window.timerState.currentToken = storedToken;
-        window.timerState.isTimerRunning = true;
-        startTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
+      // اگه هیچ داده‌ای توی localStorage نبود یا تایمر تموم شده و رفرش شده
+      if (!storedOtpData.countDownDate && !storedRateLimitData.countDownDate) {
+        window.Livewire.navigate('{{ route('admin.auth.login-register-form') }}');
+        return;
+      }
+
+      if (storedOtpData.countDownDate) {
+        if (storedOtpData.countDownDate > now) {
+          window.timerState.otpCountDownDate = Number(storedOtpData.countDownDate);
+          window.timerState.currentToken = storedOtpData.token;
+          window.timerState.isOtpTimerRunning = true;
+          startOtpTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
+        } else {
+          // اگه تایمر تموم شده و صفحه رفرش شده، به استپ 1 برو
+          toastr.error('زمان کد تأیید به پایان رسیده است');
+          window.Livewire.navigate('{{ route('admin.auth.login-register-form') }}');
+          localStorage.removeItem('otpTimerData');
+          return;
+        }
+      }
+
+      if (storedRateLimitData.countDownDate && storedRateLimitData.countDownDate > now) {
+        window.timerState.rateLimitCountDownDate = Number(storedRateLimitData.countDownDate);
+        window.timerState.isRateLimitTimerRunning = true;
+        startRateLimitTimer(Math.round((storedRateLimitData.countDownDate - now) / 1000));
       }
       setupOtpInputs();
-    });
-
-    document.addEventListener('livewire:init', () => {
-      const timerElement = document.getElementById('timer');
-      const progressBarContainer = document.getElementById('progress-bar-container');
-      if (timerElement) {
-        timerElement.setAttribute('wire:ignore', '');
-      }
-      if (progressBarContainer) {
-        progressBarContainer.setAttribute('wire:ignore', '');
-      }
-      if (window.timerState.otpCountDownDate && window.timerState.isTimerRunning) {
-        startTimer(window.timerState.otpCountDownDate, window.timerState.currentToken);
-      }
     });
   </script>
 @endpush
