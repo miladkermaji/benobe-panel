@@ -35,63 +35,79 @@ class DrPanelController extends Controller
     }
     public function getAppointmentsByDate(Request $request)
     {
-
         $selectedClinicId = $request->selectedClinicId;
-        $jalaliDate       = $request->input('date'); // دریافت تاریخ جلالی از فرانت‌اند
-        // **اصلاح فرمت تاریخ ورودی**
-        if (strpos($jalaliDate, '-') !== false) {
-            // اگر تاریخ با `-` جدا شده بود، آن را به `/` تبدیل کنیم
-            $jalaliDate = str_replace('-', '/', $jalaliDate);
+        $jalaliDate = $request->input('date'); // دریافت تاریخ از فرانت‌اند
+
+        // بررسی فرمت تاریخ ورودی
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $jalaliDate)) {
+            $gregorianDate = $jalaliDate;
+        } else {
+            if (strpos($jalaliDate, '-') !== false) {
+                $jalaliDate = str_replace('-', '/', $jalaliDate);
+            }
+
+            if (!preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $jalaliDate)) {
+                return response()->json(['error' => 'فرمت تاریخ جلالی نادرست است.'], 400);
+            }
+
+            try {
+                $gregorianDate = Jalalian::fromFormat('Y/m/d', $jalaliDate)->toCarbon()->format('Y-m-d');
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'], 500);
+            }
         }
-        // بررسی صحت فرمت تاریخ ورودی (1403/11/24)
-        if (! preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $jalaliDate)) {
-            return response()->json(['error' => 'فرمت تاریخ جلالی نادرست است.'], 400);
-        }
-        // **تبدیل تاریخ جلالی به میلادی**
-        try {
-            $gregorianDate = Jalalian::fromFormat('Y/m/d', $jalaliDate)->toCarbon()->format('Y-m-d');
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'], 500);
-        }
-        // لاگ‌گیری برای بررسی تبدیل صحیح
-        $doctorId = Auth::guard('doctor')->user()->id; // دریافت ID پزشک لاگین‌شده
-        // گرفتن نوبت‌های پزشک جاری در تاریخ تبدیل‌شده به میلادی
-        // Fetch appointments
+
+        $doctorId = Auth::guard('doctor')->user()->id;
+
+        // کوئری پایه برای دریافت نوبت‌ها
         $query = Appointment::where('doctor_id', $doctorId)
             ->whereDate('appointment_date', $gregorianDate)
             ->with(['patient', 'insurance']);
+
         // اعمال فیلتر selectedClinicId
         if ($selectedClinicId === 'default') {
-            // اگر selectedClinicId برابر با 'default' باشد، clinic_id باید NULL یا خالی باشد
             $query->whereNull('clinic_id');
         } elseif ($selectedClinicId) {
-            // اگر selectedClinicId مقدار داشت، clinic_id باید با آن مطابقت داشته باشد
             $query->where('clinic_id', $selectedClinicId);
         }
 
-        $appointments = $query->get();
+        // افزودن پیجینیشن (مثلاً 10 نوبت در هر صفحه)
+        $appointments = $query->paginate(15);
+
         return response()->json([
-            'appointments' => $appointments,
+            'appointments' => $appointments->items(), // داده‌های نوبت‌ها
+            'pagination' => [
+                'current_page' => $appointments->currentPage(),
+                'last_page' => $appointments->lastPage(),
+                'per_page' => $appointments->perPage(),
+                'total' => $appointments->total(),
+            ],
         ]);
     }
     public function searchPatients(Request $request)
     {
-        $query            = $request->query('query'); // مقدار جستجو شده
-        $date             = $request->query('date');  // تاریخ انتخاب شده
+        $query = $request->query('query');
+        $date = $request->query('date');
         $selectedClinicId = $request->query('selectedClinicId');
-        // **اصلاح فرمت تاریخ ورودی**
+
+        if (empty($date)) {
+            return response()->json(['error' => 'تاریخ جستجو الزامی است.'], 400);
+        }
+
         if (strpos($date, '-') !== false) {
-            // اگر تاریخ با `-` جدا شده بود، آن را به `/` تبدیل کنیم
             $date = str_replace('-', '/', $date);
         }
 
-        // **تبدیل تاریخ جلالی به میلادی**
+        if (!preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $date)) {
+            return response()->json(['error' => 'فرمت تاریخ جلالی نادرست است.'], 400);
+        }
+
         try {
             $gregorianDate = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
         } catch (\Exception $e) {
             return response()->json(['error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'], 500);
         }
-        // ایجاد کوئری پایه
+
         $appointmentsQuery = Appointment::with('patient', 'insurance')
             ->whereDate('appointment_date', $gregorianDate)
             ->whereHas('patient', function ($q) use ($query) {
@@ -102,18 +118,24 @@ class DrPanelController extends Controller
                     ->orWhere('national_code', 'like', "%$query%");
             });
 
-        // اعمال فیلتر selectedClinicId
         if ($selectedClinicId === 'default') {
-            // اگر selectedClinicId برابر با 'default' باشد، clinic_id باید NULL یا خالی باشد
             $appointmentsQuery->whereNull('clinic_id');
         } elseif ($selectedClinicId) {
-            // اگر selectedClinicId مقدار داشت، clinic_id باید با آن مطابقت داشته باشد
             $appointmentsQuery->where('clinic_id', $selectedClinicId);
         }
 
-        // اجرای کوئری و دریافت نتایج
-        $patients = $appointmentsQuery->get();
-        return response()->json(['patients' => $patients]);
+        // افزودن پیجینیشن
+        $patients = $appointmentsQuery->paginate(15);
+
+        return response()->json([
+            'patients' => $patients->items(),
+            'pagination' => [
+                'current_page' => $patients->currentPage(),
+                'last_page' => $patients->lastPage(),
+                'per_page' => $patients->perPage(),
+                'total' => $patients->total(),
+            ],
+        ]);
     }
 
     public function updateAppointmentDate(Request $request, $id)
@@ -153,30 +175,40 @@ class DrPanelController extends Controller
             )->delay(now()->addSeconds(5));
         }
 
-        return response()->json(['message' => 'نوبت با موفقیت جابجا شد و پیامک در صف قرار گرفت.']);
+        return response()->json(['message' => 'نوبت با موفقیت جابجا شد .']);
     }
     public function filterAppointments(Request $request)
     {
-        $status           = $request->query('status');
+        $status = $request->query('status');
         $attendanceStatus = $request->query('attendance_status');
         $selectedClinicId = $request->input('selectedClinicId');
-        $query            = Appointment::withTrashed(); // اضافه کردن withTrashed برای نمایش نوبت‌های لغو شده
+
+        $query = Appointment::withTrashed();
+
         if ($selectedClinicId && $selectedClinicId !== 'default') {
             $query->where('clinic_id', $selectedClinicId);
         }
-        // فیلتر بر اساس `status`
-        if (! empty($status)) {
+
+        if (!empty($status)) {
             $query->where('status', $status);
         }
-        // فیلتر بر اساس `attendance_status`
-        if (! empty($attendanceStatus)) {
+
+        if (!empty($attendanceStatus)) {
             $query->where('attendance_status', $attendanceStatus);
         }
-        // دریافت نوبت‌ها به همراه اطلاعات بیمار، پزشک و کلینیک
-        $appointments = $query->with(['patient', 'doctor', 'clinic', 'insurance'])->get();
+
+        // افزودن پیجینیشن
+        $appointments = $query->with(['patient', 'doctor', 'clinic', 'insurance'])->paginate(15);
+
         return response()->json([
-            'success'      => true,
-            'appointments' => $appointments,
+            'success' => true,
+            'appointments' => $appointments->items(),
+            'pagination' => [
+                'current_page' => $appointments->currentPage(),
+                'last_page' => $appointments->lastPage(),
+                'per_page' => $appointments->perPage(),
+                'total' => $appointments->total(),
+            ],
         ]);
     }
     public function endVisit(Request $request, $id)

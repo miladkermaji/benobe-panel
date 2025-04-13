@@ -8,7 +8,7 @@
     const calendarButton = document.querySelector(
       ".selectDate_datepicker__xkZeS"
     );
-    const calendarModal = document.getElementById("calendarModal");
+    const miniCalendarModal = document.getElementById("miniCalendarModal");
     calendarButton.onclick = null;
     let modalInstance = null;
     calendarButton.removeEventListener("click", handleCalendarButtonClick);
@@ -18,7 +18,7 @@
       e.stopPropagation();
 
       if (!modalInstance) {
-        modalInstance = new bootstrap.Modal(calendarModal, {
+        modalInstance = new bootstrap.Modal(miniCalendarModal, {
           backdrop: "static",
           keyboard: false,
         });
@@ -75,7 +75,7 @@
           if (modalInstance) {
             modalInstance.hide();
           }
-          $("#calendarModal").modal("hide");
+          $("#miniCalendarModal").modal("hide");
 
           selectedDateSpan.textContent = selectedDate;
 
@@ -620,7 +620,7 @@
         const selectedDate = target.getAttribute('data-date');
         handleDateSelection(selectedDate, localStorage.getItem('selectedClinicId'), $(
           '.btn-filter-appointment-toggle').text().trim());
-        $('#calendarModal').modal('hide');
+        $('#miniCalendarModal').modal('hide');
       }
     });
   });

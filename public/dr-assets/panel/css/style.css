@@ -177,20 +177,11 @@ textarea {
 .margin-bottom-0 {
     margin-bottom: 0 !important;
 }
-:root {
-    --primary: #3b82f6; /* Softer, modern blue */
-    --secondary: #f8fafc; /* Light gray for background */
-    --text: #1e293b; /* Darker, elegant text color */
-    --danger: #ef4444; /* Vibrant red */
-    --shadow: 0 6px 15px rgba(0, 0, 0, 0.05); /* Softer shadow */
-    --border-radius: 12px; /* More rounded corners */
-    --transition: all 0.3s ease; /* Smooth transitions */
-}
+
 .custom-border-bottom {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px,
         rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
     padding: 20px 28px;
-    box-shadow: var(--shadow);
     border-bottom-right-radius: 0 !important;
 }
 

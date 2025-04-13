@@ -84,10 +84,31 @@ select {
 }
 
 .btn-primary {
-    background: linear-gradient(to right, #4b5eaa, #8b5cf6);
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: var(--background-card);
     border: none;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(to right, #3b4e9a, #7b4ce6);
+      background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    box-shadow: 0 8px 20px rgba(46, 134, 193, 0.4);
+    transform: translateY(-2px);
+}
+.top-panel-bg{
+    box-shadow: var(--shadow);
+    border-radius: 8px;
+}
+.btn-end-visit{
+    font-size: 12px;
+      background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    border: none;
+    color: #ffff;
+    border-radius: 8px;
+    padding: 5px 10px;
+}
+
+.btn-end-visit:hover{
+        background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    box-shadow: 0 8px 20px rgba(46, 134, 193, 0.4);
+    transform: translateY(-2px);
 }

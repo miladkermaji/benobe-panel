@@ -67,11 +67,21 @@
       dropdownOpen = false;
     });
   });
+  $(document).ready(function() {
+    // تنظیم تاریخ امروز به‌صورت پیش‌فرض
+    let currentDate = moment().format('YYYY-MM-DD');
+    let persianDate = moment(currentDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
+    let selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
+    $('.selectDate_datepicker__xkZeS span.mx-1').text(persianDate);
+    showLoading();
+    loadCalendar(currentDate);
+    loadAppointments(currentDate, selectedClinicId);
+  });
   /* drop select option */
   const appointmentsTableBody = $('.table tbody'); // بخش <tbody> جدول
   // لودینگ به جدول اضافه کنیم
   let loadingIndicator = `<tr id="loading-row" class="w-100">
-  <td colspan="10" class="text-center py-4">
+  <td colspan="12" class="text-center py-4">
     <div class="loading-wrapper">
       <div class="spinner-custom" role="status">
         <span class="visually-hidden">در حال بارگذاری...</span>
@@ -131,98 +141,153 @@
     // در اولین لود، تاریخ امروز رو انتخاب کن
     if (todayExists && !$('.calendar-card.my-active').length) {
       $('.calendar-card[data-date="' + todayExists + '"]').addClass('my-active');
-      handleDateSelection(todayExists, selectedClinicId);
       loadAppointments(todayExists, selectedClinicId);
     }
   }
+
+  function renderPagination(pagination, callback) {
+    const paginationLinks = $('#pagination-links');
+    paginationLinks.empty();
+
+    // دکمه قبلی
+    const prevDisabled = pagination.current_page === 1 ? 'disabled' : '';
+    paginationLinks.append(`
+        <li class="page-item ${prevDisabled}">
+            <a class="page-link" href="#" data-page="${pagination.current_page - 1}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+    `);
+
+    // شماره صفحات
+    for (let i = 1; i <= pagination.last_page; i++) {
+      const activeClass = i === pagination.current_page ? 'active' : '';
+      paginationLinks.append(`
+            <li class="page-item ${activeClass}">
+                <a class="page-link" href="#" data-page="${i}">${i}</a>
+            </li>
+        `);
+    }
+
+    // دکمه بعدی
+    const nextDisabled = pagination.current_page === pagination.last_page ? 'disabled' : '';
+    paginationLinks.append(`
+        <li class="page-item ${nextDisabled}">
+            <a class="page-link" href="#" data-page="${pagination.current_page + 1}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    `);
+
+    // افزودن رویداد کلیک به لینک‌های پیجینیشن
+    paginationLinks.find('.page-link').on('click', function(e) {
+      e.preventDefault();
+      const page = $(this).data('page');
+      if (page && !$(this).parent().hasClass('disabled') && !$(this).parent().hasClass('active')) {
+        callback(page);
+      }
+    });
+  }
   // تابع بارگذاری نوبت‌ها با شناسه کلینیک جدید
-  function loadAppointments(selectedDate, clinicId) {
-    let persianDate = moment(selectedDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
+  function searchPatients(query, page = 1) {
+    let selectedDate = currentDate || moment().format('YYYY-MM-DD'); // تاریخ میلادی
+    let requestData = {
+      date: selectedDate, // ارسال تاریخ میلادی به سرور
+      selectedClinicId: localStorage.getItem('selectedClinicId') || 'default',
+      page: page
+    };
+    if (query !== "") {
+      requestData.query = query;
+    }
     $.ajax({
-      url: "{{ route('doctor.appointments.by-date') }}",
-      method: 'GET',
-      data: {
-        date: selectedDate,
-        selectedClinicId: clinicId
+      url: "{{ route('search.patients') }}",
+      method: "GET",
+      data: requestData,
+      beforeSend: function() {
+        if (!isInitialLoad) {
+          showLoading();
+        }
       },
       success: function(response) {
-        appointmentsTableBody.html('');
-        if (response.appointments.length > 0) {
-          response.appointments.forEach(function(appointment) {
-            const nationalCode = appointment.patient.national_code ?
-              appointment.patient.national_code : 'نامشخص';
+        let appointmentsTableBody = $(".table tbody");
+        appointmentsTableBody.html("");
+        if (response.patients && response.patients.length > 0) {
+          response.patients.forEach(function(appointment) {
+            let patient = appointment.patient || {};
+            let insurance = appointment.insurance ? appointment.insurance.name : 'ندارد';
+            let appointmentDate = appointment.appointment_date ?
+              moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD') :
+              'نامشخص';
             const isAttended = appointment.status === 'attended';
             const buttonDisabled = isAttended ? 'disabled' : '';
-            const dropdownItemDisabled = isAttended ? 'disabled' : ''; // برای غیرفعال کردن آیتم‌های دراپ‌داون
-            const appointmentHTML = `
-    <tr data-appointment-id="${appointment.id}">
-        <td><input type="checkbox" class="row-checkbox"></td>
-        <td>${appointment.patient.first_name} ${appointment.patient.last_name}</td>
-        <td>${appointment.patient.mobile}</td>
-        <td>${nationalCode}</td> 
-        <td>${getPrescriptionStatus(appointment.status)}</td>
-        <td>${getPaymentStatus(appointment.payment_status)}</td>
-        <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
-        <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
-        <td>${appointment.appointment_time}</td>
-        <td>
-            <button class="btn btn-outline-info btn-end-visit" data-appointment-id="${appointment.id}" ${
-                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
-            }>
-                ${
-                (appointment.status === 'attended') ? 'ویزیت شده' : 'پایان ویزیت'
-            }
-            </button>
-        </td>
-        <td class="text-center">
-            <div class="dropdown d-inline-block position-relative">
-              <button 
-    class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" 
-    type="button"
->
-    <img 
-        src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" 
-        width="20" 
-        height="20" 
-        alt="More options"
-    >
-</button>
-                <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
-                    <li class=" ${
-                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
-            }">
-                        <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
-                            لغو نوبت
-                        </a>
-                    </li>
-                    <li class="${(appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''}">
-                        <a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">
-                            جابجایی نوبت
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">
-                            مسدود کردن کاربر
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </td>
-    </tr>`;
+            const dropdownItemDisabled = (appointment.status === 'attended' || appointment.status ===
+              'cancelled') ? 'disabled' : '';
+            let appointmentHTML = `
+                        <tr>
+                            <td><input type="checkbox" class="row-checkbox"></td>
+                            <td>${patient.first_name || 'نامشخص'} ${patient.last_name || ''}</td>
+                            <td>${patient.mobile || 'نامشخص'}</td>
+                            <td>${patient.national_code || 'نامشخص'}</td>
+                            <td>${getPrescriptionStatus(appointment.status)}</td>
+                            <td>${getPaymentStatus(appointment.payment_status)}</td>
+                            <td>${insurance}</td>
+                            <td>${appointmentDate}</td>
+                            <td>${appointment.appointment_time}</td>
+                            <td>
+                                <button class="${isAttended ? 'text-primary' : 'btn-end-visit'}" 
+                                        data-appointment-id="${appointment.id}" ${buttonDisabled}>
+                                    ${isAttended ? 'ویزیت شده' : 'پایان ویزیت'}
+                                </button>
+                            </td>
+                            <td class="text-center">
+                                <div class="dropdown d-inline-block position-relative">
+                                    <button class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" type="button">
+                                        <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20" alt="More options">
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
+                                        <li class="${dropdownItemDisabled}">
+                                            <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
+                                                لغو نوبت
+                                            </a>
+                                        </li>
+                                        <li class="${dropdownItemDisabled}">
+                                            <a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">
+                                                جابجایی نوبت
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${patient.mobile}" data-user-id="${patient.id}" data-user-name="${patient.first_name + ' ' + patient.last_name}">
+                                                مسدود کردن کاربر
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>`;
             appointmentsTableBody.append(appointmentHTML);
           });
         } else {
           appointmentsTableBody.html(`
                     <tr>
-                        <td colspan="10" class="text-center py-3">هیچ نوبتی برای این تاریخ وجود ندارد.</td>
+                        <td colspan="12" class="text-center py-3 text-muted">
+                            هیچ نتیجه‌ای یافت نشد.
+                        </td>
                     </tr>
                 `);
         }
+        renderPagination(response.pagination, function(newPage) {
+          searchPatients(query, newPage);
+        });
+        isInitialLoad = false;
       },
-      error: function() {
+      error: function(xhr) {
+        hideLoading();
+        let errorMessage = xhr.responseJSON?.error || 'خطا در دریافت اطلاعات';
         appointmentsTableBody.html(`
                 <tr>
-                    <td colspan="10" class="text-center py-3 text-danger">خطا در دریافت نوبت‌ها.</td>
+                    <td colspan="12" class="text-center py-3 text-danger">
+                        ${errorMessage}
+                    </td>
                 </tr>
             `);
       }
@@ -238,14 +303,15 @@
     let userId = $(this).closest("tr").data("user-id");
   });
 
-  function handleDateSelection(selectedDate, selectedClinicId) {
+  function handleDateSelection(selectedDate, selectedClinicId, page = 1) {
     showLoading();
     $.ajax({
       url: "{{ route('doctor.appointments.by-date') }}",
       method: 'GET',
       data: {
         date: selectedDate,
-        selectedClinicId: selectedClinicId
+        selectedClinicId: selectedClinicId,
+        page: page
       },
       success: function(response) {
         hideLoading();
@@ -256,77 +322,67 @@
               appointment.patient.national_code : 'نامشخص';
             const isAttended = appointment.status === 'attended';
             const buttonDisabled = isAttended ? 'disabled' : '';
-            const dropdownItemDisabled = isAttended ? 'disabled' : ''; // برای غیرفعال کردن آیتم‌های دراپ‌داون
             const appointmentHTML = `
-    <tr data-appointment-id="${appointment.id}">
-        <td><input type="checkbox" class="row-checkbox"></td>
-        <td>${appointment.patient.first_name} ${appointment.patient.last_name}</td>
-        <td>${appointment.patient.mobile}</td>
-        <td>${nationalCode}</td> 
-        <td>${getPrescriptionStatus(appointment.status)}</td>
-                <td>${getPaymentStatus(appointment.payment_status)}</td>
-        <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
-        <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
-        <td>${appointment.appointment_time}</td>
-        <td>
-            <button class="btn btn-outline-info btn-end-visit" data-appointment-id="${appointment.id}" ${
-                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
-            }>
-                ${
-                (appointment.status === 'attended') ? 'ویزیت شده' : 'پایان ویزیت'
-            }
-            </button>
-        </td>
-        <td class="text-center">
-            <div class="dropdown d-inline-block position-relative">
-               <button 
-    class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" 
-    type="button"
->
-    <img 
-        src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" 
-        width="20" 
-        height="20" 
-        alt="More options"
-    >
-</button>
-                <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
-                    <li class=" ${
-                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
-            }">
-                        <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
-                            لغو نوبت
-                        </a>
-                    </li>
-                    <li class="${(appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''}">
-                        <a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">
-                            جابجایی نوبت
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">
-                            مسدود کردن کاربر
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </td>
-    </tr>`;
+                        <tr data-appointment-id="${appointment.id}">
+                            <td><input type="checkbox" class="row-checkbox"></td>
+                            <td>${appointment.patient.first_name} ${appointment.patient.last_name}</td>
+                            <td>${appointment.patient.mobile}</td>
+                            <td>${nationalCode}</td> 
+                            <td>${getPrescriptionStatus(appointment.status)}</td>
+                            <td>${getPaymentStatus(appointment.payment_status)}</td>
+                            <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
+                            <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
+                            <td>${appointment.appointment_time}</td>
+                            <td>
+                                <button class="${isAttended ? 'text-primary' : 'btn-end-visit'}" 
+                                        data-appointment-id="${appointment.id}" ${buttonDisabled}>
+                                    ${isAttended ? 'ویزیت شده' : 'پایان ویزیت'}
+                                </button>
+                            </td>
+                            <td class="text-center">
+                                <div class="dropdown d-inline-block position-relative">
+                                    <button class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" type="button">
+                                        <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20" alt="More options">
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
+                                        <li class="${isAttended || appointment.status === 'cancelled' ? 'disabled' : ''}">
+                                            <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
+                                                لغو نوبت
+                                            </a>
+                                        </li>
+                                        <li class="${isAttended || appointment.status === 'cancelled' ? 'disabled' : ''}">
+                                            <a class="dropdown-item textannoys('move-appointment', appointment.appointment_date, appointment.id)">جابجایی نوبت</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">
+                                                مسدود کردن کاربر
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>`;
             appointmentsTableBody.append(appointmentHTML);
           });
         } else {
           appointmentsTableBody.html(`
                     <tr>
-                        <td colspan="10" class="text-center py-3">هیچ نوبتی برای این تاریخ وجود ندارد.</td>
-                    </tr>`);
+                        <td colspan="12" class="text-center py-3">هیچ نوبتی برای این تاریخ وجود ندارد.</td>
+                    </tr>
+                `);
         }
+        // رندر پیجینیشن
+        renderPagination(response.pagination, function(newPage) {
+          handleDateSelection(selectedDate, selectedClinicId, newPage);
+        });
       },
       error: function() {
         hideLoading();
         appointmentsTableBody.html(`
                 <tr>
-                    <td colspan="10" class="text-center py-3 text-danger">خطا در دریافت نوبت‌ها.</td>
-                </tr>`);
+                    <td colspan="12" class="text-center py-3 text-danger">خطا در دریافت نوبت‌ها.</td>
+                </tr>
+            `);
       }
     });
   }
@@ -334,7 +390,7 @@
   function showLoading() {
     appointmentsTableBody.html(`
           <tr id="loading-row" class="w-100">
-  <td colspan="10" class="text-center py-4">
+  <td colspan="12" class="text-center py-4">
     <div class="loading-wrapper">
       <div class="spinner-custom" role="status">
         <span class="visually-hidden">در حال بارگذاری...</span>
@@ -378,64 +434,158 @@
       handleDateSelection(selectedDate, selectedClinicId);
       loadAppointments(selectedDate, selectedClinicId);
       // بستن مودال
-      $('#calendarModal').modal('hide');
+      $('#miniCalendarModal').modal('hide');
     });
     // در اولین لود صفحه، داده‌های امروز را نمایش دهیم
-    if (todayExists) {
-      $('.calendar-card[data-date="' + todayExists + '"]').addClass('my-active');
-      handleDateSelection(todayExists, localStorage.getItem('selectedClinicId'));
-    }
+   
   }
-  // نمایش لودینگ قبل از ارسال درخواست AJAX
-  $(document).ready(function() {
-    let currentDate = moment().format('YYYY-MM-DD'); // مقدار پیش‌فرض (امروز)
-    let persianDate = moment(currentDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
-    let isInitialLoad = true; // بررسی اولین بارگذاری صفحه
-    function searchPatients(query) {
-      let selectedDate = currentDate;
-      let spanTextDate = $('.selectDate_datepicker__xkZeS span').text();
-      let requestData = {
-        date: spanTextDate,
-        selectedClinicId: localStorage.getItem('selectedClinicId')
-      };
-      if (query !== "") {
-        requestData.query = query;
-      }
-      $.ajax({
-        url: "{{ route('search.patients') }}",
-        method: "GET",
-        data: requestData,
-        beforeSend: function() {
-          if (!isInitialLoad) {
-            $(".table tbody").html(`
-                    <tr id="loading-row" class="w-100">
-  <td colspan="10" class="text-center py-4">
-    <div class="loading-wrapper">
-      <div class="spinner-custom" role="status">
-        <span class="visually-hidden">در حال بارگذاری...</span>
-      </div>
-      <p class="loading-text">لطفاً منتظر بمانید...</p>
-    </div>
-  </td>
-</tr>
-                `);
-          }
-        },
-        success: function(response) {
-          let appointmentsTableBody = $(".table tbody");
-          appointmentsTableBody.html("");
-          if (response.patients.length > 0) {
-            response.patients.forEach(function(appointment) {
-              let patient = appointment.patient || {};
-              let insurance = appointment.insurance ? appointment.insurance.name : 'ندارد';
-              let appointmentDate = appointment.appointment_date ?
-                moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD') :
-                'نامشخص';
+  let isInitialLoad = true;
+
+  function loadAppointments(selectedDate, clinicId, page = 1) {
+    console.log('loadAppointments called with date:', selectedDate, 'clinicId:', clinicId);
+
+    // نمایش لودینگ
+    showLoading();
+
+    // تبدیل تاریخ به فرمت مناسب
+    let persianDate = moment(selectedDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
+
+    $.ajax({
+      url: "{{ route('doctor.appointments.by-date') }}",
+      method: 'GET',
+      data: {
+        date: selectedDate,
+        selectedClinicId: clinicId,
+        page: page
+      },
+      beforeSend: function() {
+        // اطمینان از نمایش لودینگ قبل از شروع درخواست
+        appointmentsTableBody.html(loadingIndicator);
+      },
+      success: function(response) {
+        // تأخیر کوچک برای اطمینان از رندر صحیح
+        setTimeout(() => {
+          // مخفی کردن لودینگ
+          hideLoading();
+
+          // پاک کردن محتوای قبلی جدول
+          appointmentsTableBody.html('');
+
+          // بررسی وجود نوبت‌ها
+          if (response.appointments && response.appointments.length > 0) {
+            response.appointments.forEach(function(appointment) {
+              const nationalCode = appointment.patient.national_code ?
+                appointment.patient.national_code : 'نامشخص';
               const isAttended = appointment.status === 'attended';
               const buttonDisabled = isAttended ? 'disabled' : '';
-              const dropdownItemDisabled = (appointment.status === 'attended' || appointment.status ===
-                'cancelled') ? 'disabled' : '';
-              let appointmentHTML = `
+              const dropdownItemDisabled = isAttended || appointment.status === 'cancelled' ? 'disabled' :
+                '';
+              const appointmentHTML = `
+                            <tr data-appointment-id="${appointment.id}">
+                                <td><input type="checkbox" class="row-checkbox"></td>
+                                <td>${appointment.patient.first_name} ${appointment.patient.last_name}</td>
+                                <td>${appointment.patient.mobile}</td>
+                                <td>${nationalCode}</td> 
+                                <td>${getPrescriptionStatus(appointment.status)}</td>
+                                <td>${getPaymentStatus(appointment.payment_status)}</td>
+                                <td>${appointment.insurance ? appointment.insurance.name : 'ندارد'}</td>
+                                <td>${moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD')}</td>
+                                <td>${appointment.appointment_time}</td>
+                                <td>
+                                    <button class="${isAttended ? 'text-primary' : 'btn-end-visit'}" 
+                                            data-appointment-id="${appointment.id}" ${buttonDisabled}>
+                                        ${isAttended ? 'ویزیت شده' : 'پایان ویزیت'}
+                                    </button>
+                                </td>
+                                <td class="text-center">
+                                    <div class="dropdown d-inline-block position-relative">
+                                        <button class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" type="button">
+                                            <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20" alt="More options">
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
+                                            <li class="${dropdownItemDisabled}">
+                                                <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
+                                                    لغو نوبت
+                                                </a>
+                                            </li>
+                                            <li class="${dropdownItemDisabled}">
+                                                <a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">
+                                                    جابجایی نوبت
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">
+                                                    مسدود کردن کاربر
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>`;
+              appointmentsTableBody.append(appointmentHTML);
+            });
+          } else {
+            appointmentsTableBody.html(`
+                        <tr>
+                            <td colspan="12" class="text-center py-3">هیچ نوبتی برای این تاریخ وجود ندارد.</td>
+                        </tr>
+                    `);
+          }
+
+          // رندر پیجینیشن
+          renderPagination(response.pagination, function(newPage) {
+            loadAppointments(selectedDate, clinicId, newPage);
+          });
+        }, 100); // تأخیر 100 میلی‌ثانیه برای اطمینان از رندر
+      },
+      error: function() {
+        // مخفی کردن لودینگ در صورت خطا
+        hideLoading();
+        appointmentsTableBody.html(`
+                <tr>
+                    <td colspan="12" class="text-center py-3 text-danger">خطا در دریافت نوبت‌ها.</td>
+                </tr>
+            `);
+      }
+    });
+  }
+  // نمایش لودینگ قبل از ارسال درخواست AJAX
+  function searchPatients(query, page = 1) {
+    let selectedDate = currentDate;
+    let spanTextDate = $('.selectDate_datepicker__xkZeS span').text();
+    let requestData = {
+      date: spanTextDate,
+      selectedClinicId: localStorage.getItem('selectedClinicId'),
+      page: page
+    };
+    if (query !== "") {
+      requestData.query = query;
+    }
+    $.ajax({
+      url: "{{ route('search.patients') }}",
+      method: "GET",
+      data: requestData,
+      beforeSend: function() {
+        let isInitialLoad = true;
+        if (!isInitialLoad) {
+          showLoading();
+        }
+      },
+      success: function(response) {
+        let appointmentsTableBody = $(".table tbody");
+        appointmentsTableBody.html("");
+        if (response.patients.length > 0) {
+          response.patients.forEach(function(appointment) {
+            let patient = appointment.patient || {};
+            let insurance = appointment.insurance ? appointment.insurance.name : 'ندارد';
+            let appointmentDate = appointment.appointment_date ?
+              moment(appointment.appointment_date).locale('fa').format('jYYYY/jMM/jDD') :
+              'نامشخص';
+            const isAttended = appointment.status === 'attended';
+            const buttonDisabled = isAttended ? 'disabled' : '';
+            const dropdownItemDisabled = (appointment.status === 'attended' || appointment.status ===
+              'cancelled') ? 'disabled' : '';
+            let appointmentHTML = `
                         <tr>
                             <td><input type="checkbox" class="row-checkbox"></td>
                             <td>${patient.first_name ? patient.first_name : 'نامشخص'} 
@@ -443,64 +593,76 @@
                             <td>${patient.mobile ? patient.mobile : 'نامشخص'}</td>
                             <td>${patient.national_code ? patient.national_code : 'نامشخص'}</td>
                             <td>${getPrescriptionStatus(appointment.status)}</td>
-        <td>${getPaymentStatus(appointment.payment_status)}</td>
+                            <td>${getPaymentStatus(appointment.payment_status)}</td>
                             <td>${insurance}</td>
                             <td>${appointmentDate}</td>
                             <td>${appointment.appointment_time}</td>
                             <td>
-                                <button class="btn btn-outline-info btn-end-visit ${buttonDisabled}" data-appointment-id="${appointment.id}" ${buttonDisabled}  ${
-                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
-            }>
-                                     ${
-                (appointment.status === 'attended') ? 'ویزیت شده' : 'پایان ویزیت'
-            }
+                                <button class="${isAttended ? 'text-primary' : 'btn-end-visit'}" 
+                                        data-appointment-id="${appointment.id}" ${buttonDisabled}>
+                                    ${isAttended ? 'ویزیت شده' : 'پایان ویزیت'}
                                 </button>
                             </td>
                             <td class="text-center">
                                 <div class="dropdown d-inline-block position-relative">
-                                    <button 
-    class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" 
-    type="button"
->
-    <img 
-        src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" 
-        width="20" 
-        height="20" 
-        alt="More options"
-    >
-</button>
+                                    <button class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" type="button">
+                                        <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20" alt="More options">
+                                    </button>
                                     <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
-                                        <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">لغو نوبت</a></li>
-                                        <li class="${dropdownItemDisabled}"><a class="dropdown-item text-dark move-appointment" data-date="${appointment.appointment_date}" href="#" data-id="${appointment.id}">جابجایی نوبت</a></li>
-                                        <li><a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">مسدود کردن کاربر</a></li>
+                                        <li class="${dropdownItemDisabled}">
+                                            <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
+                                                لغو نوبت
+                                            </a>
+                                        </li>
+                                        <li class="${dropdownItemDisabled}">
+                                            <a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">
+                                                جابجایی نوبت
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">
+                                                مسدود کردن کاربر
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             </td>
                         </tr>`;
-              appointmentsTableBody.append(appointmentHTML);
-            });
-          } else if (!isInitialLoad) {
-            appointmentsTableBody.html(`
+            appointmentsTableBody.append(appointmentHTML);
+          });
+
+        } else if (!isInitialLoad) {
+          appointmentsTableBody.html(`
                     <tr>
-                        <td colspan="10" class="text-center py-3 text-muted">
+                        <td colspan="12" class="text-center py-3 text-muted">
                             هیچ نتیجه‌ای یافت نشد.
                         </td>
                     </tr>
                 `);
-          }
-          isInitialLoad = false;
-        },
-        error: function() {
-          $(".table tbody").html(`
+        }
+        // رندر پیجینیشن
+        renderPagination(response.pagination, function(newPage) {
+          searchPatients(query, newPage);
+        });
+        isInitialLoad = false;
+      },
+      error: function() {
+        hideLoading();
+        appointmentsTableBody.html(`
                 <tr>
-                    <td colspan="10" class="text-center py-3 text-danger">
+                    <td colspan="12" class="text-center py-3 text-danger">
                         خطا در دریافت اطلاعات
                     </td>
                 </tr>
             `);
-        }
-      });
-    }
+      }
+    });
+  }
+  $(document).ready(function() {
+    let currentDate = moment().format('YYYY-MM-DD'); // مقدار پیش‌فرض (امروز)
+    let persianDate = moment(currentDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
+    let isInitialLoad = true; // بررسی اولین بارگذاری صفحه
+
     // 📌 **وقتی در اینپوت جستجو تایپ شد**
     $(".my-form-control").on("input", function() {
       let searchText = $(this).val().trim();
@@ -770,18 +932,29 @@
 
   // تابع بستن مودال
   function closeModal() {
-    const $modal = $('#calendarModal');
+    const $modal = $('#miniCalendarModal');
     $modal.modal('hide');
 
-    // حذف بک‌دراپ و کلاس‌های اضافی بعد از بسته شدن کامل مودال
-    $modal.on('hidden.bs.modal', function() {
+    // حذف فوری بک‌دراپ و کلاس‌های اضافی
+    setTimeout(() => {
       $('.modal-backdrop').remove();
       $('body').removeClass('modal-open');
+      $('body').css('padding-right', ''); // حذف padding اضافی
+    }, 300); // تأخیر برای اطمینان از اتمام انیمیشن
+    $(document).on('click', '.modal-backdrop', function() {
+      closeModal();
+    });
+    // اطمینان از حذف بک‌دراپ در صورت عدم اجرا
+    $modal.off('hidden.bs.modal').on('hidden.bs.modal', function() {
+      $('.modal-backdrop').remove();
+      $('body').removeClass('modal-open');
+      $('body').css('padding-right', '');
     });
   }
+
   $('.selectDate_datepicker__xkZeS').on('click', function() {
 
-    $('#calendarModal').modal({
+    $('#miniCalendarModal').modal({
       backdrop: true, // فعال کردن بک‌دراپ (پیش‌فرض true است)
       keyboard: true // امکان بستن با کلید ESC
     });
@@ -965,7 +1138,13 @@
             const persianDate = $(this).data('date');
             const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
             const appointment = response.data.find(a => a.appointment_date === gregorianDate);
+            // حذف کلاس قبلی و بج
+            $(this).removeClass('has-appointment');
             $(this).find('.my-badge-success').remove();
+            // اضافه کردن کلاس برای روزهایی که نوبت دارند
+            if (appointment) {
+              $(this).addClass('has-appointment');
+            }
           });
         }
       }
@@ -1012,10 +1191,12 @@
             const persianDate = $(this).data('date');
             const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
             const appointment = response.data.find(a => a.appointment_date === gregorianDate);
-            // حذف استایل قبلی
+            // حذف کلاس قبلی و بج
+            $(this).removeClass('has-appointment');
             $(this).find('.my-badge-success').remove();
+            // اضافه کردن کلاس برای روزهایی که نوبت دارند
             if (appointment) {
-              $(this).append(`<span class="my-badge-success">${appointment.appointment_count}</span>`);
+              $(this).addClass('has-appointment');
             }
           });
         }
@@ -1555,7 +1736,7 @@
       yearSelect.val(newYear);
     });
     $('.calendar-day').not('.empty').on('click', function() {
-      $('#calendarModal').modal('hide');
+      $('#miniCalendarModal').modal('hide');
 
       const selectedDayElement = $(this);
       const persianDate = selectedDayElement.data('date');
@@ -1680,7 +1861,7 @@
       $("#selectedDate").val(gregorianDate); // ذخیره تاریخ میلادی در فیلد مخفی
       $("#selectedDate").val(gregorianDate); // ذخیره تاریخ میلادی در فیلد مخفی
       handleDateSelection(persianDate, localStorage.getItem('selectedClinicId'));
-      $('#calendarModal').modal('hide');
+      $('#miniCalendarModal').modal('hide');
       // بررسی تعطیل بودن روز
       $.ajax({
         url: "{{ route('doctor.get_holiday_status') }}",
@@ -1702,14 +1883,14 @@
             getWorkHours(gregorianDate);
           }
           $(".selectDate_datepicker__xkZeS span.mx-1").text(persianDate);
-          $('#calendarModal').modal('hide'); // بستن مودال
+          $('#miniCalendarModal').modal('hide'); // بستن مودال
           // اجرای جستجو با تاریخ جدید
           $('.my-form-control').val('')
         }
       });
     });
     $(document).on("click", ".block-user", function(e) {
-      
+
       e.preventDefault();
       let row = $(this).closest("tr"); // گرفتن ردیف مربوطه
       let userId = $(this).data("user-id"); // دریافت ID کاربر
@@ -1777,9 +1958,8 @@
   $(document).ready(function() {
     $(".dropdown-item").click(function(e) {
       e.preventDefault();
-      let statusFilter = ""; // مقدار فیلتر `status`
-      let filterType = $(this).attr("id"); // دریافت ID گزینه‌ی انتخاب‌شده
-      // بررسی مقدار `filterType` و تعیین مقدار `statusFilter`
+      let statusFilter = "";
+      let filterType = $(this).attr("id");
       if (filterType === "scheduled-appointments") {
         statusFilter = "scheduled";
       } else if (filterType === "cancelled-appointments") {
@@ -1788,30 +1968,21 @@
         statusFilter = "attended";
       } else if (filterType === "missed-appointments") {
         statusFilter = "missed";
+      } else if (filterType === "all-appointments") {
+        statusFilter = "";
       }
-      // نمایش لودینگ در جدول
-      let appointmentsTableBody = $(".table tbody");
-      appointmentsTableBody.html(`
-           <tr id="loading-row" class="w-100">
-  <td colspan="10" class="text-center py-4">
-    <div class="loading-wrapper">
-      <div class="spinner-custom" role="status">
-        <span class="visually-hidden">در حال بارگذاری...</span>
-      </div>
-      <p class="loading-text">لطفاً منتظر بمانید...</p>
-    </div>
-  </td>
-</tr>
-        `);
-      // ارسال درخواست AJAX برای دریافت نوبت‌های فیلتر شده
+      showLoading();
       $.ajax({
         url: "{{ route('doctor.appointments.filter') }}",
         method: "GET",
         data: {
           status: statusFilter,
-          selectedClinicId: localStorage.getItem('selectedClinicId') // فقط مقدار `status` ارسال شود
+          selectedClinicId: localStorage.getItem('selectedClinicId'),
+          page: 1 // صفحه اول به صورت پیش‌فرض
         },
         success: function(response) {
+          hideLoading();
+          let appointmentsTableBody = $(".table tbody");
           appointmentsTableBody.html("");
           if (response.appointments.length > 0) {
             response.appointments.forEach(function(appointment) {
@@ -1822,46 +1993,44 @@
                 'نامشخص';
               let appointmentHTML = `
                             <tr>
-                             <td><input type="checkbox" class="row-checkbox"></td>
+                                <td><input type="checkbox" class="row-checkbox"></td>
                                 <td>${patient.first_name ? patient.first_name : 'نامشخص'} 
                                     ${patient.last_name ? patient.last_name : ''}</td>
                                 <td>${patient.mobile ? patient.mobile : 'نامشخص'}</td>
                                 <td>${patient.national_code ? patient.national_code : 'نامشخص'}</td>
                                 <td>${getPrescriptionStatus(appointment.status)}</td>
-        <td>${getPaymentStatus(appointment.payment_status)}</td>
+                                <td>${getPaymentStatus(appointment.payment_status)}</td>
                                 <td>${insurance}</td>
                                 <td>${appointmentDate}</td>
                                 <td>${appointment.appointment_time}</td>
                                 <td>
-    <button class="btn btn-outline-info btn-end-visit" data-appointment-id="${appointment.id}"  ${
-                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
-            }>
-        ${
-                (appointment.status === 'attended') ? 'ویزیت شده' : 'پایان ویزیت'
-            }
-    </button>
-</td>
+                                    <button class="${appointment.status === 'attended' ? 'text-primary' : 'btn-end-visit'}" 
+                                            data-appointment-id="${appointment.id}" 
+                                            ${appointment.status === 'attended' || appointment.status === 'cancelled' ? 'disabled' : ''}>
+                                        ${appointment.status === 'attended' ? 'ویزیت شده' : 'پایان ویزیت'}
+                                    </button>
+                                </td>
                                 <td class="text-center">
                                     <div class="dropdown d-inline-block position-relative">
-                                       <button 
-    class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" 
-    type="button"
->
-    <img 
-        src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" 
-        width="20" 
-        height="20" 
-        alt="More options"
-    >
-</button>
+                                        <button class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" type="button">
+                                            <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20" alt="More options">
+                                        </button>
                                         <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
-                                            <li class="${
-                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
-            }" href="#" data-id="${appointment.id}"><a class="dropdown-item text-dark cancel-appointment">لغو نوبت</a></li>
-                                            <li class=" ${
-                (appointment.status === 'attended' || appointment.status === 'cancelled') ? 'disabled' : ''
-            }"><a class="dropdown-item text-dark move-appointment" data-date="${appointment.appointment_date}" href="#" data-id="${appointment.id}">جابجایی نوبت</a></li>
-                                            <li><a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name }">مسدود کردن کاربر</a></li>
+                                            <li class="${appointment.status === 'attended' || appointment.status === 'cancelled' ? 'disabled' : ''}">
+                                                <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
+                                                    لغو نوبت
+                                                </a>
+                                            </li>
+                                            <li class="${appointment.status === 'attended' || appointment.status === 'cancelled' ? 'disabled' : ''}">
+                                                <a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">
+                                                    جابجایی نوبت
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">
+                                                    مسدود کردن کاربر
+                                                </a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </td>
@@ -1871,15 +2040,190 @@
           } else {
             appointmentsTableBody.html(`
                         <tr>
-                            <td colspan="10" class="text-center py-3">هیچ نوبتی برای این فیلتر وجود ندارد.</td>
+                            <td colspan="12" class="text-center py-3">هیچ نوبتی برای این فیلتر وجود ندارد.</td>
                         </tr>
                     `);
           }
+          // رندر پیجینیشن
+          renderPagination(response.pagination, function(newPage) {
+            $.ajax({
+              url: "{{ route('doctor.appointments.filter') }}",
+              method: "GET",
+              data: {
+                status: statusFilter,
+                selectedClinicId: localStorage.getItem('selectedClinicId'),
+                page: newPage
+              },
+              success: function(response) {
+                hideLoading();
+                appointmentsTableBody.html("");
+                if (response.appointments.length > 0) {
+                  response.appointments.forEach(function(appointment) {
+                    let patient = appointment.patient || {};
+                    let insurance = appointment.insurance ? appointment.insurance.name :
+                      'ندارد';
+                    let appointmentDate = appointment.appointment_date ?
+                      moment(appointment.appointment_date).locale('fa').format(
+                        'jYYYY/jMM/jDD') :
+                      'نامشخص';
+                    let appointmentHTML = `
+                                        <tr>
+                                            <td><input type="checkbox" class="row-checkbox"></td>
+                                            <td>${patient.first_name ? patient.first_name : 'نامشخص'} 
+                                                ${patient.last_name ? patient.last_name : ''}</td>
+                                            <td>${patient.mobile ? patient.mobile : 'نامشخص'}</td>
+                                            <td>${patient.national_code ? patient.national_code : 'نامشخص'}</td>
+                                            <td>${getPrescriptionStatus(appointment.status)}</td>
+                                            <td>${getPaymentStatus(appointment.payment_status)}</td>
+                                            <td>${insurance}</td>
+                                            <td>${appointmentDate}</td>
+                                            <td>${appointment.appointment_time}</td>
+                                            <td>
+                                                <button class="${appointment.status === 'attended' ? 'text-primary' : 'btn-end-visit'}" 
+                                                        data-appointment-id="${appointment.id}" 
+                                                        ${appointment.status === 'attended' || appointment.status === 'cancelled' ? 'disabled' : ''}>
+                                                    ${appointment.status === 'attended' ? 'ویزیت شده' : 'پایان ویزیت'}
+                                                </button>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="dropdown d-inline-block position-relative">
+                                                    <button class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" type="button">
+                                                        <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20" alt="More options">
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
+                                                        <li class="${appointment.status === 'attended' || appointment.status === 'cancelled' ? 'disabled' : ''}">
+                                                            <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
+                                                                لغو نوبت
+                                                            </a>
+                                                        </li>
+                                                        <li class="${appointment.status === 'attended' || appointment.status === 'cancelled' ? 'disabled' : ''}">
+                                                            <a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">
+                                                                جابجایی نوبت
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">
+                                                                مسدود کردن کاربر
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>`;
+                    appointmentsTableBody.append(appointmentHTML);
+                  });
+                } else {
+                  appointmentsTableBody.html(`
+                                    <tr>
+                                        <td colspan="12" class="text-center py-3">هیچ نوبتی برای این فیلتر وجود ندارد.</td>
+                                    </tr>
+                                `);
+                }
+                // رندر پیجینیشن برای صفحه جدید
+                renderPagination(response.pagination, function(newPage) {
+                  $.ajax({
+                    url: "{{ route('doctor.appointments.filter') }}",
+                    method: "GET",
+                    data: {
+                      status: statusFilter,
+                      selectedClinicId: localStorage.getItem('selectedClinicId'),
+                      page: newPage
+                    },
+                    success: function(response) {
+                      hideLoading();
+                      appointmentsTableBody.html("");
+                      if (response.appointments.length > 0) {
+                        response.appointments.forEach(function(appointment) {
+                          let patient = appointment.patient || {};
+                          let insurance = appointment.insurance ? appointment
+                            .insurance.name : 'ندارد';
+                          let appointmentDate = appointment.appointment_date ?
+                            moment(appointment.appointment_date).locale('fa')
+                            .format('jYYYY/jMM/jDD') :
+                            'نامشخص';
+                          let appointmentHTML = `
+                                                    <tr>
+                                                        <td><input type="checkbox" class="row-checkbox"></td>
+                                                        <td>${patient.first_name ? patient.first_name : 'نامشخص'} 
+                                                            ${patient.last_name ? patient.last_name : ''}</td>
+                                                        <td>${patient.mobile ? patient.mobile : 'نامشخص'}</td>
+                                                        <td>${patient.national_code ? patient.national_code : 'نامشخص'}</td>
+                                                        <td>${getPrescriptionStatus(appointment.status)}</td>
+                                                        <td>${getPaymentStatus(appointment.payment_status)}</td>
+                                                        <td>${insurance}</td>
+                                                        <td>${appointmentDate}</td>
+                                                        <td>${appointment.appointment_time}</td>
+                                                        <td>
+                                                            <button class="${appointment.status === 'attended' ? 'text-primary' : 'btn-end-visit'}" 
+                                                                    data-appointment-id="${appointment.id}" 
+                                                                    ${appointment.status === 'attended' || appointment.status === 'cancelled' ? 'disabled' : ''}>
+                                                                ${appointment.status === 'attended' ? 'ویزیت شده' : 'پایان ویزیت'}
+                                                            </button>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="dropdown d-inline-block position-relative">
+                                                                <button class="flex items-center justify-center bg-white border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors p-1 focus:outline-none dropdown-toggle custom-dropdown-trigger" type="button">
+                                                                    <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20" alt="More options">
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
+                                                                    <li class="${appointment.status === 'attended' || appointment.status === 'cancelled' ? 'disabled' : ''}">
+                                                                        <a class="dropdown-item text-dark cancel-appointment" href="#" data-id="${appointment.id}">
+                                                                            لغو نوبت
+                                                                        </a>
+                                                                    </li>
+                                                                    <li class="${appointment.status === 'attended' || appointment.status === 'cancelled' ? 'disabled' : ''}">
+                                                                        <a class="dropdown-item text-dark move-appointment" href="#" data-date="${appointment.appointment_date}" data-id="${appointment.id}">
+                                                                            جابجایی نوبت
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item text-dark block-user" href="#" data-id="${appointment.id}" data-mobile="${appointment.patient.mobile}" data-user-id="${appointment.patient.id}" data-user-name="${appointment.patient.first_name + ' ' + appointment.patient.last_name}">
+                                                                            مسدود کردن کاربر
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>`;
+                          appointmentsTableBody.append(appointmentHTML);
+                        });
+                      } else {
+                        appointmentsTableBody.html(`
+                                                <tr>
+                                                    <td colspan="12" class="text-center py-3">هیچ نوبتی برای این فیلتر وجود ندارد.</td>
+                                                </tr>
+                                            `);
+                      }
+                      // رندر پیجینیشن برای صفحه جدید
+                      renderPagination(response.pagination, arguments.callee);
+                    },
+                    error: function() {
+                      hideLoading();
+                      appointmentsTableBody.html(`
+                                            <tr>
+                                                <td colspan="12" class="text-center py-3 text-danger">خطا در دریافت نوبت‌ها.</td>
+                                            </tr>
+                                        `);
+                    }
+                  });
+                });
+              },
+              error: function() {
+                hideLoading();
+                appointmentsTableBody.html(`
+                                <tr>
+                                    <td colspan="12" class="text-center py-3 text-danger">خطا در دریافت نوبت‌ها.</td>
+                                </tr>
+                            `);
+              }
+            });
+          });
         },
         error: function() {
+          hideLoading();
           appointmentsTableBody.html(`
                     <tr>
-                        <td colspan="10" class="text-center py-3 text-danger">خطا در دریافت نوبت‌ها.</td>
+                        <td colspan="12" class="text-center py-3 text-danger">خطا در دریافت نوبت‌ها.</td>
                     </tr>
                 `);
         }
@@ -1893,14 +2237,23 @@
     checkboxes.each(function() {
       let checkbox = $(this);
       let row = checkbox.closest('tr');
-      let appointmentId = row.find('.btn-end-visit').attr('data-appointment-id'); // ID از دکمه
+      let button = row.find('[data-appointment-id]');
+      let appointmentId = button.attr('data-appointment-id');
       if (!appointmentId) {
-        console.error('No data-appointment-id found in row or button:', row);
+        console.error('No data-appointment-id found in row:', row);
+        return;
+      }
+      // دریافت تاریخ شمسی و تبدیل به میلادی
+      let persianDate = row.find('td:nth-child(8)').text().trim(); // فرمت: jYYYY/jMM/jDD
+      let gregorianDate = moment.from(persianDate, 'fa', 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+      if (!moment(gregorianDate, 'YYYY-MM-DD', true).isValid()) {
+        console.error('Invalid date format for row:', persianDate);
+        return;
       }
       selected.push({
         id: appointmentId,
         status: row.find('td:nth-child(5)').text().trim(),
-        date: row.find('td:nth-child(8)').text().trim(),
+        date: gregorianDate, // تاریخ به فرمت میلادی
         mobile: row.find('td:nth-child(3)').text().trim(),
         row: row
       });
@@ -1981,8 +2334,7 @@
       if (!selected.length) {
         return Swal.fire('هشدار', 'نوبتی انتخاب نشده!', 'warning');
       }
-      // چک کردن اینکه آیا نوبت ویزیت‌شده وجود داره
-      const hasAttended = selected.some(appointment => appointment.status === 'attended');
+      const hasAttended = selected.some(appointment => appointment.status === 'ویزیت شده');
       if (hasAttended) {
         return Swal.fire('خطا', 'نمی‌توانید نوبت‌های ویزیت‌شده را جابجا کنید!', 'error');
       }
@@ -1990,7 +2342,6 @@
       generateRescheduleCalendar(moment().jYear(), moment().jMonth() + 1);
       populateRescheduleSelectBoxes();
       $('#calendar-reschedule .calendar-day').not('.empty').off('click').on('click', function() {
-
         const newDate = $(this).data('date');
         const gregorianDate = moment(newDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
         const today = moment().format('YYYY-MM-DD');
@@ -2007,30 +2358,41 @@
           cancelButtonText: 'لغو'
         }).then((result) => {
           if (result.isConfirmed) {
-            let oldDates = selected.map(item => item.date);
+            let oldDates = [...new Set(selected.map(item => item.date))]; // تاریخ‌ها به فرمت میلادی
             oldDates.forEach(oldDate => {
               $.ajax({
                 url: "{{ route('doctor.reschedule_appointment') }}",
                 method: 'POST',
                 data: {
-                  old_date: oldDate,
+                  old_date: oldDate, // تاریخ میلادی
+                  new_date: gregorianDate, // تاریخ میلادی
                   selectedClinicId: localStorage.getItem('selectedClinicId'),
-                  new_date: gregorianDate,
-                  _token: '{{ csrf_token() }}',
+                  _token: '{{ csrf_token() }}'
+                },
+                beforeSend: function() {
+                  Swal.fire({
+                    title: 'در حال پردازش...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                      Swal.showLoading();
+                    }
+                  });
                 },
                 success: function(response) {
+                  Swal.close();
                   if (response.status) {
                     Swal.fire('موفقیت', response.message, 'success');
                     loadAppointmentsCount();
                     loadHolidayStyles();
-                    selected.forEach(app => app.row.remove()); // حذف ردیف‌ها بعد از جابجایی
+                    selected.forEach(app => app.row.remove());
                   } else {
                     Swal.fire('خطا', response.message, 'error');
                   }
                 },
                 error: function(xhr) {
+                  Swal.close();
                   let errorMessage = 'مشکلی در ارتباط با سرور رخ داده است.';
-                  if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
+                  if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMessage = xhr.responseJSON.message;
                   }
                   Swal.fire('خطا', errorMessage, 'error');
@@ -2041,38 +2403,38 @@
         });
       });
     });
-    // ✅ مسدود کردن گروهی کاربران
-    $('#block-users-btn').click(function() {
-      let selected = getSelectedAppointments();
-      if (!selected.length) return Swal.fire('هشدار', 'کاربری انتخاب نشده!', 'warning');
-      Swal.fire({
-        title: 'مسدود کردن کاربران؟',
-        input: 'textarea',
-        inputPlaceholder: 'دلیل مسدودیت را وارد کنید...',
-        showCancelButton: true,
-        confirmButtonText: 'بله',
-        cancelButtonText: 'لغو'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          let mobiles = selected.map(a => a.mobile);
-          $.post("{{ route('doctor-blocking-users.store-multiple') }}", {
-            _token: csrfToken,
-            mobiles: mobiles,
-            blocked_at: moment().format('YYYY-MM-DD'),
-            reason: result.value,
-            selectedClinicId: localStorage.getItem('selectedClinicId') // اضافه کردن برای هماهنگی
-          }, function(response) {
-            if (response.success) {
-              Swal.fire('موفقیت', response.message, 'success');
-              // اگه نیاز داری ردیف‌ها رو از جدول حذف کنی، اینجا کدش رو اضافه کن
-            } else {
-              Swal.fire('خطا', response.message, 'error');
-            }
-          }).fail(function(xhr) {
-            Swal.fire('خطا', xhr.responseJSON.message, 'error');
-          });
-        }
-      });
+  });
+  // ✅ مسدود کردن گروهی کاربران
+  $('#block-users-btn').click(function() {
+    let selected = getSelectedAppointments();
+    if (!selected.length) return Swal.fire('هشدار', 'کاربری انتخاب نشده!', 'warning');
+    Swal.fire({
+      title: 'مسدود کردن کاربران؟',
+      input: 'textarea',
+      inputPlaceholder: 'دلیل مسدودیت را وارد کنید...',
+      showCancelButton: true,
+      confirmButtonText: 'بله',
+      cancelButtonText: 'لغو'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let mobiles = selected.map(a => a.mobile);
+        $.post("{{ route('doctor-blocking-users.store-multiple') }}", {
+          _token: csrfToken,
+          mobiles: mobiles,
+          blocked_at: moment().format('YYYY-MM-DD'),
+          reason: result.value,
+          selectedClinicId: localStorage.getItem('selectedClinicId') // اضافه کردن برای هماهنگی
+        }, function(response) {
+          if (response.success) {
+            Swal.fire('موفقیت', response.message, 'success');
+            // اگه نیاز داری ردیف‌ها رو از جدول حذف کنی، اینجا کدش رو اضافه کن
+          } else {
+            Swal.fire('خطا', response.message, 'error');
+          }
+        }).fail(function(xhr) {
+          Swal.fire('خطا', xhr.responseJSON.message, 'error');
+        });
+      }
     });
   });
   $(document).ready(function() {

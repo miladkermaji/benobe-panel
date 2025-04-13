@@ -40,7 +40,7 @@ class BlockingUsersController extends Controller
         return view('dr.panel.turn.schedule.scheduleSetting.blocking_users.index', compact('blockedUsers', 'messages'));
     }
 
-private function processDate($date, $fieldName)
+    private function processDate($date, $fieldName)
     {
         if (empty($date)) {
             return null;
@@ -135,7 +135,7 @@ private function processDate($date, $fieldName)
 
             return response()->json([
                 'success' => true,
-                'message' => 'کاربر با موفقیت مسدود شد و پیامک در صف قرار گرفت.',
+                'message' => 'کاربر با موفقیت مسدود شد',
                 'blocking_user' => $blockingUser->load('user'),
             ]);
         } catch (\Exception $e) {
@@ -237,7 +237,7 @@ private function processDate($date, $fieldName)
 
             return response()->json([
                 'success' => true,
-                'message' => 'کاربران با موفقیت مسدود شدند و پیامک در صف قرار گرفت.',
+                'message' => 'کاربران با موفقیت مسدود شدند .',
                 'blocked_users' => $blockedUsers,
                 'already_blocked' => $alreadyBlocked,
             ]);
@@ -295,7 +295,7 @@ private function processDate($date, $fieldName)
 
             return response()->json([
                 'success' => true,
-                'message' => 'وضعیت با موفقیت به‌روزرسانی شد و پیامک در صف قرار گرفت.',
+                'message' => 'وضعیت با موفقیت به‌روزرسانی شد .',
             ]);
         } catch (\Exception $e) {
             return response()->json([

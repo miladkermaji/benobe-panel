@@ -156,7 +156,7 @@ class MoshavereWaitingController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => $newlyCancelled ? 'نوبت‌ها با موفقیت لغو شدند و پیامک در صف قرار گرفت.' : 'برخی نوبت‌ها قبلاً لغو یا ویزیت شده بودند و تغییری اعمال نشد.',
+            'message' => $newlyCancelled ? 'نوبت‌ها با موفقیت لغو شدند .' : 'برخی نوبت‌ها قبلاً لغو یا ویزیت شده بودند و تغییری اعمال نشد.',
             'total_recipients' => count($recipients),
         ]);
     }
@@ -455,7 +455,7 @@ class MoshavereWaitingController extends Controller
 
             return response()->json([
                 'status'           => true,
-                'message'          => 'نوبت‌ها با موفقیت جابجا شدند و پیامک در صف قرار گرفت.',
+                'message'          => 'نوبت‌ها با موفقیت جابجا شدند .',
                 'total_recipients' => count($recipients),
             ]);
         } catch (\Exception $e) {
@@ -648,7 +648,7 @@ class MoshavereWaitingController extends Controller
             )->delay(now()->addSeconds(5));
         }
 
-        return response()->json(['message' => 'نوبت با موفقیت جابجا شد و پیامک در صف قرار گرفت.']);
+        return response()->json(['message' => 'نوبت با موفقیت جابجا شد .']);
     }
     public function filterAppointments(Request $request)
     {

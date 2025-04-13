@@ -34,8 +34,15 @@
   }
 
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .calendar-card:hover {
@@ -95,9 +102,19 @@
   }
 
   @keyframes badgePulse {
-    0% { transform: scale(0.8); opacity: 0; }
-    70% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+
+    70% {
+      transform: scale(1.1);
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
 
   .calendar-card .appointment-badge:hover {
@@ -132,12 +149,14 @@
     overflow-y: hidden;
     white-space: nowrap;
     width: 100%;
-    padding: 15px 0; /* پدینگ کم برای بج‌ها */
+    padding: 15px 0;
+    /* پدینگ کم برای بج‌ها */
     display: flex;
     gap: 10px !important;
     transition: transform 0.4s ease-in-out;
     box-sizing: border-box;
-    margin: 10px; /* حذف حاشیه‌های احتمالی */
+    margin: 10px;
+    /* حذف حاشیه‌های احتمالی */
   }
 
   #calendar.d-flex.w-100::-webkit-scrollbar {
@@ -147,7 +166,7 @@
   .btn-light {
     background: var(--background-card);
     border: 1px solid var(--border-neutral);
-   /*  padding: 13px 0; */
+    /*  padding: 13px 0; */
     border-radius: var(--radius-button);
     transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   }
@@ -187,19 +206,22 @@
       padding: 8px;
       margin-right: -3px;
     }
+
     .calendar-card .day-name {
       font-size: 11px;
     }
+
     .calendar-card .date {
       font-size: 9px;
     }
+
     .calendar-card .appointment-badge {
       font-size: 10px;
       padding: 2px 5px;
       top: -6px;
       left: -6px;
     }
-    
+
   }
 </style>
 
@@ -215,7 +237,7 @@
         </svg>
       </button>
     </div>
-    <div id="calendar" class="d-flex w-100 justify-content-between">
+    <div id="calendar" class="d-flex w-100">
       <!-- تقویم اولیه با تاریخ کنونی پر می‌شود -->
     </div>
     <div>
@@ -233,153 +255,139 @@
     خطا در بارگذاری تعداد نوبت‌ها. لطفاً دوباره تلاش کنید.
   </div>
 </div>
-
 <script>
 $(document).ready(function() {
-  // تاریخ شروع رو با اولین تاریخ داده‌ها تنظیم می‌کنیم
-  let currentDate = '2025-04-07'; // اولین تاریخ داده‌ها
-  const days = 14;
-  const calendar = $('#calendar');
-  let isAnimating = false;
-  const minDate = moment().locale('en').subtract(30, 'days').format('YYYY-MM-DD');
-  const maxDate = moment().locale('en').add(30, 'days').format('YYYY-MM-DD');
-  let appointmentsData = [];
+    // تنظیم تاریخ شروع برای قرار گرفتن امروز در وسط
+    let currentDate = moment().locale('en').subtract(8, 'days').format('YYYY-MM-DD'); // 8 روز قبل از امروز
+    const days = 18; // بدون تغییر
+    const calendar = $('#calendar');
+    let isAnimating = false;
+    const minDate = moment().locale('en').subtract(30, 'days').format('YYYY-MM-DD');
+    const maxDate = moment().locale('en').add(30, 'days').format('YYYY-MM-DD');
+    let appointmentsData = [];
 
-  function fetchAppointmentsCount() {
-    $.ajax({
-      url: "{{ route('appointments.count') }}",
-      method: 'GET',
-      data: {
-        selectedClinicId: localStorage.getItem('selectedClinicId')
-      },
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      success: function(response) {
-        console.log('Appointments response:', response);
-        if (response.status) {
-          appointmentsData = response.data;
-          $('#calendar-error').hide();
-          console.log('Appointments data loaded:', appointmentsData);
-          loadCalendar(currentDate);
-        } else {
-          console.error('Error fetching appointments:', response.message);
+    function fetchAppointmentsCount() {
+      $.ajax({
+        url: "{{ route('appointments.count') }}",
+        method: 'GET',
+        data: {
+          selectedClinicId: localStorage.getItem('selectedClinicId')
+        },
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+          if (response.status) {
+            appointmentsData = response.data;
+            $('#calendar-error').hide();
+            loadCalendar(currentDate);
+          } else {
+            console.error('Error fetching appointments:', response.message);
+            $('#calendar-error').show();
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('AJAX error:', error);
           $('#calendar-error').show();
         }
-      },
-      error: function(xhr, status, error) {
-        console.error('AJAX error:', error);
-        $('#calendar-error').show();
-      }
-    });
-  }
-
-  function loadCalendar(date) {
-    calendar.empty();
-    let badgeCount = 0;
-    console.log('Loading calendar for date:', date);
-
-    for (let i = 0; i < days; i++) {
-      const current = moment(date).locale('en').add(i, 'days');
-      const persianDate = current.locale('fa').format('dddd');
-      const persianFormattedDate = current.locale('fa').format('D MMMM YYYY');
-      const isActive = current.isSame(moment().locale('en'), 'day') ? 'my-active' : '';
-      const appointmentDate = current.locale('en').format('YYYY-MM-DD');
-      
-      const appointment = appointmentsData.find(appt => {
-        const apptDate = moment(appt.appointment_date).locale('en').format('YYYY-MM-DD');
-        if (apptDate === appointmentDate) {
-          console.log(`Match found: ${appointmentDate}`);
-        }
-        return apptDate === appointmentDate;
       });
-      
-      const appointmentCount = appointment ? appointment.appointment_count : 0;
-      const badgeHtml = appointmentCount > 0 ? `<span class="appointment-badge">${appointmentCount}</span>` : '';
-      if (appointmentCount > 0) badgeCount++;
+    }
 
-      const card = `
+    function loadCalendar(date) {
+      calendar.empty();
+      let badgeCount = 0;
+
+      for (let i = 0; i < days; i++) {
+        const current = moment(date).locale('en').add(i, 'days');
+        const persianDate = current.locale('fa').format('dddd');
+        const persianFormattedDate = current.locale('fa').format('D MMMM YYYY');
+        const isActive = current.isSame(moment().locale('en'), 'day') ? 'my-active' : '';
+        const appointmentDate = current.locale('en').format('YYYY-MM-DD');
+
+        const appointment = appointmentsData.find(appt => {
+          const apptDate = moment(appt.appointment_date).locale('en').format('YYYY-MM-DD');
+          return apptDate === appointmentDate;
+        });
+
+        const appointmentCount = appointment ? appointment.appointment_count : 0;
+        const badgeHtml = appointmentCount > 0 ? `<span class="appointment-badge">${appointmentCount}</span>` : '';
+        if (appointmentCount > 0) badgeCount++;
+
+        const card = `
         <div class="calendar-card btn btn-light ${isActive}" data-date="${appointmentDate}" style="--delay: ${i}">
           ${badgeHtml}
           <div class="day-name">${persianDate}</div>
           <div class="date">${persianFormattedDate}</div>
           ${isActive ? '<div class="current-day-icon"></div>' : ''}
         </div>`;
-      calendar.append(card);
+        calendar.append(card);
+      }
+
+      updateButtonState();
     }
-    console.log('Badges rendered:', badgeCount);
-    if (badgeCount === 0) {
-      console.log('No badges rendered. Check date range:', {
-        calendarStart: date,
-        calendarEnd: moment(date).add(days - 1, 'days').format('YYYY-MM-DD'),
-        availableDates: appointmentsData.map(appt => appt.appointment_date)
-      });
+
+    function updateButtonState() {
+      const prevButton = $('#prevRow');
+      const nextButton = $('#nextRow');
+      const firstDate = moment(currentDate).locale('en');
+      const lastDate = moment(currentDate).locale('en').add(days - 1, 'days');
+
+      prevButton.prop('disabled', firstDate.isSameOrBefore(minDate, 'day'));
+      nextButton.prop('disabled', lastDate.isSameOrAfter(maxDate, 'day'));
     }
-    updateButtonState();
-  }
 
-  function updateButtonState() {
-    const prevButton = $('#prevRow');
-    const nextButton = $('#nextRow');
-    const firstDate = moment(currentDate).locale('en');
-    const lastDate = moment(currentDate).locale('en').add(days - 1, 'days');
+    function animateAndLoadCalendar(direction) {
+      if (isAnimating) return;
 
-    prevButton.prop('disabled', firstDate.isSameOrBefore(minDate, 'day'));
-    nextButton.prop('disabled', lastDate.isSameOrAfter(maxDate, 'day'));
-  }
+      isAnimating = true;
+      const newDate = direction === 'nextRow' ?
+        moment(currentDate).locale('en').add(7, 'days').format('YYYY-MM-DD') : // تغییر به 7 روز
+        moment(currentDate).locale('en').subtract(7, 'days').format('YYYY-MM-DD'); // تغییر به 7 روز
 
-  function animateAndLoadCalendar(direction) {
-    if (isAnimating) return;
-
-    isAnimating = true;
-    const newDate = direction === 'nextRow'
-      ? moment(currentDate).locale('en').add(days, 'days').format('YYYY-MM-DD')
-      : moment(currentDate).locale('en').subtract(days, 'days').format('YYYY-MM-DD');
-
-    calendar.css({
-      transition: 'transform 0.4s ease-in-out, opacity 0.6s ease-in-out',
-      transform: direction === 'nextRow' ? 'translateX(50px)' : 'translateX(-50px)',
-      opacity: 0.3
-    });
-
-    setTimeout(() => {
-      currentDate = newDate;
-      loadCalendar(currentDate);
       calendar.css({
-        transform: direction === 'nextRow' ? 'translateX(-50px)' : 'translateX(50px)',
+        transition: 'transform 0.4s ease-in-out, opacity 0.6s ease-in-out',
+        transform: direction === 'nextRow' ? 'translateX(50px)' : 'translateX(-50px)',
         opacity: 0.3
       });
+
       setTimeout(() => {
+        currentDate = newDate;
+        loadCalendar(currentDate);
         calendar.css({
-          transform: 'translateX(0)',
-          opacity: 1
+          transform: direction === 'nextRow' ? 'translateX(-50px)' : 'translateX(50px)',
+          opacity: 0.3
         });
         setTimeout(() => {
-          calendar.css('transition', '');
-          isAnimating = false;
-        }, 400);
-      }, 50);
-    }, 300);
-  }
-
-  calendar.on('click', '.calendar-card', function() {
-    $('.calendar-card').removeClass('card-selected');
-    $(this).addClass('card-selected');
-  });
-
-  $('#nextRow').click(function() {
-    if (!$(this).prop('disabled')) {
-      animateAndLoadCalendar('nextRow');
+          calendar.css({
+            transform: 'translateX(0)',
+            opacity: 1
+          });
+          setTimeout(() => {
+            calendar.css('transition', '');
+            isAnimating = false;
+          }, 400);
+        }, 50);
+      }, 300);
     }
-  });
 
-  $('#prevRow').click(function() {
-    if (!$(this).prop('disabled')) {
-      animateAndLoadCalendar('prevRow');
-    }
-  });
+    calendar.on('click', '.calendar-card', function() {
+      $('.calendar-card').removeClass('card-selected');
+      $(this).addClass('card-selected');
+    });
 
-  fetchAppointmentsCount();
+    $('#nextRow').click(function() {
+      if (!$(this).prop('disabled')) {
+        animateAndLoadCalendar('nextRow');
+      }
+    });
+
+    $('#prevRow').click(function() {
+      if (!$(this).prop('disabled')) {
+        animateAndLoadCalendar('prevRow');
+      }
+    });
+
+    fetchAppointmentsCount();
 });
 </script>
 <meta name="csrf-token" content="{{ csrf_token() }}">
