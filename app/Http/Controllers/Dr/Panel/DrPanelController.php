@@ -72,7 +72,7 @@ class DrPanelController extends Controller
         }
 
         // افزودن پیجینیشن (مثلاً 10 نوبت در هر صفحه)
-        $appointments = $query->paginate(15);
+        $appointments = $query->paginate(10);
 
         return response()->json([
             'appointments' => $appointments->items(), // داده‌های نوبت‌ها
@@ -125,7 +125,7 @@ class DrPanelController extends Controller
         }
 
         // افزودن پیجینیشن
-        $patients = $appointmentsQuery->paginate(15);
+        $patients = $appointmentsQuery->paginate(10);
 
         return response()->json([
             'patients' => $patients->items(),
@@ -198,7 +198,7 @@ class DrPanelController extends Controller
         }
 
         // افزودن پیجینیشن
-        $appointments = $query->with(['patient', 'doctor', 'clinic', 'insurance'])->paginate(15);
+        $appointments = $query->with(['patient', 'doctor', 'clinic', 'insurance'])->paginate(10);
 
         return response()->json([
             'success' => true,
