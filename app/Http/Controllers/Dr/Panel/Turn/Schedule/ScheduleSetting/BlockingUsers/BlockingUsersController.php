@@ -173,7 +173,10 @@ class BlockingUsersController extends Controller
 
             // پردازش تاریخ‌ها
             $blockedAt = $this->processDate($validated['blocked_at'], 'شروع مسدودیت');
-            $unblockedAt = $this->processDate($validated['unblocked_at'], 'پایان مسدودیت');
+            // بررسی صریح وجود unblocked_at
+            $unblockedAt = isset($validated['unblocked_at']) && !empty($validated['unblocked_at'])
+                ? $this->processDate($validated['unblocked_at'], 'پایان مسدودیت')
+                : null;
 
             $blockedUsers = [];
             $alreadyBlocked = [];
@@ -237,7 +240,7 @@ class BlockingUsersController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'کاربران با موفقیت مسدود شدند .',
+                'message' => 'کاربران با موفقیت مسدود شدند.',
                 'blocked_users' => $blockedUsers,
                 'already_blocked' => $alreadyBlocked,
             ]);

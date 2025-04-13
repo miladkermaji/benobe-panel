@@ -13,32 +13,26 @@ use App\Http\Controllers\Dr\Controller;
 
 class DrPanelController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $today    = Carbon::today();
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id; // گرفتن ID پزشک لاگین‌شده
-        // تعداد بیماران امروز فقط برای این پزشک
+        $today = Carbon::today();
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $totalPatientsToday = Appointment::where('doctor_id', $doctorId)
             ->whereDate('appointment_date', $today)
             ->count();
-        // بیماران ویزیت شده فقط برای این پزشک
         $visitedPatients = Appointment::where('doctor_id', $doctorId)
             ->whereDate('appointment_date', $today)
             ->where('attendance_status', 'attended')
             ->count();
-        // بیماران باقی‌مانده فقط برای این پزشک
         $remainingPatients = $totalPatientsToday - $visitedPatients;
         return view("dr.panel.index", compact('totalPatientsToday', 'visitedPatients', 'remainingPatients'));
     }
+
     public function getAppointmentsByDate(Request $request)
     {
         $selectedClinicId = $request->selectedClinicId;
-        $jalaliDate = $request->input('date'); // دریافت تاریخ از فرانت‌اند
+        $jalaliDate = $request->input('date');
 
-        // بررسی فرمت تاریخ ورودی
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $jalaliDate)) {
             $gregorianDate = $jalaliDate;
         } else {
@@ -47,35 +41,53 @@ class DrPanelController extends Controller
             }
 
             if (!preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $jalaliDate)) {
-                return response()->json(['error' => 'فرمت تاریخ جلالی نادرست است.'], 400);
+                return response()->json([
+                    'success' => false,
+                    'appointments' => [],
+                    'pagination' => [
+                        'current_page' => 1,
+                        'last_page' => 1,
+                        'per_page' => 10,
+                        'total' => 0,
+                    ],
+                    'error' => 'فرمت تاریخ جلالی نادرست است.'
+                ], 400);
             }
 
             try {
                 $gregorianDate = Jalalian::fromFormat('Y/m/d', $jalaliDate)->toCarbon()->format('Y-m-d');
             } catch (\Exception $e) {
-                return response()->json(['error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'], 500);
+                return response()->json([
+                    'success' => false,
+                    'appointments' => [],
+                    'pagination' => [
+                        'current_page' => 1,
+                        'last_page' => 1,
+                        'per_page' => 10,
+                        'total' => 0,
+                    ],
+                    'error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'
+                ], 500);
             }
         }
 
         $doctorId = Auth::guard('doctor')->user()->id;
 
-        // کوئری پایه برای دریافت نوبت‌ها
         $query = Appointment::where('doctor_id', $doctorId)
             ->whereDate('appointment_date', $gregorianDate)
             ->with(['patient', 'insurance']);
 
-        // اعمال فیلتر selectedClinicId
         if ($selectedClinicId === 'default') {
             $query->whereNull('clinic_id');
         } elseif ($selectedClinicId) {
             $query->where('clinic_id', $selectedClinicId);
         }
 
-        // افزودن پیجینیشن (مثلاً 10 نوبت در هر صفحه)
         $appointments = $query->paginate(10);
 
         return response()->json([
-            'appointments' => $appointments->items(), // داده‌های نوبت‌ها
+            'success' => true,
+            'appointments' => $appointments->items(),
             'pagination' => [
                 'current_page' => $appointments->currentPage(),
                 'last_page' => $appointments->lastPage(),
@@ -84,6 +96,7 @@ class DrPanelController extends Controller
             ],
         ]);
     }
+
     public function searchPatients(Request $request)
     {
         $query = $request->query('query');
@@ -91,7 +104,17 @@ class DrPanelController extends Controller
         $selectedClinicId = $request->query('selectedClinicId');
 
         if (empty($date)) {
-            return response()->json(['error' => 'تاریخ جستجو الزامی است.'], 400);
+            return response()->json([
+                'success' => false,
+                'patients' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                ],
+                'error' => 'تاریخ جستجو الزامی است.'
+            ], 400);
         }
 
         if (strpos($date, '-') !== false) {
@@ -99,13 +122,33 @@ class DrPanelController extends Controller
         }
 
         if (!preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $date)) {
-            return response()->json(['error' => 'فرمت تاریخ جلالی نادرست است.'], 400);
+            return response()->json([
+                'success' => false,
+                'patients' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                ],
+                'error' => 'فرمت تاریخ جلالی نادرست است.'
+            ], 400);
         }
 
         try {
             $gregorianDate = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
         } catch (\Exception $e) {
-            return response()->json(['error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'], 500);
+            return response()->json([
+                'success' => false,
+                'patients' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                ],
+                'error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'
+            ], 500);
         }
 
         $appointmentsQuery = Appointment::with('patient', 'insurance')
@@ -124,10 +167,10 @@ class DrPanelController extends Controller
             $appointmentsQuery->where('clinic_id', $selectedClinicId);
         }
 
-        // افزودن پیجینیشن
         $patients = $appointmentsQuery->paginate(10);
 
         return response()->json([
+            'success' => true,
             'patients' => $patients->items(),
             'pagination' => [
                 'current_page' => $patients->currentPage(),
@@ -146,37 +189,44 @@ class DrPanelController extends Controller
 
         $appointment = Appointment::findOrFail($id);
 
-        // چک کردن وضعیت نوبت
         if ($appointment->status === 'attended' || $appointment->status === 'cancelled') {
-            return response()->json(['error' => 'نمی‌توانید نوبت ویزیت‌شده یا لغو شده را جابجا کنید.'], 400);
+            return response()->json([
+                'success' => false,
+                'error' => 'نمی‌توانید نوبت ویزیت‌شده یا لغو شده را جابجا کنید.'
+            ], 400);
         }
 
         $newDate = Carbon::parse($request->new_date);
         if ($newDate->lt(Carbon::today())) {
-            return response()->json(['error' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'], 400);
+            return response()->json([
+                'success' => false,
+                'error' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'
+            ], 400);
         }
 
-        $oldDate = $appointment->appointment_date; // تاریخ قبلی
+        $oldDate = $appointment->appointment_date;
         $appointment->appointment_date = $newDate;
         $appointment->save();
 
-        // تبدیل تاریخ‌ها به فرمت شمسی
         $oldDateJalali = Jalalian::fromDateTime($oldDate)->format('Y/m/d');
         $newDateJalali = Jalalian::fromDateTime($newDate)->format('Y/m/d');
 
-        // ارسال پیامک جابجایی نوبت
         if ($appointment->patient && $appointment->patient->mobile) {
             $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به {$newDateJalali} تغییر یافت.";
             SendSmsNotificationJob::dispatch(
                 $message,
                 [$appointment->patient->mobile],
-                null, // بدون قالب
-                [] // بدون پارامتر اضافی
+                null,
+                []
             )->delay(now()->addSeconds(5));
         }
 
-        return response()->json(['message' => 'نوبت با موفقیت جابجا شد .']);
+        return response()->json([
+            'success' => true,
+            'message' => 'نوبت با موفقیت جابجا شد.'
+        ]);
     }
+
     public function filterAppointments(Request $request)
     {
         $status = $request->query('status');
@@ -197,7 +247,6 @@ class DrPanelController extends Controller
             $query->where('attendance_status', $attendanceStatus);
         }
 
-        // افزودن پیجینیشن
         $appointments = $query->with(['patient', 'doctor', 'clinic', 'insurance'])->paginate(10);
 
         return response()->json([
@@ -211,30 +260,26 @@ class DrPanelController extends Controller
             ],
         ]);
     }
+
     public function endVisit(Request $request, $id)
     {
         try {
-            // پیدا کردن نوبت با شناسه
             $appointment = Appointment::findOrFail($id);
 
-            // اعتبارسنجی درخواست
             $request->validate([
-                'description' => 'nullable|string|max:1000', // توضیحات اختیاری
+                'description' => 'nullable|string|max:1000',
             ]);
 
-            // به‌روزرسانی توضیحات و وضعیت نوبت
             $appointment->description = $request->input('description');
-            $appointment->status = 'attended'; // تغییر وضعیت به attended
-            $appointment->attendance_status = 'attended'; // هماهنگ کردن attendance_status
+            $appointment->status = 'attended';
+            $appointment->attendance_status = 'attended';
             $appointment->save();
 
-            // برگرداندن پاسخ موفقیت‌آمیز
             return response()->json([
                 'success' => true,
                 'message' => 'ویزیت با موفقیت ثبت شد.',
-                'appointment' => $appointment // اطلاعات نوبت به‌روز شده
+                'appointment' => $appointment
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

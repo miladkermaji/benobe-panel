@@ -1716,7 +1716,7 @@ img {
 }
 
 .pagination .page-item.active .page-link {
-    background-color: #007bff;
+    background-color: var(--primary);
     border-color: #007bff;
     color: white;
 }
@@ -1738,6 +1738,6 @@ img {
 }
 
 .pagination .page-link:hover:not(.disabled) {
-    background-color: #e9ecef;
+    background-color: var(--primary);
     color: #0056b3;
 }

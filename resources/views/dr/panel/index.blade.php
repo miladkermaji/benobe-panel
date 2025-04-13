@@ -410,12 +410,12 @@
     </div>
   </div>
 </div>
-
+@endsection
 @section('scripts')
+@include('dr.panel.my-tools.dashboardTools')
   <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 
 
-  @include('dr.panel.my-tools.dashboardTools')
 
   <script>
     var appointmentsSearchUrl = "{{ route('search.appointments') }}";
@@ -449,4 +449,5 @@
       $('#rescheduleModalStyles').remove();
     });
   </script>
+  
 @endsection
