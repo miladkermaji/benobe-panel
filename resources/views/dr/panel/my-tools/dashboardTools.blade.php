@@ -58,6 +58,7 @@
       checkInactiveClinics();
       handleDateSelection(persianDate, selectedId);
       loadAppointments(persianDate, selectedId);
+      fetchAppointmentsCount()
       $('.dropdown-trigger').removeClass('border border-primary');
       $('.my-dropdown-menu').addClass('d-none');
       dropdownOpen = false;
