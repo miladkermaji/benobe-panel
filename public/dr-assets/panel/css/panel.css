@@ -1710,6 +1710,11 @@ img {
 }
 .pagination-container {
     margin-top: 20px;
+    position: relative;
+    top: 70px;
+    width: 100%;
+    box-shadow: var(--shadow);
+    padding-top: 20px;
 }
 
 .pagination .page-item {
