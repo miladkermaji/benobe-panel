@@ -607,7 +607,9 @@ body {
     .selectDate_datepicker__xkZeS {
         border: 1px solid #ddd;
     }
-
+ .my-tooltip{
+        display: none !important;
+    }
     .my-form-control {
         width: 92vw;
         background-color: #ebeff8;
