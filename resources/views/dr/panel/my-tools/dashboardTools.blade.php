@@ -77,11 +77,8 @@
   const appointmentsTableBody = $('.table tbody');
   let loadingIndicator = `<tr id="loading-row" class="w-100">
     <td colspan="12" class="text-center py-4">
-        <div class="loading-wrapper">
-            <div class="spinner-custom" role="status">
-                <span class="visually-hidden">در حال بارگذاری...</span>
-            </div>
-            <p class="loading-text">لطفاً منتظر بمانید...</p>
+        <div class="spinner-custom" role="status">
+            <span class="visually-hidden">در حال بارگذاری...</span>
         </div>
     </td>
 </tr>`;
@@ -759,8 +756,12 @@
       return Swal.fire('هشدار', 'نوبتی انتخاب نشده!', 'warning');
     }
     const hasAttended = selected.some(appointment => appointment.status === 'ویزیت شده');
+    const hasCancled= selected.some(appointment => appointment.status === 'لغو شده');
     if (hasAttended) {
       return Swal.fire('خطا', 'نمی‌توانید نوبت‌های ویزیت‌شده را جابجا کنید!', 'error');
+    }
+     if (hasCancled) {
+      return Swal.fire('خطا', 'نمی‌توانید نوبت‌های لغو شده را جابجا کنید!', 'error');
     }
 
     // ذخیره oldDates در rescheduleModal
