@@ -645,7 +645,8 @@
         window.location.href = 'آدرس_مشخص_شده_توسط_کاربر';
         return;
       }
-
+ 
+      
       // آپدیت متن دکمه فیلتر
       $('.btn-filter-appointment-toggle span.text-btn-425').text(filterTypeText);
 
