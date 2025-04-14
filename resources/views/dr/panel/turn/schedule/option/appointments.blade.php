@@ -1,4 +1,7 @@
 <script>
+  function showLoading() {
+    appointmentsContainer.html(loadingIndicator);
+  }
   document.addEventListener("DOMContentLoaded", function() {
     const calendarBody = document.getElementById("calendar-body");
     const today = moment().startOf("day").locale("fa").format("jYYYY/jMM/jDD");
@@ -194,6 +197,7 @@
     generateCalendar(moment().jYear(), moment().jMonth() + 1);
   });
 
+
   $(document).ready(function() {
     let dropdownOpen = false;
 
@@ -268,6 +272,14 @@
     // لود اولیه نوبت‌ها
     loadAppointments(localStorage.getItem('selectedClinicId'), $('.btn-filter-appointment-toggle').text().trim());
   });
+  let loadingIndicator = `<div id="loading-row" class="w-100">
+    <div  class="text-center py-4">
+        <div class="spinner-custom" role="status">
+            <span class="visually-hidden">در حال بارگذاری...</span>
+        </div>
+    </div>
+</div>`;
+
 
   // لغو نوبت
   $(document).on("click", ".cancel-appointment", function(e) {
@@ -504,13 +516,7 @@
     const appointmentsContainer = $('#appointment-lists-container');
 
     // پاک کردن UI و نمایش لودینگ
-    appointmentsContainer.empty().html(`
-        <div class="text-center w-100">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">در حال بارگذاری...</span>
-            </div>
-        </div>
-    `);
+    appointmentsContainer.empty().html(loadingIndicator);
 
     $.ajax({
       url: "{{ route('dr.turn.my-appointments.by-date') }}",
@@ -648,13 +654,7 @@
       let selectedClinicId = localStorage.getItem('selectedClinicId');
 
       // پاک کردن UI و نمایش لودینگ
-      appointmentsContainer.empty().html(`
-            <div class="text-center w-100">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only">در حال بارگذاری...</span>
-                </div>
-            </div>
-        `);
+      appointmentsContainer.empty().html(loadingIndicator);
 
       $.ajax({
         url: "{{ route('dr.turn.filter-appointments') }}",
@@ -742,13 +742,7 @@
         'online');
 
       // پاک کردن UI و نمایش لودینگ
-      appointmentsContainer.empty().html(`
-            <div class="text-center w-100">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only">در حال جستجو...</span>
-                </div>
-            </div>
-        `);
+      appointmentsContainer.empty().html(loadingIndicator);
 
       $.ajax({
         url: "{{ route('dr.search.appointments') }}",

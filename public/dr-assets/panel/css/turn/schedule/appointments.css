@@ -142,7 +142,7 @@
 
 /* Search input */
 #my-appointment-search {
-    width: 100%;
+    width: 30vw;
     max-width: 600px;
     padding: 1rem 2.5rem; /* پدینگ بیشتر برای زیبایی */
     border: 2px solid #dbeafe;
