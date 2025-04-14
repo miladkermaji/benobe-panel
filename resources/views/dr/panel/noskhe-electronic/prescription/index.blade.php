@@ -92,7 +92,7 @@
                     </div>
                   </div>
                   <div class="w-100 d-flex justify-content-between gap-4 mt-3">
-                    <div class="w-100"><button class="btn btn-primary h-50 w-100">اعمال فیلتر</button></div>
+                    <div class="w-100"><button class="btn my-btn-primary h-50 w-100">اعمال فیلتر</button></div>
                     <div class="w-100"><button class="btn btn-outline-info h-50 w-100"> حذف فیلتر</button></div>
                   </div>
 
@@ -129,7 +129,7 @@
                 <input type="text" class="my-form-control-light h-50 border-radius-4 w-100 position-relative">
               </div>
               <div class="w-100 mt-3">
-                <button class="w-100 btn btn-primary h-50 border-radius-4">جستجو</button>
+                <button class="w-100 btn my-btn-primary h-50 border-radius-4">جستجو</button>
               </div>
             </form>
           </div>

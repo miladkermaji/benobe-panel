@@ -62,7 +62,8 @@
                 <option value="cancelled" {{ $status == 'cancelled' ? 'selected' : '' }}>لغو شده</option>
                 <option value="attended" {{ $status == 'attended' ? 'selected' : '' }}>حضور یافته</option>
                 <option value="missed" {{ $status == 'missed' ? 'selected' : '' }}>غایب</option>
-                <option value="pending_review" {{ $status == 'pending_review' ? 'selected' : '' }}>در انتظار بررسی</option>
+                <option value="pending_review" {{ $status == 'pending_review' ? 'selected' : '' }}>در انتظار بررسی
+                </option>
               </select>
               <label for="status" class="form-label">وضعیت نوبت</label>
             </div>
@@ -90,7 +91,7 @@
 
           <div class="text-end mt-4 w-100 d-flex justify-content-end">
             <button wire:click="update"
-              class="btn btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+              class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
@@ -145,14 +146,14 @@
       pointer-events: none;
     }
 
-    .btn-primary {
+    .my-btn-primary {
       background: linear-gradient(90deg, #6b7280, #374151);
       border: none;
       color: white;
       font-weight: 600;
     }
 
-    .btn-primary:hover {
+    .my-btn-primary:hover {
       background: linear-gradient(90deg, #4b5563, #1f2937);
       transform: translateY(-2px);
     }
@@ -235,11 +236,11 @@
           }
         }
       });
-      
+
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });
-      
+
       // Select2
       $('#doctor_id').select2({
         dir: 'rtl',

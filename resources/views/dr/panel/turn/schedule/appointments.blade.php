@@ -107,7 +107,7 @@
           <form action="">
 
             <textarea name="" id="" placeholder="توضیحات خود را وارد کنید" class="my-form-control-light w-100"></textarea>
-            <button class="h-50 w-100 btn btn-primary mt-3">ثبت</button>
+            <button class="h-50 w-100 btn my-btn-primary mt-3">ثبت</button>
           </form>
         </div>
       </div>
@@ -167,7 +167,7 @@
           <button class="btn btn-outline-danger h-50 w-100 mt-3 cancel-appointment" type="button" data-id="">
             لغو نوبت
           </button>
-          <button class="btn btn-primary h-50 w-100 mt-3" type="button"
+          <button class="btn my-btn-primary h-50 w-100 mt-3" type="button"
             onclick="location.href='{{ route('prescription.create') }}'">
             تجویز نسخه
           </button>

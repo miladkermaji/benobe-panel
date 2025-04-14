@@ -1,7 +1,7 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-{{--   <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
+  {{--   <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/profile/subuser.css') }}" rel="stylesheet" /> --}}
   <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
     rel="stylesheet" />
@@ -90,7 +90,7 @@
                   <!-- دکمه ذخیره -->
                   <div class="mt-3 position-relative p-3">
                     <button type="submit"
-                      class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                      class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
                       <span class="button_text">ذخیره تغییرات</span>
                       <div class="loader" style="display: none;"></div>
                     </button>

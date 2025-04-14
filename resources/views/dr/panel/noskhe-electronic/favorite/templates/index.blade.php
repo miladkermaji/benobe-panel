@@ -47,7 +47,8 @@
               </li>
             </ul>
           </div>
-          <button class="btn btn-primary h-50" onclick="location.href='{{ route('favorite.templates.create') }}'">افزودن
+          <button class="btn my-btn-primary h-50"
+            onclick="location.href='{{ route('favorite.templates.create') }}'">افزودن
             نسخه
             پر استفاده</button>
         </div>

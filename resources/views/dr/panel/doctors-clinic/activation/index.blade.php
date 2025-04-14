@@ -114,7 +114,7 @@
                             rows="1" class="my-form-control-light w-100"></textarea>
                           <div class="w-100">
                             <button type="submit"
-                              class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                              class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
                               <span class="button_text">ذخیره تغییرات</span>
                               <div class="loader"></div>
                             </button>
@@ -127,7 +127,7 @@
                 </div>
 
                 <div class="mt-3 w-100">
-                  <button class="btn btn-primary h-50 w-100 " type="button" data-toggle="modal"
+                  <button class="btn my-btn-primary h-50 w-100 " type="button" data-toggle="modal"
                     data-target="#doneModal">انجام
                     شد</button>
                 </div>
@@ -167,7 +167,7 @@
             </div>
             <div class="mt-3">
               <button type="submit"
-                class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+                class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
                 <span class="button_text">ذخیره</span>
                 <div class="loader" style="display: none;"></div>
               </button>

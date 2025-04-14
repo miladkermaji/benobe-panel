@@ -368,31 +368,31 @@
 
   const appointmentsCountUrl = "{{ route('appointments.count') }}";
 
-function loadAppointmentsCount() {
-  $.ajax({
-    url: "{{ route('appointments.count') }}",
-    method: 'GET',
-    data: {
-      selectedClinicId: localStorage.getItem('selectedClinicId')
-    },
-    success: function(response) {
-      if (response.status) {
-        $('.calendar-day').each(function() {
-          const persianDate = $(this).data('date');
-          const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
-          const appointment = response.data.find(a => a.appointment_date === gregorianDate);
-          // حذف کلاس قبلی و بج
-          $(this).removeClass('has-appointment');
-          $(this).find('.my-badge-success').remove();
-          // اضافه کردن کلاس برای روزهایی که نوبت دارند
-          if (appointment) {
-            $(this).addClass('has-appointment');
-          }
-        });
+  function loadAppointmentsCount() {
+    $.ajax({
+      url: "{{ route('appointments.count') }}",
+      method: 'GET',
+      data: {
+        selectedClinicId: localStorage.getItem('selectedClinicId')
+      },
+      success: function(response) {
+        if (response.status) {
+          $('.calendar-day').each(function() {
+            const persianDate = $(this).data('date');
+            const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
+            const appointment = response.data.find(a => a.appointment_date === gregorianDate);
+            // حذف کلاس قبلی و بج
+            $(this).removeClass('has-appointment');
+            $(this).find('.my-badge-success').remove();
+            // اضافه کردن کلاس برای روزهایی که نوبت دارند
+            if (appointment) {
+              $(this).addClass('has-appointment');
+            }
+          });
+        }
       }
-    }
-  });
-}
+    });
+  }
 
   function generateRescheduleCalendar(year, month) {
     const rescheduleCalendarBody = $('#calendar-reschedule');
@@ -488,7 +488,7 @@ function loadAppointmentsCount() {
         این روز تعطیل است. آیا می‌خواهید آن را از حالت تعطیلی خارج کنید؟
       </div>
       <div class="d-flex justify-content-between mt-3 gap-4 w-100">
-        <button id="confirmUnHolidayButton" class="btn btn-primary h-50 w-100 me-2">خارج کردن از تعطیلی</button>
+        <button id="confirmUnHolidayButton" class="btn my-btn-primary h-50 w-100 me-2">خارج کردن از تعطیلی</button>
       </div>
     `);
     }
@@ -500,7 +500,7 @@ function loadAppointmentsCount() {
         شما برای این روز نوبت فعال دارید.
       </div>
       <div id="workHoursContainer">${workHoursHtml}</div>
-      <button id="updateWorkHours" onclick="updateWorkhours()" class="btn btn-primary w-100 h-50 mt-3" style="display: ${
+      <button id="updateWorkHours" onclick="updateWorkhours()" class="btn my-btn-primary w-100 h-50 mt-3" style="display: ${
         workHoursResponse.status && workHoursResponse.work_hours.length > 0 ? 'block' : 'none'
       };">
         بروزرسانی ساعات کاری
@@ -519,13 +519,13 @@ function loadAppointmentsCount() {
         شما برای این روز نوبت فعالی ندارید. آیا می‌خواهید این روز را تعطیل کنید؟
       </div>
       <div id="workHoursContainer">${workHoursHtml}</div>
-      <button id="updateWorkHours" onclick="updateWorkhours()" class="btn btn-primary w-100 h-50 mt-3" style="display: ${
+      <button id="updateWorkHours" onclick="updateWorkhours()" class="btn my-btn-primary w-100 h-50 mt-3" style="display: ${
         workHoursResponse.status && workHoursResponse.work_hours.length > 0 ? 'block' : 'none'
       };">
         بروزرسانی ساعات کاری
       </button>
       <div class="d-flex justify-content-between mt-3 gap-4 w-100">
-        <button id="confirmHolidayButton" class="btn btn-primary h-50 w-100 me-2">تعطیل کردن این روز</button>
+        <button id="confirmHolidayButton" class="btn my-btn-primary h-50 w-100 me-2">تعطیل کردن این روز</button>
       </div>
     `);
     }
@@ -1017,7 +1017,7 @@ function loadAppointmentsCount() {
             این روز قبلاً تعطیل شده است. 
             <div class="w-100 d-flex justify-content-between gap-4 mt-3">
               <div class="w-100">
-                <button type="button" id="confirmUnHolidayButton" class="btn btn-primary h-50 w-100">خارج کردن از تعطیلی</button>
+                <button type="button" id="confirmUnHolidayButton" class="btn my-btn-primary h-50 w-100">خارج کردن از تعطیلی</button>
               </div>
             </div>
           `);
@@ -1047,7 +1047,7 @@ function loadAppointmentsCount() {
             آیا می‌خواهید این روز را تعطیل کنید؟
             <div class="w-100 d-flex justify-content-between gap-4 mt-3">
               <div class="w-100">
-                <button type="button" id="confirmHolidayButton" class="btn btn-primary h-50 w-100">تعطیل کردن این روز</button>
+                <button type="button" id="confirmHolidayButton" class="btn my-btn-primary h-50 w-100">تعطیل کردن این روز</button>
               </div>
 
             </div>

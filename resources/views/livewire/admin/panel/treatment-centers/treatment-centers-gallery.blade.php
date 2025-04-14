@@ -32,7 +32,7 @@
               </div>
             @endforeach
             <button wire:click="uploadImages"
-              class="btn btn-primary rounded-pill mt-3 px-4 d-flex align-items-center gap-2">
+              class="btn my-btn-primary rounded-pill mt-3 px-4 d-flex align-items-center gap-2">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
@@ -104,14 +104,14 @@
       background: #fff;
     }
 
-    .btn-primary {
+    .my-btn-primary {
       background: linear-gradient(90deg, #6b7280, #374151);
       border: none;
       color: white;
       font-weight: 600;
     }
 
-    .btn-primary:hover {
+    .my-btn-primary:hover {
       background: linear-gradient(90deg, #4b5563, #1f2937);
       transform: translateY(-2px);
     }

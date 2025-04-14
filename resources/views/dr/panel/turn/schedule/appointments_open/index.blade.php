@@ -111,7 +111,7 @@
             </div>
           </div>
           <div class="w-100 d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary h-50"><i class="fa fa-save"></i> ثبت و ذخیره</button>
+            <button type="submit" class="btn my-btn-primary h-50"><i class="fa fa-save"></i> ثبت و ذخیره</button>
           </div>
         </form>
 

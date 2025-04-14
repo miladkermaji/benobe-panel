@@ -29,7 +29,7 @@
                 style="width: 100px; height: 100px; object-fit: cover;" alt="پروفایل" wire:loading.class="opacity-50"
                 wire:target="photo">
               <label for="photo"
-                class="btn btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 p-2 shadow"
+                class="btn my-btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 p-2 shadow"
                 style="transform: translate(10%, 10%);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2">
@@ -120,7 +120,7 @@
 
           <div class="text-end mt-4 w-100 d-flex justify-content-end">
             <button wire:click="update"
-              class="btn btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+              class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
@@ -173,14 +173,14 @@
       pointer-events: none;
     }
 
-    .btn-primary {
+    .my-btn-primary {
       background: linear-gradient(90deg, #6b7280, #374151);
       border: none;
       color: white;
       font-weight: 600;
     }
 
-    .btn-primary:hover {
+    .my-btn-primary:hover {
       background: linear-gradient(90deg, #4b5563, #1f2937);
       transform: translateY(-2px);
     }
@@ -217,10 +217,12 @@
     }
 
     @keyframes bounce {
+
       0%,
       100% {
         transform: translateY(0);
       }
+
       50% {
         transform: translateY(-5px);
       }
@@ -282,98 +284,99 @@
         padding: 2rem 1.5rem;
       }
 
-      .btn-primary {
+      .my-btn-primary {
         width: 100%;
         justify-content: center;
       }
     }
   </style>
 
-<script>
+  <script>
     document.addEventListener('livewire:init', function() {
-        function initializeSelect2() {
-            $('#zone_province_id').select2({
-                dir: 'rtl',
-                placeholder: 'انتخاب کنید',
-                width: '100%'
-            });
-            $('#zone_city_id').select2({
-                dir: 'rtl',
-                placeholder: 'انتخاب کنید',
-                width: '100%'
-            });
+      function initializeSelect2() {
+        $('#zone_province_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
+        $('#zone_city_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
 
-            // تنظیم مقادیر اولیه هنگام لود صفحه
-            const provinceId = @json($zone_province_id);
-            const cityId = @json($zone_city_id);
+        // تنظیم مقادیر اولیه هنگام لود صفحه
+        const provinceId = @json($zone_province_id);
+        const cityId = @json($zone_city_id);
 
-            console.log('Initial province_id:', provinceId);
-            console.log('Initial city_id:', cityId);
+        console.log('Initial province_id:', provinceId);
+        console.log('Initial city_id:', cityId);
 
-            $('#zone_province_id').val(provinceId || '').trigger('change');
-            $('#zone_city_id').val(cityId || '').trigger('change');
+        $('#zone_province_id').val(provinceId || '').trigger('change');
+        $('#zone_city_id').val(cityId || '').trigger('change');
+      }
+
+      // اجرای اولیه Select2
+      initializeSelect2();
+
+      // رفرش Select2 وقتی شهرها تغییر می‌کنند
+      Livewire.on('refresh-select2', (event) => {
+        const cities = event.cities || [];
+        $('#zone_city_id').select2('destroy');
+        $('#zone_city_id').empty().select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%',
+          data: [{
+              id: '',
+              text: 'انتخاب کنید'
+            },
+            ...cities.map(city => ({
+              id: city.id,
+              text: city.name
+            }))
+          ]
+        });
+        const cityId = @json($zone_city_id);
+        console.log('Refreshed city_id:', cityId);
+        $('#zone_city_id').val(cityId || '').trigger('change');
+      });
+
+      // همگام‌سازی با تغییرات کاربر
+      $('#zone_province_id').on('change', function() {
+        @this.set('zone_province_id', $(this).val());
+      });
+      $('#zone_city_id').on('change', function() {
+        @this.set('zone_city_id', $(this).val());
+      });
+
+      // دیت‌پیکر JalaliDatePicker
+      jalaliDatepicker.startWatch({
+        minDate: "attr",
+        maxDate: "attr",
+        showTodayBtn: true,
+        showEmptyBtn: true,
+        time: false,
+        dateFormatter: function(unix) {
+          return new Date(unix).toLocaleDateString('fa-IR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          });
         }
+      });
 
-        // اجرای اولیه Select2
+      document.getElementById('date_of_birth').addEventListener('change', function() {
+        @this.set('date_of_birth', this.value);
+      });
+
+      Livewire.on('show-alert', (event) => {
+        toastr[event.type](event.message);
+      });
+
+      document.addEventListener('livewire:updated', function() {
         initializeSelect2();
-
-        // رفرش Select2 وقتی شهرها تغییر می‌کنند
-        Livewire.on('refresh-select2', (event) => {
-            const cities = event.cities || [];
-            $('#zone_city_id').select2('destroy');
-            $('#zone_city_id').empty().select2({
-                dir: 'rtl',
-                placeholder: 'انتخاب کنید',
-                width: '100%',
-                data: [{
-                    id: '',
-                    text: 'انتخاب کنید'
-                },
-                ...cities.map(city => ({
-                    id: city.id,
-                    text: city.name
-                }))]
-            });
-            const cityId = @json($zone_city_id);
-            console.log('Refreshed city_id:', cityId);
-            $('#zone_city_id').val(cityId || '').trigger('change');
-        });
-
-        // همگام‌سازی با تغییرات کاربر
-        $('#zone_province_id').on('change', function() {
-            @this.set('zone_province_id', $(this).val());
-        });
-        $('#zone_city_id').on('change', function() {
-            @this.set('zone_city_id', $(this).val());
-        });
-
-        // دیت‌پیکر JalaliDatePicker
-        jalaliDatepicker.startWatch({
-            minDate: "attr",
-            maxDate: "attr",
-            showTodayBtn: true,
-            showEmptyBtn: true,
-            time: false,
-            dateFormatter: function(unix) {
-                return new Date(unix).toLocaleDateString('fa-IR', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
-            }
-        });
-
-        document.getElementById('date_of_birth').addEventListener('change', function() {
-            @this.set('date_of_birth', this.value);
-        });
-
-        Livewire.on('show-alert', (event) => {
-            toastr[event.type](event.message);
-        });
-
-        document.addEventListener('livewire:updated', function () {
-            initializeSelect2();
-        });
+      });
     });
-</script>
+  </script>
 </div>

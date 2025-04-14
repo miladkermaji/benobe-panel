@@ -25,7 +25,7 @@
             {{ $message }}</div>
         @enderror
         <button type="submit" wire:loading.attr="disabled" wire:target="loginConfirm"
-          class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+          class="btn my-btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
           <span wire:loading.remove wire:target="loginConfirm">ادامه</span>
           <div wire:loading wire:target="loginConfirm" class="loader"></div>
         </button>
@@ -94,7 +94,8 @@
       progressBarContainer.style.display = 'block';
       resendSection.style.display = 'none';
       progressBar.style.width = window.timerState.lastOtpPercentage + '%';
-      progressBar.style.backgroundColor = window.timerState.lastOtpPercentage > 50 ? '#28a745' : (window.timerState.lastOtpPercentage > 20 ? '#ffc107' : '#dc3545');
+      progressBar.style.backgroundColor = window.timerState.lastOtpPercentage > 50 ? '#28a745' : (window.timerState
+        .lastOtpPercentage > 20 ? '#ffc107' : '#dc3545');
 
       window.timerState.otpInterval = setInterval(() => {
         const now = new Date().getTime();
@@ -123,7 +124,9 @@
           timerElement.classList.add('d-none');
           progressBarContainer.style.display = 'none';
           resendSection.style.display = window.timerState.isRateLimitTimerRunning ? 'none' : 'block';
-          Livewire.dispatch('updateShowResendButton', { show: !window.timerState.isRateLimitTimerRunning });
+          Livewire.dispatch('updateShowResendButton', {
+            show: !window.timerState.isRateLimitTimerRunning
+          });
           localStorage.setItem('otpTimerData', JSON.stringify({
             countDownDate: window.timerState.otpCountDownDate,
             token: window.timerState.currentToken
@@ -182,7 +185,9 @@
               const resendSection = document.getElementById('resend-otp');
               if (resendSection && !window.timerState.isOtpTimerRunning) {
                 resendSection.style.display = 'block';
-                Livewire.dispatch('updateShowResendButton', { show: true });
+                Livewire.dispatch('updateShowResendButton', {
+                  show: true
+                });
               }
             }
           }, 1000);
@@ -213,7 +218,8 @@
             }
           });
           input.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && e.target.value.length === 0 && index < inputs.length - 1) inputs[index + 1].focus();
+            if (e.key === 'Backspace' && e.target.value.length === 0 && index < inputs.length - 1) inputs[index +
+              1].focus();
           });
           input.addEventListener('focus', () => input.select());
         });
@@ -224,7 +230,9 @@
       window.addEventListener('DOMContentLoaded', () => {
         const ac = new AbortController();
         navigator.credentials.get({
-          otp: { transport: ['sms'] },
+          otp: {
+            transport: ['sms']
+          },
           signal: ac.signal
         }).then(otp => {
           Swal.fire({
@@ -241,7 +249,12 @@
               inputs.forEach((input, index) => {
                 if (code[index]) {
                   input.value = code[index];
-                  Livewire.dispatch('input', { target: { name: `otpCode.${index}`, value: code[index] } });
+                  Livewire.dispatch('input', {
+                    target: {
+                      name: `otpCode.${index}`,
+                      value: code[index]
+                    }
+                  });
                 }
               });
               const submitButton = document.querySelector('button[type="submit"]');

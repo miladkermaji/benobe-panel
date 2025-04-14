@@ -1,7 +1,6 @@
 <script>
   /* drop select option */
   $(document).ready(function() {
-
     let dropdownOpen = false;
     let selectedClinic = localStorage.getItem('selectedClinic');
     let selectedClinicId = localStorage.getItem('selectedClinicId');
@@ -27,7 +26,6 @@
       }
     }
     checkInactiveClinics();
-
     $('.dropdown-trigger').on('click', function(event) {
       event.stopPropagation();
       dropdownOpen = !dropdownOpen;
@@ -37,7 +35,6 @@
         dropdownOpen = $('.my-dropdown-menu').is(':visible');
       }, 100);
     });
-
     $(document).on('click', function() {
       if (dropdownOpen) {
         $('.dropdown-trigger').removeClass('border border-primary');
@@ -45,11 +42,9 @@
         dropdownOpen = false;
       }
     });
-
     $('.my-dropdown-menu').on('click', function(event) {
       event.stopPropagation();
     });
-
     $('.option-card').on('click', function() {
       let currentDate = moment().format('YYYY-MM-DD');
       let persianDate = moment(currentDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
@@ -68,7 +63,6 @@
       dropdownOpen = false;
     });
   });
-
   $(document).ready(function() {
     let currentDate = moment().format('YYYY-MM-DD');
     let persianDate = moment(currentDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
@@ -78,7 +72,6 @@
     loadCalendar(currentDate);
     loadAppointments(persianDate, selectedClinicId);
   });
-
   /* drop select option */
   const appointmentsTableBody = $('.table tbody');
   let loadingIndicator = `<tr id="loading-row" class="w-100">
@@ -119,7 +112,6 @@
         return '<span class="font-weight-bold text-dark">نامشخص</span>';
     }
   }
-
   let currentDate = moment().format('YYYY-MM-DD');
   const days = 14;
   const calendar = $('#calendar');
@@ -127,12 +119,10 @@
   function renderPagination(pagination, callback) {
     const paginationLinks = $('#pagination-links');
     paginationLinks.empty();
-
     if (!pagination || !pagination.current_page || !pagination.last_page) {
       paginationLinks.html('<li class="page-item disabled"><span class="page-link">بدون داده</span></li>');
       return;
     }
-
     const prevDisabled = pagination.current_page === 1 ? 'disabled' : '';
     paginationLinks.append(`
         <li class="page-item ${prevDisabled}">
@@ -141,7 +131,6 @@
             </a>
         </li>
     `);
-
     for (let i = 1; i <= pagination.last_page; i++) {
       const activeClass = i === pagination.current_page ? 'active' : '';
       paginationLinks.append(`
@@ -150,7 +139,6 @@
             </li>
         `);
     }
-
     const nextDisabled = pagination.current_page === pagination.last_page ? 'disabled' : '';
     paginationLinks.append(`
         <li class="page-item ${nextDisabled}">
@@ -159,7 +147,6 @@
             </a>
         </li>
     `);
-
     paginationLinks.find('.page-link').off('click').on('click', function(e) {
       e.preventDefault();
       const page = $(this).data('page');
@@ -395,7 +382,6 @@
             </div>`;
       calendar.append(card);
     }
-
     calendar.on('click', '.calendar-card', function() {
       const selectedDate = $(this).attr('data-date');
       selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
@@ -501,7 +487,6 @@
       }
     });
   }
-
   $(document).ready(function() {
     $(".my-form-control").on("input", function() {
       let searchText = $(this).val().trim();
@@ -509,7 +494,6 @@
     });
     searchPatients("");
   });
-
   /* manage appointment cancel reschedule blockusers */
   $(document).on("click", ".cancel-appointment", function(e) {
     e.preventDefault();
@@ -567,7 +551,6 @@
       }
     });
   });
-
   $(document).on("click", ".custom-dropdown-trigger", function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -575,7 +558,6 @@
     $(".dropdown-menu").not(dropdownMenu).removeClass("show");
     dropdownMenu.toggleClass("show");
   });
-
   $(document).on("click", function() {
     $(".dropdown-menu").removeClass("show").css({
       position: "",
@@ -583,7 +565,6 @@
       left: ""
     });
   });
-
   $('#move-appointments-btn').click(function() {
     let selected = getSelectedAppointments();
     if (!selected.length) {
@@ -658,7 +639,6 @@
       });
     });
   });
-
   $(document).on('click', '.move-appointment', function() {
     let appointmentId = $(this).data('id');
     let oldDate = $(this).data('date');
@@ -675,7 +655,6 @@
     populateRescheduleSelectBoxes();
   });
 </script>
-
 <script>
   let selectedDay = null;
 
@@ -776,11 +755,9 @@
     const daysInMonth = firstDayOfMonth.jDaysInMonth();
     let firstDayWeekday = firstDayOfMonth.weekday();
     const today = moment().locale('fa');
-
     for (let i = 0; i < firstDayWeekday; i++) {
       calendarBody.append('<div class="calendar-day empty"></div>');
     }
-
     for (let day = 1; day <= daysInMonth; day++) {
       const currentDay = firstDayOfMonth.clone().add(day - 1, 'days');
       const persianDate = currentDay.format('jYYYY/jMM/jDD');
@@ -793,7 +770,6 @@
             </div>`;
       calendarBody.append(dayElement);
     }
-
     $('.calendar-day').not('.empty').off('click').on('click', function() {
       const persianDate = $(this).data('date');
       const gregorianDate = $(this).data('gregorian-date');
@@ -825,7 +801,6 @@
         }
       });
     });
-
     loadHolidayStyles();
   }
 
@@ -846,7 +821,6 @@
       $('body').css('padding-right', '');
     });
   }
-
   $('.selectDate_datepicker__xkZeS').on('click', function() {
     $('#miniCalendarModal').modal({
       backdrop: true,
@@ -876,7 +850,6 @@
       }, 300);
     });
   }
-
   $(document).ready(function() {
     $('#next').click(() => animateAndLoadCalendar('next'));
     $('#prev').click(() => animateAndLoadCalendar('prev'));
@@ -997,7 +970,6 @@
       }
     });
   }
-
   const appointmentsCountUrl = "{{ route('appointments.count') }}";
 
   function loadAppointmentsCount() {
@@ -1085,7 +1057,7 @@
                 این روز تعطیل است. آیا می‌خواهید آن را از حالت تعطیلی خارج کنید؟
             </div>
             <div class="d-flex justify-content-between mt-3 gap-4">
-                <button id="confirmUnHolidayButton" class="btn btn-primary h-50 w-100 me-2">بله</button>
+                <button id="confirmUnHolidayButton" class="btn my-btn-primary h-50 w-100 me-2">بله</button>
                 <button class="btn btn-danger h-50 w-100 close-modal" data-bs-dismiss="modal" aria-label="Close">خیر</button>
             </div>
         `);
@@ -1096,7 +1068,7 @@
             </div>
             <div id="workHoursContainer">
             </div>
-            <button id="updateWorkHours" onclick="updateWorkhours()" class="btn btn-primary w-100 h-50 mt-3" style="display: none;">
+            <button id="updateWorkHours" onclick="updateWorkhours()" class="btn my-btn-primary w-100 h-50 mt-3" style="display: none;">
                 بروزرسانی ساعات کاری
             </button>
             <div class="d-flex justify-content-between mt-3 gap-4">
@@ -1111,17 +1083,16 @@
             </div>
             <div id="workHoursContainer">
             </div>
-            <button id="updateWorkHours" onclick="updateWorkhours()" class="btn btn-primary w-100 h-50 mt-3" style="display: none;">
+            <button id="updateWorkHours" onclick="updateWorkhours()" class="btn my-btn-primary w-100 h-50 mt-3" style="display: none;">
                 بروزرسانی ساعات کاری
             </button>
             <div class="d-flex justify-content-between mt-3 gap-4">
-                <button id="confirmHolidayButton" class="btn btn-primary h-50 w-100 me-2">بله</button>
+                <button id="confirmHolidayButton" class="btn my-btn-primary h-50 w-100 me-2">بله</button>
                 <button class="btn btn-danger h-50 w-100 close-modal" data-bs-dismiss="modal" aria-label="Close">خیر</button>
             </div>
         `);
     }
   }
-
   const toggleHolidayUrl = "{{ route('doctor.toggle_holiday') }}";
   const getHolidaysUrl = "{{ route('doctor.get_holidays') }}";
 
@@ -1251,7 +1222,6 @@
       }
     });
   }
-
   $('#goToFirstAvailableDashboard').on('click', function() {
     $.ajax({
       url: "{{ route('doctor.get_next_available_date') }}",
@@ -1340,14 +1310,12 @@
       },
     });
   });
-
   $(document).ready(function() {
     loadAppointmentsCount();
     const currentYear = moment().jYear();
     const currentMonth = moment().jMonth() + 1;
     populateSelectBoxes();
     generateCalendar(currentYear, currentMonth);
-
     $('#prev-month').off('click').on('click', function() {
       const yearSelect = $('#year');
       const monthSelect = $('#month');
@@ -1363,7 +1331,6 @@
       monthSelect.val(currentMonth);
       generateCalendar(currentYear, currentMonth);
     });
-
     $('#next-month').off('click').on('click', function() {
       const yearSelect = $('#year');
       const monthSelect = $('#month');
@@ -1379,13 +1346,11 @@
       monthSelect.val(currentMonth);
       generateCalendar(currentYear, currentMonth);
     });
-
     $('#year, #month').off('change').on('change', function() {
       const year = parseInt($('#year').val());
       const month = parseInt($('#month').val());
       generateCalendar(year, month);
     });
-
     $(document).on('click', '.cancle-btn-appointment', function() {
       const selectedDate = $('#dateModal').data('selectedDate');
       Swal.fire({
@@ -1421,7 +1386,6 @@
         }
       });
     });
-
     $(document).on('click', '.btn-reschedule', function() {
       const selectedDate = $('#dateModal').data('selectedDate');
       $('#rescheduleModal').modal('show');
@@ -1431,7 +1395,6 @@
       populateRescheduleSelectBoxes();
     });
   });
-
   $(document).ready(function() {
     $(".calendar-day").on("click", function() {
       let persianDate = $(this).data("date");
@@ -1462,7 +1425,6 @@
         }
       });
     });
-
     $(document).on("click", ".block-user", function(e) {
       e.preventDefault();
       let row = $(this).closest("tr");
@@ -1527,7 +1489,6 @@
       });
     });
   });
-
   $(document).ready(function() {
     $(".dropdown-item").click(function(e) {
       e.preventDefault();
@@ -1772,7 +1733,6 @@
   $('#block-users-btn').click(function() {
     let selected = getSelectedAppointments();
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
-
     if (!selected.length) return Swal.fire('هشدار', 'کاربری انتخاب نشده!', 'warning');
     Swal.fire({
       title: 'مسدود کردن کاربران؟',
@@ -1803,14 +1763,13 @@
       }
     });
   });
-
   $(document).on('click', '.btn-end-visit', function(e) {
     e.preventDefault();
     const appointmentId = $(this).data('appointment-id');
     $('#endVisitModalCenter').data('appointment-id', appointmentId);
     $('#endVisitModalCenter').modal('show');
   });
-  $('#endVisitModalCenter .btn-primary').on('click', function(e) {
+  $('#endVisitModalCenter .my-btn-primary').on('click', function(e) {
     e.preventDefault();
     const appointmentId = $('#endVisitModalCenter').data('appointment-id');
     const description = $('#endVisitModalCenter textarea').val();
@@ -1871,8 +1830,6 @@
       }
     });
   });
-
-
   const selectAllCheckbox = $('#select-all');
   const rowCheckboxes = $('.row-checkbox');
   const csrfToken = $('meta[name="csrf-token"]').attr('content');

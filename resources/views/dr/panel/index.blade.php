@@ -68,7 +68,8 @@
           </div>
         </div>
         <div class="btn-425-left">
-          <button class="btn btn-primary h-50 fs-13" data-toggle="modal" data-target="#exampleModalCenterAddSick">افزودن
+          <button class="btn my-btn-primary h-50 fs-13" data-toggle="modal"
+            data-target="#exampleModalCenterAddSick">افزودن
             بیمار</button>
           </button>
           <!-- Modal -->
@@ -92,7 +93,7 @@
                           از مسیر ارجاع</a>
                       </div>
                       <div class="d-flex mt-2 gap-20">
-                        <button class="btn btn-primary w-50 h-50">تجویز نسخه</button>
+                        <button class="btn my-btn-primary w-50 h-50">تجویز نسخه</button>
                         <button class="btn btn-outline-info w-50 h-50">ثبت ویزیت</button>
                       </div>
                     </form>
@@ -117,7 +118,7 @@
                       <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع بیمار">
                       <input type="text" class="my-form-control-light w-100 mt-3" placeholder="کد پیگیری">
                       <div class="mt-3">
-                        <button class="btn btn-primary w-100 h-50">ثبت</button>
+                        <button class="btn my-btn-primary w-100 h-50">ثبت</button>
                       </div>
                     </form>
                   </div>
@@ -238,11 +239,11 @@
   </div>
 </div>
 <!-- بخش پیجینیشن -->
-  <div class="pagination-container mt-3 d-flex justify-content-center">
-    <nav aria-label="Page navigation">
-      <ul class="pagination" id="pagination-links"></ul>
-    </nav>
-  </div>
+<div class="pagination-container mt-3 d-flex justify-content-center">
+  <nav aria-label="Page navigation">
+    <ul class="pagination" id="pagination-links"></ul>
+  </nav>
+</div>
 </div>
 <div class="modal fade" id="activation-modal" tabindex="-1" role="dialog"
   aria-labelledby="activation-modal-label" aria-hidden="true">
@@ -267,7 +268,7 @@
       </div>
       <div class="p-3">
         <a href="" data-toggle="modal" data-target="#contact-modal"
-          class="btn btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center">
+          class="btn my-btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center">
           فعالسازی تماس امن </a>
         <a href="" class="btn btn-light mt-3 w-100 h-50 d-flex align-items-center  justify-content-center"
           onclick="$('#activation-modal').modal('hide'); window.history.pushState({}, '', 'panel');"> فعلا نه
@@ -301,7 +302,7 @@
       </div>
       <div class="p-3">
         <a href="#"
-          class="btn btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center"
+          class="btn my-btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center"
           onclick="$('#activation-modal').modal('hide'); $('#contact-modal').modal('hide'); window.history.pushState({}, '', 'panel'); toastr.success('تماس امن با موفقیت فعال شد');">
           شرایط برقراری تماس امن را
           مطالعه کردم. </a>
@@ -403,7 +404,7 @@
           <form action="">
 
             <textarea name="" id="" placeholder="توضیحات خود را وارد کنید" class="my-form-control-light w-100"></textarea>
-            <button class="h-50 w-100 btn btn-primary mt-3">ثبت</button>
+            <button class="h-50 w-100 btn my-btn-primary mt-3">ثبت</button>
           </form>
         </div>
       </div>
@@ -413,41 +414,41 @@
 @endsection
 @section('scripts')
 @include('dr.panel.my-tools.dashboardTools')
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 
 
 
-  <script>
-    var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-    var updateStatusAppointmentUrl =
-      "{{ route('updateStatusAppointment', ':id') }}";
-  </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('showModal')) {
-        // فرض کنید ID مودال شما "activation-modal" است
-        $('#activation-modal').modal('show');
-      }
-    });
-  </script>
-  <script>
-    $('#rescheduleModal').on('show.bs.modal', function() {
-      // Check if stylesheet is already loaded
-      if (!$('#rescheduleModalStyles').length) {
-        $('<link>', {
-          id: 'rescheduleModalStyles',
-          rel: 'stylesheet',
-          type: 'text/css',
-          href: '{{ asset('dr-assets/panel/css/reschedule.css') }}'
-        }).appendTo('head');
-      }
-    });
+<script>
+  var appointmentsSearchUrl = "{{ route('search.appointments') }}";
+  var updateStatusAppointmentUrl =
+    "{{ route('updateStatusAppointment', ':id') }}";
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('showModal')) {
+      // فرض کنید ID مودال شما "activation-modal" است
+      $('#activation-modal').modal('show');
+    }
+  });
+</script>
+<script>
+  $('#rescheduleModal').on('show.bs.modal', function() {
+    // Check if stylesheet is already loaded
+    if (!$('#rescheduleModalStyles').length) {
+      $('<link>', {
+        id: 'rescheduleModalStyles',
+        rel: 'stylesheet',
+        type: 'text/css',
+        href: '{{ asset('dr-assets/panel/css/reschedule.css') }}'
+      }).appendTo('head');
+    }
+  });
 
-    $('#rescheduleModal').on('hidden.bs.modal', function() {
-      // Optionally remove the stylesheet when modal is closed
-      $('#rescheduleModalStyles').remove();
-    });
-  </script>
-  
+  $('#rescheduleModal').on('hidden.bs.modal', function() {
+    // Optionally remove the stylesheet when modal is closed
+    $('#rescheduleModalStyles').remove();
+  });
+</script>
+
 @endsection

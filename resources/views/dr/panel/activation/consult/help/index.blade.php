@@ -27,7 +27,7 @@
 
         </div>
         <button onclick="location.href='{{ route('activation.consult.messengers') }}'"
-          class="btn btn-primary h-50 w-100 mt-2" tabindex="0" type="button">ادامه
+          class="btn my-btn-primary h-50 w-100 mt-2" tabindex="0" type="button">ادامه
         </button>
       </div>
     </div>

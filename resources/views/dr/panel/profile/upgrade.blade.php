@@ -57,7 +57,7 @@
           <div class="clrfix mb-3" style="float: right; width: 100%; margin-top: 20px">
             <form action="{{ route('doctor.upgrade.pay') }}" method="POST">
               @csrf
-              <button type="submit" class="btn btn-primary text-white h-50 mt-3">
+              <button type="submit" class="btn my-btn-primary text-white h-50 mt-3">
                 <i class="fa fa-credit-card"></i> پرداخت و ارتقاء حساب کاربری
               </button>
             </form>

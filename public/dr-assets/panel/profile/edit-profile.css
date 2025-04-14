@@ -259,10 +259,10 @@ input {
     transition: max-height 0.4s ease-in-out, opacity 0.3s ease;
     overflow: hidden;
 }
-.btn-primary {
+.my-btn-primary {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
-.btn-primary:hover {
+.my-btn-primary:hover {
     background-color: #0056b3;
     transform: scale(1.02);
 }

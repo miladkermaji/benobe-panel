@@ -39,7 +39,7 @@
           </div>
           <div class="w-100 mt-2">
             <button type="submit"
-              class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+              class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -72,7 +72,7 @@
           </div>
           <div class="w-100 mt-2">
             <button type="submit"
-              class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+              class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -87,7 +87,7 @@
 <div class="subuser-content w-100 d-flex justify-content-center mt-4">
   <div class="subuser-content-wrapper p-3 w-100">
     <div class="w-100 d-flex justify-content-end">
-      <button class="btn btn-primary h-50 add-subuser-btn" id="add-subuser-btn">افزودن کاربر جدید</button>
+      <button class="btn my-btn-primary h-50 add-subuser-btn" id="add-subuser-btn">افزودن کاربر جدید</button>
     </div>
     <div class="p-3">
       <h4 class="text-dark font-weight-bold">لیست کاربران زیرمجموعه</h4>
@@ -145,20 +145,20 @@
   $(document).ready(function() {
     // Initialize TomSelect once on page load
     const addUserSelect = new TomSelect("#user-select", {
-        create: false,
-        plugins: ['clear_button'],
-        maxOptions: 50,
-        render: {
-            option: function(data, escape) {
-                return `<div>${escape(data.text)}</div>`;
-            }
+      create: false,
+      plugins: ['clear_button'],
+      maxOptions: 50,
+      render: {
+        option: function(data, escape) {
+          return `<div>${escape(data.text)}</div>`;
         }
+      }
     });
 
     let editUserSelect;
 
     $('#add-subuser-btn').on('click', function() {
-        $('#addSubUserModal').modal('show');
+      $('#addSubUserModal').modal('show');
     });
 
     function updateSubUserList(subUsers) {
@@ -234,50 +234,50 @@
     });
 
     $(document).on('click', '.edit-btn', function() {
-        const id = $(this).data('id');
-        const $btn = $(this);
-        $btn.prop('disabled', true);
+      const id = $(this).data('id');
+      const $btn = $(this);
+      $btn.prop('disabled', true);
 
-        // Show modal immediately with loading state
-        $('#editSubUserModal').modal('show');
-        $('#edit-user-select').html('<option>در حال بارگذاری...</option>');
+      // Show modal immediately with loading state
+      $('#editSubUserModal').modal('show');
+      $('#edit-user-select').html('<option>در حال بارگذاری...</option>');
 
-        $.ajax({
-            url: "{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id),
-            method: 'GET',
-            cache: true,
-            success: function(response) {
-                $('#edit-subuser-id').val(response.id);
+      $.ajax({
+        url: "{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id),
+        method: 'GET',
+        cache: true,
+        success: function(response) {
+          $('#edit-subuser-id').val(response.id);
 
-                // Destroy existing TomSelect instance if exists
-                if (editUserSelect) {
-                    editUserSelect.destroy();
-                }
+          // Destroy existing TomSelect instance if exists
+          if (editUserSelect) {
+            editUserSelect.destroy();
+          }
 
-                // Populate select options
-                const options = response.users.map(user => ({
-                    value: user.id,
-                    text: `${user.first_name} ${user.last_name} -- ${user.national_code}`,
-                    selected: user.id === response.user_id
-                }));
+          // Populate select options
+          const options = response.users.map(user => ({
+            value: user.id,
+            text: `${user.first_name} ${user.last_name} -- ${user.national_code}`,
+            selected: user.id === response.user_id
+          }));
 
-                // Initialize new TomSelect instance
-                editUserSelect = new TomSelect("#edit-user-select", {
-                    options: options,
-                    items: [response.user_id],
-                    create: false,
-                    plugins: ['clear_button'],
-                    maxOptions: 50
-                });
-            },
-            error: function() {
-                toastr.error('خطا در دریافت اطلاعات کاربر!');
-                $('#editSubUserModal').modal('hide');
-            },
-            complete: function() {
-                $btn.prop('disabled', false);
-            }
-        });
+          // Initialize new TomSelect instance
+          editUserSelect = new TomSelect("#edit-user-select", {
+            options: options,
+            items: [response.user_id],
+            create: false,
+            plugins: ['clear_button'],
+            maxOptions: 50
+          });
+        },
+        error: function() {
+          toastr.error('خطا در دریافت اطلاعات کاربر!');
+          $('#editSubUserModal').modal('hide');
+        },
+        complete: function() {
+          $btn.prop('disabled', false);
+        }
+      });
     });
 
     $('#edit-subuser-form').on('submit', function(e) {

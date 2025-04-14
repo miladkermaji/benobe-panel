@@ -64,7 +64,7 @@
             </div>
             <div class="col-12 text-end mt-4 w-100 d-flex justify-content-end">
               <button wire:click="store"
-                class="btn btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+                class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
@@ -101,7 +101,7 @@
           </div>
           <div class="modal-footer border-0">
             <button type="button" class="btn btn-secondary" wire:click="closeDiscountModal">لغو</button>
-            <button type="button" class="btn btn-primary"
+            <button type="button" class="btn my-btn-primary"
               style="background: linear-gradient(to right, #4B5EAA, #8B5CF6); border: none;"
               wire:click="applyDiscount">تأیید</button>
           </div>
@@ -152,14 +152,14 @@
       pointer-events: none;
     }
 
-    .btn-primary {
+    .my-btn-primary {
       background: linear-gradient(90deg, #6b7280, #374151);
       border: none;
       color: white;
       font-weight: 600;
     }
 
-    .btn-primary:hover {
+    .my-btn-primary:hover {
       background: linear-gradient(90deg, #4b5563, #1f2937);
       transform: translateY(-2px);
     }
@@ -226,7 +226,7 @@
         padding: 2rem 1.5rem;
       }
 
-      .btn-primary {
+      .my-btn-primary {
         width: 100%;
         justify-content: center;
       }

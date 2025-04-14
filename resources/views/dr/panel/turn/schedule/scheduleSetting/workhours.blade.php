@@ -69,7 +69,7 @@
         </div>
       </div>
       <div class="d-flex w-100 justify-content-end mt-3">
-        <button type="submit" class="btn btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
+        <button type="submit" class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
           id="save-work-schedule">
           <span class="button_text">ذخیره تغیرات</span>
           <div class="loader"></div>
@@ -107,7 +107,7 @@
               </div>
               <div class="p-3">
                 <a href="{{ route('dr-panel', ['showModal' => 'true']) }}"
-                  class="btn btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center">شروع
+                  class="btn my-btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center">شروع
                   نوبت
                   دهی</a>
               </div>
@@ -176,7 +176,8 @@
           </div>
           <div class="w-100 d-flex justify-content-end mt-3">
             <button type="submit"
-              class="btn btn-primary h-50 col-12 d-flex justify-content-center align-items-center" id="saveSchedule">
+              class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
+              id="saveSchedule">
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -211,7 +212,7 @@
         </div>
       </div>
       <div class="w-100 d-flex justify-content-between p-3 gap-4">
-        <button type="submit" class="btn btn-primary h-50  d-flex justify-content-center align-items-center w-100"
+        <button type="submit" class="btn my-btn-primary h-50  d-flex justify-content-center align-items-center w-100"
           id="saveSelection">
           <span class="button_text">ذخیره تغیرات</span>
           <div class="loader"></div>
@@ -256,7 +257,8 @@
           </div>
         </div>
         <div class="w-100 d-flex justify-content-end p-1 gap-4 mt-3">
-          <button type="submit" class="btn btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
+          <button type="submit"
+            class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
             id="saveSelectionCalculator">
             <span class="button_text">ذخیره تغیرات</span>
             <div class="loader"></div>

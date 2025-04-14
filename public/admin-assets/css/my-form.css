@@ -113,8 +113,8 @@ textarea::placeholder {
     color: #9ca3af;
     font-weight: 500;
 }
-input:not([type=checkbox]){
-  height: 50px !important;
+input:not([type="checkbox"]) {
+    height: 50px !important;
 }
 /* سوئیچ وضعیت */
 .form-check-input {
@@ -142,7 +142,7 @@ input:not([type=checkbox]){
 }
 
 /* دکمه‌ها */
-.btn-primary {
+.my-btn-primary {
     background: linear-gradient(90deg, #374151, #4b5563);
     border: none;
     color: #ffffff;
@@ -157,7 +157,7 @@ input:not([type=checkbox]){
     gap: 0.5rem;
 }
 
-.btn-primary:hover {
+.my-btn-primary:hover {
     background: linear-gradient(90deg, #1f2937, #374151);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(55, 65, 81, 0.3);
@@ -242,7 +242,7 @@ input:not([type=checkbox]){
         padding: 1.5rem;
     }
 
-    .btn-primary {
+    .my-btn-primary {
         padding: 0.65rem 1.5rem;
         font-size: 0.95rem;
     }
@@ -279,7 +279,7 @@ input:not([type=checkbox]){
         padding: 1.25rem;
     }
 
-    .btn-primary,
+    .my-btn-primary,
     .btn-outline-light {
         width: 100%;
         justify-content: center;

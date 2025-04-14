@@ -37,7 +37,7 @@
     color: #6c757d;
     margin-bottom: 15px;
 }
-.blogs-content .btn-primary {
+.blogs-content .my-btn-primary {
     background: #1e90ff;
     border: none;
     border-radius: 30px;
@@ -45,7 +45,7 @@
     font-weight: 500;
     transition: all 0.3s ease;
 }
-.blogs-content .btn-primary:hover {
+.blogs-content .my-btn-primary:hover {
     background: #1565c0;
     transform: translateY(-2px);
 }
@@ -80,6 +80,6 @@
         padding: 20px;
     }
 }
-.col-12{
-  max-width: 600px !important;
+.col-12 {
+    max-width: 600px !important;
 }

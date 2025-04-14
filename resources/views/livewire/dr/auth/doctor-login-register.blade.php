@@ -25,7 +25,7 @@
           @enderror
         </div>
         <button type="submit" wire:loading.attr="disabled"
-          class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+          class="btn my-btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
           <span wire:loading.remove wire:target="loginRegister">ادامه</span>
           <div wire:loading wire:target="loginRegister" class="loader"></div>
         </button>

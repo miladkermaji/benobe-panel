@@ -83,8 +83,8 @@
 
             <!-- تخفیف -->
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="number" wire:model="discount" class="form-control" id="discount"
-                placeholder="درصد تخفیف" step="0.01">
+              <input type="number" wire:model="discount" class="form-control" id="discount" placeholder="درصد تخفیف"
+                step="0.01">
               <label for="discount" class="form-label">تخفیف (درصد، اختیاری)</label>
               @error('discount')
                 <span class="text-danger small">{{ $message }}</span>
@@ -132,7 +132,7 @@
           <!-- دکمه ویرایش -->
           <div class="text-end mt-4 w-100 d-flex justify-content-end">
             <button wire:click="update"
-              class="btn btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+              class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
@@ -150,10 +150,12 @@
     .bg-gradient-primary {
       background: linear-gradient(90deg, #6b7280, #374151);
     }
+
     .card {
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
+
     .form-control,
     .form-select {
       border: 1px solid #e5e7eb;
@@ -165,12 +167,14 @@
       background: #fafafa;
       width: 100%;
     }
+
     .form-control:focus,
     .form-select:focus {
       border-color: #6b7280;
       box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
       background: #fff;
     }
+
     .form-label {
       position: absolute;
       top: -25px;
@@ -181,69 +185,86 @@
       padding: 0 5px;
       pointer-events: none;
     }
-    .btn-primary {
+
+    .my-btn-primary {
       background: linear-gradient(90deg, #6b7280, #374151);
       border: none;
       color: white;
       font-weight: 600;
     }
-    .btn-primary:hover {
+
+    .my-btn-primary:hover {
       background: linear-gradient(90deg, #4b5563, #1f2937);
       transform: translateY(-2px);
     }
+
     .btn-outline-light {
       border-color: rgba(255, 255, 255, 0.8);
     }
+
     .btn-outline-light:hover {
       background: rgba(255, 255, 255, 0.15);
       transform: translateY(-2px);
     }
+
     .form-check-input {
       margin-top: 0;
       height: 20px;
       width: 20px;
       vertical-align: middle;
     }
+
     .form-check-label {
       margin-right: 25px;
       line-height: 1.5;
       vertical-align: middle;
     }
+
     .form-check-input:checked {
       background-color: #6b7280;
       border-color: #6b7280;
     }
+
     .animate-bounce {
       animation: bounce 1s infinite;
     }
+
     @keyframes bounce {
+
       0%,
       100% {
         transform: translateY(0);
       }
+
       50% {
         transform: translateY(-5px);
       }
     }
+
     .text-shadow {
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
+
     .select2-container {
       width: 100% !important;
     }
+
     .select2-container--default .select2-selection--single {
       height: 48px;
       border: 1px solid #e5e7eb;
       border-radius: 8px;
       background: #fafafa;
     }
+
     .select2-container--default .select2-selection--single .select2-selection__rendered {
       line-height: 46px;
       padding-right: 15px;
     }
+
     .select2-container--default .select2-selection--single .select2-selection__arrow {
       height: 46px;
     }
+
     .select2-dropdown {
       z-index: 1050 !important;
       border: 1px solid #e5e7eb;
@@ -251,76 +272,76 @@
     }
   </style>
 
- <script>
+  <script>
     document.addEventListener('livewire:init', function() {
-        function initializeSelect2() {
-            $('#doctor_id').select2({
-                dir: 'rtl',
-                placeholder: 'انتخاب کنید',
-                width: '100%',
-                dropdownAutoWidth: true,
-            });
-            $('#clinic_id').select2({
-                dir: 'rtl',
-                placeholder: 'انتخاب کنید',
-                width: '100%'
-            });
-            $('#parent_id').select2({
-                dir: 'rtl',
-                placeholder: 'انتخاب کنید',
-                width: '100%'
-            });
+      function initializeSelect2() {
+        $('#doctor_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%',
+          dropdownAutoWidth: true,
+        });
+        $('#clinic_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
+        $('#parent_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
 
-            // تنظیم مقادیر اولیه هنگام لود صفحه
-            const doctorId = @json($this->doctor_id);
-            const clinicId = @json($this->clinic_id);
-            const parentId = @json($this->parent_id);
+        // تنظیم مقادیر اولیه هنگام لود صفحه
+        const doctorId = @json($this->doctor_id);
+        const clinicId = @json($this->clinic_id);
+        const parentId = @json($this->parent_id);
 
-            $('#doctor_id').val(doctorId || '').trigger('change');
-            $('#clinic_id').val(clinicId || '').trigger('change');
-            $('#parent_id').val(parentId || '').trigger('change');
+        $('#doctor_id').val(doctorId || '').trigger('change');
+        $('#clinic_id').val(clinicId || '').trigger('change');
+        $('#parent_id').val(parentId || '').trigger('change');
+      }
+
+      // اجرای اولیه Select2
+      initializeSelect2();
+
+      // همگام‌سازی با تغییرات کاربر
+      $('#doctor_id').on('change', function() {
+        const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
+        @this.set('doctor_id', value);
+      });
+      $('#clinic_id').on('change', function() {
+        const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
+        @this.set('clinic_id', value);
+      });
+      $('#parent_id').on('change', function() {
+        const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
+        @this.set('parent_id', value);
+      });
+
+      Livewire.on('show-alert', (event) => {
+        toastr[event.type](event.message);
+      });
+
+      Livewire.on('redirect-after-delay', () => {
+        setTimeout(() => {
+          window.location.href = "{{ route('admin.panel.doctor-services.index') }}";
+        }, 3000);
+      });
+
+      // رفرش Select2 بعد از هر آپدیت Livewire
+      document.addEventListener('livewire:updated', function() {
+        // فقط در صورتی که Select2 قبلاً initialize شده باشد
+        if ($('#doctor_id').hasClass('select2-hidden-accessible')) {
+          const doctorId = @json($this->doctor_id);
+          const clinicId = @json($this->clinic_id);
+          const parentId = @json($this->parent_id);
+
+          $('#doctor_id').val(doctorId || '').trigger('change');
+          $('#clinic_id').val(clinicId || '').trigger('change');
+          $('#parent_id').val(parentId || '').trigger('change');
         }
-
-        // اجرای اولیه Select2
-        initializeSelect2();
-
-        // همگام‌سازی با تغییرات کاربر
-        $('#doctor_id').on('change', function() {
-            const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
-            @this.set('doctor_id', value);
-        });
-        $('#clinic_id').on('change', function() {
-            const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
-            @this.set('clinic_id', value);
-        });
-        $('#parent_id').on('change', function() {
-            const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
-            @this.set('parent_id', value);
-        });
-
-        Livewire.on('show-alert', (event) => {
-            toastr[event.type](event.message);
-        });
-
-        Livewire.on('redirect-after-delay', () => {
-            setTimeout(() => {
-                window.location.href = "{{ route('admin.panel.doctor-services.index') }}";
-            }, 3000);
-        });
-
-        // رفرش Select2 بعد از هر آپدیت Livewire
-        document.addEventListener('livewire:updated', function () {
-            // فقط در صورتی که Select2 قبلاً initialize شده باشد
-            if ($('#doctor_id').hasClass('select2-hidden-accessible')) {
-                const doctorId = @json($this->doctor_id);
-                const clinicId = @json($this->clinic_id);
-                const parentId = @json($this->parent_id);
-                
-                $('#doctor_id').val(doctorId || '').trigger('change');
-                $('#clinic_id').val(clinicId || '').trigger('change');
-                $('#parent_id').val(parentId || '').trigger('change');
-            }
-        });
+      });
     });
   </script>
 </div>

@@ -97,7 +97,7 @@
             </div>
             <div class="mt-3">
               <button type="submit"
-                class="btn btn-primary w-100 h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                class="btn my-btn-primary w-100 h-50 border-radius-4 d-flex justify-content-center align-items-center">
                 <span class="button_text">ثبت تغییرات</span>
                 <div class="loader"></div>
               </button>

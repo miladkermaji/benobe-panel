@@ -109,7 +109,7 @@
                 </div>
                 <div class="d-flex w-100 justify-content-center mt-3">
                   <div class="w-100">
-                    <button class="btn btn-primary h-50 w-100" type="submit">
+                    <button class="btn my-btn-primary h-50 w-100" type="submit">
                       <span class="button_text__51wVM">ثبت</span>
                     </button>
                   </div>
@@ -215,7 +215,7 @@
                 </div>
                 <div class="d-flex w-100 justify-content-center mt-3">
                   <div class="w-100">
-                    <button class="btn btn-primary h-50 w-100" type="submit">
+                    <button class="btn my-btn-primary h-50 w-100" type="submit">
                       <span class="button_text__51wVM">ثبت</span>
                     </button>
                   </div>

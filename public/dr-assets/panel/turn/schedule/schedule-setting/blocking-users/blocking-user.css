@@ -1,278 +1,284 @@
 body {
-  direction: rtl;
-  background-color: #f9fafb;
-  font-family: 'Vazir', sans-serif;
-  overflow-x: hidden;
+    direction: rtl;
+    background-color: #f9fafb;
+    font-family: "Vazir", sans-serif;
+    overflow-x: hidden;
 }
 
 /* استایل کلی صفحه */
 .blocking_users_content {
-  padding: 30px 15px;
+    padding: 30px 15px;
 }
 
 .blocking_users_content .container-fluid {
-  max-width: 1420px; /* عرض بهینه در دسکتاپ */
-  margin: 0 auto;
+    max-width: 1420px; /* عرض بهینه در دسکتاپ */
+    margin: 0 auto;
 }
 
 /* کارت‌ها */
 .card-header {
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 15px 20px;
-  color: #1e293b;
-  font-weight: 700;
-  font-size: 16px;
-  border-radius: 12px 12px 0 0;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 15px 20px;
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 16px;
+    border-radius: 12px 12px 0 0;
 }
 
 .card-body {
-  background: #fff;
-  padding: 20px;
-  border-radius: 0 0 12px 12px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    background: #fff;
+    padding: 20px;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
 }
 
 /* دکمه افزودن کاربر */
-.btn-primary {
-  background: #2b6cb0;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-  transition: all 0.3s ease;
+.my-btn-primary {
+    background: #2b6cb0;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.3s ease;
 }
 
-.btn-primary:hover {
-  background: #1e497b;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(43, 108, 176, 0.3);
+.my-btn-primary:hover {
+    background: #1e497b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(43, 108, 176, 0.3);
 }
 
 /* جداول */
 .table-responsive {
-  margin-top: 15px;
+    margin-top: 15px;
 }
 
 .table {
-  border-radius: 10px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .table thead th {
-  color: #1e293b;
-  font-weight: 700;
-  font-size: 13px;
-  padding: 12px 15px;
-  border-bottom: 2px solid #e5e7eb;
-  text-wrap: nowrap;
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 12px 15px;
+    border-bottom: 2px solid #e5e7eb;
+    text-wrap: nowrap;
 }
 
 .table tbody td {
-  font-size: 13px;
-  color: #2d3748;
-  padding: 12px 15px;
-  vertical-align: middle;
+    font-size: 13px;
+    color: #2d3748;
+    padding: 12px 15px;
+    vertical-align: middle;
 }
 
 .table tbody tr:hover {
-  background: #f9fafb;
+    background: #f9fafb;
 }
 
 .text-danger {
-  color: #ef4444 !important;
+    color: #ef4444 !important;
 }
 
 .text-success {
-  color: #10b981 !important;
+    color: #10b981 !important;
 }
 
 /* دکمه‌های عملیات */
 .btn-light.btn-sm {
-  padding: 6px;
-  border-radius: 50%;
-  transition: all 0.3s ease;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
 }
 
 .btn-light.btn-sm:hover {
-  background: #2b6cb0;
+    background: #2b6cb0;
 }
 
 .btn-light.btn-sm:hover img {
-  filter: brightness(0) invert(1); /* آیکون سفید در هاور */
+    filter: brightness(0) invert(1); /* آیکون سفید در هاور */
 }
 
 .delete-user-btn:hover img {
-  filter: brightness(0) saturate(100%) invert(25%) sepia(95%) saturate(5109%) hue-rotate(352deg) brightness(92%) contrast(92%);
-  /* قرمز برای دکمه حذف */
+    filter: brightness(0) saturate(100%) invert(25%) sepia(95%) saturate(5109%)
+        hue-rotate(352deg) brightness(92%) contrast(92%);
+    /* قرمز برای دکمه حذف */
 }
 
 /* مودال */
 .modal-content {
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  background: #fff;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background: #fff;
 }
 
 .modal-header {
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 15px 20px;
-  color: #1e293b;
-  font-weight: 700;
-  font-size: 16px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 15px 20px;
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 16px;
 }
 
 .modal-body {
-  padding: 20px;
+    padding: 20px;
 }
 
 .close {
-  font-size: 20px;
-  color: #64748b;
-  opacity: 1;
-  transition: all 0.3s ease;
+    font-size: 20px;
+    color: #64748b;
+    opacity: 1;
+    transition: all 0.3s ease;
 }
 
 .close:hover {
-  color: #2b6cb0;
-  transform: rotate(90deg);
+    color: #2b6cb0;
+    transform: rotate(90deg);
 }
 
 /* فرم‌ها */
 .form-group {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .form-control {
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  padding: 10px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #2d3748;
-  transition: all 0.3s ease;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d3748;
+    transition: all 0.3s ease;
 }
 
 .form-control:focus {
-  border-color: #2b6cb0;
-  box-shadow: 0 0 6px rgba(43, 108, 176, 0.2);
-  outline: none;
+    border-color: #2b6cb0;
+    box-shadow: 0 0 6px rgba(43, 108, 176, 0.2);
+    outline: none;
 }
 
 .form-control::placeholder {
-  color: #c3c3c3;
-  font-size: 13px;
+    color: #c3c3c3;
+    font-size: 13px;
 }
 
 textarea.form-control {
-  resize: vertical;
-  min-height: 80px;
+    resize: vertical;
+    min-height: 80px;
 }
 
 .label-top-input-special-takhasos {
-  position: absolute;
-  top: -10px;
-  right: 0px;
-  background: #fff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  color: #2d3748;
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    position: absolute;
+    top: -10px;
+    right: 0px;
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #2d3748;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* لودر */
 .loader {
-  width: 20px;
-  height: 20px;
-  border: 3px solid #fff;
-  border-top: 3px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-right: 8px;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #fff;
+    border-top: 3px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* ریسپانسیو */
 @media only screen and (max-width: 991px) {
-  .blocking_users_content .container-fluid {
-    max-width: 920px;
-  }
-  .card-body {
-    padding: 15px;
-  }
-  .table thead th, .table tbody td {
-    font-size: 12px;
-    padding: 10px;
-  }
+    .blocking_users_content .container-fluid {
+        max-width: 920px;
+    }
+    .card-body {
+        padding: 15px;
+    }
+    .table thead th,
+    .table tbody td {
+        font-size: 12px;
+        padding: 10px;
+    }
 }
 
 @media only screen and (max-width: 768px) {
-  .blocking_users_content {
-    padding: 20px 10px;
-  }
-  .btn-primary {
-    font-size: 12px;
-    padding: 8px 15px;
-  }
-  .table-responsive {
-    overflow-x: auto;
-  }
-  .table thead th {
-    font-size: 11px;
-    padding: 8px;
-  }
-  .table tbody td {
-    font-size: 11px;
-    padding: 8px;
-  }
-  .card-header {
-    font-size: 15px;
-    padding: 12px 15px;
-  }
+    .blocking_users_content {
+        padding: 20px 10px;
+    }
+    .my-btn-primary {
+        font-size: 12px;
+        padding: 8px 15px;
+    }
+    .table-responsive {
+        overflow-x: auto;
+    }
+    .table thead th {
+        font-size: 11px;
+        padding: 8px;
+    }
+    .table tbody td {
+        font-size: 11px;
+        padding: 8px;
+    }
+    .card-header {
+        font-size: 15px;
+        padding: 12px 15px;
+    }
 }
 
 @media only screen and (max-width: 425px) {
-  .blocking_users_content .container-fluid {
-    padding: 0 10px;
-  }
-  .card-body {
-    padding: 10px;
-  }
-  .btn-primary {
-    width: 100%;
-    font-size: 11px;
-    padding: 8px 12px;
-  }
-  .form-control {
-    font-size: 12px;
-    padding: 8px 10px;
-  }
-  .label-top-input-special-takhasos {
-    font-size: 11px;
-    top: -8px;
-    right: 0px;
-  }
-  .modal-body {
-    padding: 15px;
-  }
-  .table thead th {
-    font-size: 10px;
-    padding: 6px;
-  }
-  .table tbody td {
-    font-size: 10px;
-    padding: 6px;
-  }
+    .blocking_users_content .container-fluid {
+        padding: 0 10px;
+    }
+    .card-body {
+        padding: 10px;
+    }
+    .my-btn-primary {
+        width: 100%;
+        font-size: 11px;
+        padding: 8px 12px;
+    }
+    .form-control {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+    .label-top-input-special-takhasos {
+        font-size: 11px;
+        top: -8px;
+        right: 0px;
+    }
+    .modal-body {
+        padding: 15px;
+    }
+    .table thead th {
+        font-size: 10px;
+        padding: 6px;
+    }
+    .table tbody td {
+        font-size: 10px;
+        padding: 6px;
+    }
 }

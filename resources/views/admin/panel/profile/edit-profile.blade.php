@@ -130,7 +130,7 @@
             </div>
             <div class="w-100">
               <button type="submit"
-                class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
                 <span class="button_text">ذخیره تغیرات</span>
                 <div class="loader"></div>
               </button>
@@ -156,7 +156,7 @@
                 name="mobile">
               <div class="d-flex mt-2">
                 <button onclick="sendOtpCode()"
-                  class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+                  class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
                   <span class="button_text">ارسال کد تایید</span>
                   <div class="loader"></div>
                 </button>
@@ -176,7 +176,7 @@
               </div>
               <div class="d-flex mt-3">
                 <button onclick="verifyOtpCode()"
-                  class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+                  class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
                   <span class="button_text">تایید کد</span>
                   <div class="loader"></div>
                 </button>
@@ -319,7 +319,7 @@
               </div>
               <div class="d-flex justify-content-between mt-2 gap-4">
                 <button type="submit" id="saveChangesButton"
-                  class="btn btn-primary h-50 col-lg-11 col-xs-10 col-md-11 col-sm-11 d-flex justify-content-center align-items-center">
+                  class="btn my-btn-primary h-50 col-lg-11 col-xs-10 col-md-11 col-sm-11 d-flex justify-content-center align-items-center">
                   <span class="button_text">ذخیره تغیرات</span>
                   <div class="loader"></div>
                 </button>
@@ -392,7 +392,7 @@
                 <div class="row mt-3">
                   <div class="w-100">
                     <button type="submit" id="uuid-btn"
-                      class="w-100 btn btn-primary h-50 col-lg-12 col-xs-12 col-md-12 col-sm-12 d-flex justify-content-center align-items-center">
+                      class="w-100 btn my-btn-primary h-50 col-lg-12 col-xs-12 col-md-12 col-sm-12 d-flex justify-content-center align-items-center">
                       <span class="button_text">ذخیره تغیرات</span>
                       <div class="loader"></div>
                     </button>
@@ -514,7 +514,7 @@
             </div>
             <div class="mt-3">
               <button type="submit"
-                class="btn btn-primary w-100 h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                class="btn my-btn-primary w-100 h-50 border-radius-4 d-flex justify-content-center align-items-center">
                 <span class="button_text">ثبت تغییرات</span>
                 <div class="loader"></div>
               </button>
@@ -597,7 +597,7 @@
               </div>
               <div class="w-100 mt-3">
                 <button type="submit"
-                  class="btn btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
+                  class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
                   id="btn-save-pass" {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
                   <span class="button_text">ذخیره تغیرات</span>
                   <div class="loader"></div>
@@ -658,7 +658,7 @@
               </div>
               <div class="w-100 mt-3">
                 <button type="submit"
-                  class="btn btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
+                  class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
                   id="btn-save-two-factor"
                   {{ Auth::guard('doctor')->user()->two_factor_secret_enabled ? '' : 'disabled' }}>
                   <span class="button_text">ذخیره تغیرات</span>

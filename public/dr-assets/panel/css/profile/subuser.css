@@ -76,7 +76,7 @@
 }
 
 /* Button Styling */
-.btn-primary {
+.my-btn-primary {
     height: 48px !important;
     border-radius: 8px;
     background-color: #007bff;
@@ -85,7 +85,7 @@
     transition: all 0.3s ease;
 }
 
-.btn-primary:hover {
+.my-btn-primary:hover {
     background-color: #0056b3;
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
@@ -143,7 +143,7 @@
         width: 97% !important;
         margin: 0 auto;
     }
-    
+
     .table-modern {
         font-size: 14px;
     }

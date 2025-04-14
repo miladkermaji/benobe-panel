@@ -86,11 +86,11 @@
     box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
 }
 
-.btn-primary {
+.my-btn-primary {
     background: linear-gradient(to right, #4b5eaa, #8b5cf6);
     border: none;
 }
 
-.btn-primary:hover {
+.my-btn-primary:hover {
     background: linear-gradient(to right, #3b4e9a, #7b4ce6);
 }

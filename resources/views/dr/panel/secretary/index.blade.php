@@ -11,21 +11,23 @@
       bottom: 56px;
       /* موقعیت پیش‌فرض برای لیبل‌ها در صورت وجود خطا */
     }
-  .label-top-input-special-takhasos {
-    min-height: 10px;
-    min-width: 20px;
-    background-color: #fff;
-    box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px,
+
+    .label-top-input-special-takhasos {
+      min-height: 10px;
+      min-width: 20px;
+      background-color: #fff;
+      box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px,
         rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
-    border-radius: 4px;
-    position: absolute;
-    z-index: 2;
-    padding: 2px;
-    font-weight: bold;
-    right: inherit;
-    font-size: 12px;
-    bottom: 58px;
-}
+      border-radius: 4px;
+      position: absolute;
+      z-index: 2;
+      padding: 2px;
+      font-weight: bold;
+      right: inherit;
+      font-size: 12px;
+      bottom: 58px;
+    }
+
     .field-wrapper.has-error .error-message {
       display: block;
     }
@@ -171,7 +173,7 @@
             </div>
             <div class="w-100 mt-2">
               <button type="submit"
-                class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
                 <span class="button_text">ذخیره تغییرات</span>
                 <div class="loader"></div>
               </button>
@@ -241,7 +243,7 @@
             </div>
             <div class="w-100 mt-2">
               <button type="submit"
-                class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
                 <span class="button_text">ذخیره تغییرات</span>
                 <div class="loader"></div>
               </button>
@@ -257,7 +259,7 @@
 <div class="subuser-content w-100 d-flex justify-content-center mt-4">
   <div class="subuser-content-wrapper p-3 w-100">
     <div class="w-100 d-flex justify-content-end">
-      <button class="btn btn-primary h-50 add-secretary-btn" id="add-secretary-btn">افزودن منشی جدید</button>
+      <button class="btn my-btn-primary h-50 add-secretary-btn" id="add-secretary-btn">افزودن منشی جدید</button>
     </div>
     <div class="p-3">
       <h4 class="text-dark font-weight-bold">لیست منشی‌ها</h4>

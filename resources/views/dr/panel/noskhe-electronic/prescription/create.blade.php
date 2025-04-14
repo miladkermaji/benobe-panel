@@ -72,7 +72,7 @@
                     <form action="">
                       <input type="text" placeholder="نام نسخه خود را وارد کنید"
                         class="h-50 my-form-control-light w-100">
-                      <button class="h-50 w-100 btn btn-primary mt-3">ثبت</button>
+                      <button class="h-50 w-100 btn my-btn-primary mt-3">ثبت</button>
                     </form>
                   </div>
                 </div>
@@ -81,7 +81,7 @@
           </div>
         </div>
         <div>
-          <button data-toggle="modal" data-target="#saveNoskheModalCenter" class="btn btn-primary h-50">نهایی سازی
+          <button data-toggle="modal" data-target="#saveNoskheModalCenter" class="btn my-btn-primary h-50">نهایی سازی
             نسخه</button>
           <div class="modal  fade" id="saveNoskheModalCenter" tabindex="-1" role="dialog"
             aria-labelledby="endVisitModalCenterTitle" aria-hidden="true">
@@ -102,7 +102,7 @@
                       <textarea name="" id="" cols="30" rows="30" class="form-control w-100"
                         placeholder="توضیحات (اختیاری)"></textarea>
                       <div class="mt-2 d-flex justify-content-center gap-10">
-                        <button class="h-50 w-50 btn btn-primary mt-3">ثبت ویزیت</button>
+                        <button class="h-50 w-50 btn my-btn-primary mt-3">ثبت ویزیت</button>
                         <button class="h-50 w-50 btn btn-outline-danger mt-3"> انصراف</button>
                       </div>
                     </form>
@@ -187,7 +187,7 @@
               </script>
             </div>
             <div class="mt-3 d-flex justify-content-end">
-              <button class="btn btn-primary h-50">افزودن</button>
+              <button class="btn my-btn-primary h-50">افزودن</button>
             </div>
           </form>
         </div>
@@ -256,7 +256,7 @@
               </script>
             </div>
             <div class="mt-3 d-flex justify-content-end">
-              <button class="btn btn-primary h-50">افزودن</button>
+              <button class="btn my-btn-primary h-50">افزودن</button>
             </div>
           </form>
         </div>
@@ -327,7 +327,7 @@
               </script>
             </div>
             <div class="mt-3 d-flex justify-content-end">
-              <button class="btn btn-primary h-50">افزودن</button>
+              <button class="btn my-btn-primary h-50">افزودن</button>
             </div>
           </form>
         </div>
@@ -393,7 +393,7 @@
               </script>
             </div>
             <div class="mt-3 d-flex justify-content-end">
-              <button class="btn btn-primary h-50">افزودن</button>
+              <button class="btn my-btn-primary h-50">افزودن</button>
             </div>
           </form>
         </div>

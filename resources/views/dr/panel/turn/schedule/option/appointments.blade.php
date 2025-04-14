@@ -796,7 +796,7 @@
       $('#endVisitModalCenter').modal('show');
     });
 
-    $('#endVisitModalCenter .btn-primary').on('click', function(e) {
+    $('#endVisitModalCenter .my-btn-primary').on('click', function(e) {
       e.preventDefault();
 
       const appointmentId = $('#endVisitModalCenter').data('appointment-id');

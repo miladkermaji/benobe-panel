@@ -4,8 +4,7 @@
 
   <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/appointments_open/appointments_open.css') }}"
     rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/turn/schedule/manual_nobat/manual_nobat.css') }}"
-    rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/turn/schedule/manual_nobat/manual_nobat.css') }}" rel="stylesheet" />
   <style>
     /* استایل‌های جدید برای نتایج جستجو */
     #search-results {
@@ -98,7 +97,7 @@
       </div>
     </div>
     <div class="btn-425-left">
-      <button class="btn btn-primary h-50 fs-13" data-toggle="modal" data-target="#addNewPatientModal">افزودن
+      <button class="btn my-btn-primary h-50 fs-13" data-toggle="modal" data-target="#addNewPatientModal">افزودن
         بیمار</button>
       <!-- فرم افزودن بیمار -->
       <div class="modal fade" id="addNewPatientModal" tabindex="-1" role="dialog" aria-labelledby="addNewPatientLabel"
@@ -158,7 +157,7 @@
               </div>
               <div class="modal-footer">
                 <button type="submit" id="submit-button"
-                  class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                  class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
                   <span class="button_text">ثبت تغیرات</span>
                   <div class="loader"></div>
                 </button>
@@ -215,7 +214,7 @@
           </div>
           <div class="mt-3 position-relative mb-3 w-100">
             <button type="submit" id="submit-button"
-              class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+              class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
               <span class="button_text">ثبت تغیرات</span>
               <div class="loader"></div>
             </button>
@@ -350,7 +349,7 @@
         </div>
         <div class="modal-footer">
           <button type="submit"
-            class="w-100 btn btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+            class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
             <span class="button_text">ذخیره تغییرات</span>
             <div class="loader"></div>
           </button>

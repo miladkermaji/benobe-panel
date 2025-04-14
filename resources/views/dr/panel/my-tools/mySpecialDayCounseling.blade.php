@@ -377,21 +377,21 @@
 
       },
       success: function(response) {
-      if (response.status) {
-        $('.calendar-day').each(function() {
-          const persianDate = $(this).data('date');
-          const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
-          const appointment = response.data.find(a => a.appointment_date === gregorianDate);
-          // حذف کلاس قبلی و بج
-          $(this).removeClass('has-appointment');
-          $(this).find('.my-badge-success').remove();
-          // اضافه کردن کلاس برای روزهایی که نوبت دارند
-          if (appointment) {
-            $(this).addClass('has-appointment');
-          }
-        });
+        if (response.status) {
+          $('.calendar-day').each(function() {
+            const persianDate = $(this).data('date');
+            const gregorianDate = moment(persianDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
+            const appointment = response.data.find(a => a.appointment_date === gregorianDate);
+            // حذف کلاس قبلی و بج
+            $(this).removeClass('has-appointment');
+            $(this).find('.my-badge-success').remove();
+            // اضافه کردن کلاس برای روزهایی که نوبت دارند
+            if (appointment) {
+              $(this).addClass('has-appointment');
+            }
+          });
+        }
       }
-    }
     });
   }
 
@@ -490,7 +490,7 @@
         این روز تعطیل است. آیا می‌خواهید آن را از حالت تعطیلی خارج کنید؟
       </div>
       <div class="d-flex justify-content-between mt-3 gap-4 w-100">
-        <button id="confirmUnHolidayButton" class="btn btn-primary h-50 w-100 me-2">خارج کردن از تعطیلی</button>
+        <button id="confirmUnHolidayButton" class="btn my-btn-primary h-50 w-100 me-2">خارج کردن از تعطیلی</button>
       </div>
     `);
     }
@@ -502,7 +502,7 @@
         شما برای این روز نوبت فعال دارید.
       </div>
       <div id="workHoursContainer">${workHoursHtml}</div>
-      <button id="updateWorkHours" onclick="updateWorkhours()" class="btn btn-primary w-100 h-50 mt-3" style="display: ${
+      <button id="updateWorkHours" onclick="updateWorkhours()" class="btn my-btn-primary w-100 h-50 mt-3" style="display: ${
         workHoursResponse.status && workHoursResponse.work_hours.length > 0 ? 'block' : 'none'
       };">
         بروزرسانی ساعات کاری
@@ -521,13 +521,13 @@
         شما برای این روز نوبت فعالی ندارید. آیا می‌خواهید این روز را تعطیل کنید؟
       </div>
       <div id="workHoursContainer">${workHoursHtml}</div>
-      <button id="updateWorkHours" onclick="updateWorkhours()" class="btn btn-primary w-100 h-50 mt-3" style="display: ${
+      <button id="updateWorkHours" onclick="updateWorkhours()" class="btn my-btn-primary w-100 h-50 mt-3" style="display: ${
         workHoursResponse.status && workHoursResponse.work_hours.length > 0 ? 'block' : 'none'
       };">
         بروزرسانی ساعات کاری
       </button>
       <div class="d-flex justify-content-between mt-3 gap-4 w-100">
-        <button id="confirmHolidayButton" class="btn btn-primary h-50 w-100 me-2">تعطیل کردن این روز</button>
+        <button id="confirmHolidayButton" class="btn my-btn-primary h-50 w-100 me-2">تعطیل کردن این روز</button>
       </div>
     `);
     }
@@ -785,65 +785,65 @@
 
 
     generateCalendar(moment().jYear(), moment().jMonth() + 1);
-  $(document).on('click', '.cancle-btn-appointment', function() {
-  const selectedDate = $('#dateModal').data('selectedDate');
+    $(document).on('click', '.cancle-btn-appointment', function() {
+      const selectedDate = $('#dateModal').data('selectedDate');
 
-  Swal.fire({
-    title: 'آیا مطمئن هستید؟',
-    text: "تمام نوبت‌های این روز لغو خواهند شد.",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'بله، لغو کن!',
-    cancelButtonText: 'لغو'
-  }).then(result => {
-    if (result.isConfirmed) {
-      // مرحله ۱: دریافت شناسه‌های نوبت‌ها برای تاریخ انتخاب‌شده
-      $.ajax({
-        url: "{{ route('doctor.get_appointments_by_date_counseling') }}", // فرض می‌کنیم این روت وجود داره
-        method: 'GET',
-        data: {
-          date: selectedDate,
-          selectedClinicId: localStorage.getItem('selectedClinicId')
-        },
-        success: function(response) {
-          if (response.status && response.data.length > 0) {
-            // استخراج شناسه‌های نوبت‌ها
-            const appointmentIds = response.data.map(appointment => appointment.id);
+      Swal.fire({
+        title: 'آیا مطمئن هستید؟',
+        text: "تمام نوبت‌های این روز لغو خواهند شد.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'بله، لغو کن!',
+        cancelButtonText: 'لغو'
+      }).then(result => {
+        if (result.isConfirmed) {
+          // مرحله ۱: دریافت شناسه‌های نوبت‌ها برای تاریخ انتخاب‌شده
+          $.ajax({
+            url: "{{ route('doctor.get_appointments_by_date_counseling') }}", // فرض می‌کنیم این روت وجود داره
+            method: 'GET',
+            data: {
+              date: selectedDate,
+              selectedClinicId: localStorage.getItem('selectedClinicId')
+            },
+            success: function(response) {
+              if (response.status && response.data.length > 0) {
+                // استخراج شناسه‌های نوبت‌ها
+                const appointmentIds = response.data.map(appointment => appointment.id);
 
-            // مرحله ۲: ارسال درخواست لغو با شناسه‌ها
-            $.ajax({
-              url: "{{ route('doctor.cancel_appointments_counseling') }}",
-              method: 'POST',
-              data: {
-                date: selectedDate,
-                appointment_ids: appointmentIds, // ارسال آرایه شناسه‌ها
-                _token: '{{ csrf_token() }}',
-                selectedClinicId: localStorage.getItem('selectedClinicId')
-              },
-              success: function(cancelResponse) {
-                if (cancelResponse.status) {
-                  Swal.fire('موفقیت', cancelResponse.message, 'success');
-                  $('#dateModal').modal('hide'); // بستن مودال
-                  loadAppointmentsCount(); // بروزرسانی تقویم
-                } else {
-                  Swal.fire('خطا', cancelResponse.message, 'error');
-                }
-              },
-              error: function() {
-                Swal.fire('خطا', 'مشکلی در ارتباط با سرور وجود دارد.', 'error');
+                // مرحله ۲: ارسال درخواست لغو با شناسه‌ها
+                $.ajax({
+                  url: "{{ route('doctor.cancel_appointments_counseling') }}",
+                  method: 'POST',
+                  data: {
+                    date: selectedDate,
+                    appointment_ids: appointmentIds, // ارسال آرایه شناسه‌ها
+                    _token: '{{ csrf_token() }}',
+                    selectedClinicId: localStorage.getItem('selectedClinicId')
+                  },
+                  success: function(cancelResponse) {
+                    if (cancelResponse.status) {
+                      Swal.fire('موفقیت', cancelResponse.message, 'success');
+                      $('#dateModal').modal('hide'); // بستن مودال
+                      loadAppointmentsCount(); // بروزرسانی تقویم
+                    } else {
+                      Swal.fire('خطا', cancelResponse.message, 'error');
+                    }
+                  },
+                  error: function() {
+                    Swal.fire('خطا', 'مشکلی در ارتباط با سرور وجود دارد.', 'error');
+                  }
+                });
+              } else {
+                Swal.fire('خطا', 'هیچ نوبتی برای این تاریخ یافت نشد.', 'error');
               }
-            });
-          } else {
-            Swal.fire('خطا', 'هیچ نوبتی برای این تاریخ یافت نشد.', 'error');
-          }
-        },
-        error: function() {
-          Swal.fire('خطا', 'مشکلی در دریافت نوبت‌ها وجود دارد.', 'error');
+            },
+            error: function() {
+              Swal.fire('خطا', 'مشکلی در دریافت نوبت‌ها وجود دارد.', 'error');
+            }
+          });
         }
       });
-    }
-  });
-});
+    });
 
     // Modal for Appointment Reschedule
     $(document).on('click', '#confirmReschedule', function() {
@@ -1019,7 +1019,7 @@
             این روز قبلاً تعطیل شده است. 
             <div class="w-100 d-flex justify-content-between gap-4 mt-3">
               <div class="w-100">
-                <button type="button" id="confirmUnHolidayButton" class="btn btn-primary h-50 w-100">خارج کردن از تعطیلی</button>
+                <button type="button" id="confirmUnHolidayButton" class="btn my-btn-primary h-50 w-100">خارج کردن از تعطیلی</button>
               </div>
             </div>
           `);
@@ -1049,7 +1049,7 @@
             آیا می‌خواهید این روز را تعطیل کنید؟
             <div class="w-100 d-flex justify-content-between gap-4 mt-3">
               <div class="w-100">
-                <button type="button" id="confirmHolidayButton" class="btn btn-primary h-50 w-100">تعطیل کردن این روز</button>
+                <button type="button" id="confirmHolidayButton" class="btn my-btn-primary h-50 w-100">تعطیل کردن این روز</button>
               </div>
 
             </div>

@@ -57,7 +57,7 @@
 
             <div class="mt-5 text-end">
               <button wire:click="saveLogo"
-                class="btn btn-primary rounded-pill px-5 py-2 d-flex align-items-center gap-2 shadow-md transition-all"
+                class="btn my-btn-primary rounded-pill px-5 py-2 d-flex align-items-center gap-2 shadow-md transition-all"
                 style="background: linear-gradient(135deg, #1e3a8a, #60a5fa);">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2">
@@ -101,11 +101,11 @@
       outline: none;
     }
 
-    .btn-primary {
+    .my-btn-primary {
       border: none;
     }
 
-    .btn-primary:hover {
+    .my-btn-primary:hover {
       background: linear-gradient(135deg, #1e40af, #3b82f6);
       transform: translateY(-3px);
       box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);

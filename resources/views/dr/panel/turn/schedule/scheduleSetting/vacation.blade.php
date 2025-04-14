@@ -75,7 +75,7 @@
 
                         <div class="w-100">
                           <button type="submit"
-                            class="btn btn-primary w-100 h-50 mt-3 d-flex justify-content-center align-items-center">
+                            class="btn my-btn-primary w-100 h-50 mt-3 d-flex justify-content-center align-items-center">
                             <span class="button_text">ثبت مرخصی</span>
                             <div class="loader"></div>
                           </button>
@@ -175,7 +175,7 @@
           </div>
           <div class="w-100">
             <button type="submit"
-              class="btn btn-primary w-100 h-50 mt-3 d-flex justify-content-center align-items-center">
+              class="btn my-btn-primary w-100 h-50 mt-3 d-flex justify-content-center align-items-center">
               <span class="button_text">ذخیره</span>
               <div class="loader"></div>
             </button>

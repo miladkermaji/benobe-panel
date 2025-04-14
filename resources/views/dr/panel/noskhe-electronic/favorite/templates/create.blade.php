@@ -34,7 +34,7 @@
               </div>
             </div>
             <div class="btn-top-noskhe-wrapper">
-              <button class="btn btn-primary h-50 save-btn-top-noskhe ">ذخیره نسخه پر استفاده</button>
+              <button class="btn my-btn-primary h-50 save-btn-top-noskhe ">ذخیره نسخه پر استفاده</button>
             </div>
           </div>
         </form>
@@ -89,7 +89,7 @@
               </script>
             </div>
             <div class="mt-3 d-flex justify-content-end">
-              <button class="btn btn-primary h-50">افزودن</button>
+              <button class="btn my-btn-primary h-50">افزودن</button>
             </div>
           </form>
         </div>
@@ -158,7 +158,7 @@
               </script>
             </div>
             <div class="mt-3 d-flex justify-content-end">
-              <button class="btn btn-primary h-50">افزودن</button>
+              <button class="btn my-btn-primary h-50">افزودن</button>
             </div>
           </form>
         </div>
@@ -229,7 +229,7 @@
               </script>
             </div>
             <div class="mt-3 d-flex justify-content-end">
-              <button class="btn btn-primary h-50">افزودن</button>
+              <button class="btn my-btn-primary h-50">افزودن</button>
             </div>
           </form>
         </div>
@@ -295,7 +295,7 @@
               </script>
             </div>
             <div class="mt-3 d-flex justify-content-end">
-              <button class="btn btn-primary h-50">افزودن</button>
+              <button class="btn my-btn-primary h-50">افزودن</button>
             </div>
           </form>
         </div>

@@ -1,5 +1,39 @@
 @import url("./../../../app-assets/fonts/IRANSans/style.css");
-
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
+    --primary-light: #84caf9; /* آبی روشن - در گرادیان‌ها */
+    --secondary: #1deb3c; /* سبز - برای دکمه‌های ثانویه */
+    --secondary-hover: #15802a; /* سبز تیره‌تر برای هاور */
+    --background-light: #f0f8ff; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
+    --background-footer: #d4ecfd; /* آبی روشن‌تر - فوتر */
+    --background-card: #ffffff; /* سفید - کارت‌ها */
+    --text-primary: #000000; /* مشکی - متن اصلی */
+    --text-secondary: #707070; /* خاکستری - متن ثانویه */
+    --text-discount: #008000; /* سبز - قیمت با تخفیف */
+    --text-original: #ff0000; /* قرمز - قیمت اولیه */
+    --border-neutral: #e5e7eb; /* خاکستری روشن - حاشیه‌ها */
+    --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
+    --gradient-instagram-from: #f92ca7; /* گرادیان اینستاگرام - شروع */
+    --gradient-instagram-to: #6b1a93; /* گرادیان اینستاگرام - پایان */
+    --button-mobile: #4f9acd; /* آبی متوسط - دکمه‌های موبایل */
+    --button-mobile-light: #a2cdeb; /* آبی روشن‌تر - دکمه‌های موبایل */
+    --support-section: #2e86c1; /* آبی - بخش پشتیبانی */
+    --support-text: #084d7c; /* آبی تیره - متن پشتیبانی */
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    ) !important;
+    /* شعاع گوشه‌ها (border-radius) */
+    --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
+    --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
+    --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
+    --radius-card: 1.125rem !important; /* 18px - کارت‌ها */
+    --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
+    --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
+    --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
+}
 * {
     padding: 0;
     margin: 0;
@@ -11,7 +45,18 @@
     font-family: IRANSans !important;
     font-weight: 400;
 }
-
+.my-btn-primary {
+    background-color: var(--gradient-primary);
+    color: #fff !important;
+}
+.btn-outline-primary{
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
+}
+.btn-outline-primary:hover{
+    background: var(--gradient-primary);
+    color: #fff !important;
+}
 .selectDate_datepicker__xkZeS span {
     font-family: IRANSans !important;
 }
@@ -575,7 +620,6 @@ svg {
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow); /* سایه شیک و نرم */
-   
 }
 
 .sidebar__nav.is-active {
@@ -2177,7 +2221,6 @@ span.tagRemove:hover {
     border-radius: 10px; /* Slightly smaller radius */
     transition: box-shadow 0.3s ease; /* Smooth transition */
 }
-
 
 /* Breadcrumb list for better alignment */
 .breadcrumb {

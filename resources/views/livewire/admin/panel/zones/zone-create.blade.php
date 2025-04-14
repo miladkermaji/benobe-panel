@@ -94,7 +94,7 @@
         </div>
         <div class="col-12 text-end mt-3">
           <button wire:click="store"
-            class="btn btn-primary rounded-pill px-4 py-2 d-flex align-items-center gap-2 shadow-md hover:shadow-lg transition-all">
+            class="btn my-btn-primary rounded-pill px-4 py-2 d-flex align-items-center gap-2 shadow-md hover:shadow-lg transition-all">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2">
               <path d="M12 5v14M5 12h14" />

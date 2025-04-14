@@ -3,7 +3,7 @@
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
     rel="stylesheet" />
- 
+
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -85,7 +85,8 @@
         </div>
       </div>
       <div class="btn-425-left">
-        <button class="btn btn-primary h-50 fs-13" data-toggle="modal" data-target="#exampleModalCenterAddSick">افزودن
+        <button class="btn my-btn-primary h-50 fs-13" data-toggle="modal"
+          data-target="#exampleModalCenterAddSick">افزودن
           بیمار</button>
         </button>
         <!-- Modal -->
@@ -109,7 +110,7 @@
                         از مسیر ارجاع</a>
                     </div>
                     <div class="d-flex mt-2 gap-20">
-                      <button class="btn btn-primary w-50 h-50">تجویز نسخه</button>
+                      <button class="btn my-btn-primary w-50 h-50">تجویز نسخه</button>
                       <button class="btn btn-outline-info w-50 h-50">ثبت ویزیت</button>
                     </div>
                   </form>
@@ -134,7 +135,7 @@
                     <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع بیمار">
                     <input type="text" class="my-form-control-light w-100 mt-3" placeholder="کد پیگیری">
                     <div class="mt-3">
-                      <button class="btn btn-primary w-100 h-50">ثبت</button>
+                      <button class="btn my-btn-primary w-100 h-50">ثبت</button>
                     </div>
                   </form>
                 </div>
@@ -294,7 +295,7 @@
       </div>
       <div class="p-3">
         <a href="" data-toggle="modal" data-target="#contact-modal"
-          class="btn btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center">
+          class="btn my-btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center">
           فعالسازی تماس امن </a>
         <a href="" class="btn btn-light mt-3 w-100 h-50 d-flex align-items-center  justify-content-center"
           onclick="$('#activation-modal').modal('hide'); window.history.pushState({}, '', 'panel');"> فعلا نه
@@ -328,7 +329,7 @@
       </div>
       <div class="p-3">
         <a href="#"
-          class="btn btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center"
+          class="btn my-btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center"
           onclick="$('#activation-modal').modal('hide'); $('#contact-modal').modal('hide'); window.history.pushState({}, '', 'panel'); toastr.success('تماس امن با موفقیت فعال شد');">
           شرایط برقراری تماس امن را
           مطالعه کردم. </a>
@@ -433,7 +434,7 @@
           <form action="">
 
             <textarea name="" id="" placeholder="توضیحات خود را وارد کنید" class="my-form-control-light w-100"></textarea>
-            <button class="h-50 w-100 btn btn-primary mt-3">ثبت</button>
+            <button class="h-50 w-100 btn my-btn-primary mt-3">ثبت</button>
           </form>
         </div>
       </div>

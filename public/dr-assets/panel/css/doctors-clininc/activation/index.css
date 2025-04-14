@@ -1,6 +1,6 @@
 /* استایل‌های کلی */
 body {
-    font-family: 'Vazir', sans-serif; /* فرض می‌کنم فونت فارسی داری */
+    font-family: "Vazir", sans-serif; /* فرض می‌کنم فونت فارسی داری */
     background-color: #f7f8fc;
     direction: rtl;
     margin: 0;
@@ -109,7 +109,7 @@ header {
 }
 
 /* استایل دکمه‌ها */
-.btn-primary {
+.my-btn-primary {
     background-color: #007bff;
     border-color: #007bff;
     border-radius: 12px;
@@ -119,7 +119,7 @@ header {
     color: #fff;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
-.btn-primary:hover {
+.my-btn-primary:hover {
     background-color: #0062cc;
     border-color: #0062cc;
     transform: translateY(-2px);
@@ -138,7 +138,8 @@ header {
 }
 
 /* استایل فرم‌ها */
-.my-form-control, .form-control {
+.my-form-control,
+.form-control {
     border-radius: 10px;
     padding: 12px 15px;
     border: 1px solid #e0e4e8;
@@ -147,7 +148,8 @@ header {
     color: #333;
     transition: border-color 0.3s ease, background-color 0.3s ease;
 }
-.my-form-control:focus, .form-control:focus {
+.my-form-control:focus,
+.form-control:focus {
     border-color: #007bff;
     background: #fff;
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
@@ -214,8 +216,6 @@ header {
 .close:hover {
     opacity: 1;
 }
-
-
 
 /* استایل‌های فرم شماره تماس */
 .form-group {
@@ -297,8 +297,8 @@ header {
     margin-right: -16px;
 }
 
-.step.completed+.line,
-.step.active+.line {
+.step.completed + .line,
+.step.active + .line {
     background-color: #0d6efd;
 }
 .completed .line {
@@ -349,7 +349,7 @@ header {
     .card {
         padding: 15px;
     }
-    .btn-primary {
+    .my-btn-primary {
         width: 100%;
     }
 }

@@ -76,7 +76,8 @@
           </div>
 
           <div class="col-12 text-end mt-3">
-            <button wire:click="update" class="btn btn-primary rounded-pill px-4 py-2 d-flex align-items-center gap-2">
+            <button wire:click="update"
+              class="btn my-btn-primary rounded-pill px-4 py-2 d-flex align-items-center gap-2">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
@@ -116,13 +117,13 @@
       border-color: #10b981;
     }
 
-    .btn-primary {
+    .my-btn-primary {
       background: #7c3aed;
       border: none;
       transition: all 0.3s ease;
     }
 
-    .btn-primary:hover {
+    .my-btn-primary:hover {
       background: #5b21b6;
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);

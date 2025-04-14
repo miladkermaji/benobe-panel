@@ -31,7 +31,7 @@
           @enderror
         </div>
         <button type="submit" wire:loading.attr="disabled" wire:target="loginWithMobilePass"
-          class="btn btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+          class="btn my-btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
           <span wire:loading.remove wire:target="loginWithMobilePass">ادامه</span>
           <div wire:loading wire:target="loginWithMobilePass" class="loader"></div>
         </button>

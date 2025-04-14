@@ -87,7 +87,7 @@
 
           <div class="text-end mt-4 w-100 d-flex justify-content-end">
             <button wire:click="store"
-              class="btn btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+              class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
@@ -104,10 +104,12 @@
     .bg-gradient-primary {
       background: linear-gradient(90deg, #6b7280, #374151);
     }
+
     .card {
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
+
     .form-control,
     .form-select {
       border: 1px solid #e5e7eb;
@@ -120,12 +122,14 @@
       width: 100%;
       text-align: right;
     }
+
     .form-control:focus,
     .form-select:focus {
       border-color: #6b7280;
       box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
       background: #fff;
     }
+
     .form-label {
       position: absolute;
       top: -25px;
@@ -136,47 +140,65 @@
       padding: 0 5px;
       pointer-events: none;
     }
-    .btn-primary {
+
+    .my-btn-primary {
       background: linear-gradient(90deg, #6b7280, #374151);
       border: none;
       color: white;
       font-weight: 600;
     }
-    .btn-primary:hover {
+
+    .my-btn-primary:hover {
       background: linear-gradient(90deg, #4b5563, #1f2937);
       transform: translateY(-2px);
     }
+
     .btn-outline-light {
       border-color: rgba(255, 255, 255, 0.8);
     }
+
     .btn-outline-light:hover {
       background: rgba(255, 255, 255, 0.15);
       transform: translateY(-2px);
     }
+
     .animate-bounce {
       animation: bounce 1s infinite;
     }
+
     @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-5px);
+      }
     }
+
     .text-shadow {
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
+
     .select2-container {
       width: 100% !important;
     }
+
     .select2-container--default .select2-selection--single {
       height: 48px;
       border: 1px solid #e5e7eb;
       border-radius: 8px;
       background: #fafafa;
     }
+
     .select2-container--default .select2-selection--single .select2-selection__rendered {
       line-height: 46px;
       padding-right: 15px;
       text-align: right;
     }
+
     .select2-container--default .select2-selection--single .select2-selection__arrow {
       height: 46px;
     }

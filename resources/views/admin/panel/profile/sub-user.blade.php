@@ -36,7 +36,7 @@
               @endforeach
             </select>
           </div>
-          <button type="submit" class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+          <button type="submit" class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
             <span class="button_text">ذخیره</span>
             <div class="loader"></div>
           </button>
@@ -62,7 +62,7 @@
             <label class="label-top-input-special-takhasos">انتخاب کاربر:</label>
             <select name="user_id" id="edit-user-select" class="form-control h-50 mb-3"></select>
           </div>
-          <button type="submit" class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+          <button type="submit" class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
             <span class="button_text">ذخیره</span>
             <div class="loader"></div>
           </button>
@@ -74,7 +74,7 @@
 <div class="subuser-content w-100 d-flex justify-content-center mt-4">
   <div class="subuser-content-wrapper p-3">
     <div class="w-100 mt-3 d-flex justify-content-end">
-      <button class="btn btn-primary h-50 add-subuser-btn">افزودن کاربر جدید</button>
+      <button class="btn my-btn-primary h-50 add-subuser-btn">افزودن کاربر جدید</button>
     </div>
 
     <div class="p-3">

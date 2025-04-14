@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="w-100 mt-3">
-          <button type="submit" class="btn btn-primary h-50 w-100">درخواست تسویه حساب</button>
+          <button type="submit" class="btn my-btn-primary h-50 w-100">درخواست تسویه حساب</button>
         </div>
       </form>
     </div>

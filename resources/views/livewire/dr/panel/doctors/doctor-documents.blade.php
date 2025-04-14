@@ -33,7 +33,7 @@
               </div>
             @endforeach
             <button wire:click="uploadFiles"
-              class="btn btn-primary rounded-pill mt-3 px-4 d-flex align-items-center gap-2">
+              class="btn my-btn-primary rounded-pill mt-3 px-4 d-flex align-items-center gap-2">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M12 5v14M5 12h14" />

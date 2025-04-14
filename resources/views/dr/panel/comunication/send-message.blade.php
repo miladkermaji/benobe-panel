@@ -114,7 +114,8 @@
                 placeholder="09123456789">
             </div>
             <div class="mt-2 w-100">
-              <button type="submit" class="btn btn-primary w-100 h-50 d-flex justify-content-center align-items-center"
+              <button type="submit"
+                class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center"
                 style="background: linear-gradient(to right, #2ecc71, #27ae60); border: none;">
                 <span class="button_text">ارسال</span>
                 <div class="loader" style="display: none;"></div>

@@ -122,7 +122,7 @@
 
                       <div class="mx-2">
                         @if (!$clinic->is_active)
-                          <button class="btn btn-primary fs-13 btn-sm h-35" tabindex="0" type="button"
+                          <button class="btn my-btn-primary fs-13 btn-sm h-35" tabindex="0" type="button"
                             onclick="window.location.href='{{ route('activation-doctor-clinic', $clinic) }}'">فعال‌سازی
                           </button>
                         @endif

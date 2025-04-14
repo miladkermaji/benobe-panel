@@ -19,7 +19,8 @@
         <div class="card-header">
           <h5 class="card-title text-dark">پرونده الکترونیک بیمار</h5>
           <div class="float-right">
-            <button class="btn btn-primary h-50 w-100" data-toggle="modal" data-target="#add-patient-modal">افزودن بیمار
+            <button class="btn my-btn-primary h-50 w-100" data-toggle="modal" data-target="#add-patient-modal">افزودن
+              بیمار
               جدید</button>
           </div>
         </div>
@@ -29,7 +30,7 @@
               <div class="input-group">
                 <input type="text" class="form-control h-50 mb-3  my-border-0" id="search-patient"
                   placeholder="جستجو...">
-               
+
               </div>
             </div>
           </div>
@@ -54,7 +55,7 @@
                         <td>{{ $patient->phone }}</td>
                         <td>{{ $patient->address }}</td>
                         <td>
-                          <button class="btn btn-primary h-50 w-100" data-toggle="modal"
+                          <button class="btn my-btn-primary h-50 w-100" data-toggle="modal"
                             data-target="#edit-patient-modal-{{ $patient->id }}">ویرایش</button>
                           <button class="btn btn-danger" data-toggle="modal"
                             data-target="#delete-patient-modal-{{ $patient->id }}">حذف</button>
@@ -102,7 +103,7 @@
             <input type="text" class="form-control h-50 mb-3" id="address" placeholder="آدرس">
           </div>
           <div class="w-100">
-            <button type="button" class="btn btn-primary h-50 w-100">افزودن</button>
+            <button type="button" class="btn my-btn-primary h-50 w-100">افزودن</button>
           </div>
         </form>
       </div>
@@ -146,7 +147,7 @@
                 value="{{ $patient->address }}" placeholder="آدرس">
             </div>
             <div class="w-100">
-              <button type="button" class="btn btn-primary h-50 w-100">ویرایش</button>
+              <button type="button" class="btn my-btn-primary h-50 w-100">ویرایش</button>
             </div>
           </form>
         </div>
