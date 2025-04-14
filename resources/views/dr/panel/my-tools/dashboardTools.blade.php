@@ -762,18 +762,26 @@
     if (hasAttended) {
       return Swal.fire('خطا', 'نمی‌توانید نوبت‌های ویزیت‌شده را جابجا کنید!', 'error');
     }
+
+    // ذخیره oldDates در rescheduleModal
+    const oldDates = [...new Set(selected.map(item => item.date))];
+    $("#rescheduleModal").data("old-dates", oldDates); // ذخیره تاریخ‌های قدیمی
+
     $('#rescheduleModal').modal('show');
     generateRescheduleCalendar(moment().jYear(), moment().jMonth() + 1);
     populateRescheduleSelectBoxes();
+
+    // رویداد کلیک برای روزهای تقویم جابجایی
     $('#calendar-reschedule .calendar-day').not('.empty').off('click').on('click', function() {
       const newDate = $(this).data('date');
       const gregorianDate = moment(newDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
       const today = moment().format('YYYY-MM-DD');
-      if (gregorianDate < today || $(this).hasClass('holiday') || $(this).find('.my-badge-success')
-        .length > 0) {
+      if (gregorianDate < today || $(this).hasClass('holiday') || $(this).find('.my-badge-success').length >
+        0) {
         Swal.fire('خطا', 'امکان جابجایی نوبت به این تاریخ وجود ندارد.', 'error');
         return;
       }
+
       Swal.fire({
         title: `جابجایی نوبت‌ها به ${moment(newDate, 'jYYYY-jMM-jDD').locale('fa').format('jD jMMMM jYYYY')}؟`,
         icon: 'question',
@@ -782,8 +790,15 @@
         cancelButtonText: 'لغو'
       }).then((result) => {
         if (result.isConfirmed) {
-          let oldDates = [...new Set(selected.map(item => item.date))]; // تاریخ‌ها به فرمت میلادی
-          oldDates.forEach(oldDate => {
+          // بازیابی oldDates از rescheduleModal
+          const storedOldDates = $("#rescheduleModal").data("old-dates") || [];
+          if (!storedOldDates.length) {
+            Swal.fire('خطا', 'تاریخ‌های نوبت‌های قبلی یافت نشدند!', 'error');
+            return;
+          }
+
+          // ارسال درخواست برای هر oldDate
+          storedOldDates.forEach(oldDate => {
             $.ajax({
               url: "{{ route('doctor.reschedule_appointment') }}",
               method: 'POST',
@@ -808,9 +823,10 @@
                   Swal.fire('موفقیت', response.message, 'success');
                   loadAppointmentsCount();
                   loadHolidayStyles();
-                  fetchAppointmentsCount()
-                  loadAppointments(gregorianDate, selectedClinicId)
+                  fetchAppointmentsCount();
+                  loadAppointments(gregorianDate, localStorage.getItem('selectedClinicId'));
                   selected.forEach(app => app.row.remove());
+                  $('#rescheduleModal').modal('hide');
                 } else {
                   Swal.fire('خطا', response.message, 'error');
                 }
@@ -832,20 +848,22 @@
   $(document).on('click', '.move-appointment', function() {
     let appointmentId = $(this).data('id');
     let oldDate = $(this).data('date');
+
     if (!appointmentId || !oldDate) {
       Swal.fire("خطا", "امکان دریافت اطلاعات نوبت وجود ندارد.", "error");
       return;
     }
 
+    // ذخیره oldDate و appointmentId در rescheduleModal
     $("#rescheduleModal").attr("data-appointment-id", appointmentId);
-    $("#rescheduleModal").attr("data-old-date", oldDate);
+    $("#rescheduleModal").attr("data-old-date", oldDate); // اطمینان از ذخیره oldDate
     $('#rescheduleModal').modal('show');
+
     let year = moment(oldDate, 'YYYY-MM-DD').jYear();
     let month = moment(oldDate, 'YYYY-MM-DD').jMonth() + 1;
     generateRescheduleCalendar(year, month);
     populateRescheduleSelectBoxes();
-
-    fetchAppointmentsCount()
+    fetchAppointmentsCount();
   });
 </script>
 <script>
@@ -1101,7 +1119,7 @@
   }
 
   function attachRescheduleDayClickEvents() {
-    $('#calendar-reschedule .calendar-day').not('.empty').click(function() {
+    $('#calendar-reschedule .calendar-day').not('.empty').off('click').on('click', function() {
       const selectedDate = $(this).data('date');
       const gregorianDate = moment(selectedDate, 'jYYYY-jMM-jDD').format('YYYY-MM-DD');
       const today = moment().format('YYYY-MM-DD');
@@ -1109,6 +1127,7 @@
       $('#calendar-reschedule .calendar-day').removeClass('active');
       $(this).addClass('active');
       const hasAppointment = $(this).find('.my-badge-success').length > 0;
+
       if (gregorianDate < today) {
         Swal.fire('خطا', 'نمی‌توانید نوبت‌ها را به تاریخ‌های گذشته منتقل کنید.', 'error');
       } else if (isHoliday) {
@@ -1125,43 +1144,80 @@
           cancelButtonText: 'لغو',
         }).then((result) => {
           if (result.isConfirmed) {
-            let oldDate = $('#dateModal').data('selectedDate');
-            if (!oldDate) {
-              oldDate = $("#rescheduleModal").data("old-date");
-            }
-            if (!oldDate) {
-              Swal.fire("خطا", "تاریخ نوبت قبلی یافت نشد!", "error");
-              return;
-            }
-            $.ajax({
-              url: "{{ route('doctor.reschedule_appointment') }}",
-              method: 'POST',
-              data: {
-                old_date: oldDate,
-                new_date: gregorianDate,
-                _token: '{{ csrf_token() }}',
-                selectedClinicId: localStorage.getItem('selectedClinicId')
+            // بررسی وجود old-dates (برای جابجایی گروهی)
+            let oldDates = $("#rescheduleModal").data("old-dates") || [];
+            let oldDate = $("#rescheduleModal").attr("data-old-date") || $('#dateModal').data('selectedDate');
 
-              },
-              success: function(response) {
-                if (response.status) {
-                  Swal.fire('موفقیت', response.message, 'success');
-                  loadAppointmentsCount();
-                  loadHolidayStyles();
-                  fetchAppointmentsCount()
-                  loadAppointments(gregorianDate,localStorage.getItem('selectedClinicId'))
-                } else {
-                  Swal.fire('خطا', response.message, 'error');
-                }
-              },
-              error: function(xhr) {
-                let errorMessage = 'مشکلی در ارتباط با سرور رخ داده است.';
-                if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
-                  errorMessage = xhr.responseJSON.message;
-                }
-                Swal.fire('خطا', errorMessage, 'error');
+            // اگر oldDates وجود داره (جابجایی گروهی)
+            if (oldDates.length) {
+              oldDates.forEach(oldDate => {
+                $.ajax({
+                  url: "{{ route('doctor.reschedule_appointment') }}",
+                  method: 'POST',
+                  data: {
+                    old_date: oldDate,
+                    new_date: gregorianDate,
+                    _token: '{{ csrf_token() }}',
+                    selectedClinicId: localStorage.getItem('selectedClinicId')
+                  },
+                  success: function(response) {
+                    if (response.status) {
+                      Swal.fire('موفقیت', response.message, 'success');
+                      loadAppointmentsCount();
+                      loadHolidayStyles();
+                      fetchAppointmentsCount();
+                      loadAppointments(gregorianDate, localStorage.getItem('selectedClinicId'));
+                      $('#rescheduleModal').modal('hide');
+                    } else {
+                      Swal.fire('خطا', response.message, 'error');
+                    }
+                  },
+                  error: function(xhr) {
+                    let errorMessage = 'مشکلی در ارتباط با سرور رخ داده است.';
+                    if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
+                      errorMessage = xhr.responseJSON.message;
+                    }
+                    Swal.fire('خطا', errorMessage, 'error');
+                  }
+                });
+              });
+            } else if (oldDate) {
+              // جابجایی تکی
+              if (oldDate.includes('/')) {
+                oldDate = moment(oldDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
               }
-            });
+              $.ajax({
+                url: "{{ route('doctor.reschedule_appointment') }}",
+                method: 'POST',
+                data: {
+                  old_date: oldDate,
+                  new_date: gregorianDate,
+                  _token: '{{ csrf_token() }}',
+                  selectedClinicId: localStorage.getItem('selectedClinicId')
+                },
+                success: function(response) {
+                  if (response.status) {
+                    Swal.fire('موفقیت', response.message, 'success');
+                    loadAppointmentsCount();
+                    loadHolidayStyles();
+                    fetchAppointmentsCount();
+                    loadAppointments(gregorianDate, localStorage.getItem('selectedClinicId'));
+                    $('#rescheduleModal').modal('hide');
+                  } else {
+                    Swal.fire('خطا', response.message, 'error');
+                  }
+                },
+                error: function(xhr) {
+                  let errorMessage = 'مشکلی در ارتباط با سرور رخ داده است.';
+                  if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                  }
+                  Swal.fire('خطا', errorMessage, 'error');
+                }
+              });
+            } else {
+              Swal.fire("خطا", "تاریخ نوبت قبلی یافت نشد! لطفاً دوباره تلاش کنید.", "error");
+            }
           }
         });
       }
@@ -1585,6 +1641,7 @@
     });
     $(document).on('click', '.btn-reschedule', function() {
       const selectedDate = $('#dateModal').data('selectedDate');
+      $("#rescheduleModal").data("old-dates", [selectedDate]); // ذخیره به‌صورت آرایه برای سازگاری
       $('#rescheduleModal').modal('show');
       const year = moment(selectedDate, 'YYYY-MM-DD').jYear();
       const month = moment(selectedDate, 'YYYY-MM-DD').jMonth() + 1;
