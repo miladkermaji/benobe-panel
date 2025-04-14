@@ -1245,7 +1245,7 @@ public function rescheduleAppointment(Request $request)
 {
     $validated = $request->validate([
         'old_date' => 'required',
-        'new_date' => 'required|date',
+        'new_date' => 'required|date_format:Y-m-d',
         'selectedClinicId' => 'nullable|string',
     ]);
 
@@ -1255,14 +1255,19 @@ public function rescheduleAppointment(Request $request)
     try {
         // تبدیل تاریخ old_date
         $oldDateGregorian = $validated['old_date'];
+
+        // بررسی فرمت‌های مختلف
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $oldDateGregorian)) {
-            // فرمت میلادی
+            // فرمت میلادی (Y-m-d)
         } elseif (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $oldDateGregorian)) {
-            // فرمت شمسی
+            // فرمت شمسی (Y/m/d)
             $oldDateGregorian = Jalalian::fromFormat('Y/m/d', $oldDateGregorian)->toCarbon()->toDateString();
+        } elseif (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z$/', $oldDateGregorian)) {
+            // فرمت ISO 8601
+            $oldDateGregorian = Carbon::parse($oldDateGregorian)->toDateString(); // فقط تاریخ رو نگه می‌داریم
         } else {
             Log::error('Invalid old_date format', ['old_date' => $oldDateGregorian]);
-            return response()->json(['status' => false, 'message' => 'فرمت تاریخ قدیم نادرست است.'], 400);
+            return response()->json(['status' => false, 'message' => 'فرمت تاریخ قدیم نامعتبر است. از فرمت Y/m/d، Y-m-d یا ISO 8601 استفاده کنید.'], 400);
         }
 
         // اعتبارسنجی تاریخ جدید
@@ -1291,15 +1296,6 @@ public function rescheduleAppointment(Request $request)
             }, function ($query) {
                 $query->whereNull('clinic_id');
             });
-
-        // لاگ کوئری برای دیباگ
-        Log::info('Reschedule Appointment Query', [
-            'sql' => $appointmentsQuery->toSql(),
-            'bindings' => $appointmentsQuery->getBindings(),
-            'doctor_id' => $doctorId,
-            'old_date' => $oldDateGregorian,
-            'clinic_id' => $selectedClinicId
-        ]);
 
         $appointments = $appointmentsQuery->get();
 

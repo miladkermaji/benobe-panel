@@ -33,27 +33,25 @@ class DrPanelController extends Controller
         $selectedClinicId = $request->selectedClinicId;
         $jalaliDate = $request->input('date');
 
+        // اعتبارسنجی اولیه
+        if (empty($jalaliDate)) {
+            return response()->json([
+                'success' => false,
+                'appointments' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                ],
+                'error' => 'تاریخ الزامی است.'
+            ], 400);
+        }
+
+        // بررسی فرمت‌های مختلف تاریخ
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $jalaliDate)) {
-            $gregorianDate = $jalaliDate;
-        } else {
-            if (strpos($jalaliDate, '-') !== false) {
-                $jalaliDate = str_replace('-', '/', $jalaliDate);
-            }
-
-            if (!preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $jalaliDate)) {
-                return response()->json([
-                    'success' => false,
-                    'appointments' => [],
-                    'pagination' => [
-                        'current_page' => 1,
-                        'last_page' => 1,
-                        'per_page' => 10,
-                        'total' => 0,
-                    ],
-                    'error' => 'فرمت تاریخ جلالی نادرست است.'
-                ], 400);
-            }
-
+            $gregorianDate = $jalaliDate; // فرمت میلادی
+        } elseif (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $jalaliDate)) {
             try {
                 $gregorianDate = Jalalian::fromFormat('Y/m/d', $jalaliDate)->toCarbon()->format('Y-m-d');
             } catch (\Exception $e) {
@@ -67,8 +65,20 @@ class DrPanelController extends Controller
                         'total' => 0,
                     ],
                     'error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'
-                ], 500);
+                ], 400);
             }
+        } else {
+            return response()->json([
+                'success' => false,
+                'appointments' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                ],
+                'error' => 'فرمت تاریخ نامعتبر است. از فرمت Y/m/d یا Y-m-d استفاده کنید.'
+            ], 400);
         }
 
         $doctorId = Auth::guard('doctor')->user()->id;
