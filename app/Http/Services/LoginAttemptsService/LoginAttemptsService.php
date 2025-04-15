@@ -3,6 +3,7 @@
 namespace App\Http\Services\LoginAttemptsService;
 
 use App\Models\LoginAttempt;
+use Illuminate\Support\Facades\Log;
 
 class LoginAttemptsService
 {
@@ -65,7 +66,19 @@ class LoginAttemptsService
     public function isLocked($mobile)
     {
         $attempt = LoginAttempt::where('mobile', $mobile)->first();
-        return $attempt && $attempt->lockout_until && $attempt->lockout_until > now();
+        if ($attempt && $attempt->lockout_until && $attempt->lockout_until <= now()) {
+            $this->resetLoginAttempts($mobile);
+            Log::info("Lock expired and reset for mobile: $mobile");
+            return false;
+        }
+        $isLocked = $attempt && $attempt->lockout_until && $attempt->lockout_until > now();
+        Log::info("isLocked for mobile $mobile: ", [
+            'attempt_exists' => !!$attempt,
+            'lockout_until' => $attempt?->lockout_until,
+            'now' => now(),
+            'is_locked' => $isLocked
+        ]);
+        return $isLocked;
     }
 
     public function getRemainingLockTime($mobile)

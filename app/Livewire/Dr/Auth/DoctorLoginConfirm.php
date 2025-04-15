@@ -2,18 +2,19 @@
 
 namespace App\Livewire\Dr\Auth;
 
-use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
-use App\Models\Doctor;
-use App\Models\LoginLog;
-use App\Models\LoginSession;
-use App\Models\Otp;
-use App\Models\Secretary;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use App\Models\Otp;
+use App\Models\Doctor;
 use Livewire\Component;
+use App\Models\LoginLog;
+use App\Models\Secretary;
+use Illuminate\Support\Str;
+use App\Models\LoginSession;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 
 class DoctorLoginConfirm extends Component
 {
@@ -130,6 +131,7 @@ class DoctorLoginConfirm extends Component
             $userType = 'secretary';
         }
 
+        Log::info("Resetting login attempts for mobile: $mobile");
         $loginAttempts->resetLoginAttempts($user->mobile);
         session()->forget(['step1_completed', 'current_step', 'otp_token']);
         LoginSession::where('token', $this->token)->delete();
