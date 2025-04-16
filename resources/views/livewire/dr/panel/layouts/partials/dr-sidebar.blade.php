@@ -36,7 +36,7 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li {{ Request::routeIs('dr-appointments') ? 'is-active' : '' }}">
-              <a href="{{ route('dr-appointments') }}">مراجعین من</a>
+              <a href="{{ route('dr-appointments') }}"> لیست نوبت ها</a>
             </li>
             <li class="item-li {{ Request::routeIs('dr-workhours') ? 'is-active' : '' }}">
               <a href="{{ route('dr-workhours') }}">ساعت کاری</a>

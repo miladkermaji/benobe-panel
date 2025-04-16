@@ -29,5 +29,13 @@ class AppServiceProvider extends ServiceProvider
             $view->with('clinics', $clinics);
         });
 
+        View::composer('livewire.dr.panel.layouts.partials.header-component', function ($view) {
+            $doctorId = Auth::guard('doctor')->id();
+            $clinics  = Clinic::where('doctor_id', $doctorId)->get();
+
+            $view->with('clinics', $clinics);
+        });
+
+
     }
 }

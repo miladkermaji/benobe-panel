@@ -226,7 +226,6 @@ textarea {
 .custom-border-bottom {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px,
         rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
-    padding: 20px 28px;
     border-bottom-right-radius: 0 !important;
 }
 
@@ -1080,9 +1079,8 @@ svg {
 }
 .header {
     background: white;
-    padding: 20px 28px;
+    padding: 5px 25px;
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1101,6 +1099,7 @@ svg {
     font-size: 20px;
     padding-top: 3px;
     display: inline-block;
+    color: red;
 }
 
 .margin-15 {

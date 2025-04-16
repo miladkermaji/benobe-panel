@@ -418,27 +418,27 @@ Route::prefix('dr')
 
             Route::post('appointments/{id}/end-visit-counseling', [MoshavereWaitingController::class, 'endVisit'])->name('doctor.end-visit-counseling');
 
-            Route::post('appointments/{id}/end-visit', [DrPanelController::class, 'endVisit'])->name('doctor.end-visit');
+            Route::post('appointments/{id}/end-visit', [DrScheduleController::class, 'endVisit'])->name('doctor.end-visit');
 
 
 
-            Route::get('/doctor/appointments/by-date', [DrPanelController::class, 'getAppointmentsByDate'])
+            Route::get('/doctor/appointments/by-date', [DrScheduleController::class, 'getAppointmentsByDate'])
                 ->name('doctor.appointments.by-date');
 
 
 
-            Route::get('/search/patients', [DrPanelController::class, 'searchPatients'])->name('search.patients');
+            Route::get('/search/patients', [DrScheduleController::class, 'searchPatients'])->name('search.patients');
 
             Route::get('/search/patients-counseling', [MoshavereWaitingController::class, 'searchPatients'])->name('search.patients-counseling');
 
-            Route::post('/appointments/update-date/{id}', [DrPanelController::class, 'updateAppointmentDate'])
+            Route::post('/appointments/update-date/{id}', [DrScheduleController::class, 'updateAppointmentDate'])
                 ->name('updateAppointmentDate');
             Route::prefix('doctor-notes')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'index'])->name('dr.panel.doctornotes.index');
                 Route::get('/create', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'create'])->name('dr.panel.doctornotes.create');
                 Route::get('/edit/{id}', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'edit'])->name('dr.panel.doctornotes.edit');
             });
-            Route::get('/doctor/appointments/filter', [DrPanelController::class, 'filterAppointments'])->name('doctor.appointments.filter');
+            Route::get('/doctor/appointments/filter', [DrScheduleController::class, 'filterAppointments'])->name('doctor.appointments.filter');
             Route::get('/doctor/appointments/filter-counseling', [MoshavereWaitingController::class, 'filterAppointments'])->name('doctor.appointments.filter.counseling');
 
             Route::prefix('turn')->middleware('secretary.permission:appointments')->group(function () {

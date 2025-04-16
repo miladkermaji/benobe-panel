@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Dr\Panel\Turn;
 
-use App\Http\Controllers\Dr\Controller;
-use App\Models\Appointment;
-use App\Models\SubUser;
 use Carbon\Carbon;
+use App\Models\SubUser;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Morilog\Jalali\Jalalian;
+use App\Jobs\SendSmsNotificationJob;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Dr\Controller;
 
 class DrScheduleController extends Controller
 {
@@ -70,30 +71,64 @@ class DrScheduleController extends Controller
         return view("dr.panel.turn.schedule.appointments", compact('appointments', 'clinics'));
     }
 
-    public function filterAppointments(Request $request)
+    public function getAppointmentsByDate(Request $request)
     {
-        $doctor = $this->getAuthenticatedDoctor();
-        if (! $doctor) {
-            return response()->json(['error' => 'دسترسی غیرمجاز!'], 403);
+        $selectedClinicId = $request->selectedClinicId;
+        $jalaliDate = $request->input('date');
+
+        // اعتبارسنجی اولیه
+        if (empty($jalaliDate)) {
+            return response()->json([
+                'success' => false,
+                'appointments' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                ],
+                'error' => 'تاریخ الزامی است.'
+            ], 400);
         }
 
-        $selectedClinicId = $request->query('selectedClinicId');
-        $filterType = $request->input('type');
-        $selectedDate = $request->input('date');
-
-        try {
-            $gregorianDate = Jalalian::fromFormat('Y/m/d', $selectedDate)->toCarbon()->format('Y-m-d');
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'فرمت تاریخ نامعتبر است.'], 400);
+        // بررسی فرمت‌های مختلف تاریخ
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $jalaliDate)) {
+            $gregorianDate = $jalaliDate; // فرمت میلادی
+        } elseif (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $jalaliDate)) {
+            try {
+                $gregorianDate = Jalalian::fromFormat('Y/m/d', $jalaliDate)->toCarbon()->format('Y-m-d');
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'appointments' => [],
+                    'pagination' => [
+                        'current_page' => 1,
+                        'last_page' => 1,
+                        'per_page' => 10,
+                        'total' => 0,
+                    ],
+                    'error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'
+                ], 400);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'appointments' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                ],
+                'error' => 'فرمت تاریخ نامعتبر است. از فرمت Y/m/d یا Y-m-d استفاده کنید.'
+            ], 400);
         }
 
-        $query = Appointment::with(['patient', 'clinic'])
-            ->where('doctor_id', $doctor->id)
-            ->whereDate('appointment_date', $gregorianDate);
+        $doctorId = Auth::guard('doctor')->user()->id;
 
-        if (empty($filterType)) {
-            $query->withTrashed();
-        }
+        $query = Appointment::where('doctor_id', $doctorId)
+            ->whereDate('appointment_date', $gregorianDate)
+            ->with(['patient', 'insurance']);
 
         if ($selectedClinicId === 'default') {
             $query->whereNull('clinic_id');
@@ -101,144 +136,209 @@ class DrScheduleController extends Controller
             $query->where('clinic_id', $selectedClinicId);
         }
 
-        if ($filterType) {
-            if ($filterType === "in_person") {
-                $query->where('clinic_id', $selectedClinicId);
-            }
-        }
-
-        $appointments = $query->get();
-
-        return response()->json(['appointments' => $appointments]);
-    }
-
-    public function showByDateAppointments(Request $request)
-    {
-        $doctor = $this->getAuthenticatedDoctor();
-        if (! $doctor) {
-            abort(403, 'شما به این بخش دسترسی ندارید.');
-        }
-
-        $selectedDate = $request->input('date', Jalalian::now()->format('Y/m/d'));
-        $selectedClinicId = $request->query('selectedClinicId');
-        $filterType = $request->input('type');
-
-        try {
-            $gregorianDate = Jalalian::fromFormat('Y/m/d', $selectedDate)->toCarbon()->format('Y-m-d');
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'فرمت تاریخ وارد شده نامعتبر است.',
-            ], 400);
-        }
-
-        $appointments = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
-            ->where('doctor_id', $doctor->id)
-            ->where('appointment_date', '=', $gregorianDate);
-
-        if (empty($filterType)) {
-            $appointments->withTrashed(); // برای "کل نوبت‌ها" نوبت‌های ترش‌شده رو هم بیار
-        }
-
-        if ($selectedClinicId === 'default') {
-            $appointments->whereNull('clinic_id');
-        } elseif ($selectedClinicId) {
-            $appointments->where('clinic_id', $selectedClinicId);
-        }
-
-        if ($filterType) {
-            if ($filterType === "in_person") {
-                $appointments->whereNotNull('clinic_id')
-                             ->where('clinic_id', $selectedClinicId);
-            } elseif ($filterType === "online") {
-                $appointments->whereNull('clinic_id'); // فقط نوبت‌های آنلاین بدون کلینیک
-            }
-        }
-
-        $appointments = $appointments->get();
+        $appointments = $query->paginate(10);
 
         return response()->json([
-            'appointments' => $appointments,
+            'success' => true,
+            'appointments' => $appointments->items(),
+            'pagination' => [
+                'current_page' => $appointments->currentPage(),
+                'last_page' => $appointments->lastPage(),
+                'per_page' => $appointments->perPage(),
+                'total' => $appointments->total(),
+            ],
         ]);
     }
 
-    public function searchAppointments(Request $request)
+    public function searchPatients(Request $request)
     {
-        $doctor = $this->getAuthenticatedDoctor();
-        if (!$doctor) {
-            return response()->json(['error' => 'دسترسی غیرمجاز!'], 403);
+        $query = $request->query('query');
+        $date = $request->query('date');
+        $selectedClinicId = $request->query('selectedClinicId');
+
+        if (empty($date)) {
+            return response()->json([
+                'success' => false,
+                'patients' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                ],
+                'error' => 'تاریخ جستجو الزامی است.'
+            ], 400);
         }
 
-        $searchQuery = $request->input('query');
-        $selectedClinicId = $request->query('selectedClinicId');
-        $filterType = $request->input('type');
-        $date = $request->input('date', Jalalian::now()->format('Y/m/d'));
+        if (strpos($date, '-') !== false) {
+            $date = str_replace('-', '/', $date);
+        }
+
+        if (!preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $date)) {
+            return response()->json([
+                'success' => false,
+                'patients' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                ],
+                'error' => 'فرمت تاریخ جلالی نادرست است.'
+            ], 400);
+        }
 
         try {
             $gregorianDate = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
         } catch (\Exception $e) {
-            return response()->json(['error' => 'فرمت تاریخ نامعتبر است.'], 400);
+            return response()->json([
+                'success' => false,
+                'patients' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                ],
+                'error' => 'خطا در تبدیل تاریخ جلالی به میلادی.'
+            ], 500);
         }
 
-        $query = Appointment::with(['patient', 'clinic'])
-            ->where('doctor_id', $doctor->id)
-            ->where('appointment_date', $gregorianDate);
+        $appointmentsQuery = Appointment::with('patient', 'insurance')
+            ->whereDate('appointment_date', $gregorianDate)
+            ->whereHas('patient', function ($q) use ($query) {
+                $q->where('first_name', 'like', "%$query%")
+                    ->orWhere('last_name', 'like', "%$query%")
+                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%$query%"])
+                    ->orWhere('mobile', 'like', "%$query%")
+                    ->orWhere('national_code', 'like', "%$query%");
+            });
 
-        // برای "کل نوبت‌ها" نوبت‌های ترش‌شده رو هم بیار
-        if (empty($filterType)) {
-            $query->withTrashed();
-        }
-
-        // اعمال فیلتر کلینیک
         if ($selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
+            $appointmentsQuery->whereNull('clinic_id');
         } elseif ($selectedClinicId) {
+            $appointmentsQuery->where('clinic_id', $selectedClinicId);
+        }
+
+        $patients = $appointmentsQuery->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'patients' => $patients->items(),
+            'pagination' => [
+                'current_page' => $patients->currentPage(),
+                'last_page' => $patients->lastPage(),
+                'per_page' => $patients->perPage(),
+                'total' => $patients->total(),
+            ],
+        ]);
+    }
+
+    public function updateAppointmentDate(Request $request, $id)
+    {
+        $request->validate([
+            'new_date' => 'required|date_format:Y-m-d',
+        ]);
+
+        $appointment = Appointment::findOrFail($id);
+
+        if ($appointment->status === 'attended' || $appointment->status === 'cancelled') {
+            return response()->json([
+                'success' => false,
+                'error' => 'نمی‌توانید نوبت ویزیت‌شده یا لغو شده را جابجا کنید.'
+            ], 400);
+        }
+
+        $newDate = Carbon::parse($request->new_date);
+        if ($newDate->lt(Carbon::today())) {
+            return response()->json([
+                'success' => false,
+                'error' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'
+            ], 400);
+        }
+
+        $oldDate = $appointment->appointment_date;
+        $appointment->appointment_date = $newDate;
+        $appointment->save();
+
+        $oldDateJalali = Jalalian::fromDateTime($oldDate)->format('Y/m/d');
+        $newDateJalali = Jalalian::fromDateTime($newDate)->format('Y/m/d');
+
+        if ($appointment->patient && $appointment->patient->mobile) {
+            $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به {$newDateJalali} تغییر یافت.";
+            SendSmsNotificationJob::dispatch(
+                $message,
+                [$appointment->patient->mobile],
+                null,
+                []
+            )->delay(now()->addSeconds(5));
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'نوبت با موفقیت جابجا شد.'
+        ]);
+    }
+
+    public function filterAppointments(Request $request)
+    {
+        $status = $request->query('status');
+        $attendanceStatus = $request->query('attendance_status');
+        $selectedClinicId = $request->input('selectedClinicId');
+
+        $query = Appointment::withTrashed();
+
+        if ($selectedClinicId && $selectedClinicId !== 'default') {
             $query->where('clinic_id', $selectedClinicId);
         }
 
-        // اعمال فیلتر نوع نوبت
-        if ($filterType) {
-            if ($filterType === 'in_person') {
-                $query->whereNotNull('clinic_id')
-                      ->where('clinic_id', $selectedClinicId);
-            } elseif ($filterType === 'online') {
-                $query->whereNull('clinic_id'); // فقط نوبت‌های آنلاین بدون کلینیک
-            }
+        if (!empty($status)) {
+            $query->where('status', $status);
         }
 
-        // اعمال جستجو
-        if ($searchQuery) {
-            $query->where(function ($q) use ($searchQuery) {
-                $q->whereHas('patient', function ($patientQuery) use ($searchQuery) {
-                    $patientQuery->where('first_name', 'like', "%{$searchQuery}%")
-                        ->orWhere('last_name', 'like', "%{$searchQuery}%")
-                        ->orWhere('mobile', 'like', "%{$searchQuery}%")
-                        ->orWhere('national_code', 'like', "%{$searchQuery}%");
-                });
-            });
+        if (!empty($attendanceStatus)) {
+            $query->where('attendance_status', $attendanceStatus);
         }
 
-        $appointments = $query->get();
+        $appointments = $query->with(['patient', 'doctor', 'clinic', 'insurance'])->paginate(10);
 
-        return response()->json(['appointments' => $appointments]);
+        return response()->json([
+            'success' => true,
+            'appointments' => $appointments->items(),
+            'pagination' => [
+                'current_page' => $appointments->currentPage(),
+                'last_page' => $appointments->lastPage(),
+                'per_page' => $appointments->perPage(),
+                'total' => $appointments->total(),
+            ],
+        ]);
     }
 
     public function endVisit(Request $request, $id)
     {
-        $doctor = $this->getAuthenticatedDoctor();
-        if (!$doctor) {
-            return response()->json(['error' => 'دسترسی غیرمجاز!'], 403);
+        try {
+            $appointment = Appointment::findOrFail($id);
+
+            $request->validate([
+                'description' => 'nullable|string|max:1000',
+            ]);
+
+            $appointment->description = $request->input('description');
+            $appointment->status = 'attended';
+            $appointment->attendance_status = 'attended';
+            $appointment->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'ویزیت با موفقیت ثبت شد.',
+                'appointment' => $appointment
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ثبت ویزیت: ' . $e->getMessage()
+            ], 500);
         }
-
-        $appointment = Appointment::where('doctor_id', $doctor->id)->findOrFail($id);
-
-        if ($appointment->status === 'attended' || $appointment->status === 'cancelled') {
-            return response()->json(['error' => 'این نوبت قبلاً پایان یافته یا لغو شده است.'], 400);
-        }
-
-        $appointment->status = 'attended';
-        $appointment->save();
-
-        return response()->json(['message' => 'ویزیت با موفقیت پایان یافت.']);
     }
 
     public function myAppointments()
