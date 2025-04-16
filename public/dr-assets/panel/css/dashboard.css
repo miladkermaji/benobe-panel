@@ -65,7 +65,6 @@
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(8px);
-    -webkit-background-clip: text;
 }
 
 .chart-container:hover {
