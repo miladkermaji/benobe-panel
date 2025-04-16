@@ -1072,7 +1072,9 @@ svg {
     margin-right: 250px;
     transition: all 200ms ease;
 }
-
+.h-30{
+    height: 30px !important;
+}
 .content.is-active {
     margin-right: 80px;
     transition: all 200ms ease;

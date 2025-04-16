@@ -112,7 +112,7 @@
   </div>
   {{-- here put calender --}}
 <x-jalali-calendar-row />
-<div class="sicks-content h-100 mt-2 w-100  position-relative border">
+<div class="sicks-content h-100 w-100  position-relative border">
   <div>
     <div class="table-responsive position-relative top-table w-100">
       <table class="table w-100 text-sm text-center table-bordered">
@@ -149,6 +149,7 @@
             <input class="w-4 h-4 text-blue-600 border-none focus:ring-0 bg-transparent cursor-pointer"
               type="checkbox" value="" id="select-all">
             <!-- فاصله بین چک‌باکس و آیکون -->
+
             <span class="w-2"></span>
           </button>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -196,23 +197,23 @@
         });
       </script>
       <button id="cancel-appointments-btn"
-        class="btn btn-light h-50 fs-13 d-flex align-items-center justify-content-center">
+        class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center">
 
         <img src="{{ asset('dr-assets/icons/cancle-appointment.svg') }}" alt="" srcset="">
-        <span class="d-none d-md-block mx-1">لغو </span>
+        <span class="d-none d-md-block mx-1">لغو نوبت</span>
       </button>
       <button id="move-appointments-btn"
-        class="btn btn-light h-50 fs-13 d-flex align-items-center justify-content-center">
+        class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center">
 
         <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="" srcset="">
 
-        <span class="d-none d-md-block mx-1">جابجایی </span>
+        <span class="d-none d-md-block mx-1">جابجایی نوبت</span>
       </button>
-      <button id="block-users-btn" class="btn btn-light h-50 fs-13 d-flex align-items-center justify-content-center">
+      <button id="block-users-btn" class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center">
 
         <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="" srcset="">
 
-        <span class="d-none d-md-block mx-1">مسدود کردن </span>
+        <span class="d-none d-md-block mx-1">مسدود کردن کاربر </span>
       </button>
     </div>
   </div>
