@@ -66,9 +66,7 @@
     overflow: hidden;
     backdrop-filter: blur(8px);
 }
-.myPanelOption{
-    display: none;
-}
+
 .chart-container:hover {
     transform: translateY(-8px);
     box-shadow: var(--hover-shadow);

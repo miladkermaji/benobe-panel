@@ -217,11 +217,19 @@ class MyPerformanceController extends Controller
         $clinicId = $request->input('clinic_id', 'default');
         $doctorId = Auth::guard('doctor')->user()->id;
 
+        // اعتبارسنجی clinic_id
+        if ($clinicId !== 'default' && !is_numeric($clinicId)) {
+            Log::warning('مقدار clinic_id نامعتبر:', ['clinicId' => $clinicId]);
+            return response()->json(['error' => 'مقدار clinic_id نامعتبر است'], 400);
+        }
+
         $clinicCondition = function ($query) use ($clinicId) {
             if ($clinicId === 'default') {
+                Log::debug('اعمال فیلتر whereNull برای clinic_id');
                 $query->whereNull('clinic_id');
             } else {
-                $query->where('clinic_id', $clinicId);
+                Log::debug('اعمال فیلتر where برای clinic_id:', ['clinicId' => $clinicId]);
+                $query->whereNotNull('clinic_id')->where('clinic_id', $clinicId);
             }
         };
 
@@ -241,6 +249,8 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
             ->get();
 
+        Log::info('نتایج نوبت‌ها:', ['appointments' => $appointments]);
+
         $monthlyIncome = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
@@ -249,6 +259,8 @@ class MyPerformanceController extends Controller
             ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
             ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
             ->get();
+
+        Log::info('نتایج درآمد ماهانه:', ['monthlyIncome' => $monthlyIncome]);
 
         $newPatients = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
@@ -259,26 +271,13 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointments.appointment_date, '%m')")
             ->get();
 
-        $appointmentStatusByMonth = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition)
-            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
-                     COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
-                     COUNT(CASE WHEN status = 'attended' THEN 1 END) as attended_count,
-                     COUNT(CASE WHEN status = 'missed' THEN 1 END) as missed_count,
-                     COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count")
-            ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-            ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
-            ->get();
-
-
-    
+        Log::info('نتایج بیماران جدید:', ['newPatients' => $newPatients]);
 
         return response()->json([
             'appointments'             => $appointments->isEmpty() ? [] : $appointments,
             'monthlyIncome'            => $monthlyIncome->isEmpty() ? [] : $monthlyIncome,
             'newPatients'              => $newPatients->isEmpty() ? [] : $newPatients,
-            'appointmentStatusByMonth' => $appointmentStatusByMonth->isEmpty() ? [] : $appointmentStatusByMonth,
-            
+            'appointmentStatusByMonth' => $appointments->isEmpty() ? [] : $appointments,
         ]);
     }
 }

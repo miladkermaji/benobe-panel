@@ -55,10 +55,12 @@
       $('.dropdown-label').text(selectedText);
       localStorage.setItem('selectedClinic', selectedText);
       localStorage.setItem('selectedClinicId', selectedId);
-      checkInactiveClinics();
-      handleDateSelection(persianDate, selectedId);
-      loadAppointments(persianDate, selectedId);
-      fetchAppointmentsCount()
+      /*    checkInactiveClinics();
+         handleDateSelection(persianDate, selectedId);
+         loadAppointments(persianDate, selectedId);
+         fetchAppointmentsCount(); */
+      window.location.reload()
+
       $('.dropdown-trigger').removeClass('border border-primary');
       $('.my-dropdown-menu').addClass('d-none');
       dropdownOpen = false;
@@ -573,34 +575,116 @@
     });
   });
 
-  function loadCalendarRow(date) {
+  function loadCalendarRow() {
     calendar.empty();
     let badgeCount = 0;
+    let displayedDays = 0;
+    let current = moment(currentDate).locale('en');
+    let i = 0;
 
-    for (let i = 0; i < days; i++) {
-      const current = moment(date).locale('en').add(i, 'days');
-      const persianDate = current.locale('fa').format('dddd');
-      const persianFormattedDate = current.locale('fa').format('D MMMM YYYY');
-      const isActive = current.isSame(moment().locale('en'), 'day') ? 'my-active' : '';
-      const appointmentDate = current.locale('en').format('YYYY-MM-DD');
+    // اضافه کردن تاریخ امروز به‌صورت اجباری
+    const persianDateToday = today.locale('fa').format('dddd');
+    const persianFormattedDateToday = today.locale('fa').format('D MMMM YYYY');
+    const appointmentDateToday = today.locale('en').format('YYYY-MM-DD');
+    const dayOfWeekToday = today.format('dddd').toLowerCase();
 
-      const appointment = appointmentsData.find(appt => {
-        const apptDate = moment(appt.appointment_date).locale('en').format('YYYY-MM-DD');
-        return apptDate === appointmentDate;
-      });
+    const appointmentToday = appointmentsData.find(appt => {
+      const apptDate = moment(appt.appointment_date).locale('en').format('YYYY-MM-DD');
+      return apptDate === appointmentDateToday;
+    });
 
-      const appointmentCount = appointment ? appointment.appointment_count : 0;
-      const badgeHtml = appointmentCount > 0 ? `<span class="appointment-badge">${appointmentCount}</span>` : '';
-      if (appointmentCount > 0) badgeCount++;
+    // تعداد نوبت‌ها برای امروز (اگر روز کاری باشد)
+    let appointmentCountToday = 0;
+    if (workingDays.includes(dayOfWeekToday) && appointmentToday) {
+      // بررسی appointment_settings
+      const settingsForDay = appointmentSettings.find(setting => setting.day === dayOfWeekToday);
+      let isReservable = true; // پیش‌فرض: قابل رزرو
+      if (settingsForDay && settingsForDay.settings.length > 0) {
+        isReservable = false; // اگر تنظیمات وجود دارد، بررسی می‌کنیم
+        settingsForDay.settings.forEach(setting => {
+          const settingDay = setting.selected_day;
+          const settingStart = moment(setting.start_time, 'HH:mm');
+          const settingEnd = moment(setting.end_time, 'HH:mm');
+          const currentTime = moment();
 
-      const card = `
-        <div class="calendar-card btn btn-light ${isActive}" data-date="${appointmentDate}" style="--delay: ${i}">
-          ${badgeHtml}
-          <div class="day-name">${persianDate}</div>
-          <div class="date">${persianFormattedDate}</div>
-          ${isActive ? '<div class="current-day-icon"></div>' : ''}
-        </div>`;
-      calendar.append(card);
+          if (currentTime.format('dddd').toLowerCase() === settingDay &&
+            currentTime.isBetween(settingStart, settingEnd)) {
+            isReservable = true;
+          }
+        });
+      }
+      if (isReservable) {
+        appointmentCountToday = appointmentToday.appointment_count;
+      }
+    }
+
+    const badgeHtmlToday = appointmentCountToday > 0 ?
+      `<span class="appointment-badge">${appointmentCountToday}</span>` : '';
+    if (appointmentCountToday > 0) badgeCount++;
+
+    const cardToday = `
+            <div class="calendar-card btn btn-light my-active" data-date="${appointmentDateToday}" style="--delay: ${displayedDays}">
+                ${badgeHtmlToday}
+                <div class="day-name">${persianDateToday}</div>
+                <div class="date">${persianFormattedDateToday}</div>
+                <div class="current-day-icon"></div>
+            </div>`;
+    calendar.append(cardToday);
+    displayedDays++;
+
+    // ادامه برای سایر روزها
+    while (displayedDays < calendarDays && i < calendarDays * 2) {
+      if (!current.isSame(today, 'day')) { // جلوگیری از تکرار امروز
+        const dayOfWeek = current.format('dddd').toLowerCase();
+        if (workingDays.includes(dayOfWeek)) {
+          const persianDate = current.locale('fa').format('dddd');
+          const persianFormattedDate = current.locale('fa').format('D MMMM YYYY');
+          const appointmentDate = current.locale('en').format('YYYY-MM-DD');
+
+          const appointment = appointmentsData.find(appt => {
+            const apptDate = moment(appt.appointment_date).locale('en').format('YYYY-MM-DD');
+            return apptDate === appointmentDate;
+          });
+
+          // تعداد نوبت‌ها برای روزهای کاری و امروز یا آینده
+          let appointmentCount = 0;
+          if (workingDays.includes(dayOfWeek) && current.isSameOrAfter(today, 'day') && appointment) {
+            const settingsForDay = appointmentSettings.find(setting => setting.day === dayOfWeek);
+            let isReservable = true; // پیش‌فرض: قابل رزرو
+            if (settingsForDay && settingsForDay.settings.length > 0) {
+              isReservable = false; // اگر تنظیمات وجود دارد، بررسی می‌کنیم
+              settingsForDay.settings.forEach(setting => {
+                const settingDay = setting.selected_day;
+                const settingStart = moment(setting.start_time, 'HH:mm');
+                const settingEnd = moment(setting.end_time, 'HH:mm');
+                const currentTime = moment();
+
+                if (currentTime.format('dddd').toLowerCase() === settingDay &&
+                  currentTime.isBetween(settingStart, settingEnd)) {
+                  isReservable = true;
+                }
+              });
+            }
+            if (isReservable) {
+              appointmentCount = appointment.appointment_count;
+            }
+          }
+
+          const badgeHtml = appointmentCount > 0 ? `<span class="appointment-badge">${appointmentCount}</span>` : '';
+          if (appointmentCount > 0) badgeCount++;
+
+          const card = `
+                        <div class="calendar-card btn btn-light" data-date="${appointmentDate}" style="--delay: ${displayedDays}">
+                            ${badgeHtml}
+                            <div class="day-name">${persianDate}</div>
+                            <div class="date">${persianFormattedDate}</div>
+                        </div>`;
+          calendar.append(card);
+          displayedDays++;
+        }
+      }
+      current.add(1, 'days');
+      i++;
     }
 
     updateButtonState();
@@ -611,17 +695,20 @@
   const maxDate = moment().locale('en').add(30, 'days').format('YYYY-MM-DD');
   let appointmentsData = [];
 
-  function updateButtonState() {
-    const prevButton = $('#prevRow');
-    const nextButton = $('#nextRow');
-    const firstDate = moment(currentDate).locale('en');
-    const lastDate = moment(currentDate).locale('en').add(days - 1, 'days');
+   function updateButtonState() {
+        const prevButton = $('#prevRow');
+        const nextButton = $('#nextRow');
+        const firstDate = moment(currentDate).locale('en');
+        const lastDate = moment(currentDate).locale('en').add(calendarDays - 1, 'days');
 
-    prevButton.prop('disabled', firstDate.isSameOrBefore(minDate, 'day'));
-    nextButton.prop('disabled', lastDate.isSameOrAfter(maxDate, 'day'));
-  }
+        prevButton.prop('disabled', firstDate.isSameOrBefore(today, 'day'));
+        nextButton.prop('disabled', lastDate.isSameOrAfter(moment().add(calendarDays, 'days'), 'day'));
+    }
+  const loadingOverlay = $('#calendar-loading');
 
   function fetchAppointmentsCount() {
+    loadingOverlay.show();
+    calendar.hide();
     $.ajax({
       url: "{{ route('appointments.count') }}",
       method: 'GET',
@@ -634,16 +721,23 @@
       success: function(response) {
         if (response.status) {
           appointmentsData = response.data;
+          workingDays = response.working_days || [];
+          calendarDays = response.calendar_days || 30;
+          appointmentSettings = response.appointment_settings || [];
           $('#calendar-error').hide();
-          loadCalendarRow(currentDate);
+          loadCalendar();
+          loadingOverlay.hide();
+          calendar.show();
         } else {
           console.error('Error fetching appointments:', response.message);
           $('#calendar-error').show();
+          loadingOverlay.hide();
         }
       },
       error: function(xhr, status, error) {
         console.error('AJAX error:', error);
         $('#calendar-error').show();
+        loadingOverlay.hide();
       }
     });
   }
@@ -756,11 +850,11 @@
       return Swal.fire('هشدار', 'نوبتی انتخاب نشده!', 'warning');
     }
     const hasAttended = selected.some(appointment => appointment.status === 'ویزیت شده');
-    const hasCancled= selected.some(appointment => appointment.status === 'لغو شده');
+    const hasCancled = selected.some(appointment => appointment.status === 'لغو شده');
     if (hasAttended) {
       return Swal.fire('خطا', 'نمی‌توانید نوبت‌های ویزیت‌شده را جابجا کنید!', 'error');
     }
-     if (hasCancled) {
+    if (hasCancled) {
       return Swal.fire('خطا', 'نمی‌توانید نوبت‌های لغو شده را جابجا کنید!', 'error');
     }
 

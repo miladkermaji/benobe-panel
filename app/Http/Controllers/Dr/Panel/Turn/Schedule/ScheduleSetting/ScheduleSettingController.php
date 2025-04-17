@@ -944,44 +944,68 @@ class ScheduleSettingController extends Controller
     public function getAppointmentsCountPerDay(Request $request)
     {
         try {
-            // دریافت شناسه پزشک یا منشی
-            $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-            $selectedClinicId = $request->input('selectedClinicId'); // کلینیک انتخابی
+            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+            $selectedClinicId = $request->input('selectedClinicId');
 
-            // استخراج تعداد نوبت‌های هر روز با شرط خاص برای 'default'
+            // دریافت تنظیمات تقویم
+            $appointmentConfig = DoctorAppointmentConfig::where('doctor_id', $doctorId)
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->first();
+
+            $calendarDays = $appointmentConfig ? $appointmentConfig->calendar_days : 30;
+
+            // دریافت روزهای کاری
+            $workSchedules = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->where('is_working', true)
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->pluck('day')
+                ->toArray();
+
+            // دریافت تعداد نوبت‌ها
             $appointments = DB::table('appointments')
                 ->select(DB::raw('appointment_date, COUNT(*) as appointment_count'))
                 ->where('doctor_id', $doctorId)
                 ->where('status', 'scheduled')
-                ->whereNull('deleted_at') // فیلتر برای نوبت‌های فعال
+                ->whereNull('deleted_at')
                 ->when($selectedClinicId === 'default', function ($query) use ($doctorId) {
-                    // در صورت 'default' فقط نوبت‌های بدون کلینیک (clinic_id = NULL) مرتبط با پزشک
                     $query->whereNull('clinic_id')->where('doctor_id', $doctorId);
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    // در صورت ارسال کلینیک خاص
                     $query->where('clinic_id', $selectedClinicId);
                 })
                 ->groupBy('appointment_date')
                 ->get();
 
-            // قالب‌بندی داده‌ها
             $data = $appointments->map(function ($item) {
                 return [
-                    'appointment_date'  => $item->appointment_date,
+                    'appointment_date' => $item->appointment_date,
                     'appointment_count' => $item->appointment_count,
                 ];
             });
 
             return response()->json([
                 'status' => true,
-                'data'   => $data,
+                'data' => $data,
+                'working_days' => $workSchedules, // روزهای کاری
+                'calendar_days' => $calendarDays, // تعداد روزهای باز تقویم
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status'  => false,
+                'status' => false,
                 'message' => 'خطا در دریافت داده‌ها',
-                'error'   => $e->getMessage(), // نمایش پیام خطا برای دیباگ بهتر
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -1241,135 +1265,135 @@ class ScheduleSettingController extends Controller
         ]);
     }
 
-public function rescheduleAppointment(Request $request)
-{
-    $validated = $request->validate([
-        'old_date' => 'required',
-        'new_date' => 'required|date_format:Y-m-d',
-        'selectedClinicId' => 'nullable|string',
-    ]);
+    public function rescheduleAppointment(Request $request)
+    {
+        $validated = $request->validate([
+            'old_date' => 'required',
+            'new_date' => 'required|date_format:Y-m-d',
+            'selectedClinicId' => 'nullable|string',
+        ]);
 
-    $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-    $selectedClinicId = $request->input('selectedClinicId');
+        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $selectedClinicId = $request->input('selectedClinicId');
 
-    try {
-        // تبدیل تاریخ old_date
-        $oldDateGregorian = $validated['old_date'];
+        try {
+            // تبدیل تاریخ old_date
+            $oldDateGregorian = $validated['old_date'];
 
-        // بررسی فرمت‌های مختلف
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $oldDateGregorian)) {
-            // فرمت میلادی (Y-m-d)
-        } elseif (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $oldDateGregorian)) {
-            // فرمت شمسی (Y/m/d)
-            $oldDateGregorian = Jalalian::fromFormat('Y/m/d', $oldDateGregorian)->toCarbon()->toDateString();
-        } elseif (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z$/', $oldDateGregorian)) {
-            // فرمت ISO 8601
-            $oldDateGregorian = Carbon::parse($oldDateGregorian)->toDateString(); // فقط تاریخ رو نگه می‌داریم
-        } else {
-            Log::error('Invalid old_date format', ['old_date' => $oldDateGregorian]);
-            return response()->json(['status' => false, 'message' => 'فرمت تاریخ قدیم نامعتبر است. از فرمت Y/m/d، Y-m-d یا ISO 8601 استفاده کنید.'], 400);
-        }
+            // بررسی فرمت‌های مختلف
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $oldDateGregorian)) {
+                // فرمت میلادی (Y-m-d)
+            } elseif (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $oldDateGregorian)) {
+                // فرمت شمسی (Y/m/d)
+                $oldDateGregorian = Jalalian::fromFormat('Y/m/d', $oldDateGregorian)->toCarbon()->toDateString();
+            } elseif (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z$/', $oldDateGregorian)) {
+                // فرمت ISO 8601
+                $oldDateGregorian = Carbon::parse($oldDateGregorian)->toDateString(); // فقط تاریخ رو نگه می‌داریم
+            } else {
+                Log::error('Invalid old_date format', ['old_date' => $oldDateGregorian]);
+                return response()->json(['status' => false, 'message' => 'فرمت تاریخ قدیم نامعتبر است. از فرمت Y/m/d، Y-m-d یا ISO 8601 استفاده کنید.'], 400);
+            }
 
-        // اعتبارسنجی تاریخ جدید
-        $newDateGregorian = Carbon::parse($validated['new_date'])->toDateString();
-        if ($oldDateGregorian === $newDateGregorian) {
-            return response()->json(['status' => false, 'message' => 'تاریخ جدید نمی‌تواند با تاریخ فعلی یکسان باشد.'], 400);
-        }
+            // اعتبارسنجی تاریخ جدید
+            $newDateGregorian = Carbon::parse($validated['new_date'])->toDateString();
+            if ($oldDateGregorian === $newDateGregorian) {
+                return response()->json(['status' => false, 'message' => 'تاریخ جدید نمی‌تواند با تاریخ فعلی یکسان باشد.'], 400);
+            }
 
-        // بررسی تاریخ جدید: فقط تاریخ‌های قبل از امروز بلاک می‌شوند
-        $today = Carbon::today()->toDateString();
-        if (Carbon::parse($newDateGregorian)->lt($today)) {
-            return response()->json(['status' => false, 'message' => 'نمی‌توانید نوبت‌ها را به تاریخ گذشته منتقل کنید.'], 400);
-        }
+            // بررسی تاریخ جدید: فقط تاریخ‌های قبل از امروز بلاک می‌شوند
+            $today = Carbon::today()->toDateString();
+            if (Carbon::parse($newDateGregorian)->lt($today)) {
+                return response()->json(['status' => false, 'message' => 'نمی‌توانید نوبت‌ها را به تاریخ گذشته منتقل کنید.'], 400);
+            }
 
-        // بررسی کلینیک
-        if ($selectedClinicId !== 'default' && !Clinic::where('id', $selectedClinicId)->exists()) {
-            Log::error('Invalid clinic_id', ['clinic_id' => $selectedClinicId]);
-            return response()->json(['status' => false, 'message' => 'کلینیک نامعتبر است.'], 400);
-        }
+            // بررسی کلینیک
+            if ($selectedClinicId !== 'default' && !Clinic::where('id', $selectedClinicId)->exists()) {
+                Log::error('Invalid clinic_id', ['clinic_id' => $selectedClinicId]);
+                return response()->json(['status' => false, 'message' => 'کلینیک نامعتبر است.'], 400);
+            }
 
-        // کوئری نوبت‌ها
-        $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
-            ->whereDate('appointment_date', $oldDateGregorian)
-            ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                $query->where('clinic_id', $selectedClinicId);
-            }, function ($query) {
-                $query->whereNull('clinic_id');
-            });
+            // کوئری نوبت‌ها
+            $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
+                ->whereDate('appointment_date', $oldDateGregorian)
+                ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                    $query->where('clinic_id', $selectedClinicId);
+                }, function ($query) {
+                    $query->whereNull('clinic_id');
+                });
 
-        $appointments = $appointmentsQuery->get();
+            $appointments = $appointmentsQuery->get();
 
-        if ($appointments->isEmpty()) {
-            Log::warning('No appointments found', [
-                'doctor_id' => $doctorId,
-                'old_date' => $oldDateGregorian,
-                'clinic_id' => $selectedClinicId
+            if ($appointments->isEmpty()) {
+                Log::warning('No appointments found', [
+                    'doctor_id' => $doctorId,
+                    'old_date' => $oldDateGregorian,
+                    'clinic_id' => $selectedClinicId
+                ]);
+                return response()->json(['status' => false, 'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.'], 404);
+            }
+
+            // بررسی ساعات کاری برای تاریخ جدید
+            $workHours = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->where('day', strtolower(Carbon::parse($newDateGregorian)->format('l')))
+                ->when($selectedClinicId === 'default', function ($query) {
+                    $query->whereNull('clinic_id');
+                }, function ($query) use ($selectedClinicId) {
+                    $query->where('clinic_id', $selectedClinicId);
+                })
+                ->first();
+
+            if (!$workHours) {
+                return response()->json(['status' => false, 'message' => 'ساعات کاری برای تاریخ جدید تعریف نشده است.'], 400);
+            }
+
+            // جابجایی نوبت‌ها
+            $recipients = [];
+            $oldDateJalali = Jalalian::fromDateTime($oldDateGregorian)->format('Y/m/d');
+            $newDateJalali = Jalalian::fromDateTime($newDateGregorian)->format('Y/m/d');
+
+            foreach ($appointments as $appointment) {
+                if ($appointment->status === 'attended') {
+                    continue; // نوبت‌های ویزیت‌شده جابجا نمی‌شوند
+                }
+                $appointment->appointment_date = $newDateGregorian;
+                $appointment->save();
+
+                if ($appointment->patient && $appointment->patient->mobile) {
+                    $recipients[] = $appointment->patient->mobile;
+                }
+            }
+
+            // ارسال پیامک
+            if (!empty($recipients)) {
+                $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به تاریخ {$newDateJalali} تغییر یافت.";
+                $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+                $templateId = ($gatewayName === 'pishgamrayan') ? 100252 : null;
+
+                SendSmsNotificationJob::dispatch(
+                    $message,
+                    $recipients,
+                    $templateId,
+                    [$oldDateJalali, $newDateJalali, 'به نوبه']
+                )->delay(now()->addSeconds(5));
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'نوبت‌ها با موفقیت جابجا شدند.',
+                'total_recipients' => count($recipients),
             ]);
-            return response()->json(['status' => false, 'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.'], 404);
+        } catch (\Exception $e) {
+            Log::error('Reschedule Appointment Error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'status' => false,
+                'message' => 'خطا در جابجایی نوبت‌ها: ' . $e->getMessage(),
+            ], 500);
         }
-
-        // بررسی ساعات کاری برای تاریخ جدید
-        $workHours = DoctorWorkSchedule::where('doctor_id', $doctorId)
-            ->where('day', strtolower(Carbon::parse($newDateGregorian)->format('l')))
-            ->when($selectedClinicId === 'default', function ($query) {
-                $query->whereNull('clinic_id');
-            }, function ($query) use ($selectedClinicId) {
-                $query->where('clinic_id', $selectedClinicId);
-            })
-            ->first();
-
-        if (!$workHours) {
-            return response()->json(['status' => false, 'message' => 'ساعات کاری برای تاریخ جدید تعریف نشده است.'], 400);
-        }
-
-        // جابجایی نوبت‌ها
-        $recipients = [];
-        $oldDateJalali = Jalalian::fromDateTime($oldDateGregorian)->format('Y/m/d');
-        $newDateJalali = Jalalian::fromDateTime($newDateGregorian)->format('Y/m/d');
-
-        foreach ($appointments as $appointment) {
-            if ($appointment->status === 'attended') {
-                continue; // نوبت‌های ویزیت‌شده جابجا نمی‌شوند
-            }
-            $appointment->appointment_date = $newDateGregorian;
-            $appointment->save();
-
-            if ($appointment->patient && $appointment->patient->mobile) {
-                $recipients[] = $appointment->patient->mobile;
-            }
-        }
-
-        // ارسال پیامک
-        if (!empty($recipients)) {
-            $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به تاریخ {$newDateJalali} تغییر یافت.";
-            $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
-            $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-            $templateId = ($gatewayName === 'pishgamrayan') ? 100252 : null;
-
-            SendSmsNotificationJob::dispatch(
-                $message,
-                $recipients,
-                $templateId,
-                [$oldDateJalali, $newDateJalali, 'به نوبه']
-            )->delay(now()->addSeconds(5));
-        }
-
-        return response()->json([
-            'status' => true,
-            'message' => 'نوبت‌ها با موفقیت جابجا شدند.',
-            'total_recipients' => count($recipients),
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Reschedule Appointment Error', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        return response()->json([
-            'status' => false,
-            'message' => 'خطا در جابجایی نوبت‌ها: ' . $e->getMessage(),
-        ], 500);
     }
-}
     public function updateFirstAvailableAppointment(Request $request)
     {
         // اعتبارسنجی ورودی

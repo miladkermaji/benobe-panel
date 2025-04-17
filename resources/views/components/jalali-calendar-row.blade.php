@@ -38,7 +38,6 @@
       opacity: 0;
       transform: translateY(10px);
     }
-
     to {
       opacity: 1;
       transform: translateY(0);
@@ -83,7 +82,6 @@
     box-shadow: 0 0 4px rgba(29, 235, 60, 0.5);
   }
 
-
   .calendar-card .appointment-badge {
     position: absolute;
     top: -8px;
@@ -106,11 +104,9 @@
       transform: scale(0.8);
       opacity: 0;
     }
-
     70% {
       transform: scale(1.1);
     }
-
     100% {
       transform: scale(1);
       opacity: 1;
@@ -130,7 +126,7 @@
 
   .my-active .day-name,
   .my-active .date {
-    color: var(--secondary-hover);
+    color: var(--secondary-hover); /* سبز برای روز جاری */
   }
 
   .card-selected {
@@ -141,22 +137,26 @@
 
   .card-selected .day-name,
   .card-selected .date {
-    color: var(--support-text);
+    color: var(--support-text); /* پریمری برای کارت‌های کلیک‌شده */
   }
 
   #calendar.d-flex.w-100 {
-    overflow-x: scroll;
+    overflow-x: hidden;
     overflow-y: hidden;
     white-space: nowrap;
     width: 100%;
     padding: 15px 0;
-    /* پدینگ کم برای بج‌ها */
     display: flex;
     gap: 10px !important;
-    transition: transform 0.4s ease-in-out;
+    transition: transform 0.3s ease-out;
     box-sizing: border-box;
     margin: 10px;
-    /* حذف حاشیه‌های احتمالی */
+    cursor: grab;
+    user-select: none;
+  }
+
+  #calendar.d-flex.w-100.grabbing {
+    cursor: grabbing;
   }
 
   #calendar.d-flex.w-100::-webkit-scrollbar {
@@ -166,7 +166,6 @@
   .btn-light {
     background: var(--background-card);
     border: 1px solid var(--border-neutral);
-    /*  padding: 13px 0; */
     border-radius: var(--radius-button);
     transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   }
@@ -200,6 +199,33 @@
     margin-top: 8px;
   }
 
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .loading-spinner {
+    border: 4px solid var(--border-neutral);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
   @media (max-width: 576px) {
     .calendar-card {
       min-width: 80px;
@@ -221,11 +247,10 @@
       top: -6px;
       left: -6px;
     }
-
   }
 </style>
 
-<div class="w-100 d-flex justify-content-around align-items-center" style="margin: 0; padding: 0;">
+<div class="w-100 d-flex justify-content-around align-items-center" style="margin: 0; padding: 0; position: relative;">
   <div class="w-100 d-flex align-items-center gap-2">
     <div>
       <button id="prevRow" class="btn btn-light">
@@ -237,8 +262,11 @@
         </svg>
       </button>
     </div>
-    <div id="calendar" class="d-flex w-100">
+    <div id="calendar" class="d-flex w-100" style="display: none;">
       <!-- تقویم اولیه با تاریخ کنونی پر می‌شود -->
+    </div>
+    <div class="loading-overlay" id="calendar-loading">
+      <div class="loading-spinner"></div>
     </div>
     <div>
       <button id="nextRow" class="btn btn-light">
@@ -255,136 +283,301 @@
     خطا در بارگذاری تعداد نوبت‌ها. لطفاً دوباره تلاش کنید.
   </div>
 </div>
+
+<script src="{{ asset('dr-assets/panel/js/jquery-easing/1.4.1/jquery.easing.min.js') }}"></script>
 <script>
-$(document).ready(function() {
-    // تنظیم تاریخ شروع برای قرار گرفتن امروز در وسط
-    let currentDate = moment().locale('en').subtract(8, 'days').format('YYYY-MM-DD'); // 8 روز قبل از امروز
-    const days = 18; // بدون تغییر
+$(document).ready(function () {
+    let currentDate = moment().locale('en').startOf('day');
     const calendar = $('#calendar');
+    const loadingOverlay = $('#calendar-loading');
     let isAnimating = false;
-    const minDate = moment().locale('en').subtract(30, 'days').format('YYYY-MM-DD');
-    const maxDate = moment().locale('en').add(30, 'days').format('YYYY-MM-DD');
     let appointmentsData = [];
+    let workingDays = [];
+    let calendarDays = 30; // پیش‌فرض
+    let appointmentSettings = [];
+    const today = moment().locale('en').startOf('day');
+    let isDragging = false;
+    let startX = 0;
+    let scrollLeft = 0;
+    let velocity = 0;
+    let lastX = 0;
+    let lastTime = 0;
 
     function fetchAppointmentsCount() {
-      $.ajax({
-        url: "{{ route('appointments.count') }}",
-        method: 'GET',
-        data: {
-          selectedClinicId: localStorage.getItem('selectedClinicId')
-        },
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-          if (response.status) {
-            appointmentsData = response.data;
-            $('#calendar-error').hide();
-            loadCalendar(currentDate);
-          } else {
-            console.error('Error fetching appointments:', response.message);
-            $('#calendar-error').show();
-          }
-        },
-        error: function(xhr, status, error) {
-          console.error('AJAX error:', error);
-          $('#calendar-error').show();
-        }
-      });
+        loadingOverlay.show();
+        calendar.hide();
+        $.ajax({
+            url: "{{ route('appointments.count') }}",
+            method: 'GET',
+            data: {
+                selectedClinicId: localStorage.getItem('selectedClinicId')
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.status) {
+                    appointmentsData = response.data;
+                    workingDays = response.working_days || [];
+                    calendarDays = response.calendar_days || 30;
+                    appointmentSettings = response.appointment_settings || [];
+                    $('#calendar-error').hide();
+                    loadCalendar();
+                    loadingOverlay.hide();
+                    calendar.show();
+                } else {
+                    console.error('Error fetching appointments:', response.message);
+                    $('#calendar-error').show();
+                    loadingOverlay.hide();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX error:', error);
+                $('#calendar-error').show();
+                loadingOverlay.hide();
+            }
+        });
     }
 
-    function loadCalendar(date) {
-      calendar.empty();
-      let badgeCount = 0;
+    function loadCalendar() {
+        calendar.empty();
+        let badgeCount = 0;
+        let displayedDays = 0;
+        let current = moment(currentDate).locale('en');
+        let i = 0;
 
-      for (let i = 0; i < days; i++) {
-        const current = moment(date).locale('en').add(i, 'days');
-        const persianDate = current.locale('fa').format('dddd');
-        const persianFormattedDate = current.locale('fa').format('D MMMM YYYY');
-        const isActive = current.isSame(moment().locale('en'), 'day') ? 'my-active' : '';
-        const appointmentDate = current.locale('en').format('YYYY-MM-DD');
+        // اضافه کردن تاریخ امروز به‌صورت اجباری
+        const persianDateToday = today.locale('fa').format('dddd');
+        const persianFormattedDateToday = today.locale('fa').format('D MMMM YYYY');
+        const appointmentDateToday = today.locale('en').format('YYYY-MM-DD');
+        const dayOfWeekToday = today.format('dddd').toLowerCase();
 
-        const appointment = appointmentsData.find(appt => {
-          const apptDate = moment(appt.appointment_date).locale('en').format('YYYY-MM-DD');
-          return apptDate === appointmentDate;
+        const appointmentToday = appointmentsData.find(appt => {
+            const apptDate = moment(appt.appointment_date).locale('en').format('YYYY-MM-DD');
+            return apptDate === appointmentDateToday;
         });
 
-        const appointmentCount = appointment ? appointment.appointment_count : 0;
-        const badgeHtml = appointmentCount > 0 ? `<span class="appointment-badge">${appointmentCount}</span>` : '';
-        if (appointmentCount > 0) badgeCount++;
+        // تعداد نوبت‌ها برای امروز (اگر روز کاری باشد)
+        let appointmentCountToday = 0;
+        if (workingDays.includes(dayOfWeekToday) && appointmentToday) {
+            // بررسی appointment_settings
+            const settingsForDay = appointmentSettings.find(setting => setting.day === dayOfWeekToday);
+            let isReservable = true; // پیش‌فرض: قابل رزرو
+            if (settingsForDay && settingsForDay.settings.length > 0) {
+                isReservable = false; // اگر تنظیمات وجود دارد، بررسی می‌کنیم
+                settingsForDay.settings.forEach(setting => {
+                    const settingDay = setting.selected_day;
+                    const settingStart = moment(setting.start_time, 'HH:mm');
+                    const settingEnd = moment(setting.end_time, 'HH:mm');
+                    const currentTime = moment();
 
-        const card = `
-        <div class="calendar-card btn btn-light ${isActive}" data-date="${appointmentDate}" style="--delay: ${i}">
-          ${badgeHtml}
-          <div class="day-name">${persianDate}</div>
-          <div class="date">${persianFormattedDate}</div>
-          ${isActive ? '<div class="current-day-icon"></div>' : ''}
-        </div>`;
-        calendar.append(card);
-      }
+                    if (currentTime.format('dddd').toLowerCase() === settingDay &&
+                        currentTime.isBetween(settingStart, settingEnd)) {
+                        isReservable = true;
+                    }
+                });
+            }
+            if (isReservable) {
+                appointmentCountToday = appointmentToday.appointment_count;
+            }
+        }
 
-      updateButtonState();
+        const badgeHtmlToday = appointmentCountToday > 0 ? `<span class="appointment-badge">${appointmentCountToday}</span>` : '';
+        if (appointmentCountToday > 0) badgeCount++;
+
+        const cardToday = `
+            <div class="calendar-card btn btn-light my-active" data-date="${appointmentDateToday}" style="--delay: ${displayedDays}">
+                ${badgeHtmlToday}
+                <div class="day-name">${persianDateToday}</div>
+                <div class="date">${persianFormattedDateToday}</div>
+                <div class="current-day-icon"></div>
+            </div>`;
+        calendar.append(cardToday);
+        displayedDays++;
+
+        // ادامه برای سایر روزها
+        while (displayedDays < calendarDays && i < calendarDays * 2) {
+            if (!current.isSame(today, 'day')) { // جلوگیری از تکرار امروز
+                const dayOfWeek = current.format('dddd').toLowerCase();
+                if (workingDays.includes(dayOfWeek)) {
+                    const persianDate = current.locale('fa').format('dddd');
+                    const persianFormattedDate = current.locale('fa').format('D MMMM YYYY');
+                    const appointmentDate = current.locale('en').format('YYYY-MM-DD');
+
+                    const appointment = appointmentsData.find(appt => {
+                        const apptDate = moment(appt.appointment_date).locale('en').format('YYYY-MM-DD');
+                        return apptDate === appointmentDate;
+                    });
+
+                    // تعداد نوبت‌ها برای روزهای کاری و امروز یا آینده
+                    let appointmentCount = 0;
+                    if (workingDays.includes(dayOfWeek) && current.isSameOrAfter(today, 'day') && appointment) {
+                        const settingsForDay = appointmentSettings.find(setting => setting.day === dayOfWeek);
+                        let isReservable = true; // پیش‌فرض: قابل رزرو
+                        if (settingsForDay && settingsForDay.settings.length > 0) {
+                            isReservable = false; // اگر تنظیمات وجود دارد، بررسی می‌کنیم
+                            settingsForDay.settings.forEach(setting => {
+                                const settingDay = setting.selected_day;
+                                const settingStart = moment(setting.start_time, 'HH:mm');
+                                const settingEnd = moment(setting.end_time, 'HH:mm');
+                                const currentTime = moment();
+
+                                if (currentTime.format('dddd').toLowerCase() === settingDay &&
+                                    currentTime.isBetween(settingStart, settingEnd)) {
+                                    isReservable = true;
+                                }
+                            });
+                        }
+                        if (isReservable) {
+                            appointmentCount = appointment.appointment_count;
+                        }
+                    }
+
+                    const badgeHtml = appointmentCount > 0 ? `<span class="appointment-badge">${appointmentCount}</span>` : '';
+                    if (appointmentCount > 0) badgeCount++;
+
+                    const card = `
+                        <div class="calendar-card btn btn-light" data-date="${appointmentDate}" style="--delay: ${displayedDays}">
+                            ${badgeHtml}
+                            <div class="day-name">${persianDate}</div>
+                            <div class="date">${persianFormattedDate}</div>
+                        </div>`;
+                    calendar.append(card);
+                    displayedDays++;
+                }
+            }
+            current.add(1, 'days');
+            i++;
+        }
+
+        updateButtonState();
     }
 
     function updateButtonState() {
-      const prevButton = $('#prevRow');
-      const nextButton = $('#nextRow');
-      const firstDate = moment(currentDate).locale('en');
-      const lastDate = moment(currentDate).locale('en').add(days - 1, 'days');
+        const prevButton = $('#prevRow');
+        const nextButton = $('#nextRow');
+        const firstDate = moment(currentDate).locale('en');
+        const lastDate = moment(currentDate).locale('en').add(calendarDays - 1, 'days');
 
-      prevButton.prop('disabled', firstDate.isSameOrBefore(minDate, 'day'));
-      nextButton.prop('disabled', lastDate.isSameOrAfter(maxDate, 'day'));
+        prevButton.prop('disabled', firstDate.isSameOrBefore(today, 'day'));
+        nextButton.prop('disabled', lastDate.isSameOrAfter(moment().add(calendarDays, 'days'), 'day'));
     }
 
     function animateAndLoadCalendar(direction) {
-      if (isAnimating) return;
+        if (isAnimating) return;
 
-      isAnimating = true;
-      const newDate = direction === 'nextRow' ?
-        moment(currentDate).locale('en').add(7, 'days').format('YYYY-MM-DD') : // تغییر به 7 روز
-        moment(currentDate).locale('en').subtract(7, 'days').format('YYYY-MM-DD'); // تغییر به 7 روز
+        isAnimating = true;
+        const offset = direction === 'nextRow' ? 7 : -7;
+        const newDate = moment(currentDate).locale('en').add(offset, 'days').format('YYYY-MM-DD');
 
-      calendar.css({
-        transition: 'transform 0.4s ease-in-out, opacity 0.6s ease-in-out',
-        transform: direction === 'nextRow' ? 'translateX(50px)' : 'translateX(-50px)',
-        opacity: 0.3
-      });
-
-      setTimeout(() => {
-        currentDate = newDate;
-        loadCalendar(currentDate);
         calendar.css({
-          transform: direction === 'nextRow' ? 'translateX(-50px)' : 'translateX(50px)',
-          opacity: 0.3
+            transition: 'transform 0.4s ease-in-out, opacity 0.6s ease-in-out',
+            transform: direction === 'nextRow' ? 'translateX(50px)' : 'translateX(-50px)',
+            opacity: 0.3
         });
+
         setTimeout(() => {
-          calendar.css({
-            transform: 'translateX(0)',
-            opacity: 1
-          });
-          setTimeout(() => {
-            calendar.css('transition', '');
-            isAnimating = false;
-          }, 400);
-        }, 50);
-      }, 300);
+            currentDate = newDate;
+            loadCalendar();
+            calendar.css({
+                transform: direction === 'nextRow' ? 'translateX(-50px)' : 'translateX(50px)',
+                opacity: 0.3
+            });
+            setTimeout(() => {
+                calendar.css({
+                    transform: 'translateX(0)',
+                    opacity: 1
+                });
+                setTimeout(() => {
+                    calendar.css('transition', '');
+                    isAnimating = false;
+                }, 400);
+            }, 50);
+        }, 300);
     }
 
-    calendar.on('click', '.calendar-card', function() {
-      $('.calendar-card').removeClass('card-selected');
-      $(this).addClass('card-selected');
+    // قابلیت کشیدن (Drag) و انتخاب کارت
+    calendar.on('mousedown touchstart', function (e) {
+        isDragging = true;
+        calendar.addClass('grabbing');
+        startX = (e.type === 'touchstart' ? e.originalEvent.touches[0].pageX : e.pageX);
+        scrollLeft = calendar.scrollLeft() || 0;
+        velocity = 0;
+        lastX = startX;
+        lastTime = Date.now();
+        e.preventDefault();
     });
 
-    $('#nextRow').click(function() {
-      if (!$(this).prop('disabled')) {
-        animateAndLoadCalendar('nextRow');
-      }
+    calendar.on('mousemove touchmove', function (e) {
+        if (!isDragging) return;
+
+        const x = (e.type === 'touchmove' ? e.originalEvent.touches[0].pageX : e.pageX);
+        const deltaX = x - startX;
+        calendar.scrollLeft(scrollLeft - deltaX);
+
+        // محاسبه سرعت برای انیمیشن اینرسی
+        const currentTime = Date.now();
+        const timeDiff = currentTime - lastTime;
+        if (timeDiff > 0) {
+            velocity = (x - lastX) / timeDiff;
+        }
+        lastX = x;
+        lastTime = currentTime;
+
+        // انتخاب کارت هنگام حرکت ماوس روی آن
+        const targetCard = $(e.target).closest('.calendar-card');
+        if (targetCard.length) {
+            $('.calendar-card').not('.my-active').removeClass('card-selected');
+            targetCard.addClass('card-selected');
+        }
+
+        e.preventDefault();
     });
 
-    $('#prevRow').click(function() {
-      if (!$(this).prop('disabled')) {
-        animateAndLoadCalendar('prevRow');
-      }
+    calendar.on('mouseup touchend', function () {
+        isDragging = false;
+        calendar.removeClass('grabbing');
+
+        // اعمال انیمیشن اینرسی
+        const inertiaDuration = 500; // مدت زمان اینرسی (میلی‌ثانیه)
+        const inertiaDistance = velocity * inertiaDuration * 0.5; // فاصله اینرسی
+        const currentScroll = calendar.scrollLeft();
+        const targetScroll = currentScroll - inertiaDistance;
+
+        calendar.animate(
+            { scrollLeft: targetScroll },
+            {
+                duration: inertiaDuration,
+                easing: 'easeOutQuad' // استفاده از easing پلاگین
+            }
+        );
+    });
+
+    calendar.on('mouseleave', function () {
+        if (isDragging) {
+            isDragging = false;
+            calendar.removeClass('grabbing');
+        }
+    });
+
+    // مدیریت کلیک روی کارت‌ها
+    calendar.on('click', '.calendar-card', function (e) {
+        // جلوگیری از اعمال کلیک هنگام drag
+        if (Math.abs(velocity) > 0.1) return; // اگر حرکت drag وجود داشت، کلیک نادیده گرفته شود
+        $('.calendar-card').not('.my-active').removeClass('card-selected');
+        $(this).addClass('card-selected');
+    });
+
+    $('#nextRow').click(function () {
+        if (!$(this).prop('disabled')) {
+            animateAndLoadCalendar('nextRow');
+        }
+    });
+
+    $('#prevRow').click(function () {
+        if (!$(this).prop('disabled')) {
+            animateAndLoadCalendar('prevRow');
+        }
     });
 
     fetchAppointmentsCount();
