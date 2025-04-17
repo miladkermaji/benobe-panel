@@ -41,9 +41,12 @@
               <input type="number" value="{{ $appointmentConfig->calendar_days ?? '' }}"
                 class="form-control text-center h-50 border-radius-0" name="calendar_days"
                 placeholder="تعداد روز مورد نظر خود را وارد کنید">
-              <div class="input-group-append count-span-prepand-style"><span class="input-group-text px-2">روز</span>
+              <div class="input-group-append count-span-prepand-style border-radius-0"><span class="input-group-text px-2">روز</span>
               </div>
             </div>
+              <div class="mt-3">
+          <x-my-check :isChecked="$appointmentConfig->holiday_availability" id="posible-appointments-inholiday" day="باز بودن مطب در تعطیلات رسمی" />
+        </div>
           </div>
           <div class="mt-4">
             <label class="text-dark font-weight-bold">روزهای کاری</label>
@@ -60,13 +63,8 @@
             </div>
           </div>
         </div>
-        <div class="mt-5">
-          <x-my-check :isChecked="$appointmentConfig->online_consultation" id="posible-appointments"
-            day="امکان دریافت مشاوره آنلاین توسط کاربران وجود داشته باشد؟" />
-        </div>
-        <div class="mt-3">
-          <x-my-check :isChecked="$appointmentConfig->holiday_availability" id="posible-appointments-inholiday" day="باز بودن مطب در تعطیلات رسمی" />
-        </div>
+       
+      
       </div>
       <div class="d-flex w-100 justify-content-end mt-3">
         <button type="submit" class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
