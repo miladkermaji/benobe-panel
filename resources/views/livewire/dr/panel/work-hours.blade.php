@@ -44,7 +44,7 @@
                           @if (!empty($slots[$englishDay]))
                             @foreach ($slots[$englishDay] as $index => $slot)
                               <div
-                                class="Log::mt-3 form-row d-flex justify-content-between w-100 pt-4 bg-active-slot border-radius-4"
+                                class="mt-3 form-row d-flex justify-content-between w-100 pt-4 bg-active-slot border-radius-4"
                                 data-slot-id="{{ $slot['id'] ?? '' }}">
                                 <div class="d-flex justify-content-start align-items-center gap-4">
                                   <div class="form-group position-relative timepicker-ui">
@@ -74,6 +74,16 @@
                                       data-toggle="modal" data-target="#CalculatorModal" data-day="{{ $englishDay }}"
                                       data-index="{{ $index }}" readonly />
                                   </div>
+                                  <!-- دکمه جدید برای نوبت‌های اورژانسی -->
+                                  <div class="form-group position-relative">
+                                    <button class="btn btn-light btn-sm emergency-slot-btn" data-toggle="modal"
+                                      data-target="#emergencyModal" data-day="{{ $englishDay }}"
+                                      data-index="{{ $index }}"
+                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                      <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                                    </button>
+                                  </div>
+                                  <!-- دکمه کپی -->
                                   <div class="form-group position-relative">
                                     <button class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal"
                                       data-target="#checkboxModal" data-day="{{ $englishDay }}"
@@ -82,6 +92,7 @@
                                       <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
                                     </button>
                                   </div>
+                                  <!-- دکمه حذف -->
                                   <div class="form-group position-relative">
                                     <button class="btn btn-light btn-sm remove-row-btn"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
@@ -101,7 +112,7 @@
                             @endforeach
                           @else
                             <div
-                              class="Log::mt-3 form-row d-flex justify-content-between w-100 pt-4 bg-active-slot border-radius-4"
+                              class="mt-3 form-row d-flex justify-content-between w-100 pt-4 bg-active-slot border-radius-4"
                               data-slot-id="{{ $slot['id'] ?? '' }}">
                               <div class="d-flex justify-content-start align-items-center gap-4">
                                 <div class="form-group position-relative timepicker-ui">
@@ -130,6 +141,16 @@
                                     data-toggle="modal" data-target="#CalculatorModal"
                                     data-day="{{ $englishDay }}" data-index="{{ $index }}" readonly />
                                 </div>
+                                <!-- دکمه جدید برای نوبت‌های اورژانسی -->
+                                <div class="form-group position-relative">
+                                  <button class="btn btn-light btn-sm emergency-slot-btn" data-toggle="modal"
+                                    data-target="#emergencyModal" data-day="{{ $englishDay }}"
+                                    data-index="{{ $index }}"
+                                    {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                    <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                                  </button>
+                                </div>
+                                <!-- دکمه کپی -->
                                 <div class="form-group position-relative">
                                   <button class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal"
                                     data-target="#checkboxModal" data-day="{{ $englishDay }}"
@@ -138,6 +159,7 @@
                                     <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
                                   </button>
                                 </div>
+                                <!-- دکمه حذف -->
                                 <div class="form-group position-relative">
                                   <button class="btn btn-light btn-sm remove-row-btn"
                                     {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
@@ -220,6 +242,35 @@
               </div>
             </div>
           @endif
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- مودال برای انتخاب زمان‌های اورژانسی -->
+  <div class="modal fade" id="emergencyModal" tabindex="-1" role="dialog" aria-labelledby="emergencyModalLabel"
+    aria-hidden="true" wire:ignore.self>
+    <div class="modal-dialog modal-dialog-centered my-modal-lg" role="document">
+      <div class="modal-content border-radius-6">
+        <div class="modal-header border-radius-6">
+          <h6 class="modal-title font-weight-bold" id="emergencyModalLabel">انتخاب زمان‌های اورژانسی</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="emergency-times-container">
+            <div class="d-flex flex-wrap gap-2 justify-content-center" id="emergency-times" wire:ignore>
+              <!-- زمان‌ها به‌صورت داینامیک با جاوااسکریپت اضافه می‌شن -->
+            </div>
+          </div>
+          <div class="w-100 d-flex justify-content-end mt-3">
+            <button type="button"
+              class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
+              wire:click="saveEmergencyTimes">
+              <span class="button_text">ذخیره تغییرات</span>
+              <div class="loader"></div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -622,6 +673,174 @@
 
         @this.set('copySource.day', day);
         @this.set('copySource.index', index);
+      });
+
+      // مدیریت باز شدن مودال emergencyModal
+      $(document).on('show.bs.modal', '#emergencyModal', function(e) {
+        const $modal = $(this);
+        const button = $(e.relatedTarget);
+        const day = button.data('day');
+        const index = button.data('index');
+
+       
+
+        // تنظیم پراپرتی‌های Livewire
+        @this.set('isEmergencyModalOpen', true);
+        @this.set('emergencyModalDay', day);
+        @this.set('emergencyModalIndex', index);
+
+        // بررسی وجود المنت‌ها
+        const $startTimeInput = $(`#morning-start-${day}-${index}`);
+        const $endTimeInput = $(`#morning-end-${day}-${index}`);
+        const $maxAppointmentsInput = $(`#morning-patients-${day}-${index}`);
+
+        if (!$startTimeInput.length || !$endTimeInput.length || !$maxAppointmentsInput.length) {
+          console.error('One or more inputs not found:', {
+            startTime: $startTimeInput.length,
+            endTime: $endTimeInput.length,
+            maxAppointments: $maxAppointmentsInput.length
+          });
+          @this.set('modalMessage', 'خطا: ورودی‌های زمان یا تعداد نوبت یافت نشدند');
+          @this.set('modalType', 'error');
+          @this.set('modalOpen', true);
+          @this.dispatch('show-toastr', {
+            message: 'خطا: ورودی‌های زمان یا تعداد نوبت یافت نشدند',
+            type: 'error'
+          });
+          $modal.modal('hide');
+          return;
+        }
+
+        const startTime = $startTimeInput.val();
+        const endTime = $endTimeInput.val();
+        const maxAppointments = $maxAppointmentsInput.val();
+
+        if (!startTime || !endTime || !maxAppointments) {
+          console.error('Invalid input values:', {
+            startTime,
+            endTime,
+            maxAppointments
+          });
+          @this.set('modalMessage', 'لطفاً ابتدا زمان شروع، پایان و تعداد نوبت را وارد کنید');
+          @this.set('modalType', 'error');
+          @this.set('modalOpen', true);
+          @this.dispatch('show-toastr', {
+            message: 'لطفاً ابتدا زمان شروع، پایان و تعداد نوبت را وارد کنید',
+            type: 'error'
+          });
+          $modal.modal('hide');
+          return;
+        }
+
+        // محاسبه زمان‌های تقسیم‌شده
+        const timeToMinutes = (time) => {
+          const [hours, minutes] = time.split(':').map(Number);
+          return hours * 60 + minutes;
+        };
+
+        const minutesToTime = (minutes) => {
+          const hours = Math.floor(minutes / 60).toString().padStart(2, '0');
+          const mins = (minutes % 60).toString().padStart(2, '0');
+          return `${hours}:${mins}`;
+        };
+
+        const totalMinutes = timeToMinutes(endTime) - timeToMinutes(startTime);
+        const slotDuration = Math.floor(totalMinutes / maxAppointments);
+        const times = [];
+
+        for (let i = 0; i < maxAppointments; i++) {
+          const start = timeToMinutes(startTime) + (i * slotDuration);
+          times.push(minutesToTime(start));
+        }
+
+        // دریافت زمان‌های اورژانسی فعلی از emergency_times
+        let currentEmergencyTimes = [];
+        try {
+          const workSchedule = @this.workSchedules && @this.workSchedules.find(s => s.day === day);
+       
+          if (workSchedule && workSchedule.emergency_times) {
+            // بررسی اینکه emergency_times آرایه است یا رشته JSON
+            if (Array.isArray(workSchedule.emergency_times)) {
+              currentEmergencyTimes = workSchedule.emergency_times;
+            } else {
+              currentEmergencyTimes = JSON.parse(workSchedule.emergency_times) || [];
+            }
+          } else {
+            console.warn('No emergency_times found for day:', day);
+          }
+     
+        } catch (error) {
+          console.error('Error accessing emergency_times:', error);
+          currentEmergencyTimes = [];
+        }
+
+        // تنظیم emergencyTimes اولیه با زمان‌های ذخیره‌شده
+        @this.set('emergencyTimes', currentEmergencyTimes);
+
+        // رندر دکمه‌های زمان
+        const $timesContainer = $('#emergency-times');
+        $timesContainer.empty(); // خالی کردن قبل از رندر
+
+        times.forEach(time => {
+          // زمان‌های ذخیره‌شده فعال (btn-primary) و غیرذخیره‌شده غیرفعال (btn-outline-primary)
+          // بررسی فرمت‌های مختلف زمان (مثل 07:52 در مقابل 7:52)
+          const isSaved = currentEmergencyTimes.some(savedTime =>
+            savedTime === time || savedTime.padStart(5, '0') === time
+          );
+        
+          const $button = $(`
+          <button type="button" class="btn btn-sm time-slot-btn ${isSaved ? 'btn-primary' : 'btn-outline-primary'}"
+                  data-time="${time}">
+            ${time}
+          </button>
+        `);
+          $timesContainer.append($button);
+        });
+
+        $timesContainer.show(); // اطمینان از نمایش
+
+        // مدیریت کلیک روی دکمه‌های زمان
+        $timesContainer.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+          const $btn = $(this);
+          const time = $btn.data('time');
+          const isSelected = $btn.hasClass('btn-primary'); // حالت فعال (btn-primary)
+
+          if (isSelected) {
+            // از فعال به غیرفعال: حذف از emergencyTimes
+            $btn.removeClass('btn-primary').addClass('btn-outline-primary');
+            @this.emergencyTimes = @this.emergencyTimes.filter(t => t !== time);
+          } else {
+            // از غیرفعال به فعال: اضافه کردن به emergencyTimes
+            $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+            @this.emergencyTimes = [...@this.emergencyTimes, time];
+          }
+        });
+
+        // بررسی بعد از 1 ثانیه برای دیباگ
+        setTimeout(() => {
+          if ($timesContainer.is(':hidden')) {
+            console.warn('Times container is hidden!');
+          } else if ($timesContainer.children().length === 0) {
+            console.warn('Times container is empty!');
+          }
+        }, 1000);
+      });
+
+      // مدیریت بستن مودال
+      $(document).on('hidden.bs.modal', '#emergencyModal', function() {
+        @this.set('isEmergencyModalOpen', false);
+        $('#emergency-times').empty();
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open').css('padding-right', '');
+      });
+
+      // بستن مودال بعد از ذخیره
+      Livewire.on('close-emergency-modal', () => {
+        @this.set('isEmergencyModalOpen', false);
+        $('#emergencyModal').modal('hide');
+        $('#emergency-times').empty();
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open').css('padding-right', '');
       });
     });
   });

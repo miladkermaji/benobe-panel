@@ -92,6 +92,15 @@ select {
     color: var(--background-card);
     border: none;
 }
+.btn-primary {
+    background: linear-gradient(
+        90deg,
+        var(--primary) 0%,
+        var(--primary-light) 100%
+    );
+    color: var(--background-card);
+    border: none;
+}
 
 .my-btn-primary:hover {
     background: linear-gradient(

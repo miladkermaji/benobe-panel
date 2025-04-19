@@ -435,7 +435,7 @@ h6 {
 
 /* دکمه‌های خاص کپی و حذف */
 .copy-single-slot-btn,
-.remove-row-btn {
+.remove-row-btn,.emergency-slot-btn {
     min-width: 40px; /* حداقل عرض ثابت برای دکمه‌های کپی و حذف */
     height: 40px; /* ارتفاع ثابت */
     padding: 4px 12px;
@@ -646,3 +646,24 @@ h6 {
 .h-55 {
     height: 55px !important;
 }
+.emergency-times-container {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  display: block !important; /* اطمینان از نمایش */
+}
+
+.time-slot-btn {
+  font-size: 0.875rem;
+  padding: 0.1rem 0.1rem;
+  margin: 0.25rem;
+  transition: all 0.2s ease;
+  display: inline-block !important; /* اطمینان از نمایش دکمه‌ها */
+}
+
+.time-slot-btn:hover {
+  transform: scale(1.05);
+}
+

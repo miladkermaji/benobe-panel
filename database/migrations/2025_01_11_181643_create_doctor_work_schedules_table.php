@@ -33,7 +33,7 @@ return new class extends Migration {
             // ذخیره‌سازی ساعات کاری به صورت جیسون برای انعطاف‌پذیری بیشتر
             // مثال: [{"start": "08:00", "end": "12:00"}, {"start": "14:00", "end": "18:00"}]
 
-            $table->json('appointment_settings')->nullable()->comment('تنظیمات نوبت‌دهی');
+            $table->json('appointment_settings')->nullable()->comment(' زمانبندی باز شدن نوبت ها');
             // تنظیمات اختصاصی نوبت‌دهی برای هر روز
             // مثال: {"max_appointments": 10, "appointment_duration": 15}
 

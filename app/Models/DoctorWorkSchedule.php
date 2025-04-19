@@ -13,11 +13,13 @@ class DoctorWorkSchedule extends Model
         'is_working', // اضافه کردن is_working به فیلدهای قابل پر شدن
         'work_hours',
         'appointment_settings',
+        'emergency_times',
     ];
 
     protected $casts = [
         'work_hours'           => 'array',
         'appointment_settings' => 'array',
+        'emergency_times' => 'array',
         'is_working'           => 'boolean',
     ];
 
