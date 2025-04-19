@@ -1,10 +1,10 @@
-
 <div class="checkbox-wrapper-1">
     <div class="d-flex ">
-        <input {{ $isChecked ? 'checked' : '' }} id="{{ $id }}" class="substituted" type="checkbox" aria-hidden="true" wire:model.live="isWorking.{{ $id }}"  wire:loading.attr="disabled" />
+        <input {{ $isChecked ? 'checked' : '' }} id="{{ $id }}" class="substituted" type="checkbox" aria-hidden="true" />
         <label for="{{ $id }}" class="text-dark font-weight-bold">{{ $day }}</label>
     </div>
 </div>
+
 
 
 <style>

@@ -29,7 +29,7 @@ class ScheduleSettingController extends Controller
      */
     public function workhours(Request $request)
     {
-        $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        /* $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
         $selectedClinicId = $request->query('selectedClinicId', 'default');
 
         // ایجاد تنظیمات نوبت‌دهی فقط در صورت عدم وجود رکورد
@@ -60,7 +60,10 @@ class ScheduleSettingController extends Controller
             'appointmentConfig' => $appointmentConfig,
             'workSchedules'     => $workSchedules,
             'selectedClinicId'  => $selectedClinicId,
-        ]);
+        ]); */
+        
+return view("dr.panel.turn.schedule.scheduleSetting.workhours");
+
     }
 
     public function copyWorkHours(Request $request)
