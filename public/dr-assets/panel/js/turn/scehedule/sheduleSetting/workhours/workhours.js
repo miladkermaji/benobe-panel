@@ -66,14 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
    // اگر کلیک شده، بررسی کلاس active-hours  
    const isActive = this.classList.contains('active-hours');
 
-   // غیرفعال کردن تمامی badges  
-   dayBadges.forEach((b) => {
-    b.classList.remove('active-hours'); // حذف کلاس active-hours از همه  
-    const svg = b.querySelector('svg'); // پیدا کردن svg در این اسپن  
-    if (svg) {
-     svg.remove(); // حذف svg اگر وجود داشته باشد  
-    }
-   });
+   // غیرفعال کردن تمامی badges 
 
    // اگر فعال نبود، اکنون فعال کردن این اسپن  
    if (!isActive) {
