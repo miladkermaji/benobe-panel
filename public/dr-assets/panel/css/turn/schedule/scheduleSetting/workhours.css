@@ -252,9 +252,18 @@
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
+#scheduleModal .modal-content{
+    width: 650px !important;
 
+}
 #scheduleModal .timepicker-ui-input {
     width: 300px !important;
+}
+.badge-time-styles-day.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+    background-color: #e0e0e0;
 }
 
 /* تنظیمات کلی */
@@ -503,7 +512,7 @@ h6 {
         padding: 8px;
     }
 
-    .btn {
+    .btn.btn {
         min-width: 70px; /* کمی کوچکتر ولی ثابت */
         height: 34px;
     }
