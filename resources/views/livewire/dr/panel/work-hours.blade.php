@@ -1,6 +1,6 @@
 <div>
   <div>
-    <div class="w-100 d-flex justify-content-center" dir="ltr">
+    <div class="w-100 d-flex justify-content-center mt-3" dir="ltr">
       <div class="auto-scheule-content-top">
         <x-my-toggle-appointment :isChecked="$autoScheduling" id="appointment-toggle" day="نوبت دهی خودکار" class="mt-3"
           wire:model="autoScheduling" wire:change="updateAutoScheduling" />
@@ -13,17 +13,16 @@
             <div>
               <div>
                 <div class="input-group position-relative">
-                  <label class="label-top-input-special-takhasos"> تعداد روز های باز تقویم </label>
-                  <input type="number" value="{{ $calendarDays ?? '' }}"
-                    class="form-control text-center h-50 border-radius-0" name="calendar_days"
-                    placeholder="تعداد روز مورد نظر خود را وارد کنید">
-                  <div class="input-group-append count-span-prepand-style border-radius-0"><span
-                      class="input-group-text px-2">روز</span>
+                  <label class="label-top-input-special-takhasos">تعداد روز‌های باز تقویم</label>
+                  <input type="number" class="form-control text-center h-50 border-radius-0" name="calendar_days"
+                    placeholder="تعداد روز مورد نظر خود را وارد کنید" wire:model.live="calendarDays">
+                  <div class="input-group-append count-span-prepand-style border-radius-0">
+                    <span class="input-group-text px-2">روز</span>
                   </div>
                 </div>
                 <div class="mt-3">
-                  <x-my-check :isChecked="$holidayAvailability" id="posible-appointments-inholiday"
-                    day="باز بودن مطب در تعطیلات رسمی" />
+                  <x-my-check :isChecked="$holidayAvailability" id="posible-appointments-inholiday" day="باز بودن مطب در تعطیلات رسمی"
+                    model="holidayAvailability" />
                 </div>
               </div>
               <div class="mt-4">
@@ -210,10 +209,10 @@
 
           </div>
           <div class="d-flex w-100 justify-content-end mt-3">
-            <button type="submit"
+            <button type="button"
               class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-              id="save-work-schedule">
-              <span class="button_text">ذخیره تغیرات</span>
+              id="save-work-schedule" wire:click="saveWorkSchedule">
+              <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
           </div>
@@ -268,7 +267,7 @@
   <!-- مودال برای انتخاب زمان‌های اورژانسی -->
   <div class="modal fade" id="emergencyModal" tabindex="-1" role="dialog" aria-labelledby="emergencyModalLabel"
     aria-hidden="true" wire:ignore.self>
-    <div class="modal-dialog modal-dialog-centered my-modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content border-radius-6">
         <div class="modal-header border-radius-6">
           <h6 class="modal-title font-weight-bold" id="emergencyModalLabel">انتخاب زمان‌های اورژانسی</h6>
@@ -506,6 +505,54 @@
   <script>
     document.addEventListener('livewire:initialized', () => {
       $(document).ready(function() {
+        function toggleButtonLoading($button, isLoading) {
+          const $loader = $button.find('.loader');
+          const $text = $button.find('.button_text');
+
+          if (isLoading) {
+            $loader.show();
+            $text.hide();
+            $button.prop('disabled', true);
+          } else {
+            $loader.hide();
+            $text.show();
+            $button.prop('disabled', false);
+          }
+        }
+        // لیست دکمه‌هایی که نباید لودینگ داشته باشند
+        const excludedButtons = [
+          '.copy-single-slot-btn',
+          '.delete-schedule-setting',
+          '.emergency-slot-btn'
+        ];
+        // افزودن لودینگ به همه دکمه‌های غیرمستثنی
+        $(document).on('click', '.btn:not(' + excludedButtons.join(',') + ')', function(e) {
+          const $button = $(this);
+          if ($button.find('.loader').length && $button.find('.button_text').length) {
+            toggleButtonLoading($button, true);
+          }
+        });
+        Livewire.on('show-toastr', () => {
+          $('.btn').each(function() {
+            const $button = $(this);
+            if ($button.find('.loader').length && $button.find('.button_text').length) {
+              toggleButtonLoading($button, false);
+            }
+          });
+        });
+
+        // متوقف کردن لودینگ هنگام بستن مودال‌ها
+        ['#CalculatorModal', '#scheduleModal', '#emergencyModal', '#checkboxModal'].forEach(modalId => {
+          $(document).on('hidden.bs.modal', modalId, function() {
+            $('.btn').each(function() {
+              const $button = $(this);
+              if ($button.find('.loader').length && $button.find('.button_text').length) {
+                toggleButtonLoading($button, false);
+              }
+            });
+          });
+        });
+
         function initializeTooltips() {
           $('[data-tooltip="true"]').tooltip('dispose');
           $('[data-tooltip="true"]').tooltip({
@@ -575,6 +622,7 @@
             reverseButtons: true
           }).then((result) => {
             if (result.isConfirmed) {
+              toggleButtonLoading($(this), true);
               @this.call('removeSlot', day, index);
             }
           });

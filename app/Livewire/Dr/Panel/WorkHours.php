@@ -191,7 +191,7 @@ class Workhours extends Component
             }
         }
         $this->autoScheduling = $this->appointmentConfig->auto_scheduling;
-        $this->calendarDays = $this->appointmentConfig->calendar_days;
+        $this->calendarDays = $this->appointmentConfig->calendar_days ?? 30;
         $this->onlineConsultation = $this->appointmentConfig->online_consultation;
         $this->holidayAvailability = $this->appointmentConfig->holiday_availability;
 
@@ -548,6 +548,47 @@ class Workhours extends Component
         }
         $this->isEmergencyModalOpen = false;
         $this->dispatch('close-emergency-modal');
+    }
+    public function saveWorkSchedule()
+    {
+        try {
+            $this->validate([
+                'calendarDays' => 'required|integer|min:1',
+                'holidayAvailability' => 'boolean',
+            ]);
+
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+
+            DoctorAppointmentConfig::updateOrCreate(
+                [
+                    'doctor_id' => $doctor->id,
+                    'clinic_id' => $this->selectedClinicId !== 'default' ? $this->selectedClinicId : null,
+                ],
+                [
+                    'calendar_days' => $this->calendarDays,
+                    'holiday_availability' => $this->holidayAvailability,
+                    'auto_scheduling' => $this->autoScheduling,
+                    'online_consultation' => $this->onlineConsultation,
+                ]
+            );
+
+            $this->modalMessage = 'تنظیمات با موفقیت ذخیره شد';
+            $this->modalType = 'success';
+            $this->modalOpen = true;
+            $this->dispatch('show-toastr', [
+                'message' => $this->modalMessage,
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in saveWorkSchedule: ' . $e->getMessage(), ['exception' => $e]);
+            $this->modalMessage = 'خطا در ذخیره تنظیمات';
+            $this->modalType = 'error';
+            $this->modalOpen = true;
+            $this->dispatch('show-toastr', [
+                'message' => $this->modalMessage,
+                'type' => 'error',
+            ]);
+        }
     }
     public $storedCopySource = [];
     public $storedSelectedDays = [];
