@@ -256,6 +256,30 @@
     width: 650px !important;
 
 }
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-overlay .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+.loading-overlay p {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #333;
+}
 #scheduleModal .timepicker-ui-input {
     width: 300px !important;
 }
