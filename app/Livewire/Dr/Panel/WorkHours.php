@@ -334,11 +334,12 @@ class Workhours extends Component
             $settings = is_array($schedule->appointment_settings)
                 ? $schedule->appointment_settings
                 : json_decode($schedule->appointment_settings, true) ?? [];
-            Log::info('Setting selectedScheduleDays', [
+            Log::info('Loading settings for schedule modal', [
                 'day' => $day,
                 'index' => $index,
                 'settings' => $settings,
             ]);
+
             foreach ($settings as $setting) {
                 if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index) {
                     foreach ($setting['days'] as $d) {
@@ -351,7 +352,9 @@ class Workhours extends Component
             Log::warning('No schedule or settings found', ['day' => $day, 'index' => $index]);
         }
 
+        // رفرش تنظیمات
         $this->refreshWorkSchedules();
+        $this->dispatch('refresh-schedule-settings');
     }
 
     public function refreshWorkSchedules()
@@ -420,16 +423,13 @@ class Workhours extends Component
             $appointmentSettings = json_decode($schedule->appointment_settings, true) ?? [];
             Log::info('Current appointment settings', ['appointmentSettings' => $appointmentSettings]);
 
-            $filteredSettings = array_values(array_filter(
+            // فیلتر کردن تنظیمات برای اندیس و work_hour_key
+            $filteredKeys = array_keys(array_filter(
                 $appointmentSettings,
                 fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
             ));
-            Log::info('Filtered settings for deletion', [
-                'filteredSettings' => $filteredSettings,
-                'index' => $index,
-            ]);
 
-            if (!isset($filteredSettings[$index])) {
+            if (!isset($filteredKeys[$index])) {
                 Log::warning('Setting not found for index', ['index' => $index]);
                 $this->modalMessage = 'تنظیم انتخاب‌شده یافت نشد';
                 $this->modalType = 'error';
@@ -441,10 +441,6 @@ class Workhours extends Component
                 return;
             }
 
-            $filteredKeys = array_keys(array_filter(
-                $appointmentSettings,
-                fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
-            ));
             $actualIndex = $filteredKeys[$index];
             Log::info('Deleting setting at actual index', ['actualIndex' => $actualIndex]);
             unset($appointmentSettings[$actualIndex]);
@@ -463,7 +459,6 @@ class Workhours extends Component
                 'type' => 'success',
             ]);
             $this->dispatch('refresh-schedule-settings');
-            $this->dispatch('refresh');
         } catch (\Exception $e) {
             Log::error('Error in deleteScheduleSetting: ' . $e->getMessage(), ['exception' => $e]);
             $this->modalMessage = 'خطا در حذف تنظیم زمان‌بندی';
