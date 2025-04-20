@@ -312,10 +312,15 @@
           <div class="modal-content-inner">
             <div>
               <label class="font-weight-bold text-dark">روزهای کاری</label>
-              <div class="mt-2 d-flex gap-2">
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" wire:model.live="selectAllScheduleModal"
+                  id="select-all-schedule-days">
+                <label class="form-check-label" for="select-all-schedule-days">انتخاب همه</label>
+              </div>
+              <div class="mt-2 d-flex gap-2 flex-wrap">
                 @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox"
+                    <input class="form-check-input schedule-day-checkbox" type="checkbox"
                       wire:model.live="selectedScheduleDays.{{ $day }}"
                       id="schedule-day-{{ $day }}" data-day="{{ $day }}">
                     <label class="form-check-label"
@@ -376,7 +381,7 @@
                           {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
                         </span>
                         <button class="btn btn-danger btn-sm delete-schedule-setting"
-                          wire:click="deleteScheduleSetting('{{ $scheduleModalDay }}', {{ $index }})">
+                          data-day="{{ $scheduleModalDay }}" data-index="{{ $index }}">
                           <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
                         </button>
                       </div>
@@ -887,151 +892,147 @@
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
         }
-$(document).on('show.bs.modal', '#scheduleModal', function(e) {
-    const $modal = $(this);
-    const button = $(e.relatedTarget);
-    const day = button.data('day');
-    const index = button.data('index');
+        $(document).on('show.bs.modal', '#scheduleModal', function(e) {
+          const $modal = $(this);
+          const button = $(e.relatedTarget);
+          const day = button.data('day');
+          const index = button.data('index');
 
-    try {
-        if (!day || index === undefined) {
-            throw new Error('Invalid day or index');
-        }
-
-        @this.call('openScheduleModal', day, index);
-
-        // نمایش لودینگ
-        $('#scheduleLoading').removeClass('d-none');
-        $('.modal-content-inner').hide();
-
-        // دریافت زمان شروع و پایان
-        const startTimeInput = $(`#morning-start-${day}-${index}`);
-        const endTimeInput = $(`#morning-end-${day}-${index}`);
-        const startTime = startTimeInput.length ? startTimeInput.val() : '00:00';
-        const endTime = endTimeInput.length ? endTimeInput.val() : '23:59';
-
-        if (!startTime || !endTime) {
-            throw new Error('Start or end time is missing');
-        }
-
-        $('#schedule-start').val(startTime);
-        $('#schedule-end').val(endTime);
-
-        // غیرفعال کردن روزهایی که در تنظیمات دیگر استفاده شده‌اند
-        const schedule = @this.workSchedules.find((s) => s.day === day);
-        const settings = schedule && schedule.appointment_settings ? schedule.appointment_settings : [];
-        const usedDays = new Set();
-        settings.forEach((setting) => {
-            if (setting.days && Array.isArray(setting.days) && setting.work_hour_key != index) {
-                setting.days.forEach((d) => usedDays.add(d));
+          try {
+            if (!day || index === undefined) {
+              throw new Error('Invalid day or index');
             }
-        });
 
-        $('.form-check-input').each(function() {
-            const d = $(this).data('day');
-            if (usedDays.has(d) && d !== day) {
-                $(this).prop('disabled', true);
-            } else {
-                $(this).prop('disabled', false);
+            @this.call('openScheduleModal', day, index);
+
+            // نمایش لودینگ
+            $('#scheduleLoading').removeClass('d-none');
+            $('.modal-content-inner').hide();
+
+            // دریافت زمان شروع و پایان
+            const startTimeInput = $(`#morning-start-${day}-${index}`);
+            const endTimeInput = $(`#morning-end-${day}-${index}`);
+            const startTime = startTimeInput.length ? startTimeInput.val() : '00:00';
+            const endTime = endTimeInput.length ? endTimeInput.val() : '23:59';
+
+            if (!startTime || !endTime) {
+              throw new Error('Start or end time is missing');
             }
-        });
 
-        // رفرش تنظیمات
-        setTimeout(() => {
-            $('#scheduleLoading').addClass('d-none');
-            $('.modal-content-inner').show();
-            initializeTooltips();
-            initializeTimepicker();
-        }, 300);
-    } catch (error) {
-        console.error('Error in scheduleModal:', error);
-        @this.set('modalMessage', 'خطا در بارگذاری مودال: ' + error.message);
-        @this.set('modalType', 'error');
-        @this.set('modalOpen', true);
-        $modal.modal('hide');
-        cleanupModal();
-    }
-});
+            $('#schedule-start').val(startTime);
+            $('#schedule-end').val(endTime);
 
-$(document).on('click', '#saveSchedule', function() {
-    const startTime = $('#schedule-start').val();
-    const endTime = $('#schedule-end').val();
-    const selectedDays = $('.form-check-input:checked')
-        .map(function() {
-            return $(this).data('day');
-        })
-        .get();
-
-    try {
-        if (!startTime || !endTime) {
-            @this.set('modalMessage', 'لطفاً زمان شروع و پایان را وارد کنید');
-            @this.set('modalType', 'error');
-            @this.set('modalOpen', true);
-            return;
-        }
-
-        if (!selectedDays.length) {
-            @this.set('modalMessage', 'لطفاً حداقل یک روز انتخاب کنید');
-            @this.set('modalType', 'error');
-            @this.set('modalOpen', true);
-            return;
-        }
-
-        const timeToMinutes = (time) => {
-            const [hours, minutes] = time.split(':').map(Number);
-            return hours * 60 + minutes;
-        };
-
-        if (timeToMinutes(endTime) <= timeToMinutes(startTime)) {
-            @this.set('modalMessage', 'زمان پایان باید بعد از زمان شروع باشد');
-            @this.set('modalType', 'error');
-            @this.set('modalOpen', true);
-            return;
-        }
-
-        @this.call('saveSchedule', startTime, endTime, selectedDays);
-    } catch (error) {
-        console.error('Error saving schedule:', error);
-        @this.set('modalMessage', 'خطا در ذخیره زمان‌بندی');
-        @this.set('modalType', 'error');
-        @this.set('modalOpen', true);
-    }
-});
-
-$(document).on('click', '.delete-schedule-setting', function() {
-    const day = @this.get('scheduleModalDay');
-    const index = $(this).closest('.d-flex').index();
-
-    Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: 'این تنظیم زمان‌بندی حذف خواهد شد و قابل بازگشت نیست!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'بله، حذف کن!',
-        cancelButtonText: 'خیر',
-        reverseButtons: true,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            @this.call('deleteScheduleSetting', day, index);
+            // رفرش تنظیمات
             setTimeout(() => {
-                @this.dispatch('refresh-schedule-settings');
+              $('#scheduleLoading').addClass('d-none');
+              $('.modal-content-inner').show();
+              initializeTooltips();
+              initializeTimepicker();
+              // تنظیم گزینه انتخاب همه
+              const selectAllCheckbox = $('#select-all-schedule-days');
+              const dayCheckboxes = $('.schedule-day-checkbox');
+              selectAllCheckbox.prop('checked', false);
+              selectAllCheckbox.off('change').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                dayCheckboxes.prop('checked', isChecked);
+                dayCheckboxes.each(function() {
+                  @this.set(`selectedScheduleDays.${$(this).data('day')}`, isChecked);
+                });
+              });
+              // به‌روزرسانی انتخاب همه بر اساس وضعیت چک‌باکس‌ها
+              const allChecked = dayCheckboxes.length === dayCheckboxes.filter(':checked').length;
+              selectAllCheckbox.prop('checked', allChecked);
             }, 300);
-        }
-    });
-});
+          } catch (error) {
+            console.error('Error in scheduleModal:', error);
+            @this.set('modalMessage', 'خطا در بارگذاری مودال: ' + error.message);
+            @this.set('modalType', 'error');
+            @this.set('modalOpen', true);
+            $modal.modal('hide');
+            cleanupModal();
+          }
+        });
 
-$(document).on('hidden.bs.modal', '#scheduleModal', function() {
-    cleanupModal();
-    @this.set('scheduleModalDay', null);
-    @this.set('scheduleModalIndex', null);
-    @this.set('selectedScheduleDays', []);
-    $('#schedule-settings-list').empty();
-    $('.form-check-input').prop('disabled', false);
-    initializeTooltips();
-    initializeTimepicker();
-});
+        $(document).on('click', '#saveSchedule', function() {
+          const startTime = $('#schedule-start').val();
+          const endTime = $('#schedule-end').val();
+          const selectedDays = $('.schedule-day-checkbox:checked')
+            .map(function() {
+              return $(this).data('day');
+            })
+            .get();
+
+          try {
+            if (!startTime || !endTime) {
+              @this.set('modalMessage', 'لطفاً زمان شروع و پایان را وارد کنید');
+              @this.set('modalType', 'error');
+              @this.set('modalOpen', true);
+              return;
+            }
+
+            if (!selectedDays.length) {
+              @this.set('modalMessage', 'لطفاً حداقل یک روز انتخاب کنید');
+              @this.set('modalType', 'error');
+              @this.set('modalOpen', true);
+              return;
+            }
+
+            const timeToMinutes = (time) => {
+              const [hours, minutes] = time.split(':').map(Number);
+              return hours * 60 + minutes;
+            };
+
+            if (timeToMinutes(endTime) <= timeToMinutes(startTime)) {
+              @this.set('modalMessage', 'زمان پایان باید بعد از زمان شروع باشد');
+              @this.set('modalType', 'error');
+              @this.set('modalOpen', true);
+              return;
+            }
+
+            @this.call('saveSchedule', startTime, endTime, selectedDays);
+          } catch (error) {
+            console.error('Error saving schedule:', error);
+            @this.set('modalMessage', 'خطا در ذخیره زمان‌بندی');
+            @this.set('modalType', 'error');
+            @this.set('modalOpen', true);
+          }
+        });
+
+        $(document).on('click', '.delete-schedule-setting', function() {
+          const day = $(this).data('day');
+          const index = $(this).data('index');
+
+          Swal.fire({
+            title: 'آیا مطمئن هستید؟',
+            text: 'این تنظیم زمان‌بندی حذف خواهد شد و قابل بازگشت نیست!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'بله، حذف کن!',
+            cancelButtonText: 'خیر',
+            reverseButtons: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              @this.call('deleteScheduleSetting', day, index);
+              setTimeout(() => {
+                @this.dispatch('refresh-schedule-settings');
+              }, 300);
+            }
+          });
+        });
+
+        $(document).on('hidden.bs.modal', '#scheduleModal', function() {
+          cleanupModal();
+          @this.set('scheduleModalDay', null);
+          @this.set('scheduleModalIndex', null);
+          @this.set('selectedScheduleDays', []);
+          @this.set('selectAllScheduleModal', false);
+          $('#schedule-settings-list').empty();
+          $('.form-check-input').prop('disabled', false);
+          initializeTooltips();
+          initializeTimepicker();
+        });
 
         // رویداد رفرش تنظیمات
         Livewire.on('refresh-schedule-settings', () => {

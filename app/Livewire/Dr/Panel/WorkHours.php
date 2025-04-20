@@ -208,7 +208,7 @@ class Workhours extends Component
         $this->dispatch('refresh-schedule-settings');
     }
 
-      public function openScheduleModal($day, $index)
+    public function openScheduleModal($day, $index)
     {
         $this->scheduleModalDay = $day;
         $this->scheduleModalIndex = $index;
@@ -247,7 +247,15 @@ class Workhours extends Component
         $this->refreshWorkSchedules();
         $this->dispatch('refresh-schedule-settings');
     }
+    public $selectAllScheduleModal = false;
 
+    public function updatedSelectAllScheduleModal($value)
+    {
+        $days = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        foreach ($days as $day) {
+            $this->selectedScheduleDays[$day] = $value;
+        }
+    }
     public function saveSchedule($startTime, $endTime, $days)
     {
         try {
@@ -265,8 +273,22 @@ class Workhours extends Component
             $newStartMinutes = $timeToMinutes($startTime);
             $newEndMinutes = $timeToMinutes($endTime);
 
+            if ($newEndMinutes <= $newStartMinutes) {
+                throw new \Exception('زمان پایان باید بعد از زمان شروع باشد.');
+            }
+
             // بررسی تداخل
             $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+            $dayTranslations = [
+                'saturday' => 'شنبه',
+                'sunday' => 'یکشنبه',
+                'monday' => 'دوشنبه',
+                'tuesday' => 'سه‌شنبه',
+                'wednesday' => 'چهارشنبه',
+                'thursday' => 'پنج‌شنبه',
+                'friday' => 'جمعه',
+            ];
+
             foreach ($days as $day) {
                 $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                     ->where('day', $day)
@@ -293,16 +315,9 @@ class Workhours extends Component
                             ($newEndMinutes > $existingStartMinutes && $newEndMinutes <= $existingEndMinutes) ||
                             ($newStartMinutes <= $existingStartMinutes && $newEndMinutes >= $existingEndMinutes)
                         ) {
-                            $dayTranslations = [
-                                'saturday' => 'شنبه',
-                                'sunday' => 'یکشنبه',
-                                'monday' => 'دوشنبه',
-                                'tuesday' => 'سه‌شنبه',
-                                'wednesday' => 'چهارشنبه',
-                                'thursday' => 'پنج‌شنبه',
-                                'friday' => 'جمعه',
-                            ];
-                            throw new \Exception("تداخل زمانی در روز {$dayTranslations[$day]} با بازه {$setting['start_time']} تا {$setting['end_time']} وجود دارد.");
+                            throw new \Exception(
+                                "تداخل زمانی در روز {$dayTranslations[$day]} با بازه {$setting['start_time']} تا {$setting['end_time']} وجود دارد. لطفاً زمان دیگری انتخاب کنید."
+                            );
                         }
                     }
                 }
@@ -460,7 +475,7 @@ class Workhours extends Component
         Log::info('Work schedules refreshed', ['workSchedules' => $this->workSchedules]);
     }
 
-   
+
 
 
     public function closeScheduleModal()
