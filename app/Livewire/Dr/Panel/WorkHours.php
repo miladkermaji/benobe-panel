@@ -485,9 +485,9 @@ class Workhours extends Component
     }
     public function updatedSelectAllCopyModal($value)
     {
-        $sourceDay = $this->copySource['day'];
-        foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day) {
-            if ($day !== $sourceDay) {
+        $days = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        foreach ($days as $day) {
+            if ($day !== $this->sourceDay) {
                 $this->selectedDays[$day] = $value;
             }
         }
@@ -780,21 +780,12 @@ class Workhours extends Component
             return false;
         }
     }
-    public function openCopyModal($day, $index)
+    public function openCopyModal($day)
     {
-        $this->copySource = [
-            'day' => $day,
-            'index' => (int) $index,
-        ];
-        // فقط اگر selectedDays خالی باشد، مقداردهی اولیه کن
-        if (empty(array_filter($this->selectedDays))) {
-            $this->selectedDays = array_fill_keys(
-                ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-                false
-            );
-        }
+        $this->sourceDay = $day;
         $this->selectAllCopyModal = false;
-        $this->dispatch('open-checkbox-modal', $this->copySource);
+        $this->selectedDays = [];
+        $this->dispatchBrowserEvent('open-checkbox-modal');
     }
     protected function timeToMinutes($time)
     {

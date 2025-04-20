@@ -1,6 +1,12 @@
 <div class="checkbox-wrapper-1">
-    <div class="d-flex ">
-        <input {{ $isChecked ? 'checked' : '' }} id="{{ $id }}" class="substituted" type="checkbox" aria-hidden="true" />
+    <div class="d-flex">
+        <input 
+            {{ $isChecked ? 'checked' : '' }} 
+            id="{{ $id }}" 
+            class="substituted {{ $attributes->get('class') }}" 
+            type="checkbox" 
+            aria-hidden="true" 
+            {{ $attributes }} />
         <label for="{{ $id }}" class="text-dark font-weight-bold">{{ $day }}</label>
     </div>
 </div>
