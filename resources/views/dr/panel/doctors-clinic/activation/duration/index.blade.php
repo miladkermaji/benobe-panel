@@ -1,47 +1,20 @@
-<!DOCTYPE html>
-<html lang="fa">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ساعت کاری</title>
-  @include('dr.panel.layouts.partials.head-tags')
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/bootstrap.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/style.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/panel.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}">
+@extends('dr.panel.doctors-clinic.layouts.master')
+@section('styles')
   <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/activation/index.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clinic/duration/duration.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastify/toastify.min.css') }}">
-</head>
+    <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clinic/duration/duration.css') }}">
+@endsection
 
-<body dir="rtl">
-  <!-- لودینگ کلی سایت -->
-  <div id="global-loader">
-    <div class="loader-backdrop"></div> <!-- بک‌دراپ -->
-    <div class="loader-content">
-      <div class="spinner"></div> <!-- انیمیشن لودینگ -->
-      <p>لطفا منتظر بمانید...</p>
-    </div>
-  </div>
-  <header class="bg-light text-dark p-3 my-shodow w-100 d-flex align-items-center">
-    <div class="back w-50">
-      <a href="{{ route('doctors.clinic.cost', $clinicId) }}" class="btn btn-light">
-        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none">
-          <g id="Arrow / Chevron_Right_MD">
-            <path id="Vector" d="M10 8L14 12L10 16" stroke="#000000" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round"></path>
-          </g>
-        </svg>
-        <span class="font-weight-bold">بازگشت</span>
 
-      </a>
-    </div>
-    <div class="w-50">
-      <h5 class="font-weight-bold title-header">مدت زمان نوبت ها</h5>
-    </div>
-  </header>
+@section('headerTitle')
+  
+مدت زمان نوبت ها
 
+@endsection
+
+@section('backUrl')
+ {{ route('doctors.clinic.cost', $clinicId) }}
+@endsection
+@section('content')
   <div class="d-flex w-100 justify-content-center align-items-center flex-column">
     <div class="roadmap-container mt-3">
       <div class="step completed">
@@ -178,7 +151,7 @@
         </div>
         <div class="modal-body d-flex justify-content-center align-items-center">
           <button type="button" class="btn btn-outline-secondary mx-2" id="decreaseDuration">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#333"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               class="feather feather-minus">
               <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -200,8 +173,11 @@
       </div>
     </div>
   </div>
-  @include('dr.panel.layouts.partials.scripts')
-  <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+@endsection
+
+
+@section('scripts')
+    <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
   <script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -373,6 +349,7 @@
           });
 
           const data = await response.json();
+          
 
           if (data.success) {
             toastr.success(data.message);
@@ -389,8 +366,4 @@
       });
     });
   </script>
-
-
-</body>
-
-</html>
+@endsection

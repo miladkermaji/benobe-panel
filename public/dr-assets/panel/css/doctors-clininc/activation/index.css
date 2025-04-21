@@ -108,34 +108,9 @@ header {
     background-color: #f1f3f5;
 }
 
-/* استایل دکمه‌ها */
-.my-btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    border-radius: 12px;
-    padding: 12px 25px;
-    font-weight: 600;
-    font-size: 14px;
-    color: #fff;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-.my-btn-primary:hover {
-    background-color: #0062cc;
-    border-color: #0062cc;
-    transform: translateY(-2px);
-}
 
-.btn-danger {
-    background-color: #dc3545;
-    border-color: #dc3545;
-    border-radius: 8px;
-    padding: 8px 12px;
-    transition: background-color 0.3s ease;
-}
-.btn-danger:hover {
-    background-color: #c82333;
-    border-color: #c82333;
-}
+
+
 
 /* استایل فرم‌ها */
 .my-form-control,
@@ -232,7 +207,7 @@ header {
     font-size: 12px;
     font-weight: 600;
     color: #6c757d;
-    z-index: 1;
+    z-index: 1000;
 }
 
 .input-group-append .btn {

@@ -1,42 +1,18 @@
-<!DOCTYPE html>
-<html lang="fa">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>محل مطب من</title>
-  @include('dr.panel.layouts.partials.head-tags')
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/bootstrap.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/style.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/panel.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}">
+@extends('dr.panel.doctors-clinic.layouts.master')
+@section('styles')
   <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/activation/index.css') }}">
   <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/clinic/cost/cost.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastify/toastify.min.css') }}">
-  @include('dr.panel.my-tools.loader-btn')
-</head>
-
-<body dir="rtl">
-  <x-global-loader />
-  <header class="bg-light text-dark p-3 my-shodow w-100 d-flex align-items-center">
-    <div class="back w-50">
-      <a href="{{ route('activation-doctor-clinic', $clinicId) }}" class="btn btn-light">
-        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none">
-          <g id="Arrow / Chevron_Right_MD">
-            <path id="Vector" d="M10 8L14 12L10 16" stroke="#000000" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round"></path>
-          </g>
-        </svg>
-        <span class="font-weight-bold">بازگشت</span>
-
-      </a>
-    </div>
-    <div class="w-50">
-      <h5 class="font-weight-bold title-header"> بیعانه</h5>
-    </div>
-  </header>
+@endsection
 
 
+@section('headerTitle')
+  بیعانه
+@endsection
+
+@section('backUrl')
+  {{ route('activation-doctor-clinic',$clinicId) }}
+@endsection
+@section('content')
   <div class="d-flex w-100 justify-content-center align-items-center flex-column">
     <div class="roadmap-container mt-3">
       <div class="step completed">
@@ -112,11 +88,12 @@
               </div>
               <!-- بعد از <form id="depositForm"> این بخش رو اضافه کن -->
               <div class="mb-3">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="noDeposit" name="no_deposit" value="1">
+                <div class="">
                   <label class="form-check-label" for="noDeposit">
+                    <input class="form-check-input" type="checkbox" id="noDeposit" name="no_deposit" value="1">
                     بدون بیعانه (اختیاری)
                   </label>
+
                 </div>
               </div>
               <div class="alert alert-warning text-center" role="alert">
@@ -171,8 +148,10 @@
       </div>
     </div>
   </div>
-  @include('dr.panel.layouts.partials.scripts')
-  <script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
+@endsection
+
+
+@section('scripts')
   <script>
     document.getElementById('noDeposit').addEventListener('change', function() {
       const depositSelect = document.getElementById('depositAmount');
@@ -357,7 +336,4 @@
         });
     });
   </script>
-
-</body>
-
-</html>
+@endsection
