@@ -127,7 +127,7 @@
 .form-check-input {
     width: 1rem;
     /* Change width as needed */
-    height: 0.87rem;
+    height: 1rem;
     /* Change height as needed */
     border-radius: 0.5rem;
     /* Adjust border radius */
@@ -1475,7 +1475,8 @@ body {
 @media screen and (min-width: 992px) {
     #scheduleModal .modal-header,
     #scheduleModal .modal-content {
-        max-width: 654px !important;
+        max-width: 630px !important;
+        width: 630px !important;
     }
     #scheduleModal .timepicker-ui-input {
         max-width: 300px !important;
@@ -1900,4 +1901,11 @@ h6 {
     .form-control {
         font-size: 13px;
     }
+}
+.border-radius-0{
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important; 
+}
+.input-group-append{
+  height: 50px !important;
 }

@@ -154,11 +154,13 @@ th {
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
     /* Focus shadow */
 }
-
+.sidebar__scrollable ol ul{
+    padding-right: 0 !important;
+}
 .form-check-input {
     width: 1rem;
     /* Change width as needed */
-    height: 0.87rem;
+    height: 1rem;
     /* Change height as needed */
     border-radius: 0.5rem;
     /* Adjust border radius */

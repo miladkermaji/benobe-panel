@@ -67,22 +67,6 @@
 
 @section('scripts')
     <script>
-    // تنظیمات پیش‌فرض Toastr
-
-    // ثبت رویداد show-toastr
-    Livewire.on('show-toastr', (data) => {
-      console.log('show-toastr received', data);
-      const toastrData = Array.isArray(data) ? data[0] : data;
-
-      if (toastrData.type === 'success') {
-        toastr.success(toastrData.message);
-      } else if (toastrData.type === 'warning') {
-        toastr.warning(toastrData.message);
-      } else if (toastrData.type === 'error') {
-        toastr.error(toastrData.message);
-      }
-    });
-
     document.getElementById('startAppointmentBtn').addEventListener('click', function() {
       Swal.fire({
         title: 'آیا مطمئن هستید؟',

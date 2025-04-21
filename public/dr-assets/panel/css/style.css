@@ -1880,7 +1880,9 @@ span.tagRemove:hover {
     transform: rotate(-180deg);
     top: 37%;
 }
-
+.sidebar__scrollable ol ul{
+    padding-right: 0 !important;
+}
 .t-header-search-content {
     position: absolute;
     display: none;

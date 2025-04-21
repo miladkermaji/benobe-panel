@@ -151,10 +151,10 @@ address {
     font-style: normal;
     line-height: inherit;
 }
-ol,
+/* ol,
 ul {
     padding-right: 2rem;
-}
+} */
 dl,
 ol,
 ul {

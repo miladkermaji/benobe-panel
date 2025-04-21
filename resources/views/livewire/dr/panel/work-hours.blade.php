@@ -12,13 +12,12 @@
           <div>
             <div>
               <div>
-                <div class="input-group position-relative">
+                <div class="input-group position-relative mb-3">
                   <label class="label-top-input-special-takhasos">تعداد روز‌های باز تقویم</label>
-                  <input type="number" class="form-control text-center h-50 border-radius-0" name="calendar_days"
-                    placeholder="تعداد روز مورد نظر خود را وارد کنید" wire:model.live="calendarDays">
-                  <div class="input-group-append count-span-prepand-style border-radius-0">
-                    <span class="input-group-text px-2">روز</span>
-                  </div>
+                  <input type="number" class="form-control text-center" name="calendar_days"
+                    placeholder="تعداد روز مورد نظر خود را وارد کنید" wire:model.live="calendarDays"
+                    style="height: 50px;">
+                  <span class="input-group-text" style="height: 50px;">روز</span>
                 </div>
                 <div class="mt-3">
                   <x-my-check :isChecked="$holidayAvailability" id="posible-appointments-inholiday" day="باز بودن مطب در تعطیلات رسمی"
@@ -315,14 +314,13 @@
           <!-- محتوای اصلی -->
           <div class="modal-content-inner">
             <div>
-              <label class="font-weight-bold text-dark">روزهای کاری</label>
-              <div class="form-check mb-3">
+              <div class="mb-3">
                 <x-my-check-box :is-checked="$selectAllScheduleModal" id="select-all-schedule-days" day="انتخاب همه"
                   wire:model.live="selectAllScheduleModal" />
               </div>
               <div class="mt-2 d-flex gap-2 flex-wrap" id="day-schdule-wrapper">
                 @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
-                  <div class="form-check">
+                  <div class="">
                     <x-my-check-box :is-checked="isset($selectedScheduleDays[$day]) && $selectedScheduleDays[$day]" id="schedule-day-{{ $day }}"
                       day="{{ $label }}" wire:model.live="selectedScheduleDays.{{ $day }}"
                       data-day="{{ $day }}" class="schedule-day-checkbox" />
@@ -408,58 +406,50 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" id="CalculatorModal" tabindex="-1" role="dialog" aria-labelledby="CalculatorModalLabel"
+  <div class="modal fade" id="CalculatorModal" tabindex="-1" aria-labelledby="CalculatorModalLabel"
     aria-hidden="true" wire:ignore.self>
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content border-radius-6" id="calculate-modal">
-        <div class="modal-header border-radius-6">
-          <h6 class="modal-title font-weight-bold" id="CalculatorModalLabel">انتخاب تعداد نوبت یا زمان ویزیت:</h6>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-2" id="calculate-modal">
+        <div class="modal-header rounded-2">
+          <h6 class="modal-title fw-bold" id="CalculatorModalLabel">انتخاب تعداد نوبت یا زمان ویزیت:</h6>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="d-flex align-items-center">
             <div class="d-flex flex-wrap flex-column align-items-start gap-4 w-100">
               <!-- حالت انتخاب تعداد نوبت -->
               <div class="d-flex align-items-center w-100">
-                <div class="custom-control custom-radio mr-2">
-                  <input type="radio" id="count-radio" name="calculation-mode" class="custom-control-input"
+                <div class="d-flex align-items-center">
+                  <input type="radio" id="count-radio" name="calculation-mode" class="form-check-input"
                     wire:model.live="calculationMode" value="count">
-                  <label class="custom-control-label" for="count-radio"></label>
+                  <label class="form-check-label" for="count-radio"></label>
                 </div>
                 <div class="input-group position-relative mx-2">
                   <label class="label-top-input-special-takhasos">تعداد نوبت‌ها</label>
-                  <input type="number" class="form-control text-center h-50 border-radius-0" id="appointment-count"
-                    wire:model.live="calculator.appointment_count"
-                    {{ $calculationMode !== 'count' ? 'disabled' : '' }}>
-                  <div class="input-group-append count-span-prepand-style">
-                    <span class="input-group-text px-2">نوبت</span>
-                  </div>
+                  <input type="number" class="form-control text-center h-50 rounded-0 border-radius-0"
+                    id="appointment-count" wire:model.live="calculator.appointment_count" style="height: 50px;">
+                  <span class="input-group-text px-2 count-span-prepand-style">نوبت</span>
                 </div>
               </div>
               <!-- حالت انتخاب زمان هر نوبت -->
               <div class="d-flex align-items-center mt-4 w-100">
-                <div class="custom-control custom-radio mr-2">
-                  <input type="radio" id="time-radio" name="calculation-mode" class="custom-control-input"
+                <div class="d-flex align-items-center">
+                  <input type="radio" id="time-radio" name="calculation-mode" class="form-check-input"
                     wire:model.live="calculationMode" value="time">
-                  <label class="custom-control-label" for="time-radio"></label>
+                  <label class="form-check-label" for="time-radio"></label>
                 </div>
                 <div class="input-group position-relative mx-2">
                   <label class="label-top-input-special-takhasos">زمان هر نوبت</label>
-                  <input type="number" class="form-control text-center h-50 border-radius-0" id="time-count"
-                    wire:model.live="calculator.time_per_appointment"
-                    {{ $calculationMode !== 'time' ? 'disabled' : '' }}>
-                  <div class="input-group-append">
-                    <span class="input-group-text px-2">دقیقه</span>
-                  </div>
+                  <input type="number" class="form-control text-center h-50 rounded-0 border-radius-0"
+                    id="time-count" wire:model.live="calculator.time_per_appointment" style="height: 50px;">
+                  <span class="input-group-text px-2">دقیقه</span>
                 </div>
               </div>
             </div>
           </div>
           <div class="w-100 d-flex justify-content-end p-1 gap-4 mt-3">
-            <button type="button" class="btn my-btn-primary h-50 w-100" wire:click="saveCalculator"
-              id="saveSelectionCalculator">
+            <button type="button" class="btn my-btn-primary w-100 d-flex justify-content-center align-items-center"
+              wire:click="saveCalculator" id="saveSelectionCalculator" style="height: 50px;">
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -762,7 +752,15 @@
             $('body').removeClass('modal-open').css('padding-right', '');
           }
         });
-
+        Livewire.on('close-calculator-modal', () => {
+          $('#CalculatorModal').modal('hide');
+          $('.modal-backdrop').remove();
+          $('body').removeClass('modal-open').css('padding-right', '');
+          const $button = $('#saveSelectionCalculator');
+          if ($button.find('.loader').length && $button.find('.button_text').length) {
+            toggleButtonLoading($button, false);
+          }
+        });
         $(document).on('hidden.bs.modal', '#CalculatorModal', function() {
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
@@ -967,7 +965,7 @@
               throw new Error('Start or end time is missing');
             }
 
-         
+
 
             $('#schedule-start').val(startTime);
             $('#schedule-end').val(endTime);
@@ -1008,7 +1006,7 @@
             })
             .get();
 
-         
+
 
           try {
             // اعتبارسنجی سمت کلاینت
