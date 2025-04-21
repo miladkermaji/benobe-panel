@@ -739,26 +739,26 @@ button {
 
 #incrementHour {
     position: absolute;
-    top: -10px;
+    top: 7px;
     left: 32px;
     font-weight: bolder !important;
 }
 
 #decrementHour {
     position: absolute;
-    bottom: -10px;
+    bottom: 7px;
     left: 36px;
 }
 
 #incrementMinute {
     position: absolute;
-    top: -10px;
+    top: 7px;
     right: 32px;
 }
 
 #decrementMinute {
     position: absolute;
-    bottom: -10px;
+    bottom: 7px;
     right: 32px;
 }
 

@@ -685,26 +685,26 @@ button {
 
 #incrementHour {
     position: absolute;
-    top: -10px;
+    top: 7px;
     left: 64px;
     font-weight: bolder !important;
 }
 
 #decrementHour {
     position: absolute;
-    bottom: -10px;
+    bottom: 7px;
     left: 64px;
 }
 
 #incrementMinute {
     position: absolute;
-    top: -10px;
+    top: 7px;
     right: 64px;
 }
 
 #decrementMinute {
     position: absolute;
-    bottom: -10px;
+    bottom: 7px;
     right: 64px;
 }
 .timepicker-ui-minute-text,
