@@ -378,7 +378,7 @@
                           از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }} (روزها:
                           {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
                         </span>
-                        <button class="btn btn-danger btn-sm delete-schedule-setting"
+                        <button class="btn btn-light btn-sm delete-schedule-setting"
                           data-day="{{ $scheduleModalDay }}" data-index="{{ $index }}">
                           <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
                         </button>

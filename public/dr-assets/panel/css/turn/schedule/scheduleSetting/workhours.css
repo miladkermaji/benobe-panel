@@ -171,7 +171,6 @@ body {
     border-radius: var(--radius-button);
     font-size: 0.875rem;
     font-weight: 500;
-    padding: 0.625rem 1.25rem;
     transition: all 0.3s ease;
     white-space: nowrap;
     display: inline-flex;
@@ -230,7 +229,7 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.remove-row-btn:hover {
+.remove-row-btn:hover,.delete-schedule-setting:hover {
     background: #ffe5e5;
     border-color: var(--text-original);
 }
