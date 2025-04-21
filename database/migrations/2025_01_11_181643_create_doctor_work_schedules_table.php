@@ -34,6 +34,7 @@ return new class extends Migration {
             // مثال: [{"start": "08:00", "end": "12:00"}, {"start": "14:00", "end": "18:00"}]
 
             $table->json('appointment_settings')->nullable()->comment(' زمانبندی باز شدن نوبت ها');
+            $table->json('emergency_times')->nullable()->comment(' زمان های اورژانسی');
             // تنظیمات اختصاصی نوبت‌دهی برای هر روز
             // مثال: {"max_appointments": 10, "appointment_duration": 15}
 
