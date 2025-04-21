@@ -16,6 +16,7 @@ use App\Jobs\SendSmsNotificationJob;
 use App\Models\SpecialDailySchedule;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DoctorAppointmentConfig;
+use Illuminate\Support\Facades\Validator;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
@@ -87,6 +88,32 @@ class Workhours extends Component
         'oldDate' => 'required',
         'newDate' => 'required|date_format:Y-m-d',
         'appointmentIds' => 'array',
+        'scheduleModalDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
+        'scheduleModalIndex' => 'required|integer',
+        'selectedScheduleDays' => 'required|array|min:1', // حداقل یک روز باید انتخاب شده باشد
+    ];
+
+    protected $messages = [
+        'selectedDay.required' => 'لطفاً یک روز را انتخاب کنید.',
+        'startTime.required' => 'لطفاً زمان شروع را وارد کنید.',
+        'startTime.date_format' => 'فرمت زمان شروع نامعتبر است.',
+        'endTime.required' => 'لطفاً زمان پایان را وارد کنید.',
+        'endTime.date_format' => 'فرمت زمان پایان نامعتبر است.',
+        'endTime.after' => 'زمان پایان باید بعد از زمان شروع باشد.',
+        'maxAppointments.required' => 'لطفاً تعداد حداکثر نوبت‌ها را وارد کنید.',
+        'maxAppointments.integer' => 'تعداد نوبت‌ها باید عدد باشد.',
+        'maxAppointments.min' => 'تعداد نوبت‌ها باید حداقل ۱ باشد.',
+        'sourceDay.required' => 'لطفاً روز مبدا را انتخاب کنید.',
+        'targetDays.required' => 'لطفاً حداقل یک روز مقصد را انتخاب کنید.',
+        'targetDays.min' => 'لطفاً حداقل یک روز مقصد را انتخاب کنید.',
+        'holidayDate.required' => 'لطفاً تاریخ تعطیلی را وارد کنید.',
+        'oldDate.required' => 'لطفاً تاریخ قدیمی را وارد کنید.',
+        'newDate.required' => 'لطفاً تاریخ جدید را وارد کنید.',
+        'newDate.date_format' => 'فرمت تاریخ جدید نامعتبر است.',
+        'scheduleModalDay.required' => 'لطفاً یک روز را برای زمان‌بندی انتخاب کنید.',
+        'scheduleModalIndex.required' => 'اندیس زمان‌بندی نامعتبر است.',
+        'selectedScheduleDays.required' => 'لطفاً حداقل یک روز را انتخاب کنید.',
+        'selectedScheduleDays.min' => 'لطفاً حداقل یک روز را انتخاب کنید.',
     ];
     public function mount()
     {
@@ -256,26 +283,59 @@ class Workhours extends Component
             $this->selectedScheduleDays[$day] = $value;
         }
     }
-    public function saveSchedule($startTime, $endTime, $days)
+    public function saveSchedule($startTime, $endTime)
     {
         try {
-            $this->validate([
+         
+
+            // اعتبارسنجی ورودی‌ها
+            $validator = Validator::make([
+                'startTime' => $startTime,
+                'endTime' => $endTime,
+                'selectedScheduleDays' => $this->selectedScheduleDays,
+                'scheduleModalDay' => $this->scheduleModalDay,
+                'scheduleModalIndex' => $this->scheduleModalIndex,
+            ], [
                 'scheduleModalDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
                 'scheduleModalIndex' => 'required|integer',
+                'selectedScheduleDays' => 'required|array|min:1',
+                'startTime' => 'required|date_format:H:i',
+                'endTime' => 'required|date_format:H:i|after:startTime',
+            ], [
+                'scheduleModalDay.required' => 'لطفاً یک روز را برای زمان‌بندی انتخاب کنید.',
+                'scheduleModalIndex.required' => 'اندیس زمان‌بندی نامعتبر است.',
+                'selectedScheduleDays.required' => 'لطفاً حداقل یک روز انتخاب کنید.',
+                'selectedScheduleDays.min' => 'لطفاً حداقل یک روز انتخاب کنید.',
+                'startTime.required' => 'لطفاً زمان شروع را وارد کنید.',
+                'startTime.date_format' => 'فرمت زمان شروع نامعتبر است.',
+                'endTime.required' => 'لطفاً زمان پایان را وارد کنید.',
+                'endTime.date_format' => 'فرمت زمان پایان نامعتبر است.',
+                'endTime.after' => 'زمان پایان باید بعد از زمان شروع باشد.',
             ]);
+
+            if ($validator->fails()) {
+                $errors = $validator->errors()->all();
+                $this->modalMessage = implode(' ', $errors);
+                $this->modalType = 'error';
+                $this->modalOpen = true;
+                $this->dispatch('show-toastr', [
+                    'message' => $this->modalMessage,
+                    'type' => 'error',
+                ]);
+                return;
+            }
+
+            // دریافت روزهای انتخاب‌شده
+            $days = array_keys(array_filter($this->selectedScheduleDays));
 
             // تبدیل زمان به دقیقه برای مقایسه
             $timeToMinutes = function ($time) {
-                list($hours, $minutes) = explode(':', $time);
+                [$hours, $minutes] = explode(':', $time);
                 return (int)$hours * 60 + (int)$minutes;
             };
 
             $newStartMinutes = $timeToMinutes($startTime);
             $newEndMinutes = $timeToMinutes($endTime);
-
-            if ($newEndMinutes <= $newStartMinutes) {
-                throw new \Exception('زمان پایان باید بعد از زمان شروع باشد.');
-            }
 
             // بررسی تداخل
             $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
@@ -305,7 +365,7 @@ class Workhours extends Component
                     $settings = json_decode($schedule->appointment_settings, true) ?? [];
                     foreach ($settings as $setting) {
                         if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex) {
-                            continue; // نادیده گرفتن تنظیمات مربوط به همین اسلات
+                            continue;
                         }
                         $existingStartMinutes = $timeToMinutes($setting['start_time']);
                         $existingEndMinutes = $timeToMinutes($setting['end_time']);
@@ -352,7 +412,6 @@ class Workhours extends Component
                 'work_hour_key' => (int)$this->scheduleModalIndex,
             ];
 
-            // اضافه کردن یا به‌روزرسانی تنظیم
             $existingIndex = array_search(
                 (int)$this->scheduleModalIndex,
                 array_column($appointmentSettings, 'work_hour_key')
@@ -375,9 +434,8 @@ class Workhours extends Component
                 'message' => $this->modalMessage,
                 'type' => 'success',
             ]);
-            $this->dispatch('refresh-schedule-settings');
+            $this->dispatch('close-schedule-modal');
         } catch (\Exception $e) {
-            Log::error('Error in saveSchedule: ' . $e->getMessage(), ['exception' => $e]);
             $this->modalMessage = $e->getMessage();
             $this->modalType = 'error';
             $this->modalOpen = true;
@@ -438,7 +496,6 @@ class Workhours extends Component
             ]);
             $this->dispatch('refresh-schedule-settings');
         } catch (\Exception $e) {
-            Log::error('Error in deleteScheduleSetting: ' . $e->getMessage(), ['exception' => $e]);
             $this->modalMessage = $e->getMessage();
             $this->modalType = 'error';
             $this->modalOpen = true;
@@ -472,7 +529,6 @@ class Workhours extends Component
                 ];
             })
             ->toArray();
-        Log::info('Work schedules refreshed', ['workSchedules' => $this->workSchedules]);
     }
 
 
@@ -580,7 +636,6 @@ class Workhours extends Component
                 'type' => 'success',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in saveWorkSchedule: ' . $e->getMessage(), ['exception' => $e]);
             $this->modalMessage = 'خطا در ذخیره تنظیمات';
             $this->modalType = 'error';
             $this->modalOpen = true;
