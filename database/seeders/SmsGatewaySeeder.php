@@ -13,7 +13,7 @@ class SmsGatewaySeeder extends Seeder
    [
     'name' => 'pishgamrayan',
     'title' => 'پیشگام رایان',
-    'is_active' => true,
+    'is_active' => false,
     'settings' => json_encode([
      'auth_key' => env('SMS_AUTH_KEY', 'hP0qkpJZriM8PyVujTepFgVhnhlpv05wuVtRYm0v2I4='),
      'otp_id' => env('SMS_OTP_ID', '96'),
@@ -43,7 +43,7 @@ class SmsGatewaySeeder extends Seeder
    [
     'name' => 'kavenegar',
     'title' => 'کاوه‌نگار',
-    'is_active' => false,
+    'is_active' => true,
     'settings' => json_encode([
      'api_key' => env('KAVENEGAR_API_KEY', ''),
      'sender_number' => env('KAVENEGAR_SENDER_NUMBER', '')
