@@ -200,8 +200,8 @@
                             </div>
                           @endif
                           <div class="add-new-row mt-3">
-                            <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true" data-placement="bottom"
-                                  data-original-title="اضافه کردن ساعت کاری جدید "
+                            <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true"
+                              data-placement="bottom" data-original-title="اضافه کردن ساعت کاری جدید "
                               wire:click="addSlot('{{ $englishDay }}')">
                               <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" srcset="">
                               <span>افزودن ردیف جدید</span>
@@ -394,11 +394,15 @@
                       </div>
                     @endforeach
                   @else
-                    <p class="text-muted text-center text-danger">هیچ تنظیم زمان‌بندی برای این بازه زمانی ذخیره نشده
-                      است.</p>
+                    <div class="alert alert-danger text-center fw-bold">
+                      هیچ تنظیم زمان‌بندی برای این بازه زمانی ذخیره نشده
+                      است.
+                    </div>
                   @endif
                 @else
-                  <p class="text-muted text-center text-danger">روز یا بازه زمانی انتخاب نشده است.</p>
+                  <div class="alert alert-danger text-center fw-bold">
+                    روز یا بازه زمانی انتخاب نشده است.
+                  </div>
                 @endif
               </div>
             </div>
