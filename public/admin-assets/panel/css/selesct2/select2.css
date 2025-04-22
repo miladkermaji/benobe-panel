@@ -1,3 +1,38 @@
+:root {
+  /* پالت رنگی اصلی */
+  --primary: #2E86C1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
+  --primary-light: #84CAF9; /* آبی روشن - در گرادیان‌ها */
+  --secondary: #1DEB3C; /* سبز - برای دکمه‌های ثانویه */
+  --secondary-hover: #15802A; /* سبز تیره‌تر برای هاور */
+  --background-light: #F0F8FF; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
+  --background-footer: #D4ECFD; /* آبی روشن‌تر - فوتر */
+  --background-card: #FFFFFF; /* سفید - کارت‌ها */
+  --text-primary: #000000; /* مشکی - متن اصلی */
+  --text-secondary: #707070; /* خاکستری - متن ثانویه */
+  --text-discount: #008000; /* سبز - قیمت با تخفیف */
+  --text-original: #FF0000; /* قرمز - قیمت اولیه */
+  --border-neutral: #E5E7EB; /* خاکستری روشن - حاشیه‌ها */
+  --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
+  --gradient-instagram-from: #F92CA7; /* گرادیان اینستاگرام - شروع */
+  --gradient-instagram-to: #6B1A93; /* گرادیان اینستاگرام - پایان */
+  --button-mobile: #4F9ACD; /* آبی متوسط - دکمه‌های موبایل */
+  --button-mobile-light: #A2CDEB; /* آبی روشن‌تر - دکمه‌های موبایل */
+  --support-section: #2E86C1; /* آبی - بخش پشتیبانی */
+  --support-text: #084D7C; /* آبی تیره - متن پشتیبانی */
+ --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    ) !important;
+  /* شعاع گوشه‌ها (border-radius) */
+  --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
+  --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
+  --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
+  --radius-card: 1.125rem; /* 18px - کارت‌ها */
+  --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
+  --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
+  --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
+}
 .select2-container {
  box-sizing: border-box;
  display: inline-block;
@@ -10,6 +45,7 @@
  box-sizing: border-box;
  cursor: pointer;
  display: flex;
+ height: 50px !important;
  align-items: center;
  height: 38px;
  user-select: none;
@@ -19,7 +55,15 @@
  background-color: #fff;
  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
+.select2-container--default .select2-results__option {
+    padding: 8px 15px;
+    font-size: 0.875rem;
+}
 
+.select2-container--default .select2-results__option--highlighted {
+    background: var(--primary-light);
+    color: var(--text-primary);
+}
 .select2-container .select2-selection--single .select2-selection__rendered {
  display: flex;
  align-items: center;

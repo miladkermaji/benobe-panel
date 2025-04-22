@@ -7,16 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class DoctorService extends Model
 {
     protected $fillable = [
-        'doctor_id',
-        'clinic_id',
-        'name',
-        'description',
-        'duration',
-        'price',
-        'discount',
-        'status',
-        'parent_id',
-    ];
+            'doctor_id',
+            'clinic_id',
+            'insurance_id',
+            'name',
+            'description',
+            'duration',
+            'price',
+            'discount',
+            'status',
+            'parent_id',
+        ];
 
     // ارتباط با مدل دکتر
     public function doctor()
@@ -39,7 +40,10 @@ class DoctorService extends Model
     {
         return $this->hasMany(DoctorService::class, 'parent_id')->with('children');
     }
-
+    public function insurance()
+    {
+        return $this->belongsTo(Insurance::class);
+    }
     public function subServices()
     {
         return $this->hasMany(DoctorService::class, 'parent_id');

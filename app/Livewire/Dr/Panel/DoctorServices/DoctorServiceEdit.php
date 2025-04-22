@@ -5,6 +5,9 @@ namespace App\Livewire\Dr\Panel\DoctorServices;
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 use App\Models\DoctorService;
+use App\Models\Insurance;
+use App\Models\Clinic;
+use Illuminate\Support\Facades\Auth;
 
 class DoctorServiceEdit extends Component
 {
@@ -16,6 +19,8 @@ class DoctorServiceEdit extends Component
     public $price;
     public $discount;
     public $parent_id;
+    public $insurance_id;
+    public $clinic_id;
     public $showDiscountModal = false;
     public $discountPercent = 0;
     public $discountAmount = 0;
@@ -30,6 +35,8 @@ class DoctorServiceEdit extends Component
         $this->price = $this->doctorService->price;
         $this->discount = $this->doctorService->discount;
         $this->parent_id = $this->doctorService->parent_id;
+        $this->insurance_id = $this->doctorService->insurance_id;
+        $this->clinic_id = $this->doctorService->clinic_id;
     }
 
     public function openDiscountModal()
@@ -70,39 +77,49 @@ class DoctorServiceEdit extends Component
 
     public function update()
     {
-        $validator = Validator::make([
-            'name' => $this->name,
-            'description' => $this->description,
-            'status' => $this->status,
-            'duration' => $this->duration,
-            'price' => $this->price,
-            'discount' => $this->discount,
-            'parent_id' => $this->parent_id,
-        ], [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-            'status' => 'required|boolean',
-            'duration' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'discount' => 'nullable|numeric|min:0|max:100',
-            'parent_id' => 'nullable|exists:doctor_services,id',
-        ], [
-            'name.required' => 'فیلد نام الزامی است.',
-            'name.string' => 'نام باید یک رشته باشد.',
-            'name.max' => 'نام نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
-            'description.max' => 'توضیحات نمی‌تواند بیشتر از ۵۰۰ کاراکتر باشد.',
-            'status.required' => 'وضعیت الزامی است.',
-            'duration.required' => 'مدت زمان الزامی است.',
-            'duration.integer' => 'مدت زمان باید یک عدد صحیح باشد.',
-            'duration.min' => 'مدت زمان باید حداقل ۱ دقیقه باشد.',
-            'price.required' => 'قیمت الزامی است.',
-            'price.numeric' => 'قیمت باید یک عدد باشد.',
-            'price.min' => 'قیمت نمی‌تواند منفی باشد.',
-            'discount.numeric' => 'تخفیف باید یک عدد باشد.',
-            'discount.min' => 'تخفیف نمی‌تواند منفی باشد.',
-            'discount.max' => 'تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد.',
-            'parent_id.exists' => 'خدمت مادر انتخاب‌شده معتبر نیست.',
-        ]);
+        
+$validator = Validator::make([
+           'name' => $this->name,
+           'description' => $this->description,
+           'status' => $this->status,
+           'duration' => $this->duration,
+           'price' => $this->price,
+           'discount' => $this->discount,
+           'parent_id' => $this->parent_id,
+           'insurance_id' => $this->insurance_id,
+           'clinic_id' => $this->clinic_id,
+       ], [
+           'name' => 'required|string|max:255',
+           'description' => 'nullable|string|max:500',
+           'status' => 'required|boolean',
+           'duration' => 'required|integer|min:1',
+           'price' => 'required|numeric|min:0',
+           'discount' => 'nullable|numeric|min:0|max:100',
+           'parent_id' => 'nullable|exists:doctor_services,id',
+           'insurance_id' => 'required|exists:insurances,id',
+           'clinic_id' => 'required|exists:clinics,id',
+       ], [
+           'name.required' => 'فیلد نام الزامی است.',
+           'name.string' => 'نام باید یک رشته باشد.',
+           'name.max' => 'نام نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+           'description.max' => 'توضیحات نمی‌تواند بیشتر از ۵۰۰ کاراکتر باشد.',
+           'status.required' => 'وضعیت الزامی است.',
+           'duration.required' => 'مدت زمان الزامی است.',
+           'duration.integer' => 'مدت زمان باید یک عدد صحیح باشد.',
+           'duration.min' => 'مدت زمان باید حداقل ۱ دقیقه باشد.',
+           'price.required' => 'قیمت الزامی است.',
+           'price.numeric' => 'قیمت باید یک عدد باشد.',
+           'price.min' => 'قیمت نمی‌تواند منفی باشد.',
+           'discount.numeric' => 'تخفیف باید یک عدد باشد.',
+           'discount.min' => 'تخفیف نمی‌تواند منفی باشد.',
+           'discount.max' => 'تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد.',
+           'parent_id.exists' => 'سرویس مادر انتخاب‌شده معتبر نیست.',
+           'insurance_id.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+           'insurance_id.required' => 'بیمه  الزامی است .',
+           'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+           'clinic_id.required' => 'کلینیک   الزامی است.',
+       ]);
+
 
         if ($validator->fails()) {
             $this->dispatch('show-alert', type: 'error', message: $validator->errors()->first());
@@ -117,15 +134,22 @@ class DoctorServiceEdit extends Component
             'price' => $this->price,
             'discount' => $this->discount,
             'parent_id' => $this->parent_id,
+            'insurance_id' => $this->insurance_id,
+            'clinic_id' => $this->clinic_id,
         ]);
 
-        $this->dispatch('show-alert', type: 'success', message: 'خدمت با موفقیت به‌روزرسانی شد!');
+        $this->dispatch('show-alert', type: 'success', message: 'سرویس با موفقیت به‌روزرسانی شد!');
         return redirect()->route('dr.panel.doctor-services.index');
     }
 
     public function render()
     {
-        $parentServices = DoctorService::whereNull('parent_id')->get();
-        return view('livewire.dr.panel.doctor-services.doctor-service-edit', compact('parentServices'));
+        $parentServices = DoctorService::whereNull('parent_id')
+            ->where('id', '!=', $this->doctorService->id)
+            ->with('clinic') // رابط کلینیک رو لود می‌کنیم
+            ->get();
+        $insurances = Insurance::all();
+        $clinics = Clinic::where('doctor_id', Auth::guard('doctor')->user()->id)->get();
+        return view('livewire.dr.panel.doctor-services.doctor-service-edit', compact('parentServices', 'insurances', 'clinics'));
     }
 }

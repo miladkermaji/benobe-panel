@@ -98,7 +98,7 @@
         </li>
         <li
           class="item-li i-checkout__request {{ Request::routeIs('dr.panel.doctor-services.index') ? 'is-active' : '' }}">
-          <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات</a>
+          <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
         </li>
         <li
           class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}">

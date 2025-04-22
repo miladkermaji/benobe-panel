@@ -1,7 +1,7 @@
 @extends('dr.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/css/panel/doctorservice/doctorservice.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/css/panel/doctorservice/doctorservice-form.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
 @endsection
 

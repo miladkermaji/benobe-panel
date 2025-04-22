@@ -3,8 +3,8 @@
   <div class="w-100 d-flex align-items-center">
     <div class="header__right d-flex flex-grow-1 item-center">
       <span class="bars"></span>
-      <div class="top-dr-panel d-flex justify-content-between w-100 align-items-start">
-        <div class="p-3 bg-white stylish-breadcrumb">
+      <div class="top-dr-panel d-flex justify-content-between w-100 align-items-start" >
+        <div class="p-3 bg-white stylish-breadcrumb" style="display: none">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-white mb-0">
               <li class="breadcrumb-item"><a href="#">پنل دکتر</a></li>

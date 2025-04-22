@@ -1,7 +1,6 @@
 <div class="container-fluid py-4" dir="rtl">
-  <div class="card shadow-lg border-0 rounded-3 overflow-hidden" style="background: #ffffff;">
-    <div
-      class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+  <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
+    <div class="card-header text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           class="animate-bounce">
@@ -23,6 +22,24 @@
       <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
           <div class="row g-4">
+            <div class="col-md-6 col-sm-12 position-relative mt-5" wire:ignore>
+              <select wire:model="insurance_id" class="form-select select2" id="insurance_id">
+                <option value="" selected>بدون انتخاب </option>
+                @foreach ($insurances as $insurance)
+                  <option value="{{ $insurance->id }}">{{ $insurance->name }}</option>
+                @endforeach
+              </select>
+              <label for="insurance_id" class="form-label">بیمه </label>
+            </div>
+            <div class="col-md-6 col-sm-12 position-relative mt-5" wire:ignore>
+              <select wire:model="clinic_id" class="form-select select2" id="clinic_id">
+                <option value="" selected>بدون انتخاب </option>
+                @foreach ($clinics as $clinic)
+                  <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
+                @endforeach
+              </select>
+              <label for="clinic_id" class="form-label">کلینیک </label>
+            </div>
             <div class="col-md-6 col-sm-12 position-relative mt-5">
               <input type="text" wire:model="name" class="form-control" id="name" placeholder=" " required>
               <label for="name" class="form-label">نام خدمت</label>
@@ -40,17 +57,20 @@
                 class="form-control cursor-pointer" id="discount" placeholder=" " readonly>
               <label for="discount" class="form-label">تخفیف (درصد)</label>
             </div>
-            <div class="col-md-6 col-sm-12 position-relative mt-5">
-              <select wire:model="parent_id" class="form-select" id="parent_id">
-                <option value="">بدون خدمت مادر</option>
+            <div class="col-md-6 col-sm-12 position-relative mt-5" wire:ignore>
+              <select wire:model="parent_id" class="form-select select2" id="parent_id">
+                <option value="">بدون  زیر دسته</option>
                 @foreach ($parentServices as $service)
-                  <option value="{{ $service->id }}">{{ $service->name }}</option>
+                  <option value="{{ $service->id }}">
+                    {{ $service->name }}
+                    ({{ $service->clinic_id ? $service->clinic->name ?? 'کلینیک نامشخص' : 'ویزیت آنلاین' }})
+                  </option>
                 @endforeach
               </select>
-              <label for="parent_id" class="form-label">خدمت مادر (اختیاری)</label>
+              <label for="parent_id" class="form-label">زیر دسته (اختیاری)</label>
             </div>
             <div class="col-md-6 col-sm-12 position-relative mt-5 d-flex align-items-center">
-              <div class="form-check form-switch w-100 d-flex align-items-center">
+              <div class="form-check w-100 d-flex align-items-center">
                 <input class="form-check-input" type="checkbox" id="status" wire:model="status">
                 <label class="form-check-label fw-medium mx-4" for="status">
                   وضعیت: <span
@@ -64,7 +84,7 @@
             </div>
             <div class="col-12 text-end mt-4 w-100 d-flex justify-content-end">
               <button wire:click="update"
-                class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+                class="btn btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2">
                   <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
@@ -102,9 +122,7 @@
           </div>
           <div class="modal-footer border-0">
             <button type="button" class="btn btn-secondary" wire:click="closeDiscountModal">لغو</button>
-            <button type="button" class="btn my-btn-primary"
-              style="background: linear-gradient(to right, #4B5EAA, #8B5CF6); border: none;"
-              wire:click="applyDiscount">تأیید</button>
+            <button type="button" class="btn btn-primary" wire:click="applyDiscount">تأیید</button>
           </div>
         </div>
       </div>
@@ -112,132 +130,97 @@
     <div class="modal-backdrop fade show"></div>
   @endif
 
-  <style>
-    /* Same CSS as previous examples */
-    .bg-gradient-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-    }
-
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-control,
-    .form-select {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 12px 15px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      height: 48px;
-      background: #fafafa;
-      width: 100%;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-      border-color: #6b7280;
-      box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
-      background: #fff;
-    }
-
-    .form-label {
-      position: absolute;
-      top: -25px;
-      right: 15px;
-      color: #374151;
-      font-size: 12px;
-      background: #ffffff;
-      padding: 0 5px;
-      pointer-events: none;
-    }
-
-    .my-btn-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-
-    .my-btn-primary:hover {
-      background: linear-gradient(90deg, #4b5563, #1f2937);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline-light {
-      border-color: rgba(255, 255, 255, 0.8);
-    }
-
-    .btn-outline-light:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-2px);
-    }
-
-    .form-check-input {
-      margin-top: 0;
-      height: 20px;
-      width: 20px;
-    }
-
-    .form-check-input:checked {
-      background-color: #6b7280;
-      border-color: #6b7280;
-    }
-
-    .animate-bounce {
-      animation: bounce 1s infinite;
-    }
-
-    @keyframes bounce {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-5px);
-      }
-    }
-
-    .text-shadow {
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-
-    @media (max-width: 767px) {
-      .card-header {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .btn-outline-light {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .col-md-6 {
-        flex: 0 0 100%;
-        max-width: 100%;
-      }
-    }
-
-    @media (max-width: 575px) {
-      .card-body {
-        padding: 2rem 1.5rem;
-      }
-
-      .my-btn-primary {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
-
   <script>
     document.addEventListener('livewire:init', function() {
+      function initializeSelect2() {
+        // جلوگیری از مقداردهی مجدد Select2
+        $('#insurance_id, #clinic_id, #parent_id').each(function() {
+          if ($(this).hasClass('select2-hidden-accessible')) {
+            $(this).select2('destroy');
+          }
+        });
+
+        // مقداردهی اولیه Select2 برای insurance_id
+        $('#insurance_id').select2({
+          dir: 'rtl',
+          placeholder: 'بدون انتخاب ',
+          allowClear: true,
+          width: '100%',
+          dropdownAutoWidth: true,
+          minimumResultsForSearch: 5
+        });
+
+        // مقداردهی اولیه Select2 برای clinic_id
+        $('#clinic_id').select2({
+          dir: 'rtl',
+          placeholder: 'بدون انتخاب ',
+          allowClear: true,
+          width: '100%',
+          dropdownAutoWidth: true,
+          minimumResultsForSearch: 5
+        });
+
+        // مقداردهی اولیه Select2 برای parent_id
+        $('#parent_id').select2({
+          dir: 'rtl',
+          placeholder: 'بدون زیر دسته',
+          allowClear: true,
+          width: '100%',
+          dropdownAutoWidth: true,
+          minimumResultsForSearch: 5
+        });
+
+        // تنظیم مقادیر اولیه هنگام لود صفحه
+        const insuranceId = @json($insurance_id);
+        const clinicId = @json($clinic_id);
+        const parentId = @json($parent_id);
+
+        console.log('Initial Values:', {
+          insuranceId,
+          clinicId,
+          parentId
+        });
+
+        $('#insurance_id').val(insuranceId || '').trigger('change');
+        $('#clinic_id').val(clinicId || '').trigger('change');
+        $('#parent_id').val(parentId || '').trigger('change');
+      }
+
+      // اجرای اولیه Select2
+      initializeSelect2();
+
+      // همگام‌سازی با تغییرات کاربر
+      $('#insurance_id').on('change', function() {
+        const value = $(this).val() === '' ? null : $(this).val();
+        console.log('Insurance ID Changed:', value);
+        @this.set('insurance_id', value);
+      });
+
+      $('#clinic_id').on('change', function() {
+        const value = $(this).val() === '' ? null : $(this).val();
+        console.log('Clinic ID Changed:', value);
+        @this.set('clinic_id', value);
+      });
+
+      $('#parent_id').on('change', function() {
+        const value = $(this).val() === '' ? null : $(this).val();
+        console.log('Parent ID Changed:', value);
+        @this.set('parent_id', value);
+      });
+
+      // به‌روزرسانی Select2 بعد از تغییرات Livewire
+      Livewire.on('updateSelect2', () => {
+        initializeSelect2();
+      });
+
+      // نمایش اعلان‌ها
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
+      });
+
+      // اطمینان از مقداردهی مجدد Select2 بعد از به‌روزرسانی‌های Livewire
+      document.addEventListener('livewire:updated', function() {
+        initializeSelect2();
       });
     });
   </script>

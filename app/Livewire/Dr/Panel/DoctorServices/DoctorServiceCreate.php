@@ -1,10 +1,12 @@
 <?php
 
-
 namespace App\Livewire\Dr\Panel\DoctorServices;
 
+use App\Models\Clinic;
 use Livewire\Component;
+use App\Models\Insurance;
 use App\Models\DoctorService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,6 +19,8 @@ class DoctorServiceCreate extends Component
     public $price;
     public $discount;
     public $parent_id;
+    public $insurance_id;
+    public $clinic_id;
     public $showDiscountModal = false;
     public $discountPercent = 0;
     public $discountAmount = 0;
@@ -59,6 +63,8 @@ class DoctorServiceCreate extends Component
 
     public function store()
     {
+    
+
         $validator = Validator::make([
             'name' => $this->name,
             'description' => $this->description,
@@ -67,6 +73,8 @@ class DoctorServiceCreate extends Component
             'price' => $this->price,
             'discount' => $this->discount,
             'parent_id' => $this->parent_id,
+            'insurance_id' => $this->insurance_id,
+            'clinic_id' => $this->clinic_id,
         ], [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
@@ -75,6 +83,8 @@ class DoctorServiceCreate extends Component
             'price' => 'required|numeric|min:0',
             'discount' => 'nullable|numeric|min:0|max:100',
             'parent_id' => 'nullable|exists:doctor_services,id',
+            'insurance_id' => 'required|exists:insurances,id',
+            'clinic_id' => 'required|exists:clinics,id',
         ], [
             'name.required' => 'فیلد نام الزامی است.',
             'name.string' => 'نام باید یک رشته باشد.',
@@ -91,6 +101,10 @@ class DoctorServiceCreate extends Component
             'discount.min' => 'تخفیف نمی‌تواند منفی باشد.',
             'discount.max' => 'تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد.',
             'parent_id.exists' => 'سرویس مادر انتخاب‌شده معتبر نیست.',
+            'insurance_id.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+            'insurance_id.required' => 'بیمه  الزامی است .',
+            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'clinic_id.required' => 'کلینیک   الزامی است.',
         ]);
 
         if ($validator->fails()) {
@@ -100,6 +114,8 @@ class DoctorServiceCreate extends Component
 
         DoctorService::create([
             'doctor_id' => Auth::guard('doctor')->user()->id,
+            'clinic_id' => $this->clinic_id,
+            'insurance_id' => $this->insurance_id,
             'name' => $this->name,
             'description' => $this->description,
             'status' => $this->status,
@@ -115,7 +131,11 @@ class DoctorServiceCreate extends Component
 
     public function render()
     {
-        $parentServices = DoctorService::whereNull('parent_id')->get();
-        return view('livewire.dr.panel.doctor-services.doctor-service-create', compact('parentServices'));
+        $parentServices = DoctorService::whereNull('parent_id')
+            ->with('clinic')
+            ->get();
+        $insurances = Insurance::all();
+        $clinics = Clinic::where('doctor_id', Auth::guard('doctor')->user()->id)->get();
+        return view('livewire.dr.panel.doctor-services.doctor-service-create', compact('parentServices', 'insurances', 'clinics'));
     }
 }

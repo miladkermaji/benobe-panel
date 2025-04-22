@@ -39,4 +39,9 @@ class Insurance extends Model
         return $this->belongsToMany(Doctor::class, 'doctor_insurance', 'insurance_id', 'doctor_id')
                     ->withTimestamps();
     }
+     public function doctorServices()
+    {
+        return $this->hasMany(DoctorService::class);
+    }
+
 }

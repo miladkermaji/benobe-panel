@@ -20,13 +20,16 @@
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/responsive_768.css') }}" media="(max-width:768px)">
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/font.css') }}">
 <link type="text/css" href="{{ asset('admin-assets/panel/jalali-datepicker/jalalidatepicker.min.css') }}"
-  rel="stylesheet" />
+rel="stylesheet" />
+<link rel="stylesheet" href="{{ asset('admin-assets/panel/css/selesct2/select2.css') }}">
 
 {{-- tom select --}}
 {{-- tom select --}}
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/tom-select.bootstrap5.min.css') }}">
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/toastr/toastr.min.css') }}">
+
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/global-loader.css') }}">
+
 {{-- <link rel="stylesheet" href="{{ asset('admin-assets/css/my-form.css') }}"> --}}
 
 {{-- tom select --}}
