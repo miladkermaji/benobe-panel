@@ -6,12 +6,12 @@
           wire:model="autoScheduling" wire:change="updateAutoScheduling" />
       </div>
     </div>
-    <div class="workhours-content w-100 d-flex justify-content-center mt-4">
+    <div class="workhours-content w-100 d-flex justify-content-center mt-4 mb-3">
       <div class="workhours-wrapper-content p-3 pt-4 {{ $autoScheduling ? '' : 'd-none' }}">
         <div>
           <div>
             <div>
-              <div class="row border border-radius-4 p-3 align-items-center">
+              <div class="row border border-radius-11 p-3 align-items-center">
                 <!-- تعداد روزهای باز تقویم -->
                 <div class="col-8">
                   <div class="input-group position-relative p-1 rounded bg-white" style="min-width: 250px;">
@@ -37,7 +37,7 @@
               <div class="mt-4">
                 <label class="text-dark fw-bold">روزهای کاری</label>
                 <div
-                  class="d-flex flex-wrap justify-content-start mt-3 gap-40 bg-light p-3 border-radius-4 day-contents align-items-center h-55"
+                  class="d-flex flex-wrap justify-content-start mt-3 gap-40 bg-light p-3 border-radius-11 day-contents align-items-center h-55"
                   id="day-contents-outside">
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $englishDay => $persianDay)
                     <x-my-check :isChecked="$isWorking[$englishDay]" id="{{ $englishDay }}" day="{{ $persianDay }}" />
@@ -47,12 +47,12 @@
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $englishDay => $persianDay)
                     <div
                       class="work-hours-{{ $englishDay }} {{ $isWorking[$englishDay] ? '' : 'd-none' }} position-relative">
-                      <div class="border-333 p-3 mt-3 border-radius-4">
+                      <div class="border-333 p-3 mt-3 border-radius-11">
                         <h6>{{ $persianDay }}</h6>
                         <div id="morning-{{ $englishDay }}-details" class="mt-4">
                           @if (!empty($slots[$englishDay]))
                             @foreach ($slots[$englishDay] as $index => $slot)
-                              <div class="mt-3 form-row d-flex  w-100 pt-4 bg-active-slot border-radius-4"
+                              <div class="mt-3 form-row d-flex  w-100 pt-4 bg-active-slot border-radius-11"
                                 data-slot-id="{{ $slot['id'] ?? '' }}">
                                 <div class="d-flex justify-content-start align-items-center gap-4">
                                   <div class="form-group position-relative timepicker-ui">
@@ -85,7 +85,7 @@
                                   <!-- دکمه جدید برای نوبت‌های اورژانسی -->
                                   <div class="form-group position-relative">
                                     <button data-tooltip="true" data-placement="bottom"
-                                      data-original-title="زمان های اورژانسی که میتوانید برای شرایط خاص نگهدارید"
+                                      data-original-title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
                                       class="btn btn-light btn-sm emergency-slot-btn" data-toggle="modal"
                                       data-target="#emergencyModal" data-day="{{ $englishDay }}"
                                       data-index="{{ $index }}"
@@ -126,7 +126,7 @@
                               </div>
                             @endforeach
                           @else
-                            <div class="mt-3 form-row d-flex  w-100 pt-4 bg-active-slot border-radius-4"
+                            <div class="mt-3 form-row d-flex  w-100 pt-4 bg-active-slot border-radius-11"
                               data-slot-id="{{ $slot['id'] ?? '' }}">
                               <div class="d-flex justify-content-start align-items-center gap-4">
                                 <div class="form-group position-relative timepicker-ui">
@@ -158,7 +158,7 @@
                                 <!-- دکمه جدید برای نوبت‌های اورژانسی -->
                                 <div class="form-group position-relative">
                                   <button data-tooltip="true" data-placement="bottom"
-                                    data-original-title="زمان های اورژانسی که میتوانید برای شرایط خاص نگهدارید"
+                                    data-original-title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
                                     class="btn btn-light btn-sm emergency-slot-btn" data-toggle="modal"
                                     data-target="#emergencyModal" data-day="{{ $englishDay }}"
                                     data-index="{{ $index }}"
@@ -200,7 +200,8 @@
                             </div>
                           @endif
                           <div class="add-new-row mt-3">
-                            <button class="add-row-btn btn btn-sm btn-light"
+                            <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true" data-placement="bottom"
+                                  data-original-title="اضافه کردن ساعت کاری جدید "
                               wire:click="addSlot('{{ $englishDay }}')">
                               <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" srcset="">
                               <span>افزودن ردیف جدید</span>

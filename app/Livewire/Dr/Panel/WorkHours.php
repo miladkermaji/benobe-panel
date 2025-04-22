@@ -1002,7 +1002,56 @@ class Workhours extends Component
                 'max_appointments' => $appointmentCount,
             ];
 
-            $this->modalMessage = 'ساعت کاری با موفقیت ذخیره شد';
+            // **بخش جدید: افزودن تنظیمات نوبت‌دهی برای تمام روزهای هفته**
+            $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+            $newSetting = [
+                'start_time' => '00:00',
+                'end_time' => '23:59',
+                'days' => $daysOfWeek,
+                'work_hour_key' => (int)$index,
+            ];
+
+            foreach ($daysOfWeek as $weekDay) {
+                $schedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
+                    ->where('day', $weekDay)
+                    ->where(function ($query) {
+                        if ($this->activeClinicId !== 'default') {
+                            $query->where('clinic_id', $this->activeClinicId);
+                        } else {
+                            $query->whereNull('clinic_id');
+                        }
+                    })
+                    ->first();
+
+                if (!$schedule) {
+                    $schedule = DoctorWorkSchedule::create([
+                        'doctor_id' => $doctor->id,
+                        'day' => $weekDay,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'is_working' => false,
+                        'work_hours' => json_encode([]),
+                        'appointment_settings' => json_encode([]),
+                    ]);
+                }
+
+                $appointmentSettings = json_decode($schedule->appointment_settings, true) ?? [];
+                $existingIndex = array_search(
+                    (int)$index,
+                    array_column($appointmentSettings, 'work_hour_key')
+                );
+
+                if ($existingIndex !== false) {
+                    $appointmentSettings[$existingIndex] = $newSetting;
+                } else {
+                    $appointmentSettings[] = $newSetting;
+                }
+
+                $schedule->update(['appointment_settings' => json_encode(array_values($appointmentSettings))]);
+            }
+
+            $this->refreshWorkSchedules();
+
+            $this->modalMessage = 'ساعت کاری و تنظیمات نوبت‌دهی با موفقیت ذخیره شد';
             $this->modalType = 'success';
             $this->modalOpen = true;
             $this->dispatch('show-toastr', [
@@ -1014,12 +1063,12 @@ class Workhours extends Component
             $this->dispatch('refresh-work-hours');
             $this->reset(['calculator', 'calculationMode']);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $errorMessages = $e->validator->errors()->all(); // دریافت تمام پیام‌های خطا به صورت آرایه تخت
-            $errorMessage = implode('، ', $errorMessages); // تبدیل به رشته با جداکننده کاما
-            $this->modalMessage = $errorMessage ?: 'لطفاً تمام فیلدهای مورد نیاز را پر کنید'; // پیام پیش‌فرض
+            $errorMessages = $e->validator->errors()->all();
+            $errorMessage = implode('، ', $errorMessages);
+            $this->modalMessage = $errorMessage ?: 'لطفاً تمام فیلدهای مورد نیاز را پر کنید';
             $this->modalType = 'error';
             $this->modalOpen = true;
-            Log::error('Validation error in saveCalculator: ' . $errorMessage); // ثبت پیام فارسی در لاگ
+            Log::error('Validation error in saveCalculator: ' . $errorMessage);
             $this->dispatch('show-toastr', [
                 'message' => $this->modalMessage,
                 'type' => 'error',

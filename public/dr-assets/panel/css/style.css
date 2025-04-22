@@ -603,11 +603,8 @@ svg {
 }
 .sidebar__nav {
     width: 250px;
-    background: linear-gradient(
-        180deg,
-        #ffffff 0%,
-        #f8fafc 100%
-    ); /* گرادیان نرم سفید به خاکستری روشن */
+    background: linear-gradient(180deg, #fefefe 0%, #f9fbff 100%); /* گرادیان سفید ملایم */
+    backdrop-filter: blur(2px); /* بلور خیلی کم برای نرمی */
     height: 100vh;
     position: fixed;
     transition: all 200ms ease;
@@ -618,7 +615,7 @@ svg {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: var(--shadow); /* سایه شیک و نرم */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); /* سایه کاستوم قوی‌تر */
 }
 
 .sidebar__nav.is-active {
