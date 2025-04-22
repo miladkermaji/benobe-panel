@@ -21,7 +21,7 @@
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="alert alert-warning mt-2 text-center">
-            <span class="text-sm font-weight-bold d-block font-size-15">لطفا شماره و نام کاربری پیام رسان ایتا یا شماره
+            <span class="text-sm fw-bold d-block font-size-15">لطفا شماره و نام کاربری پیام رسان ایتا یا شماره
               واتساپ خود را وارد.</span>
             <span class="font-size-15 mt-1">شماره موبایل این پیام رسان ها در دسترس بیمار قرار میگیرد.</span>
           </div>
@@ -29,7 +29,7 @@
             @csrf
             @method('PUT')
             <div>
-              <h6 class="text-left font-weight-bold d-block font-size-13">پیام رسان های داخلی</h6>
+              <h6 class="text-left fw-bold d-block font-size-13">پیام رسان های داخلی</h6>
             </div>
             <div class="d-flex align-items-center justify-content-start gap-20">
               <div
@@ -52,7 +52,7 @@
               </div>
             </div>
             <div class="mt-2">
-              <h6 class="text-left font-weight-bold d-block font-size-13">پیام رسان های خارجی</h6>
+              <h6 class="text-left fw-bold d-block font-size-13">پیام رسان های خارجی</h6>
             </div>
             <div class="d-flex align-items-center justify-content-start gap-20 mt-2">
               <div
@@ -71,12 +71,12 @@
               </div>
             </div>
             <div class="mt-2">
-              <h6 class="text-left font-weight-bold d-block font-size-13"> تماس امن</h6>
+              <h6 class="text-left fw-bold d-block font-size-13"> تماس امن</h6>
             </div>
             <div
               class="d-flex gap-4 justify-content-between align-items-center p-3 border border-solid rounded-lg border-slate-200 mt-2">
               <div>
-                <span class="text-responsive font-size-13 font-weight-bold">تماس امن به عنوان راه ارتباط جانبی در کنار
+                <span class="text-responsive font-size-13 fw-bold">تماس امن به عنوان راه ارتباط جانبی در کنار
                   هر یک از
                   پیام‌رسان‌ها قرار می‌گیرد.</span>
                 <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="">

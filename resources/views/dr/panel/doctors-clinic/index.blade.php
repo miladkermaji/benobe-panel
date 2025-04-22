@@ -30,7 +30,7 @@
         جدید</a>
     </div>
     <div class="p-3">
-      <h4 class="text-dark font-weight-bold">لیست مطب‌های من</h4>
+      <h4 class="text-dark fw-bold">لیست مطب‌های من</h4>
     </div>
     <div class="mt-2">
       <table class="table table-modern table-striped table-bordered table-hover" id="clinic-list">

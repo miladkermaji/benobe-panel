@@ -1,6 +1,6 @@
 <div>
   <div class="shadow-lg border-0 rounded-3 overflow-hidden">
-    <div class="card-header glass-header font-weight-bold p-3">اضافه کردن تعرفه بر اساس شرکت بیمه</div>
+    <div class="card-header glass-header fw-bold p-3">اضافه کردن تعرفه بر اساس شرکت بیمه</div>
     <div class="card-body p-4">
       <h5>روش محاسبه:</h5>
       <div class="ant-radio-group ant-radio-group-outline mt-3">
@@ -9,7 +9,7 @@
             <input type="radio" wire:model.live="calculation_method" value="0">
             <span class="ant-radio-inner"></span>
           </span>
-          <span class="px-1 font-weight-bold">
+          <span class="px-1 fw-bold">
             مبلغ ثابت: مبلغ نهایی مشخص برای بیمار محاسبه می‌شود.
           </span>
         </label>
@@ -18,7 +18,7 @@
             <input type="radio" wire:model.live="calculation_method" value="1">
             <span class="ant-radio-inner"></span>
           </span>
-          <span class="px-1 font-weight-bold">
+          <span class="px-1 fw-bold">
             درصد از مبلغ نوبت: درصدی از مبلغ نوبت کسر شده و مبلغ نهایی محاسبه می‌شود.
           </span>
         </label>
@@ -27,7 +27,7 @@
             <input type="radio" wire:model.live="calculation_method" value="2">
             <span class="ant-radio-inner"></span>
           </span>
-          <span class="px-1 font-weight-bold">
+          <span class="px-1 fw-bold">
             مبلغ ثابت + درصد: مبلغ پایه ثابت به علاوه درصد تخفیف اعمال می‌شود.
           </span>
         </label>
@@ -36,7 +36,7 @@
             <input type="radio" wire:model.live="calculation_method" value="3">
             <span class="ant-radio-inner"></span>
           </span>
-          <span class="px-1 font-weight-bold">
+          <span class="px-1 fw-bold">
             فقط برای آمار: هیچ تغییری در مبلغ قابل پرداخت ایجاد نمی‌کند.
           </span>
         </label>
@@ -45,7 +45,7 @@
             <input type="radio" wire:model.live="calculation_method" value="4">
             <span class="ant-radio-inner"></span>
           </span>
-          <span class="px-1 font-weight-bold">
+          <span class="px-1 fw-bold">
             پویا: ترکیبی از مبلغ نوبت و درصد، با حداقل مبلغ نهایی (اختیاری).
           </span>
         </label>

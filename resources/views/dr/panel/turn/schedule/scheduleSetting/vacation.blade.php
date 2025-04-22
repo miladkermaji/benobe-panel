@@ -29,8 +29,8 @@
       <div class="muirtl-60hgb7">
         <div class="" role="alert">
           <div class="">
-            <p class="font-weight-bold text-dark">ثبت مرخصی</p>
-            <p class="alert alert-warning font-size-13 font-weight-bold mt-2">شما می‌توانید برای ساعاتی که طبق ساعت کاری
+            <p class="fw-bold text-dark">ثبت مرخصی</p>
+            <p class="alert alert-warning font-size-13 fw-bold mt-2">شما می‌توانید برای ساعاتی که طبق ساعت کاری
               خود حضور ندارید، مرخصی اعمال کنید.</p>
             <div class="w-100">
               <button data-toggle="modal" data-target="#exampleModalCenterAddVacation"
@@ -93,7 +93,7 @@
         <div class="d-flex flex-column w-100 gap-4 mt-3">
           <div class="d-flex align-items-center justify-content-between w-100 gap-4">
             <div>
-              <span class="text-dark font-weight-bold"> مرخصی‌های ثبت‌شده: </span>
+              <span class="text-dark fw-bold"> مرخصی‌های ثبت‌شده: </span>
             </div>
             <div>
               <form action="" method="post">
@@ -246,7 +246,7 @@
     });
 
     $('.option-card').on('click', function() {
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
       $('.option-card').removeClass('card-active');
       $(this).addClass('card-active');
@@ -299,7 +299,7 @@
             html += `
               <div class="has-list-vacation w-100 bg-white d-flex justify-content-between align-items-center p-2 h-24">
                 <div class="d-flex flex-column gap-4">
-                  <span class="text-dark font-weight-bold d-block font-size-13">
+                  <span class="text-dark fw-bold d-block font-size-13">
                     ${jalaliDate} - ${vacation.start_time || '00:00'} الی ${vacation.end_time || '23:59'}
                   </span>
                   <span class="text-start text-black font-size-13">مدت زمان: ${duration}</span>
@@ -328,7 +328,7 @@
               </div>`;
           });
         } else {
-          html = '<span class="font-weight-bold text-dark mt-2">مرخصی وجود ندارد</span>';
+          html = '<span class="fw-bold text-dark mt-2">مرخصی وجود ندارد</span>';
         }
         $('.vacation-list').html(html);
       },

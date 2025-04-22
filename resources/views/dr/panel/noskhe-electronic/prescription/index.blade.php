@@ -44,15 +44,14 @@
                 <div class="">
                   <div class="border  d-flex justify-content-between p-2-5 border-radius-6" id="top-modal-div">
                     <div class="d-flex gap-4">
-                      <div><span
-                          class="font-size-13 bg-light-blue p-2 border-radius-6 font-weight-bold cursor-pointer">تامین
+                      <div><span class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">تامین
                           اجتماعی</span></div>
                       <div><span
-                          class="font-size-13 bg-light-blue p-2 border-radius-6 font-weight-bold cursor-pointer">سلامت</span>
+                          class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">سلامت</span>
                       </div>
                     </div>
                     <div><span
-                        class="font-size-13 bg-light-blue p-2 border-radius-6 font-weight-bold cursor-pointer border border-primary">سلامت</span>
+                        class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer border border-primary">سلامت</span>
                     </div>
                   </div>
                   <div
@@ -80,15 +79,14 @@
                   </div>
                   <div class="border d-flex justify-content-between p-2-5 border-radius-6 mt-3" id="top-modal-div">
                     <div class="d-flex gap-4">
-                      <div><span
-                          class="font-size-13 bg-light-blue p-2 border-radius-6 font-weight-bold cursor-pointer">آقا
+                      <div><span class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">آقا
                         </span></div>
                       <div><span
-                          class="font-size-13 bg-light-blue p-2 border-radius-6 font-weight-bold cursor-pointer">خانم</span>
+                          class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">خانم</span>
                       </div>
                     </div>
                     <div><span
-                        class="font-size-13 bg-light-blue p-2 border-radius-6 font-weight-bold cursor-pointer border border-primary">همه</span>
+                        class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer border border-primary">همه</span>
                     </div>
                   </div>
                   <div class="w-100 d-flex justify-content-between gap-4 mt-3">

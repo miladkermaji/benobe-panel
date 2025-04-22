@@ -9,20 +9,19 @@
     <div class="gozaresh-mali-content mt-3">
       <div class="gozaresh-mali-card-bg w-100 d-flex mt-3 p-3 justify-content-around">
         <div class="d-flex flex-column justify-content-center">
-          <span class="text-center text-white font-weight-bold font-size-13">کل در آمد</span>
-          <span
-            class="text-center text-white font-weight-bold mt-2 font-size-13">{{ number_format($totalIncome) }}</span>
-          <span class="text-center text-white font-weight-bold mt-2 font-size-13">تومان</span>
+          <span class="text-center text-white fw-bold font-size-13">کل در آمد</span>
+          <span class="text-center text-white fw-bold mt-2 font-size-13">{{ number_format($totalIncome) }}</span>
+          <span class="text-center text-white fw-bold mt-2 font-size-13">تومان</span>
         </div>
         <div class="d-flex flex-column justify-content-center">
-          <span class="text-center text-white font-weight-bold font-size-13">پرداخت شده</span>
-          <span class="text-center text-white font-weight-bold mt-2 font-size-13">{{ number_format($paid) }}</span>
-          <span class="text-center text-white font-weight-bold mt-2 font-size-13">تومان</span>
+          <span class="text-center text-white fw-bold font-size-13">پرداخت شده</span>
+          <span class="text-center text-white fw-bold mt-2 font-size-13">{{ number_format($paid) }}</span>
+          <span class="text-center text-white fw-bold mt-2 font-size-13">تومان</span>
         </div>
         <div class="d-flex flex-column justify-content-center">
-          <span class="text-center text-white font-weight-bold font-size-13">موجودی</span>
-          <span class="text-center text-white font-weight-bold mt-2 font-size-13">{{ number_format($available) }}</span>
-          <span class="text-center text-white font-weight-bold mt-2 font-size-13">تومان</span>
+          <span class="text-center text-white fw-bold font-size-13">موجودی</span>
+          <span class="text-center text-white fw-bold mt-2 font-size-13">{{ number_format($available) }}</span>
+          <span class="text-center text-white fw-bold mt-2 font-size-13">تومان</span>
         </div>
       </div>
       <form wire:submit.prevent="requestSettlement">
@@ -58,7 +57,7 @@
     </div>
     <div class="card border-0 shadow-sm rounded-3">
       <div class="card-header bg-white p-4 border-bottom">
-        <span class="font-weight-bold">درخواست‌های من</span>
+        <span class="fw-bold">درخواست‌های من</span>
       </div>
       <div class="card-body p-4">
         <div class="table-responsive">

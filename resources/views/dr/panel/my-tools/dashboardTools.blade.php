@@ -60,7 +60,7 @@
     $('.option-card').on('click', function() {
       let currentDate = moment().format('YYYY-MM-DD');
       let persianDate = moment(currentDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
       $('.option-card').removeClass('card-active');
       $(this).addClass('card-active');
@@ -68,7 +68,7 @@
       localStorage.setItem('selectedClinic', selectedText);
       localStorage.setItem('selectedClinicId', selectedId);
       selectedClinicId = selectedId; // آپدیت متغیر جهانی
-            window.location.reload()
+      window.location.reload()
 
       $('.dropdown-trigger').removeClass('border border-primary');
       $('.my-dropdown-menu').addClass('d-none');

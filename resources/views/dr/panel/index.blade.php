@@ -17,27 +17,27 @@
     <div class="top-s-a-wrapper">
       <div>
         <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد بیماران امروز">
-        <span class="font-weight-bold mr-2 ml-2 text-dark">تعداد بیماران امروز</span>
+        <span class="fw-bold mr-2 ml-2 text-dark">تعداد بیماران امروز</span>
         <span class="font-medium">{{ $totalPatientsToday }} بیمار</span>
       </div>
       <div>
         <img src="{{ asset('dr-assets/icons/dashboard-tick.svg') }}" alt="بیماران ویزیت شده">
-        <span class="font-weight-bold mr-2 ml-2 text-dark">بیماران ویزیت شده</span>
+        <span class="fw-bold mr-2 ml-2 text-dark">بیماران ویزیت شده</span>
         <span class="font-medium">{{ $visitedPatients }} بیمار</span>
       </div>
       <div>
         <img src="{{ asset('dr-assets/icons/dashboard-timer.svg') }}" alt="بیماران باقی مانده">
-        <span class="font-weight-bold mr-2 ml-2 text-dark">بیماران باقی مانده</span>
+        <span class="fw-bold mr-2 ml-2 text-dark">بیماران باقی مانده</span>
         <span class="font-medium">{{ $remainingPatients }} بیمار</span>
       </div>
       <div>
         <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد منشی ها">
-        <span class="font-weight-bold mr-2 ml-2 text-dark">تعداد منشی ها</span>
+        <span class="fw-bold mr-2 ml-2 text-dark">تعداد منشی ها</span>
         <span class="font-medium">{{ $secretriesCount }} نفر</span>
       </div>
       <div>
         <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد کلینیک">
-        <span class="font-weight-bold mr-2 ml-2 text-dark">تعداد کلینیک</span>
+        <span class="fw-bold mr-2 ml-2 text-dark">تعداد کلینیک</span>
         <span class="font-medium">{{ $clinicsCount }} کلینیک</span>
       </div>
     </div>

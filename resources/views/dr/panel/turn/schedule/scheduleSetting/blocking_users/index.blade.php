@@ -51,7 +51,7 @@
                   <td>{{ $blockedUser->reason ?? 'بدون دلیل' }}</td>
                   <td>
                     <span
-                      class="cursor-pointer font-weight-bold {{ $blockedUser->status == 1 ? 'text-danger' : 'text-success' }}"
+                      class="cursor-pointer fw-bold {{ $blockedUser->status == 1 ? 'text-danger' : 'text-success' }}"
                       title="برای تغییر وضعیت کلیک کنید" data-toggle="tooltip" data-status="{{ $blockedUser->status }}"
                       data-id="{{ $blockedUser->id }}" onclick="toggleStatus(this)">
                       {{ $blockedUser->status == 1 ? 'مسدود' : 'آزاد' }}
@@ -210,7 +210,7 @@
     });
 
     $('.option-card').on('click', function() {
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
       $('.option-card').removeClass('card-active');
       $(this).addClass('card-active');
@@ -307,7 +307,7 @@
             <td>${unblockedAt}</td>
             <td>${user.reason || 'بدون دلیل'}</td>
             <td>
-                <span class="cursor-pointer font-weight-bold ${statusClass}" data-toggle="tooltip" data-status="${user.status}" data-id="${user.id}" onclick="toggleStatus(this)">
+                <span class="cursor-pointer fw-bold ${statusClass}" data-toggle="tooltip" data-status="${user.status}" data-id="${user.id}" onclick="toggleStatus(this)">
                     ${statusText}
                 </span>
             </td>

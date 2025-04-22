@@ -19,7 +19,7 @@
       <img src="{{ asset('app-assets/logos/benobe.svg') }}" alt="benobe-logo">
     </div>
     <section class="terms-section">
-      <p class="intro-text font-weight-bold">
+      <p class="intro-text fw-bold">
         ایجاد تجربه‌ی درمانی بی‌نقص و رضایت‌بخش برای بیماران، یکی از مهم‌ترین اهداف به نوبه است. در این راستا، قوانین و
         مقرراتی تدوین شده است که رعایت آن‌ها برای همکاری پزشکان و بیماران با به نوبه الزامی است.
       </p>

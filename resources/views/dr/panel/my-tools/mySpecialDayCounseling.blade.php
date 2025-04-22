@@ -49,7 +49,7 @@
     });
 
     $('.option-card').on('click', function() {
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
       $('.option-card').removeClass('card-active');
       $(this).addClass('card-active');
@@ -338,7 +338,7 @@
 
   function generateWorkHoursHtml(response, selectedDate) {
     if (response.status && response.work_hours.length > 0) {
-      let html = '<h6 class="font-weight-bold">برنامه کاری</h6>';
+      let html = '<h6 class="fw-bold">برنامه کاری</h6>';
       response.work_hours.forEach((slot, index) => {
         html += `
         <div class="p-3 border mt-2">
@@ -362,7 +362,7 @@
       });
       return html;
     } else {
-      return `<p class="text-center text-danger font-weight-bold">هیچ ساعات کاری برای این روز تعریف نشده است.</p>`;
+      return `<p class="text-center text-danger fw-bold">هیچ ساعات کاری برای این روز تعریف نشده است.</p>`;
     }
   }
 
@@ -697,7 +697,7 @@
         if (response.status && response.work_hours.length > 0) {
           response.work_hours.forEach((slot, index) => {
             $("#workHoursContainer").append(`
-                        <h6 class="font-weight-bold">برنامه کاری</h6>
+                        <h6 class="fw-bold">برنامه کاری</h6>
                         <div class="p-3 border mt-2">
                           <input type="hidden" id="selectedDate" value="${selectedDate}">
 
@@ -724,7 +724,7 @@
           $("#updateWorkHours").show();
         } else {
           $("#workHoursContainer").append(
-            `<p class="text-center text-danger font-weight-bold">هیچ ساعات کاری برای این روز تعریف نشده است.</p>`
+            `<p class="text-center text-danger fw-bold">هیچ ساعات کاری برای این روز تعریف نشده است.</p>`
           );
           $("#updateWorkHours").hide();
         }

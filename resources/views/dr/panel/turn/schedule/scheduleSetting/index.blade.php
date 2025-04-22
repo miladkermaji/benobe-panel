@@ -31,7 +31,7 @@
             </div>
           </div>
         </div>
-        <div class="ml-2 mt-4"><span class="font-weight-bold">ساعت
+        <div class="ml-2 mt-4"><span class="fw-bold">ساعت
             کاری</span>
           <p class="">ساعت کاری خود را همیشه بروز نگه
             دارید</p>
@@ -47,7 +47,7 @@
           </svg>
         </div>
         <div class="ml-2 mt-4">
-          <span class="font-weight-bold">
+          <span class="fw-bold">
             روزهای تعطیل
           </span>
           <p class="">اعلام روز تعطیل مشاوره آنلاین</p>
@@ -63,7 +63,7 @@
           </svg>
         </div>
         <div class="ml-2 mt-4">
-          <span class="font-weight-bold">
+          <span class="fw-bold">
             مسدود کردن کاربر
           </span>
           <p class="">مدیریت کاربران مسدود </p>

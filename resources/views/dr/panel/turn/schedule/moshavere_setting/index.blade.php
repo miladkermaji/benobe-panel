@@ -72,7 +72,7 @@
               </div>
             </div>
             <div class="form-group w-100 mt-3 pb-4">
-              <label class="text-dark font-weight-bold">تعرفه مشاوره</label>
+              <label class="text-dark fw-bold">تعرفه مشاوره</label>
 
               <div class="row mt-3 w-100">
                 <div class="col-md-6">
@@ -114,7 +114,7 @@
 
             </div>
             <div class="mt-2">
-              <label class="text-dark font-weight-bold">روزهای کاری</label>
+              <label class="text-dark fw-bold">روزهای کاری</label>
               <div
                 class="d-flex flex-wrap justify-content-start  mt-3 gap-40 bg-light p-3 border-radius-4 day-contents">
                 <x-my-check :isChecked="false" id="saturday" day="شنبه" />
@@ -194,7 +194,7 @@
   <div class="modal-dialog modal-dialog-centered my-modal-lg" role="document">
     <div class="modal-content border-radius-6">
       <div class="modal-header">
-        <h6 class="modal-title font-weight-bold" id="scheduleModalLabel">برنامه زمانبندی</h6>
+        <h6 class="modal-title fw-bold" id="scheduleModalLabel">برنامه زمانبندی</h6>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -211,7 +211,7 @@
         <div class="modal-content-inner" style="display: none;">
           <div class="">
             <div class="">
-              <label class="font-weight-bold text-dark">روزهای کاری</label>
+              <label class="fw-bold text-dark">روزهای کاری</label>
               <div class="mt-2 d-flex flex-wrap gap-10 justify-content-start my-768px-styles-day-and-times">
                 <div class="" tabindex="0" role="button"><span class="badge-time-styles-day"
                     data-day="saturday">شنبه</span><span class=""></span></div>
@@ -233,14 +233,12 @@
           <div class="w-100 d-flex mt-4 gap-4 justify-content-center">
             <div class="form-group position-relative timepicker-ui">
               <label class="label-top-input-special-takhasos">شروع</label>
-              <input type="text"
-                class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13"
+              <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13"
                 id="schedule-start" value="00:00">
             </div>
             <div class="form-group position-relative timepicker-ui">
               <label class="label-top-input-special-takhasos">پایان</label>
-              <input type="text"
-                class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13"
+              <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13"
                 id="schedule-end" value="23:59">
             </div>
           </div>
@@ -262,7 +260,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content border-radius-6">
       <div class="modal-header">
-        <h6 class="modal-title font-weight-bold" id="checkboxModalLabel"> کپی ساعت کاری برای روز های : </h6>
+        <h6 class="modal-title fw-bold" id="checkboxModalLabel"> کپی ساعت کاری برای روز های : </h6>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
@@ -296,7 +294,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content border-radius-6" id="calculate-modal">
       <div class="modal-header">
-        <h6 class="modal-title font-weight-bold" id="checkboxModalLabel"> انتخاب تعداد نوبت یا زمان ویزیت: </h6>
+        <h6 class="modal-title fw-bold" id="checkboxModalLabel"> انتخاب تعداد نوبت یا زمان ویزیت: </h6>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>

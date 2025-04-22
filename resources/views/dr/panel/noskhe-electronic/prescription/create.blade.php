@@ -28,7 +28,7 @@
           </svg>
         </span>
         <span>
-          <span class="font-weight-bold">
+          <span class="fw-bold">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path
                 d="M8.20094 13.3872L5.42786 12.0508C5.42786 12.0508 6.12948 11.1487 6.26312 6.1371L6.24085 6.73849C6.24085 3.47538 8.88029 0.835938 12.1434 0.835938C15.4065 0.835938 18.046 3.47538 18.046 6.73849L18.0125 6.12596C18.135 11.1376 18.8367 12.0396 18.8367 12.0396L16.0636 13.3761"
@@ -40,12 +40,12 @@
                 fill="#2b2f33"></path>
             </svg>
           </span>
-          <span class="font-weight-bold">
+          <span class="fw-bold">
             صبا کرمی
           </span>
         </span>
-        <span class="mx-4 font-weight-bold">
-          بیمه : <span class="font-weight-bold">تامین اجتماعی</span>
+        <span class="mx-4 fw-bold">
+          بیمه : <span class="fw-bold">تامین اجتماعی</span>
         </span>
       </div>
       <div class="d-flex gap-10 align-items-center">
@@ -62,7 +62,7 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
               <div class="modal-content border-radius-6">
                 <div class="modal-header">
-                  <h6 class="modal-title font-weight-bold" id="exampleModalCenterTitle"> نسخه پر استفاده</h6>
+                  <h6 class="modal-title fw-bold" id="exampleModalCenterTitle"> نسخه پر استفاده</h6>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -88,13 +88,13 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
               <div class="modal-content border-radius-6">
                 <div class="modal-header">
-                  <h6 class="modal-title font-weight-bold" id="exampleModalCenterTitle"> ویزیت</h6>
+                  <h6 class="modal-title fw-bold" id="exampleModalCenterTitle"> ویزیت</h6>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  <p class="font-weight-bold">
+                  <p class="fw-bold">
                     در نسخه آیتمی وجود ندارد، آیا می خواهید ویزیت ثبت کنید؟
                   </p>
                   <div class="mt-3">

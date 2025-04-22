@@ -2,7 +2,7 @@
   <div class="wallet-charge-wrapper p-4 bg-white rounded shadow" style="max-width: 700px; width: 100%;">
     <!-- هدر شیک -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="font-weight-bold text-dark m-0">شارژ کیف پول</h4>
+      <h4 class="fw-bold text-dark m-0">شارژ کیف پول</h4>
       <span class="badge bg-primary text-white p-2">موجودی شما: {{ number_format($availableAmount) }} تومان</span>
     </div>
 

@@ -162,7 +162,7 @@
     });
 
     $('.option-card').on('click', function() {
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
       $('.option-card').removeClass('card-active');
       $(this).addClass('card-active');

@@ -34,7 +34,7 @@ body {
 }
 
 /* هدر و اعلان */
-.muirtl-60hgb7 .font-weight-bold.text-dark {
+.muirtl-60hgb7 .fw-bold.text-dark {
     font-size: 16px;
     color: #1e293b;
     margin-bottom: 10px;
@@ -237,7 +237,7 @@ body {
     box-shadow: 0 4px 12px rgba(43, 108, 176, 0.1);
 }
 
-.has-list-vacation .text-dark.font-weight-bold {
+.has-list-vacation .text-dark.fw-bold {
     font-size: 14px;
     color: #1e293b;
 }
@@ -277,7 +277,7 @@ body {
 }
 
 /* پیام خالی */
-.nothing-vacation .font-weight-bold.text-dark {
+.nothing-vacation .fw-bold.text-dark {
     font-size: 14px;
     color: #64748b;
     padding: 20px;
@@ -303,7 +303,7 @@ body {
     .has-list-vacation {
         padding: 12px;
     }
-    .muirtl-60hgb7 .font-weight-bold.text-dark {
+    .muirtl-60hgb7 .fw-bold.text-dark {
         font-size: 15px;
     }
     .alert-warning {
@@ -342,10 +342,10 @@ body {
     .alert-warning {
         font-size: 11px;
     }
-    .muirtl-60hgb7 .font-weight-bold.text-dark {
+    .muirtl-60hgb7 .fw-bold.text-dark {
         font-size: 14px;
     }
-    .has-list-vacation .text-dark.font-weight-bold {
+    .has-list-vacation .text-dark.fw-bold {
         font-size: 13px;
     }
     .has-list-vacation .text-black {

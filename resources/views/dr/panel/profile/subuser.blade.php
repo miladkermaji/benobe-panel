@@ -90,7 +90,7 @@
       <button class="btn my-btn-primary h-50 add-subuser-btn" id="add-subuser-btn">افزودن کاربر جدید</button>
     </div>
     <div class="p-3">
-      <h4 class="text-dark font-weight-bold">لیست کاربران زیرمجموعه</h4>
+      <h4 class="text-dark fw-bold">لیست کاربران زیرمجموعه</h4>
     </div>
     <div class="mt-2">
       <table class="table table-modern table-striped table-bordered table-hover" id="subuser-list">

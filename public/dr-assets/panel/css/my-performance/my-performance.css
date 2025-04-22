@@ -19,7 +19,7 @@ p {
     .text-dark {
         font-size: 12px !important;
     }
-    a.font-weight-bold {
+    a.fw-bold {
         font-size: 12px !important;
     }
 }
@@ -132,6 +132,6 @@ p {
         font-size: 13px;
     }
 }
-.myPanelOption{
-  display: none;
+.myPanelOption {
+    display: none;
 }

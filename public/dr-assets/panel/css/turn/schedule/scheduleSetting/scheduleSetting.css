@@ -1,227 +1,241 @@
 body {
-  direction: rtl;
-  background-color: #f9fafb;
-  font-family: 'Vazir', sans-serif;
-  overflow-x: hidden;
+    direction: rtl;
+    background-color: #f9fafb;
+    font-family: "Vazir", sans-serif;
+    overflow-x: hidden;
 }
 
 /* استایل کلی صفحه */
 .schedule-setting-content {
-  padding: 30px 15px;
-  max-width: 1200px;
-  margin: 0 auto;
+    padding: 30px 15px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .schedule-setting-wrapper {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
-  padding: 20px;
-  animation: fadeIn 0.5s ease-in-out;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    padding: 20px;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* لیست تنظیمات */
 .schedule-setting-wrapper ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .schedule-setting-wrapper li {
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #e5e7eb;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
 .schedule-setting-wrapper li:last-child {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .schedule-setting-wrapper li:hover {
-  background: linear-gradient(135deg, #dbeafe 0%, #f1f5f9 100%); /* گرادیان جذاب */
-  border-radius: 10px;
-  transform: scale(1.02); /* بزرگ‌نمایی ظریف */
-  box-shadow: 0 6px 20px rgba(43, 108, 176, 0.15); /* سایه پویا */
+    background: linear-gradient(
+        135deg,
+        #dbeafe 0%,
+        #f1f5f9 100%
+    ); /* گرادیان جذاب */
+    border-radius: 10px;
+    transform: scale(1.02); /* بزرگ‌نمایی ظریف */
+    box-shadow: 0 6px 20px rgba(43, 108, 176, 0.15); /* سایه پویا */
 }
 
-.my-card-hover:hover{
-   background: linear-gradient(135deg, #dbeafe 0%, #f1f5f9 100%); /* گرادیان جذاب */
-  border-radius: 10px;
-  transform: scale(1.02); /* بزرگ‌نمایی ظریف */
-  box-shadow: 0 6px 20px rgba(43, 108, 176, 0.15); /* سایه پویا */
+.my-card-hover:hover {
+    background: linear-gradient(
+        135deg,
+        #dbeafe 0%,
+        #f1f5f9 100%
+    ); /* گرادیان جذاب */
+    border-radius: 10px;
+    transform: scale(1.02); /* بزرگ‌نمایی ظریف */
+    box-shadow: 0 6px 20px rgba(43, 108, 176, 0.15); /* سایه پویا */
 }
 /* افکت هاور اضافه */
 .schedule-setting-wrapper li::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -50px;
-  width: 20px;
-  height: 20px;
-  background: rgba(43, 108, 176, 0.2);
-  border-radius: 50%;
-  transform: translateY(-50%) scale(0);
-  transition: all 0.4s ease;
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -50px;
+    width: 20px;
+    height: 20px;
+    background: rgba(43, 108, 176, 0.2);
+    border-radius: 50%;
+    transform: translateY(-50%) scale(0);
+    transition: all 0.4s ease;
 }
 
 .schedule-setting-wrapper li:hover::before {
-  right: 10px;
-  transform: translateY(-50%) scale(1);
+    right: 10px;
+    transform: translateY(-50%) scale(1);
 }
 
 /* آیکون‌ها */
 .my-svg-setting-nobat {
-  background: #e2e8f0;
-  padding: 12px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: all 0.3s ease;
-  width: 50px;
-  height: 50px;
+    background: #e2e8f0;
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+    width: 50px;
+    height: 50px;
 }
 
 .my-svg-setting-nobat svg {
-  width: 24px;
-  height: 24px;
+    width: 24px;
+    height: 24px;
 }
 
 .my-svg-setting-nobat path {
-  fill: #2d3748;
-  stroke: #2d3748;
-  transition: all 0.3s ease;
+    fill: #2d3748;
+    stroke: #2d3748;
+    transition: all 0.3s ease;
 }
 
 .schedule-setting-wrapper li:hover .my-svg-setting-nobat {
-  background: #2b6cb0;
+    background: #2b6cb0;
 }
 
 .schedule-setting-wrapper li:hover .my-svg-setting-nobat path {
-  fill: #fff;
-  stroke: #fff;
+    fill: #fff;
+    stroke: #fff;
 }
 
 .top-21 {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); /* دقیقاً وسط */
-  background: #38b2ac;
-  color: #fff;
-  font-size: 12px; /* کمی بزرگ‌تر برای خوانایی */
-  font-weight: 700;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* دقیقاً وسط */
+    background: #38b2ac;
+    color: #fff;
+    font-size: 12px; /* کمی بزرگ‌تر برای خوانایی */
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* متن‌ها */
 .schedule-setting-wrapper .ml-2 {
-  margin-right: 15px;
+    margin-right: 15px;
 }
 
-.schedule-setting-wrapper .font-weight-bold {
-  font-size: 15px;
-  color: #1e293b;
-  font-weight: 700;
-  display: block;
-  margin-bottom: 4px;
+.schedule-setting-wrapper .fw-bold {
+    font-size: 15px;
+    color: #1e293b;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
 }
 
 .schedule-setting-wrapper p {
-  font-size: 13px;
-  color: #64748b;
-  margin: 0;
-  line-height: 1.4;
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.4;
 }
 
 /* ریسپانسیو */
 @media only screen and (max-width: 991px) {
-  .schedule-setting-wrapper {
-    margin: 0 15px;
-  }
+    .schedule-setting-wrapper {
+        margin: 0 15px;
+    }
 }
 
 @media only screen and (max-width: 768px) {
-  .schedule-setting-wrapper {
-    padding: 15px;
-  }
-  .schedule-setting-wrapper li {
-    padding: 12px;
-  }
-  .my-svg-setting-nobat {
-    width: 45px;
-    height: 45px;
-    padding: 10px;
-  }
-  .my-svg-setting-nobat svg {
-    width: 20px;
-    height: 20px;
-  }
-  .top-21 {
-    width: 18px;
-    height: 18px;
-    font-size: 11px;
-  }
-  .schedule-setting-wrapper .font-weight-bold {
-    font-size: 14px;
-  }
-  .schedule-setting-wrapper p {
-    font-size: 12px;
-  }
+    .schedule-setting-wrapper {
+        padding: 15px;
+    }
+    .schedule-setting-wrapper li {
+        padding: 12px;
+    }
+    .my-svg-setting-nobat {
+        width: 45px;
+        height: 45px;
+        padding: 10px;
+    }
+    .my-svg-setting-nobat svg {
+        width: 20px;
+        height: 20px;
+    }
+    .top-21 {
+        width: 18px;
+        height: 18px;
+        font-size: 11px;
+    }
+    .schedule-setting-wrapper .fw-bold {
+        font-size: 14px;
+    }
+    .schedule-setting-wrapper p {
+        font-size: 12px;
+    }
 }
 
 @media only screen and (max-width: 425px) {
-  .schedule-setting-content {
-    padding: 20px 10px;
-  }
-  .schedule-setting-wrapper {
-    padding: 10px;
-    margin: 0 10px;
-  }
-  .schedule-setting-wrapper li {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 10px;
-  }
-  .my-svg-setting-nobat {
-    width: 40px;
-    height: 40px;
-    padding: 8px;
-    margin-bottom: 10px;
-  }
-  .my-svg-setting-nobat svg {
-    width: 18px;
-    height: 18px;
-  }
-  .top-21 {
-    width: 16px;
-    height: 16px;
-    font-size: 10px;
-  }
-  .schedule-setting-wrapper .ml-2 {
-    margin-right: 0;
-  }
-  .schedule-setting-wrapper .font-weight-bold {
-    font-size: 13px;
-  }
-  .schedule-setting-wrapper p {
-    font-size: 11px;
-  }
+    .schedule-setting-content {
+        padding: 20px 10px;
+    }
+    .schedule-setting-wrapper {
+        padding: 10px;
+        margin: 0 10px;
+    }
+    .schedule-setting-wrapper li {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px;
+    }
+    .my-svg-setting-nobat {
+        width: 40px;
+        height: 40px;
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+    .my-svg-setting-nobat svg {
+        width: 18px;
+        height: 18px;
+    }
+    .top-21 {
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+    }
+    .schedule-setting-wrapper .ml-2 {
+        margin-right: 0;
+    }
+    .schedule-setting-wrapper .fw-bold {
+        font-size: 13px;
+    }
+    .schedule-setting-wrapper p {
+        font-size: 11px;
+    }
 }

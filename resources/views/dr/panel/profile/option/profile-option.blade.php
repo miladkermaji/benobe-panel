@@ -22,7 +22,7 @@
           // ایجاد هشدار
           const alertHtml = `
                 <div class="alert alert-warning text-center">
-                    <span class="font-weight-bold">
+                    <span class="fw-bold">
                         پروفایل شما کامل نیست. لطفا بخش‌های زیر را تکمیل کنید:
                         <ul class="w-100 d-flex gap-4">
                             ${profileData.incomplete_sections.map(section => 
@@ -232,7 +232,7 @@
           // ایجاد هشدار
           const alertHtml = `
                 <div class="alert alert-warning text-center">
-                    <span class="font-weight-bold">
+                    <span class="fw-bold">
                         پروفایل شما کامل نیست. لطفا بخش‌های زیر را تکمیل کنید:
                         <ul class="w-100 d-flex gap-4">
                             ${profileData.incomplete_sections.map(section => 

@@ -50,7 +50,7 @@
     });
 
     $('.option-card').on('click', function() {
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
       $('.option-card').removeClass('card-active');
       $(this).addClass('card-active');
@@ -358,11 +358,11 @@
         <div class="d-flex justify-content-start align-items-center gap-4">
           <div class="form-group position-relative timepicker-ui">
             <label class="label-top-input-special-takhasos" for="morning-start-${day}">از</label>
-            <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 start-time bg-white" id="morning-start-${day}" value="" name="start_time">
+            <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white" id="morning-start-${day}" value="" name="start_time">
           </div>
           <div class="form-group position-relative timepicker-ui">
             <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
-            <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 end-time bg-white" id="morning-end-${day}" value="" name="end_time">
+            <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white" id="morning-end-${day}" value="" name="end_time">
           </div>
           <div class="form-group  position-relative">
             <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
@@ -638,11 +638,11 @@
       <div class="d-flex justify-content-start align-items-center gap-4">
         <div class="form-group position-relative timepicker-ui">
           <label class="label-top-input-special-takhasos" for="morning-start-${day}">از</label>
-          <input type="text" id="morning-start-${day}" name="start_time" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 start-time bg-white" value="${start_time}" readonly ${start_time ? 'disabled' : ''}>
+          <input type="text" id="morning-start-${day}" name="start_time" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white" value="${start_time}" readonly ${start_time ? 'disabled' : ''}>
         </div>
         <div class="form-group position-relative timepicker-ui">
           <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
-          <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 end-time bg-white" id="morning-end-${day}" name="end_time" value="${end_time}" readonly ${end_time ? 'disabled' : ''}>
+          <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white" id="morning-end-${day}" name="end_time" value="${end_time}" readonly ${end_time ? 'disabled' : ''}>
         </div>
         <div class="form-group  position-relative">
           <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
@@ -743,11 +743,11 @@
                 <div class="d-flex justify-content-start align-items-center gap-4">
                     <div class="form-group position-relative timepicker-ui">
                         <label class="label-top-input-special-takhasos" for="morning-start-${day}">از</label>
-                        <input id="morning-start-${day}" name="start_time" type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 start-time bg-white" value="${startTime}" readonly ${startTime ? 'disabled' : ''}>
+                        <input id="morning-start-${day}" name="start_time" type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white" value="${startTime}" readonly ${startTime ? 'disabled' : ''}>
                     </div>
                     <div class="form-group position-relative timepicker-ui">
                         <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
-                        <input id="morning-end-${day}" name="end_time" type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 end-time bg-white" value="${endTime}" readonly ${endTime ? 'disabled' : ''}>
+                        <input id="morning-end-${day}" name="end_time" type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white" value="${endTime}" readonly ${endTime ? 'disabled' : ''}>
                     </div>
                     <div class="form-group  position-relative">
                         <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
@@ -961,7 +961,7 @@
             settingsListHtml += `
                       <div class="d-flex justify-content-between align-items-center border-bottom p-2 border-radius-4 mb-2 setting-item mt-2 bg-active-slot"
                            data-day="${response.day}" data-selected-day="${setting.selected_day}">
-                          <span class="font-weight-bold text-success p-2">
+                          <span class="fw-bold text-success p-2">
                               باز شدن نوبت‌ها از ${setting.start_time} تا ${setting.end_time} روز ${dayMapFa[setting.selected_day]}
                           </span>
                           <button class="btn btn-sm btn-light delete-schedule-setting"
@@ -977,7 +977,7 @@
           $('#scheduleModal .modal-body').append(settingsListHtml);
         } else {
           $('#scheduleModal .modal-body').append(
-            '<div class="mt-3 font-weight-bold settings-list text-danger text-center not-appointment-found">هیچ برنامه‌ای یافت نشد.</div>'
+            '<div class="mt-3 fw-bold settings-list text-danger text-center not-appointment-found">هیچ برنامه‌ای یافت نشد.</div>'
           );
         }
       },
@@ -1002,11 +1002,11 @@
             <div class="d-flex justify-content-start align-items-center gap-4">
                 <div class="form-group position-relative timepicker-ui">
                     <label class="label-top-input-special-takhasos" for="morning-start-${day}">از</label>
-                    <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 bg-white start-time" id="morning-start-${day}" value="" name="start_time">
+                    <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 bg-white start-time" id="morning-start-${day}" value="" name="start_time">
                 </div>
                 <div class="form-group position-relative timepicker-ui">
                     <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
-                    <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 bg-white end-time" id="morning-end-${day}" value="" name="end_time">
+                    <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 bg-white end-time" id="morning-end-${day}" value="" name="end_time">
                 </div>
                 <div class="form-group  position-relative">
                     <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
@@ -1590,11 +1590,11 @@
             <div class="d-flex justify-content-start align-items-center gap-4">
                 <div class="form-group position-relative timepicker-ui">
                     <label class="label-top-input-special-takhasos" for="morning-start-${day}">از</label>
-                    <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 start-time bg-white" value="" id="morning-start-${day}" name="start_time">
+                    <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white" value="" id="morning-start-${day}" name="start_time">
                 </div>
                 <div class="form-group position-relative timepicker-ui">
                     <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
-                    <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 end-time bg-white" value="" id="morning-end-${day}" name="end_time">
+                    <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white" value="" id="morning-end-${day}" name="end_time">
                 </div>
                 <div class="form-group  position-relative">
                     <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
@@ -1652,11 +1652,11 @@
         <div class="d-flex justify-content-start align-items-center gap-4">
           <div class="form-group position-relative timepicker-ui">
             <label class="label-top-input-special-takhasos" for="morning-start-${day}">از</label>
-            <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 bg-white start-time" id="morning-start-${day}" value="" name="start_time">
+            <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 bg-white start-time" id="morning-start-${day}" value="" name="start_time">
           </div>
           <div class="form-group position-relative timepicker-ui">
             <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
-            <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 bg-white end-time" id="morning-end-${day}" value="" name="end_time">
+            <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 bg-white end-time" id="morning-end-${day}" value="" name="end_time">
           </div>
           <div class="form-group  position-relative">
             <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
@@ -1700,11 +1700,11 @@
         <div class="d-flex justify-content-start align-items-center gap-4">
           <div class="form-group position-relative timepicker-ui">
             <label class="label-top-input-special-takhasos" for="morning-start-${day}">از</label>
-            <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 bg-white start-time" id="morning-start-${day}" value="" name="start_time">
+            <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 bg-white start-time" id="morning-start-${day}" value="" name="start_time">
           </div>
           <div class="form-group position-relative timepicker-ui">
             <label class="label-top-input-special-takhasos" for="morning-end-${day}">تا</label>
-            <input type="text" class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 bg-white end-time" id="morning-end-${day}" value="" name="end_time">
+            <input type="text" class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 bg-white end-time" id="morning-end-${day}" value="" name="end_time">
           </div>
           <div class="form-group  position-relative">
             <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
@@ -1803,7 +1803,7 @@
               };
               settingsListHtml += `
               <div class="d-flex justify-content-between align-items-center border-bottom p-2 border-radius-4  mb-2 setting-item bg-active-slot" data-day="${setting.day}" data-selected-day="${setting.selected_day}">
-                <span class="font-weight-bold text-success p-2">
+                <span class="fw-bold text-success p-2">
                     باز شدن نوبت‌ها از ${setting.start_time} تا ${setting.end_time} روز ${dayMapFa[response.day]}
                 </span>
                 <button class="btn btn-sm btn-light delete-schedule-setting"
@@ -1919,7 +1919,7 @@
       const persianDay = getPersianDayName(day);
       const settingsHtml = `
         <div class="d-flex justify-content-between align-items-center border-bottom p-2 border-radius-4  mb-2 setting-item mt-3 bg-active-slot" data-day="${day}" data-selected-day="${day}">
-            <span class="font-weight-bold text-success p-2">
+            <span class="fw-bold text-success p-2">
                    باز شدن نوبت‌ها از ${startTime} تا ${endTime} روز ${persianDay}
             </span>
             <button class="btn btn-sm btn-light delete-schedule-setting"

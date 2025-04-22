@@ -8,100 +8,99 @@
 @endsection
 @section('content')
 @section('bread-crumb-title', 'لیست نوبت ها')
-  <div class="d-flex justify-content-center top-s-wrapper">
-    <div class="calendar-and-add-sick-section p-3">
-      <div class="d-flex justify-content-between gap-10 align-items-center c-a-wrapper">
-        <div>
-          <div class="turning_selectDate__MLRSb">
-            <button
-              class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50 bg-light-blue d-flex justify-content-center align-items-center"
-              data-toggle="modal" data-target="#miniCalendarModal">
-              <div class="d-flex align-items-center">
-                <span class="mx-1"></span>
-                <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
-              </div>
-            </button>
-            <div class="modal fade " id="miniCalendarModal" tabindex="-1" role="dialog"
-              aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered " role="document">
-                <div class="modal-content border-radius-6">
-                  <div class="my-modal-header">
-                    <div>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="modal-body">
-                    <x-jalali-calendar />
-                  </div>
-                </div>
-              </div>
+<div class="d-flex justify-content-center top-s-wrapper">
+  <div class="calendar-and-add-sick-section p-3">
+    <div class="d-flex justify-content-between gap-10 align-items-center c-a-wrapper">
+      <div>
+        <div class="turning_selectDate__MLRSb">
+          <button
+            class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50 bg-light-blue d-flex justify-content-center align-items-center"
+            data-toggle="modal" data-target="#miniCalendarModal">
+            <div class="d-flex align-items-center">
+              <span class="mx-1"></span>
+              <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
             </div>
-          </div>
-        </div>
-        <div>
-          <div class="turning_filterWrapper__2cOOi">
-            <div class="turning_search-wrapper__loGVc">
-              <input type="text" class="my-form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ...">
-            </div>
-          </div>
-        </div>
-        <div class="btn-425-left">
-          <button class="btn my-btn-primary h-50 fs-13" data-toggle="modal"
-            data-target="#exampleModalCenterAddSick">افزودن
-            بیمار</button>
           </button>
-          <!-- Modal -->
-          <div class="modal fade " id="exampleModalCenterAddSick" tabindex="-1" role="dialog"
+          <div class="modal fade " id="miniCalendarModal" tabindex="-1" role="dialog"
             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered " role="document">
               <div class="modal-content border-radius-6">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLongTitle">افزودن بیمار </h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
+                <div class="my-modal-header">
+                  <div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
                 </div>
                 <div class="modal-body">
-                  <div>
-                    <form action="" method="post">
-                      <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع">
-                      <div class="mt-2">
-                        <a class="text-decoration-none text-primary font-bold" href="#" data-toggle="modal"
-                          data-target="#exampleModalCenterPaziresh">پذیرش
-                          از مسیر ارجاع</a>
-                      </div>
-                      <div class="d-flex mt-2 gap-20">
-                        <button class="btn my-btn-primary w-50 h-50">تجویز نسخه</button>
-                        <button class="btn btn-outline-info w-50 h-50">ثبت ویزیت</button>
-                      </div>
-                    </form>
-                  </div>
+                  <x-jalali-calendar />
                 </div>
               </div>
             </div>
           </div>
-          <div class="modal fade " id="exampleModalCenterPaziresh" tabindex="-1" role="dialog"
-            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered " role="document">
-              <div class="modal-content border-radius-6">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLongTitle"> ارجاع </h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
+        </div>
+      </div>
+      <div>
+        <div class="turning_filterWrapper__2cOOi">
+          <div class="turning_search-wrapper__loGVc">
+            <input type="text" class="my-form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ...">
+          </div>
+        </div>
+      </div>
+      <div class="btn-425-left">
+        <button class="btn my-btn-primary h-50 fs-13" data-toggle="modal"
+          data-target="#exampleModalCenterAddSick">افزودن
+          بیمار</button>
+        </button>
+        <!-- Modal -->
+        <div class="modal fade " id="exampleModalCenterAddSick" tabindex="-1" role="dialog"
+          aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered " role="document">
+            <div class="modal-content border-radius-6">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">افزودن بیمار </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div>
+                  <form action="" method="post">
+                    <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع">
+                    <div class="mt-2">
+                      <a class="text-decoration-none text-primary font-bold" href="#" data-toggle="modal"
+                        data-target="#exampleModalCenterPaziresh">پذیرش
+                        از مسیر ارجاع</a>
+                    </div>
+                    <div class="d-flex mt-2 gap-20">
+                      <button class="btn my-btn-primary w-50 h-50">تجویز نسخه</button>
+                      <button class="btn btn-outline-info w-50 h-50">ثبت ویزیت</button>
+                    </div>
+                  </form>
                 </div>
-                <div class="modal-body">
-                  <div>
-                    <form action="" method="post">
-                      <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع بیمار">
-                      <input type="text" class="my-form-control-light w-100 mt-3" placeholder="کد پیگیری">
-                      <div class="mt-3">
-                        <button class="btn my-btn-primary w-100 h-50">ثبت</button>
-                      </div>
-                    </form>
-                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade " id="exampleModalCenterPaziresh" tabindex="-1" role="dialog"
+          aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered " role="document">
+            <div class="modal-content border-radius-6">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle"> ارجاع </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div>
+                  <form action="" method="post">
+                    <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع بیمار">
+                    <input type="text" class="my-form-control-light w-100 mt-3" placeholder="کد پیگیری">
+                    <div class="mt-3">
+                      <button class="btn my-btn-primary w-100 h-50">ثبت</button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -110,7 +109,8 @@
       </div>
     </div>
   </div>
-  {{-- here put calender --}}
+</div>
+{{-- here put calender --}}
 <x-jalali-calendar-row />
 <div class="sicks-content h-100 w-100  position-relative border">
   <div>
@@ -361,18 +361,18 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content border-radius-6">
       <div class="modal-header">
-        <h6 class="modal-title font-weight-bold" id="exampleModalCenterTitle"> توضیحات درمان</h6>
+        <h6 class="modal-title fw-bold" id="exampleModalCenterTitle"> توضیحات درمان</h6>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
         <div>
-          <span class="font-weight-bold">پزشک گرامی</span>
+          <span class="fw-bold">پزشک گرامی</span>
           <br>
           <p class="mt-2 font-size-14">
-            لطفا در صورتی که برای بیمار نسخه الکترونیک ثبت کرده اید <span class="font-weight-bold">“کد پیگیری
-              نسخه”</span> و در صورت نیاز <span class="font-weight-bold">“توضیحات درمان”</span> خود را
+            لطفا در صورتی که برای بیمار نسخه الکترونیک ثبت کرده اید <span class="fw-bold">“کد پیگیری
+              نسخه”</span> و در صورت نیاز <span class="fw-bold">“توضیحات درمان”</span> خود را
             یادداشت نمایید.
           </p>
           <span class="mt-2">

@@ -154,7 +154,7 @@ th {
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
     /* Focus shadow */
 }
-.sidebar__scrollable ol ul{
+.sidebar__scrollable ol ul {
     padding-right: 0 !important;
 }
 .form-check-input {
@@ -1268,7 +1268,7 @@ img {
     padding: 1.5rem 1.5rem 0;
 }
 
-.modal-body .font-weight-bold {
+.modal-body .fw-bold {
     color: #1f2937;
 }
 /* دراپ‌داون */
@@ -1676,28 +1676,30 @@ img {
     color: #0056b3;
 }
 
-
-
 .loader {
-  display: none;
-  width: 16px;
-  height: 16px;
-  border: 2px solid #fff;
-  border-top: 2px solid transparent;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  margin-left: 8px;
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-left: 8px;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .loading .loader {
-  display: inline-block;
+    display: inline-block;
 }
 
 .loading .button_text {
-  display: none;
+    display: none;
 }

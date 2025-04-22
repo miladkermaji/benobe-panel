@@ -204,8 +204,7 @@
           </div>
           <div class="mt-3 position-relative timepicker-ui w-100">
             <label class="label-top-input-special-takhasos"> ساعت مراجعه:</label>
-            <input type="text"
-              class="form-control w-100 h-50 timepicker-ui-input text-end font-weight-bold font-size-13"
+            <input type="text" class="form-control w-100 h-50 timepicker-ui-input text-end fw-bold font-size-13"
               id="appointment-time" value="00:00" style="width: 100% !important">
           </div>
           <div class="mt-3 position-relative">
@@ -420,7 +419,7 @@
     });
 
     $('.option-card').on('click', function() {
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
       $('.option-card').removeClass('card-active');
       $(this).addClass('card-active');

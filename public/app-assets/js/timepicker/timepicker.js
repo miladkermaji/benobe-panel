@@ -3481,7 +3481,7 @@
 
 // this is a customElementsm code to add change increse ans decres hour and minute
 $(document).ready(function () {
-    $(".timepicker-ui-select-time").addClass("font-weight-bold");
+    $(".timepicker-ui-select-time").addClass("fw-bold");
 });
 
 function changeHourAndMinute(currentSvgId) {

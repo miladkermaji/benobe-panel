@@ -3,7 +3,6 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="icon" type="image/x-icon" href="{{ asset('app-assets/logos/favicon.ico') }}">
 <link href="{{ asset('admin-assets/panel/css/bootstrap.min.css') }}" rel="stylesheet">
-<link href="{{ asset('admin-assets/panel/css/bootstrap.min.css') }}" rel="stylesheet">
 <link href="{{ asset('admin-assets/panel/css/fontawesome/fontawesome.min.css') }}" rel="stylesheet">
 <script src="{{ asset('admin-assets/panel/js/home/bootstrap/bootstrap.popper.min.js') }}"></script>
 

@@ -48,7 +48,7 @@
     $('.option-card').on('click', function() {
       let currentDate = moment().format('YYYY-MM-DD');
       let persianDate = moment(currentDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
       $('.option-card').removeClass('card-active');
       $(this).addClass('card-active');
@@ -88,28 +88,28 @@
   function getPrescriptionStatus(status) {
     switch (status) {
       case 'scheduled':
-        return '<span class="font-weight-bold text-warning">در انتظار</span>';
+        return '<span class="fw-bold text-warning">در انتظار</span>';
       case 'cancelled':
-        return '<span class="font-weight-bold text-danger">لغو شده</span>';
+        return '<span class="fw-bold text-danger">لغو شده</span>';
       case 'attended':
-        return '<span class="font-weight-bold text-primary">ویزیت شده</span>';
+        return '<span class="fw-bold text-primary">ویزیت شده</span>';
       case 'missed':
-        return '<span class="font-weight-bold text-muted">ویزیت نشده</span>';
+        return '<span class="fw-bold text-muted">ویزیت نشده</span>';
       default:
-        return '<span class="font-weight-bold text-dark">نامشخص</span>';
+        return '<span class="fw-bold text-dark">نامشخص</span>';
     }
   }
 
   function getPaymentStatus(status) {
     switch (status) {
       case 'pending':
-        return '<span class="font-weight-bold text-warning">در حال پرداخت</span>';
+        return '<span class="fw-bold text-warning">در حال پرداخت</span>';
       case 'paid':
-        return '<span class="font-weight-bold text-success">پرداخت شده</span>';
+        return '<span class="fw-bold text-success">پرداخت شده</span>';
       case 'unpaid':
-        return '<span class="font-weight-bold text-danger">پرداخت نشده</span>';
+        return '<span class="fw-bold text-danger">پرداخت نشده</span>';
       default:
-        return '<span class="font-weight-bold text-dark">نامشخص</span>';
+        return '<span class="fw-bold text-dark">نامشخص</span>';
     }
   }
   let currentDate = moment().format('YYYY-MM-DD');
@@ -536,7 +536,7 @@
             });
             // به‌روزرسانی ردیف در جدول
             row.find('td:nth-child(5)').html(
-              '<span class="font-weight-bold text-danger">لغو شده</span>'); // تغییر وضعیت به "لغو شده"
+              '<span class="fw-bold text-danger">لغو شده</span>'); // تغییر وضعیت به "لغو شده"
             row.find('.btn-end-visit').prop('disabled', true).addClass(
               'text-muted'); // غیرفعال کردن دکمه پایان ویزیت
             row.find('.cancel-appointment').closest('li').addClass(
@@ -695,15 +695,15 @@
   const maxDate = moment().locale('en').add(30, 'days').format('YYYY-MM-DD');
   let appointmentsData = [];
 
-   function updateButtonState() {
-        const prevButton = $('#prevRow');
-        const nextButton = $('#nextRow');
-        const firstDate = moment(currentDate).locale('en');
-        const lastDate = moment(currentDate).locale('en').add(calendarDays - 1, 'days');
+  function updateButtonState() {
+    const prevButton = $('#prevRow');
+    const nextButton = $('#nextRow');
+    const firstDate = moment(currentDate).locale('en');
+    const lastDate = moment(currentDate).locale('en').add(calendarDays - 1, 'days');
 
-        prevButton.prop('disabled', firstDate.isSameOrBefore(today, 'day'));
-        nextButton.prop('disabled', lastDate.isSameOrAfter(moment().add(calendarDays, 'days'), 'day'));
-    }
+    prevButton.prop('disabled', firstDate.isSameOrBefore(today, 'day'));
+    nextButton.prop('disabled', lastDate.isSameOrAfter(moment().add(calendarDays, 'days'), 'day'));
+  }
   const loadingOverlay = $('#calendar-loading');
 
   function fetchAppointmentsCount() {
@@ -1537,7 +1537,7 @@
         if (response.status && response.work_hours.length > 0) {
           response.work_hours.forEach((slot, index) => {
             $("#workHoursContainer").append(`
-                        <h6 class="font-weight-bold">برنامه کاری</h6>
+                        <h6 class="fw-bold">برنامه کاری</h6>
                         <div class="p-3 border mt-2">
                             <input type="hidden" id="selectedDate" value="${selectedDate}">
                             <div class="work-hour-slot d-flex justify-content-center gap-4">
@@ -1560,7 +1560,7 @@
           $("#updateWorkHours").show();
         } else {
           $("#workHoursContainer").append(
-            `<p class="text-center text-danger font-weight-bold">هیچ ساعات کاری برای این روز تعریف نشده است.</p>`
+            `<p class="text-center text-danger fw-bold">هیچ ساعات کاری برای این روز تعریف نشده است.</p>`
           );
           $("#updateWorkHours").hide();
         }
@@ -2178,7 +2178,7 @@
           }
           // به‌روزرسانی وضعیت در جدول
           row.find('td:nth-child(5)').html(
-            '<span class="font-weight-bold text-primary">ویزیت شده</span>');
+            '<span class="fw-bold text-primary">ویزیت شده</span>');
           // غیرفعال کردن دکمه "پایان ویزیت"
           endVisitButton.prop('disabled', true).addClass('disabled');
           // غیرفعال کردن گزینه‌های "لغو نوبت" و "جابجایی نوبت" در دراپ‌داون
@@ -2253,7 +2253,7 @@
               selected.forEach(app => {
                 let row = app.row;
                 row.find('td:nth-child(5)').html(
-                  '<span class="font-weight-bold text-danger">لغو شده</span>'); // تغییر وضعیت
+                  '<span class="fw-bold text-danger">لغو شده</span>'); // تغییر وضعیت
                 row.find('.btn-end-visit').prop('disabled', true).addClass(
                   'text-muted'); // غیرفعال کردن دکمه پایان ویزیت
                 row.find('.cancel-appointment').closest('li').addClass(

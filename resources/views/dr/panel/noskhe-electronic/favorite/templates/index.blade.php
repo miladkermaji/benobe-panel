@@ -18,7 +18,7 @@
   <div class="container">
     <div class="d-flex justify-content-between position-relative favorite-wrapper">
       <div>
-        <h6 class="font-weight-bold">نسخه های پر استفاده من</h6>
+        <h6 class="fw-bold">نسخه های پر استفاده من</h6>
         <p>با نسخه پراستفاده، سرعت نسخه نویسی چند برابر می شود.</p>
       </div>
       <div>

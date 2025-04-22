@@ -19,7 +19,7 @@
     --button-mobile-light: #a2cdeb; /* آبی روشن‌تر - دکمه‌های موبایل */
     --support-section: #2e86c1; /* آبی - بخش پشتیبانی */
     --support-text: #084d7c; /* آبی تیره - متن پشتیبانی */
- --glass-border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    --glass-border: 1px solid rgba(255, 255, 255, 0.2) !important;
     /* شعاع گوشه‌ها (border-radius) */
     --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
     --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
@@ -28,7 +28,7 @@
     --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
     --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
     --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
-     --gradient-primary: linear-gradient(
+    --gradient-primary: linear-gradient(
         90deg,
         var(--primary-light) 0%,
         var(--primary) 100%
@@ -158,7 +158,7 @@ canvas {
     height: 24px;
 }
 
-.font-weight-bold {
+.fw-bold {
     font-weight: 700;
     color: var(--text-color);
 }

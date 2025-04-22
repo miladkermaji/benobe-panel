@@ -21,7 +21,7 @@
     <div class="mt-4">
       <div class="border-0 shadow-sm rounded-3">
         <div class="card-header bg-dark text-white p-4">
-          <h5 class="mb-0 font-weight-bold">پیام‌های ارسالی</h5>
+          <h5 class="mb-0 fw-bold">پیام‌های ارسالی</h5>
         </div>
         <div class="card-body p-4">
           <div class="w-100 d-flex justify-content-end mb-3">
@@ -83,7 +83,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-radius-6 shadow-sm">
         <div class="modal-header bg-dark text-white">
-          <h5 class="modal-title font-weight-bold" id="sendSmsModalLabel">ارسال پیام جدید</h5>
+          <h5 class="modal-title fw-bold" id="sendSmsModalLabel">ارسال پیام جدید</h5>
           <button type="button" class="close text-white" data-dismiss="modal" aria-label="بستن">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -184,7 +184,7 @@
     });
 
     $('.option-card').on('click', function() {
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
       $('.option-card').removeClass('card-active');
       $(this).addClass('card-active');

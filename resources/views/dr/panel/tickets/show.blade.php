@@ -5,7 +5,9 @@
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/tickets/tickets.css') }}" rel="stylesheet" />
   <style>
-    .myPanelOption { display: none; }
+    .myPanelOption {
+      display: none;
+    }
 
     .container {
       background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%);
@@ -181,7 +183,9 @@
       margin-top: 0.4rem;
     }
 
-    .error-message { display: none; }
+    .error-message {
+      display: none;
+    }
 
     .btn-custom {
       background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
@@ -233,7 +237,7 @@
     </div>
 
     <div class="card-body">
-      <h5 class="text-dark font-weight-bold mb-4">اطلاعات تیکت</h5>
+      <h5 class="text-dark fw-bold mb-4">اطلاعات تیکت</h5>
 
       <div class="table-responsive">
         <table class="table table-bordered">
@@ -249,7 +253,8 @@
             <tr>
               <th>وضعیت</th>
               <td>
-                <span class="badge 
+                <span
+                  class="badge 
                   @if ($ticket->status == 'open') badge-success
                   @elseif ($ticket->status == 'pending') badge-warning
                   @elseif ($ticket->status == 'closed') badge-danger
@@ -277,7 +282,7 @@
         </table>
       </div>
 
-      <h5 class="mt-5 mb-3 text-dark font-weight-bold">پاسخ‌ها</h5>
+      <h5 class="mt-5 mb-3 text-dark fw-bold">پاسخ‌ها</h5>
       <div class="response-list">
         @forelse ($ticket->responses as $response)
           <div class="response-card {{ $response->manager_id ? 'manager' : 'doctor' }} p-3 mb-3">

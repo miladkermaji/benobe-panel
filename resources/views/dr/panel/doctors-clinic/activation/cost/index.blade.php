@@ -10,7 +10,7 @@
 @endsection
 
 @section('backUrl')
-  {{ route('activation-doctor-clinic',$clinicId) }}
+  {{ route('activation-doctor-clinic', $clinicId) }}
 @endsection
 @section('content')
   <div class="d-flex w-100 justify-content-center align-items-center flex-column">
@@ -61,7 +61,7 @@
               در مطب
               شوند.
             </div>
-            <p class="text-center font-weight-bold">
+            <p class="text-center fw-bold">
               همکاران شما به‌صورت میانگین مبلغ {{ number_format($averageDeposit) }} تومان را در نظر گرفته‌اند.
             </p>
 
@@ -73,7 +73,7 @@
 
               <div class="mb-3 mt-4">
                 <select id="depositAmount" name="deposit_amount" class="form-control h-50" dir="rtl">
-                  <option value="" selected><span class="font-weight-bold">قیمت بیعانه</span></option>
+                  <option value="" selected><span class="fw-bold">قیمت بیعانه</span></option>
                   <option value="10000">۱۰,۰۰۰ تومان</option>
                   <option value="20000">۲۰,۰۰۰ تومان</option>
                   <option value="30000">۳۰,۰۰۰ تومان</option>
@@ -107,15 +107,15 @@
                   <div class="modal-content border-radius-6">
                     <div class="modal-body">
                       <ul class="list-unstyled">
-                        <li class="mt-3 font-size-14 font-weight-bold">• بیمار در صورتی موفق به اخذ نوبت می‌شود که
+                        <li class="mt-3 font-size-14 fw-bold">• بیمار در صورتی موفق به اخذ نوبت می‌شود که
                           بیعانه را پرداخت
                           نماید.
                         </li>
-                        <li class="mt-3 font-size-14 font-weight-bold">• بیماری که در لیست بیماران مشاهده می‌کنید،
+                        <li class="mt-3 font-size-14 fw-bold">• بیماری که در لیست بیماران مشاهده می‌کنید،
                           تمامی پرداخت
                           بیعانه را
                           انجام داده‌است.</li>
-                        <li class="mt-3 font-size-14 font-weight-bold">• در صورتی که بیمار نوبت خود را تا ۲۴ ساعت پیش
+                        <li class="mt-3 font-size-14 fw-bold">• در صورتی که بیمار نوبت خود را تا ۲۴ ساعت پیش
                           از ساعت نوبت
                           لغو
                           نماید، وجه پرداختی بیمار استرداد می‌گردد.</li>

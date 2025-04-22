@@ -22,7 +22,7 @@
   <div class="container-fluid bg-white p-2">
     <div class="user-panel-content">
       <div class="">
-        <div class="card-header font-weight-bold"><span>ارتقاء حساب کاربری</span></div>
+        <div class="card-header fw-bold"><span>ارتقاء حساب کاربری</span></div>
         <div class="card-body">
           <div class="alert bg-light-blue">
             <strong><i class="mdi mdi-information"></i> ارتقاء حساب کاربری!</strong>

@@ -14,7 +14,7 @@
   <div class="appointments-content-wrapper">
     <div class="top-appointment d-flex justify-content-start p-4 align-items-center">
       <div>
-        <span class="text-dark font-weight-bold">نوبت های من</span>
+        <span class="text-dark fw-bold">نوبت های من</span>
       </div>
 
     </div>
@@ -31,7 +31,7 @@
                     src="{{ asset('dr-assets/panel/img/pro.jpg') }}">
                 </div>
                 <div class="mx-2">
-                  <h6 class="d-block font-weight-bold"> {{ $appointment->doctor->first_name }}
+                  <h6 class="d-block fw-bold"> {{ $appointment->doctor->first_name }}
                     {{ $appointment->doctor->last_name }}</h6>
                   <span class="font-size-13"> {{ $appointment->doctor->specialty_name }}</span>
                 </div>
@@ -81,28 +81,27 @@
           <div class="bg-light w-100 border-radius-6">
             <div class="d-flex flex-column w-100 bg-light p-3 px-4  cursor-pointer">
               <div class="d-flex align-items-center justify-content-between"><span
-                  class="font-size-13 mt-2 font-weight-bold">تاریخ
+                  class="font-size-13 mt-2 fw-bold">تاریخ
                   نوبت:</span><span
-                  class="text-sm font-weight-bold font-size-13 mt-2">{{ \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}</span>
+                  class="text-sm fw-bold font-size-13 mt-2">{{ \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}</span>
               </div>
               <div class="d-flex align-items-center justify-content-between"><span
-                  class="font-size-13 mt-2 font-weight-bold">زمان
+                  class="font-size-13 mt-2 fw-bold">زمان
                   نوبت:</span><span
-                  class="text-sm font-weight-bold font-size-13 mt-2">{{ \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($appointment->appointment_time))->format('H:i') }}</span>
+                  class="text-sm fw-bold font-size-13 mt-2">{{ \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($appointment->appointment_time))->format('H:i') }}</span>
               </div>
               <div class="d-flex align-items-center justify-content-between"><span
-                  class="font-size-13 mt-2 font-weight-bold">مراجعه
-                  کننده:</span><span class="text-sm font-weight-bold font-size-13 mt-2">
+                  class="font-size-13 mt-2 fw-bold">مراجعه
+                  کننده:</span><span class="text-sm fw-bold font-size-13 mt-2">
                   {{ $appointment->patient->first_name }}
                   {{ $appointment->patient->last_name }}</span></div>
-              <div class="d-flex align-items-center justify-content-between"><span
-                  class="font-size-13 mt-2 font-weight-bold">کد
+              <div class="d-flex align-items-center justify-content-between"><span class="font-size-13 mt-2 fw-bold">کد
                   پیگیری:</span><span
-                  class="text-sm font-weight-bold font-size-13 mt-2">{{ $appointment->tracking_code }}</span>
+                  class="text-sm fw-bold font-size-13 mt-2">{{ $appointment->tracking_code }}</span>
               </div>
               <div class="d-flex align-items-center justify-content-between"><span
-                  class="font-size-13 mt-2 font-weight-bold">میانگین
-                  زمان انتظار در مطب:</span><span class="text-sm font-weight-bold font-size-13 mt-2">30 دقیقه</span>
+                  class="font-size-13 mt-2 fw-bold">میانگین
+                  زمان انتظار در مطب:</span><span class="text-sm fw-bold font-size-13 mt-2">30 دقیقه</span>
               </div>
             </div>
           </div>
@@ -123,7 +122,7 @@
             <span class="text-sm">هنوز به این پزشک امتیازی نداده‌اید.</span>
             <a href="https://emr-benobe.ir/profile/doctor/{{ $appointment->doctor->slug }}" target="_blank"
               rel="noreferrer" class="d-flex align-items-center text-info">
-              <span class="text-sm font-weight-bold ml-2 text-info mx-2">ثبت نظر</span>
+              <span class="text-sm fw-bold ml-2 text-info mx-2">ثبت نظر</span>
               <img class="btn-show-details" src="{{ asset('dr-assets/icons/caret-left.svg') }}" alt="">
             </a>
           </div>
@@ -143,7 +142,7 @@
   @else
     <div class="container mt-2">
       <div class="alert alert-info w-100 text-center">
-        <p class="font-weight-bold">نوبتی یافت نشد . </p>
+        <p class="fw-bold">نوبتی یافت نشد . </p>
       </div>
 
     </div>

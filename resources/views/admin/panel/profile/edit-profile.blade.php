@@ -18,7 +18,7 @@
 <div class="main-content mb-5">
   @if (!$doctor->profile_completed && count($incompleteSections) > 0)
     <div class="alert alert-warning text-center">
-      <span class="font-weight-bold">
+      <span class="fw-bold">
         پروفایل شما کامل نیست. لطفا بخش‌های زیر را تکمیل کنید:
         <ul class="w-100 d-flex gap-4">
           @foreach ($doctor->getIncompleteProfileSections() as $section)
@@ -36,7 +36,7 @@
             <img src="{{ asset('dr-assets/panel/img/pro.jpg') }}" class="avatar___img-main">
           </div>
           <div class="mx-2 mt-3">
-            <span class="d-block font-weight-bold font-size-15 profile-header-name">
+            <span class="d-block fw-bold font-size-15 profile-header-name">
               {{ Auth::guard('doctor')->user()->first_name . ' ' . Auth::guard('doctor')->user()->last_name }}</span>
             <span class="badge badge-light p-2 border-radius-8 mt-3 mx-3 font-size-13 cursor-pointer">
               {{ $specialtyName }}
@@ -87,7 +87,7 @@
               <input type="text" class="my-form-control w-100 border-radius-6 mt-3"
                 value="{{ Auth::guard('doctor')->user()->first_name }}" name="first_name" readonly>
               @error('first_name')
-                <span class="text-danger font-weight-bold mt-2">{{ $message }}</span>
+                <span class="text-danger fw-bold mt-2">{{ $message }}</span>
               @enderror
             </div>
             <div class="mt-2">
@@ -123,7 +123,7 @@
               </button>
             </div>
             <div class="mt-3">
-              <label for="name" class="font-weight-bold font-size-13"> بیوگرافی و توضیحات</label>
+              <label for="name" class="fw-bold font-size-13"> بیوگرافی و توضیحات</label>
               <textarea class="ckeditor form-control" name="description" class="form-control" id="description">
             {{ trim(Auth::guard('doctor')->user()->bio ?? '') }}
         </textarea>
@@ -163,7 +163,7 @@
               </div>
             </div>
             <div id="otpInputStep" style="display:none;">
-              <label class="label-top font-weight-bold">کد تایید 4 رقمی را وارد کنید</label>
+              <label class="label-top fw-bold">کد تایید 4 رقمی را وارد کنید</label>
               <div class="d-flex justify-content-center gap-10 mt-2" dir="ltr">
                 <input type="text" maxlength="1" class="form-control otp-input text-center"
                   style="width:70px;height:60px">
@@ -255,7 +255,7 @@
                   class="form-control h-50 w-100 border-radius-6 mt-3  ">
               </div>
               <div id="additionalInputs">
-                <h6 class="font-weight-bold mt-3">تخصص های اضافی</h6>
+                <h6 class="fw-bold mt-3">تخصص های اضافی</h6>
                 <div class="alert alert-warning mt-2">
                   تخصص های اضافه شده شما قابل ویرایش نیستند اگه قصد تغییر یا ویرایش تخصص را دارید ابتدا آن را پاک کنید و
                   مجدد
@@ -430,7 +430,7 @@
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="alert alert-warning mt-2 text-center">
-            <span class="text-sm font-weight-bold d-block font-size-15">لطفا شماره و نام کاربری پیام رسان ایتا یا شماره
+            <span class="text-sm fw-bold d-block font-size-15">لطفا شماره و نام کاربری پیام رسان ایتا یا شماره
               واتساپ خود را وارد.</span>
             <span class="font-size-15 mt-1">شماره موبایل این پیام رسان ها در دسترس بیمار قرار میگیرد.</span>
           </div>
@@ -438,7 +438,7 @@
             @csrf
             @method('PUT')
             <div>
-              <h6 class="text-left font-weight-bold d-block font-size-13">پیام رسان های داخلی</h6>
+              <h6 class="text-left fw-bold d-block font-size-13">پیام رسان های داخلی</h6>
             </div>
             <div class="d-flex align-items-center justify-content-start gap-20">
               <div
@@ -461,7 +461,7 @@
               </div>
             </div>
             <div class="mt-2">
-              <h6 class="text-left font-weight-bold d-block font-size-13">پیام رسان های خارجی</h6>
+              <h6 class="text-left fw-bold d-block font-size-13">پیام رسان های خارجی</h6>
             </div>
             <div class="d-flex align-items-center justify-content-start gap-20 mt-2">
               <div
@@ -480,12 +480,12 @@
               </div>
             </div>
             <div class="mt-2">
-              <h6 class="text-left font-weight-bold d-block font-size-13"> تماس امن</h6>
+              <h6 class="text-left fw-bold d-block font-size-13"> تماس امن</h6>
             </div>
             <div
               class="d-flex gap-4 justify-content-between align-items-center p-3 border border-solid rounded-lg border-slate-200 mt-2">
               <div>
-                <span class="text-responsive font-size-13 font-weight-bold">تماس امن به عنوان راه ارتباط جانبی در کنار
+                <span class="text-responsive font-size-13 fw-bold">تماس امن به عنوان راه ارتباط جانبی در کنار
                   هر یک از
                   پیام‌رسان‌ها قرار می‌گیرد.</span>
                 <svg class="help-svg" width="16" height="17" viewBox="0 0 16 17" fill="none"

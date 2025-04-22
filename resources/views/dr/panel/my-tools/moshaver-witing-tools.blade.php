@@ -64,7 +64,7 @@
       let persianDate = moment(currentDate, 'YYYY-MM-DD').locale('fa').format('jYYYY/jMM/jDD');
 
 
-      var selectedText = $(this).find('.font-weight-bold.d-block.fs-15').text().trim();
+      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
       var selectedId = $(this).attr('data-id');
 
       $('.option-card').removeClass('card-active');
@@ -98,43 +98,43 @@
   function getPrescriptionStatus(status) {
     switch (status) {
       case 'scheduled':
-        return '<span class="font-weight-bold text-warning">در انتظار</span>';
+        return '<span class="fw-bold text-warning">در انتظار</span>';
       case 'cancelled':
-        return '<span class="font-weight-bold text-danger">لغو شده</span>';
+        return '<span class="fw-bold text-danger">لغو شده</span>';
       case 'attended':
-        return '<span class="font-weight-bold text-primary">مشاوره شده</span>';
+        return '<span class="fw-bold text-primary">مشاوره شده</span>';
       case 'missed':
-        return '<span class="font-weight-bold text-muted">مشاوره نشده</span>';
+        return '<span class="fw-bold text-muted">مشاوره نشده</span>';
       default:
-        return '<span class="font-weight-bold text-dark">نامشخص</span>';
+        return '<span class="fw-bold text-dark">نامشخص</span>';
     }
   }
 
   function getAppointmentType(type) {
     switch (type) {
       case 'in_person':
-        return '<span class="font-weight-bold text-warning">حضوری </span>';
+        return '<span class="fw-bold text-warning">حضوری </span>';
       case 'phone':
-        return '<span class="font-weight-bold text-success"> تلفنی</span>';
+        return '<span class="fw-bold text-success"> تلفنی</span>';
       case 'text':
-        return '<span class="font-weight-bold text-primary">متنی </span>';
+        return '<span class="fw-bold text-primary">متنی </span>';
       case 'video':
-        return '<span class="font-weight-bold text-info"> ویدیویی</span>';
+        return '<span class="fw-bold text-info"> ویدیویی</span>';
       default:
-        return '<span class="font-weight-bold text-dark">نامشخص</span>';
+        return '<span class="fw-bold text-dark">نامشخص</span>';
     }
   }
 
   function getPaymentStatus(status) {
     switch (status) {
       case 'pending':
-        return '<span class="font-weight-bold text-warning">در حال پرداخت</span>';
+        return '<span class="fw-bold text-warning">در حال پرداخت</span>';
       case 'paid':
-        return '<span class="font-weight-bold text-success">پرداخت شده</span>';
+        return '<span class="fw-bold text-success">پرداخت شده</span>';
       case 'unpaid':
-        return '<span class="font-weight-bold text-danger">پرداخت نشده</span>';
+        return '<span class="fw-bold text-danger">پرداخت نشده</span>';
       default:
-        return '<span class="font-weight-bold text-dark">نامشخص</span>';
+        return '<span class="fw-bold text-dark">نامشخص</span>';
     }
   }
   let currentDate = moment().format('YYYY-MM-DD');
@@ -1172,7 +1172,7 @@
         if (response.status && response.work_hours.length > 0) {
           response.work_hours.forEach((slot, index) => {
             $("#workHoursContainer").append(`
-                        <h6 class="font-weight-bold">برنامه کاری</h6>
+                        <h6 class="fw-bold">برنامه کاری</h6>
                         <div class="p-3 border mt-2">
                           <input type="hidden" id="selectedDate" value="${selectedDate}">
 
@@ -1197,7 +1197,7 @@
           $("#updateWorkHours").show();
         } else {
           $("#workHoursContainer").append(
-            `<p class="text-center text-danger font-weight-bold">هیچ ساعات کاری برای این روز تعریف نشده است.</p>`
+            `<p class="text-center text-danger fw-bold">هیچ ساعات کاری برای این روز تعریف نشده است.</p>`
           );
           $("#updateWorkHours").hide();
         }
@@ -1906,7 +1906,7 @@
                 Swal.fire('موفقیت', response.message, 'success');
                 selected.forEach(app => {
                   app.row.find('td:nth-child(5)').html(
-                    '<span class="font-weight-bold text-danger">لغو شده</span>');
+                    '<span class="fw-bold text-danger">لغو شده</span>');
                   app.row.find('.row-checkbox').prop('checked', false); // تیک رو بردار
                 });
               } else {
@@ -2083,7 +2083,7 @@
 
             // به‌روزرسانی وضعیت در جدول
             row.find('td:nth-child(5)').html(
-              '<span class="font-weight-bold text-primary">مشاوره شده</span>');
+              '<span class="fw-bold text-primary">مشاوره شده</span>');
 
             // غیرفعال کردن دکمه "پایان مشاوره"
             endVisitButton.prop('disabled', true).addClass('disabled');

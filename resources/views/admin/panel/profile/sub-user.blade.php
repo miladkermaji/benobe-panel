@@ -78,7 +78,7 @@
     </div>
 
     <div class="p-3">
-      <h4 class="text-dark font-weight-bold">لیست کاربران زیرمجموعه</h4>
+      <h4 class="text-dark fw-bold">لیست کاربران زیرمجموعه</h4>
     </div>
 
     <div class="subuser-cards mt-4">
@@ -86,10 +86,10 @@
         <div class="subuser-card p-3 w-100 d-flex justify-content-between align-items-end"
           data-id="{{ $subUser->id }}">
           <div>
-            <span class="d-block font-weight-bold text-dark">
+            <span class="d-block fw-bold text-dark">
               {{ $subUser->user->first_name }} {{ $subUser->user->last_name . '--' . $subUser->user->national_code }}
             </span>
-            <span class="font-size-13 font-weight-bold">
+            <span class="font-size-13 fw-bold">
               شماره موبایل: <span>{{ $subUser->user->mobile }}</span>
               کد ملی: <span>{{ $subUser->user->national_code }}</span>
             </span>
@@ -167,9 +167,9 @@
       $('.sub-user-cards').append(`
             <div class="subuser-card p-3 w-100 d-flex justify-content-between align-items-end" data-id="${subUser.id}">
                 <div>
-                    <span class="d-block font-weight-bold text-dark">${subUser.user.first_name} ${subUser.user.last_name}--${subUser.user.national_code}</span>
-                    <span class="font-size-13 font-weight-bold">شماره موبایل: <span>${subUser.user.mobile}</span></span>
-                    <span class="font-size-13 font-weight-bold"> کد ملی: <span>${subUser.user.national_code}</span></span>
+                    <span class="d-block fw-bold text-dark">${subUser.user.first_name} ${subUser.user.last_name}--${subUser.user.national_code}</span>
+                    <span class="font-size-13 fw-bold">شماره موبایل: <span>${subUser.user.mobile}</span></span>
+                    <span class="font-size-13 fw-bold"> کد ملی: <span>${subUser.user.national_code}</span></span>
                 </div>
                 <div>
                     <div class="d-flex gap-4">

@@ -1,18 +1,16 @@
 @extends('dr.panel.doctors-clinic.layouts.master')
 @section('styles')
   <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/activation/index.css') }}">
-    <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clinic/duration/duration.css') }}">
+  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clinic/duration/duration.css') }}">
 @endsection
 
 
 @section('headerTitle')
-  
-مدت زمان نوبت ها
-
+  مدت زمان نوبت ها
 @endsection
 
 @section('backUrl')
- {{ route('doctors.clinic.cost', $clinicId) }}
+  {{ route('doctors.clinic.cost', $clinicId) }}
 @endsection
 @section('content')
   <div class="d-flex w-100 justify-content-center align-items-center flex-column">
@@ -59,15 +57,15 @@
       <div class="row justify-content-center">
         <div class="">
           <div class="card p-4">
-            <h5 class="text-start font-weight-bold">مدت زمان هر نوبت بیمار در مطب شما چقدر است؟</h5>
+            <h5 class="text-start fw-bold">مدت زمان هر نوبت بیمار در مطب شما چقدر است؟</h5>
             <div class="d-flex flex-wrap mt-4 gap-10 justify-content-end my-768px-styles-day-and-times">
               <div class="" tabindex="0" role="button">
                 <span class="badge-time-styles-plus">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round"
                     class="plasmic-default__svg plasmic_all__FLoMj PlasmicDuration_svg__l9OeP__cvsVD lucide lucide-plus"
-                    viewBox="0 0 24 24" height="20px" width="20px" role="img" type="button"
-                    aria-haspopup="dialog" aria-expanded="false" aria-controls="radix-:r7:" data-state="closed">
+                    viewBox="0 0 24 24" height="20px" width="20px" role="img" type="button" aria-haspopup="dialog"
+                    aria-expanded="false" aria-controls="radix-:r7:" data-state="closed">
                     <path d="M5 12h14m-7-7v14"></path>
                   </svg>
                 </span>
@@ -157,12 +155,12 @@
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
           </button>
-          <span id="durationValue" class="mx-3 font-weight-bold">15</span>
+          <span id="durationValue" class="mx-3 fw-bold">15</span>
           <button type="button" class="btn btn-outline-secondary mx-2" id="increaseDuration">
-            <svg class="feather feather-plus" xmlns="http://www.w3.org/2000/svg" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              viewBox="0 0 24 24" height="20px" width="20px" role="img" type="button"
-              aria-haspopup="dialog" aria-expanded="false" aria-controls="radix-:r7:" data-state="closed">
+            <svg class="feather feather-plus" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" height="20px"
+              width="20px" role="img" type="button" aria-haspopup="dialog" aria-expanded="false"
+              aria-controls="radix-:r7:" data-state="closed">
               <path d="M5 12h14m-7-7v14"></path>
             </svg>
           </button>
@@ -177,7 +175,7 @@
 
 
 @section('scripts')
-    <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+  <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
   <script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -349,7 +347,7 @@
           });
 
           const data = await response.json();
-          
+
 
           if (data.success) {
             toastr.success(data.message);
