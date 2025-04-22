@@ -11,21 +11,31 @@
         <div>
           <div>
             <div>
-              <div>
-                <div class="input-group position-relative mb-3">
-                  <label class="label-top-input-special-takhasos">تعداد روز‌های باز تقویم</label>
-                  <input type="number" class="form-control text-center" name="calendar_days"
-                    placeholder="تعداد روز مورد نظر خود را وارد کنید" wire:model.live="calendarDays"
-                    style="height: 50px;">
-                  <span class="input-group-text" style="height: 50px;">روز</span>
+              <div class="row border border-radius-4 p-3 align-items-center">
+                <!-- تعداد روزهای باز تقویم -->
+                <div class="col-8">
+                  <div class="input-group position-relative p-1 rounded bg-white" style="min-width: 250px;">
+                    <label class="floating-label bg-white px-2"
+                      style="position: absolute; top: -10px; right: -4px; font-size: 0.85rem; color: #6c757d; z-index: 10; transition: all 0.2s ease;">
+                      تعداد روز‌های باز تقویم
+                    </label>
+                    <input type="number" class="form-control text-center" name="calendar_days"
+                      placeholder="تعداد روز مورد نظر خود را وارد کنید" wire:model.live="calendarDays"
+                      style="height: 50px; z-index: 1;">
+                    <span class="input-group-text" style="height: 50px; z-index: 1;">روز</span>
+                  </div>
                 </div>
-                <div class="mt-3">
-                  <x-my-check :isChecked="$holidayAvailability" id="posible-appointments-inholiday" day="باز بودن مطب در تعطیلات رسمی"
-                    model="holidayAvailability" />
+                <!-- باز بودن مطب در تعطیلات رسمی -->
+                <div class="col-4">
+                  <div class="p-1 rounded bg-white"
+                    style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
+                    <x-my-check :isChecked="$holidayAvailability" id="posible-appointments-inholiday" day="باز بودن مطب در تعطیلات رسمی"
+                      model="holidayAvailability" />
+                  </div>
                 </div>
               </div>
               <div class="mt-4">
-                <label class="text-dark font-weight-bold">روزهای کاری</label>
+                <label class="text-dark fw-bold">روزهای کاری</label>
                 <div
                   class="d-flex flex-wrap justify-content-start mt-3 gap-40 bg-light p-3 border-radius-4 day-contents align-items-center h-55"
                   id="day-contents-outside">
@@ -42,15 +52,14 @@
                         <div id="morning-{{ $englishDay }}-details" class="mt-4">
                           @if (!empty($slots[$englishDay]))
                             @foreach ($slots[$englishDay] as $index => $slot)
-                              <div
-                                class="mt-3 form-row d-flex justify-content-between w-100 pt-4 bg-active-slot border-radius-4"
+                              <div class="mt-3 form-row d-flex  w-100 pt-4 bg-active-slot border-radius-4"
                                 data-slot-id="{{ $slot['id'] ?? '' }}">
                                 <div class="d-flex justify-content-start align-items-center gap-4">
                                   <div class="form-group position-relative timepicker-ui">
                                     <label class="label-top-input-special-takhasos"
                                       for="morning-start-{{ $englishDay }}-{{ $index }}">از</label>
                                     <input type="text"
-                                      class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 start-time bg-white"
+                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
                                       id="morning-start-{{ $englishDay }}-{{ $index }}"
                                       wire:model.live="slots.{{ $englishDay }}.{{ $index }}.start_time" />
                                   </div>
@@ -58,7 +67,7 @@
                                     <label class="label-top-input-special-takhasos"
                                       for="morning-end-{{ $englishDay }}-{{ $index }}">تا</label>
                                     <input type="text"
-                                      class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 end-time bg-white"
+                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
                                       id="morning-end-{{ $englishDay }}-{{ $index }}"
                                       wire:model.live="slots.{{ $englishDay }}.{{ $index }}.end_time" />
                                   </div>
@@ -117,15 +126,14 @@
                               </div>
                             @endforeach
                           @else
-                            <div
-                              class="mt-3 form-row d-flex justify-content-between w-100 pt-4 bg-active-slot border-radius-4"
+                            <div class="mt-3 form-row d-flex  w-100 pt-4 bg-active-slot border-radius-4"
                               data-slot-id="{{ $slot['id'] ?? '' }}">
                               <div class="d-flex justify-content-start align-items-center gap-4">
                                 <div class="form-group position-relative timepicker-ui">
                                   <label class="label-top-input-special-takhasos"
                                     for="morning-start-{{ $englishDay }}-{{ $index }}">از</label>
                                   <input type="text"
-                                    class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 start-time bg-white"
+                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
                                     id="morning-start-{{ $englishDay }}-{{ $index }}"
                                     wire:model.live="slots.{{ $englishDay }}.{{ $index }}.start_time" />
                                 </div>
@@ -133,7 +141,7 @@
                                   <label class="label-top-input-special-takhasos"
                                     for="morning-end-{{ $englishDay }}-{{ $index }}">تا</label>
                                   <input type="text"
-                                    class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 end-time bg-white"
+                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
                                     id="morning-end-{{ $englishDay }}-{{ $index }}"
                                     wire:model.live="slots.{{ $englishDay }}.{{ $index }}.end_time" />
                                 </div>
@@ -270,7 +278,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content border-radius-6">
         <div class="modal-header border-radius-6">
-          <h6 class="modal-title font-weight-bold" id="emergencyModalLabel">انتخاب زمان‌های اورژانسی</h6>
+          <h6 class="modal-title fw-bold" id="emergencyModalLabel">انتخاب زمان‌های اورژانسی</h6>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
@@ -298,7 +306,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content border-radius-6">
         <div class="modal-header border-radius-6">
-          <h5 class="modal-title font-weight-bold" id="scheduleModalLabel">تنظیم زمان‌بندی</h5>
+          <h5 class="modal-title fw-bold" id="scheduleModalLabel">تنظیم زمان‌بندی</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
@@ -332,13 +340,13 @@
               <div class="form-group position-relative timepicker-ui">
                 <label class="label-top-input-special-takhasos">شروع</label>
                 <input type="text"
-                  class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 col-6"
+                  class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 col-6"
                   id="schedule-start" value="00:00">
               </div>
               <div class="form-group position-relative timepicker-ui">
                 <label class="label-top-input-special-takhasos">پایان</label>
                 <input type="text"
-                  class="form-control h-50 timepicker-ui-input text-center font-weight-bold font-size-13 col-6"
+                  class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 col-6"
                   id="schedule-end" value="23:59">
               </div>
             </div>
@@ -464,7 +472,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-radius-6">
         <div class="modal-header border-radius-6">
-          <h5 class="modal-title font-weight-bold" id="checkboxModalLabel">کپی برنامه کاری</h5>
+          <h5 class="modal-title fw-bold" id="checkboxModalLabel">کپی برنامه کاری</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
             <span aria-hidden="true">×</span>
           </button>
