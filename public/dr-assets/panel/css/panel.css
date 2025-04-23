@@ -1359,15 +1359,7 @@ img {
     vertical-align: middle;
 }
 
-/* چک‌باکس‌ها در جدول */
-.table td input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: #6b7280;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-}
+
 
 .table td input[type="checkbox"]:checked {
     accent-color: #6366f1; /* رنگ بنفش مدرن */

@@ -59,6 +59,8 @@
 }
 .selectDate_datepicker__xkZeS span {
     font-family: IRANSans !important;
+    font-size: 14px;
+    font-weight: bold;
 }
 select {
     font-family: IRANSans, sans-serif !important;

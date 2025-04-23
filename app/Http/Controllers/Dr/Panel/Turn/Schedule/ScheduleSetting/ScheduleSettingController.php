@@ -61,8 +61,8 @@ class ScheduleSettingController extends Controller
             'workSchedules'     => $workSchedules,
             'selectedClinicId'  => $selectedClinicId,
         ]); */
-        
-return view("dr.panel.turn.schedule.scheduleSetting.workhours");
+
+        return view("dr.panel.turn.schedule.scheduleSetting.workhours");
 
     }
 
@@ -949,6 +949,7 @@ return view("dr.panel.turn.schedule.scheduleSetting.workhours");
         try {
             $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
             $selectedClinicId = $request->input('selectedClinicId');
+          
 
             // دریافت تنظیمات تقویم
             $appointmentConfig = DoctorAppointmentConfig::where('doctor_id', $doctorId)
@@ -996,15 +997,37 @@ return view("dr.panel.turn.schedule.scheduleSetting.workhours");
                     'appointment_date' => $item->appointment_date,
                     'appointment_count' => $item->appointment_count,
                 ];
-            });
+            })->toArray();
+
+            // دریافت تنظیمات نوبت‌دهی
+            $appointmentSettings = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->where('is_working', true)
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->select('day', 'appointment_settings')
+                ->get()
+                ->map(function ($schedule) {
+                    return [
+                        'day' => $schedule->day,
+                        'settings' => $schedule->appointment_settings ? json_decode($schedule->appointment_settings, true) : [],
+                    ];
+                })
+                ->toArray();
 
             return response()->json([
                 'status' => true,
                 'data' => $data,
-                'working_days' => $workSchedules, // روزهای کاری
-                'calendar_days' => $calendarDays, // تعداد روزهای باز تقویم
+                'working_days' => $workSchedules,
+                'calendar_days' => $calendarDays,
+                'appointment_settings' => $appointmentSettings,
             ]);
         } catch (\Exception $e) {
+          
             return response()->json([
                 'status' => false,
                 'message' => 'خطا در دریافت داده‌ها',
@@ -1293,7 +1316,6 @@ return view("dr.panel.turn.schedule.scheduleSetting.workhours");
                 // فرمت ISO 8601
                 $oldDateGregorian = Carbon::parse($oldDateGregorian)->toDateString(); // فقط تاریخ رو نگه می‌داریم
             } else {
-                Log::error('Invalid old_date format', ['old_date' => $oldDateGregorian]);
                 return response()->json(['status' => false, 'message' => 'فرمت تاریخ قدیم نامعتبر است. از فرمت Y/m/d، Y-m-d یا ISO 8601 استفاده کنید.'], 400);
             }
 
@@ -1311,7 +1333,6 @@ return view("dr.panel.turn.schedule.scheduleSetting.workhours");
 
             // بررسی کلینیک
             if ($selectedClinicId !== 'default' && !Clinic::where('id', $selectedClinicId)->exists()) {
-                Log::error('Invalid clinic_id', ['clinic_id' => $selectedClinicId]);
                 return response()->json(['status' => false, 'message' => 'کلینیک نامعتبر است.'], 400);
             }
 
@@ -1327,11 +1348,7 @@ return view("dr.panel.turn.schedule.scheduleSetting.workhours");
             $appointments = $appointmentsQuery->get();
 
             if ($appointments->isEmpty()) {
-                Log::warning('No appointments found', [
-                    'doctor_id' => $doctorId,
-                    'old_date' => $oldDateGregorian,
-                    'clinic_id' => $selectedClinicId
-                ]);
+              
                 return response()->json(['status' => false, 'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.'], 404);
             }
 
@@ -1387,10 +1404,7 @@ return view("dr.panel.turn.schedule.scheduleSetting.workhours");
                 'total_recipients' => count($recipients),
             ]);
         } catch (\Exception $e) {
-            Log::error('Reschedule Appointment Error', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+           
             return response()->json([
                 'status' => false,
                 'message' => 'خطا در جابجایی نوبت‌ها: ' . $e->getMessage(),
@@ -1560,7 +1574,6 @@ return view("dr.panel.turn.schedule.scheduleSetting.workhours");
 
             return ! $appointmentQuery->exists();
         });
-        Log::info($nextAvailableDate);
         return response()->json([
             'status' => $nextAvailableDate ? true : false,
             'date'   => $nextAvailableDate ?? 'هیچ نوبت خالی یافت نشد.',

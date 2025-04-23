@@ -9,11 +9,9 @@
     box-shadow: 0 6px 30px rgba(0, 0, 0, 0.07);
     transition: box-shadow 0.3s ease;
 }
-
 .appointments-content-wrapper:hover {
     box-shadow: 0 8px 35px rgba(0, 0, 0, 0.09);
 }
-
 /* Top section styling */
 .top-appointment {
     background: linear-gradient(135deg, #f9fafb, #e0e7ff);
@@ -26,14 +24,12 @@
     flex-wrap: wrap;
     gap: 1.25rem;
 }
-
 .text-dark {
     color: #1e3a8a !important;
     font-size: 1.35rem;
     font-weight: 700;
     letter-spacing: -0.03em;
 }
-
 /* Calendar button */
 .selectDate_datepicker__xkZeS {
     background: #ffffff;
@@ -50,20 +46,17 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
-
 .selectDate_datepicker__xkZeS:hover {
     background: #e0e7ff;
     border-color: #3b82f6;
     transform: translateY(-3px);
 }
-
 .calendar-svg {
     width: 24px;
     height: 24px;
     margin-right: 0.75rem;
     fill: #1e40af;
 }
-
 /* Filter dropdown button */
 .btn-filter-appointment-toggle {
     background: #ffffff;
@@ -78,23 +71,19 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
-
 .btn-filter-appointment-toggle:hover {
     background: #e0e7ff;
     border-color: #3b82f6;
     transform: translateY(-3px);
 }
-
 .dropdown-icon {
     width: 1.1em;
     height: 1.1em;
     transition: transform 0.3s ease;
 }
-
 .btn-filter-appointment-toggle.active .dropdown-icon {
     transform: rotate(180deg);
 }
-
 /* Filter dropdown menu */
 .appointments-filter-drop-toggle {
     width: 360px;
@@ -111,17 +100,14 @@
     display: none;
     animation: slideDown 0.3s ease-out;
 }
-
 .appointments-filter-drop-toggle.show {
     display: block;
 }
-
 .appointments-filter-drop-toggle ul {
     margin: 0;
     padding: 0;
     list-style: none;
 }
-
 .appointments-filter-drop-toggle li {
     padding: 0.875rem 1.25rem;
     border-radius: 10px;
@@ -132,14 +118,12 @@
     margin: 0.25rem 0;
     transition: all 0.3s ease;
 }
-
 .appointments-filter-drop-toggle li:hover {
     background: #bfdbfe; /* رنگ پررنگ‌تر در هاور */
     color: #1e3a8a; /* متن تیره‌تر برای کنتراست */
     transform: translateX(5px);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
-
 /* Search input */
 #my-appointment-search {
     width: 30vw;
@@ -154,12 +138,10 @@
     transition: all 0.3s ease;
     position: relative;
 }
-
 #my-appointment-search:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
 }
-
 /* اضافه کردن آیکون جستجو */
 #my-appointment-search::before {
     content: "";
@@ -173,7 +155,6 @@
         no-repeat center;
     background-size: contain;
 }
-
 /* Appointments list cards */
 .my-appointments-lists-cards {
     display: grid;
@@ -181,7 +162,6 @@
     gap: 2rem;
     padding: 2rem;
 }
-
 .my-appointments-lists-card {
     background: linear-gradient(145deg, #ffffff, #f9fafb);
     border-radius: 14px;
@@ -190,12 +170,10 @@
     border: 1px solid #f1f5f9;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .my-appointments-lists-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
-
 .my-appointments-lists-card button {
     background: #10b981;
     border: none;
@@ -205,48 +183,31 @@
     font-weight: 600;
     transition: all 0.3s ease;
 }
-
 .my-appointments-lists-card button:hover {
     background: #059669;
     transform: translateY(-2px);
 }
-
 .my-appointments-lists-card .btn-outline-info {
     background: transparent;
     color: #3b82f6;
     border: 2px solid #3b82f6;
     padding: 0.75rem 1.5rem;
 }
-
 .my-appointments-lists-card .btn-outline-info:hover {
     background: #3b82f6;
     color: #ffffff;
     transform: translateY(-2px);
 }
-
 /* Modal styling */
 .modal-content {
-    border-radius: 14px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     border: none;
 }
-
-.modal-header {
-    background: #f9fafb;
-    border-bottom: 2px solid #dbeafe;
-    padding: 1.25rem 1.75rem;
-}
-
 .modal-title {
     font-size: 1.3rem;
     font-weight: 700;
     color: #1e3a8a;
 }
-
-.modal-body {
-    padding: 2rem;
-}
-
 .my-form-control-light {
     width: 100%;
     background: #ffffff;
@@ -257,15 +218,11 @@
     color: #1f2937;
     transition: all 0.3s ease;
 }
-
 .my-form-control-light:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
 }
-
 /* Buttons in modal */
-
-
 .btn-outline-danger {
     border: 2px solid #ef4444;
     color: #ef4444;
@@ -275,13 +232,11 @@
     font-weight: 600;
     transition: all 0.3s ease;
 }
-
 .btn-outline-danger:hover {
     background: #ef4444;
     color: #ffffff;
     transform: translateY(-3px);
 }
-
 /* User info modal */
 .top-user-modal-info {
     width: 50%;
@@ -291,49 +246,40 @@
     align-items: center;
     border-radius: 12px;
 }
-
 .bg-light-success {
     background: #ecfdf5 !important;
     border-color: #d1fae5 !important;
 }
-
 .time-card {
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
 }
-
 .date-card {
     border-top-left-radius: 12px;
     border-bottom-left-radius: 12px;
 }
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .appointments-content-wrapper {
         padding: 1.25rem;
         border-radius: 12px;
     }
-
     .top-appointment {
         flex-direction: column;
         gap: 1.25rem;
         padding: 1rem 1.25rem;
     }
-
     .text-dark {
         font-size: 1.2rem;
     }
-
     .selectDate_datepicker__xkZeS {
         width: 100%;
         height: 46px;
     }
-
     .btn-filter-appointment-toggle {
         width: 100%;
         padding: 0.75rem 1.25rem;
     }
-
     .appointments-filter-drop-toggle {
         width: 90%; /* عرض نسبی برای ریسپانسیو بودن */
         max-width: 360px; /* حداکثر عرض */
@@ -342,50 +288,40 @@
         transform: translateX(-50%); /* دقیقاً وسط */
         margin-top: 15px; /* فاصله بیشتر */
     }
-
     #my-appointment-search {
         max-width: 100%;
         padding: 0.875rem 2rem;
     }
-
     .my-appointments-lists-cards {
         grid-template-columns: 1fr;
         padding: 1.25rem;
     }
 }
-
 @media (max-width: 425px) {
     .text-425-none {
         font-size: 1.1rem;
         font-weight: 700;
     }
-
     .text-btn-425 {
         font-size: 0.95rem;
     }
-
     .top-appointment {
         padding: 0.875rem;
     }
-
     .selectDate_datepicker__xkZeS {
         height: 44px;
     }
-
     .btn-filter-appointment-toggle {
         padding: 0.625rem 1rem;
     }
-
     .appointments-filter-drop-toggle {
         width: 85%;
         margin-top: 10px;
     }
-
     #my-appointment-search {
         padding: 0.75rem 1.5rem;
     }
 }
-
 /* Animation for dropdown */
 @keyframes slideDown {
     0% {
