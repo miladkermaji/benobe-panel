@@ -1,3 +1,4 @@
+//resources\views\dr\panel\turn\schedule\option\appointments.blade.php
 <script>
   /* drop select option */
   $(document).ready(function() {
