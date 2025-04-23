@@ -14,9 +14,9 @@
         }
       });
     } else {
-      localStorage.setItem('selectedClinic', 'ویزیت آنلاین به نوبه');
+      localStorage.setItem('selectedClinic', 'مشاوره آنلاین به نوبه');
       localStorage.setItem('selectedClinicId', 'default');
-      $('.dropdown-label').text('ویزیت آنلاین به نوبه');
+      $('.dropdown-label').text('مشاوره آنلاین به نوبه');
     }
 
     // بررسی کلینیک‌های غیرفعال برای نمایش هشدار

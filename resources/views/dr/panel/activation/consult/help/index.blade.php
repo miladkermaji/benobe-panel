@@ -20,7 +20,7 @@
     <div class="">
       <div
         class="MuiContainer-root MuiContainer-maxWidthSm flex flex-col h-full pt-4 space-y-5 bg-white rounded-md md:h-auto md:p-5 md:mt-8 md:shadow-2xl md:shadow-slate-300 muirtl-bbjvwn page-enter-done">
-        <span class="d-block w-100  fw-bold text-center">ویدیو آموزشی پزشک ویزیت آنلاین به نوبه</span>
+        <span class="d-block w-100  fw-bold text-center">ویدیو آموزشی پزشک مشاوره آنلاین به نوبه</span>
         <div class="overflow-scroll mt-3">
           <video src="https://benobe.ir/uploads/home_video/1666005351_benobe.mp4" class="border-radius-6 w-100"
             controls></video>

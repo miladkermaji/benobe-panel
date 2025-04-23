@@ -26,9 +26,9 @@
             <div class="modal-dialog modal-dialog-centered " role="document">
               <div class="modal-content border-radius-6">
                 <div class="my-modal-header">
-                  <div>
+                  <div class="text-end">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
+                      <span style="font-size: 28px !important; margin: 4px" aria-hidden="true">&times;</span>
                     </button>
                   </div>
                 </div>

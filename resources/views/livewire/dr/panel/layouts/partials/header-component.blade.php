@@ -37,7 +37,7 @@
                   class="dropdown-trigger btn  h-40 w-300 bg-light-blue text-left d-flex justify-content-between align-items-center"
                   aria-haspopup="true" aria-expanded="false">
                   <div class="">
-                    <span class="dropdown-label">ویزیت آنلاین به نوبه</span>
+                    <span class="dropdown-label">مشاوره آنلاین به نوبه</span>
                   </div>
                   <div>
                     <svg width="7" height="11" viewBox="0 0 7 11" fill="none"
@@ -69,9 +69,8 @@
                             fill="#3F3F79"></path>
                         </svg>
                         <div class="d-flex flex-column mx-3">
-                          <span class="fw-bold d-block fs-15">ویزیت آنلاین به
-                            نوبه</span>
-                          <span class="fw-bold fs-13">مرکز ویزیت آنلاین به نوبه</span>
+                          <span class="fw-bold d-block fs-15">مشاوره آنلاین به نوبه</span>
+                          <span class="fw-bold fs-13">مرکز مشاوره آنلاین به نوبه</span>
                         </div>
                       </div>
                     </div>

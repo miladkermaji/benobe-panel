@@ -129,7 +129,7 @@
         }
       });
     } else {
-      localStorage.setItem('selectedClinic', 'ویزیت آنلاین به نوبه');
+      localStorage.setItem('selectedClinic', 'مشاوره آنلاین به نوبه');
       localStorage.setItem('selectedClinicId', 'default');
     }
 

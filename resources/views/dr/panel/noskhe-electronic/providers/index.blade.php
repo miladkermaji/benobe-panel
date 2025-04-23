@@ -156,7 +156,7 @@
           <div class="d-flex align-items-center justify-content-between">
             <div>
               <div class="d-flex align-items-center gap-2">
-                <span class="fw-bold">ویزیت آنلاین به نوبه</span>
+                <span class="fw-bold">مشاوره آنلاین به نوبه</span>
                 <a href="#" data-toggle="modal" data-target="#exampleModalCenterEdit">
                   <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
@@ -166,7 +166,7 @@
                   </svg>
                 </a>
               </div>
-              <span class="d-block mt-1 text-muted font-size-13">مرکز ویزیت آنلاین به نوبه</span>
+              <span class="d-block mt-1 text-muted font-size-13">مرکز مشاوره آنلاین به نوبه</span>
             </div>
             <div>
               <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">احراز هویت نشده</span>
