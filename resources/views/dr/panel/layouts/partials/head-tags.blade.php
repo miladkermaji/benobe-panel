@@ -5,8 +5,6 @@
 @vite(['resources/js/app.js', 'resources/css/app.css'])
 
 <link href="{{ asset('dr-assets/panel/css/bootstrap.min.css') }}" rel="stylesheet">
-<script src="{{ asset('dr-assets/panel/js/home/bootstrap/bootstrap.popper.min.js') }}"></script>
-
 <script src="{{ asset('dr-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
 
 {{-- persian calander --}}

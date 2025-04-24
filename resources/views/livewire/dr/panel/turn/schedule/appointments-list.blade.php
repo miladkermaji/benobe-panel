@@ -3,7 +3,6 @@
     use Morilog\Jalali\Jalalian;
     use Carbon\Carbon;
   @endphp
-
   <div class="d-flex justify-content-center top-s-wrapper flex-wrap">
     <div class="calendar-and-add-sick-section p-3">
       <div class="d-flex justify-content-between gap-10 align-items-center c-a-wrapper">
@@ -11,7 +10,7 @@
           <div class="turning_selectDate__MLRSb" wire:ignore>
             <button
               class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50 bg-light-blue d-flex justify-content-center align-items-center"
-              data-toggle="modal" data-target="#miniCalendarModal">
+              data-bs-toggle="modal" data-bs-target="#miniCalendarModal">
               <div class="d-flex align-items-center">
                 <span class="mx-1">{{ Jalalian::fromCarbon(Carbon::parse($selectedDate))->format('Y/m/d') }}</span>
                 <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
@@ -23,9 +22,7 @@
                 <div class="modal-content border-radius-11">
                   <div class="my-modal-header">
                     <div class="text-end">
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span style="font-size: 28px !important; margin: 4px" aria-hidden="true">×</span>
-                      </button>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                   </div>
                   <div class="modal-body">
@@ -45,7 +42,8 @@
           </div>
         </div>
         <div class="btn-425-left">
-          <button class="btn my-btn-primary h-50 fs-13" data-toggle="modal" data-target="#exampleModalCenterAddSick">ثبت
+          <button class="btn my-btn-primary h-50 fs-13" data-bs-toggle="modal"
+            data-bs-target="#exampleModalCenterAddSick">ثبت
             نوبت دستی</button>
           <div class="modal fade" id="exampleModalCenterAddSick" tabindex="-1" role="dialog"
             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -53,17 +51,15 @@
               <div class="modal-content border-radius-11">
                 <div class="modal-header">
                   <h5 class="modal-title" id="exampleModalLongTitle"> ثبت نوبت دستی</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                  </button>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                   <div>
                     <form action="" method="post">
                       <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع">
                       <div class="mt-2">
-                        <a class="text-decoration-none text-primary font-bold" href="#" data-toggle="modal"
-                          data-target="#exampleModalCenterPaziresh">پذیرش از مسیر ارجاع</a>
+                        <a class="text-decoration-none text-primary font-bold" href="#" data-bs-toggle="modal"
+                          data-bs-target="#exampleModalCenterPaziresh">پذیرش از مسیر ارجاع</a>
                       </div>
                       <div class="d-flex mt-2 gap-20">
                         <button class="btn my-btn-primary w-50 h-50">تجویز نسخه</button>
@@ -80,9 +76,7 @@
                 <div class="modal-content border-radius-11">
                   <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLongTitle">ارجاع</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">×</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                     <div>
@@ -102,21 +96,17 @@
         </div>
       </div>
     </div>
-
-
     <div wire:ignore class="w-100">
       <x-jalali-calendar-row />
-
     </div>
-
     <div class="sicks-content h-100 w-100 position-relative border">
       <div>
         <div class="table-responsive position-relative top-table w-100">
-          <table class="table w-100 text-sm text-center">
-            <thead>
+          <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
+            <thead class="bg-light">
               <tr>
                 <th>
-                  <input class="form-check-input" type="checkbox" id="select-all-row" disabled>
+                  <input class="form-check-input" type="checkbox" id="select-all-row">
                 </th>
                 <th scope="col" class="px-6 py-3 fw-bolder">نام بیمار</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">شماره‌موبایل</th>
@@ -131,63 +121,92 @@
               </tr>
             </thead>
             <tbody>
-              @foreach ($appointments as $appointment)
+              @if (count($appointments) > 0)
+                @foreach ($appointments as $appointment)
+                  <tr>
+                    <td>
+                      <input type="checkbox" class="appointment-checkbox form-check-input"
+                        value="{{ $appointment->id }}" data-status="{{ $appointment->status }}"
+                        data-mobile="{{ $appointment->patient->mobile ?? '' }}">
+                    </td>
+                    <td class="fw-bold">
+                      {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
+                    </td>
+                    <td>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</td>
+                    <td>{{ $appointment->patient ? $appointment->patient->national_code : '-' }}</td>
+                    <td>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}</td>
+                    <td>{{ $appointment->appointment_time->format('H:i') ?? '-' }}</td>
+                    <td>
+                      @php
+                        $statusLabels = [
+                            'scheduled' => ['label' => 'در انتظار', 'class' => 'text-primary'],
+                            'attended' => ['label' => 'ویزیت شده', 'class' => 'text-success'],
+                            'cancelled' => ['label' => 'لغو شده', 'class' => 'text-danger'],
+                            'missed' => ['label' => 'عدم حضور', 'class' => 'text-warning'],
+                            'pending_review' => ['label' => 'در انتظار بررسی', 'class' => 'text-secondary'],
+                        ];
+                        $status = $appointment->status ?? 'scheduled';
+                        $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
+                      @endphp
+                      <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
+                    </td>
+                    <td>
+                      @php
+                        $paymentStatusLabels = [
+                            'paid' => ['label' => 'پرداخت شده', 'class' => 'text-success'],
+                            'unpaid' => ['label' => 'پرداخت نشده', 'class' => 'text-danger'],
+                            'pending' => ['label' => 'در انتظار پرداخت', 'class' => 'text-primary'],
+                        ];
+                        $paymentStatus = $appointment->payment_status;
+                        $paymentStatusInfo = $paymentStatusLabels[$paymentStatus] ?? [
+                            'label' => 'نامشخص',
+                            'class' => 'text-muted',
+                        ];
+                      @endphp
+                      <span
+                        class="{{ $paymentStatusInfo['class'] }} fw-bold">{{ $paymentStatusInfo['label'] }}</span>
+                    </td>
+                    <td>{{ $appointment->insurance ? $appointment->insurance->name : '-' }}</td>
+                    <td>
+                      @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
+                        <button class="btn btn-sm btn-primary shadow-sm end-visit-btn" data-bs-toggle="modal"
+                          data-bs-target="#endVisitModalCenter"
+                          wire:click="$set('endVisitAppointmentId', {{ $appointment->id }})">پایان ویزیت</button>
+                      @else
+                        -
+                      @endif
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-center gap-2">
+                        <button class="btn btn-light rounded-circle shadow-sm reschedule-btn" data-tooltip="true"
+                          data-placement="top" data-original-title="جابجایی نوبت" data-toggle="modal"
+                          data-target="#rescheduleModal"
+                          wire:click="$set('rescheduleAppointmentId', {{ $appointment->id }})"
+                          {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
+                          <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="جابجایی">
+                        </button>
+                        <button class="btn btn-light rounded-circle shadow-sm cancel-btn" data-tooltip="true"
+                          data-placement="top" data-original-title="لغو نوبت"
+                          wire:click="cancelSingleAppointment({{ $appointment->id }})"
+                          {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
+                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                        </button>
+                        <button class="btn btn-light rounded-circle shadow-sm block-btn" data-tooltip="true"
+                          data-placement="top" data-original-title="مسدود کردن کاربر" data-toggle="modal"
+                          data-target="#blockUserModal"
+                          wire:click="$set('blockAppointmentId', {{ $appointment->id }})"
+                          {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
+                          <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="مسدود کردن">
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                @endforeach
+              @else
                 <tr>
-                  <td>
-                    <input type="checkbox" class="appointment-checkbox form-check-input"
-                      value="{{ $appointment->id }}">
-                  </td>
-                  <td class="fw-bold">
-                    {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
-                  </td>
-                  <td>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</td>
-                  <td>{{ $appointment->patient ? $appointment->patient->national_code : '-' }}</td>
-                  <td>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}</td>
-                  <td>{{ $appointment->appointment_time->format('H:i') ?? '-' }}</td>
-                  <td>
-                    @php
-                      $statusLabels = [
-                          'scheduled' => ['label' => 'در انتظار', 'class' => 'text-primary'],
-                          'attended' => ['label' => 'ویزیت شده', 'class' => 'text-success'],
-                          'cancelled' => ['label' => 'لغو شده', 'class' => 'text-danger'],
-                          'missed' => ['label' => 'عدم حضور', 'class' => 'text-warning'],
-                          'pending_review' => ['label' => 'در انتظار بررسی', 'class' => 'text-secondary'],
-                      ];
-                      $status = $appointment->status ?? 'scheduled';
-                      $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
-                    @endphp
-                    <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
-                  </td>
-                  <td>
-                    @php
-                      $paymentStatusLabels = [
-                          'paid' => ['label' => 'پرداخت شده', 'class' => 'text-success'],
-                          'unpaid' => ['label' => 'پرداخت نشده', 'class' => 'text-danger'],
-                          'pending' => ['label' => 'در انتظار پرداخت', 'class' => 'text-primary'],
-                      ];
-                      $paymentStatus = $appointment->payment_status;
-                      $paymentStatusInfo = $paymentStatusLabels[$paymentStatus] ?? [
-                          'label' => 'نامشخص',
-                          'class' => 'text-muted',
-                      ];
-                    @endphp
-                    <span class="{{ $paymentStatusInfo['class'] }} fw-bold">{{ $paymentStatusInfo['label'] }}</span>
-                  </td>
-                  <td>{{ $appointment->insurance ? $appointment->insurance->name : '-' }}</td>
-                  <td>
-                    @if ($appointment->status !== 'attended')
-                      <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#endVisitModalCenter"
-                        wire:click="$set('endVisitAppointmentId', {{ $appointment->id }})">پایان ویزیت</button>
-                    @else
-                      -
-                    @endif
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#rescheduleModal"
-                      wire:click="$set('rescheduleAppointmentId', {{ $appointment->id }})">جابجایی</button>
-                  </td>
+                  <td colspan="11" class="text-center">نتیجه‌ای یافت نشد</td>
                 </tr>
-              @endforeach
+              @endif
             </tbody>
           </table>
         </div>
@@ -196,79 +215,82 @@
         <div class="d-flex align-items-center m-2 gap-4">
           <div class="turning_filterWrapper__2cOOi">
             <div class="dropdown">
-              <button
-                class="flex items-center justify-center bg-transparent border border-gray-300 rounded-sm hover:bg-gray-100 transition-colors bg-light w-12 h-8 focus:outline-none dropdown-toggle"
-                type="button" id="dropdownMenuButton" aria-haspopup="true" aria-expanded="true">
-                <input class="w-4 h-4 text-blue-600 border-none focus:ring-0  cursor-pointer form-check-input"
-                  type="checkbox" value="" id="select-all">
-                <span class="w-2"></span>
+              <button class="btn btn-light dropdown-toggle h-30 fs-13" type="button" id="filterDropdown"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                فیلتر
               </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <ul class="dropdown-list" style="list-style-type: none; padding: 0; margin: 0;">
-                  <li>
-                    <a href="#" class="dropdown-item" wire:click="$set('filterStatus', '')">همه نوبت‌ها</a>
-                  </li>
-                  <li>
-                    <a href="#" class="dropdown-item" wire:click="$set('filterStatus', 'scheduled')">در
-                      انتظار</a>
-                  </li>
-                  <li>
-                    <a href="#" class="dropdown-item" wire:click="$set('filterStatus', 'cancelled')">لغو
-                      شده</a>
-                  </li>
-                  <li>
-                    <a href="#" class="dropdown-item" wire:click="$set('filterStatus', 'attended')">ویزیت
-                      شده</a>
-                  </li>
-                </ul>
-              </div>
+              <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', '')">همه نوبت‌ها</a>
+                </li>
+                <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'scheduled')">در
+                    انتظار</a></li>
+                <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'cancelled')">لغو
+                    شده</a></li>
+                <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'attended')">ویزیت
+                    شده</a></li>
+                <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_week')">هفته
+                    جاری</a></li>
+                <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_month')">ماه
+                    جاری</a></li>
+                <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_year')">سال
+                    جاری</a></li>
+              </ul>
             </div>
           </div>
           <button id="cancel-appointments-btn"
-            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center"
-            wire:click="cancelAppointments([])">
+            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
             <img src="{{ asset('dr-assets/icons/cancle-appointment.svg') }}" alt="" srcset="">
             <span class="d-none d-md-block mx-1">لغو نوبت</span>
           </button>
           <button id="move-appointments-btn"
-            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center" data-toggle="modal"
-            data-target="#rescheduleModal">
+            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
+            data-bs-toggle="modal" data-bs-target="#rescheduleModal" disabled>
             <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="" srcset="">
             <span class="d-none d-md-block mx-1">جابجایی نوبت</span>
           </button>
           <button id="block-users-btn"
-            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center" data-toggle="modal"
-            data-target="#blockUserModal">
+            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
+            data-bs-toggle="modal" data-bs-target="#blockMultipleUsersModal" disabled>
             <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="" srcset="">
             <span class="d-none d-md-block mx-1">مسدود کردن کاربر</span>
           </button>
         </div>
       </div>
     </div>
-
     <div class="pagination-container mt-3 d-flex justify-content-center">
       <nav aria-label="Page navigation">
         <ul class="pagination" id="pagination-links">
           @if ($pagination['current_page'] > 1)
             <li class="page-item">
-              <a class="page-link" href="#" wire:click="previousPage">قبلی</a>
+              <a class="page-link" href="#" wire:click="previousPage" wire:loading.attr="disabled">قبلی</a>
+            </li>
+          @else
+            <li class="page-item disabled">
+              <span class="page-link">قبلی</span>
             </li>
           @endif
-          @for ($i = 1; $i <= $pagination['last_page']; $i++)
+          @php
+            $startPage = max(1, $pagination['current_page'] - 2);
+            $endPage = min($pagination['last_page'], $pagination['current_page'] + 2);
+          @endphp
+          @for ($i = $startPage; $i <= $endPage; $i++)
             <li class="page-item {{ $pagination['current_page'] == $i ? 'active' : '' }}">
-              <a class="page-link" href="#"
-                wire:click="gotoPage({{ $i }})">{{ $i }}</a>
+              <a class="page-link" href="#" wire:click="gotoPage({{ $i }})"
+                wire:loading.attr="disabled">{{ $i }}</a>
             </li>
           @endfor
           @if ($pagination['current_page'] < $pagination['last_page'])
             <li class="page-item">
-              <a class="page-link" href="#" wire:click="nextPage">بعدی</a>
+              <a class="page-link" href="#" wire:click="nextPage" wire:loading.attr="disabled">بعدی</a>
+            </li>
+          @else
+            <li class="page-item disabled">
+              <span class="page-link">بعدی</span>
             </li>
           @endif
         </ul>
       </nav>
     </div>
-
     <!-- Modals -->
     <div class="modal fade" id="activation-modal" tabindex="-1" role="dialog"
       aria-labelledby="activation-modal-label" aria-hidden="true">
@@ -276,9 +298,7 @@
         <div class="modal-content border-radius-11">
           <div class="modal-header">
             <h5 class="modal-title" id="activation-modal-label">فعالسازی نوبت دهی</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="flex flex-col"><span>پزشک گرامی</span>
@@ -292,30 +312,26 @@
             </div>
           </div>
           <div class="p-3">
-            <a href="" data-toggle="modal" data-target="#contact-modal"
+            <a href="" data-bs-toggle="modal" data-bs-target="#contact-modal"
               class="btn my-btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center">
               فعالسازی تماس امن </a>
             <a href="" class="btn btn-light mt-3 w-100 h-50 d-flex align-items-center justify-content-center"
-              onclick="$('#activation-modal').modal('hide'); window.history.pushState({}, '', 'panel');"> فعلا نه
-              بعدا فعال میکنم </a>
+              data-bs-dismiss="modal"> فعلا نه بعدا فعال میکنم </a>
           </div>
         </div>
       </div>
     </div>
-
     <div class="modal fade" id="contact-modal" tabindex="-1" role="dialog" aria-labelledby="contact-modal-label"
       aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content border-radius-11">
           <div class="modal-header">
-            <h5 class="modal-title" id="activation-modal-label">تماس امن</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
+            <h5 class="modal-title" id="contact-modal-label">تماس امن</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body my-modal-body">
             <div class="d-flex flex-column align-items-center w-100">
-              <ul class="mx-4text-sm font-medium list-disc d-flex flex-column">
+              <ul class="mx-4 text-sm font-medium list-disc d-flex flex-column">
                 <li>در پنل پزشک، در مقابل اسم هر بیمار، دکمه تماس وجود دارد。</li>
                 <li>پزشک قادر است در هر زمان با بیمار تماس برقرار کند。</li>
                 <li>بیمار در قبض نوبت و در نوبت‌های من، دکمه برقراری تماس را دارد。</li>
@@ -329,22 +345,19 @@
           <div class="p-3">
             <a href="#"
               class="btn my-btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center"
-              onclick="$('#activation-modal').modal('hide'); $('#contact-modal').modal('hide'); window.history.pushState({}, '', 'panel'); toastr.success('تماس امن با موفقیت فعال شد');">
+              data-bs-dismiss="modal" onclick="toastr.success('تماس امن با موفقیت فعال شد');">
               شرایط برقراری تماس امن را مطالعه کردم。 </a>
           </div>
         </div>
       </div>
     </div>
-
     <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel"
       aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-radius-11">
           <div class="modal-header">
             <h6 class="modal-title" id="rescheduleModalLabel">جابجایی نوبت</h6>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="calendar-header w-100 d-flex justify-content-between align-items-center">
@@ -404,254 +417,482 @@
         </div>
       </div>
     </div>
-
     <div class="modal fade" id="endVisitModalCenter" tabindex="-1" role="dialog"
       aria-labelledby="endVisitModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content border-radius-11">
           <div class="modal-header">
             <h6 class="modal-title fw-bold" id="exampleModalCenterTitle">توضیحات درمان</h6>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <textarea class="form-control" rows="5" wire:model="endVisitDescription"
               placeholder="توضیحات درمان را وارد کنید..."></textarea>
-            <button class="btn my-btn-primary w-100 mt-3"
+            <button class="btn my-btn-primary w-100 mt-3 shadow-sm end-visit-btn"
               wire:click="endVisit({{ $endVisitAppointmentId }})">ثبت</button>
           </div>
         </div>
       </div>
     </div>
-
     <div class="modal fade" id="blockUserModal" tabindex="-1" role="dialog" aria-labelledby="blockUserModalLabel"
-      aria-hidden="true">
+      aria-hidden="true" wire:ignore.self>
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content border-radius-11">
           <div class="modal-header">
             <h5 class="modal-title" id="blockUserModalLabel">مسدود کردن کاربر</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form>
-              <div class="mb-3">
-                <label for="blockMobile" class="form-label">شماره موبایل</label>
-                <input type="text" class="form-control" id="blockMobile" wire:model="blockMobile">
-                @error('blockMobile')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
+            <form wire:submit.prevent="blockUser">
               <div class="mb-3">
                 <label for="blockedAt" class="form-label">تاریخ شروع مسدودیت</label>
-                <input type="text" class="form-control" id="blockedAt" wire:model="blockedAt">
+                <input type="text" class="form-control" id="blockedAt" wire:model.live="blockedAt" data-jdp>
                 @error('blockedAt')
                   <span class="text-danger">{{ $message }}</span>
                 @enderror
               </div>
               <div class="mb-3">
                 <label for="unblockedAt" class="form-label">تاریخ پایان مسدودیت (اختیاری)</label>
-                <input type="text" class="form-control" id="unblockedAt" wire:model="unblockedAt">
+                <input type="text" class="form-control" id="unblockedAt" wire:model.live="unblockedAt" data-jdp>
                 @error('unblockedAt')
                   <span class="text-danger">{{ $message }}</span>
                 @enderror
               </div>
               <div class="mb-3">
                 <label for="blockReason" class="form-label">دلیل مسدودیت (اختیاری)</label>
-                <textarea class="form-control" id="blockReason" rows="3" wire:model="blockReason"></textarea>
+                <textarea class="form-control" id="blockReason" rows="3" wire:model.live="blockReason"
+                  placeholder="دلیل مسدودیت را وارد کنید..."></textarea>
                 @error('blockReason')
                   <span class="text-danger">{{ $message }}</span>
                 @enderror
               </div>
-              <button type="button" class="btn my-btn-primary w-100" wire:click="blockUser">مسدود کردن</button>
+              <button type="submit" class="btn my-btn-primary w-100">مسدود کردن</button>
             </form>
           </div>
         </div>
       </div>
     </div>
-  </div>
+    <div class="modal fade" id="blockMultipleUsersModal" tabindex="-1" role="dialog"
+      aria-labelledby="blockMultipleUsersModalLabel" aria-hidden="true" wire:ignore.self>
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-radius-11">
+          <div class="modal-header">
+            <h5 class="modal-title" id="blockMultipleUsersModalLabel">مسدود کردن کاربران</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form wire:submit.prevent="blockMultipleUsers">
+              <div class="mb-3">
+                <label for="blockedAtMultiple" class="form-label">تاریخ شروع مسدودیت</label>
+                <input type="text" class="form-control" id="blockedAtMultiple" wire:model.live="blockedAt"
+                  data-jdp>
+                @error('blockedAt')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
+              <div class="mb-3">
+                <label for="unblockedAtMultiple" class="form-label">تاریخ پایان مسدودیت (اختیاری)</label>
+                <input type="text" class="form-control" id="unblockedAtMultiple" wire:model.live="unblockedAt"
+                  data-jdp>
+                @error('unblockedAt')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
+              <div class="mb-3">
+                <label for="blockReasonMultiple" class="form-label">دلیل مسدودیت (اختیاری)</label>
+                <textarea class="form-control" id="blockReasonMultiple" rows="3" wire:model.live="blockReason"
+                  placeholder="دلیل مسدودیت را وارد کنید..."></textarea>
+                @error('blockReason')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
+              <button type="submit" class="btn my-btn-primary w-100" id="blockMultipleUsersSubmit">مسدود
+                کردن</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <style>
+      .table {
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+      }
 
-  <script src="{{ asset('dr-assets/panel/js/jquery-easing/1.4.1/jquery.easing.min.js') }}"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const dropdownButton = document.getElementById('dropdownMenuButton');
-      const dropdownMenu = document.querySelector('.dropdown-menu');
-      const dropdownItems = document.querySelectorAll('.dropdown-item');
+      .table thead {
+        background-color: #f8f9fa;
+      }
 
-      dropdownButton.addEventListener('click', function() {
-        dropdownMenu.classList.toggle('show');
-      });
+      .table tbody tr:hover {
+        background-color: #f1f5f9;
+      }
 
-      document.getElementById("select-all").addEventListener('click', function(event) {
-        event.stopPropagation();
-        const checkboxes = document.querySelectorAll('.appointment-checkbox');
-        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-      });
+      .end-visit-btn {
+        transition: all 0.3s ease;
+      }
 
-      dropdownItems.forEach(item => {
-        item.addEventListener('click', function(event) {
-          event.stopPropagation();
-          dropdownMenu.classList.remove('show');
+      .end-visit-btn:hover {
+        background-color: #0052cc;
+        transform: translateY(-2px);
+      }
+
+      /* استایل‌های تولتیپ */
+      .bootstrap-tooltip .tooltip-inner {
+        background-color: #212529;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        max-width: 200px;
+      }
+
+      .bootstrap-tooltip.bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: #212529;
+      }
+
+      .bootstrap-tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+        border-bottom-color: #212529;
+      }
+
+      .bootstrap-tooltip.bs-tooltip-start .tooltip-arrow::before {
+        border-left-color: #212529;
+      }
+
+      .bootstrap-tooltip.bs-tooltip-end .tooltip-arrow::before {
+        border-right-color: #212529;
+      }
+
+      .tooltip {
+        z-index: 1050 !important;
+      }
+    </style>
+    <script>
+      function initializeTooltips() {
+        // اطمینان از تخریب تولتیپ‌های قبلی
+        const tooltipTriggerList = document.querySelectorAll('[data-tooltip="true"]');
+        tooltipTriggerList.forEach(tooltipTriggerEl => {
+          const tooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+          if (tooltip) {
+            tooltip.dispose();
+          }
+          new bootstrap.Tooltip(tooltipTriggerEl, {
+            trigger: 'hover focus',
+            container: 'body',
+            boundary: 'window',
+            delay: {
+              show: 100,
+              hide: 200
+            },
+            customClass: 'bootstrap-tooltip'
+          });
+        });
+      }
+      document.addEventListener('livewire:initialized', () => {
+
+        // تأخیر برای اطمینان از لود Bootstrap
+        setTimeout(() => {
+          initializeTooltips();
+          initializeLivewireListener();
+        }, 100);
+
+
+
+        function initializeLivewireListener() {
+          if (typeof Swal === 'undefined') {
+            console.error('SweetAlert2 is not defined');
+            return;
+          }
+          Livewire.on('no-results-found', (event) => {
+            Swal.fire({
+              title: 'جستجوی نوبت',
+              text: `پزشک گرامی، برای تاریخ ${event.date} هیچ نوبت یا نتیجه‌ای یافت نشد. آیا می‌خواهید جستجو در سوابق همه نوبت‌ها انجام شود؟`,
+              icon: 'info',
+              showCancelButton: true,
+              confirmButtonText: 'بله، جستجو در همه تاریخ‌ها',
+              cancelButtonText: 'خیر',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                Livewire.dispatch('searchAllDates');
+              }
+            });
+          });
+          Livewire.on('confirm-cancel-single', (event) => {
+            Swal.fire({
+              title: 'تأیید لغو نوبت',
+              text: 'آیا مطمئن هستید که می‌خواهید این نوبت را لغو کنید؟',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'بله، لغو کن',
+              cancelButtonText: 'خیر',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // ارسال آرایه‌ای از idها به متد cancelAppointments
+                Livewire.dispatch('cancelAppointments', {
+                  ids: [event.id]
+                });
+              }
+            });
+          });
+        }
+
+        Livewire.hook('element.updated', () => {
+          initializeTooltips();
         });
       });
 
-      document.addEventListener('click', function(event) {
-        if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
-          dropdownMenu.classList.remove('show');
-        }
-      });
-
-      // Handle cancel appointments
-      document.getElementById('cancel-appointments-btn').addEventListener('click', function() {
-        const selected = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb => cb
-          .value);
-        if (selected.length > 0) {
-          @this.cancelAppointments(selected);
-        } else {
-          alert('لطفاً حداقل یک نوبت را انتخاب کنید.');
-        }
-      });
-
-      // Handle reschedule calendar
-      const rescheduleCalendarBody = document.getElementById("calendar-reschedule");
-      const yearSelect = document.getElementById("year-reschedule");
-      const monthSelect = document.getElementById("month-reschedule");
-
       function generateRescheduleCalendar(year, month) {
+        const rescheduleCalendarBody = document.getElementById("calendar-reschedule");
         rescheduleCalendarBody.innerHTML = "";
         const firstDayOfMonth = moment(`${year}/${month}/01`, "jYYYY/jMM/jDD").locale("fa");
         const daysInMonth = firstDayOfMonth.jDaysInMonth();
         let firstDayWeekday = firstDayOfMonth.weekday();
         const today = moment().locale("fa");
-
         for (let i = 0; i < firstDayWeekday; i++) {
           const emptyDay = document.createElement("div");
-          emptyDay.classList.add("calendar-day", "empty");
+          emptyDay.className = "calendar-day empty";
           rescheduleCalendarBody.appendChild(emptyDay);
         }
-
-        for (let day = 1; day <= daysInMonth; day++) {
-          const currentDay = firstDayOfMonth.clone().add(day - 1, "days");
-          const dayElement = document.createElement("div");
-          dayElement.classList.add("calendar-day");
-          dayElement.setAttribute("data-date", currentDay.format("jYYYY/jMM/jDD"));
-
-          if (currentDay.day() === 5) {
-            dayElement.classList.add("friday");
+        const holidays = @json($this->getHolidays());
+        const dateStr = `${year}-${month.toString().padStart(2, '0')}-01`;
+        Livewire.dispatch('getAppointmentsByDateSpecial', {
+          date: dateStr
+        });
+        Livewire.on('appointmentsFetched', (response) => {
+          const appointmentsByDate = response.data || [];
+          for (let day = 1; day <= daysInMonth; day++) {
+            const jalaliDateStr = `${year}/${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}`;
+            const gregorianDate = moment(jalaliDateStr, "jYYYY/jMM/jDD").format("YYYY-MM-DD");
+            const dayElement = document.createElement("div");
+            dayElement.className = "calendar-day text-center";
+            const isHoliday = holidays.includes(gregorianDate);
+            const hasAppointment = appointmentsByDate.some(appt => appt.appointment_date === gregorianDate);
+            const isPast = moment(gregorianDate).isBefore(today, 'day');
+            if (isPast) {
+              dayElement.classList.add("disabled");
+            } else if (isHoliday) {
+              dayElement.classList.add("holiday");
+            } else if (hasAppointment) {
+              dayElement.classList.add("has-appointment");
+            } else {
+              dayElement.classList.add("available");
+              dayElement.style.cursor = "pointer";
+              dayElement.addEventListener("click", () => {
+                @this.set('rescheduleNewDate', gregorianDate);
+                document.querySelectorAll(".calendar-day").forEach(el => el.classList.remove("selected"));
+                dayElement.classList.add("selected");
+                Swal.fire({
+                  title: 'تأیید جابجایی',
+                  text: `آیا می‌خواهید نوبت به تاریخ ${jalaliDateStr} منتقل شود؟`,
+                  icon: 'question',
+                  showCancelButton: true,
+                  confirmButtonText: 'بله، جابجا کن',
+                  cancelButtonText: 'خیر',
+                  reverseButtons: true
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    @this.updateAppointmentDate(@this.rescheduleAppointmentId);
+                  }
+                });
+              });
+            }
+            dayElement.textContent = day;
+            rescheduleCalendarBody.appendChild(dayElement);
           }
+        });
+        const yearSelect = document.getElementById("year-reschedule");
+        const monthSelect = document.getElementById("month-reschedule");
+        yearSelect.value = year;
+        monthSelect.value = month;
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        initializeTooltips();
 
-          if (currentDay.isSame(today, "day")) {
-            dayElement.classList.add("today");
+        const selectAllCheckbox = document.getElementById('select-all-row');
+        const cancelAppointmentsBtn = document.getElementById('cancel-appointments-btn');
+        const moveAppointmentsBtn = document.getElementById('move-appointments-btn');
+        const blockUsersBtn = document.getElementById('block-users-btn');
+        const blockMultipleUsersSubmit = document.getElementById('blockMultipleUsersSubmit');
+
+        function updateButtonStates() {
+          const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
+          const anySelected = selectedCheckboxes.length > 0;
+          if (!anySelected) {
+            cancelAppointmentsBtn.disabled = true;
+            moveAppointmentsBtn.disabled = true;
+            blockUsersBtn.disabled = true;
+            return;
           }
-
-          dayElement.innerHTML = `<span>${currentDay.format("jD")}</span>`;
-
-          dayElement.addEventListener("click", function() {
-            const selectedDate = this.getAttribute("data-date");
-            @this.set('rescheduleNewDate', moment(selectedDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD'));
-            @this.updateAppointmentDate(@this.rescheduleAppointmentId);
+          let hasScheduled = false;
+          let hasNonScheduled = false;
+          selectedCheckboxes.forEach(checkbox => {
+            const status = checkbox.dataset.status;
+            if (status === 'scheduled') {
+              hasScheduled = true;
+            } else if (status === 'cancelled' || status === 'attended') {
+              hasNonScheduled = true;
+            }
           });
-
-          rescheduleCalendarBody.appendChild(dayElement);
+          if (hasNonScheduled) {
+            cancelAppointmentsBtn.disabled = true;
+            moveAppointmentsBtn.disabled = true;
+            blockUsersBtn.disabled = false;
+          } else if (hasScheduled) {
+            cancelAppointmentsBtn.disabled = false;
+            moveAppointmentsBtn.disabled = false;
+            blockUsersBtn.disabled = false;
+          }
         }
-      }
-
-      function populateRescheduleSelectBoxes() {
-        yearSelect.innerHTML = "";
-        const currentYear = moment().jYear();
-        for (let year = currentYear - 10; year <= currentYear + 10; year++) {
-          const option = document.createElement("option");
-          option.value = year;
-          option.textContent = year;
-          yearSelect.appendChild(option);
-        }
-
-        const persianMonths = [
-          "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
-          "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
-        ];
-
-        monthSelect.innerHTML = "";
-        for (let month = 1; month <= 12; month++) {
-          const option = document.createElement("option");
-          option.value = month;
-          option.textContent = persianMonths[month - 1];
-          monthSelect.appendChild(option);
-        }
-
-        yearSelect.value = currentYear;
-        monthSelect.value = moment().jMonth() + 1;
-
-        yearSelect.addEventListener("change", function() {
-          generateRescheduleCalendar(parseInt(yearSelect.value), parseInt(monthSelect.value));
+        selectAllCheckbox.addEventListener('change', function() {
+          const checkboxes = document.querySelectorAll('.appointment-checkbox');
+          checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+          });
+          updateButtonStates();
         });
 
-        monthSelect.addEventListener("change", function() {
+        document.addEventListener('change', (event) => {
+          if (event.target.classList.contains('appointment-checkbox')) {
+            const checkboxes = document.querySelectorAll('.appointment-checkbox');
+            selectAllCheckbox.checked = checkboxes.length === document.querySelectorAll(
+              '.appointment-checkbox:checked').length;
+            updateButtonStates();
+            initializeTooltips();
+          }
+        });
+        cancelAppointmentsBtn.addEventListener('click', function() {
+          const selected = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
+            parseInt(cb.value));
+          if (selected.length === 0) {
+            Swal.fire({
+              title: 'خطا',
+              text: 'لطفاً حداقل یک نوبت را انتخاب کنید.',
+              icon: 'error',
+              confirmButtonText: 'باشه'
+            });
+            return;
+          }
+          Swal.fire({
+            title: 'تأیید لغو نوبت',
+            text: `آیا مطمئن هستید که می‌خواهید ${selected.length} نوبت را لغو کنید؟`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'بله، لغو کن',
+            cancelButtonText: 'خیر',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Livewire.dispatch('cancelAppointments', {
+                ids: selected
+              });
+            }
+          });
+        });
+        blockUsersBtn.addEventListener('click', function() {
+          const selectedMobiles = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
+            cb.dataset.mobile).filter(mobile => mobile);
+          if (selectedMobiles.length === 0) {
+            Swal.fire({
+              title: 'خطا',
+              text: 'هیچ کاربری انتخاب نشده است.',
+              icon: 'error',
+              confirmButtonText: 'باشه'
+            });
+            return;
+          }
+          // باز کردن مودال
+          const blockMultipleUsersModal = new bootstrap.Modal(document.getElementById('blockMultipleUsersModal'));
+          blockMultipleUsersModal.show();
+        });
+
+        blockMultipleUsersSubmit.addEventListener('click', function() {
+          const selectedMobiles = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
+            cb.dataset.mobile).filter(mobile => mobile);
+          if (selectedMobiles.length === 0) {
+            Swal.fire({
+              title: 'خطا',
+              text: 'هیچ کاربری انتخاب نشده است.',
+              icon: 'error',
+              confirmButtonText: 'باشه'
+            });
+            return;
+          }
+          Swal.fire({
+            title: 'تأیید مسدود کردن',
+            text: `آیا مطمئن هستید که می‌خواهید ${selectedMobiles.length} کاربر را مسدود کنید؟`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'بله، مسدود کن',
+            cancelButtonText: 'خیر',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Livewire.dispatch('blockMultipleUsers', {
+                mobiles: selectedMobiles
+              });
+            }
+          });
+        });
+        // Initialize Jalali Datepicker
+        if (typeof jalaliDatepicker !== 'undefined') {
+          jalaliDatepicker.startWatch({
+            minDate: 'today',
+            dateFormat: 'YYYY/MM/DD',
+          });
+        }
+        // Handle reschedule calendar
+        const rescheduleCalendarBody = document.getElementById("calendar-reschedule");
+        const yearSelect = document.getElementById("year-reschedule");
+        const monthSelect = document.getElementById("month-reschedule");
+
+        function populateYearMonthSelectors() {
+          const currentYear = moment().jYear();
+          yearSelect.innerHTML = "";
+          for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+            const option = document.createElement("option");
+            option.value = y;
+            option.textContent = y;
+            yearSelect.appendChild(option);
+          }
+          monthSelect.innerHTML = "";
+          for (let m = 1; m <= 12; m++) {
+            const option = document.createElement("option");
+            option.value = m;
+            option.textContent = moment().jMonth(m - 1).format("jMMMM");
+            monthSelect.appendChild(option);
+          }
+        }
+        yearSelect.addEventListener("change", () => {
           generateRescheduleCalendar(parseInt(yearSelect.value), parseInt(monthSelect.value));
         });
-      }
-
-      document.getElementById("prev-month-reschedule").addEventListener("click", function() {
-        let currentMonth = parseInt(monthSelect.value);
-        let currentYear = parseInt(yearSelect.value);
-
-        if (currentMonth === 1) {
-          currentYear -= 1;
-          currentMonth = 12;
-        } else {
-          currentMonth -= 1;
-        }
-
-        yearSelect.value = currentYear;
-        monthSelect.value = currentMonth;
-        generateRescheduleCalendar(currentYear, currentMonth);
+        monthSelect.addEventListener("change", () => {
+          generateRescheduleCalendar(parseInt(yearSelect.value), parseInt(monthSelect.value));
+        });
+        document.getElementById("prev-month-reschedule").addEventListener("click", () => {
+          let newMonth = parseInt(monthSelect.value) - 1;
+          let newYear = parseInt(yearSelect.value);
+          if (newMonth < 1) {
+            newMonth = 12;
+            newYear--;
+          }
+          generateRescheduleCalendar(newYear, newMonth);
+        });
+        document.getElementById("next-month-reschedule").addEventListener("click", () => {
+          let newMonth = parseInt(monthSelect.value) + 1;
+          let newYear = parseInt(yearSelect.value);
+          if (newMonth > 12) {
+            newMonth = 1;
+            newYear++;
+          }
+          generateRescheduleCalendar(newYear, newMonth);
+        });
+        // فراخوانی اولیه
+        populateYearMonthSelectors();
+        const initialYear = moment().jYear();
+        const initialMonth = moment().jMonth() + 1;
+        generateRescheduleCalendar(initialYear, initialMonth);
       });
-
-      document.getElementById("next-month-reschedule").addEventListener("click", function() {
-        let currentMonth = parseInt(monthSelect.value);
-        let currentYear = parseInt(yearSelect.value);
-
-        if (currentMonth === 12) {
-          currentYear += 1;
-          currentMonth = 1;
-        } else {
-          currentMonth += 1;
-        }
-
-        yearSelect.value = currentYear;
-        monthSelect.value = currentMonth;
-        generateRescheduleCalendar(currentYear, currentMonth);
-      });
-
-      populateRescheduleSelectBoxes();
-      generateRescheduleCalendar(moment().jYear(), moment().jMonth() + 1);
-
-      // Handle Livewire events
-      Livewire.on('alert', ({
-        type,
-        message
-      }) => {
-        toastr[type](message);
-      });
-
-      Livewire.on('close-modal', ({
-        id
-      }) => {
-        $(`#${id}`).modal('hide');
-      });
-
-      Livewire.on('update-reschedule-calendar', ({
-        date
-      }) => {
-        const momentDate = moment(date);
-        const jYear = momentDate.jYear();
-        const jMonth = momentDate.jMonth() + 1;
-        yearSelect.value = jYear;
-        monthSelect.value = jMonth;
-        generateRescheduleCalendar(jYear, jMonth);
-      });
-    });
-  </script>
-</div>
+    </script>
+  </div>

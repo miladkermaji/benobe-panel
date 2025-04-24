@@ -22,8 +22,6 @@ use App\Jobs\SendSmsNotificationJob;
 use App\Models\SpecialDailySchedule;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DoctorAppointmentConfig;
-use Modules\SendOtp\App\Http\Services\MessageService;
-use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
 class AppointmentsList extends Component
 {
@@ -34,6 +32,7 @@ class AppointmentsList extends Component
     public $searchQuery = '';
     public $filterStatus = '';
     public $attendanceStatus = '';
+    public $dateFilter = '';
     public $appointments = [];
     public $clinics = [];
     public $blockedUsers = [];
@@ -44,12 +43,9 @@ class AppointmentsList extends Component
         'per_page' => 10,
         'total' => 0,
     ];
+    public $isSearchingAllDates = false;
 
     // Properties for blocking users
-    #[Validate('required', message: 'لطفاً شماره موبایل را وارد کنید.')]
-    #[Validate('exists:users,mobile', message: 'شماره موبایل واردشده در سیستم ثبت نشده است.')]
-    public $blockMobile;
-
     #[Validate('required', message: 'لطفاً تاریخ شروع مسدودیت را وارد کنید.')]
     #[Validate('regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', message: 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.')]
     public $blockedAt;
@@ -81,11 +77,19 @@ class AppointmentsList extends Component
     // Properties for ending visit
     public $endVisitAppointmentId;
     public $endVisitDescription;
-    protected $listeners = ['updateSelectedDate' => 'updateSelectedDate'];
+
+    // Property for single block user
+    public $blockAppointmentId;
+
+    protected $listeners = [
+        'updateSelectedDate' => 'updateSelectedDate',
+        'searchAllDates' => 'searchAllDates',
+    ];
 
     public function mount()
     {
         $this->selectedDate = Carbon::now()->format('Y-m-d');
+        $this->blockedAt = Jalalian::now()->format('Y/m/d'); // تاریخ امروز به جلالی
         $doctor = $this->getAuthenticatedDoctor();
         if ($doctor) {
             $defaultClinic = $doctor->clinics()->where('is_active', 0)->first();
@@ -99,11 +103,13 @@ class AppointmentsList extends Component
 
     public function updateSelectedDate($date)
     {
-        Log::info('updateSelectedDate called with date:', ['date' => $date]);
-
-        // اگه $date آرایه‌ست، مقدار date رو بگیر
         $selectedDate = is_array($date) && isset($date['date']) ? $date['date'] : $date;
         $this->selectedDate = $selectedDate;
+        $this->isSearchingAllDates = false;
+        $this->filterStatus = '';
+        $this->dateFilter = '';
+        $this->resetPage();
+        $this->appointments = [];
         $this->loadAppointments();
     }
 
@@ -131,23 +137,38 @@ class AppointmentsList extends Component
     {
         $doctor = $this->getAuthenticatedDoctor();
         if (!$doctor) {
-            Log::warning('No authenticated doctor found');
             return;
         }
 
         $gregorianDate = $this->convertToGregorian($this->selectedDate);
-        Log::info('loadAppointments called', [
-            'selectedDate' => $this->selectedDate,
-            'gregorianDate' => $gregorianDate,
-            'clinicId' => $this->selectedClinicId,
-            'filterStatus' => $this->filterStatus,
-            'attendanceStatus' => $this->attendanceStatus,
-            'searchQuery' => $this->searchQuery,
-        ]);
+       
 
         $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
-            ->where('doctor_id', $doctor->id)
-            ->whereDate('appointment_date', $gregorianDate);
+            ->withTrashed()
+            ->where('doctor_id', $doctor->id);
+
+        if ($this->dateFilter) {
+            $today = Carbon::today();
+            if ($this->dateFilter === 'current_week') {
+                $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
+                $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
+                $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
+               
+            } elseif ($this->dateFilter === 'current_month') {
+                $startOfMonth = $today->copy()->startOfMonth();
+                $endOfMonth = $today->copy()->endOfMonth();
+                $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
+               
+            } elseif ($this->dateFilter === 'current_year') {
+                $startOfYear = $today->copy()->startOfYear();
+                $endOfYear = $today->copy()->endOfYear();
+                $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
+               
+            }
+        } elseif ($this->filterStatus !== 'all' && !$this->isSearchingAllDates) {
+            $query->whereDate('appointment_date', $gregorianDate);
+        } else {
+        }
 
         if ($this->selectedClinicId === 'default') {
             $query->whereNull('clinic_id');
@@ -155,7 +176,7 @@ class AppointmentsList extends Component
             $query->where('clinic_id', $this->selectedClinicId);
         }
 
-        if ($this->filterStatus) {
+        if ($this->filterStatus && $this->filterStatus !== 'all') {
             $query->where('status', $this->filterStatus);
         }
 
@@ -173,7 +194,7 @@ class AppointmentsList extends Component
             });
         }
 
-        $appointments = $query->paginate(10);
+        $appointments = $query->orderBy('appointment_date', 'desc')->paginate($this->pagination['per_page']);
         $this->appointments = $appointments->items();
         $this->pagination = [
             'current_page' => $appointments->currentPage(),
@@ -182,10 +203,19 @@ class AppointmentsList extends Component
             'total' => $appointments->total(),
         ];
 
-        Log::info('Appointments loaded', [
-            'count' => count($this->appointments),
-            'pagination' => $this->pagination,
-        ]);
+       
+
+        if (empty($this->appointments) && !$this->isSearchingAllDates && $this->searchQuery) {
+            $jalaliDate = Jalalian::fromCarbon(Carbon::parse($gregorianDate))->format('Y/m/d');
+            $this->dispatch('no-results-found', date: $jalaliDate);
+        }
+    }
+
+    public function searchAllDates()
+    {
+        $this->isSearchingAllDates = true;
+        $this->dateFilter = '';
+        $this->loadAppointments();
     }
 
     private function convertToGregorian($date)
@@ -195,15 +225,13 @@ class AppointmentsList extends Component
         } elseif (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $date)) {
             try {
                 $gregorian = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
-                Log::info('Converted Jalali to Gregorian', ['jalali' => $date, 'gregorian' => $gregorian]);
                 return $gregorian;
             } catch (\Exception $e) {
-                Log::error('Error converting Jalali to Gregorian', ['date' => $date, 'error' => $e->getMessage()]);
+            
                 $this->dispatch('alert', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
                 return Carbon::now()->format('Y-m-d');
             }
         } else {
-            Log::error('Invalid date format', ['date' => $date]);
             $this->dispatch('alert', type: 'error', message: 'فرمت تاریخ نامعتبر است.');
             return Carbon::now()->format('Y-m-d');
         }
@@ -211,29 +239,66 @@ class AppointmentsList extends Component
 
     public function updatedSelectedDate()
     {
-        Log::info('updatedSelectedDate triggered', ['selectedDate' => $this->selectedDate]);
+        $this->isSearchingAllDates = false;
+        $this->filterStatus = '';
+        $this->dateFilter = '';
+        $this->resetPage();
+        $this->appointments = [];
         $this->loadAppointments();
-        
     }
 
     public function updatedSelectedClinicId()
     {
+        $this->isSearchingAllDates = false;
         $this->loadAppointments();
         $this->loadBlockedUsers();
     }
 
     public function updatedSearchQuery()
     {
+        $this->isSearchingAllDates = false;
         $this->loadAppointments();
     }
 
     public function updatedFilterStatus()
     {
+        $this->isSearchingAllDates = false;
+        $this->dateFilter = '';
+        $this->resetPage();
+        $this->appointments = [];
         $this->loadAppointments();
     }
 
     public function updatedAttendanceStatus()
     {
+        $this->isSearchingAllDates = false;
+        $this->loadAppointments();
+    }
+
+    public function updatedDateFilter()
+    {
+        $this->isSearchingAllDates = false;
+        $this->filterStatus = '';
+        $this->resetPage();
+        $this->appointments = [];
+        $this->loadAppointments();
+    }
+
+    public function gotoPage($page)
+    {
+        $this->setPage($page);
+        $this->loadAppointments();
+    }
+
+    public function previousPage()
+    {
+        $this->setPage($this->pagination['current_page'] - 1);
+        $this->loadAppointments();
+    }
+
+    public function nextPage()
+    {
+        $this->setPage($this->pagination['current_page'] + 1);
         $this->loadAppointments();
     }
 
@@ -297,16 +362,24 @@ class AppointmentsList extends Component
 
     public function cancelAppointments($ids)
     {
+
+        if (empty($ids)) {
+            $this->dispatch('alert', type: 'error', message: 'لطفاً حداقل یک نوبت را انتخاب کنید.');
+            return;
+        }
+
         $appointments = Appointment::whereIn('id', $ids)->get();
         $recipients = [];
 
         foreach ($appointments as $appointment) {
             if ($appointment->status !== 'cancelled') {
                 $appointment->status = 'cancelled';
+                $appointment->delete(); // سافت‌دلیت
                 $appointment->save();
                 if ($appointment->patient && $appointment->patient->mobile) {
                     $recipients[] = $appointment->patient->mobile;
                 }
+             
             }
         }
 
@@ -322,6 +395,11 @@ class AppointmentsList extends Component
 
         $this->dispatch('alert', type: 'success', message: 'نوبت‌ها با موفقیت لغو شدند.');
         $this->loadAppointments();
+    }
+
+    public function cancelSingleAppointment($id)
+    {
+        $this->dispatch('confirm-cancel-single', id: $id);
     }
 
     private function loadBlockedUsers()
@@ -368,11 +446,24 @@ class AppointmentsList extends Component
 
     public function blockUser()
     {
-        $this->validate();
+
+        $this->validate([
+                'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
+                'unblockedAt' => ['nullable', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
+                'blockReason' => ['nullable', 'string', 'max:255'],
+            ], [
+                'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
+                'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+                'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+                'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
+                'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+            ]);
+
 
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
-        $user = User::where('mobile', $this->blockMobile)->first();
+        $appointment = Appointment::findOrFail($this->blockAppointmentId);
+        $user = $appointment->patient;
 
         $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
         $unblockedAt = $this->processDate($this->unblockedAt, 'پایان مسدودیت');
@@ -388,7 +479,7 @@ class AppointmentsList extends Component
             return;
         }
 
-        $blockingUser = UserBlocking::create([
+        UserBlocking::create([
             'user_id' => $user->id,
             'doctor_id' => $doctorId,
             'clinic_id' => $clinicId,
@@ -398,28 +489,33 @@ class AppointmentsList extends Component
             'status' => 1,
         ]);
 
-        $doctor = Doctor::find($doctorId);
-        $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-        $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-
-        $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
-        $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-        $templateId = ($gatewayName === 'pishgamrayan') ? 100254 : null;
-
-        SendSmsNotificationJob::dispatch(
-            $message,
-            [$user->mobile],
-            $templateId,
-            [$doctorName]
-        )->delay(now()->addSeconds(5));
-
         $this->dispatch('alert', type: 'success', message: 'کاربر با موفقیت مسدود شد.');
+        $this->dispatch('close-modal', id: 'blockUserModal');
         $this->loadBlockedUsers();
-        $this->reset(['blockMobile', 'blockedAt', 'unblockedAt', 'blockReason']);
+        $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId']);
     }
 
     public function blockMultipleUsers($mobiles)
     {
+        if (empty($mobiles)) {
+            $this->dispatch('alert', type: 'error', message: 'هیچ کاربری انتخاب نشده است.');
+            return;
+        }
+
+
+        $this->validate([
+                'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
+                'unblockedAt' => ['nullable', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
+                'blockReason' => ['nullable', 'string', 'max:255'],
+            ], [
+                'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
+                'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+                'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+                'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
+                'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+            ]);
+
+
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
 
@@ -428,7 +524,6 @@ class AppointmentsList extends Component
 
         $blockedUsers = [];
         $alreadyBlocked = [];
-        $recipients = [];
 
         foreach ($mobiles as $mobile) {
             $user = User::where('mobile', $mobile)->first();
@@ -458,7 +553,6 @@ class AppointmentsList extends Component
             ]);
 
             $blockedUsers[] = $blockingUser;
-            $recipients[] = $mobile;
         }
 
         if (empty($blockedUsers) && !empty($alreadyBlocked)) {
@@ -471,26 +565,10 @@ class AppointmentsList extends Component
             return;
         }
 
-        if (!empty($recipients)) {
-            $doctor = Doctor::find($doctorId);
-            $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-            $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-
-            $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
-            $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-            $templateId = ($gatewayName === 'pishgamrayan') ? 100254 : null;
-
-            SendSmsNotificationJob::dispatch(
-                $message,
-                $recipients,
-                $templateId,
-                [$doctorName]
-            )->delay(now()->addSeconds(5));
-        }
-
         $this->dispatch('alert', type: 'success', message: 'کاربران با موفقیت مسدود شدند.');
+        $this->dispatch('close-modal', id: 'blockMultipleUsersModal');
         $this->loadBlockedUsers();
-        $this->reset(['blockMobile', 'blockedAt', 'unblockedAt', 'blockReason']);
+        $this->reset(['blockedAt', 'unblockedAt', 'blockReason']);
     }
 
     public function updateBlockStatus($id, $status)
@@ -503,38 +581,6 @@ class AppointmentsList extends Component
 
         $userBlocking->status = $status;
         $userBlocking->save();
-
-        $user = $userBlocking->user;
-        $doctor = $userBlocking->doctor;
-        $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-
-        if ($status == 1) {
-            $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-            $defaultTemplateId = 100254;
-        } else {
-            $message = "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.";
-            $defaultTemplateId = 100255;
-        }
-
-        $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
-        $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-        $templateId = ($gatewayName === 'pishgamrayan') ? $defaultTemplateId : null;
-
-        SendSmsNotificationJob::dispatch(
-            $message,
-            [$user->mobile],
-            $templateId,
-            [$doctorName]
-        )->delay(now()->addSeconds(5));
-
-        SmsTemplate::create([
-            'doctor_id' => $doctor->id,
-            'clinic_id' => $clinicId,
-            'user_id' => $user->id,
-            'identifier' => Str::random(11),
-            'title' => $status == 1 ? 'مسدودی کاربر' : 'رفع مسدودی',
-            'content' => $message,
-        ]);
 
         $this->dispatch('alert', type: 'success', message: 'وضعیت با موفقیت به‌روزرسانی شد.');
         $this->loadBlockedUsers();
@@ -598,14 +644,10 @@ class AppointmentsList extends Component
         $doctor = Doctor::find($doctorId);
         $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
 
-        $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
-        $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-        $templateId = ($gatewayName === 'pishgamrayan') ? null : null;
-
         SendSmsNotificationJob::dispatch(
             $this->messageContent,
             $recipients,
-            $templateId,
+            null,
             [$doctorName]
         )->delay(now()->addSeconds(5));
 
@@ -687,6 +729,7 @@ class AppointmentsList extends Component
         $nextAvailableDate = $this->getNextAvailableDate();
         if ($nextAvailableDate) {
             $this->selectedDate = $nextAvailableDate;
+            $this->isSearchingAllDates = false;
             $this->loadAppointments();
             $this->dispatch('update-reschedule-calendar', date: $nextAvailableDate);
         } else {

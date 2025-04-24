@@ -1359,7 +1359,9 @@ img {
     vertical-align: middle;
 }
 
-
+.dropdown-menu{
+    inset: 0px 1px auto 0px !important;
+}
 
 .table td input[type="checkbox"]:checked {
     accent-color: #6366f1; /* رنگ بنفش مدرن */

@@ -28,7 +28,6 @@ $(document).ready(function () {
 
     // رویداد Livewire برای آپدیت DOM
     document.addEventListener("livewire:updated", function () {
-        console.log("Livewire updated, ensuring calendar visibility");
         setTimeout(() => {
             loadingOverlay.hide();
             calendar.show();
@@ -39,7 +38,6 @@ $(document).ready(function () {
     function ensureLoadingHidden() {
         setTimeout(() => {
             if (loadingOverlay.is(":visible")) {
-                console.log("Emergency: Forcing calendar loading to hide");
                 loadingOverlay.hide();
                 calendar.show();
             }
@@ -48,7 +46,6 @@ $(document).ready(function () {
 
     // رویداد آپدیت تقویم ردیفی
     $(document).on("updateCalendarRow", function (e, selectedDate) {
-        console.log("Updating calendar row for date:", selectedDate);
         currentDate = moment(selectedDate, "YYYY-MM-DD")
             .startOf("day")
             .subtract(9, "days");
@@ -56,7 +53,6 @@ $(document).ready(function () {
     });
 
     function fetchAppointmentsCount() {
-        console.log("Fetching appointments count, showing loading");
         if (!calendar.length) {
             console.error("Calendar element not found, aborting AJAX");
             return;
@@ -75,14 +71,12 @@ $(document).ready(function () {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
             success: function (response) {
-                console.log("Appointments count fetched:", response);
                 if (response.status) {
                     appointmentsData = response.data || [];
                     workingDays = response.working_days || [];
                     calendarDays = response.calendar_days || 60;
                     appointmentSettings = response.appointment_settings || [];
-                    console.log("Working days:", workingDays);
-                    console.log("Appointments data:", appointmentsData);
+                   
                     $("#calendar-error").hide();
                     loadCalendar();
                 } else {
@@ -102,9 +96,7 @@ $(document).ready(function () {
                 calendar.show();
             },
             complete: function () {
-                console.log(
-                    "AJAX request completed, ensuring loading is hidden"
-                );
+             
                 loadingOverlay.hide();
                 calendar.show();
             },
@@ -112,10 +104,7 @@ $(document).ready(function () {
     }
 
     function loadCalendar() {
-        console.log(
-            "Loading calendar, currentDate:",
-            currentDate.format("YYYY-MM-DD")
-        );
+       
         if (!calendar.length) {
             console.error("Calendar element not found in DOM");
             return;
@@ -126,7 +115,6 @@ $(document).ready(function () {
         let current = moment(currentDate);
         let i = 0;
 
-        console.log("Starting calendar generation, visibleDays:", visibleDays);
         while (displayedDays < visibleDays && i < calendarDays * 2) {
             const dayOfWeek = current.format("dddd").toLowerCase();
             const appointmentDate = current.format("YYYY-MM-DD");
@@ -135,9 +123,7 @@ $(document).ready(function () {
             const isWorkingDay = workingDays.includes(dayOfWeek);
             const isSelected = appointmentDate === selectedDate;
 
-            console.log(
-                `Processing date: ${appointmentDate}, isWorkingDay: ${isWorkingDay}, isToday: ${isToday}, dayOfWeek: ${dayOfWeek}`
-            );
+          
 
             if (isWorkingDay || isToday) {
                 const persianDate = moment(current).locale("fa").format("dddd");
@@ -174,9 +160,7 @@ $(document).ready(function () {
                         <div class="date">${persianFormattedDate}</div>
                         ${isToday ? '<div class="current-day-icon"></div>' : ""}
                     </div>`;
-                console.log(
-                    `Adding card for ${appointmentDate}, count: ${appointmentCount}`
-                );
+          
                 calendar.append(card);
                 if (appointmentCount > 0) badgeCount++;
                 displayedDays++;
@@ -185,9 +169,7 @@ $(document).ready(function () {
             i++;
         }
 
-        console.log(
-            `Calendar loaded, displayedDays: ${displayedDays}, badgeCount: ${badgeCount}`
-        );
+      
         if (displayedDays === 0) {
             console.warn(
                 "No days displayed. Check workingDays or appointmentsData."
@@ -207,7 +189,6 @@ $(document).ready(function () {
             "day"
         );
         nextButton.prop("disabled", isNextDisabled);
-        console.log("Button state updated, nextDisabled:", isNextDisabled);
     }
 
     function animateAndLoadCalendar(direction) {
@@ -303,7 +284,6 @@ $(document).ready(function () {
         $(".calendar-card").not(".my-active").removeClass("card-selected");
         $(this).addClass("card-selected");
         const date = $(this).data("date");
-        console.log("Calendar card clicked, date:", date);
         if (typeof Livewire !== "undefined") {
             Livewire.dispatch("updateSelectedDate", { date: date });
             selectedDate = date;
@@ -327,7 +307,6 @@ $(document).ready(function () {
 
     // رویداد Livewire برای اطمینان از ریست تقویم
     document.addEventListener("livewire:init", function () {
-        console.log("Livewire initialized, resetting calendar");
         fetchAppointmentsCount();
     });
 

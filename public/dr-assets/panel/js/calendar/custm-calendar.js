@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
             e.stopPropagation();
 
-            console.log("Calendar button clicked"); // لاگ برای کلیک دکمه
 
             if (!modalInstance) {
                 modalInstance = new bootstrap.Modal(calendarModal, {
@@ -54,9 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let firstDayWeekday = firstDayOfMonth.weekday();
         const today = moment().locale("fa");
 
-        console.log(
-            `Generating calendar for ${year}/${month}, first weekday: ${firstDayWeekday}`
-        );
+
 
         for (let i = 0; i < firstDayWeekday; i++) {
             const emptyDay = document.createElement("div");
@@ -74,9 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             if (currentDay.day() === 5) {
-                console.log(
-                    `Friday detected: ${currentDay.format("jYYYY/jMM/jDD")}`
-                );
+               
                 dayElement.classList.add("friday");
             }
 
@@ -88,7 +83,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       dayElement.addEventListener("click", function () {
           const selectedDate = this.getAttribute("data-date");
-          console.log("Selected date (Jalali):", selectedDate);
 
           // تبدیل تاریخ جلالی به میلادی
           let gregorianDate;
@@ -96,7 +90,6 @@ document.addEventListener("DOMContentLoaded", function () {
               const jalaliMoment = moment(selectedDate, "jYYYY/jMM/jDD");
               gregorianDate = jalaliMoment.toDate();
               gregorianDate = moment(gregorianDate).format("YYYY-MM-DD");
-              console.log("Converted to Gregorian:", gregorianDate);
           } catch (error) {
               console.error("Error converting Jalali to Gregorian:", error);
               return;
@@ -105,21 +98,16 @@ document.addEventListener("DOMContentLoaded", function () {
           // آپدیت span
           if (selectedDateSpan) {
               selectedDateSpan.textContent = selectedDate;
-              console.log("Span updated with:", selectedDate);
           }
 
           // بستن مودال
           if (modalInstance) modalInstance.hide();
           $("#miniCalendarModal").modal("hide");
-          console.log("Modal closed");
 
           // ارسال رویداد به Livewire
           if (typeof Livewire !== "undefined") {
               Livewire.dispatch("updateSelectedDate", { date: gregorianDate });
-              console.log(
-                  "Livewire event dispatched: updateSelectedDate",
-                  gregorianDate
-              );
+             
               // ارسال رویداد برای آپدیت تقویم ردیفی
               $(document).trigger("updateCalendarRow", gregorianDate);
           } else {
@@ -131,7 +119,6 @@ document.addEventListener("DOMContentLoaded", function () {
                   document.querySelectorAll(".modal-backdrop");
               existingBackdrops.forEach((backdrop) => backdrop.remove());
               document.body.classList.remove("modal-open");
-              console.log("Backdrops cleared");
           }, 300);
       });
 
