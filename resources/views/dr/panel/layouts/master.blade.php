@@ -100,41 +100,6 @@
       }
     });
   </script>
-  <script>
-    $(document).ready(function() {
-      $('.modal').on('show.bs.modal', function() {
-        let modalDialog = $(this).find('.modal-dialog');
-        modalDialog.css({
-          transform: 'translateY(100%)',
-          opacity: 0
-        });
-        setTimeout(function() {
-          modalDialog.css({
-            transition: 'transform 0.5s ease-out, opacity 0.5s ease-out',
-            transform: 'translateY(0)',
-            opacity: 1
-          });
-        }, 10);
-      });
-
-      $('.modal').on('hide.bs.modal', function() {
-        let modalDialog = $(this).find('.modal-dialog');
-        modalDialog.css({
-          transition: 'transform 0.4s ease-in, opacity 0.4s ease-in',
-          transform: 'translateY(100%)',
-          opacity: 0
-        });
-      });
-
-      $('.modal').on('hidden.bs.modal', function() {
-        $(this).find('.modal-dialog').css({
-          transform: '',
-          opacity: '',
-          transition: ''
-        });
-      });
-    });
-  </script>
 </body>
 
 </html>

@@ -21,8 +21,8 @@
               <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-radius-11">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="miniCalendarModalLabel">تقویم</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal"
+                      aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                     <x-jalali-calendar />
@@ -571,38 +571,38 @@
         const blockUsersBtn = document.getElementById('block-users-btn');
         const blockMultipleUsersSubmit = document.getElementById('blockMultipleUsersSubmit');
 
-  
+
 
         // تابع به‌روزرسانی وضعیت دکمه‌ها
-      function updateButtonStates() {
-  const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
-  const anySelected = selectedCheckboxes.length > 0;
+        function updateButtonStates() {
+          const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
+          const anySelected = selectedCheckboxes.length > 0;
 
-  if (!cancelAppointmentsBtn || !moveAppointmentsBtn || !blockUsersBtn) {
-    console.warn('یکی از دکمه‌ها یافت نشد');
-    return;
-  }
+          if (!cancelAppointmentsBtn || !moveAppointmentsBtn || !blockUsersBtn) {
+            console.warn('یکی از دکمه‌ها یافت نشد');
+            return;
+          }
 
-  // ابتدا همه دکمه‌ها را بر اساس انتخاب شدن یا نشدن تنظیم می‌کنیم
-  cancelAppointmentsBtn.disabled = !anySelected;
-  moveAppointmentsBtn.disabled = !anySelected;
-  blockUsersBtn.disabled = !anySelected;
+          // ابتدا همه دکمه‌ها را بر اساس انتخاب شدن یا نشدن تنظیم می‌کنیم
+          cancelAppointmentsBtn.disabled = !anySelected;
+          moveAppointmentsBtn.disabled = !anySelected;
+          blockUsersBtn.disabled = !anySelected;
 
-  if (anySelected) {
-    let hasInvalidStatus = false;
-    selectedCheckboxes.forEach(checkbox => {
-      const status = checkbox.dataset.status;
-      if (status === 'cancelled' || status === 'attended') {
-        hasInvalidStatus = true;
-      }
-    });
+          if (anySelected) {
+            let hasInvalidStatus = false;
+            selectedCheckboxes.forEach(checkbox => {
+              const status = checkbox.dataset.status;
+              if (status === 'cancelled' || status === 'attended') {
+                hasInvalidStatus = true;
+              }
+            });
 
-    // فقط دکمه‌های لغو و جابجایی را در صورت وجود وضعیت نامعتبر غیرفعال می‌کنیم
-    cancelAppointmentsBtn.disabled = hasInvalidStatus;
-    moveAppointmentsBtn.disabled = hasInvalidStatus;
-    // دکمه بلاک کاربران بدون تغییر باقی می‌ماند (فعال اگر anySelected true باشد)
-  }
-}
+            // فقط دکمه‌های لغو و جابجایی را در صورت وجود وضعیت نامعتبر غیرفعال می‌کنیم
+            cancelAppointmentsBtn.disabled = hasInvalidStatus;
+            moveAppointmentsBtn.disabled = hasInvalidStatus;
+            // دکمه بلاک کاربران بدون تغییر باقی می‌ماند (فعال اگر anySelected true باشد)
+          }
+        }
 
         // تابع مقداردهی اولیه تولتیپ‌ها
         function initializeTooltips() {
@@ -957,7 +957,7 @@
         // مدیریت سال و ماه در تقویم جابجایی
         const yearSelect = document.getElementById("year-reschedule");
         const monthSelect = document.getElementById("month-reschedule");
-      
+
 
         if (yearSelect && monthSelect) {
           function populateYearMonthSelectors() {
