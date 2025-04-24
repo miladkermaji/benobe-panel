@@ -333,3 +333,55 @@
         transform: translateY(0);
     }
 }
+.table {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table thead {
+    background-color: #f8f9fa;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+.end-visit-btn {
+    transition: all 0.3s ease;
+}
+
+.end-visit-btn:hover {
+    background-color: #0052cc;
+    transform: translateY(-2px);
+}
+
+/* استایل‌های تولتیپ */
+.tooltip-inner {
+    background-color: #212529;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    max-width: 200px;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #212529;
+}
+
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+    border-bottom-color: #212529;
+}
+
+.tooltip.bs-tooltip-start .tooltip-arrow::before {
+    border-left-color: #212529;
+}
+
+.tooltip.bs-tooltip-end .tooltip-arrow::before {
+    border-right-color: #212529;
+}
+
+.tooltip {
+    z-index: 1050 !important;
+}

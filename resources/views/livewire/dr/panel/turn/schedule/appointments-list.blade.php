@@ -216,7 +216,7 @@
                 data-bs-toggle="dropdown" aria-expanded="false">
                 فیلتر
               </button>
-              <ul class="dropdown-menu" aria-labelledby="filterDropdown" wire:ignore>
+              <ul class="dropdown-menu" aria-labelledby="filterDropdown">
                 <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', '')">همه نوبت‌ها</a>
                 </li>
                 <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'scheduled')">در
@@ -507,61 +507,86 @@
         </div>
       </div>
     </div>
-    <style>
-      .table {
-        background-color: #fff;
-        border-radius: 8px;
-        overflow: hidden;
-      }
 
-      .table thead {
-        background-color: #f8f9fa;
-      }
-
-      .table tbody tr:hover {
-        background-color: #f1f5f9;
-      }
-
-      .end-visit-btn {
-        transition: all 0.3s ease;
-      }
-
-      .end-visit-btn:hover {
-        background-color: #0052cc;
-        transform: translateY(-2px);
-      }
-
-      /* استایل‌های تولتیپ */
-      .tooltip-inner {
-        background-color: #212529;
-        color: #fff;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 13px;
-        max-width: 200px;
-      }
-
-      .tooltip.bs-tooltip-top .tooltip-arrow::before {
-        border-top-color: #212529;
-      }
-
-      .tooltip.bs-tooltip-bottom .tooltip-arrow::before {
-        border-bottom-color: #212529;
-      }
-
-      .tooltip.bs-tooltip-start .tooltip-arrow::before {
-        border-left-color: #212529;
-      }
-
-      .tooltip.bs-tooltip-end .tooltip-arrow::before {
-        border-right-color: #212529;
-      }
-
-      .tooltip {
-        z-index: 1050 !important;
-      }
-    </style>
     <script>
+      document.addEventListener('DOMContentLoaded', () => {
+    // تابع برای مقداردهی اولیه دراپ‌داون
+    function initializeDropdown(dropdownId) {
+        const dropdownElement = document.getElementById(dropdownId);
+        if (!dropdownElement) {
+            console.warn(`Dropdown element with ID ${dropdownId} not found.`);
+            return;
+        }
+
+        // حذف نمونه قبلی دراپ‌داون (برای جلوگیری از تداخل)
+        const existingInstance = bootstrap.Dropdown.getInstance(dropdownElement);
+        if (existingInstance) {
+            existingInstance.dispose();
+        }
+
+        // ایجاد نمونه جدید دراپ‌داون
+        new bootstrap.Dropdown(dropdownElement);
+
+        // حذف رویدادهای کلیک قبلی برای جلوگیری از اتصال چندگانه
+        dropdownElement.removeEventListener('click', handleDropdownClick);
+        dropdownElement.addEventListener('click', handleDropdownClick);
+    }
+
+    // تابع مدیریت کلیک روی دکمه دراپ‌داون
+    function handleDropdownClick(e) {
+        e.preventDefault(); // جلوگیری از رفتار پیش‌فرض لینک‌ها
+        const dropdownElement = this;
+        const dropdownInstance = bootstrap.Dropdown.getInstance(dropdownElement) || new bootstrap.Dropdown(dropdownElement);
+        dropdownInstance.toggle(); // باز یا بسته کردن دراپ‌داون
+    }
+
+    // مقداردهی اولیه دراپ‌داون در زمان لود
+    initializeDropdown('filterDropdown');
+
+    // مدیریت به‌روزرسانی‌های Livewire
+    if (typeof Livewire !== 'undefined') {
+        Livewire.hook('morph.updated', () => {
+            setTimeout(() => {
+                initializeDropdown('filterDropdown');
+            }, 100);
+        });
+    }
+
+    // مدیریت آیتم‌های دراپ‌داون (برای حفظ عملکرد Livewire)
+    function initializeDropdownItems() {
+        const filterDropdownItems = document.querySelectorAll('#filterDropdown + .dropdown-menu .dropdown-item');
+        filterDropdownItems.forEach(item => {
+            // حذف رویدادهای قبلی برای جلوگیری از اتصال چندگانه
+            item.removeEventListener('click', handleDropdownItemClick);
+            item.addEventListener('click', handleDropdownItemClick);
+        });
+    }
+
+    // تابع مدیریت کلیک روی آیتم‌های دراپ‌داون
+    function handleDropdownItemClick(e) {
+        e.preventDefault();
+        const filterValue = this.getAttribute('wire:click').match(/'([^']+)'/)?.[1] || '';
+        Livewire.dispatch('setFilter', { filter: filterValue });
+        // بستن دراپ‌داون پس از انتخاب
+        const dropdownElement = document.getElementById('filterDropdown');
+        const dropdownInstance = bootstrap.Dropdown.getInstance(dropdownElement);
+        if (dropdownInstance) {
+            dropdownInstance.hide();
+        }
+    }
+
+    // مقداردهی اولیه آیتم‌های دراپ‌داون
+    initializeDropdownItems();
+
+    // به‌روزرسانی آیتم‌های دراپ‌داون پس از رندر Livewire
+    if (typeof Livewire !== 'undefined') {
+        Livewire.hook('morph.updated', () => {
+            setTimeout(() => {
+                initializeDropdownItems();
+            }, 100);
+        });
+    }
+});
       document.addEventListener('livewire:initialized', () => {
 
         // تعریف متغیرهای DOM
@@ -644,6 +669,7 @@
             checkCheckboxes();
             updateButtonStates();
           }, 100);
+          
         });
 
         // نمایش توستر موفقیت
