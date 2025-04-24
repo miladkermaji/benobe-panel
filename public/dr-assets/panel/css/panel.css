@@ -728,9 +728,7 @@ button {
     transform: translateX(-100%);
 }
 
-.dropdown-menu {
-    display: none !important;
-}
+
 
 .gap-10 {
     gap: 10px !important;
@@ -805,9 +803,7 @@ button {
     padding: 0px 10px;
 }
 
-.dropdown-menu.show {
-    display: block !important;
-}
+
 
 .dropdown-item {
     display: block;
@@ -925,17 +921,13 @@ button {
     /* اندازه حداقل */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     /* سایه برای بهتر دیده شدن */
-    display: none;
     /* در حالت عادی مخفی باشد */
 }
 .my-drp-left-0 {
     position: absolute !important;
     left: 0 !important;
 }
-.dropdown-menu.show {
-    display: block;
-    /* نمایش منو زمانی که کلاس show اضافه شود */
-}
+
 .top-table {
     overflow: scroll !important;
 }
