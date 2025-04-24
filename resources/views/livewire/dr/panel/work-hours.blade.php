@@ -79,15 +79,15 @@
                                       class="form-control h-50 text-center max-appointments bg-white"
                                       id="morning-patients-{{ $englishDay }}-{{ $index }}"
                                       wire:model.live="slots.{{ $englishDay }}.{{ $index }}.max_appointments"
-                                      data-toggle="modal" data-target="#CalculatorModal" data-day="{{ $englishDay }}"
-                                      data-index="{{ $index }}" readonly />
+                                      data-toggle="modal" data-bs-target="#CalculatorModal"
+                                      data-day="{{ $englishDay }}" data-index="{{ $index }}" readonly />
                                   </div>
                                   <!-- دکمه جدید برای نوبت‌های اورژانسی -->
                                   <div class="form-group position-relative">
                                     <button data-tooltip="true" data-placement="bottom"
                                       data-original-title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
                                       class="btn btn-light btn-sm emergency-slot-btn" data-toggle="modal"
-                                      data-target="#emergencyModal" data-day="{{ $englishDay }}"
+                                      data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
                                       data-index="{{ $index }}"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
                                       <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
@@ -98,7 +98,7 @@
                                     <button data-tooltip="true" data-placement="top"
                                       data-original-title="کپی ساعات کاری"
                                       class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal"
-                                      data-target="#checkboxModal" data-day="{{ $englishDay }}"
+                                      data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
                                       data-index="{{ $index }}"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
                                       <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
@@ -117,7 +117,7 @@
                                   <button data-tooltip="true" data-placement="top"
                                     data-original-title="زمانبندی باز شدن نوبت ها" type="button"
                                     class="btn text-black btn-sm btn-outline-primary schedule-btn" data-toggle="modal"
-                                    data-target="#scheduleModal" data-day="{{ $englishDay }}"
+                                    data-bs-target="#scheduleModal" data-day="{{ $englishDay }}"
                                     data-index="{{ $index }}"
                                     {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
                                     <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
@@ -152,7 +152,7 @@
                                     class="form-control h-50 text-center max-appointments bg-white"
                                     id="morning-patients-{{ $englishDay }}-{{ $index }}"
                                     wire:model.live="slots.{{ $englishDay }}.{{ $index }}.max_appointments"
-                                    data-toggle="modal" data-target="#CalculatorModal"
+                                    data-toggle="modal" data-bs-target="#CalculatorModal"
                                     data-day="{{ $englishDay }}" data-index="{{ $index }}" readonly />
                                 </div>
                                 <!-- دکمه جدید برای نوبت‌های اورژانسی -->
@@ -160,7 +160,7 @@
                                   <button data-tooltip="true" data-placement="bottom"
                                     data-original-title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
                                     class="btn btn-light btn-sm emergency-slot-btn" data-toggle="modal"
-                                    data-target="#emergencyModal" data-day="{{ $englishDay }}"
+                                    data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
                                     data-index="{{ $index }}"
                                     {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
                                     <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
@@ -171,7 +171,7 @@
                                   <button data-tooltip="true" data-placement="top"
                                     data-original-title="کپی ساعات کاری"
                                     class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal"
-                                    data-target="#checkboxModal" data-day="{{ $englishDay }}"
+                                    data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
                                     data-index="{{ $index }}"
                                     {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
                                     <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
@@ -190,7 +190,7 @@
                                 <button data-tooltip="true" data-placement="top"
                                   data-original-title="زمانبندی باز شدن نوبت ها" type="button"
                                   class="btn text-black btn-sm btn-outline-primary schedule-btn" data-toggle="modal"
-                                  data-target="#scheduleModal" data-day="{{ $englishDay }}"
+                                  data-bs-target="#scheduleModal" data-day="{{ $englishDay }}"
                                   data-index="{{ $index }}"
                                   {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
                                   <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
@@ -229,7 +229,7 @@
           @if (isset($_GET['activation-path']) && $_GET['activation-path'] == true)
             <div class="w-100 mt-3">
               <button class="btn btn-success w-100 h-50" tabindex="0" type="button" id=":rs:"
-                data-toggle="modal" data-target="#activation-modal">
+                data-toggle="modal" data-bs-target="#activation-modal">
                 <span class="button_text"> پایان فعالسازی</span>
                 <div class="loader"></div>
               </button>
@@ -241,7 +241,7 @@
                 <div class="modal-content border-radius-6">
                   <div class="modal-header border-radius-6">
                     <h5 class="modal-title" id="activation-modal-label">فعالسازی نوبت دهی</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
@@ -280,7 +280,7 @@
       <div class="modal-content border-radius-6">
         <div class="modal-header border-radius-6">
           <h6 class="modal-title fw-bold" id="emergencyModalLabel">انتخاب زمان‌های اورژانسی</h6>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
@@ -308,7 +308,7 @@
       <div class="modal-content border-radius-6">
         <div class="modal-header border-radius-6">
           <h5 class="modal-title fw-bold" id="scheduleModalLabel">تنظیم زمان‌بندی</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
@@ -425,7 +425,7 @@
       <div class="modal-content rounded-2" id="calculate-modal">
         <div class="modal-header rounded-2">
           <h6 class="modal-title fw-bold" id="CalculatorModalLabel">انتخاب تعداد نوبت یا زمان ویزیت:</h6>
-          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="d-flex align-items-center">
@@ -478,7 +478,7 @@
       <div class="modal-content border-radius-6">
         <div class="modal-header border-radius-6">
           <h5 class="modal-title fw-bold" id="checkboxModalLabel">کپی برنامه کاری</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="بستن">
             <span aria-hidden="true">×</span>
           </button>
         </div>

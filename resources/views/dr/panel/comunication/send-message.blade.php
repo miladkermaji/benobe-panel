@@ -25,7 +25,7 @@
         </div>
         <div class="card-body p-4">
           <div class="w-100 d-flex justify-content-end mb-3">
-            <button class="btn btn-success h-50 py-2 fw-bold" data-toggle="modal" data-target="#sendSmsModal"
+            <button class="btn btn-success h-50 py-2 fw-bold" data-toggle="modal" data-bs-target="#sendSmsModal"
               style="background: linear-gradient(to right, #2ecc71, #27ae60); border: none;">
               ارسال پیام جدید
             </button>
@@ -84,7 +84,7 @@
       <div class="modal-content border-radius-6 shadow-sm">
         <div class="modal-header bg-dark text-white">
           <h5 class="modal-title fw-bold" id="sendSmsModalLabel">ارسال پیام جدید</h5>
-          <button type="button" class="close text-white" data-dismiss="modal" aria-label="بستن">
+          <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="بستن">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>

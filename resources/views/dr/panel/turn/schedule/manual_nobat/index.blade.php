@@ -97,7 +97,7 @@
       </div>
     </div>
     <div class="btn-425-left">
-      <button class="btn my-btn-primary h-50 fs-13" data-toggle="modal" data-target="#addNewPatientModal">افزودن
+      <button class="btn my-btn-primary h-50 fs-13" data-toggle="modal" data-bs-target="#addNewPatientModal">افزودن
         بیمار</button>
       <!-- فرم افزودن بیمار -->
       <div class="modal fade" id="addNewPatientModal" tabindex="-1" role="dialog" aria-labelledby="addNewPatientLabel"
@@ -108,7 +108,7 @@
               @csrf
               <div class="modal-header">
                 <h5 class="modal-title" id="addNewPatientLabel">افزودن بیمار جدید</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">×</span>
                 </button>
               </div>
@@ -224,7 +224,7 @@
           <div class="modal-dialog modal-dialog-centered " role="document">
             <div class="modal-content border-radius-6">
               <div class="my-modal-header p-3">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">×</span>
                 </button>
               </div>
@@ -298,7 +298,7 @@
         @csrf
         <div class="modal-header">
           <h5 class="modal-title" id="editPatientLabel">ویرایش بیمار</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>

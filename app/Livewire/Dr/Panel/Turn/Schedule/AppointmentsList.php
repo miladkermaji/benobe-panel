@@ -85,7 +85,11 @@ class AppointmentsList extends Component
         'updateSelectedDate' => 'updateSelectedDate',
         'searchAllDates' => 'searchAllDates',
     ];
-
+    public function initialize()
+    {
+        // این متد برای اطمینان از اجرای اسکریپت‌های اولیه استفاده می‌شود
+        $this->dispatch('initialize-tooltips');
+    }
     public function mount()
     {
         $this->selectedDate = Carbon::now()->format('Y-m-d');
@@ -141,7 +145,7 @@ class AppointmentsList extends Component
         }
 
         $gregorianDate = $this->convertToGregorian($this->selectedDate);
-       
+
 
         $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
             ->withTrashed()
@@ -153,17 +157,17 @@ class AppointmentsList extends Component
                 $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
                 $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
                 $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
-               
+
             } elseif ($this->dateFilter === 'current_month') {
                 $startOfMonth = $today->copy()->startOfMonth();
                 $endOfMonth = $today->copy()->endOfMonth();
                 $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
-               
+
             } elseif ($this->dateFilter === 'current_year') {
                 $startOfYear = $today->copy()->startOfYear();
                 $endOfYear = $today->copy()->endOfYear();
                 $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
-               
+
             }
         } elseif ($this->filterStatus !== 'all' && !$this->isSearchingAllDates) {
             $query->whereDate('appointment_date', $gregorianDate);
@@ -203,7 +207,7 @@ class AppointmentsList extends Component
             'total' => $appointments->total(),
         ];
 
-       
+
 
         if (empty($this->appointments) && !$this->isSearchingAllDates && $this->searchQuery) {
             $jalaliDate = Jalalian::fromCarbon(Carbon::parse($gregorianDate))->format('Y/m/d');
@@ -227,7 +231,7 @@ class AppointmentsList extends Component
                 $gregorian = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
                 return $gregorian;
             } catch (\Exception $e) {
-            
+
                 $this->dispatch('alert', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
                 return Carbon::now()->format('Y-m-d');
             }
@@ -362,44 +366,50 @@ class AppointmentsList extends Component
 
     public function cancelAppointments($ids)
     {
+        Log::info('cancelAppointments called', ['ids' => $ids]);
 
-        if (empty($ids)) {
-            $this->dispatch('alert', type: 'error', message: 'لطفاً حداقل یک نوبت را انتخاب کنید.');
-            return;
-        }
+        try {
+            $doctor = $this->getAuthenticatedDoctor();
+            $appointments = Appointment::whereIn('id', $ids)
+                ->where('doctor_id', $doctor->id)
+                ->whereNotIn('status', ['cancelled', 'attended'])
+                ->get();
 
-        $appointments = Appointment::whereIn('id', $ids)->get();
-        $recipients = [];
-
-        foreach ($appointments as $appointment) {
-            if ($appointment->status !== 'cancelled') {
-                $appointment->status = 'cancelled';
-                $appointment->delete(); // سافت‌دلیت
-                $appointment->save();
-                if ($appointment->patient && $appointment->patient->mobile) {
-                    $recipients[] = $appointment->patient->mobile;
-                }
-             
+            if ($appointments->isEmpty()) {
+                Log::warning('No valid appointments found for cancellation', ['ids' => $ids]);
+                $this->dispatch('close-modal', ['id' => 'someModalId']);
+                return;
             }
-        }
 
-        if (!empty($recipients)) {
-            $message = "کاربر گرامی، نوبت شما لغو شده است. برای اطلاعات بیشتر تماس بگیرید.";
-            SendSmsNotificationJob::dispatch(
-                $message,
-                $recipients,
-                null,
-                []
-            )->delay(now()->addSeconds(5));
-        }
+            foreach ($appointments as $appointment) {
+                $appointment->update([
+                    'status' => 'cancelled',
+                    'updated_at' => now(),
+                ]);
+                Log::info('Appointment cancelled', ['id' => $appointment->id]);
+            }
 
-        $this->dispatch('alert', type: 'success', message: 'نوبت‌ها با موفقیت لغو شدند.');
-        $this->loadAppointments();
+            // ارسال رویداد برای نمایش توستر موفقیت
+            $this->dispatch('appointments-cancelled', [
+                'message' => count($ids) > 1 ? 'نوبت‌ها با موفقیت لغو شدند.' : 'نوبت با موفقیت لغو شد.'
+            ]);
+
+            // به‌روزرسانی جدول
+            $this->loadAppointments();
+        } catch (\Exception $e) {
+            Log::error('Error cancelling appointments', ['error' => $e->getMessage(), 'ids' => $ids]);
+            $this->dispatch('close-modal', ['id' => 'someModalId']);
+            $this->dispatch('show-error', ['message' => 'خطایی در لغو نوبت رخ داد.']);
+        }
     }
-
+    public function confirmCancelSingle($id)
+    {
+        Log::info('confirmCancelSingle called', ['id' => $id]);
+        $this->dispatch('confirm-cancel-single', ['id' => $id]);
+    }
     public function cancelSingleAppointment($id)
     {
-        $this->dispatch('confirm-cancel-single', id: $id);
+        $this->dispatch('confirm-cancel-single', ['id' => $id]); // Ensure array format for consistency
     }
 
     private function loadBlockedUsers()
@@ -446,27 +456,22 @@ class AppointmentsList extends Component
 
     public function blockUser()
     {
-
         $this->validate([
-                'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
-                'unblockedAt' => ['nullable', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
-                'blockReason' => ['nullable', 'string', 'max:255'],
-            ], [
-                'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
-                'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
-                'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
-                'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
-                'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-            ]);
-
+            'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
+            'unblockedAt' => ['nullable', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
+            'blockReason' => ['nullable', 'string', 'max:255'],
+        ], [
+            'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
+            'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+            'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+            'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
+            'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+        ]);
 
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
         $appointment = Appointment::findOrFail($this->blockAppointmentId);
         $user = $appointment->patient;
-
-        $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
-        $unblockedAt = $this->processDate($this->unblockedAt, 'پایان مسدودیت');
 
         $isBlocked = UserBlocking::where('user_id', $user->id)
             ->where('doctor_id', $doctorId)
@@ -483,8 +488,8 @@ class AppointmentsList extends Component
             'user_id' => $user->id,
             'doctor_id' => $doctorId,
             'clinic_id' => $clinicId,
-            'blocked_at' => $blockedAt,
-            'unblocked_at' => $unblockedAt,
+            'blocked_at' => $this->processDate($this->blockedAt, 'شروع مسدودیت'),
+            'unblocked_at' => $this->processDate($this->unblockedAt, 'پایان مسدودیت'),
             'reason' => $this->blockReason ?? null,
             'status' => 1,
         ]);
@@ -502,19 +507,17 @@ class AppointmentsList extends Component
             return;
         }
 
-
         $this->validate([
-                'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
-                'unblockedAt' => ['nullable', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
-                'blockReason' => ['nullable', 'string', 'max:255'],
-            ], [
-                'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
-                'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
-                'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
-                'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
-                'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-            ]);
-
+            'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
+            'unblockedAt' => ['nullable', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
+            'blockReason' => ['nullable', 'string', 'max:255'],
+        ], [
+            'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
+            'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+            'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+            'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
+            'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+        ]);
 
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;

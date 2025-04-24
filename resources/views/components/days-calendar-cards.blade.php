@@ -18,7 +18,7 @@
       dayDiv.classList.add('day-calendar-card', 'd-flex', 'flex-column', 'align-items-center',
         'justify-content-center');
       dayDiv.setAttribute('data-toggle', 'modal');
-      dayDiv.setAttribute('data-target', '#currentDayModal');
+      dayDiv.setAttribute('data-bs-target', '#currentDayModal');
       dayDiv.setAttribute('data-day', day);
       dayDiv.setAttribute('onclick', `openModal('${day}')`);
       var dayContent = `
@@ -99,7 +99,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">تعریف برنامه جدید</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>

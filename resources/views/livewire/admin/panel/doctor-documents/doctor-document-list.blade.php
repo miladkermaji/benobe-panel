@@ -165,7 +165,7 @@
         </div>
         <div class="modal-footer p-3">
           <a href="#" id="downloadLink" class="btn btn-gradient-success rounded-pill px-4" download>دانلود</a>
-          <button type="button" class="btn btn-secondary rounded-pill px-4" data-dismiss="modal">بستن</button>
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">بستن</button>
         </div>
       </div>
     </div>

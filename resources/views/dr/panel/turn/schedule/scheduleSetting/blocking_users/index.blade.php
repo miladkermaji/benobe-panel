@@ -24,7 +24,8 @@
       </div>
       <div class="card-body">
         <div class="d-flex justify-content-end mb-3">
-          <button class="btn my-btn-primary h-50" data-toggle="modal" data-target="#addUserModal">افزودن کاربر</button>
+          <button class="btn my-btn-primary h-50" data-toggle="modal" data-bs-target="#addUserModal">افزودن
+            کاربر</button>
         </div>
         <div class="table-responsive">
           <table id="blockedUsersTable" class="table table-striped table-bordered text-center">
@@ -113,7 +114,7 @@
       <div class="modal-content border-radius-6">
         <div class="modal-header">
           <h5 class="modal-title" id="addUserModalLabel">افزودن کاربر مسدود</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="بستن">
             <span aria-hidden="true">×</span>
           </button>
         </div>

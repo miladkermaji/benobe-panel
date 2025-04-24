@@ -39,10 +39,10 @@
     <div class="header-chosser-option w-100">
       <div class="d-flex w-100">
         <ul class="d-flex">
-          <li class="tab my-border-bottom-primary" data-target="#tajviz"><span>تجویز دارو</span></li>
-          <li class="tab" data-target="#azmayeshgah"><span>آزمایشگاه</span></li>
-          <li class="tab" data-target="#tasvir-bardary"><span>تصویربرداری</span></li>
-          <li class="tab" data-target="#paraclinic"><span>پاراکلینیک</span></li>
+          <li class="tab my-border-bottom-primary" data-bs-target="#tajviz"><span>تجویز دارو</span></li>
+          <li class="tab" data-bs-target="#azmayeshgah"><span>آزمایشگاه</span></li>
+          <li class="tab" data-bs-target="#tasvir-bardary"><span>تصویربرداری</span></li>
+          <li class="tab" data-bs-target="#paraclinic"><span>پاراکلینیک</span></li>
         </ul>
       </div>
     </div>

@@ -21,7 +21,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h5 class="modal-title">افزودن کاربر</h5>
-        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        <button type="button" class="close" data-bs-dismiss="modal"><span>&times;</span></button>
       </div>
       <div class="modal-body">
         <form id="add-subuser-form">
@@ -52,7 +52,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h5 class="modal-title">ویرایش کاربر</h5>
-        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        <button type="button" class="close" data-bs-dismiss="modal"><span>&times;</span></button>
       </div>
       <div class="modal-body">
         <form id="edit-subuser-form">

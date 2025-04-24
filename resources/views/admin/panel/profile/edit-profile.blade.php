@@ -112,7 +112,7 @@
                 disabled>
               <button
                 class="btn btn-dark h-50 col-lg-1 col-xs-2 col-md-1 col-sm-1 d-flex justify-content-center align-items-center fs-6 add-form-item"
-                type="button" id="editButton" data-toggle="modal" data-target="#mobileEditModal">
+                type="button" id="editButton" data-toggle="modal" data-bs-target="#mobileEditModal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                   fill="#fff">
                   <path d="M4 22H20" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
@@ -145,7 +145,7 @@
         <div class="modal-content border-radius-6">
           <div class="modal-header">
             <h5 class="modal-title">ویرایش شماره موبایل</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>

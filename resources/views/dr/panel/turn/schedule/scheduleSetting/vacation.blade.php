@@ -33,7 +33,7 @@
             <p class="alert alert-warning font-size-13 fw-bold mt-2">شما می‌توانید برای ساعاتی که طبق ساعت کاری
               خود حضور ندارید، مرخصی اعمال کنید.</p>
             <div class="w-100">
-              <button data-toggle="modal" data-target="#exampleModalCenterAddVacation"
+              <button data-toggle="modal" data-bs-target="#exampleModalCenterAddVacation"
                 class="h-50 w-100 btn btn-outline-primary" tabindex="0" type="button" id=":r18:">اضافه کردن
                 مرخصی<span class=""></span>
               </button>
@@ -43,7 +43,7 @@
                   <div class="modal-content border-radius-6">
                     <div class="modal-header">
                       <h5 class="modal-title" id="exampleModalLongTitle"> ثبت مرخصی </h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                       </button>
                     </div>
@@ -143,7 +143,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h5 class="modal-title">ویرایش مرخصی</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
       </div>

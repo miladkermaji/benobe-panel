@@ -7,7 +7,7 @@
   <td class="align-middle">
     <div class="d-flex align-items-center gap-2">
       @if ($service->children->isNotEmpty())
-        <button class="dropdown-toggle btn btn-link p-0" data-target="children-{{ $service->id }}">
+        <button class="dropdown-toggle btn btn-link p-0" data-bs-target="children-{{ $service->id }}">
           <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2">
             <path d="M9 18l6-6-6-6" />

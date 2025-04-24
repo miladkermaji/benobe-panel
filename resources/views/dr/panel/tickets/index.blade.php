@@ -152,7 +152,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
           <h4 class="card-title">تیکت‌های من</h4>
           <button type="button" class="btn btn-light btn-custom h-50" data-toggle="modal"
-            data-target="#add-ticket-modal">
+            data-bs-target="#add-ticket-modal">
             <i class="fas fa-plus mr-2"></i> افزودن تیکت جدید
           </button>
         </div>
@@ -216,7 +216,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="add-ticket-modal-label">ایجاد تیکت جدید</h5>
-        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
       </div>

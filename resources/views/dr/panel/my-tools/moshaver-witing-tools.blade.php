@@ -1513,7 +1513,7 @@
                 <button type="button" id="confirmUnHolidayButton" class="btn my-btn-primary h-50 w-100">بله</button>
               </div>
               <div class="w-100">
-                <button type="button" class="btn btn-danger h-50 w-100 close-modal" data-dismiss="modal" aria-label="Close">خیر</button>
+                <button type="button" class="btn btn-danger h-50 w-100 close-modal" data-bs-dismiss="modal" aria-label="Close">خیر</button>
               </div>
             </div>
           `);
@@ -1546,7 +1546,7 @@
                 <button type="button" id="confirmHolidayButton" class="btn my-btn-primary h-50 w-100">بله</button>
               </div>
               <div class="w-100">
-                <button type="button" class="btn btn-danger h-50 w-100 close-modal" data-dismiss="modal" aria-label="Close">خیر</button>
+                <button type="button" class="btn btn-danger h-50 w-100 close-modal" data-bs-dismiss="modal" aria-label="Close">خیر</button>
               </div>
             </div>
           `);

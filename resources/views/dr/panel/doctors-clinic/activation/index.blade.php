@@ -70,14 +70,14 @@
               </div>
               <div class="input-group mt-2">
                 <input type="text" value="{{ $clinic->address ?? '' }}" class="my-form-control w-100"
-                  placeholder="آدرس شما" readonly data-toggle="modal" data-target="#addressModalCenter">
+                  placeholder="آدرس شما" readonly data-toggle="modal" data-bs-target="#addressModalCenter">
                 <div class="modal fade" id="addressModalCenter" tabindex="-1" role="dialog"
                   aria-labelledby="addressModalCenterLabel" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content border-radius-6">
                       <div class="modal-header">
                         <h5 class="modal-title" id="addressModalCenterLabel">ثبت آدرس</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                         </button>
                       </div>
@@ -104,7 +104,7 @@
 
                 <div class="mt-3 w-100">
                   <button class="btn my-btn-primary h-50 w-100 " type="button" data-toggle="modal"
-                    data-target="#doneModal">انجام
+                    data-bs-target="#doneModal">انجام
                     شد</button>
                 </div>
               </div>
@@ -122,7 +122,7 @@
       <div class="modal-content border-radius-6">
         <div class="modal-header">
           <h5 class="modal-title fs-6 fw-bold" id="doneModalLabel">اطلاعات تماس مطب</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>

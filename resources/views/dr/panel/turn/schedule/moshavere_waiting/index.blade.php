@@ -45,7 +45,7 @@
         <div class="turning_selectDate__MLRSb">
           <button
             class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50 bg-light-blue d-flex justify-content-center align-items-center"
-            data-toggle="modal" data-target="#calendarModal">
+            data-toggle="modal" data-bs-target="#calendarModal">
             <span class="mx-1"></span>
             {{-- <span type="text" class="observer-example bg-transparent text-center cursor-pointer"></span> --}}
             <svg style="margin-top: -4px" width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -64,7 +64,7 @@
               <div class="modal-content border-radius-6">
                 <div class="my-modal-header">
                   <div>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
@@ -86,7 +86,7 @@
       </div>
       <div class="btn-425-left">
         <button class="btn my-btn-primary h-50 fs-13" data-toggle="modal"
-          data-target="#exampleModalCenterAddSick">افزودن
+          data-bs-target="#exampleModalCenterAddSick">افزودن
           بیمار</button>
         </button>
         <!-- Modal -->
@@ -96,7 +96,7 @@
             <div class="modal-content border-radius-6">
               <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">افزودن بیمار </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -106,7 +106,7 @@
                     <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع">
                     <div class="mt-2">
                       <a class="text-decoration-underline" href="#" data-toggle="modal"
-                        data-target="#exampleModalCenterPaziresh">پذیرش
+                        data-bs-target="#exampleModalCenterPaziresh">پذیرش
                         از مسیر ارجاع</a>
                     </div>
                     <div class="d-flex mt-2 gap-20">
@@ -125,7 +125,7 @@
             <div class="modal-content border-radius-6">
               <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle"> ارجاع </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -278,7 +278,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h5 class="modal-title" id="activation-modal-label">فعالسازی مشاوره دهی</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -294,7 +294,7 @@
         </div>
       </div>
       <div class="p-3">
-        <a href="" data-toggle="modal" data-target="#contact-modal"
+        <a href="" data-toggle="modal" data-bs-target="#contact-modal"
           class="btn my-btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center">
           فعالسازی تماس امن </a>
         <a href="" class="btn btn-light mt-3 w-100 h-50 d-flex align-items-center  justify-content-center"
@@ -310,7 +310,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h5 class="modal-title" id="activation-modal-label">تماس امن</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -343,7 +343,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h6 class="modal-title" id="rescheduleModalLabel">جابجایی مشاوره</h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -412,7 +412,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h6 class="modal-title fw-bold" id="exampleModalCenterTitle"> توضیحات درمان</h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>

@@ -102,7 +102,7 @@
                 disabled>
               <button
                 class="btn btn-dark h-50 col-lg-1 col-xs-2 col-md-1 col-sm-1 d-flex justify-content-center align-items-center fs-6 add-form-item"
-                type="button" id="editButton" data-toggle="modal" data-target="#mobileEditModal">
+                type="button" id="editButton" data-toggle="modal" data-bs-target="#mobileEditModal">
 
                 <img src="{{ asset('dr-assets/icons/pencil-edit.svg') }}" alt="" srcset="">
 
@@ -157,7 +157,7 @@
         <div class="modal-content border-radius-6">
           <div class="modal-header">
             <h5 class="modal-title">ویرایش شماره موبایل</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>

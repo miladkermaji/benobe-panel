@@ -21,7 +21,7 @@
 
       </div>
       <div class="">
-        <button class="btn btn-light h-50" data-toggle="modal" data-target="#exampleModalCenterAddSick">
+        <button class="btn btn-light h-50" data-toggle="modal" data-bs-target="#exampleModalCenterAddSick">
 
           <svg width="20px" height="20px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             class="sc-8d06d158-0 jrjHxO">
@@ -36,7 +36,7 @@
             <div class="modal-content border-radius-6">
               <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle"> فیلترها </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -104,7 +104,7 @@
     </div>
   </div>
   <div class="vakeshi-noskhe  p-3">
-    <button class="btn btn-outline-secondary h-50" data-toggle="modal" data-target="#exampleModalCenterVakeshi">واکشی
+    <button class="btn btn-outline-secondary h-50" data-toggle="modal" data-bs-target="#exampleModalCenterVakeshi">واکشی
       نسخه</button>
     <div class="modal fade " id="exampleModalCenterVakeshi" tabindex="-1" role="dialog"
       aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -112,7 +112,7 @@
         <div class="modal-content border-radius-6">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLongTitle"> واکشی نسخه </h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>

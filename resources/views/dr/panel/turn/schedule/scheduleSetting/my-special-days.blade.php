@@ -65,7 +65,7 @@
 
       <div class="modal-header">
         <h6 class="modal-title" id="dateModalLabel">تاریخ</h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -82,7 +82,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h6 class="modal-title" id="rescheduleModalLabel">جابجایی نوبت</h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -90,8 +90,7 @@
         <div class="calendar-header w-100 d-flex justify-content-between align-items-center gap-4">
           <div class="">
             <button id="prev-month-reschedule" class="btn btn-light">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                fill="none">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <g id="Arrow / Chevron_Right_MD">
                   <path id="Vector" d="M10 8L14 12L10 16" stroke="#000000" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round" />
@@ -141,7 +140,7 @@
       </div>
     </div>
   </div>
-  
+
 </div>
 <div class="calendar-legend mt-4">
   <div class="d-flex flex-wrap justify-content-center gap-3">

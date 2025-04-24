@@ -149,7 +149,7 @@
         @if (isset($_GET['activation-path']) && $_GET['activation-path'] == true)
           <div class="w-100">
             <button class="btn btn-outline-primary w-100 h-50" tabindex="0" type="button" id=":rs:"
-              data-toggle="modal" data-target="#activation-modal">پایان فعالسازی<span></span></button>
+              data-toggle="modal" data-bs-target="#activation-modal">پایان فعالسازی<span></span></button>
           </div>
           <div class="modal fade" id="activation-modal" tabindex="-1" role="dialog"
             aria-labelledby="activation-modal-label" aria-hidden="true">
@@ -157,7 +157,7 @@
               <div class="modal-content border-radius-6">
                 <div class="modal-header">
                   <h5 class="modal-title" id="activation-modal-label">فعالسازی نوبت دهی</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                   </button>
                 </div>
@@ -195,7 +195,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h6 class="modal-title fw-bold" id="scheduleModalLabel">برنامه زمانبندی</h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -261,7 +261,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h6 class="modal-title fw-bold" id="checkboxModalLabel"> کپی ساعت کاری برای روز های : </h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
       </div>
@@ -295,7 +295,7 @@
     <div class="modal-content border-radius-6" id="calculate-modal">
       <div class="modal-header">
         <h6 class="modal-title fw-bold" id="checkboxModalLabel"> انتخاب تعداد نوبت یا زمان ویزیت: </h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
       </div>

@@ -19,7 +19,7 @@
         <div class="card-header">
           <h5 class="card-title text-dark">پرونده الکترونیک بیمار</h5>
           <div class="float-right">
-            <button class="btn my-btn-primary h-50 w-100" data-toggle="modal" data-target="#add-patient-modal">افزودن
+            <button class="btn my-btn-primary h-50 w-100" data-toggle="modal" data-bs-target="#add-patient-modal">افزودن
               بیمار
               جدید</button>
           </div>
@@ -56,9 +56,9 @@
                         <td>{{ $patient->address }}</td>
                         <td>
                           <button class="btn my-btn-primary h-50 w-100" data-toggle="modal"
-                            data-target="#edit-patient-modal-{{ $patient->id }}">ویرایش</button>
+                            data-bs-target="#edit-patient-modal-{{ $patient->id }}">ویرایش</button>
                           <button class="btn btn-danger" data-toggle="modal"
-                            data-target="#delete-patient-modal-{{ $patient->id }}">حذف</button>
+                            data-bs-target="#delete-patient-modal-{{ $patient->id }}">حذف</button>
                         </td>
                       </tr>
                     @endforeach
@@ -80,7 +80,7 @@
     <div class="modal-content border-radius-6">
       <div class="modal-header">
         <h5 class="modal-title" id="add-patient-modal-label">افزودن بیمار جدید</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -120,7 +120,7 @@
       <div class="modal-content border-radius-6">
         <div class="modal-header">
           <h5 class="modal-title" id="edit-patient-modal-label-{{ $patient->id }}">ویرایش بیمار</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -165,7 +165,7 @@
       <div class="modal-content border-radius-6">
         <div class="modal-header">
           <h5 class="modal-title" id="delete-patient-modal-label-{{ $patient->id }}">حذف بیمار</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>

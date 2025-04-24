@@ -66,7 +66,7 @@
                     <div class="d-flex justify-content-center gap-2">
                       @if (str_starts_with($document->file_type, 'image'))
                         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" data-toggle="modal"
-                          data-target="#previewModal" data-image="{{ asset(Storage::url($document->file_path)) }}"
+                          data-bs-target="#previewModal" data-image="{{ asset(Storage::url($document->file_path)) }}"
                           data-title="{{ $document->title ?? 'مدرک بدون عنوان' }}">
                           مشاهده
                         </button>
@@ -101,7 +101,7 @@
         style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 15px;">
         <div class="modal-header bg-gradient-primary text-white border-0">
           <h5 class="modal-title fw-bold" id="previewModalLabel">پیش‌نمایش مدرک</h5>
-          <button type="button" class="close btn-close-white" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -117,7 +117,7 @@
             </svg>
             دانلود
           </a>
-          <button type="button" class="btn btn-gradient-danger rounded-pill" data-dismiss="modal">بستن</button>
+          <button type="button" class="btn btn-gradient-danger rounded-pill" data-bs-dismiss="modal">بستن</button>
         </div>
       </div>
     </div>

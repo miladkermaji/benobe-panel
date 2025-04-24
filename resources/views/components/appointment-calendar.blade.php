@@ -31,13 +31,14 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="currentDayMonthModal" tabindex="-1" aria-labelledby="currentDayMonthModalLabel" aria-hidden="true">
+<div class="modal fade" id="currentDayMonthModal" tabindex="-1" aria-labelledby="currentDayMonthModalLabel"
+  aria-hidden="true">
   <input type="hidden" id="dayAppointments">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h6 class="modal-title" id="exampleModalTitleText">شنبه‌ها</h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -78,8 +79,8 @@
               <label for="start-time-appointments">زمان شروع</label>
               <select class="form-control select2-appointments" id="start-time-appointments" style="width: 100%">
                 <!-- گزینه‌های زمان شروع از 6 صبح تا 12 شب با ساعات کاری‌های 5 دقیقه‌ای -->
-                @for($hour = 6; $hour <= 23; $hour++)
-                  @for($minute = 0; $minute < 60; $minute += 5)
+                @for ($hour = 6; $hour <= 23; $hour++)
+                  @for ($minute = 0; $minute < 60; $minute += 5)
                     <option value="{{ sprintf('%02d:%02d', $hour, $minute) }}">
                       {{ sprintf('%02d:%02d', $hour, $minute) }}
                     </option>
@@ -91,13 +92,13 @@
               <label for="end-time-appointments">زمان پایان</label>
               <select class="form-control select2-appointments" id="end-time-appointments" style="width: 100%">
                 <!-- گزینه‌های زمان پایان از 6:30 صبح تا 12 شب با ساعات کاری‌های 5 دقیقه‌ای -->
-                @for($hour = 6; $hour <= 23; $hour++)
-                  @for($minute = 30; $minute < 60; $minute += 5)
+                @for ($hour = 6; $hour <= 23; $hour++)
+                  @for ($minute = 30; $minute < 60; $minute += 5)
                     <option value="{{ sprintf('%02d:%02d', $hour, $minute) }}">
                       {{ sprintf('%02d:%02d', $hour, $minute) }}
                     </option>
                   @endfor
-                  @if($hour < 24)
+                  @if ($hour < 24)
                     <option value="{{ sprintf('%02d:00', $hour + 1) }}">
                       {{ sprintf('%02d:00', $hour + 1) }}
                     </option>
@@ -109,12 +110,14 @@
           <div class="form-group">
             <label for="slot">تعداد نفرات</label>
             <div class="d-flex align-items-center">
-              <input type="number" class="form-control text-center mx-2" id="max_appointments-appointments" name="max_appointments" value="10" min="1">
+              <input type="number" class="form-control text-center mx-2" id="max_appointments-appointments"
+                name="max_appointments" value="10" min="1">
               <input type="hidden" name="appointment_date" id="appointments_date" value="">
             </div>
           </div>
           <div class="mt-2 p-2" id="holiday_container-appointments">
-            <h6 class="d-flex justify-content-center align-items-center py-2 rounded-30">آیا تعطیلات رسمی برای برنامه نوبت دهی لحاظ شود؟
+            <h6 class="d-flex justify-content-center align-items-center py-2 rounded-30">آیا تعطیلات رسمی برای برنامه
+              نوبت دهی لحاظ شود؟
               <div class="ant-click-animating-node mx-2">
                 <label class="switch mt-3">
                   <input type="checkbox" checked id="holiday-schedule_pattern-appointments">
@@ -127,7 +130,8 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-dark rounded-circle" id="save-pattern-appointments">
-          <svg viewBox="64 64 896 896" focusable="false" width="14" height="14" fill="currentColor" aria-hidden="true">
+          <svg viewBox="64 64 896 896" focusable="false" width="14" height="14" fill="currentColor"
+            aria-hidden="true">
             <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z"></path>
             <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z"></path>
           </svg>

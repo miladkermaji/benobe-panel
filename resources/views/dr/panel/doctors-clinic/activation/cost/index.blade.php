@@ -133,7 +133,7 @@
               </div>
               <div class="d-flex justify-content-between w-100 gap-4">
                 <button type="button" class="btn my-btn-primary h-50 w-50" data-toggle="modal"
-                  data-target="#confirmationModal">ادامه</button>
+                  data-bs-target="#confirmationModal">ادامه</button>
                 <button type="button" class="btn btn-outline-secondary h-50 w-50">انصراف</button>
               </div>
               <div id="depositList" class="mt-4">

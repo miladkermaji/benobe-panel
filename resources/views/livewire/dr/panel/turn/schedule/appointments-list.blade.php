@@ -16,14 +16,13 @@
                 <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
               </div>
             </button>
-            <div class="modal fade" id="miniCalendarModal" tabindex="-1" role="dialog"
-              aria-labelledby="exampleModalCenterTitle" aria-hidden="true" wire:ignore>
-              <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal fade" id="miniCalendarModal" tabindex="-1" aria-labelledby="miniCalendarModalLabel"
+              aria-hidden="true" wire:ignore.self>
+              <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-radius-11">
-                  <div class="my-modal-header">
-                    <div class="text-end">
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="miniCalendarModalLabel">تقویم</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                     <x-jalali-calendar />
@@ -43,14 +42,13 @@
         </div>
         <div class="btn-425-left">
           <button class="btn my-btn-primary h-50 fs-13" data-bs-toggle="modal"
-            data-bs-target="#exampleModalCenterAddSick">ثبت
-            نوبت دستی</button>
-          <div class="modal fade" id="exampleModalCenterAddSick" tabindex="-1" role="dialog"
-            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
+            data-bs-target="#exampleModalCenterAddSick">ثبت نوبت دستی</button>
+          <div class="modal fade" id="exampleModalCenterAddSick" tabindex="-1"
+            aria-labelledby="exampleModalCenterAddSickLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content border-radius-11">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLongTitle"> ثبت نوبت دستی</h5>
+                  <h5 class="modal-title" id="exampleModalCenterAddSickLabel">ثبت نوبت دستی</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -70,12 +68,12 @@
                 </div>
               </div>
             </div>
-            <div class="modal fade" id="exampleModalCenterPaziresh" tabindex="-1" role="dialog"
-              aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal fade" id="exampleModalCenterPaziresh" tabindex="-1"
+              aria-labelledby="exampleModalCenterPazireshLabel" aria-hidden="true" wire:ignore.self>
+              <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-radius-11">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">ارجاع</h5>
+                    <h5 class="modal-title" id="exampleModalCenterPazireshLabel">ارجاع</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
@@ -101,9 +99,9 @@
     </div>
     <div class="sicks-content h-100 w-100 position-relative border">
       <div>
-        <div class="table-responsive position-relative top-table w-100">
+        <div class="table-responsive position-relative top-table w-100" wire:ignore.self>
           <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
-            <thead class="bg-light">
+            <thead class="bg-light" wire:ignore>
               <tr>
                 <th>
                   <input class="form-check-input" type="checkbox" id="select-all-row">
@@ -178,24 +176,23 @@
                     </td>
                     <td>
                       <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-light rounded-circle shadow-sm reschedule-btn" data-tooltip="true"
-                          data-placement="top" data-original-title="جابجایی نوبت" data-toggle="modal"
-                          data-target="#rescheduleModal"
+                        <button class="btn btn-light rounded-circle shadow-sm reschedule-btn" data-bs-toggle="tooltip"
+                          data-bs-placement="top" title="جابجایی نوبت" data-bs-toggle="modal"
+                          data-bs-target="#rescheduleModal"
                           wire:click="$set('rescheduleAppointmentId', {{ $appointment->id }})"
                           {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
                           <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="جابجایی">
                         </button>
-                        <button class="btn btn-light rounded-circle shadow-sm cancel-btn" data-tooltip="true"
-                          data-placement="top" data-original-title="لغو نوبت"
+                        <button class="btn btn-light rounded-circle shadow-sm cancel-btn" data-bs-toggle="tooltip"
+                          data-bs-placement="top" title="لغو نوبت"
                           wire:click="cancelSingleAppointment({{ $appointment->id }})"
                           {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
-                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                          <img src="{{ asset('dr-assets/icons/cancle-appointment.svg') }}" alt="حذف">
                         </button>
-                        <button class="btn btn-light rounded-circle shadow-sm block-btn" data-tooltip="true"
-                          data-placement="top" data-original-title="مسدود کردن کاربر" data-toggle="modal"
-                          data-target="#blockUserModal"
-                          wire:click="$set('blockAppointmentId', {{ $appointment->id }})"
-                          {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
+                        <button class="btn btn-light rounded-circle shadow-sm block-btn" data-bs-toggle="tooltip"
+                          data-bs-placement="top" title="مسدود کردن کاربر" data-bs-toggle="modal"
+                          data-bs-target="#blockUserModal"
+                          wire:click="$set('blockAppointmentId', {{ $appointment->id }})">
                           <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="مسدود کردن">
                         </button>
                       </div>
@@ -219,7 +216,7 @@
                 data-bs-toggle="dropdown" aria-expanded="false">
                 فیلتر
               </button>
-              <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+              <ul class="dropdown-menu" aria-labelledby="filterDropdown" wire:ignore>
                 <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', '')">همه نوبت‌ها</a>
                 </li>
                 <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'scheduled')">در
@@ -292,23 +289,20 @@
       </nav>
     </div>
     <!-- Modals -->
-    <div class="modal fade" id="activation-modal" tabindex="-1" role="dialog"
-      aria-labelledby="activation-modal-label" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal fade" id="activation-modal" tabindex="-1" aria-labelledby="activation-modal-label"
+      aria-hidden="true" wire:ignore.self>
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-radius-11">
           <div class="modal-header">
             <h5 class="modal-title" id="activation-modal-label">فعالسازی نوبت دهی</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="flex flex-col"><span>پزشک گرامی</span>
-              <span>
-                با فعال سازی امکان برقراری تماس امن، علاوه بر فراهم آوردن یک ویزیت
-                پیوسته و با کیفیت، زمان انتظار پاسخگویی به بیماران را نیز کاهش دهید.
-              </span>
-              <span>
-                پاسخ‌دهی به موقع برای برآورده کردن انتظارات بیماران بسیار مهم است.
-              </span>
+            <div class="flex flex-col">
+              <span>پزشک گرامی</span>
+              <span>با فعال سازی امکان برقراری تماس امن، علاوه بر فراهم آوردن یک ویزیت پیوسته و با کیفیت، زمان انتظار
+                پاسخگویی به بیماران را نیز کاهش دهید.</span>
+              <span>پاسخ‌دهی به موقع برای برآورده کردن انتظارات بیماران بسیار مهم است.</span>
             </div>
           </div>
           <div class="p-3">
@@ -321,9 +315,9 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="contact-modal" tabindex="-1" role="dialog" aria-labelledby="contact-modal-label"
-      aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal fade" id="contact-modal" tabindex="-1" aria-labelledby="contact-modal-label"
+      aria-hidden="true" wire:ignore.self>
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-radius-11">
           <div class="modal-header">
             <h5 class="modal-title" id="contact-modal-label">تماس امن</h5>
@@ -337,8 +331,8 @@
                 <li>بیمار در قبض نوبت و در نوبت‌های من، دکمه برقراری تماس را دارد。</li>
                 <li>بیمار تنها در ساعت کاری پزشک، قادر به تماس با پزشک است。</li>
                 <li>بیمار از زمان نوبت تا ۳ روز بعد از زمان نوبت، دکمه تماس را در اختیار دارد。</li>
-                <li>تماس امن همراه با پیام‌رسان است و در صورت نیاز، شما و یا بیمار می‌توانید از هر یک از دو
-                  سرویس استفاده کنید。</li>
+                <li>تماس امن همراه با پیام‌رسان است و در صورت نیاز، شما و یا بیمار می‌توانید از هر یک از دو سرویس
+                  استفاده کنید。</li>
               </ul>
             </div>
           </div>
@@ -352,7 +346,7 @@
       </div>
     </div>
     <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel"
-      aria-hidden="true">
+      aria-hidden="true" wire:ignore.self>
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-radius-11">
           <div class="modal-header">
@@ -361,7 +355,7 @@
           </div>
           <div class="modal-body">
             <div class="calendar-header w-100 d-flex justify-content-between align-items-center">
-              <div class="">
+              <div>
                 <button id="prev-month-reschedule" class="btn btn-light">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                     fill="none">
@@ -378,7 +372,7 @@
               <div class="w-100">
                 <select id="month-reschedule" class="form-select w-100 border-0"></select>
               </div>
-              <div class="">
+              <div>
                 <button id="next-month-reschedule" class="btn btn-light">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                     fill="none">
@@ -417,12 +411,12 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="endVisitModalCenter" tabindex="-1" role="dialog"
-      aria-labelledby="endVisitModalCenterTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal fade" id="endVisitModalCenter" tabindex="-1" aria-labelledby="endVisitModalCenterTitle"
+      aria-hidden="true" wire:ignore.self>
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-radius-11">
           <div class="modal-header">
-            <h6 class="modal-title fw-bold" id="exampleModalCenterTitle">توضیحات درمان</h6>
+            <h6 class="modal-title fw-bold" id="endVisitModalCenterTitle">توضیحات درمان</h6>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -434,9 +428,9 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="blockUserModal" tabindex="-1" role="dialog" aria-labelledby="blockUserModalLabel"
+    <div class="modal fade" id="blockUserModal" tabindex="-1" aria-labelledby="blockUserModalLabel"
       aria-hidden="true" wire:ignore.self>
-      <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-radius-11">
           <div class="modal-header">
             <h5 class="modal-title" id="blockUserModalLabel">مسدود کردن کاربر</h5>
@@ -472,9 +466,9 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="blockMultipleUsersModal" tabindex="-1" role="dialog"
+    <div class="modal 너 fade" id="blockMultipleUsersModal" tabindex="-1"
       aria-labelledby="blockMultipleUsersModalLabel" aria-hidden="true" wire:ignore.self>
-      <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-radius-11">
           <div class="modal-header">
             <h5 class="modal-title" id="blockMultipleUsersModalLabel">مسدود کردن کاربران</h5>
@@ -538,7 +532,7 @@
       }
 
       /* استایل‌های تولتیپ */
-      .bootstrap-tooltip .tooltip-inner {
+      .tooltip-inner {
         background-color: #212529;
         color: #fff;
         padding: 6px 12px;
@@ -547,19 +541,19 @@
         max-width: 200px;
       }
 
-      .bootstrap-tooltip.bs-tooltip-top .tooltip-arrow::before {
+      .tooltip.bs-tooltip-top .tooltip-arrow::before {
         border-top-color: #212529;
       }
 
-      .bootstrap-tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+      .tooltip.bs-tooltip-bottom .tooltip-arrow::before {
         border-bottom-color: #212529;
       }
 
-      .bootstrap-tooltip.bs-tooltip-start .tooltip-arrow::before {
+      .tooltip.bs-tooltip-start .tooltip-arrow::before {
         border-left-color: #212529;
       }
 
-      .bootstrap-tooltip.bs-tooltip-end .tooltip-arrow::before {
+      .tooltip.bs-tooltip-end .tooltip-arrow::before {
         border-right-color: #212529;
       }
 
@@ -568,207 +562,130 @@
       }
     </style>
     <script>
-      function initializeTooltips() {
-        // اطمینان از تخریب تولتیپ‌های قبلی
-        const tooltipTriggerList = document.querySelectorAll('[data-tooltip="true"]');
-        tooltipTriggerList.forEach(tooltipTriggerEl => {
-          const tooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
-          if (tooltip) {
-            tooltip.dispose();
-          }
-          new bootstrap.Tooltip(tooltipTriggerEl, {
-            trigger: 'hover focus',
-            container: 'body',
-            boundary: 'window',
-            delay: {
-              show: 100,
-              hide: 200
-            },
-            customClass: 'bootstrap-tooltip'
-          });
-        });
-      }
       document.addEventListener('livewire:initialized', () => {
 
-        // تأخیر برای اطمینان از لود Bootstrap
-        setTimeout(() => {
-          initializeTooltips();
-          initializeLivewireListener();
-        }, 100);
-
-
-
-        function initializeLivewireListener() {
-          if (typeof Swal === 'undefined') {
-            console.error('SweetAlert2 is not defined');
-            return;
-          }
-          Livewire.on('no-results-found', (event) => {
-            Swal.fire({
-              title: 'جستجوی نوبت',
-              text: `پزشک گرامی، برای تاریخ ${event.date} هیچ نوبت یا نتیجه‌ای یافت نشد. آیا می‌خواهید جستجو در سوابق همه نوبت‌ها انجام شود؟`,
-              icon: 'info',
-              showCancelButton: true,
-              confirmButtonText: 'بله، جستجو در همه تاریخ‌ها',
-              cancelButtonText: 'خیر',
-              reverseButtons: true
-            }).then((result) => {
-              if (result.isConfirmed) {
-                Livewire.dispatch('searchAllDates');
-              }
-            });
-          });
-          Livewire.on('confirm-cancel-single', (event) => {
-            Swal.fire({
-              title: 'تأیید لغو نوبت',
-              text: 'آیا مطمئن هستید که می‌خواهید این نوبت را لغو کنید؟',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'بله، لغو کن',
-              cancelButtonText: 'خیر',
-              reverseButtons: true
-            }).then((result) => {
-              if (result.isConfirmed) {
-                // ارسال آرایه‌ای از idها به متد cancelAppointments
-                Livewire.dispatch('cancelAppointments', {
-                  ids: [event.id]
-                });
-              }
-            });
-          });
-        }
-
-        Livewire.hook('element.updated', () => {
-          initializeTooltips();
-        });
-      });
-
-      function generateRescheduleCalendar(year, month) {
-        const rescheduleCalendarBody = document.getElementById("calendar-reschedule");
-        rescheduleCalendarBody.innerHTML = "";
-        const firstDayOfMonth = moment(`${year}/${month}/01`, "jYYYY/jMM/jDD").locale("fa");
-        const daysInMonth = firstDayOfMonth.jDaysInMonth();
-        let firstDayWeekday = firstDayOfMonth.weekday();
-        const today = moment().locale("fa");
-        for (let i = 0; i < firstDayWeekday; i++) {
-          const emptyDay = document.createElement("div");
-          emptyDay.className = "calendar-day empty";
-          rescheduleCalendarBody.appendChild(emptyDay);
-        }
-        const holidays = @json($this->getHolidays());
-        const dateStr = `${year}-${month.toString().padStart(2, '0')}-01`;
-        Livewire.dispatch('getAppointmentsByDateSpecial', {
-          date: dateStr
-        });
-        Livewire.on('appointmentsFetched', (response) => {
-          const appointmentsByDate = response.data || [];
-          for (let day = 1; day <= daysInMonth; day++) {
-            const jalaliDateStr = `${year}/${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}`;
-            const gregorianDate = moment(jalaliDateStr, "jYYYY/jMM/jDD").format("YYYY-MM-DD");
-            const dayElement = document.createElement("div");
-            dayElement.className = "calendar-day text-center";
-            const isHoliday = holidays.includes(gregorianDate);
-            const hasAppointment = appointmentsByDate.some(appt => appt.appointment_date === gregorianDate);
-            const isPast = moment(gregorianDate).isBefore(today, 'day');
-            if (isPast) {
-              dayElement.classList.add("disabled");
-            } else if (isHoliday) {
-              dayElement.classList.add("holiday");
-            } else if (hasAppointment) {
-              dayElement.classList.add("has-appointment");
-            } else {
-              dayElement.classList.add("available");
-              dayElement.style.cursor = "pointer";
-              dayElement.addEventListener("click", () => {
-                @this.set('rescheduleNewDate', gregorianDate);
-                document.querySelectorAll(".calendar-day").forEach(el => el.classList.remove("selected"));
-                dayElement.classList.add("selected");
-                Swal.fire({
-                  title: 'تأیید جابجایی',
-                  text: `آیا می‌خواهید نوبت به تاریخ ${jalaliDateStr} منتقل شود؟`,
-                  icon: 'question',
-                  showCancelButton: true,
-                  confirmButtonText: 'بله، جابجا کن',
-                  cancelButtonText: 'خیر',
-                  reverseButtons: true
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    @this.updateAppointmentDate(@this.rescheduleAppointmentId);
-                  }
-                });
-              });
-            }
-            dayElement.textContent = day;
-            rescheduleCalendarBody.appendChild(dayElement);
-          }
-        });
-        const yearSelect = document.getElementById("year-reschedule");
-        const monthSelect = document.getElementById("month-reschedule");
-        yearSelect.value = year;
-        monthSelect.value = month;
-      }
-      document.addEventListener('DOMContentLoaded', () => {
-        initializeTooltips();
-
+        // تعریف متغیرهای DOM
         const selectAllCheckbox = document.getElementById('select-all-row');
         const cancelAppointmentsBtn = document.getElementById('cancel-appointments-btn');
         const moveAppointmentsBtn = document.getElementById('move-appointments-btn');
         const blockUsersBtn = document.getElementById('block-users-btn');
         const blockMultipleUsersSubmit = document.getElementById('blockMultipleUsersSubmit');
 
-        function updateButtonStates() {
-          const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
-          const anySelected = selectedCheckboxes.length > 0;
-          if (!anySelected) {
-            cancelAppointmentsBtn.disabled = true;
-            moveAppointmentsBtn.disabled = true;
-            blockUsersBtn.disabled = true;
-            return;
-          }
-          let hasScheduled = false;
-          let hasNonScheduled = false;
-          selectedCheckboxes.forEach(checkbox => {
-            const status = checkbox.dataset.status;
-            if (status === 'scheduled') {
-              hasScheduled = true;
-            } else if (status === 'cancelled' || status === 'attended') {
-              hasNonScheduled = true;
+  
+
+        // تابع به‌روزرسانی وضعیت دکمه‌ها
+      function updateButtonStates() {
+  const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
+  const anySelected = selectedCheckboxes.length > 0;
+
+  if (!cancelAppointmentsBtn || !moveAppointmentsBtn || !blockUsersBtn) {
+    console.warn('یکی از دکمه‌ها یافت نشد');
+    return;
+  }
+
+  // ابتدا همه دکمه‌ها را بر اساس انتخاب شدن یا نشدن تنظیم می‌کنیم
+  cancelAppointmentsBtn.disabled = !anySelected;
+  moveAppointmentsBtn.disabled = !anySelected;
+  blockUsersBtn.disabled = !anySelected;
+
+  if (anySelected) {
+    let hasInvalidStatus = false;
+    selectedCheckboxes.forEach(checkbox => {
+      const status = checkbox.dataset.status;
+      if (status === 'cancelled' || status === 'attended') {
+        hasInvalidStatus = true;
+      }
+    });
+
+    // فقط دکمه‌های لغو و جابجایی را در صورت وجود وضعیت نامعتبر غیرفعال می‌کنیم
+    cancelAppointmentsBtn.disabled = hasInvalidStatus;
+    moveAppointmentsBtn.disabled = hasInvalidStatus;
+    // دکمه بلاک کاربران بدون تغییر باقی می‌ماند (فعال اگر anySelected true باشد)
+  }
+}
+
+        // تابع مقداردهی اولیه تولتیپ‌ها
+        function initializeTooltips() {
+          const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+          tooltipTriggerList.forEach(tooltipTriggerEl => {
+            const existingTooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+            if (existingTooltip) {
+              existingTooltip.dispose();
             }
+            new bootstrap.Tooltip(tooltipTriggerEl, {
+              trigger: 'hover focus',
+              container: 'body',
+              boundary: 'window',
+              delay: {
+                show: 100,
+                hide: 200
+              }
+            });
           });
-          if (hasNonScheduled) {
-            cancelAppointmentsBtn.disabled = true;
-            moveAppointmentsBtn.disabled = true;
-            blockUsersBtn.disabled = false;
-          } else if (hasScheduled) {
-            cancelAppointmentsBtn.disabled = false;
-            moveAppointmentsBtn.disabled = false;
-            blockUsersBtn.disabled = false;
-          }
         }
-        selectAllCheckbox.addEventListener('change', function() {
+
+        // بررسی اولیه تعداد چک‌باکس‌ها
+        function checkCheckboxes() {
           const checkboxes = document.querySelectorAll('.appointment-checkbox');
-          checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-          });
+          return checkboxes.length;
+        }
+
+        // اجرای اولیه
+        setTimeout(() => {
+          initializeTooltips();
+          checkCheckboxes();
           updateButtonStates();
+        }, 100);
+
+        // به‌روزرسانی پس از رندر Livewire
+        Livewire.hook('morph.updated', () => {
+          setTimeout(() => {
+            initializeTooltips();
+            checkCheckboxes();
+            updateButtonStates();
+          }, 100);
         });
 
-        document.addEventListener('change', (event) => {
-          if (event.target.classList.contains('appointment-checkbox')) {
-            const checkboxes = document.querySelectorAll('.appointment-checkbox');
-            selectAllCheckbox.checked = checkboxes.length === document.querySelectorAll(
-              '.appointment-checkbox:checked').length;
-            updateButtonStates();
-            initializeTooltips();
-          }
+        // نمایش توستر موفقیت
+        function showSuccessToast(message) {
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: message,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer);
+              toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
+          });
+        }
+
+        // مدیریت رویدادهای SweetAlert و توستر موفقیت
+        Livewire.on('no-results-found', (event) => {
+          Swal.fire({
+            title: 'جستجوی نوبت',
+            text: `پزشک گرامی، برای تاریخ ${event.date} هیچ نوبت یا نتیجه‌ای یافت نشد. آیا می‌خواهید جستجو در سوابق همه نوبت‌ها انجام شود؟`,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'بله، جستجو در همه تاریخ‌ها',
+            cancelButtonText: 'خیر',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Livewire.dispatch('searchAllDates');
+            }
+          });
         });
-        cancelAppointmentsBtn.addEventListener('click', function() {
-          const selected = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
-            parseInt(cb.value));
-          if (selected.length === 0) {
+
+        Livewire.on('confirm-cancel-single', (event) => {
+          if (!event.id) {
+            console.error('Appointment ID is undefined in confirm-cancel-single');
             Swal.fire({
               title: 'خطا',
-              text: 'لطفاً حداقل یک نوبت را انتخاب کنید.',
+              text: 'شناسه نوبت نامعتبر است.',
               icon: 'error',
               confirmButtonText: 'باشه'
             });
@@ -776,7 +693,7 @@
           }
           Swal.fire({
             title: 'تأیید لغو نوبت',
-            text: `آیا مطمئن هستید که می‌خواهید ${selected.length} نوبت را لغو کنید؟`,
+            text: 'آیا مطمئن هستید که می‌خواهید این نوبت را لغو کنید؟',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'بله، لغو کن',
@@ -785,114 +702,326 @@
           }).then((result) => {
             if (result.isConfirmed) {
               Livewire.dispatch('cancelAppointments', {
-                ids: selected
+                ids: [event.id]
               });
             }
           });
-        });
-        blockUsersBtn.addEventListener('click', function() {
-          const selectedMobiles = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
-            cb.dataset.mobile).filter(mobile => mobile);
-          if (selectedMobiles.length === 0) {
-            Swal.fire({
-              title: 'خطا',
-              text: 'هیچ کاربری انتخاب نشده است.',
-              icon: 'error',
-              confirmButtonText: 'باشه'
-            });
-            return;
-          }
-          // باز کردن مودال
-          const blockMultipleUsersModal = new bootstrap.Modal(document.getElementById('blockMultipleUsersModal'));
-          blockMultipleUsersModal.show();
         });
 
-        blockMultipleUsersSubmit.addEventListener('click', function() {
-          const selectedMobiles = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
-            cb.dataset.mobile).filter(mobile => mobile);
-          if (selectedMobiles.length === 0) {
-            Swal.fire({
-              title: 'خطا',
-              text: 'هیچ کاربری انتخاب نشده است.',
-              icon: 'error',
-              confirmButtonText: 'باشه'
-            });
-            return;
+        Livewire.on('appointments-cancelled', (event) => {
+          showSuccessToast(event.message || 'نوبت(ها) با موفقیت لغو شد.');
+        });
+
+        Livewire.on('close-modal', (event) => {
+          const modal = document.getElementById(event.id);
+          if (modal) {
+            const bsModal = bootstrap.Modal.getInstance(modal) || new bootstrap.Modal(modal);
+            bsModal.hide();
           }
-          Swal.fire({
-            title: 'تأیید مسدود کردن',
-            text: `آیا مطمئن هستید که می‌خواهید ${selectedMobiles.length} کاربر را مسدود کنید؟`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'بله، مسدود کن',
-            cancelButtonText: 'خیر',
-            reverseButtons: true
-          }).then((result) => {
-            if (result.isConfirmed) {
-              Livewire.dispatch('blockMultipleUsers', {
-                mobiles: selectedMobiles
-              });
+        });
+
+        // مدیریت رویدادهای چک‌باکس‌ها با Event Delegation
+        document.body.addEventListener('change', (event) => {
+          if (event.target.id === 'select-all-row') {
+            const checkboxes = document.querySelectorAll('.appointment-checkbox');
+            checkboxes.forEach(checkbox => {
+              checkbox.checked = event.target.checked;
+            });
+            updateButtonStates();
+            initializeTooltips();
+          } else if (event.target.classList.contains('appointment-checkbox')) {
+            const checkboxes = document.querySelectorAll('.appointment-checkbox');
+            if (selectAllCheckbox) {
+              selectAllCheckbox.checked = checkboxes.length === document.querySelectorAll(
+                '.appointment-checkbox:checked').length;
             }
+            updateButtonStates();
+            initializeTooltips();
+          }
+        });
+
+        // مدیریت دکمه لغو نوبت‌ها
+        if (cancelAppointmentsBtn) {
+          cancelAppointmentsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const selected = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
+              parseInt(cb.value));
+            if (selected.length === 0) {
+              Swal.fire({
+                title: 'خطا',
+                text: 'لطفاً حداقل یک نوبت را انتخاب کنید.',
+                icon: 'error',
+                confirmButtonText: 'باشه'
+              });
+              return;
+            }
+            Swal.fire({
+              title: 'تأیید لغو نوبت',
+              text: `آیا مطمئن هستید که می‌خواهید ${selected.length} نوبت را لغو کنید؟`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'بله، لغو کن',
+              cancelButtonText: 'خیر',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                Livewire.dispatch('cancelAppointments', {
+                  ids: selected
+                });
+              }
+            });
+          });
+        } else {
+          console.warn('Cancel Appointments Button not found');
+        }
+
+        // مدیریت دکمه مسدود کردن گروهی
+        if (blockUsersBtn) {
+          blockUsersBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const selectedMobiles = Array.from(document.querySelectorAll('.appointment-checkbox:checked'))
+              .map(cb => cb.dataset.mobile)
+              .filter(mobile => mobile);
+            if (selectedMobiles.length === 0) {
+              Swal.fire({
+                title: 'خطا',
+                text: 'هیچ کاربری انتخاب نشده است.',
+                icon: 'error',
+                confirmButtonText: 'باشه'
+              });
+              return;
+            }
+            const blockMultipleUsersModal = new bootstrap.Modal(document.getElementById('blockMultipleUsersModal'));
+            blockMultipleUsersModal.show();
+          });
+        } else {
+          console.warn('Block Users Button not found');
+        }
+
+        // مدیریت دکمه تأیید مسدود کردن گروهی
+        if (blockMultipleUsersSubmit) {
+          blockMultipleUsersSubmit.addEventListener('click', function(e) {
+            e.preventDefault();
+            const selectedMobiles = Array.from(document.querySelectorAll('.appointment-checkbox:checked'))
+              .map(cb => cb.dataset.mobile)
+              .filter(mobile => mobile);
+            if (selectedMobiles.length === 0) {
+              Swal.fire({
+                title: 'خطا',
+                text: 'هیچ کاربری انتخاب نشده است.',
+                icon: 'error',
+                confirmButtonText: 'باشه'
+              });
+              return;
+            }
+            Swal.fire({
+              title: 'تأیید مسدود کردن',
+              text: `آیا مطمئن هستید که می‌خواهید ${selectedMobiles.length} کاربر را مسدود کنید؟`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'بله، مسدود کن',
+              cancelButtonText: 'خیر',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                Livewire.dispatch('blockMultipleUsers', {
+                  mobiles: selectedMobiles
+                });
+              }
+            });
+          });
+        } else {
+          console.warn('Block Multiple Users Submit not found');
+        }
+
+        // مدیریت دراپ‌داون فیلتر
+        const filterDropdownItems = document.querySelectorAll('#filterDropdown + .dropdown-menu .dropdown-item');
+        filterDropdownItems.forEach(item => {
+          item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const filterValue = this.getAttribute('wire:click').match(/'([^']+)'/)?.[1] || '';
+            Livewire.dispatch('setFilter', {
+              filter: filterValue
+            });
           });
         });
+
+        // مدیریت کلیک‌های دکمه‌های دارای مودال (برای جلوگیری از اتصال چندگانه)
+        document.body.addEventListener('click', (event) => {
+          const target = event.target.closest('button');
+          if (!target) return;
+
+          if (target.classList.contains('reschedule-btn')) {
+            const appointmentId = target.getAttribute('wire:click').match(/\d+/)[0];
+            Livewire.dispatch('set', {
+              key: 'rescheduleAppointmentId',
+              value: parseInt(appointmentId)
+            });
+            const modal = new bootstrap.Modal(document.getElementById('rescheduleModal'));
+            modal.show();
+          }
+
+          if (target.classList.contains('cancel-btn')) {
+            const appointmentId = target.getAttribute('wire:click').match(/\d+/)[0];
+            Livewire.dispatch('confirm-cancel-single', {
+              id: parseInt(appointmentId)
+            });
+          }
+
+          if (target.classList.contains('block-btn')) {
+            const appointmentId = target.getAttribute('wire:click').match(/\d+/)[0];
+            Livewire.dispatch('set', {
+              key: 'blockAppointmentId',
+              value: parseInt(appointmentId)
+            });
+            const modal = new bootstrap.Modal(document.getElementById('blockUserModal'));
+            modal.show();
+          }
+        }, {
+          once: true
+        }); // جلوگیری از اتصال چندگانه
+
+        // مدیریت تقویم جابجایی
+        function generateRescheduleCalendar(year, month) {
+          const rescheduleCalendarBody = document.getElementById("calendar-reschedule");
+          if (!rescheduleCalendarBody) {
+            console.warn('Reschedule calendar body not found');
+            return;
+          }
+          rescheduleCalendarBody.innerHTML = "";
+          const firstDayOfMonth = moment(`${year}/${month}/01`, "jYYYY/jMM/jDD").locale("fa");
+          const daysInMonth = firstDayOfMonth.jDaysInMonth();
+          let firstDayWeekday = firstDayOfMonth.weekday();
+          const today = moment().locale("fa");
+          for (let i = 0; i < firstDayWeekday; i++) {
+            const emptyDay = document.createElement("div");
+            emptyDay.className = "calendar-day empty";
+            rescheduleCalendarBody.appendChild(emptyDay);
+          }
+          const holidays = @json($this->getHolidays());
+          const dateStr = `${year}-${month.toString().padStart(2, '0')}-01`;
+          Livewire.dispatch('getAppointmentsByDateSpecial', {
+            date: dateStr
+          });
+          Livewire.on('appointmentsFetched', (response) => {
+            const appointmentsByDate = response.data || [];
+            for (let day = 1; day <= daysInMonth; day++) {
+              const jalaliDateStr =
+                `${year}/${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}`;
+              const gregorianDate = moment(jalaliDateStr, "jYYYY/jMM/jDD").format("YYYY-MM-DD");
+              const dayElement = document.createElement("div");
+              dayElement.className = "calendar-day text-center";
+              const isHoliday = holidays.includes(gregorianDate);
+              const hasAppointment = appointmentsByDate.some(appt => appt.appointment_date === gregorianDate);
+              const isPast = moment(gregorianDate).isBefore(today, 'day');
+              if (isPast) {
+                dayElement.classList.add("disabled");
+              } else if (isHoliday) {
+                dayElement.classList.add("holiday");
+              } else if (hasAppointment) {
+                dayElement.classList.add("has-appointment");
+              } else {
+                dayElement.classList.add("available");
+                dayElement.style.cursor = "pointer";
+                dayElement.addEventListener("click", () => {
+                  @this.set('rescheduleNewDate', gregorianDate);
+                  document.querySelectorAll(".calendar-day").forEach(el => el.classList.remove("selected"));
+                  dayElement.classList.add("selected");
+                  Swal.fire({
+                    title: 'تأیید جابجایی',
+                    text: `آیا می‌خواهید نوبت به تاریخ ${jalaliDateStr} منتقل شود؟`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'بله، جابجا کن',
+                    cancelButtonText: 'خیر',
+                    reverseButtons: true
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      @this.updateAppointmentDate(@this.rescheduleAppointmentId);
+                    }
+                  });
+                });
+              }
+              dayElement.textContent = day;
+              rescheduleCalendarBody.appendChild(dayElement);
+            }
+          });
+          const yearSelect = document.getElementById("year-reschedule");
+          const monthSelect = document.getElementById("month-reschedule");
+          if (yearSelect && monthSelect) {
+            yearSelect.value = year;
+            monthSelect.value = month;
+          }
+        }
+
+        // مدیریت سال و ماه در تقویم جابجایی
+        const yearSelect = document.getElementById("year-reschedule");
+        const monthSelect = document.getElementById("month-reschedule");
+      
+
+        if (yearSelect && monthSelect) {
+          function populateYearMonthSelectors() {
+            const currentYear = moment().jYear();
+            yearSelect.innerHTML = "";
+            for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+              const option = document.createElement("option");
+              option.value = y;
+              option.textContent = y;
+              yearSelect.appendChild(option);
+            }
+            monthSelect.innerHTML = "";
+            for (let m = 1; m <= 12; m++) {
+              const option = document.createElement("option");
+              option.value = m;
+              option.textContent = moment().jMonth(m - 1).format("jMMMM");
+              monthSelect.appendChild(option);
+            }
+          }
+
+          yearSelect.addEventListener("change", () => {
+            generateRescheduleCalendar(parseInt(yearSelect.value), parseInt(monthSelect.value));
+          });
+
+          monthSelect.addEventListener("change", () => {
+            generateRescheduleCalendar(parseInt(yearSelect.value), parseInt(monthSelect.value));
+          });
+
+          document.getElementById("prev-month-reschedule")?.addEventListener("click", () => {
+            let newMonth = parseInt(monthSelect.value) - 1;
+            let newYear = parseInt(yearSelect.value);
+            if (newMonth < 1) {
+              newMonth = 12;
+              newYear--;
+            }
+            generateRescheduleCalendar(newYear, newMonth);
+          });
+
+          document.getElementById("next-month-reschedule")?.addEventListener("click", () => {
+            let newMonth = parseInt(monthSelect.value) + 1;
+            let newYear = parseInt(yearSelect.value);
+            if (newMonth > 12) {
+              newMonth = 1;
+              newYear++;
+            }
+            generateRescheduleCalendar(newYear, newMonth);
+          });
+
+          // فراخوانی اولیه
+          populateYearMonthSelectors();
+          const initialYear = moment().jYear();
+          const initialMonth = moment().jMonth() + 1;
+          generateRescheduleCalendar(initialYear, initialMonth);
+        }
+
         // Initialize Jalali Datepicker
         if (typeof jalaliDatepicker !== 'undefined') {
           jalaliDatepicker.startWatch({
             minDate: 'today',
             dateFormat: 'YYYY/MM/DD',
           });
+        } else {
+          console.warn('Jalali Datepicker not found');
         }
-        // Handle reschedule calendar
-        const rescheduleCalendarBody = document.getElementById("calendar-reschedule");
-        const yearSelect = document.getElementById("year-reschedule");
-        const monthSelect = document.getElementById("month-reschedule");
-
-        function populateYearMonthSelectors() {
-          const currentYear = moment().jYear();
-          yearSelect.innerHTML = "";
-          for (let y = currentYear - 5; y <= currentYear + 5; y++) {
-            const option = document.createElement("option");
-            option.value = y;
-            option.textContent = y;
-            yearSelect.appendChild(option);
-          }
-          monthSelect.innerHTML = "";
-          for (let m = 1; m <= 12; m++) {
-            const option = document.createElement("option");
-            option.value = m;
-            option.textContent = moment().jMonth(m - 1).format("jMMMM");
-            monthSelect.appendChild(option);
-          }
-        }
-        yearSelect.addEventListener("change", () => {
-          generateRescheduleCalendar(parseInt(yearSelect.value), parseInt(monthSelect.value));
-        });
-        monthSelect.addEventListener("change", () => {
-          generateRescheduleCalendar(parseInt(yearSelect.value), parseInt(monthSelect.value));
-        });
-        document.getElementById("prev-month-reschedule").addEventListener("click", () => {
-          let newMonth = parseInt(monthSelect.value) - 1;
-          let newYear = parseInt(yearSelect.value);
-          if (newMonth < 1) {
-            newMonth = 12;
-            newYear--;
-          }
-          generateRescheduleCalendar(newYear, newMonth);
-        });
-        document.getElementById("next-month-reschedule").addEventListener("click", () => {
-          let newMonth = parseInt(monthSelect.value) + 1;
-          let newYear = parseInt(yearSelect.value);
-          if (newMonth > 12) {
-            newMonth = 1;
-            newYear++;
-          }
-          generateRescheduleCalendar(newYear, newMonth);
-        });
-        // فراخوانی اولیه
-        populateYearMonthSelectors();
-        const initialYear = moment().jYear();
-        const initialMonth = moment().jMonth() + 1;
-        generateRescheduleCalendar(initialYear, initialMonth);
       });
     </script>
   </div>
