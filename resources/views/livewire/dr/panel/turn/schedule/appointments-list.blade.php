@@ -37,9 +37,9 @@
     </div>
     <div class="sicks-content h-100 w-100 position-relative border">
       <div>
-        <div class="table-responsive position-relative top-table w-100" wire:ignore.self>
+        <div class="table-responsive position-relative top-table w-100">
           <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
-            <thead class="bg-light" wire:ignore>
+            <thead class="bg-light">
               <tr>
                 <th>
                   <input class="form-check-input" type="checkbox" id="select-all-row">
