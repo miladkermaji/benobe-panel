@@ -3,6 +3,7 @@
 
 <head>
   @include('dr.panel.layouts.partials.head-tags')
+  <link href="{{ asset('vendor/livewire-bootstrap-modal/css/modals.css') }}" rel="stylesheet">
   @yield('styles')
   <title>
     @if (Auth::guard('doctor')->check())
@@ -28,7 +29,6 @@
 
   @livewireScripts
   <livewire:modals />
-
   <script>
     // ثبت رویداد show-toastr
     Livewire.on('show-toastr', (data) => {

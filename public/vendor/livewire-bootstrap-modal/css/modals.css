@@ -1,0 +1,76 @@
+/* public/vendor/livewire-bootstrap-modal/css/modals.css */
+.modal-dialog.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 1rem);
+    margin: 0 auto;
+    max-width: 400px; /* عرض پیش‌فرض 400px */
+}
+
+.modal-content {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 0.75rem; /* گوشه‌های گردتر برای ظاهر شیک */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* سایه نرم‌تر */
+    background-color: #fff; /* پس‌زمینه سفید */
+    border: none; /* حذف حاشیه پیش‌فرض */
+}
+
+/* تنظیم اندازه‌های مختلف مودال */
+.modal-sm { max-width: 300px; }
+.modal-md { max-width: 400px; } /* modal-md هم 400px */
+.modal-lg { max-width: 600px; }
+.modal-xl { max-width: 800px; }
+
+/* استایل دکمه بستن */
+.modal-header .btn-close {
+    width: 20px;
+    height: 20px;
+    background-size: 16px; /* کوچک‌تر کردن آیکون */
+    opacity: 0.7; /* شفافیت برای ظاهر شیک */
+    transition: opacity 0.1s ease; /* انیمیشن نرم */
+}
+
+.modal-header .btn-close:hover {
+    opacity: 1; /* افزایش شفافیت هنگام هاور */
+}
+
+/* Custom Animations */
+.fade-animation .modal-content {
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.slide-animation .modal-content {
+    animation: slideIn 0.2s ease-in-out;
+}
+
+.zoom-animation .modal-content {
+    animation: zoomIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: 90vw; /* تنظیم عرض برای موبایل */
+    }
+    .modal-content {
+        border-radius: 0.5rem; /* گوشه‌های کمی کوچک‌تر در موبایل */
+    }
+}

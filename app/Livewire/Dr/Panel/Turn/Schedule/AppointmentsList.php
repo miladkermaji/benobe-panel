@@ -503,86 +503,17 @@ class AppointmentsList extends Component
 
     public function blockUser()
     {
-        $this->validate([
-            'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
-            'unblockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
-            'blockReason' => ['required', 'string', 'max:255'],
-        ], [
-            'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
-            'unblockedAt.required' => 'لطفاً تاریخ پایان مسدودیت را وارد کنید.',
-            'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
-            'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
-            'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
-            'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-        ]);
+        try {
+            $this->validate([
+                'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
+                'unblockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
+                'blockReason' => ['required', 'string', 'max:255'],
+            ]);
 
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
-        $appointment = Appointment::findOrFail($this->blockAppointmentId);
-        $user = $appointment->patient;
-
-        $isBlocked = UserBlocking::where('user_id', $user->id)
-            ->where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId)
-            ->where('status', 1)
-            ->exists();
-
-        if ($isBlocked) {
-            $this->dispatch('show-toastr', type: 'error', message: 'این کاربر قبلاً در این کلینیک مسدود شده است.');
-            return;
-        }
-
-        UserBlocking::create([
-            'user_id' => $user->id,
-            'doctor_id' => $doctorId,
-            'clinic_id' => $clinicId,
-            'blocked_at' => $this->processDate($this->blockedAt, 'شروع مسدودیت'),
-            'unblocked_at' => $this->processDate($this->unblockedAt, 'پایان مسدودیت'),
-            'reason' => $this->blockReason ?? null,
-            'status' => 1,
-        ]);
-
-        $this->dispatch('show-toastr', type: 'success', message: 'کاربر با موفقیت مسدود شد.');
-        $this->dispatch('close-modal', id: 'blockUserModal');
-        $this->loadBlockedUsers();
-        $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId']);
-    }
-
-    public function blockMultipleUsers($mobiles)
-    {
-        if (empty($mobiles)) {
-            $this->dispatch('show-toastr', type: 'error', message: 'هیچ کاربری انتخاب نشده است.');
-            return;
-        }
-
-
-        $this->validate([
-                    'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
-                    'unblockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
-                    'blockReason' => ['required', 'string', 'max:255'],
-                ], [
-                    'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
-                    'unblockedAt.required' => 'لطفاً تاریخ پایان مسدودیت را وارد کنید.',
-                    'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
-                    'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
-                    'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
-                    'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-                ]);
-
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
-
-        $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
-        $unblockedAt = $this->processDate($this->unblockedAt, 'پایان مسدودیت');
-
-        $blockedUsers = [];
-        $alreadyBlocked = [];
-
-        foreach ($mobiles as $mobile) {
-            $user = User::where('mobile', $mobile)->first();
-            if (!$user) {
-                continue;
-            }
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+            $appointment = Appointment::findOrFail($this->blockAppointmentId);
+            $user = $appointment->patient;
 
             $isBlocked = UserBlocking::where('user_id', $user->id)
                 ->where('doctor_id', $doctorId)
@@ -591,37 +522,111 @@ class AppointmentsList extends Component
                 ->exists();
 
             if ($isBlocked) {
-                $alreadyBlocked[] = $mobile;
-                continue;
+                $this->dispatch('show-toastr', type: 'error', message: 'این کاربر قبلاً در این کلینیک مسدود شده است.');
+                return;
             }
 
-            $blockingUser = UserBlocking::create([
+            UserBlocking::create([
                 'user_id' => $user->id,
                 'doctor_id' => $doctorId,
                 'clinic_id' => $clinicId,
-                'blocked_at' => $blockedAt,
-                'unblocked_at' => $unblockedAt,
+                'blocked_at' => $this->processDate($this->blockedAt, 'شروع مسدودیت'),
+                'unblocked_at' => $this->processDate($this->unblockedAt, 'پایان مسدودیت'),
                 'reason' => $this->blockReason ?? null,
                 'status' => 1,
             ]);
 
-            $blockedUsers[] = $blockingUser;
+            $this->dispatch('show-toastr', type: 'success', message: 'کاربر با موفقیت مسدود شد.');
+            $this->dispatch('close-modal', id: 'blockUserModal');
+            $this->loadBlockedUsers();
+            $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            foreach ($e->errors() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $this->dispatch('show-toastr', type: 'error', message: $message);
+                }
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('show-toastr', type: 'error', message: 'خطایی رخ داد: ' . $e->getMessage());
         }
+    }
 
-        if (empty($blockedUsers) && !empty($alreadyBlocked)) {
-            $this->dispatch('show-toastr', type: 'error', message: 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.');
-            return;
+    public function blockMultipleUsers($mobiles)
+    {
+        try {
+            if (empty($mobiles)) {
+                $this->dispatch('show-toastr', type: 'error', message: 'هیچ کاربری انتخاب نشده است.');
+                return;
+            }
+
+            $this->validate([
+                'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
+                'unblockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
+                'blockReason' => ['required', 'string', 'max:255'],
+            ]);
+
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+
+            $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
+            $unblockedAt = $this->processDate($this->unblockedAt, 'پایان مسدودیت');
+
+            $blockedUsers = [];
+            $alreadyBlocked = [];
+
+            foreach ($mobiles as $mobile) {
+                $user = User::where('mobile', $mobile)->first();
+                if (!$user) {
+                    continue;
+                }
+
+                $isBlocked = UserBlocking::where('user_id', $user->id)
+                    ->where('doctor_id', $doctorId)
+                    ->where('clinic_id', $clinicId)
+                    ->where('status', 1)
+                    ->exists();
+
+                if ($isBlocked) {
+                    $alreadyBlocked[] = $mobile;
+                    continue;
+                }
+
+                $blockingUser = UserBlocking::create([
+                    'user_id' => $user->id,
+                    'doctor_id' => $doctorId,
+                    'clinic_id' => $clinicId,
+                    'blocked_at' => $blockedAt,
+                    'unblocked_at' => $unblockedAt,
+                    'reason' => $this->blockReason ?? null,
+                    'status' => 1,
+                ]);
+
+                $blockedUsers[] = $blockingUser;
+            }
+
+            if (empty($blockedUsers) && !empty($alreadyBlocked)) {
+                $this->dispatch('show-toastr', type: 'error', message: 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.');
+                return;
+            }
+
+            if (empty($blockedUsers)) {
+                $this->dispatch('show-toastr', type: 'error', message: 'هیچ کاربری برای مسدود کردن پیدا نشد.');
+                return;
+            }
+
+            $this->dispatch('show-toastr', type: 'success', message: 'کاربران با موفقیت مسدود شدند.');
+            $this->dispatch('close-modal', id: 'blockMultipleUsersModal');
+            $this->loadBlockedUsers();
+            $this->reset(['blockedAt', 'unblockedAt', 'blockReason']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            foreach ($e->errors() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $this->dispatch('show-toastr', type: 'error', message: $message);
+                }
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('show-toastr', type: 'error', message: 'خطایی رخ داد: ' . $e->getMessage());
         }
-
-        if (empty($blockedUsers)) {
-            $this->dispatch('show-toastr', type: 'error', message: 'هیچ کاربری برای مسدود کردن پیدا نشد.');
-            return;
-        }
-
-        $this->dispatch('show-toastr', type: 'success', message: 'کاربران با موفقیت مسدود شدند.');
-        $this->dispatch('close-modal', id: 'blockMultipleUsersModal');
-        $this->loadBlockedUsers();
-        $this->reset(['blockedAt', 'unblockedAt', 'blockReason']);
     }
 
     public function updateBlockStatus($id, $status)
