@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Morilog\Jalali\Jalalian;
 
 class BlockMultipleUsersModal extends Component
 {
@@ -10,19 +11,28 @@ class BlockMultipleUsersModal extends Component
     public $unblockedAt;
     public $blockReason;
 
-    public function render()
+    public function mount()
     {
-        return view('livewire.block-multiple-users-modal');
-    }
-
-    public function hideModal()
-    {
-        $this->dispatch('hideModal');
+        $this->blockedAt = Jalalian::now()->format('Y/m/d'); // تنظیم تاریخ جلالی امروز
     }
 
     public function blockMultipleUsers()
     {
-        // منطق مسدود کردن گروهی کاربران
-        $this->dispatch('hideModal');
+        // دریافت شماره‌های موبایل از چک‌باکس‌های انتخاب‌شده
+        $this->dispatch('blockMultipleUsers', [
+            'blockedAt' => $this->blockedAt,
+            'unblockedAt' => $this->unblockedAt,
+            'blockReason' => $this->blockReason,
+        ]);
+    }
+
+    public function hideModal()
+    {
+        $this->dispatch('close-modal', id: 'blockMultipleUsersModal');
+    }
+
+    public function render()
+    {
+        return view('livewire.block-multiple-users-modal');
     }
 }

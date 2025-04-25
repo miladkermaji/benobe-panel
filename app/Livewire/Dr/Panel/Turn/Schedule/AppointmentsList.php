@@ -85,6 +85,8 @@ class AppointmentsList extends Component
         'updateSelectedDate' => 'updateSelectedDate',
         'searchAllDates' => 'searchAllDates',
         'cancelAppointments' => 'cancelAppointments',
+        'blockUser' => 'handleBlockUser',
+        'blockMultipleUsers' => 'handleBlockMultipleUsers',
     ];
 
     public function initialize()
@@ -107,6 +109,30 @@ class AppointmentsList extends Component
         $this->loadMessages();
     }
 
+    public function handleBlockUser($data)
+    {
+        $this->blockAppointmentId = $data['appointmentId'];
+        $this->blockedAt = $data['blockedAt'];
+        $this->unblockedAt = $data['unblockedAt'];
+        $this->blockReason = $data['blockReason'];
+        $this->blockUser();
+    }
+
+    public function handleBlockMultipleUsers($data)
+    {
+        $this->blockedAt = $data['blockedAt'];
+        $this->unblockedAt = $data['unblockedAt'];
+        $this->blockReason = $data['blockReason'];
+
+        $selectedCheckboxes = request()->input('selectedMobiles', []);
+        $mobiles = array_filter($selectedCheckboxes, function ($mobile) {
+            return !empty($mobile);
+        });
+
+        $this->blockMultipleUsers($mobiles);
+    }
+
+    // سایر متدها بدون تغییر باقی می‌مانند
     public function updateSelectedDate($date)
     {
         $selectedDate = is_array($date) && isset($date['date']) ? $date['date'] : $date;
@@ -226,11 +252,11 @@ class AppointmentsList extends Component
                 $gregorian = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
                 return $gregorian;
             } catch (\Exception $e) {
-                $this->dispatch('alert', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
+                $this->dispatch('show-toastr', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
                 return Carbon::now()->format('Y-m-d');
             }
         } else {
-            $this->dispatch('alert', type: 'error', message: 'فرمت تاریخ نامعتبر است.');
+            $this->dispatch('show-toastr', type: 'error', message: 'فرمت تاریخ نامعتبر است.');
             return Carbon::now()->format('Y-m-d');
         }
     }
@@ -309,13 +335,13 @@ class AppointmentsList extends Component
         $appointment = Appointment::findOrFail($id);
 
         if ($appointment->status === 'attended' || $appointment->status === 'cancelled') {
-            $this->dispatch('alert', type: 'error', message: 'نمی‌توانید نوبت ویزیت‌شده یا لغو شده را جابجا کنید.');
+            $this->dispatch('show-toastr', type: 'error', message: 'نمی‌توانید نوبت ویزیت‌شده یا لغو شده را جابجا کنید.');
             return;
         }
 
         $newDate = Carbon::parse($this->rescheduleNewDate);
         if ($newDate->lt(Carbon::today())) {
-            $this->dispatch('alert', type: 'error', message: 'امکان جابجایی به تاریخ گذشته وجود ندارد.');
+            $this->dispatch('show-toastr', type: 'error', message: 'امکان جابجایی به تاریخ گذشته وجود ندارد.');
             return;
         }
 
@@ -336,7 +362,7 @@ class AppointmentsList extends Component
             )->delay(now()->addSeconds(5));
         }
 
-        $this->dispatch('alert', type: 'success', message: 'نوبت با موفقیت جابجا شد.');
+        $this->dispatch('show-toastr', type: 'success', message: 'نوبت با موفقیت جابجا شد.');
         $this->loadAppointments();
         $this->dispatch('close-modal', id: 'rescheduleModal');
     }
@@ -353,11 +379,10 @@ class AppointmentsList extends Component
         $appointment->attendance_status = 'attended';
         $appointment->save();
 
-        $this->dispatch('alert', type: 'success', message: 'ویزیت با موفقیت ثبت شد.');
+        $this->dispatch('show-toastr', type: 'success', message: 'ویزیت با موفقیت ثبت شد.');
         $this->loadAppointments();
         $this->dispatch('close-modal', id: 'endVisitModalCenter');
     }
-
 
     public function cancelSingleAppointment($id)
     {
@@ -367,30 +392,26 @@ class AppointmentsList extends Component
     public function triggerCancelAppointments()
     {
         $this->cancelAppointments($this->cancelIds);
-        $this->cancelIds = []; // پاک کردن بعد از استفاده
+        $this->cancelIds = [];
     }
 
     public function cancelAppointments($ids = [])
     {
-        // دیباگ داده‌های خام درخواست
         $requestData = request()->all();
 
-
-        // نرمال‌سازی آیدی‌ها
         $normalizedIds = [];
         if (is_array($ids) && !empty($ids)) {
             if (array_is_list($ids)) {
-                $normalizedIds = $ids; // آرایه ساده مثل [1, 2]
+                $normalizedIds = $ids;
             } else {
-                $normalizedIds = array_values($ids); // فال‌بک به مقادیر آرایه
+                $normalizedIds = array_values($ids);
             }
         } elseif (is_scalar($ids) && !empty($ids)) {
-            $normalizedIds = [$ids]; // آیدی تکی
+            $normalizedIds = [$ids];
         }
 
-
         if (empty($normalizedIds)) {
-            $this->dispatch('alert', type: 'error', message: 'هیچ نوبت انتخاب‌شده‌ای یافت نشد.');
+            $this->dispatch('show-toastr', type: 'error', message: 'هیچ نوبت انتخاب‌شده‌ای یافت نشد.');
             return;
         }
 
@@ -406,7 +427,7 @@ class AppointmentsList extends Component
                 ->get();
 
             if ($appointments->isEmpty()) {
-                $this->dispatch('alert', type: 'error', message: 'هیچ نوبت معتبری برای لغو یافت نشد.');
+                $this->dispatch('show-toastr', type: 'error', message: 'هیچ نوبت معتبری برای لغو یافت نشد.');
                 return;
             }
 
@@ -434,7 +455,7 @@ class AppointmentsList extends Component
 
             $this->loadAppointments();
         } catch (\Exception $e) {
-            $this->dispatch('alert', type: 'error', message: 'خطایی در لغو نوبت رخ داد: ' . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطایی در لغو نوبت رخ داد: ' . $e->getMessage());
         }
     }
 
@@ -484,10 +505,11 @@ class AppointmentsList extends Component
     {
         $this->validate([
             'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
-            'unblockedAt' => ['nullable', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
-            'blockReason' => ['nullable', 'string', 'max:255'],
+            'unblockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
+            'blockReason' => ['required', 'string', 'max:255'],
         ], [
             'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
+            'unblockedAt.required' => 'لطفاً تاریخ پایان مسدودیت را وارد کنید.',
             'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
             'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
             'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
@@ -506,7 +528,7 @@ class AppointmentsList extends Component
             ->exists();
 
         if ($isBlocked) {
-            $this->dispatch('alert', type: 'error', message: 'این کاربر قبلاً در این کلینیک مسدود شده است.');
+            $this->dispatch('show-toastr', type: 'error', message: 'این کاربر قبلاً در این کلینیک مسدود شده است.');
             return;
         }
 
@@ -520,7 +542,7 @@ class AppointmentsList extends Component
             'status' => 1,
         ]);
 
-        $this->dispatch('alert', type: 'success', message: 'کاربر با موفقیت مسدود شد.');
+        $this->dispatch('show-toastr', type: 'success', message: 'کاربر با موفقیت مسدود شد.');
         $this->dispatch('close-modal', id: 'blockUserModal');
         $this->loadBlockedUsers();
         $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId']);
@@ -529,21 +551,23 @@ class AppointmentsList extends Component
     public function blockMultipleUsers($mobiles)
     {
         if (empty($mobiles)) {
-            $this->dispatch('alert', type: 'error', message: 'هیچ کاربری انتخاب نشده است.');
+            $this->dispatch('show-toastr', type: 'error', message: 'هیچ کاربری انتخاب نشده است.');
             return;
         }
 
+
         $this->validate([
-            'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
-            'unblockedAt' => ['nullable', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
-            'blockReason' => ['nullable', 'string', 'max:255'],
-        ], [
-            'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
-            'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
-            'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
-            'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
-            'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-        ]);
+                    'blockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/'],
+                    'unblockedAt' => ['required', 'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', 'after:blockedAt'],
+                    'blockReason' => ['required', 'string', 'max:255'],
+                ], [
+                    'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
+                    'unblockedAt.required' => 'لطفاً تاریخ پایان مسدودیت را وارد کنید.',
+                    'blockedAt.regex' => 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+                    'unblockedAt.regex' => 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.',
+                    'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
+                    'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+                ]);
 
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
@@ -585,16 +609,16 @@ class AppointmentsList extends Component
         }
 
         if (empty($blockedUsers) && !empty($alreadyBlocked)) {
-            $this->dispatch('alert', type: 'error', message: 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.');
+            $this->dispatch('show-toastr', type: 'error', message: 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.');
             return;
         }
 
         if (empty($blockedUsers)) {
-            $this->dispatch('alert', type: 'error', message: 'هیچ کاربری برای مسدود کردن پیدا نشد.');
+            $this->dispatch('show-toastr', type: 'error', message: 'هیچ کاربری برای مسدود کردن پیدا نشد.');
             return;
         }
 
-        $this->dispatch('alert', type: 'success', message: 'کاربران با موفقیت مسدود شدند.');
+        $this->dispatch('show-toastr', type: 'success', message: 'کاربران با موفقیت مسدود شدند.');
         $this->dispatch('close-modal', id: 'blockMultipleUsersModal');
         $this->loadBlockedUsers();
         $this->reset(['blockedAt', 'unblockedAt', 'blockReason']);
@@ -611,7 +635,7 @@ class AppointmentsList extends Component
         $userBlocking->status = $status;
         $userBlocking->save();
 
-        $this->dispatch('alert', type: 'success', message: 'وضعیت با موفقیت به‌روزرسانی شد.');
+        $this->dispatch('show-toastr', type: 'success', message: 'وضعیت با موفقیت به‌روزرسانی شد.');
         $this->loadBlockedUsers();
     }
 
@@ -633,7 +657,7 @@ class AppointmentsList extends Component
                 ->pluck('users.mobile')
                 ->toArray();
             if (empty($recipients)) {
-                $this->dispatch('alert', type: 'error', message: 'هیچ کاربری با شما نوبت ثبت نکرده است.');
+                $this->dispatch('show-toastr', type: 'error', message: 'هیچ کاربری با شما نوبت ثبت نکرده است.');
                 return;
             }
         } elseif ($this->recipientType === 'blocked') {
@@ -644,7 +668,7 @@ class AppointmentsList extends Component
                 ->pluck('users.mobile')
                 ->toArray();
             if (empty($recipients)) {
-                $this->dispatch('alert', type: 'error', message: 'هیچ کاربر مسدودی یافت نشد.');
+                $this->dispatch('show-toastr', type: 'error', message: 'هیچ کاربر مسدودی یافت نشد.');
                 return;
             }
         } elseif ($this->recipientType === 'specific') {
@@ -680,7 +704,7 @@ class AppointmentsList extends Component
             [$doctorName]
         )->delay(now()->addSeconds(5));
 
-        $this->dispatch('alert', type: 'success', message: 'پیام با موفقیت در صف ارسال قرار گرفت.');
+        $this->dispatch('show-toastr', type: 'success', message: 'پیام با موفقیت در صف ارسال قرار گرفت.');
         $this->loadMessages();
         $this->reset(['messageTitle', 'messageContent', 'recipientType', 'specificRecipient']);
     }
@@ -690,7 +714,7 @@ class AppointmentsList extends Component
         $message = SmsTemplate::findOrFail($id);
         $message->delete();
 
-        $this->dispatch('alert', type: 'success', message: 'پیام با موفقیت حذف شد.');
+        $this->dispatch('show-toastr', type: 'success', message: 'پیام با موفقیت حذف شد.');
         $this->loadMessages();
     }
 
@@ -706,7 +730,7 @@ class AppointmentsList extends Component
 
         $userBlocking->delete();
 
-        $this->dispatch('alert', type: 'success', message: 'کاربر با موفقیت از لیست مسدودی حذف شد.');
+        $this->dispatch('show-toastr', type: 'success', message: 'کاربر با موفقیت از لیست مسدودی حذف شد.');
         $this->loadBlockedUsers();
     }
 
@@ -762,7 +786,7 @@ class AppointmentsList extends Component
             $this->loadAppointments();
             $this->dispatch('update-reschedule-calendar', date: $nextAvailableDate);
         } else {
-            $this->dispatch('alert', type: 'error', message: 'هیچ نوبت خالی یافت نشد.');
+            $this->dispatch('show-toastr', type: 'error', message: 'هیچ نوبت خالی یافت نشد.');
         }
     }
 
@@ -841,7 +865,7 @@ class AppointmentsList extends Component
             'holiday_dates' => json_encode(array_values($holidayDates)),
         ]);
 
-        $this->dispatch('alert', type: 'success', message: $message);
+        $this->dispatch('show-toastr', type: 'success', message: $message);
         return ['is_holiday' => $isHoliday, 'holiday_dates' => $holidayDates];
     }
 

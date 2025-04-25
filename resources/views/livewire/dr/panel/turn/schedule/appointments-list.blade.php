@@ -225,180 +225,196 @@
       </nav>
     </div>
 
-  <script>
-  document.addEventListener('livewire:initialized', () => {
-    const selectAllCheckbox = document.getElementById('select-all-row');
-    const cancelAppointmentsBtn = document.getElementById('cancel-appointments-btn');
-    const moveAppointmentsBtn = document.getElementById('move-appointments-btn');
-    const blockUsersBtn = document.getElementById('block-users-btn');
+    <script>
+      document.addEventListener('livewire:initialized', () => {
+        const selectAllCheckbox = document.getElementById('select-all-row');
+        const cancelAppointmentsBtn = document.getElementById('cancel-appointments-btn');
+        const moveAppointmentsBtn = document.getElementById('move-appointments-btn');
+        const blockUsersBtn = document.getElementById('block-users-btn');
 
-    function updateButtonStates() {
-      const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
-      const anySelected = selectedCheckboxes.length > 0;
+        function updateButtonStates() {
+          const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
+          const anySelected = selectedCheckboxes.length > 0;
 
-      if (!cancelAppointmentsBtn || !moveAppointmentsBtn || !blockUsersBtn) {
-        console.warn('یکی از دکمه‌ها یافت نشد');
-        return;
-      }
-
-      cancelAppointmentsBtn.disabled = !anySelected;
-      moveAppointmentsBtn.disabled = !anySelected;
-      blockUsersBtn.disabled = !anySelected;
-
-      if (anySelected) {
-        let hasInvalidStatus = false;
-        selectedCheckboxes.forEach(checkbox => {
-          const status = checkbox.dataset.status;
-          if (status === 'cancelled' || status === 'attended') {
-            hasInvalidStatus = true;
+          if (!cancelAppointmentsBtn || !moveAppointmentsBtn || !blockUsersBtn) {
+            console.warn('یکی از دکمه‌ها یافت نشد');
+            return;
           }
-        });
 
-        cancelAppointmentsBtn.disabled = hasInvalidStatus;
-        moveAppointmentsBtn.disabled = hasInvalidStatus;
-      }
-    }
+          cancelAppointmentsBtn.disabled = !anySelected;
+          moveAppointmentsBtn.disabled = !anySelected;
+          blockUsersBtn.disabled = !anySelected;
 
-    function initializeTooltips() {
-      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-    }
+          if (anySelected) {
+            let hasInvalidStatus = false;
+            selectedCheckboxes.forEach(checkbox => {
+              const status = checkbox.dataset.status;
+              if (status === 'cancelled' || status === 'attended') {
+                hasInvalidStatus = true;
+              }
+            });
 
-    function checkCheckboxes() {
-      const checkboxes = document.querySelectorAll('.appointment-checkbox');
-      const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
-      selectAllCheckbox.checked = checkboxes.length > 0 && selectedCheckboxes.length === checkboxes.length;
-      updateButtonStates();
-    }
-
-    if (selectAllCheckbox) {
-      selectAllCheckbox.addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.appointment-checkbox');
-        checkboxes.forEach(checkbox => {
-          const status = checkbox.dataset.status;
-          if (status !== 'cancelled' && status !== 'attended') {
-            checkbox.checked = selectAllCheckbox.checked;
+            cancelAppointmentsBtn.disabled = hasInvalidStatus;
+            moveAppointmentsBtn.disabled = hasInvalidStatus;
           }
-        });
-        updateButtonStates();
-      });
-    } else {
-      console.warn('چک‌باکس انتخاب همه پیدا نشد');
-    }
-
-    document.addEventListener('change', function(e) {
-      if (e.target.classList.contains('appointment-checkbox')) {
-        checkCheckboxes();
-      }
-    });
-
-    Livewire.on('confirm-cancel-single', (event) => {
-      const appointmentId = event.id || (event[0] && event[0].id) || null;
-      
-      if (!appointmentId) {
-        console.error('شناسه نوبت در confirm-cancel-single پیدا نشد', event);
-        Swal.fire({
-          title: 'خطا',
-          text: 'شناسه نوبت نامعتبر است.',
-          icon: 'error',
-          confirmButtonText: 'باشه'
-        });
-        return;
-      }
-
-      Swal.fire({
-        title: 'تأیید لغو نوبت',
-        text: 'آیا مطمئن هستید که می‌خواهید این نوبت را لغو کنید؟',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'بله، لغو کن',
-        cancelButtonText: 'خیر',
-        reverseButtons: true
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const ids = [parseInt(appointmentId)];
-          @this.set('cancelIds', ids);
-          @this.call('triggerCancelAppointments');
         }
-      });
-    });
 
-    Livewire.on('appointments-cancelled', (event) => {
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: event.message || 'نوبت(ها) با موفقیت لغو شد.',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer);
-          toast.addEventListener('mouseleave', Swal.resumeTimer);
+        function initializeTooltips() {
+          const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+          const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
         }
-      });
 
-     
-    });
+        function checkCheckboxes() {
+          const checkboxes = document.querySelectorAll('.appointment-checkbox');
+          const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
+          selectAllCheckbox.checked = checkboxes.length > 0 && selectedCheckboxes.length === checkboxes.length;
+          updateButtonStates();
+        }
 
-    if (cancelAppointmentsBtn) {
-      cancelAppointmentsBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const selected = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb => 
-          parseInt(cb.value));
-        
-        if (selected.length === 0) {
-          console.warn('هیچ نوبت برای لغو گروهی انتخاب نشده');
-          Swal.fire({
-            title: 'خطا',
-            text: 'لطفاً حداقل یک نوبت را انتخاب کنید.',
-            icon: 'error',
-            confirmButtonText: 'باشه'
+        if (selectAllCheckbox) {
+          selectAllCheckbox.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.appointment-checkbox');
+            checkboxes.forEach(checkbox => {
+              const status = checkbox.dataset.status;
+              if (status !== 'cancelled' && status !== 'attended') {
+                checkbox.checked = selectAllCheckbox.checked;
+              }
+            });
+            updateButtonStates();
           });
-          return;
+        } else {
+          console.warn('چک‌باکس انتخاب همه پیدا نشد');
         }
 
-        Swal.fire({
-          title: 'تأیید لغو نوبت',
-          text: `آیا مطمئن هستید که می‌خواهید ${selected.length} نوبت را لغو کنید؟`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'بله، لغو کن',
-          cancelButtonText: 'خیر',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            @this.set('cancelIds', selected);
-            @this.call('triggerCancelAppointments');
+        document.addEventListener('change', function(e) {
+          if (e.target.classList.contains('appointment-checkbox')) {
+            checkCheckboxes();
           }
         });
-      });
-    } else {
-      console.warn('دکمه لغو نوبت‌ها پیدا نشد');
-    }
 
-    Livewire.on('alert', (event) => {
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: event.type || 'info',
-        title: event.message || 'عملیات انجام شد.',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer);
-          toast.addEventListener('mouseleave', Swal.resumeTimer);
+        Livewire.on('confirm-cancel-single', (event) => {
+          const appointmentId = event.id || (event[0] && event[0].id) || null;
+
+          if (!appointmentId) {
+            console.error('شناسه نوبت در confirm-cancel-single پیدا نشد', event);
+            Swal.fire({
+              title: 'خطا',
+              text: 'شناسه نوبت نامعتبر است.',
+              icon: 'error',
+              confirmButtonText: 'باشه'
+            });
+            return;
+          }
+
+          Swal.fire({
+            title: 'تأیید لغو نوبت',
+            text: 'آیا مطمئن هستید که می‌خواهید این نوبت را لغو کنید؟',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'بله، لغو کن',
+            cancelButtonText: 'خیر',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              const ids = [parseInt(appointmentId)];
+              @this.set('cancelIds', ids);
+              @this.call('triggerCancelAppointments');
+            }
+          });
+        });
+
+        Livewire.on('appointments-cancelled', (event) => {
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: event.message || 'نوبت(ها) با موفقیت لغو شد.',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer);
+              toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
+          });
+        });
+
+        if (cancelAppointmentsBtn) {
+          cancelAppointmentsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const selected = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
+              parseInt(cb.value));
+
+            if (selected.length === 0) {
+              console.warn('هیچ نوبت برای لغو گروهی انتخاب نشده');
+              Swal.fire({
+                title: 'خطا',
+                text: 'لطفاً حداقل یک نوبت را انتخاب کنید.',
+                icon: 'error',
+                confirmButtonText: 'باشه'
+              });
+              return;
+            }
+
+            Swal.fire({
+              title: 'تأیید لغو نوبت',
+              text: `آیا مطمئن هستید که می‌خواهید ${selected.length} نوبت را لغو کنید؟`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'بله، لغو کن',
+              cancelButtonText: 'خیر',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                @this.set('cancelIds', selected);
+                @this.call('triggerCancelAppointments');
+              }
+            });
+          });
+        } else {
+          console.warn('دکمه لغو نوبت‌ها پیدا نشد');
         }
+
+        if (blockUsersBtn) {
+          blockUsersBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
+            const mobiles = Array.from(selectedCheckboxes)
+              .map(cb => cb.dataset.mobile)
+              .filter(mobile => mobile); // فقط شماره‌های معتبر
+
+            if (mobiles.length === 0) {
+              console.warn('هیچ کاربری برای مسدود کردن انتخاب نشده');
+              Swal.fire({
+                title: 'خطا',
+                text: 'لطفاً حداقل یک کاربر را انتخاب کنید.',
+                icon: 'error',
+                confirmButtonText: 'باشه'
+              });
+              return;
+            }
+
+            Swal.fire({
+              title: 'تأیید مسدود کردن کاربران',
+              text: `آیا مطمئن هستید که می‌خواهید ${mobiles.length} کاربر را مسدود کنید؟`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'بله، مسدود کن',
+              cancelButtonText: 'خیر',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                @this.call('blockMultipleUsers', mobiles);
+              }
+            });
+          });
+        } else {
+          console.warn('دکمه مسدود کردن کاربران پیدا نشد');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+          initializeTooltips();
+          checkCheckboxes();
+        });
       });
-    });
-
-   
-
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeTooltips();
-      checkCheckboxes();
-    });
-  });
-</script>
+    </script>
   </div>
