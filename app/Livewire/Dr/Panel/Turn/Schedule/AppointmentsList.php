@@ -26,7 +26,7 @@ use App\Models\DoctorAppointmentConfig;
 class AppointmentsList extends Component
 {
     use WithPagination;
-
+    public $cancelIds = [];
     public $selectedDate;
     public $selectedClinicId = 'default';
     public $searchQuery = '';
@@ -84,16 +84,18 @@ class AppointmentsList extends Component
     protected $listeners = [
         'updateSelectedDate' => 'updateSelectedDate',
         'searchAllDates' => 'searchAllDates',
+        'cancelAppointments' => 'cancelAppointments',
     ];
+
     public function initialize()
     {
-        // این متد برای اطمینان از اجرای اسکریپت‌های اولیه استفاده می‌شود
         $this->dispatch('initialize-tooltips');
     }
+
     public function mount()
     {
         $this->selectedDate = Carbon::now()->format('Y-m-d');
-        $this->blockedAt = Jalalian::now()->format('Y/m/d'); // تاریخ امروز به جلالی
+        $this->blockedAt = Jalalian::now()->format('Y/m/d');
         $doctor = $this->getAuthenticatedDoctor();
         if ($doctor) {
             $defaultClinic = $doctor->clinics()->where('is_active', 0)->first();
@@ -146,7 +148,6 @@ class AppointmentsList extends Component
 
         $gregorianDate = $this->convertToGregorian($this->selectedDate);
 
-
         $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
             ->withTrashed()
             ->where('doctor_id', $doctor->id);
@@ -157,21 +158,17 @@ class AppointmentsList extends Component
                 $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
                 $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
                 $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
-
             } elseif ($this->dateFilter === 'current_month') {
                 $startOfMonth = $today->copy()->startOfMonth();
                 $endOfMonth = $today->copy()->endOfMonth();
                 $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
-
             } elseif ($this->dateFilter === 'current_year') {
                 $startOfYear = $today->copy()->startOfYear();
                 $endOfYear = $today->copy()->endOfYear();
                 $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
-
             }
         } elseif ($this->filterStatus !== 'all' && !$this->isSearchingAllDates) {
             $query->whereDate('appointment_date', $gregorianDate);
-        } else {
         }
 
         if ($this->selectedClinicId === 'default') {
@@ -207,8 +204,6 @@ class AppointmentsList extends Component
             'total' => $appointments->total(),
         ];
 
-
-
         if (empty($this->appointments) && !$this->isSearchingAllDates && $this->searchQuery) {
             $jalaliDate = Jalalian::fromCarbon(Carbon::parse($gregorianDate))->format('Y/m/d');
             $this->dispatch('no-results-found', date: $jalaliDate);
@@ -231,7 +226,6 @@ class AppointmentsList extends Component
                 $gregorian = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
                 return $gregorian;
             } catch (\Exception $e) {
-
                 $this->dispatch('alert', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
                 return Carbon::now()->format('Y-m-d');
             }
@@ -364,20 +358,55 @@ class AppointmentsList extends Component
         $this->dispatch('close-modal', id: 'endVisitModalCenter');
     }
 
-    public function cancelAppointments($ids)
+
+    public function cancelSingleAppointment($id)
     {
-        Log::info('cancelAppointments called', ['ids' => $ids]);
+        $this->dispatch('confirm-cancel-single', id: $id);
+    }
+
+    public function triggerCancelAppointments()
+    {
+        $this->cancelAppointments($this->cancelIds);
+        $this->cancelIds = []; // پاک کردن بعد از استفاده
+    }
+
+    public function cancelAppointments($ids = [])
+    {
+        // دیباگ داده‌های خام درخواست
+        $requestData = request()->all();
+
+
+        // نرمال‌سازی آیدی‌ها
+        $normalizedIds = [];
+        if (is_array($ids) && !empty($ids)) {
+            if (array_is_list($ids)) {
+                $normalizedIds = $ids; // آرایه ساده مثل [1, 2]
+            } else {
+                $normalizedIds = array_values($ids); // فال‌بک به مقادیر آرایه
+            }
+        } elseif (is_scalar($ids) && !empty($ids)) {
+            $normalizedIds = [$ids]; // آیدی تکی
+        }
+
+
+        if (empty($normalizedIds)) {
+            $this->dispatch('alert', type: 'error', message: 'هیچ نوبت انتخاب‌شده‌ای یافت نشد.');
+            return;
+        }
 
         try {
             $doctor = $this->getAuthenticatedDoctor();
-            $appointments = Appointment::whereIn('id', $ids)
+            if (!$doctor) {
+                throw new \Exception('دکتر معتبر یافت نشد.');
+            }
+
+            $appointments = Appointment::whereIn('id', $normalizedIds)
                 ->where('doctor_id', $doctor->id)
                 ->whereNotIn('status', ['cancelled', 'attended'])
                 ->get();
 
             if ($appointments->isEmpty()) {
-                Log::warning('No valid appointments found for cancellation', ['ids' => $ids]);
-                $this->dispatch('close-modal', ['id' => 'someModalId']);
+                $this->dispatch('alert', type: 'error', message: 'هیچ نوبت معتبری برای لغو یافت نشد.');
                 return;
             }
 
@@ -386,30 +415,27 @@ class AppointmentsList extends Component
                     'status' => 'cancelled',
                     'updated_at' => now(),
                 ]);
-                Log::info('Appointment cancelled', ['id' => $appointment->id]);
+
+                if ($appointment->patient && $appointment->patient->mobile) {
+                    $dateJalali = Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d');
+                    $message = "کاربر گرامی، نوبت شما در تاریخ {$dateJalali} لغو شد.";
+                    SendSmsNotificationJob::dispatch(
+                        $message,
+                        [$appointment->patient->mobile],
+                        null,
+                        []
+                    )->delay(now()->addSeconds(5));
+                }
             }
 
-            // ارسال رویداد برای نمایش توستر موفقیت
             $this->dispatch('appointments-cancelled', [
-                'message' => count($ids) > 1 ? 'نوبت‌ها با موفقیت لغو شدند.' : 'نوبت با موفقیت لغو شد.'
+                'message' => count($normalizedIds) > 1 ? 'نوبت‌ها با موفقیت لغو شدند.' : 'نوبت با موفقیت لغو شد.'
             ]);
 
-            // به‌روزرسانی جدول
             $this->loadAppointments();
         } catch (\Exception $e) {
-            Log::error('Error cancelling appointments', ['error' => $e->getMessage(), 'ids' => $ids]);
-            $this->dispatch('close-modal', ['id' => 'someModalId']);
-            $this->dispatch('show-error', ['message' => 'خطایی در لغو نوبت رخ داد.']);
+            $this->dispatch('alert', type: 'error', message: 'خطایی در لغو نوبت رخ داد: ' . $e->getMessage());
         }
-    }
-    public function confirmCancelSingle($id)
-    {
-        Log::info('confirmCancelSingle called', ['id' => $id]);
-        $this->dispatch('confirm-cancel-single', ['id' => $id]);
-    }
-    public function cancelSingleAppointment($id)
-    {
-        $this->dispatch('confirm-cancel-single', ['id' => $id]); // Ensure array format for consistency
     }
 
     private function loadBlockedUsers()

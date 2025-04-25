@@ -61,6 +61,11 @@ $(document).ready(function () {
         fetchAppointmentsCount();
     });
 
+    // گوش دادن به رویداد لغو نوبت
+    Livewire.on("appointments-cancelled", (event) => {
+        fetchAppointmentsCount();
+    });
+
     function fetchAppointmentsCount() {
         if (!calendar.length) {
             console.error("Calendar element not found, aborting AJAX");
@@ -70,7 +75,6 @@ $(document).ready(function () {
         calendar.hide();
         ensureLoadingHidden();
 
-       
         $.ajax({
             url: appointmentsCountUrl,
             method: "GET",
@@ -86,7 +90,6 @@ $(document).ready(function () {
                     workingDays = response.working_days || [];
                     calendarDays = response.calendar_days || 60;
                     appointmentSettings = response.appointment_settings || [];
-                   
                     $("#calendar-error").hide();
                     loadCalendar();
                 } else {
@@ -130,8 +133,6 @@ $(document).ready(function () {
         let current = moment(currentDate);
         let i = 0;
 
-      
-
         while (displayedDays < visibleDays && i < calendarDays * 2) {
             const dayOfWeek = current.format("dddd").toLowerCase();
             const appointmentDate = current.format("YYYY-MM-DD");
@@ -139,8 +140,6 @@ $(document).ready(function () {
             const isPast = current.isBefore(today, "day");
             const isWorkingDay = workingDays.includes(dayOfWeek);
             const isSelected = appointmentDate === selectedDate;
-
-          
 
             if (isWorkingDay || isToday) {
                 const persianDate = moment(current).locale("fa").format("dddd");
@@ -186,7 +185,6 @@ $(document).ready(function () {
             i++;
         }
 
-       
         if (displayedDays === 0) {
             console.warn(
                 "No days displayed. Check workingDays or appointmentsData."
