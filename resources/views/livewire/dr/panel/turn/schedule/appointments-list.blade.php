@@ -128,7 +128,7 @@
                         </button>
                         <button class="btn btn-light rounded-circle shadow-sm block-btn" data-bs-toggle="tooltip"
                           data-bs-placement="top" title="مسدود کردن کاربر"
-                          wire:click="$dispatch('showModal', {data: {alias: 'block-user-modal','size' :'modal-md', params: {appointmentId: {{ $appointment->id }}}})">
+                          wire:click="$dispatch('showModal', {data: {alias: 'block-user-modal','size' :'modal-md', params: {appointmentId: {{ $appointment->id }}}}})">
                           <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="مسدود کردن">
                         </button>
                       </div>
