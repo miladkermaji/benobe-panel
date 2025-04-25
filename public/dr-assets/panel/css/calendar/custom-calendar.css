@@ -1,209 +1,303 @@
-body {
- direction: rtl;
- background-color: #f8f9fa;
-}
+  :root {
+    --primary: #2E86C1;
+    --primary-light: #84CAF9;
+    --secondary: #1DEB3C;
+    --secondary-hover: #15802A;
+    --background-light: #F0F8FF;
+    --background-footer: #D4ECFD;
+    --background-card: #FFFFFF;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --text-discount: #008000;
+    --text-original: #FF0000;
+    --border-neutral: #E5E7EB;
+    --shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px !important;
+    --gradient-instagram-from: #F92CA7;
+    --gradient-instagram-to: #6B1A93;
+    --button-mobile: #4F9ACD;
+    --button-mobile-light: #A2CDEB;
+    --support-section: #2E86C1;
+    --support-text: #084D7C;
+    --radius-button: 0.5rem;
+    --radius-button-large: 1rem;
+    --radius-button-xl: 1.25rem;
+    --radius-card: 1.125rem;
+    --radius-footer: 1.875rem;
+    --radius-nav: 1.25rem;
+    --radius-circle: 9999px;
+  }
 
-.calendar {
- max-width: 500px;
- margin: auto;
- border: 1px solid #ddd;
- border-radius: 10px;
- padding: 10px;
- background-color: white;
-}
-.text-title-calendar-modal{
-  position: relative !important;
-   right: 15px !important;
-   top: 10px !important;
-}
-.calendar-day.active {
- background-color: #cce5ff;
- /* رنگ آبی روشن */
- border-color: #004085;
- color: #004085;
-}
-.my-modal-header{
- position: relative;
-}
-.my-modal-header button{
- position: relative !important;
- left: 15px !important;
- top: 10px !important;
-}
-.calendar-header {
- display: flex;
- justify-content: space-between;
- align-items: center;
- padding: 10px 0;
-}
+  #miniCalendarModal .modal.custom-modal {
+    display: none;
+  }
 
-.calendar-body {
- display: grid;
- grid-template-columns: repeat(7, 1fr);
- grid-gap: 5px;
- margin-top: 10px;
-}
+  #miniCalendarModal .modal.custom-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1050;
+  }
 
-.calendar-day {
- text-align: center;
- background-color: white;
- border: 1px solid #ddd;
- border-radius: 5px;
- aspect-ratio: 1.7;
- display: flex;
- justify-content: center;
- align-items: center;
- cursor: pointer;
- transition: background-color 0.3s ease;
-}
+  #miniCalendarModal .modal-dialog {
+    max-width: 400px !important;
+    margin: 1.75rem auto;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: scale(0.7);
+    opacity: 0;
+  }
 
-.calendar-day:hover {
- background-color: #f0f0f0;
-}
+  #miniCalendarModal .modal.custom-modal.show .modal-dialog {
+    transform: scale(1);
+    opacity: 1;
+  }
 
-.calendar-day.friday {
- color: red;
-}
+  #miniCalendarModal .modal-content {
+    background: var(--background-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    border: none;
+    padding: 8px;
+    height:412px !important;
+  }
 
-.calendar-day.active {
- background-color: #cce5ff;
- border-color: #004085;
-}
+  #miniCalendarModal .modal-header {
+    border-bottom: none;
+    padding: 8px 16px;
+    position: relative;
+  }
 
-.calendar-day.selected {
- background-color: #d1ecf1;
- border-color: #0c5460;
-}
+  #miniCalendarModal .calendar-day.friday {
+    color: #ff4d4f !important;
+  }
 
-.calendar-day-name {
- font-weight: bold;
- text-align: center;
-}
+  #miniCalendarModal .modal-header .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.7rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    position: absolute;
+    left: 16px;
+    top: 12px;
+    padding: 10px;
+  }
 
-.my-badge-success {
- position: absolute;
- top: -4px;
- left: -3px;
- width: 22px;
- height: 22px;
- display: flex;
- justify-content: center;
- align-items: center;
- line-height: middle;
- padding-top: 2px;
- background-color: #28a745;
- color: white;
- border-radius: 50%;
- font-size: 0.75rem;
+  #miniCalendarModal .modal-header .btn-close:hover {
+    opacity: 1;
+    color: var(--text-primary);
+  }
 
-}
+  #miniCalendarModal .modal-body {
+    padding: 0 16px 16px;
+  }
 
-.my-sm-badge-success {
- position: absolute;
- top: -4px;
- left: -3px;
- width: 18px;
- height: 18px;
- display: flex;
- justify-content: center;
- align-items: center;
- line-height: middle;
- padding-top: 2px;
- background-color: #28a745;
- color: white;
- border-radius: 50%;
- font-size: 0.65rem;
+  #miniCalendarModal .calendar {
+    background: var(--background-card);
+  }
 
-}
+  #miniCalendarModal .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+  }
 
-#calendar-reschedule .calendar-day {
- font-size: 13px;
- font-weight: bold;
-}
+  #miniCalendarModal .select-group {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+  }
 
+  #miniCalendarModal .calendar-select {
+    background: var(--background-card);
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 8px center;
+    padding-left: 24px;
+  }
 
+  #miniCalendarModal .calendar-select:focus {
+    outline: none;
+    background: var(--primary-light);
+    color: var(--primary);
+  }
 
-.form-select {
- width: auto;
- display: inline-block;
- padding: 5px;
- border-radius: 5px;
- border: 1px solid #ddd;
- margin-left: 10px;
-}
+  #miniCalendarModal .calendar-select:hover {
+    background: var(--primary-light);
+  }
 
-.form-select:focus {
- outline: none;
- border-color: #004085;
- box-shadow: 0 0 5px rgba(0, 64, 133, .5);
-}
+  #miniCalendarModal .nav-btn {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-circle);
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
 
-.calendar-day {
- font-size: 15px;
-}
+  #miniCalendarModal .nav-btn svg {
+    stroke: var(--text-secondary);
+    width: 16px;
+    height: 16px;
+  }
 
-@media only screen and (max-width:768px) {
- .calendar-day {
-  font-size: 11px;
-  font-weight: bold;
- }
+  #miniCalendarModal .nav-btn:hover {
+    background: var(--primary-light);
+    transform: scale(1.1);
+  }
 
- .top-dr-panel {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  flex-direction: column;
- }
+  #miniCalendarModal .nav-btn:hover svg {
+    stroke: var(--primary);
+  }
 
- .d-none-768 {
-  display: none !important;
- }
+  #miniCalendarModal .calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
 
- .my-badge-success {
-  font-size: 11px;
-  width: 19px;
-  height: 19px;
- }
-}
+  #miniCalendarModal .calendar-day-name {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 8px 0;
+  }
 
-@media only screen and (max-width:425px) {
- .calendar-body-g-425 {
-  display: none !important;
- }
+  #miniCalendarModal .calendar-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: var(--radius-circle);
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    position: relative;
+    margin: 2px;
+  }
 
- .calendar-day {
-  font-size: 10px;
-  text-align: left !important;
- }
+  #miniCalendarModal .calendar-day.empty {
+    background: transparent;
+    cursor: default;
+  }
 
- .d-none-425 {
-  display: none !important;
- }
+  #miniCalendarModal .calendar-day:hover:not(.empty) {
+    background: var(--primary-light);
+    transform: scale(1.15);
+  }
 
- .my-badge-success {
-  font-size: 10px;
-  width: 15px;
-  height: 15px;
- }
+  #miniCalendarModal .calendar-day.friday {
+    color: #ff4d4f !important;
+  }
 
- .my-sm-badge-success {
-  font-size: 10px;
-  width: 15px;
-  height: 15px;
- }
+  #miniCalendarModal .calendar-day.today {
+    background: var(--primary-light);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+    border-radius: var(--radius-circle);
+  }
+    #miniCalendarModal .calendar-day.active {
+    background: var(--primary-light);
+    color: #333;
+    font-weight: 600;
+    border-radius: var(--radius-circle);
+  }
 
- .calendar-body-425 {
-  display: flex !important;
-  text-align: center !important;
-  justify-content: space-between !important;
- }
+  #miniCalendarModal .calendar-day.selected {
+    background: var(--primary);
+    color: var(--background-card);
+    font-weight: 600;
+    border-radius: var(--radius-circle);
+    box-shadow: 0 2px 4px rgba(0, 147, 255, 0.2);
+  }
 
- .calendar-body-425 .calendar-day-name {
-  text-align: center !important;
-  width: 100%;
- }
+  #miniCalendarModal .calendar-day.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 5px;
+    height: 5px;
+    background: var(--secondary);
+    border-radius: var(--radius-circle);
+  }
 
- .calendar-day {
-  font-size: 11px;
-  font-weight: bold;
- }
-}
+  #miniCalendarModal .calendar-footer {
+    text-align: center;
+    padding-top: 12px;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 576px) {
+    #miniCalendarModal .modal-dialog {
+      max-width: 90%;
+      margin: 1rem auto;
+    }
+
+    #miniCalendarModal .calendar {
+      padding: 12px;
+    }
+
+    #miniCalendarModal .calendar-header {
+      gap: 6px;
+    }
+
+    #miniCalendarModal .select-group {
+      gap: 4px;
+    }
+
+    #miniCalendarModal .calendar-select {
+      font-size: 14px;
+      padding: 4px 8px 4px 20px;
+      background-position: left 6px center;
+    }
+
+    #miniCalendarModal .calendar-day {
+      width: 36px;
+      height: 36px;
+      font-size: 14px;
+    }
+
+    #miniCalendarModal .calendar-day-name {
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 425px) {
+    #miniCalendarModal .calendar-day {
+      width: 32px;
+      height: 32px;
+      font-size: 13px;
+    }
+
+    #miniCalendarModal .calendar-day-name {
+      font-size: 11px;
+    }
+  }

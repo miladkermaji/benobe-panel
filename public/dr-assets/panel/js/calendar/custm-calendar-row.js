@@ -45,7 +45,16 @@ $(document).ready(function () {
     }
 
     // رویداد آپدیت تقویم ردیفی
-    $(document).on("updateCalendarRow", function (e, selectedDate) {
+    $(document).on("updateCalendarRow", function (e) {
+        const selectedDate = e.originalEvent.detail;
+        if (!moment(selectedDate, "YYYY-MM-DD", true).isValid()) {
+            console.warn(
+                "Invalid selectedDate, using currentDate:",
+                currentDate.format("YYYY-MM-DD")
+            );
+            fetchAppointmentsCount();
+            return;
+        }
         currentDate = moment(selectedDate, "YYYY-MM-DD")
             .startOf("day")
             .subtract(9, "days");
@@ -61,6 +70,7 @@ $(document).ready(function () {
         calendar.hide();
         ensureLoadingHidden();
 
+       
         $.ajax({
             url: appointmentsCountUrl,
             method: "GET",
@@ -96,7 +106,6 @@ $(document).ready(function () {
                 calendar.show();
             },
             complete: function () {
-             
                 loadingOverlay.hide();
                 calendar.show();
             },
@@ -104,16 +113,24 @@ $(document).ready(function () {
     }
 
     function loadCalendar() {
-       
         if (!calendar.length) {
             console.error("Calendar element not found in DOM");
             return;
+        }
+        if (!moment(currentDate).isValid()) {
+            console.warn(
+                "Invalid currentDate, resetting to today:",
+                moment().format("YYYY-MM-DD")
+            );
+            currentDate = moment().startOf("day").subtract(9, "days");
         }
         calendar.empty();
         let badgeCount = 0;
         let displayedDays = 0;
         let current = moment(currentDate);
         let i = 0;
+
+      
 
         while (displayedDays < visibleDays && i < calendarDays * 2) {
             const dayOfWeek = current.format("dddd").toLowerCase();
@@ -160,7 +177,7 @@ $(document).ready(function () {
                         <div class="date">${persianFormattedDate}</div>
                         ${isToday ? '<div class="current-day-icon"></div>' : ""}
                     </div>`;
-          
+
                 calendar.append(card);
                 if (appointmentCount > 0) badgeCount++;
                 displayedDays++;
@@ -169,7 +186,7 @@ $(document).ready(function () {
             i++;
         }
 
-      
+       
         if (displayedDays === 0) {
             console.warn(
                 "No days displayed. Check workingDays or appointmentsData."

@@ -1,18 +1,21 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // تابع برای بررسی وجود المنت
-    function ensureElementExists(selector, errorMessage) {
-        const element = document.querySelector(selector);
-        if (!element) {
-            console.warn(errorMessage);
-            return null;
-        }
-        return element;
+// تابع برای بررسی وجود المنت
+function ensureElementExists(selector, errorMessage, scope = document) {
+    const element = scope.querySelector(selector);
+    if (!element) {
+        return null;
     }
+    return element;
+}
 
-    // انتخاب المنت‌ها
+// تابع اصلی تقویم
+function initializeCalendar() {
+    // پیدا کردن محدوده مودال
+    const modalScope = document.querySelector("#miniCalendarModal") || document;
+
     const calendarBody = ensureElementExists(
         "#calendar-body",
-        "Calendar body not found"
+        "Calendar body not found",
+        modalScope
     );
     const selectedDateSpan = ensureElementExists(
         ".turning_selectDate__MLRSb span:first-child",
@@ -92,16 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 // بستن مودال
-                const modal = ensureElementExists(
-                    "#miniCalendarModal",
-                    "MiniCalendarModal not found"
-                );
-                if (modal) {
-                    const modalInstance = bootstrap.Modal.getInstance(modal);
-                    if (modalInstance) {
-                        modalInstance.hide();
-                    }
-                }
+                Livewire.dispatch("hideModal");
 
                 // حذف backdrop
                 const existingBackdrops =
@@ -112,18 +106,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.body.style.paddingRight = "";
 
                 // ارسال رویداد به Livewire
-                if (typeof Livewire !== "undefined") {
-                    Livewire.dispatch("updateSelectedDate", {
-                        date: gregorianDate,
-                    });
-                    // ارسال رویداد برای آپدیت تقویم ردیفی
-                    const event = new CustomEvent("updateCalendarRow", {
-                        detail: gregorianDate,
-                    });
-                    document.dispatchEvent(event);
-                } else {
-                    console.warn("Livewire is not defined");
-                }
+                Livewire.dispatch("updateSelectedDate", {
+                    date: gregorianDate,
+                });
+                // ارسال رویداد برای آپدیت تقویم ردیفی
+                const event = new CustomEvent("updateCalendarRow", {
+                    detail: gregorianDate,
+                });
+                document.dispatchEvent(event);
             });
 
             calendarBody.appendChild(dayElement);
@@ -134,11 +124,13 @@ document.addEventListener("DOMContentLoaded", function () {
     function populateSelectBoxes() {
         const yearSelect = ensureElementExists(
             "#year",
-            "Year select not found"
+            "Year select not found",
+            modalScope
         );
         const monthSelect = ensureElementExists(
             "#month",
-            "Month select not found"
+            "Month select not found",
+            modalScope
         );
         if (!yearSelect || !monthSelect) return;
 
@@ -197,16 +189,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // مدیریت دکمه‌های قبلی و بعدی
     const prevMonthBtn = ensureElementExists(
         "#prev-month",
-        "Prev month button not found"
+        "Prev month button not found",
+        modalScope
     );
     const nextMonthBtn = ensureElementExists(
         "#next-month",
-        "Next month button not found"
+        "Next month button not found",
+        modalScope
     );
     if (prevMonthBtn && nextMonthBtn) {
         prevMonthBtn.addEventListener("click", () => {
-            const yearSelect = document.getElementById("year");
-            const monthSelect = document.getElementById("month");
+            const yearSelect = modalScope.querySelector("#year");
+            const monthSelect = modalScope.querySelector("#month");
             let currentMonth = parseInt(monthSelect.value);
             let currentYear = parseInt(yearSelect.value);
 
@@ -223,8 +217,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         nextMonthBtn.addEventListener("click", () => {
-            const yearSelect = document.getElementById("year");
-            const monthSelect = document.getElementById("month");
+            const yearSelect = modalScope.querySelector("#year");
+            const monthSelect = modalScope.querySelector("#month");
             let currentMonth = parseInt(monthSelect.value);
             let currentYear = parseInt(yearSelect.value);
 
@@ -244,14 +238,29 @@ document.addEventListener("DOMContentLoaded", function () {
     // اجرای اولیه
     populateSelectBoxes();
     generateCalendar(moment().jYear(), moment().jMonth() + 1);
+}
 
-    // مدیریت به‌روزرسانی‌های Livewire
-    if (typeof Livewire !== "undefined") {
-        Livewire.hook("morph.updated", () => {
-            setTimeout(() => {
-                populateSelectBoxes();
-                generateCalendar(moment().jYear(), moment().jMonth() + 1);
-            }, 150);
-        });
+// اجرای تقویم برای تقویم ردیفی
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.querySelector(".turning_selectDate__MLRSb")) {
+        initializeCalendar();
     }
+});
+
+// اجرای تقویم فقط وقتی مودال MiniCalendarModal باز می‌شه
+Livewire.on("showModal", (event) => {
+    if (event.data && event.data.alias === "mini-calendar-modal") {
+        setTimeout(() => {
+            initializeCalendar();
+        }, 2000);
+    }
+});
+
+// مدیریت به‌روزرسانی‌های Livewire
+Livewire.hook("morph.updated", () => {
+    setTimeout(() => {
+        if (document.querySelector("#miniCalendarModal.show")) {
+            initializeCalendar();
+        }
+    }, 300);
 });

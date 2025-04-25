@@ -2,6 +2,8 @@
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/appointments.css') }}" rel="stylesheet" />
+
+
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -36,8 +38,6 @@
   var updateStatusAppointmentUrl =
     "{{ route('updateStatusAppointment', ':id') }}";
 </script>
-<script src="{{ asset('dr-assets/panel/js/jquery-easing/1.4.1/jquery.easing.min.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
 <script>
     $(document).ready(function() {
     let dropdownOpen = false;

@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "aliqasemzadeh/livewire-bootstrap-modal": "^2.3",
         "cviebrock/eloquent-sluggable": "^12.0",
         "dedoc/scramble": "^0.12.12",
         "guzzlehttp/guzzle": "^7.2",

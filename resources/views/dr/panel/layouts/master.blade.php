@@ -27,7 +27,7 @@
   </div>
 
   @livewireScripts
-
+  <livewire:modals />
 
   <script>
     // ثبت رویداد show-toastr

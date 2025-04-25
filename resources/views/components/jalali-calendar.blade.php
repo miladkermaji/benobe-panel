@@ -28,96 +28,27 @@
     --radius-circle: 9999px;
   }
 
-  #miniCalendarModal .modal.custom-modal {
-    display: none;
-  }
-
-  #miniCalendarModal .modal.custom-modal.show {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.5);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1050;
-  }
-
-  #miniCalendarModal .modal-dialog {
-    max-width: 400px !important;
-    margin: 1.75rem auto;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    transform: scale(0.7);
-    opacity: 0;
-  }
-
-  #miniCalendarModal .modal.custom-modal.show .modal-dialog {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  #miniCalendarModal .modal-content {
+  .calendar {
     background: var(--background-card);
-    border-radius: var(--radius-card);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    border: none;
     padding: 8px;
-    height:412px !important;
   }
 
-  #miniCalendarModal .modal-header {
-    border-bottom: none;
-    padding: 8px 16px;
-    position: relative;
-  }
-
-  #miniCalendarModal .calendar-day.friday {
-    color: #ff4d4f !important;
-  }
-
-  #miniCalendarModal .modal-header .btn-close {
-    background: none;
-    border: none;
-    font-size: 1.7rem;
-    color: var(--text-secondary);
-    opacity: 0.7;
-    transition: opacity 0.2s ease;
-    position: absolute;
-    left: 16px;
-    top: 12px;
-    padding: 10px;
-  }
-
-  #miniCalendarModal .modal-header .btn-close:hover {
-    opacity: 1;
-    color: var(--text-primary);
-  }
-
-  #miniCalendarModal .modal-body {
-    padding: 0 16px 16px;
-  }
-
-  #miniCalendarModal .calendar {
-    background: var(--background-card);
-  }
-
-  #miniCalendarModal .calendar-header {
+  .calendar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 8px 0;
+    gap: 4px;
   }
 
-  #miniCalendarModal .select-group {
+  .select-group {
     display: flex;
     gap: 6px;
     flex: 1;
     justify-content: center;
   }
 
-  #miniCalendarModal .calendar-select {
+  .calendar-select {
     background: var(--background-card);
     border: none;
     border-radius: 4px;
@@ -134,17 +65,17 @@
     padding-left: 24px;
   }
 
-  #miniCalendarModal .calendar-select:focus {
+  .calendar-select:focus {
     outline: none;
     background: var(--primary-light);
     color: var(--primary);
   }
 
-  #miniCalendarModal .calendar-select:hover {
+  .calendar-select:hover {
     background: var(--primary-light);
   }
 
-  #miniCalendarModal .nav-btn {
+  .nav-btn {
     background: transparent;
     border: none;
     padding: 6px;
@@ -158,28 +89,28 @@
     transition: background 0.3s ease, transform 0.3s ease;
   }
 
-  #miniCalendarModal .nav-btn svg {
+  .nav-btn svg {
     stroke: var(--text-secondary);
     width: 16px;
     height: 16px;
   }
 
-  #miniCalendarModal .nav-btn:hover {
+  .nav-btn:hover {
     background: var(--primary-light);
     transform: scale(1.1);
   }
 
-  #miniCalendarModal .nav-btn:hover svg {
+  .nav-btn:hover svg {
     stroke: var(--primary);
   }
 
-  #miniCalendarModal .calendar-body {
+  .calendar-body {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 2px;
   }
 
-  #miniCalendarModal .calendar-day-name {
+  .calendar-day-name {
     text-align: center;
     font-size: 13px;
     font-weight: 600;
@@ -187,7 +118,7 @@
     padding: 8px 0;
   }
 
-  #miniCalendarModal .calendar-day {
+  .calendar-day {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -203,35 +134,36 @@
     margin: 2px;
   }
 
-  #miniCalendarModal .calendar-day.empty {
+  .calendar-day.empty {
     background: transparent;
     cursor: default;
   }
 
-  #miniCalendarModal .calendar-day:hover:not(.empty) {
+  .calendar-day:hover:not(.empty) {
     background: var(--primary-light);
     transform: scale(1.15);
   }
 
-  #miniCalendarModal .calendar-day.friday {
+  .calendar-day.friday {
     color: #ff4d4f !important;
   }
 
-  #miniCalendarModal .calendar-day.today {
+  .calendar-day.today {
     background: var(--primary-light);
     border: 1px solid var(--primary);
     color: var(--primary);
     font-weight: 600;
     border-radius: var(--radius-circle);
   }
-    #miniCalendarModal .calendar-day.active {
+
+  .calendar-day.active {
     background: var(--primary-light);
     color: #333;
     font-weight: 600;
     border-radius: var(--radius-circle);
   }
 
-  #miniCalendarModal .calendar-day.selected {
+  .calendar-day.selected {
     background: var(--primary);
     color: var(--background-card);
     font-weight: 600;
@@ -239,7 +171,7 @@
     box-shadow: 0 2px 4px rgba(0, 147, 255, 0.2);
   }
 
-  #miniCalendarModal .calendar-day.has-event::after {
+  .calendar-day.has-event::after {
     content: '';
     position: absolute;
     bottom: 4px;
@@ -249,7 +181,7 @@
     border-radius: var(--radius-circle);
   }
 
-  #miniCalendarModal .calendar-footer {
+  .calendar-footer {
     text-align: center;
     padding-top: 12px;
     font-size: 14px;
@@ -257,48 +189,43 @@
   }
 
   @media (max-width: 576px) {
-    #miniCalendarModal .modal-dialog {
-      max-width: 90%;
-      margin: 1rem auto;
-    }
-
-    #miniCalendarModal .calendar {
+    .calendar {
       padding: 12px;
     }
-
-    #miniCalendarModal .calendar-header {
+     
+    .calendar-header {
       gap: 6px;
     }
 
-    #miniCalendarModal .select-group {
+    .select-group {
       gap: 4px;
     }
 
-    #miniCalendarModal .calendar-select {
+    .calendar-select {
       font-size: 14px;
       padding: 4px 8px 4px 20px;
       background-position: left 6px center;
     }
 
-    #miniCalendarModal .calendar-day {
+    .calendar-day {
       width: 36px;
       height: 36px;
       font-size: 14px;
     }
 
-    #miniCalendarModal .calendar-day-name {
+    .calendar-day-name {
       font-size: 12px;
     }
   }
 
   @media (max-width: 425px) {
-    #miniCalendarModal .calendar-day {
+    .calendar-day {
       width: 32px;
       height: 32px;
       font-size: 13px;
     }
 
-    #miniCalendarModal .calendar-day-name {
+    .calendar-day-name {
       font-size: 11px;
     }
   }
@@ -345,6 +272,3 @@
   <div class="calendar-body" id="calendar-body"></div>
 </div>
 
-@push('scripts')
-<script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
-@endpush
