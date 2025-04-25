@@ -10,7 +10,7 @@
           <div class="turning_selectDate__MLRSb">
             <button
               class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50 bg-light-blue d-flex justify-content-center align-items-center"
-              wire:click="$dispatch('showModal', {data: {'alias': 'mini-calendar-modal'}})">
+              wire:click="$dispatch('showModal', {data: {'alias': 'mini-calendar-modal','size' :'modal-md'}})">
               <div class="d-flex align-items-center">
                 <span class="mx-1">{{ Jalalian::fromCarbon(Carbon::parse($selectedDate))->format('Y/m/d') }}</span>
                 <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
@@ -28,7 +28,7 @@
         </div>
         <div class="btn-425-left">
           <button class="btn my-btn-primary h-50 fs-13"
-            wire:click="$dispatch('showModal', {data: {'alias': 'add-sick-modal'}})">ثبت نوبت دستی</button>
+            wire:click="$dispatch('showModal', {data: {'alias': 'add-sick-modal','size' :'modal-md'}})">ثبت نوبت دستی</button>
         </div>
       </div>
     </div>
@@ -105,7 +105,7 @@
                     <td>
                       @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
                         <button class="btn btn-sm btn-primary shadow-sm end-visit-btn"
-                          wire:click="$dispatch('showModal', {data: {'alias': 'end-visit-modal', 'params': {'appointmentId': {{ $appointment->id }}}})">پایان
+                          wire:click="$dispatch('showModal', {data: {'alias': 'end-visit-modal','size':'modal-md','params': {'appointmentId': {{ $appointment->id }}}}})">پایان
                           ویزیت</button>
                       @else
                         -
@@ -115,7 +115,7 @@
                       <div class="d-flex justify-content-center gap-2">
                         <button class="btn btn-light rounded-circle shadow-sm reschedule-btn" data-bs-toggle="tooltip"
                           data-bs-placement="top" title="جابجایی نوبت"
-                          wire:click="$dispatch('showModal', {data: {'alias': 'reschedule-modal', 'params': {'appointmentId': {{ $appointment->id }}}})"
+                          wire:click="$dispatch('showModal', {data: {'alias': 'reschedule-modal', 'params': {'appointmentId': {{ $appointment->id }}}}})"
                           {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
                           <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="جابجایی">
                         </button>
@@ -127,7 +127,7 @@
                         </button>
                         <button class="btn btn-light rounded-circle shadow-sm block-btn" data-bs-toggle="tooltip"
                           data-bs-placement="top" title="مسدود کردن کاربر"
-                         wire:click="$dispatch('showModal', {data: {alias: 'block-user-modal', params: {appointmentId: 5}}})">
+                         wire:click="$dispatch('showModal', {data: {alias: 'block-user-modal','size' :'modal-md', params: {appointmentId: 5}}})">
                           <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="مسدود کردن">
                         </button>
                       </div>
@@ -181,7 +181,7 @@
           </button>
           <button id="block-users-btn"
             class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
-            wire:cliick="$dispatch('showModal', {data: {'alias': 'block-multiple-users-modal'}})" disabled>
+            wire:cliick="$dispatch('showModal', {data: {'alias': 'block-multiple-users-modal','size' :'modal-md'}})" disabled>
             <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="" srcset="">
             <span class="d-none d-md-block mx-1">مسدود کردن کاربر</span>
           </button>

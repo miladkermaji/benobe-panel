@@ -1,6 +1,43 @@
+:root {
+  /* پالت رنگی اصلی */
+  --primary: #2E86C1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
+  --primary-light: #84CAF9; /* آبی روشن - در گرادیان‌ها */
+  --secondary: #1DEB3C; /* سبز - برای دکمه‌های ثانویه */
+  --secondary-hover: #15802A; /* سبز تیره‌تر برای هاور */
+  --background-light: #F0F8FF; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
+  --background-footer: #D4ECFD; /* آبی روشن‌تر - فوتر */
+  --background-card: #FFFFFF; /* سفید - کارت‌ها */
+  --text-primary: #000000; /* مشکی - متن اصلی */
+  --text-secondary: #707070; /* خاکستری - متن ثانویه */
+  --text-discount: #008000; /* سبز - قیمت با تخفیف */
+  --text-original: #FF0000; /* قرمز - قیمت اولیه */
+  --border-neutral: #E5E7EB; /* خاکستری روشن - حاشیه‌ها */
+  --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
+  --gradient-instagram-from: #F92CA7; /* گرادیان اینستاگرام - شروع */
+  --gradient-instagram-to: #6B1A93; /* گرادیان اینستاگرام - پایان */
+  --button-mobile: #4F9ACD; /* آبی متوسط - دکمه‌های موبایل */
+  --button-mobile-light: #A2CDEB; /* آبی روشن‌تر - دکمه‌های موبایل */
+  --support-section: #2E86C1; /* آبی - بخش پشتیبانی */
+  --support-text: #084D7C; /* آبی تیره - متن پشتیبانی */
+  --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    ) !important;
+  /* شعاع گوشه‌ها (border-radius) */
+  --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
+  --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
+  --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
+  --radius-card: 1.125rem; /* 18px - کارت‌ها */
+  --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
+  --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
+  --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
+}
+
 jdp-overlay {
     height: 0;
     width: 0;
+    transition: all 0.3s ease;
 }
 
 @media only screen and (max-width: 481px) {
@@ -14,6 +51,7 @@ jdp-overlay {
         position: fixed;
         top: 0;
         width: 100%;
+        transition: opacity 0.3s ease-in-out;
     }
 }
 
@@ -21,9 +59,9 @@ jdp-container {
     -moz-animation: jdpOpenAnimation 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     -webkit-animation: jdpOpenAnimation 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     animation: jdpOpenAnimation 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    background: #fff;
+    background: var(--background-card);
     border-radius: 4px;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
+    box-shadow: 0 4px 12px var(--shadow);
     direction: rtl;
     display: none;
     max-width: 307.875px;
@@ -37,16 +75,20 @@ jdp-container {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+jdp-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--shadow);
 }
 
 @media only screen and (max-width: 481px) {
     jdp-container {
-        -moz-animation: jdpOpenAnimationMobile 0.3s
-            cubic-bezier(0.23, 1, 0.32, 1);
-        -webkit-animation: jdpOpenAnimationMobile 0.3s
-            cubic-bezier(0.23, 1, 0.32, 1);
+        -moz-animation: jdpOpenAnimationMobile 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        -webkit-animation: jdpOpenAnimationMobile 0.3s cubic-bezier(0.23, 1, 0.32, 1);
         animation: jdpOpenAnimationMobile 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        border-radius: 4px 4px 0 0;
+        border-radius: 4px;
         bottom: 0 !important;
         left: 50% !important;
         max-width: 100%;
@@ -54,6 +96,7 @@ jdp-container {
         top: unset !important;
         transform: translateX(-50%) !important;
         width: 100%;
+        box-shadow: 0 -4px 12px var(--shadow);
     }
 }
 
@@ -68,15 +111,24 @@ jdp-container :before {
 
 jdp-container .jdp-icon-minus,
 jdp-container .jdp-icon-plus {
-    border: 1px solid #e6e6e6;
-    border-radius: 4px;
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
     cursor: pointer;
     display: inline-block;
     flex: none;
+    height: 30px;
     overflow: hidden;
     text-align: center;
     text-decoration: none;
     vertical-align: middle;
+    background: var(--background-light);
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+jdp-container .jdp-icon-minus:hover,
+jdp-container .jdp-icon-plus:hover {
+    background: var(--primary-light);
+    transform: scale(1.1);
 }
 
 jdp-container .jdp-icon-minus svg,
@@ -85,6 +137,7 @@ jdp-container .jdp-icon-plus svg {
     padding: 0.25rem;
     vertical-align: middle;
     width: 1.5rem;
+    fill: var(--primary);
 }
 
 jdp-container .jdp-icon-minus.not-in-range,
@@ -99,8 +152,8 @@ jdp-container .jdp-icon-plus.not-in-range svg {
 
 jdp-container .jdp-months,
 jdp-container .jdp-years {
-    fill: rgba(0, 0, 0, 0.9);
-    color: rgba(0, 0, 0, 0.9);
+    fill: var(--text-primary);
+    color: var(--text-primary);
     display: -webkit-inline-box;
     display: -webkit-flex;
     display: -ms-inline-flexbox;
@@ -126,10 +179,10 @@ jdp-container .jdp-time select,
 jdp-container .jdp-year,
 jdp-container .jdp-year input,
 jdp-container .jdp-year select {
-    background: #fff;
+    background: var(--background-card);
     border: none;
     border-radius: 0;
-    color: inherit;
+    color: var(--text-primary);
     display: inline-block;
     font-family: inherit;
     font-size: inherit;
@@ -142,6 +195,7 @@ jdp-container .jdp-year select {
     text-align: center;
     vertical-align: initial;
     width: 100%;
+    transition: background 0.2s ease;
 }
 
 jdp-container .jdp-month:active,
@@ -163,6 +217,7 @@ jdp-container .jdp-year input:focus,
 jdp-container .jdp-year select:active,
 jdp-container .jdp-year select:focus {
     outline: none;
+    background: var(--background-light);
 }
 
 jdp-container .jdp-month input option,
@@ -183,7 +238,7 @@ jdp-container .jdp-year select option {
 jdp-container .jdp-month:hover,
 jdp-container .jdp-time:hover,
 jdp-container .jdp-year:hover {
-    filter: brightness(0.9);
+    background: var(--background-light);
 }
 
 jdp-container .jdp-month input,
@@ -210,6 +265,10 @@ jdp-container .jdp-year select {
     -moz-appearance: menulist;
     cursor: pointer;
     position: relative;
+    background: var(--background-light);
+    border-radius: var(--radius-button);
+    font-size: 14px;
+    font-weight: bold;
 }
 
 jdp-container .jdp-days {
@@ -230,7 +289,7 @@ jdp-container .jdp-day,
 jdp-container .jdp-day-name {
     background: none;
     border: 1px solid transparent;
-    color: rgba(0, 0, 0, 0.9);
+    color: var(--text-primary);
     display: inline-block;
     flex-basis: 14.2857143%;
     font-weight: 400;
@@ -245,21 +304,22 @@ jdp-container .jdp-day-name {
 
 jdp-container .jdp-day-name.today,
 jdp-container .jdp-day.today {
-    border-color: rgba(0, 0, 0, 0.3);
+    border-color: var(--primary);
 }
 
 jdp-container .jdp-day-name.selected,
 jdp-container .jdp-day.selected {
-    background-color: #569ff7 !important;
-    color: #fff !important;
+    background: var(--gradient-primary) !important;
+    color: var(--background-card) !important;
     opacity: 1 !important;
+    border-radius: var(--radius-button);
 }
 
 jdp-container .jdp-day-name.holly-day,
 jdp-container .jdp-day-name.last-week,
 jdp-container .jdp-day.holly-day,
 jdp-container .jdp-day.last-week {
-    color: #f44336;
+    color: var(--text-original);
 }
 
 jdp-container .jdp-day.not-in-month {
@@ -272,23 +332,25 @@ jdp-container .jdp-day.disabled-day {
 }
 
 jdp-container .jdp-day:not(.disabled-day) {
-    border-radius: 4px;
+    border-radius: var(--radius-button);
     cursor: pointer;
-    transition: 0.1s linear;
+    transition: all 0.2s ease;
 }
 
 jdp-container .jdp-day:not(.disabled-day):hover {
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--primary-light);
     transform: scale(1.15);
     z-index: 1;
 }
 
 jdp-container .jdp-day-name {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: var(--background-light);
     border-radius: 0;
     cursor: default;
     font-size: 90%;
     font-weight: 900;
+    display: flex;
+    align-items: center;
 }
 
 jdp-container .jdp-footer {
@@ -303,27 +365,38 @@ jdp-container .jdp-footer {
     padding: 0.5rem 0.5rem 0;
     width: 100%;
 }
+
 jdp-container {
-    z-index: 3000 !important;
+    z-index: 10000 !important;
+    padding: 10px;
 }
+
 @media only screen and (max-width: 481px) {
     jdp-container .jdp-footer {
-        margin: 0.5rem 0;
+        margin: 0.8rem 0;
     }
 }
 
 jdp-container .jdp-btn-close,
 jdp-container .jdp-btn-empty,
 jdp-container .jdp-btn-today {
-    background: #569ff7;
-    border-radius: 5px;
-    color: #fff;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-button);
+    color: var(--background-card);
     cursor: pointer;
     display: inline-block;
     font-size: 90%;
     font-weight: 400;
     padding: 0.3em 0.6em;
     text-align: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+jdp-container .jdp-btn-close:hover,
+jdp-container .jdp-btn-empty:hover,
+jdp-container .jdp-btn-today:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
 }
 
 @media only screen and (max-width: 481px) {
@@ -361,9 +434,14 @@ jdp-container .jdp-time-container .jdp-time {
 }
 
 jdp-container .jdp-time-container .jdp-time select {
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 5px;
+    background: var(--background-light);
+    border-radius: var(--radius-button);
     padding: 0.5rem 1rem 0.5rem 7px;
+    transition: background 0.2s ease;
+}
+
+jdp-container .jdp-time-container .jdp-time select:hover {
+    background: var(--primary-light);
 }
 
 jdp-container .jdp-time-container .jdp-time:after {
@@ -374,6 +452,7 @@ jdp-container .jdp-time-container .jdp-time:after {
     right: -0.7rem;
     top: 50%;
     transform: translateY(-50%);
+    color: var(--text-secondary);
 }
 
 jdp-container .jdp-time-container .jdp-time:first-child:after {

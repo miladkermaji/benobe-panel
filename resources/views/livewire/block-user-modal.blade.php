@@ -5,29 +5,29 @@
     </div>
     <div class="modal-body">
         <form wire:submit.prevent="blockUser">
-            <div class="mb-3">
-                <label for="blockedAt" class="form-label">تاریخ شروع مسدودیت</label>
-                <input type="text" class="form-control" id="blockedAt" wire:model.live="blockedAt" data-jdp>
+            <div class="mb-3 position-relative">
+                <label for="blockedAt" class="label-top-input-special-takhasos">تاریخ شروع مسدودیت</label>
+                <input data-jdp="" type="text" class="form-control h-50" id="blockedAt" wire:model.live="blockedAt" data-jdp>
                 @error('blockedAt')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
-            <div class="mb-3">
-                <label for="unblockedAt" class="form-label">تاریخ پایان مسدودیت (اختیاری)</label>
-                <input type="text" class="form-control" id="unblockedAt" wire:model.live="unblockedAt" data-jdp>
+            <div class="mb-3 position-relative">
+                <label for="unblockedAt" class="label-top-input-special-takhasos">تاریخ پایان مسدودیت (اختیاری)</label>
+                <input data-jdp="" type="text" class="form-control h-50" id="unblockedAt" wire:model.live="unblockedAt" data-jdp>
                 @error('unblockedAt')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
-            <div class="mb-3">
-                <label for="blockReason" class="form-label">دلیل مسدودیت (اختیاری)</label>
+            <div class="mb-3 position-relative">
+               
                 <textarea class="form-control" id="blockReason" rows="3" wire:model.live="blockReason"
                     placeholder="دلیل مسدودیت را وارد کنید..."></textarea>
                 @error('blockReason')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
-            <button type="submit" class="btn my-btn-primary w-100">مسدود کردن</button>
+            <button type="submit" class="btn my-btn-primary w-100 h-50">مسدود کردن</button>
         </form>
     </div>
 </div>
