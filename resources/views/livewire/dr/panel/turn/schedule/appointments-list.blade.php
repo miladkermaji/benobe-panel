@@ -181,9 +181,7 @@
             <span class="d-none d-md-block mx-1">جابجایی نوبت</span>
           </button>
           <button id="block-users-btn"
-            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
-            wire:click="$dispatch('showModal', {data: {'alias': 'block-multiple-users-modal','size' :'modal-md'}})"
-            disabled>
+            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
             <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="" srcset="">
             <span class="d-none d-md-block mx-1">مسدود کردن کاربر</span>
           </button>
@@ -374,17 +372,20 @@
         } else {
           console.warn('دکمه لغو نوبت‌ها پیدا نشد');
         }
-
+      
         if (blockUsersBtn) {
-          blockUsersBtn.addEventListener('click', function(e) {
+          // جلوگیری از افزودن چندباره event listener
+          blockUsersBtn.removeEventListener('click', handleBlockUsersClick);
+          blockUsersBtn.addEventListener('click', handleBlockUsersClick);
+
+          function handleBlockUsersClick(e) {
             e.preventDefault();
             const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
             const mobiles = Array.from(selectedCheckboxes)
               .map(cb => cb.dataset.mobile)
-              .filter(mobile => mobile); // فقط شماره‌های معتبر
+              .filter(mobile => mobile);
 
             if (mobiles.length === 0) {
-              console.warn('هیچ کاربری برای مسدود کردن انتخاب نشده');
               Swal.fire({
                 title: 'خطا',
                 text: 'لطفاً حداقل یک کاربر را انتخاب کنید.',
@@ -394,23 +395,21 @@
               return;
             }
 
-            Swal.fire({
-              title: 'تأیید مسدود کردن کاربران',
-              text: `آیا مطمئن هستید که می‌خواهید ${mobiles.length} کاربر را مسدود کنید؟`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'بله، مسدود کن',
-              cancelButtonText: 'خیر',
-              reverseButtons: true
-            }).then((result) => {
-              if (result.isConfirmed) {
-                @this.call('blockMultipleUsers', mobiles);
+
+            Livewire.dispatch('showModal', {
+              data: {
+                alias: 'block-multiple-users-modal',
+                size: 'modal-md',
+                params: {
+                  mobiles: mobiles
+                }
               }
             });
-          });
+          }
         } else {
           console.warn('دکمه مسدود کردن کاربران پیدا نشد');
         }
+
         document.addEventListener('DOMContentLoaded', () => {
           initializeTooltips();
           checkCheckboxes();

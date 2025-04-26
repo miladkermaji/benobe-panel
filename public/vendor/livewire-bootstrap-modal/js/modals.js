@@ -38,20 +38,7 @@ Livewire.on("hideBootstrapModal", () => {
     }
 });
 
-Livewire.on("show-toastr", (event) => {
-    const { type, message } = Array.isArray(event) ? event[0] : event;
-    if (typeof toastr !== "undefined") {
-        if (type === "success") {
-            toastr.success(message);
-        } else if (type === "error") {
-            toastr.error(message);
-        } else if (type === "warning") {
-            toastr.warning(message);
-        }
-    } else {
-        console.warn("Toastr is not defined. Please include Toastr library.");
-    }
-});
+
 
 Livewire.on("modalError", (error) => {
     console.error("Modal Error:", error);

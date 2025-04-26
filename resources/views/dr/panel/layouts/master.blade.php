@@ -31,20 +31,20 @@
   <livewire:modals />
   <script>
     // ثبت رویداد show-toastr
-    Livewire.on('show-toastr', (data) => {
-    console.log('hi');
-    
-      // اگر data یک آرایه است، از اولین عنصر استفاده کنید
-      const toastrData = Array.isArray(data) ? data[0] : data;
+   Livewire.on('show-toastr', (data) => {
+    // اگر data یک آرایه است، از اولین عنصر استفاده کنید
+    const toastrData = Array.isArray(data) ? data[0] : data;
 
-      if (toastrData.type === 'success') {
+    // اطمینان از عدم تکرار توستر
+    toastr.clear(); // پاک کردن توسترهای قبلی
+    if (toastrData.type === 'success') {
         toastr.success(toastrData.message);
-      } else if (toastrData.type === 'warning') {
+    } else if (toastrData.type === 'warning') {
         toastr.warning(toastrData.message);
-      } else if (toastrData.type === 'error') {
+    } else if (toastrData.type === 'error') {
         toastr.error(toastrData.message);
-      }
-    });
+    }
+});
 
   </script>
 
