@@ -5,7 +5,6 @@
     justify-content: center;
     min-height: calc(100vh - 1rem);
     margin: 0 auto;
-    max-width: 400px; /* عرض پیش‌فرض 400px */
 }
 
 .modal-content {
@@ -18,10 +17,10 @@
 }
 
 /* تنظیم اندازه‌های مختلف مودال */
-.modal-sm { max-width: 300px; }
+.modal-sm { max-width: 400px; }
 .modal-md { max-width: 400px; } /* modal-md هم 400px */
-.modal-lg { max-width: 600px; }
-.modal-xl { max-width: 800px; }
+.modal-lg { max-width: 900px; }
+.modal-xl { max-width: 1200px; }
 
 /* استایل دکمه بستن */
 .modal-header .btn-close {
