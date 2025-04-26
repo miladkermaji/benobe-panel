@@ -79,14 +79,14 @@
                                       class="form-control h-50 text-center max-appointments bg-white"
                                       id="morning-patients-{{ $englishDay }}-{{ $index }}"
                                       wire:model.live="slots.{{ $englishDay }}.{{ $index }}.max_appointments"
-                                      data-toggle="modal" data-bs-target="#CalculatorModal"
+                                      data-bs-toggle="modal" data-bs-target="#CalculatorModal"
                                       data-day="{{ $englishDay }}" data-index="{{ $index }}" readonly />
                                   </div>
                                   <!-- دکمه جدید برای نوبت‌های اورژانسی -->
                                   <div class="form-group position-relative">
                                     <button data-tooltip="true" data-placement="bottom"
                                       data-original-title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
-                                      class="btn btn-light btn-sm emergency-slot-btn" data-toggle="modal"
+                                      class="btn btn-light btn-sm emergency-slot-btn" data-bs-toggle="modal"
                                       data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
                                       data-index="{{ $index }}"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
@@ -97,7 +97,7 @@
                                   <div class="form-group position-relative">
                                     <button data-tooltip="true" data-placement="top"
                                       data-original-title="کپی ساعات کاری"
-                                      class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal"
+                                      class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal"
                                       data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
                                       data-index="{{ $index }}"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
@@ -116,9 +116,9 @@
                                 <div class="d-flex align-items-center">
                                   <button data-tooltip="true" data-placement="top"
                                     data-original-title="زمانبندی باز شدن نوبت ها" type="button"
-                                    class="btn text-black btn-sm btn-outline-primary schedule-btn" data-toggle="modal"
-                                    data-bs-target="#scheduleModal" data-day="{{ $englishDay }}"
-                                    data-index="{{ $index }}"
+                                    class="btn text-black btn-sm btn-outline-primary schedule-btn"
+                                    data-bs-toggle="modal" data-bs-target="#scheduleModal"
+                                    data-day="{{ $englishDay }}" data-index="{{ $index }}"
                                     {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
                                     <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
                                   </button>
@@ -152,14 +152,14 @@
                                     class="form-control h-50 text-center max-appointments bg-white"
                                     id="morning-patients-{{ $englishDay }}-{{ $index }}"
                                     wire:model.live="slots.{{ $englishDay }}.{{ $index }}.max_appointments"
-                                    data-toggle="modal" data-bs-target="#CalculatorModal"
+                                    data-bs-toggle="modal" data-bs-target="#CalculatorModal"
                                     data-day="{{ $englishDay }}" data-index="{{ $index }}" readonly />
                                 </div>
                                 <!-- دکمه جدید برای نوبت‌های اورژانسی -->
                                 <div class="form-group position-relative">
                                   <button data-tooltip="true" data-placement="bottom"
                                     data-original-title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
-                                    class="btn btn-light btn-sm emergency-slot-btn" data-toggle="modal"
+                                    class="btn btn-light btn-sm emergency-slot-btn" data-bs-toggle="modal"
                                     data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
                                     data-index="{{ $index }}"
                                     {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
@@ -170,7 +170,7 @@
                                 <div class="form-group position-relative">
                                   <button data-tooltip="true" data-placement="top"
                                     data-original-title="کپی ساعات کاری"
-                                    class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal"
+                                    class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal"
                                     data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
                                     data-index="{{ $index }}"
                                     {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
@@ -189,9 +189,9 @@
                               <div class="d-flex align-items-center">
                                 <button data-tooltip="true" data-placement="top"
                                   data-original-title="زمانبندی باز شدن نوبت ها" type="button"
-                                  class="btn text-black btn-sm btn-outline-primary schedule-btn" data-toggle="modal"
-                                  data-bs-target="#scheduleModal" data-day="{{ $englishDay }}"
-                                  data-index="{{ $index }}"
+                                  class="btn text-black btn-sm btn-outline-primary schedule-btn"
+                                  data-bs-toggle="modal" data-bs-target="#scheduleModal"
+                                  data-day="{{ $englishDay }}" data-index="{{ $index }}"
                                   {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
                                   <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
 
@@ -229,7 +229,7 @@
           @if (isset($_GET['activation-path']) && $_GET['activation-path'] == true)
             <div class="w-100 mt-3">
               <button class="btn btn-success w-100 h-50" tabindex="0" type="button" id=":rs:"
-                data-toggle="modal" data-bs-target="#activation-modal">
+                data-bs-toggle="modal" data-bs-target="#activation-modal">
                 <span class="button_text"> پایان فعالسازی</span>
                 <div class="loader"></div>
               </button>

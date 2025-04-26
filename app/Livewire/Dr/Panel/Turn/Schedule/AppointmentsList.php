@@ -84,9 +84,9 @@ class AppointmentsList extends Component
         $this->selectedDate = Carbon::now()->format('Y-m-d');
         $this->blockedAt = Jalalian::now()->format('Y/m/d');
         $doctor = $this->getAuthenticatedDoctor();
+        $this->selectedClinicId = request()->query('selectedClinicId', 'default');
         if ($doctor) {
-            $defaultClinic = $doctor->clinics()->where('is_active', 0)->first();
-            $this->selectedClinicId = $defaultClinic ? $defaultClinic->id : null;
+            $this->selectedClinicId = request()->query('selectedClinicId', 'default');
         }
         $this->loadClinics();
         $this->loadAppointments();
@@ -457,6 +457,7 @@ class AppointmentsList extends Component
             ]);
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+            Log::info($this->selectedClinicId);
             $appointment = Appointment::findOrFail($this->blockAppointmentId);
             $user = $appointment->patient;
             $isBlocked = UserBlocking::where('user_id', $user->id)
@@ -478,7 +479,7 @@ class AppointmentsList extends Component
                 'status' => 1,
             ]);
             $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'کاربر با موفقیت مسدود شد.']);
-            $this->dispatch('close-modal', ['id' => 'blockUserModal']); // اطمینان از بسته شدن مودال
+            $this->dispatch('hideModal');
             $this->loadBlockedUsers();
             $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId']);
         } catch (\Illuminate\Validation\ValidationException $e) {
