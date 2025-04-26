@@ -13,24 +13,6 @@
 @livewire('dr.panel.turn.schedule.appointments-list')
 @endsection
 @section('scripts')
-<script>
-  $('#rescheduleModal').on('show.bs.modal', function() {
-    // Check if stylesheet is already loaded
-    if (!$('#rescheduleModalStyles').length) {
-      $('<link>', {
-        id: 'rescheduleModalStyles',
-        rel: 'stylesheet',
-        type: 'text/css',
-        href: '{{ asset('dr-assets/panel/css/reschedule.css') }}'
-      }).appendTo('head');
-    }
-  });
-
-  $('#rescheduleModal').on('hidden.bs.modal', function() {
-    // Optionally remove the stylesheet when modal is closed
-    $('#rescheduleModalStyles').remove();
-  });
-</script>
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";

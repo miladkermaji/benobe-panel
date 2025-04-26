@@ -20,6 +20,7 @@
 <script src="{{ asset('dr-assets/panel/js/toastr/toastr.min.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/global-loader.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/calendar/reschedule-calendar.js') }}"></script>
 
 <script>
   function initializeTimepicker() {

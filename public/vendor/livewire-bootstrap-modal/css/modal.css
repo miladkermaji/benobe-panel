@@ -17,10 +17,10 @@
 }
 
 /* تنظیم اندازه‌های مختلف مودال */
-.modal-sm { max-width: 400px; }
+.modal-sm { max-width: 300px; }
 .modal-md { max-width: 400px; } /* modal-md هم 400px */
-.modal-lg { max-width: 900px; }
-.modal-xl { max-width: 1200px; }
+.modal-lg { max-width: 800px; }
+.modal-xl { max-width: 1100px; }
 
 /* استایل دکمه بستن */
 .modal-header .btn-close {

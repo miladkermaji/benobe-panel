@@ -14,9 +14,14 @@ class RescheduleModal extends Component
         $this->appointmentId = $appointmentId;
     }
 
-    public function render()
+    public function updateAppointmentDate()
     {
-        return view('livewire.reschedule-modal');
+        $this->validate([
+            'rescheduleNewDate' => 'required|date_format:Y-m-d',
+        ]);
+
+        $this->dispatch('updateAppointmentDate', id: $this->appointmentId, date: $this->rescheduleNewDate);
+        $this->dispatch('hideModal');
     }
 
     public function hideModal()
@@ -24,9 +29,8 @@ class RescheduleModal extends Component
         $this->dispatch('hideModal');
     }
 
-    public function updateAppointmentDate()
+    public function render()
     {
-        // منطق به‌روزرسانی تاریخ نوبت
-        $this->dispatch('hideModal');
+        return view('livewire.reschedule-modal');
     }
 }
