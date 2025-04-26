@@ -372,7 +372,7 @@
         } else {
           console.warn('دکمه لغو نوبت‌ها پیدا نشد');
         }
-      
+
         if (blockUsersBtn) {
           // جلوگیری از افزودن چندباره event listener
           blockUsersBtn.removeEventListener('click', handleBlockUsersClick);

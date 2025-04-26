@@ -128,6 +128,9 @@ $(document).ready(function () {
 $(function () {
     $('[data-toggle="tooltip"]').tooltip();
 });
+$(function () {
+    $('[data-bs-toggle="tooltip"]').tooltip();
+});
 
 
 
