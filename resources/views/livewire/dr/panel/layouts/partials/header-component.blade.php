@@ -118,7 +118,7 @@
             </div>
           </div>
         </div>
-        <div class="d-flex notif-option px-2">
+        <div class="d-flex notif-option px-3">
           <div class="position-relative">
             <!-- آیکون زنگوله -->
             <span class="bell-red-badge" x-show="{{ $unreadCount }} > 0" x-text="{{ $unreadCount }}"></span>
@@ -170,7 +170,7 @@
               </div>
             </div>
           </div>
-          <div class="mx-3 cursor-pointer d-flex" onclick="location.href='{{ route('dr-wallet-charge') }}'">
+          <div style="display: none !important" class="mx-3 cursor-pointer d-flex" onclick="location.href='{{ route('dr-wallet-charge') }}'">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="24px" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               class="plasmic-default__svg plasmic_all__FLoMj PlasmicQuickAccessWallet_svg__4uUbY lucide lucide-wallet"

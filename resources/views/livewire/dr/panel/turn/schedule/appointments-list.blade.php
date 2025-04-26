@@ -11,7 +11,7 @@
             <button
               class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50 bg-light-blue d-flex justify-content-center align-items-center"
               wire:click="$dispatch('showModal', {data: {'alias': 'mini-calendar-modal','size' :'modal-md'}})">
-              <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center justify-content-center">
                 <span class="mx-1">{{ Jalalian::fromCarbon(Carbon::parse($selectedDate))->format('Y/m/d') }}</span>
                 <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
               </div>

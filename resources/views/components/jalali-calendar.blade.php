@@ -113,7 +113,7 @@
   .calendar-day-name {
     text-align: center;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 600 !important;
     color: var(--text-secondary);
     padding: 8px 0;
   }
@@ -150,7 +150,6 @@
 
   .calendar-day.today {
     background: var(--primary-light);
-    border: 1px solid var(--primary);
     color: var(--primary);
     font-weight: 600;
     border-radius: var(--radius-circle);
