@@ -225,6 +225,18 @@
 
     <script>
       document.addEventListener('livewire:initialized', () => {
+        Livewire.on('refresh', () => {
+          initializeDropdowns();
+        });
+
+        function initializeDropdowns() {
+          const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+          dropdownElementList.map(function(dropdownToggleEl) {
+            return new bootstrap.Dropdown(dropdownToggleEl);
+          });
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeDropdowns);
         const selectAllCheckbox = document.getElementById('select-all-row');
         const cancelAppointmentsBtn = document.getElementById('cancel-appointments-btn');
         const moveAppointmentsBtn = document.getElementById('move-appointments-btn');

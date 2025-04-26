@@ -26,22 +26,7 @@ $('.bars').click(function () {
  }, 10);
 });
 
-// جلوگیری از بسته شدن سایدبار هنگام کلیک روی دراپ‌داگ
-$('.dropdown-toggle').click(function (event) {
- event.stopPropagation(); // جلوگیری از تریگر شدن رویداد کلیک سایدبار
- $(this).next('.dropdown-menu').toggle(); // باز/بسته کردن دراپ‌داگ
-});
 
-// اضافه کردن رویداد کلیک روی منوهای دراپ‌داگ
-$('.dropdown-menu').click(function (event) {
- event.stopPropagation(); // جلوگیری از بسته شدن سایدبار
-});
-
-// جلوگیری از بسته شدن سایدبار هنگام کلیک روی دراپ‌داگ
-$('.dropdown-toggle').click(function (event) {
- event.stopPropagation(); // جلوگیری از تریگر شدن رویداد کلیک سایدبار
- $(this).next('.dropdown-menu').toggle(); // باز/بسته کردن دراپ‌داگ
-});
 $('.notification__icon').on('click', function () {
  $('.dropdown__notification').toggleClass('is-active');
 });
