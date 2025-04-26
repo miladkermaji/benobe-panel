@@ -31,6 +31,7 @@
   .calendar {
     background: var(--background-card);
     padding: 8px;
+    margin-top: -29px
   }
 
   .calendar-header {
@@ -91,8 +92,8 @@
 
   .nav-btn svg {
     stroke: var(--text-secondary);
-    width: 16px;
-    height: 16px;
+    width: 100px;
+    height: 100px;
   }
 
   .nav-btn:hover {
