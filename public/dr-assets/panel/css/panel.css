@@ -85,14 +85,11 @@ th {
 }
 
 .calendar-and-add-sick-section {
-    /* box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
-  border-radius: 12px; */
+
     position: relative;
-    flex: 0 1;
 }
 
 .my-form-control {
-    width: 44vw;
     background-color: #ebeff8;
     border-radius: 8px;
     padding: 10px;
@@ -1624,7 +1621,7 @@ img {
 .pagination-container {
     margin-top: 20px;
     position: relative;
-    top: 70px;
+    top: 27px;
     width: 100%;
     box-shadow: var(--shadow);
     padding-top: 20px;

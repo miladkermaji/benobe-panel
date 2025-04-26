@@ -4,32 +4,22 @@
     use Carbon\Carbon;
   @endphp
   <div class="d-flex justify-content-center top-s-wrapper flex-wrap">
-    <div class="calendar-and-add-sick-section p-3">
-      <div class="d-flex justify-content-between gap-10 align-items-center c-a-wrapper">
-        <div>
-          <div class="turning_selectDate__MLRSb">
-            <button
-              class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50 bg-light-blue d-flex justify-content-center align-items-center"
-              wire:click="$dispatch('showModal', {data: {'alias': 'mini-calendar-modal','size' :'modal-md'}})">
-              <div class="d-flex align-items-center justify-content-center">
-                <span class="mx-1">{{ Jalalian::fromCarbon(Carbon::parse($selectedDate))->format('Y/m/d') }}</span>
-                <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
-              </div>
-            </button>
+    <div class="calendar-and-add-sick-section p-3 w-100">
+  <div class="calendar-and-add-sick-section">
+        <div class="c-a-wrapper">
+          <button class="selectDate_datepicker__xkZeS"
+            wire:click="$dispatch('showModal', {data: {'alias': 'mini-calendar-modal','size' :'modal-md'}})">
+            <span class="mx-1">{{ Jalalian::fromCarbon(Carbon::parse($selectedDate))->format('Y/m/d') }}</span>
+            <img src="http://127.0.0.1:8000/dr-assets/icons/calendar.svg" alt="تقویم">
+          </button>
+          <div class="turning_search-wrapper__loGVc">
+            <input type="text" class="my-form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ..."
+              wire:model.live.debounce.500ms="searchQuery">
           </div>
-        </div>
-        <div>
-          <div class="turning_filterWrapper__2cOOi">
-            <div class="turning_search-wrapper__loGVc">
-              <input type="text" class="my-form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ..."
-                wire:model.live.debounce.500ms="searchQuery">
-            </div>
-          </div>
-        </div>
-        <div class="btn-425-left">
-          <button class="btn my-btn-primary h-50 fs-13"
-            wire:click="$dispatch('showModal', {data: {'alias': 'add-sick-modal','size' :'modal-md'}})">ثبت نوبت
-            دستی</button>
+          <button class="my-btn-primary"
+            wire:click="$dispatch('showModal', {data: {'alias': 'add-sick-modal','size' :'modal-md'}})">
+            ثبت نوبت دستی
+          </button>
         </div>
       </div>
     </div>
@@ -46,7 +36,7 @@
                   <input class="form-check-input" type="checkbox" id="select-all-row">
                 </th>
                 <th scope="col" class="px-6 py-3 fw-bolder">نام بیمار</th>
-                <th scope="col" class="px-6 py-3 fw-bolder">شماره‌موبایل</th>
+                <th scope="col" class="px-6 py-3 fw-bolder">شماره‌ موبایل</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">کد ملی</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">تاریخ نوبت</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">زمان نوبت</th>
@@ -144,7 +134,7 @@
           </table>
         </div>
       </div>
-      <div class="d-flex justify-content-start gap-10 nobat-option">
+      <div class="d-flex justify-content-start gap-10 nobat-option w-100">
         <div class="d-flex align-items-center m-2 gap-4">
           <div class="turning_filterWrapper__2cOOi">
             <div class="dropdown">
@@ -172,18 +162,18 @@
           <button id="cancel-appointments-btn"
             class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
             <img src="{{ asset('dr-assets/icons/cancle-appointment.svg') }}" alt="" srcset="">
-            <span class="d-none d-md-block mx-1">لغو نوبت</span>
+            <span class="d-none d-md-block">لغو نوبت</span>
           </button>
           <button id="move-appointments-btn"
             class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
             wire:click="$dispatch('showModal', {data: {'alias': 'reschedule-modal'}})" disabled>
             <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="" srcset="">
-            <span class="d-none d-md-block mx-1">جابجایی نوبت</span>
+            <span class="d-none d-md-block">جابجایی نوبت</span>
           </button>
           <button id="block-users-btn"
             class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
             <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="" srcset="">
-            <span class="d-none d-md-block mx-1">مسدود کردن کاربر</span>
+            <span class="d-none d-md-block">مسدود کردن کاربر</span>
           </button>
         </div>
       </div>
