@@ -218,7 +218,7 @@
   <!-- مودال‌های جدید -->
   <!-- مودال مینی‌کالندر -->
   <div wire:ignore>
-    <x-custom-modal id="mini-calendar-modal" title="انتخاب تاریخ" size="md" :show="false">
+    <x-custom-modal id="mini-calendar-modal" title="انتخاب تاریخ" size="sm" :show="false">
       <x-jalali-calendar />
     </x-custom-modal>
   </div>
