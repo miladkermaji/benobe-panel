@@ -96,7 +96,7 @@
                   <td>
                     @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
                       <button class="btn btn-sm btn-primary shadow-sm end-visit-btn"
-                        wire:click="$dispatch('openXModal', { id: 'end-visit-modal-{{ $appointment->id }}' })">
+                        wire:click="$dispatch('openXModal', { id: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">
                         پایان ویزیت
                       </button>
                     @else
@@ -283,18 +283,18 @@
     </x-custom-modal>
   </div>
 
-  <!-- مودال پایان ویزیت برای هر نوبت -->
-  @foreach ($appointments as $appointment)
-    <x-custom-modal id="end-visit-modal-{{ $appointment->id }}" title="پایان ویزیت" size="md"
-      :show="false">
+
+  <!-- مودال عمومی برای پایان ویزیت (خارج از حلقه) -->
+  <div wire:ignore>
+    <x-custom-modal id="end-visit-modal" title="پایان ویزیت" size="md" :show="false">
       <div>
         <textarea class="form-control" rows="5" wire:model="endVisitDescription"
           placeholder="توضیحات درمان را وارد کنید..."></textarea>
         <button class="btn my-btn-primary w-100 mt-3 shadow-sm end-visit-btn"
-          wire:click="endVisit({{ $appointment->id }})">ثبت</button>
+          wire:click="endVisit({{ $endVisitAppointmentId }})">ثبت</button>
       </div>
     </x-custom-modal>
-  @endforeach
+  </div>
   <script>
     document.addEventListener('livewire:initialized', () => {
       // Listener برای باز کردن مودال‌ها
@@ -303,17 +303,26 @@
         const appointmentId = event.detail.appointmentId || null;
         window.openXModal(modalId);
 
-        // تنظیم appointmentId برای مودال‌های تکی
-        if (appointmentId && modalId === 'reschedule-modal') {
+        // تنظیم appointmentId برای مودال‌های مختلف
+        if (appointmentId && modalId === 'end-visit-modal') {
+          @this.set('endVisitAppointmentId', appointmentId);
+        } else if (appointmentId && modalId === 'reschedule-modal') {
           @this.set('rescheduleAppointmentId', appointmentId);
           @this.set('rescheduleAppointmentIds', [appointmentId]);
         } else if (appointmentId && modalId === 'block-user-modal') {
           @this.set('blockAppointmentId', appointmentId);
-          // تنظیم selectedMobiles برای حالت تکی
           const appointmentCheckbox = document.querySelector(`.appointment-checkbox[value="${appointmentId}"]`);
           if (appointmentCheckbox && appointmentCheckbox.dataset.mobile) {
             @this.set('selectedMobiles', [appointmentCheckbox.dataset.mobile]);
           }
+        }
+      });
+
+      // لیسنر برای بستن مودال
+      Livewire.on('hideModal', () => {
+        const openModal = document.querySelector('.x-modal--visible');
+        if (openModal) {
+          window.closeXModal(openModal.id);
         }
       });
 
@@ -329,6 +338,7 @@
       }
 
       document.addEventListener('DOMContentLoaded', initializeDropdowns);
+
       const selectAllCheckbox = document.getElementById('select-all-row');
       const cancelAppointmentsBtn = document.getElementById('cancel-appointments-btn');
       const moveAppointmentsBtn = document.getElementById('move-appointments-btn');
@@ -358,7 +368,7 @@
 
           cancelAppointmentsBtn.disabled = hasInvalidStatus;
           moveAppointmentsBtn.disabled = hasInvalidStatus;
-          blockUsersBtn.disabled = false; // دکمه مسدود کردن همیشه فعال باشد اگر کاربر انتخاب شده باشد
+          blockUsersBtn.disabled = false;
         }
       }
 
@@ -494,7 +504,6 @@
             return;
           }
 
-          // تنظیم appointmentIds برای جابجایی گروهی
           @this.set('rescheduleAppointmentIds', selected);
           window.openXModal('reschedule-modal');
         });
@@ -520,18 +529,12 @@
             return;
           }
 
-          // انتقال mobiles به مودال
           @this.set('selectedMobiles', mobiles);
           window.openXModal('block-user-modal');
         });
       } else {
         console.warn('دکمه مسدود کردن کاربران پیدا نشد');
       }
-
-      // اطمینان از باز ماندن مودال پس از به‌روزرسانی Livewire
-      Livewire.on('showModal', (modalId) => {
-        window.openXModal(modalId);
-      });
 
       document.addEventListener('DOMContentLoaded', () => {
         initializeTooltips();

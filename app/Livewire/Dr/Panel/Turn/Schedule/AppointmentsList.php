@@ -77,22 +77,21 @@ class AppointmentsList extends Component
     public $rescheduleAppointmentId;
     public $rescheduleNewDate;
     public $rescheduleAppointmentIds = []; // برای جابجایی گروهی
-
+    public $endVisitAppointmentId = null;
     // Properties for ending visit
-    public $endVisitAppointmentId;
     public $endVisitDescription;
 
     // Property for single block user
     public $blockAppointmentId;
 
-  protected $listeners = [
-    'updateSelectedDate' => 'updateSelectedDate',
-    'searchAllDates' => 'searchAllDates',
-    'cancelAppointments' => 'cancelAppointments',
-    'blockUser' => 'handleBlockUser',
-    'blockMultipleUsers' => 'handleBlockMultipleUsers',
-    'confirm-partial-reschedule' => 'confirmPartialReschedule',
-    'setSelectedClinicId' => 'setSelectedClinicId', // اضافه شده
+    protected $listeners = [
+      'updateSelectedDate' => 'updateSelectedDate',
+      'searchAllDates' => 'searchAllDates',
+      'cancelAppointments' => 'cancelAppointments',
+      'blockUser' => 'handleBlockUser',
+      'blockMultipleUsers' => 'handleBlockMultipleUsers',
+      'confirm-partial-reschedule' => 'confirmPartialReschedule',
+      'setSelectedClinicId' => 'setSelectedClinicId', // اضافه شده
 ];
 
     public function initialize()
@@ -565,15 +564,22 @@ class AppointmentsList extends Component
             'endVisitDescription' => 'nullable|string|max:1000',
         ]);
 
-        $appointment = Appointment::findOrFail($id);
-        $appointment->description = $this->endVisitDescription;
-        $appointment->status = 'attended';
-        $appointment->attendance_status = 'attended';
-        $appointment->save();
+        $appointment = Appointment::where('id', $appointmentId)
+            ->where('doctor_id', $this->doctor_id)
+            ->whereNotIn('status', ['cancelled', 'attended'])
+            ->first();
 
-        $this->dispatch('show-toastr', type: 'success', message: 'ویزیت با موفقیت ثبت شد.');
-        $this->loadAppointments();
-        $this->dispatch('hideModal');
+        if ($appointment) {
+            $appointment->status = 'attended';
+            $appointment->visit_description = $this->endVisitDescription;
+            $appointment->save();
+
+            $this->endVisitDescription = '';
+            $this->endVisitAppointmentId = null; // ریست کردن
+            $this->loadAppointments();
+            $this->dispatch('hideModal');
+            $this->dispatch('toastr', type: 'success', message: 'ویزیت با موفقیت ثبت شد.');
+        }
     }
 
     public function cancelSingleAppointment($id)
