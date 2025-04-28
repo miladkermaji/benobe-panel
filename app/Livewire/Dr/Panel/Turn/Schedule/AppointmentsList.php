@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Livewire\Dr\Panel\Turn\Schedule;
+
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Doctor;
@@ -21,9 +23,11 @@ use App\Jobs\SendSmsNotificationJob;
 use App\Models\SpecialDailySchedule;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DoctorAppointmentConfig;
+
 class AppointmentsList extends Component
 {
     use WithPagination;
+
     public $cancelIds = [];
     public $selectedDate;
     public $selectedClinicId = 'default';
@@ -42,32 +46,44 @@ class AppointmentsList extends Component
         'total' => 0,
     ];
     public $isSearchingAllDates = false;
+
     // Properties for blocking users
     #[Validate('required', message: 'لطفاً تاریخ شروع مسدودیت را وارد کنید.')]
     #[Validate('regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', message: 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.')]
     public $blockedAt;
+
     #[Validate('nullable')]
     #[Validate('regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', message: 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.')]
     #[Validate('after:blockedAt', message: 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.')]
     public $unblockedAt;
+
     #[Validate('nullable|string|max:255', message: 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.')]
     public $blockReason;
+
     // Properties for sending messages
     #[Validate('required|string|max:255', message: 'عنوان پیام را وارد کنید.')]
     public $messageTitle;
+
     #[Validate('required|string|max:1000', message: 'متن پیام را وارد کنید.')]
     public $messageContent;
+
     #[Validate('required|in:all,blocked,specific', message: 'نوع گیرنده را انتخاب کنید.')]
     public $recipientType;
+
     public $specificRecipient;
+
     // Properties for rescheduling
     public $rescheduleAppointmentId;
     public $rescheduleNewDate;
+    public $rescheduleAppointmentIds = []; // برای جابجایی گروهی
+
     // Properties for ending visit
     public $endVisitAppointmentId;
     public $endVisitDescription;
+
     // Property for single block user
     public $blockAppointmentId;
+
     protected $listeners = [
         'updateSelectedDate' => 'updateSelectedDate',
         'searchAllDates' => 'searchAllDates',
@@ -75,10 +91,12 @@ class AppointmentsList extends Component
         'blockUser' => 'handleBlockUser',
         'blockMultipleUsers' => 'handleBlockMultipleUsers',
     ];
+
     public function initialize()
     {
         $this->dispatch('initialize-tooltips');
     }
+
     public function mount()
     {
         $this->selectedDate = Carbon::now()->format('Y-m-d');
@@ -93,6 +111,7 @@ class AppointmentsList extends Component
         $this->loadBlockedUsers();
         $this->loadMessages();
     }
+
     public function handleBlockUser($data)
     {
         $this->blockAppointmentId = $data['appointmentId'];
@@ -101,6 +120,7 @@ class AppointmentsList extends Component
         $this->blockReason = $data['blockReason'];
         $this->blockUser();
     }
+
     public function handleBlockMultipleUsers($data)
     {
         $this->blockedAt = $data['blockedAt'];
@@ -112,7 +132,7 @@ class AppointmentsList extends Component
         });
         $this->blockMultipleUsers($mobiles);
     }
-    // سایر متدها بدون تغییر باقی می‌مانند
+
     public function updateSelectedDate($date)
     {
         $selectedDate = is_array($date) && isset($date['date']) ? $date['date'] : $date;
@@ -124,6 +144,7 @@ class AppointmentsList extends Component
         $this->appointments = [];
         $this->loadAppointments();
     }
+
     private function getAuthenticatedDoctor()
     {
         $doctor = Auth::guard('doctor')->user();
@@ -135,6 +156,7 @@ class AppointmentsList extends Component
         }
         return $doctor;
     }
+
     private function loadClinics()
     {
         $doctor = $this->getAuthenticatedDoctor();
@@ -142,6 +164,7 @@ class AppointmentsList extends Component
             $this->clinics = $doctor->clinics()->where('is_active', 0)->get()->toArray();
         }
     }
+
     public function loadAppointments()
     {
         $doctor = $this->getAuthenticatedDoctor();
@@ -152,6 +175,7 @@ class AppointmentsList extends Component
         $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
             ->withTrashed()
             ->where('doctor_id', $doctor->id);
+
         if ($this->dateFilter) {
             $today = Carbon::today();
             if ($this->dateFilter === 'current_week') {
@@ -170,17 +194,21 @@ class AppointmentsList extends Component
         } elseif ($this->filterStatus !== 'all' && !$this->isSearchingAllDates) {
             $query->whereDate('appointment_date', $gregorianDate);
         }
+
         if ($this->selectedClinicId === 'default') {
             $query->whereNull('clinic_id');
         } elseif ($this->selectedClinicId) {
             $query->where('clinic_id', $this->selectedClinicId);
         }
+
         if ($this->filterStatus && $this->filterStatus !== 'all') {
             $query->where('status', $this->filterStatus);
         }
+
         if ($this->attendanceStatus) {
             $query->where('attendance_status', $this->attendanceStatus);
         }
+
         if ($this->searchQuery) {
             $query->whereHas('patient', function ($q) {
                 $q->where('first_name', 'like', "%{$this->searchQuery}%")
@@ -190,6 +218,7 @@ class AppointmentsList extends Component
                     ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
             });
         }
+
         $appointments = $query->orderBy('appointment_date', 'desc')->paginate($this->pagination['per_page']);
         $this->appointments = $appointments->items();
         $this->pagination = [
@@ -198,17 +227,20 @@ class AppointmentsList extends Component
             'per_page' => $appointments->perPage(),
             'total' => $appointments->total(),
         ];
+
         if (empty($this->appointments) && !$this->isSearchingAllDates && $this->searchQuery) {
             $jalaliDate = Jalalian::fromCarbon(Carbon::parse($gregorianDate))->format('Y/m/d');
             $this->dispatch('no-results-found', date: $jalaliDate);
         }
     }
+
     public function searchAllDates()
     {
         $this->isSearchingAllDates = true;
         $this->dateFilter = '';
         $this->loadAppointments();
     }
+
     private function convertToGregorian($date)
     {
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
@@ -226,6 +258,7 @@ class AppointmentsList extends Component
             return Carbon::now()->format('Y-m-d');
         }
     }
+
     public function updatedSelectedDate()
     {
         $this->isSearchingAllDates = false;
@@ -235,17 +268,20 @@ class AppointmentsList extends Component
         $this->appointments = [];
         $this->loadAppointments();
     }
+
     public function updatedSelectedClinicId()
     {
         $this->isSearchingAllDates = false;
         $this->loadAppointments();
         $this->loadBlockedUsers();
     }
+
     public function updatedSearchQuery()
     {
         $this->isSearchingAllDates = false;
         $this->loadAppointments();
     }
+
     public function updatedFilterStatus()
     {
         $this->isSearchingAllDates = false;
@@ -254,11 +290,13 @@ class AppointmentsList extends Component
         $this->appointments = [];
         $this->loadAppointments();
     }
+
     public function updatedAttendanceStatus()
     {
         $this->isSearchingAllDates = false;
         $this->loadAppointments();
     }
+
     public function updatedDateFilter()
     {
         $this->isSearchingAllDates = false;
@@ -267,77 +305,331 @@ class AppointmentsList extends Component
         $this->appointments = [];
         $this->loadAppointments();
     }
+
     public function gotoPage($page)
     {
         $this->setPage($page);
         $this->loadAppointments();
     }
+
     public function previousPage()
     {
         $this->setPage($this->pagination['current_page'] - 1);
         $this->loadAppointments();
     }
+
     public function nextPage()
     {
         $this->setPage($this->pagination['current_page'] + 1);
         $this->loadAppointments();
     }
+
+    // متد بررسی ظرفیت و شرایط جابجایی
+    private function checkRescheduleConditions($newDate, $appointmentIds)
+    {
+        $doctor = $this->getAuthenticatedDoctor();
+        if (!$doctor) {
+            return ['success' => false, 'message' => 'دکتر معتبر یافت نشد.'];
+        }
+
+        $newDateCarbon = Carbon::parse($newDate);
+        $today = Carbon::today();
+
+        // بررسی تاریخ گذشته
+        if ($newDateCarbon->lt($today)) {
+            return ['success' => false, 'message' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'];
+        }
+
+        // بررسی بازه تقویم
+        $calendarDays = DoctorAppointmentConfig::where('doctor_id', $doctor->id)
+            ->value('calendar_days') ?? 30;
+        $maxDate = $today->copy()->addDays($calendarDays);
+        if ($newDateCarbon->gt($maxDate)) {
+            return ['success' => false, 'message' => 'تاریخ مقصد خارج از بازه تقویم مجاز است.'];
+        }
+
+        // بررسی تعطیلات
+        $holidaysQuery = DoctorHoliday::where('doctor_id', $doctor->id)
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
+        $holidays = $holidaysQuery->first();
+        $holidayDates = json_decode($holidays->holiday_dates ?? '[]', true);
+        if (in_array($newDate, $holidayDates)) {
+            return ['success' => false, 'message' => 'تاریخ مقصد تعطیل است.'];
+        }
+
+        // بررسی ساعات کاری و ظرفیت
+        $dayOfWeek = strtolower($newDateCarbon->format('l'));
+        $workScheduleQuery = DoctorWorkSchedule::where('doctor_id', $doctor->id)
+            ->where('day', $dayOfWeek)
+            ->where('is_working', true)
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
+        $workSchedule = $workScheduleQuery->first();
+
+        if (!$workSchedule) {
+            return ['success' => false, 'message' => 'پزشک در این روز کاری ندارد.'];
+        }
+
+        // بررسی برنامه ویژه روزانه
+        $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctor->id)
+            ->where('date', $newDate)
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
+        $specialSchedule = $specialScheduleQuery->first();
+
+        $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
+        $appointmentSettings = json_decode($workSchedule->appointment_settings, true) ?? ['max_appointments' => 10, 'appointment_duration' => 15];
+
+        // محاسبه زمان‌های خالی
+        $availableSlots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $newDate, $doctor->id);
+
+        // بررسی تعداد نوبت‌های درخواستی
+        $requiredSlots = count($appointmentIds);
+        $availableSlotsCount = count($availableSlots);
+
+        if ($availableSlotsCount < $requiredSlots) {
+            $nextAvailableDate = $this->getNextAvailableDateAfter($newDate);
+            $remainingAppointments = $requiredSlots - $availableSlotsCount;
+            return [
+                'success' => false,
+                'message' => "تعداد نوبت‌های خالی در این روز $availableSlotsCount است. آیا مایلید $remainingAppointments نوبت به تاریخ " . Jalalian::fromCarbon(Carbon::parse($nextAvailableDate))->format('Y/m/d') . " منتقل شود؟",
+                'available_slots' => $availableSlots,
+                'next_available_date' => $nextAvailableDate,
+                'partial' => true,
+            ];
+        }
+
+        return [
+            'success' => true,
+            'available_slots' => $availableSlots,
+        ];
+    }
+
+    // محاسبه زمان‌های خالی
+    private function calculateAvailableSlots($workHours, $appointmentSettings, $date, $doctorId)
+    {
+        $slots = [];
+        $duration = $appointmentSettings['appointment_duration'] ?? 15; // مدت زمان هر نوبت
+        $existingAppointments = Appointment::where('doctor_id', $doctorId)
+            ->where('appointment_date', $date)
+            ->where('status', '!=', 'cancelled')
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+            ->pluck('appointment_time')
+            ->map(fn ($time) => $time->format('H:i'))
+            ->toArray();
+
+        foreach ($workHours as $period) {
+            $start = Carbon::parse($period['start']);
+            $end = Carbon::parse($period['end']);
+            while ($start->lt($end)) {
+                $slotTime = $start->format('H:i');
+                if (!in_array($slotTime, $existingAppointments)) {
+                    $slots[] = $slotTime;
+                }
+                $start->addMinutes($duration);
+            }
+        }
+
+        return $slots;
+    }
+
+    // دریافت اولین تاریخ خالی پس از تاریخ مشخص
+    private function getNextAvailableDateAfter($startDate)
+    {
+        $doctorId = $this->getAuthenticatedDoctor()->id;
+        $today = Carbon::today();
+        $calendarDays = DoctorAppointmentConfig::where('doctor_id', $doctorId)->value('calendar_days') ?? 30;
+        $maxDate = $today->copy()->addDays($calendarDays);
+
+        $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
+        $holidays = $holidaysQuery->first();
+        $holidayDates = json_decode($holidays->holiday_dates ?? '[]', true);
+
+        $currentDate = Carbon::parse($startDate)->addDay();
+        while ($currentDate->lte($maxDate)) {
+            $dateStr = $currentDate->format('Y-m-d');
+            if (in_array($dateStr, $holidayDates)) {
+                $currentDate->addDay();
+                continue;
+            }
+
+            $dayOfWeek = strtolower($currentDate->format('l'));
+            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->where('day', $dayOfWeek)
+                ->where('is_working', true)
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->first();
+
+            if (!$workSchedule) {
+                $currentDate->addDay();
+                continue;
+            }
+
+            $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
+                ->where('date', $dateStr)
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->first();
+
+            $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
+            $appointmentSettings = json_decode($workSchedule->appointment_settings, true) ?? ['max_appointments' => 10, 'appointment_duration' => 15];
+
+            $availableSlots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $dateStr, $doctorId);
+            if (!empty($availableSlots)) {
+                return $dateStr;
+            }
+
+            $currentDate->addDay();
+        }
+
+        return null;
+    }
+
+    // متد جابجایی تکی
     public function updateAppointmentDate($id)
     {
         $this->validate([
             'rescheduleNewDate' => 'required|date_format:Y-m-d',
         ]);
-        $appointment = Appointment::findOrFail($id);
-        if ($appointment->status === 'attended' || $appointment->status === 'cancelled') {
-            $this->dispatch('show-toastr', type: 'error', message: 'نمی‌توانید نوبت ویزیت‌شده یا لغو شده را جابجا کنید.');
-            return;
-        }
+
+        $appointmentIds = is_array($id) ? $id : [$id];
         $newDate = Carbon::parse($this->rescheduleNewDate);
-        if ($newDate->lt(Carbon::today())) {
-            $this->dispatch('show-toastr', type: 'error', message: 'امکان جابجایی به تاریخ گذشته وجود ندارد.');
+
+        // بررسی شرایط
+        $conditions = $this->checkRescheduleConditions($newDate->format('Y-m-d'), $appointmentIds);
+        if (!$conditions['success']) {
+            if (isset($conditions['partial']) && $conditions['partial']) {
+                // نمایش SweetAlert برای جابجایی جزئی
+                $nextDate = $conditions['next_available_date'];
+                $nextDateJalali = Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m/d');
+                $message = $conditions['message'];
+
+                $this->dispatch('show-partial-reschedule-confirm', [
+                    'message' => $message,
+                    'appointmentIds' => $appointmentIds,
+                    'newDate' => $newDate->format('Y-m-d'),
+                    'nextDate' => $nextDate,
+                    'availableSlots' => $conditions['available_slots'],
+                ]);
+                return;
+            }
+
+            $this->dispatch('show-toastr', type: 'error', message: $conditions['message']);
             return;
         }
-        $oldDate = $appointment->appointment_date;
-        $appointment->appointment_date = $newDate;
-        $appointment->save();
-        $oldDateJalali = Jalalian::fromDateTime($oldDate)->format('Y/m/d');
-        $newDateJalali = Jalalian::fromDateTime($newDate)->format('Y/m/d');
-        if ($appointment->patient && $appointment->patient->mobile) {
-            $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به {$newDateJalali} تغییر یافت.";
-            SendSmsNotificationJob::dispatch(
-                $message,
-                [$appointment->patient->mobile],
-                null,
-                []
-            )->delay(now()->addSeconds(5));
-        }
-        $this->dispatch('show-toastr', type: 'success', message: 'نوبت با موفقیت جابجا شد.');
+
+        // جابجایی نوبت‌ها
+        $this->processReschedule($appointmentIds, $newDate->format('Y-m-d'), $conditions['available_slots']);
+        $this->dispatch('show-toastr', type: 'success', message: count($appointmentIds) > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.');
         $this->loadAppointments();
         $this->dispatch('close-modal', id: 'rescheduleModal');
     }
+
+    // متد جابجایی گروهی با انتقال باقی‌مانده به تاریخ بعدی
+    #[On('confirm-partial-reschedule')]
+    public function confirmPartialReschedule($data)
+    {
+        $appointmentIds = $data['appointmentIds'];
+        $newDate = $data['newDate'];
+        $nextDate = $data['nextDate'];
+        $availableSlots = $data['availableSlots'];
+
+        // جابجایی نوبت‌های ممکن به تاریخ مقصد
+        $remainingIds = $this->processReschedule(array_slice($appointmentIds, 0, count($availableSlots)), $newDate, $availableSlots);
+
+        // جابجایی باقی‌مانده به تاریخ بعدی
+        if (!empty($remainingIds) && $nextDate) {
+            $nextConditions = $this->checkRescheduleConditions($nextDate, $remainingIds);
+            if ($nextConditions['success']) {
+                $this->processReschedule($remainingIds, $nextDate, $nextConditions['available_slots']);
+            } else {
+                $this->dispatch('show-toastr', type: 'error', message: 'امکان جابجایی باقی نوبت‌ها به تاریخ بعدی وجود ندارد.');
+                return;
+            }
+        }
+
+        $this->dispatch('show-toastr', type: 'success', message: 'نوبت‌ها با موفقیت جابجا شدند.');
+        $this->loadAppointments();
+        $this->dispatch('close-modal', id: 'rescheduleModal');
+    }
+
+    // متد پردازش جابجایی نوبت‌ها
+    private function processReschedule($appointmentIds, $newDate, $availableSlots)
+    {
+        $doctor = $this->getAuthenticatedDoctor();
+        $remainingIds = [];
+
+        foreach ($appointmentIds as $index => $id) {
+            $appointment = Appointment::find($id);
+            if (!$appointment || in_array($appointment->status, ['attended', 'cancelled'])) {
+                $remainingIds[] = $id;
+                continue;
+            }
+
+            $oldDate = $appointment->appointment_date;
+            $oldTime = $appointment->appointment_time;
+
+            // تخصیص زمان خالی
+            $newTime = isset($availableSlots[$index]) ? $availableSlots[$index] : null;
+            if (!$newTime) {
+                $remainingIds[] = $id;
+                continue;
+            }
+
+            $appointment->appointment_date = $newDate;
+            $appointment->appointment_time = Carbon::createFromFormat('H:i', $newTime);
+            $appointment->save();
+
+            // ارسال پیامک
+            if ($appointment->patient && $appointment->patient->mobile) {
+                $oldDateJalali = Jalalian::fromDateTime($oldDate)->format('Y/m/d');
+                $newDateJalali = Jalalian::fromCarbon(Carbon::parse($newDate))->format('Y/m/d');
+                $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} ساعت {$oldTime->format('H:i')} به {$newDateJalali} ساعت {$newTime} تغییر یافت.";
+                SendSmsNotificationJob::dispatch(
+                    $message,
+                    [$appointment->patient->mobile],
+                    null,
+                    []
+                )->delay(now()->addSeconds(5));
+            }
+        }
+
+        return $remainingIds;
+    }
+
     public function endVisit($id)
     {
         $this->validate([
             'endVisitDescription' => 'nullable|string|max:1000',
         ]);
+
         $appointment = Appointment::findOrFail($id);
         $appointment->description = $this->endVisitDescription;
         $appointment->status = 'attended';
         $appointment->attendance_status = 'attended';
         $appointment->save();
+
         $this->dispatch('show-toastr', type: 'success', message: 'ویزیت با موفقیت ثبت شد.');
         $this->loadAppointments();
         $this->dispatch('close-modal', id: 'endVisitModalCenter');
     }
+
     public function cancelSingleAppointment($id)
     {
         $this->dispatch('confirm-cancel-single', id: $id);
     }
+
     public function triggerCancelAppointments()
     {
         $this->cancelAppointments($this->cancelIds);
         $this->cancelIds = [];
     }
+
     public function cancelAppointments($ids = [])
     {
         $requestData = request()->all();
@@ -351,28 +643,34 @@ class AppointmentsList extends Component
         } elseif (is_scalar($ids) && !empty($ids)) {
             $normalizedIds = [$ids];
         }
+
         if (empty($normalizedIds)) {
             $this->dispatch('show-toastr', type: 'error', message: 'هیچ نوبت انتخاب‌شده‌ای یافت نشد.');
             return;
         }
+
         try {
             $doctor = $this->getAuthenticatedDoctor();
             if (!$doctor) {
                 throw new \Exception('دکتر معتبر یافت نشد.');
             }
+
             $appointments = Appointment::whereIn('id', $normalizedIds)
                 ->where('doctor_id', $doctor->id)
                 ->whereNotIn('status', ['cancelled', 'attended'])
                 ->get();
+
             if ($appointments->isEmpty()) {
                 $this->dispatch('show-toastr', type: 'error', message: 'هیچ نوبت معتبری برای لغو یافت نشد.');
                 return;
             }
+
             foreach ($appointments as $appointment) {
                 $appointment->update([
                     'status' => 'cancelled',
                     'updated_at' => now(),
                 ]);
+
                 if ($appointment->patient && $appointment->patient->mobile) {
                     $dateJalali = Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d');
                     $message = "کاربر گرامی، نوبت شما در تاریخ {$dateJalali} لغو شد.";
@@ -384,6 +682,7 @@ class AppointmentsList extends Component
                     )->delay(now()->addSeconds(5));
                 }
             }
+
             $this->dispatch('appointments-cancelled', [
                 'message' => count($normalizedIds) > 1 ? 'نوبت‌ها با موفقیت لغو شدند.' : 'نوبت با موفقیت لغو شد.'
             ]);
@@ -392,6 +691,7 @@ class AppointmentsList extends Component
             $this->dispatch('show-toastr', type: 'error', message: 'خطایی در لغو نوبت رخ داد: ' . $e->getMessage());
         }
     }
+
     private function loadBlockedUsers()
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -401,10 +701,12 @@ class AppointmentsList extends Component
             ->where('clinic_id', $clinicId)
             ->get()->toArray();
     }
+
     private function loadMessages()
     {
         $this->messages = SmsTemplate::with('user')->latest()->get()->toArray();
     }
+
     private function processDate($date, $fieldName)
     {
         if (empty($date)) {
@@ -427,6 +729,7 @@ class AppointmentsList extends Component
         }
         throw new \Exception("فرمت تاریخ $fieldName ناشناخته است: $date");
     }
+
     public function blockUser()
     {
         try {
@@ -455,20 +758,23 @@ class AppointmentsList extends Component
                 'blockReason.string' => 'دلیل مسدودیت باید متنی باشد.',
                 'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
             ]);
+
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
-            Log::info($this->selectedClinicId);
             $appointment = Appointment::findOrFail($this->blockAppointmentId);
             $user = $appointment->patient;
+
             $isBlocked = UserBlocking::where('user_id', $user->id)
                 ->where('doctor_id', $doctorId)
                 ->where('clinic_id', $clinicId)
                 ->where('status', 1)
                 ->exists();
+
             if ($isBlocked) {
                 $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'این کاربر قبلاً در این کلینیک مسدود شده است.']);
                 return;
             }
+
             UserBlocking::create([
                 'user_id' => $user->id,
                 'doctor_id' => $doctorId,
@@ -478,18 +784,19 @@ class AppointmentsList extends Component
                 'reason' => $this->blockReason,
                 'status' => 1,
             ]);
+
             $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'کاربر با موفقیت مسدود شد.']);
             $this->dispatch('hideModal');
             $this->loadBlockedUsers();
             $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId']);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // فقط اولین خطا را نمایش بده
             $firstError = collect($e->errors())->flatten()->first();
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => $firstError]);
         } catch (\Exception $e) {
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطایی رخ داد: ' . $e->getMessage()]);
         }
     }
+
     #[On('block-multiple-users')]
     public function blockMultipleUsers($data)
     {
@@ -499,9 +806,11 @@ class AppointmentsList extends Component
                 $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'هیچ کاربری برای مسدود کردن انتخاب نشده است.']);
                 return;
             }
+
             $this->blockedAt = $data['blockedAt'] ?? $this->blockedAt;
             $this->unblockedAt = $data['unblockedAt'] ?? $this->unblockedAt;
             $this->blockReason = $data['blockReason'] ?? $this->blockReason;
+
             $this->validate([
                 'blockedAt' => [
                     'required',
@@ -527,26 +836,32 @@ class AppointmentsList extends Component
                 'blockReason.string' => 'دلیل مسدودیت باید متنی باشد.',
                 'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
             ]);
+
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
             $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
             $unblockedAt = $this->processDate($this->unblockedAt, 'پایان مسدودیت');
+
             $blockedUsers = [];
             $alreadyBlocked = [];
+
             foreach ($mobiles as $mobile) {
                 $user = User::where('mobile', $mobile)->first();
                 if (!$user) {
                     continue;
                 }
+
                 $isBlocked = UserBlocking::where('user_id', $user->id)
                     ->where('doctor_id', $doctorId)
                     ->where('clinic_id', $clinicId)
                     ->where('status', 1)
                     ->exists();
+
                 if ($isBlocked) {
                     $alreadyBlocked[] = $mobile;
                     continue;
                 }
+
                 $blockingUser = UserBlocking::create([
                     'user_id' => $user->id,
                     'doctor_id' => $doctorId,
@@ -556,16 +871,20 @@ class AppointmentsList extends Component
                     'reason' => $this->blockReason,
                     'status' => 1,
                 ]);
+
                 $blockedUsers[] = $blockingUser;
             }
+
             if (empty($blockedUsers) && !empty($alreadyBlocked)) {
                 $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.']);
                 return;
             }
+
             if (empty($blockedUsers)) {
                 $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'هیچ کاربری برای مسدود کردن پیدا نشد.']);
                 return;
             }
+
             $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'کاربران با موفقیت مسدود شدند.']);
             $this->dispatch('hideModal');
             $this->loadBlockedUsers();
@@ -577,6 +896,7 @@ class AppointmentsList extends Component
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطایی رخ داد: ' . $e->getMessage()]);
         }
     }
+
     public function updateBlockStatus($id, $status)
     {
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
@@ -585,16 +905,20 @@ class AppointmentsList extends Component
             ->firstOrFail();
         $userBlocking->status = $status;
         $userBlocking->save();
+
         $this->dispatch('show-toastr', type: 'success', message: 'وضعیت با موفقیت به‌روزرسانی شد.');
         $this->loadBlockedUsers();
     }
+
     public function sendMessage()
     {
         $this->validate();
+
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
         $recipients = [];
         $userId = null;
+
         if ($this->recipientType === 'all') {
             $recipients = DB::table('appointments')
                 ->where('doctor_id', $doctorId)
@@ -602,6 +926,7 @@ class AppointmentsList extends Component
                 ->distinct()
                 ->pluck('users.mobile')
                 ->toArray();
+
             if (empty($recipients)) {
                 $this->dispatch('show-toastr', type: 'error', message: 'هیچ کاربری با شما نوبت ثبت نکرده است.');
                 return;
@@ -613,6 +938,7 @@ class AppointmentsList extends Component
                 ->join('users', 'user_blockings.user_id', '=', 'users.id')
                 ->pluck('users.mobile')
                 ->toArray();
+
             if (empty($recipients)) {
                 $this->dispatch('show-toastr', type: 'error', message: 'هیچ کاربر مسدودی یافت نشد.');
                 return;
@@ -624,10 +950,12 @@ class AppointmentsList extends Component
                 'specificRecipient.required' => 'شماره موبایل گیرنده را وارد کنید.',
                 'specificRecipient.exists' => 'شماره موبایل واردشده در سیستم ثبت نشده یا نوبت نگرفته است.',
             ]);
+
             $user = User::where('mobile', $this->specificRecipient)->first();
             $recipients[] = $this->specificRecipient;
             $userId = $user->id;
         }
+
         $smsTemplate = SmsTemplate::create([
             'doctor_id' => $doctorId,
             'user_id' => $userId,
@@ -637,25 +965,31 @@ class AppointmentsList extends Component
             'recipient_type' => $this->recipientType,
             'identifier' => uniqid(),
         ]);
+
         $doctor = Doctor::find($doctorId);
         $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+
         SendSmsNotificationJob::dispatch(
             $this->messageContent,
             $recipients,
             null,
             [$doctorName]
         )->delay(now()->addSeconds(5));
+
         $this->dispatch('show-toastr', type: 'success', message: 'پیام با موفقیت در صف ارسال قرار گرفت.');
         $this->loadMessages();
         $this->reset(['messageTitle', 'messageContent', 'recipientType', 'specificRecipient']);
     }
+
     public function deleteMessage($id)
     {
         $message = SmsTemplate::findOrFail($id);
         $message->delete();
+
         $this->dispatch('show-toastr', type: 'success', message: 'پیام با موفقیت حذف شد.');
         $this->loadMessages();
     }
+
     public function unblockUser($id)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -665,49 +999,68 @@ class AppointmentsList extends Component
             ->where('clinic_id', $clinicId)
             ->firstOrFail();
         $userBlocking->delete();
+
         $this->dispatch('show-toastr', type: 'success', message: 'کاربر با موفقیت از لیست مسدودی حذف شد.');
         $this->loadBlockedUsers();
     }
+
     public function getNextAvailableDate()
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)
-            ->when($this->selectedClinicId === 'default', function ($query) use ($doctorId) {
-                $query->whereNull('clinic_id');
-            })
-            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
-                $query->where('clinic_id', $this->selectedClinicId);
-            });
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $holidays = $holidaysQuery->first();
         $holidayDates = json_decode($holidays->holiday_dates ?? '[]', true);
-        $today = Carbon::now()->startOfDay();
-        $daysToCheck = DoctorAppointmentConfig::where('doctor_id', $doctorId)->value('calendar_days') ?? 30;
+
+        $today = Carbon::today();
+        $calendarDays = DoctorAppointmentConfig::where('doctor_id', $doctorId)->value('calendar_days') ?? 30;
         $datesToCheck = collect();
-        for ($i = 1; $i <= $daysToCheck; $i++) {
+
+        for ($i = 0; $i <= $calendarDays; $i++) {
             $date = $today->copy()->addDays($i)->format('Y-m-d');
             $datesToCheck->push($date);
         }
+
         $nextAvailableDate = $datesToCheck->first(function ($date) use ($doctorId, $holidayDates) {
             if (in_array($date, $holidayDates)) {
                 return false;
             }
-            $appointmentQuery = Appointment::where('doctor_id', $doctorId)
-                ->where('appointment_date', $date)
-                ->when($this->selectedClinicId === 'default', function ($query) {
-                    $query->whereNull('clinic_id');
-                })
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
-                    $query->where('clinic_id', $this->selectedClinicId);
-                });
-            return !$appointmentQuery->exists();
+
+            $dayOfWeek = strtolower(Carbon::parse($date)->format('l'));
+            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->where('day', $dayOfWeek)
+                ->where('is_working', true)
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->first();
+
+            if (!$workSchedule) {
+                return false;
+            }
+
+            $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
+                ->where('date', $date)
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->first();
+
+            $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
+            $appointmentSettings = json_decode($workSchedule->appointment_settings, true) ?? ['max_appointments' => 10, 'appointment_duration' => 15];
+
+            $availableSlots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $date, $doctorId);
+            return !empty($availableSlots);
         });
+
         return $nextAvailableDate ?? null;
     }
+
     public function goToFirstAvailableDate()
     {
         $nextAvailableDate = $this->getNextAvailableDate();
         if ($nextAvailableDate) {
             $this->selectedDate = $nextAvailableDate;
+            $this->rescheduleNewDate = $nextAvailableDate;
             $this->isSearchingAllDates = false;
             $this->loadAppointments();
             $this->dispatch('update-reschedule-calendar', date: $nextAvailableDate);
@@ -715,6 +1068,7 @@ class AppointmentsList extends Component
             $this->dispatch('show-toastr', type: 'error', message: 'هیچ نوبت خالی یافت نشد.');
         }
     }
+
     public function getAppointmentsByDateSpecial($date)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -722,13 +1076,10 @@ class AppointmentsList extends Component
             ->where('appointment_date', $date)
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
-            ->when($this->selectedClinicId === 'default', function ($query) {
-                $query->whereNull('clinic_id');
-            })
-            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
-                $query->where('clinic_id', $this->selectedClinicId);
-            })
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->get();
+
         return $appointments->map(function ($appointment) {
             return [
                 'id' => $appointment->id,
@@ -737,6 +1088,7 @@ class AppointmentsList extends Component
             ];
         })->toArray();
     }
+
     public function getHolidays()
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -749,6 +1101,7 @@ class AppointmentsList extends Component
         $holidays = $holidaysQuery->get()->pluck('holiday_dates')->flatten()->toArray();
         return $holidays;
     }
+
     public function toggleHoliday($date)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -758,12 +1111,14 @@ class AppointmentsList extends Component
         } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
             $holidayRecordQuery->where('clinic_id', $this->selectedClinicId);
         }
+
         $holidayRecord = $holidayRecordQuery->firstOrCreate([
             'doctor_id' => $doctorId,
             'clinic_id' => ($this->selectedClinicId !== 'default' ? $this->selectedClinicId : null),
         ], [
             'holiday_dates' => json_encode([])
         ]);
+
         $holidayDates = json_decode($holidayRecord->holiday_dates, true) ?? [];
         if (in_array($date, $holidayDates)) {
             $holidayDates = array_diff($holidayDates, [$date]);
@@ -774,33 +1129,41 @@ class AppointmentsList extends Component
             $message = 'این تاریخ تعطیل شد.';
             $isHoliday = true;
         }
+
         $holidayRecord->update([
             'holiday_dates' => json_encode(array_values($holidayDates)),
         ]);
+
         $this->dispatch('show-toastr', type: 'success', message: $message);
         return ['is_holiday' => $isHoliday, 'holiday_dates' => $holidayDates];
     }
+
     public function getDefaultSchedule($date)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $selectedDate = Carbon::parse($date);
         $dayOfWeek = strtolower($selectedDate->format('l'));
+
         $specialScheduleQuery = SpecialDailySchedule::where('date', $date);
         if ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
             $specialScheduleQuery->where('clinic_id', $this->selectedClinicId);
         }
         $specialSchedule = $specialScheduleQuery->first();
+
         if ($specialSchedule) {
             return json_decode($specialSchedule->work_hours, true);
         }
+
         $workScheduleQuery = DoctorWorkSchedule::where('doctor_id', $doctorId)
             ->where('day', $dayOfWeek);
         if ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
             $workScheduleQuery->where('clinic_id', $this->selectedClinicId);
         }
         $workSchedule = $workScheduleQuery->first();
+
         return $workSchedule ? json_decode($workSchedule->work_hours, true) ?? [] : [];
     }
+
     public function render()
     {
         return view('livewire.dr.panel.turn.schedule.appointments-list');
