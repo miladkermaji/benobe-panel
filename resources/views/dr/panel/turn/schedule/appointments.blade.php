@@ -14,6 +14,7 @@
 @endsection
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var appointmentsCountUrl = "{{ route('appointments.count') }}";

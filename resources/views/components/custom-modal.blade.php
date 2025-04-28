@@ -76,7 +76,7 @@
   }
 
   .x-modal__dialog--lg {
-    max-width: 800px;
+    max-width: 850px;
   }
 
   .x-modal__dialog--xl {

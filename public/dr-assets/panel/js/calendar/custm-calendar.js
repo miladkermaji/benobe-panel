@@ -2,6 +2,7 @@
 function ensureElementExists(selector, errorMessage, scope = document) {
     const element = scope.querySelector(selector);
     if (!element) {
+        console.warn(errorMessage);
         return null;
     }
     return element;
@@ -10,7 +11,8 @@ function ensureElementExists(selector, errorMessage, scope = document) {
 // تابع اصلی تقویم
 function initializeCalendar() {
     // پیدا کردن محدوده مودال
-    const modalScope = document.querySelector("#miniCalendarModal") || document;
+    const modalScope =
+        document.querySelector("#mini-calendar-modal") || document;
 
     const calendarBody = ensureElementExists(
         "#calendar-body",
@@ -18,7 +20,7 @@ function initializeCalendar() {
         modalScope
     );
     const selectedDateSpan = ensureElementExists(
-        ".turning_selectDate__MLRSb span:first-child",
+        ".selectDate_datepicker__xkZeS span:first-child",
         "Selected date span not found"
     );
     const today = moment().startOf("day").locale("fa").format("jYYYY/jMM/jDD");
@@ -95,7 +97,7 @@ function initializeCalendar() {
                 }
 
                 // بستن مودال
-                Livewire.dispatch("hideModal");
+                window.closeXModal("mini-calendar-modal");
 
                 // حذف backdrop
                 const existingBackdrops =
@@ -109,6 +111,7 @@ function initializeCalendar() {
                 Livewire.dispatch("updateSelectedDate", {
                     date: gregorianDate,
                 });
+
                 // ارسال رویداد برای آپدیت تقویم ردیفی
                 const event = new CustomEvent("updateCalendarRow", {
                     detail: gregorianDate,
@@ -240,27 +243,37 @@ function initializeCalendar() {
     generateCalendar(moment().jYear(), moment().jMonth() + 1);
 }
 
-// اجرای تقویم برای تقویم ردیفی
-document.addEventListener("DOMContentLoaded", () => {
-    if (document.querySelector(".turning_selectDate__MLRSb")) {
-        initializeCalendar();
-    }
+// اجرای تقویم وقتی مودال باز می‌شه
+document.addEventListener("livewire:initialized", () => {
+    // گوش دادن به رویداد openXModal
+    window.addEventListener("openXModal", (event) => {
+        const modalId = event.detail.id;
+
+        if (modalId === "mini-calendar-modal") {
+            setTimeout(() => {
+                initializeCalendar();
+            }, 100); // تأخیر برای اطمینان از رندر DOM
+        }
+    });
+
+    // نگه‌داری پشتیبانی از showModal برای مودال‌های دیگر
+    Livewire.on("showModal", (modalId) => {
+        if (modalId === "mini-calendar-modal") {
+            setTimeout(() => {
+                initializeCalendar();
+            }, 100);
+        }
+    });
 });
 
-// اجرای تقویم فقط وقتی مودال MiniCalendarModal باز می‌شه
-Livewire.on("showModal", (event) => {
-    if (event.data && event.data.alias === "mini-calendar-modal") {
+// اطمینان از اجرای تقویم بعد از به‌روزرسانی DOM
+Livewire.hook("morph.updated", () => {
+    const modal = document.querySelector(
+        "#mini-calendar-modal.x-modal--visible"
+    );
+    if (modal) {
         setTimeout(() => {
             initializeCalendar();
-        }, 2000);
+        }, 100);
     }
-});
-
-// مدیریت به‌روزرسانی‌های Livewire
-Livewire.hook("morph.updated", () => {
-    setTimeout(() => {
-        if (document.querySelector("#miniCalendarModal.show")) {
-            initializeCalendar();
-        }
-    }, 300);
 });

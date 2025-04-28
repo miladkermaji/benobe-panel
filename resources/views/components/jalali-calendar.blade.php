@@ -28,13 +28,13 @@
     --radius-circle: 9999px;
   }
 
-  .calendar {
+  #mini-calendar-container .calendar {
     background: var(--background-card);
     padding: 8px;
     margin-top: -29px
   }
 
-  .calendar-header {
+  #mini-calendar-container .calendar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -42,14 +42,14 @@
     gap: 4px;
   }
 
-  .select-group {
+  #mini-calendar-container .select-group {
     display: flex;
     gap: 6px;
     flex: 1;
     justify-content: center;
   }
 
-  .calendar-select {
+  #mini-calendar-container .calendar-select {
     background: var(--background-card);
     border: none;
     border-radius: 4px;
@@ -66,17 +66,17 @@
     padding-left: 24px;
   }
 
-  .calendar-select:focus {
+  #mini-calendar-container .calendar-select:focus {
     outline: none;
     background: var(--primary-light);
     color: var(--primary);
   }
 
-  .calendar-select:hover {
+  #mini-calendar-container .calendar-select:hover {
     background: var(--primary-light);
   }
 
-  .nav-btn {
+  #mini-calendar-container .nav-btn {
     background: transparent;
     border: none;
     padding: 6px;
@@ -90,28 +90,28 @@
     transition: background 0.3s ease, transform 0.3s ease;
   }
 
-  .nav-btn svg {
+  #mini-calendar-container .nav-btn svg {
     stroke: var(--text-secondary);
     width: 100px;
     height: 100px;
   }
 
-  .nav-btn:hover {
+  #mini-calendar-container .nav-btn:hover {
     background: var(--primary-light);
     transform: scale(1.1);
   }
 
-  .nav-btn:hover svg {
+  #mini-calendar-container .nav-btn:hover svg {
     stroke: var(--primary);
   }
 
-  .calendar-body {
+  #mini-calendar-container .calendar-body {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 2px;
   }
 
-  .calendar-day-name {
+  #mini-calendar-container .calendar-day-name {
     text-align: center;
     font-size: 13px;
     font-weight: 600 !important;
@@ -119,7 +119,7 @@
     padding: 8px 0;
   }
 
-  .calendar-day {
+  #mini-calendar-container .calendar-day {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -135,35 +135,35 @@
     margin: 2px;
   }
 
-  .calendar-day.empty {
+  #mini-calendar-container .calendar-day.empty {
     background: transparent;
     cursor: default;
   }
 
-  .calendar-day:hover:not(.empty) {
+  #mini-calendar-container .calendar-day:hover:not(.empty) {
     background: var(--primary-light);
     transform: scale(1.15);
   }
 
-  .calendar-day.friday {
+  #mini-calendar-container .calendar-day.friday {
     color: #ff4d4f !important;
   }
 
-  .calendar-day.today {
+  #mini-calendar-container .calendar-day.today {
     background: var(--primary-light);
     color: var(--primary);
     font-weight: 600;
     border-radius: var(--radius-circle);
   }
 
-  .calendar-day.active {
+  #mini-calendar-container .calendar-day.active {
     background: var(--primary-light);
     color: #333;
     font-weight: 600;
     border-radius: var(--radius-circle);
   }
 
-  .calendar-day.selected {
+  #mini-calendar-container .calendar-day.selected {
     background: var(--primary);
     color: var(--background-card);
     font-weight: 600;
@@ -171,7 +171,7 @@
     box-shadow: 0 2px 4px rgba(0, 147, 255, 0.2);
   }
 
-  .calendar-day.has-event::after {
+  #mini-calendar-container .calendar-day.has-event::after {
     content: '';
     position: absolute;
     bottom: 4px;
@@ -181,7 +181,7 @@
     border-radius: var(--radius-circle);
   }
 
-  .calendar-footer {
+  #mini-calendar-container .calendar-footer {
     text-align: center;
     padding-top: 12px;
     font-size: 14px;
@@ -189,49 +189,49 @@
   }
 
   @media (max-width: 576px) {
-    .calendar {
+    #mini-calendar-container .calendar {
       padding: 12px;
     }
      
-    .calendar-header {
+    #mini-calendar-container .calendar-header {
       gap: 6px;
     }
 
-    .select-group {
+    #mini-calendar-container .select-group {
       gap: 4px;
     }
 
-    .calendar-select {
+    #mini-calendar-container .calendar-select {
       font-size: 14px;
       padding: 4px 8px 4px 20px;
       background-position: left 6px center;
     }
 
-    .calendar-day {
+    #mini-calendar-container .calendar-day {
       width: 36px;
       height: 36px;
       font-size: 14px;
     }
 
-    .calendar-day-name {
+    #mini-calendar-container .calendar-day-name {
       font-size: 12px;
     }
   }
 
   @media (max-width: 425px) {
-    .calendar-day {
+    #mini-calendar-container .calendar-day {
       width: 32px;
       height: 32px;
       font-size: 13px;
     }
 
-    .calendar-day-name {
+    #mini-calendar-container .calendar-day-name {
       font-size: 11px;
     }
   }
 </style>
 
-<div class="container calendar">
+<div class="container calendar" id="mini-calendar-container">
   <div class="calendar-header w-100 d-flex justify-content-between align-items-center gap-4">
     <div>
       <button id="prev-month" class="btn btn-light nav-btn">

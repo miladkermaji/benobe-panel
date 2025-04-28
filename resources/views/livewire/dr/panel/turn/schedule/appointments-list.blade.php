@@ -216,9 +216,12 @@
   </div>
 
   <!-- مودال‌های جدید -->
-  <x-custom-modal id="mini-calendar-modal" title="انتخاب تاریخ" size="md" :show="false">
-    <x-jalali-calendar />
-  </x-custom-modal>
+  <!-- مودال مینی‌کالندر -->
+  <div wire:ignore>
+    <x-custom-modal id="mini-calendar-modal" title="انتخاب تاریخ" size="md" :show="false">
+      <x-jalali-calendar />
+    </x-custom-modal>
+  </div>
 
   <x-custom-modal id="add-sick-modal" title="ثبت نوبت دستی" size="md" :show="false">
     <form action="" method="post">

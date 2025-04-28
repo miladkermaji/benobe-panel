@@ -74,21 +74,21 @@
     border-radius: var(--radius-card);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     direction: rtl;
-    width:770px;
     margin: 0 auto;
     padding: 1rem;
     font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     transition: all 0.3s ease;
   }
 
-  .calendar-header {
+  .reschedule-calendar-container .calendar-header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem;
+
   }
 
-  .btn-nav {
+  .reschedule-calendar-container .btn-nav {
     width: 36px;
     height: 36px;
     background: var(--background-card);
@@ -100,13 +100,13 @@
     transition: all 0.3s ease;
   }
 
-  .btn-nav:hover {
+  .reschedule-calendar-container .btn-nav:hover {
     background: var(--primary);
     border-color: var(--primary);
     transform: scale(1.08);
   }
 
-  .btn-nav:hover svg path {
+  .reschedule-calendar-container .btn-nav:hover svg path {
     stroke: var(--background-card);
   }
 
@@ -115,7 +115,7 @@
     position: relative;
   }
 
-  .form-select {
+  .reschedule-calendar-container .form-select {
     width: 100%;
     padding: 0.5rem 2rem 0.5rem 0.75rem;
     background: var(--background-card);
@@ -132,19 +132,19 @@
     background-size: 12px;
   }
 
-  .form-select:focus {
+  .reschedule-calendar-container .form-select:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.2);
   }
 
-  .calendar-controls {
+  .reschedule-calendar-container .calendar-controls {
     display: flex;
     justify-content: flex-end;
     padding: 0.75rem;
   }
 
-  .btn-primary {
+  .reschedule-calendar-container .btn-primary {
     background: var(--secondary);
     color: var(--background-card);
     padding: 0.5rem 1.5rem;
@@ -154,34 +154,34 @@
     transition: all 0.3s ease;
   }
 
-  .btn-primary:hover {
+  .reschedule-calendar-container .btn-primary:hover {
     background: var(--secondary-hover);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
-  .calendar-body {
+  .reschedule-calendar-container .calendar-body {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 0.5rem;
     padding: 0.5rem;
   }
 
-  .calendar-day-name {
+  .reschedule-calendar-container .calendar-day-name {
     text-align: center;
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--text-secondary);
   }
 
-  .calendar-grid {
+  .reschedule-calendar-container .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 0.5rem;
     padding: 0 0.5rem 0.75rem;
   }
 
-  .calendar-day {
+  .reschedule-calendar-container .calendar-day {
     background: var(--background-card);
     border: 1px solid var(--border-neutral);
     border-radius: 6px;
@@ -197,55 +197,55 @@
     position: relative;
   }
 
-  .calendar-day:hover:not(.empty) {
+  .reschedule-calendar-container .calendar-day:hover:not(.empty) {
     background: var(--primary-light);
     border-color: var(--primary);
     transform: scale(1.05);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  .calendar-day.empty {
+  .reschedule-calendar-container .calendar-day.empty {
     background: transparent;
     border: none;
     cursor: default;
   }
 
-  .calendar-day.friday {
+  .reschedule-calendar-container .calendar-day.friday {
     color: #ef4444;
   }
 
-  .calendar-day.today {
+  .reschedule-calendar-container .calendar-day.today {
     background: var(--gradient-primary);
     border-color: var(--primary);
     color: var(--background-card);
     font-weight: 600;
   }
 
-  .calendar-day.active {
+  .reschedule-calendar-container .calendar-day.active {
     background: var(--primary);
     color: var(--background-card);
     border-color: var(--primary);
   }
 
-  .calendar-day.selected {
+  .reschedule-calendar-container .calendar-day.selected {
     background: var(--secondary);
     color: var(--background-card);
     border-color: var(--secondary);
     box-shadow: 0 0 8px rgba(29, 235, 60, 0.3);
   }
 
-  .calendar-day.has-appointment {
+  .reschedule-calendar-container .calendar-day.has-appointment {
     background: #d1fae5;
     border-color: #6ee7b7;
   }
 
-  .calendar-day.holiday {
+  .reschedule-calendar-container .calendar-day.holiday {
     background: #fef2f2;
     border-color: #f56565;
     color: #c53030;
   }
 
-  .calendar-day.holiday::after {
+  .reschedule-calendar-container .calendar-day.holiday::after {
     content: '';
     position: absolute;
     top: 4px;
@@ -256,7 +256,7 @@
     border-radius: 50%;
   }
 
-  .calendar-legend {
+  .reschedule-calendar-container .calendar-legend {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -264,32 +264,32 @@
     border-top: 1px solid var(--border-neutral);
   }
 
-  .legend-item {
+  .reschedule-calendar-container .legend-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
 
-  .legend-color {
+  .reschedule-calendar-container .legend-color {
     width: 14px;
     height: 14px;
     border-radius: 4px;
   }
 
-  .legend-color.selected {
+  .reschedule-calendar-container .legend-color.selected {
     background: var(--secondary);
   }
 
-  .legend-color.appointment {
+  .reschedule-calendar-container .legend-color.appointment {
     background: #d1fae5;
     border: 1px solid #6ee7b7;
   }
 
-  .legend-color.holiday {
+  .reschedule-calendar-container .legend-color.holiday {
     background: #f56565;
   }
 
-  .legend-text {
+  .reschedule-calendar-container .legend-text {
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--text-secondary);
@@ -301,26 +301,26 @@
       padding: 0.75rem;
     }
 
-    .calendar-header {
+    .reschedule-calendar-container .calendar-header {
       padding: 0.5rem;
       gap: 0.4rem;
     }
 
-    .btn-nav {
+    .reschedule-calendar-container .btn-nav {
       width: 32px;
       height: 32px;
     }
 
-    .form-select {
+    .reschedule-calendar-container .form-select {
       font-size: 0.85rem;
       padding: 0.4rem 1.5rem 0.4rem 0.6rem;
     }
 
-    .calendar-day {
+    .reschedule-calendar-container .calendar-day {
       font-size: 0.9rem;
     }
 
-    .calendar-day-name {
+    .reschedule-calendar-container .calendar-day-name {
       font-size: 0.8rem;
     }
   }
@@ -330,33 +330,33 @@
       padding: 0.5rem;
     }
 
-    .calendar-header {
+    .reschedule-calendar-container .calendar-header {
       flex-wrap: wrap;
       gap: 0.3rem;
     }
 
-    .select-wrapper {
+    .reschedule-calendar-container .select-wrapper {
       flex: 1 1 45%;
     }
 
-    .btn-nav {
+    .reschedule-calendar-container .btn-nav {
       width: 30px;
       height: 30px;
     }
 
-    .form-select {
+    .reschedule-calendar-container .form-select {
       font-size: 0.8rem;
     }
 
-    .calendar-day {
+    .reschedule-calendar-container .calendar-day {
       font-size: 0.85rem;
     }
 
-    .calendar-legend {
+    .reschedule-calendar-container .calendar-legend {
       gap: 0.75rem;
     }
 
-    .legend-text {
+    .reschedule-calendar-container .legend-text {
       font-size: 0.75rem;
     }
   }
@@ -366,31 +366,31 @@
       padding: 0.4rem;
     }
 
-    .btn-nav {
+    .reschedule-calendar-container .btn-nav {
       width: 28px;
       height: 28px;
     }
 
-    .form-select {
+    .reschedule-calendar-container .form-select {
       font-size: 0.75rem;
       padding: 0.4rem 1.2rem 0.4rem 0.5rem;
     }
 
-    .calendar-day {
+    .reschedule-calendar-container .calendar-day {
       font-size: 0.8rem;
     }
 
-    .calendar-day-name {
+    .reschedule-calendar-container .calendar-day-name {
       font-size: 0.75rem;
     }
 
-    .calendar-legend {
+    .reschedule-calendar-container .calendar-legend {
       flex-direction: column;
       align-items: flex-start;
       gap: 0.5rem;
     }
 
-    .legend-text {
+    .reschedule-calendar-container .legend-text {
       font-size: 0.7rem;
     }
   }
