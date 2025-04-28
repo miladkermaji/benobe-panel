@@ -27,7 +27,6 @@
   </div>
 
   @livewireScripts
-  @livewire('modal')
   <script>
     // ثبت رویداد show-toastr
    Livewire.on('show-toastr', (data) => {

@@ -7,9 +7,8 @@
     <div class="calendar-and-add-sick-section p-3 w-100">
   <div class="calendar-and-add-sick-section">
         <div class="c-a-wrapper">
-          @livewire('test-modal')
           <button class="selectDate_datepicker__xkZeS"
-           wire:click="openExampleModal">
+            wire:click="$dispatch('showModal', {data: {'alias': 'mini-calendar-modal','size' :'modal-md'}})">
             <span class="mx-1">{{ Jalalian::fromCarbon(Carbon::parse($selectedDate))->format('Y/m/d') }}</span>
             <img src="http://127.0.0.1:8000/dr-assets/icons/calendar.svg" alt="تقویم">
           </button>
