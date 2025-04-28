@@ -46,18 +46,19 @@ class AppointmentsList extends Component
         'total' => 0,
     ];
     public $isSearchingAllDates = false;
+    public $selectedMobiles = []; // اضافه شده برای مسدود کردن گروهی
 
     // Properties for blocking users
     #[Validate('required', message: 'لطفاً تاریخ شروع مسدودیت را وارد کنید.')]
     #[Validate('regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', message: 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.')]
     public $blockedAt;
 
-    #[Validate('nullable')]
+    #[Validate('required', message: 'لطفاً تاریخ پایان مسدودیت را وارد کنید.')]
     #[Validate('regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', message: 'تاریخ پایان مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.')]
     #[Validate('after:blockedAt', message: 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.')]
     public $unblockedAt;
 
-    #[Validate('nullable|string|max:255', message: 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.')]
+    #[Validate('required|string|max:255', message: 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.')]
     public $blockReason;
 
     // Properties for sending messages
@@ -90,6 +91,7 @@ class AppointmentsList extends Component
         'cancelAppointments' => 'cancelAppointments',
         'blockUser' => 'handleBlockUser',
         'blockMultipleUsers' => 'handleBlockMultipleUsers',
+        'confirm-partial-reschedule' => 'confirmPartialReschedule',
     ];
 
     public function initialize()
@@ -126,11 +128,7 @@ class AppointmentsList extends Component
         $this->blockedAt = $data['blockedAt'];
         $this->unblockedAt = $data['unblockedAt'];
         $this->blockReason = $data['blockReason'];
-        $selectedCheckboxes = request()->input('selectedMobiles', []);
-        $mobiles = array_filter($selectedCheckboxes, function ($mobile) {
-            return !empty($mobile);
-        });
-        $this->blockMultipleUsers($mobiles);
+        $this->blockMultipleUsers();
     }
 
     public function updateSelectedDate($date)
@@ -324,7 +322,6 @@ class AppointmentsList extends Component
         $this->loadAppointments();
     }
 
-    // متد بررسی ظرفیت و شرایط جابجایی
     private function checkRescheduleConditions($newDate, $appointmentIds)
     {
         $doctor = $this->getAuthenticatedDoctor();
@@ -335,12 +332,10 @@ class AppointmentsList extends Component
         $newDateCarbon = Carbon::parse($newDate);
         $today = Carbon::today();
 
-        // بررسی تاریخ گذشته
         if ($newDateCarbon->lt($today)) {
             return ['success' => false, 'message' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'];
         }
 
-        // بررسی بازه تقویم
         $calendarDays = DoctorAppointmentConfig::where('doctor_id', $doctor->id)
             ->value('calendar_days') ?? 30;
         $maxDate = $today->copy()->addDays($calendarDays);
@@ -348,7 +343,6 @@ class AppointmentsList extends Component
             return ['success' => false, 'message' => 'تاریخ مقصد خارج از بازه تقویم مجاز است.'];
         }
 
-        // بررسی تعطیلات
         $holidaysQuery = DoctorHoliday::where('doctor_id', $doctor->id)
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
@@ -358,7 +352,6 @@ class AppointmentsList extends Component
             return ['success' => false, 'message' => 'تاریخ مقصد تعطیل است.'];
         }
 
-        // بررسی ساعات کاری و ظرفیت
         $dayOfWeek = strtolower($newDateCarbon->format('l'));
         $workScheduleQuery = DoctorWorkSchedule::where('doctor_id', $doctor->id)
             ->where('day', $dayOfWeek)
@@ -371,7 +364,6 @@ class AppointmentsList extends Component
             return ['success' => false, 'message' => 'پزشک در این روز کاری ندارد.'];
         }
 
-        // بررسی برنامه ویژه روزانه
         $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctor->id)
             ->where('date', $newDate)
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
@@ -381,10 +373,8 @@ class AppointmentsList extends Component
         $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
         $appointmentSettings = json_decode($workSchedule->appointment_settings, true) ?? ['max_appointments' => 10, 'appointment_duration' => 15];
 
-        // محاسبه زمان‌های خالی
         $availableSlots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $newDate, $doctor->id);
 
-        // بررسی تعداد نوبت‌های درخواستی
         $requiredSlots = count($appointmentIds);
         $availableSlotsCount = count($availableSlots);
 
@@ -406,11 +396,10 @@ class AppointmentsList extends Component
         ];
     }
 
-    // محاسبه زمان‌های خالی
     private function calculateAvailableSlots($workHours, $appointmentSettings, $date, $doctorId)
     {
         $slots = [];
-        $duration = $appointmentSettings['appointment_duration'] ?? 15; // مدت زمان هر نوبت
+        $duration = $appointmentSettings['appointment_duration'] ?? 15;
         $existingAppointments = Appointment::where('doctor_id', $doctorId)
             ->where('appointment_date', $date)
             ->where('status', '!=', 'cancelled')
@@ -435,7 +424,6 @@ class AppointmentsList extends Component
         return $slots;
     }
 
-    // دریافت اولین تاریخ خالی پس از تاریخ مشخص
     private function getNextAvailableDateAfter($startDate)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -490,23 +478,20 @@ class AppointmentsList extends Component
         return null;
     }
 
-    // متد جابجایی تکی
     public function updateAppointmentDate($id)
     {
         $this->validate([
             'rescheduleNewDate' => 'required|date_format:Y-m-d',
         ]);
 
-        $appointmentIds = is_array($id) ? $id : [$id];
+        $appointmentIds = is_array($id) ? $id : (is_array($this->rescheduleAppointmentIds) && !empty($this->rescheduleAppointmentIds) ? $this->rescheduleAppointmentIds : [$id]);
         $newDate = Carbon::parse($this->rescheduleNewDate);
 
-        // بررسی شرایط
         $conditions = $this->checkRescheduleConditions($newDate->format('Y-m-d'), $appointmentIds);
         if (!$conditions['success']) {
             if (isset($conditions['partial']) && $conditions['partial']) {
-                // نمایش SweetAlert برای جابجایی جزئی
                 $nextDate = $conditions['next_available_date'];
-                $nextDateJalali = Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m/d');
+                $nextDateJalali = Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m uncertainties/d');
                 $message = $conditions['message'];
 
                 $this->dispatch('show-partial-reschedule-confirm', [
@@ -516,49 +501,22 @@ class AppointmentsList extends Component
                     'nextDate' => $nextDate,
                     'availableSlots' => $conditions['available_slots'],
                 ]);
+                $this->dispatch('showModal', 'reschedule-modal'); // باز نگه داشتن مودال
                 return;
             }
 
             $this->dispatch('show-toastr', type: 'error', message: $conditions['message']);
+            $this->dispatch('showModal', 'reschedule-modal'); // باز نگه داشتن مودال
             return;
         }
 
-        // جابجایی نوبت‌ها
         $this->processReschedule($appointmentIds, $newDate->format('Y-m-d'), $conditions['available_slots']);
         $this->dispatch('show-toastr', type: 'success', message: count($appointmentIds) > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.');
         $this->loadAppointments();
-        $this->dispatch('close-modal', id: 'rescheduleModal');
+        $this->dispatch('hideModal');
+        $this->reset(['rescheduleAppointmentIds', 'rescheduleNewDate']);
     }
 
-    // متد جابجایی گروهی با انتقال باقی‌مانده به تاریخ بعدی
-    #[On('confirm-partial-reschedule')]
-    public function confirmPartialReschedule($data)
-    {
-        $appointmentIds = $data['appointmentIds'];
-        $newDate = $data['newDate'];
-        $nextDate = $data['nextDate'];
-        $availableSlots = $data['availableSlots'];
-
-        // جابجایی نوبت‌های ممکن به تاریخ مقصد
-        $remainingIds = $this->processReschedule(array_slice($appointmentIds, 0, count($availableSlots)), $newDate, $availableSlots);
-
-        // جابجایی باقی‌مانده به تاریخ بعدی
-        if (!empty($remainingIds) && $nextDate) {
-            $nextConditions = $this->checkRescheduleConditions($nextDate, $remainingIds);
-            if ($nextConditions['success']) {
-                $this->processReschedule($remainingIds, $nextDate, $nextConditions['available_slots']);
-            } else {
-                $this->dispatch('show-toastr', type: 'error', message: 'امکان جابجایی باقی نوبت‌ها به تاریخ بعدی وجود ندارد.');
-                return;
-            }
-        }
-
-        $this->dispatch('show-toastr', type: 'success', message: 'نوبت‌ها با موفقیت جابجا شدند.');
-        $this->loadAppointments();
-        $this->dispatch('close-modal', id: 'rescheduleModal');
-    }
-
-    // متد پردازش جابجایی نوبت‌ها
     private function processReschedule($appointmentIds, $newDate, $availableSlots)
     {
         $doctor = $this->getAuthenticatedDoctor();
@@ -574,7 +532,6 @@ class AppointmentsList extends Component
             $oldDate = $appointment->appointment_date;
             $oldTime = $appointment->appointment_time;
 
-            // تخصیص زمان خالی
             $newTime = isset($availableSlots[$index]) ? $availableSlots[$index] : null;
             if (!$newTime) {
                 $remainingIds[] = $id;
@@ -585,7 +542,6 @@ class AppointmentsList extends Component
             $appointment->appointment_time = Carbon::createFromFormat('H:i', $newTime);
             $appointment->save();
 
-            // ارسال پیامک
             if ($appointment->patient && $appointment->patient->mobile) {
                 $oldDateJalali = Jalalian::fromDateTime($oldDate)->format('Y/m/d');
                 $newDateJalali = Jalalian::fromCarbon(Carbon::parse($newDate))->format('Y/m/d');
@@ -616,7 +572,7 @@ class AppointmentsList extends Component
 
         $this->dispatch('show-toastr', type: 'success', message: 'ویزیت با موفقیت ثبت شد.');
         $this->loadAppointments();
-        $this->dispatch('close-modal', id: 'endVisitModalCenter');
+        $this->dispatch('hideModal');
     }
 
     public function cancelSingleAppointment($id)
@@ -739,7 +695,7 @@ class AppointmentsList extends Component
                     'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/',
                 ],
                 'unblockedAt' => [
-                    'required',
+                    'nullable',
                     'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/',
                     'after:blockedAt',
                 ],
@@ -748,76 +704,88 @@ class AppointmentsList extends Component
                     'string',
                     'max:255',
                 ],
-            ], [
-                'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
-                'blockedAt.regex' => 'فرمت تاریخ شروع مسدودیت باید YYYY-MM-DD یا YYYY/MM/DD باشد.',
-                'unblockedAt.required' => 'لطفاً تاریخ پایان مسدودیت را وارد کنید.',
-                'unblockedAt.regex' => 'فرمت تاریخ پایان مسدودیت باید YYYY-MM-DD یا YYYY/MM/DD باشد.',
-                'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
-                'blockReason.required' => 'لطفاً دلیل مسدودیت را وارد کنید.',
-                'blockReason.string' => 'دلیل مسدودیت باید متنی باشد.',
-                'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
             ]);
 
-            $doctorId = $this->getAuthenticatedDoctor()->id;
-            $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
-            $appointment = Appointment::findOrFail($this->blockAppointmentId);
-            $user = $appointment->patient;
-
-            $isBlocked = UserBlocking::where('user_id', $user->id)
-                ->where('doctor_id', $doctorId)
-                ->where('clinic_id', $clinicId)
-                ->where('status', 1)
-                ->exists();
-
-            if ($isBlocked) {
-                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'این کاربر قبلاً در این کلینیک مسدود شده است.']);
+            if (empty($this->selectedMobiles)) {
+                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'کاربری برای مسدود کردن انتخاب نشده است.']);
+                $this->dispatch('showModal', 'block-user-modal');
                 return;
             }
 
-            UserBlocking::create([
-                'user_id' => $user->id,
-                'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
-                'blocked_at' => $this->processDate($this->blockedAt, 'شروع مسدودیت'),
-                'unblocked_at' => $this->processDate($this->unblockedAt, 'پایان مسدودیت'),
-                'reason' => $this->blockReason,
-                'status' => 1,
-            ]);
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+            $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
+            $unblockedAt = $this->unblockedAt ? $this->processDate($this->unblockedAt, 'پایان مسدودیت') : null;
+
+            $blockedUsers = [];
+            $alreadyBlocked = [];
+
+            foreach ($this->selectedMobiles as $mobile) {
+                $user = User::where('mobile', $mobile)->first();
+                if (!$user) {
+                    continue;
+                }
+
+                $isBlocked = UserBlocking::where('user_id', $user->id)
+                    ->where('doctor_id', $doctorId)
+                    ->where('clinic_id', $clinicId)
+                    ->where('status', 1)
+                    ->exists();
+
+                if ($isBlocked) {
+                    $alreadyBlocked[] = $mobile;
+                    continue;
+                }
+
+                $blockingUser = UserBlocking::create([
+                    'user_id' => $user->id,
+                    'doctor_id' => $doctorId,
+                    'clinic_id' => $clinicId,
+                    'blocked_at' => $blockedAt,
+                    'unblocked_at' => $unblockedAt,
+                    'reason' => $this->blockReason,
+                    'status' => 1,
+                ]);
+
+                $blockedUsers[] = $blockingUser;
+            }
+
+            if (empty($blockedUsers) && !empty($alreadyBlocked)) {
+                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'کاربر انتخاب‌شده قبلاً مسدود شده است.']);
+                $this->dispatch('showModal', 'block-user-modal');
+                return;
+            }
+
+            if (empty($blockedUsers)) {
+                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'کاربری برای مسدود کردن پیدا نشد.']);
+                $this->dispatch('showModal', 'block-user-modal');
+                return;
+            }
 
             $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'کاربر با موفقیت مسدود شد.']);
             $this->dispatch('hideModal');
             $this->loadBlockedUsers();
-            $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId']);
+            $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId', 'selectedMobiles']);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $firstError = collect($e->errors())->flatten()->first();
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => $firstError]);
+            $this->dispatch('showModal', 'block-user-modal');
         } catch (\Exception $e) {
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطایی رخ داد: ' . $e->getMessage()]);
+            $this->dispatch('showModal', 'block-user-modal');
         }
     }
 
-    #[On('block-multiple-users')]
-    public function blockMultipleUsers($data)
+    public function blockMultipleUsers()
     {
         try {
-            $mobiles = $data['selectedMobiles'] ?? [];
-            if (empty($mobiles)) {
-                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'هیچ کاربری برای مسدود کردن انتخاب نشده است.']);
-                return;
-            }
-
-            $this->blockedAt = $data['blockedAt'] ?? $this->blockedAt;
-            $this->unblockedAt = $data['unblockedAt'] ?? $this->unblockedAt;
-            $this->blockReason = $data['blockReason'] ?? $this->blockReason;
-
             $this->validate([
                 'blockedAt' => [
                     'required',
                     'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/',
                 ],
                 'unblockedAt' => [
-                    'required',
+                    'nullable',
                     'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/',
                     'after:blockedAt',
                 ],
@@ -826,26 +794,23 @@ class AppointmentsList extends Component
                     'string',
                     'max:255',
                 ],
-            ], [
-                'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
-                'blockedAt.regex' => 'فرمت تاریخ شروع مسدودیت باید YYYY-MM-DD یا YYYY/MM/DD باشد.',
-                'unblockedAt.required' => 'لطفاً تاریخ پایان مسدودیت را وارد کنید.',
-                'unblockedAt.regex' => 'فرمت تاریخ پایان مسدودیت باید YYYY-MM-DD یا YYYY/MM/DD باشد.',
-                'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع باشد.',
-                'blockReason.required' => 'لطفاً دلیل مسدودیت را وارد کنید.',
-                'blockReason.string' => 'دلیل مسدودیت باید متنی باشد.',
-                'blockReason.max' => 'دلیل مسدودیت نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
             ]);
+
+            if (empty($this->selectedMobiles)) {
+                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'هیچ کاربری برای مسدود کردن انتخاب نشده است.']);
+                $this->dispatch('showModal', 'block-user-modal');
+                return;
+            }
 
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
             $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
-            $unblockedAt = $this->processDate($this->unblockedAt, 'پایان مسدودیت');
+            $unblockedAt = $this->unblockedAt ? $this->processDate($this->unblockedAt, 'پایان مسدودیت') : null;
 
             $blockedUsers = [];
             $alreadyBlocked = [];
 
-            foreach ($mobiles as $mobile) {
+            foreach ($this->selectedMobiles as $mobile) {
                 $user = User::where('mobile', $mobile)->first();
                 if (!$user) {
                     continue;
@@ -877,23 +842,27 @@ class AppointmentsList extends Component
 
             if (empty($blockedUsers) && !empty($alreadyBlocked)) {
                 $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.']);
+                $this->dispatch('showModal', 'block-user-modal');
                 return;
             }
 
             if (empty($blockedUsers)) {
                 $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'هیچ کاربری برای مسدود کردن پیدا نشد.']);
+                $this->dispatch('showModal', 'block-user-modal');
                 return;
             }
 
             $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'کاربران با موفقیت مسدود شدند.']);
             $this->dispatch('hideModal');
             $this->loadBlockedUsers();
-            $this->reset(['blockedAt', 'unblockedAt', 'blockReason']);
+            $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'selectedMobiles']);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $firstError = collect($e->errors())->flatten()->first();
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => $firstError]);
+            $this->dispatch('showModal', 'block-user-modal');
         } catch (\Exception $e) {
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطایی رخ داد: ' . $e->getMessage()]);
+            $this->dispatch('showModal', 'block-user-modal');
         }
     }
 
@@ -1163,7 +1132,7 @@ class AppointmentsList extends Component
 
         return $workSchedule ? json_decode($workSchedule->work_hours, true) ?? [] : [];
     }
-  
+
     public function render()
     {
         return view('livewire.dr.panel.turn.schedule.appointments-list');

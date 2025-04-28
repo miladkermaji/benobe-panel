@@ -86,8 +86,6 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem;
-    background: var(--gradient-primary);
-    border-radius: var(--radius-card) var(--radius-card) 0 0;
   }
 
   .btn-nav {
