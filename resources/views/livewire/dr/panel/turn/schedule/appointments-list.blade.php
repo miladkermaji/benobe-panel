@@ -30,11 +30,12 @@
     <div>
       <div class="table-responsive position-relative top-table w-100">
         <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
-          23 <thead class="bg-light">
+           <thead class="bg-light">
             <tr>
               <th>
                 <input class="form-check-input" type="checkbox" id="select-all-row">
               </th>
+              <th scope="col" class="px-6 py-3 fw-bolder"> #</th>
               <th scope="col" class="px-6 py-3 fw-bolder">نام بیمار</th>
               <th scope="col" class="px-6 py-3 fw-bolder">شماره‌ موبایل</th>
               <th scope="col" class="px-6 py-3 fw-bolder">کد ملی</th>
@@ -55,6 +56,9 @@
                     <input type="checkbox" class="appointment-checkbox form-check-input" value="{{ $appointment->id }}"
                       data-status="{{ $appointment->status }}" data-mobile="{{ $appointment->patient->mobile ?? '' }}"
                       wire:model="cancelIds.{{ $appointment->id }}">
+                  </td>
+                  <td>
+                   {{ $loop->iteration }}
                   </td>
                   <td class="fw-bold">
                     {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
