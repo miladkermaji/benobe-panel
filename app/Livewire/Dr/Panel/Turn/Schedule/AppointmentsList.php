@@ -564,7 +564,7 @@ class AppointmentsList extends Component
             'endVisitDescription' => 'nullable|string|max:1000',
         ]);
 
-        $appointment = Appointment::where('id', $appointmentId)
+        $appointment = Appointment::where('id', $id)
             ->where('doctor_id', $this->doctor_id)
             ->whereNotIn('status', ['cancelled', 'attended'])
             ->first();
