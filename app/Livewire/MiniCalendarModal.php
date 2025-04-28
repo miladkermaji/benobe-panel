@@ -10,6 +10,7 @@ class MiniCalendarModal extends Component
     {
         return view('livewire.mini-calendar-modal');
     }
+    
 
     public function hideModal()
     {

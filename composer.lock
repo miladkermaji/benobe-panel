@@ -4,62 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "559b6227f8776d40c7fc2435f8933d38",
+    "content-hash": "8b29c0040957603fd5a10db3d2eaa7ad",
     "packages": [
-        {
-            "name": "aliqasemzadeh/livewire-bootstrap-modal",
-            "version": "v2.3.0",
-            "dist": {
-                "type": "zip",
-                "url": "https://mirrors.cloud.tencent.com/repository/composer/aliqasemzadeh/livewire-bootstrap-modal/v2.3.0/aliqasemzadeh-livewire-bootstrap-modal-v2.3.0.zip",
-                "reference": "17f35f110402765e00f35b9a1f4e0e013e42fa25",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "^8.0|^9.0|^10.0|^11.0|^12.0",
-                "livewire/livewire": "^3.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "AliQasemzadeh\\LaravelLivewireModals\\Providers\\LaravelLivewireModalsProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "AliQasemzadeh\\LaravelLivewireModals\\": "src"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kevin Dion",
-                    "email": "bastinald@icloud.com",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Ali Qasemzadeh",
-                    "email": "aliqasemzadeh7@gmail.com",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Lungdsuo Mozhui",
-                    "email": "mozhui.lungdsuo@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Dynamic Laravel Livewire 3 Bootstrap modals.",
-            "homepage": "https://github.com/aliqasemzadeh/livewire-bootstrap-modal",
-            "support": {
-                "issues": "https://github.com/aliqasemzadeh/livewire-bootstrap-modal/issues",
-                "source": "https://github.com/aliqasemzadeh/livewire-bootstrap-modal/tree/v2.3.0"
-            },
-            "time": "2025-02-28T06:11:45+00:00"
-        },
         {
             "name": "bacon/bacon-qr-code",
             "version": "v3.0.1",

@@ -1163,7 +1163,7 @@ class AppointmentsList extends Component
 
         return $workSchedule ? json_decode($workSchedule->work_hours, true) ?? [] : [];
     }
-
+  
     public function render()
     {
         return view('livewire.dr.panel.turn.schedule.appointments-list');

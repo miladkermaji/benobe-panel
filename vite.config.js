@@ -9,7 +9,6 @@ export default defineConfig({
             input: [
                 "resources/css/app.css",
                 "resources/js/app.js",
-                "vendor/aliqasemzadeh/livewire-bootstrap-modal/resources/js/modals.js",
             ],
             refresh: ["resources/views/**/*"],
         }),
