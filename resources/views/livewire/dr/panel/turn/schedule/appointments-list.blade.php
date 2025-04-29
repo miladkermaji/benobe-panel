@@ -4,14 +4,7 @@
 @endphp
 
 <div class="d-flex justify-content-center top-s-wrapper flex-wrap">
-  <x-custom-alert 
-    id="my-alert" 
-    type="success" 
-    title="موفقیت!" 
-    message="عملیات با موفقیت انجام شد." 
-    size="md" 
-    :show="true"
-/>
+  
     <div class="calendar-and-add-sick-section p-3 w-100">
         <div class="calendar-and-add-sick-section">
             <div class="c-a-wrapper">
