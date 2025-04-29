@@ -65,6 +65,10 @@ $(document).ready(function () {
     Livewire.on("appointments-cancelled", (event) => {
         fetchAppointmentsCount();
     });
+     Livewire.on("appointments-rescheduled", (event) => {
+         fetchAppointmentsCount();
+     });
+    
 
     function fetchAppointmentsCount() {
         if (!calendar.length) {

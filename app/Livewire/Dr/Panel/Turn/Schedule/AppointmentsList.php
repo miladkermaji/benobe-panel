@@ -23,6 +23,7 @@ use App\Jobs\SendSmsNotificationJob;
 use App\Models\SpecialDailySchedule;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DoctorAppointmentConfig;
+use Illuminate\Support\Facades\Validator;
 
 class AppointmentsList extends Component
 {
@@ -91,8 +92,13 @@ class AppointmentsList extends Component
       'blockUser' => 'handleBlockUser',
       'blockMultipleUsers' => 'handleBlockMultipleUsers',
       'confirm-partial-reschedule' => 'confirmPartialReschedule',
+      'rescheduleAppointment' => 'handleRescheduleAppointment',
       'setSelectedClinicId' => 'setSelectedClinicId', // اضافه شده
 ];
+    public function handleRescheduleAppointment($ids, $newDate)
+    {
+        $this->updateAppointmentDate($ids, $newDate);
+    }
 
     public function initialize()
     {
@@ -478,43 +484,81 @@ class AppointmentsList extends Component
         return null;
     }
 
-    public function updateAppointmentDate($id)
+    public function updateAppointmentDate($ids, $newDate)
     {
-        $this->validate([
-            'rescheduleNewDate' => 'required|date_format:Y-m-d',
-        ]);
+        try {
 
-        $appointmentIds = is_array($id) ? $id : (is_array($this->rescheduleAppointmentIds) && !empty($this->rescheduleAppointmentIds) ? $this->rescheduleAppointmentIds : [$id]);
-        $newDate = Carbon::parse($this->rescheduleNewDate);
-
-        $conditions = $this->checkRescheduleConditions($newDate->format('Y-m-d'), $appointmentIds);
-        if (!$conditions['success']) {
-            if (isset($conditions['partial']) && $conditions['partial']) {
-                $nextDate = $conditions['next_available_date'];
-                $nextDateJalali = Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m uncertainties/d');
-                $message = $conditions['message'];
-
-                $this->dispatch('show-partial-reschedule-confirm', [
-                    'message' => $message,
-                    'appointmentIds' => $appointmentIds,
-                    'newDate' => $newDate->format('Y-m-d'),
-                    'nextDate' => $nextDate,
-                    'availableSlots' => $conditions['available_slots'],
-                ]);
-                $this->dispatch('showModal', 'reschedule-modal'); // باز نگه داشتن مودال
+            // چک کردن ورودی‌ها
+            $appointmentIds = is_array($ids) ? $ids : [$ids];
+            if (empty($appointmentIds)) {
+               
                 return;
             }
 
-            $this->dispatch('show-toastr', type: 'error', message: $conditions['message']);
-            $this->dispatch('showModal', 'reschedule-modal'); // باز نگه داشتن مودال
-            return;
-        }
+            $newDateCarbon = Carbon::parse($newDate);
 
-        $this->processReschedule($appointmentIds, $newDate->format('Y-m-d'), $conditions['available_slots']);
-        $this->dispatch('show-toastr', type: 'success', message: count($appointmentIds) > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.');
-        $this->loadAppointments();
-        $this->dispatch('hideModal');
-        $this->reset(['rescheduleAppointmentIds', 'rescheduleNewDate']);
+            // اعتبارسنجی تاریخ
+            $validator = Validator::make(['newDate' => $newDate], [
+                'newDate' => 'required|date_format:Y-m-d',
+            ]);
+            if ($validator->fails()) {
+                $this->dispatch('show-toastr', ['type' => 'error', 'message' => $validator->errors()->first()]);
+                return;
+            }
+
+            // چک کردن شرایط جابجایی
+            $conditions = $this->checkRescheduleConditions($newDate, $appointmentIds);
+
+            if (!$conditions['success']) {
+                if (isset($conditions['partial']) && $conditions['partial']) {
+                    $nextDate = $conditions['next_available_date'];
+                    $nextDateJalali = Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m/d');
+                    $message = $conditions['message'];
+
+                 
+
+                    $this->dispatch('show-partial-reschedule-confirm', [
+                        'message' => $message,
+                        'appointmentIds' => $appointmentIds,
+                        'newDate' => $newDate,
+                        'nextDate' => $nextDate,
+                        'availableSlots' => $conditions['available_slots'],
+                    ]);
+                    $this->dispatch('showModal', 'reschedule-modal');
+                    return;
+                }
+
+                $this->dispatch('show-toastr', ['type' => 'error', 'message' => $conditions['message']]);
+                $this->dispatch('showModal', 'reschedule-modal');
+                return;
+            }
+
+            // جابجایی نوبت‌ها
+            $remainingIds = $this->processReschedule($appointmentIds, $newDate, $conditions['available_slots']);
+
+            if (!empty($remainingIds)) {
+                $this->dispatch('show-toastr', [
+                    'type' => 'warning',
+                    'message' => 'برخی نوبت‌ها به دلیل عدم وجود اسلات خالی جابجا نشدند.'
+                ]);
+            } else {
+                $this->dispatch('show-toastr', [
+                    'type' => 'success',
+                    'message' => count($appointmentIds) > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.'
+                ]);
+
+                $this->dispatch('appointments-rescheduled', [
+                              'message' => count($appointmentIds) > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.'
+                          ]);
+
+            }
+
+            $this->loadAppointments();
+            $this->dispatch('hideModal');
+            $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
+        } catch (\Exception $e) {
+            $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطایی در جابجایی نوبت رخ داد: ' . $e->getMessage()]);
+        }
     }
 
     private function processReschedule($appointmentIds, $newDate, $availableSlots)
