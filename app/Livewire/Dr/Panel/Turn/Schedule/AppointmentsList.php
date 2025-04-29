@@ -367,7 +367,7 @@ class AppointmentsList extends Component
         $workSchedule = $workScheduleQuery->first();
 
         if (!$workSchedule) {
-            return ['success' => false, 'message' => 'پزشک در این روز کاری ندارد.'];
+            return ['success' => false, 'message' => 'پزشک در این روز ساعات کاری ندارد.'];
         }
 
         $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctor->id)
