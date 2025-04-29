@@ -250,7 +250,9 @@
 
   <div>
     <div wire:ignore>
+
       <x-custom-modal id="reschedule-modal" title="جابجایی نوبت" size="lg" :show="false">
+
         <x-reschedule-calendar :appointmentId="$rescheduleAppointmentIds ? $rescheduleAppointmentIds : [$rescheduleAppointmentId]" />
         <x-custom-alert id="reschedule-confirm-alert" type="warning" title="تأیید جابجایی نوبت" message=""
           size="md" :show="false" />
@@ -303,6 +305,8 @@
 
   <script>
     document.addEventListener('livewire:initialized', () => {
+      window.holidays = @json($this->getHolidays());
+      window.apointments = @json($this->loadAppointments());
       window.addEventListener('openXModal', event => {
         const modalId = event.detail.id;
         const appointmentId = event.detail.appointmentId || null;
