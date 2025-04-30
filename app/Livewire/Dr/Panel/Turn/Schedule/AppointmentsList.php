@@ -119,8 +119,7 @@ class AppointmentsList extends Component
         $this->loadBlockedUsers();
         $this->loadMessages();
         $this->getHolidays();
-        Log::info("Initial holidays:", ['holidays' => $this->getHolidays()]);
-        Log::info("Initial appointments:", ['appointments' => $this->loadAppointments()]);
+
 
     }
 

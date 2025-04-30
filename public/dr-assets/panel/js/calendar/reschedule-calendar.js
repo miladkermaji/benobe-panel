@@ -1,9 +1,7 @@
+
+
 // تابع برای بررسی وجود المنت
-function ensureRescheduleElementExists(
-    selector,
-    errorMessage,
-    scope = document
-) {
+function ensureRescheduleElementExists(selector, errorMessage, scope = document) {
     const element = scope.querySelector(selector);
     if (!element) {
         console.warn(errorMessage);
@@ -43,17 +41,16 @@ function initializeRescheduleCalendar() {
     // اطمینان از وجود متغیرهای سراسری
     window.selectedAppointmentDates = window.selectedAppointmentDates || [];
     window.selectedAppointmentIds = window.selectedAppointmentIds || [];
-    window.selectedSingleAppointmentId =
-        window.selectedSingleAppointmentId || null;
+    window.selectedSingleAppointmentId = window.selectedSingleAppointmentId || null;
+    window.holidays = window.holidays || [];
+
+    // لاگ‌گیری مقدار selectedClinicId
+    const clinicId = localStorage.getItem("selectedClinicId") || "default";
 
     // تابع جمع‌آوری اطلاعات نوبت‌های انتخاب‌شده
     function collectSelectedAppointments() {
-        const selectedCheckboxes = document.querySelectorAll(
-            ".appointment-checkbox:checked"
-        );
-        const selectedIds = Array.from(selectedCheckboxes).map((cb) =>
-            parseInt(cb.value)
-        );
+        const selectedCheckboxes = document.querySelectorAll(".appointment-checkbox:checked");
+        const selectedIds = Array.from(selectedCheckboxes).map((cb) => parseInt(cb.value));
         const selectedDates = Array.from(selectedCheckboxes).map((cb) => {
             const row = cb.closest("tr");
             const dateCell = row ? row.querySelector("td:nth-child(5)") : null;
@@ -69,12 +66,8 @@ function initializeRescheduleCalendar() {
             );
             if (checkbox) {
                 const row = checkbox.closest("tr");
-                const dateCell = row
-                    ? row.querySelector("td:nth-child(5)")
-                    : null;
-                window.selectedAppointmentIds = [
-                    window.selectedSingleAppointmentId,
-                ];
+                const dateCell = row ? row.querySelector("td:nth-child(5)") : null;
+                window.selectedAppointmentIds = [window.selectedSingleAppointmentId];
                 window.selectedAppointmentDates = [
                     dateCell ? dateCell.textContent.trim() : "",
                 ];
@@ -92,38 +85,51 @@ function initializeRescheduleCalendar() {
         });
     }
 
+    // تابع دریافت تعطیلات از مسیر AJAX
+    function loadHolidayStyles(year, month) {
+        return new Promise((resolve, reject) => {
+            const clinicId = localStorage.getItem("selectedClinicId") || "default";
+            if (clinicId === "default") {
+                console.warn("selectedClinicId is default, returning empty holidays");
+                resolve([]);
+                return;
+            }
+
+            $.ajax({
+                url: getHolidaysUrl,
+                method: "GET",
+                data: {
+                    selectedClinicId: clinicId,
+                    year: year,
+                    month: month,
+                },
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                success: function (response) {
+                    if (response.status && response.holidays) {
+                        console.debug("Holidays fetched:", response.holidays);
+                        window.holidays = response.holidays;
+                        resolve(response.holidays);
+                    } else {
+                        console.warn("No holidays found in response:", response);
+                        resolve([]);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching holidays:", status, error, xhr.responseText);
+                    resolve([]);
+                },
+            });
+        });
+    }
+
     async function fetchCalendarData(year, month) {
         try {
-            console.log(
-                "Fetching calendar data for year:",
-                year,
-                "month:",
-                month
-            );
+            console.debug("Fetching calendar data for year:", year, "month:", month);
 
-            // دریافت داده‌های تعطیلات
-            let holidays = window.holidays || [];
-            if (
-                typeof Livewire !== "undefined" &&
-                typeof Livewire.dispatch === "function"
-            ) {
-                console.log("Updating Livewire properties...");
-                await Promise.all([
-                    Livewire.dispatch("set", {
-                        component: "dr.panel.turn.schedule.appointments-list",
-                        property: "calendarYear",
-                        value: year,
-                    }),
-                    Livewire.dispatch("set", {
-                        component: "dr.panel.turn.schedule.appointments-list",
-                        property: "calendarMonth",
-                        value: month,
-                    }),
-                ]);
-                holidays = window.holidays || holidays;
-            } else {
-                console.warn("Livewire.dispatch is not available");
-            }
+            // دریافت تعطیلات
+            const holidays = await loadHolidayStyles(year, month);
 
             // دریافت داده‌های نوبت‌ها از AJAX
             if (!appointmentsCountUrl) {
@@ -138,53 +144,33 @@ function initializeRescheduleCalendar() {
                     url: appointmentsCountUrl,
                     method: "GET",
                     data: {
-                        selectedClinicId:
-                            localStorage.getItem("selectedClinicId"),
+                        selectedClinicId: localStorage.getItem("selectedClinicId"),
                         year: year,
                         month: month,
                     },
                     headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                            "content"
-                        ),
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     success: function (response) {
                         if (response.status) {
-                            const formattedAppointments = (
-                                response.data || []
-                            ).map((item) => ({
+                            const formattedAppointments = (response.data || []).map((item) => ({
                                 date: item.appointment_date,
                                 count: item.appointment_count,
                             }));
-                            console.log(
-                                "Appointments data fetched:",
-                                formattedAppointments
-                            );
+                            console.debug("Appointments data fetched:", formattedAppointments);
                             resolve(formattedAppointments);
                         } else {
-                            console.error(
-                                "Error fetching appointments:",
-                                response.message
-                            );
+                            console.error("Error fetching appointments:", response.message);
                             resolve([]);
                         }
                     },
                     error: function (xhr, status, error) {
-                        console.error(
-                            "AJAX Error:",
-                            status,
-                            error,
-                            xhr.responseText
-                        );
+                        console.error("AJAX Error:", status, error, xhr.responseText);
                         resolve([]);
-                    },
-                    complete: function () {
-                        // لودینگ در generateCalendar مدیریت می‌شود
                     },
                 });
             });
 
-            console.log("Returning calendar data:", { holidays, appointments });
             return { holidays, appointments };
         } catch (error) {
             console.error("Error in fetchCalendarData:", error);
@@ -194,7 +180,6 @@ function initializeRescheduleCalendar() {
         }
     }
 
-    // تابع تولید تقویم
     async function generateCalendar(year, month) {
         if (!calendarBody) {
             console.error("Cannot generate calendar: Calendar body is missing");
@@ -203,10 +188,7 @@ function initializeRescheduleCalendar() {
         }
 
         calendarBody.innerHTML = "";
-        const firstDayOfMonth = moment(
-            `${year}/${month}/01`,
-            "jYYYY/jMM/jDD"
-        ).locale("fa");
+        const firstDayOfMonth = moment(`${year}/${month}/01`, "jYYYY/jMM/jDD").locale("fa");
         const daysInMonth = firstDayOfMonth.jDaysInMonth();
         let firstDayWeekday = firstDayOfMonth.weekday();
         const today = moment().locale("fa");
@@ -249,17 +231,12 @@ function initializeRescheduleCalendar() {
             }
 
             // بررسی نوبت‌ها
-            const appointmentData = appointments.find(
-                (appt) => appt.date === gregorianString
-            );
-            const appointmentCount = appointmentData
-                ? appointmentData.count
-                : 0;
+            const appointmentData = appointments.find((appt) => appt.date === gregorianString);
+            const appointmentCount = appointmentData ? appointmentData.count : 0;
             if (appointmentCount > 0) {
                 dayElement.classList.add("has-appointment");
             }
 
-            // ایجاد محتوای روز با تولتیپ
             const spanElement = document.createElement("span");
             spanElement.textContent = currentDay.format("jD");
 
@@ -271,10 +248,7 @@ function initializeRescheduleCalendar() {
             if (tooltipContent) {
                 const tooltipWrapper = document.createElement("div");
                 tooltipWrapper.setAttribute("x-tooltip", "");
-                tooltipWrapper.setAttribute(
-                    "id",
-                    `tooltip-day-${gregorianString}`
-                );
+                tooltipWrapper.setAttribute("id", `tooltip-day-${gregorianString}`);
                 tooltipWrapper.setAttribute("data-trigger", "hover");
                 tooltipWrapper.setAttribute("data-placement", "top");
                 tooltipWrapper.classList.add("x-tooltip");
@@ -303,73 +277,48 @@ function initializeRescheduleCalendar() {
             }
 
             dayElement.addEventListener("click", function () {
-                document
-                    .querySelectorAll(".calendar-day")
-                    .forEach((el) => el.classList.remove("selected"));
+                document.querySelectorAll(".calendar-day").forEach((el) => el.classList.remove("selected"));
                 this.classList.add("selected");
 
-                const selectedGregorianDate =
-                    this.getAttribute("data-gregorian");
+                const selectedGregorianDate = this.getAttribute("data-gregorian");
                 const selectedJalaliDate = formattedJalaliDate;
 
-                // جمع‌آوری اطلاعات نوبت‌ها
                 collectSelectedAppointments();
 
-                // بررسی وجود نوبت‌های انتخاب‌شده
                 if (window.selectedAppointmentDates.length === 0) {
-                    const errorAlert = document.getElementById(
-                        "reschedule-error-alert"
-                    );
+                    const errorAlert = document.getElementById("reschedule-error-alert");
                     if (errorAlert) {
-                        console.debug(
-                            "No appointments selected, showing error alert"
-                        );
+                        console.debug("No appointments selected, showing error alert");
                         window.openXAlert("reschedule-error-alert");
                     } else {
-                        console.error(
-                            "Error alert element 'reschedule-error-alert' not found"
-                        );
+                        console.error("Error alert element 'reschedule-error-alert' not found");
                     }
                     return;
                 }
 
-                // ساخت پیام تأیید با تاریخ قبلی
                 const oldDate = window.selectedAppointmentDates[0];
-                const formattedOldDate = moment(oldDate, "jYYYY/jMM/jDD")
-                    .locale("fa")
-                    .format("jD jMMMM jYYYY");
+                const formattedOldDate = moment(oldDate, "jYYYY/jMM/jDD").locale("fa").format("jD jMMMM jYYYY");
                 const message = `آیا می‌خواهید نوبت‌ها از تاریخ ${formattedOldDate} به تاریخ ${selectedJalaliDate} منتقل شوند؟`;
 
-                // به‌روزرسانی پیام در الرت
-                const alertElement = document.getElementById(
-                    "reschedule-confirm-alert"
-                );
+                const alertElement = document.getElementById("reschedule-confirm-alert");
                 if (alertElement) {
-                    let messageElement =
-                        alertElement.querySelector(".x-alert__message");
+                    let messageElement = alertElement.querySelector(".x-alert__message");
                     if (!messageElement) {
-                        console.warn(
-                            "Alert message element '.x-alert__message' not found, creating one"
-                        );
+                        console.warn("Alert message element '.x-alert__message' not found, creating one");
                         messageElement = document.createElement("p");
                         messageElement.classList.add("x-alert__message");
-                        const bodyElement =
-                            alertElement.querySelector(".x-alert__body") ||
-                            alertElement;
+                        const bodyElement = alertElement.querySelector(".x-alert__body") || alertElement;
                         bodyElement.appendChild(messageElement);
                     }
                     messageElement.textContent = message;
                     console.debug("Alert message set to:", message);
 
-                    // به‌روزرسانی عنوان الرت
-                    const titleElement =
-                        alertElement.querySelector(".x-alert__title");
+                    const titleElement = alertElement.querySelector(".x-alert__title");
                     if (titleElement) {
                         titleElement.textContent = "تأیید جابجایی نوبت";
                         console.debug("Alert title set to: تأیید جابجایی نوبت");
                     }
 
-                    // پاک کردن محتوای اسلات اضافی
                     const slotContent = alertElement.querySelector(
                         ".x-alert__body > :not(.x-alert__title):not(.x-alert__message)"
                     );
@@ -378,54 +327,35 @@ function initializeRescheduleCalendar() {
                         console.debug("Removed extra slot content from alert");
                     }
 
-                    // تنظیم عملکرد دکمه تأیید
-                    const confirmButton = alertElement.querySelector(
-                        ".x-alert__button--confirm"
-                    );
+                    const confirmButton = alertElement.querySelector(".x-alert__button--confirm");
                     if (confirmButton) {
                         const newConfirmButton = confirmButton.cloneNode(true);
-                        confirmButton.parentNode.replaceChild(
-                            newConfirmButton,
-                            confirmButton
-                        );
+                        confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
 
                         newConfirmButton.addEventListener("click", function () {
                             if (window.selectedAppointmentIds.length === 0) {
-                                const errorAlert = document.getElementById(
-                                    "reschedule-error-alert"
-                                );
+                                const errorAlert = document.getElementById("reschedule-error-alert");
                                 if (errorAlert) {
                                     window.openXAlert("reschedule-error-alert");
                                 }
                                 return;
                             }
 
-                            console.debug(
-                                "Calling Livewire updateAppointmentDate:",
-                                {
-                                    component:
-                                        "dr.panel.turn.schedule.appointments-list",
-                                    method: "updateAppointmentDate",
-                                    params: [
-                                        window.selectedAppointmentIds,
-                                        selectedGregorianDate,
-                                    ],
-                                }
-                            );
+                            console.debug("Calling Livewire updateAppointmentDate:", {
+                                component: "dr.panel.turn.schedule.appointments-list",
+                                method: "updateAppointmentDate",
+                                params: [window.selectedAppointmentIds, selectedGregorianDate],
+                            });
 
-                            // فراخوانی مستقیم به کامپوننت
+                            // بازگرداندن منطق جابجایی از کد قدیمی
                             Livewire.dispatchTo(
                                 "dr.panel.turn.schedule.appointments-list",
                                 "call",
                                 {
                                     method: "updateAppointmentDate",
-                                    params: [
-                                        window.selectedAppointmentIds,
-                                        selectedGregorianDate,
-                                    ],
+                                    params: [window.selectedAppointmentIds, selectedGregorianDate],
                                 }
                             );
-                            // اضافه کردن رویداد rescheduleAppointment
                             Livewire.dispatch("rescheduleAppointment", [
                                 window.selectedAppointmentIds,
                                 selectedGregorianDate,
@@ -435,16 +365,12 @@ function initializeRescheduleCalendar() {
                             window.closeXModal("reschedule-modal");
                         });
                     } else {
-                        console.error(
-                            "Confirm button '.x-alert__button--confirm' not found"
-                        );
+                        console.error("Confirm button '.x-alert__button--confirm' not found");
                     }
 
                     window.openXAlert("reschedule-confirm-alert");
                 } else {
-                    console.error(
-                        "Alert element 'reschedule-confirm-alert' not found"
-                    );
+                    console.error("Alert element 'reschedule-confirm-alert' not found");
                 }
             });
 
@@ -452,7 +378,6 @@ function initializeRescheduleCalendar() {
         }
     }
 
-    // تابع پر کردن سلکت‌باکس‌ها
     function populateSelectBoxes() {
         const yearSelect = ensureRescheduleElementExists(
             "#reschedule-year",
@@ -506,23 +431,16 @@ function initializeRescheduleCalendar() {
         yearSelect.addEventListener("change", () => {
             if (loadingOverlay) loadingOverlay.style.display = "flex";
             if (calendarBody) calendarBody.style.display = "none";
-            generateCalendar(
-                parseInt(yearSelect.value),
-                parseInt(monthSelect.value)
-            );
+            generateCalendar(parseInt(yearSelect.value), parseInt(monthSelect.value));
         });
 
         monthSelect.addEventListener("change", () => {
             if (loadingOverlay) loadingOverlay.style.display = "flex";
             if (calendarBody) calendarBody.style.display = "none";
-            generateCalendar(
-                parseInt(yearSelect.value),
-                parseInt(monthSelect.value)
-            );
+            generateCalendar(parseInt(yearSelect.value), parseInt(monthSelect.value));
         });
     }
 
-    // مدیریت دکمه‌های قبلی و بعدی
     const prevMonthBtn = ensureRescheduleElementExists(
         "#reschedule-prev-month",
         "Prev month button not found",
@@ -575,24 +493,35 @@ function initializeRescheduleCalendar() {
         });
     }
 
-    // جمع‌آوری اولیه نوبت‌ها
     collectSelectedAppointments();
-
     populateSelectBoxes();
 
-    // تولید تقویم با تأخیر کوچک برای اطمینان از آماده بودن DOM
     setTimeout(() => {
         generateCalendar(moment().jYear(), moment().jMonth() + 1);
     }, 0);
 }
 
-// اجرای تقویم وقتی مودال باز می‌شود
+// مدیریت رویدادهای مودال
 document.addEventListener("livewire:initialized", () => {
+    window.holidays = window.holidays || [];
+    console.debug("Livewire initialized, window.holidays initialized as:", window.holidays);
+
+    const clinicId = localStorage.getItem("selectedClinicId") || "default";
+    console.debug("Livewire initialized, setting selectedClinicId:", clinicId);
+    if (clinicId !== "default") {
+        Livewire.dispatch("setSelectedClinicId", { clinicId });
+    }
+
     window.addEventListener("openXModal", (event) => {
         const modalId = event.detail.id;
         const appointmentId = event.detail.appointmentId || null;
 
         if (modalId === "reschedule-modal") {
+            const clinicId = localStorage.getItem("selectedClinicId") || "default";
+            console.debug("openXModal: Setting selectedClinicId:", clinicId);
+            if (clinicId !== "default") {
+                Livewire.dispatch("setSelectedClinicId", { clinicId });
+            }
             window.selectedSingleAppointmentId = appointmentId;
             initializeRescheduleCalendar();
         }
@@ -600,6 +529,11 @@ document.addEventListener("livewire:initialized", () => {
 
     window.addEventListener("showModal", (event) => {
         if (event.detail === "reschedule-modal") {
+            const clinicId = localStorage.getItem("selectedClinicId") || "default";
+            console.debug("showModal: Setting selectedClinicId:", clinicId);
+            if (clinicId !== "default") {
+                Livewire.dispatch("setSelectedClinicId", { clinicId });
+            }
             window.selectedSingleAppointmentId = null;
             initializeRescheduleCalendar();
         }

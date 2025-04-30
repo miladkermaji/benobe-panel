@@ -50,7 +50,7 @@
     </div>
     <div class="legend-item">
       <span class="legend-color appointment"></span>
-      <span class="legend-text">نوبت‌های رزروشده</span>
+      <span class="legend-text"> دارای نوبت</span>
     </div>
     <div class="legend-item">
       <span class="legend-color holiday"></span>
@@ -60,12 +60,12 @@
 </div>
 
 <style>
- :root {
+:root {
   --primary: #2E86C1;
   --primary-light: #84CAF9;
   --secondary: #1DEB3C;
   --secondary-hover: #15802A;
-  --background-light: #F EightyEightF;
+  --background-light: #F8F8F8;
   --background-card: #FFFFFF;
   --text-primary: #000000;
   --text-secondary: #707070;
@@ -74,6 +74,9 @@
   --gradient-primary: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
   --radius-button: 8px;
   --radius-card: 12px;
+  --appointment-bg: #f0fff4; /* سبز کم‌رنگ برای پس‌زمینه */
+  --appointment-border: #48bb78; /* سبز برای بوردر */
+  --appointment-dot: #6ee7b7; /* رنگ نقطه سبز */
 }
 
 #loading-overlay {
@@ -273,6 +276,8 @@
 }
 
 .reschedule-calendar-container .calendar-day.has-appointment {
+  background: var(--appointment-bg); /* پس‌زمینه سبز کم‌رنگ برای روزهای غیر امروز */
+  border-color: var(--appointment-border); /* بوردر سبز */
   position: relative;
 }
 
@@ -283,7 +288,7 @@
   right: 5px;
   width: 6px;
   height: 6px;
-  background: #6ee7b7;
+  background: var(--appointment-dot); /* نقطه سبز */
   border-radius: 50%;
   z-index: 1;
 }
@@ -304,6 +309,19 @@
   background: #f56565;
   border-radius: 50%;
   z-index: 1;
+}
+
+/* استایل خاص برای روز جاری که دارای نوبت است */
+.reschedule-calendar-container .calendar-day.today.has-appointment {
+  background: var(--gradient-primary); /* حفظ گرادیانت آبی */
+  border-color: var(--appointment-border); /* بوردر سبز */
+  color: var(--background-card);
+}
+
+/* اولویت‌دهی به استایل selected */
+.reschedule-calendar-container .calendar-day.selected.has-appointment {
+  background: var(--secondary); /* سبز پررنگ برای انتخاب */
+  border-color: var(--secondary);
 }
 
 /* استایل‌های لجند */
@@ -332,8 +350,8 @@
 }
 
 .reschedule-calendar-container .legend-color.appointment {
-  background: #.preface;
-  border: 1px solid #6ee7b7;
+  background: var(--appointment-bg);
+  border: 1px solid var(--appointment-border);
 }
 
 .reschedule-calendar-container .legend-color.holiday {
