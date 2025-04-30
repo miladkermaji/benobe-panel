@@ -28,7 +28,10 @@ use Illuminate\Support\Facades\Validator;
 class AppointmentsList extends Component
 {
     use WithPagination;
-
+    public $calendarYear;
+    public $calendarMonth;
+    public $holidaysData = ['status' => true, 'holidays' => []];
+    public $appointmentsData = ['status' => true, 'data' => [], 'working_days' => [], 'calendar_days' => 30, 'appointment_settings' => []];
     public $cancelIds = [];
     public $selectedDate;
     public $selectedClinicId = 'default';
@@ -86,15 +89,16 @@ class AppointmentsList extends Component
     public $blockAppointmentId;
 
     protected $listeners = [
-      'updateSelectedDate' => 'updateSelectedDate',
-      'searchAllDates' => 'searchAllDates',
-      'cancelAppointments' => 'cancelAppointments',
-      'blockUser' => 'handleBlockUser',
-      'blockMultipleUsers' => 'handleBlockMultipleUsers',
-      'confirm-partial-reschedule' => 'confirmPartialReschedule',
-      'rescheduleAppointment' => 'handleRescheduleAppointment',
-      'setSelectedClinicId' => 'setSelectedClinicId', // اضافه شده
-];
+        'updateSelectedDate' => 'updateSelectedDate',
+        'searchAllDates' => 'searchAllDates',
+        'cancelAppointments' => 'cancelAppointments',
+        'blockUser' => 'handleBlockUser',
+        'blockMultipleUsers' => 'handleBlockMultipleUsers',
+        'confirm-partial-reschedule' => 'confirmPartialReschedule',
+        'rescheduleAppointment' => 'handleRescheduleAppointment',
+        'setSelectedClinicId' => 'setSelectedClinicId',
+        'setCalendarDate' => 'setCalendarDate', // اضافه شده
+    ];
     public function handleRescheduleAppointment($ids, $newDate)
     {
         $this->updateAppointmentDate($ids, $newDate);
@@ -109,18 +113,148 @@ class AppointmentsList extends Component
     {
         $this->selectedDate = Carbon::now()->format('Y-m-d');
         $this->blockedAt = Jalalian::now()->format('Y/m/d');
+
+        // مقداردهی اولیه calendarYear و calendarMonth
+        $this->calendarYear = Jalalian::now()->getYear();
+        $this->calendarMonth = Jalalian::now()->getMonth();
+
         $doctor = $this->getAuthenticatedDoctor();
-        $this->selectedClinicId = request()->query('selectedClinicId', 'default');
+
+        // تنظیم clinicId از درخواست یا session
+        $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1')); // پیش‌فرض به 1 تغییر کرد
+
         if ($doctor) {
-            $this->selectedClinicId = request()->query('selectedClinicId', 'default');
+            $this->loadClinics();
+            $this->loadAppointments();
+            $this->loadBlockedUsers();
+            $this->loadMessages();
+            $this->loadCalendarData();
         }
-        $this->loadClinics();
-        $this->loadAppointments();
-        $this->loadBlockedUsers();
-        $this->loadMessages();
-        $this->getHolidays();
+
+       
+    }
+    public function loadCalendarData()
+    {
+        $this->holidaysData = [
+            'status' => true,
+            'holidays' => $this->getHolidays(),
+        ];
+        $this->appointmentsData = $this->getAppointmentsCountData();
+
+       
+    }
+    public function getAppointmentsCountData()
+    {
+        try {
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $selectedClinicId = $this->selectedClinicId;
+
+            // استفاده از مقادیر پیش‌فرض اگر calendarYear یا calendarMonth مقدار نداشته باشند
+            $year = $this->calendarYear ?? Jalalian::now()->getYear();
+            $month = $this->calendarMonth ?? Jalalian::now()->getMonth();
+
+           
+
+            // دریافت تنظیمات تقویم
+            $appointmentConfig = DoctorAppointmentConfig::where('doctor_id', $doctorId)
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->first();
+
+            $calendarDays = $appointmentConfig ? $appointmentConfig->calendar_days : 30;
+
+            // دریافت روزهای کاری
+            $workSchedules = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->where('is_working', true)
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->pluck('day')
+                ->toArray();
 
 
+            // تبدیل سال و ماه جلالی به میلادی
+            $jalaliDate = Jalalian::fromFormat('Y/m/d', sprintf('%d/%02d/01', $year, $month));
+            $startDate = $jalaliDate->toCarbon()->startOfDay();
+            $endDate = $jalaliDate->toCarbon()->endOfMonth(); // استفاده از endOfMonth برای ماه میلادی معادل
+
+            // تنظیم دقیق برای ماه جلالی
+            $jalaliEndDate = Jalalian::fromCarbon($startDate)->addMonths(1)->subDays(1);
+            $endDate = $jalaliEndDate->toCarbon()->endOfDay();
+
+         
+
+
+            // دریافت تعداد نوبت‌ها
+            $appointmentsQuery = DB::table('appointments')
+                ->select(DB::raw('appointment_date, COUNT(*) as appointment_count'))
+                ->where('doctor_id', $doctorId)
+                ->where('status', '!=', 'cancelled')
+                ->whereNull('deleted_at');
+
+            if ($selectedClinicId === 'default') {
+                $appointmentsQuery->whereNull('clinic_id');
+            } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
+                $appointmentsQuery->where('clinic_id', $selectedClinicId);
+            }
+
+            $appointments = $appointmentsQuery
+                ->whereBetween('appointment_date', [$startDate, $endDate])
+                ->groupBy('appointment_date')
+                ->get();
+
+            $data = $appointments->map(function ($item) {
+                return [
+                    'appointment_date' => Carbon::parse($item->appointment_date)->format('Y-m-d'),
+                    'appointment_count' => (int) $item->appointment_count,
+                ];
+            })->toArray();
+
+            // دریافت تنظیمات نوبت‌دهی
+            $appointmentSettings = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->where('is_working', true)
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->select('day', 'appointment_settings')
+                ->get()
+                ->map(function ($schedule) {
+                    return [
+                        'day' => $schedule->day,
+                        'settings' => $schedule->appointment_settings ? json_decode($schedule->appointment_settings, true) : [],
+                    ];
+                })
+                ->toArray();
+
+
+            return [
+                'status' => true,
+                'data' => $data,
+                'working_days' => $workSchedules,
+                'calendar_days' => $calendarDays,
+                'appointment_settings' => $appointmentSettings,
+            ];
+        } catch (\Exception $e) {
+          
+            return [
+                'status' => false,
+                'message' => 'خطا در دریافت داده‌ها',
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     public function handleBlockUser($data)
@@ -758,11 +892,15 @@ class AppointmentsList extends Component
     public function setSelectedClinicId($clinicId)
     {
         $this->selectedClinicId = $clinicId;
-        $this->isSearchingAllDates = false;
-        $this->loadAppointments();
-        $this->loadBlockedUsers();
-        $this->getHolidays();
-
+        session(['selectedClinicId' => $clinicId]);
+        $this->loadCalendarData();
+    }
+    public function setCalendarDate($year, $month)
+    {
+        $this->calendarYear = (int) $year;
+        $this->calendarMonth = (int) $month;
+        $this->loadCalendarData();
+        $this->dispatch('calendarDataUpdated');
     }
     public function blockUser()
     {
@@ -1178,33 +1316,42 @@ class AppointmentsList extends Component
 
     public function getHolidays()
     {
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId);
+        try {
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)
+                ->where('status', 'active'); // فقط تعطیلات فعال
 
-        if ($this->selectedClinicId === 'default') {
-            $holidaysQuery->whereNull('clinic_id');
-        } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
-            $holidaysQuery->where('clinic_id', $this->selectedClinicId);
+            if ($this->selectedClinicId === 'default') {
+                $holidaysQuery->whereNull('clinic_id');
+            } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
+                $holidaysQuery->where('clinic_id', $this->selectedClinicId);
+            }
+
+            $holidays = $holidaysQuery->get()->pluck('holiday_dates')->map(function ($holiday) {
+                // اطمینان از decode صحیح JSON
+                $dates = is_string($holiday) ? json_decode($holiday, true) : $holiday;
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return [];
+                }
+                return is_array($dates) ? $dates : (is_string($dates) ? [$dates] : []);
+            })->flatten()->filter()->map(function ($date) {
+                try {
+                    // مدیریت تاریخ‌های جلالی و میلادی
+                    if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $date)) {
+                        return Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
+                    }
+                    return Carbon::parse($date)->format('Y-m-d');
+                } catch (\Exception $e) {
+                    return null;
+                }
+            })->filter()->unique()->values()->toArray();
+
+            
+
+            return $holidays;
+        } catch (\Exception $e) {
+            return [];
         }
-
-        $holidays = $holidaysQuery->get()->pluck('holiday_dates')->map(function ($holiday) {
-            // اطمینان از اینکه holiday_dates به درستی decode می‌شود
-            $dates = json_decode($holiday, true);
-            // اگر یک رشته JSON باشد، دوباره decode کنید
-            if (is_string($dates)) {
-                $dates = json_decode($dates, true);
-            }
-            return is_array($dates) ? $dates : [];
-        })->flatten()->toArray();
-
-        // تبدیل تاریخ‌ها به فرمت Y-m-d و حذف موارد نامعتبر
-        return array_filter(array_map(function ($holiday) {
-            try {
-                return Carbon::parse($holiday)->format('Y-m-d');
-            } catch (\Exception $e) {
-                return null;
-            }
-        }, array_unique($holidays)));
     }
 
     public function toggleHoliday($date)

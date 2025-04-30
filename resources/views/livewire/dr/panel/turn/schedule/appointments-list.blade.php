@@ -304,9 +304,24 @@
   </div>
 
   <script>
+    window.holidaysData = @json($holidaysData);
+    window.appointmentsData = @json($appointmentsData);
+
     document.addEventListener('livewire:initialized', () => {
-      window.holidays = @json($this->getHolidays());
-      window.apointments = @json($this->loadAppointments());
+      // اطمینان از وجود متغیرهای سراسری
+      window.holidaysData = window.holidaysData || {
+        status: false,
+        holidays: []
+      };
+      window.appointmentsData = window.appointmentsData || {
+        status: false,
+        data: []
+      };
+      const clinicId = @json($selectedClinicId);
+      if (clinicId && clinicId !== 'default') {
+        localStorage.setItem('selectedClinicId', clinicId);
+      }
+
       window.addEventListener('openXModal', event => {
         const modalId = event.detail.id;
         const appointmentId = event.detail.appointmentId || null;
@@ -319,9 +334,16 @@
           const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
           const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
           @this.set('rescheduleAppointmentIds', selectedIds);
+          // به‌روزرسانی داده‌های تقویم هنگام باز کردن مودال
+          @this.loadCalendarData();
         }
       });
+      Livewire.on('calendarDataUpdated', () => {
+        // به‌روزرسانی دستی متغیرهای سراسری
+        window.holidaysData = @json($holidaysData);
+        window.appointmentsData = @json($appointmentsData);
 
+      });
       Livewire.on('hideModal', () => {
         const openModal = document.querySelector('.x-modal--visible');
         if (openModal) {

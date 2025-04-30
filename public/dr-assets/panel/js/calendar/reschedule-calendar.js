@@ -1,5 +1,3 @@
-
-
 // تابع برای بررسی وجود المنت
 function ensureRescheduleElementExists(selector, errorMessage, scope = document) {
     const element = scope.querySelector(selector);
@@ -42,7 +40,8 @@ function initializeRescheduleCalendar() {
     window.selectedAppointmentDates = window.selectedAppointmentDates || [];
     window.selectedAppointmentIds = window.selectedAppointmentIds || [];
     window.selectedSingleAppointmentId = window.selectedSingleAppointmentId || null;
-    window.holidays = window.holidays || [];
+    window.holidaysData = window.holidaysData || { status: false, holidays: [] };
+    window.appointmentsData = window.appointmentsData || { status: false, data: [] };
 
     // لاگ‌گیری مقدار selectedClinicId
     const clinicId = localStorage.getItem("selectedClinicId") || "default";
@@ -79,106 +78,48 @@ function initializeRescheduleCalendar() {
             window.selectedAppointmentIds = [];
             window.selectedAppointmentDates = [];
         }
-        console.debug("Collected appointments:", {
-            ids: window.selectedAppointmentIds,
-            dates: window.selectedAppointmentDates,
-        });
+    
     }
 
-    // تابع دریافت تعطیلات از مسیر AJAX
-    function loadHolidayStyles(year, month) {
-        return new Promise((resolve, reject) => {
-            const clinicId = localStorage.getItem("selectedClinicId") || "default";
-            if (clinicId === "default") {
-                console.warn("selectedClinicId is default, returning empty holidays");
-                resolve([]);
-                return;
-            }
+ async function fetchCalendarData(year, month) {
+    try {
 
-            $.ajax({
-                url: getHolidaysUrl,
-                method: "GET",
-                data: {
-                    selectedClinicId: clinicId,
-                    year: year,
-                    month: month,
-                },
-                headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                },
-                success: function (response) {
-                    if (response.status && response.holidays) {
-                        console.debug("Holidays fetched:", response.holidays);
-                        window.holidays = response.holidays;
-                        resolve(response.holidays);
-                    } else {
-                        console.warn("No holidays found in response:", response);
-                        resolve([]);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error fetching holidays:", status, error, xhr.responseText);
-                    resolve([]);
-                },
+        // به‌روزرسانی پراپرتی‌های Livewire
+        if (typeof Livewire !== "undefined" && typeof Livewire.dispatch === "function") {
+            await new Promise((resolve) => {
+                Livewire.dispatchTo(
+                    "dr.panel.turn.schedule.appointments-list",
+                    "setCalendarDate",
+                    { year, month }
+                );
+                // منتظر تکمیل درخواست Livewire
+                setTimeout(resolve, 100); // تأخیر کوچک برای اطمینان از به‌روزرسانی
             });
-        });
-    }
-
-    async function fetchCalendarData(year, month) {
-        try {
-            console.debug("Fetching calendar data for year:", year, "month:", month);
-
-            // دریافت تعطیلات
-            const holidays = await loadHolidayStyles(year, month);
-
-            // دریافت داده‌های نوبت‌ها از AJAX
-            if (!appointmentsCountUrl) {
-                console.error("Appointments count URL is not defined");
-                if (loadingOverlay) loadingOverlay.style.display = "none";
-                if (calendarBody) calendarBody.style.display = "grid";
-                return { holidays, appointments: [] };
-            }
-
-            const appointments = await new Promise((resolve) => {
-                $.ajax({
-                    url: appointmentsCountUrl,
-                    method: "GET",
-                    data: {
-                        selectedClinicId: localStorage.getItem("selectedClinicId"),
-                        year: year,
-                        month: month,
-                    },
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                    },
-                    success: function (response) {
-                        if (response.status) {
-                            const formattedAppointments = (response.data || []).map((item) => ({
-                                date: item.appointment_date,
-                                count: item.appointment_count,
-                            }));
-                            console.debug("Appointments data fetched:", formattedAppointments);
-                            resolve(formattedAppointments);
-                        } else {
-                            console.error("Error fetching appointments:", response.message);
-                            resolve([]);
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("AJAX Error:", status, error, xhr.responseText);
-                        resolve([]);
-                    },
-                });
-            });
-
-            return { holidays, appointments };
-        } catch (error) {
-            console.error("Error in fetchCalendarData:", error);
-            if (loadingOverlay) loadingOverlay.style.display = "none";
-            if (calendarBody) calendarBody.style.display = "grid";
-            return { holidays: window.holidays || [], appointments: [] };
+        } else {
+            console.warn("Livewire.dispatch is not available");
         }
+
+        // دریافت داده‌های تعطیلات و نوبت‌ها از Livewire
+ 
+
+        const holidays = window.holidaysData.status ? window.holidaysData.holidays : [];
+        const appointments = window.appointmentsData.status
+            ? window.appointmentsData.data.map((item) => ({
+                  date: item.appointment_date,
+                  count: item.appointment_count,
+              }))
+            : [];
+
+ 
+
+        return { holidays, appointments };
+    } catch (error) {
+        console.error("Error in fetchCalendarData:", error);
+        if (loadingOverlay) loadingOverlay.style.display = "none";
+        if (calendarBody) calendarBody.style.display = "grid";
+        return { holidays: [], appointments: [] };
     }
+}
 
     async function generateCalendar(year, month) {
         if (!calendarBody) {
@@ -288,7 +229,6 @@ function initializeRescheduleCalendar() {
                 if (window.selectedAppointmentDates.length === 0) {
                     const errorAlert = document.getElementById("reschedule-error-alert");
                     if (errorAlert) {
-                        console.debug("No appointments selected, showing error alert");
                         window.openXAlert("reschedule-error-alert");
                     } else {
                         console.error("Error alert element 'reschedule-error-alert' not found");
@@ -311,12 +251,10 @@ function initializeRescheduleCalendar() {
                         bodyElement.appendChild(messageElement);
                     }
                     messageElement.textContent = message;
-                    console.debug("Alert message set to:", message);
 
                     const titleElement = alertElement.querySelector(".x-alert__title");
                     if (titleElement) {
                         titleElement.textContent = "تأیید جابجایی نوبت";
-                        console.debug("Alert title set to: تأیید جابجایی نوبت");
                     }
 
                     const slotContent = alertElement.querySelector(
@@ -324,7 +262,6 @@ function initializeRescheduleCalendar() {
                     );
                     if (slotContent) {
                         slotContent.remove();
-                        console.debug("Removed extra slot content from alert");
                     }
 
                     const confirmButton = alertElement.querySelector(".x-alert__button--confirm");
@@ -341,13 +278,8 @@ function initializeRescheduleCalendar() {
                                 return;
                             }
 
-                            console.debug("Calling Livewire updateAppointmentDate:", {
-                                component: "dr.panel.turn.schedule.appointments-list",
-                                method: "updateAppointmentDate",
-                                params: [window.selectedAppointmentIds, selectedGregorianDate],
-                            });
+                           
 
-                            // بازگرداندن منطق جابجایی از کد قدیمی
                             Livewire.dispatchTo(
                                 "dr.panel.turn.schedule.appointments-list",
                                 "call",
@@ -355,6 +287,7 @@ function initializeRescheduleCalendar() {
                                     method: "updateAppointmentDate",
                                     params: [window.selectedAppointmentIds, selectedGregorianDate],
                                 }
+
                             );
                             Livewire.dispatch("rescheduleAppointment", [
                                 window.selectedAppointmentIds,
@@ -503,11 +436,11 @@ function initializeRescheduleCalendar() {
 
 // مدیریت رویدادهای مودال
 document.addEventListener("livewire:initialized", () => {
-    window.holidays = window.holidays || [];
-    console.debug("Livewire initialized, window.holidays initialized as:", window.holidays);
+    window.holidaysData = window.holidaysData || { status: false, holidays: [] };
+    window.appointmentsData = window.appointmentsData || { status: false, data: [] };
+
 
     const clinicId = localStorage.getItem("selectedClinicId") || "default";
-    console.debug("Livewire initialized, setting selectedClinicId:", clinicId);
     if (clinicId !== "default") {
         Livewire.dispatch("setSelectedClinicId", { clinicId });
     }
@@ -518,7 +451,6 @@ document.addEventListener("livewire:initialized", () => {
 
         if (modalId === "reschedule-modal") {
             const clinicId = localStorage.getItem("selectedClinicId") || "default";
-            console.debug("openXModal: Setting selectedClinicId:", clinicId);
             if (clinicId !== "default") {
                 Livewire.dispatch("setSelectedClinicId", { clinicId });
             }
@@ -530,7 +462,6 @@ document.addEventListener("livewire:initialized", () => {
     window.addEventListener("showModal", (event) => {
         if (event.detail === "reschedule-modal") {
             const clinicId = localStorage.getItem("selectedClinicId") || "default";
-            console.debug("showModal: Setting selectedClinicId:", clinicId);
             if (clinicId !== "default") {
                 Livewire.dispatch("setSelectedClinicId", { clinicId });
             }
