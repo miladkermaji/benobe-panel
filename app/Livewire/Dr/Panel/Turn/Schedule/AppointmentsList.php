@@ -88,17 +88,18 @@ class AppointmentsList extends Component
     // Property for single block user
     public $blockAppointmentId;
 
-    protected $listeners = [
-        'updateSelectedDate' => 'updateSelectedDate',
-        'searchAllDates' => 'searchAllDates',
-        'cancelAppointments' => 'cancelAppointments',
-        'blockUser' => 'handleBlockUser',
-        'blockMultipleUsers' => 'handleBlockMultipleUsers',
-        'confirm-partial-reschedule' => 'confirmPartialReschedule',
-        'rescheduleAppointment' => 'handleRescheduleAppointment',
-        'setSelectedClinicId' => 'setSelectedClinicId',
-        'setCalendarDate' => 'setCalendarDate', // اضافه شده
-    ];
+  protected $listeners = [
+    'updateSelectedDate' => 'updateSelectedDate',
+    'searchAllDates' => 'searchAllDates',
+    'cancelAppointments' => 'cancelAppointments',
+    'blockUser' => 'handleBlockUser',
+    'blockMultipleUsers' => 'handleBlockMultipleUsers',
+    'confirm-partial-reschedule' => 'confirmPartialReschedule',
+    'rescheduleAppointment' => 'handleRescheduleAppointment',
+    'setSelectedClinicId' => 'setSelectedClinicId',
+    'setCalendarDate' => 'setCalendarDate',
+    'confirm-search-all-dates' => 'searchAllDates', // اضافه شده
+];
     public function handleRescheduleAppointment($ids, $newDate)
     {
         $this->updateAppointmentDate($ids, $newDate);
@@ -306,97 +307,111 @@ class AppointmentsList extends Component
         }
     }
 
-
-    public function loadAppointments()
-    {
-        $doctor = $this->getAuthenticatedDoctor();
-        if (!$doctor) {
-            return [];
-        }
-
-        $gregorianDate = $this->convertToGregorian($this->selectedDate);
-        $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
-            ->withTrashed()
-            ->where('doctor_id', $doctor->id);
-
-        // اعمال فیلترهای موجود
-        if ($this->dateFilter) {
-            $today = Carbon::today();
-            if ($this->dateFilter === 'current_week') {
-                $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
-                $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
-                $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
-            } elseif ($this->dateFilter === 'current_month') {
-                $startOfMonth = $today->copy()->startOfMonth();
-                $endOfMonth = $today->copy()->endOfMonth();
-                $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
-            } elseif ($this->dateFilter === 'current_year') {
-                $startOfYear = $today->copy()->startOfYear();
-                $endOfYear = $today->copy()->endOfYear();
-                $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
-            }
-        } elseif ($this->filterStatus !== 'all' && !$this->isSearchingAllDates) {
-            $query->whereDate('appointment_date', $gregorianDate);
-        }
-
-        if ($this->selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
-        } elseif ($this->selectedClinicId) {
-            $query->where('clinic_id', $this->selectedClinicId);
-        }
-
-        if ($this->filterStatus && $this->filterStatus !== 'all') {
-            $query->where('status', $this->filterStatus);
-        }
-
-        if ($this->attendanceStatus) {
-            $query->where('attendance_status', $this->attendanceStatus);
-        }
-
-        if ($this->searchQuery) {
-            $query->whereHas('patient', function ($q) {
-                $q->where('first_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
-                    ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
-            });
-        }
-
-        $appointments = $query->orderBy('appointment_date', 'desc')->paginate($this->pagination['per_page']);
-
-        // استفاده از Jalalian برای تاریخ جلالی
-        $jalaliDate = Jalalian::fromCarbon(Carbon::parse($gregorianDate));
-        $appointmentData = $this->getAppointmentsInMonth(
-            $jalaliDate->getYear(),
-            $jalaliDate->getMonth()
-        );
-
-        $this->appointments = $appointments->items();
-        $this->pagination = [
-            'current_page' => $appointments->currentPage(),
-            'last_page' => $appointments->lastPage(),
-            'per_page' => $appointments->perPage(),
-            'total' => $appointments->total(),
-        ];
-
-        // تنظیم متغیر جهانی برای جاوااسکریپت
-        $this->dispatch('setAppointments', ['appointments' => $appointmentData]);
-
-        if (empty($this->appointments) && !$this->isSearchingAllDates && $this->searchQuery) {
-            $formattedJalaliDate = $jalaliDate->format('Y/m/d');
-            $this->dispatch('no-results-found', date: $formattedJalaliDate);
-        }
-
-        return $appointmentData;
+public $showNoResultsAlert = false;
+public function loadAppointments()
+{
+    $doctor = $this->getAuthenticatedDoctor();
+    if (!$doctor) {
+        return [];
     }
 
-    public function searchAllDates()
-    {
-        $this->isSearchingAllDates = true;
-        $this->dateFilter = '';
-        $this->loadAppointments();
+    $gregorianDate = $this->convertToGregorian($this->selectedDate);
+    $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
+        ->withTrashed()
+        ->where('doctor_id', $doctor->id);
+
+    // اعمال فیلترهای موجود
+    if ($this->dateFilter) {
+        $today = Carbon::today();
+        if ($this->dateFilter === 'current_week') {
+            $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
+            $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
+            $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
+        } elseif ($this->dateFilter === 'current_month') {
+            $startOfMonth = $today->copy()->startOfMonth();
+            $endOfMonth = $today->copy()->endOfMonth();
+            $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
+        } elseif ($this->dateFilter === 'current_year') {
+            $startOfYear = $today->copy()->startOfYear();
+            $endOfYear = $today->copy()->endOfYear();
+            $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
+        }
+    } elseif ($this->filterStatus !== 'all' && !$this->isSearchingAllDates) {
+        $query->whereDate('appointment_date', $gregorianDate);
     }
+
+    if ($this->selectedClinicId === 'default') {
+        $query->whereNull('clinic_id');
+    } elseif ($this->selectedClinicId) {
+        $query->where('clinic_id', $this->selectedClinicId);
+    }
+
+    if ($this->filterStatus && $this->filterStatus !== 'all') {
+        $query->where('status', $this->filterStatus);
+    }
+
+    if ($this->attendanceStatus) {
+        $query->where('attendance_status', $this->attendanceStatus);
+    }
+
+    if ($this->searchQuery) {
+        $query->whereHas('patient', function ($q) {
+            $q->where('first_name', 'like', "%{$this->searchQuery}%")
+                ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
+                ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
+                ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
+                ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
+        });
+    }
+
+    $appointments = $query->orderBy('appointment_date', 'desc')->paginate($this->pagination['per_page']);
+
+    // استفاده از Jalalian برای تاریخ جلالی
+    $jalaliDate = Jalalian::fromCarbon(Carbon::parse($gregorianDate));
+    $appointmentData = $this->getAppointmentsInMonth(
+        $jalaliDate->getYear(),
+        $jalaliDate->getMonth()
+    );
+
+    $this->appointments = $appointments->items();
+    $this->pagination = [
+        'current_page' => $appointments->currentPage(),
+        'last_page' => $appointments->lastPage(),
+        'per_page' => $appointments->perPage(),
+        'total' => $appointments->total(),
+    ];
+
+    // تنظیم متغیر جهانی برای جاوااسکریپت
+    $this->dispatch('setAppointments', ['appointments' => $appointmentData]);
+
+    // بررسی خالی بودن نتایج و نمایش آلرت یا پیام در جدول
+    if (empty($this->appointments) && $this->searchQuery) {
+        if ($this->isSearchingAllDates) {
+            // در جستجوی کلی، پیام در جدول نمایش داده می‌شود
+            $this->dispatch('no-results-found', ['date' => $jalaliDate->format('Y/m/d'), 'searchAll' => true]);
+        } else {
+            // در جستجوی عادی، آلرت نمایش داده می‌شود
+            $this->showNoResultsAlert = true;
+            $this->dispatch('show-no-results-alert', ['date' => $jalaliDate->format('Y/m/d')]);
+        }
+    } else {
+        $this->showNoResultsAlert = false;
+        $this->dispatch('hide-no-results-alert');
+    }
+
+    return $appointmentData;
+}
+
+public function searchAllDates()
+{
+    $this->isSearchingAllDates = true;
+    $this->dateFilter = '';
+    $this->filterStatus = '';
+    $this->resetPage();
+    $this->appointments = [];
+    $this->showNoResultsAlert = false; // مخفی کردن آلرت
+    $this->loadAppointments();
+}
 
     private function convertToGregorian($date)
     {

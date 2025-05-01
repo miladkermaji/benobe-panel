@@ -130,7 +130,13 @@
               @endforeach
             @else
               <tr>
-                <td colspan="11" class="text-center">نتیجه‌ای یافت نشد</td>
+                <td colspan="11" class="text-center">
+                  @if ($isSearchingAllDates && $searchQuery)
+                    نتیجه‌ای یافت نشد
+                  @else
+                    نتیجه‌ای یافت نشد
+                  @endif
+                </td>
               </tr>
             @endif
           </tbody>
@@ -302,7 +308,11 @@
       </div>
     </x-custom-modal>
   </div>
-
+  <div wire:ignore>
+    <x-custom-alert id="no-results-alert" type="warning" title="نتیجه‌ای یافت نشد"
+      message="هیچ نتیجه‌ای برای جستجوی شما یافت نشد. آیا می‌خواهید در همه سوابق و نوبت‌ها جستجو کنید؟" size="md"
+      :show="$showNoResultsAlert" />
+  </div>
   <script>
     window.holidaysData = @json($holidaysData);
     window.appointmentsData = @json($appointmentsData);
@@ -558,6 +568,53 @@
 
       document.addEventListener('DOMContentLoaded', () => {
         checkCheckboxes();
+      });
+      Livewire.on('show-no-results-alert', (event) => {
+        window.openXAlert('no-results-alert');
+
+        // مدیریت کلیک روی دکمه‌های آلرت
+        const alert = document.getElementById('no-results-alert');
+        if (alert) {
+          const confirmButton = alert.querySelector('.x-alert__button--confirm');
+          const cancelButton = alert.querySelector('.x-alert__button--cancel');
+
+          // حذف شنونده‌های قبلی برای جلوگیری از اتصال چندگانه
+          const newConfirmButton = confirmButton.cloneNode(true);
+          const newCancelButton = cancelButton.cloneNode(true);
+          confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+          cancelButton.parentNode.replaceChild(newCancelButton, cancelButton);
+
+          // افزودن شنونده برای دکمه تأیید
+          newConfirmButton.addEventListener('click', () => {
+            @this.dispatch('confirm-search-all-dates');
+            window.closeXAlert('no-results-alert');
+          });
+
+          // افزودن شنونده برای دکمه لغو
+          newCancelButton.addEventListener('click', () => {
+            window.closeXAlert('no-results-alert');
+          });
+        }
+      });
+
+      // مدیریت مخفی کردن آلرت
+      Livewire.on('hide-no-results-alert', () => {
+        window.closeXAlert('no-results-alert');
+      });
+
+      // مدیریت پیام عدم یافتن نتیجه در جستجوی کلی
+      Livewire.on('no-results-found', (event) => {
+        if (event.searchAll) {
+          // در جستجوی کلی، پیام در جدول نمایش داده می‌شود
+          const tbody = document.querySelector('tbody');
+          if (tbody) {
+            tbody.innerHTML = `
+                        <tr>
+                            <td colspan="11" class="text-center">نتیجه‌ای یافت نشد</td>
+                        </tr>
+                    `;
+          }
+        }
       });
     });
   </script>

@@ -11,10 +11,10 @@
       </div>
       <div class="x-alert__footer">
         <button type="button" class="x-alert__button x-alert__button--confirm" data-x-alert-close>
-          {{ __('تأیید') }}
+          {{ __('بله') }}
         </button>
         <button type="button" class="x-alert__button x-alert__button--cancel" data-x-alert-close>
-          {{ __('لغو') }}
+          {{ __('خیر') }}
         </button>
       </div>
     </div>
@@ -131,6 +131,7 @@
     font-size: 1rem;
     color: var(--text-secondary);
     margin: 0;
+    font-weight: bold;
     line-height: 1.6;
   }
 
