@@ -633,6 +633,8 @@ class AppointmentsList extends Component
     {
         $slots = [];
         $duration = $appointmentSettings['appointment_duration'] ?? 15;
+
+        // دریافت نوبت‌های موجود برای تاریخ و دکتر
         $existingAppointments = Appointment::where('doctor_id', $doctorId)
             ->where('appointment_date', $date)
             ->where('status', '!=', 'cancelled')
@@ -642,22 +644,30 @@ class AppointmentsList extends Component
             ->map(fn ($time) => $time->format('H:i'))
             ->toArray();
 
+        Log::info('Existing appointments for date', [
+            'date' => $date,
+            'existingAppointments' => $existingAppointments,
+        ]);
+
         $totalSlots = 0;
         foreach ($workHours as $period) {
             $start = Carbon::parse($period['start']);
             $end = Carbon::parse($period['end']);
-            $maxAppointments = $period['max_appointments'] ?? PHP_INT_MAX; // اگر تعریف نشده، نامحدود فرض می‌کنیم
+            $maxAppointments = $period['max_appointments'] ?? PHP_INT_MAX;
 
             while ($start->lt($end) && $totalSlots < $maxAppointments) {
                 $slotTime = $start->format('H:i');
                 if (!in_array($slotTime, $existingAppointments)) {
                     $slots[] = $slotTime;
                     $totalSlots++;
+                } else {
+                    Log::info('Slot already taken', ['slotTime' => $slotTime, 'date' => $date]);
                 }
                 $start->addMinutes($duration);
             }
         }
 
+        Log::info('Calculated available slots', ['date' => $date, 'slots' => $slots]);
         return $slots;
     }
     public function confirmPartialReschedule($appointmentIds, $newDate, $nextDate, $availableSlots)
@@ -886,50 +896,60 @@ class AppointmentsList extends Component
         }
     }
 
-    private function processReschedule($appointmentIds, $newDate, $availableSlots)
+    public function processReschedule($appointmentIds, $newDate, $availableSlots)
     {
-
-        Log::info('processReschedule called', [
-                'appointmentIds' => $appointmentIds,
-                'newDate' => $newDate,
-                'availableSlots' => $availableSlots,
-            ]);
-
-        $doctor = $this->getAuthenticatedDoctor();
         $remainingIds = [];
+        $usedSlots = [];
 
-        foreach ($appointmentIds as $index => $id) {
-            $appointment = Appointment::find($id);
-            if (!$appointment || in_array($appointment->status, ['attended', 'cancelled'])) {
-                $remainingIds[] = $id;
-                continue;
+        Log::info('processReschedule started', [
+            'appointmentIds' => $appointmentIds,
+            'newDate' => $newDate,
+            'availableSlots' => $availableSlots,
+        ]);
+
+        foreach ($appointmentIds as $appointmentId) {
+            // پیدا کردن اولین اسلات خالی که هنوز استفاده نشده
+            $selectedSlot = null;
+            foreach ($availableSlots as $slot) {
+                if (!in_array($slot, $usedSlots)) {
+                    $selectedSlot = $slot;
+                    $usedSlots[] = $slot;
+                    break;
+                }
             }
 
-            $oldDate = $appointment->appointment_date;
-            $oldTime = $appointment->appointment_time;
+            if ($selectedSlot) {
+                // آپدیت نوبت در جدول appointments
+                $appointment = Appointment::find($appointmentId);
+                if ($appointment) {
+                    $appointment->update([
+                        'appointment_date' => $newDate,
+                        'appointment_time' => $selectedSlot,
+                    ]);
 
-            $newTime = isset($availableSlots[$index]) ? $availableSlots[$index] : null;
-            if (!$newTime) {
-                $remainingIds[] = $id;
-                continue;
-            }
-
-            $appointment->appointment_date = $newDate;
-            $appointment->appointment_time = Carbon::createFromFormat('H:i', $newTime);
-            $appointment->save();
-
-            if ($appointment->patient && $appointment->patient->mobile) {
-                $oldDateJalali = Jalalian::fromDateTime($oldDate)->format('Y/m/d');
-                $newDateJalali = Jalalian::fromCarbon(Carbon::parse($newDate))->format('Y/m/d');
-                $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} ساعت {$oldTime->format('H:i')} به {$newDateJalali} ساعت {$newTime} تغییر یافت.";
-                SendSmsNotificationJob::dispatch(
-                    $message,
-                    [$appointment->patient->mobile],
-                    null,
-                    []
-                )->delay(now()->addSeconds(5));
+                    Log::info('Appointment rescheduled', [
+                        'appointmentId' => $appointmentId,
+                        'newDate' => $newDate,
+                        'newTime' => $selectedSlot,
+                    ]);
+                } else {
+                    Log::warning('Appointment not found', ['appointmentId' => $appointmentId]);
+                    $remainingIds[] = $appointmentId;
+                }
+            } else {
+                // اگر اسلات خالی پیدا نشد، نوبت به لیست باقی‌مانده اضافه می‌شه
+                Log::warning('No available slot found for appointment', [
+                    'appointmentId' => $appointmentId,
+                    'newDate' => $newDate,
+                ]);
+                $remainingIds[] = $appointmentId;
             }
         }
+
+        Log::info('processReschedule completed', [
+            'remainingIds' => $remainingIds,
+            'usedSlots' => $usedSlots,
+        ]);
 
         return $remainingIds;
     }
