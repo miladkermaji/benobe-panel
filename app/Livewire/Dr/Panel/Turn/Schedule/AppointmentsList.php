@@ -89,44 +89,45 @@ class AppointmentsList extends Component
     public $blockAppointmentId;
 
     protected $listeners = [
-      'updateSelectedDate' => 'updateSelectedDate',
-      'searchAllDates' => 'searchAllDates',
-      'cancelAppointments' => 'cancelAppointments',
-      'blockUser' => 'handleBlockUser',
-      'blockMultipleUsers' => 'handleBlockMultipleUsers',
-      'confirm-partial-reschedule' => 'confirmPartialReschedule',
-      'rescheduleAppointment' => 'handleRescheduleAppointment',
-      'setSelectedClinicId' => 'setSelectedClinicId',
-      'setCalendarDate' => 'setCalendarDate',
-      'confirm-search-all-dates' => 'searchAllDates', // اضافه شده
-];
+        'updateSelectedDate' => 'updateSelectedDate',
+        'searchAllDates' => 'searchAllDates',
+        'cancelAppointments' => 'cancelAppointments',
+        'blockUser' => 'handleBlockUser',
+        'blockMultipleUsers' => 'handleBlockMultipleUsers',
+        'confirm-partial-reschedule' => 'confirmPartialReschedule',
+        'rescheduleAppointment' => 'handleRescheduleAppointment',
+        'setSelectedClinicId' => 'setSelectedClinicId',
+        'setCalendarDate' => 'setCalendarDate',
+        'confirm-search-all-dates' => 'searchAllDates',
+        'show-first-available-confirm' => 'showFirstAvailableConfirm',
+    ];
     public function handleRescheduleAppointment($appointmentIds, $newDate)
     {
-        Log::info('handleRescheduleAppointment called', [
-            'appointmentIds' => $appointmentIds,
-            'newDate' => $newDate,
-        ]);
+       
 
         $result = $this->checkRescheduleConditions($newDate, $appointmentIds);
 
         if (!$result['success']) {
             if (isset($result['partial']) && $result['partial']) {
-                // رویداد قبلاً در checkRescheduleConditions ارسال شده
-                Log::info('Partial reschedule triggered', $result);
             } else {
                 $this->dispatch('show-toastr', [
                     'type' => 'error',
-                    'message' => $result['message']
+                    'message' => $result['message'],
                 ]);
             }
             return;
         }
 
-        // ادامه فرآیند جابجایی اگر ظرفیت کافی باشد
         $this->processReschedule($appointmentIds, $newDate, $result['available_slots']);
-        $this->dispatch('appointments-rescheduled', [
-            'message' => 'نوبت‌ها با موفقیت جابجا شدند.'
+        $this->dispatch('show-toastr', [
+            'type' => 'success',
+            'message' => 'نوبت‌ها با موفقیت جابجا شدند.',
         ]);
+
+        $this->dispatch('appointments-rescheduled', [
+                  'message' => 'نوبت‌ها با موفقیت جابجا شدند.'
+              ]);
+
         $this->loadAppointments();
         $this->dispatch('hideModal');
         $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
@@ -585,7 +586,7 @@ class AppointmentsList extends Component
             $maxAppointments += $period['max_appointments'] ?? 0;
         }
 
-        // محاسبه اسلات‌های خالی
+        // محاسبه زمان های کاری خالی
         $availableSlots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $newDate, $doctor->id);
         $availableSlotsCount = count($availableSlots);
 
@@ -596,14 +597,7 @@ class AppointmentsList extends Component
             $remainingAppointments = $requiredSlots - min($availableSlotsCount, $maxAppointments);
             $message = "تعداد نوبت‌های خالی در این روز " . min($availableSlotsCount, $maxAppointments) . " است. آیا مایلید $remainingAppointments نوبت به تاریخ " . Jalalian::fromCarbon(Carbon::parse($nextAvailableDate))->format('Y/m/d') . " منتقل شود؟";
 
-            // لاگ‌گیری برای دیباگ
-            Log::info('Dispatching show-partial-reschedule-confirm', [
-                'message' => $message,
-                'appointmentIds' => $appointmentIds,
-                'newDate' => $newDate,
-                'nextDate' => $nextAvailableDate,
-                'availableSlots' => $availableSlots,
-            ]);
+          
 
             // ارسال رویداد به کلاینت
             $this->dispatch('show-partial-reschedule-confirm', [
@@ -644,10 +638,7 @@ class AppointmentsList extends Component
             ->map(fn ($time) => $time->format('H:i'))
             ->toArray();
 
-        Log::info('Existing appointments for date', [
-            'date' => $date,
-            'existingAppointments' => $existingAppointments,
-        ]);
+     
 
         $totalSlots = 0;
         foreach ($workHours as $period) {
@@ -660,25 +651,17 @@ class AppointmentsList extends Component
                 if (!in_array($slotTime, $existingAppointments)) {
                     $slots[] = $slotTime;
                     $totalSlots++;
-                } else {
-                    Log::info('Slot already taken', ['slotTime' => $slotTime, 'date' => $date]);
                 }
                 $start->addMinutes($duration);
             }
         }
 
-        Log::info('Calculated available slots', ['date' => $date, 'slots' => $slots]);
         return $slots;
     }
     public function confirmPartialReschedule($appointmentIds, $newDate, $nextDate, $availableSlots)
     {
         try {
-            Log::info('confirmPartialReschedule called', [
-                'appointmentIds' => $appointmentIds,
-                'newDate' => $newDate,
-                'nextDate' => $nextDate,
-                'availableSlots' => $availableSlots,
-            ]);
+           
 
             // اعتبارسنجی ورودی‌ها
             if (empty($appointmentIds) || !is_array($appointmentIds)) {
@@ -688,7 +671,7 @@ class AppointmentsList extends Component
                 throw new \Exception('تاریخ‌های انتخاب‌شده نامعتبر هستند.');
             }
             if (empty($availableSlots) || !is_array($availableSlots)) {
-                throw new \Exception('اسلات‌های خالی نامعتبر هستند.');
+                throw new \Exception('زمان های کاری خالی نامعتبر هستند.');
             }
 
             // جابجایی نوبت‌های ممکن به تاریخ انتخاب‌شده
@@ -697,10 +680,9 @@ class AppointmentsList extends Component
             // جابجایی نوبت‌های باقی‌مانده به تاریخ بعدی
             if (!empty($remainingIds) && $nextDate) {
                 $nextDateSlots = $this->getAvailableSlotsForDate($nextDate);
-                Log::info('Next date slots', ['nextDate' => $nextDate, 'slots' => $nextDateSlots]);
 
                 if (empty($nextDateSlots)) {
-                    throw new \Exception('هیچ اسلات خالی برای تاریخ بعدی یافت نشد.');
+                    throw new \Exception('هیچ زمان کاری خالی برای تاریخ بعدی یافت نشد.');
                 }
 
                 $remainingRemainingIds = $this->processReschedule($remainingIds, $nextDate, $nextDateSlots);
@@ -708,13 +690,18 @@ class AppointmentsList extends Component
                 if (!empty($remainingRemainingIds)) {
                     $this->dispatch('show-toastr', [
                         'type' => 'warning',
-                        'message' => 'برخی نوبت‌ها به دلیل عدم وجود اسلات خالی جابجا نشدند.'
+                        'message' => 'برخی نوبت‌ها به دلیل عدم وجود زمان کاری خالی جابجا نشدند.'
                     ]);
                 } else {
                     $this->dispatch('show-toastr', [
                         'type' => 'success',
                         'message' => 'نوبت‌های باقی‌مانده با موفقیت به تاریخ ' . Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m/d') . ' منتقل شدند.'
                     ]);
+
+                    $this->dispatch('appointments-rescheduled', [
+                              'message' => 'نوبت‌های باقی‌مانده با موفقیت به تاریخ ' . Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m/d') . ' منتقل شدند.'
+                          ]);
+
                 }
             }
 
@@ -725,7 +712,6 @@ class AppointmentsList extends Component
             $this->dispatch('hideModal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
         } catch (\Exception $e) {
-            Log::error('Error in confirmPartialReschedule', ['error' => $e->getMessage()]);
             $this->dispatch('show-toastr', [
                 'type' => 'error',
                 'message' => 'خطایی در جابجایی نوبت رخ داد: ' . $e->getMessage()
@@ -760,7 +746,6 @@ class AppointmentsList extends Component
         $appointmentSettings = json_decode($workSchedule->appointment_settings, true) ?? ['appointment_duration' => 15];
 
         $slots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $date, $doctor->id);
-        Log::info('Available slots for date', ['date' => $date, 'slots' => $slots]);
 
         return $slots;
     }
@@ -874,7 +859,7 @@ class AppointmentsList extends Component
             if (!empty($remainingIds)) {
                 $this->dispatch('show-toastr', [
                     'type' => 'warning',
-                    'message' => 'برخی نوبت‌ها به دلیل عدم وجود اسلات خالی جابجا نشدند.'
+                    'message' => 'برخی نوبت‌ها به دلیل عدم وجود زمان کاری خالی جابجا نشدند.'
                 ]);
             } else {
                 $this->dispatch('show-toastr', [
@@ -901,14 +886,10 @@ class AppointmentsList extends Component
         $remainingIds = [];
         $usedSlots = [];
 
-        Log::info('processReschedule started', [
-            'appointmentIds' => $appointmentIds,
-            'newDate' => $newDate,
-            'availableSlots' => $availableSlots,
-        ]);
+       
 
         foreach ($appointmentIds as $appointmentId) {
-            // پیدا کردن اولین اسلات خالی که هنوز استفاده نشده
+            // پیدا کردن اولین زمان کاری خالی که هنوز استفاده نشده
             $selectedSlot = null;
             foreach ($availableSlots as $slot) {
                 if (!in_array($slot, $usedSlots)) {
@@ -927,29 +908,17 @@ class AppointmentsList extends Component
                         'appointment_time' => $selectedSlot,
                     ]);
 
-                    Log::info('Appointment rescheduled', [
-                        'appointmentId' => $appointmentId,
-                        'newDate' => $newDate,
-                        'newTime' => $selectedSlot,
-                    ]);
+                    
                 } else {
-                    Log::warning('Appointment not found', ['appointmentId' => $appointmentId]);
                     $remainingIds[] = $appointmentId;
                 }
             } else {
-                // اگر اسلات خالی پیدا نشد، نوبت به لیست باقی‌مانده اضافه می‌شه
-                Log::warning('No available slot found for appointment', [
-                    'appointmentId' => $appointmentId,
-                    'newDate' => $newDate,
-                ]);
+              
                 $remainingIds[] = $appointmentId;
             }
         }
 
-        Log::info('processReschedule completed', [
-            'remainingIds' => $remainingIds,
-            'usedSlots' => $usedSlots,
-        ]);
+     
 
         return $remainingIds;
     }
@@ -1457,15 +1426,89 @@ class AppointmentsList extends Component
 
     public function goToFirstAvailableDate()
     {
-        $nextAvailableDate = $this->getNextAvailableDate();
-        if ($nextAvailableDate) {
-            $this->selectedDate = $nextAvailableDate;
-            $this->rescheduleNewDate = $nextAvailableDate;
-            $this->isSearchingAllDates = false;
-            $this->loadAppointments();
-            $this->dispatch('update-reschedule-calendar', date: $nextAvailableDate);
-        } else {
-            $this->dispatch('show-toastr', type: 'error', message: 'هیچ نوبت خالی یافت نشد.');
+        try {
+            // جمع‌آوری نوبت‌های انتخاب‌شده
+            $appointmentIds = $this->rescheduleAppointmentIds ?? [];
+            if (empty($appointmentIds)) {
+                throw new \Exception('هیچ نوبت انتخاب‌شده‌ای یافت نشد.');
+            }
+
+            $requiredSlots = count($appointmentIds);
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                throw new \Exception('دکتر معتبر یافت نشد.');
+            }
+
+            $today = Carbon::today();
+            $calendarDays = DoctorAppointmentConfig::where('doctor_id', $doctor->id)
+                ->value('calendar_days') ?? 30;
+            $maxDate = $today->copy()->addDays($calendarDays);
+
+            // پیدا کردن اولین تاریخ با زمان کاری خالی
+            $currentDate = $today->copy();
+            $firstAvailableDate = null;
+            $availableSlots = [];
+            $nextAvailableDate = null;
+
+            while ($currentDate <= $maxDate) {
+                $result = $this->checkRescheduleConditions($currentDate->toDateString(), $appointmentIds);
+
+                if ($result['success']) {
+                    // تاریخ با ظرفیت کافی پیدا شد
+                    $firstAvailableDate = $currentDate->toDateString();
+                    $availableSlots = $result['available_slots'];
+                    break;
+                } elseif (isset($result['partial']) && $result['partial']) {
+                    // ظرفیت ناقص وجود داره
+                    if (!$firstAvailableDate) {
+                        $firstAvailableDate = $currentDate->toDateString();
+                        $availableSlots = $result['available_slots'];
+                        $nextAvailableDate = $result['next_available_date'];
+                    }
+                }
+
+                $currentDate->addDay();
+            }
+
+            if (!$firstAvailableDate) {
+                throw new \Exception('هیچ تاریخ خالی در بازه مجاز یافت نشد.');
+            }
+
+            // آماده‌سازی پیام برای الرت
+            $jalaliDate = Jalalian::fromCarbon(Carbon::parse($firstAvailableDate))->format('Y/m/d');
+            $availableSlotsCount = count($availableSlots);
+
+            if ($availableSlotsCount >= $requiredSlots) {
+                // ظرفیت کافی وجود داره
+                $message = "اولین تاریخ خالی در {$jalaliDate} با {$availableSlotsCount} زمان کاری خالی یافت شد. آیا می‌خواهید نوبت‌ها به این تاریخ منتقل شوند؟";
+                $this->dispatch('show-first-available-confirm', [
+                    'message' => $message,
+                    'appointmentIds' => $appointmentIds,
+                    'newDate' => $firstAvailableDate,
+                    'availableSlots' => $availableSlots,
+                    'isFullCapacity' => true,
+                ]);
+            } else {
+                // ظرفیت ناقص
+                $remainingSlots = $requiredSlots - $availableSlotsCount;
+                $jalaliNextDate = Jalalian::fromCarbon(Carbon::parse($nextAvailableDate))->format('Y/m/d');
+                $message = "اولین تاریخ خالی در {$jalaliDate} فقط {$availableSlotsCount} زمان کاری خالی دارد. آیا می‌خواهید {$availableSlotsCount} نوبت به این تاریخ و {$remainingSlots} نوبت به {$jalaliNextDate} منتقل شوند؟ یا همه نوبت‌ها به اولین تاریخ با ظرفیت کامل منتقل شوند؟";
+                $this->dispatch('show-first-available-confirm', [
+                    'message' => $message,
+                    'appointmentIds' => $appointmentIds,
+                    'newDate' => $firstAvailableDate,
+                    'nextDate' => $nextAvailableDate,
+                    'availableSlots' => $availableSlots,
+                    'isFullCapacity' => false,
+                ]);
+            }
+
+           
+        } catch (\Exception $e) {
+            $this->dispatch('show-toastr', [
+                'type' => 'error',
+                'message' => 'خطایی رخ داد: ' . $e->getMessage(),
+            ]);
         }
     }
     public function getAppointmentsByDateSpecial($date)

@@ -618,7 +618,6 @@
       });
 
       Livewire.on('show-partial-reschedule-confirm', (event) => {
-        console.log('show-partial-reschedule-confirm triggered', event);
 
         // اطمینان از اینکه event یک آرایه است و داده‌ها در اولین عنصر قرار دارند
         const data = event[0] || {};
@@ -652,12 +651,7 @@
           reverseButtons: true
         }).then((result) => {
           if (result.isConfirmed) {
-            console.log('Confirming partial reschedule', {
-              appointmentIds,
-              newDate,
-              nextDate,
-              availableSlots
-            });
+          
 
             Livewire.dispatchTo(
               'dr.panel.turn.schedule.appointments-list',
@@ -670,6 +664,84 @@
               window.closeXModal('reschedule-modal');
             }, 100);
           } else {
+            window.closeXAlert('reschedule-confirm-alert');
+          }
+        });
+      });
+      Livewire.on('show-first-available-confirm', (event) => {
+
+        const data = event[0] || {};
+        const {
+          message,
+          appointmentIds,
+          newDate,
+          availableSlots,
+          isFullCapacity,
+          nextDate
+        } = data;
+
+        // بررسی داده‌ها
+        if (!message || !appointmentIds || !newDate || !availableSlots) {
+          console.error('Invalid data in show-first-available-confirm', data);
+          Swal.fire({
+            title: 'خطا',
+            text: 'داده‌های نامعتبر دریافت شد.',
+            icon: 'error',
+            confirmButtonText: 'باشه',
+          });
+          return;
+        }
+
+        const swalOptions = {
+          title: 'تأیید جابجایی به اولین نوبت خالی',
+          text: message,
+          icon: isFullCapacity ? 'info' : 'warning',
+          showCancelButton: true,
+          confirmButtonText: isFullCapacity ? 'انتقال نوبت‌ها' : 'انتقال ناقص',
+          cancelButtonText: 'لغو',
+          reverseButtons: true,
+        };
+
+        // اضافه کردن دکمه دوم برای جابجایی کامل (فقط در حالت ظرفیت ناقص)
+        if (!isFullCapacity) {
+          swalOptions.showDenyButton = true;
+          swalOptions.denyButtonText = 'انتقال کامل به تاریخ با ظرفیت کافی';
+        }
+
+        Swal.fire(swalOptions).then((result) => {
+          if (result.isConfirmed) {
+            // انتقال نوبت‌ها (ناقص یا کامل)
+            
+
+            if (isFullCapacity) {
+              // انتقال کامل به تاریخ مقصد
+              Livewire.dispatchTo(
+                'dr.panel.turn.schedule.appointments-list',
+                'rescheduleAppointment',
+                [appointmentIds, newDate]
+              );
+            } else {
+              // انتقال ناقص
+              Livewire.dispatchTo(
+                'dr.panel.turn.schedule.appointments-list',
+                'confirm-partial-reschedule',
+                [appointmentIds, newDate, nextDate, availableSlots]
+              );
+            }
+
+            window.closeXModal('reschedule-modal');
+          } else if (result.isDenied && !isFullCapacity) {
+            // انتقال کامل به اولین تاریخ با ظرفیت کافی
+
+            Livewire.dispatchTo(
+              'dr.panel.turn.schedule.appointments-list',
+              'rescheduleAppointment',
+              [appointmentIds, nextDate]
+            );
+
+            window.closeXModal('reschedule-modal');
+          } else {
+            // لغو
             window.closeXAlert('reschedule-confirm-alert');
           }
         });
