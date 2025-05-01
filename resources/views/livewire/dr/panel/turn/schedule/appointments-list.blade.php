@@ -616,6 +616,64 @@
           }
         }
       });
+
+      Livewire.on('show-partial-reschedule-confirm', (event) => {
+        console.log('show-partial-reschedule-confirm triggered', event);
+
+        // اطمینان از اینکه event یک آرایه است و داده‌ها در اولین عنصر قرار دارند
+        const data = event[0] || {};
+        const {
+          message,
+          appointmentIds,
+          newDate,
+          nextDate,
+          availableSlots
+        } = data;
+
+        // بررسی مقادیر
+        if (!message || !appointmentIds || !newDate || !nextDate || !availableSlots) {
+          console.error('Invalid data received in show-partial-reschedule-confirm', data);
+          Swal.fire({
+            title: 'خطا',
+            text: 'داده‌های نامعتبر دریافت شد. لطفاً دوباره تلاش کنید.',
+            icon: 'error',
+            confirmButtonText: 'باشه'
+          });
+          return;
+        }
+
+        Swal.fire({
+          title: 'تأیید جابجایی ناقص',
+          text: message,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'بله، منتقل کن',
+          cancelButtonText: 'خیر',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            console.log('Confirming partial reschedule', {
+              appointmentIds,
+              newDate,
+              nextDate,
+              availableSlots
+            });
+
+            Livewire.dispatchTo(
+              'dr.panel.turn.schedule.appointments-list',
+              'confirm-partial-reschedule',
+              [appointmentIds, newDate, nextDate, availableSlots] // ارسال پارامترها به صورت آرایه
+            );
+
+            // بستن مودال با تأخیر
+            setTimeout(() => {
+              window.closeXModal('reschedule-modal');
+            }, 100);
+          } else {
+            window.closeXAlert('reschedule-confirm-alert');
+          }
+        });
+      });
     });
   </script>
 </div>
