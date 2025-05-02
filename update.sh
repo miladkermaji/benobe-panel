@@ -1,5 +1,7 @@
 #!/bin/bash
-
+# قبل از دستورات git این خط را اضافه کنید
+export GIT_CONFIG_NOSYSTEM=1
+export XDG_CONFIG_HOME=/tmp
 # دایرکتوری کاری
 WORKING_DIR="/var/www/panel"
 LOG_FILE="$WORKING_DIR/git_pull_log.txt"
