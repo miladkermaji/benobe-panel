@@ -24,6 +24,7 @@ class Appointment extends Model
 
         'tracking_code',
         'fee',
+        'final_price',
         'appointment_category',
         'location',
         'notification_sent',

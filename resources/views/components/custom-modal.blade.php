@@ -68,7 +68,7 @@
   position: relative;
   width: 100%;
   max-width: 500px;
-  min-height: 200px;
+  min-height: 200px !important;
   margin: 1rem;
   transform: translateY(100px) scale(0.9);
   opacity: 0;
@@ -102,7 +102,7 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   transform: translateZ(0);
-  min-height: 200px;
+  min-height: 200px !important;
   display: flex;
   flex-direction: column;
 }
@@ -148,7 +148,6 @@
 
 .x-modal__body {
   padding: 1.5rem;
-  max-height: 70vh;
   flex: 1;
 }
 
@@ -163,7 +162,7 @@
   }
 
   .x-modal__content {
-    min-height: 180px;
+    min-height: 180px !important;
   }
 }
 </style>

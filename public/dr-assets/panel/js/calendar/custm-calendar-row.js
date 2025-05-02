@@ -65,10 +65,12 @@ $(document).ready(function () {
     Livewire.on("appointments-cancelled", (event) => {
         fetchAppointmentsCount();
     });
-     Livewire.on("appointments-rescheduled", (event) => {
-         fetchAppointmentsCount();
-     });
-    
+    Livewire.on("appointments-rescheduled", (event) => {
+        fetchAppointmentsCount();
+    });
+    Livewire.on("visited", (event) => {
+        fetchAppointmentsCount();
+    });
 
     function fetchAppointmentsCount() {
         if (!calendar.length) {

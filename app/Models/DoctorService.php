@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 class DoctorService extends Model
 {
     protected $fillable = [
@@ -37,7 +36,7 @@ class DoctorService extends Model
 
     public function insurance()
     {
-        return $this->belongsTo(Insurance::class);
+        return $this->belongsTo(Insurance::class, 'insurance_id');
     }
 
     public function parent()
