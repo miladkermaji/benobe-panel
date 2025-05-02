@@ -34,12 +34,18 @@
     border-radius: 8px;
     font-size: 0.875rem;
     font-weight: 500;
-    white-space: nowrap;
+    width: 170px;
+    min-height: 40px;
+    text-align: center;
+    align-items: center;
+    white-space: wrap;
     opacity: 0;
+    display: flex;
+    justify-content: center;
     visibility: hidden;
     transform: translateY(10px);
     transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-    z-index: 1000;
+    z-index: 11000 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
@@ -47,7 +53,7 @@
     content: '';
     position: absolute;
     border: 6px solid transparent;
-    z-index: 1001;
+    z-index: 11001;
   }
 
   /* موقعیت‌های مختلف تولتیپ */

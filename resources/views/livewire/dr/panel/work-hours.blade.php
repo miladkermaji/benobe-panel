@@ -75,53 +75,61 @@
                                     <label class="label-top-input-special-takhasos"
                                       for="morning-patients-{{ $englishDay }}-{{ $index }}">تعداد
                                       نوبت</label>
+
                                     <input type="text"
                                       class="form-control h-50 text-center max-appointments bg-white"
                                       id="morning-patients-{{ $englishDay }}-{{ $index }}"
                                       wire:model.live="slots.{{ $englishDay }}.{{ $index }}.max_appointments"
                                       data-bs-toggle="modal" data-bs-target="#CalculatorModal"
                                       data-day="{{ $englishDay }}" data-index="{{ $index }}" readonly />
+
                                   </div>
                                   <!-- دکمه جدید برای نوبت‌های اورژانسی -->
                                   <div class="form-group position-relative">
-                                    <button data-tooltip="true" data-placement="bottom"
-                                      data-original-title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
-                                      class="btn btn-light btn-sm emergency-slot-btn" data-bs-toggle="modal"
-                                      data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
-                                      data-index="{{ $index }}"
-                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                      <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
-                                    </button>
+                                    <x-custom-tooltip
+                                      title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
+                                      placement="top">
+
+                                      <button class="btn btn-light btn-sm emergency-slot-btn" data-bs-toggle="modal"
+                                        data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
+                                        data-index="{{ $index }}"
+                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                        <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                                      </button>
+                                    </x-custom-tooltip>
                                   </div>
                                   <!-- دکمه کپی -->
                                   <div class="form-group position-relative">
-                                    <button data-tooltip="true" data-placement="top"
-                                      data-original-title="کپی ساعات کاری"
-                                      class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal"
-                                      data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
-                                      data-index="{{ $index }}"
-                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                      <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
-                                    </button>
+                                    <x-custom-tooltip title="کپی ساعات کاری" placement="top">
+                                      <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal"
+                                        data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
+                                        data-index="{{ $index }}"
+                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                        <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
+                                      </button>
+                                    </x-custom-tooltip>
                                   </div>
                                   <!-- دکمه حذف -->
                                   <div class="form-group position-relative">
-                                    <button data-tooltip="true" data-placement="bottom"
-                                      data-original-title="حذف برنامه کاری" class="btn btn-light btn-sm remove-row-btn"
-                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                      <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                                    </button>
+                                    <x-custom-tooltip title="حذف برنامه کاری" placement="top">
+                                      <button class="btn btn-light btn-sm remove-row-btn"
+                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                      </button>
+                                    </x-custom-tooltip>
                                   </div>
                                 </div>
                                 <div class="d-flex align-items-center">
-                                  <button data-tooltip="true" data-placement="top"
-                                    data-original-title="زمانبندی باز شدن نوبت ها" type="button"
-                                    class="btn text-black btn-sm btn-outline-primary schedule-btn"
-                                    data-bs-toggle="modal" data-bs-target="#scheduleModal"
-                                    data-day="{{ $englishDay }}" data-index="{{ $index }}"
-                                    {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                    <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
-                                  </button>
+                                  <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
+                                    <button type="button"
+                                      class="btn text-black btn-sm btn-outline-primary schedule-btn"
+                                      data-bs-toggle="modal" data-bs-target="#scheduleModal"
+                                      data-day="{{ $englishDay }}" data-index="{{ $index }}"
+                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                      <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                    </button>
+                                  </x-custom-tooltip>
+
                                 </div>
                               </div>
                             @endforeach
@@ -157,45 +165,48 @@
                                 </div>
                                 <!-- دکمه جدید برای نوبت‌های اورژانسی -->
                                 <div class="form-group position-relative">
-                                  <button data-tooltip="true" data-placement="bottom"
-                                    data-original-title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
-                                    class="btn btn-light btn-sm emergency-slot-btn" data-bs-toggle="modal"
-                                    data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
-                                    data-index="{{ $index }}"
-                                    {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                    <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
-                                  </button>
+                                  <x-custom-tooltip
+                                    title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
+                                    placement="top">
+                                    <button class="btn btn-light btn-sm emergency-slot-btn" data-bs-toggle="modal"
+                                      data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
+                                      data-index="{{ $index }}"
+                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                      <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                                    </button>
+                                  </x-custom-tooltip>
                                 </div>
                                 <!-- دکمه کپی -->
                                 <div class="form-group position-relative">
-                                  <button data-tooltip="true" data-placement="top"
-                                    data-original-title="کپی ساعات کاری"
-                                    class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal"
-                                    data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
-                                    data-index="{{ $index }}"
-                                    {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                    <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
-                                  </button>
+                                  <x-custom-tooltip title="کپی ساعات کاری" placement="top">
+                                      <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal"
+                                        data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
+                                        data-index="{{ $index }}"
+                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                        <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
+                                      </button>
+                                    </x-custom-tooltip>
                                 </div>
                                 <!-- دکمه حذف -->
                                 <div class="form-group position-relative">
-                                  <button data-tooltip="true" data-placement="bottom"
-                                    data-original-title="حذف برنامه کاری" class="btn btn-light btn-sm remove-row-btn"
-                                    {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                                  </button>
+                                  <x-custom-tooltip title="حذف برنامه کاری" placement="top">
+                                      <button class="btn btn-light btn-sm remove-row-btn"
+                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                      </button>
+                                    </x-custom-tooltip>
                                 </div>
                               </div>
                               <div class="d-flex align-items-center">
-                                <button data-tooltip="true" data-placement="top"
-                                  data-original-title="زمانبندی باز شدن نوبت ها" type="button"
-                                  class="btn text-black btn-sm btn-outline-primary schedule-btn"
-                                  data-bs-toggle="modal" data-bs-target="#scheduleModal"
-                                  data-day="{{ $englishDay }}" data-index="{{ $index }}"
-                                  {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                  <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
-
-                                </button>
+                                <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
+                                    <button type="button"
+                                      class="btn text-black btn-sm btn-outline-primary schedule-btn"
+                                      data-bs-toggle="modal" data-bs-target="#scheduleModal"
+                                      data-day="{{ $englishDay }}" data-index="{{ $index }}"
+                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                      <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                    </button>
+                                  </x-custom-tooltip>
                               </div>
                             </div>
                           @endif
