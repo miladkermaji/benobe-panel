@@ -4,47 +4,48 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+
 class DoctorService extends Model
 {
     protected $fillable = [
-            'doctor_id',
-            'clinic_id',
-            'insurance_id',
-            'name',
-            'description',
-            'duration',
-            'price',
-            'discount',
-            'status',
-            'parent_id',
-        ];
+        'doctor_id',
+        'clinic_id',
+        'insurance_id',
+        'service_id',
+        'name',
+        'description',
+        'status',
+        'duration',
+        'price',
+        'discount',
+        'parent_id',
+    ];
 
-    // ارتباط با مدل دکتر
-    public function doctor()
+    protected $casts = [
+        'status' => 'boolean',
+    ];
+
+    public function service()
     {
-        return $this->belongsTo(Doctor::class, 'doctor_id');
+        return $this->belongsTo(Service::class);
     }
+
     public function clinic()
     {
-        return $this->belongsTo(Clinic::class, 'clinic_id');
+        return $this->belongsTo(Clinic::class);
     }
 
-    // ارتباط خودارجاعی برای دسترسی به سرویس مادر (در صورت وجود)
+    public function insurance()
+    {
+        return $this->belongsTo(Insurance::class);
+    }
+
     public function parent()
     {
         return $this->belongsTo(DoctorService::class, 'parent_id');
     }
 
-    // ارتباط خودارجاعی برای دریافت زیرسرویس‌ها
     public function children()
-    {
-        return $this->hasMany(DoctorService::class, 'parent_id')->with('children');
-    }
-    public function insurance()
-    {
-        return $this->belongsTo(Insurance::class);
-    }
-    public function subServices()
     {
         return $this->hasMany(DoctorService::class, 'parent_id');
     }

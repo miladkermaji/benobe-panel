@@ -10,4 +10,8 @@ class Service extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+    public function doctorServices()
+    {
+        return $this->hasMany(DoctorService::class);
+    }
 }

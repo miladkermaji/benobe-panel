@@ -2,13 +2,14 @@
 
 namespace App\Livewire\Dr\Panel\DoctorServices;
 
+use App\Models\Clinic;
+use App\Models\Service;
 use Livewire\Component;
+use App\Models\Insurance;
 use Livewire\WithPagination;
 use App\Models\DoctorService;
-use App\Models\Insurance;
-use App\Models\Clinic;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class DoctorServiceList extends Component
 {
@@ -59,9 +60,9 @@ class DoctorServiceList extends Component
         }
 
         $this->createDefaultVisitService();
-        $this->readyToLoad = true; // اطمینان از تنظیم readyToLoad
+        $this->readyToLoad = true;
         $this->resetPage();
-        $this->dispatch('refreshList'); // event برای رفرش ویو
+        $this->dispatch('refreshList');
     }
 
     public function createDefaultVisitService()
@@ -69,25 +70,34 @@ class DoctorServiceList extends Component
         $doctorId = Auth::guard('doctor')->user()->id;
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
 
-        // بررسی وجود بیمه آزاد
-        $freeInsurance = Insurance::where('id', 72)->first();
-        if (!$freeInsurance) {
-            Log::warning('بیمه آزاد با ID 72 یافت نشد.');
-            return;
-        }
+        // بررسی وجود هرگونه خدمت برای پزشک
+        $hasServices = DoctorService::where('doctor_id', $doctorId)->exists();
 
-        // بررسی وجود سرویس ویزیت پیش‌فرض
-        $existingService = DoctorService::where('doctor_id', $doctorId)
-            ->where('name', 'ویزیت')
-            ->where('insurance_id', 72)
-            ->where('clinic_id', $clinicId)
-            ->first();
+        if (!$hasServices) {
+            // بررسی وجود بیمه آزاد
+            $freeInsurance = Insurance::where('id', 72)->first();
+            if (!$freeInsurance) {
+                Log::warning('بیمه آزاد با ID 72 یافت نشد.');
+                return;
+            }
 
-        if (!$existingService) {
+            // پیدا کردن یا ایجاد خدمت "ویزیت" در جدول Service
+            $visitService = Service::where('name', 'ویزیت')->first();
+            if (!$visitService) {
+                $visitService = Service::create([
+                    'name' => 'ویزیت',
+                    'description' => 'ویزیت عمومی پزشک',
+                    'status' => true,
+                ]);
+                Log::info('خدمت ویزیت در جدول Service ایجاد شد.');
+            }
+
+            // ایجاد سرویس ویزیت پیش‌فرض
             DoctorService::create([
                 'doctor_id' => $doctorId,
                 'clinic_id' => $clinicId,
                 'insurance_id' => 72,
+                'service_id' => $visitService->id,
                 'name' => 'ویزیت',
                 'description' => 'ویزیت پیش‌فرض',
                 'duration' => 15,
@@ -97,6 +107,8 @@ class DoctorServiceList extends Component
                 'parent_id' => null,
             ]);
             Log::info('سرویس ویزیت پیش‌فرض برای پزشک با ID ' . $doctorId . ' ایجاد شد.');
+        } else {
+            Log::info('ویزیت پیش‌فرض ایجاد نشد چون حداقل یک خدمت برای پزشک با ID ' . $doctorId . ' وجود دارد.');
         }
     }
 
@@ -104,7 +116,7 @@ class DoctorServiceList extends Component
     {
         $this->readyToLoad = true;
         Log::info('loadDoctorServices called with selectedClinicId: ' . $this->selectedClinicId);
-        $this->dispatch('refreshList'); // event برای رفرش ویو
+        $this->dispatch('refreshList');
     }
 
     public function clinicSelected($clinicId = 'default')
@@ -127,59 +139,59 @@ class DoctorServiceList extends Component
         $this->createDefaultVisitService();
         $this->readyToLoad = true;
         $this->resetPage();
-        $this->dispatch('refreshList'); // event برای رفرش ویو
+        $this->dispatch('refreshList');
     }
 
-private function getDoctorServicesQuery()
-{
-    $doctorId = Auth::guard('doctor')->user()->id;
+    private function getDoctorServicesQuery()
+    {
+        $doctorId = Auth::guard('doctor')->user()->id;
 
-    // کوئری اصلی برای دریافت بیمه‌ها و خدمات مرتبط
-    $query = Insurance::with(['doctorServices' => function ($query) use ($doctorId) {
-        $query->where('doctor_id', $doctorId)
-              ->where(function ($q) {
-                  $q->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('description', 'like', '%' . $this->search . '%');
-              });
-        // اعمال فیلتر clinic_id در بخش with
-        if ($this->selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
-        } else {
-            $query->where('clinic_id', $this->selectedClinicId);
-        }
-        $query->with('children');
-    }])
-    ->whereHas('doctorServices', function ($query) use ($doctorId) {
-        $query->where('doctor_id', $doctorId)
-              ->where(function ($q) {
-                  $q->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('description', 'like', '%' . $this->search . '%');
-              });
-        // اعمال فیلتر clinic_id در بخش whereHas
-        if ($this->selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
-        } else {
-            $query->where('clinic_id', $this->selectedClinicId);
-        }
-    });
-
-    // دریافت نتایج با صفحه‌بندی
-    $paginated = $query->paginate($this->perPage);
-
-    // لاگ برای دیباگ
-    Log::info('Selected Clinic ID: ' . $this->selectedClinicId);
-    Log::info('Doctor ID: ' . $doctorId);
-    Log::info('Query Results: ', $paginated->toArray());
-
-    // تنظیم پراپرتی isOpen برای خدمات
-    $paginated->getCollection()->each(function ($insurance) {
-        $insurance->doctorServices->each(function ($service) {
-            $service->isOpen = in_array($service->id, $this->openServices);
+        // کوئری اصلی برای دریافت بیمه‌ها و خدمات مرتبط
+        $query = Insurance::with(['doctorServices' => function ($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId)
+                  ->where(function ($q) {
+                      $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%');
+                  });
+            // اعمال فیلتر clinic_id در بخش with
+            if ($this->selectedClinicId === 'default') {
+                $query->whereNull('clinic_id');
+            } else {
+                $query->where('clinic_id', $this->selectedClinicId);
+            }
+            $query->with('children');
+        }])
+        ->whereHas('doctorServices', function ($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId)
+                  ->where(function ($q) {
+                      $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%');
+                  });
+            // اعمال فیلتر clinic_id در بخش whereHas
+            if ($this->selectedClinicId === 'default') {
+                $query->whereNull('clinic_id');
+            } else {
+                $query->where('clinic_id', $this->selectedClinicId);
+            }
         });
-    });
 
-    return $paginated;
-}
+        // دریافت نتایج با صفحه‌بندی
+        $paginated = $query->paginate($this->perPage);
+
+        // لاگ برای دیباگ
+        Log::info('Selected Clinic ID: ' . $this->selectedClinicId);
+        Log::info('Doctor ID: ' . $doctorId);
+        Log::info('Query Results: ', $paginated->toArray());
+
+        // تنظیم پراپرتی isOpen برای خدمات
+        $paginated->getCollection()->each(function ($insurance) {
+            $insurance->doctorServices->each(function ($service) {
+                $service->isOpen = in_array($service->id, $this->openServices);
+            });
+        });
+
+        return $paginated;
+    }
 
     public function toggleStatus($id)
     {
