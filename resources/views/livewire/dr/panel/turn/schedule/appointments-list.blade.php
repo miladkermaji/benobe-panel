@@ -79,7 +79,7 @@
                     <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
                   </td>
                   <td>
-                    {{ $appointment->fee ? $appointment->fee . " " . "تومان" :  '---' }}
+                    {{ $appointment->fee ? $appointment->fee . ' ' . 'تومان' : '---' }}
                   </td>
                   <td>
                     @php
@@ -304,106 +304,107 @@
     </x-custom-modal>
   </div>
 
-<div wire:ignore>
+  <div wire:ignore>
     <x-custom-modal id="end-visit-modal" title="پایان ویزیت" size="lg" :show="false">
-        <form wire:submit.prevent="endVisit({{ $endVisitAppointmentId ?? 'null' }})">
-            <div class="row g-2">
-                <!-- بخش بیمه -->
-                <div class="col-12">
-                    <div class="border rounded p-2 bg-light">
-                        <label class="form-label fw-bold mb-1">انتخاب بیمه</label>
-                        @if (count($insurances) > 0)
-                            @foreach ($insurances as $index => $insurance)
-                                <div class="form-check mb-1">
-                                    <input class="form-check-input" type="radio" name="selectedInsuranceId"
-                                        id="insurance_{{ $insurance['id'] }}" wire:model.live="selectedInsuranceId"
-                                        value="{{ $insurance['id'] }}">
-                                    <label class="form-check-label" for="insurance_{{ $insurance['id'] }}">{{ $insurance['name'] }}</label>
-                                </div>
-                            @endforeach
-                        @else
-                            <p class="text-danger small mb-0">هیچ بیمه‌ای یافت نشد.</p>
-                        @endif
-                        @error('selectedInsuranceId')
-                            <span class="text-danger small">{{ $message }}</span>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- بخش خدمات -->
-                <div class="col-12">
-                    <div class="border rounded p-2 bg-light services-checkbox-container">
-                        <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
-                        <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
-                            @if (count($services) > 0)
-                                @foreach ($services as $service)
-                                    <div class="form-check mb-1">
-                                        <input class="form-check-input" type="checkbox" id="service_{{ $service['id'] }}"
-                                            wire:model.live="selectedServiceIds" value="{{ $service['id'] }}"
-                                            wire:key="service-{{ $service['id'] }}">
-                                        <label class="form-check-label" for="service_{{ $service['id'] }}">
-                                            {{ $service['name'] }} ({{ number_format($service['price']) }} تومان)
-                                        </label>
-                                    </div>
-                                @endforeach
-                            @else
-                                <p class="text-danger small mb-0">هیچ خدمتی یافت نشد.</p>
-                            @endif
-                        </div>
-                        @error('selectedServiceIds')
-                            <span class="text-danger small">{{ $message }}</span>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- ویزیت رایگان -->
-                <div class="col-12">
-                    <div class="border rounded p-2 bg-light">
-                        <div class="form-check mb-0">
-                            <input type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
-                            <label class="form-check-label" for="isFree">ویزیت رایگان</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- تخفیف و قیمت نهایی -->
-                <div class="col-md-6">
-                    <div class="border rounded p-2 bg-light">
-                        <label class="form-label fw-bold mb-1">تخفیف</label>
-                        <input type="text" class="form-control" readonly
-                            wire:click="$dispatch('openXModal', { id: 'discount-modal' })"
-                            value="{{ $discountPercentage ? number_format($discountPercentage, 2) . '%' : '' }}"
-                            @if ($isFree) disabled @endif>
-                        @error('discountPercentage')
-                            <span class="text-danger small">{{ $message }}</span>
-                        @enderror
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="border rounded p-2 bg-light">
-                        <label class="form-label fw-bold mb-1">قیمت نهایی</label>
-                        <input type="text" class="form-control" readonly
-                            value="{{ number_format($finalPrice) }} تومان">
-                        @error('finalPrice')
-                            <span class="text-danger small">{{ $message }}</span>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- توضیحات -->
-                <div class="col-12">
-                    <div class="border rounded p-2 bg-light">
-                        <label class="form-label fw-bold mb-1">توضیحات درمان</label>
-                        <textarea class="form-control" rows="2" wire:model.live="endVisitDescription"
-                            placeholder="توضیحات درمان را وارد کنید..."></textarea>
-                    </div>
-                </div>
+      <form wire:submit.prevent="endVisit({{ $endVisitAppointmentId ?? 'null' }})">
+        <div class="row g-2">
+          <!-- بخش بیمه -->
+          <div class="col-12">
+            <div class="border rounded p-2 bg-light">
+              <label class="form-label fw-bold mb-1">انتخاب بیمه</label>
+              @if (count($insurances) > 0)
+                @foreach ($insurances as $index => $insurance)
+                  <div class="form-check mb-1">
+                    <input class="form-check-input" type="radio" name="selectedInsuranceId"
+                      id="insurance_{{ $insurance['id'] }}" wire:model.live="selectedInsuranceId"
+                      value="{{ $insurance['id'] }}">
+                    <label class="form-check-label"
+                      for="insurance_{{ $insurance['id'] }}">{{ $insurance['name'] }}</label>
+                  </div>
+                @endforeach
+              @else
+                <p class="text-danger small mb-0">هیچ بیمه‌ای یافت نشد.</p>
+              @endif
+              @error('selectedInsuranceId')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
+          </div>
 
-            <button type="submit" class="btn my-btn-primary w-100 mt-2">ثبت</button>
-        </form>
+          <!-- بخش خدمات -->
+          <div class="col-12">
+            <div class="border rounded p-2 bg-light services-checkbox-container">
+              <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
+              <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
+                @if (count($services) > 0)
+                  @foreach ($services as $service)
+                    <div class="form-check mb-1">
+                      <input class="form-check-input" type="checkbox" id="service_{{ $service['id'] }}"
+                        wire:model.live="selectedServiceIds" value="{{ $service['id'] }}"
+                        wire:key="service-{{ $service['id'] }}">
+                      <label class="form-check-label" for="service_{{ $service['id'] }}">
+                        {{ $service['name'] }} ({{ number_format($service['price']) }} تومان)
+                      </label>
+                    </div>
+                  @endforeach
+                @else
+                  <p class="text-danger small mb-0">هیچ خدمتی یافت نشد.</p>
+                @endif
+              </div>
+              @error('selectedServiceIds')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
+            </div>
+          </div>
+
+          <!-- ویزیت رایگان -->
+          <div class="col-12">
+            <div class="border rounded p-2 bg-light">
+              <div class="form-check mb-0">
+                <input type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
+                <label class="form-check-label" for="isFree">ویزیت رایگان</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- تخفیف و قیمت نهایی -->
+          <div class="col-md-6">
+            <div class="border rounded p-2 bg-light">
+              <label class="form-label fw-bold mb-1">تخفیف</label>
+              <input type="text" class="form-control" readonly
+                wire:click="$dispatch('openXModal', { id: 'discount-modal' })"
+                value="{{ $discountPercentage ? number_format($discountPercentage, 2) . '%' : '' }}"
+                @if ($isFree) disabled @endif>
+              @error('discountPercentage')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="border rounded p-2 bg-light">
+              <label class="form-label fw-bold mb-1">قیمت نهایی</label>
+              <input type="text" class="form-control" readonly value="{{ number_format($finalPrice) }} تومان"
+                @if ($isFree) disabled @endif>
+              @error('finalPrice')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
+            </div>
+          </div>
+
+          <!-- توضیحات -->
+          <div class="col-12">
+            <div class="border rounded p-2 bg-light">
+              <label class="form-label fw-bold mb-1">توضیحات درمان</label>
+              <textarea class="form-control" rows="2" wire:model.live="endVisitDescription"
+                placeholder="توضیحات درمان را وارد کنید..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn my-btn-primary w-100 mt-2">ثبت</button>
+      </form>
     </x-custom-modal>
-</div>
+  </div>
 
   <div wire:ignore>
     <x-custom-modal id="discount-modal" title="اعمال تخفیف" size="md" :show="false">
@@ -411,7 +412,8 @@
         <div class="mb-3">
           <label class="form-label">درصد تخفیف</label>
           <input type="number" class="form-control" wire:model.live="discountInputPercentage"
-            placeholder="درصد تخفیف را وارد کنید" min="0" max="100" step="0.01">
+            placeholder="درصد تخفیف را وارد کنید" min="0" max="100" step="0.01"
+            @if ($isFree) disabled @endif>
           @error('discountInputPercentage')
             <span class="text-danger">{{ $message }}</span>
           @enderror
@@ -420,147 +422,199 @@
         <div class="mb-3">
           <label class="form-label">مبلغ تخفیف</label>
           <input type="number" class="form-control" wire:model.live="discountInputAmount"
-            placeholder="مبلغ تخفیف را وارد کنید" min="0" step="1">
+            placeholder="مبلغ تخفیف را وارد کنید" min="0" step="1"
+            @if ($isFree) disabled @endif>
           @error('discountInputAmount')
             <span class="text-danger">{{ $message }}</span>
-            @endif
-          </div>
+          @enderror
+        </div>
 
-          <button type="submit" class="btn my-btn-primary w-100 h-50">تأیید</button>
-        </form>
-      </x-custom-modal>
-    </div>
-    <div wire:ignore>
-      <x-custom-alert id="no-results-alert" type="warning" title="نتیجه‌ای یافت نشد"
-        message="هیچ نتیجه‌ای برای جستجوی شما یافت نشد. آیا می‌خواهید در همه سوابق و نوبت‌ها جستجو کنید؟" size="md"
-        :show="$showNoResultsAlert" />
-    </div>
-    <script>
-      window.holidaysData = @json($holidaysData);
-      window.appointmentsData = @json($appointmentsData);
+        <button type="submit" class="btn my-btn-primary w-100 h-50"
+          @if ($isFree) disabled @endif>تأیید</button>
+      </form>
+    </x-custom-modal>
+  </div>
+  <div wire:ignore>
+    <x-custom-alert id="no-results-alert" type="warning" title="نتیجه‌ای یافت نشد"
+      message="هیچ نتیجه‌ای برای جستجوی شما یافت نشد. آیا می‌خواهید در همه سوابق و نوبت‌ها جستجو کنید؟" size="md"
+      :show="$showNoResultsAlert" />
+  </div>
+  <script>
+    window.holidaysData = @json($holidaysData);
+    window.appointmentsData = @json($appointmentsData);
 
-      document.addEventListener('livewire:initialized', () => {
-        // اطمینان از وجود متغیرهای سراسری
-        window.holidaysData = window.holidaysData || {
-          status: false,
-          holidays: []
-        };
-        window.appointmentsData = window.appointmentsData || {
-          status: false,
-          data: []
-        };
-        const clinicId = @json($selectedClinicId);
-        if (clinicId && clinicId !== 'default') {
-          localStorage.setItem('selectedClinicId', clinicId);
-        }
+    document.addEventListener('livewire:initialized', () => {
+      // اطمینان از وجود متغیرهای سراسری
+      window.holidaysData = window.holidaysData || {
+        status: false,
+        holidays: []
+      };
+      window.appointmentsData = window.appointmentsData || {
+        status: false,
+        data: []
+      };
+      const clinicId = @json($selectedClinicId);
+      if (clinicId && clinicId !== 'default') {
+        localStorage.setItem('selectedClinicId', clinicId);
+      }
 
-        window.addEventListener('openXModal', event => {
-          const modalId = event.detail.id;
-          const appointmentId = event.detail.appointmentId || null;
-          window.openXModal(modalId);
+      window.addEventListener('openXModal', event => {
+        const modalId = event.detail.id;
+        const appointmentId = event.detail.appointmentId || null;
+        window.openXModal(modalId);
 
-          if (appointmentId && modalId === 'reschedule-modal') {
-            @this.set('rescheduleAppointmentId', appointmentId);
-            @this.set('rescheduleAppointmentIds', [appointmentId]);
-          } else if (modalId === 'reschedule-modal') {
-            const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
-            const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
-            @this.set('rescheduleAppointmentIds', selectedIds);
-            @this.loadCalendarData();
-          } else if (modalId === 'end-visit-modal' && appointmentId) {
-            @this.set('endVisitAppointmentId', appointmentId);
-          }
-        });
-        Livewire.on('calendarDataUpdated', () => {
-          // به‌روزرسانی دستی متغیرهای سراسری
-          window.holidaysData = @json($holidaysData);
-          window.appointmentsData = @json($appointmentsData);
-
-        });
-
-
-        Livewire.on('refresh', () => {
-          initializeDropdowns();
-        });
-
-        function initializeDropdowns() {
-          const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-          dropdownElementList.map(function(dropdownToggleEl) {
-            return new bootstrap.Dropdown(dropdownToggleEl);
-          });
-        }
-
-        document.addEventListener('DOMContentLoaded', initializeDropdowns);
-
-        const selectAllCheckbox = document.getElementById('select-all-row');
-        const cancelAppointmentsBtn = document.getElementById('cancel-appointments-btn');
-        const moveAppointmentsBtn = document.getElementById('move-appointments-btn');
-        const blockUsersBtn = document.getElementById('block-users-btn');
-
-        function updateButtonStates() {
+        if (appointmentId && modalId === 'reschedule-modal') {
+          @this.set('rescheduleAppointmentId', appointmentId);
+          @this.set('rescheduleAppointmentIds', [appointmentId]);
+        } else if (modalId === 'reschedule-modal') {
           const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
-          const anySelected = selectedCheckboxes.length > 0;
+          const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
+          @this.set('rescheduleAppointmentIds', selectedIds);
+          @this.loadCalendarData();
+        } else if (modalId === 'end-visit-modal' && appointmentId) {
+          @this.set('endVisitAppointmentId', appointmentId);
+        }
+      });
+      Livewire.on('calendarDataUpdated', () => {
+        // به‌روزرسانی دستی متغیرهای سراسری
+        window.holidaysData = @json($holidaysData);
+        window.appointmentsData = @json($appointmentsData);
 
-          if (!cancelAppointmentsBtn || !moveAppointmentsBtn || !blockUsersBtn) {
-            console.warn('یکی از دکمه‌ها یافت نشد');
-            return;
-          }
+      });
 
-          cancelAppointmentsBtn.disabled = !anySelected;
-          moveAppointmentsBtn.disabled = !anySelected;
-          blockUsersBtn.disabled = !anySelected;
 
-          if (anySelected) {
-            let hasInvalidStatus = false;
-            selectedCheckboxes.forEach(checkbox => {
-              const status = checkbox.dataset.status;
-              if (status === 'cancelled' || status === 'attended') {
-                hasInvalidStatus = true;
-              }
-            });
+      Livewire.on('refresh', () => {
+        initializeDropdowns();
+      });
 
-            cancelAppointmentsBtn.disabled = hasInvalidStatus;
-            moveAppointmentsBtn.disabled = hasInvalidStatus;
-            blockUsersBtn.disabled = false;
-          }
+      function initializeDropdowns() {
+        const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+        dropdownElementList.map(function(dropdownToggleEl) {
+          return new bootstrap.Dropdown(dropdownToggleEl);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', initializeDropdowns);
+
+      const selectAllCheckbox = document.getElementById('select-all-row');
+      const cancelAppointmentsBtn = document.getElementById('cancel-appointments-btn');
+      const moveAppointmentsBtn = document.getElementById('move-appointments-btn');
+      const blockUsersBtn = document.getElementById('block-users-btn');
+
+      function updateButtonStates() {
+        const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
+        const anySelected = selectedCheckboxes.length > 0;
+
+        if (!cancelAppointmentsBtn || !moveAppointmentsBtn || !blockUsersBtn) {
+          console.warn('یکی از دکمه‌ها یافت نشد');
+          return;
         }
 
-        function checkCheckboxes() {
+        cancelAppointmentsBtn.disabled = !anySelected;
+        moveAppointmentsBtn.disabled = !anySelected;
+        blockUsersBtn.disabled = !anySelected;
+
+        if (anySelected) {
+          let hasInvalidStatus = false;
+          selectedCheckboxes.forEach(checkbox => {
+            const status = checkbox.dataset.status;
+            if (status === 'cancelled' || status === 'attended') {
+              hasInvalidStatus = true;
+            }
+          });
+
+          cancelAppointmentsBtn.disabled = hasInvalidStatus;
+          moveAppointmentsBtn.disabled = hasInvalidStatus;
+          blockUsersBtn.disabled = false;
+        }
+      }
+
+      function checkCheckboxes() {
+        const checkboxes = document.querySelectorAll('.appointment-checkbox');
+        const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
+        selectAllCheckbox.checked = checkboxes.length > 0 && selectedCheckboxes.length === checkboxes.length;
+        updateButtonStates();
+      }
+
+      if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
           const checkboxes = document.querySelectorAll('.appointment-checkbox');
-          const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
-          selectAllCheckbox.checked = checkboxes.length > 0 && selectedCheckboxes.length === checkboxes.length;
-          updateButtonStates();
-        }
-
-        if (selectAllCheckbox) {
-          selectAllCheckbox.addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('.appointment-checkbox');
-            checkboxes.forEach(checkbox => {
-              const status = checkbox.dataset.status;
-              if (status !== 'cancelled' && status !== 'attended') {
-                checkbox.checked = selectAllCheckbox.checked;
-              }
-            });
-            updateButtonStates();
+          checkboxes.forEach(checkbox => {
+            const status = checkbox.dataset.status;
+            if (status !== 'cancelled' && status !== 'attended') {
+              checkbox.checked = selectAllCheckbox.checked;
+            }
           });
-        } else {
-          console.warn('چک‌باکس انتخاب همه پیدا نشد');
+          updateButtonStates();
+        });
+      } else {
+        console.warn('چک‌باکس انتخاب همه پیدا نشد');
+      }
+
+      document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('appointment-checkbox')) {
+          checkCheckboxes();
+        }
+      });
+
+      Livewire.on('confirm-cancel-single', (event) => {
+        const appointmentId = event.id || (event[0] && event[0].id) || null;
+
+        if (!appointmentId) {
+          console.error('شناسه نوبت در confirm-cancel-single پیدا نشد', event);
+          Swal.fire({
+            title: 'خطا',
+            text: 'شناسه نوبت نامعتبر است.',
+            icon: 'error',
+            confirmButtonText: 'باشه'
+          });
+          return;
         }
 
-        document.addEventListener('change', function(e) {
-          if (e.target.classList.contains('appointment-checkbox')) {
-            checkCheckboxes();
+        Swal.fire({
+          title: 'تأیید لغو نوبت',
+          text: 'آیا مطمئن هستید که می‌خواهید این نوبت را لغو کنید؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'بله، لغو کن',
+          cancelButtonText: 'خیر',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const ids = [parseInt(appointmentId)];
+            @this.set('cancelIds', ids);
+            @this.call('triggerCancelAppointments');
           }
         });
+      });
 
-        Livewire.on('confirm-cancel-single', (event) => {
-          const appointmentId = event.id || (event[0] && event[0].id) || null;
+      Livewire.on('appointments-cancelled', (event) => {
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: event.message || 'نوبت(ها) با موفقیت لغو شد.',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+          }
+        });
+      });
 
-          if (!appointmentId) {
-            console.error('شناسه نوبت در confirm-cancel-single پیدا نشد', event);
+      if (cancelAppointmentsBtn) {
+        cancelAppointmentsBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const selected = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
+            parseInt(cb.value));
+
+          if (selected.length === 0) {
+            console.warn('هیچ نوبت برای لغو گروهی انتخاب نشده');
             Swal.fire({
               title: 'خطا',
-              text: 'شناسه نوبت نامعتبر است.',
+              text: 'لطفاً حداقل یک نوبت را انتخاب کنید.',
               icon: 'error',
               confirmButtonText: 'باشه'
             });
@@ -569,7 +623,7 @@
 
           Swal.fire({
             title: 'تأیید لغو نوبت',
-            text: 'آیا مطمئن هستید که می‌خواهید این نوبت را لغو کنید؟',
+            text: `آیا مطمئن هستید که می‌خواهید ${selected.length} نوبت را لغو کنید؟`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'بله، لغو کن',
@@ -577,313 +631,263 @@
             reverseButtons: true
           }).then((result) => {
             if (result.isConfirmed) {
-              const ids = [parseInt(appointmentId)];
-              @this.set('cancelIds', ids);
+              @this.set('cancelIds', selected);
               @this.call('triggerCancelAppointments');
             }
           });
         });
+      } else {
+        console.warn('دکمه لغو نوبت‌ها پیدا نشد');
+      }
 
-        Livewire.on('appointments-cancelled', (event) => {
-          Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'success',
-            title: event.message || 'نوبت(ها) با موفقیت لغو شد.',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer);
-              toast.addEventListener('mouseleave', Swal.resumeTimer);
-            }
-          });
-        });
+      if (moveAppointmentsBtn) {
+        moveAppointmentsBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
+          const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
 
-        if (cancelAppointmentsBtn) {
-          cancelAppointmentsBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const selected = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
-              parseInt(cb.value));
-
-            if (selected.length === 0) {
-              console.warn('هیچ نوبت برای لغو گروهی انتخاب نشده');
-              Swal.fire({
-                title: 'خطا',
-                text: 'لطفاً حداقل یک نوبت را انتخاب کنید.',
-                icon: 'error',
-                confirmButtonText: 'باشه'
-              });
-              return;
-            }
-
-            Swal.fire({
-              title: 'تأیید لغو نوبت',
-              text: `آیا مطمئن هستید که می‌خواهید ${selected.length} نوبت را لغو کنید؟`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'بله، لغو کن',
-              cancelButtonText: 'خیر',
-              reverseButtons: true
-            }).then((result) => {
-              if (result.isConfirmed) {
-                @this.set('cancelIds', selected);
-                @this.call('triggerCancelAppointments');
-              }
-            });
-          });
-        } else {
-          console.warn('دکمه لغو نوبت‌ها پیدا نشد');
-        }
-
-        if (moveAppointmentsBtn) {
-          moveAppointmentsBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
-            const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
-
-            if (selectedIds.length === 0) {
-              Swal.fire({
-                title: 'خطا',
-                text: 'لطفاً حداقل یک نوبت را انتخاب کنید.',
-                icon: 'error',
-                confirmButtonText: 'باشه'
-              });
-              return;
-            }
-
-            @this.set('rescheduleAppointmentIds', selectedIds);
-            window.openXModal('reschedule-modal');
-          });
-        } else {
-          console.warn('دکمه جابجایی نوبت‌ها پیدا نشد');
-        }
-
-        if (blockUsersBtn) {
-          blockUsersBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
-            const mobiles = Array.from(selectedCheckboxes)
-              .map(cb => cb.dataset.mobile)
-              .filter(mobile => mobile);
-
-            if (mobiles.length === 0) {
-              Swal.fire({
-                title: 'خطا',
-                text: 'لطفاً حداقل یک کاربر را انتخاب کنید.',
-                icon: 'error',
-                confirmButtonText: 'باشه'
-              });
-              return;
-            }
-
-            @this.set('selectedMobiles', mobiles);
-            window.openXModal('block-user-modal');
-          });
-        } else {
-          console.warn('دکمه مسدود کردن کاربران پیدا نشد');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-          checkCheckboxes();
-        });
-        Livewire.on('show-no-results-alert', (event) => {
-          window.openXAlert('no-results-alert');
-
-          // مدیریت کلیک روی دکمه‌های آلرت
-          const alert = document.getElementById('no-results-alert');
-          if (alert) {
-            const confirmButton = alert.querySelector('.x-alert__button--confirm');
-            const cancelButton = alert.querySelector('.x-alert__button--cancel');
-
-            // حذف شنونده‌های قبلی برای جلوگیری از اتصال چندگانه
-            const newConfirmButton = confirmButton.cloneNode(true);
-            const newCancelButton = cancelButton.cloneNode(true);
-            confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
-            cancelButton.parentNode.replaceChild(newCancelButton, cancelButton);
-
-            // افزودن شنونده برای دکمه تأیید
-            newConfirmButton.addEventListener('click', () => {
-              @this.dispatch('confirm-search-all-dates');
-              window.closeXAlert('no-results-alert');
-            });
-
-            // افزودن شنونده برای دکمه لغو
-            newCancelButton.addEventListener('click', () => {
-              window.closeXAlert('no-results-alert');
-            });
-          }
-        });
-
-        // مدیریت مخفی کردن آلرت
-        Livewire.on('hide-no-results-alert', () => {
-          window.closeXAlert('no-results-alert');
-        });
-
-        // مدیریت پیام عدم یافتن نتیجه در جستجوی کلی
-        Livewire.on('no-results-found', (event) => {
-          if (event.searchAll) {
-            // در جستجوی کلی، پیام در جدول نمایش داده می‌شود
-            const tbody = document.querySelector('tbody');
-            if (tbody) {
-              tbody.innerHTML = `
-                        <tr>
-                            <td colspan="11" class="text-center">نتیجه‌ای یافت نشد</td>
-                        </tr>
-                    `;
-            }
-          }
-        });
-
-        Livewire.on('show-partial-reschedule-confirm', (event) => {
-
-          // اطمینان از اینکه event یک آرایه است و داده‌ها در اولین عنصر قرار دارند
-          const data = event[0] || {};
-          const {
-            message,
-            appointmentIds,
-            newDate,
-            nextDate,
-            availableSlots
-          } = data;
-
-          // بررسی مقادیر
-          if (!message || !appointmentIds || !newDate || !nextDate || !availableSlots) {
-            console.error('Invalid data received in show-partial-reschedule-confirm', data);
+          if (selectedIds.length === 0) {
             Swal.fire({
               title: 'خطا',
-              text: 'داده‌های نامعتبر دریافت شد. لطفاً دوباره تلاش کنید.',
+              text: 'لطفاً حداقل یک نوبت را انتخاب کنید.',
               icon: 'error',
               confirmButtonText: 'باشه'
             });
             return;
           }
 
-          Swal.fire({
-            title: 'تأیید جابجایی ناقص',
-            text: message,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'بله، منتقل کن',
-            cancelButtonText: 'خیر',
-            reverseButtons: true
-          }).then((result) => {
-            if (result.isConfirmed) {
-
-
-              Livewire.dispatchTo(
-                'dr.panel.turn.schedule.appointments-list',
-                'confirm-partial-reschedule',
-                [appointmentIds, newDate, nextDate, availableSlots] // ارسال پارامترها به صورت آرایه
-              );
-
-              // بستن مودال با تأخیر
-              setTimeout(() => {
-                window.closeXModal('reschedule-modal');
-              }, 100);
-            } else {
-              window.closeXAlert('reschedule-confirm-alert');
-            }
-          });
+          @this.set('rescheduleAppointmentIds', selectedIds);
+          window.openXModal('reschedule-modal');
         });
-        Livewire.on('show-first-available-confirm', (event) => {
+      } else {
+        console.warn('دکمه جابجایی نوبت‌ها پیدا نشد');
+      }
 
-          const data = event[0] || {};
-          const {
-            message,
-            appointmentIds,
-            newDate,
-            availableSlots,
-            isFullCapacity,
-            nextDate
-          } = data;
+      if (blockUsersBtn) {
+        blockUsersBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
+          const mobiles = Array.from(selectedCheckboxes)
+            .map(cb => cb.dataset.mobile)
+            .filter(mobile => mobile);
 
-          // بررسی داده‌ها
-          if (!message || !appointmentIds || !newDate || !availableSlots) {
-            console.error('Invalid data in show-first-available-confirm', data);
+          if (mobiles.length === 0) {
             Swal.fire({
               title: 'خطا',
-              text: 'داده‌های نامعتبر دریافت شد.',
+              text: 'لطفاً حداقل یک کاربر را انتخاب کنید.',
               icon: 'error',
-              confirmButtonText: 'باشه',
+              confirmButtonText: 'باشه'
             });
             return;
           }
 
-          const swalOptions = {
-            title: 'تأیید جابجایی به اولین نوبت خالی',
-            text: message,
-            icon: isFullCapacity ? 'info' : 'warning',
-            showCancelButton: true,
-            confirmButtonText: isFullCapacity ? 'انتقال نوبت‌ها' : 'انتقال ناقص',
-            cancelButtonText: 'لغو',
-            reverseButtons: true,
-          };
+          @this.set('selectedMobiles', mobiles);
+          window.openXModal('block-user-modal');
+        });
+      } else {
+        console.warn('دکمه مسدود کردن کاربران پیدا نشد');
+      }
 
-          // اضافه کردن دکمه دوم برای جابجایی کامل (فقط در حالت ظرفیت ناقص)
-          if (!isFullCapacity) {
-            swalOptions.showDenyButton = true;
-            swalOptions.denyButtonText = 'انتقال کامل به تاریخ با ظرفیت کافی';
+      document.addEventListener('DOMContentLoaded', () => {
+        checkCheckboxes();
+      });
+      Livewire.on('show-no-results-alert', (event) => {
+        window.openXAlert('no-results-alert');
+
+        // مدیریت کلیک روی دکمه‌های آلرت
+        const alert = document.getElementById('no-results-alert');
+        if (alert) {
+          const confirmButton = alert.querySelector('.x-alert__button--confirm');
+          const cancelButton = alert.querySelector('.x-alert__button--cancel');
+
+          // حذف شنونده‌های قبلی برای جلوگیری از اتصال چندگانه
+          const newConfirmButton = confirmButton.cloneNode(true);
+          const newCancelButton = cancelButton.cloneNode(true);
+          confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+          cancelButton.parentNode.replaceChild(newCancelButton, cancelButton);
+
+          // افزودن شنونده برای دکمه تأیید
+          newConfirmButton.addEventListener('click', () => {
+            @this.dispatch('confirm-search-all-dates');
+            window.closeXAlert('no-results-alert');
+          });
+
+          // افزودن شنونده برای دکمه لغو
+          newCancelButton.addEventListener('click', () => {
+            window.closeXAlert('no-results-alert');
+          });
+        }
+      });
+
+      // مدیریت مخفی کردن آلرت
+      Livewire.on('hide-no-results-alert', () => {
+        window.closeXAlert('no-results-alert');
+      });
+
+      // مدیریت پیام عدم یافتن نتیجه در جستجوی کلی
+      Livewire.on('no-results-found', (event) => {
+        if (event.searchAll) {
+          // در جستجوی کلی، پیام در جدول نمایش داده می‌شود
+          const tbody = document.querySelector('tbody');
+          if (tbody) {
+            tbody.innerHTML = `
+                        <tr>
+                            <td colspan="11" class="text-center">نتیجه‌ای یافت نشد</td>
+                        </tr>
+                    `;
           }
+        }
+      });
 
-          Swal.fire(swalOptions).then((result) => {
-            if (result.isConfirmed) {
-              // انتقال نوبت‌ها (ناقص یا کامل)
+      Livewire.on('show-partial-reschedule-confirm', (event) => {
+
+        // اطمینان از اینکه event یک آرایه است و داده‌ها در اولین عنصر قرار دارند
+        const data = event[0] || {};
+        const {
+          message,
+          appointmentIds,
+          newDate,
+          nextDate,
+          availableSlots
+        } = data;
+
+        // بررسی مقادیر
+        if (!message || !appointmentIds || !newDate || !nextDate || !availableSlots) {
+          console.error('Invalid data received in show-partial-reschedule-confirm', data);
+          Swal.fire({
+            title: 'خطا',
+            text: 'داده‌های نامعتبر دریافت شد. لطفاً دوباره تلاش کنید.',
+            icon: 'error',
+            confirmButtonText: 'باشه'
+          });
+          return;
+        }
+
+        Swal.fire({
+          title: 'تأیید جابجایی ناقص',
+          text: message,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'بله، منتقل کن',
+          cancelButtonText: 'خیر',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
 
 
-              if (isFullCapacity) {
-                // انتقال کامل به تاریخ مقصد
-                Livewire.dispatchTo(
-                  'dr.panel.turn.schedule.appointments-list',
-                  'rescheduleAppointment',
-                  [appointmentIds, newDate]
-                );
-              } else {
-                // انتقال ناقص
-                Livewire.dispatchTo(
-                  'dr.panel.turn.schedule.appointments-list',
-                  'confirm-partial-reschedule',
-                  [appointmentIds, newDate, nextDate, availableSlots]
-                );
-              }
+            Livewire.dispatchTo(
+              'dr.panel.turn.schedule.appointments-list',
+              'confirm-partial-reschedule',
+              [appointmentIds, newDate, nextDate, availableSlots] // ارسال پارامترها به صورت آرایه
+            );
 
+            // بستن مودال با تأخیر
+            setTimeout(() => {
               window.closeXModal('reschedule-modal');
-            } else if (result.isDenied && !isFullCapacity) {
-              // انتقال کامل به اولین تاریخ با ظرفیت کافی
+            }, 100);
+          } else {
+            window.closeXAlert('reschedule-confirm-alert');
+          }
+        });
+      });
+      Livewire.on('show-first-available-confirm', (event) => {
 
+        const data = event[0] || {};
+        const {
+          message,
+          appointmentIds,
+          newDate,
+          availableSlots,
+          isFullCapacity,
+          nextDate
+        } = data;
+
+        // بررسی داده‌ها
+        if (!message || !appointmentIds || !newDate || !availableSlots) {
+          console.error('Invalid data in show-first-available-confirm', data);
+          Swal.fire({
+            title: 'خطا',
+            text: 'داده‌های نامعتبر دریافت شد.',
+            icon: 'error',
+            confirmButtonText: 'باشه',
+          });
+          return;
+        }
+
+        const swalOptions = {
+          title: 'تأیید جابجایی به اولین نوبت خالی',
+          text: message,
+          icon: isFullCapacity ? 'info' : 'warning',
+          showCancelButton: true,
+          confirmButtonText: isFullCapacity ? 'انتقال نوبت‌ها' : 'انتقال ناقص',
+          cancelButtonText: 'لغو',
+          reverseButtons: true,
+        };
+
+        // اضافه کردن دکمه دوم برای جابجایی کامل (فقط در حالت ظرفیت ناقص)
+        if (!isFullCapacity) {
+          swalOptions.showDenyButton = true;
+          swalOptions.denyButtonText = 'انتقال کامل به تاریخ با ظرفیت کافی';
+        }
+
+        Swal.fire(swalOptions).then((result) => {
+          if (result.isConfirmed) {
+            // انتقال نوبت‌ها (ناقص یا کامل)
+
+
+            if (isFullCapacity) {
+              // انتقال کامل به تاریخ مقصد
               Livewire.dispatchTo(
                 'dr.panel.turn.schedule.appointments-list',
                 'rescheduleAppointment',
-                [appointmentIds, nextDate]
+                [appointmentIds, newDate]
               );
-
-              window.closeXModal('reschedule-modal');
             } else {
-              // لغو
-              window.closeXAlert('reschedule-confirm-alert');
-            }
-          });
-        });
-        Livewire.on('services-updated', () => {
-          console.log('services-updated event received');
-          Livewire.dispatch('get-services', {});
-        });
-
-        Livewire.on('services-received', (services) => {
-          console.log('Services received:', services);
-          const container = document.querySelector('.services-checkbox-container .checkbox-area');
-          if (container) {
-            container.innerHTML = ''; // پاک کردن محتوای قبلی
-            const flatServices = services[0] || [];
-            if (flatServices.length === 0) {
-              container.innerHTML = '<p class="text-danger">هیچ خدمتی یافت نشد.</p>';
-              return;
+              // انتقال ناقص
+              Livewire.dispatchTo(
+                'dr.panel.turn.schedule.appointments-list',
+                'confirm-partial-reschedule',
+                [appointmentIds, newDate, nextDate, availableSlots]
+              );
             }
 
-            flatServices.forEach(service => {
-              const div = document.createElement('div');
-              div.className = 'form-check';
-              div.innerHTML = `
+            window.closeXModal('reschedule-modal');
+          } else if (result.isDenied && !isFullCapacity) {
+            // انتقال کامل به اولین تاریخ با ظرفیت کافی
+
+            Livewire.dispatchTo(
+              'dr.panel.turn.schedule.appointments-list',
+              'rescheduleAppointment',
+              [appointmentIds, nextDate]
+            );
+
+            window.closeXModal('reschedule-modal');
+          } else {
+            // لغو
+            window.closeXAlert('reschedule-confirm-alert');
+          }
+        });
+      });
+      Livewire.on('services-updated', () => {
+        console.log('services-updated event received');
+        Livewire.dispatch('get-services', {});
+      });
+
+      Livewire.on('services-received', (services) => {
+        console.log('Services received:', services);
+        const container = document.querySelector('.services-checkbox-container .checkbox-area');
+        if (container) {
+          container.innerHTML = ''; // پاک کردن محتوای قبلی
+          const flatServices = services[0] || [];
+          if (flatServices.length === 0) {
+            container.innerHTML = '<p class="text-danger">هیچ خدمتی یافت نشد.</p>';
+            return;
+          }
+
+          flatServices.forEach(service => {
+            const div = document.createElement('div');
+            div.className = 'form-check';
+            div.innerHTML = `
                     <input class="form-check-input" type="checkbox"
                            id="service_${service.id}"
                            wire:model.live="selectedServiceIds"
@@ -892,51 +896,64 @@
                         ${service.name} (${new Intl.NumberFormat('fa-IR').format(service.price)} تومان)
                     </label>
                 `;
-              container.appendChild(div);
-            });
-          } else {
-            console.warn('Services container not found');
-          }
-        });
-
-        Livewire.on('discount-updated', () => {
-          console.log('Discount updated');
-          // به‌روزرسانی اینپوت‌های مودال تخفیف
-          const percentageInput = document.querySelector('input[wire\\:model\\.live="discountInputPercentage"]');
-          const amountInput = document.querySelector('input[wire\\:model\\.live="discountInputAmount"]');
-          if (percentageInput && amountInput) {
-            percentageInput.value = @this.get('discountInputPercentage') || 0;
-            amountInput.value = @this.get('discountInputAmount') || 0;
-          }
-        });
-        Livewire.on('hideModal', (event) => {
-          const modalId = event.id || (event[0] && event[0].id);
-          if (modalId) {
-            console.log('در حال بستن مودال: ', modalId); // دیباگ
-            window.closeXModal(modalId);
-          } else {
-            console.warn('شناسه مودال برای بستن پیدا نشد');
-          }
-        });
-        Livewire.on('discount-applied', () => {
-          console.log('Discount applied');
-          const discountInput = document.querySelector(
-            'input[wire\\:click*="$dispatch(\'openXModal\', { id: \'discount-modal\' })"]');
-          if (discountInput) {
-            const percentage = @this.get('discountPercentage');
-            discountInput.value = percentage ? `${parseFloat(percentage).toFixed(2)}%` : '';
-          }
-          // اطمینان از بسته شدن فقط مودال تخفیف
-          window.closeXModal('discount-modal');
-        });
-
-        Livewire.on('final-price-updated', () => {
-          console.log('Final price updated');
-          const priceInput = document.querySelector('input[value*="{{ number_format($finalPrice) }} تومان"]');
-          if (priceInput) {
-            priceInput.value = `${new Intl.NumberFormat('fa-IR').format(@this.get('finalPrice'))} تومان`;
-          }
-        });
+            container.appendChild(div);
+          });
+        } else {
+          console.warn('Services container not found');
+        }
       });
-    </script>
-  </div>
+
+      Livewire.on('discount-updated', () => {
+        console.log('Discount updated');
+        // به‌روزرسانی اینپوت‌های مودال تخفیف
+        const percentageInput = document.querySelector('input[wire\\:model\\.live="discountInputPercentage"]');
+        const amountInput = document.querySelector('input[wire\\:model\\.live="discountInputAmount"]');
+        if (percentageInput && amountInput) {
+          percentageInput.value = @this.get('discountInputPercentage') || 0;
+          amountInput.value = @this.get('discountInputAmount') || 0;
+        }
+      });
+      Livewire.on('hideModal', (event) => {
+        const modalId = event.id || (event[0] && event[0].id);
+        if (modalId) {
+          console.log('در حال بستن مودال: ', modalId); // دیباگ
+          window.closeXModal(modalId);
+        } else {
+          console.warn('شناسه مودال برای بستن پیدا نشد');
+        }
+      });
+      Livewire.on('discount-applied', () => {
+        console.log('Discount applied');
+        const discountInput = document.querySelector(
+          'input[wire\\:click*="$dispatch(\'openXModal\', { id: \'discount-modal\' })"]');
+        if (discountInput) {
+          const percentage = @this.get('discountPercentage');
+          discountInput.value = percentage ? `${parseFloat(percentage).toFixed(2)}%` : '';
+        }
+        // اطمینان از بسته شدن فقط مودال تخفیف
+        window.closeXModal('discount-modal');
+      });
+
+      Livewire.on('final-price-updated', () => {
+        console.log('Final price updated');
+        const priceInput = document.querySelector('input[value*="{{ number_format($finalPrice) }} تومان"]');
+        const discountInput = document.querySelector(
+          'input[wire\\:click*="$dispatch(\'openXModal\', { id: \'discount-modal\' })"]'
+        );
+        const isFree = @this.get('isFree');
+        const finalPrice = @this.get('finalPrice');
+        const discountPercentage = @this.get('discountPercentage');
+
+        if (priceInput) {
+          priceInput.value = `${new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان`;
+          priceInput.disabled = isFree;
+        }
+        if (discountInput) {
+          discountInput.value = discountPercentage ? `${parseFloat(discountPercentage).toFixed(2)}%` : '';
+          discountInput.disabled = isFree;
+        }
+      });
+    
+    });
+  </script>
+</div>

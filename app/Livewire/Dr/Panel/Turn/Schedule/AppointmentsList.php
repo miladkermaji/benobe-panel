@@ -854,14 +854,18 @@ class AppointmentsList extends Component
             $this->finalPrice = 0;
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
+            $this->dispatch('final-price-updated');
             return;
         }
+
         if (empty($this->selectedServiceIds)) {
             $this->finalPrice = 0;
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
+            $this->dispatch('final-price-updated');
             return;
         }
+
         $basePrice = 0;
         foreach ($this->selectedServiceIds as $serviceId) {
             $service = DoctorService::find($serviceId);
@@ -869,6 +873,7 @@ class AppointmentsList extends Component
                 $basePrice += $service->price ?? 0;
             }
         }
+
         if ($this->discountPercentage > 0) {
             $this->discountAmount = ($basePrice * $this->discountPercentage) / 100;
         } elseif ($this->discountAmount > 0 && $basePrice > 0) {
@@ -877,6 +882,7 @@ class AppointmentsList extends Component
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
         }
+
         $this->finalPrice = max(0, $basePrice - $this->discountAmount);
         $this->dispatch('final-price-updated');
     }
@@ -936,64 +942,75 @@ class AppointmentsList extends Component
         $this->dispatch('hideModal', ['id' => 'discount-modal']);
     }
 
-   public function endVisit($appointmentId = null)
-    {
-        // اگه appointmentId پاس داده نشده، از متغیر داخلی استفاده کن
-        $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
+public function endVisit($appointmentId = null)
+{
+    $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
 
-        if (!$appointmentId) {
-            Log::error('شناسه نوبت برای پایان ویزیت پیدا نشد', ['endVisitAppointmentId' => $this->endVisitAppointmentId]);
-            $this->dispatch('show-toastr', [
-                'type' => 'error',
-                'message' => 'خطا: شناسه نوبت نامعتبر است.'
-            ]);
-            return;
-        }
+    if (!$appointmentId) {
+        Log::error('شناسه نوبت برای پایان ویزیت پیدا نشد', ['endVisitAppointmentId' => $this->endVisitAppointmentId]);
+        $this->dispatch('show-toastr', [
+            'type' => 'error',
+            'message' => 'شناسه نوبت نامعتبر است.'
+        ]);
+        return;
+    }
 
+    try {
         $this->validate([
             'selectedInsuranceId' => 'required|exists:insurances,id',
             'selectedServiceIds' => 'required|array|min:1',
+        ], [
+            'selectedInsuranceId.required' => 'لطفاً یک بیمه انتخاب کنید.',
+            'selectedInsuranceId.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+            'selectedServiceIds.required' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
+            'selectedServiceIds.array' => 'خدمات انتخاب‌شده باید به‌صورت آرایه باشد.',
+            'selectedServiceIds.min' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
         ]);
-
-        $appointment = Appointment::findOrFail($appointmentId);
-        
-        // به‌روزرسانی نوبت
-        $appointment->update([
-            'insurance_id' => $this->selectedInsuranceId,
-            'service_ids' => json_encode($this->selectedServiceIds),
-            'final_price' => $this->finalPrice,
-            'discount_percentage' => $this->discountPercentage,
-            'discount_amount' => $this->discountAmount,
-            'status' => 'attended',
-            'description' => $this->endVisitDescription,
-            'payment_status' => $appointment->payment_status === 'pending' ? 'paid' : $appointment->payment_status,
-        ]);
-
-        // بستن مودال پایان ویزیت
-        $this->dispatch('hideModal', ['id' => 'end-visit-modal']);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        $firstError = collect($e->errors())->flatten()->first();
         $this->dispatch('show-toastr', [
-            'type' => 'success',
-            'message' => 'ویزیت با موفقیت ثبت شد.'
+            'type' => 'error',
+            'message' => $firstError
         ]);
-        
-$this->dispatch('visited', [
-          'type' => 'success',
-          'message' => 'ویزیت با موفقیت ثبت شد.'
-      ]);
-
-        
-        $this->loadAppointments();
-        $this->reset([
-            'selectedInsuranceId',
-            'selectedServiceIds',
-            'isFree',
-            'discountPercentage',
-            'discountAmount',
-            'finalPrice',
-            'endVisitDescription',
-            'endVisitAppointmentId'
-        ]);
+        return;
     }
+
+    $appointment = Appointment::findOrFail($appointmentId);
+
+    $appointment->update([
+        'insurance_id' => $this->selectedInsuranceId,
+        'service_ids' => json_encode($this->selectedServiceIds),
+        'final_price' => $this->finalPrice,
+        'discount_percentage' => $this->discountPercentage,
+        'discount_amount' => $this->discountAmount,
+        'status' => 'attended',
+        'description' => $this->endVisitDescription,
+        'payment_status' => $appointment->payment_status === 'pending' ? 'paid' : $appointment->payment_status,
+    ]);
+
+    $this->dispatch('hideModal', ['id' => 'end-visit-modal']);
+    $this->dispatch('show-toastr', [
+        'type' => 'success',
+        'message' => 'ویزیت با موفقیت ثبت شد.'
+    ]);
+
+    $this->dispatch('visited', [
+        'type' => 'success',
+        'message' => 'ویزیت با موفقیت ثبت شد.'
+    ]);
+
+    $this->loadAppointments();
+    $this->reset([
+        'selectedInsuranceId',
+        'selectedServiceIds',
+        'isFree',
+        'discountPercentage',
+        'discountAmount',
+        'finalPrice',
+        'endVisitDescription',
+        'endVisitAppointmentId'
+    ]);
+}
 
     public function updatedDiscountPercentage()
     {
