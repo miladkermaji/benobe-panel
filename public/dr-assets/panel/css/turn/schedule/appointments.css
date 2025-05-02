@@ -258,7 +258,6 @@
 .end-visit-btn {
     background: var(--primary);
     border: none;
-    padding: 0.5rem 1rem;
     border-radius: 0.25rem;
     font-size: 0.85rem;
     font-weight: 600;
