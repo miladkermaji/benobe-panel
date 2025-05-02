@@ -9,7 +9,7 @@
     <!-- فرم شارژ -->
     <form wire:submit.prevent="chargeWallet" class="bg-light p-2 rounded mb-4">
       <div class="row">
-        <div class="col-md-12 mb-3 mt-3">
+        <div class="col-md-12 mb-3 mt-3 position-relative">
           <label for="displayAmount" class="form-label fw-bold label-top-input-special-takhasos">مبلغ شارژ
             (تومان)</label>
           <input type="text" id="displayAmount" wire:model.live="displayAmount"
