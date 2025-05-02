@@ -430,6 +430,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal fade" id="CalculatorModal" tabindex="-1" aria-labelledby="CalculatorModalLabel"
     aria-hidden="true" wire:ignore.self>
     <div class="modal-dialog modal-dialog-centered">
@@ -568,18 +569,7 @@
           });
         });
 
-        function initializeTooltips() {
-          $('[data-tooltip="true"]').tooltip('dispose');
-          $('[data-tooltip="true"]').tooltip({
-            trigger: 'hover focus',
-            container: 'body',
-            boundary: 'window',
-            delay: {
-              show: 100,
-              hide: 200
-            },
-          });
-        }
+    
 
         function initializeTimepicker() {
           $('.timepicker-ui').each(function() {
@@ -603,18 +593,18 @@
           });
         }
 
-        initializeTooltips();
+        
         initializeTimepicker();
 
         Livewire.on('refresh-work-hours', () => {
           initializeTimepicker();
-          initializeTooltips();
+          
         });
 
         Livewire.on('refresh-timepicker', () => {
           setTimeout(() => {
             initializeTimepicker();
-            initializeTooltips();
+            
           }, 100);
         });
 
@@ -812,7 +802,7 @@
               if ($element.length > 0) {
                 $element.hide();
               }
-              initializeTooltips();
+              
             }, 100);
           } catch (error) {
             console.error('Error setting copySource:', error);
@@ -832,7 +822,7 @@
             index: null
           });
           @this.set('selectAllCopyModal', false);
-          initializeTooltips();
+          
         });
 
         $(document).on('show.bs.modal', '#emergencyModal', function(e) {
@@ -932,7 +922,7 @@
             });
 
             setTimeout(() => {
-              initializeTooltips();
+              
             }, 100);
           } catch (error) {
             console.error('Error in emergencyModal:', error);
@@ -947,7 +937,7 @@
           $('#emergency-times').empty();
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
-          initializeTooltips();
+          
         });
 
         Livewire.on('close-emergency-modal', () => {
@@ -956,7 +946,7 @@
           $('#emergency-times').empty();
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
-          initializeTooltips();
+          
         });
 
         function cleanupModal() {
@@ -997,7 +987,7 @@
             setTimeout(() => {
               $('#scheduleLoading').addClass('d-none');
               $('.modal-content-inner').show();
-              initializeTooltips();
+              
               initializeTimepicker();
               const selectAllCheckbox = $('#select-all-schedule-days');
               const dayCheckboxes = $('.schedule-day-checkbox');
@@ -1111,19 +1101,19 @@
           @this.set('selectAllScheduleModal', false);
           $('#schedule-settings-list').empty();
           $('.form-check-input').prop('disabled', false);
-          initializeTooltips();
+          
           initializeTimepicker();
         });
 
         Livewire.on('refresh-schedule-settings', () => {
-          initializeTooltips();
+          
           initializeTimepicker();
         });
 
         Livewire.on('close-schedule-modal', () => {
           $('#scheduleModal').modal('hide');
           cleanupModal();
-          initializeTooltips();
+          
         });
 
         $(document).on('change', '#select-all-days', function() {
@@ -1134,7 +1124,7 @@
         $('#checkboxModal').on('hidden.bs.modal', function() {
           $('#day-checkboxes .form-check').css('display', 'flex');
           $('#day-checkboxes input[type="checkbox"]').prop('checked', false);
-          initializeTooltips();
+          
         });
 
         Livewire.on('show-conflict-alert', (event) => {
