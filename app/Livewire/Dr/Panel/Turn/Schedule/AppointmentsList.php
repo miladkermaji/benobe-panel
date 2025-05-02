@@ -626,7 +626,6 @@ class AppointmentsList extends Component
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->first();
         if (!$workSchedule) {
-            Log::warning('No work schedule found', ['date' => $date, 'dayOfWeek' => $dayOfWeek]);
             return [];
         }
         $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctor->id)
@@ -789,10 +788,8 @@ class AppointmentsList extends Component
 
     public function updatedSelectedInsuranceId()
     {
-        Log::info('Selected Insurance ID: ' . $this->selectedInsuranceId);
-        Log::info('Selected Clinic ID: ' . $this->selectedClinicId);
+        
         $this->loadServices();
-        Log::info('Loaded Services: ', $this->services);
         $this->reset(['selectedServiceIds', 'isFree', 'discountPercentage', 'discountAmount', 'finalPrice']);
         $this->dispatch('services-updated');
     }
@@ -800,7 +797,6 @@ class AppointmentsList extends Component
     public function loadServices()
     {
         if (!$this->selectedInsuranceId) {
-            Log::info('No insurance selected, resetting services.');
             $this->services = [];
             $this->dispatch('services-updated');
             return;
@@ -814,15 +810,7 @@ class AppointmentsList extends Component
             $query->where('clinic_id', $this->selectedClinicId);
         }
         $services = $query->get();
-        if ($services->isEmpty()) {
-            Log::warning('No services found', [
-                'insurance_id' => $this->selectedInsuranceId,
-                'clinic_id' => $this->selectedClinicId,
-                'doctor_id' => $doctorId
-            ]);
-        } else {
-            Log::info('Services loaded successfully', ['count' => $services->count()]);
-        }
+      
         $this->services = $services->toArray();
         $this->dispatch('services-updated');
     }
@@ -942,75 +930,75 @@ class AppointmentsList extends Component
         $this->dispatch('hideModal', ['id' => 'discount-modal']);
     }
 
-public function endVisit($appointmentId = null)
-{
-    $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
+    public function endVisit($appointmentId = null)
+    {
+        $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
 
-    if (!$appointmentId) {
-        Log::error('شناسه نوبت برای پایان ویزیت پیدا نشد', ['endVisitAppointmentId' => $this->endVisitAppointmentId]);
+        if (!$appointmentId) {
+        
+            $this->dispatch('show-toastr', [
+                'type' => 'error',
+                'message' => 'شناسه نوبت نامعتبر است.'
+            ]);
+            return;
+        }
+
+        try {
+            $this->validate([
+                'selectedInsuranceId' => 'required|exists:insurances,id',
+                'selectedServiceIds' => 'required|array|min:1',
+            ], [
+                'selectedInsuranceId.required' => 'لطفاً یک بیمه انتخاب کنید.',
+                'selectedInsuranceId.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+                'selectedServiceIds.required' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
+                'selectedServiceIds.array' => 'خدمات انتخاب‌شده باید به‌صورت آرایه باشد.',
+                'selectedServiceIds.min' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $firstError = collect($e->errors())->flatten()->first();
+            $this->dispatch('show-toastr', [
+                'type' => 'error',
+                'message' => $firstError
+            ]);
+            return;
+        }
+
+        $appointment = Appointment::findOrFail($appointmentId);
+
+        $appointment->update([
+            'insurance_id' => $this->selectedInsuranceId,
+            'service_ids' => json_encode($this->selectedServiceIds),
+            'final_price' => $this->finalPrice,
+            'discount_percentage' => $this->discountPercentage,
+            'discount_amount' => $this->discountAmount,
+            'status' => 'attended',
+            'description' => $this->endVisitDescription,
+            'payment_status' => $appointment->payment_status === 'pending' ? 'paid' : $appointment->payment_status,
+        ]);
+
+        $this->dispatch('hideModal', ['id' => 'end-visit-modal']);
         $this->dispatch('show-toastr', [
-            'type' => 'error',
-            'message' => 'شناسه نوبت نامعتبر است.'
+            'type' => 'success',
+            'message' => 'ویزیت با موفقیت ثبت شد.'
         ]);
-        return;
+
+        $this->dispatch('visited', [
+            'type' => 'success',
+            'message' => 'ویزیت با موفقیت ثبت شد.'
+        ]);
+
+        $this->loadAppointments();
+        $this->reset([
+            'selectedInsuranceId',
+            'selectedServiceIds',
+            'isFree',
+            'discountPercentage',
+            'discountAmount',
+            'finalPrice',
+            'endVisitDescription',
+            'endVisitAppointmentId'
+        ]);
     }
-
-    try {
-        $this->validate([
-            'selectedInsuranceId' => 'required|exists:insurances,id',
-            'selectedServiceIds' => 'required|array|min:1',
-        ], [
-            'selectedInsuranceId.required' => 'لطفاً یک بیمه انتخاب کنید.',
-            'selectedInsuranceId.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
-            'selectedServiceIds.required' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
-            'selectedServiceIds.array' => 'خدمات انتخاب‌شده باید به‌صورت آرایه باشد.',
-            'selectedServiceIds.min' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
-        ]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        $firstError = collect($e->errors())->flatten()->first();
-        $this->dispatch('show-toastr', [
-            'type' => 'error',
-            'message' => $firstError
-        ]);
-        return;
-    }
-
-    $appointment = Appointment::findOrFail($appointmentId);
-
-    $appointment->update([
-        'insurance_id' => $this->selectedInsuranceId,
-        'service_ids' => json_encode($this->selectedServiceIds),
-        'final_price' => $this->finalPrice,
-        'discount_percentage' => $this->discountPercentage,
-        'discount_amount' => $this->discountAmount,
-        'status' => 'attended',
-        'description' => $this->endVisitDescription,
-        'payment_status' => $appointment->payment_status === 'pending' ? 'paid' : $appointment->payment_status,
-    ]);
-
-    $this->dispatch('hideModal', ['id' => 'end-visit-modal']);
-    $this->dispatch('show-toastr', [
-        'type' => 'success',
-        'message' => 'ویزیت با موفقیت ثبت شد.'
-    ]);
-
-    $this->dispatch('visited', [
-        'type' => 'success',
-        'message' => 'ویزیت با موفقیت ثبت شد.'
-    ]);
-
-    $this->loadAppointments();
-    $this->reset([
-        'selectedInsuranceId',
-        'selectedServiceIds',
-        'isFree',
-        'discountPercentage',
-        'discountAmount',
-        'finalPrice',
-        'endVisitDescription',
-        'endVisitAppointmentId'
-    ]);
-}
 
     public function updatedDiscountPercentage()
     {
@@ -1154,95 +1142,11 @@ public function endVisit($appointmentId = null)
         $this->dispatch('calendarDataUpdated');
     }
 
-    public function blockUser()
-    {
-        try {
-            $this->validate([
-                'blockedAt' => [
-                    'required',
-                    'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/',
-                ],
-                'unblockedAt' => [
-                    'nullable',
-                    'regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/',
-                    'after:blockedAt',
-                ],
-                'blockReason' => [
-                    'required',
-                    'string',
-                    'max:255',
-                ],
-            ], [
-                'blockedAt.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
-                'blockedAt.regex' => 'فرمت تاریخ شروع مسدودیت معتبر نیست (مثال: 1403/06/15 یا 2024-06-15).',
-                'unblockedAt.regex' => 'فرمت تاریخ پایان مسدودیت معتبر نیست (مثال: 1403/06/15 یا 2024-06-15).',
-                'unblockedAt.after' => 'تاریخ پایان مسدودیت باید بعد از تاریخ شروع مسدودیت باشد.',
-                'blockReason.required' => 'لطفاً دلیل مسدود کردن را وارد کنید.',
-                'blockReason.string' => 'دلیل مسدود کردن باید متن باشد.',
-                'blockReason.max' => 'دلیل مسدود کردن نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-            ]);
-            if (empty($this->selectedMobiles)) {
-                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'کاربری برای مسدود کردن انتخاب نشده است.']);
-                $this->dispatch('showModal', 'block-user-modal');
-                return;
-            }
-            $doctorId = $this->getAuthenticatedDoctor()->id;
-            $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
-            $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
-            $unblockedAt = $this->unblockedAt ? $this->processDate($this->unblockedAt, 'پایان مسدودیت') : null;
-            $blockedUsers = [];
-            $alreadyBlocked = [];
-            foreach ($this->selectedMobiles as $mobile) {
-                $user = User::where('mobile', $mobile)->first();
-                if (!$user) {
-                    continue;
-                }
-                $isBlocked = UserBlocking::where('user_id', $user->id)
-                    ->where('doctor_id', $doctorId)
-                    ->where('clinic_id', $clinicId)
-                    ->where('status', 1)
-                    ->exists();
-                if ($isBlocked) {
-                    $alreadyBlocked[] = $mobile;
-                    continue;
-                }
-                $blockingUser = UserBlocking::create([
-                    'user_id' => $user->id,
-                    'doctor_id' => $doctorId,
-                    'clinic_id' => $clinicId,
-                    'blocked_at' => $blockedAt,
-                    'unblocked_at' => $unblockedAt,
-                    'reason' => $this->blockReason,
-                    'status' => 1,
-                ]);
-                $blockedUsers[] = $blockingUser;
-            }
-            if (empty($blockedUsers) && !empty($alreadyBlocked)) {
-                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'کاربر انتخاب‌شده قبلاً مسدود شده است.']);
-                $this->dispatch('showModal', 'block-user-modal');
-                return;
-            }
-            if (empty($blockedUsers)) {
-                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'کاربری برای مسدود کردن پیدا نشد.']);
-                $this->dispatch('showModal', 'block-user-modal');
-                return;
-            }
-            $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'کاربر با موفقیت مسدود شد.']);
-            $this->dispatch('hideModal');
-            $this->loadBlockedUsers();
-            $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId', 'selectedMobiles']);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            $firstError = collect($e->errors())->flatten()->first();
-            $this->dispatch('show-toastr', ['type' => 'error', 'message' => $firstError]);
-            $this->dispatch('showModal', 'block-user-modal');
-        } catch (\Exception $e) {
-            $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطایی رخ داد: ' . $e->getMessage()]);
-            $this->dispatch('showModal', 'block-user-modal');
-        }
-    }
 
     public function blockMultipleUsers()
     {
+       
+
         try {
             $this->validate([
                 'blockedAt' => [
@@ -1268,15 +1172,46 @@ public function endVisit($appointmentId = null)
                 'blockReason.string' => 'دلیل مسدود کردن باید متن باشد.',
                 'blockReason.max' => 'دلیل مسدود کردن نمی‌تواند بیشتر از 255 کاراکتر باشد.',
             ]);
+
+            if ($this->blockAppointmentId && empty($this->selectedMobiles)) {
+                $appointment = Appointment::with('patient')->find($this->blockAppointmentId);
+               
+
+                if (!$appointment) {
+                    $this->dispatch('show-toastr', [
+                        'type' => 'error',
+                        'message' => 'نوبت با شناسه موردنظر یافت نشد.',
+                    ]);
+                    $this->dispatch('showModal', 'block-user-modal');
+                    return;
+                }
+
+                if (!$appointment->patient || !$appointment->patient->mobile) {
+                    $this->dispatch('show-toastr', [
+                        'type' => 'error',
+                        'message' => 'کاربر یا شماره موبایل مرتبط با این نوبت یافت نشد.',
+                    ]);
+                    $this->dispatch('showModal', 'block-user-modal');
+                    return;
+                }
+
+                $this->selectedMobiles = [$appointment->patient->mobile];
+            }
+
             if (empty($this->selectedMobiles)) {
-                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'هیچ کاربری برای مسدود کردن انتخاب نشده است.']);
+                $this->dispatch('show-toastr', [
+                    'type' => 'error',
+                    'message' => 'کاربری برای مسدود کردن انتخاب نشده است.',
+                ]);
                 $this->dispatch('showModal', 'block-user-modal');
                 return;
             }
+
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
             $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
             $unblockedAt = $this->unblockedAt ? $this->processDate($this->unblockedAt, 'پایان مسدودیت') : null;
+
             $blockedUsers = [];
             $alreadyBlocked = [];
             foreach ($this->selectedMobiles as $mobile) {
@@ -1304,26 +1239,37 @@ public function endVisit($appointmentId = null)
                 ]);
                 $blockedUsers[] = $blockingUser;
             }
+
             if (empty($blockedUsers) && !empty($alreadyBlocked)) {
-                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'کاربران انتخاب‌شده قبلاً مسدود شده‌اند.']);
+                $this->dispatch('show-toastr', [
+                    'type' => 'error',
+                    'message' => 'کاربر(ان) انتخاب‌شده قبلاً مسدود شده‌اند.',
+                ]);
                 $this->dispatch('showModal', 'block-user-modal');
                 return;
             }
             if (empty($blockedUsers)) {
-                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'هیچ کاربری برای مسدود کردن پیدا نشد.']);
+                $this->dispatch('show-toastr', [
+                    'type' => 'error',
+                    'message' => 'کاربری برای مسدود کردن پیدا نشد.',
+                ]);
                 $this->dispatch('showModal', 'block-user-modal');
                 return;
             }
-            $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'کاربران با موفقیت مسدود شدند.']);
-            $this->dispatch('hideModal');
+
+            $this->dispatch('show-toastr', [
+                'type' => 'success',
+                'message' => 'کاربر(ان) با موفقیت مسدود شدند.',
+            ]);
+            $this->dispatch('hideModal', ['id' => 'block-user-modal']);
             $this->loadBlockedUsers();
-            $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'selectedMobiles']);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            $firstError = collect($e->errors())->flatten()->first();
-            $this->dispatch('show-toastr', ['type' => 'error', 'message' => $firstError]);
-            $this->dispatch('showModal', 'block-user-modal');
+            $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId', 'selectedMobiles']);
         } catch (\Exception $e) {
-            $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطایی رخ داد: ' . $e->getMessage()]);
+           
+            $this->dispatch('show-toastr', [
+                'type' => 'error',
+                'message' => 'خطایی رخ داد: ' . $e->getMessage(),
+            ]);
             $this->dispatch('showModal', 'block-user-modal');
         }
     }

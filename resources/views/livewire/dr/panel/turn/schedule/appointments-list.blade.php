@@ -277,7 +277,8 @@
 
   <div wire:ignore>
     <x-custom-modal id="block-user-modal" title="مسدود کردن کاربر" size="md" :show="false">
-      <form wire:submit.prevent="{{ $blockAppointmentId ? 'blockUser' : 'blockMultipleUsers' }}">
+
+      <form wire:submit.prevent="blockMultipleUsers">
         <div class="mb-4 position-relative">
           <label for="blockedAt" class="label-top-input-special-takhasos">تاریخ شروع مسدودیت</label>
           <input data-jdp type="text" class="form-control h-50" id="blockedAt" wire:model.live="blockedAt">
@@ -462,7 +463,6 @@
         const modalId = event.detail.id;
         const appointmentId = event.detail.appointmentId || null;
         window.openXModal(modalId);
-
         if (appointmentId && modalId === 'reschedule-modal') {
           @this.set('rescheduleAppointmentId', appointmentId);
           @this.set('rescheduleAppointmentIds', [appointmentId]);
@@ -473,6 +473,9 @@
           @this.loadCalendarData();
         } else if (modalId === 'end-visit-modal' && appointmentId) {
           @this.set('endVisitAppointmentId', appointmentId);
+        } else if (appointmentId && modalId === 'block-user-modal') {
+          @this.set('blockAppointmentId', appointmentId);
+
         }
       });
       Livewire.on('calendarDataUpdated', () => {
@@ -869,12 +872,10 @@
         });
       });
       Livewire.on('services-updated', () => {
-        console.log('services-updated event received');
         Livewire.dispatch('get-services', {});
       });
 
       Livewire.on('services-received', (services) => {
-        console.log('Services received:', services);
         const container = document.querySelector('.services-checkbox-container .checkbox-area');
         if (container) {
           container.innerHTML = ''; // پاک کردن محتوای قبلی
@@ -904,7 +905,6 @@
       });
 
       Livewire.on('discount-updated', () => {
-        console.log('Discount updated');
         // به‌روزرسانی اینپوت‌های مودال تخفیف
         const percentageInput = document.querySelector('input[wire\\:model\\.live="discountInputPercentage"]');
         const amountInput = document.querySelector('input[wire\\:model\\.live="discountInputAmount"]');
@@ -914,16 +914,23 @@
         }
       });
       Livewire.on('hideModal', (event) => {
-        const modalId = event.id || (event[0] && event[0].id);
+        // تلاش برای استخراج modalId از ساختارهای مختلف رویداد
+        const modalId = event?.id || (event && event[0]?.id) || null;
+     
+
         if (modalId) {
-          console.log('در حال بستن مودال: ', modalId); // دیباگ
           window.closeXModal(modalId);
         } else {
-          console.warn('شناسه مودال برای بستن پیدا نشد');
+          console.warn('Modal ID not found, attempting to close all open modals');
+          // Fallback: بستن تمام مودال‌های باز
+          document.querySelectorAll('.modal.show').forEach(modal => {
+            if (modal.id) {
+              window.closeXModal(modal.id);
+            }
+          });
         }
       });
       Livewire.on('discount-applied', () => {
-        console.log('Discount applied');
         const discountInput = document.querySelector(
           'input[wire\\:click*="$dispatch(\'openXModal\', { id: \'discount-modal\' })"]');
         if (discountInput) {
@@ -935,7 +942,6 @@
       });
 
       Livewire.on('final-price-updated', () => {
-        console.log('Final price updated');
         const priceInput = document.querySelector('input[value*="{{ number_format($finalPrice) }} تومان"]');
         const discountInput = document.querySelector(
           'input[wire\\:click*="$dispatch(\'openXModal\', { id: \'discount-modal\' })"]'
@@ -953,7 +959,7 @@
           discountInput.disabled = isFree;
         }
       });
-    
+
     });
   </script>
 </div>
