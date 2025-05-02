@@ -727,3 +727,64 @@
         transform: translateY(0);
     }
 }
+  /* تنظیم ارتفاع اینپوت‌ها و بهینه‌سازی ظاهر */
+    .form-control, .form-control-sm {
+        height: 50px;
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+
+  
+
+    textarea.form-control {
+        height: auto; /* برای تنظیم rows=2 */
+    }
+
+    .form-label {
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .form-check {
+        margin-bottom: 0;
+    }
+
+    .text-danger {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+
+    .services-checkbox-container .checkbox-area {
+        border-radius: 4px;
+    }
+
+    .btn.my-btn-primary {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        height: 50px;
+    }
+
+    /* اسکرول‌بار برای بخش خدمات */
+    .checkbox-area::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .checkbox-area::-webkit-scrollbar-track {
+        background: #e5e7eb;
+        border-radius: 10px;
+    }
+
+    .checkbox-area::-webkit-scrollbar-thumb {
+        background-color: #2E86C1;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .checkbox-area::-webkit-scrollbar-thumb:hover {
+        background-color: #256d9b;
+    }
+
+    .checkbox-area {
+        scrollbar-width: thin;
+        scrollbar-color: #2E86C1 #e5e7eb;
+    }

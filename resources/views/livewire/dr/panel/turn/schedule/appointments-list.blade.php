@@ -40,6 +40,7 @@
               <th scope="col" class="px-6 py-3 fw-bolder">تاریخ نوبت</th>
               <th scope="col" class="px-6 py-3 fw-bolder">زمان نوبت</th>
               <th scope="col" class="px-6 py-3 fw-bolder">وضعیت نوبت</th>
+              <th scope="col" class="px-6 py-3 fw-bolder"> بیعانه</th>
               <th scope="col" class="px-6 py-3 fw-bolder">وضعیت پرداخت</th>
               <th scope="col" class="px-6 py-3 fw-bolder">بیمه</th>
               <th scope="col" class="px-6 py-3 fw-bolder">قیمت نهایی</th>
@@ -76,6 +77,9 @@
                       $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
                     @endphp
                     <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
+                  </td>
+                  <td>
+                    {{ $appointment->fee ? $appointment->fee . " " . "تومان" :  '---' }}
                   </td>
                   <td>
                     @php
@@ -300,86 +304,107 @@
     </x-custom-modal>
   </div>
 
- <div wire:ignore>
-        <x-custom-modal id="end-visit-modal" title="پایان ویزیت" size="lg" :show="false">
-            <form wire:submit.prevent="endVisit({{ $endVisitAppointmentId ?? 'null' }})">
-                <div class="mb-3">
-                    <label class="form-label">انتخاب بیمه</label>
-                    @if (count($insurances) > 0)
-                        @foreach ($insurances as $insurance)
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="selectedInsuranceId"
-                                    id="insurance_{{ $insurance['id'] }}" wire:model.live="selectedInsuranceId"
-                                    value="{{ $insurance['id'] }}">
-                                <label class="form-check-label"
-                                    for="insurance_{{ $insurance['id'] }}">{{ $insurance['name'] }}</label>
-                            </div>
-                        @endforeach
-                    @else
-                        <p class="text-danger">هیچ بیمه‌ای یافت نشد.</p>
-                    @endif
-                    @error('selectedInsuranceId')
-                        <span class="text-danger">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div class="mb-3 services-checkbox-container">
-                    <label class="form-label">انتخاب خدمت</label>
-                    <div class="checkbox-area">
-                        @if (count($services) > 0)
-                            @foreach ($services as $service)
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="service_{{ $service['id'] }}"
-                                        wire:model.live="selectedServiceIds" value="{{ $service['id'] }}"
-                                        wire:key="service-{{ $service['id'] }}">
-                                    <label class="form-check-label" for="service_{{ $service['id'] }}">
-                                        {{ $service['name'] }} ({{ number_format($service['price']) }} تومان)
-                                    </label>
+<div wire:ignore>
+    <x-custom-modal id="end-visit-modal" title="پایان ویزیت" size="lg" :show="false">
+        <form wire:submit.prevent="endVisit({{ $endVisitAppointmentId ?? 'null' }})">
+            <div class="row g-2">
+                <!-- بخش بیمه -->
+                <div class="col-12">
+                    <div class="border rounded p-2 bg-light">
+                        <label class="form-label fw-bold mb-1">انتخاب بیمه</label>
+                        @if (count($insurances) > 0)
+                            @foreach ($insurances as $index => $insurance)
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input" type="radio" name="selectedInsuranceId"
+                                        id="insurance_{{ $insurance['id'] }}" wire:model.live="selectedInsuranceId"
+                                        value="{{ $insurance['id'] }}">
+                                    <label class="form-check-label" for="insurance_{{ $insurance['id'] }}">{{ $insurance['name'] }}</label>
                                 </div>
                             @endforeach
                         @else
-                            <p class="text-danger">هیچ خدمتی یافت نشد.</p>
+                            <p class="text-danger small mb-0">هیچ بیمه‌ای یافت نشد.</p>
                         @endif
+                        @error('selectedInsuranceId')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
                     </div>
-                    @error('selectedServiceIds')
-                        <span class="text-danger">{{ $message }}</span>
-                    @enderror
                 </div>
 
-                <div class="mb-3 form-check">
-                    <input type="checkbox" type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
-                    <label class="form-check-label" for="isFree">ویزیت رایگان</label>
+                <!-- بخش خدمات -->
+                <div class="col-12">
+                    <div class="border rounded p-2 bg-light services-checkbox-container">
+                        <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
+                        <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
+                            @if (count($services) > 0)
+                                @foreach ($services as $service)
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input" type="checkbox" id="service_{{ $service['id'] }}"
+                                            wire:model.live="selectedServiceIds" value="{{ $service['id'] }}"
+                                            wire:key="service-{{ $service['id'] }}">
+                                        <label class="form-check-label" for="service_{{ $service['id'] }}">
+                                            {{ $service['name'] }} ({{ number_format($service['price']) }} تومان)
+                                        </label>
+                                    </div>
+                                @endforeach
+                            @else
+                                <p class="text-danger small mb-0">هیچ خدمتی یافت نشد.</p>
+                            @endif
+                        </div>
+                        @error('selectedServiceIds')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">تخفیف</label>
-                    <input type="text" class="form-control" readonly
-                        wire:click="$dispatch('openXModal', { id: 'discount-modal' })"
-                        value="{{ $discountPercentage ? number_format($discountPercentage, 2) . '%' : '' }}"
-                        @if ($isFree) disabled @endif>
-                    @error('discountPercentage')
-                        <span class="text-danger">{{ $message }}</span>
-                    @enderror
+                <!-- ویزیت رایگان -->
+                <div class="col-12">
+                    <div class="border rounded p-2 bg-light">
+                        <div class="form-check mb-0">
+                            <input type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
+                            <label class="form-check-label" for="isFree">ویزیت رایگان</label>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">قیمت نهایی</label>
-                    <input type="text" class="form-control" readonly value="{{ number_format($finalPrice) }} تومان">
-                    @error('finalPrice')
-                        <span class="text-danger">{{ $message }}</span>
-                    @enderror
+                <!-- تخفیف و قیمت نهایی -->
+                <div class="col-md-6">
+                    <div class="border rounded p-2 bg-light">
+                        <label class="form-label fw-bold mb-1">تخفیف</label>
+                        <input type="text" class="form-control" readonly
+                            wire:click="$dispatch('openXModal', { id: 'discount-modal' })"
+                            value="{{ $discountPercentage ? number_format($discountPercentage, 2) . '%' : '' }}"
+                            @if ($isFree) disabled @endif>
+                        @error('discountPercentage')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-2 bg-light">
+                        <label class="form-label fw-bold mb-1">قیمت نهایی</label>
+                        <input type="text" class="form-control" readonly
+                            value="{{ number_format($finalPrice) }} تومان">
+                        @error('finalPrice')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">توضیحات درمان</label>
-                    <textarea class="form-control" rows="5" wire:model.live="endVisitDescription"
-                        placeholder="توضیحات درمان را وارد کنید..."></textarea>
+                <!-- توضیحات -->
+                <div class="col-12">
+                    <div class="border rounded p-2 bg-light">
+                        <label class="form-label fw-bold mb-1">توضیحات درمان</label>
+                        <textarea class="form-control" rows="2" wire:model.live="endVisitDescription"
+                            placeholder="توضیحات درمان را وارد کنید..."></textarea>
+                    </div>
                 </div>
+            </div>
 
-                <button type="submit" class="btn my-btn-primary w-100 h-50">ثبت</button>
-            </form>
-        </x-custom-modal>
-    </div>
+            <button type="submit" class="btn my-btn-primary w-100 mt-2">ثبت</button>
+        </form>
+    </x-custom-modal>
+</div>
+
   <div wire:ignore>
     <x-custom-modal id="discount-modal" title="اعمال تخفیف" size="md" :show="false">
       <form wire:submit.prevent="applyDiscount">
@@ -452,7 +477,7 @@
           window.appointmentsData = @json($appointmentsData);
 
         });
-       
+
 
         Livewire.on('refresh', () => {
           initializeDropdowns();
@@ -884,14 +909,14 @@
             amountInput.value = @this.get('discountInputAmount') || 0;
           }
         });
-Livewire.on('hideModal', (event) => {
-            const modalId = event.id || (event[0] && event[0].id);
-            if (modalId) {
-                console.log('در حال بستن مودال: ', modalId); // دیباگ
-                window.closeXModal(modalId);
-            } else {
-                console.warn('شناسه مودال برای بستن پیدا نشد');
-            }
+        Livewire.on('hideModal', (event) => {
+          const modalId = event.id || (event[0] && event[0].id);
+          if (modalId) {
+            console.log('در حال بستن مودال: ', modalId); // دیباگ
+            window.closeXModal(modalId);
+          } else {
+            console.warn('شناسه مودال برای بستن پیدا نشد');
+          }
         });
         Livewire.on('discount-applied', () => {
           console.log('Discount applied');
