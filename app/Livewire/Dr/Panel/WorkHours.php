@@ -125,10 +125,15 @@ class Workhours extends Component
     {
         $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
         $this->clinicId = $clinicId; // clinicId از پراپرتی‌های کامپوننت
-        $this->selectedClinicId = request()->query('selectedClinicId', 'default'); // برای صفحه قبلی
+
+        // دریافت selectedClinicId از درخواست URL یا localStorage
+        $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
 
         // انتخاب clinicId فعال: اولویت با clinicId از URL، سپس selectedClinicId
         $this->activeClinicId = $this->clinicId ?? $this->selectedClinicId;
+
+        // ذخیره selectedClinicId در session برای استفاده‌های بعدی
+        session(['selectedClinicId' => $this->selectedClinicId]);
 
         $this->appointmentConfig = DoctorAppointmentConfig::firstOrCreate(
             [
@@ -195,6 +200,19 @@ class Workhours extends Component
         $this->holidayAvailability = $this->appointmentConfig->holiday_availability;
 
         $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
+
+        // ارسال رویداد برای رفرش داده‌ها
+        $this->dispatch('refresh-clinic-data');
+    }
+
+    public function setSelectedClinicId($clinicId)
+    {
+        $this->selectedClinicId = $clinicId;
+        $this->activeClinicId = $this->clinicId ?? $clinicId;
+        session(['selectedClinicId' => $clinicId]);
+        $this->reset(['workSchedules', 'isWorking', 'slots']);
+        $this->mount($this->clinicId);
+        $this->dispatch('refresh-clinic-data');
     }
 
     public function forceRefreshSettings()
@@ -1470,7 +1488,6 @@ class Workhours extends Component
             ]);
         }
     }
-
 
     public function updateAutoScheduling()
     {

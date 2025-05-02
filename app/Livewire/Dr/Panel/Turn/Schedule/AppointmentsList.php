@@ -788,7 +788,7 @@ class AppointmentsList extends Component
 
     public function updatedSelectedInsuranceId()
     {
-        
+
         $this->loadServices();
         $this->reset(['selectedServiceIds', 'isFree', 'discountPercentage', 'discountAmount', 'finalPrice']);
         $this->dispatch('services-updated');
@@ -810,7 +810,7 @@ class AppointmentsList extends Component
             $query->where('clinic_id', $this->selectedClinicId);
         }
         $services = $query->get();
-      
+
         $this->services = $services->toArray();
         $this->dispatch('services-updated');
     }
@@ -935,7 +935,7 @@ class AppointmentsList extends Component
         $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
 
         if (!$appointmentId) {
-        
+
             $this->dispatch('show-toastr', [
                 'type' => 'error',
                 'message' => 'شناسه نوبت نامعتبر است.'
@@ -1145,7 +1145,7 @@ class AppointmentsList extends Component
 
     public function blockMultipleUsers()
     {
-       
+
 
         try {
             $this->validate([
@@ -1175,7 +1175,7 @@ class AppointmentsList extends Component
 
             if ($this->blockAppointmentId && empty($this->selectedMobiles)) {
                 $appointment = Appointment::with('patient')->find($this->blockAppointmentId);
-               
+
 
                 if (!$appointment) {
                     $this->dispatch('show-toastr', [
@@ -1265,7 +1265,7 @@ class AppointmentsList extends Component
             $this->loadBlockedUsers();
             $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId', 'selectedMobiles']);
         } catch (\Exception $e) {
-           
+
             $this->dispatch('show-toastr', [
                 'type' => 'error',
                 'message' => 'خطایی رخ داد: ' . $e->getMessage(),

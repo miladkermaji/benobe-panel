@@ -42,6 +42,8 @@
     let dropdownOpen = false;
     let selectedClinic = localStorage.getItem("selectedClinic");
     let selectedClinicId = localStorage.getItem("selectedClinicId");
+
+    // چک کردن و ست کردن مقدار پیش‌فرض برای localStorage
     if (selectedClinic && selectedClinicId) {
       $(".dropdown-label").text(selectedClinic);
       $(".option-card").each(function() {
@@ -53,8 +55,16 @@
     } else {
       localStorage.setItem("selectedClinic", "مشاوره آنلاین به نوبه");
       localStorage.setItem("selectedClinicId", "default");
+      selectedClinicId = "default";
+      $(".dropdown-label").text("مشاوره آنلاین به نوبه");
     }
 
+    // ارسال مقدار اولیه selectedClinicId به Livewire برای بارگذاری داده‌ها
+    Livewire.dispatch('setSelectedClinicId', {
+      clinicId: selectedClinicId
+    });
+
+    // چک کردن کلینیک‌های غیرفعال
     function checkInactiveClinics() {
       var hasInactiveClinics =
         $('.option-card[data-active="0"]').length > 0;
@@ -66,6 +76,7 @@
     }
     checkInactiveClinics();
 
+    // رویداد کلیک برای باز و بسته کردن دراپ‌داون
     $(".dropdown-trigger").on("click", function(event) {
       event.stopPropagation();
       dropdownOpen = !dropdownOpen;
@@ -76,6 +87,7 @@
       }, 100);
     });
 
+    // بستن دراپ‌داون با کلیک خارج از آن
     $(document).on("click", function() {
       if (dropdownOpen) {
         $(".dropdown-trigger").removeClass("border border-primary");
@@ -84,10 +96,12 @@
       }
     });
 
+    // جلوگیری از بسته شدن دراپ‌داون با کلیک داخل آن
     $(".my-dropdown-menu").on("click", function(event) {
       event.stopPropagation();
     });
 
+    // انتخاب کلینیک و ریلود صفحه
     $(".option-card").on("click", function() {
       var selectedText = $(this)
         .find(".fw-bold.d-block.fs-15")
@@ -104,6 +118,11 @@
       $(".dropdown-trigger").removeClass("border border-primary");
       $(".my-dropdown-menu").addClass("d-none");
       dropdownOpen = false;
+
+      // ارسال رویداد به Livewire برای به‌روزرسانی
+      Livewire.dispatch('setSelectedClinicId', {
+        clinicId: selectedId
+      });
 
       // ریلود صفحه با پارامتر جدید
       window.location.href =
