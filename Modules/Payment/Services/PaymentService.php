@@ -28,7 +28,7 @@ class PaymentService
         $gateway = $this->getActiveGateway();
         $callbackUrl = $callbackUrl ?? route('payment.callback');
 
-        // تعیین نوع و شناسه موجودیت از meta یا auth
+        // تعیین نوع و شناسه موجودیت
         $transactableType = 'App\Models\User'; // پیش‌فرض
         $transactableId = null;
 
@@ -36,31 +36,22 @@ class PaymentService
             $transactableType = 'App\Models\Doctor';
             $transactableId = $meta['doctor_id'];
         } else {
-            // اگر در پنل دکتر هستیم اما meta خالیه، از گارد doctor استفاده کن
-            if (Auth::guard('doctor')->check()) {
-                $transactableType = 'App\Models\Doctor';
-                $transactableId = Auth::guard('doctor')->user()->id;
-            } else {
-                // گارد پیش‌فرض برای کاربران
-                $transactableId = Auth::guard('custom-auth.jwt')->check()
-                    ? Auth::guard('custom-auth.jwt')->user()->id
-                    : Auth::id();
+            // استفاده از کاربر احراز هویت‌شده
+            $user = Auth::user();
+            if (!$user) {
+                throw new \Exception('کاربر احراز هویت نشده است.');
             }
+            $transactableId = $user->id;
         }
 
-        // مطمئن شویم که transactableId داریم
-        if (!$transactableId) {
-            throw new \Exception('شناسه موجودیت برای تراکنش مشخص نشده است.');
-        }
-
-        // ایجاد تراکنش در دیتابیس با ساختار مورفیک
+        // ایجاد تراکنش در دیتابیس
         $transaction = Transaction::create([
             'transactable_type' => $transactableType,
             'transactable_id'   => $transactableId,
             'amount'            => $amount,
             'gateway'           => $gateway,
             'status'            => 'pending',
-            'meta'              => json_encode($meta), // ذخیره meta به صورت JSON
+            'meta'              => json_encode($meta),
         ]);
 
         // ایجاد فاکتور پرداخت

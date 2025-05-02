@@ -81,8 +81,6 @@ class WalletChargeComponent extends Component
                 return;
             }
 
-       
-
             $paymentResponse = $this->paymentService->pay(
                 $this->amount,
                 $callbackUrl,
@@ -92,7 +90,6 @@ class WalletChargeComponent extends Component
                     'description' => 'شارژ کیف پول',
                 ]
             );
-
 
             if ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
                 return $paymentResponse;
@@ -106,7 +103,6 @@ class WalletChargeComponent extends Component
                 throw new \Exception('پاسخ درگاه پرداخت نامعتبر است: نوع پاسخ پشتیبانی نمی‌شود.');
             }
         } catch (\Exception $e) {
-       
             $this->isLoading = false;
             $this->dispatch('toast', message: 'خطایی در فرآیند پرداخت رخ داد: ' . $e->getMessage(), type: 'error');
         }
@@ -150,6 +146,34 @@ class WalletChargeComponent extends Component
         }
 
         return redirect()->route('doctor.wallet')->with('error', 'پرداخت ناموفق بود.');
+    }
+
+    public function deleteTransaction($transactionId)
+    {
+        try {
+            $doctorId = Auth::guard('doctor')->user()->id;
+            $transaction = DoctorWalletTransaction::where('id', $transactionId)
+                ->where('doctor_id', $doctorId)
+                ->first();
+
+            if (!$transaction) {
+                $this->dispatch('toast', message: 'تراکنش یافت نشد یا متعلق به شما نیست.', type: 'error');
+                return;
+            }
+
+            // بررسی اینکه آیا تراکنش قابل حذف است
+            if ($transaction->status !== 'pending') {
+                $this->dispatch('toast', message: 'فقط تراکنش‌های در انتظار قابل حذف هستند.', type: 'error');
+                return;
+            }
+
+            $transaction->delete();
+            $this->dispatch('toast', message: 'تراکنش با موفقیت حذف شد.', type: 'success');
+
+        } catch (\Exception $e) {
+            Log::error("DeleteTransaction - Error: {$e->getMessage()}", ['transaction_id' => $transactionId]);
+            $this->dispatch('toast', message: 'خطایی در حذف تراکنش رخ داد: ' . $e->getMessage(), type: 'error');
+        }
     }
 
     public function updatedDisplayAmount($value)

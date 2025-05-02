@@ -46,6 +46,10 @@ return [
         'driver' => 'jwt',
         'provider' => 'users',
     ],
+    'custom-auth.jwt' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+        ],
         'manager' => [
             'driver' => 'session',
             'provider' => 'managers',
