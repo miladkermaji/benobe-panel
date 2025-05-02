@@ -1,11 +1,12 @@
 <?php
 
+use App\Models\Admin\Panel\Tools\SmsGateway;
+use Database\Seeders\SmsGatewaySeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -19,6 +20,10 @@ return new class extends Migration
             $table->json('settings')->nullable(); // تنظیمات خاص هر درایور
             $table->timestamps();
         });
+
+        $seeder = new SmsGatewaySeeder();
+        $seeder->run();
+
     }
 
     /**

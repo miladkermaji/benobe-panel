@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Database\Seeders\PaymentGatewaySeeder; // اضافه کردن Seeder
 
 class CreatePaymentGatewaysTable extends Migration
 {
@@ -17,6 +18,10 @@ class CreatePaymentGatewaysTable extends Migration
             $table->json('settings')->nullable(); // تنظیمات خاص هر درگاه (مثل merchant_id یا api_key)
             $table->timestamps();
         });
+
+        // فراخوانی Seeder بعد از ایجاد جدول
+        $seeder = new PaymentGatewaySeeder();
+        $seeder->run();
     }
 
     public function down()
