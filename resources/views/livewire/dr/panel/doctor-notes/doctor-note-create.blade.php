@@ -23,8 +23,8 @@
       <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
           <div class="row g-4">
-            <div class="col-md-6 col-sm-12 position-relative mt-5">
-              <select wire:model="appointment_type" class="form-select" id="appointment_type" required>
+            <div class="col-md-6 col-sm-12 position-relative mt-5" wire:ignore>
+              <select wire:model="appointment_type" class="form-select select2-type" id="appointment_type" required>
                 <option value="in_person">حضوری</option>
                 <option value="online_phone">تلفنی</option>
                 <option value="online_text">متنی</option>
@@ -32,8 +32,8 @@
               </select>
               <label for="appointment_type" class="form-label">نوع نوبت</label>
             </div>
-            <div class="col-md-6 col-sm-12 position-relative mt-5">
-              <select wire:model="clinic_id" class="form-select" id="clinic_id">
+            <div class="col-md-6 col-sm-12 position-relative mt-5" wire:ignore>
+              <select wire:model="clinic_id" class="form-select select2-clinic" id="clinic_id">
                 <option value="">بدون کلینیک</option>
                 @foreach ($clinics as $clinic)
                   <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
@@ -47,7 +47,7 @@
             </div>
             <div class="col-12 text-end mt-4 w-100 d-flex justify-content-end">
               <button wire:click="store"
-                class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+                class="btn my-btn-primary  py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
@@ -59,123 +59,38 @@
         </div>
       </div>
     </div>
-  </div>
+    <script>
+      document.addEventListener('livewire:init', function() {
+        Livewire.on('show-alert', (event) => {
+          toastr[event.type](event.message);
+        });
 
-  <style>
-    .bg-gradient-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-    }
+        // Initialize Select2
+        $('#clinic_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کلینیک',
+          allowClear: true,
+          width: '100%',
+        });
+        $('#appointment_type').select2({
+          dir: 'rtl',
+          placeholder: ' نوع نوبت',
+          allowClear: true,
+          width: '100%',
+        });
 
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
+        // Sync Select2 with Livewire
+        $('#clinic_id').on('change', function() {
+          @this.set('clinic_id', this.value);
+        });
+        $('#appointment_type').on('change', function() {
+          @this.set('appointment_type', this.value);
+        });
 
-    .form-control,
-    .form-select {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 12px 15px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      height: 48px;
-      background: #fafafa;
-      width: 100%;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-      border-color: #6b7280;
-      box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
-      background: #fff;
-    }
-
-    .form-label {
-      position: absolute;
-      top: -25px;
-      right: 15px;
-      color: #374151;
-      font-size: 12px;
-      background: #ffffff;
-      padding: 0 5px;
-      pointer-events: none;
-    }
-
-    .my-btn-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-
-    .my-btn-primary:hover {
-      background: linear-gradient(90deg, #4b5563, #1f2937);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline-light {
-      border-color: rgba(255, 255, 255, 0.8);
-    }
-
-    .btn-outline-light:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-2px);
-    }
-
-    .animate-bounce {
-      animation: bounce 1s infinite;
-    }
-
-    @keyframes bounce {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-5px);
-      }
-    }
-
-    .text-shadow {
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-
-    @media (max-width: 767px) {
-      .card-header {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .btn-outline-light {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .col-md-6 {
-        flex: 0 0 100%;
-        max-width: 100%;
-      }
-    }
-
-    @media (max-width: 575px) {
-      .card-body {
-        padding: 2rem 1.5rem;
-      }
-
-      .my-btn-primary {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
-
-  <script>
-    document.addEventListener('livewire:init', function() {
-      Livewire.on('show-alert', (event) => {
-        toastr[event.type](event.message);
+        // Update Select2 when Livewire updates
+        Livewire.on('update-clinic-id', (event) => {
+          $('#clinic_id').val(event.value).trigger('change');
+        });
       });
-    });
-  </script>
-</div>
+    </script>
+  </div>

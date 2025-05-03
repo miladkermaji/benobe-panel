@@ -2,11 +2,7 @@
 
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/css/panel/doctornote/doctornote.css') }}" rel="stylesheet" />
-  <style>
-    .myPanelOption {
-      display: none
-    }
-  </style>
+
 @endsection
 
 @section('site-header')
@@ -20,7 +16,9 @@
 
 
   <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-
-
 @endsection
 @endsection
+
+
+
+

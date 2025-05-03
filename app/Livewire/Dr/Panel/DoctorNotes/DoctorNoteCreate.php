@@ -17,7 +17,8 @@ class DoctorNoteCreate extends Component
 
     public function mount()
     {
-        $this->clinics = Clinic::all(); // کلینیک‌ها برای انتخاب
+        // Fetch only the clinics associated with the authenticated doctor
+        $this->clinics = Auth::guard('doctor')->user()->clinics;
     }
 
     public function store()

@@ -1,285 +1,446 @@
-/* کلیات */
-.container-fluid {
-  padding: 1.5rem;
-  background: #f4f6f9;
+/* تعریف متغیرهای پالت رنگی */
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2E86C1; /* آبی اصلی - دکمه‌ها و لینک‌ها */
+    --primary-light: #84CAF9; /* آبی روشن - گرادیان‌ها */
+    --secondary: #1DEB3C; /* سبز - دکمه‌های ثانویه */
+    --secondary-hover: #15802A; /* سبز تیره‌تر برای هاور */
+    --background-light: #F0F8FF; /* آبی بسیار روشن - پس‌زمینه */
+    --background-footer: #D4ECFD; /* آبی روشن‌تر - فوتر */
+    --background-card: #FFFFFF; /* سفید - کارت‌ها */
+    --text-primary: #000000; /* مشکی - متن اصلی */
+    --text-secondary: #707070; /* خاکستری - متن ثانویه */
+    --text-discount: #008000; /* سبز - قیمت با تخفیف */
+    --text-original: #FF0000; /* قرمز - قیمت اولیه */
+    --border-neutral: #E5E7EB; /* خاکستری روشن - حاشیه‌ها */
+    --shadow: rgba(0, 0, 0, 0.15); /* سایه‌ها */
+    --gradient-instagram-from: #F92CA7; /* گرادیان اینستاگرام - شروع */
+    --gradient-instagram-to: #6B1A93; /* گرادیان اینستاگرام - پایان */
+    --button-mobile: #4F9ACD; /* آبی متوسط - دکمه‌های موبایل */
+    --button-mobile-light: #A2CDEB; /* آبی روشن‌تر - دکمه‌های موبایل */
+    --support-section: #2E86C1; /* آبی - بخش پشتیبانی */
+    --support-text: #084D7C; /* آبی تیره - متن پشتیبانی */
+    --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    --gradient-header: linear-gradient(90deg, #1B6FA6 0%, #2E86C1 100%); /* هدر پررنگ‌تر */
+    
+    /* شعاع گوشه‌ها */
+    --radius-button: 0.5rem; /* 8px - دکمه‌ها (کاهش یافته) */
+    --radius-card: 1.25rem; /* 20px - کارت‌ها */
+    --radius-nav: 1.5rem; /* 24px - نوار ناوبری */
+    --radius-circle: 9999px; /* دایره کامل */
+}
+
+/* استایل‌های عمومی */
+body {
+    background-color: var(--background-light);
+    color: var(--text-primary);
+    font-size: 16px;
+    direction: rtl;
+    font-family: 'Vazir', sans-serif; /* فونت مدرن */
+}
+
+/* کارت‌ها */
+.card {
+    background: var(--background-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 6px 18px var(--shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--shadow);
+}
+
+/* هدر کارت */
+.card-header {
+    background: var(--gradient-primary);
+    color: #ffffff;
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* بدنه کارت */
+.card-body {
+    padding: 1.5rem;
+}
+
+/* دکمه‌ها */
+.my-btn-primary {
+    background: var(--gradient-primary);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-button);
+    padding: 0.5rem 1.25rem; /* کاهش پدینگ برای کوچکتر شدن */
+    font-weight: 500;
+    font-size: 13px; /* کاهش سایز فونت */
+    transition: transform 0.2s ease, background 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.my-btn-primary:hover {
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+    transform: translateY(-2px);
+}
+
+.btn-outline-light {
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    color: #ffffff;
+    border-radius: var(--radius-button);
+    padding: 0.375rem 1rem; /* کاهش پدینگ برای کوچکتر شدن */
+    font-size: 12px; /* کاهش سایز فونت */
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-gradient-success {
+    background: linear-gradient(90deg, var(--secondary) 0%, var(--secondary-hover) 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-button);
+    padding: 0.5rem 1.25rem; /* کاهش پدینگ برای کوچکتر شدن */
+    font-size: 13px; /* کاهش سایز فونت */
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.btn-gradient-success:hover {
+    background: linear-gradient(90deg, var(--secondary-hover) 0%, var(--secondary) 100%);
+    transform: translateY(-2px);
+}
+
+.btn-gradient-danger {
+    background: linear-gradient(90deg, var(--text-original) 0%, #f87171 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-button);
+    padding: 0.5rem 1.25rem; /* کاهش پدینگ برای کوچکتر شدن */
+    font-size: 13px; /* کاهش سایز فونت */
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.btn-gradient-danger:hover:not(:disabled) {
+    background: linear-gradient(90deg, #ef4444 0%, var(--text-original) 100%);
+    transform: translateY(-2px);
+}
+
+.btn-gradient-danger:disabled {
+    background: rgba(200, 200, 200, 0.5);
+    cursor: not-allowed;
+}
+
+/* ورودی‌ها */
+.form-control,
+.form-select {
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
+    padding: 0.75rem 1rem;
+    background: var(--background-card);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    height: 44px;
+    font-size: 14px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.25);
+    background: var(--background-card);
+}
+
+.form-label {
+    position: absolute;
+    top: -18px;
+    right: 10px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    background: var(--background-card);
+    padding: 0 6px;
+    transition: all 0.2s ease;
+}
+
+/* استایل Select2 */
+.select2-container--default .select2-selection--single {
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
+    height: 44px;
+    background: var(--background-card);
+    padding: 0.5rem;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 32px;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 44px;
+    right: 10px;
+}
+
+.select2-container--default .select2-selection--single:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.25);
+}
+
+.select2-container--default .select2-dropdown {
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
+    background: var(--background-card);
+}
+
+.select2-container--default .select2-results__option {
+    padding: 8px 12px;
+    color: var(--text-primary);
+}
+
+.select2-container--default .select2-results__option--highlighted {
+    background: var(--background-footer);
+    color: var(--text-primary);
 }
 
 /* هدر شیشه‌ای */
 .glass-header {
-  background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.85));
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  border-radius: 16px;
-  padding: 1.5rem;
-  transition: all 0.4s ease;
-}
-
-.glass-header:hover {
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
-  transform: translateY(-3px);
-}
-
-.glass-header h1 {
-  color: #ffffff;
-  font-size: 1.75rem;
-  font-weight: 300;
-  margin: 0;
-  letter-spacing: -0.025em;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-/* فیلد جستجو */
-.input-group {
-  max-width: 400px;
-  position: relative;
-}
-
-.form-control {
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 12px;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  font-size: 0.95rem;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
-  transition: all 0.3s ease;
-  height: 48px;
-}
-
-.form-control:focus {
-  border-color: #374151;
-  box-shadow: 0 0 0 4px rgba(55, 65, 81, 0.15);
-  background: #f9fafb;
-  outline: none;
-}
-
-.form-control::placeholder {
-  color: #6b7280;
-}
-
-.search-icon {
-  position: absolute;
-  top: 50%;
-  right: 1rem;
-  transform: translateY(-50%);
-  z-index: 5;
-}
-
-/* دکمه‌ها */
-.btn-gradient-success {
-  background: linear-gradient(90deg, #10b981, #34d399);
-  border: none;
-  color: #ffffff;
-  border-radius: 9999px;
-  padding: 0.65rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
-  transition: all 0.3s ease;
-}
-
-.btn-gradient-success:hover {
-  background: linear-gradient(90deg, #059669, #10b981);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-}
-
-.btn-gradient-danger {
-  background: linear-gradient(90deg, #f43f5e, #fb7185);
-  border: none;
-  color: #ffffff;
-  border-radius: 9999px;
-  padding: 0.65rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  box-shadow: 0 3px 10px rgba(244, 63, 94, 0.2);
-  transition: all 0.3s ease;
-}
-
-.btn-gradient-danger:hover:not(:disabled) {
-  background: linear-gradient(90deg, #e11d48, #f43f5e);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3);
-}
-
-.btn-gradient-danger:disabled {
-  background: #e5e7eb;
-  color: #9ca3af;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.buttons-container {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-/* کارت */
-.card {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  border: none;
-}
-
-.card:hover {
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+    background: var(--gradient-header);
+    border-radius: var(--radius-nav);
+    padding: 1.25rem;
+    box-shadow: 0 6px 20px var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 /* جدول */
 .table {
-  border-collapse: separate;
-  border-spacing: 0;
-  margin: 0;
-  width: 100% !important;
+    width: 100% !important;
+    max-width: 100%;
+    border-collapse: collapse;
+    background: var(--background-card);
+    border-radius: var(--radius-button);
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--shadow);
+    margin: 0;
 }
 
-.table thead th {
-  background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.85));
-  color: #ffffff;
-  font-weight: 600;
-  padding: 1rem;
-  border-bottom: none;
-  text-wrap: nowrap !important;
+.table thead {
+    background: var(--gradient-primary);
+    color: #ffffff;
+}
+
+.table th,
+.table td {
+    padding: 1rem;
+    text-align: right;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-neutral);
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .table td {
-  border-bottom: 1px solid #e5e7eb;
-  padding: 1rem;
-  vertical-align: middle;
+    font-size: 13px;
+    color: var(--text-primary);
 }
 
 .table-hover tbody tr:hover {
-  background: #f9fafb;
-  transition: background 0.2s ease;
+    background-color: var(--background-footer);
 }
 
-/* چک‌باکس */
-.form-check-input {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 4px;
-  border: 1px solid #d1d5db;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  margin: 0;
-  vertical-align: middle;
-}
-
-.form-check-input:checked {
-  background-color: #374151;
-  border-color: #374151;
-}
-
-/* بج‌ها */
-.badge {
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.bg-label-success {
-  background-color: #d1fae5;
-  color: #10b981;
-}
-
-.bg-label-danger {
-  background-color: #fee2e2;
-  color: #f43f5e;
-}
-
-/* افکت‌ها */
-.cursor-pointer {
-  cursor: pointer;
-}
-
-/* ریسپانسیو */
-@media (max-width: 991px) {
-  .glass-header {
-    padding: 1.25rem;
-  }
-
-  .input-group {
+.table-responsive {
+    width: 100%;
     max-width: 100%;
-    margin-top: 1rem;
-  }
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-button);
+}
 
-  .buttons-container {
-    margin-top: 1rem;
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-  }
+/* آیکون جستجو */
+.search-icon {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
 
-  .btn {
-    width: 100%;
-    max-width: 250px;
-  }
+/* انیمیشن */
+.animate-bounce {
+    animation: bounce 1.2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+/* تنظیمات ریسپانسیو */
+@media (max-width: 1200px) {
+    .glass-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem;
+    }
+
+    .buttons-container {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: none;
+    }
+}
+
+@media (max-width: 991px) {
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+
+    .form-control,
+    .form-select,
+    .select2-container--default .select2-selection--single {
+        height: 40px;
+        font-size: 13px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 28px;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.75rem;
+    }
+
+    .my-btn-primary,
+    .btn-gradient-success,
+    .btn-gradient-danger {
+        padding: 0.375rem 1rem; /* کوچکتر در موبایل */
+        font-size: 12px;
+    }
+
+    .btn-outline-light {
+        padding: 0.25rem 0.75rem; /* کوچکتر در موبایل */
+        font-size: 11px;
+    }
 }
 
 @media (max-width: 767px) {
-  .container-fluid {
-    padding: 1rem;
-  }
+    body {
+        font-size: 14px;
+    }
 
-  .glass-header {
-    padding: 1rem;
-  }
+    .card {
+        border-radius: 1rem;
+    }
 
-  .glass-header h1 {
-    font-size: 1.5rem;
-    text-align: center;
-    width: 100%;
-  }
+    .card-body {
+        padding: 1rem;
+    }
 
-  .form-control {
-    font-size: 0.9rem;
-    padding: 0.65rem 1rem 0.65rem 2.5rem;
-    height: 44px;
-  }
+    .card-header {
+        padding: 0.75rem;
+    }
 
-  .btn-gradient-success,
-  .btn-gradient-danger {
-    font-size: 0.9rem;
-    padding: 0.5rem 1.25rem;
-  }
+    .glass-header {
+        padding: 0.75rem;
+    }
 
-  .table td,
-  .table th {
-    padding: 0.75rem;
-    font-size: 0.9rem;
-  }
+    .glass-header h1 {
+        font-size: 1.25rem;
+        text-align: center;
+    }
+
+    .form-label {
+        font-size: 11px;
+        top: -16px;
+    }
+
+    .my-btn-primary,
+    .btn-gradient-success,
+    .btn-gradient-danger {
+        padding: 0.375rem 1rem; /* کوچکتر در موبایل */
+        font-size: 12px;
+    }
+
+    .btn-outline-light {
+        padding: 0.25rem 0.75rem; /* کوچکتر در موبایل */
+        font-size: 11px;
+    }
+
+    .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .table {
+        font-size: 12px;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.5rem;
+    }
 }
 
-@media (max-width: 576px) {
-  .glass-header h1 {
-    font-size: 1.25rem;
-  }
+@media (max-width: 575px) {
+    .card {
+        border-radius: 0.75rem;
+    }
 
-  .form-control {
-    font-size: 0.85rem;
-    padding: 0.5rem 1rem 0.5rem 2.5rem;
-    height: 40px;
-  }
+    .card-body {
+        padding: 0.75rem;
+    }
 
-  .btn-gradient-success,
-  .btn-gradient-danger {
-    font-size: 0.85rem;
-    padding: 0.5rem 1rem;
-  }
+    .glass-header {
+        border-radius: 1rem;
+    }
 
-  .table-responsive {
-    font-size: 0.85rem;
-  }
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
 
-  .table td,
-  .table th {
-    padding: 0.5rem;
-  }
+    .table th,
+    .table td {
+        font-size: 11px;
+        padding: 0.4rem;
+    }
+}
+
+/* مخفی کردن گزینه‌های پنل */
+.myPanelOption {
+    display: none !important;
 }

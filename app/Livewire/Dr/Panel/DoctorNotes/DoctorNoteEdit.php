@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Doctornotes;
+namespace App\Livewire\Dr\Panel\DoctorNotes;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
@@ -22,27 +22,26 @@ class DoctorNoteEdit extends Component
         $this->clinic_id = $this->doctorNote->clinic_id;
         $this->appointment_type = $this->doctorNote->appointment_type;
         $this->notes = $this->doctorNote->notes;
-        $this->clinics = Clinic::all(); // کلینیک‌ها برای انتخاب
+        // Fetch only the clinics associated with the authenticated doctor
+        $this->clinics = Auth::guard('doctor')->user()->clinics;
     }
 
     public function update()
     {
-
         $validator = Validator::make([
-                   'clinic_id' => $this->clinic_id,
-                   'appointment_type' => $this->appointment_type,
-                   'notes' => $this->notes,
-               ], [
-                   'clinic_id' => 'nullable|exists:clinics,id',
-                   'appointment_type' => 'required|in:in_person,online_phone,online_text,online_video',
-                   'notes' => 'nullable|string|max:1000',
-               ], [
-                   'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
-                   'appointment_type.required' => 'نوع نوبت الزامی است.',
-                   'appointment_type.in' => 'نوع نوبت باید یکی از گزینه‌های حضوری، تلفنی ویدیویی یا متنی باشد.',
-                   'notes.max' => 'یادداشت نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد.',
-               ]);
-
+            'clinic_id' => $this->clinic_id,
+            'appointment_type' => $this->appointment_type,
+            'notes' => $this->notes,
+        ], [
+            'clinic_id' => 'nullable|exists:clinics,id',
+            'appointment_type' => 'required|in:in_person,online_phone,online_text,online_video',
+            'notes' => 'nullable|string|max:1000',
+        ], [
+            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'appointment_type.required' => 'نوع نوبت الزامی است.',
+            'appointment_type.in' => 'نوع نوبت باید یکی از گزینه‌های حضوری، تلفنی ویدیویی یا متنی باشد.',
+            'notes.max' => 'یادداشت نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد.',
+        ]);
 
         if ($validator->fails()) {
             $this->dispatch('show-alert', type: 'error', message: $validator->errors()->first());

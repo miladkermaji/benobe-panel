@@ -24,7 +24,7 @@
       <button wire:click="deleteSelected"
         class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
         @if (empty($selectedDoctorNotes)) disabled @endif>
-        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">
           <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
         </svg>
@@ -38,7 +38,7 @@
       <div class="card-body p-0">
         <div class="table-responsive text-nowrap">
           <table class="table table-bordered table-hover w-100 m-0">
-            <thead class="glass-header text-white">
+            <thead class="">
               <tr>
                 <th class="text-center align-middle" style="width: 50px;">
                   <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
