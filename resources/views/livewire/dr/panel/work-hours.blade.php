@@ -313,123 +313,110 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel"
-    aria-hidden="true" wire:ignore.self>
+<div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true" wire:ignore.self>
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content border-radius-6">
-        <div class="modal-header border-radius-6">
-          <h5 class="modal-title fw-bold" id="scheduleModalLabel">تنظیم زمان‌بندی</h5>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="modal-body position-relative">
-          <!-- لودینگ -->
-          <div class="loading-overlay d-none" id="scheduleLoading">
-            <div class="spinner-border text-primary" role="status">
-              <span class="sr-only">در حال بارگذاری...</span>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="scheduleModalLabel">تنظیم زمان‌بندی</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
             </div>
-            <p class="mt-2">در حال بارگذاری...</p>
-          </div>
-          <!-- محتوای اصلی -->
-          <div class="modal-content-inner">
-            <div>
-              <div class="mb-3">
-                <x-my-check-box :is-checked="$selectAllScheduleModal" id="select-all-schedule-days" day="انتخاب همه"
-                  wire:model.live="selectAllScheduleModal" />
-              </div>
-              <div class="mt-2 d-flex gap-2 flex-wrap" id="day-schdule-wrapper">
-                @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
-                  <div class="">
-                    <x-my-check-box :is-checked="isset($selectedScheduleDays[$day]) && $selectedScheduleDays[$day]" id="schedule-day-{{ $day }}"
-                      day="{{ $label }}" wire:model.live="selectedScheduleDays.{{ $day }}"
-                      data-day="{{ $day }}" class="schedule-day-checkbox" />
-                  </div>
-                @endforeach
-              </div>
-            </div>
-            <div class="w-100 d-flex mt-4 gap-4 justify-content-center">
-              <div class="form-group position-relative timepicker-ui">
-                <label class="label-top-input-special-takhasos">شروع</label>
-                <input type="text"
-                  class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 col-6"
-                  id="schedule-start" value="00:00">
-              </div>
-              <div class="form-group position-relative timepicker-ui">
-                <label class="label-top-input-special-takhasos">پایان</label>
-                <input type="text"
-                  class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 col-6"
-                  id="schedule-end" value="23:59">
-              </div>
-            </div>
-            <div class="mt-4">
-              <div class="d-flex flex-column gap-2" id="schedule-settings-list">
-                @if ($scheduleModalDay && $scheduleModalIndex !== null)
-                  @php
-                    $schedule = collect($this->workSchedules)->firstWhere('day', $scheduleModalDay);
-                    $settings =
-                        $schedule && isset($schedule['appointment_settings'])
-                            ? (is_array($schedule['appointment_settings'])
-                                ? $schedule['appointment_settings']
-                                : json_decode($schedule['appointment_settings'], true) ?? [])
-                            : [];
-                    $filteredSettings = array_values(
-                        array_filter(
-                            $settings,
-                            fn($setting) => isset($setting['work_hour_key']) &&
-                                (int) $setting['work_hour_key'] === (int) $this->scheduleModalIndex,
-                        ),
-                    );
-                    $dayTranslations = [
-                        'saturday' => 'شنبه',
-                        'sunday' => 'یکشنبه',
-                        'monday' => 'دوشنبه',
-                        'tuesday' => 'سه‌شنبه',
-                        'wednesday' => 'چهارشنبه',
-                        'thursday' => 'پنج‌شنبه',
-                        'friday' => 'جمعه',
-                    ];
-                  @endphp
-                  @if (!empty($filteredSettings))
-                    @foreach ($filteredSettings as $index => $setting)
-                      <div class="d-flex justify-content-between align-items-center p-2 border rounded"
-                        wire:key="setting-{{ $scheduleModalDay }}-{{ $index }}">
-                        <span>
-                          از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }} (روزها:
-                          {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
-                        </span>
-                        <button class="btn btn-light btn-sm delete-schedule-setting"
-                          data-day="{{ $scheduleModalDay }}" data-index="{{ $index }}">
-                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                        </button>
-                      </div>
-                    @endforeach
-                  @else
-                    <div class="alert alert-danger text-center fw-bold">
-                      هیچ تنظیم زمان‌بندی برای این بازه زمانی ذخیره نشده
-                      است.
+            <div class="modal-body position-relative">
+                <!-- لودینگ -->
+                <div class="loading-overlay d-none" id="scheduleLoading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">در حال بارگذاری...</span>
                     </div>
-                  @endif
-                @else
-                  <div class="alert alert-danger text-center fw-bold">
-                    روز یا بازه زمانی انتخاب نشده است.
-                  </div>
-                @endif
-              </div>
+                    <p class="mt-2">در حال بارگذاری...</p>
+                </div>
+                <!-- محتوای اصلی -->
+                <div class="modal-content-inner">
+                    <div class="schedule-days-section">
+                        <div class="day-schdule-wrapper">
+                            <div class="day-checkbox">
+                                <x-my-check-box :is-checked="$selectAllScheduleModal" id="select-all-schedule-days" day="انتخاب همه" wire:model.live="selectAllScheduleModal" />
+                            </div>
+                            @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+                                <div class="day-checkbox">
+                                    <x-my-check-box :is-checked="isset($selectedScheduleDays[$day]) && $selectedScheduleDays[$day]" id="schedule-day-{{ $day }}"
+                                        day="{{ $label }}" wire:model.live="selectedScheduleDays.{{ $day }}"
+                                        data-day="{{ $day }}" class="schedule-day-checkbox" />
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="timepicker-save-section">
+                        <div class="form-group position-relative timepicker-ui">
+                            <label class="label-top-input-special-takhasos">شروع</label>
+                            <input type="text" class="form-control timepicker-ui-input text-center fw-bold" id="schedule-start" value="00:00">
+                        </div>
+                        <div class="form-group position-relative timepicker-ui">
+                            <label class="label-top-input-special-takhasos">پایان</label>
+                            <input type="text" class="form-control timepicker-ui-input text-center fw-bold" id="schedule-end" value="23:59">
+                        </div>
+                        <button type="button" class="btn my-btn-primary d-flex justify-content-center align-items-center" id="saveSchedule">
+                            <span class="button_text">ذخیره تغییرات</span>
+                            <div class="loader"></div>
+                        </button>
+                    </div>
+                    <div class="schedule-settings-section">
+                        <div class="schedule-settings-list">
+                            @if ($scheduleModalDay && $scheduleModalIndex !== null)
+                                @php
+                                    $schedule = collect($this->workSchedules)->firstWhere('day', $scheduleModalDay);
+                                    $settings = $schedule && isset($schedule['appointment_settings'])
+                                        ? (is_array($schedule['appointment_settings'])
+                                            ? $schedule['appointment_settings']
+                                            : json_decode($schedule['appointment_settings'], true) ?? [])
+                                        : [];
+                                    $filteredSettings = array_values(
+                                        array_filter(
+                                            $settings,
+                                            fn($setting) => isset($setting['work_hour_key']) &&
+                                                (int) $setting['work_hour_key'] === (int) $this->scheduleModalIndex,
+                                        ),
+                                    );
+                                    $dayTranslations = [
+                                        'saturday' => 'شنبه',
+                                        'sunday' => 'یکشنبه',
+                                        'monday' => 'دوشنبه',
+                                        'tuesday' => 'سه‌شنبه',
+                                        'wednesday' => 'چهارشنبه',
+                                        'thursday' => 'پنج‌شنبه',
+                                        'friday' => 'جمعه',
+                                    ];
+                                @endphp
+                                @if (!empty($filteredSettings))
+                                    @foreach ($filteredSettings as $index => $setting)
+                                        <div class="schedule-setting-item" wire:key="setting-{{ $scheduleModalDay }}-{{ $index }}">
+                                            <span>
+                                                از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }} (روزها:
+                                                {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
+                                            </span>
+                                            <button class="btn btn-light delete-schedule-setting"
+                                                data-day="{{ $scheduleModalDay }}" data-index="{{ $index }}">
+                                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="alert alert-danger text-center fw-bold">
+                                        هیچ تنظیم زمان‌بندی برای این بازه زمانی ذخیره نشده است.
+                                    </div>
+                                @endif
+                            @else
+                                <div class="alert alert-danger text-center fw-bold">
+                                    روز یا بازه زمانی انتخاب نشده است.
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="w-100 d-flex justify-content-end mt-3">
-              <button type="button"
-                class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-                id="saveSchedule">
-                <span class="button_text">ذخیره تغییرات</span>
-                <div class="loader"></div>
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 
   <div class="modal fade" id="CalculatorModal" tabindex="-1" aria-labelledby="CalculatorModalLabel"
     aria-hidden="true" wire:ignore.self>
