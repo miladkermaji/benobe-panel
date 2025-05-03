@@ -37,7 +37,7 @@
               <div class="mt-4">
                 <label class="text-dark fw-bold">روزهای کاری</label>
                 <div
-                  class="d-flex flex-wrap justify-content-start mt-3 gap-40 bg-light p-3 border-radius-11 day-contents align-items-center h-55"
+                  class="d-flex  justify-content-start mt-3 gap-40 bg-light p-3 border-radius-11 day-contents align-items-center h-55"
                   id="day-contents-outside">
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $englishDay => $persianDay)
                     <x-my-check :isChecked="$isWorking[$englishDay]" id="{{ $englishDay }}" day="{{ $persianDay }}" />
@@ -179,34 +179,34 @@
                                 <!-- دکمه کپی -->
                                 <div class="form-group position-relative">
                                   <x-custom-tooltip title="کپی ساعات کاری" placement="top">
-                                      <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal"
-                                        data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
-                                        data-index="{{ $index }}"
-                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                        <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
-                                      </button>
-                                    </x-custom-tooltip>
+                                    <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal"
+                                      data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
+                                      data-index="{{ $index }}"
+                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                      <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
+                                    </button>
+                                  </x-custom-tooltip>
                                 </div>
                                 <!-- دکمه حذف -->
                                 <div class="form-group position-relative">
                                   <x-custom-tooltip title="حذف برنامه کاری" placement="top">
-                                      <button class="btn btn-light btn-sm remove-row-btn"
-                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                                      </button>
-                                    </x-custom-tooltip>
+                                    <button class="btn btn-light btn-sm remove-row-btn"
+                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                      <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                    </button>
+                                  </x-custom-tooltip>
                                 </div>
                               </div>
                               <div class="d-flex align-items-center">
                                 <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
-                                    <button type="button"
-                                      class="btn text-black btn-sm btn-outline-primary schedule-btn"
-                                      data-bs-toggle="modal" data-bs-target="#scheduleModal"
-                                      data-day="{{ $englishDay }}" data-index="{{ $index }}"
-                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                      <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
-                                    </button>
-                                  </x-custom-tooltip>
+                                  <button type="button"
+                                    class="btn text-black btn-sm btn-outline-primary schedule-btn"
+                                    data-bs-toggle="modal" data-bs-target="#scheduleModal"
+                                    data-day="{{ $englishDay }}" data-index="{{ $index }}"
+                                    {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                    <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                  </button>
+                                </x-custom-tooltip>
                               </div>
                             </div>
                           @endif
@@ -569,7 +569,7 @@
           });
         });
 
-    
+
 
         function initializeTimepicker() {
           $('.timepicker-ui').each(function() {
@@ -593,18 +593,18 @@
           });
         }
 
-        
+
         initializeTimepicker();
 
         Livewire.on('refresh-work-hours', () => {
           initializeTimepicker();
-          
+
         });
 
         Livewire.on('refresh-timepicker', () => {
           setTimeout(() => {
             initializeTimepicker();
-            
+
           }, 100);
         });
 
@@ -802,7 +802,7 @@
               if ($element.length > 0) {
                 $element.hide();
               }
-              
+
             }, 100);
           } catch (error) {
             console.error('Error setting copySource:', error);
@@ -822,7 +822,7 @@
             index: null
           });
           @this.set('selectAllCopyModal', false);
-          
+
         });
 
         $(document).on('show.bs.modal', '#emergencyModal', function(e) {
@@ -922,7 +922,7 @@
             });
 
             setTimeout(() => {
-              
+
             }, 100);
           } catch (error) {
             console.error('Error in emergencyModal:', error);
@@ -937,7 +937,7 @@
           $('#emergency-times').empty();
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
-          
+
         });
 
         Livewire.on('close-emergency-modal', () => {
@@ -946,7 +946,7 @@
           $('#emergency-times').empty();
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
-          
+
         });
 
         function cleanupModal() {
@@ -987,7 +987,7 @@
             setTimeout(() => {
               $('#scheduleLoading').addClass('d-none');
               $('.modal-content-inner').show();
-              
+
               initializeTimepicker();
               const selectAllCheckbox = $('#select-all-schedule-days');
               const dayCheckboxes = $('.schedule-day-checkbox');
@@ -1101,19 +1101,19 @@
           @this.set('selectAllScheduleModal', false);
           $('#schedule-settings-list').empty();
           $('.form-check-input').prop('disabled', false);
-          
+
           initializeTimepicker();
         });
 
         Livewire.on('refresh-schedule-settings', () => {
-          
+
           initializeTimepicker();
         });
 
         Livewire.on('close-schedule-modal', () => {
           $('#scheduleModal').modal('hide');
           cleanupModal();
-          
+
         });
 
         $(document).on('change', '#select-all-days', function() {
@@ -1124,7 +1124,7 @@
         $('#checkboxModal').on('hidden.bs.modal', function() {
           $('#day-checkboxes .form-check').css('display', 'flex');
           $('#day-checkboxes input[type="checkbox"]').prop('checked', false);
-          
+
         });
 
         Livewire.on('show-conflict-alert', (event) => {
