@@ -70,7 +70,7 @@
               </div>
               <div class="input-group mt-2">
                 <input type="text" value="{{ $clinic->address ?? '' }}" class="my-form-control w-100"
-                  placeholder="آدرس شما" readonly data-toggle="modal" data-bs-target="#addressModalCenter">
+                  placeholder="آدرس شما" readonly data-bs-toggle="modal" data-bs-target="#addressModalCenter">
                 <div class="modal fade" id="addressModalCenter" tabindex="-1" role="dialog"
                   aria-labelledby="addressModalCenterLabel" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -103,7 +103,7 @@
                 </div>
 
                 <div class="mt-3 w-100">
-                  <button class="btn my-btn-primary h-50 w-100 " type="button" data-toggle="modal"
+                  <button class="btn my-btn-primary h-50 w-100 " type="button" data-bs-toggle="modal"
                     data-bs-target="#doneModal">انجام
                     شد</button>
                 </div>
