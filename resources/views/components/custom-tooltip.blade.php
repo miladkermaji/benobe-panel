@@ -23,7 +23,7 @@
         --tooltip-shadow: rgba(0, 0, 0, 0.2);
         --tooltip-radius: 8px;
         --tooltip-font: 'Vazirmatn', 'Inter', system-ui, sans-serif;
-        --tooltip-transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+        --tooltip-transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
     }
 
     .x-tooltip {
@@ -58,7 +58,7 @@
         visibility: hidden;
         transform: scale(0.95);
         transition: var(--tooltip-transition);
-        z-index: 9999999;
+        z-index: 1000001;
         box-shadow: 0 6px 16px var(--tooltip-shadow);
         pointer-events: none;
     }
@@ -66,8 +66,11 @@
     .x-tooltip__content::before {
         content: '';
         position: absolute;
+        width: 0;
+        height: 0;
         border: 6px solid transparent;
-        z-index: 10000000;
+        z-index: 1000002;
+        transition: var(--tooltip-transition);
     }
 
     .x-tooltip[data-placement="top"] .x-tooltip__content {
@@ -78,11 +81,11 @@
         border-top-color: var(--tooltip-bg-start);
         top: 100%;
         left: 50%;
-        transform: translateX(-50%) rotate(180deg);
+        transform: translateX(-50%);
     }
 
     .x-tooltip[data-placement="bottom"] .x-tooltip__content {
-        transform-origin: top;
+        transformйтесь-origin: top;
     }
 
     .x-tooltip[data-placement="bottom"] .x-tooltip__content::before {
@@ -100,7 +103,7 @@
         border-left-color: var(--tooltip-bg-start);
         left: 100%;
         top: 50%;
-        transform: translateY(-50%) rotate(90deg);
+        transform: translateY(-50%);
     }
 
     .x-tooltip[data-placement="right"] .x-tooltip__content {
@@ -111,7 +114,7 @@
         border-right-color: var(--tooltip-bg-start);
         right: 100%;
         top: 50%;
-        transform: translateY(-50%) rotate(-90deg);
+        transform: translateY(-50%);
     }
 
     .x-tooltip[data-trigger="hover"]:hover .x-tooltip__content,
@@ -165,7 +168,7 @@
                     content.style.visibility = 'hidden';
                     content.style.transform = 'scale(0.95)';
                     setTimeout(() => {
-                        content.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
+                        content.style.transition = 'opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease';
                     }, 0);
                 }
             });
@@ -201,7 +204,7 @@
                     const viewportWidth = window.innerWidth;
                     const viewportHeight = window.innerHeight;
                     const margin = 12;
-                    const offset = 10;
+                    const offset = 8;
 
                     const space = {
                         top: triggerRect.top - contentRect.height - margin,
@@ -277,7 +280,7 @@
                             content.style.visibility = 'hidden';
                             content.style.transform = 'scale(0.95)';
                             setTimeout(() => {
-                                content.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
+                                content.style.transition = 'opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease';
                             }, 0);
                             tooltip.dataset.placement = originalPlacement;
                         }, 150);
@@ -290,7 +293,7 @@
                             content.style.visibility = 'hidden';
                             content.style.transform = 'scale(0.95)';
                             setTimeout(() => {
-                                content.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
+                                content.style.transition = 'opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease';
                             }, 0);
                             tooltip.dataset.placement = originalPlacement;
                         }, 150);
@@ -314,6 +317,15 @@
                 }
 
                 trigger.setAttribute('aria-describedby', `${tooltipId}-content`);
+
+                // Ensure re-initialization on Livewire updates
+                if (window.Livewire) {
+                    window.Livewire.hook('element.updated', () => {
+                        if (!tooltip.dataset.xProcessed) {
+                            initializeTooltips();
+                        }
+                    });
+                }
             });
         };
 
@@ -349,14 +361,14 @@
             document.querySelectorAll('.x-tooltip--active').forEach(tooltip => {
                 if (!tooltip.contains(e.target)) {
                     tooltip.classList.remove('x-tooltip--active');
-                    const content = document.body.querySelector(`.x-tooltip__content[data-tooltip-id="${tooltip.id}"]`);
+                    const content = document.body.querySelector(`.x-tooltip__content[data-tooltip回復-id="${tooltip.id}"]`);
                     if (content) {
                         content.style.transition = 'none';
                         content.style.opacity = '0';
                         content.style.visibility = 'hidden';
                         content.style.transform = 'scale(0.95)';
                         setTimeout(() => {
-                            content.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
+                            content.style.transition = 'opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease';
                         }, 0);
                     }
                 }
