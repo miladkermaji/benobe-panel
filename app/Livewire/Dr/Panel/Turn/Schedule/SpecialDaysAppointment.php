@@ -241,20 +241,18 @@ class SpecialDaysAppointment extends Component
         ]);
 
         if ($modalId === 'holiday-modal' && $gregorianDate) {
-            $parsedDate = Carbon::parse($gregorianDate);
-            if ($parsedDate->isPast()) {
-                $this->dispatch('show-toastr', type: 'error', message: 'نمی‌توانید روزهای گذشته را ویرایش کنید.');
-                return;
-            }
-            Log::info("Opening holiday modal for date: {$gregorianDate}");
             $this->selectedDate = $gregorianDate;
-            $this->isEditable = false; // غیرفعال کردن ویرایش به‌صورت پیش‌فرض
+            $this->isEditable = false;
             $this->showModal = true;
             $this->holidaysData = [
                 'status' => true,
                 'holidays' => $this->getHolidays(),
             ];
             $this->workSchedule = $this->getWorkScheduleForDate($gregorianDate);
+
+            // ارسال workSchedule به SpecialWorkhours
+            $this->dispatch('updateSelectedDate', $gregorianDate, $this->workSchedule);
+
             Log::info("Selected date set to: {$this->selectedDate}, showModal: {$this->showModal}, holidaysData: ", $this->holidaysData);
             Log::info("Work schedule: ", $this->workSchedule);
             $this->dispatch('openXModal', id: 'holiday-modal');

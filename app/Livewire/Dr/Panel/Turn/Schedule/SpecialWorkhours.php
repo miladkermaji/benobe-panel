@@ -41,23 +41,28 @@ class SpecialWorkhours extends Component
         'close-emergency-modal' => 'closeEmergencyModal',
         'close-schedule-modal' => 'closeScheduleModal',
         'updateSelectedDate' => 'updateSelectedDate',
-        'enableWorkHoursEditing' => 'enableEditing', // listener جدید
+        'enableWorkHoursEditing' => 'enableEditing',
+        'refreshWorkhours' => '$refresh', // listener جدید
     ];
 
-    public function mount($selectedDate, $clinicId = 'default', $isEditable = false)
+
+
+    public function mount($selectedDate, $workSchedule, $clinicId = 'default', $isEditable = false)
     {
         $this->selectedDate = $selectedDate;
+        $this->workSchedule = $workSchedule;
         $this->clinicId = $clinicId;
-        $this->isEditable = $isEditable; // گرفتن مقدار از SpecialDaysAppointment
-        $this->loadWorkSchedule();
+        $this->isEditable = $isEditable;
+        $this->emergencyTimes = $this->getEmergencyTimes();
         Log::info("Mounting SpecialWorkhours", [
             'selectedDate' => $this->selectedDate,
+            'workSchedule' => $this->workSchedule,
             'clinicId' => $this->clinicId,
             'isEditable' => $this->isEditable,
         ]);
     }
 
-    public function updateSelectedDate($date)
+    public function updateSelectedDate($date, $workSchedule = null)
     {
         try {
             $parsedDate = Carbon::parse($date);
@@ -65,8 +70,17 @@ class SpecialWorkhours extends Component
                 throw new \Exception("Invalid date format: {$date}");
             }
             $this->selectedDate = $parsedDate->toDateString();
-            $this->loadWorkSchedule();
-            $this->dispatch('show-toastr', type: 'success', message: 'تاریخ انتخاب‌شده به‌روزرسانی شد.');
+            if ($workSchedule) {
+                $this->workSchedule = $workSchedule;
+            } else {
+                $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
+            }
+            $this->emergencyTimes = $this->getEmergencyTimes();
+            // حذف توستر برای تجربه کاربری بهتر
+            // $this->dispatch('show-toastr', type: 'success', message: 'تاریخ انتخاب‌شده به‌روزرسانی شد.');
+            Log::info("Selected date updated in SpecialWorkhours: {$this->selectedDate}", [
+                'workSchedule' => $this->workSchedule,
+            ]);
         } catch (\Exception $e) {
             Log::error("Error in updateSelectedDate: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در انتخاب تاریخ: ' . $e->getMessage());
@@ -588,7 +602,12 @@ class SpecialWorkhours extends Component
         $this->selectedScheduleDays = [];
         $this->selectAllScheduleModal = false;
     }
-
+    public function updatedSelectedDate($value)
+    {
+        $this->selectedDate = $value;
+        $this->loadWorkSchedule();
+        Log::info("Selected date updated in SpecialWorkhours: {$this->selectedDate}");
+    }
     public function render()
     {
         return view('livewire.dr.panel.turn.schedule.special-workhours');

@@ -7,11 +7,13 @@
   <div>
     <x-custom-modal id="holiday-modal" title="مدیریت تعطیلات و ساعات کاری"
       size="{{ $selectedDate && in_array($selectedDate, $holidaysData['holidays']) ? 'sm' : 'lg' }}" :show="$showModal"
-      wire:key="holiday-modal-{{ $selectedDate ?? 'default' }}">
+      wire:key="holiday-modal">
       <div class="">
         @php
           $isPastDate = $selectedDate ? \Carbon\Carbon::parse($selectedDate)->isPast() : false;
-          $jalaliDate = $selectedDate ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('d F Y') : '';
+          $jalaliDate = $selectedDate
+              ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('d F Y')
+              : '';
           $hasWorkHours = $workSchedule['status'] && !empty($workSchedule['data']['work_hours']);
         @endphp
         @if ($selectedDate && in_array($selectedDate, $holidaysData['holidays'] ?? []))
@@ -26,45 +28,60 @@
                 {{ $isProcessing ? 'disabled' : '' }}>لغو</button>
             </div>
           </div>
-        @else
-          <div class="alert alert-info" role="alert">
-            <p class="fw-bold text-center">
-              @if ($hasWorkHours)
-                  شما از قبل برای این روز ساعات کاری تعریف کرده اید  در صورتی که قصد تغیر دارید روی دکمه ویرایش  ساعت کاری کیک کنید 
-              @endif
-            </p>
-          </div>
-          @if ($hasWorkHours)
-            <livewire:dr.panel.turn.schedule.special-workhours :selectedDate="$selectedDate" :clinicId="$selectedClinicId" :isEditable="$isEditable" />
-            <div class="d-flex justify-content-center gap-2 mt-3">
-              <button class="btn btn-primary w-100 h-50" wire:click="enableEditing" {{ $isProcessing || $isPastDate || $isEditable ? 'disabled' : '' }}>
-                ویرایش ساعات کاری
-              </button>
-              <button class="btn btn-danger w-100 h-50" wire:click="addHoliday" {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
-                تعطیل کردن
-              </button>
-              <button class="btn btn-secondary w-100 h-50" wire:click="closeModal" {{ $isProcessing ? 'disabled' : '' }}>
-                لغو
-              </button>
-            </div>
-          @else
-            <livewire:dr.panel.turn.schedule.special-workhours :selectedDate="$selectedDate" :clinicId="$selectedClinicId" :isEditable="true" />
-            <div class="d-flex justify-content-center gap-2 mt-3">
-              <button class="btn btn-danger w-100 h-50" wire:click="addHoliday" {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
-                تعطیل کردن
-              </button>
-              <button class="btn btn-secondary w-100 h-50" wire:click="closeModal" {{ $isProcessing ? 'disabled' : '' }}>
-                لغو
-              </button>
-            </div>
-          @endif
-        @endif
+    @else
+  <div class="alert alert-info" role="alert">
+    <p class="fw-bold text-center">
+      @if ($hasWorkHours)
+        شما از قبل برای این روز ساعات کاری تعریف کرده‌اید. در صورتی که قصد تغییر دارید، روی دکمه ویرایش ساعات کاری کلیک کنید.
+      @endif
+    </p>
+  </div>
+  @if ($hasWorkHours)
+    <livewire:dr.panel.turn.schedule.special-workhours
+      :selectedDate="$selectedDate"
+      :workSchedule="$workSchedule"
+      :clinicId="$selectedClinicId"
+      :isEditable="$isEditable"
+      wire:key="special-workhours-{{ $selectedDate ?? 'default' }}" />
+    <div class="d-flex justify-content-center gap-2 mt-3">
+      <button class="btn btn-primary w-100 h-50" wire:click="enableEditing"
+        {{ $isProcessing || $isPastDate || $isEditable ? 'disabled' : '' }}>
+        ویرایش ساعات کاری
+      </button>
+      <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
+        {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
+        تعطیل کردن
+      </button>
+      <button class="btn btn-secondary w-100 h-50" wire:click="closeModal"
+        {{ $isProcessing ? 'disabled' : '' }}>
+        لغو
+      </button>
+    </div>
+  @else
+    <livewire:dr.panel.turn.schedule.special-workhours
+      :selectedDate="$selectedDate"
+      :workSchedule="$workSchedule"
+      :clinicId="$selectedClinicId"
+      :isEditable="true"
+      wire:key="special-workhours-{{ $selectedDate ?? 'default' }}" />
+    <div class="d-flex justify-content-center gap-2 mt-3">
+      <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
+        {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
+        تعطیل کردن
+      </button>
+      <button class="btn btn-secondary w-100 h-50" wire:click="closeModal"
+        {{ $isProcessing ? 'disabled' : '' }}>
+        لغو
+      </button>
+    </div>
+  @endif
+  @endif
       </div>
     </x-custom-modal>
   </div>
 
   <!-- مودال جابجایی -->
-  <div wire:ignore>
+  <div>
     <x-custom-modal id="transfer-modal" title="جابجایی نوبت‌ها" size="lg" :show="false"
       wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}">
       <div class="alert alert-info" role="alert">
@@ -113,6 +130,8 @@
         if (modalId) {
           window.openXModal(modalId);
           console.log(`Modal ${modalId} opened`);
+          // اطمینان از رفرش محتوای مودال
+          Livewire.dispatch('refreshWorkhours');
         } else {
           console.error('Modal ID not found in openXModal event:', event.detail);
         }
