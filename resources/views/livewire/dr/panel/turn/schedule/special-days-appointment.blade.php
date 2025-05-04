@@ -29,18 +29,16 @@
   </div>
 
   <!-- مودال جابجایی -->
-  <div>
-    <x-custom-modal id="transfer-modal" title="جابجایی نوبت‌ها" size="md" :show="false" wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}">
+  <div wire:ignore>
+    <x-custom-modal id="transfer-modal" title="جابجایی نوبت‌ها" size="lg" :show="false" wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}">
       <div class="alert alert-info" role="alert">
-        <h4 class="alert-heading">جابجایی نوبت‌ها</h4>
-        <p>
-          این روز دارای نوبت است. لطفاً نوبت‌ها را به روز دیگری جابجا کنید یا اقدامات لازم را انجام دهید.
+        <p class="fw-bold">
+          این روز دارای نوبت است. برای تعطیل کردن باید نوبت هارا جابجا کنید
         </p>
-        <hr>
-        <div class="d-flex justify-content-center gap-2 mt-3">
+      </div>
+       <div class="d-flex justify-content-center gap-2 mt-3">
           <button class="btn btn-secondary w-100 h-50" onclick="window.closeXModal('transfer-modal')">بستن</button>
         </div>
-      </div>
     </x-custom-modal>
   </div>
 
