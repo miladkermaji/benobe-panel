@@ -20,7 +20,7 @@
           @if ($selectedDate && in_array($selectedDate, $holidaysData['holidays'] ?? []))
             <button class="btn btn-primary w-100 h-50" wire:click="removeHoliday" {{ $isProcessing ? 'disabled' : '' }}>خروج از تعطیلی</button>
           @else
-            <button class="btn btn-warning w-100 h-50" wire:click="addHoliday" {{ $isProcessing ? 'disabled' : '' }}>تعطیل کردن</button>
+            <button class="btn btn-danger w-100 h-50" wire:click="addHoliday" {{ $isProcessing ? 'disabled' : '' }}>تعطیل کردن</button>
           @endif
           <button class="btn btn-secondary w-100 h-50" wire:click="closeModal" {{ $isProcessing ? 'disabled' : '' }}>لغو</button>
         </div>
