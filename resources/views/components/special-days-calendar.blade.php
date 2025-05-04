@@ -1,0 +1,466 @@
+<div class="special-days-calendar-container" style="position: relative;">
+  <!-- لودینگ اورلی -->
+  <div id="loading-overlay"></div>
+
+  <div class="calendar-header">
+    <button id="special-days-prev-month" class="btn-nav" aria-label="Previous Month">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+        transform="rotate(180)">
+        <path d="M15 18L9 12L15 6" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+    </button>
+    <div class="select-wrapper">
+      <select id="special-days-year" class="form-select"></select>
+    </div>
+    <div class="select-wrapper">
+      <select id="special-days-month" class="form-select"></select>
+    </div>
+    <button id="special-days-next-month" class="btn-nav" aria-label="Next Month">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+        transform="rotate(180)">
+        <path d="M9 18L15 12L9 6" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="calendar-controls">
+    <button wire:click="goToFirstAvailableDate" class="btn-primary">
+      برو به اولین نوبت خالی
+    </button>
+  </div>
+
+  <div class="calendar-body" id="calendar-body">
+    <div class="calendar-day-name">ش</div>
+    <div class="calendar-day-name">ی</div>
+    <div class="calendar-day-name">د</div>
+    <div class="calendar-day-name">س</div>
+    <div class="calendar-day-name">چ</div>
+    <div class="calendar-day-name">پ</div>
+    <div class="calendar-day-name">ج</div>
+  </div>
+
+  <div id="special-days-calendar-body" class="calendar-grid"></div>
+
+  <div class="calendar-legend">
+    <div class="legend-item">
+      <span class="legend-color selected"></span>
+      <span class="legend-text">روز انتخاب‌شده</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color appointment"></span>
+      <span class="legend-text"> دارای نوبت</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color holiday"></span>
+      <span class="legend-text">تعطیل</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  :root {
+    --primary: #2E86C1;
+    --primary-light: #84CAF9;
+    --secondary: #1DEB3C;
+    --secondary-hover: #15802A;
+    --background-light: #F8F8F8;
+    --background-card: #FFFFFF;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --border-neutral: #E5E7EB;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --gradient-primary: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+    --radius-button: 8px;
+    --radius-card: 12px;
+    --appointment-bg: #f0fff4;
+    /* سبز کم‌رنگ برای پس‌زمینه */
+    --appointment-border: #48bb78;
+    /* سبز برای بوردر */
+    --appointment-dot: #6ee7b7;
+    /* رنگ نقطه سبز */
+  }
+
+  #loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    border-radius: var(--radius-card);
+  }
+
+  #loading-overlay::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--background-card);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .special-days-calendar-container {
+    background: var(--background-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 6px 24px var(--shadow);
+    direction: rtl;
+    margin: 0 auto;
+    font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    /* برای محدود کردن لودینگ به مودال */
+    width: 900px;
+    padding: 10px;
+  }
+
+  /* استایل‌های هدر تقویم */
+  .special-days-calendar-container .calendar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+
+  .special-days-calendar-container .btn-nav {
+    width: 36px;
+    height: 36px;
+    background: var(--background-light);
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .special-days-calendar-container .btn-nav:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .special-days-calendar-container .btn-nav:hover svg path {
+    stroke: var(--background-card);
+  }
+
+  .select-wrapper {
+    flex: 1;
+  }
+
+  .special-days-calendar-container .form-select {
+    width: 100%;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    background: var(--background-light);
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    appearance: none;
+    transition: all 0.2s ease;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="%232e86c1"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>');
+    background-repeat: no-repeat;
+    background-position: left 0.5rem center;
+    background-size: 12px;
+  }
+
+  .special-days-calendar-container .form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(46, 134, 193, 0.15);
+  }
+
+  /* استایل‌های کنترل‌ها */
+  .special-days-calendar-container .calendar-controls {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem 0;
+  }
+
+  .special-days-calendar-container .btn-primary {
+    background: var(--secondary);
+    color: var(--background-card);
+    padding: 0.6rem 1.5rem;
+    border-radius: var(--radius-button);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+
+  .special-days-calendar-container .btn-primary:hover {
+    background: var(--secondary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  /* استایل‌های بدنه تقویم */
+  .special-days-calendar-container .calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.4rem;
+    padding: 0.5rem 0;
+  }
+
+  .special-days-calendar-container .calendar-day-name {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .special-days-calendar-container .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.4rem;
+    padding: 0 0 0.75rem;
+  }
+
+  .special-days-calendar-container .calendar-day {
+    background: var(--background-card);
+    border: 1px solid var(--border-neutral);
+    border-radius: 6px;
+    aspect-ratio: 1.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .special-days-calendar-container .calendar-day:hover:not(.empty) {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .special-days-calendar-container .calendar-day.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+  }
+
+  .special-days-calendar-container .calendar-day.friday {
+    color: #ef4444;
+  }
+
+  .special-days-calendar-container .calendar-day.today {
+    background: var(--gradient-primary);
+    border-color: var(--primary);
+    color: var(--background-card);
+    font-weight: 600;
+  }
+
+  .special-days-calendar-container .calendar-day.active {
+    background: var(--primary);
+    color: var(--background-card);
+    border-color: var(--primary);
+  }
+
+  .special-days-calendar-container .calendar-day.selected {
+    background: var(--secondary);
+    color: var(--background-card);
+    border-color: var(--secondary);
+    box-shadow: 0 0 10px rgba(29, 235, 60, 0.3);
+  }
+
+  .special-days-calendar-container .calendar-day.has-appointment {
+    background: var(--appointment-bg);
+    /* پس‌زمینه سبز کم‌رنگ برای روزهای غیر امروز */
+    border-color: var(--appointment-border);
+    /* بوردر سبز */
+    position: relative;
+  }
+
+  .special-days-calendar-container .calendar-day.has-appointment::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    background: var(--appointment-dot);
+    /* نقطه سبز */
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  .special-days-calendar-container .calendar-day.holiday {
+    background: #fef2f2;
+    border-color: #f56565;
+    color: #c53030;
+  }
+
+  .special-days-calendar-container .calendar-day.holiday::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 6px;
+    height: 6px;
+    background: #f56565;
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  /* استایل خاص برای روز جاری که دارای نوبت است */
+  .special-days-calendar-container .calendar-day.today.has-appointment {
+    background: var(--gradient-primary);
+    /* حفظ گرادیانت آبی */
+    border-color: var(--appointment-border);
+    /* بوردر سبز */
+    color: var(--background-card);
+  }
+
+  /* اولویت‌دهی به استایل selected */
+  .special-days-calendar-container .calendar-day.selected.has-appointment {
+    background: var(--secondary);
+    /* سبز پررنگ برای انتخاب */
+    border-color: var(--secondary);
+  }
+
+  /* استایل‌های لجند */
+  .special-days-calendar-container .calendar-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--border-neutral);
+  }
+
+  .special-days-calendar-container .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .special-days-calendar-container .legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+  }
+
+  .special-days-calendar-container .legend-color.selected {
+    background: var(--secondary);
+  }
+
+  .special-days-calendar-container .legend-color.appointment {
+    background: var(--appointment-bg);
+    border: 1px solid var(--appointment-border);
+  }
+
+  .special-days-calendar-container .legend-color.holiday {
+    background: #f56565;
+  }
+
+  .special-days-calendar-container .legend-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  /* پاسخ‌گویی به صفحه‌نمایش‌های کوچک */
+  @media (max-width: 950px) {
+    .special-days-calendar-container {
+      max-width: 100%;
+      padding: 0.75rem;
+    }
+
+    .special-days-calendar-container .calendar-header {
+      gap: 0.4rem;
+    }
+
+    .special-days-calendar-container .btn-nav {
+      width: 34px;
+      height: 34px;
+    }
+
+    .special-days-calendar-container .form-select {
+      font-size: 0.85rem;
+      padding: 0.5rem 1.5rem 0.5rem 0.6rem;
+    }
+
+    .special-days-calendar-container .calendar-day {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .special-days-calendar-container {
+      padding: 0.6rem;
+    }
+
+    .special-days-calendar-container .calendar-header {
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .special-days-calendar-container .select-wrapper {
+      flex: 1 1 48%;
+    }
+
+    .special-days-calendar-container .btn-nav {
+      width: 32px;
+      height: 32px;
+    }
+
+    .special-days-calendar-container .form-select {
+      font-size: 0.8rem;
+    }
+
+    .special-days-calendar-container .calendar-day {
+      font-size: 0.85rem;
+    }
+
+    .special-days-calendar-container .calendar-legend {
+      gap: 0.75rem;
+    }
+  }
+
+  @media (max-width: 425px) {
+    .special-days-calendar-container {
+      padding: 0.5rem;
+    }
+
+    .special-days-calendar-container .btn-nav {
+      width: 30px;
+      height: 30px;
+    }
+
+    .special-days-calendar-container .form-select {
+      font-size: 0.75rem;
+      padding: 0.4rem 1.2rem 0.4rem 0.5rem;
+    }
+
+    .special-days-calendar-container .calendar-day {
+      font-size: 0.8rem;
+    }
+
+    .special-days-calendar-container .calendar-day-name {
+      font-size: 0.75rem;
+    }
+
+    .special-days-calendar-container .calendar-legend {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>
