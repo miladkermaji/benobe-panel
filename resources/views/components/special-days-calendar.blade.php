@@ -303,9 +303,9 @@
   }
 
   .special-days-calendar-container .calendar-day.holiday {
-    background: #fef2f2;
-    border-color: #f56565;
-    color: #c53030;
+    background: #fef2f2 !important;
+    border-color: #f56565 !important;
+    color: #c53030 !important;
   }
 
   .special-days-calendar-container .calendar-day.holiday::after {
@@ -315,7 +315,7 @@
     left: 5px;
     width: 6px;
     height: 6px;
-    background: #f56565;
+    background: #f56565 !important;
     border-radius: 50%;
     z-index: 1;
   }

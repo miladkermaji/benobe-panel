@@ -403,64 +403,107 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
         generateCalendar(year, month);
     });
 
- Livewire.on("holidayUpdated", (event) => {
-     console.log("holidayUpdated event received:", event);
-     const { date, isHoliday } = event;
-     const dayElement = document.querySelector(
-         `.calendar-day[data-gregorian="${date}"]`
-     );
+    Livewire.on("holidayUpdated", (event) => {
+        console.log("holidayUpdated event received:", event);
+        const { date, isHoliday } = event;
 
-     if (dayElement) {
-         // به‌روزرسانی کلاس‌های روز
-         if (isHoliday) {
-             dayElement.classList.add("holiday");
-         } else {
-             dayElement.classList.remove("holiday");
-         }
+        // آپدیت window.holidaysData
+        if (isHoliday) {
+            if (!window.holidaysData.holidays.includes(date)) {
+                window.holidaysData.holidays.push(date);
+            }
+        } else {
+            window.holidaysData.holidays = window.holidaysData.holidays.filter(
+                (holiday) => holiday !== date
+            );
+        }
 
-         // به‌روزرسانی تولتیپ
-         const appointmentData = window.appointmentsData.data.find(
-             (appt) => appt.date === date
-         );
-         const appointmentCount = appointmentData ? appointmentData.count : 0;
+        const dayElement = document.querySelector(
+            `.calendar-day[data-gregorian="${date}"]`
+        );
 
-         const tooltipContent = isHoliday
-             ? "این روز تعطیل است"
-             : appointmentCount > 0
-             ? `تعداد نوبت‌ها: ${appointmentCount}`
-             : "";
+        if (dayElement) {
+            // به‌روزرسانی کلاس‌های روز
+            if (isHoliday) {
+                dayElement.classList.add("holiday");
+            } else {
+                dayElement.classList.remove("holiday");
+            }
 
-         const span = dayElement.querySelector("span");
-         dayElement.innerHTML = ""; // پاک کردن محتوای قبلی
+            // به‌روزرسانی تولتیپ
+            const appointmentData = window.appointmentsData.data.find(
+                (appt) => appt.date === date
+            );
+            const appointmentCount = appointmentData
+                ? appointmentData.count
+                : 0;
 
-         if (tooltipContent) {
-             const tooltipWrapper = document.createElement("div");
-             tooltipWrapper.setAttribute("x-tooltip", "");
-             tooltipWrapper.setAttribute("id", `tooltip-day-${date}`);
-             tooltipWrapper.setAttribute("data-trigger", "hover");
-             tooltipWrapper.setAttribute("data-placement", "top");
-             tooltipWrapper.classList.add("x-tooltip");
+            const tooltipContent = isHoliday
+                ? "این روز تعطیل است"
+                : appointmentCount > 0
+                ? `تعداد نوبت‌ها: ${appointmentCount}`
+                : "";
 
-             const triggerDiv = document.createElement("div");
-             triggerDiv.classList.add("x-tooltip__trigger");
-             triggerDiv.appendChild(span);
+            const span = dayElement.querySelector("span");
+            dayElement.innerHTML = ""; // پاک کردن محتوای قبلی
 
-             constContentDiv = document.createElement("div");
-             contentDiv.classList.add("x-tooltip__content");
-             contentDiv.textContent = tooltipContent;
+            if (tooltipContent) {
+                const tooltipWrapper = document.createElement("div");
+                tooltipWrapper.setAttribute("x-tooltip", "");
+                tooltipWrapper.setAttribute("id", `tooltip-day-${date}`);
+                tooltipWrapper.setAttribute("data-trigger", "hover");
+                tooltipWrapper.setAttribute("data-placement", "top");
+                tooltipWrapper.classList.add("x-tooltip");
 
-             tooltipWrapper.appendChild(triggerDiv);
-             tooltipWrapper.appendChild(contentDiv);
+                const triggerDiv = document.createElement("div");
+                triggerDiv.classList.add("x-tooltip__trigger");
+                triggerDiv.appendChild(span);
 
-             dayElement.appendChild(tooltipWrapper);
-         } else {
-             dayElement.appendChild(span);
-         }
-     }
+                const contentDiv = document.createElement("div");
+                contentDiv.classList.add("x-tooltip__content");
+                contentDiv.setAttribute(
+                    "data-tooltip-id",
+                    `tooltip-day-${date}`
+                );
+                contentDiv.textContent = tooltipContent;
 
-     // بستن مودال
-     window.closeXModal("holiday-modal");
- });
+                tooltipWrapper.appendChild(triggerDiv);
+                tooltipWrapper.appendChild(contentDiv);
+
+                dayElement.appendChild(tooltipWrapper);
+
+                // انتقال contentDiv به body برای سازگاری با CustomTooltip
+                document.body.appendChild(contentDiv);
+            } else {
+                dayElement.appendChild(span);
+            }
+
+            // اجبار به رندر دوباره
+            dayElement.style.display = "none";
+            void dayElement.offsetHeight;
+            dayElement.style.display = "flex";
+        } else {
+            console.warn(
+                `Day element for date ${date} not found, re-rendering calendar`
+            );
+            // رندر دوباره تقویم
+            const yearSelect = document.querySelector("#special-days-year");
+            const monthSelect = document.querySelector("#special-days-month");
+            let year = parseInt(yearSelect?.value);
+            let month = parseInt(monthSelect?.value);
+
+            if (isNaN(year) || isNaN(month)) {
+                console.warn("Invalid year or month, using initial values");
+                year = initialYear || moment().jYear();
+                month = initialMonth || moment().jMonth() + 1;
+            }
+
+            generateCalendar(year, month);
+        }
+
+        // بستن مودال
+        window.closeXModal("holiday-modal");
+    });
 
     // پر کردن اولیه سلکت‌باکس‌ها
     populateSelectBoxes(initialYear, initialMonth);
