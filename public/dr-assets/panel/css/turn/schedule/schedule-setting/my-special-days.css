@@ -20,12 +20,12 @@ body {
     overflow: hidden;
     animation: fadeIn 0.5s ease-in-out;
 }
-.workhours-content-special{
+/* .workhours-content-special{
     height: 100px;
     overflow-y: scroll;
     scroll-behavior: smooth;
     scrollbar-width: thin;
-}
+} */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -176,25 +176,7 @@ body {
     background-color: #f9fafb;
 }
 
-.btn.btn-light {
-    border-radius: 50%;
-    padding: 0;
-    width: 34px; /* کمی کوچکتر و منظم */
-    height: 34px;
-    background-color: #fff;
-    border: 1px solid #e5e7eb;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
 
-.btn.btn-light:hover {
-    background-color: #2b6cb0;
-    border-color: #2b6cb0;
-    transform: rotate(8deg); /* چرخش ظریف‌تر */
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
 
 .btn.btn-light svg {
     width: 18px;

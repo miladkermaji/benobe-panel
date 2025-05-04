@@ -1,7 +1,8 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/schedule-setting/my-special-days.css') }}"
+
+  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
     rel="stylesheet" />
 @endsection
 @section('site-header')

@@ -132,6 +132,7 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
         }
 
         // رندر روزهای ماه
+        // رندر روزهای ماه
         for (let day = 1; day <= daysInMonth; day++) {
             const currentDay = firstDayOfMonth.clone().add(day - 1, "days");
             const jalaliDate = currentDay.format("jYYYY/jMM/jDD");
@@ -143,29 +144,38 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             dayElement.setAttribute("data-date", jalaliDate);
             dayElement.setAttribute("data-gregorian", gregorianString);
 
+            const isPastDate = moment(gregorianString).isBefore(
+                moment(),
+                "day"
+            );
             const isHoliday = holidays.includes(gregorianString);
-            if (isHoliday) {
-                dayElement.classList.add("holiday");
-            }
-
             const appointmentData = appointments.find(
                 (appt) => appt.date === gregorianString
             );
             const appointmentCount = appointmentData
                 ? appointmentData.count
                 : 0;
-            if (appointmentCount > 0) {
-                dayElement.classList.add("has-appointment");
+
+            // فقط برای روزهای غیر گذشته استایل‌ها را اعمال کن
+            if (!isPastDate) {
+                if (isHoliday) {
+                    dayElement.classList.add("holiday");
+                }
+                if (appointmentCount > 0) {
+                    dayElement.classList.add("has-appointment");
+                }
             }
 
             const spanElement = document.createElement("span");
             spanElement.textContent = currentDay.format("jD");
 
-            const tooltipContent = isHoliday
-                ? "این روز تعطیل است"
-                : appointmentCount > 0
-                ? `تعداد نوبت‌ها: ${appointmentCount}`
-                : "";
+            // تولتیپ فقط برای روزهای غیر گذشته
+            const tooltipContent =
+                !isPastDate && isHoliday
+                    ? "این روز تعطیل است"
+                    : !isPastDate && appointmentCount > 0
+                    ? `تعداد نوبت‌ها: ${appointmentCount}`
+                    : "";
             if (tooltipContent) {
                 const tooltipWrapper = document.createElement("div");
                 tooltipWrapper.setAttribute("x-tooltip", "");
@@ -209,15 +219,12 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
                 const hasAppointment = appointmentCount > 0;
 
                 if (isPastDate) {
-                    // نمایش پیام برای روزهای گذشته
-                    Livewire.dispatch("show-toastr", {
-                        type: "warning",
-                        message: "نمی‌توانید روزهای گذشته را تعطیل کنید.",
+                    // اجازه باز شدن مودال برای روزهای گذشته
+                    Livewire.dispatch("openHolidayModal", {
+                        modalId: "holiday-modal",
+                        gregorianDate: gregorianDate,
                     });
-                    return;
-                }
-
-                if (hasAppointment) {
+                } else if (hasAppointment) {
                     // باز کردن مودال جابجایی برای روزهای دارای نوبت
                     Livewire.dispatch("openTransferModal", {
                         modalId: "transfer-modal",
@@ -515,296 +522,4 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             initialMonth || moment().jMonth() + 1
         );
     }, 0);
-}
-
-function initializeTimepicker() {
-    $(".timepicker-ui").each(function () {
-        if (!$(this).data("timepicker-initialized")) {
-            try {
-                const options = {
-                    clockType: "24h",
-                    theme: "basic",
-                    mobile: true,
-                    enableScrollbar: true,
-                    disableTimeRangeValidation: false,
-                    autoClose: true,
-                };
-                const timepicker = new window.tui.TimepickerUI(this, options);
-                timepicker.create();
-                $(this).data("timepicker-initialized", true);
-            } catch (e) {
-                console.error("Error initializing timepicker:", e);
-            }
-        }
-    });
-}
-initializeTimepicker();
-
-// فراخوانی تایم‌پیکر بعد از باز شدن مودال
-document.addEventListener("openXModal", (event) => {
-    console.log("openXModal event received:", event.detail);
-    const modalId = event.detail.id;
-    if (modalId === "holiday-modal" || modalId === "calculator-modal") {
-        setTimeout(() => {
-            initializeTimepicker();
-        }, 100);
-    }
-});
-
-// اطمینان از اجرای تایم‌پیکر بعد از رندر اولیه
-document.addEventListener("livewire:initialized", () => {
-    // مدیریت باز شدن مودال‌ها
-    Livewire.on("openXModal", (event) => {
-        console.log("openXModal event received:", event);
-        const modalId = event.id;
-        const day = event.day;
-        const index = event.index;
-
-        if (modalId === "holiday-modal") {
-            setTimeout(() => {
-                initializeTimepicker();
-            }, 100);
-        } else if (
-            modalId === "calculator-modal" &&
-            day &&
-            index !== undefined
-        ) {
-            console.log(
-                "Opening calculator-modal with day:",
-                day,
-                "index:",
-                index
-            );
-            // تنظیم داده‌های محاسبه‌گر
-            Livewire.dispatchTo(
-                "dr.panel.turn.schedule.special-days-appointment",
-                "setCalculatorData",
-                { day, index }
-            );
-            window.openXModal(modalId);
-            // دریافت زمان شروع و پایان
-            const slotElement = document.querySelector(
-                `.form-row[data-slot-id="${index}"]`
-            );
-            const startTime = slotElement?.querySelector(".start-time")?.value;
-            const endTime = slotElement?.querySelector(".end-time")?.value;
-
-            if (!startTime || !endTime) {
-                Livewire.dispatch("show-toastr", {
-                    type: "error",
-                    message: "لطفاً ابتدا زمان شروع و پایان را وارد کنید",
-                });
-                return;
-            }
-
-            Livewire.dispatchTo(
-                "dr.panel.turn.schedule.special-days-appointment",
-                "setCalculatorTimes",
-                { startTime, endTime }
-            );
-
-            // باز کردن مودال
-            window.openXModal(modalId);
-
-            setTimeout(() => {
-                initializeTimepicker();
-
-                const $appointmentCount = $("#appointment-count");
-                const $timeCount = $("#time-count");
-                const $countRadio = $("#count-radio");
-                const $timeRadio = $("#time-radio");
-
-                const timeToMinutes = (time) => {
-                    const [hours, minutes] = time.split(":").map(Number);
-                    return hours * 60 + minutes;
-                };
-                const totalMinutes =
-                    timeToMinutes(endTime) - timeToMinutes(startTime);
-
-                if (totalMinutes <= 0) {
-                    Livewire.dispatch("show-toastr", {
-                        type: "error",
-                        message: "زمان پایان باید بعد از زمان شروع باشد",
-                    });
-                    window.closeXModal(modalId);
-                    return;
-                }
-
-                // دریافت مقادیر فعلی از Livewire
-                Livewire.dispatchTo(
-                    "dr.panel.turn.schedule.special-days-appointment",
-                    "getCalculatorData",
-                    {},
-                    (response) => {
-                        const currentCount = response.appointment_count;
-                        const currentTime = response.time_per_appointment;
-
-                        if (currentCount) {
-                            $appointmentCount.val(currentCount);
-                            $timeCount.val(
-                                Math.round(totalMinutes / currentCount)
-                            );
-                        } else if (currentTime) {
-                            $timeCount.val(currentTime);
-                            $appointmentCount.val(
-                                Math.round(totalMinutes / currentTime)
-                            );
-                        } else {
-                            $appointmentCount.val("");
-                            $timeCount.val("");
-                        }
-                    }
-                );
-
-                $appointmentCount.on("focus", function () {
-                    $countRadio.prop("checked", true).trigger("change");
-                    $timeRadio.prop("checked", false);
-                    $appointmentCount.prop("disabled", false);
-                    $timeCount.prop("disabled", true);
-                    Livewire.dispatchTo(
-                        "dr.panel.turn.schedule.special-days-appointment",
-                        "setCalculationMode",
-                        { mode: "count" }
-                    );
-                });
-
-                $timeCount.on("focus", function () {
-                    $timeRadio.prop("checked", true).trigger("change");
-                    $countRadio.prop("checked", false);
-                    $timeCount.prop("disabled", false);
-                    $appointmentCount.prop("disabled", true);
-                    Livewire.dispatchTo(
-                        "dr.panel.turn.schedule.special-days-appointment",
-                        "setCalculationMode",
-                        { mode: "time" }
-                    );
-                });
-
-                $appointmentCount.on("input", function () {
-                    const count = parseInt($(this).val());
-                    if (count && !isNaN(count) && count > 0) {
-                        const timePerAppointment = Math.round(
-                            totalMinutes / count
-                        );
-                        $timeCount.val(timePerAppointment);
-                        Livewire.dispatchTo(
-                            "dr.panel.turn.schedule.special-days-appointment",
-                            "setCalculatorValues",
-                            {
-                                appointment_count: count,
-                                time_per_appointment: timePerAppointment,
-                            }
-                        );
-                    } else {
-                        $timeCount.val("");
-                        Livewire.dispatchTo(
-                            "dr.panel.turn.schedule.special-days-appointment",
-                            "setCalculatorValues",
-                            {
-                                appointment_count: null,
-                                time_per_appointment: null,
-                            }
-                        );
-                    }
-                });
-
-                $timeCount.on("input", function () {
-                    const time = parseInt($(this).val());
-                    if (time && !isNaN(time) && time > 0) {
-                        const appointmentCount = Math.round(
-                            totalMinutes / time
-                        );
-                        $appointmentCount.val(appointmentCount);
-                        Livewire.dispatchTo(
-                            "dr.panel.turn.schedule.special-days-appointment",
-                            "setCalculatorValues",
-                            {
-                                time_per_appointment: time,
-                                appointment_count: appointmentCount,
-                            }
-                        );
-                    } else {
-                        $appointmentCount.val("");
-                        Livewire.dispatchTo(
-                            "dr.panel.turn.schedule.special-days-appointment",
-                            "setCalculatorValues",
-                            {
-                                appointment_count: null,
-                                time_per_appointment: null,
-                            }
-                        );
-                    }
-                });
-
-                $countRadio.on("change", function () {
-                    if ($(this).is(":checked")) {
-                        $appointmentCount.prop("disabled", false);
-                        $timeCount.prop("disabled", true);
-                        Livewire.dispatchTo(
-                            "dr.panel.turn.schedule.special-days-appointment",
-                            "setCalculationMode",
-                            { mode: "count" }
-                        );
-                    }
-                });
-
-                $timeRadio.on("change", function () {
-                    if ($(this).is(":checked")) {
-                        $timeCount.prop("disabled", false);
-                        $appointmentCount.prop("disabled", true);
-                        Livewire.dispatchTo(
-                            "dr.panel.turn.schedule.special-days-appointment",
-                            "setCalculationMode",
-                            { mode: "time" }
-                        );
-                    }
-                });
-            }, 100);
-        } else {
-            console.warn("Invalid parameters for openXModal:", event);
-        }
-    });
-
-    // مدیریت بستن مودال
-    Livewire.on("closeXModal", (event) => {
-        console.log("closeXModal event received:", event);
-        const modalId = event.id;
-        window.closeXModal(modalId);
-        if (modalId === "calculator-modal") {
-            // پاک‌سازی رویدادهای ورودی
-            $("#appointment-count").off("input focus");
-            $("#time-count").off("input focus");
-            $("#count-radio").off("change");
-            $("#time-radio").off("change");
-        }
-    });
-
-    // مدیریت رویدادهای Livewire برای محاسبه‌گر
-    Livewire.on("close-calculator-modal", () => {
-        console.log("close-calculator-modal event received");
-        window.closeXModal("calculator-modal");
-        const $button = $("#saveSelectionCalculator");
-        if (
-            $button.find(".loader").length &&
-            $button.find(".button_text").length
-        ) {
-            toggleButtonLoading($button, false);
-        }
-    });
-});
-
-// تابع مدیریت لودینگ دکمه
-function toggleButtonLoading($button, isLoading) {
-    const $loader = $button.find(".loader");
-    const $text = $button.find(".button_text");
-
-    if (isLoading) {
-        $loader.show();
-        $text.hide();
-        $button.prop("disabled", true);
-    } else {
-        $loader.hide();
-        $text.show();
-        $button.prop("disabled", false);
-    }
 }
