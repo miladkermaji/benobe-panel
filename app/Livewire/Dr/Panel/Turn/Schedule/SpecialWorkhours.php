@@ -14,6 +14,7 @@ class SpecialWorkhours extends Component
     public $selectedDate;
     public $workSchedule = ['status' => false, 'data' => []];
     public $clinicId = 'default';
+    public $isEditable = false; // مقدار پیش‌فرض برای غیرفعال بودن
     public $isProcessing = false;
     public $emergencyTimes = [];
     public $emergencyModalDay;
@@ -39,17 +40,20 @@ class SpecialWorkhours extends Component
         'close-calculator-modal' => 'closeCalculatorModal',
         'close-emergency-modal' => 'closeEmergencyModal',
         'close-schedule-modal' => 'closeScheduleModal',
-        'updateSelectedDate' => 'updateSelectedDate', // رویداد جدید برای آپدیت تاریخ
+        'updateSelectedDate' => 'updateSelectedDate',
+        'enableWorkHoursEditing' => 'enableEditing', // listener جدید
     ];
 
-    public function mount($selectedDate, $clinicId = 'default')
+    public function mount($selectedDate, $clinicId = 'default', $isEditable = false)
     {
         $this->selectedDate = $selectedDate;
         $this->clinicId = $clinicId;
+        $this->isEditable = $isEditable; // گرفتن مقدار از SpecialDaysAppointment
         $this->loadWorkSchedule();
         Log::info("Mounting SpecialWorkhours", [
             'selectedDate' => $this->selectedDate,
             'clinicId' => $this->clinicId,
+            'isEditable' => $this->isEditable,
         ]);
     }
 
@@ -197,7 +201,7 @@ class SpecialWorkhours extends Component
 
     public function addSlot()
     {
-        if ($this->isProcessing) {
+        if ($this->isProcessing || !$this->isEditable) {
             return;
         }
 
@@ -245,7 +249,7 @@ class SpecialWorkhours extends Component
             $specialSchedule = SpecialDailySchedule::firstOrCreate(
                 [
                     'doctor_id' => $doctorId,
-                    'date' => $parsedDate->toDateString(), // اطمینان از فرمت درست تاریخ
+                    'date' => $parsedDate->toDateString(),
                     'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
@@ -286,7 +290,7 @@ class SpecialWorkhours extends Component
 
     public function removeSlot($index)
     {
-        if ($this->isProcessing) {
+        if ($this->isProcessing || !$this->isEditable) {
             return;
         }
 
@@ -333,7 +337,7 @@ class SpecialWorkhours extends Component
 
     public function saveCalculator()
     {
-        if ($this->isProcessing) {
+        if ($this->isProcessing || !$this->isEditable) {
             return;
         }
 
@@ -408,7 +412,7 @@ class SpecialWorkhours extends Component
 
     public function saveEmergencyTimes()
     {
-        if ($this->isProcessing) {
+        if ($this->isProcessing || !$this->isEditable) {
             return;
         }
 
@@ -443,6 +447,10 @@ class SpecialWorkhours extends Component
 
     public function openScheduleModal($day, $index)
     {
+        if ($this->isProcessing || !$this->isEditable) {
+            return;
+        }
+
         $this->scheduleModalDay = $day;
         $this->scheduleModalIndex = $index;
         $this->selectedScheduleDays = [];
@@ -452,7 +460,7 @@ class SpecialWorkhours extends Component
 
     public function saveSchedule($startTime, $endTime)
     {
-        if ($this->isProcessing) {
+        if ($this->isProcessing || !$this->isEditable) {
             return;
         }
 
@@ -505,7 +513,7 @@ class SpecialWorkhours extends Component
 
     public function deleteScheduleSetting($day, $index)
     {
-        if ($this->isProcessing) {
+        if ($this->isProcessing || !$this->isEditable) {
             return;
         }
 
@@ -543,6 +551,13 @@ class SpecialWorkhours extends Component
         } finally {
             $this->isProcessing = false;
         }
+    }
+
+    public function enableEditing()
+    {
+        $this->isEditable = true;
+        Log::info("Work hours editing enabled for date: {$this->selectedDate}");
+        $this->dispatch('show-toastr', type: 'info', message: 'حالت ویرایش فعال شد.');
     }
 
     public function closeCalculatorModal()

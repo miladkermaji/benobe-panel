@@ -11,11 +11,13 @@
       <div class="">
         @php
           $isPastDate = $selectedDate ? \Carbon\Carbon::parse($selectedDate)->isPast() : false;
+          $jalaliDate = $selectedDate ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('d F Y') : '';
+          $hasWorkHours = $workSchedule['status'] && !empty($workSchedule['data']['work_hours']);
         @endphp
         @if ($selectedDate && in_array($selectedDate, $holidaysData['holidays'] ?? []))
           <div class="alert alert-warning" role="alert">
             <h4 class="alert-heading">تأیید تغییر وضعیت تعطیلات</h4>
-            <p>این روز تعطیل است. آیا می‌خواهید آن را از تعطیلی خارج کنید؟</p>
+            <p>روز {{ $jalaliDate }} تعطیل است. آیا می‌خواهید از تعطیلی خارج کنید؟</p>
             <hr>
             <div class="d-flex justify-content-center gap-2 mt-3">
               <button class="btn btn-primary w-100 h-50" wire:click="removeHoliday"
@@ -26,15 +28,36 @@
           </div>
         @else
           <div class="alert alert-info" role="alert">
-            <p class="fw-bold text-center">این روز تعطیل نیست در صورت تمایل میتوانید این روز را تعطیل کنید.</p>
+            <p class="fw-bold text-center">
+              @if ($hasWorkHours)
+                  شما از قبل برای این روز ساعات کاری تعریف کرده اید  در صورتی که قصد تغیر دارید روی دکمه ویرایش  ساعت کاری کیک کنید 
+              @endif
+            </p>
           </div>
-          <livewire:dr.panel.turn.schedule.special-workhours :selectedDate="$selectedDate" :clinicId="$selectedClinicId" />
-          <div class="d-flex justify-content-center gap-2">
-            <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
-              {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>تعطیل کردن</button>
-            <button class="btn btn-secondary w-100 h-50" wire:click="closeModal"
-              {{ $isProcessing ? 'disabled' : '' }}>لغو</button>
-          </div>
+          @if ($hasWorkHours)
+            <livewire:dr.panel.turn.schedule.special-workhours :selectedDate="$selectedDate" :clinicId="$selectedClinicId" :isEditable="$isEditable" />
+            <div class="d-flex justify-content-center gap-2 mt-3">
+              <button class="btn btn-primary w-100 h-50" wire:click="enableEditing" {{ $isProcessing || $isPastDate || $isEditable ? 'disabled' : '' }}>
+                ویرایش ساعات کاری
+              </button>
+              <button class="btn btn-danger w-100 h-50" wire:click="addHoliday" {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
+                تعطیل کردن
+              </button>
+              <button class="btn btn-secondary w-100 h-50" wire:click="closeModal" {{ $isProcessing ? 'disabled' : '' }}>
+                لغو
+              </button>
+            </div>
+          @else
+            <livewire:dr.panel.turn.schedule.special-workhours :selectedDate="$selectedDate" :clinicId="$selectedClinicId" :isEditable="true" />
+            <div class="d-flex justify-content-center gap-2 mt-3">
+              <button class="btn btn-danger w-100 h-50" wire:click="addHoliday" {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
+                تعطیل کردن
+              </button>
+              <button class="btn btn-secondary w-100 h-50" wire:click="closeModal" {{ $isProcessing ? 'disabled' : '' }}>
+                لغو
+              </button>
+            </div>
+          @endif
         @endif
       </div>
     </x-custom-modal>
@@ -54,7 +77,6 @@
       </div>
     </x-custom-modal>
   </div>
-
 
   <script>
     window.holidaysData = @json($holidaysData) || {
