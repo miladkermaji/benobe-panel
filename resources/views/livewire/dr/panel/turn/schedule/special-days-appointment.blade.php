@@ -29,7 +29,7 @@
                 <h5>ساعات کاری</h5>
                 <div class="workhours-content-special">
                   @foreach ($workSchedule['data']['work_hours'] as $index => $slot)
-                    <div class="mt-3 form-row d-flex w-100 p-3 bg-active-slot border-radius-11 align-items-center"
+                    <div class="mt-3 form-row d-flex w-100 p-3 bg-active-slot border-radius-11 align-items-center justify-content-center"
                       data-slot-id="{{ $index }}">
                       <div class="d-flex justify-content-start align-items-center gap-4">
                         <div class="form-group position-relative timepicker-ui">
