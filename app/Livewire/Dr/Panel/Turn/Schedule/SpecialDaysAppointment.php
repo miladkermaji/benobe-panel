@@ -309,9 +309,17 @@ class SpecialDaysAppointment extends Component
             $appointmentCount = $this->calculator['appointment_count'];
             $timePerAppointment = $this->calculator['time_per_appointment'];
 
-            if (!$day || $index === null || !$appointmentCount || !$timePerAppointment) {
-                Log::error("Incomplete calculator data", $this->calculator);
-                $this->dispatch('show-toastr', type: 'error', message: 'اطلاعات ناقص است.');
+            // اعتبارسنجی انعطاف‌پذیر
+            if (
+                empty($day) ||
+                $index === null ||
+                !is_numeric($appointmentCount) ||
+                $appointmentCount <= 0 ||
+                !is_numeric($timePerAppointment) ||
+                $timePerAppointment <= 0
+            ) {
+                Log::error("Invalid or incomplete calculator data", $this->calculator);
+                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً تعداد نوبت‌ها و زمان هر نوبت را به‌درستی وارد کنید.');
                 return;
             }
 
@@ -330,12 +338,16 @@ class SpecialDaysAppointment extends Component
                 // به‌روزرسانی max_appointments در work_hours
                 if (isset($workHours[$index])) {
                     $workHours[$index]['max_appointments'] = $appointmentCount;
+                } else {
+                    Log::warning("Work hour index {$index} not found in work_hours", $workHours);
+                    $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی معتبر نیست.');
+                    return;
                 }
 
                 // به‌روزرسانی appointment_settings
                 $appointmentSettings[$index] = [
-                    'start_time' => '00:00',
-                    'end_time' => '23:59',
+                    'start_time' => $workHours[$index]['start'] ?? '00:00', // استفاده از زمان واقعی
+                    'end_time' => $workHours[$index]['end'] ?? '23:59',
                     'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
                     'work_hour_key' => $index,
                     'max_appointments' => $appointmentCount,
@@ -348,6 +360,12 @@ class SpecialDaysAppointment extends Component
 
                 // به‌روزرسانی workSchedule برای نمایش تغییرات در مودال
                 $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
+
+                // ارسال رویداد برای به‌روزرسانی DOM
+                $this->dispatch('calculatorSaved', [
+                    'index' => $index,
+                    'max_appointments' => $appointmentCount,
+                ]);
 
                 $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات نوبت‌دهی ذخیره شد.');
                 $this->dispatch('closeXModal', id: 'calculator-modal');
