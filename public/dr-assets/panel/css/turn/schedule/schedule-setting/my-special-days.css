@@ -20,7 +20,12 @@ body {
     overflow: hidden;
     animation: fadeIn 0.5s ease-in-out;
 }
-
+.workhours-content-special{
+    height: 100px;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+}
 @keyframes fadeIn {
     from {
         opacity: 0;
