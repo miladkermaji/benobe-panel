@@ -13,6 +13,8 @@ class SpecialDailySchedule extends Model
         'doctor_id',
         'date',
         'work_hours',
+        'appointment_settings',
+        'emergency_times',
     ];
 
     // تعیین اینکه `work_hours` به عنوان JSON ذخیره شود

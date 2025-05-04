@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,6 +16,10 @@ return new class extends Migration {
             $table->unsignedBigInteger('clinic_id')->nullable(); // ارتباط با پزشک
             $table->date('date'); // تاریخ روز خاص
             $table->json('work_hours'); // ذخیره ساعات کاری در قالب JSON
+
+            $table->json('appointment_settings')->nullable()->comment(' زمانبندی باز شدن نوبت ها');
+            $table->json('emergency_times')->nullable()->comment(' زمان های اورژانسی');
+
             $table->timestamps();
 
             // کلید خارجی برای ارتباط با جدول پزشکان
