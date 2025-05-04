@@ -29,7 +29,8 @@
                 <h5>ساعات کاری</h5>
                 <div class="workhours-content-special">
                   @foreach ($workSchedule['data']['work_hours'] as $index => $slot)
-                    <div class="mt-3 form-row d-flex w-100 p-3 bg-active-slot border-radius-11 align-items-center justify-content-center"
+                    <div
+                      class="mt-3 form-row d-flex w-100 p-3 bg-active-slot border-radius-11 align-items-center justify-content-center"
                       data-slot-id="{{ $index }}">
                       <div class="d-flex justify-content-start align-items-center gap-4">
                         <div class="form-group position-relative timepicker-ui">
@@ -49,7 +50,7 @@
                           <input type="text" class="form-control h-50 text-center max-appointments bg-white"
                             value="{{ $workSchedule['data']['appointment_settings'][$index]['max_appointments'] ?? ($slot['max_appointments'] ?? 0) }}"
                             wire:click="$dispatch('openXModal', { id: 'calculator-modal', day: '{{ $workSchedule['data']['day'] }}', index: {{ $index }} })"
-                            readonly />
+                            data-day="{{ $workSchedule['data']['day'] }}" data-index="{{ $index }}" readonly />
                         </div>
                       </div>
                     </div>
@@ -74,7 +75,7 @@
     </x-custom-modal>
   </div>
   <div wire:ignore>
-    <x-custom-modal id="calculator-modal" title="انتخاب تعداد نوبت یا زمان ویزیت" size="md" :show="false"
+    <x-custom-modal id="calculator-modal" title="انتخاب تعداد نوبت یا زمان ویزیت" size="sm" :show="false"
       wire:key="calculator-modal-{{ $selectedDate ?? 'default' }}">
       <div class="p-3">
         <div class="d-flex align-items-center">

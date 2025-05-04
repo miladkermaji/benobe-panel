@@ -246,114 +246,122 @@ class SpecialDaysAppointment extends Component
             $this->dispatch('show-toastr', type: 'error', message: 'خطا: تاریخ یا شناسه مودال نامعتبر است.');
         }
     }
-  public $calculator = [
-    'day' => null,
-    'index' => null,
-    'start_time' => null,
-    'end_time' => null,
-    'appointment_count' => null,
-    'time_per_appointment' => null,
-    'calculation_mode' => 'count',
+    public $calculator = [
+      'day' => null,
+      'index' => null,
+      'start_time' => null,
+      'end_time' => null,
+      'appointment_count' => null,
+      'time_per_appointment' => null,
+      'calculation_mode' => 'count',
 ];
 
-public function setCalculatorData($day, $index)
-{
-    $this->calculator['day'] = $day;
-    $this->calculator['index'] = $index;
-    Log::info("Calculator data set: day={$day}, index={$index}");
-}
+    public function setCalculatorData($day, $index)
+    {
+        $this->calculator['day'] = $day;
+        $this->calculator['index'] = $index;
 
-public function setCalculatorTimes($startTime, $endTime)
-{
-    $this->calculator['start_time'] = $startTime;
-    $this->calculator['end_time'] = $endTime;
-    Log::info("Calculator times set: start_time={$startTime}, end_time={$endTime}");
-}
+        // دریافت workSchedule برای روز انتخاب‌شده
+        $workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
+        if ($workSchedule['status'] && isset($workSchedule['data']['work_hours'][$index])) {
+            $this->calculator['start_time'] = $workSchedule['data']['work_hours'][$index]['start'];
+            $this->calculator['end_time'] = $workSchedule['data']['work_hours'][$index]['end'];
+        }
 
-public function setCalculationMode($mode)
-{
-    $this->calculator['calculation_mode'] = $mode;
-    Log::info("Calculation mode set: mode={$mode}");
-}
-
-public function setCalculatorValues($values)
-{
-    $this->calculator['appointment_count'] = $values['appointment_count'];
-    $this->calculator['time_per_appointment'] = $values['time_per_appointment'];
-    Log::info("Calculator values set: ", $values);
-}
-
-public function getCalculatorData()
-{
-    return $this->calculator;
-}
-
-public function saveCalculator()
-{
-    if ($this->isProcessing) {
-        return;
+        Log::info("Calculator data set: ", $this->calculator);
     }
 
-    $this->isProcessing = true;
-    try {
-        $day = $this->calculator['day'];
-        $index = $this->calculator['index'];
-        $appointmentCount = $this->calculator['appointment_count'];
-        $timePerAppointment = $this->calculator['time_per_appointment'];
+    public function setCalculatorTimes($startTime, $endTime)
+    {
+        $this->calculator['start_time'] = $startTime;
+        $this->calculator['end_time'] = $endTime;
+        Log::info("Calculator times set: start_time={$startTime}, end_time={$endTime}");
+    }
 
-        if (!$day || $index === null || !$appointmentCount || !$timePerAppointment) {
-            Log::error("Incomplete calculator data", $this->calculator);
-            $this->dispatch('show-toastr', type: 'error', message: 'اطلاعات ناقص است.');
+    public function setCalculationMode($mode)
+    {
+        $this->calculator['calculation_mode'] = $mode;
+        Log::info("Calculation mode set: mode={$mode}");
+    }
+
+    public function setCalculatorValues($values)
+    {
+        $this->calculator['appointment_count'] = $values['appointment_count'];
+        $this->calculator['time_per_appointment'] = $values['time_per_appointment'];
+        Log::info("Calculator values set: ", $values);
+    }
+
+    public function getCalculatorData()
+    {
+        return $this->calculator;
+    }
+
+    public function saveCalculator()
+    {
+        if ($this->isProcessing) {
             return;
         }
 
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $schedule = \App\Models\DoctorWorkSchedule::where('doctor_id', $doctorId)
-            ->where('day', $day)
-            ->where('is_working', true)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
-            ->first();
+        $this->isProcessing = true;
+        try {
+            $day = $this->calculator['day'];
+            $index = $this->calculator['index'];
+            $appointmentCount = $this->calculator['appointment_count'];
+            $timePerAppointment = $this->calculator['time_per_appointment'];
 
-        if ($schedule) {
-            $workHours = $schedule->work_hours ? json_decode($schedule->work_hours, true) : [];
-            $appointmentSettings = $schedule->appointment_settings ? json_decode($schedule->appointment_settings, true) : [];
-
-            // به‌روزرسانی max_appointments در work_hours
-            if (isset($workHours[$index])) {
-                $workHours[$index]['max_appointments'] = $appointmentCount;
+            if (!$day || $index === null || !$appointmentCount || !$timePerAppointment) {
+                Log::error("Incomplete calculator data", $this->calculator);
+                $this->dispatch('show-toastr', type: 'error', message: 'اطلاعات ناقص است.');
+                return;
             }
 
-            // به‌روزرسانی appointment_settings
-            $appointmentSettings[$index] = [
-                'start_time' => '00:00',
-                'end_time' => '23:59',
-                'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-                'work_hour_key' => $index,
-                'max_appointments' => $appointmentCount,
-                'appointment_duration' => $timePerAppointment,
-            ];
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $schedule = \App\Models\DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->where('day', $day)
+                ->where('is_working', true)
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->first();
 
-            $schedule->work_hours = json_encode($workHours);
-            $schedule->appointment_settings = json_encode($appointmentSettings);
-            $schedule->save();
+            if ($schedule) {
+                $workHours = $schedule->work_hours ? json_decode($schedule->work_hours, true) : [];
+                $appointmentSettings = $schedule->appointment_settings ? json_decode($schedule->appointment_settings, true) : [];
 
-            // به‌روزرسانی workSchedule برای نمایش تغییرات در مودال
-            $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
+                // به‌روزرسانی max_appointments در work_hours
+                if (isset($workHours[$index])) {
+                    $workHours[$index]['max_appointments'] = $appointmentCount;
+                }
 
-            $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات نوبت‌دهی ذخیره شد.');
-            $this->dispatch('closeXModal', id: 'calculator-modal');
-        } else {
-            Log::error("No work schedule found for day: {$day}");
-            $this->dispatch('show-toastr', type: 'error', message: 'برنامه کاری برای این روز یافت نشد.');
+                // به‌روزرسانی appointment_settings
+                $appointmentSettings[$index] = [
+                    'start_time' => '00:00',
+                    'end_time' => '23:59',
+                    'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                    'work_hour_key' => $index,
+                    'max_appointments' => $appointmentCount,
+                    'appointment_duration' => $timePerAppointment,
+                ];
+
+                $schedule->work_hours = json_encode($workHours);
+                $schedule->appointment_settings = json_encode($appointmentSettings);
+                $schedule->save();
+
+                // به‌روزرسانی workSchedule برای نمایش تغییرات در مودال
+                $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
+
+                $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات نوبت‌دهی ذخیره شد.');
+                $this->dispatch('closeXModal', id: 'calculator-modal');
+            } else {
+                Log::error("No work schedule found for day: {$day}");
+                $this->dispatch('show-toastr', type: 'error', message: 'برنامه کاری برای این روز یافت نشد.');
+            }
+        } catch (\Exception $e) {
+            Log::error("Error in saveCalculator: " . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در ذخیره تنظیمات: ' . $e->getMessage());
+        } finally {
+            $this->isProcessing = false;
         }
-    } catch (\Exception $e) {
-        Log::error("Error in saveCalculator: " . $e->getMessage());
-        $this->dispatch('show-toastr', type: 'error', message: 'خطا در ذخیره تنظیمات: ' . $e->getMessage());
-    } finally {
-        $this->isProcessing = false;
     }
-}
 
     public function addHoliday()
     {

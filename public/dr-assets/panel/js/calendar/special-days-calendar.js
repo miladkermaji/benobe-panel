@@ -581,20 +581,13 @@ document.addEventListener("livewire:initialized", () => {
                 "setCalculatorData",
                 { day, index }
             );
-
+            window.openXModal(modalId);
             // دریافت زمان شروع و پایان
-            const startTime = document
-                .querySelector(
-                    `input[data-day="${day}"][data-index="${index}"]`
-                )
-                ?.closest(".form-row")
-                ?.querySelector(".start-time")?.value;
-            const endTime = document
-                .querySelector(
-                    `input[data-day="${day}"][data-index="${index}"]`
-                )
-                ?.closest(".form-row")
-                ?.querySelector(".end-time")?.value;
+            const slotElement = document.querySelector(
+                `.form-row[data-slot-id="${index}"]`
+            );
+            const startTime = slotElement?.querySelector(".start-time")?.value;
+            const endTime = slotElement?.querySelector(".end-time")?.value;
 
             if (!startTime || !endTime) {
                 Livewire.dispatch("show-toastr", {
