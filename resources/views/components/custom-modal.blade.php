@@ -29,166 +29,229 @@
 </div>
 
 <style>
-  .x-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1050;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    overflow: auto;
-    direction: rtl;
-    font-family: 'Vazir', sans-serif;
-  }
+  :root {
+  --modal-bg: #ffffff;
+  --modal-border: #e5e7eb;
+  --modal-shadow: rgba(0, 0, 0, 0.15);
+  --modal-backdrop: rgba(0, 0, 0, 0.65);
+  --modal-text: #1f2937;
+  --modal-text-secondary: #6b7280;
+  --modal-accent: #2E86C1;
+  --modal-accent-hover: #256d9b;
+  --modal-radius: 16px;
+  --modal-font: 'Vazirmatn', 'Inter', system-ui, sans-serif;
+  --modal-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  .x-modal--visible {
-    display: flex;
-  }
+.x-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  direction: rtl;
+  font-family: var(--modal-font);
+  isolation: isolate;
+}
 
-  .x-modal__backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    opacity: 0;
-    transition: opacity 0.4s ease, backdrop-filter 0.4s ease;
-  }
+.x-modal--visible {
+  display: flex;
+}
 
-  .x-modal--visible .x-modal__backdrop {
-    opacity: 1;
-  }
+.x-modal__backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--modal-backdrop);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+}
 
+.x-modal--visible .x-modal__backdrop {
+  opacity: 1;
+}
+
+.x-modal__dialog {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 1rem;
+  transform: translateY(50px) scale(0.95);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, scale 0.3s ease;
+}
+
+.x-modal--visible .x-modal__dialog {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.x-modal__dialog--sm {
+  max-width: 400px;
+}
+
+.x-modal__dialog--md {
+  max-width: 520px;
+}
+
+.x-modal__dialog--lg {
+  max-width: 720px;
+}
+
+.x-modal__dialog--xl {
+  max-width: 1080px;
+}
+
+.x-modal__content {
+  background-color: var(--modal-bg);
+  border-radius: var(--modal-radius);
+  box-shadow: 0 10px 40px var(--modal-shadow);
+  overflow: hidden;
+  transform: translateZ(0);
+  display: flex;
+  flex-direction: column;
+  min-height: 160px;
+}
+
+.x-modal__header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--modal-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+}
+
+.x-modal__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--modal-text);
+  margin: 0;
+}
+
+.x-modal__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--modal-text-secondary);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.x-modal__close:hover {
+  color: var(--modal-text);
+  transform: scale(1.1);
+}
+
+.x-modal__close svg {
+  width: 20px;
+  height: 20px;
+  transition: stroke 0.2s ease;
+}
+
+.x-modal__body {
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 80vh;
+  scrollbar-width: thin;
+  scrollbar-color: var(--modal-accent) var(--modal-border);
+}
+
+.x-modal__body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.x-modal__body::-webkit-scrollbar-track {
+  background: var(--modal-border);
+  border-radius: 8px;
+}
+
+.x-modal__body::-webkit-scrollbar-thumb {
+  background-color: var(--modal-accent);
+  border-radius: 8px;
+  border: 1px solid var(--modal-border);
+}
+
+.x-modal__body::-webkit-scrollbar-thumb:hover {
+  background-color: var(--modal-accent-hover);
+}
+
+@media (max-width: 768px) {
   .x-modal__dialog {
-    position: relative;
-    width: 100%;
-    max-width: 500px;
-    min-height: 200px !important;
-    margin: 1rem;
-    transform: translateY(100px) scale(0.9);
-    opacity: 0;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease, scale 0.5s ease;
+    margin: 0.75rem;
   }
 
-  .x-modal--visible .x-modal__dialog {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-
-  .x-modal__dialog--sm {
-    max-width: 440px;
-  }
-
-  .x-modal__dialog--md {
-    max-width: 550px;
-  }
-
-  .x-modal__dialog--lg {
-    max-width: 730px;
-  }
-
+  .x-modal__dialog--lg,
   .x-modal__dialog--xl {
-    max-width: 1140px;
+    max-width: 92%;
   }
 
   .x-modal__content {
-    background-color: #fff;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
-    transform: translateZ(0);
-    min-height: 200px !important;
-    display: flex;
-    flex-direction: column;
+    min-height: 140px;
   }
 
   .x-modal__header {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(245, 247, 250, 1) 100%);
+    padding: 0.5rem 0.75rem;
   }
 
   .x-modal__title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0;
-  }
-
-  .x-modal__close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6b7280;
-    transition: color 0.3s ease, transform 0.3s ease;
-  }
-
-  .x-modal__close:hover {
-    color: #1f2937;
-    transform: rotate(90deg);
-  }
-
-  .x-modal__close svg {
-    width: 24px;
-    height: 24px;
-    transition: stroke 0.3s ease;
+    font-size: 1rem;
   }
 
   .x-modal__body {
-    padding: 1.5rem;
-    flex: 1;
-    overflow-y: auto;
-    max-height: 90vh; /* حداکثر ارتفاع برای فعال شدن اسکرول */
-    scrollbar-width: thin; /* عرض اسکرول‌بار در فایرفاکس */
-    scrollbar-color: #2E86C1 #e5e7eb; /* رنگ اسکرول‌بار و پس‌زمینه در فایرفاکس */
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .x-modal__dialog {
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
   }
 
-  /* استایل اسکرول‌بار برای مرورگرهای مبتنی بر Webkit (کروم، سافاری، اج) */
-  .x-modal__body::-webkit-scrollbar {
-    width: 8px; /* عرض اسکرول‌بار */
+  .x-modal__dialog--sm,
+  .x-modal__dialog--md,
+  .x-modal__dialog--lg,
+  .x-modal__dialog--xl {
+    max-width: 100%;
+    width: 100%;
   }
 
-  .x-modal__body::-webkit-scrollbar-track {
-    background: #e5e7eb; /* رنگ پس‌زمینه اسکرول‌بار */
-    border-radius: 10px; /* گرد کردن گوشه‌های پس‌زمینه */
+  .x-modal__content {
+    min-height: 120px;
+    border-radius: var(--modal-radius) var(--modal-radius) 0 0;
   }
 
-  .x-modal__body::-webkit-scrollbar-thumb {
-    background-color: #2E86C1; /* رنگ اسکرول‌بار */
-    border-radius: 10px; /* گرد کردن گوشه‌های اسکرول‌بار */
-    border: 2px solid #e5e7eb; /* حاشیه اطراف اسکرول‌بار */
+  .x-modal__header {
+    padding: 0.5rem 0.75rem;
   }
 
-  .x-modal__body::-webkit-scrollbar-thumb:hover {
-    background-color: #256d9b; /* رنگ اسکرول‌بار هنگام هاور */
+  .x-modal__title {
+    font-size: 0.875rem;
   }
 
-  @media (max-width: 640px) {
-    .x-modal__dialog {
-      margin: 0.5rem;
-    }
-
-    .x-modal__dialog--lg,
-    .x-modal__dialog--xl {
-      max-width: 95%;
-    }
-
-    .x-modal__content {
-      min-height: 180px !important;
-    }
+  .x-modal__body {
+    padding: 0.5rem;
   }
+
+  .x-modal__close svg {
+    width: 16px;
+    height: 16px;
+  }
+}
 </style>
 
 <script>

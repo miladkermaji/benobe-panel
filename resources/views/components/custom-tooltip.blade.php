@@ -2,114 +2,158 @@
     'title' => '',
     'placement' => 'top', // top, bottom, left, right
     'trigger' => 'hover', // hover, click
-    'id' => 'tooltip-' . uniqid(),
+    'id' => 'x-tooltip-' . uniqid(),
 ])
 
-<div x-tooltip id="{{ $id }}" class="x-tooltip" data-trigger="{{ $trigger }}"
-     data-placement="{{ $placement }}">
-    <div class="x-tooltip__trigger">
+<div x-tooltip id="{{ $id }}" class="x-tooltip" data-trigger="{{ $trigger }}" data-placement="{{ $placement }}" role="tooltip" aria-describedby="{{ $id }}-content">
+    <div class="x-tooltip__trigger" tabindex="0">
         {{ $slot }}
     </div>
-    <div class="x-tooltip__content" data-tooltip-id="{{ $id }}">
+    <div class="x-tooltip__content" data-tooltip-id="{{ $id }}" id="{{ $id }}-content">
         {{ $title }}
     </div>
 </div>
 
 <style>
+    :root {
+        --tooltip-bg-start: #1e293b;
+        --tooltip-bg-end: #334155;
+        --tooltip-text: #f1f5f9;
+        --tooltip-border: #475569;
+        --tooltip-shadow: rgba(0, 0, 0, 0.2);
+        --tooltip-radius: 8px;
+        --tooltip-font: 'Vazirmatn', 'Inter', system-ui, sans-serif;
+        --tooltip-transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    }
+
     .x-tooltip {
         position: relative;
         display: inline-block;
-        font-family: 'Vazir', sans-serif;
+        font-family: var(--tooltip-font);
+        isolation: isolate;
+        z-index: 9999;
     }
 
     .x-tooltip__trigger {
         display: inline-block;
+        cursor: pointer;
     }
 
     .x-tooltip__content {
         position: fixed;
-        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-        color: #edf2f7;
+        background: linear-gradient(135deg, var(--tooltip-bg-start) 0%, var(--tooltip-bg-end) 100%);
+        color: var(--tooltip-text);
         padding: 0.5rem 0.75rem;
-        border-radius: 8px;
+        border-radius: var(--tooltip-radius);
+        border: 1px solid var(--tooltip-border);
         font-size: 0.85rem;
         font-weight: 400;
-        line-height: 1.4;
-        width: 140px;
-        min-height: 36px;
+        line-height: 1.5;
+        max-width: 160px;
+        min-width: 100px;
+        min-height: 28px;
         text-align: center;
         white-space: normal;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-        z-index: 100001;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transform: scale(0.95);
+        transition: var(--tooltip-transition);
+        z-index: 9999999;
+        box-shadow: 0 6px 16px var(--tooltip-shadow);
+        pointer-events: none;
     }
 
     .x-tooltip__content::before {
         content: '';
         position: absolute;
         border: 6px solid transparent;
-        z-index: 100002;
+        z-index: 10000000;
+    }
+
+    .x-tooltip[data-placement="top"] .x-tooltip__content {
+        transform-origin: bottom;
     }
 
     .x-tooltip[data-placement="top"] .x-tooltip__content::before {
-        border-top-color: #1a202c;
+        border-top-color: var(--tooltip-bg-start);
         top: 100%;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translateX(-50%) rotate(180deg);
+    }
+
+    .x-tooltip[data-placement="bottom"] .x-tooltip__content {
+        transform-origin: top;
     }
 
     .x-tooltip[data-placement="bottom"] .x-tooltip__content::before {
-        border-bottom-color: #1a202c;
+        border-bottom-color: var(--tooltip-bg-start);
         bottom: 100%;
         left: 50%;
         transform: translateX(-50%);
     }
 
+    .x-tooltip[data-placement="left"] .x-tooltip__content {
+        transform-origin: right;
+    }
+
     .x-tooltip[data-placement="left"] .x-tooltip__content::before {
-        border-left-color: #1a202c;
+        border-left-color: var(--tooltip-bg-start);
         left: 100%;
         top: 50%;
-        transform: translateY(-50%);
+        transform: translateY(-50%) rotate(90deg);
+    }
+
+    .x-tooltip[data-placement="right"] .x-tooltip__content {
+        transform-origin: left;
     }
 
     .x-tooltip[data-placement="right"] .x-tooltip__content::before {
-        border-right-color: #1a202c;
+        border-right-color: var(--tooltip-bg-start);
         right: 100%;
         top: 50%;
-        transform: translateY(-50%);
+        transform: translateY(-50%) rotate(-90deg);
     }
 
     .x-tooltip[data-trigger="hover"]:hover .x-tooltip__content,
     .x-tooltip[data-trigger="click"].x-tooltip--active .x-tooltip__content {
         opacity: 1;
         visibility: visible;
+        transform: scale(1);
     }
 
     @media (max-width: 768px) {
         .x-tooltip__content {
-            width: 120px;
+            max-width: 140px;
+            min-width: 90px;
             font-size: 0.8rem;
             padding: 0.4rem 0.6rem;
-            min-height: 32px;
+            min-height: 24px;
         }
     }
 
     @media (max-width: 480px) {
         .x-tooltip__content {
-            width: 100px;
+            max-width: 120px;
+            min-width: 80px;
             font-size: 0.75rem;
             padding: 0.3rem 0.5rem;
-            min-height: 28px;
+            min-height: 20px;
         }
     }
 </style>
 
 <script>
-    if (!window.tooltipInitialized) {
-        window.tooltipInitialized = true;
+    if (!window.xTooltipInitialized) {
+        window.xTooltipInitialized = true;
         const processedTooltipIds = new Set();
+
+        const debounce = (func, wait) => {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        };
 
         const closeAllTooltips = () => {
             document.querySelectorAll('.x-tooltip--active').forEach(tooltip => {
@@ -119,15 +163,16 @@
                     content.style.transition = 'none';
                     content.style.opacity = '0';
                     content.style.visibility = 'hidden';
+                    content.style.transform = 'scale(0.95)';
                     setTimeout(() => {
-                        content.style.transition = 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out';
+                        content.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
                     }, 0);
                 }
             });
         };
 
         const initializeTooltips = () => {
-            const tooltips = document.querySelectorAll('[x-tooltip]:not([data-processed])');
+            const tooltips = document.querySelectorAll('[x-tooltip]:not([data-x-processed])');
             if (tooltips.length === 0) return;
 
             tooltips.forEach(tooltip => {
@@ -147,7 +192,7 @@
                     document.body.appendChild(content);
                 }
 
-                tooltip.dataset.processed = 'true';
+                tooltip.dataset.xProcessed = 'true';
                 processedTooltipIds.add(tooltipId);
 
                 const adjustPlacement = () => {
@@ -155,8 +200,8 @@
                     const contentRect = content.getBoundingClientRect();
                     const viewportWidth = window.innerWidth;
                     const viewportHeight = window.innerHeight;
-                    const margin = 10;
-                    const offset = 8;
+                    const margin = 12;
+                    const offset = 10;
 
                     const space = {
                         top: triggerRect.top - contentRect.height - margin,
@@ -222,6 +267,7 @@
                         closeAllTooltips();
                         content.style.opacity = '1';
                         content.style.visibility = 'visible';
+                        content.style.transform = 'scale(1)';
                         adjustPlacement();
                     });
                     trigger.addEventListener('mouseleave', () => {
@@ -229,11 +275,25 @@
                             content.style.transition = 'none';
                             content.style.opacity = '0';
                             content.style.visibility = 'hidden';
+                            content.style.transform = 'scale(0.95)';
                             setTimeout(() => {
-                                content.style.transition = 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out';
+                                content.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
                             }, 0);
                             tooltip.dataset.placement = originalPlacement;
-                        }, 100);
+                        }, 150);
+                    });
+                    content.addEventListener('mouseenter', () => clearTimeout(hoverTimeout));
+                    content.addEventListener('mouseleave', () => {
+                        hoverTimeout = setTimeout(() => {
+                            content.style.transition = 'none';
+                            content.style.opacity = '0';
+                            content.style.visibility = 'hidden';
+                            content.style.transform = 'scale(0.95)';
+                            setTimeout(() => {
+                                content.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
+                            }, 0);
+                            tooltip.dataset.placement = originalPlacement;
+                        }, 150);
                     });
                 }
 
@@ -247,10 +307,13 @@
                             tooltip.classList.add('x-tooltip--active');
                             content.style.opacity = '1';
                             content.style.visibility = 'visible';
+                            content.style.transform = 'scale(1)';
                             adjustPlacement();
                         }
                     });
                 }
+
+                trigger.setAttribute('aria-describedby', `${tooltipId}-content`);
             });
         };
 
@@ -261,7 +324,7 @@
             mutations.forEach(mutation => {
                 if (mutation.addedNodes.length) {
                     mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && (node.matches('[x-tooltip]:not([data-processed])') || node.querySelector('[x-tooltip]:not([data-processed])'))) {
+                        if (node.nodeType === Node.ELEMENT_NODE && (node.matches('[x-tooltip]:not([data-x-processed])') || node.querySelector('[x-tooltip]:not([data-x-processed])'))) {
                             hasNewTooltips = true;
                         }
                     });
@@ -291,8 +354,9 @@
                         content.style.transition = 'none';
                         content.style.opacity = '0';
                         content.style.visibility = 'hidden';
+                        content.style.transform = 'scale(0.95)';
                         setTimeout(() => {
-                            content.style.transition = 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out';
+                            content.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
                         }, 0);
                     }
                 }
@@ -305,14 +369,20 @@
             }
         });
 
-        window.addEventListener('resize', () => {
-            closeAllTooltips();
+        const handleResize = debounce(() => {
             document.querySelectorAll('.x-tooltip--active').forEach(tooltip => {
-                const trigger = tooltip.querySelector('.x-tooltip__trigger');
-                if (trigger) {
-                    trigger.dispatchEvent(new Event('mouseenter'));
+                const content = document.body.querySelector(`.x-tooltip__content[data-tooltip-id="${tooltip.id}"]`);
+                if (content) {
+                    const trigger = tooltip.querySelector('.x-tooltip__trigger');
+                    if (trigger) {
+                        const evt = new Event('mouseenter');
+                        trigger.dispatchEvent(evt);
+                    }
                 }
             });
-        });
+        }, 100);
+
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('scroll', debounce(closeAllTooltips, 100), { passive: true });
     }
 </script>
