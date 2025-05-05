@@ -412,22 +412,27 @@ class SpecialWorkhours extends Component
             $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
 
-            // چک کردن وجود work_hours[$index]
-            if (!isset($workHours[$index])) {
-                Log::warning("Work hour index {$index} not found in work_hours", $workHours);
-                // ایجاد یک اسلات جدید اگر وجود نداشته باشد
-                $workHours[$index] = [
-                    'start' => $this->calculator['start_time'] ?? '00:00',
-                    'end' => $this->calculator['end_time'] ?? '23:59',
-                    'max_appointments' => $appointmentCount,
-                ];
-            } else {
-                $workHours[$index]['max_appointments'] = $appointmentCount;
+            // دریافت مقادیر start و end از workSchedule یا calculator
+            $startTime = $this->workSchedule['data']['work_hours'][$index]['start'] ?? $this->calculator['start_time'] ?? '00:00';
+            $endTime = $this->workSchedule['data']['work_hours'][$index]['end'] ?? $this->calculator['end_time'] ?? '23:59';
+
+            // اطمینان از معتبر بودن مقادیر زمان
+            if (empty($startTime) || empty($endTime)) {
+                Log::error("Invalid start or end time", ['start' => $startTime, 'end' => $endTime]);
+                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً زمان شروع و پایان را وارد کنید.');
+                return;
             }
 
+            // تنظیم یا به‌روزرسانی اسلات
+            $workHours[$index] = [
+                'start' => $startTime,
+                'end' => $endTime,
+                'max_appointments' => $appointmentCount,
+            ];
+
             $appointmentSettings[$index] = [
-                'start_time' => $workHours[$index]['start'] ?? '00:00',
-                'end_time' => $workHours[$index]['end'] ?? '23:59',
+                'start_time' => $startTime,
+                'end_time' => $endTime,
                 'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
                 'work_hour_key' => $index,
                 'max_appointments' => $appointmentCount,
@@ -616,49 +621,47 @@ class SpecialWorkhours extends Component
         Log::info("Calculation mode set to: {$mode}");
     }
 
-    public function openCalculatorModal($day, $index)
-    {
-        if ($this->isProcessing) {
+ public function openCalculatorModal($day, $index)
+{
+    if ($this->isProcessing) {
+        return;
+    }
+
+    try {
+        $this->calculator['day'] = $day;
+        $this->calculator['index'] = $index;
+
+        // دریافت مقادیر start و end از workSchedule
+        $this->calculator['start_time'] = $this->workSchedule['data']['work_hours'][$index]['start'] ?? '00:00';
+        $this->calculator['end_time'] = $this->workSchedule['data']['work_hours'][$index]['end'] ?? '23:59';
+
+        if (empty($this->calculator['start_time']) || empty($this->calculator['end_time'])) {
+            Log::warning("Empty start or end time for index {$index}", $this->workSchedule);
+            $this->dispatch('show-toastr', type: 'error', message: 'لطفاً ابتدا زمان شروع و پایان را وارد کنید.');
             return;
         }
 
-        try {
-            $this->calculator['day'] = $day;
-            $this->calculator['index'] = $index;
+        Log::info("Opening CalculatorModal", [
+            'day' => $day,
+            'index' => $index,
+            'start_time' => $this->calculator['start_time'],
+            'end_time' => $this->calculator['end_time'],
+        ]);
 
-            // بررسی وجود اسلات و مقادیر شروع و پایان
-            if (isset($this->workSchedule['data']['work_hours'][$index])) {
-                $this->calculator['start_time'] = $this->workSchedule['data']['work_hours'][$index]['start'] ?? '00:00';
-                $this->calculator['end_time'] = $this->workSchedule['data']['work_hours'][$index]['end'] ?? '23:59';
-            } else {
-                Log::warning("Work hour index {$index} not found in workSchedule", $this->workSchedule);
-                $this->calculator['start_time'] = '00:00';
-                $this->calculator['end_time'] = '23:59';
-                $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی معتبر نیست.');
-                return;
-            }
+        // ارسال مقادیر به جاوااسکریپت
+        $this->dispatch('initialize-calculator', [
+            'start_time' => $this->calculator['start_time'],
+            'end_time' => $this->calculator['end_time'],
+            'index' => $index,
+            'day' => $day,
+        ]);
 
-            Log::info("Opening CalculatorModal", [
-                'day' => $day,
-                'index' => $index,
-                'start_time' => $this->calculator['start_time'],
-                'end_time' => $this->calculator['end_time'],
-            ]);
-
-            // ارسال مقادیر به جاوااسکریپت
-            $this->dispatch('initialize-calculator', [
-                'start_time' => $this->calculator['start_time'],
-                'end_time' => $this->calculator['end_time'],
-                'index' => $index,
-                'day' => $day,
-            ]);
-
-            $this->dispatch('openXModal', id: 'CalculatorModal');
-        } catch (\Exception $e) {
-            Log::error("Error in openCalculatorModal: " . $e->getMessage());
-            $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال محاسبه: ' . $e->getMessage());
-        }
+        $this->dispatch('openXModal', id: 'CalculatorModal');
+    } catch (\Exception $e) {
+        Log::error("Error in openCalculatorModal: " . $e->getMessage());
+        $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال محاسبه: ' . $e->getMessage());
     }
+}
 
     public function closeCalculatorModal()
     {
