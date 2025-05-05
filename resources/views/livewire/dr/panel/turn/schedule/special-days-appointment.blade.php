@@ -86,29 +86,7 @@
   </div>
 
   <script>
-    function initializeTimepicker() {
-      $(".timepicker-ui").each(function() {
-        if (!$(this).data("timepicker-initialized")) {
-          try {
-            const options = {
-              clockType: "24h",
-              theme: "basic",
-              mobile: true,
-              enableScrollbar: true,
-              disableTimeRangeValidation: false,
-              autoClose: true,
-            };
-            const timepicker = new window.tui.TimepickerUI(this, options);
-            timepicker.create();
-            $(this).data("timepicker-initialized", true);
-          } catch (e) {
-            console.error("Error initializing timepicker:", e);
-          }
-        }
-      });
-    }
 
-    initializeTimepicker();
     window.holidaysData = @json($holidaysData) || {
       status: true,
       holidays: []
@@ -119,12 +97,7 @@
     };
 
     document.addEventListener("livewire:initialized", () => {
-      Livewire.on('refresh-timepicker', () => {
-        console.log('Received refresh-timepicker event');
-        setTimeout(() => {
-          initializeTimepicker();
-        }, 100);
-      });
+    
       window.holidaysData = @json($holidaysData) || {
         status: true,
         holidays: []

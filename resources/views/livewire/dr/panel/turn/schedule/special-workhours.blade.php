@@ -1,5 +1,4 @@
 <div>
-  
   <div class="workhours-content w-100 d-flex justify-content-center mb-3">
     <div class="workhours-wrapper-content p-3">
       @if ($workSchedule['status'] && !empty($workSchedule['data']['work_hours']))
@@ -11,16 +10,16 @@
             @foreach ($workSchedule['data']['work_hours'] as $index => $slot)
               <div class="form-row d-flex w-100 p-3 bg-active-slot border-radius-11" data-slot-id="{{ $index }}">
                 <div class="d-flex justify-content-start align-items-center gap-4">
-                  <div class="form-group position-relative">
+                  <div class="form-group position-relative timepicker-ui">
                     <label class="label-top-input-special-takhasos" for="start-{{ $index }}">از</label>
-                    <input type="text" data-timepicker wire:model.live="time"
-                      class="form-control h-50  text-center fw-bold font-size-13 start-time bg-white"
+                    <input type="text" data-timepicker
+                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
                       id="start-{{ $index }}"
                       wire:model.live="workSchedule.data.work_hours.{{ $index }}.start" />
                   </div>
                   <div class="form-group position-relative timepicker-ui">
                     <label class="label-top-input-special-takhasos" for="end-{{ $index }}">تا</label>
-                    <input type="text"
+                    <input type="text" data-timepicker
                       class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
                       id="end-{{ $index }}"
                       wire:model.live="workSchedule.data.work_hours.{{ $index }}.end" />
@@ -185,12 +184,12 @@
           <div class="timepicker-save-section">
             <div class="form-group position-relative timepicker-ui">
               <label class="label-top-input-special-takhasos">شروع</label>
-              <input type="text" class="form-control timepicker-ui-input text-center fw-bold" id="schedule-start"
+              <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold" id="schedule-start"
                 value="00:00">
             </div>
             <div class="form-group position-relative timepicker-ui">
               <label class="label-top-input-special-takhasos">پایان</label>
-              <input type="text" class="form-control timepicker-ui-input text-center fw-bold" id="schedule-end"
+              <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold" id="schedule-end"
                 value="23:59">
             </div>
             <button type="button" class="btn my-btn-primary d-flex justify-content-center align-items-center"

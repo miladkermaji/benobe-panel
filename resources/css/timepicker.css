@@ -31,8 +31,8 @@
 }
 
 .timepicker {
-    position: absolute;
-    z-index: 1000;
+    position: fixed;
+    z-index: 1001;
     font-family: 'Vazir', sans-serif;
 }
 
@@ -42,11 +42,12 @@
     box-shadow: 0 8px 24px var(--shadow);
     padding: 24px;
     width: 320px;
+    max-width: calc(100vw - 20px); /* جلوگیری از خروج از viewport */
     display: flex;
     flex-direction: column;
     gap: 16px;
     direction: ltr;
-    animation: slideIn 0.3s ease-in-out;
+    animation: slideIn 0.2s ease-in-out; /* انیمیشن سریع‌تر */
 }
 
 .timepicker-time {
@@ -143,7 +144,78 @@
     transform: translateY(-1px);
 }
 
+/* ریسپانسیو برای صفحه‌های کوچک */
+@media (max-width: 768px) {
+    .timepicker-content {
+        width: 280px;
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .timepicker-hours,
+    .timepicker-minutes {
+        width: 70px;
+        height: 50px;
+        font-size: 24px;
+        padding: 10px;
+    }
+
+    .timepicker-divider {
+        font-size: 24px;
+    }
+
+    .timepicker-arrow svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .timepicker-confirm,
+    .timepicker-cancel {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .timepicker-content {
+        width: 240px;
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .timepicker-hours,
+    .timepicker-minutes {
+        width: 60px;
+        height: 45px;
+        font-size: 20px;
+        padding: 8px;
+    }
+
+    .timepicker-divider {
+        font-size: 20px;
+    }
+
+    .timepicker-arrow {
+        padding: 8px;
+    }
+
+    .timepicker-arrow svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .timepicker-actions {
+        gap: 8px;
+    }
+
+    .timepicker-confirm,
+    .timepicker-cancel {
+        padding: 8px;
+        font-size: 13px;
+    }
+}
+
 @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-15px); }
+    from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }

@@ -14,11 +14,13 @@
 
 @endsection
 @section('scripts')
+<script src="{{ asset('dr-assets/panel/js/home/bootstrap/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 
 @livewire('dr.panel.turn.schedule.special-days-appointment')
 <script src="{{ asset('dr-assets/panel/js/jalali-moment/dist/jalali-moment.browser.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/calendar/special-days-calendar.js') }}"></script>
+
 <script>
   $(document).ready(function() {
     let dropdownOpen = false;

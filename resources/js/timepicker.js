@@ -1,17 +1,76 @@
 class TimePicker {
     constructor() {
         this.activePicker = null;
+        this.showPickerBound = null;
         this.init();
     }
 
     init() {
-        document.querySelectorAll("input[data-timepicker]").forEach((input) => {
-            input.addEventListener("click", (e) => this.showPicker(e.target));
-        });
+        // مقداردهی اولیه با تأخیر
+        setTimeout(() => {
+            this.bindInputs();
+        }, 200);
+
+        // مدیریت کلیک خارج
         document.addEventListener("click", (e) => this.handleOutsideClick(e));
+
+        // گوش دادن به آپدیت‌های Livewire
+        document.addEventListener("livewire:initialized", () => {
+            Livewire.on("refresh-timepicker", () => {
+                setTimeout(() => {
+                    this.bindInputs();
+                }, 200);
+            });
+            Livewire.on("component.updated", () => {
+                setTimeout(() => {
+                    this.bindInputs();
+                }, 200);
+            });
+        });
+
+        // مشاهده تغییرات DOM
+        const observer = new MutationObserver((mutations) => {
+            if (mutations.some((mutation) => mutation.addedNodes.length)) {
+                this.bindInputs();
+            }
+        });
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+    }
+
+    bindInputs() {
+        // حذف listenerهای قبلی
+        document.querySelectorAll("input[data-timepicker]").forEach((input) => {
+            if (input._timePickerListener) {
+                input.removeEventListener("click", input._timePickerListener);
+            }
+        });
+
+        // اضافه کردن listenerهای جدید
+        this.showPickerBound = this.showPicker.bind(this);
+        document.querySelectorAll("input[data-timepicker]").forEach((input) => {
+            const listener = (e) => {
+                if (input instanceof HTMLElement) {
+                    this.showPickerBound(input);
+                }
+            };
+            input._timePickerListener = listener;
+            input.addEventListener("click", listener, { capture: true });
+        });
     }
 
     showPicker(input) {
+        // اطمینان از معتبر بودن input
+        if (
+            !(input instanceof HTMLElement) ||
+            !input.hasAttribute("data-timepicker")
+        ) {
+            console.warn("Invalid input element for TimePicker:", input);
+            return;
+        }
+
         if (this.activePicker) {
             this.activePicker.remove();
         }
@@ -20,11 +79,43 @@ class TimePicker {
         picker.classList.add("timepicker");
         picker.innerHTML = this.getPickerHTML();
 
-        const rect = input.getBoundingClientRect();
-        picker.style.top = `${rect.bottom + window.scrollY + 5}px`;
-        picker.style.left = `${rect.left + window.scrollX}px`;
+        // محاسبه موقعیت تایم‌پیکر
+        try {
+            const rect = input.getBoundingClientRect();
+            const pickerWidth = 320; // عرض تقریبی تایم‌پیکر (بر اساس CSS)
+            const pickerHeight = 240; // ارتفاع تقریبی تایم‌پیکر
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
 
-        const value = input.value.split(":");
+            // تنظیم موقعیت افقی
+            let left = rect.left + window.scrollX;
+            if (left + pickerWidth > viewportWidth - 10) {
+                left = viewportWidth - pickerWidth - 10; // 10px حاشیه
+            }
+            if (left < 10) {
+                left = 10;
+            }
+
+            // تنظیم موقعیت عمودی (اولویت زیر اینپوت)
+            let top = rect.bottom + window.scrollY + 5;
+            if (top + pickerHeight > viewportHeight - 10) {
+                // اگه زیر اینپوت جا نشد، بالای اینپوت
+                top = rect.top + window.scrollY - pickerHeight - 5;
+            }
+            if (top < 10) {
+                top = 10;
+            }
+
+            picker.style.position = "fixed";
+            picker.style.top = `${top}px`;
+            picker.style.left = `${left}px`;
+        } catch (e) {
+            console.error("Error positioning timepicker:", e);
+            return;
+        }
+
+        // خواندن مقدار اولیه
+        const value = input.value ? input.value.split(":") : ["00", "00"];
         const hours = value[0] || "00";
         const minutes = value[1] || "00";
 
@@ -47,6 +138,7 @@ class TimePicker {
                     .value.padStart(2, "0");
                 input.value = `${hours}:${minutes}`;
                 input.dispatchEvent(new Event("input"));
+                input.dispatchEvent(new Event("change"));
                 this.closePicker();
             });
 
@@ -123,7 +215,8 @@ class TimePicker {
         if (
             this.activePicker &&
             !this.activePicker.contains(e.target) &&
-            !e.target.hasAttribute("data-timepicker")
+            !e.target.hasAttribute("data-timepicker") &&
+            !e.target.closest(".x-modal__content")
         ) {
             this.closePicker();
         }
