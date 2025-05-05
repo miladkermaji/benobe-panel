@@ -1,10 +1,7 @@
 <div>
 
   <div wire:ignore>
-      <div class="text-center">
-    <input type="text" data-timepicker wire:model.live="time" placeholder="انتخاب زمان">
-    <p>زمان انتخاب‌شده: {{ $time }}</p>
-</div>
+
     <x-special-days-calendar />
   </div>
 
@@ -33,48 +30,42 @@
                 {{ $isProcessing ? 'disabled' : '' }}>لغو</button>
             </div>
           </div>
-    @else
-  <div class="alert alert-info" role="alert">
-    <p class="fw-bold text-center">
-      @if ($hasWorkHours)
-        شما از قبل برای این روز ساعات کاری تعریف کرده‌اید. در صورت تمایل میتوانید آن را  ویرایش کنید
-      @endif
-    </p>
-  </div>
-  @if ($hasWorkHours)
-    <livewire:dr.panel.turn.schedule.special-workhours
-      :selectedDate="$selectedDate"
-      :workSchedule="$workSchedule"
-      :clinicId="$selectedClinicId"
-      wire:key="special-workhours-{{ $selectedDate ?? 'default' }}" />
-    <div class="d-flex justify-content-center gap-2 mt-3">
-      <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
-        {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
-        تعطیل کردن
-      </button>
-      <button class="btn btn-secondary w-100 h-50" wire:click="closeModal"
-        {{ $isProcessing ? 'disabled' : '' }}>
-        لغو
-      </button>
-    </div>
-  @else
-    <livewire:dr.panel.turn.schedule.special-workhours
-      :selectedDate="$selectedDate"
-      :workSchedule="$workSchedule"
-      :clinicId="$selectedClinicId"
-      wire:key="special-workhours-{{ $selectedDate ?? 'default' }}" />
-    <div class="d-flex justify-content-center gap-2 mt-3">
-      <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
-        {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
-        تعطیل کردن
-      </button>
-      <button class="btn btn-secondary w-100 h-50" wire:click="closeModal"
-        {{ $isProcessing ? 'disabled' : '' }}>
-        لغو
-      </button>
-    </div>
-  @endif
-  @endif
+        @else
+          <div class="alert alert-info" role="alert">
+            <p class="fw-bold text-center">
+              @if ($hasWorkHours)
+                شما از قبل برای این روز ساعات کاری تعریف کرده‌اید. در صورت تمایل میتوانید آن را ویرایش کنید
+              @endif
+            </p>
+          </div>
+          @if ($hasWorkHours)
+            <livewire:dr.panel.turn.schedule.special-workhours :selectedDate="$selectedDate" :workSchedule="$workSchedule" :clinicId="$selectedClinicId"
+              wire:key="special-workhours-{{ $selectedDate ?? 'default' }}" />
+            <div class="d-flex justify-content-center gap-2 mt-3">
+              <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
+                {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
+                تعطیل کردن
+              </button>
+              <button class="btn btn-secondary w-100 h-50" wire:click="closeModal"
+                {{ $isProcessing ? 'disabled' : '' }}>
+                لغو
+              </button>
+            </div>
+          @else
+            <livewire:dr.panel.turn.schedule.special-workhours :selectedDate="$selectedDate" :workSchedule="$workSchedule" :clinicId="$selectedClinicId"
+              wire:key="special-workhours-{{ $selectedDate ?? 'default' }}" />
+            <div class="d-flex justify-content-center gap-2 mt-3">
+              <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
+                {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
+                تعطیل کردن
+              </button>
+              <button class="btn btn-secondary w-100 h-50" wire:click="closeModal"
+                {{ $isProcessing ? 'disabled' : '' }}>
+                لغو
+              </button>
+            </div>
+          @endif
+        @endif
       </div>
     </x-custom-modal>
   </div>
@@ -96,28 +87,28 @@
 
   <script>
     function initializeTimepicker() {
-    $(".timepicker-ui").each(function () {
+      $(".timepicker-ui").each(function() {
         if (!$(this).data("timepicker-initialized")) {
-            try {
-                const options = {
-                    clockType: "24h",
-                    theme: "basic",
-                    mobile: true,
-                    enableScrollbar: true,
-                    disableTimeRangeValidation: false,
-                    autoClose: true,
-                };
-                const timepicker = new window.tui.TimepickerUI(this, options);
-                timepicker.create();
-                $(this).data("timepicker-initialized", true);
-            } catch (e) {
-                console.error("Error initializing timepicker:", e);
-            }
+          try {
+            const options = {
+              clockType: "24h",
+              theme: "basic",
+              mobile: true,
+              enableScrollbar: true,
+              disableTimeRangeValidation: false,
+              autoClose: true,
+            };
+            const timepicker = new window.tui.TimepickerUI(this, options);
+            timepicker.create();
+            $(this).data("timepicker-initialized", true);
+          } catch (e) {
+            console.error("Error initializing timepicker:", e);
+          }
         }
-    });
-}
+      });
+    }
 
-initializeTimepicker();
+    initializeTimepicker();
     window.holidaysData = @json($holidaysData) || {
       status: true,
       holidays: []
@@ -128,7 +119,7 @@ initializeTimepicker();
     };
 
     document.addEventListener("livewire:initialized", () => {
- Livewire.on('refresh-timepicker', () => {
+      Livewire.on('refresh-timepicker', () => {
         console.log('Received refresh-timepicker event');
         setTimeout(() => {
           initializeTimepicker();
