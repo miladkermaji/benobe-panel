@@ -338,19 +338,28 @@ class SpecialWorkhours extends Component
         }
     }
 
-    public function setCalculatorValues($values)
+    public function setCalculatorValues($values = [])
     {
         if ($this->isProcessing) {
             return;
         }
 
         try {
-            $this->calculator['appointment_count'] = $values['appointment_count'] ?? null;
-            $this->calculator['time_per_appointment'] = $values['time_per_appointment'] ?? null;
-            $this->calculator['calculation_mode'] = $values['calculation_mode'] ?? 'count';
+            // اطمینان از اینکه $values یک آرایه یا شیء معتبر است
+            if (is_array($values) && isset($values[0]) && is_array($values[0])) {
+                $values = $values[0]; // گرفتن اولین آیتم آرایه
+            } elseif (!is_array($values)) {
+                Log::warning("Invalid values format in setCalculatorValues", ['values' => $values]);
+                $values = [];
+            }
+
+            $this->calculator['appointment_count'] = isset($values['appointment_count']) ? (int) $values['appointment_count'] : null;
+            $this->calculator['time_per_appointment'] = isset($values['time_per_appointment']) ? (int) $values['time_per_appointment'] : null;
+            $this->calculator['calculation_mode'] = isset($values['calculation_mode']) ? $values['calculation_mode'] : 'count';
+
             Log::info("Calculator values updated", $this->calculator);
         } catch (\Exception $e) {
-            Log::error("Error in setCalculatorValues: " . $e->getMessage());
+            Log::error("Error in setCalculatorValues: " . $e->getMessage(), ['values' => $values]);
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در تنظیم مقادیر محاسبه‌گر: ' . $e->getMessage());
         }
     }
@@ -403,12 +412,17 @@ class SpecialWorkhours extends Component
             $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
 
-            if (isset($workHours[$index])) {
-                $workHours[$index]['max_appointments'] = $appointmentCount;
-            } else {
+            // چک کردن وجود work_hours[$index]
+            if (!isset($workHours[$index])) {
                 Log::warning("Work hour index {$index} not found in work_hours", $workHours);
-                $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی معتبر نیست.');
-                return;
+                // ایجاد یک اسلات جدید اگر وجود نداشته باشد
+                $workHours[$index] = [
+                    'start' => $this->calculator['start_time'] ?? '00:00',
+                    'end' => $this->calculator['end_time'] ?? '23:59',
+                    'max_appointments' => $appointmentCount,
+                ];
+            } else {
+                $workHours[$index]['max_appointments'] = $appointmentCount;
             }
 
             $appointmentSettings[$index] = [
