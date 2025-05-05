@@ -42,6 +42,7 @@ class SpecialWorkhours extends Component
         'close-schedule-modal' => 'closeScheduleModal',
         'updateSelectedDate' => 'updateSelectedDate',
         'refreshWorkhours' => '$refresh',
+        'set-calculator-values' => 'setCalculatorValues',
     ];
 
     public function mount($selectedDate, $workSchedule, $clinicId = 'default')
@@ -337,6 +338,23 @@ class SpecialWorkhours extends Component
         }
     }
 
+    public function setCalculatorValues($values)
+    {
+        if ($this->isProcessing) {
+            return;
+        }
+
+        try {
+            $this->calculator['appointment_count'] = $values['appointment_count'] ?? null;
+            $this->calculator['time_per_appointment'] = $values['time_per_appointment'] ?? null;
+            $this->calculator['calculation_mode'] = $values['calculation_mode'] ?? 'count';
+            Log::info("Calculator values updated", $this->calculator);
+        } catch (\Exception $e) {
+            Log::error("Error in setCalculatorValues: " . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در تنظیم مقادیر محاسبه‌گر: ' . $e->getMessage());
+        }
+    }
+
     public function saveCalculator()
     {
         if ($this->isProcessing) {
@@ -349,17 +367,22 @@ class SpecialWorkhours extends Component
             $index = $this->calculator['index'];
             $appointmentCount = $this->calculator['appointment_count'];
             $timePerAppointment = $this->calculator['time_per_appointment'];
+            $calculationMode = $this->calculator['calculation_mode'];
 
             if (
                 empty($day) ||
                 $index === null ||
                 !is_numeric($appointmentCount) ||
-                $appointmentCount <= 0 ||
-                !is_numeric($timePerAppointment) ||
-                $timePerAppointment <= 0
+                $appointmentCount <= 0
             ) {
                 Log::error("Invalid or incomplete calculator data", $this->calculator);
-                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً تعداد نوبت‌ها و زمان هر نوبت را به‌درستی وارد کنید.');
+                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً تعداد نوبت‌ها را به‌درستی وارد کنید.');
+                return;
+            }
+
+            if ($calculationMode === 'time' && (!is_numeric($timePerAppointment) || $timePerAppointment <= 0)) {
+                Log::error("Invalid time_per_appointment in time mode", $this->calculator);
+                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً زمان هر نوبت را به‌درستی وارد کنید.');
                 return;
             }
 
@@ -394,7 +417,7 @@ class SpecialWorkhours extends Component
                 'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
                 'work_hour_key' => $index,
                 'max_appointments' => $appointmentCount,
-                'appointment_duration' => $timePerAppointment,
+                'appointment_duration' => $timePerAppointment ?? 0,
             ];
 
             $specialSchedule->work_hours = json_encode($workHours);
@@ -472,9 +495,6 @@ class SpecialWorkhours extends Component
         $this->selectAllScheduleModal = false;
         $this->dispatch('openXModal', id: 'scheduleModal');
         $this->dispatch('refresh-schedule-settings');
-        
-$this->dispatch('refresh-timepicker');
-
     }
 
     public function saveSchedule($startTime, $endTime)
@@ -584,9 +604,6 @@ $this->dispatch('refresh-timepicker');
 
     public function openCalculatorModal($day, $index)
     {
-        
-$this->dispatch('refresh-timepicker');
-
         if ($this->isProcessing) {
             return;
         }
@@ -612,6 +629,14 @@ $this->dispatch('refresh-timepicker');
                 'index' => $index,
                 'start_time' => $this->calculator['start_time'],
                 'end_time' => $this->calculator['end_time'],
+            ]);
+
+            // ارسال مقادیر به جاوااسکریپت
+            $this->dispatch('initialize-calculator', [
+                'start_time' => $this->calculator['start_time'],
+                'end_time' => $this->calculator['end_time'],
+                'index' => $index,
+                'day' => $day,
             ]);
 
             $this->dispatch('openXModal', id: 'CalculatorModal');
