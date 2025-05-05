@@ -8,7 +8,9 @@ export default defineConfig({
         laravel({
             input: [
                 "resources/css/app.css",
+                "resources/css/timepicker.css",
                 "resources/js/app.js",
+                "resources/js/timepicker.js",
             ],
             refresh: ["resources/views/**/*"],
         }),

@@ -12,6 +12,7 @@ use App\Models\SpecialDailySchedule;
 class SpecialWorkhours extends Component
 {
     public $selectedDate;
+    public $time;
     public $workSchedule = ['status' => false, 'data' => []];
     public $clinicId = 'default';
     public $isProcessing = false;

@@ -1,5 +1,10 @@
 <div>
+
   <div wire:ignore>
+      <div class="text-center">
+    <input type="text" data-timepicker wire:model.live="time" placeholder="انتخاب زمان">
+    <p>زمان انتخاب‌شده: {{ $time }}</p>
+</div>
     <x-special-days-calendar />
   </div>
 

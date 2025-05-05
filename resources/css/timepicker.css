@@ -1,0 +1,149 @@
+:root {
+  /* پالت رنگی اصلی */
+  --primary: #2E86C1;
+  --primary-light: #84CAF9;
+  --secondary: #1DEB3C;
+  --secondary-hover: #15802A;
+  --background-light: #F0F8FF;
+  --background-footer: #D4ECFD;
+  --background-card: #FFFFFF;
+  --text-primary: #000000;
+  --text-secondary: #707070;
+  --text-discount: #008000;
+  --text-original: #FF0000;
+  --border-neutral: #E5E7EB;
+  --shadow: rgba(0, 0, 0, 0.35);
+  --gradient-instagram-from: #F92CA7;
+  --gradient-instagram-to: #6B1A93;
+  --button-mobile: #4F9ACD;
+  --button-mobile-light: #A2CDEB;
+  --support-section: #2E86C1;
+  --support-text: #084D7C;
+  --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%) !important;
+  /* شعاع گوشه‌ها */
+  --radius-button: 0.5rem;
+  --radius-button-large: 1rem;
+  --radius-button-xl: 1.25rem;
+  --radius-card: 1.125rem;
+  --radius-footer: 1.875rem;
+  --radius-nav: 1.25rem;
+  --radius-circle: 9999px;
+}
+
+.timepicker {
+    position: absolute;
+    z-index: 1000;
+    font-family: 'Vazir', sans-serif;
+}
+
+.timepicker-content {
+    background: var(--background-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 8px 24px var(--shadow);
+    padding: 24px;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    direction: ltr;
+    animation: slideIn 0.3s ease-in-out;
+}
+
+.timepicker-time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.timepicker-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.timepicker-hours,
+.timepicker-minutes {
+    width: 80px;
+    height: 60px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    border: 1px solid var(--border-neutral);
+    background: var(--background-light);
+    padding: 12px;
+    border-radius: var(--radius-button);
+    color: var(--text-primary);
+}
+
+.timepicker-arrow {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.timepicker-arrow:hover {
+    transform: scale(1.1);
+}
+
+.timepicker-arrow svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--primary);
+}
+
+.timepicker-arrow:hover svg {
+    stroke: var(--primary-light);
+}
+
+.timepicker-divider {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.timepicker-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.timepicker-confirm,
+.timepicker-cancel {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: var(--radius-button-large);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.timepicker-confirm {
+    background: var(--secondary);
+    color: var(--background-card);
+}
+
+.timepicker-confirm:hover {
+    background: var(--secondary-hover);
+    transform: translateY(-1px);
+}
+
+.timepicker-cancel {
+    background: var(--text-original);
+    color: var(--background-card);
+}
+
+.timepicker-cancel:hover {
+    background: #cc0000;
+    transform: translateY(-1px);
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+}

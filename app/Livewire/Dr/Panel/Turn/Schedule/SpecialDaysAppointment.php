@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SpecialDaysAppointment extends Component
 {
+    public $time;
     public $calendarYear;
     public $calendarMonth;
     public $selectedClinicId = 'default';
