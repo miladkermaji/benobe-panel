@@ -32,7 +32,7 @@
   <div class="alert alert-info" role="alert">
     <p class="fw-bold text-center">
       @if ($hasWorkHours)
-        شما از قبل برای این روز ساعات کاری تعریف کرده‌اید. در صورتی که قصد تغییر دارید، روی دکمه ویرایش ساعات کاری کلیک کنید.
+        شما از قبل برای این روز ساعات کاری تعریف کرده‌اید. در صورت تمایل میتوانید آن را  ویرایش کنید
       @endif
     </p>
   </div>
@@ -41,13 +41,8 @@
       :selectedDate="$selectedDate"
       :workSchedule="$workSchedule"
       :clinicId="$selectedClinicId"
-      :isEditable="$isEditable"
       wire:key="special-workhours-{{ $selectedDate ?? 'default' }}" />
     <div class="d-flex justify-content-center gap-2 mt-3">
-      <button class="btn btn-primary w-100 h-50" wire:click="enableEditing"
-        {{ $isProcessing || $isPastDate || $isEditable ? 'disabled' : '' }}>
-        ویرایش ساعات کاری
-      </button>
       <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
         {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
         تعطیل کردن
@@ -62,7 +57,6 @@
       :selectedDate="$selectedDate"
       :workSchedule="$workSchedule"
       :clinicId="$selectedClinicId"
-      :isEditable="true"
       wire:key="special-workhours-{{ $selectedDate ?? 'default' }}" />
     <div class="d-flex justify-content-center gap-2 mt-3">
       <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
@@ -96,6 +90,29 @@
   </div>
 
   <script>
+    function initializeTimepicker() {
+    $(".timepicker-ui").each(function () {
+        if (!$(this).data("timepicker-initialized")) {
+            try {
+                const options = {
+                    clockType: "24h",
+                    theme: "basic",
+                    mobile: true,
+                    enableScrollbar: true,
+                    disableTimeRangeValidation: false,
+                    autoClose: true,
+                };
+                const timepicker = new window.tui.TimepickerUI(this, options);
+                timepicker.create();
+                $(this).data("timepicker-initialized", true);
+            } catch (e) {
+                console.error("Error initializing timepicker:", e);
+            }
+        }
+    });
+}
+
+initializeTimepicker();
     window.holidaysData = @json($holidaysData) || {
       status: true,
       holidays: []
@@ -106,8 +123,12 @@
     };
 
     document.addEventListener("livewire:initialized", () => {
-      console.log('Livewire initialized for SpecialDaysAppointment');
-
+ Livewire.on('refresh-timepicker', () => {
+        console.log('Received refresh-timepicker event');
+        setTimeout(() => {
+          initializeTimepicker();
+        }, 100);
+      });
       window.holidaysData = @json($holidaysData) || {
         status: true,
         holidays: []
@@ -125,11 +146,9 @@
       }
 
       window.addEventListener('openXModal', event => {
-        console.log('openXModal event received:', event.detail);
         const modalId = event.detail.id;
         if (modalId) {
           window.openXModal(modalId);
-          console.log(`Modal ${modalId} opened`);
           // اطمینان از رفرش محتوای مودال
           Livewire.dispatch('refreshWorkhours');
         } else {
@@ -138,25 +157,21 @@
       });
 
       window.addEventListener('closeXModal', event => {
-        console.log('closeXModal event received:', event.detail);
         const modalId = event.detail.id;
         if (modalId) {
           window.closeXModal(modalId);
-          console.log(`Modal ${modalId} closed`);
         } else {
           console.error('Modal ID not found in closeXModal event:', event.detail);
         }
       });
 
       Livewire.on('openTransferModal', (event) => {
-        console.log('openTransferModal event received:', event);
         const {
           modalId,
           gregorianDate
         } = event;
         if (modalId === 'transfer-modal' && gregorianDate) {
           window.openXModal(modalId);
-          console.log(`Transfer modal opened for date: ${gregorianDate}`);
         }
       });
 

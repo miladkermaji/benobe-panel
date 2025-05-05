@@ -31,7 +31,7 @@
         display: inline-block;
         font-family: var(--tooltip-font);
         isolation: isolate;
-        z-index: 9999;
+        z-index: 999;
     }
 
     .x-tooltip__trigger {

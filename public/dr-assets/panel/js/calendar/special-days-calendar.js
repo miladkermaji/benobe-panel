@@ -53,9 +53,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
                 console.warn("Livewire.dispatch is not available");
             }
 
-            console.log("window.holidaysData:", window.holidaysData);
-            console.log("window.appointmentsData:", window.appointmentsData);
-
             const holidays = window.holidaysData.status
                 ? window.holidaysData.holidays || []
                 : [];
@@ -65,8 +62,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
                       count: parseInt(item.count) || 0,
                   })) || []
                 : [];
-
-            console.log("Processed appointments:", appointments);
 
             return { holidays, appointments };
         } catch (error) {
@@ -81,7 +76,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
 
     async function generateCalendar(year, month) {
         if (isRendering) {
-            console.log("Calendar is already rendering, skipping...");
             return;
         }
         isRendering = true;
@@ -389,7 +383,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
     }
 
     Livewire.on("calendarDataUpdated", () => {
-        console.log("calendarDataUpdated event received");
         const yearSelect = document.querySelector("#special-days-year");
         const monthSelect = document.querySelector("#special-days-month");
         let year = parseInt(yearSelect?.value);
@@ -411,7 +404,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
     });
 
     Livewire.on("holidayUpdated", (event) => {
-        console.log("holidayUpdated event received:", event);
         const { date, isHoliday } = event;
 
         // آپدیت window.holidaysData
@@ -523,3 +515,4 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
         );
     }, 0);
 }
+
