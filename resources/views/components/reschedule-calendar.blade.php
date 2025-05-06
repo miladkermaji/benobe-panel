@@ -185,9 +185,8 @@
 }
 
 .reschedule-calendar-container .btn-primary {
-  background: var(--secondary);
   color: var(--background-card);
-  padding: 0.6rem 1.5rem;
+  padding: 0.4rem 1.2rem;
   border-radius: var(--radius-button);
   font-weight: 600;
   font-size: 0.9rem;
@@ -195,7 +194,6 @@
 }
 
 .reschedule-calendar-container .btn-primary:hover {
-  background: var(--secondary-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
