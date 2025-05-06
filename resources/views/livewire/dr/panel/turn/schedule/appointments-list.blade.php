@@ -7,7 +7,7 @@
   <div class="d-flex justify-content-center top-s-wrapper flex-wrap">
     <div class="calendar-and-add-sick-section p-3 w-100">
       <div class="c-a-wrapper">
-        <button class="selectDate_datepicker__xkZeS" wire:click="$dispatch('openXModal', { id: 'mini-calendar-modal' })">
+        <button class="selectDate_datepicker__xkZeS" x-data @click="$dispatch('open-modal',{name:'mini-calendar-modal'})">
           <span class="mx-1">{{ Jalalian::fromCarbon(Carbon::parse($selectedDate))->format('Y/m/d') }}</span>
           <img src="http://127.0.0.1:8000/dr-assets/icons/calendar.svg" alt="تقویم">
         </button>
@@ -15,7 +15,7 @@
           <input type="text" class="my-form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ..."
             wire:model.live.debounce.500ms="searchQuery">
         </div>
-        <button class="btn-primary" wire:click="$dispatch('openXModal', { id: 'add-sick-modal' })">
+        <button class="btn-primary" x-data @click="$dispatch('open-modal', { name: 'add-sick-modal' })">
           ثبت نوبت دستی
         </button>
       </div>
@@ -35,7 +35,8 @@
                 فیلتر
               </button>
               <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', '')">همه نوبت‌ها</a>
+                <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', '')">همه
+                    نوبت‌ها</a>
                 </li>
                 <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'scheduled')">در
                     انتظار</a></li>
@@ -60,12 +61,12 @@
             <span class="d-none d-md-block">لغو نوبت</span>
           </button>
           <button id="move-appointments-btn"
-            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
-            wire:click="$dispatch('openXModal', { id: 'reschedule-modal' })" disabled>
+            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" x-data
+            @click="$dispatch('open-modal', { name: 'reschedule-modal' })" disabled>
             <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="" srcset="">
             <span class="d-none d-md-block">جابجایی نوبت</span>
           </button>
-          <button id="block-users-btn" wire:click="$dispatch('openXModal', { id: 'block-user-modal' })"
+          <button id="block-users-btn" x-data @click="$dispatch('open-modal', { name: 'block-user-modal' })"
             class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
             <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="" srcset="">
             <span class="d-none d-md-block">مسدود کردن کاربر</span>
@@ -147,8 +148,8 @@
                     </td>
                     <td>
                       @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
-                        <button class="btn btn-sm btn-primary-sm shadow-sm end-visit-btn"
-                          wire:click="$dispatch('openXModal', { id: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">
+                        <button class="btn btn-sm btn-primary-sm shadow-sm end-visit-btn" x-data
+                          @click="$dispatch('open-modal', { name: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">
                           پایان ویزیت
                         </button>
                       @else
@@ -158,8 +159,8 @@
                     <td>
                       <div class="d-flex justify-content-center gap-2">
                         <x-custom-tooltip title="جابجایی نوبت" placement="top">
-                          <button class="btn btn-light rounded-circle shadow-sm reschedule-btn"
-                            wire:click="$dispatch('openXModal', { id: 'reschedule-modal', appointmentId: {{ $appointment->id }} })"
+                          <button class="btn btn-light rounded-circle shadow-sm reschedule-btn" x-data
+                            @click="$dispatch('open-modal', { name: 'reschedule-modal', appointmentId: {{ $appointment->id }} })"
                             {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
                             <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="جابجایی">
                           </button>
@@ -172,8 +173,8 @@
                           </button>
                         </x-custom-tooltip>
                         <x-custom-tooltip title="مسدود کردن کاربر" placement="top">
-                          <button class="btn btn-light rounded-circle shadow-sm block-btn"
-                            wire:click="$dispatch('openXModal', { id: 'block-user-modal', appointmentId: {{ $appointment->id }} })">
+                          <button class="btn btn-light rounded-circle shadow-sm block-btn" x-data
+                            @click="$dispatch('open-modal', { name: 'block-user-modal', appointmentId: {{ $appointment->id }} })">
                             <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="مسدود کردن">
                           </button>
                         </x-custom-tooltip>
@@ -269,8 +270,8 @@
                   <div class="card-item d-none details">
                     <span class="label">پایان ویزیت:</span>
                     @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
-                      <button class="btn btn-sm btn-primary shadow-sm end-visit-btn"
-                        wire:click="$dispatch('openXModal', { id: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">
+                      <button class="btn btn-sm btn-primary shadow-sm end-visit-btn" x-data
+                        @click="$dispatch('open-modal', { name: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">
                         پایان ویزیت
                       </button>
                     @else
@@ -279,8 +280,8 @@
                   </div>
                   <div class="card-actions">
                     <x-custom-tooltip title="جابجایی نوبت" placement="top">
-                      <button class="btn btn-light rounded-circle shadow-sm reschedule-btn"
-                        wire:click="$dispatch('openXModal', { id: 'reschedule-modal', appointmentId: {{ $appointment->id }} })"
+                      <button class="btn btn-light rounded-circle shadow-sm reschedule-btn" x-data
+                        @click="$dispatch('open-modal', { name: 'reschedule-modal', appointmentId: {{ $appointment->id }} })"
                         {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
                         <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="جابجایی">
                       </button>
@@ -293,8 +294,8 @@
                       </button>
                     </x-custom-tooltip>
                     <x-custom-tooltip title="مسدود کردن کاربر" placement="top">
-                      <button class="btn btn-light rounded-circle shadow-sm block-btn"
-                        wire:click="$dispatch('openXModal', { id: 'block-user-modal', appointmentId: {{ $appointment->id }} })">
+                      <button class="btn btn-light rounded-circle shadow-sm block-btn" x-data
+                        @click="$dispatch('open-modal', { name: 'block-user-modal', appointmentId: {{ $appointment->id }} })">
                         <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="مسدود کردن">
                       </button>
                     </x-custom-tooltip>
@@ -316,7 +317,6 @@
 
 
     </div>
-
     <div class="pagination-container mt-3 d-flex justify-content-center">
       <nav aria-label="Page navigation">
         <ul class="pagination" id="pagination-links">
@@ -353,202 +353,222 @@
     </div>
 
     <!-- مودال‌ها -->
+    <!-- مودال‌ها -->
     <div wire:ignore>
-      <x-custom-modal id="mini-calendar-modal" title="انتخاب تاریخ" size="sm" :show="false">
-        <x-jalali-calendar />
-      </x-custom-modal>
+      <x-modal name="mini-calendar-modal" title="انتخاب تاریخ" size="sm">
+        <x-slot:body>
+          <x-jalali-calendar />
+        </x-slot:body>
+      </x-modal>
     </div>
 
-    <x-custom-modal id="add-sick-modal" title="ثبت نوبت دستی" size="md" :show="false">
-      <form action="" method="post">
-        <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع">
-        <div class="mt-2">
-          <a class="text-decoration-none text-primary-link fw-bold" href="#"
-            wire:click="$dispatch('openXModal', { id: 'paziresh-modal' })">پذیرش از مسیر ارجاع</a>
-        </div>
-        <div class="d-flex mt-3 gap-20">
-          <button class="btn my-btn-primary w-100 h-50">تجویز نسخه</button>
-          <button class="btn btn-outline-info w-100 h-50">ثبت ویزیت</button>
-        </div>
-      </form>
-    </x-custom-modal>
-
-    <x-custom-modal id="paziresh-modal" title="ارجاع" size="md" :show="false">
-      <form action="" method="post">
-        <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع بیمار">
-        <input type="text" class="my-form-control-light w-100 mt-3" placeholder="کد پیگیری">
-        <div class="mt-3 w-100">
-          <button class="btn my-btn-primary w-100 h-50">ثبت</button>
-        </div>
-      </form>
-    </x-custom-modal>
-
-    <div>
-      <div wire:ignore>
-        <x-custom-modal id="reschedule-modal" title="جابجایی نوبت" size="lg" :show="false">
-          <x-reschedule-calendar :appointmentId="$rescheduleAppointmentIds ? $rescheduleAppointmentIds : [$rescheduleAppointmentId]" />
-          <x-custom-alert id="reschedule-confirm-alert" type="warning" title="تأیید جابجایی نوبت" message=""
-            size="md" :show="false" />
-          <x-custom-alert id="reschedule-error-alert" type="error" title="خطا"
-            message="هیچ نوبت انتخاب‌شده‌ای یافت نشد. لطفاً حداقل یک نوبت را انتخاب کنید." size="md"
-            :show="false" />
-        </x-custom-modal>
-      </div>
-    </div>
-
-    <div wire:ignore>
-      <x-custom-modal id="block-user-modal" title="مسدود کردن کاربر" size="md" :show="false">
-        <form wire:submit.prevent="blockMultipleUsers">
-          <div class="mb-4 position-relative">
-            <label for="blockedAt" class="label-top-input-special-takhasos">تاریخ شروع مسدودیت</label>
-            <input data-jdp type="text" class="form-control h-50" id="blockedAt" wire:model.live="blockedAt">
-            @error('blockedAt')
-              <span class="text-danger">{{ $message }}</span>
-            @enderror
+    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="md">
+      <x-slot:body>
+        <form action="" method="post">
+          <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع">
+          <div class="mt-2">
+            <a class="text-decoration-none text-primary-link fw-bold" href="#" x-data
+              @click="$dispatch('open-modal', { name: 'paziresh-modal' })">پذیرش از مسیر ارجاع</a>
           </div>
-          <div class="mb-4 position-relative">
-            <label for="unblockedAt" class="label-top-input-special-takhasos">تاریخ پایان مسدودیت (اختیاری)</label>
-            <input data-jdp type="text" class="form-control h-50" id="unblockedAt" wire:model.live="unblockedAt">
-            @error('unblockedAt')
-              <span class="text-danger">{{ $message }}</span>
-            @enderror
+          <div class="d-flex mt-3 gap-20">
+            <button class="btn my-btn-primary w-100 h-50">تجویز نسخه</button>
+            <button class="btn btn-outline-info w-100 h-50">ثبت ویزیت</button>
           </div>
-          <div class="mb-4 position-relative">
-            <textarea class="form-control" id="blockReason" rows="3" wire:model.live="blockReason"
-              placeholder="دلیل مسدودیت را وارد کنید..."></textarea>
-            @error('blockReason')
-              <span class="text-danger">{{ $message }}</span>
-            @enderror
-          </div>
-          <button type="submit" class="btn my-btn-primary w-100 h-50">مسدود کردن</button>
         </form>
-      </x-custom-modal>
+      </x-slot:body>
+
+
+    </x-modal>
+
+    <x-modal name="paziresh-modal" title="ارجاع" size="md">
+      <x-slot:body>
+
+        <form action="" method="post">
+          <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع بیمار">
+          <input type="text" class="my-form-control-light w-100 mt-3" placeholder="کد پیگیری">
+          <div class="mt-3 w-100">
+            <button class="btn my-btn-primary w-100 h-50">ثبت</button>
+          </div>
+        </form>
+      </x-slot:body>
+
+    </x-modal>
+
+    <div wire:ignore>
+      <x-modal name="reschedule-modal" title="جابجایی نوبت" size="lg">
+        <x-slot:body>
+
+          <x-reschedule-calendar :appointmentId="$rescheduleAppointmentIds ? $rescheduleAppointmentIds : [$rescheduleAppointmentId]" />
+        </x-slot:body>
+      </x-modal>
     </div>
 
     <div wire:ignore>
-      <x-custom-modal id="end-visit-modal" title="پایان ویزیت" size="lg" :show="false">
-        <form wire:submit.prevent="endVisit({{ $endVisitAppointmentId ?? 'null' }})">
-          <div class="row g-2">
-            <div class="col-12">
-              <div class="border rounded p-2 bg-light">
-                <label class="form-label fw-bold mb-1">انتخاب بیمه</label>
-                @if (count($insurances) > 0)
-                  @foreach ($insurances as $index => $insurance)
-                    <div class="form-check mb-1">
-                      <input class="form-check-input" type="radio" name="selectedInsuranceId"
-                        id="insurance_{{ $insurance['id'] }}" wire:model.live="selectedInsuranceId"
-                        value="{{ $insurance['id'] }}">
-                      <label class="form-check-label"
-                        for="insurance_{{ $insurance['id'] }}">{{ $insurance['name'] }}</label>
-                    </div>
-                  @endforeach
-                @else
-                  <p class="text-danger small mb-0">هیچ بیمه‌ای یافت نشد.</p>
-                @endif
-                @error('selectedInsuranceId')
-                  <span class="text-danger small">{{ $message }}</span>
-                @enderror
-              </div>
+
+      <x-modal name="block-user-modal" title="مسدود کردن کاربر" size="md">
+        <x-slot:body>
+
+          <form wire:submit.prevent="blockMultipleUsers">
+            <div class="mb-4 position-relative">
+              <label for="blockedAt" class="label-top-input-special-takhasos">تاریخ شروع مسدودیت</label>
+              <input data-jdp type="text" class="form-control h-50" id="blockedAt" wire:model.live="blockedAt">
+              @error('blockedAt')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
             </div>
-            <div class="col-12">
-              <div class="border rounded p-2 bg-light services-checkbox-container">
-                <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
-                <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
-                  @if (count($services) > 0)
-                    @foreach ($services as $service)
+            <div class="mb-4 position-relative">
+              <label for="unblockedAt" class="label-top-input-special-takhasos">تاریخ پایان مسدودیت
+                (اختیاری)</label>
+              <input data-jdp type="text" class="form-control h-50" id="unblockedAt"
+                wire:model.live="unblockedAt">
+              @error('unblockedAt')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+            <div class="mb-4 position-relative">
+              <textarea class="form-control" id="blockReason" rows="3" wire:model.live="blockReason"
+                placeholder="دلیل مسدودیت را وارد کنید..."></textarea>
+              @error('blockReason')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+            <button type="submit" class="btn my-btn-primary w-100 h-50">مسدود کردن</button>
+          </form>
+        </x-slot:body>
+
+      </x-modal>
+    </div>
+
+    <div wire:ignore>
+      <x-modal name="end-visit-modal" title="پایان ویزیت" size="lg">
+        <x-slot:body>
+
+          <form wire:submit.prevent="endVisit({{ $endVisitAppointmentId ?? 'null' }})">
+            <div class="row g-2">
+              <div class="col-12">
+                <div class="border rounded p-2 bg-light">
+                  <label class="form-label fw-bold mb-1">انتخاب بیمه</label>
+                  @if (count($insurances) > 0)
+                    @foreach ($insurances as $index => $insurance)
                       <div class="form-check mb-1">
-                        <input class="form-check-input" type="checkbox" id="service_{{ $service['id'] }}"
-                          wire:model.live="selectedServiceIds" value="{{ $service['id'] }}"
-                          wire:key="service-{{ $service['id'] }}">
-                        <label class="form-check-label" for="service_{{ $service['id'] }}">
-                          {{ $service['name'] }} ({{ number_format($service['price']) }} تومان)
-                        </label>
+                        <input class="form-check-input" type="radio" name="selectedInsuranceId"
+                          id="insurance_{{ $insurance['id'] }}" wire:model.live="selectedInsuranceId"
+                          value="{{ $insurance['id'] }}">
+                        <label class="form-check-label"
+                          for="insurance_{{ $insurance['id'] }}">{{ $insurance['name'] }}</label>
                       </div>
                     @endforeach
                   @else
-                    <p class="text-danger small mb-0">هیچ خدمتی یافت نشد.</p>
+                    <p class="text-danger small mb-0">هیچ بیمه‌ای یافت نشد.</p>
                   @endif
-                </div>
-                @error('selectedServiceIds')
-                  <span class="text-danger small">{{ $message }}</span>
-                @enderror
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="border rounded p-2 bg-light">
-                <div class="form-check mb-0">
-                  <input type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
-                  <label class="form-check-label" for="isFree">ویزیت رایگان</label>
+                  @error('selectedInsuranceId')
+                    <span class="text-danger small">{{ $message }}</span>
+                  @enderror
                 </div>
               </div>
-            </div>
-            <div class="col-md-6">
-              <div class="border rounded p-2 bg-light">
-                <label class="form-label fw-bold mb-1">تخفیف</label>
-                <input type="text" class="form-control" readonly
-                  wire:click="$dispatch('openXModal', { id: 'discount-modal' })"
-                  value="{{ $discountPercentage ? number_format($discountPercentage, 2) . '%' : '' }}"
-                  @if ($isFree) disabled @endif>
-                @error('discountPercentage')
-                  <span class="text-danger small">{{ $message }}</span>
-                @enderror
+              <div class="col-12">
+                <div class="border rounded p-2 bg-light services-checkbox-container">
+                  <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
+                  <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
+                    @if (count($services) > 0)
+                      @foreach ($services as $service)
+                        <div class="form-check mb-1">
+                          <input class="form-check-input" type="checkbox" id="service_{{ $service['id'] }}"
+                            wire:model.live="selectedServiceIds" value="{{ $service['id'] }}"
+                            wire:key="service-{{ $service['id'] }}">
+                          <label class="form-check-label" for="service_{{ $service['id'] }}">
+                            {{ $service['name'] }} ({{ number_format($service['price']) }}
+                            تومان)
+                          </label>
+                        </div>
+                      @endforeach
+                    @else
+                      <p class="text-danger small mb-0">هیچ خدمتی یافت نشد.</p>
+                    @endif
+                  </div>
+                  @error('selectedServiceIds')
+                    <span class="text-danger small">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="border rounded p-2 bg-light">
+                  <div class="form-check mb-0">
+                    <input type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
+                    <label class="form-check-label" for="isFree">ویزیت رایگان</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="border rounded p-2 bg-light">
+                  <label class="form-label fw-bold mb-1">تخفیف</label>
+                  <input type="text" class="form-control" readonly x-data
+                    @click="$dispatch('open-modal', { name: 'discount-modal' })"
+                    value="{{ $discountPercentage ? number_format($discountPercentage, 2) . '%' : '' }}"
+                    @if ($isFree) disabled @endif>
+                  @error('discountPercentage')
+                    <span class="text-danger small">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="border rounded p-2 bg-light">
+                  <label class="form-label fw-bold mb-1">قیمت نهایی</label>
+                  <input type="text" class="form-control" readonly value="{{ number_format($finalPrice) }} تومان"
+                    @if ($isFree) disabled @endif>
+                  @error('finalPrice')
+                    <span class="text-danger small">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="border rounded p-2 bg-light">
+                  <label class="form-label fw-bold mb-1">توضیحات درمان</label>
+                  <textarea class="form-control" rows="2" wire:model.live="endVisitDescription"
+                    placeholder="توضیحات درمان را وارد کنید..."></textarea>
+                </div>
               </div>
             </div>
-            <div class="col-md-6">
-              <div class="border rounded p-2 bg-light">
-                <label class="form-label fw-bold mb-1">قیمت نهایی</label>
-                <input type="text" class="form-control" readonly value="{{ number_format($finalPrice) }} تومان"
-                  @if ($isFree) disabled @endif>
-                @error('finalPrice')
-                  <span class="text-danger small">{{ $message }}</span>
-                @enderror
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="border rounded p-2 bg-light">
-                <label class="form-label fw-bold mb-1">توضیحات درمان</label>
-                <textarea class="form-control" rows="2" wire:model.live="endVisitDescription"
-                  placeholder="توضیحات درمان را وارد کنید..."></textarea>
-              </div>
-            </div>
-          </div>
-          <button type="submit" class="btn my-btn-primary w-100 mt-2">ثبت</button>
-        </form>
-      </x-custom-modal>
+            <button type="submit" class="btn my-btn-primary w-100 mt-2">ثبت</button>
+          </form>
+        </x-slot:body>
+
+      </x-modal>
     </div>
 
     <div wire:ignore>
-      <x-custom-modal id="discount-modal" title="اعمال تخفیف" size="md" :show="false">
-        <form wire:submit.prevent="applyDiscount">
-          <div class="mb-3">
-            <label class="form-label">درصد تخفیف</label>
-            <input type="number" class="form-control" wire:model.live="discountInputPercentage"
-              placeholder="درصد تخفیف را وارد کنید" min="0" max="100" step="0.01"
-              @if ($isFree) disabled @endif>
-            @error('discountInputPercentage')
-              <span class="text-danger">{{ $message }}</span>
-            @enderror
-          </div>
-          <div class="mb-3">
-            <label class="form-label">مبلغ تخفیف</label>
-            <input type="number" class="form-control" wire:model.live="discountInputAmount"
-              placeholder="مبلغ تخفیف را وارد کنید" min="0" step="1"
-              @if ($isFree) disabled @endif>
-            @error('discountInputAmount')
-              <span class="text-danger">{{ $message }}</span>
-            @enderror
-          </div>
-          <button type="submit" class="btn my-btn-primary w-100 h-50"
-            @if ($isFree) disabled @endif>تأیید</button>
-        </form>
-      </x-custom-modal>
+      <x-modal name="discount-modal" title="اعمال تخفیف" size="md">
+        <x-slot:body>
+
+          <form wire:submit.prevent="applyDiscount">
+            <div class="mb-3">
+              <label class="form-label">درصد تخفیف</label>
+              <input type="number" class="form-control" wire:model.live="discountInputPercentage"
+                placeholder="درصد تخفیف را وارد کنید" min="0" max="100" step="0.01"
+                @if ($isFree) disabled @endif>
+              @error('discountInputPercentage')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+            <div class="mb-3">
+              <label class="form-label">مبلغ تخفیف</label>
+              <input type="number" class="form-control" wire:model.live="discountInputAmount"
+                placeholder="مبلغ تخفیف را وارد کنید" min="0" step="1"
+                @if ($isFree) disabled @endif>
+              @error('discountInputAmount')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+            <button type="submit" class="btn my-btn-primary w-100 h-50"
+              @if ($isFree) disabled @endif>تأیید
+            </button>
+          </form>
+        </x-slot:body>
+
+      </x-modal>
     </div>
 
-    <div wire:ignore>
-      <x-custom-alert id="no-results-alert" type="warning" title="نتیجه‌ای یافت نشد"
-        message="هیچ نتیجه‌ای برای جستجوی شما یافت نشد. آیا می‌خواهید در همه سوابق و نوبت‌ها جستجو کنید؟"
-        size="md" :show="$showNoResultsAlert" />
-    </div>
+
 
     <script>
       const toggleButtons = document.querySelectorAll('.appointment-card .toggle-details');
@@ -596,9 +616,14 @@
         }
 
         window.addEventListener('openXModal', event => {
-          const modalId = event.detail.id;
+          console.log('jiiii');
+
+          const modalId = event.detail.name;
           const appointmentId = event.detail.appointmentId || null;
-          window.openXModal(modalId);
+
+          // Alpine خودش این ایونت رو هندل می‌کنه با x-on:openXModal.window
+
+          // حالا Livewire
           if (appointmentId && modalId === 'reschedule-modal') {
             @this.set('rescheduleAppointmentId', appointmentId);
             @this.set('rescheduleAppointmentIds', [appointmentId]);
@@ -606,13 +631,14 @@
             const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
             const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
             @this.set('rescheduleAppointmentIds', selectedIds);
-            @this.loadCalendarData();
+            @this.call('loadCalendarData');
           } else if (modalId === 'end-visit-modal' && appointmentId) {
             @this.set('endVisitAppointmentId', appointmentId);
           } else if (appointmentId && modalId === 'block-user-modal') {
             @this.set('blockAppointmentId', appointmentId);
           }
         });
+
 
         Livewire.on('calendarDataUpdated', () => {
           window.holidaysData = @json($holidaysData);
@@ -621,6 +647,242 @@
 
         Livewire.on('refresh', () => {
           initializeDropdowns();
+        });
+        Livewire.on('no-results-found', (event) => {
+          if (event.searchAll) {
+            const tbody = document.querySelector('tbody');
+            if (tbody) {
+              tbody.innerHTML = `
+              <tr>
+                <td colspan="13" class="text-center">نتیجه‌ای یافت نشد</td>
+              </tr>
+            `;
+            }
+            const cardsContainer = document.querySelector('.appointments-cards');
+            if (cardsContainer) {
+              cardsContainer.innerHTML = `
+              <div class="text-center p-3">نتیجه‌ای یافت نشد</div>
+            `;
+            }
+          }
+        });
+
+        Livewire.on('show-partial-reschedule-confirm', (event) => {
+          const data = event[0] || {};
+          const {
+            message,
+            appointmentIds,
+            newDate,
+            nextDate,
+            availableSlots
+          } = data;
+
+          if (!message || !appointmentIds || !newDate || !nextDate || !availableSlots) {
+            console.error('Invalid data received in show-partial-reschedule-confirm', data);
+            Swal.fire({
+              title: 'خطا',
+              text: 'داده‌های نامعتبر دریافت شد. لطفاً دوباره تلاش کنید.',
+              icon: 'error',
+              confirmButtonText: 'باشه',
+            });
+            return;
+          }
+
+          Swal.fire({
+            title: 'تأیید جابجایی ناقص',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'بله، منتقل کن',
+            cancelButtonText: 'خیر',
+            reverseButtons: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Livewire.dispatchTo(
+                'dr.panel.turn.schedule.appointments-list',
+                'confirm-partial-reschedule',
+                [appointmentIds, newDate, nextDate, availableSlots]
+              );
+              window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: {
+                  name: 'reschedule-modal'
+                },
+              }));
+            }
+          });
+        });
+
+        Livewire.on('show-first-available-confirm', (event) => {
+          const data = event[0] || {};
+          const {
+            message,
+            appointmentIds,
+            newDate,
+            availableSlots,
+            isFullCapacity,
+            nextDate
+          } = data;
+
+          if (!message || !appointmentIds || !newDate || !availableSlots) {
+            console.error('Invalid data in show-first-available-confirm', data);
+            Swal.fire({
+              title: 'خطا',
+              text: 'داده‌های نامعتبر دریافت شد.',
+              icon: 'error',
+              confirmButtonText: 'باشه',
+            });
+            return;
+          }
+
+          const swalOptions = {
+            title: 'تأیید جابجایی به اولین نوبت خالی',
+            text: message,
+            icon: isFullCapacity ? 'info' : 'warning',
+            showCancelButton: true,
+            confirmButtonText: isFullCapacity ? 'انتقال نوبت‌ها' : 'انتقال ناقص',
+            cancelButtonText: 'لغو',
+            reverseButtons: true,
+          };
+
+          if (!isFullCapacity) {
+            swalOptions.showDenyButton = true;
+            swalOptions.denyButtonText = 'انتقال کامل به تاریخ با ظرفیت کافی';
+          }
+
+          Swal.fire(swalOptions).then((result) => {
+            if (result.isConfirmed) {
+              if (isFullCapacity) {
+                Livewire.dispatchTo(
+                  'dr.panel.turn.schedule.appointments-list',
+                  'rescheduleAppointment',
+                  [appointmentIds, newDate]
+                );
+              } else {
+                Livewire.dispatchTo(
+                  'dr.panel.turn.schedule.appointments-list',
+                  'confirm-partial-reschedule',
+                  [appointmentIds, newDate, nextDate, availableSlots]
+                );
+              }
+              window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: {
+                  name: 'reschedule-modal'
+                },
+              }));
+            } else if (result.isDenied && !isFullCapacity) {
+              Livewire.dispatchTo(
+                'dr.panel.turn.schedule.appointments-list',
+                'rescheduleAppointment',
+                [appointmentIds, nextDate]
+              );
+              window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: {
+                  name: 'reschedule-modal'
+                },
+              }));
+            }
+          });
+        });
+
+        Livewire.on('services-updated', () => {
+          Livewire.dispatch('get-services', {});
+        });
+
+        Livewire.on('services-received', (services) => {
+          const container = document.querySelector('.services-checkbox-container .checkbox-area');
+          if (container) {
+            container.innerHTML = '';
+            const flatServices = services[0] || [];
+            if (flatServices.length === 0) {
+              container.innerHTML = '<p class="text-danger">هیچ خدمتی یافت نشد.</p>';
+              return;
+            }
+
+            flatServices.forEach(service => {
+              const div = document.createElement('div');
+              div.className = 'form-check';
+              div.innerHTML = `
+              <input class="form-check-input" type="checkbox"
+                     id="service_${service.id}"
+                     wire:model.live="selectedServiceIds"
+                     value="${service.id}">
+              <label class="form-check-label" for="service_${service.id}">
+                  ${service.name} (${new Intl.NumberFormat('fa-IR').format(service.price)} تومان)
+              </label>
+            `;
+              container.appendChild(div);
+            });
+          } else {
+            console.warn('Services container not found');
+          }
+        });
+
+        Livewire.on('discount-updated', () => {
+          const percentageInput = document.querySelector('input[wire\\:model\\.live="discountInputPercentage"]');
+          const amountInput = document.querySelector('input[wire\\:model\\.live="discountInputAmount"]');
+          if (percentageInput && amountInput) {
+            percentageInput.value = @this.get('discountInputPercentage') || 0;
+            amountInput.value = @this.get('discountInputAmount') || 0;
+          }
+        });
+
+        Livewire.on('close-modal', (event) => {
+          const modalId = event?.name || (event && event[0]?.name) || null;
+          if (modalId) {
+            window.dispatchEvent(new CustomEvent('close-modal', {
+              detail: {
+                name: modalId
+              }
+            }));
+
+          } else {
+            console.warn('Modal ID not found, attempting to close all open modals');
+            document.querySelectorAll('.modal.show').forEach(modal => {
+              if (modal.name) {
+                window.dispatchEvent(new CustomEvent('close-modal', {
+                  detail: {
+                    name: modalId
+                  }
+                }));
+
+              }
+            });
+          }
+        });
+
+        Livewire.on('discount-applied', () => {
+          const discountInput = document.querySelector(
+            'input[wire\\:click*="$dispatch(\'openXModal\', { id: \'discount-modal\' })"]');
+          if (discountInput) {
+            const percentage = @this.get('discountPercentage');
+            discountInput.value = percentage ? `${parseFloat(percentage).toFixed(2)}%` : '';
+          }
+
+          window.dispatchEvent(new CustomEvent('close-modal', {
+            detail: {
+              name: 'discount-modal'
+            }
+          }));
+
+        });
+
+        Livewire.on('final-price-updated', () => {
+          const priceInput = document.querySelector('input[value*="{{ number_format($finalPrice) }} تومان"]');
+          const discountInput = document.querySelector(
+            'input[wire\\:click*="$dispatch(\'openXModal\', { id: \'discount-modal\' })"]'
+          );
+          const isFree = @this.get('isFree');
+          const finalPrice = @this.get('finalPrice');
+          const discountPercentage = @this.get('discountPercentage');
+
+          if (priceInput) {
+            priceInput.value = `${new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان`;
+            priceInput.disabled = isFree;
+          }
+          if (discountInput) {
+            discountInput.value = discountPercentage ? `${parseFloat(discountPercentage).toFixed(2)}%` : '';
+            discountInput.disabled = isFree;
+          }
         });
 
         function initializeDropdowns() {
@@ -832,245 +1094,22 @@
         });
 
         Livewire.on('show-no-results-alert', (event) => {
-          window.openXAlert('no-results-alert');
-          const alert = document.getElementById('no-results-alert');
-          if (alert) {
-            const confirmButton = alert.querySelector('.x-alert__button--confirm');
-            const cancelButton = alert.querySelector('.x-alert__button--cancel');
-            const newConfirmButton = confirmButton.cloneNode(true);
-            const newCancelButton = cancelButton.cloneNode(true);
-            confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
-            cancelButton.parentNode.replaceChild(newCancelButton, cancelButton);
-            newConfirmButton.addEventListener('click', () => {
-              @this.dispatch('confirm-search-all-dates');
-              window.closeXAlert('no-results-alert');
-            });
-            newCancelButton.addEventListener('click', () => {
-              window.closeXAlert('no-results-alert');
-            });
-          }
-        });
-
-        Livewire.on('hide-no-results-alert', () => {
-          window.closeXAlert('no-results-alert');
-        });
-
-        Livewire.on('no-results-found', (event) => {
-          if (event.searchAll) {
-            const tbody = document.querySelector('tbody');
-            if (tbody) {
-              tbody.innerHTML = `
-              <tr>
-                <td colspan="13" class="text-center">نتیجه‌ای یافت نشد</td>
-              </tr>
-            `;
-            }
-            const cardsContainer = document.querySelector('.appointments-cards');
-            if (cardsContainer) {
-              cardsContainer.innerHTML = `
-              <div class="text-center p-3">نتیجه‌ای یافت نشد</div>
-            `;
-            }
-          }
-        });
-
-        Livewire.on('show-partial-reschedule-confirm', (event) => {
-          const data = event[0] || {};
-          const {
-            message,
-            appointmentIds,
-            newDate,
-            nextDate,
-            availableSlots
-          } = data;
-
-          if (!message || !appointmentIds || !newDate || !nextDate || !availableSlots) {
-            console.error('Invalid data received in show-partial-reschedule-confirm', data);
-            Swal.fire({
-              title: 'خطا',
-              text: 'داده‌های نامعتبر دریافت شد. لطفاً دوباره تلاش کنید.',
-              icon: 'error',
-              confirmButtonText: 'باشه'
-            });
-            return;
-          }
-
           Swal.fire({
-            title: 'تأیید جابجایی ناقص',
-            text: message,
+            title: 'نتیجه‌ای یافت نشد',
+            text: 'هیچ نتیجه‌ای برای جستجوی شما یافت نشد. آیا می‌خواهید در همه سوابق و نوبت‌ها جستجو کنید؟',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'بله، منتقل کن',
-            cancelButtonText: 'خیر',
-            reverseButtons: true
-          }).then((result) => {
-            if (result.isConfirmed) {
-              Livewire.dispatchTo(
-                'dr.panel.turn.schedule.appointments-list',
-                'confirm-partial-reschedule',
-                [appointmentIds, newDate, nextDate, availableSlots]
-              );
-              setTimeout(() => {
-                window.closeXModal('reschedule-modal');
-              }, 100);
-            } else {
-              window.closeXAlert('reschedule-confirm-alert');
-            }
-          });
-        });
-
-        Livewire.on('show-first-available-confirm', (event) => {
-          const data = event[0] || {};
-          const {
-            message,
-            appointmentIds,
-            newDate,
-            availableSlots,
-            isFullCapacity,
-            nextDate
-          } = data;
-
-          if (!message || !appointmentIds || !newDate || !availableSlots) {
-            console.error('Invalid data in show-first-available-confirm', data);
-            Swal.fire({
-              title: 'خطا',
-              text: 'داده‌های نامعتبر دریافت شد.',
-              icon: 'error',
-              confirmButtonText: 'باشه',
-            });
-            return;
-          }
-
-          const swalOptions = {
-            title: 'تأیید جابجایی به اولین نوبت خالی',
-            text: message,
-            icon: isFullCapacity ? 'info' : 'warning',
-            showCancelButton: true,
-            confirmButtonText: isFullCapacity ? 'انتقال نوبت‌ها' : 'انتقال ناقص',
+            confirmButtonText: 'جستجوی همه',
             cancelButtonText: 'لغو',
             reverseButtons: true,
-          };
-
-          if (!isFullCapacity) {
-            swalOptions.showDenyButton = true;
-            swalOptions.denyButtonText = 'انتقال کامل به تاریخ با ظرفیت کافی';
-          }
-
-          Swal.fire(swalOptions).then((result) => {
+          }).then((result) => {
             if (result.isConfirmed) {
-              if (isFullCapacity) {
-                Livewire.dispatchTo(
-                  'dr.panel.turn.schedule.appointments-list',
-                  'rescheduleAppointment',
-                  [appointmentIds, newDate]
-                );
-              } else {
-                Livewire.dispatchTo(
-                  'dr.panel.turn.schedule.appointments-list',
-                  'confirm-partial-reschedule',
-                  [appointmentIds, newDate, nextDate, availableSlots]
-                );
-              }
-              window.closeXModal('reschedule-modal');
-            } else if (result.isDenied && !isFullCapacity) {
-              Livewire.dispatchTo(
-                'dr.panel.turn.schedule.appointments-list',
-                'rescheduleAppointment',
-                [appointmentIds, nextDate]
-              );
-              window.closeXModal('reschedule-modal');
-            } else {
-              window.closeXAlert('reschedule-confirm-alert');
+              Livewire.dispatch('confirm-search-all-dates');
             }
           });
         });
 
-        Livewire.on('services-updated', () => {
-          Livewire.dispatch('get-services', {});
-        });
 
-        Livewire.on('services-received', (services) => {
-          const container = document.querySelector('.services-checkbox-container .checkbox-area');
-          if (container) {
-            container.innerHTML = '';
-            const flatServices = services[0] || [];
-            if (flatServices.length === 0) {
-              container.innerHTML = '<p class="text-danger">هیچ خدمتی یافت نشد.</p>';
-              return;
-            }
-
-            flatServices.forEach(service => {
-              const div = document.createElement('div');
-              div.className = 'form-check';
-              div.innerHTML = `
-              <input class="form-check-input" type="checkbox"
-                     id="service_${service.id}"
-                     wire:model.live="selectedServiceIds"
-                     value="${service.id}">
-              <label class="form-check-label" for="service_${service.id}">
-                  ${service.name} (${new Intl.NumberFormat('fa-IR').format(service.price)} تومان)
-              </label>
-            `;
-              container.appendChild(div);
-            });
-          } else {
-            console.warn('Services container not found');
-          }
-        });
-
-        Livewire.on('discount-updated', () => {
-          const percentageInput = document.querySelector('input[wire\\:model\\.live="discountInputPercentage"]');
-          const amountInput = document.querySelector('input[wire\\:model\\.live="discountInputAmount"]');
-          if (percentageInput && amountInput) {
-            percentageInput.value = @this.get('discountInputPercentage') || 0;
-            amountInput.value = @this.get('discountInputAmount') || 0;
-          }
-        });
-
-        Livewire.on('hideModal', (event) => {
-          const modalId = event?.id || (event && event[0]?.id) || null;
-          if (modalId) {
-            window.closeXModal(modalId);
-          } else {
-            console.warn('Modal ID not found, attempting to close all open modals');
-            document.querySelectorAll('.modal.show').forEach(modal => {
-              if (modal.id) {
-                window.closeXModal(modal.id);
-              }
-            });
-          }
-        });
-
-        Livewire.on('discount-applied', () => {
-          const discountInput = document.querySelector(
-            'input[wire\\:click*="$dispatch(\'openXModal\', { id: \'discount-modal\' })"]');
-          if (discountInput) {
-            const percentage = @this.get('discountPercentage');
-            discountInput.value = percentage ? `${parseFloat(percentage).toFixed(2)}%` : '';
-          }
-          window.closeXModal('discount-modal');
-        });
-
-        Livewire.on('final-price-updated', () => {
-          const priceInput = document.querySelector('input[value*="{{ number_format($finalPrice) }} تومان"]');
-          const discountInput = document.querySelector(
-            'input[wire\\:click*="$dispatch(\'openXModal\', { id: \'discount-modal\' })"]'
-          );
-          const isFree = @this.get('isFree');
-          const finalPrice = @this.get('finalPrice');
-          const discountPercentage = @this.get('discountPercentage');
-
-          if (priceInput) {
-            priceInput.value = `${new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان`;
-            priceInput.disabled = isFree;
-          }
-          if (discountInput) {
-            discountInput.value = discountPercentage ? `${parseFloat(discountPercentage).toFixed(2)}%` : '';
-            discountInput.disabled = isFree;
-          }
-        });
       });
     </script>
   </div>
-
-</div>

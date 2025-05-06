@@ -53,6 +53,7 @@ class AppointmentsList extends Component
         'per_page' => 10,
         'total' => 0,
     ];
+
     public $isSearchingAllDates = false;
     public $selectedMobiles = [];
     public $selectedInsuranceId;
@@ -122,6 +123,23 @@ class AppointmentsList extends Component
         }
     }
 
+    public function showNoResultsAlert()
+    {
+        $this->showNoResultsAlert = true;
+    }
+
+    public function hideNoResultsAlert()
+    {
+        $this->showNoResultsAlert = false;
+    }
+
+    public function confirmSearchAllDates()
+    {
+        // منطق جستجو در همه تاریخ‌ها
+        $this->isSearchingAllDates = true;
+        $this->showNoResultsAlert = false;
+        // به‌روزرسانی لیست نوبت‌ها
+    }
     public function loadCalendarData()
     {
         $this->holidaysData = [
@@ -459,7 +477,7 @@ class AppointmentsList extends Component
             'message' => 'نوبت‌ها با موفقیت جابجا شدند.'
         ]);
         $this->loadAppointments();
-        $this->dispatch('hideModal');
+        $this->dispatch('close-modal');
         $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
     }
 
@@ -604,7 +622,7 @@ class AppointmentsList extends Component
                 'message' => 'نوبت‌ها با موفقیت جابجا شدند.'
             ]);
             $this->loadAppointments();
-            $this->dispatch('hideModal');
+            $this->dispatch('close-modal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
         } catch (\Exception $e) {
             $this->dispatch('show-toastr', [
@@ -735,7 +753,7 @@ class AppointmentsList extends Component
                 ]);
             }
             $this->loadAppointments();
-            $this->dispatch('hideModal');
+            $this->dispatch('close-modal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
         } catch (\Exception $e) {
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطایی در جابجایی نوبت رخ داد: ' . $e->getMessage()]);
@@ -927,7 +945,7 @@ class AppointmentsList extends Component
         $this->calculateFinalPrice();
         $this->dispatch('discount-applied');
         // فقط مودال تخفیف بسته می‌شه
-        $this->dispatch('hideModal', ['id' => 'discount-modal']);
+        $this->dispatch('close-modal', ['id' => 'discount-modal']);
     }
 
     public function endVisit($appointmentId = null)
@@ -976,7 +994,7 @@ class AppointmentsList extends Component
             'payment_status' => $appointment->payment_status === 'pending' ? 'paid' : $appointment->payment_status,
         ]);
 
-        $this->dispatch('hideModal', ['id' => 'end-visit-modal']);
+        $this->dispatch('close-modal', ['id' => 'end-visit-modal']);
         $this->dispatch('show-toastr', [
             'type' => 'success',
             'message' => 'ویزیت با موفقیت ثبت شد.'
@@ -1261,7 +1279,7 @@ class AppointmentsList extends Component
                 'type' => 'success',
                 'message' => 'کاربر(ان) با موفقیت مسدود شدند.',
             ]);
-            $this->dispatch('hideModal', ['id' => 'block-user-modal']);
+            $this->dispatch('close-modal', ['id' => 'block-user-modal']);
             $this->loadBlockedUsers();
             $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId', 'selectedMobiles']);
         } catch (\Exception $e) {

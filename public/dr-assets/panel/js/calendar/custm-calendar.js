@@ -97,7 +97,11 @@ function initializeCalendar() {
                 }
 
                 // بستن مودال
-                window.closeXModal("mini-calendar-modal");
+                window.dispatchEvent(
+                    new CustomEvent("close-modal", {
+                        detail: { name: "mini-calendar-modal" },
+                    })
+                );
 
                 // حذف backdrop
                 const existingBackdrops =
@@ -245,19 +249,10 @@ function initializeCalendar() {
 
 // اجرای تقویم وقتی مودال باز می‌شه
 document.addEventListener("livewire:initialized", () => {
-    // گوش دادن به رویداد openXModal
-    window.addEventListener("openXModal", (event) => {
-        const modalId = event.detail.id;
-
-        if (modalId === "mini-calendar-modal") {
-            setTimeout(() => {
-                initializeCalendar();
-            }, 100); // تأخیر برای اطمینان از رندر DOM
-        }
-    });
+    initializeCalendar();
 
     // نگه‌داری پشتیبانی از showModal برای مودال‌های دیگر
-    Livewire.on("showModal", (modalId) => {
+    Livewire.on("open-modal", (modalId) => {
         if (modalId === "mini-calendar-modal") {
             setTimeout(() => {
                 initializeCalendar();

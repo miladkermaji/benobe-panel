@@ -14,6 +14,8 @@
 @endsection
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/calendar/reschedule-calendar.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
 
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
