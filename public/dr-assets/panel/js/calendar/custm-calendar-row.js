@@ -138,7 +138,6 @@ $(document).ready(function () {
         let displayedDays = 0;
         let current = moment(currentDate);
         let i = 0;
-
         while (displayedDays < visibleDays && i < calendarDays * 2) {
             const dayOfWeek = current.format("dddd").toLowerCase();
             const appointmentDate = current.format("YYYY-MM-DD");
@@ -146,13 +145,17 @@ $(document).ready(function () {
             const isPast = current.isBefore(today, "day");
             const isWorkingDay = workingDays.includes(dayOfWeek);
             const isSelected = appointmentDate === selectedDate;
+            // بررسی آیا این تاریخ تعطیل است یا خیر
+            const isHoliday =
+                window.holidaysData && window.holidaysData.holidays
+                    ? window.holidaysData.holidays.includes(appointmentDate)
+                    : false;
 
             if (isWorkingDay || isToday) {
                 const persianDate = moment(current).locale("fa").format("dddd");
                 const persianFormattedDate = moment(current)
                     .locale("fa")
                     .format("D MMMM YYYY");
-
                 const appointment = appointmentsData.find((appt) => {
                     const apptDate = moment(appt.appointment_date, [
                         "YYYY-MM-DD",
@@ -160,7 +163,6 @@ $(document).ready(function () {
                     ]).format("YYYY-MM-DD");
                     return apptDate === appointmentDate;
                 });
-
                 let appointmentCount =
                     appointment && !isPast && appointment.appointment_count > 0
                         ? appointment.appointment_count
@@ -174,14 +176,24 @@ $(document).ready(function () {
                     : isSelected
                     ? "card-selected"
                     : "";
-
-                const card = `
-                    <div class="calendar-card btn btn-light ${cardClass}" data-date="${appointmentDate}" style="--delay: ${displayedDays}">
-                        ${badgeHtml}
-                        <div class="day-name">${persianDate}</div>
-                        <div class="date">${persianFormattedDate}</div>
-                        ${isToday ? '<div class="current-day-icon"></div>' : ""}
-                    </div>`;
+                // اضافه کردن کلاس برای بورد قرمز در صورت تعطیل بودن
+                const holidayClass = isHoliday ? "holiday-card" : "";
+                const cardContent = `
+                <div class="calendar-card btn btn-light ${cardClass} ${holidayClass}" data-date="${appointmentDate}" style="--delay: ${displayedDays}">
+                    ${badgeHtml}
+                    <div class="day-name">${persianDate}</div>
+                    <div class="date">${persianFormattedDate}</div>
+                    ${isToday ? '<div class="current-day-icon"></div>' : ""}
+                </div>
+            `;
+                // اگر تعطیل است، کارت را داخل x-custom-tooltip قرار می‌دهیم
+                const card = isHoliday
+                    ? `
+                    <x-custom-tooltip title="این روز تعطیل است" placement="top">
+                        ${cardContent}
+                    </x-custom-tooltip>
+                `
+                    : cardContent;
 
                 calendar.append(card);
                 if (appointmentCount > 0) badgeCount++;
@@ -190,7 +202,6 @@ $(document).ready(function () {
             current.add(1, "days");
             i++;
         }
-
         if (displayedDays === 0) {
             console.warn(
                 "No days displayed. Check workingDays or appointmentsData."

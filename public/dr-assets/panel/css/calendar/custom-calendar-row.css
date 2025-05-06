@@ -14,7 +14,10 @@
     --radius-button: 6px;
     --radius-circle: 50%;
 }
-
+.holiday-card {
+    border: 2px solid #ef4444 !important; /* رنگ قرمز برای بورد */
+    box-sizing: border-box;
+}
 .calendar-card {
     background: var(--background-card);
     padding: 10px;
