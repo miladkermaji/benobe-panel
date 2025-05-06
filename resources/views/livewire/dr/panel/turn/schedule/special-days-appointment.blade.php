@@ -1,154 +1,140 @@
 <div>
+    <div wire:ignore>
+        <x-special-days-calendar />
+    </div>
 
-  <div wire:ignore>
+    <!-- مودال تعطیلات -->
+    <div>
+        <x-custom-modal 
+            id="holiday-modal" 
+            title="مدیریت تعطیلات و ساعات کاری"
+            size="{{ $selectedDate && in_array($selectedDate, $holidaysData['holidays']) ? 'sm' : 'lg' }}"
+            :show="$showModal"
+            wire:key="holiday-modal-{{ $selectedDate ?? 'default' }}"
+        >
+            <div class="">
+                @php
+                    $isPastDate = $selectedDate ? \Carbon\Carbon::parse($selectedDate)->isPast() : false;
+                    $jalaliDate = $selectedDate ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('d F Y') : '';
+                @endphp
 
-    <x-special-days-calendar />
-  </div>
-
-  <!-- مودال تعطیلات -->
-  <div>
-    <x-custom-modal id="holiday-modal" title="مدیریت تعطیلات و ساعات کاری"
-      size="{{ $selectedDate && in_array($selectedDate, $holidaysData['holidays']) ? 'sm' : 'lg' }}" :show="$showModal"
-      wire:key="holiday-modal">
-      <div class="">
-        @php
-          $isPastDate = $selectedDate ? \Carbon\Carbon::parse($selectedDate)->isPast() : false;
-          $jalaliDate = $selectedDate
-              ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('d F Y')
-              : '';
-          $hasWorkHours = $workSchedule['status'] && !empty($workSchedule['data']['work_hours']);
-        @endphp
-        @if ($selectedDate && in_array($selectedDate, $holidaysData['holidays'] ?? []))
-          <div class="alert alert-warning" role="alert">
-            <h4 class="alert-heading">تأیید تغییر وضعیت تعطیلات</h4>
-            <p>روز {{ $jalaliDate }} تعطیل است. آیا می‌خواهید از تعطیلی خارج کنید؟</p>
-            <hr>
-            <div class="d-flex justify-content-center gap-2 mt-3">
-              <button class="btn btn-primary w-100 h-50" wire:click="removeHoliday"
-                {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>خروج از تعطیلی</button>
-              <button class="btn btn-secondary w-100 h-50" wire:click="closeModal"
-                {{ $isProcessing ? 'disabled' : '' }}>لغو</button>
+                @if ($selectedDate && in_array($selectedDate, $holidaysData['holidays'] ?? []))
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">تأیید تغییر وضعیت تعطیلات</h4>
+                        <p>روز {{ $jalaliDate }} تعطیل است. آیا می‌خواهید از تعطیلی خارج کنید؟</p>
+                        <hr>
+                        <div class="d-flex justify-content-center gap-2 mt-3">
+                            <button 
+                                class="btn btn-primary w-100 h-50" 
+                                wire:click="removeHoliday"
+                                {{ $isProcessing || $isPastDate ? 'disabled' : '' }}
+                            >
+                                خروج از تعطیلی
+                            </button>
+                            <button 
+                                class="btn btn-secondary w-100 h-50" 
+                                wire:click="closeModal"
+                                {{ $isProcessing ? 'disabled' : '' }}
+                            >
+                                لغو
+                            </button>
+                        </div>
+                    </div>
+                @else
+                    <livewire:dr.panel.turn.schedule.special-workhours 
+                        :selectedDate="$selectedDate" 
+                        :workSchedule="$workSchedule" 
+                        :clinicId="$selectedClinicId"
+                        wire:key="special-workhours-{{ $selectedDate ?? 'default' }}"
+                    />
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+                        <button 
+                            class="btn btn-danger w-100 h-50" 
+                            wire:click="addHoliday"
+                            {{ $isProcessing || $isPastDate ? 'disabled' : '' }}
+                        >
+                            تعطیل کردن
+                        </button>
+                        <button 
+                            class="btn btn-secondary w-100 h-50" 
+                            wire:click="closeModal"
+                            {{ $isProcessing ? 'disabled' : '' }}
+                        >
+                            لغو
+                        </button>
+                    </div>
+                @endif
             </div>
-          </div>
-        @else
-          <div class="alert alert-info" role="alert">
-            <p class="fw-bold text-center">
-              @if ($hasWorkHours)
-                شما از قبل برای این روز ساعات کاری تعریف کرده‌اید. در صورت تمایل میتوانید آن را ویرایش کنید
-              @endif
-            </p>
-          </div>
-          @if ($hasWorkHours)
-            <livewire:dr.panel.turn.schedule.special-workhours :selectedDate="$selectedDate" :workSchedule="$workSchedule" :clinicId="$selectedClinicId"
-              wire:key="special-workhours-{{ $selectedDate ?? 'default' }}" />
-            <div class="d-flex justify-content-center gap-2 mt-3">
-              <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
-                {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
-                تعطیل کردن
-              </button>
-              <button class="btn btn-secondary w-100 h-50" wire:click="closeModal"
-                {{ $isProcessing ? 'disabled' : '' }}>
-                لغو
-              </button>
+        </x-custom-modal>
+    </div>
+
+    <!-- مودال جابجایی -->
+    <div>
+        <x-custom-modal 
+            id="transfer-modal" 
+            title="جابجایی نوبت‌ها" 
+            size="lg" 
+            :show="false"
+            wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}"
+        >
+            <div class="alert alert-info" role="alert">
+                <p class="fw-bold">این روز دارای نوبت است. برای تعطیل کردن باید نوبت‌ها را جابجا کنید</p>
             </div>
-          @else
-            <livewire:dr.panel.turn.schedule.special-workhours :selectedDate="$selectedDate" :workSchedule="$workSchedule" :clinicId="$selectedClinicId"
-              wire:key="special-workhours-{{ $selectedDate ?? 'default' }}" />
             <div class="d-flex justify-content-center gap-2 mt-3">
-              <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
-                {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
-                تعطیل کردن
-              </button>
-              <button class="btn btn-secondary w-100 h-50" wire:click="closeModal"
-                {{ $isProcessing ? 'disabled' : '' }}>
-                لغو
-              </button>
+                <button 
+                    class="btn btn-secondary w-100 h-50" 
+                    onclick="window.closeXModal('transfer-modal')"
+                >
+                    بستن
+                </button>
             </div>
-          @endif
-        @endif
-      </div>
-    </x-custom-modal>
-  </div>
+        </x-custom-modal>
+    </div>
 
-  <!-- مودال جابجایی -->
-  <div>
-    <x-custom-modal id="transfer-modal" title="جابجایی نوبت‌ها" size="lg" :show="false"
-      wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}">
-      <div class="alert alert-info" role="alert">
-        <p class="fw-bold">
-          این روز دارای نوبت است. برای تعطیل کردن باید نوبت‌ها را جابجا کنید
-        </p>
-      </div>
-      <div class="d-flex justify-content-center gap-2 mt-3">
-        <button class="btn btn-secondary w-100 h-50" onclick="window.closeXModal('transfer-modal')">بستن</button>
-      </div>
-    </x-custom-modal>
-  </div>
+    <script>
+        window.holidaysData = @json($holidaysData) || { status: true, holidays: [] };
+        window.appointmentsData = @json($appointmentsData) || { status: true, data: [] };
 
-  <script>
+        document.addEventListener("livewire:initialized", () => {
+            window.holidaysData = @json($holidaysData) || { status: true, holidays: [] };
+            window.appointmentsData = @json($appointmentsData) || { status: true, data: [] };
 
-    window.holidaysData = @json($holidaysData) || {
-      status: true,
-      holidays: []
-    };
-    window.appointmentsData = @json($appointmentsData) || {
-      status: true,
-      data: []
-    };
+            const clinicId = localStorage.getItem("selectedClinicId") || "default";
+            if (clinicId !== "default") {
+                Livewire.dispatch("setSelectedClinicId", { clinicId });
+            }
 
-    document.addEventListener("livewire:initialized", () => {
-    
-      window.holidaysData = @json($holidaysData) || {
-        status: true,
-        holidays: []
-      };
-      window.appointmentsData = @json($appointmentsData) || {
-        status: true,
-        data: []
-      };
+            window.addEventListener('openXModal', event => {
+                const modalId = event.detail.id;
+                if (modalId) {
+                    window.openXModal(modalId);
+                    Livewire.dispatch('refreshWorkhours');
+                } else {
+                    console.error('Modal ID not found in openXModal event:', event.detail);
+                }
+            });
 
-      const clinicId = localStorage.getItem("selectedClinicId") || "default";
-      if (clinicId !== "default") {
-        Livewire.dispatch("setSelectedClinicId", {
-          clinicId
+            window.addEventListener('closeXModal', event => {
+                const modalId = event.detail.id;
+                if (modalId) {
+                    window.closeXModal(modalId);
+                } else {
+                    console.error('Modal ID not found in closeXModal event:', event.detail);
+                }
+            });
+
+            Livewire.on('openTransferModal', (event) => {
+                const { modalId, gregorianDate } = event;
+                if (modalId === 'transfer-modal' && gregorianDate) {
+                    window.openXModal(modalId);
+                }
+            });
+
+            try {
+                initializeSpecialDaysCalendar();
+            } catch (error) {
+                console.error('Error initializing special days calendar:', error);
+            }
         });
-      }
-
-      window.addEventListener('openXModal', event => {
-        const modalId = event.detail.id;
-        if (modalId) {
-          window.openXModal(modalId);
-          // اطمینان از رفرش محتوای مودال
-          Livewire.dispatch('refreshWorkhours');
-        } else {
-          console.error('Modal ID not found in openXModal event:', event.detail);
-        }
-      });
-
-      window.addEventListener('closeXModal', event => {
-        const modalId = event.detail.id;
-        if (modalId) {
-          window.closeXModal(modalId);
-        } else {
-          console.error('Modal ID not found in closeXModal event:', event.detail);
-        }
-      });
-
-      Livewire.on('openTransferModal', (event) => {
-        const {
-          modalId,
-          gregorianDate
-        } = event;
-        if (modalId === 'transfer-modal' && gregorianDate) {
-          window.openXModal(modalId);
-        }
-      });
-
-      try {
-        initializeSpecialDaysCalendar();
-      } catch (error) {
-        console.error('Error initializing special days calendar:', error);
-      }
-    });
-  </script>
+    </script>
 </div>
