@@ -45,20 +45,20 @@ class SpecialDaysAppointment extends Component
     public $selectAllScheduleModal = false;
     public $hasWorkHoursMessage = false;
 
- protected $listeners = [
-    'openHolidayModal' => 'handleOpenHolidayModal',
-    'openTransferModal' => 'handleOpenTransferModal',
-    'refresh-work-hours' => '$refresh',
-    'refresh-timepicker' => '$refresh',
-    'close-calculator-modal' => 'closeCalculatorModal',
-    'close-emergency-modal' => 'closeEmergencyModal',
-    'close-schedule-modal' => 'closeScheduleModal',
-    'updateSelectedDate' => 'updateSelectedDate',
-    'refreshWorkhours' => '$refresh',
-    'set-calculator-values' => 'setCalculatorValues',
-    'initialize-calculator' => 'initializeCalculator',
-    'confirm-add-slot' => 'confirmAddSlot', // اضافه کردن این خط
-    'confirm-delete-slot' => 'confirmDeleteSlot', // اضافه کردن این خط
+    protected $listeners = [
+     'openHolidayModal' => 'handleOpenHolidayModal',
+     'openTransferModal' => 'handleOpenTransferModal',
+     'refresh-work-hours' => '$refresh',
+     'refresh-timepicker' => '$refresh',
+     'close-calculator-modal' => 'closeCalculatorModal',
+     'close-emergency-modal' => 'closeEmergencyModal',
+     'close-schedule-modal' => 'closeScheduleModal',
+     'updateSelectedDate' => 'updateSelectedDate',
+     'refreshWorkhours' => '$refresh',
+     'set-calculator-values' => 'setCalculatorValues',
+     'initialize-calculator' => 'initializeCalculator',
+     'confirm-add-slot' => 'confirmAddSlot',
+     'confirm-delete-slot' => 'confirmDeleteSlot',
 ];
 
     public function mount()
@@ -630,132 +630,170 @@ class SpecialDaysAppointment extends Component
     public function addSlot()
     {
         if ($this->isProcessing) {
+            Log::warning("Processing already in progress, exiting addSlot");
             return;
         }
 
         $this->isProcessing = true;
 
         try {
-            $doctorId = $this->getAuthenticatedDoctor()->id;
-            $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
-                ->where('date', $this->selectedDate)
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
-                ->first();
+            Log::info("addSlot triggered", [
+                'selectedDate' => $this->selectedDate,
+                'workSchedule' => $this->workSchedule,
+            ]);
 
-            $isFromDoctorWorkSchedule = !$specialSchedule || empty($specialSchedule->work_hours);
-
-            if ($isFromDoctorWorkSchedule && !empty($this->workSchedule['data']['work_hours'])) {
-                // نمایش SweetAlert برای تأیید ذخیره ردیف‌های قبلی
-                Log::info("Dispatching confirm-add-slot for date: {$this->selectedDate}");
-                $this->dispatch('confirm-add-slot');
-                return;
-            }
-
-            $this->addNewSlot($specialSchedule, $doctorId);
+            // فقط رویداد SweetAlert رو ارسال کن
+            $this->dispatch('confirm-add-slot');
         } catch (\Exception $e) {
-            Log::error("Error in addSlot: " . $e->getMessage());
+            Log::error("Error in addSlot: {$e->getMessage()}", ['trace' => $e->getTraceAsString()]);
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در افزودن بازه زمانی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
+            Log::info("addSlot completed");
         }
     }
 
-    public function confirmAddSlot($savePrevious = true)
-    {
-        Log::info("confirmAddSlot called with savePrevious: " . json_encode($savePrevious));
+public function confirmAddSlot($savePrevious = true)
+{
+    Log::info("confirmAddSlot called", [
+        'savePrevious' => $savePrevious,
+        'selectedDate' => $this->selectedDate,
+        'workSchedule' => $this->workSchedule,
+    ]);
 
-        if ($this->isProcessing) {
-            Log::warning("Processing already in progress, exiting confirmAddSlot");
-            return;
-        }
+    if ($this->isProcessing) {
+        Log::warning("Processing already in progress, exiting confirmAddSlot");
+        return;
+    }
 
-        $this->isProcessing = true;
+    // بررسی مقدار savePrevious
+    if (!is_bool($savePrevious)) {
+        Log::warning("Invalid or null savePrevious value", ['savePrevious' => $savePrevious]);
+        $this->dispatch('show-toastr', type: 'error', message: 'لطفاً انتخاب کنید که ردیف‌های قبلی ذخیره شوند یا خیر.');
+        return;
+    }
 
-        try {
-            $doctorId = $this->getAuthenticatedDoctor()->id;
-            $specialSchedule = SpecialDailySchedule::firstOrCreate(
-                [
-                    'doctor_id' => $doctorId,
-                    'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
-                ],
-                [
-                    'work_hours' => json_encode([]),
-                    'appointment_settings' => json_encode([]),
-                    'emergency_times' => json_encode([]),
-                ]
-            );
+    $this->isProcessing = true;
 
-            $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
-            $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
-            $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [];
+    try {
+        $doctorId = $this->getAuthenticatedDoctor()->id;
+        Log::info("Authenticated doctor ID: {$doctorId}");
 
-            if (!$savePrevious) {
-                // خالی کردن تمام ردیف‌ها و نگه‌داشتن فقط یک ردیف خالی
-                $this->workSchedule['data']['work_hours'] = [[
-                    'start' => '',
-                    'end' => '',
-                    'max_appointments' => '',
-                ]];
-                $this->workSchedule['data']['appointment_settings'] = [[
-                    'max_appointments' => '',
-                    'appointment_duration' => '',
-                    'start_time' => '00:00',
-                    'end_time' => '23:59',
-                    'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-                    'work_hour_key' => 0,
-                ]];
-                $this->workSchedule['data']['emergency_times'] = [[]];
-                $specialSchedule->work_hours = json_encode($this->workSchedule['data']['work_hours']);
-                $specialSchedule->appointment_settings = json_encode($this->workSchedule['data']['appointment_settings']);
-                $specialSchedule->emergency_times = json_encode($this->workSchedule['data']['emergency_times']);
-                $specialSchedule->save();
-                $this->dispatch('show-toastr', type: 'success', message: 'ردیف‌ها خالی شدند. لطفاً مقادیر جدید را وارد کنید.');
-                $this->dispatch('refresh-timepicker');
-                Log::info("Rows cleared, one empty row remains");
-                return;
-            }
+        $specialSchedule = SpecialDailySchedule::firstOrCreate(
+            [
+                'doctor_id' => $doctorId,
+                'date' => $this->selectedDate,
+                'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+            ],
+            [
+                'work_hours' => json_encode([]),
+                'appointment_settings' => json_encode([]),
+                'emergency_times' => json_encode([]),
+            ]
+        );
 
-            // ذخیره ردیف‌های موجود
+        $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+        $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
+        $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [];
+
+        if (!$savePrevious) {
+            Log::info("Clearing all rows as savePrevious is false");
+            $workHours = [[
+                'start' => '',
+                'end' => '',
+                'max_appointments' => '',
+            ]];
+            $appointmentSettings = [[
+                'max_appointments' => '',
+                'appointment_duration' => '',
+                'start_time' => '00:00',
+                'end_time' => '23:59',
+                'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                'work_hour_key' => 0,
+            ]];
+            $emergencyTimes = [[]];
+        } else {
+            Log::info("Saving existing rows");
+            $validWorkHours = [];
+            $validAppointmentSettings = [];
+            $validEmergencyTimes = [];
+
             foreach ($this->workSchedule['data']['work_hours'] as $index => $slot) {
-                if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments']) || $slot['max_appointments'] <= 0) {
-                    $this->dispatch('show-toastr', type: 'error', message: 'لطفاً ردیف‌های قبلی را کامل کنید.');
-                    Log::warning("Invalid slot data: " . json_encode($slot));
-                    return;
+                if (!empty($slot['start']) && !empty($slot['end']) && !empty($slot['max_appointments']) && $slot['max_appointments'] > 0) {
+                    if ($this->hasTimeOverlap($slot['start'], $slot['end'], array_diff_key($validWorkHours, [$index => $slot]))) {
+                        Log::warning("Time overlap detected for slot at index {$index}", ['slot' => $slot]);
+                        $this->dispatch('show-toastr', type: 'error', message: 'تداخل زمانی در ساعات کاری وجود دارد.');
+                        return;
+                    }
+                    $validWorkHours[$index] = $slot;
+                    $validAppointmentSettings[$index] = $this->workSchedule['data']['appointment_settings'][$index] ?? [
+                        'max_appointments' => $slot['max_appointments'],
+                        'appointment_duration' => 0,
+                        'start_time' => '00:00',
+                        'end_time' => '23:59',
+                        'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                        'work_hour_key' => $index,
+                    ];
+                    $validEmergencyTimes[$index] = $this->workSchedule['data']['emergency_times'][$index] ?? [];
                 }
-                if ($this->hasTimeOverlap($slot['start'], $slot['end'], array_diff_key($workHours, [$index => $slot]))) {
-                    $this->dispatch('show-toastr', type: 'error', message: 'تداخل زمانی در ساعات کاری وجود دارد.');
-                    Log::warning("Time overlap detected for slot: " . json_encode($slot));
-                    return;
-                }
-                $workHours[$index] = $slot;
-                $appointmentSettings[$index] = $this->workSchedule['data']['appointment_settings'][$index] ?? [
-                    'max_appointments' => $slot['max_appointments'],
-                    'appointment_duration' => 0,
-                    'start_time' => '00:00',
-                    'end_time' => '23:59',
-                    'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-                    'work_hour_key' => $index,
-                ];
-                $emergencyTimes[$index] = $this->workSchedule['data']['emergency_times'][$index] ?? [];
             }
 
-            $specialSchedule->work_hours = json_encode($workHours);
-            $specialSchedule->appointment_settings = json_encode($appointmentSettings);
-            $specialSchedule->emergency_times = json_encode($emergencyTimes);
-            $specialSchedule->save();
-
-            Log::info("Previous rows saved to SpecialDailySchedule: " . json_encode($workHours));
-
-            $this->addNewSlot($specialSchedule, $doctorId, $workHours, $appointmentSettings, $emergencyTimes);
-        } catch (\Exception $e) {
-            Log::error("Error in confirmAddSlot: " . $e->getMessage());
-            $this->dispatch('show-toastr', type: 'error', message: 'خطا در افزودن بازه زمانی: ' . $e->getMessage());
-        } finally {
-            $this->isProcessing = false;
+            $workHours = $validWorkHours;
+            $appointmentSettings = $validAppointmentSettings;
+            $emergencyTimes = $validEmergencyTimes;
         }
+
+        // اضافه کردن ردیف جدید
+        $newIndex = count($workHours);
+        $workHours[$newIndex] = [
+            'start' => '',
+            'end' => '',
+            'max_appointments' => '',
+        ];
+        $appointmentSettings[$newIndex] = [
+            'max_appointments' => '',
+            'appointment_duration' => '',
+            'start_time' => '00:00',
+            'end_time' => '23:59',
+            'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+            'work_hour_key' => $newIndex,
+        ];
+        $emergencyTimes[$newIndex] = [];
+
+        // ذخیره تغییرات
+        $specialSchedule->work_hours = json_encode($workHours);
+        $specialSchedule->appointment_settings = json_encode($appointmentSettings);
+        $specialSchedule->emergency_times = json_encode($emergencyTimes);
+        $specialSchedule->save();
+
+        // به‌روزرسانی workSchedule
+        $this->workSchedule = [
+            'status' => true,
+            'data' => [
+                'day' => strtolower(Carbon::parse($this->selectedDate)->englishDayOfWeek),
+                'work_hours' => $workHours,
+                'appointment_settings' => $appointmentSettings,
+                'emergency_times' => $emergencyTimes,
+            ],
+        ];
+        $this->hasWorkHoursMessage = !empty($workHours);
+
+        // پاک کردن کش
+        $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
+        Cache::forget($cacheKey);
+
+        // ارسال پیام موفقیت
+        $this->dispatch('show-toastr', type: 'success', message: $savePrevious ? 'ردیف جدید اضافه شد.' : 'ردیف‌های قبلی حذف شدند و یک ردیف خالی اضافه شد.');
+        $this->dispatch('refresh-timepicker');
+        $this->dispatch('refresh');
+        Log::info("confirmAddSlot completed", ['workSchedule' => $this->workSchedule]);
+    } catch (\Exception $e) {
+        Log::error("Exception in confirmAddSlot: {$e->getMessage()}", ['trace' => $e->getTraceAsString()]);
+        $this->dispatch('show-toastr', type: 'error', message: 'خطا در افزودن بازه زمانی: ' . $e->getMessage());
+    } finally {
+        $this->isProcessing = false;
     }
+}
 
     private function addNewSlot($specialSchedule, $doctorId, $workHours = null, $appointmentSettings = null, $emergencyTimes = null)
     {
