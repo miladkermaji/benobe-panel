@@ -164,8 +164,7 @@
   </x-modal>
 
   <!-- مودال محاسبه‌گر -->
-  <x-modal name="CalculatorModal" title="انتخاب تعداد نوبت یا زمان ویزیت" size="sm"
-    wire:key="calculator-modal-{{ $selectedDate ?? 'default' }}" wire:ignore.self>
+  <x-modal name="CalculatorModal" name="CalculatorModal" title="انتخاب تعداد نوبت یا زمان ویزیت" size="sm">
     <x-slot:body>
       <div class="d-flex align-items-center">
         <div class="d-flex flex-wrap flex-column align-items-start gap-4 w-100">
@@ -351,6 +350,7 @@
     };
 
     document.addEventListener("livewire:initialized", () => {
+
       window.holidaysData = @json($holidaysData) || {
         status: true,
         holidays: []
@@ -378,6 +378,9 @@
         }));
         if (id === 'holiday-modal') {
           Livewire.dispatch('refreshWorkhours');
+        }
+        if (id === 'CalculatorModal') {
+          console.log('CalculatorModal open event dispatched successfully');
         }
       });
 
@@ -426,7 +429,7 @@
         }
       });
 
-  
+
 
       Livewire.on('initialize-calculator', ({
         start_time,
@@ -459,68 +462,157 @@
     }
 
     function initializeCalculatorModal(start_time, end_time, index, day) {
-      const $modal = $('#CalculatorModal');
-      if (!$modal.length) {
-        console.error('Calculator modal not found');
-        return;
-      }
+      const maxAttempts = 5;
+      let attempts = 0;
 
-      const $appointmentCountInput = $modal.find('#appointment-count');
-      const $timeCountInput = $modal.find('#time-count');
-      const $countRadio = $modal.find('#count-radio');
-      const $timeRadio = $modal.find('#time-radio');
-      const $saveButton = $modal.find('#saveSelectionCalculator');
+      function tryInitialize() {
+        const $modal = $('#CalculatorModal');
+        if (!$modal.length) {
+          attempts++;
+          if (attempts < maxAttempts) {
+            setTimeout(tryInitialize, 100);
+            return;
+          }
+          console.error('Calculator modal not found after multiple attempts');
+          Livewire.dispatch('show-toastr', {
+            type: 'error',
+            message: 'مودال محاسبه‌گر یافت نشد. لطفاً صفحه را رفرش کنید.'
+          });
+          return;
+        }
 
-      $appointmentCountInput.val('');
-      $timeCountInput.val('');
+        const $appointmentCountInput = $modal.find('#appointment-count');
+        const $timeCountInput = $modal.find('#time-count');
+        const $countRadio = $modal.find('#count-radio');
+        const $timeRadio = $modal.find('#time-radio');
+        const $saveButton = $modal.find('#saveSelectionCalculator');
 
-      $countRadio.on('change', function() {
-        if ($(this).is(':checked')) {
-          $appointmentCountInput.focus();
+        // تنظیم مقادیر اولیه
+        $appointmentCountInput.val('');
+        $timeCountInput.val('');
+
+        // محاسبه زمان کل
+        const start = moment(start_time, 'HH:mm');
+        const end = moment(end_time, 'HH:mm');
+        const totalMinutes = end.diff(start, 'minutes');
+
+        // فوکوس خودکار روی اینپوت تعداد نوبت‌ها
+        $modal.on('shown.bs.modal', function() {
+          const appointmentCount = @json($calculator['appointment_count'] ?? null);
+          const timePerAppointment = @json($calculator['time_per_appointment'] ?? 0);
+          const calculationMode = @json($calculator['calculation_mode'] ?? 'count');
+
+          $appointmentCountInput.val(appointmentCount);
+          $timeCountInput.val(timePerAppointment);
+
+          if (calculationMode === 'count') {
+            $countRadio.prop('checked', true);
+            $appointmentCountInput.focus();
+          } else {
+            $timeRadio.prop('checked', true);
+            $timeCountInput.focus();
+          }
+        });
+
+        // تغییر حالت با فوکوس روی اینپوت‌ها
+        $appointmentCountInput.on('focus', function() {
+          $countRadio.prop('checked', true);
           Livewire.dispatch('setCalculationMode', {
             mode: 'count'
           });
-        }
-      });
+        });
 
-      $timeRadio.on('change', function() {
-        if ($(this).is(':checked')) {
-          $timeCountInput.focus();
+        $timeCountInput.on('focus', function() {
+          $timeRadio.prop('checked', true);
           Livewire.dispatch('setCalculationMode', {
             mode: 'time'
           });
-        }
-      });
+        });
 
-      $saveButton.on('click', function() {
-        toggleButtonLoading($(this), true);
-        const values = {
-          appointment_count: parseInt($appointmentCountInput.val()) || null,
-          time_per_appointment: parseInt($timeCountInput.val()) || null,
-          calculation_mode: $countRadio.is(':checked') ? 'count' : 'time',
-        };
-        Livewire.dispatch('set-calculator-values', [values]);
-        setTimeout(() => {
-          toggleButtonLoading($(this), false);
-        }, 1000);
-      });
+        // محاسبه زنده هنگام تغییر اینپوت‌ها
+        $appointmentCountInput.on('input', function() {
+          const count = parseInt($(this).val());
+          if (count > 0) {
+            const timePerAppointment = Math.floor(totalMinutes / count);
+            $timeCountInput.val(timePerAppointment || '');
+            Livewire.dispatch('set-calculator-values', [{
+              appointment_count: count,
+              time_per_appointment: timePerAppointment,
+              calculation_mode: 'count'
+            }]);
+          } else {
+            $timeCountInput.val('');
+          }
+        });
 
-      $modal.on('shown.bs.modal', function() {
-        const appointmentCount = @json($calculator['appointment_count'] ?? null);
-        const timePerAppointment = @json($calculator['time_per_appointment'] ?? null);
-        const calculationMode = @json($calculator['calculation_mode'] ?? 'count');
+        $timeCountInput.on('input', function() {
+          const time = parseInt($(this).val());
+          if (time > 0) {
+            const appointmentCount = Math.floor(totalMinutes / time);
+            $appointmentCountInput.val(appointmentCount || '');
+            Livewire.dispatch('set-calculator-values', [{
+              appointment_count: appointmentCount,
+              time_per_appointment: time,
+              calculation_mode: 'time'
+            }]);
+          } else {
+            $appointmentCountInput.val('');
+          }
+        });
 
-        $appointmentCountInput.val(appointmentCount);
-        $timeCountInput.val(timePerAppointment);
-        if (calculationMode === 'count') {
-          $countRadio.prop('checked', true);
-          $appointmentCountInput.focus();
-        } else {
-          $timeRadio.prop('checked', true);
-          $timeCountInput.focus();
-        }
-      });
+        // ذخیره و بستن مودال
+        $saveButton.on('click', function() {
+          toggleButtonLoading($(this), true);
+          const values = {
+            appointment_count: parseInt($appointmentCountInput.val()) || null,
+            time_per_appointment: parseInt($timeCountInput.val()) || null,
+            calculation_mode: $countRadio.is(':checked') ? 'count' : 'time',
+          };
+          Livewire.dispatch('set-calculator-values', [values]);
+          setTimeout(() => {
+            toggleButtonLoading($(this), false);
+            $(`#patients-${index}`).val(values.appointment_count);
+            Livewire.dispatch('close-modal', {
+              id: 'CalculatorModal'
+            });
+          }, 1000);
+        });
+      }
+
+      tryInitialize();
     }
 
+    // مدیریت به‌روزرسانی UI
+    document.addEventListener('livewire:initialized', function() {
+      Livewire.on('update-calculator-ui', (data) => {
+        const $modal = $('#CalculatorModal');
+        if (!$modal.length) {
+          console.error('Calculator modal not found during UI update');
+          return;
+        }
+
+        const $appointmentCountInput = $modal.find('#appointment-count');
+        const $timeCountInput = $modal.find('#time-count');
+        const $countRadio = $modal.find('#count-radio');
+        const $timeRadio = $modal.find('#time-radio');
+
+        $appointmentCountInput.val(data.appointment_count || '');
+        $timeCountInput.val(data.time_per_appointment || '');
+        if (data.calculation_mode === 'count') {
+          $countRadio.prop('checked', true);
+        } else {
+          $timeRadio.prop('checked', true);
+        }
+      });
+
+      Livewire.on('update-appointment-count', (data) => {
+        const $input = $(`#patients-${data.index}`);
+        if ($input.length) {
+          $input.val(data.count);
+        } else {
+          console.warn(`Input #patients-${data.index} not found`);
+        }
+      });
+    });
   </script>
 </div>

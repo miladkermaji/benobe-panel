@@ -1,4 +1,4 @@
-@props(['name', 'title', 'size' => 'md'])
+@props(['name', 'id', 'title', 'size' => 'md'])
 
 @php
   $sizes = [
@@ -119,18 +119,14 @@
   }
 </style>
 
-<div x-data="{ show: false, name: '{{ $name }}' }" x-show="show" x-cloak x-on:open-modal.window="show = ($event.detail.name === name)"
-  x-on:close-modal.window="show = false" x-on:keydown.escape.window="show = false"
-  class="fixed z-[1000] inset-0 flex items-center justify-center" x-transition:enter="transition ease-out duration-200"
-  x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-  x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
-  x-transition:leave-end="opacity-0">
-
+<div id="{{ $id ?? $name }}" x-data="{ show: false, name: '{{ $name }}' }" x-show="show" x-cloak
+  x-on:open-modal.window="show = ($event.detail.name === name)" x-on:close-modal.window="show = false"
+  x-on:keydown.escape.window="show = false" class="fixed z-[1000] inset-0 flex items-center justify-center"
+  x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+  x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
+  x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
   <div x-on:click="show = false" class="xai-modal-overlay"></div>
-
   <div class="xai-modal-container {{ $sizeClass }}">
-    <!-- برای دیباگ -->
-    <!-- <div style="color: red;">Size Class: {{ $sizeClass }}</div> -->
     @if (isset($title))
       <div class="xai-modal-header">
         <div class="xai-modal-title">{{ $title }}</div>

@@ -437,10 +437,15 @@ class SpecialDaysAppointment extends Component
                         if (!isset($appointmentSettings[$index])) {
                             $appointmentSettings[$index] = [
                                 'max_appointments' => $slot['max_appointments'] ?? 0,
-                                'appointment_duration' => 0,
+                                'appointment_duration' => 0, // مقدار پیش‌فرض
+                                'start_time' => $slot['start'] ?? '00:00',
+                                'end_time' => $slot['end'] ?? '23:59',
+                                'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                                'work_hour_key' => $index,
                             ];
                         } else {
                             $appointmentSettings[$index]['max_appointments'] = $slot['max_appointments'] ?? $appointmentSettings[$index]['max_appointments'] ?? 0;
+                            $appointmentSettings[$index]['appointment_duration'] = $appointmentSettings[$index]['appointment_duration'] ?? 0; // مقدار پیش‌فرض
                         }
                     }
                     return [
@@ -473,10 +478,15 @@ class SpecialDaysAppointment extends Component
                     if (!isset($appointmentSettings[$index])) {
                         $appointmentSettings[$index] = [
                             'max_appointments' => $slot['max_appointments'] ?? 0,
-                            'appointment_duration' => 0,
+                            'appointment_duration' => 0, // مقدار پیش‌فرض
+                            'start_time' => $slot['start'] ?? '00:00',
+                            'end_time' => $slot['end'] ?? '23:59',
+                            'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                            'work_hour_key' => $index,
                         ];
                     } else {
                         $appointmentSettings[$index]['max_appointments'] = $slot['max_appointments'] ?? $appointmentSettings[$index]['max_appointments'] ?? 0;
+                        $appointmentSettings[$index]['appointment_duration'] = $appointmentSettings[$index]['appointment_duration'] ?? 0; // مقدار پیش‌فرض
                     }
                 }
                 return [
@@ -722,30 +732,69 @@ class SpecialDaysAppointment extends Component
         }
     }
 
-    public function setCalculatorValues($values = [])
-    {
-        if ($this->isProcessing) {
+ public function setCalculatorValues($values)
+{
+    if ($this->isProcessing) {
+        return;
+    }
+
+    try {
+        $startTime = $this->calculator['start_time'] ?? null;
+        $endTime = $this->calculator['end_time'] ?? null;
+
+        if (empty($startTime) || empty($endTime)) {
+            Log::error("Missing start or end time in calculator", ['start_time' => $startTime, 'end_time' => $endTime]);
+            $this->dispatch('show-toastr', type: 'error', message: 'زمان شروع یا پایان مشخص نشده است.');
             return;
         }
 
-        try {
-            if (is_array($values) && isset($values[0]) && is_array($values[0])) {
-                $values = $values[0];
-            } elseif (!is_array($values)) {
-                Log::warning("Invalid values format in setCalculatorValues", ['values' => $values]);
-                $values = [];
-            }
-
-            $this->calculator['appointment_count'] = isset($values['appointment_count']) ? (int) $values['appointment_count'] : null;
-            $this->calculator['time_per_appointment'] = isset($values['time_per_appointment']) ? (int) $values['time_per_appointment'] : null;
-            $this->calculator['calculation_mode'] = isset($values['calculation_mode']) ? $values['calculation_mode'] : 'count';
-
-            Log::info("Calculator values updated", $this->calculator);
-        } catch (\Exception $e) {
-            Log::error("Error in setCalculatorValues: " . $e->getMessage(), ['values' => $values]);
-            $this->dispatch('show-toastr', type: 'error', message: 'خطا در تنظیم مقادیر محاسبه‌گر: ' . $e->getMessage());
+        // اعتبارسنجی فرمت زمان
+        if (!preg_match('/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/', $startTime) || 
+            !preg_match('/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/', $endTime)) {
+            Log::error("Invalid time format in calculator", ['start_time' => $startTime, 'end_time' => $endTime]);
+            $this->dispatch('show-toastr', type: 'error', message: 'فرمت زمان نامعتبر است.');
+            return;
         }
+
+        $start = Carbon::createFromFormat('H:i', $startTime);
+        $end = Carbon::createFromFormat('H:i', $endTime);
+
+        // بررسی ترتیب زمانی
+        if ($end->lte($start)) {
+            Log::error("End time is not after start time", ['start_time' => $startTime, 'end_time' => $endTime]);
+            $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
+            return;
+        }
+
+        $totalMinutes = $end->diffInMinutes($start);
+
+        if ($totalMinutes <= 0) {
+            Log::error("Invalid time range in calculator", ['total_minutes' => $totalMinutes]);
+            $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی نامعتبر است.');
+            return;
+        }
+
+        $this->calculator['calculation_mode'] = $values['calculation_mode'] ?? $this->calculator['calculation_mode'];
+        $mode = $this->calculator['calculation_mode'];
+
+        if ($mode === 'count' && isset($values['appointment_count']) && is_numeric($values['appointment_count']) && $values['appointment_count'] > 0) {
+            $this->calculator['appointment_count'] = (int) $values['appointment_count'];
+            $this->calculator['time_per_appointment'] = floor($totalMinutes / $this->calculator['appointment_count']);
+        } elseif ($mode === 'time' && isset($values['time_per_appointment']) && is_numeric($values['time_per_appointment']) && $values['time_per_appointment'] > 0) {
+            $this->calculator['time_per_appointment'] = (int) $values['time_per_appointment'];
+            $this->calculator['appointment_count'] = floor($totalMinutes / $this->calculator['time_per_appointment']);
+        } else {
+            Log::warning("Invalid input values for calculator", ['values' => $values]);
+            return;
+        }
+
+        Log::info("Calculator values updated", $this->calculator);
+        $this->dispatch('update-calculator-ui', $this->calculator);
+    } catch (\Exception $e) {
+        Log::error("Error in setCalculatorValues: " . $e->getMessage(), ['values' => $values]);
+        $this->dispatch('show-toastr', type: 'error', message: 'خطا در به‌روزرسانی مقادیر محاسبه‌گر: ' . $e->getMessage());
     }
+}
 
     public function saveCalculator()
     {
@@ -760,11 +809,10 @@ class SpecialDaysAppointment extends Component
             $index = $this->calculator['index'];
             $appointmentCount = $this->calculator['appointment_count'];
             $timePerAppointment = $this->calculator['time_per_appointment'];
-            $calculationMode = $this->calculator['calculation_mode'];
 
-            if (empty($day) || $index === null) {
-                Log::error("Invalid day or index in calculator data", $this->calculator);
-                $this->dispatch('show-toastr', type: 'error', message: 'روز یا بازه زمانی نامعتبر است.');
+            if (empty($day) || $index === null || !is_numeric($appointmentCount) || $appointmentCount <= 0) {
+                Log::error("Invalid calculator data", $this->calculator);
+                $this->dispatch('show-toastr', type: 'error', message: 'داده‌های محاسبه‌گر نامعتبر است.');
                 return;
             }
 
@@ -774,38 +822,6 @@ class SpecialDaysAppointment extends Component
             if (empty($startTime) || empty($endTime)) {
                 Log::error("Missing start or end time", ['start' => $startTime, 'end' => $endTime]);
                 $this->dispatch('show-toastr', type: 'error', message: 'لطفاً زمان شروع و پایان را وارد کنید.');
-                return;
-            }
-
-            $start = Carbon::createFromFormat('H:i', $startTime);
-            $end = Carbon::createFromFormat('H:i', $endTime);
-            $totalMinutes = $end->diffInMinutes($start);
-
-            if ($totalMinutes <= 0) {
-                Log::error("Invalid time range: end time is not after start time", ['start' => $startTime, 'end' => $endTime]);
-                $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
-                return;
-            }
-
-            if ($calculationMode === 'count') {
-                if (!is_numeric($appointmentCount) || $appointmentCount <= 0) {
-                    Log::error("Invalid appointment count", ['appointment_count' => $appointmentCount]);
-                    $this->dispatch('show-toastr', type: 'error', message: 'لطفاً تعداد نوبت‌ها را به‌درستی وارد کنید.');
-                    return;
-                }
-                $timePerAppointment = $appointmentCount > 0 ? floor($totalMinutes / $appointmentCount) : 0;
-            } else {
-                if (!is_numeric($timePerAppointment) || $timePerAppointment <= 0) {
-                    Log::error("Invalid time per appointment", ['time_per_appointment' => $timePerAppointment]);
-                    $this->dispatch('show-toastr', type: 'error', message: 'لطفاً زمان هر نوبت را به‌درستی وارد کنید.');
-                    return;
-                }
-                $appointmentCount = $timePerAppointment > 0 ? floor($totalMinutes / $timePerAppointment) : 0;
-            }
-
-            if ($appointmentCount <= 0) {
-                Log::error("Calculated appointment count is invalid", ['appointment_count' => $appointmentCount]);
-                $this->dispatch('show-toastr', type: 'error', message: 'تعداد نوبت‌های محاسبه‌شده نامعتبر است.');
                 return;
             }
 
@@ -855,7 +871,11 @@ class SpecialDaysAppointment extends Component
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
             $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات نوبت‌دهی ذخیره شد.');
-            $this->dispatch('close-calculator-modal');
+            $this->dispatch('close-modal', id: 'CalculatorModal');
+            $this->dispatch('update-appointment-count', [
+                'index' => $index,
+                'count' => $appointmentCount,
+            ]);
         } catch (\Exception $e) {
             Log::error("Error in saveCalculator: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در ذخیره تنظیمات: ' . $e->getMessage());
@@ -1042,33 +1062,62 @@ class SpecialDaysAppointment extends Component
     public function openCalculatorModal($day, $index)
     {
         try {
-            $startTime = $this->workSchedule['data']['work_hours'][$index]['start'] ?? '00:00';
-            $endTime = $this->workSchedule['data']['work_hours'][$index]['end'] ?? '23:59';
+            // بررسی وجود داده‌های work_hours
+            if (!isset($this->workSchedule['data']['work_hours'][$index])) {
+                Log::error("Work schedule data not found for index: {$index}", ['workSchedule' => $this->workSchedule]);
+                $this->dispatch('show-toastr', type: 'error', message: 'داده‌های برنامه کاری برای این بازه زمانی یافت نشد.');
+                return;
+            }
 
+            $startTime = $this->workSchedule['data']['work_hours'][$index]['start'] ?? null;
+            $endTime = $this->workSchedule['data']['work_hours'][$index]['end'] ?? null;
+
+            // اعتبارسنجی زمان‌های شروع و پایان
             if (empty($startTime) || empty($endTime)) {
+                Log::warning("Empty start or end time", ['startTime' => $startTime, 'endTime' => $endTime]);
                 $this->dispatch('show-toastr', type: 'error', message: 'لطفاً ابتدا زمان شروع و پایان را وارد کنید.');
                 return;
             }
 
-            $start = Carbon::createFromFormat('H:i', $startTime);
-            $end = Carbon::createFromFormat('H:i', $endTime);
-            $totalMinutes = $end->diffInMinutes($start);
+            // بررسی فرمت زمان
+            try {
+                $start = Carbon::createFromFormat('H:i', $startTime);
+                $end = Carbon::createFromFormat('H:i', $endTime);
+            } catch (\Exception $e) {
+                Log::error("Invalid time format", ['startTime' => $startTime, 'endTime' => $endTime, 'error' => $e->getMessage()]);
+                $this->dispatch('show-toastr', type: 'error', message: 'فرمت زمان نامعتبر است.');
+                return;
+            }
 
-            if ($totalMinutes <= 0) {
+            if (!$start || !$end) {
+                Log::error("Failed to parse time", ['startTime' => $startTime, 'endTime' => $endTime]);
+                $this->dispatch('show-toastr', type: 'error', message: 'زمان شروع یا پایان نامعتبر است.');
+                return;
+            }
+
+            // محاسبه تفاوت زمانی
+            $totalMinutes = $start->diffInMinutes($end, true);
+
+            if ($end->lessThanOrEqualTo($start)) {
+                Log::warning("End time is not after start time", ['startTime' => $startTime, 'endTime' => $endTime, 'totalMinutes' => $totalMinutes]);
                 $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
                 return;
             }
 
+            // تنظیم مقادیر محاسبه‌گر
             $this->calculator = [
                 'day' => $day,
                 'index' => $index,
                 'start_time' => $startTime,
                 'end_time' => $endTime,
                 'appointment_count' => $this->workSchedule['data']['work_hours'][$index]['max_appointments'] ?? null,
-                'time_per_appointment' => $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] ?? null,
-                'calculation_mode' => $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] ? 'time' : 'count',
+                'time_per_appointment' => $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] ?? 0,
+                'calculation_mode' => isset($this->workSchedule['data']['appointment_settings'][$index]['appointment_duration']) && $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] > 0 ? 'time' : 'count',
             ];
 
+            Log::info("Opening CalculatorModal", ['calculator' => $this->calculator]);
+
+            // باز کردن مودال با شناسه معتبر
             $this->dispatch('open-modal', id: 'CalculatorModal');
             $this->dispatch('initialize-calculator', [
                 'start_time' => $startTime,
@@ -1077,7 +1126,7 @@ class SpecialDaysAppointment extends Component
                 'day' => $day,
             ]);
         } catch (\Exception $e) {
-            Log::error("Error in openCalculatorModal: " . $e->getMessage());
+            Log::error("Error in openCalculatorModal: " . $e->getMessage(), ['day' => $day, 'index' => $index]);
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال محاسبه‌گر: ' . $e->getMessage());
         }
     }
