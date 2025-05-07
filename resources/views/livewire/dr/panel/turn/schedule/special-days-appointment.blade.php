@@ -4,7 +4,7 @@
   </div>
 
   <!-- مودال تعطیلات -->
-  <x-modal name="holiday-modal" title="مدیریت تعطیلات و ساعات کاری"
+  <x-modal name="holiday-modal" title="مدیریت تعطیلات و ساعات کاری" persistent="true"
     size="{{ $selectedDate && in_array($selectedDate, $holidaysData['holidays']) ? 'sm' : 'lg' }}"
     wire:key="holiday-modal-{{ $selectedDate ?? 'default' }}" wire:ignore.self>
     <x-slot:body>
@@ -339,7 +339,28 @@
       </div>
     </x-slot>
   </x-modal>
-
+  <x-modal name="add-slot-modal" title="تأیید افزودن ردیف جدید" size="sm"
+    wire:key="add-slot-modal-{{ $selectedDate ?? 'default' }}">
+    <x-slot:body>
+      <div class="alert alert-info" role="alert">
+        <p class="fw-bold">آیا مایلید ساعات کاری قبلی ذخیره شوند؟</p>
+        <p>در صورت انتخاب "ذخیره کن"، ساعات کاری فعلی حفظ شده و یک ردیف جدید اضافه می‌شود. در غیر این صورت، تمام
+          ردیف‌های قبلی حذف خواهند شد.</p>
+      </div>
+      <div class="d-flex justify-content-center gap-2 mt-3">
+        <button class="btn btn-primary w-100 h-50" wire:click="confirmAddSlot" wire:loading.attr="disabled">
+          ذخیره کن
+        </button>
+        <button class="btn btn-secondary w-100 h-50" wire:click="confirmAddSlot(false)" wire:loading.attr="disabled">
+          بدون ذخیره
+        </button>
+        <button class="btn btn-outline-secondary w-100 h-50" wire:click="closeAddSlotModal"
+          wire:loading.attr="disabled">
+          لغو
+        </button>
+      </div>
+    </x-slot>
+  </x-modal>
   <script>
     window.holidaysData = @json($holidaysData) || {
       status: true,
