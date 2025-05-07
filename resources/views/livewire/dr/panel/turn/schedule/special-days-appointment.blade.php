@@ -426,23 +426,7 @@
         }
       });
 
-      Livewire.on('refresh-timepicker', () => {
-        $('.timepicker-ui-input').each(function() {
-          if ($(this).hasClass('timepicker-ui')) {
-            $(this).timepicker('destroy');
-          }
-          $(this).timepicker({
-            timeFormat: 'HH:mm',
-            interval: 15,
-            minTime: '00:00',
-            maxTime: '23:59',
-            startTime: '00:00',
-            dynamic: true,
-            dropdown: true,
-            scrollbar: true,
-          });
-        });
-      });
+  
 
       Livewire.on('initialize-calculator', ({
         start_time,

@@ -432,6 +432,7 @@ class SpecialDaysAppointment extends Component
                 if ($specialSchedule) {
                     $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
                     $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
+                    $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [];
                     foreach ($workHours as $index => $slot) {
                         if (!isset($appointmentSettings[$index])) {
                             $appointmentSettings[$index] = [
@@ -448,6 +449,7 @@ class SpecialDaysAppointment extends Component
                             'day' => $dayOfWeek,
                             'work_hours' => $workHours,
                             'appointment_settings' => $appointmentSettings,
+                            'emergency_times' => $emergencyTimes,
                         ],
                     ];
                 }
@@ -466,6 +468,7 @@ class SpecialDaysAppointment extends Component
 
                 $workHours = $schedule->work_hours ? json_decode($schedule->work_hours, true) : [];
                 $appointmentSettings = $schedule->appointment_settings ? json_decode($schedule->appointment_settings, true) : [];
+                $emergencyTimes = $schedule->emergency_times ? json_decode($schedule->emergency_times, true) : [];
                 foreach ($workHours as $index => $slot) {
                     if (!isset($appointmentSettings[$index])) {
                         $appointmentSettings[$index] = [
@@ -482,6 +485,7 @@ class SpecialDaysAppointment extends Component
                         'day' => $dayOfWeek,
                         'work_hours' => $workHours,
                         'appointment_settings' => $appointmentSettings,
+                        'emergency_times' => $emergencyTimes,
                     ],
                 ];
             });
@@ -538,36 +542,42 @@ class SpecialDaysAppointment extends Component
                 ? json_decode($specialSchedule->emergency_times, true) ?? []
                 : [];
 
-            $this->selectedEmergencyTimes = $emergencyTimes[$this->emergencyModalIndex] ?? [];
-
             if ($this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours'])) {
                 $slot = $this->workSchedule['data']['work_hours'][$this->emergencyModalIndex] ?? null;
                 $appointmentSettings = $this->workSchedule['data']['appointment_settings'][$this->emergencyModalIndex] ?? null;
 
-                if ($slot && $appointmentSettings && !empty($slot['start']) && !empty($slot['end']) && $appointmentSettings['appointment_duration'] > 0) {
+                if ($slot && $appointmentSettings && !empty($slot['start']) && !empty($slot['end']) && isset($slot['max_appointments']) && $slot['max_appointments'] > 0) {
                     $start = Carbon::createFromFormat('H:i', $slot['start']);
                     $end = Carbon::createFromFormat('H:i', $slot['end']);
-                    $duration = (int) $appointmentSettings['appointment_duration'];
-                    $maxAppointments = (int) ($slot['max_appointments'] ?? 0);
+                    $maxAppointments = (int) $slot['max_appointments'];
+                    $totalMinutes = $end->diffInMinutes($start);
+                    $slotDuration = $maxAppointments > 0 ? floor($totalMinutes / $maxAppointments) : 0;
+
+                    if ($slotDuration <= 0) {
+                        return [
+                            'possible' => [],
+                            'selected' => $emergencyTimes[$this->emergencyModalIndex] ?? [],
+                        ];
+                    }
 
                     $possibleTimes = [];
                     $current = $start->copy();
 
                     while ($current->lessThan($end) && count($possibleTimes) < $maxAppointments) {
                         $possibleTimes[] = $current->format('H:i');
-                        $current->addMinutes($duration);
+                        $current->addMinutes($slotDuration);
                     }
 
                     return [
                         'possible' => $possibleTimes,
-                        'selected' => $this->selectedEmergencyTimes,
+                        'selected' => $emergencyTimes[$this->emergencyModalIndex] ?? [],
                     ];
                 }
             }
 
             return [
                 'possible' => [],
-                'selected' => $this->selectedEmergencyTimes,
+                'selected' => $emergencyTimes[$this->emergencyModalIndex] ?? [],
             ];
         } catch (\Exception $e) {
             Log::error("Error in getEmergencyTimes: " . $e->getMessage());
@@ -683,15 +693,19 @@ class SpecialDaysAppointment extends Component
 
             $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
+            $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [];
 
             if (isset($workHours[$index])) {
                 unset($workHours[$index]);
                 unset($appointmentSettings[$index]);
+                unset($emergencyTimes[$index]);
                 $workHours = array_values($workHours);
                 $appointmentSettings = array_values($appointmentSettings);
+                $emergencyTimes = array_values($emergencyTimes);
 
                 $specialSchedule->work_hours = json_encode($workHours);
                 $specialSchedule->appointment_settings = json_encode($appointmentSettings);
+                $specialSchedule->emergency_times = json_encode($emergencyTimes);
                 $specialSchedule->save();
 
                 $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
@@ -748,15 +762,50 @@ class SpecialDaysAppointment extends Component
             $timePerAppointment = $this->calculator['time_per_appointment'];
             $calculationMode = $this->calculator['calculation_mode'];
 
-            if (empty($day) || $index === null || !is_numeric($appointmentCount) || $appointmentCount <= 0) {
-                Log::error("Invalid or incomplete calculator data", $this->calculator);
-                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً تعداد نوبت‌ها را به‌درستی وارد کنید.');
+            if (empty($day) || $index === null) {
+                Log::error("Invalid day or index in calculator data", $this->calculator);
+                $this->dispatch('show-toastr', type: 'error', message: 'روز یا بازه زمانی نامعتبر است.');
                 return;
             }
 
-            if ($calculationMode === 'time' && (!is_numeric($timePerAppointment) || $timePerAppointment <= 0)) {
-                Log::error("Invalid time_per_appointment in time mode", $this->calculator);
-                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً زمان هر نوبت را به‌درستی وارد کنید.');
+            $startTime = $this->calculator['start_time'] ?? $this->workSchedule['data']['work_hours'][$index]['start'] ?? null;
+            $endTime = $this->calculator['end_time'] ?? $this->workSchedule['data']['work_hours'][$index]['end'] ?? null;
+
+            if (empty($startTime) || empty($endTime)) {
+                Log::error("Missing start or end time", ['start' => $startTime, 'end' => $endTime]);
+                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً زمان شروع و پایان را وارد کنید.');
+                return;
+            }
+
+            $start = Carbon::createFromFormat('H:i', $startTime);
+            $end = Carbon::createFromFormat('H:i', $endTime);
+            $totalMinutes = $end->diffInMinutes($start);
+
+            if ($totalMinutes <= 0) {
+                Log::error("Invalid time range: end time is not after start time", ['start' => $startTime, 'end' => $endTime]);
+                $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
+                return;
+            }
+
+            if ($calculationMode === 'count') {
+                if (!is_numeric($appointmentCount) || $appointmentCount <= 0) {
+                    Log::error("Invalid appointment count", ['appointment_count' => $appointmentCount]);
+                    $this->dispatch('show-toastr', type: 'error', message: 'لطفاً تعداد نوبت‌ها را به‌درستی وارد کنید.');
+                    return;
+                }
+                $timePerAppointment = $appointmentCount > 0 ? floor($totalMinutes / $appointmentCount) : 0;
+            } else {
+                if (!is_numeric($timePerAppointment) || $timePerAppointment <= 0) {
+                    Log::error("Invalid time per appointment", ['time_per_appointment' => $timePerAppointment]);
+                    $this->dispatch('show-toastr', type: 'error', message: 'لطفاً زمان هر نوبت را به‌درستی وارد کنید.');
+                    return;
+                }
+                $appointmentCount = $timePerAppointment > 0 ? floor($totalMinutes / $timePerAppointment) : 0;
+            }
+
+            if ($appointmentCount <= 0) {
+                Log::error("Calculated appointment count is invalid", ['appointment_count' => $appointmentCount]);
+                $this->dispatch('show-toastr', type: 'error', message: 'تعداد نوبت‌های محاسبه‌شده نامعتبر است.');
                 return;
             }
 
@@ -778,28 +827,6 @@ class SpecialDaysAppointment extends Component
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [];
 
-            $startTime = $this->workSchedule['data']['work_hours'][$index]['start'] ?? $this->calculator['start_time'] ?? '00:00';
-            $endTime = $this->workSchedule['data']['work_hours'][$index]['end'] ?? $this->calculator['end_time'] ?? '23:59';
-
-            if (empty($startTime) || empty($endTime)) {
-                Log::error("Invalid start or end time", ['start' => $startTime, 'end' => $endTime]);
-                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً زمان شروع و پایان را وارد کنید.');
-                return;
-            }
-
-            $start = Carbon::createFromFormat('H:i', $startTime);
-            $end = Carbon::createFromFormat('H:i', $endTime);
-            $duration = $timePerAppointment ?? 0;
-            $possibleEmergencyTimes = [];
-            $current = $start->copy();
-
-            while ($current->lessThan($end) && count($possibleEmergencyTimes) < $appointmentCount) {
-                $possibleEmergencyTimes[] = $current->format('H:i');
-                $current->addMinutes($duration);
-            }
-
-            $emergencyTimes[$index] = $this->selectedEmergencyTimes;
-
             $workHours[$index] = [
                 'start' => $startTime,
                 'end' => $endTime,
@@ -812,13 +839,18 @@ class SpecialDaysAppointment extends Component
                 'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
                 'work_hour_key' => $index,
                 'max_appointments' => $appointmentCount,
-                'appointment_duration' => $timePerAppointment ?? 0,
+                'appointment_duration' => $timePerAppointment,
             ];
+
+            $emergencyTimes[$index] = $emergencyTimes[$index] ?? [];
 
             $specialSchedule->work_hours = json_encode($workHours);
             $specialSchedule->appointment_settings = json_encode($appointmentSettings);
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
+
+            $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
+            Cache::forget($cacheKey);
 
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
@@ -856,11 +888,15 @@ class SpecialDaysAppointment extends Component
             );
 
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [];
-            $emergencyTimes[$this->emergencyModalIndex] = $this->selectedEmergencyTimes;
+            $emergencyTimes[$this->emergencyModalIndex] = array_values(array_filter($this->emergencyTimes, fn ($time) => is_string($time)));
 
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
 
+            $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
+            Cache::forget($cacheKey);
+
+            $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->dispatch('show-toastr', type: 'success', message: 'زمان‌های اورژانسی ذخیره شد.');
             $this->dispatch('close-emergency-modal');
         } catch (\Exception $e) {
@@ -902,17 +938,37 @@ class SpecialDaysAppointment extends Component
                 return;
             }
 
+            if (empty($startTime) || empty($endTime)) {
+                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً زمان شروع و پایان را وارد کنید.');
+                return;
+            }
+
+            $start = Carbon::createFromFormat('H:i', $startTime);
+            $end = Carbon::createFromFormat('H:i', $endTime);
+
+            if ($end->lessThanOrEqualTo($start)) {
+                $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
+                return;
+            }
+
+            $existingSettings = $appointmentSettings[$this->scheduleModalIndex] ?? [];
+            $maxAppointments = $existingSettings['max_appointments'] ?? $this->workSchedule['data']['work_hours'][$this->scheduleModalIndex]['max_appointments'] ?? 0;
+            $appointmentDuration = $existingSettings['appointment_duration'] ?? 0;
+
             $appointmentSettings[$this->scheduleModalIndex] = [
                 'start_time' => $startTime,
                 'end_time' => $endTime,
                 'days' => $selectedDays,
                 'work_hour_key' => $this->scheduleModalIndex,
-                'max_appointments' => $appointmentSettings[$this->scheduleModalIndex]['max_appointments'] ?? 0,
-                'appointment_duration' => $appointmentSettings[$this->scheduleModalIndex]['appointment_duration'] ?? 0,
+                'max_appointments' => $maxAppointments,
+                'appointment_duration' => $appointmentDuration,
             ];
 
             $specialSchedule->appointment_settings = json_encode($appointmentSettings);
             $specialSchedule->save();
+
+            $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
+            Cache::forget($cacheKey);
 
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
@@ -955,9 +1011,13 @@ class SpecialDaysAppointment extends Component
                 $specialSchedule->appointment_settings = json_encode($appointmentSettings);
                 $specialSchedule->save();
 
+                $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
+                Cache::forget($cacheKey);
+
                 $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
                 $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
-                $this->dispatch('show-toastr', type: 'success', message: 'تنظیم زمان Ive‌بندی حذف شد.');
+                $this->dispatch('show-toastr', type: 'success', message: 'تنظیم زمان‌بندی حذف شد.');
+                $this->dispatch('refresh-schedule-settings');
             } else {
                 $this->dispatch('show-toastr', type: 'error', message: 'تنظیم زمان‌بندی نامعتبر است.');
             }
@@ -981,39 +1041,77 @@ class SpecialDaysAppointment extends Component
 
     public function openCalculatorModal($day, $index)
     {
-        $this->calculator = [
-            'day' => $day,
-            'index' => $index,
-            'start_time' => $this->workSchedule['data']['work_hours'][$index]['start'] ?? '00:00',
-            'end_time' => $this->workSchedule['data']['work_hours'][$index]['end'] ?? '23:59',
-            'appointment_count' => $this->workSchedule['data']['work_hours'][$index]['max_appointments'] ?? null,
-            'time_per_appointment' => $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] ?? null,
-            'calculation_mode' => $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] ? 'time' : 'count',
-        ];
+        try {
+            $startTime = $this->workSchedule['data']['work_hours'][$index]['start'] ?? '00:00';
+            $endTime = $this->workSchedule['data']['work_hours'][$index]['end'] ?? '23:59';
 
-        $this->dispatch('open-modal', id: 'CalculatorModal');
-        $this->dispatch('initialize-calculator', [
-            'start_time' => $this->calculator['start_time'],
-            'end_time' => $this->calculator['end_time'],
-            'index' => $index,
-            'day' => $day,
-        ]);
+            if (empty($startTime) || empty($endTime)) {
+                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً ابتدا زمان شروع و پایان را وارد کنید.');
+                return;
+            }
+
+            $start = Carbon::createFromFormat('H:i', $startTime);
+            $end = Carbon::createFromFormat('H:i', $endTime);
+            $totalMinutes = $end->diffInMinutes($start);
+
+            if ($totalMinutes <= 0) {
+                $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
+                return;
+            }
+
+            $this->calculator = [
+                'day' => $day,
+                'index' => $index,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+                'appointment_count' => $this->workSchedule['data']['work_hours'][$index]['max_appointments'] ?? null,
+                'time_per_appointment' => $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] ?? null,
+                'calculation_mode' => $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] ? 'time' : 'count',
+            ];
+
+            $this->dispatch('open-modal', id: 'CalculatorModal');
+            $this->dispatch('initialize-calculator', [
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+                'index' => $index,
+                'day' => $day,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error in openCalculatorModal: " . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال محاسبه‌گر: ' . $e->getMessage());
+        }
     }
 
     public function openEmergencyModal($day, $index)
     {
-        $this->isEmergencyModalOpen = true;
-        $this->emergencyModalDay = $day;
-        $this->emergencyModalIndex = $index;
-        $this->emergencyTimes = $this->getEmergencyTimes();
-        $this->dispatch('open-modal', id: 'emergencyModal');
+        try {
+            $this->isEmergencyModalOpen = true;
+            $this->emergencyModalDay = $day;
+            $this->emergencyModalIndex = $index;
+            $this->emergencyTimes = $this->getEmergencyTimes()['possible'] ?? [];
+            $this->selectedEmergencyTimes = $this->getEmergencyTimes()['selected'] ?? [];
+            $this->dispatch('open-modal', id: 'emergencyModal');
+        } catch (\Exception $e) {
+            Log::error("Error in openEmergencyModal: " . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال اورژانسی: ' . $e->getMessage());
+        }
     }
 
     public function openScheduleModal($day, $index)
     {
-        $this->scheduleModalDay = $day;
-        $this->scheduleModalIndex = $index;
-        $this->dispatch('open-modal', id: 'scheduleModal');
+        try {
+            $this->scheduleModalDay = $day;
+            $this->scheduleModalIndex = $index;
+
+            $settings = $this->workSchedule['data']['appointment_settings'][$index] ?? [];
+            $this->selectedScheduleDays = array_fill_keys($settings['days'] ?? [], true);
+            $this->selectAllScheduleModal = count($this->selectedScheduleDays) === 7;
+
+            $this->dispatch('open-modal', id: 'scheduleModal');
+        } catch (\Exception $e) {
+            Log::error("Error in openScheduleModal: " . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال زمان‌بندی: ' . $e->getMessage());
+        }
     }
 
     public function closeCalculatorModal()
@@ -1051,7 +1149,7 @@ class SpecialDaysAppointment extends Component
 
     public function updatedSelectedEmergencyTimes()
     {
-        Log::info("Selected emergency times updated", ['selectedEmergencyTimes' => $this->selectedEmergencyTimes]);
+        Log::info("Selected emergency times updated", ['emergencyTimes' => $this->emergencyTimes]);
     }
 
     public function updatedWorkScheduleDataWorkHours($value, $nested)
@@ -1111,7 +1209,6 @@ class SpecialDaysAppointment extends Component
 
     public function initializeCalculator($params)
     {
-        // این متد می‌تواند برای هماهنگی با جاوااسکریپت استفاده بشه، اما فعلاً خالیه
         Log::info("Initialize calculator called with params", ['params' => $params]);
     }
 
