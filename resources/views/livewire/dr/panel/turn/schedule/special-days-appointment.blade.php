@@ -351,6 +351,130 @@
     };
 
     document.addEventListener("livewire:initialized", () => {
+      // حذف شنونده‌های قبلی برای جلوگیری از تکرار
+      
+
+      // تعریف شنونده جدید
+      Livewire.on('confirm-add-slot', () => {
+        console.log('Received confirm-add-slot event');
+        Swal.fire({
+          title: 'آیا مایلید ساعات کاری قبلی ذخیره شوند؟',
+          text: 'در صورت تأیید، ساعات کاری فعلی ذخیره شده و یک ردیف جدید اضافه می‌شود.',
+          icon: 'question',
+          showCancelButton: true,
+          showDenyButton: true,
+          confirmButtonText: 'بله، ذخیره کن',
+          cancelButtonText: 'بدون ذخیره',
+          denyButtonText: 'بستن',
+          reverseButtons: true,
+          showLoaderOnConfirm: true,
+          showLoaderOnCancel: true
+        }).then((result) => {
+          console.log('SweetAlert result:', result);
+          if (result.isConfirmed) {
+            console.log('Dispatching confirmAddSlot with savePrevious: true');
+            window.Livewire.dispatchTo('dr.panel.turn.schedule.special-days-appointment', 'confirmAddSlot', {
+              savePrevious: true
+            });
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            console.log('Dispatching confirmAddSlot with savePrevious: false');
+            window.Livewire.dispatchTo('dr.panel.turn.schedule.special-days-appointment', 'confirmAddSlot', {
+              savePrevious: false
+            });
+          } else if (result.isDenied) {
+            console.log('SweetAlert closed without action');
+          }
+        }).catch((error) => {
+          console.error('SweetAlert error:', error);
+          window.Livewire.dispatch('show-toastr', {
+            type: 'error',
+            message: 'خطا در نمایش تأیید: ' + error.message
+          });
+        });
+      });
+      Livewire.on('confirm-delete-slot', ({
+        index
+      }) => {
+        Swal.fire({
+          title: 'آیا مطمئن هستید؟',
+          text: 'این بازه زمانی حذف خواهد شد!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            console.log('Dispatching confirmDeleteSlot with index: ' + index);
+            Livewire.dispatch('confirmDeleteSlot', {
+              index: index
+            });
+          }
+        });
+      });
+      Livewire.on('confirm-delete-schedule-setting', ({
+        day,
+        index
+      }) => {
+        Swal.fire({
+          title: 'آیا مطمئن هستید؟',
+          text: 'این تنظیم زمان‌بندی حذف خواهد شد!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('deleteScheduleSetting', {
+              day: day,
+              index: index
+            });
+          }
+        });
+      });
+      Livewire.on('refresh-schedule-settings', () => {
+        // به‌روزرسانی لیست تنظیمات در Schedule Modal
+        const $settingsList = $('.schedule-settings-list');
+        $settingsList.find('.schedule-setting-item').remove();
+
+        // به‌روزرسانی چک‌باکس‌ها
+        $('.schedule-day-checkbox').each(function() {
+          $(this).prop('checked', false);
+        });
+
+        // رفرش کامل کامپوننت
+        Livewire.dispatch('refresh');
+      });
+      Livewire.on('update-calculator-ui', (data) => {
+        const $modal = $('#CalculatorModal');
+        if (!$modal.length) {
+          console.error('Calculator modal not found during UI update');
+          return;
+        }
+
+        const $appointmentCountInput = $modal.find('#appointment-count');
+        const $timeCountInput = $modal.find('#time-count');
+        const $countRadio = $modal.find('#count-radio');
+        const $timeRadio = $modal.find('#time-radio');
+
+        $appointmentCountInput.val(data.appointment_count || '');
+        $timeCountInput.val(data.time_per_appointment || '');
+        if (data.calculation_mode === 'count') {
+          $countRadio.prop('checked', true);
+        } else {
+          $timeRadio.prop('checked', true);
+        }
+      });
+
+      Livewire.on('update-appointment-count', (data) => {
+        const $input = $(`#patients-${data.index}`);
+        if ($input.length) {
+          $input.val(data.count);
+        } else {
+          console.warn(`Input #patients-${data.index} not found`);
+        }
+      });
       Livewire.on('open-modal', ({
         id
       }) => {
@@ -606,115 +730,5 @@
 
       tryInitialize();
     }
-
-    // مدیریت به‌روزرسانی UI
-    document.addEventListener('livewire:initialized', function() {
-      Livewire.on('confirm-add-slot', () => {
-        Swal.fire({
-          title: 'آیا مایلید ساعات کاری قبلی ذخیره شوند؟',
-          text: 'در صورت تأیید، ساعات کاری فعلی ذخیره شده و یک ردیف جدید اضافه می‌شود.',
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: 'بله، ذخیره کن',
-          cancelButtonText: 'خیر',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            console.log('Dispatching confirmAddSlot with savePrevious: true');
-            Livewire.dispatch('confirmAddSlot', {
-              savePrevious: true
-            });
-          } else {
-            console.log('Dispatching confirmAddSlot with savePrevious: false');
-            Livewire.dispatch('confirmAddSlot', {
-              savePrevious: false
-            });
-          }
-        });
-      });
-      Livewire.on('confirm-delete-slot', ({
-        index
-      }) => {
-        Swal.fire({
-          title: 'آیا مطمئن هستید؟',
-          text: 'این بازه زمانی حذف خواهد شد!',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'بله، حذف کن',
-          cancelButtonText: 'خیر',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            console.log('Dispatching confirmDeleteSlot with index: ' + index);
-            Livewire.dispatch('confirmDeleteSlot', {
-              index: index
-            });
-          }
-        });
-      });
-      Livewire.on('confirm-delete-schedule-setting', ({
-        day,
-        index
-      }) => {
-        Swal.fire({
-          title: 'آیا مطمئن هستید؟',
-          text: 'این تنظیم زمان‌بندی حذف خواهد شد!',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'بله، حذف کن',
-          cancelButtonText: 'خیر',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Livewire.dispatch('deleteScheduleSetting', {
-              day: day,
-              index: index
-            });
-          }
-        });
-      });
-      Livewire.on('refresh-schedule-settings', () => {
-        // به‌روزرسانی لیست تنظیمات در Schedule Modal
-        const $settingsList = $('.schedule-settings-list');
-        $settingsList.find('.schedule-setting-item').remove();
-
-        // به‌روزرسانی چک‌باکس‌ها
-        $('.schedule-day-checkbox').each(function() {
-          $(this).prop('checked', false);
-        });
-
-        // رفرش کامل کامپوننت
-        Livewire.dispatch('refresh');
-      });
-      Livewire.on('update-calculator-ui', (data) => {
-        const $modal = $('#CalculatorModal');
-        if (!$modal.length) {
-          console.error('Calculator modal not found during UI update');
-          return;
-        }
-
-        const $appointmentCountInput = $modal.find('#appointment-count');
-        const $timeCountInput = $modal.find('#time-count');
-        const $countRadio = $modal.find('#count-radio');
-        const $timeRadio = $modal.find('#time-radio');
-
-        $appointmentCountInput.val(data.appointment_count || '');
-        $timeCountInput.val(data.time_per_appointment || '');
-        if (data.calculation_mode === 'count') {
-          $countRadio.prop('checked', true);
-        } else {
-          $timeRadio.prop('checked', true);
-        }
-      });
-
-      Livewire.on('update-appointment-count', (data) => {
-        const $input = $(`#patients-${data.index}`);
-        if ($input.length) {
-          $input.val(data.count);
-        } else {
-          console.warn(`Input #patients-${data.index} not found`);
-        }
-      });
-    });
   </script>
 </div>
