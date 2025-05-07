@@ -732,69 +732,71 @@ class SpecialDaysAppointment extends Component
         }
     }
 
- public function setCalculatorValues($values)
-{
-    if ($this->isProcessing) {
-        return;
+    public function setCalculatorValues($values)
+    {
+        if ($this->isProcessing) {
+            return;
+        }
+
+        try {
+            $startTime = $this->calculator['start_time'] ?? null;
+            $endTime = $this->calculator['end_time'] ?? null;
+
+            if (empty($startTime) || empty($endTime)) {
+                Log::error("Missing start or end time in calculator", ['start_time' => $startTime, 'end_time' => $endTime]);
+                $this->dispatch('show-toastr', type: 'error', message: 'زمان شروع یا پایان مشخص نشده است.');
+                return;
+            }
+
+            // اعتبارسنجی فرمت زمان
+            if (!preg_match('/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/', $startTime) ||
+                !preg_match('/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/', $endTime)) {
+                Log::error("Invalid time format in calculator", ['start_time' => $startTime, 'end_time' => $endTime]);
+                $this->dispatch('show-toastr', type: 'error', message: 'فرمت زمان نامعتبر است.');
+                return;
+            }
+
+            $start = Carbon::createFromFormat('H:i', $startTime);
+            $end = Carbon::createFromFormat('H:i', $endTime);
+
+            // بررسی ترتیب زمانی
+            if ($end->lte($start)) {
+                Log::error("End time is not after start time", ['start_time' => $startTime, 'end_time' => $endTime]);
+                $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
+                return;
+            }
+
+
+            $totalMinutes = abs($end->diffInMinutes($start));
+
+
+            if ($totalMinutes <= 0) {
+                Log::error("Invalid time range in calculator", ['total_minutes' => $totalMinutes]);
+                $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی نامعتبر است.');
+                return;
+            }
+
+            $this->calculator['calculation_mode'] = $values['calculation_mode'] ?? $this->calculator['calculation_mode'];
+            $mode = $this->calculator['calculation_mode'];
+
+            if ($mode === 'count' && isset($values['appointment_count']) && is_numeric($values['appointment_count']) && $values['appointment_count'] > 0) {
+                $this->calculator['appointment_count'] = (int) $values['appointment_count'];
+                $this->calculator['time_per_appointment'] = floor($totalMinutes / $this->calculator['appointment_count']);
+            } elseif ($mode === 'time' && isset($values['time_per_appointment']) && is_numeric($values['time_per_appointment']) && $values['time_per_appointment'] > 0) {
+                $this->calculator['time_per_appointment'] = (int) $values['time_per_appointment'];
+                $this->calculator['appointment_count'] = floor($totalMinutes / $this->calculator['time_per_appointment']);
+            } else {
+                Log::warning("Invalid input values for calculator", ['values' => $values]);
+                return;
+            }
+
+            Log::info("Calculator values updated", $this->calculator);
+            $this->dispatch('update-calculator-ui', $this->calculator);
+        } catch (\Exception $e) {
+            Log::error("Error in setCalculatorValues: " . $e->getMessage(), ['values' => $values]);
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در به‌روزرسانی مقادیر محاسبه‌گر: ' . $e->getMessage());
+        }
     }
-
-    try {
-        $startTime = $this->calculator['start_time'] ?? null;
-        $endTime = $this->calculator['end_time'] ?? null;
-
-        if (empty($startTime) || empty($endTime)) {
-            Log::error("Missing start or end time in calculator", ['start_time' => $startTime, 'end_time' => $endTime]);
-            $this->dispatch('show-toastr', type: 'error', message: 'زمان شروع یا پایان مشخص نشده است.');
-            return;
-        }
-
-        // اعتبارسنجی فرمت زمان
-        if (!preg_match('/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/', $startTime) || 
-            !preg_match('/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/', $endTime)) {
-            Log::error("Invalid time format in calculator", ['start_time' => $startTime, 'end_time' => $endTime]);
-            $this->dispatch('show-toastr', type: 'error', message: 'فرمت زمان نامعتبر است.');
-            return;
-        }
-
-        $start = Carbon::createFromFormat('H:i', $startTime);
-        $end = Carbon::createFromFormat('H:i', $endTime);
-
-        // بررسی ترتیب زمانی
-        if ($end->lte($start)) {
-            Log::error("End time is not after start time", ['start_time' => $startTime, 'end_time' => $endTime]);
-            $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
-            return;
-        }
-
-        $totalMinutes = $end->diffInMinutes($start);
-
-        if ($totalMinutes <= 0) {
-            Log::error("Invalid time range in calculator", ['total_minutes' => $totalMinutes]);
-            $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی نامعتبر است.');
-            return;
-        }
-
-        $this->calculator['calculation_mode'] = $values['calculation_mode'] ?? $this->calculator['calculation_mode'];
-        $mode = $this->calculator['calculation_mode'];
-
-        if ($mode === 'count' && isset($values['appointment_count']) && is_numeric($values['appointment_count']) && $values['appointment_count'] > 0) {
-            $this->calculator['appointment_count'] = (int) $values['appointment_count'];
-            $this->calculator['time_per_appointment'] = floor($totalMinutes / $this->calculator['appointment_count']);
-        } elseif ($mode === 'time' && isset($values['time_per_appointment']) && is_numeric($values['time_per_appointment']) && $values['time_per_appointment'] > 0) {
-            $this->calculator['time_per_appointment'] = (int) $values['time_per_appointment'];
-            $this->calculator['appointment_count'] = floor($totalMinutes / $this->calculator['time_per_appointment']);
-        } else {
-            Log::warning("Invalid input values for calculator", ['values' => $values]);
-            return;
-        }
-
-        Log::info("Calculator values updated", $this->calculator);
-        $this->dispatch('update-calculator-ui', $this->calculator);
-    } catch (\Exception $e) {
-        Log::error("Error in setCalculatorValues: " . $e->getMessage(), ['values' => $values]);
-        $this->dispatch('show-toastr', type: 'error', message: 'خطا در به‌روزرسانی مقادیر محاسبه‌گر: ' . $e->getMessage());
-    }
-}
 
     public function saveCalculator()
     {
