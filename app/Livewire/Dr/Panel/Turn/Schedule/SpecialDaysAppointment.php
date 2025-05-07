@@ -542,6 +542,8 @@ class SpecialDaysAppointment extends Component
     {
         try {
             $doctorId = $this->getAuthenticatedDoctor()->id;
+
+            // خواندن زمان‌های انتخاب‌شده از SpecialDailySchedule
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
@@ -552,41 +554,89 @@ class SpecialDaysAppointment extends Component
                 ? json_decode($specialSchedule->emergency_times, true) ?? []
                 : [];
 
+            // تولید زمان‌های ممکن
+            $possibleTimes = [];
             if ($this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours'])) {
                 $slot = $this->workSchedule['data']['work_hours'][$this->emergencyModalIndex] ?? null;
                 $appointmentSettings = $this->workSchedule['data']['appointment_settings'][$this->emergencyModalIndex] ?? null;
 
                 if ($slot && $appointmentSettings && !empty($slot['start']) && !empty($slot['end']) && isset($slot['max_appointments']) && $slot['max_appointments'] > 0) {
-                    $start = Carbon::createFromFormat('H:i', $slot['start']);
-                    $end = Carbon::createFromFormat('H:i', $slot['end']);
-                    $maxAppointments = (int) $slot['max_appointments'];
-                    $totalMinutes = $end->diffInMinutes($start);
-                    $slotDuration = $maxAppointments > 0 ? floor($totalMinutes / $maxAppointments) : 0;
-
-                    if ($slotDuration <= 0) {
+                    // اعتبارسنجی فرمت زمان
+                    try {
+                        $start = Carbon::createFromFormat('H:i', $slot['start']);
+                        $end = Carbon::createFromFormat('H:i', $slot['end']);
+                    } catch (\Exception $e) {
+                        Log::error("Invalid time format in getEmergencyTimes", [
+                            'start' => $slot['start'],
+                            'end' => $slot['end'],
+                            'error' => $e->getMessage(),
+                        ]);
                         return [
                             'possible' => [],
                             'selected' => $emergencyTimes[$this->emergencyModalIndex] ?? [],
                         ];
                     }
 
+                    if (!$start || !$end || $end->lessThanOrEqualTo($start)) {
+                        Log::warning("Invalid time range", [
+                            'start' => $slot['start'],
+                            'end' => $slot['end'],
+                        ]);
+                        return [
+                            'possible' => [],
+                            'selected' => $emergencyTimes[$this->emergencyModalIndex] ?? [],
+                        ];
+                    }
+
+                    $maxAppointments = (int) $slot['max_appointments'];
+
+
+                    $totalMinutes = abs($end->diffInMinutes($start));
+
+                    $slotDuration = $maxAppointments > 0 ? floor($totalMinutes / $maxAppointments) : 0;
+
+                    if ($slotDuration <= 0) {
+                        Log::warning("Invalid slot duration calculated", [
+                            'slotDuration' => $slotDuration,
+                            'totalMinutes' => $totalMinutes,
+                            'maxAppointments' => $maxAppointments,
+                        ]);
+                        return [
+                            'possible' => [],
+                            'selected' => $emergencyTimes[$this->emergencyModalIndex] ?? [],
+                        ];
+                    }
+
+                    // تولید زمان‌های ممکن
                     $possibleTimes = [];
                     $current = $start->copy();
-
                     while ($current->lessThan($end) && count($possibleTimes) < $maxAppointments) {
                         $possibleTimes[] = $current->format('H:i');
                         $current->addMinutes($slotDuration);
                     }
 
-                    return [
-                        'possible' => $possibleTimes,
-                        'selected' => $emergencyTimes[$this->emergencyModalIndex] ?? [],
-                    ];
+                    Log::info("Emergency times generated", [
+                        'possibleTimes' => $possibleTimes,
+                        'slotDuration' => $slotDuration,
+                        'start' => $slot['start'],
+                        'end' => $slot['end'],
+                        'maxAppointments' => $maxAppointments,
+                    ]);
+                } else {
+                    Log::warning("Missing or invalid slot data", [
+                        'slot' => $slot,
+                        'appointmentSettings' => $appointmentSettings,
+                        'emergencyModalIndex' => $this->emergencyModalIndex,
+                    ]);
                 }
+            } else {
+                Log::warning("No work hours available in workSchedule", [
+                    'workSchedule' => $this->workSchedule,
+                ]);
             }
 
             return [
-                'possible' => [],
+                'possible' => $possibleTimes,
                 'selected' => $emergencyTimes[$this->emergencyModalIndex] ?? [],
             ];
         } catch (\Exception $e) {
@@ -910,7 +960,9 @@ class SpecialDaysAppointment extends Component
             );
 
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [];
-            $emergencyTimes[$this->emergencyModalIndex] = array_values(array_filter($this->emergencyTimes, fn ($time) => is_string($time)));
+            // ذخیره فقط زمان‌های انتخاب‌شده
+            $selectedTimes = array_keys(array_filter($this->selectedEmergencyTimes, fn ($value) => $value));
+            $emergencyTimes[$this->emergencyModalIndex] = array_values(array_filter($selectedTimes, fn ($time) => in_array($time, $this->emergencyTimes['possible'] ?? [])));
 
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
@@ -1098,7 +1150,9 @@ class SpecialDaysAppointment extends Component
             }
 
             // محاسبه تفاوت زمانی
-            $totalMinutes = $start->diffInMinutes($end, true);
+
+            $totalMinutes = abs($end->diffInMinutes($start));
+
 
             if ($end->lessThanOrEqualTo($start)) {
                 Log::warning("End time is not after start time", ['startTime' => $startTime, 'endTime' => $endTime, 'totalMinutes' => $totalMinutes]);
@@ -1139,8 +1193,13 @@ class SpecialDaysAppointment extends Component
             $this->isEmergencyModalOpen = true;
             $this->emergencyModalDay = $day;
             $this->emergencyModalIndex = $index;
-            $this->emergencyTimes = $this->getEmergencyTimes()['possible'] ?? [];
-            $this->selectedEmergencyTimes = $this->getEmergencyTimes()['selected'] ?? [];
+            $emergencyData = $this->getEmergencyTimes();
+            $this->emergencyTimes = [
+                'possible' => $emergencyData['possible'] ?? [],
+                'selected' => $emergencyData['selected'] ?? [],
+            ];
+            // تنظیم selectedEmergencyTimes برای UI
+            $this->selectedEmergencyTimes = array_fill_keys($emergencyData['selected'] ?? [], true);
             $this->dispatch('open-modal', id: 'emergencyModal');
         } catch (\Exception $e) {
             Log::error("Error in openEmergencyModal: " . $e->getMessage());
