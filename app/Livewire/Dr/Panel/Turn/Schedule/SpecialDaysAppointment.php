@@ -7,9 +7,10 @@ use App\Models\Doctor;
 use Livewire\Component;
 use Morilog\Jalali\Jalalian;
 use App\Models\DoctorHoliday;
-use App\Models\SpecialDailySchedule;
 use Illuminate\Support\Facades\Log;
+use App\Models\SpecialDailySchedule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class SpecialDaysAppointment extends Component
 {
@@ -42,7 +43,7 @@ class SpecialDaysAppointment extends Component
         $this->selectedDate = $date;
         $this->showModal = true;
         $this->workSchedule = $this->getWorkScheduleForDate($date);
-        $this->dispatch('openXModal', ['id' => 'holiday-modal']);
+        $this->dispatch('open-modal', ['id' => 'holiday-modal']);
     }
 
     public function loadCalendarData()
@@ -96,32 +97,35 @@ class SpecialDaysAppointment extends Component
     {
         try {
             $doctorId = $this->getAuthenticatedDoctor()->id;
-            $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)->where('status', 'active');
+            $cacheKey = "holidays_{$doctorId}_{$this->selectedClinicId}";
 
-            if ($this->selectedClinicId === 'default') {
-                $holidaysQuery->whereNull('clinic_id');
-            } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
-                $holidaysQuery->where('clinic_id', $this->selectedClinicId);
-            }
-
-            $holidays = $holidaysQuery->get()->pluck('holiday_dates')->map(function ($holiday) {
-                $dates = is_string($holiday) ? json_decode($holiday, true) : $holiday;
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    return [];
+            return Cache::remember($cacheKey, now()->addHours(24), function () use ($doctorId) {
+                $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)->where('status', 'active');
+                if ($this->selectedClinicId === 'default') {
+                    $holidaysQuery->whereNull('clinic_id');
+                } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
+                    $holidaysQuery->where('clinic_id', $this->selectedClinicId);
                 }
-                return is_array($dates) ? $dates : [];
-            })->flatten()->filter()->map(function ($date) {
-                try {
-                    if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $date)) {
-                        return Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
+
+                $holidays = $holidaysQuery->get()->pluck('holiday_dates')->map(function ($holiday) {
+                    $dates = is_string($holiday) ? json_decode($holiday, true) : $holiday;
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        return [];
                     }
-                    return Carbon::parse($date)->format('Y-m-d');
-                } catch (\Exception $e) {
-                    return null;
-                }
-            })->filter()->unique()->values()->toArray();
+                    return is_array($dates) ? $dates : [];
+                })->flatten()->filter()->map(function ($date) {
+                    try {
+                        if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $date)) {
+                            return Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
+                        }
+                        return Carbon::parse($date)->format('Y-m-d');
+                    } catch (\Exception $e) {
+                        return null;
+                    }
+                })->filter()->unique()->values()->toArray();
 
-            return $holidays;
+                return $holidays;
+            });
         } catch (\Exception $e) {
             return [];
         }
@@ -191,7 +195,7 @@ class SpecialDaysAppointment extends Component
             ];
             $this->workSchedule = $this->getWorkScheduleForDate($gregorianDate);
             $this->dispatch('updateSelectedDate', $gregorianDate, $this->workSchedule);
-            $this->dispatch('openXModal', id: 'holiday-modal');
+            $this->dispatch('open-modal', id: 'holiday-modal');
         } else {
             $this->dispatch('show-toastr', type: 'error', message: 'خطا: تاریخ یا شناسه مودال نامعتبر است.');
         }
@@ -266,6 +270,9 @@ class SpecialDaysAppointment extends Component
                     'calendarMonth' => $this->calendarMonth,
                 ]);
 
+                $cacheKey = "holidays_{$doctorId}_{$this->selectedClinicId}";
+                Cache::forget($cacheKey);
+
                 $this->dispatch('holidayUpdated', date: $this->selectedDate, isHoliday: true);
                 $this->dispatch('show-toastr', type: 'success', message: 'این تاریخ تعطیل شد.');
             } else {
@@ -274,7 +281,7 @@ class SpecialDaysAppointment extends Component
 
             $this->showModal = false;
             $this->selectedDate = null;
-            $this->dispatch('closeXModal', id: 'holiday-modal');
+            $this->dispatch('close-modal', id: 'holiday-modal');
         } catch (\Exception $e) {
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در افزودن تعطیلی: ' . $e->getMessage());
         } finally {
@@ -335,6 +342,10 @@ class SpecialDaysAppointment extends Component
                         'calendarMonth' => $this->calendarMonth,
                     ]);
 
+                    $cacheKey = "holidays_{$doctorId}_{$this->selectedClinicId}";
+                    Cache::forget($cacheKey);
+
+
                     $this->dispatch('holidayUpdated', date: $this->selectedDate, isHoliday: false);
                     $this->dispatch('show-toastr', type: 'success', message: 'این تاریخ از حالت تعطیلی خارج شد.');
                 } else {
@@ -346,7 +357,7 @@ class SpecialDaysAppointment extends Component
 
             $this->showModal = false;
             $this->selectedDate = null;
-            $this->dispatch('closeXModal', id: 'holiday-modal');
+            $this->dispatch('close-modal', id: 'holiday-modal');
         } catch (\Exception $e) {
             $message = 'خطا در حذف تعطیلی: ' . $e->getMessage();
             $this->dispatch('show-toastr', type: 'error', message: $message);
@@ -360,7 +371,7 @@ class SpecialDaysAppointment extends Component
         $this->showModal = false;
         $this->selectedDate = null;
         $this->workSchedule = ['status' => false, 'data' => []];
-        $this->dispatch('closeXModal', id: 'holiday-modal');
+        $this->dispatch('close-modal', id: 'holiday-modal');
     }
 
     public function getWorkScheduleForDate($gregorianDate)

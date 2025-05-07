@@ -4,10 +4,11 @@ namespace App\Livewire\Dr\Panel\Turn\Schedule;
 
 use Carbon\Carbon;
 use Livewire\Component;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 use App\Models\DoctorWorkSchedule;
+use Illuminate\Support\Facades\Log;
 use App\Models\SpecialDailySchedule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class SpecialWorkhours extends Component
 {
@@ -109,18 +110,55 @@ class SpecialWorkhours extends Component
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $date = Carbon::parse($gregorianDate);
             $dayOfWeek = strtolower($date->format('l'));
-            Log::info("Fetching work schedule for date: {$gregorianDate}, day: {$dayOfWeek}, doctor_id: {$doctorId}, clinic_id: {$this->clinicId}");
+            $cacheKey = "work_schedule_{$doctorId}_{$gregorianDate}_{$this->clinicId}";
 
-            $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
-                ->where('date', $gregorianDate)
-                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
-                ->first();
+            // تلاش برای دریافت از کش
+            $cachedSchedule = Cache::remember($cacheKey, now()->addHours(24), function () use ($doctorId, $gregorianDate, $dayOfWeek) {
+                Log::info("Fetching work schedule from DB for date: {$gregorianDate}, day: {$dayOfWeek}, doctor_id: {$doctorId}, clinic_id: {$this->clinicId}");
 
-            if ($specialSchedule) {
-                $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
-                $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
+                $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
+                    ->where('date', $gregorianDate)
+                    ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                    ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
+                    ->first();
 
+                if ($specialSchedule) {
+                    $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+                    $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
+                    foreach ($workHours as $index => $slot) {
+                        if (!isset($appointmentSettings[$index])) {
+                            $appointmentSettings[$index] = [
+                                'max_appointments' => $slot['max_appointments'] ?? 0,
+                                'appointment_duration' => 0,
+                            ];
+                        } else {
+                            $appointmentSettings[$index]['max_appointments'] = $slot['max_appointments'] ?? $appointmentSettings[$index]['max_appointments'] ?? 0;
+                        }
+                    }
+                    return [
+                        'status' => true,
+                        'data' => [
+                            'day' => $dayOfWeek,
+                            'work_hours' => $workHours,
+                            'appointment_settings' => $appointmentSettings,
+                        ],
+                    ];
+                }
+
+                $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                    ->where('day', $dayOfWeek)
+                    ->where('is_working', true)
+                    ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                    ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
+                    ->first();
+
+                if (!$schedule) {
+                    Log::info("No work schedule found for {$dayOfWeek} with doctor_id: {$doctorId}, clinic_id: {$this->clinicId}");
+                    return ['status' => false, 'data' => []];
+                }
+
+                $workHours = $schedule->work_hours ? json_decode($schedule->work_hours, true) : [];
+                $appointmentSettings = $schedule->appointment_settings ? json_decode($schedule->appointment_settings, true) : [];
                 foreach ($workHours as $index => $slot) {
                     if (!isset($appointmentSettings[$index])) {
                         $appointmentSettings[$index] = [
@@ -131,7 +169,6 @@ class SpecialWorkhours extends Component
                         $appointmentSettings[$index]['max_appointments'] = $slot['max_appointments'] ?? $appointmentSettings[$index]['max_appointments'] ?? 0;
                     }
                 }
-
                 return [
                     'status' => true,
                     'data' => [
@@ -140,51 +177,13 @@ class SpecialWorkhours extends Component
                         'appointment_settings' => $appointmentSettings,
                     ],
                 ];
-            }
+            });
 
-            $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-                ->where('day', $dayOfWeek)
-                ->where('is_working', true)
-                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
-                ->first();
+            return $cachedSchedule;
 
-            if (!$schedule) {
-                Log::info("No work schedule found for {$dayOfWeek} with doctor_id: {$doctorId}, clinic_id: {$this->clinicId}");
-                return [
-                    'status' => false,
-                    'data' => [],
-                ];
-            }
-
-            $workHours = $schedule->work_hours ? json_decode($schedule->work_hours, true) : [];
-            $appointmentSettings = $schedule->appointment_settings ? json_decode($schedule->appointment_settings, true) : [];
-
-            foreach ($workHours as $index => $slot) {
-                if (!isset($appointmentSettings[$index])) {
-                    $appointmentSettings[$index] = [
-                        'max_appointments' => $slot['max_appointments'] ?? 0,
-                        'appointment_duration' => 0,
-                    ];
-                } else {
-                    $appointmentSettings[$index]['max_appointments'] = $slot['max_appointments'] ?? $appointmentSettings[$index]['max_appointments'] ?? 0;
-                }
-            }
-
-            return [
-                'status' => true,
-                'data' => [
-                    'day' => $dayOfWeek,
-                    'work_hours' => $workHours,
-                    'appointment_settings' => $appointmentSettings,
-                ],
-            ];
         } catch (\Exception $e) {
             Log::error("Error in getWorkScheduleForDate: " . $e->getMessage());
-            return [
-                'status' => false,
-                'data' => [],
-            ];
+            return ['status' => false, 'data' => []];
         }
     }
 
@@ -537,40 +536,7 @@ class SpecialWorkhours extends Component
         }
     }
 
-    public function openEmergencyModal($day, $index)
-    {
-        if ($this->isProcessing) {
-            return;
-        }
 
-        $this->isEmergencyModalOpen = true;
-        $this->emergencyModalDay = $day;
-        $this->emergencyModalIndex = $index;
-        $this->emergencyTimes = $this->getEmergencyTimes();
-        $this->dispatch('openXModal', id: 'emergencyModal');
-    }
-
-    public function openScheduleModal($day, $index)
-    {
-        if ($this->isProcessing) {
-            return;
-        }
-
-        $this->scheduleModalDay = $day;
-        $this->scheduleModalIndex = $index;
-        $this->selectedScheduleDays = [];
-
-        // Load existing days from appointment_settings
-        $settings = $this->workSchedule['data']['appointment_settings'][$index] ?? [];
-        $days = $settings['days'] ?? [];
-        foreach ($days as $day) {
-            $this->selectedScheduleDays[$day] = true;
-        }
-
-        $this->selectAllScheduleModal = count($days) === 7;
-        $this->dispatch('openXModal', id: 'scheduleModal');
-        $this->dispatch('refresh-schedule-settings');
-    }
 
     public function saveSchedule($startTime, $endTime)
     {
@@ -682,41 +648,37 @@ class SpecialWorkhours extends Component
 
     public function openCalculatorModal($day, $index)
     {
-        if ($this->isProcessing) {
-            return;
-        }
+        $this->calculator = [
+            'day' => $day,
+            'index' => $index,
+            'start_time' => $this->workSchedule['data']['work_hours'][$index]['start'] ?? '00:00',
+            'end_time' => $this->workSchedule['data']['work_hours'][$index]['end'] ?? '23:59',
+            'appointment_count' => $this->workSchedule['data']['work_hours'][$index]['max_appointments'] ?? null,
+            'time_per_appointment' => $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] ?? null,
+            'calculation_mode' => $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] ? 'time' : 'count',
+        ];
 
-        try {
-            $this->calculator['day'] = $day;
-            $this->calculator['index'] = $index;
-            $this->calculator['start_time'] = $this->workSchedule['data']['work_hours'][$index]['start'] ?? '00:00';
-            $this->calculator['end_time'] = $this->workSchedule['data']['work_hours'][$index]['end'] ?? '23:59';
+        $this->dispatch('open-modal', id: 'CalculatorModal');
+        $this->dispatch('initialize-calculator', [
+            'start_time' => $this->calculator['start_time'],
+            'end_time' => $this->calculator['end_time'],
+            'index' => $index,
+            'day' => $day,
+        ]);
+    }
 
-            if (empty($this->calculator['start_time']) || empty($this->calculator['end_time'])) {
-                Log::warning("Empty start or end time for index {$index}", $this->workSchedule);
-                $this->dispatch('show-toastr', type: 'error', message: 'لطفاً ابتدا زمان شروع و پایان را وارد کنید.');
-                return;
-            }
+    public function openEmergencyModal($day, $index)
+    {
+        $this->isEmergencyModalOpen = true;
+        $this->emergencyTimes = $this->getPossibleEmergencyTimes($day, $index);
+        $this->dispatch('open-modal', id: 'emergencyModal');
+    }
 
-            Log::info("Opening CalculatorModal", [
-                'day' => $day,
-                'index' => $index,
-                'start_time' => $this->calculator['start_time'],
-                'end_time' => $this->calculator['end_time'],
-            ]);
-
-            $this->dispatch('initialize-calculator', [
-                'start_time' => $this->calculator['start_time'],
-                'end_time' => $this->calculator['end_time'],
-                'index' => $index,
-                'day' => $day,
-            ]);
-
-            $this->dispatch('openXModal', id: 'CalculatorModal');
-        } catch (\Exception $e) {
-            Log::error("Error in openCalculatorModal: " . $e->getMessage());
-            $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال محاسبه: ' . $e->getMessage());
-        }
+    public function openScheduleModal($day, $index)
+    {
+        $this->scheduleModalDay = $day;
+        $this->scheduleModalIndex = $index;
+        $this->dispatch('open-modal', id: 'scheduleModal');
     }
 
     public function closeCalculatorModal()
@@ -730,7 +692,7 @@ class SpecialWorkhours extends Component
             'time_per_appointment' => null,
             'calculation_mode' => 'count',
         ];
-        $this->dispatch('closeXModal', id: 'CalculatorModal');
+        $this->dispatch('close-modal', id: 'CalculatorModal');
     }
 
     public function closeEmergencyModal()
@@ -740,7 +702,7 @@ class SpecialWorkhours extends Component
         $this->emergencyModalIndex = null;
         $this->emergencyTimes = [];
         $this->selectedEmergencyTimes = [];
-        $this->dispatch('closeXModal', id: 'emergencyModal');
+        $this->dispatch('close-modal', id: 'emergencyModal');
     }
 
     public function closeScheduleModal()
@@ -749,7 +711,7 @@ class SpecialWorkhours extends Component
         $this->scheduleModalIndex = null;
         $this->selectedScheduleDays = [];
         $this->selectAllScheduleModal = false;
-        $this->dispatch('closeXModal', id: 'scheduleModal');
+        $this->dispatch('close-modal', id: 'scheduleModal');
     }
 
     public function updatedSelectedEmergencyTimes()
@@ -799,6 +761,10 @@ class SpecialWorkhours extends Component
 
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+
+            $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->clinicId}";
+            Cache::forget($cacheKey);
+
             $this->dispatch('show-toastr', type: 'success', message: 'تغییرات ساعت کاری ذخیره شد.');
         } catch (\Exception $e) {
             Log::error("Error in updatedWorkScheduleDataWorkHours: " . $e->getMessage());

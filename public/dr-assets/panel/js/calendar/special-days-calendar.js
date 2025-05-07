@@ -8,7 +8,6 @@ function ensureElementExists(selector, errorMessage, scope = document) {
 }
 
 function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
-    // اطمینان از وجود فقط یک نمونه تقویم
     const calendarContainer = document.querySelector(
         ".special-days-calendar-container"
     );
@@ -52,7 +51,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             } else {
                 console.warn("Livewire.dispatch is not available");
             }
-
             const holidays = window.holidaysData.status
                 ? window.holidaysData.holidays || []
                 : [];
@@ -62,7 +60,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
                       count: parseInt(item.count) || 0,
                   })) || []
                 : [];
-
             return { holidays, appointments };
         } catch (error) {
             console.error("Error in fetchCalendarData:", error);
@@ -72,7 +69,7 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
         }
     }
 
-    let isRendering = false; // فلگ برای جلوگیری از رندر همزمان
+    let isRendering = false;
 
     async function generateCalendar(year, month) {
         if (isRendering) {
@@ -87,11 +84,9 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             return;
         }
 
-        // پاک‌سازی کامل محتوای قبلی
         calendarBody.innerHTML = "";
         calendarBody.style.display = "none";
 
-        // اعتبارسنجی year و month
         if (!year || !month || isNaN(year) || isNaN(month)) {
             console.warn(
                 "Invalid year or month, falling back to initial values"
@@ -100,7 +95,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             month = initialMonth || moment().jMonth() + 1;
         }
 
-        // بقیه کد بدون تغییر
         const firstDayOfMonth = moment(
             `${year}/${month}/01`,
             "jYYYY/jMM/jDD"
@@ -115,18 +109,14 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
         let firstDayWeekday = firstDayOfMonth.weekday();
         const today = moment().locale("fa");
 
-        // به‌روزرسانی داده‌ها قبل از رندر
         const { holidays, appointments } = await fetchCalendarData(year, month);
 
-        // رندر روزهای خالی
         for (let i = 0; i < firstDayWeekday; i++) {
             const emptyDay = document.createElement("div");
             emptyDay.classList.add("calendar-day", "empty");
             calendarBody.appendChild(emptyDay);
         }
 
-        // رندر روزهای ماه
-        // رندر روزهای ماه
         for (let day = 1; day <= daysInMonth; day++) {
             const currentDay = firstDayOfMonth.clone().add(day - 1, "days");
             const jalaliDate = currentDay.format("jYYYY/jMM/jDD");
@@ -150,7 +140,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
                 ? appointmentData.count
                 : 0;
 
-            // فقط برای روزهای غیر گذشته استایل‌ها را اعمال کن
             if (!isPastDate) {
                 if (isHoliday) {
                     dayElement.classList.add("holiday");
@@ -163,13 +152,13 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             const spanElement = document.createElement("span");
             spanElement.textContent = currentDay.format("jD");
 
-            // تولتیپ فقط برای روزهای غیر گذشته
             const tooltipContent =
                 !isPastDate && isHoliday
                     ? "این روز تعطیل است"
                     : !isPastDate && appointmentCount > 0
                     ? `تعداد نوبت‌ها: ${appointmentCount}`
                     : "";
+
             if (tooltipContent) {
                 const tooltipWrapper = document.createElement("div");
                 tooltipWrapper.setAttribute("x-tooltip", "");
@@ -191,7 +180,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
 
                 tooltipWrapper.appendChild(triggerDiv);
                 tooltipWrapper.appendChild(contentDiv);
-
                 dayElement.appendChild(tooltipWrapper);
             } else {
                 dayElement.appendChild(spanElement);
@@ -213,19 +201,16 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
                 const hasAppointment = appointmentCount > 0;
 
                 if (isPastDate) {
-                    // اجازه باز شدن مودال برای روزهای گذشته
                     Livewire.dispatch("openHolidayModal", {
                         modalId: "holiday-modal",
                         gregorianDate: gregorianDate,
                     });
                 } else if (hasAppointment) {
-                    // باز کردن مودال جابجایی برای روزهای دارای نوبت
                     Livewire.dispatch("openTransferModal", {
                         modalId: "transfer-modal",
                         gregorianDate: gregorianDate,
                     });
                 } else {
-                    // باز کردن مودال تعطیلی برای روزهای بدون نوبت
                     Livewire.dispatch("openHolidayModal", {
                         modalId: "holiday-modal",
                         gregorianDate: gregorianDate,
@@ -236,7 +221,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             calendarBody.appendChild(dayElement);
         }
 
-        // نمایش تقویم
         if (loadingOverlay) {
             loadingOverlay.style.display = "none";
         }
@@ -244,9 +228,7 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             calendarBody.style.display = "grid";
         }
 
-        // به‌روزرسانی سلکت‌باکس‌ها
         populateSelectBoxes(year, month);
-
         isRendering = false;
     }
 
@@ -263,7 +245,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
         );
         if (!yearSelect || !monthSelect) return;
 
-        // استفاده از مقادیر اولیه یا جاری
         const currentYear = year || initialYear || moment().jYear();
         const currentMonth = month || initialMonth || moment().jMonth() + 1;
 
@@ -289,7 +270,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             "بهمن",
             "اسفند",
         ];
-
         monthSelect.innerHTML = "";
         for (let m = 1; m <= 12; m++) {
             const option = document.createElement("option");
@@ -330,6 +310,7 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
         "Next month button not found",
         calendarContainer
     );
+
     if (prevMonthBtn && nextMonthBtn) {
         prevMonthBtn.addEventListener("click", () => {
             const yearSelect = document.querySelector("#special-days-year");
@@ -406,7 +387,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
     Livewire.on("holidayUpdated", (event) => {
         const { date, isHoliday } = event;
 
-        // آپدیت window.holidaysData
         if (isHoliday) {
             if (!window.holidaysData.holidays.includes(date)) {
                 window.holidaysData.holidays.push(date);
@@ -420,23 +400,19 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
         const dayElement = document.querySelector(
             `.calendar-day[data-gregorian="${date}"]`
         );
-
         if (dayElement) {
-            // به‌روزرسانی کلاس‌های روز
             if (isHoliday) {
                 dayElement.classList.add("holiday");
             } else {
                 dayElement.classList.remove("holiday");
             }
 
-            // به‌روزرسانی تولتیپ
             const appointmentData = window.appointmentsData.data.find(
                 (appt) => appt.date === date
             );
             const appointmentCount = appointmentData
                 ? appointmentData.count
                 : 0;
-
             const tooltipContent = isHoliday
                 ? "این روز تعطیل است"
                 : appointmentCount > 0
@@ -444,7 +420,7 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
                 : "";
 
             const span = dayElement.querySelector("span");
-            dayElement.innerHTML = ""; // پاک کردن محتوای قبلی
+            dayElement.innerHTML = "";
 
             if (tooltipContent) {
                 const tooltipWrapper = document.createElement("div");
@@ -468,16 +444,11 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
 
                 tooltipWrapper.appendChild(triggerDiv);
                 tooltipWrapper.appendChild(contentDiv);
-
                 dayElement.appendChild(tooltipWrapper);
-
-                // انتقال contentDiv به body برای سازگاری با CustomTooltip
-                document.body.appendChild(contentDiv);
             } else {
                 dayElement.appendChild(span);
             }
 
-            // اجبار به رندر دوباره
             dayElement.style.display = "none";
             void dayElement.offsetHeight;
             dayElement.style.display = "flex";
@@ -485,7 +456,6 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             console.warn(
                 `Day element for date ${date} not found, re-rendering calendar`
             );
-            // رندر دوباره تقویم
             const yearSelect = document.querySelector("#special-days-year");
             const monthSelect = document.querySelector("#special-days-month");
             let year = parseInt(yearSelect?.value);
@@ -500,14 +470,15 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
             generateCalendar(year, month);
         }
 
-        // بستن مودال
-        window.closeXModal("holiday-modal");
+        window.dispatchEvent(
+            new CustomEvent("close-modal", {
+                detail: { name: "holiday-modal" },
+            })
+        );
     });
 
-    // پر کردن اولیه سلکت‌باکس‌ها
     populateSelectBoxes(initialYear, initialMonth);
 
-    // رندر اولیه تقویم
     setTimeout(() => {
         generateCalendar(
             initialYear || moment().jYear(),
@@ -515,4 +486,3 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
         );
     }, 0);
 }
-
