@@ -6,7 +6,7 @@
   <!-- مودال تعطیلات -->
   <x-modal name="holiday-modal" title="مدیریت تعطیلات و ساعات کاری" persistent="true"
     size="{{ $selectedDate && in_array($selectedDate, $holidaysData['holidays']) ? 'sm' : 'lg' }}"
-    wire:key="holiday-modal-{{ $selectedDate ?? 'default' }}" wire:ignore.self>
+    wire:key="holiday-modal-{{ $selectedDate ?? 'default' }}">
     <x-slot:body>
       @php
         $isPastDate = $selectedDate ? \Carbon\Carbon::parse($selectedDate)->isPast() : false;
@@ -149,7 +149,7 @@
 
   <!-- مودال جابجایی -->
   <x-modal name="transfer-modal" title="جابجایی نوبت‌ها" size="lg"
-    wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}" wire:ignore.self>
+    wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}" >
     <x-slot:body>
       <div class="alert alert-info" role="alert">
         <p class="fw-bold">این روز دارای نوبت است. برای تعطیل کردن باید نوبت‌ها را جابجا کنید</p>
@@ -211,7 +211,7 @@
 
   <!-- مودال زمان‌های اورژانسی -->
   <x-modal name="emergencyModal" title="انتخاب زمان‌های اورژانسی" size="md"
-    wire:key="emergency-modal-{{ $selectedDate ?? 'default' }}" wire:ignore.self>
+    wire:key="emergency-modal-{{ $selectedDate ?? 'default' }}" >
     <x-slot:body>
       <div class="emergency-times-container">
         <div class="d-flex flex-wrap gap-2 justify-content-center" id="emergency-times">
@@ -243,7 +243,7 @@
 
   <!-- مودال تنظیم زمان‌بندی -->
   <x-modal name="scheduleModal" title="تنظیم زمان‌بندی" size="lg"
-    wire:key="schedule-modal-{{ $selectedDate ?? 'default' }}" wire:ignore.self>
+    wire:key="schedule-modal-{{ $selectedDate ?? 'default' }}" >
     <x-slot:body>
       <div class="position-relative">
         <div class="loading-overlay d-none" id="scheduleLoading">
@@ -639,11 +639,6 @@
             setTimeout(tryInitialize, 100);
             return;
           }
-          console.error('Calculator modal not found after multiple attempts');
-          Livewire.dispatch('show-toastr', {
-            type: 'error',
-            message: 'مودال محاسبه‌گر یافت نشد. لطفاً صفحه را رفرش کنید.'
-          });
           return;
         }
 

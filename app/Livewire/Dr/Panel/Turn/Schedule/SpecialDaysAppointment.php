@@ -1006,7 +1006,7 @@ class SpecialDaysAppointment extends Component
             $this->dispatch('update-calculator-ui', $this->calculator);
         } catch (\Exception $e) {
             Log::error("Error in setCalculatorValues: " . $e->getMessage(), ['values' => $values]);
-            $this->dispatch('show-toastr', type: 'error', message: 'خطا در به‌روزرسانی مقادیر محاسبه‌گر: ' . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در به‌روزرسانی  ساعت کاری: ' . $e->getMessage());
         }
     }
 
@@ -1075,12 +1075,12 @@ class SpecialDaysAppointment extends Component
 
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
-            $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات محاسبه‌گر ذخیره شد.');
+            $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات ساعت کاری ذخیره شد.');
             $this->dispatch('close-modal', 'CalculatorModal');
             $this->dispatch('refresh-timepicker');
         } catch (\Exception $e) {
             Log::error("Error in saveCalculator: " . $e->getMessage());
-            $this->dispatch('show-toastr', type: 'error', message: 'خطا در ذخیره تنظیمات محاسبه‌گر: ' . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در ذخیره تنظیمات ساعت کاری: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
         }
@@ -1382,7 +1382,7 @@ class SpecialDaysAppointment extends Component
                 return;
             }
 
-            // تنظیم مقادیر محاسبه‌گر
+            // تنظیم مقادیر ساعت کاری
             $this->calculator = [
                 'day' => $day,
                 'index' => $index,
@@ -1405,7 +1405,7 @@ class SpecialDaysAppointment extends Component
             ]);
         } catch (\Exception $e) {
             Log::error("Error in openCalculatorModal: " . $e->getMessage(), ['day' => $day, 'index' => $index]);
-            $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال محاسبه‌گر: ' . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال ساعت کاری: ' . $e->getMessage());
         }
     }
 
