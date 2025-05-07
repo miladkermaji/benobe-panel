@@ -351,10 +351,6 @@
     };
 
     document.addEventListener("livewire:initialized", () => {
-      // حذف شنونده‌های قبلی برای جلوگیری از تکرار
-      
-
-      // تعریف شنونده جدید
       Livewire.on('confirm-add-slot', () => {
         console.log('Received confirm-add-slot event');
         Swal.fire({
@@ -366,19 +362,17 @@
           confirmButtonText: 'بله، ذخیره کن',
           cancelButtonText: 'بدون ذخیره',
           denyButtonText: 'بستن',
-          reverseButtons: true,
-          showLoaderOnConfirm: true,
-          showLoaderOnCancel: true
+          reverseButtons: true
         }).then((result) => {
           console.log('SweetAlert result:', result);
           if (result.isConfirmed) {
-            console.log('Dispatching confirmAddSlot with savePrevious: true');
-            window.Livewire.dispatchTo('dr.panel.turn.schedule.special-days-appointment', 'confirmAddSlot', {
+            console.log('Calling confirmAddSlot with savePrevious: true');
+            Livewire.dispatch('confirmAddSlot', {
               savePrevious: true
             });
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            console.log('Dispatching confirmAddSlot with savePrevious: false');
-            window.Livewire.dispatchTo('dr.panel.turn.schedule.special-days-appointment', 'confirmAddSlot', {
+            console.log('Calling confirmAddSlot with savePrevious: false');
+            Livewire.dispatch('confirmAddSlot', {
               savePrevious: false
             });
           } else if (result.isDenied) {
@@ -386,7 +380,7 @@
           }
         }).catch((error) => {
           console.error('SweetAlert error:', error);
-          window.Livewire.dispatch('show-toastr', {
+          Livewire.dispatch('show-toastr', {
             type: 'error',
             message: 'خطا در نمایش تأیید: ' + error.message
           });
