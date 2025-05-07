@@ -653,7 +653,7 @@ class SpecialDaysAppointment extends Component
         }
     }
 
-    public function confirmAddSlot($savePrevious = '')
+    public function confirmAddSlot($savePrevious = null)
     {
         Log::info("confirmAddSlot called", [
             'savePrevious' => $savePrevious,
@@ -666,7 +666,13 @@ class SpecialDaysAppointment extends Component
             return;
         }
 
-        
+        // بررسی مقدار savePrevious
+        if (!is_bool($savePrevious)) {
+            Log::warning("Invalid or null savePrevious value", ['savePrevious' => $savePrevious]);
+            $this->dispatch('show-toastr', type: 'error', message: 'لطفاً انتخاب کنید که ردیف‌های قبلی ذخیره شوند یا خیر.');
+            return;
+        }
+
 
         $this->isProcessing = true;
 

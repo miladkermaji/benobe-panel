@@ -366,12 +366,18 @@
         }).then((result) => {
           console.log('SweetAlert result:', result);
           if (result.isConfirmed) {
-            console.log('Calling confirmAddSlot with savePrevious: true');
+            console.log('Dispatching confirmAddSlot with savePrevious: true');
+            console.log('Dispatch payload:', {
+              savePrevious: true
+            });
             Livewire.dispatch('confirmAddSlot', {
               savePrevious: true
             });
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            console.log('Calling confirmAddSlot with savePrevious: false');
+            console.log('Dispatching confirmAddSlot with savePrevious: false');
+            console.log('Dispatch payload:', {
+              savePrevious: false
+            });
             Livewire.dispatch('confirmAddSlot', {
               savePrevious: false
             });
@@ -380,10 +386,6 @@
           }
         }).catch((error) => {
           console.error('SweetAlert error:', error);
-          Livewire.dispatch('show-toastr', {
-            type: 'error',
-            message: 'خطا در نمایش تأیید: ' + error.message
-          });
         });
       });
       Livewire.on('confirm-delete-slot', ({
