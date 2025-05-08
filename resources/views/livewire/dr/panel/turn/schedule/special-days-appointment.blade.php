@@ -289,12 +289,14 @@
             <div class="form-group position-relative">
               <label class="label-top-input-special-takhasos">شروع</label>
               <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
-                id="schedule-start" wire:model="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.start">
+                id="schedule-start"
+                wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.start">
             </div>
             <div class="form-group position-relative">
               <label class="label-top-input-special-takhasos">پایان</label>
               <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
-                id="schedule-end" wire:model="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.end">
+                id="schedule-end"
+                wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.end">
             </div>
             <button type="button" class="btn my-btn-primary d-flex justify-content-center align-items-center"
               id="saveSchedule" wire:click="saveSchedule" @if ($isProcessing) disabled @endif>
@@ -328,10 +330,8 @@
                   @foreach ($filteredSettings as $index => $setting)
                     <div class="schedule-setting-item"
                       wire:key="setting-{{ $scheduleModalDay }}-{{ $index }}-{{ $selectedDate ?? 'default' }}">
-                      <span>
-                        از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }} (روزها:
-                        {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
-                      </span>
+                      <span>از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }} (روزها:
+                        {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})</span>
                       <button class="btn btn-light delete-schedule-setting" data-day="{{ $scheduleModalDay }}"
                         data-index="{{ $index }}"
                         wire:click="deleteScheduleSetting('{{ $scheduleModalDay }}', {{ $index }})">
@@ -422,7 +422,7 @@
             div.className = 'schedule-setting-item';
             div.setAttribute('wire:key',
               `setting-${@json($scheduleModalDay)}-${index}-${@json($selectedDate) || 'default'}`
-              );
+            );
             div.innerHTML = `
                         <span>از ${setting.start_time} تا ${setting.end_time} (روزها: ${daysText})</span>
                         <button class="btn btn-light delete-schedule-setting" data-day="${@json($scheduleModalDay)}" data-index="${index}">
@@ -475,7 +475,13 @@
         // به‌روزرسانی select all
         document.querySelector('#select-all-schedule-days').checked = @json($selectAllScheduleModal) || false;
       });
-
+      document.querySelector('#saveSchedule')?.addEventListener('click', function() {
+        toggleButtonLoading(this, true);
+        Livewire.dispatch('saveSchedule');
+        setTimeout(() => {
+          toggleButtonLoading(this, false);
+        }, 1000);
+      });
       // مدیریت انتخاب همه
       const selectAllCheckbox = document.querySelector('#select-all-schedule-days');
       if (selectAllCheckbox) {
