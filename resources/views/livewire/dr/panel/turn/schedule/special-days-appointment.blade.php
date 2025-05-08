@@ -84,7 +84,7 @@
                               data-day="{{ $workSchedule['data']['day'] }}"
                               wire:click="openEmergencyModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
                               data-index="{{ $index }}" @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
-                              <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                              <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت مخصوص منشی">
                             </button>
                           </x-custom-tooltip>
                         </div>
@@ -209,8 +209,8 @@
     </x-slot>
   </x-modal>
 
-  <!-- مودال زمان‌های اورژانسی -->
-  <x-modal name="emergencyModal" title="انتخاب زمان‌های اورژانسی" size="md"
+  <!-- مودال زمان‌های مخصوص منشی -->
+  <x-modal name="emergencyModal" title="انتخاب زمان‌های مخصوص منشی" size="md"
     wire:key="emergency-modal-{{ $selectedDate ?? 'default' }}" >
     <x-slot:body>
       <div class="emergency-times-container">
@@ -226,7 +226,7 @@
             @endforeach
           @else
             <div class="alert alert-warning text-center">
-              هیچ زمان اورژانسی برای این بازه زمانی در دسترس نیست.
+              هیچ زمان مخصوص منشی برای این بازه زمانی در دسترس نیست.
             </div>
           @endif
         </div>
@@ -270,12 +270,12 @@
             </div>
           </div>
           <div class="timepicker-save-section">
-            <div class="form-group position-relative timepicker-ui">
+            <div class="form-group position-relative">
               <label class="label-top-input-special-takhasos">شروع</label>
               <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
                 id="schedule-start" wire:model="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.start">
             </div>
-            <div class="form-group position-relative timepicker-ui">
+            <div class="form-group position-relative">
               <label class="label-top-input-special-takhasos">پایان</label>
               <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
                 id="schedule-end" wire:model="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.end">
