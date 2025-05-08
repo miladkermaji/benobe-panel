@@ -19,9 +19,6 @@
 
 @livewire('dr.panel.turn.schedule.special-days-appointment')
 <script src="{{ asset('dr-assets/panel/js/jalali-moment/dist/jalali-moment.browser.js') }}"></script>
-@once
-  <script src="{{ asset('dr-assets/panel/js/calendar/special-reschedule-calendar.js') }}"></script>
-@endonce
 <script src="{{ asset('dr-assets/panel/js/calendar/special-days-calendar.js') }}"></script>
 
 <script>
