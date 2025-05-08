@@ -20,34 +20,32 @@
 @section('bread-crumb-title', ' تنظیمات نوبت دستی')
 @include('dr.panel.my-tools.loader-btn')
 <div class="manual-nobat-content w-100 d-flex justify-content-center mt-3">
-  <div class="manual-nobat-content-wrapper p-3">
+  <div class="manual-nobat-content-wrapper">
     <div class="main-content">
-      <div class="row no-gutters font-size-13 margin-bottom-10">
+      <div class="row g-0 font-size-13 mb-2">
         <div class="user-panel-content w-100">
           <div class="p-3 w-100 d-flex justify-content-center">
-            <div class="" style="width: 850px;height: 100%;">
+            <div class="w-100" style="max-width: 850px;">
               <div class="card-header"> تنظیمات تایید دو مرحله ای نوبت‌های دستی</div>
               <div class="card-body">
                 <div class="alert alert-info">
                   <i class="fa fa-info-circle"></i>
                   <strong>راهنما!</strong>
                   <div>
-                    در فیلد اول میتوانید مشخص کنید که چند ساعت قبل از زمان نوبت پیامک تایید نهایی نوبت ارسال شود و در
-                    فیلد
-                    دوم، می‌توانید مشخص کنید بیمار چند ساعت مهلت دارد نوبت خود را تایید کند، در غیر اینصورت نوبت لغو
-                    خواهد
-                    شد.<br>
-                    در زیر با استفاده از گزینه بلی یا خیر میتوانید این امکان را فعال یا غیرفعال نمایید.
+                    در فیلد اول می‌توانید مشخص کنید که چند ساعت قبل از زمان نوبت پیامک تأیید نهایی نوبت ارسال شود و در
+                    فیلد دوم، می‌توانید مشخص کنید بیمار چند ساعت مهلت دارد نوبت خود را تأیید کند، در غیر این صورت نوبت
+                    لغو خواهد شد.<br>
+                    در زیر با استفاده از گزینه بلی یا خیر می‌توانید این امکان را فعال یا غیرفعال نمایید.
                   </div>
                 </div>
                 <form method="post" action="" autocomplete="off" id="save_verify_nobat">
                   @csrf
                   <div class="row">
-                    <!-- تایید دو مرحله‌ای نوبت‌های دستی -->
-                    <div class="col-md-6 col-sm-12 col-12">
-                      <div class="mt-3 position-relative">
-                        <label>آیا تایید دو مرحله‌ای نوبت‌های دستی فعال باشد؟</label>
-                        <select class="form-control h-50" name="status">
+                    <!-- تأیید دو مرحله‌ای نوبت‌های دستی -->
+                    <div class="col-md-6 col-12">
+                      <div class="mb-3 position-relative">
+                        <label class="form-label">آیا تأیید دو مرحله‌ای نوبت‌های دستی فعال باشد؟</label>
+                        <select class="form-control" name="status">
                           <option value="0" {{ isset($settings) && $settings->is_active == 0 ? 'selected' : '' }}>
                             خیر</option>
                           <option value="1" {{ isset($settings) && $settings->is_active == 1 ? 'selected' : '' }}>
@@ -56,47 +54,42 @@
                       </div>
                     </div>
 
-                    <!-- زمان ارسال لینک تایید -->
-                    <div class="col-md-6 col-sm-12 col-12 stmvd" style="display: block">
-                      <div class="mt-3 position-relative">
-                        <label class="label-top-input-special-takhasos">زمان ارسال لینک تایید:</label>
+                    <!-- زمان ارسال لینک تأیید -->
+                    <div class="col-md-6 col-12">
+                      <div class="mb-3 position-relative">
+                        <label class="label-top-input">زمان ارسال لینک تأیید:</label>
                         <div class="input-group">
-                          <input class="form-control ltr center h-50 border-radius-0" type="tel"
+                          <input class="form-control ltr text-center" type="tel"
                             value="{{ isset($settings) ? $settings->duration_send_link : '' }}"
                             name="duration_send_link" placeholder="مثلا: 72">
-                          <div class="input-group-append">
-                            <span class="input-group-text">ساعت قبل</span>
-                          </div>
+                          <span class="input-group-text">ساعت قبل</span>
                         </div>
                       </div>
                     </div>
 
                     <!-- مدت زمان اعتبار لینک -->
-                    <div class="col-md-6 col-sm-12 col-12 stmvd" style="display: block">
-                      <div class="mt-3 position-relative">
-                        <label class="label-top-input-special-takhasos">مدت زمان اعتبار لینک:</label>
+                    <div class="col-md-6 col-12">
+                      <div class="mb-3 position-relative">
+                        <label class="label-top-input">مدت زمان اعتبار لینک:</label>
                         <div class="input-group">
-                          <input class="form-control ltr center h-50 border-radius-0" type="tel"
+                          <input class="form-control ltr text-center" type="tel"
                             value="{{ isset($settings) ? $settings->duration_confirm_link : '' }}"
                             name="duration_confirm_link" placeholder="مثلا: 48">
-                          <div class="input-group-append">
-                            <span class="input-group-text">ساعت</span>
-                          </div>
+                          <span class="input-group-text">ساعت</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <!-- دکمه ذخیره -->
-                  <div class="mt-3 position-relative p-3">
+                  <div class="mt-3">
                     <button type="submit"
-                      class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                      class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2 h-50">
                       <span class="button_text">ذخیره تغییرات</span>
                       <div class="loader" style="display: none;"></div>
                     </button>
                   </div>
                 </form>
-
               </div>
             </div>
           </div>
@@ -217,7 +210,6 @@
               errorMessage += '</ul>';
             }
             toastr.error(errorMessage, 'خطا', {
-              closeButton: true,
               timeOut: 5000
             });
           }
@@ -234,7 +226,6 @@
             errorMessage = `${xhr.responseJSON.message}<br>جزئیات: ${xhr.responseJSON.error.details}`;
           }
           toastr.error(errorMessage, 'خطا', {
-            closeButton: true,
             timeOut: 5000
           });
         },

@@ -5,79 +5,6 @@
   <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/appointments_open/appointments_open.css') }}"
     rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/turn/schedule/manual_nobat/manual_nobat.css') }}" rel="stylesheet" />
-  <style>
-    /* استایل‌های جدید برای نتایج جستجو */
-    #search-results {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 1000;
-      padding: 10px;
-      display: none;
-    }
-
-    .search-result-card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      margin-bottom: 8px;
-      background: #f8f9fa;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-    .search-result-card:hover {
-      background: #e9ecef;
-    }
-
-    .search-result-info {
-      flex-grow: 1;
-    }
-
-    .search-result-info p {
-      margin: 0;
-      font-size: 14px;
-      color: #333;
-    }
-
-    .search-result-info .name {
-      font-weight: bold;
-      color: #007bff;
-    }
-
-    .search-result-action {
-      margin-left: 10px;
-    }
-
-    .search-result-action button {
-      padding: 5px 10px;
-      font-size: 12px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .search-result-action button:hover {
-      background: #0056b3;
-    }
-
-    .no-results {
-      text-align: center;
-      padding: 10px;
-      color: #666;
-      font-size: 14px;
-    }
-  </style>
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -85,93 +12,182 @@
 @section('content')
   @include('dr.panel.my-tools.loader-btn')
 @section('bread-crumb-title', ' ثبت نوبت دستی')
-<div class="calendar-and-add-sick-section p-3">
-  <div class="d-flex justify-content-center gap-10 align-items-center c-a-wrapper">
-    <div>
-      <div class="turning_search-wrapper__loGVc position-relative">
-        <input type="text" id="search-input" class="my-form-control"
-          placeholder="نام بیمار، شماره موبایل یا کد ملی ...">
-        <div id="search-results" class="search-results">
-          <div id="search-results-body"></div>
-        </div>
+<div class="calendar-and-add-sick-section p-3 mb-4 w-100">
+  <div class="d-flex justify-content-center align-items-center gap-3 w-100 flex-nowrap">
+    <div class="position-relative flex-grow-1">
+      <input type="text" id="search-input" class="form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ...">
+      <div id="search-results" class="search-results">
+        <div id="search-results-body"></div>
       </div>
     </div>
-    <div class="btn-425-left">
-      <button class="btn my-btn-primary h-50 fs-13" data-toggle="modal" data-bs-target="#addNewPatientModal">افزودن
-        بیمار</button>
-      <!-- فرم افزودن بیمار -->
-      <div class="modal fade" id="addNewPatientModal" tabindex="-1" role="dialog" aria-labelledby="addNewPatientLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content border-radius-6">
-            <form id="add-new-patient-form">
-              @csrf
-              <div class="modal-header">
-                <h5 class="modal-title" id="addNewPatientLabel">افزودن بیمار جدید</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="mt-3 position-relative">
-                  <label class="label-top-input-special-takhasos">نام بیمار:</label>
-                  <input type="text" name="first_name" class="form-control h-50"
-                    placeholder="نام بیمار را وارد کنید">
-                </div>
-                <small class="text-danger error-first_name"></small>
-                <div class="mt-3 position-relative">
-                  <label class="label-top-input-special-takhasos">نام خانوادگی بیمار:</label>
-                  <input type="text" name="last_name" class="form-control h-50"
-                    placeholder="نام و نام خانوادگی بیمار را وارد کنید">
-                </div>
-                <small class="text-danger error-last_name"></small>
-                <div class="mt-3 position-relative">
-                  <label class="label-top-input-special-takhasos">شماره موبایل:</label>
-                  <input type="text" name="mobile" class="form-control h-50"
-                    placeholder="شماره موبایل بیمار را وارد کنید">
-                </div>
-                <small class="text-danger error-mobile"></small>
-                <div class="mt-3 position-relative">
-                  <label class="label-top-input-special-takhasos">کد ملی:</label>
-                  <input type="text" name="national_code" class="form-control h-50"
-                    placeholder="کد ملی بیمار را وارد کنید">
-                </div>
-                <small class="text-danger error-national_code"></small>
-                <div class="mt-3 position-relative">
-                  <label class="label-top-input-special-takhasos">تاریخ مراجعه:</label>
-                  <input type="text" placeholder="1403/05/02" name="appointment_date"
-                    class="form-control w-100 h-50 position-relative text-start" data-jdp>
-                </div>
-                <small class="text-danger error-appointment_date"></small>
-                <div class="mt-3 position-relative timepicker-ui w-100">
-                  <label class="label-top-input-special-takhasos">ساعت مراجعه:</label>
-                  <input type="text" class="form-control w-100 h-50 position-relative timepicker-ui-input"
-                    style="width: 100% !important" name="appointment_time">
-                </div>
-                <small class="text-danger error-appointment_time"></small>
-                <div class="mt-3 position-relative">
-                  <label class="label-top-input-special-takhasos">توضیحات:</label>
-                  <textarea name="description" class="form-control h-50" rows="3"></textarea>
-                </div>
-                <small class="text-danger error-description"></small>
-              </div>
-              <div class="modal-footer">
-                <button type="submit" id="submit-button"
-                  class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
-                  <span class="button_text">ثبت تغیرات</span>
-                  <div class="loader"></div>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+    <div>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewPatientModal">افزودن بیمار</button>
     </div>
   </div>
 </div>
+
+<!-- مودال افزودن بیمار -->
+<!-- مودال افزودن بیمار -->
+<div class="modal fade" id="addNewPatientModal" tabindex="-1" aria-labelledby="addNewPatientLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <form id="add-new-patient-form">
+        @csrf
+        <div class="modal-header p-3">
+          <h5 class="modal-title" id="addNewPatientLabel">افزودن بیمار جدید</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">نام بیمار:</label>
+                <input type="text" name="first_name" class="form-control" placeholder="نام بیمار را وارد کنید">
+              </div>
+              <small class="text-danger error-first_name mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">نام خانوادگی بیمار:</label>
+                <input type="text" name="last_name" class="form-control"
+                  placeholder="نام و نام خانوادگی بیمار را وارد کنید">
+              </div>
+              <small class="text-danger error-last_name mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">شماره موبایل:</label>
+                <input type="text" name="mobile" class="form-control" placeholder="شماره موبایل بیمار را وارد کنید">
+              </div>
+              <small class="text-danger error-mobile mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">کد ملی:</label>
+                <input type="text" name="national_code" class="form-control" placeholder="کد ملی بیمار را وارد کنید">
+              </div>
+              <small class="text-danger error-national_code mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">تاریخ مراجعه:</label>
+                <input type="text" placeholder="1403/05/02" name="appointment_date" class="form-control text-start"
+                  data-jdp>
+              </div>
+              <small class="text-danger error-appointment_date mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative timepicker-ui w-100">
+                <label class="label-top-input">ساعت مراجعه:</label>
+                <input type="text" class="form-control timepicker-ui-input" name="appointment_time"
+                  style="width: 100% !important">
+              </div>
+              <small class="text-danger error-appointment_time mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">توضیحات:</label>
+                <textarea name="description" class="form-control" rows="4"></textarea>
+              </div>
+              <small class="text-danger error-description mt-1 text-start"></small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer p-3">
+          <button type="submit" class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2">
+            <span class="button_text">ثبت تغییرات</span>
+            <div class="loader" style="display: none;"></div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- مودال ویرایش بیمار -->
+<div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <form id="edit-patient-form">
+        @csrf
+        <div class="modal-header p-3">
+          <h5 class="modal-title" id="editPatientLabel">ویرایش بیمار</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-3">
+            <div class="col-12">
+              <input type="hidden" name="appointment_id" id="edit-appointment-id">
+              <div class="position-relative">
+                <label class="label-top-input">نام بیمار:</label>
+                <input type="text" name="first_name" id="edit-first-name" class="form-control"
+                  placeholder="نام بیمار را وارد کنید">
+              </div>
+              <small class="text-danger error-first_name mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">نام خانوادگی بیمار:</label>
+                <input type="text" name="last_name" id="edit-last-name" class="form-control"
+                  placeholder="نام و نام خانوادگی بیمار را وارد کنید">
+              </div>
+              <small class="text-danger error-last_name mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">شماره موبایل:</label>
+                <input type="text" name="mobile" id="edit-mobile" class="form-control"
+                  placeholder="شماره موبایل بیمار را وارد کنید">
+              </div>
+              <small class="text-danger error-mobile mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">کد ملی:</label>
+                <input type="text" name="national_code" id="edit-national-code" class="form-control"
+                  placeholder="کد ملی بیمار را وارد کنید">
+              </div>
+              <small class="text-danger error-national_code mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">تاریخ مراجعه:</label>
+                <input type="text" name="appointment_date" placeholder="1403/05/02" id="edit-appointment-date"
+                  data-jdp class="form-control">
+              </div>
+              <small class="text-danger error-appointment_date mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative timepicker-ui w-100">
+                <label class="label-top-input">ساعت مراجعه:</label>
+                <input type="text" name="appointment_time" id="edit-appointment-time" class="form-control"
+                  style="width: 100% !important">
+              </div>
+              <small class="text-danger error-appointment_time mt-1 text-start"></small>
+            </div>
+            <div class="col-12">
+              <div class="position-relative">
+                <label class="label-top-input">توضیحات:</label>
+                <textarea name="description" id="edit-description" class="form-control" rows="4"></textarea>
+              </div>
+              <small class="text-danger error-description mt-1 text-start"></small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer p-3">
+          <button type="submit" class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2">
+            <span class="button_text">ذخیره تغییرات</span>
+            <div class="loader" style="display: none;"></div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <div class="patient-information-content w-100 d-flex justify-content-center">
-  <div class="my-patient-content d-none">
-    <div class="card gray clrfix" style="padding-bottom: 0;">
+  <div class="my-patient-content d-none w-100">
+    <div class="card">
       <div class="card-header">ثبت نوبت</div>
       <div class="card-body">
         <form method="post" action="" id="manual-appointment-form" autocomplete="off">
@@ -179,54 +195,54 @@
           <input type="hidden" id="user-id" name="user_id" value="">
           <input type="hidden" id="doctor-id" name="doctor_id"
             value="{{ auth('doctor')->id() ?? auth('secretary')->user()->doctor_id }}">
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos"> نام بیمار:</label>
-            <input type="text" name="fristname" class="form-control h-50" placeholder="نام بیمار را وارد کنید"
-              required="">
-          </div>
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos"> نام خانوادگی بیمار:</label>
-            <input type="text" name="lastname" class="form-control h-50"
-              placeholder="نام و نام خانوادگی بیمار را وارد کنید" required="">
-          </div>
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos"> شماره موبایل بیمار:</label>
-            <input type="text" name="mobile" class="form-control h-50"
-              placeholder="شماره موبایل بیمار را وارد کنید" required="">
-          </div>
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos"> کد ملی بیمار:</label>
-            <input type="text" name="codemeli" class="form-control h-50" placeholder="کدملی بیمار را وارد کنید">
-          </div>
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos"> تاریخ مراجعه: </label>
-            <input type="text" placeholder="1403/05/02" class="form-control h-50" id="selected-date" data-jdp>
-          </div>
-          <div class="mt-3 position-relative timepicker-ui w-100">
-            <label class="label-top-input-special-takhasos"> ساعت مراجعه:</label>
-            <input type="text" class="form-control w-100 h-50 timepicker-ui-input text-end fw-bold font-size-13"
-              id="appointment-time" value="00:00" style="width: 100% !important">
-          </div>
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos"> توضیحات : </label>
-            <textarea id="description" name="description" class="form-control h-50" cols="30" rows="10"></textarea>
-          </div>
-          <div class="mt-3 position-relative mb-3 w-100">
-            <button type="submit" id="submit-button"
-              class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
-              <span class="button_text">ثبت تغیرات</span>
-              <div class="loader"></div>
-            </button>
+          <div class="row g-3">
+            <div class="col-12 position-relative">
+              <label class="label-top-input">نام بیمار:</label>
+              <input type="text" name="fristname" class="form-control" placeholder="نام بیمار را وارد کنید"
+                required>
+            </div>
+            <div class="col-12 position-relative">
+              <label class="label-top-input">نام خانوادگی بیمار:</label>
+              <input type="text" name="lastname" class="form-control"
+                placeholder="نام و نام خانوادگی بیمار را وارد کنید" required>
+            </div>
+            <div class="col-12 position-relative">
+              <label class="label-top-input">شماره موبایل بیمار:</label>
+              <input type="text" name="mobile" class="form-control text-end"
+                placeholder="شماره موبایل بیمار را وارد کنید" required>
+            </div>
+            <div class="col-12 position-relative">
+              <label class="label-top-input">کد ملی بیمار:</label>
+              <input type="text" name="codemeli" class="form-control text-end" placeholder="کدملی بیمار را وارد کنید">
+            </div>
+            <div class="col-12 position-relative">
+              <label class="label-top-input">تاریخ مراجعه:</label>
+              <input type="text" placeholder="1403/05/02" class="form-control" id="selected-date" data-jdp>
+            </div>
+            <div class="col-12 position-relative timepicker-ui w-100">
+              <label class="label-top-input">ساعت مراجعه:</label>
+              <input type="text" class="form-control timepicker-ui-input text-end fw-bold" id="appointment-time"
+                value="00:00" style="width: 100% !important">
+            </div>
+            <div class="col-12 position-relative">
+              <label class="label-top-input">توضیحات:</label>
+              <textarea id="description" name="description" class="form-control" rows="4"></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit"
+                class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2">
+                <span class="button_text">ثبت تغییرات</span>
+                <div class="loader" style="display: none;"></div>
+              </button>
+            </div>
           </div>
         </form>
-        <div class="modal fade " id="calendarModal" tabindex="-1" role="dialog"
-          aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered " role="document">
-            <div class="modal-content border-radius-6">
-              <div class="my-modal-header p-3">
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
+        <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="exampleModalCenterTitle"
+          aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header p-3">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
                 <x-jalali-calendar />
@@ -238,125 +254,57 @@
     </div>
   </div>
 </div>
-<div class="manual-nobat-content w-100 d-flex justify-content-center mt-3">
+
+<div class="manual-nobat-content w-100 d-flex justify-content-center mt-4">
   <div class="manual-nobat-content-wrapper p-3">
     <div class="main-content">
-      <div class="row no-gutters font-size-13 margin-bottom-10">
+      <div class="row g-0">
         <div class="user-panel-content w-100">
-          <div class="row w-100">
-            <div class="w-100 d-flex justify-content-center">
-              <div class="table-responsive">
-                <table class="table table-light table-hover">
-                  <thead>
-                    <tr>
-                      <th>ردیف</th>
-                      <th>نام</th>
-                      <th>موبایل</th>
-                      <th>کدملی</th>
-                      <th>تاریخ</th>
-                      <th>ساعت</th>
-                      <th>توضیحات</th>
-                      <th>عملیات</th>
-                    </tr>
-                  </thead>
-                  <tbody id="result_nobat">
-                    @foreach ($appointments as $appointment)
-                      <tr>
-                        <td>{{ $appointment->id }}</td>
-                        <td>{{ $appointment->user->first_name }} {{ $appointment->user->last_name }}</td>
-                        <td>{{ $appointment->user->mobile }}</td>
-                        <td>{{ $appointment->user->national_code }}</td>
-                        <td>{{ $appointment->appointment_date }}</td>
-                        <td>{{ $appointment->appointment_time }}</td>
-                        <td>{{ $appointment->description ?? '---' }}</td>
-                        <td>
-                          <button class="btn btn-sm btn-light edit-btn rounded-circle"
-                            data-id="{{ $appointment->id }}"><img
-                              src="{{ asset('dr-assets/icons/edit.svg') }}"></button>
-                          <button class="btn btn-sm btn-light rounded-circle delete-btn"
-                            data-id="{{ $appointment->id }}"><img
-                              src="{{ asset('dr-assets/icons/trash.svg') }}"></button>
-                        </td>
-                      </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <div class="table-responsive">
+            <table class="table table-light table-hover">
+              <thead>
+                <tr>
+                  <th>ردیف</th>
+                  <th>نام</th>
+                  <th>موبایل</th>
+                  <th>کدملی</th>
+                  <th>تاریخ</th>
+                  <th>ساعت</th>
+                  <th>توضیحات</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="result_nobat">
+                @foreach ($appointments as $appointment)
+                  <tr>
+                    <td>{{ $appointment->id }}</td>
+                    <td>{{ $appointment->user->first_name }} {{ $appointment->user->last_name }}</td>
+                    <td>{{ $appointment->user->mobile }}</td>
+                    <td>{{ $appointment->user->national_code }}</td>
+                    <td>{{ $appointment->appointment_date }}</td>
+                    <td>{{ $appointment->appointment_time }}</td>
+                    <td>{{ $appointment->description ?? '---' }}</td>
+                    <td>
+                      <button class="btn btn-sm btn-light edit-btn rounded-circle" data-id="{{ $appointment->id }}">
+                        <img src="{{ asset('dr-assets/icons/edit.svg') }}">
+                      </button>
+                      <button class="btn btn-sm btn-light delete-btn rounded-circle"
+                        data-id="{{ $appointment->id }}">
+                        <img src="{{ asset('dr-assets/icons/trash.svg') }}">
+                      </button>
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-<!-- مودال ویرایش بیمار -->
-<div class="modal fade" id="editPatientModal" tabindex="-1" role="dialog" aria-labelledby="editPatientLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content border-radius-6">
-      <form id="edit-patient-form">
-        @csrf
-        <div class="modal-header">
-          <h5 class="modal-title" id="editPatientLabel">ویرایش بیمار</h5>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" name="appointment_id" id="edit-appointment-id">
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos">نام بیمار:</label>
-            <input type="text" name="first_name" id="edit-first-name" class="form-control h-50"
-              placeholder="نام بیمار را وارد کنید">
-          </div>
-          <small class="text-danger error-first_name"></small>
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos">نام خانوادگی بیمار:</label>
-            <input type="text" name="last_name" id="edit-last-name" class="form-control h-50"
-              placeholder="نام و نام خانوادگی بیمار را وارد کنید">
-          </div>
-          <small class="text-danger error-last_name"></small>
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos">شماره موبایل:</label>
-            <input type="text" name="mobile" id="edit-mobile" class="form-control h-50"
-              placeholder="شماره موبایل بیمار را وارد کنید">
-          </div>
-          <small class="text-danger error-mobile"></small>
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos">کد ملی:</label>
-            <input type="text" name="national_code" id="edit-national-code" class="form-control h-50"
-              placeholder="کد ملی بیمار را وارد کنید">
-          </div>
-          <small class="text-danger error-national_code"></small>
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos">تاریخ مراجعه:</label>
-            <input type="text" name="appointment_date" placeholder="1403/05/02" id="edit-appointment-date"
-              data-jdp="" class="form-control h-50">
-          </div>
-          <small class="text-danger error-appointment_date"></small>
-          <div class="mt-3 position-relative timepicker-ui w-100">
-            <label class="label-top-input-special-takhasos">ساعت مراجعه:</label>
-            <input type="text" name="appointment_time" id="edit-appointment-time" class="form-control w-100 h-50"
-              style="width: 100% !important">
-          </div>
-          <small class="text-danger error-appointment_time"></small>
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos">توضیحات:</label>
-            <textarea name="description" id="edit-description" class="form-control h-50" rows="3"></textarea>
-          </div>
-          <small class="text-danger error-description"></small>
-        </div>
-        <div class="modal-footer">
-          <button type="submit"
-            class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
-            <span class="button_text">ذخیره تغییرات</span>
-            <div class="loader"></div>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+
+
 @endsection
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>

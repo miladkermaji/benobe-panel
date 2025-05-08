@@ -1,124 +1,560 @@
+/* متغیرهای جهانی */
+:root {
+    --primary: #2e86c1;
+    --primary-light: #84caf9;
+    --background-light: #f0f8ff;
+    --background-card: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --border-neutral: #e5e7eb;
+    --shadow: rgba(0, 0, 0, 0.15);
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-card: 1rem;
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
+}
+
+/* استایل‌های عمومی */
+body {
+    direction: rtl;
+    font-family: "Vazir", sans-serif;
+    background-color: var(--background-light);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+}
+
+.manual-nobat-content-wrapper,
+.calendar-and-add-sick-section {
+    background-color: var(--background-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 6px 20px var(--shadow);
+    transition: box-shadow 0.3s ease;
+    width: 97% !important;
+    margin: 20px auto;
+    padding: 1.5rem;
+}
+
+.manual-nobat-content-wrapper:hover,
+.calendar-and-add-sick-section:hover {
+    box-shadow: 0 8px 25px var(--shadow);
+}
+
+.card {
+    max-width: 850px;
+    width: 100%;
+    margin: 0 auto;
+    border-radius: var(--radius-card);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.card-header {
+    background: var(--background-card);
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 1.125rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-neutral);
+    text-align: center;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* فرم و اینپوت‌ها */
+.label-top-input {
+    position: absolute;
+    top: -1rem;
+    background: var(--background-card);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    color: var(--text-primary);
+    z-index: 1;
+    transition: all 0.2s ease;
+}
+
+.input-group .label-top-input {
+    right: 2.5rem;
+}
+
+.form-control {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-neutral);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    height: calc(3rem + 2px);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 6px rgba(46, 134, 193, 0.2);
+    outline: none;
+}
+
+.form-control.ltr {
+    direction: ltr;
+}
+
+.form-control.text-center {
+    text-align: center;
+}
+
+.input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
 .input-group-text {
-    display: -ms-flexbox;
+    background-color: var(--background-light);
+    border: 1px solid var(--border-neutral);
+    border-left: none;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-top-left-radius: var(--radius-md);
+    border-bottom-left-radius: var(--radius-md);
+    height: calc(3rem + 2px);
     display: flex;
-    -ms-flex-align: center;
     align-items: center;
-    padding: 0.375rem 0.75rem;
-    margin-bottom: 0;
+}
+
+/* مودال‌ها */
+.modal-content {
+    box-shadow: 0 8px 16px var(--shadow);
+    border-radius: var(--radius-card);
+}
+
+.modal-header {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border-neutral);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-neutral);
+}
+
+.modal-dialog.modal-lg {
+    max-width: 900px;
+}
+
+.row.g-3 > .col-12 {
+    margin-bottom: 1rem;
+}
+
+small.text-danger {
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 0.25rem;
+    text-align: right;
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* دکمه‌ها */
+.btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1.5rem;
     font-size: 1rem;
-    font-weight: 400;
-    line-height: 0.5 !important;
-    color: #495057;
-    text-align: center;
-    white-space: nowrap;
-    background-color: #e9ecef;
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-}
-.z-t {
-    z-index: 500 !important;
+    font-weight: 600;
+    color: var(--background-card);
+    transition: all 0.3s ease;
 }
 
-.patient-information-conten {
-    width: 800px !important;
+.btn-primary:hover {
+    background: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 134, 193, 0.3);
 }
 
-label {
-    margin-bottom: 0 !important;
-    line-height: 1 !important;
+.btn-primary:disabled {
+    background: var(--primary-light);
+    cursor: not-allowed;
 }
 
-.label-top-input-special-takhasos {
-    position: absolute !important;
-    bottom: 43px !important;
-    z-index: 100 !important;
+.loader {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 3px solid var(--background-card);
+    border-top: 3px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 0.5rem;
 }
 
-.center {
-    text-align: center;
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
+/* جستجو */
 #search-results {
     position: absolute;
-    z-index: 2500;
-    width: 773px;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--background-card);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px var(--shadow);
     max-height: 300px;
-    /* محدود کردن ارتفاع برای پیمایش */
     overflow-y: auto;
-    /* فعال کردن اسکرول عمودی */
-    background: #fff;
-    /* پس‌زمینه سفید برای خوانایی */
-    border: 1px solid #ddd;
-    /* حاشیه برای مشخص شدن جدول */
+    z-index: 1000;
+    padding: 0.5rem;
     display: none;
-    /* پیش‌فرض مخفی */
+    width: 100%;
 }
 
-.manual-nobat-content-wrapper {
-    background-color: #fff;
-    border-radius: 10px;
-    width: 97% !important;
+.search-result-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-body,
-.card-body {
-    letter-spacing: 0 !important;
+.search-result-card:hover {
+    background: #e9ecef;
 }
 
-@media only screen and (max-width: 991px) {
-    .main-content .p-3 {
-        padding: 0.5rem !important;
-    }
+.search-result-info p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
 
-    .card-body {
-        padding: 0 !important;
+.search-result-info .name {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.search-result-action button {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    background: var(--primary);
+    color: var(--background-card);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+.search-result-action button:hover {
+    background: darken(var(--primary), 10%);
+}
+
+.no-results {
+    text-align: center;
+    padding: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* جدول */
+.table-responsive {
+    box-shadow: 0 4px 12px var(--shadow);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    width: 100%;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+/* ریسپانسیو */
+@media (max-width: 991px) {
+    .manual-nobat-content-wrapper,
+    .calendar-and-add-sick-section {
+        margin: 10px auto;
+        padding: 1rem;
+        width: 100% !important;
     }
 
     .card {
-        padding: 0 !important;
+        max-width: 100%;
+        margin: 0 10px;
     }
 
-    .col-12,
-    .col-md-6,
-    .col-sm-12 {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
+    .card-body {
+        padding: 1rem;
+    }
+
+    .patient-information-content {
+        padding: 0 10px;
+    }
+
+    .my-patient-content {
+        width: 100% !important;
+    }
+
+    .form-control,
+    .input-group-text {
+        font-size: 0.8125rem;
+        padding: 0.5rem 0.75rem;
+        height: calc(2.75rem + 2px);
+    }
+
+    .label-top-input {
+        font-size: 0.6875rem;
+        top: -0.5rem;
+        right: 0.5rem;
+        padding: 0.0625rem 0.375rem;
+    }
+
+    .input-group .label-top-input {
+        right: 2rem;
+    }
+
+    .btn-primary {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .modal-dialog.modal-lg {
+        max-width: 100%;
+        margin: 0.5rem;
+    }
+
+    .modal-body,
+    .modal-header,
+    .modal-footer {
+        padding: 1rem;
     }
 
     .table-responsive {
-        margin-top: 10px !important;
+        margin-top: 0.5rem;
     }
 
-    .card-body,
-    .card-details {
-        text-align: right;
-        letter-spacing: -1px;
-        margin: 5px 5px 0 6px;
-        line-height: 22px;
+    .table th,
+    .table td {
+        font-size: 0.8125rem;
+        padding: 0.5rem;
+    }
+
+    /* بخش جستجو */
+    .calendar-and-add-sick-section .d-flex {
+        align-items: center;
+    }
+
+    .calendar-and-add-sick-section .w-md-50 {
+        width: 100% !important;
+        max-width: 100%;
+    }
+
+    #search-results {
+        width: 100%;
+        max-width: 100%;
     }
 }
-.modal-content {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    z-index: 1050;
-    border-radius: 10px;
+
+@media (max-width: 576px) {
+    .manual-nobat-content-wrapper,
+    .calendar-and-add-sick-section {
+        padding: 0.75rem;
+        margin: 5px auto;
+        border-radius: var(--radius-sm);
+        width: 100% !important;
+    }
+
+    .card {
+        margin: 0 5px;
+    }
+
+    .card-header {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .card-body {
+        padding: 0.75rem;
+    }
+
+    .patient-information-content {
+        padding: 0 5px;
+    }
+
+    .form-control,
+    .input-group-text {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.5rem;
+        height: calc(2.5rem + 2px);
+    }
+
+    .label-top-input {
+        font-size: 0.625rem;
+        top: -0.375rem;
+        right: 0.375rem;
+        padding: 0.0625rem 0.25rem;
+    }
+
+    .input-group .label-top-input {
+        right: 1.75rem;
+    }
+
+    .btn-primary {
+        font-size: 0.8125rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .search-result-card {
+        padding: 0.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-result-info p {
+        font-size: 0.75rem;
+    }
+
+    .search-result-action button {
+        margin-top: 0.5rem;
+        font-size: 0.6875rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .modal-dialog {
+        margin: 0;
+    }
+
+    .modal-body .row.g-3 > .col-12 {
+        margin-bottom: 0.75rem;
+    }
+
+    .table th,
+    .table td {
+        font-size: 0.75rem;
+        padding: 0.375rem;
+    }
+
+    .table th {
+        white-space: nowrap;
+    }
 }
-.table-responsive {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-}
-.my-btn-primary {
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-.my-btn-primary:hover {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-.search-results {
-    z-index: 1000;
-}
-.calendar-and-add-sick-section {
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 10px;
+@media (max-width: 426px) {
+     .calendar-and-add-sick-section .d-flex {
+        flex-direction: column;
+        align-items: start;
+    }
+    .gap-3{
+        gap: 15px !important;
+    }
+    .flex-grow-1{
+        width: 100% !important;
+    }
+    .manual-nobat-content-wrapper,
+    .calendar-and-add-sick-section {
+        padding: 0.75rem;
+        margin: 5px auto;
+        border-radius: var(--radius-sm);
+        width: 100% !important;
+    }
+
+    .card {
+        margin: 0 5px;
+    }
+
+    .card-header {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .card-body {
+        padding: 0.75rem;
+    }
+
+    .patient-information-content {
+        padding: 0 5px;
+    }
+
+    .form-control,
+    .input-group-text {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.5rem;
+        height: calc(2.5rem + 2px);
+    }
+
+    .label-top-input {
+        font-size: 0.625rem;
+        top: -0.375rem;
+        right: 0.375rem;
+        padding: 0.0625rem 0.25rem;
+    }
+
+    .input-group .label-top-input {
+        right: 1.75rem;
+    }
+
+    .btn-primary {
+        font-size: 0.8125rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .search-result-card {
+        padding: 0.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-result-info p {
+        font-size: 0.75rem;
+    }
+
+    .search-result-action button {
+        margin-top: 0.5rem;
+        font-size: 0.6875rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .modal-dialog {
+        margin: 0;
+    }
+
+    .modal-body .row.g-3 > .col-12 {
+        margin-bottom: 0.75rem;
+    }
+
+    .table th,
+    .table td {
+        font-size: 0.75rem;
+        padding: 0.375rem;
+    }
+
+    .table th {
+        white-space: nowrap;
+    }
 }
