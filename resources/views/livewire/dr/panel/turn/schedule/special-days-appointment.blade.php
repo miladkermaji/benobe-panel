@@ -164,16 +164,15 @@
   </x-modal>
 
   <!-- مودال جابجایی -->
-  <x-modal name="transfer-modal" title="جابجایی نوبت‌ها" size="lg"
+  <x-modal name="transfer-modal" title="جابجایی نوبت‌ها" size="sm"
     wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}">
     <x-slot:body>
       <div class="alert alert-info" role="alert">
-        <p class="fw-bold">این روز دارای نوبت است. برای تعطیل کردن باید نوبت‌ها را جابجا کنید</p>
+        <p class="fw-bold">این روز دارای نوبت است. برای تعطیل کردن باید نوبت‌ها را جابجا کنید </p>
       </div>
-      <div class="d-flex justify-content-center gap-2 mt-3">
-        <button class="btn btn-secondary w-100 h-50"
-          x-on:click="$dispatch('close-modal', { name: 'transfer-modal' })">
-          بستن
+      <div class="d-flex justify-content-center gap-2 mt-3 w-100">
+        <button class="btn btn-primary w-100 h-50">
+        جابجایی نوبت ها
         </button>
       </div>
     </x-slot>
