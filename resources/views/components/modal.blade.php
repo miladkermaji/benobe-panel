@@ -4,6 +4,7 @@
   $sizes = [
       'sm' => 'xai-modal__dialog--sm',
       'md' => 'xai-modal__dialog--md',
+      'md-medium' => 'xai-modal__dialog--md-medium',
       'lg' => 'xai-modal__dialog--lg',
       'xl' => 'xai-modal__dialog--xl',
   ];
@@ -44,6 +45,10 @@
 
   .xai-modal-container.xai-modal__dialog--md {
     width: 620px !important;
+  }
+
+  .xai-modal-container.xai-modal__dialog--md-medium {
+    width: 730px !important;
   }
 
   .xai-modal-container.xai-modal__dialog--lg {
