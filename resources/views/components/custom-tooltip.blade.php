@@ -264,7 +264,7 @@
     display: inline-block;
     font-family: var(--tooltip-font);
     isolation: isolate;
-    z-index: 10000 !important;
+    z-index: 100;
   }
 
   .x-tooltip__trigger {
@@ -291,7 +291,7 @@
     visibility: hidden;
     transform: scale(0.95);
     transition: var(--tooltip-transition);
-    z-index: 10001 !important;
+    z-index: 101;
     box-shadow: 0 8px 24px var(--tooltip-shadow);
     pointer-events: none;
     backdrop-filter: blur(4px);
@@ -304,7 +304,7 @@
     width: 0;
     height: 0;
     border: var(--tooltip-arrow-size) solid transparent;
-    z-index: 10002 !important;
+    z-index: 102;
     box-sizing: border-box;
     pointer-events: none;
     display: block !important;
