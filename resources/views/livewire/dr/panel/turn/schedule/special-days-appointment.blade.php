@@ -498,6 +498,10 @@
               value: isChecked
             });
           });
+          Livewire.dispatch('set', {
+            key: 'selectAllScheduleModal',
+            value: isChecked
+          });
         });
       }
 
@@ -510,6 +514,11 @@
           Livewire.dispatch('set', {
             key: 'selectAllScheduleModal',
             value: allChecked
+          });
+          const day = checkbox.dataset.day;
+          Livewire.dispatch('set', {
+            key: `selectedScheduleDays.${day}`,
+            value: checkbox.checked
           });
         });
       });
