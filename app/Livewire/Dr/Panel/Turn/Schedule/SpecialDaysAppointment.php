@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Livewire\Dr\Panel\Turn\Schedule;
-
 use Carbon\Carbon;
 use App\Models\Doctor;
 use Livewire\Component;
@@ -12,7 +10,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\Cache;
-
 class SpecialDaysAppointment extends Component
 {
     public $time;
@@ -125,7 +122,40 @@ class SpecialDaysAppointment extends Component
         }
         return $doctor;
     }
-
+    public function getHolidays()
+    {
+        try {
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $cacheKey = "holidays_{$doctorId}_{$this->selectedClinicId}";
+            return Cache::remember($cacheKey, now()->addHours(24), function () use ($doctorId) {
+                $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)->where('status', 'active');
+                if ($this->selectedClinicId === 'default') {
+                    $holidaysQuery->whereNull('clinic_id');
+                } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
+                    $holidaysQuery->where('clinic_id', $this->selectedClinicId);
+                }
+                $holidays = $holidaysQuery->get()->pluck('holiday_dates')->map(function ($holiday) {
+                    $dates = is_string($holiday) ? json_decode($holiday, true) : $holiday;
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        return [];
+                    }
+                    return is_array($dates) ? $dates : [];
+                })->flatten()->filter()->map(function ($date) {
+                    try {
+                        if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $date)) {
+                            return Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
+                        }
+                        return Carbon::parse($date)->format('Y-m-d');
+                    } catch (\Exception $e) {
+                        return null;
+                    }
+                })->filter()->unique()->values()->toArray();
+                return $holidays;
+            });
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
     public function getAppointmentsInMonth($year, $month)
     {
         try {
@@ -202,179 +232,131 @@ class SpecialDaysAppointment extends Component
             $this->dispatch('open-modal', id: 'transfer-modal');
         }
     }
-    public function addHoliday()
-    {
-        if ($this->isProcessing) {
-            return;
-        }
-        $this->isProcessing = true;
-        try {
-            if (empty($this->selectedDate)) {
-                $this->dispatch('show-toastr', type: 'error', message: 'هیچ تاریخی انتخاب نشده است.');
-                return;
-            }
-            $selectedDate = Carbon::parse($this->selectedDate);
-            if ($selectedDate->isPast()) {
-                $this->dispatch('show-toastr', type: 'warning', message: 'نمی‌توانید روزهای گذشته را تعطیل کنید.');
-                return;
-            }
-            $doctorId = $this->getAuthenticatedDoctor()->id;
-            $hasAppointments = isset($this->appointmentsData['data']) && collect($this->appointmentsData['data'])->contains('date', $this->selectedDate);
-            if ($hasAppointments) {
-                $this->dispatch('openTransferModal', [
-                    'modalId' => 'transfer-modal',
-                    'gregorianDate' => $this->selectedDate,
-                ]);
-                return;
-            }
-            $holiday = DoctorHoliday::firstOrCreate(
-                [
-                    'doctor_id' => $doctorId,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
-                    'status' => 'active',
-                ],
-                [
-                    'holiday_dates' => json_encode([]),
-                ]
-            );
-            $holidayDates = is_string($holiday->holiday_dates)
-                ? json_decode($holiday->holiday_dates, true) ?? []
-                : $holiday->holiday_dates ?? [];
-            if (!in_array($this->selectedDate, $holidayDates)) {
-                $holidayDates[] = $this->selectedDate;
-                $holiday->holiday_dates = json_encode($holidayDates);
-                $holiday->save();
-                SpecialDailySchedule::where('doctor_id', $doctorId)
-                    ->where('date', $this->selectedDate)
-                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
-                    ->delete();
-                // به‌روزرسانی داده‌های holidays و appointments
-                $this->holidaysData = [
-                    'status' => true,
-                    'holidays' => $this->getHolidays(),
-                ];
-                $this->appointmentsData = $this->getAppointmentsInMonth($this->calendarYear, $this->calendarMonth);
-                // لاگ برای دیباگ
-                Log::info('Holiday added', [
-                    'date' => $this->selectedDate,
-                    'holidaysData' => $this->holidaysData,
-                    'appointmentsData' => $this->appointmentsData,
-                ]);
-                $this->dispatch('calendarDataUpdated', [
-                    'holidaysData' => $this->holidaysData,
-                    'appointmentsData' => $this->appointmentsData,
-                    'calendarYear' => $this->calendarYear,
-                    'calendarMonth' => $this->calendarMonth,
-                ]);
-                $cacheKey = "holidays_{$doctorId}_{$this->selectedClinicId}";
-                Cache::forget($cacheKey);
-                $this->dispatch('holidayUpdated', date: $this->selectedDate, isHoliday: true);
-                $this->dispatch('show-toastr', type: 'success', message: 'این تاریخ تعطیل شد.');
-            } else {
-                $this->dispatch('show-toastr', type: 'warning', message: 'این تاریخ قبلاً تعطیل است.');
-            }
-            $this->showModal = false;
-            $this->selectedDate = null;
-            $this->dispatch('close-modal', id: 'holiday-modal');
-        } catch (\Exception $e) {
-            Log::error('Error adding holiday', ['error' => $e->getMessage()]);
-            $this->dispatch('show-toastr', type: 'error', message: 'خطا در افزودن تعطیلی: ' . $e->getMessage());
-        } finally {
-            $this->isProcessing = false;
-        }
+public function addHoliday()
+{
+    if ($this->isProcessing) {
+        return;
     }
-
-    public function removeHoliday()
-    {
-        if ($this->isProcessing) {
+    $this->isProcessing = true;
+    try {
+        if (empty($this->selectedDate)) {
+            $this->dispatch('show-toastr', type: 'error', message: 'هیچ تاریخی انتخاب نشده است.');
             return;
         }
-        $this->isProcessing = true;
-        try {
-            if (empty($this->selectedDate)) {
-                $this->dispatch('show-toastr', type: 'error', message: 'هیچ تاریخی انتخاب نشده است.');
-                return;
-            }
-            $selectedDate = Carbon::parse($this->selectedDate);
-            if ($selectedDate->isPast()) {
-                $this->dispatch('show-toastr', type: 'warning', message: 'نمی‌توانید روزهای گذشته را از تعطیلی خارج کنید.');
-                return;
-            }
-            $doctorId = $this->getAuthenticatedDoctor()->id;
-            $holiday = DoctorHoliday::where('doctor_id', $doctorId)
-                ->where('status', 'active')
+        $selectedDate = Carbon::parse($this->selectedDate);
+        if ($selectedDate->isPast()) {
+            $this->dispatch('show-toastr', type: 'warning', message: 'نمی‌توانید روزهای گذشته را تعطیل کنید.');
+            return;
+        }
+        $doctorId = $this->getAuthenticatedDoctor()->id;
+        $hasAppointments = isset($this->appointmentsData['data']) && collect($this->appointmentsData['data'])->contains('date', $this->selectedDate);
+        if ($hasAppointments) {
+            $this->dispatch('openTransferModal', [
+                'modalId' => 'transfer-modal',
+                'gregorianDate' => $this->selectedDate,
+            ]);
+            return;
+        }
+        $holiday = DoctorHoliday::firstOrCreate(
+            [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                'status' => 'active',
+            ],
+            [
+                'holiday_dates' => json_encode([]),
+            ]
+        );
+        $holidayDates = is_string($holiday->holiday_dates)
+            ? json_decode($holiday->holiday_dates, true) ?? []
+            : $holiday->holiday_dates ?? [];
+        if (!in_array($this->selectedDate, $holidayDates)) {
+            $holidayDates[] = $this->selectedDate;
+            $holiday->holiday_dates = json_encode($holidayDates);
+            $holiday->save();
+            SpecialDailySchedule::where('doctor_id', $doctorId)
+                ->where('date', $this->selectedDate)
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
-                ->first();
-            if ($holiday) {
-                $holidayDates = is_string($holiday->holiday_dates)
-                    ? json_decode($holiday->holiday_dates, true) ?? []
-                    : $holiday->holiday_dates ?? [];
-                if (in_array($this->selectedDate, $holidayDates)) {
-                    $holidayDates = array_filter($holidayDates, fn ($date) => $date !== $this->selectedDate);
-                    if (empty($holidayDates)) {
-                        $holiday->delete();
-                    } else {
-                        $holiday->holiday_dates = json_encode(array_values($holidayDates));
-                        $holiday->save();
-                    }
-                    // به‌روزرسانی داده‌های holidays و appointments
-                    $this->holidaysData = [
-                        'status' => true,
-                        'holidays' => $this->getHolidays(),
-                    ];
-                    $this->appointmentsData = $this->getAppointmentsInMonth($this->calendarYear, $this->calendarMonth);
-                    // لاگ برای دیباگ
-                    Log::info('Holiday removed', [
-                        'date' => $this->selectedDate,
-                        'holidaysData' => $this->holidaysData,
-                        'appointmentsData' => $this->appointmentsData,
-                    ]);
-                    $this->dispatch('calendarDataUpdated', [
-                        'holidaysData' => $this->holidaysData,
-                        'appointmentsData' => $this->appointmentsData,
-                        'calendarYear' => $this->calendarYear,
-                        'calendarMonth' => $this->calendarMonth,
-                    ]);
-                    $cacheKey = "holidays_{$doctorId}_{$this->selectedClinicId}";
-                    Cache::forget($cacheKey);
-                    $this->dispatch('holidayUpdated', date: $this->selectedDate, isHoliday: false);
-                    $this->dispatch('show-toastr', type: 'success', message: 'این تاریخ از حالت تعطیلی خارج شد.');
-                } else {
-                    $this->dispatch('show-toastr', type: 'warning', message: 'این تاریخ تعطیل نیست.');
-                }
-            } else {
-                $this->dispatch('show-toastr', type: 'warning', message: 'هیچ تعطیلی برای این تاریخ ثبت نشده است.');
-            }
-            $this->showModal = false;
-            $this->selectedDate = null;
-            $this->dispatch('close-modal', id: 'holiday-modal');
-        } catch (\Exception $e) {
-            Log::error('Error removing holiday', ['error' => $e->getMessage()]);
-            $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف تعطیلی: ' . $e->getMessage());
-        } finally {
-            $this->isProcessing = false;
+                ->delete();
+            $this->holidaysData = [
+                'status' => true,
+                'holidays' => $this->getHolidays(),
+            ];
+            $cacheKey = "holidays_{$doctorId}_{$this->selectedClinicId}";
+            Cache::forget($cacheKey);
+            $this->dispatch('holidayUpdated', date: $this->selectedDate, isHoliday: true);
+            $this->dispatch('show-toastr', type: 'success', message: 'این تاریخ تعطیل شد.');
+        } else {
+            $this->dispatch('show-toastr', type: 'warning', message: 'این تاریخ قبلاً تعطیل است.');
         }
+        $this->showModal = false;
+        $this->selectedDate = null;
+        $this->dispatch('close-modal', id: 'holiday-modal');
+    } catch (\Exception $e) {
+        $this->dispatch('show-toastr', type: 'error', message: 'خطا در افزودن تعطیلی: ' . $e->getMessage());
+    } finally {
+        $this->isProcessing = false;
     }
+}
 
-    protected function getHolidays()
-    {
+public function removeHoliday()
+{
+    if ($this->isProcessing) {
+        return;
+    }
+    $this->isProcessing = true;
+    try {
+        if (empty($this->selectedDate)) {
+            $this->dispatch('show-toastr', type: 'error', message: 'هیچ تاریخی انتخاب نشده است.');
+            return;
+        }
+        $selectedDate = Carbon::parse($this->selectedDate);
+        if ($selectedDate->isPast()) {
+            $this->dispatch('show-toastr', type: 'warning', message: 'نمی‌توانید روزهای گذشته را از تعطیلی خارج کنید.');
+            return;
+        }
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $holiday = DoctorHoliday::where('doctor_id', $doctorId)
             ->where('status', 'active')
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->first();
-
-        $holidays = $holiday && !empty($holiday->holiday_dates)
-            ? (is_string($holiday->holiday_dates)
+        if ($holiday) {
+            $holidayDates = is_string($holiday->holiday_dates)
                 ? json_decode($holiday->holiday_dates, true) ?? []
-                : $holiday->holiday_dates ?? [])
-            : [];
-
-        return array_values(array_filter($holidays, fn ($date) => !Carbon::parse($date)->isPast()));
+                : $holiday->holiday_dates ?? [];
+            if (in_array($this->selectedDate, $holidayDates)) {
+                $holidayDates = array_filter($holidayDates, fn ($date) => $date !== $this->selectedDate);
+                if (empty($holidayDates)) {
+                    $holiday->delete();
+                } else {
+                    $holiday->holiday_dates = json_encode(array_values($holidayDates));
+                    $holiday->save();
+                }
+                $this->holidaysData = [
+                    'status' => true,
+                    'holidays' => $this->getHolidays(),
+                ];
+                $cacheKey = "holidays_{$doctorId}_{$this->selectedClinicId}";
+                Cache::forget($cacheKey);
+                $this->dispatch('holidayUpdated', date: $this->selectedDate, isHoliday: false);
+                $this->dispatch('show-toastr', type: 'success', message: 'این تاریخ از حالت تعطیلی خارج شد.');
+            } else {
+                $this->dispatch('show-toastr', type: 'warning', message: 'این تاریخ تعطیل نیست.');
+            }
+        } else {
+            $this->dispatch('show-toastr', type: 'warning', message: 'هیچ تعطیلی برای این تاریخ ثبت نشده است.');
+        }
+        $this->showModal = false;
+        $this->selectedDate = null;
+        $this->dispatch('close-modal', id: 'holiday-modal');
+    } catch (\Exception $e) {
+        $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف تعطیلی: ' . $e->getMessage());
+    } finally {
+        $this->isProcessing = false;
     }
+}
     public function closeModal()
     {
         $this->showModal = false;
