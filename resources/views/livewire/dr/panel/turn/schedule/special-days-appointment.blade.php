@@ -155,17 +155,18 @@
   </x-modal>
 
   <!-- مودال جابجایی -->
-<x-modal name="transfer-modal" title="جابجایی نوبت‌ها" size="sm"
+  <x-modal name="transfer-modal" title="جابجایی نوبت‌ها" size="sm"
     wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}">
     <x-slot:body>
       <div class="alert alert-info" role="alert">
         <p class="fw-bold">این روز دارای نوبت است. برای تعطیل کردن باید نوبت‌ها را جابجا یا در صورت تمایل لغو کنید.
-          برای انجام عملیات روی جابجایی نوبت‌ها کلیک کنید و بعد از جابجایی مجدد به همین صفحه برگردید و روز مورد نظر را تعطیل کنید.</p>
+          برای انجام عملیات روی جابجایی نوبت‌ها کلیک کنید و بعد از جابجایی مجدد به همین صفحه برگردید و روز مورد نظر را
+          تعطیل کنید.</p>
       </div>
       <div class="d-flex justify-content-center gap-2 mt-3 w-100">
         <a href="{{ route('dr-appointments', [
             'selected_date' => \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('Y-m-d'),
-            'redirect_back' => route('dr-mySpecialDays')
+            'redirect_back' => route('dr-mySpecialDays'),
         ]) }}"
           class="btn btn-primary w-100 h-50 text-white">
           جابجایی نوبت‌ها
@@ -484,7 +485,6 @@
       if (selectAllCheckbox) {
         selectAllCheckbox.addEventListener('change', function() {
           const isChecked = this.checked;
-          console.log('selectAllScheduleModal changed:', isChecked); // لاگ برای دیباگ
           document.querySelectorAll('.schedule-day-checkbox').forEach((checkbox) => {
             checkbox.checked = isChecked;
             const day = checkbox.dataset.day;
@@ -511,7 +511,6 @@
             value: allChecked
           });
           const day = checkbox.dataset.day;
-          console.log(`selectedScheduleDays.${day} changed:`, checkbox.checked); // لاگ برای دیباگ
           Livewire.dispatch('set', {
             key: `selectedScheduleDays.${day}`,
             value: checkbox.checked
@@ -642,9 +641,8 @@
       });
 
       // تأیید حذف بازه زمانی
-      Livewire.on('confirm-delete-slot', ({
-        index
-      }) => {
+      Livewire.on('confirm-delete-slot', (event) => {
+        const index = event.index;
         Swal.fire({
           title: 'آیا مطمئن هستید؟',
           text: 'این بازه زمانی حذف خواهد شد!',
@@ -656,9 +654,12 @@
         }).then((result) => {
           if (result.isConfirmed) {
             Livewire.dispatch('confirmDeleteSlot', {
-              index
-            });
+              index: index
+            }); // نام رویداد دقیقاً همونه
+          } else {
           }
+        }).catch((error) => {
+          console.error('SweetAlert error:', error);
         });
       });
 
