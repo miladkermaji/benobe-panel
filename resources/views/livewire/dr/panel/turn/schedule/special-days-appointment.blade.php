@@ -226,36 +226,36 @@
   </x-modal>
 
   <!-- مودال زمان‌های مخصوص منشی -->
-  <x-modal name="emergencyModal" title="انتخاب زمان‌های مخصوص منشی" size="md"
+<x-modal name="emergencyModal" title="انتخاب زمان‌های مخصوص منشی" size="md"
     wire:key="emergency-modal-{{ $selectedDate ?? 'default' }}">
     <x-slot:body>
-      <div class="emergency-times-container">
-        <div class="d-flex flex-wrap gap-2 justify-content-center" id="emergency-times">
-          @if (!empty($emergencyTimes['possible']))
-            @foreach ($emergencyTimes['possible'] as $time)
-              <button type="button"
-                class="btn btn-sm time-slot-btn {{ isset($selectedEmergencyTimes[$time]) && $selectedEmergencyTimes[$time] ? 'btn-primary' : 'btn-outline-primary' }}"
-                wire:click="$set('selectedEmergencyTimes.{{ $time }}', {{ isset($selectedEmergencyTimes[$time]) && $selectedEmergencyTimes[$time] ? 'false' : 'true' }})"
-                data-time="{{ $time }}">
-                {{ $time }}
-              </button>
-            @endforeach
-          @else
-            <div class="alert alert-warning text-center">
-              هیچ زمان مخصوص منشی برای این بازه زمانی در دسترس نیست.
+        <div class="emergency-times-container">
+            <div class="d-flex flex-wrap gap-2 justify-content-center" id="emergency-times">
+                @if (!empty($emergencyTimes['possible']))
+                    @foreach ($emergencyTimes['possible'] as $time)
+                        <button type="button"
+                            class="btn btn-sm time-slot-btn {{ isset($selectedEmergencyTimes[$time]) && $selectedEmergencyTimes[$time] ? 'btn-primary' : 'btn-outline-primary' }}"
+                            wire:click="$set('selectedEmergencyTimes.{{ $time }}', {{ isset($selectedEmergencyTimes[$time]) && $selectedEmergencyTimes[$time] ? 'false' : 'true' }})"
+                            data-time="{{ $time }}">
+                            {{ $time }}
+                        </button>
+                    @endforeach
+                @else
+                    <div class="alert alert-warning text-center">
+                        هیچ زمان مخصوص منشی برای این بازه زمانی در دسترس نیست.
+                    </div>
+                @endif
             </div>
-          @endif
         </div>
-      </div>
-      <div class="w-100 d-flex justify-content-end mt-3">
-        <button type="button" class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-          wire:click="saveEmergencyTimes" @if ($isProcessing) disabled @endif>
-          <span class="button_text">ذخیره تغییرات</span>
-          <div class="loader" style="display: none;"></div>
-        </button>
-      </div>
+        <div class="w-100 d-flex justify-content-end mt-3">
+            <button type="button" class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
+                wire:click="saveEmergencyTimes" @if ($isProcessing) disabled @endif>
+                <span class="button_text">ذخیره تغییرات</span>
+                <div class="loader" style="display: none;"></div>
+            </button>
+        </div>
     </x-slot>
-  </x-modal>
+</x-modal>
 
   <!-- مودال تنظیم زمان‌بندی -->
   <x-modal name="scheduleModal" title="تنظیم زمان‌بندی" size="lg"
