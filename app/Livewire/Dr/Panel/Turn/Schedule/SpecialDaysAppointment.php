@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 class SpecialDaysAppointment extends Component
 {
     public $time;
+    public $editingSettingIndex = null;
     public $calendarYear;
     public $isLoading = false;
     public $calendarMonth;
@@ -1443,7 +1444,7 @@ class SpecialDaysAppointment extends Component
         }
     }
 
-public function saveSchedule()
+  public function saveSchedule()
 {
     if ($this->isProcessing) {
         return;
@@ -1482,8 +1483,8 @@ public function saveSchedule()
                 'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
             ],
             [
-                'work_hours' => json_encode([]), // مقدار پیش‌فرض برای work_hours
-                'appointment_settings' => json_encode([]), // مقدار پیش‌فرض خالی برای appointment_settings
+                'work_hours' => json_encode([]),
+                'appointment_settings' => json_encode([]),
                 'emergency_times' => json_encode([[]]),
             ]
         );
@@ -1517,13 +1518,24 @@ public function saveSchedule()
             return;
         }
 
-        // بررسی تعداد تنظیمات موجود برای این work_hour_key
+        // بررسی تداخل روزهای انتخاب‌شده با تنظیمات قبلی
         $existingSettings = array_filter(
             $appointmentSettings,
             fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
         );
 
-        // ایجاد تنظیم جدید
+        foreach ($existingSettings as $key => $existing) {
+            if (isset($this->editingSettingIndex) && (int)$key === (int)$this->editingSettingIndex) {
+                continue; // تنظیم در حال ویرایش را نادیده بگیر
+            }
+            $commonDays = array_intersect($selectedDays, $existing['days']);
+            if (!empty($commonDays)) {
+                $this->dispatch('show-toastr', type: 'error', message: 'روزهای انتخاب‌شده با تنظیمات قبلی تداخل دارند: ' . implode(', ', $commonDays));
+                return;
+            }
+        }
+
+        // ایجاد یا به‌روزرسانی تنظیم
         $newSetting = [
             'start_time' => $startTime,
             'end_time' => $endTime,
@@ -1533,25 +1545,10 @@ public function saveSchedule()
             'appointment_duration' => $appointmentSettings[$this->scheduleModalIndex]['appointment_duration'] ?? 0,
         ];
 
-        if (count($existingSettings) <= 1) {
-            // اگر فقط یک تنظیم وجود داره یا هیچی نیست، جایگزین می‌کنیم
-            $existingIndex = array_key_first($existingSettings);
-            if ($existingIndex !== null) {
-                // جایگزینی تنظیم موجود
-                $appointmentSettings[$existingIndex] = $newSetting;
-            } else {
-                // اضافه کردن تنظیم جدید (وقتی هیچی نیست)
-                $appointmentSettings[] = $newSetting;
-            }
+        if (isset($this->editingSettingIndex) && isset($appointmentSettings[$this->editingSettingIndex])) {
+            // به‌روزرسانی تنظیم موجود
+            $appointmentSettings[$this->editingSettingIndex] = $newSetting;
         } else {
-            // اگر بیش از یک تنظیم وجود داره، بررسی تداخل روزهای انتخاب‌شده
-            foreach ($existingSettings as $existing) {
-                $commonDays = array_intersect($selectedDays, $existing['days']);
-                if (!empty($commonDays)) {
-                    $this->dispatch('show-toastr', type: 'error', message: 'روزهای انتخاب‌شده با تنظیمات قبلی تداخل دارند: ' . implode(', ', $commonDays));
-                    return;
-                }
-            }
             // اضافه کردن تنظیم جدید
             $appointmentSettings[] = $newSetting;
         }
@@ -1594,6 +1591,9 @@ public function saveSchedule()
         }
         $this->selectAllScheduleModal = count(array_filter($this->selectedScheduleDays)) === 7;
 
+        // ریست اندیس ویرایش
+        $this->editingSettingIndex = null;
+
         $this->dispatch('refresh-schedule-settings');
         $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات زمان‌بندی ذخیره شد.');
         $this->dispatch('close-schedule-modal');
@@ -1605,107 +1605,143 @@ public function saveSchedule()
     }
 }
 
-public function deleteScheduleSetting($day, $index)
-{
-    Log::info("deleteScheduleSetting called with day: {$day}, index: {$index}");
-    if ($this->isProcessing) {
-        Log::warning("Processing already in progress, exiting deleteScheduleSetting");
-        return;
-    }
+    public function deleteScheduleSetting($day, $index)
+    {
+        Log::info("deleteScheduleSetting called with day: {$day}, index: {$index}");
+        if ($this->isProcessing) {
+            Log::warning("Processing already in progress, exiting deleteScheduleSetting");
+            return;
+        }
 
-    $this->isProcessing = true;
-    try {
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
-            ->where('date', $this->selectedDate)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
-            ->first();
+        $this->isProcessing = true;
+        try {
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
+                ->where('date', $this->selectedDate)
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->first();
 
-        $isFromDoctorWorkSchedule = !$specialSchedule || empty($specialSchedule->work_hours);
+            $isFromDoctorWorkSchedule = !$specialSchedule || empty($specialSchedule->work_hours);
 
-        if ($isFromDoctorWorkSchedule) {
-            // فقط UI را به‌روزرسانی می‌کنیم
-            $this->selectedScheduleDays = array_fill_keys(
-                ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-                false
-            );
-            $this->selectAllScheduleModal = false;
-            $this->workSchedule['data']['appointment_settings'] = [];
-            $this->dispatch('refresh-schedule-settings');
-            $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات زمان‌بندی در UI حذف شد. برای اعمال تغییرات، تنظیمات جدید را ذخیره کنید.');
-        } else {
-            // داده‌ها از SpecialDailySchedule
-            if (!$specialSchedule) {
-                $this->dispatch('show-toastr', type: 'error', message: 'برنامه کاری برای این تاریخ یافت نشد.');
-                Log::warning("No SpecialDailySchedule found for date: " . $this->selectedDate);
-                return;
-            }
-
-            $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
-            $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
-            $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
-
-            if (isset($appointmentSettings[$index])) {
-                // بررسی تعداد تنظیمات برای این work_hour_key
-                $settingsForThisSlot = array_filter(
-                    $appointmentSettings,
-                    fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
-                );
-
-                if (count($settingsForThisSlot) <= 1) {
-                    $this->dispatch('show-toastr', type: 'warning', message: 'نمی‌توانید آخرین تنظیم زمان‌بندی را حذف کنید. می‌توانید آن را ویرایش کنید.');
-                    Log::info("Attempt to delete last setting for work_hour_key: {$this->scheduleModalIndex}");
-                    return;
-                }
-
-                // حذف تنظیم
-                unset($appointmentSettings[$index]);
-                $appointmentSettings = array_values($appointmentSettings);
-
-                // به‌روزرسانی SpecialDailySchedule
-                $specialSchedule->appointment_settings = json_encode($appointmentSettings);
-                $specialSchedule->work_hours = json_encode($workHours);
-                $specialSchedule->emergency_times = json_encode($emergencyTimes);
-                $specialSchedule->save();
-
-                // پاک کردن کش
-                $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
-                Cache::forget($cacheKey);
-
-                // به‌روزرسانی workSchedule
-                $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
-                $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
-
-                // به‌روزرسانی چک‌باکس‌ها
+            if ($isFromDoctorWorkSchedule) {
+                // فقط UI را به‌روزرسانی می‌کنیم
                 $this->selectedScheduleDays = array_fill_keys(
                     ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
                     false
                 );
-                foreach ($appointmentSettings as $setting) {
-                    if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex) {
-                        foreach ($setting['days'] as $day) {
-                            $this->selectedScheduleDays[$day] = true;
+                $this->selectAllScheduleModal = false;
+                $this->workSchedule['data']['appointment_settings'] = [];
+                $this->dispatch('refresh-schedule-settings');
+                $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات زمان‌بندی در UI حذف شد. برای اعمال تغییرات، تنظیمات جدید را ذخیره کنید.');
+            } else {
+                // داده‌ها از SpecialDailySchedule
+                if (!$specialSchedule) {
+                    $this->dispatch('show-toastr', type: 'error', message: 'برنامه کاری برای این تاریخ یافت نشد.');
+                    Log::warning("No SpecialDailySchedule found for date: " . $this->selectedDate);
+                    return;
+                }
+
+                $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
+                $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+                $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
+
+                if (isset($appointmentSettings[$index])) {
+                    // بررسی تعداد تنظیمات برای این work_hour_key
+                    $settingsForThisSlot = array_filter(
+                        $appointmentSettings,
+                        fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
+                    );
+
+                    if (count($settingsForThisSlot) <= 1) {
+                        // باز کردن مودال ویرایش برای تنظیم فعلی
+                        $this->openScheduleModalForEdit($day, $index, $appointmentSettings[$index]);
+                        $this->dispatch('show-toastr', type: 'warning', message: 'نمی‌توانید آخرین تنظیم زمان‌بندی را حذف کنید. لطفاً آن را ویرایش کنید.');
+                        Log::info("Attempt to delete last setting for work_hour_key: {$this->scheduleModalIndex}, opening edit modal");
+                        return;
+                    }
+
+                    // حذف تنظیم
+                    unset($appointmentSettings[$index]);
+                    $appointmentSettings = array_values($appointmentSettings);
+
+                    // به‌روزرسانی SpecialDailySchedule
+                    $specialSchedule->appointment_settings = json_encode($appointmentSettings);
+                    $specialSchedule->work_hours = json_encode($workHours);
+                    $specialSchedule->emergency_times = json_encode($emergencyTimes);
+                    $specialSchedule->save();
+
+                    // پاک کردن کش
+                    $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
+                    Cache::forget($cacheKey);
+
+                    // به‌روزرسانی workSchedule
+                    $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
+                    $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+
+                    // به‌روزرسانی چک‌باکس‌ها
+                    $this->selectedScheduleDays = array_fill_keys(
+                        ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                        false
+                    );
+                    foreach ($appointmentSettings as $setting) {
+                        if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex) {
+                            foreach ($setting['days'] as $day) {
+                                $this->selectedScheduleDays[$day] = true;
+                            }
                         }
                     }
-                }
-                $this->selectAllScheduleModal = count(array_filter($this->selectedScheduleDays)) === 7;
+                    $this->selectAllScheduleModal = count(array_filter($this->selectedScheduleDays)) === 7;
 
-                $this->dispatch('refresh-schedule-settings');
-                $this->dispatch('show-toastr', type: 'success', message: 'تنظیم زمان‌بندی حذف شد.');
-                Log::info("Schedule setting deleted from SpecialDailySchedule: index {$index}");
-            } else {
-                $this->dispatch('show-toastr', type: 'error', message: 'تنظیم زمان‌بندی نامعتبر است.');
-                Log::warning("Invalid schedule setting index: " . $index);
+                    $this->dispatch('refresh-schedule-settings');
+                    $this->dispatch('show-toastr', type: 'success', message: 'تنظیم زمان‌بندی حذف شد.');
+                    Log::info("Schedule setting deleted from SpecialDailySchedule: index {$index}");
+                } else {
+                    $this->dispatch('show-toastr', type: 'error', message: 'تنظیم زمان‌بندی نامعتبر است.');
+                    Log::warning("Invalid schedule setting index: " . $index);
+                }
             }
+        } catch (\Exception $e) {
+            Log::error("Error in deleteScheduleSetting: " . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف تنظیم زمان‌بندی: ' . $e->getMessage());
+        } finally {
+            $this->isProcessing = false;
         }
-    } catch (\Exception $e) {
-        Log::error("Error in deleteScheduleSetting: " . $e->getMessage());
-        $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف تنظیم زمان‌بندی: ' . $e->getMessage());
-    } finally {
-        $this->isProcessing = false;
     }
-}
+
+    protected function openScheduleModalForEdit($day, $index, $setting)
+    {
+        try {
+            // تنظیم متغیرهای مودال
+            $this->scheduleModalDay = $day;
+            $this->scheduleModalIndex = $setting['work_hour_key'];
+
+            // تنظیم زمان‌های شروع و پایان
+            $this->workSchedule['data']['work_hours'][$this->scheduleModalIndex]['start'] = $setting['start_time'];
+            $this->workSchedule['data']['work_hours'][$this->scheduleModalIndex]['end'] = $setting['end_time'];
+            $this->workSchedule['data']['work_hours'][$this->scheduleModalIndex]['max_appointments'] = $setting['max_appointments'] ?? 0;
+
+            // تنظیم روزهای انتخاب‌شده
+            $this->selectedScheduleDays = array_fill_keys(
+                ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                false
+            );
+            foreach ($setting['days'] as $day) {
+                $this->selectedScheduleDays[$day] = true;
+            }
+            $this->selectAllScheduleModal = count(array_filter($this->selectedScheduleDays)) === 7;
+
+            // ذخیره اندیس تنظیم برای ویرایش
+            $this->editingSettingIndex = $index;
+
+            // باز کردن مودال
+            $this->dispatch('open-modal', id: 'scheduleModal');
+            Log::info("Edit modal opened for setting index: {$index}", ['setting' => $setting]);
+        } catch (\Exception $e) {
+            Log::error("Error in openScheduleModalForEdit: " . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال ویرایش: ' . $e->getMessage());
+        }
+    }
 
     public function setCalculationMode($mode)
     {
@@ -1791,30 +1827,30 @@ public function deleteScheduleSetting($day, $index)
         }
     }
 
-  public function openEmergencyModal($day, $index)
-{
-    try {
-        if (!isset($this->workSchedule['data']['work_hours'][$index])) {
-            $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی انتخاب‌شده نامعتبر است.');
-            Log::error("Invalid work hours index: {$index}");
-            return;
-        }
+    public function openEmergencyModal($day, $index)
+    {
+        try {
+            if (!isset($this->workSchedule['data']['work_hours'][$index])) {
+                $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی انتخاب‌شده نامعتبر است.');
+                Log::error("Invalid work hours index: {$index}");
+                return;
+            }
 
-        $this->isEmergencyModalOpen = true;
-        $this->emergencyModalDay = $day;
-        $this->emergencyModalIndex = $index; // تنظیم صریح emergencyModalIndex
-        $emergencyData = $this->getEmergencyTimes();
-        $this->emergencyTimes = [
-            'possible' => $emergencyData['possible'] ?? [],
-            'selected' => $emergencyData['selected'] ?? [],
-        ];
-        $this->selectedEmergencyTimes = array_fill_keys($emergencyData['selected'] ?? [], true);
-        $this->dispatch('open-modal', id: 'emergencyModal');
-    } catch (\Exception $e) {
-        Log::error("Error in openEmergencyModal: " . $e->getMessage());
-        $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال اورژانسی: ' . $e->getMessage());
+            $this->isEmergencyModalOpen = true;
+            $this->emergencyModalDay = $day;
+            $this->emergencyModalIndex = $index; // تنظیم صریح emergencyModalIndex
+            $emergencyData = $this->getEmergencyTimes();
+            $this->emergencyTimes = [
+                'possible' => $emergencyData['possible'] ?? [],
+                'selected' => $emergencyData['selected'] ?? [],
+            ];
+            $this->selectedEmergencyTimes = array_fill_keys($emergencyData['selected'] ?? [], true);
+            $this->dispatch('open-modal', id: 'emergencyModal');
+        } catch (\Exception $e) {
+            Log::error("Error in openEmergencyModal: " . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال اورژانسی: ' . $e->getMessage());
+        }
     }
-}
 
     public function openScheduleModal($day, $index)
     {
@@ -1926,7 +1962,7 @@ public function deleteScheduleSetting($day, $index)
             $this->dispatch('show-toastr', type: 'success', message: 'تغییرات ساعت کاری ذخیره شد.');
         } catch (\Exception $e) {
             Log::error("Error in updatedWorkScheduleDataWorkHours: " . $e->getMessage());
-           
+
         } finally {
             $this->isProcessing = false;
         }
