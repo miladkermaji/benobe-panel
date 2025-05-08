@@ -568,11 +568,19 @@ body {
 }
 
 .loading-overlay .spinner-border {
-    width: 2rem;
-    height: 2rem;
-    border-width: 3px;
-    border-color: var(--primary);
+    display: inline-block;
+    width: 3rem;
+    height: 3rem;
+    vertical-align: text-bottom;
+    border: 0.25em solid currentColor;
     border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* سایر استایل‌ها */
@@ -883,16 +891,25 @@ h6 {
 /*   schedule modal styles */
 /* متغیرهای پالت رنگی */
 
-
 /* انیمیشن‌ها */
 @keyframes modalFadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* استایل مودال */
@@ -1013,7 +1030,10 @@ h6 {
 }
 
 /* چک‌باکس‌ها */
-#scheduleModal .checkbox-wrapper-1 [type="checkbox"].substituted + label:before {
+#scheduleModal
+    .checkbox-wrapper-1
+    [type="checkbox"].substituted
+    + label:before {
     content: "";
     display: inline-block;
     vertical-align: middle;
@@ -1026,13 +1046,21 @@ h6 {
     transition: all 0.2s ease;
 }
 
-#scheduleModal .checkbox-wrapper-1 [type="checkbox"].substituted:checked + label:before {
-    background: var(--primary) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 9 9"><path d="M3.5 6.5L1.5 4.5L0.5 5.5L3.5 8.5L8.5 3.5L7.5 2.5L3.5 6.5Z"/></svg>') no-repeat center;
+#scheduleModal
+    .checkbox-wrapper-1
+    [type="checkbox"].substituted:checked
+    + label:before {
+    background: var(--primary)
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 9 9"><path d="M3.5 6.5L1.5 4.5L0.5 5.5L3.5 8.5L8.5 3.5L7.5 2.5L3.5 6.5Z"/></svg>')
+        no-repeat center;
     background-size: 0.875rem;
     border-color: var(--primary);
 }
 
-#scheduleModal .checkbox-wrapper-1 [type="checkbox"].substituted:focus + label:before {
+#scheduleModal
+    .checkbox-wrapper-1
+    [type="checkbox"].substituted:focus
+    + label:before {
     box-shadow: 0 0 6px rgba(46, 134, 193, 0.3);
 }
 
@@ -1049,7 +1077,10 @@ h6 {
     transition: all 0.2s ease;
 }
 
-#scheduleModal .checkbox-wrapper-1 [type="checkbox"].substituted:checked + label {
+#scheduleModal
+    .checkbox-wrapper-1
+    [type="checkbox"].substituted:checked
+    + label {
     background: var(--primary-light);
     color: var(--background-card);
     border-color: var(--primary);
@@ -1086,17 +1117,17 @@ h6 {
 }
 
 #scheduleModal .timepicker-ui-input {
-  width: 100%;
-  border: 1px solid var(--border-neutral);
-  border-radius: var(--radius-button);
-  padding: 0.875rem;
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  text-align: center;
-  background: var(--background-card);
-  transition: all 0.2s ease;
-  height: 56px;
-  width: 200px !important;
+    width: 100%;
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
+    padding: 0.875rem;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    text-align: center;
+    background: var(--background-card);
+    transition: all 0.2s ease;
+    height: 56px;
+    width: 200px !important;
 }
 
 #scheduleModal .timepicker-ui-input:focus {
@@ -1176,7 +1207,11 @@ h6 {
 
 /* دکمه ذخیره */
 #scheduleModal #saveSchedule {
-    background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    background: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
     border: none;
     border-radius: var(--radius-button);
     color: var(--background-card);
@@ -1192,7 +1227,11 @@ h6 {
 }
 
 #scheduleModal #saveSchedule:hover {
-    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+    background: linear-gradient(
+        90deg,
+        var(--primary) 0%,
+        var(--primary-light) 100%
+    );
     transform: translateY(-1px);
     box-shadow: 0 4px 8px var(--shadow);
 }
@@ -1237,7 +1276,10 @@ h6 {
         padding: 0.375rem 0.5rem;
     }
 
-    #scheduleModal .checkbox-wrapper-1 [type="checkbox"].substituted + label:before {
+    #scheduleModal
+        .checkbox-wrapper-1
+        [type="checkbox"].substituted
+        + label:before {
         height: 1rem;
         width: 1rem;
         background-size: 0.625rem;

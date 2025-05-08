@@ -6,150 +6,166 @@
   <!-- مودال تعطیلات -->
   <x-modal name="holiday-modal" title="مدیریت تعطیلات و ساعات کاری" persistent="true"
     size="{{ $selectedDate && in_array($selectedDate, $holidaysData['holidays']) ? 'sm' : 'lg' }}"
-    wire:key="holiday-modal-{{ $selectedDate ?? 'default' }}">
+    wire:key="holiday-modal-{{ $selectedDate ?? 'default' }}" id="holidayModal">
     <x-slot:body>
-      @php
-        $isPastDate = $selectedDate ? \Carbon\Carbon::parse($selectedDate)->isPast() : false;
-        $jalaliDate = $selectedDate
-            ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('d F Y')
-            : '';
-      @endphp
-      @if ($selectedDate && in_array($selectedDate, $holidaysData['holidays'] ?? []))
-        <div class="alert alert-warning" role="alert">
-          <h4 class="alert-heading">تأیید تغییر وضعیت تعطیلات</h4>
-          <p>روز {{ $jalaliDate }} تعطیل است. آیا می‌خواهید از تعطیلی خارج کنید؟</p>
-          <hr>
+      <!-- لودینگ -->
+      <div class="loading-overlay d-none">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+          <span class="sr-only">در حال بارگذاری...</span>
+        </div>
+        <p class="mt-2 text-primary">در حال بارگذاری...</p>
+      </div>
+
+      <!-- محتوای اصلی مودال -->
+      <div class="modal-content-inner">
+        @php
+          $isPastDate = $selectedDate ? \Carbon\Carbon::parse($selectedDate)->isPast() : false;
+          $jalaliDate = $selectedDate
+              ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('d F Y')
+              : '';
+        @endphp
+        @if ($selectedDate && in_array($selectedDate, $holidaysData['holidays'] ?? []))
+          <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">تأیید تغییر وضعیت تعطیلات</h4>
+            <p>روز {{ $jalaliDate }} تعطیل است. آیا می‌خواهید از تعطیلی خارج کنید؟</p>
+            <hr>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+              <button class="btn btn-primary w-100 h-50" wire:click="removeHoliday"
+                {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
+                خروج از تعطیلی
+              </button>
+              <button class="btn btn-secondary w-100 h-50"
+                x-on:click="$dispatch('close-modal', { name: 'holiday-modal' })" {{ $isProcessing ? 'disabled' : '' }}>
+                لغو
+              </button>
+            </div>
+          </div>
+        @else
+          <div class="workhours-content w-100 d-flex justify-content-center mb-3">
+            <div class="workhours-wrapper-content p-3">
+              @if ($hasWorkHoursMessage)
+                <div class="alert alert-info" role="alert">
+                  <p class="fw-bold text-center">
+                    @if ($isFromSpecialDailySchedule)
+                      پزشک گرامی، شما برای این روز تنظیمات خاص دارید.
+                    @else
+                      شما از قبل برای این روز ساعات کاری تعریف کرده‌اید. در صورت تمایل می‌توانید آن را ویرایش کنید.
+                    @endif
+                  </p>
+                </div>
+              @endif
+              @if ($workSchedule['status'] && !empty($workSchedule['data']['work_hours']))
+                <div class="border-333 p-3 mt-3 border-radius-11">
+                  <h6>ساعات کاری -
+                    {{ $selectedDate ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('d F Y') : '' }}
+                  </h6>
+                  <div class="mt-4">
+                    @foreach ($workSchedule['data']['work_hours'] as $index => $slot)
+                      <div class="form-row d-flex w-100 p-3 bg-active-slot border-radius-11"
+                        data-slot-id="{{ $index }}"
+                        wire:key="slot-{{ $index }}-{{ $selectedDate ?? 'default' }}">
+                        <div class="d-flex justify-content-start align-items-center gap-4">
+                          <div class="form-group position-relative timepicker-ui">
+                            <label class="label-top-input-special-takhasos" for="start-{{ $index }}">از</label>
+                            <input type="text" data-timepicker
+                              class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                              id="start-{{ $index }}"
+                              wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $index }}.start"
+                              wire:key="start-{{ $index }}-{{ $selectedDate ?? 'default' }}" />
+                          </div>
+                          <div class="form-group position-relative timepicker-ui">
+                            <label class="label-top-input-special-takhasos" for="end-{{ $index }}">تا</label>
+                            <input type="text" data-timepicker
+                              class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                              id="end-{{ $index }}"
+                              wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $index }}.end"
+                              wire:key="end-{{ $index }}-{{ $selectedDate ?? 'default' }}" />
+                          </div>
+                          <div class="form-group position-relative">
+                            <label class="label-top-input-special-takhasos" for="patients-{{ $index }}">تعداد
+                              نوبت</label>
+                            <input type="text" class="form-control h-50 text-center max-appointments bg-white"
+                              id="patients-{{ $index }}"
+                              wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $index }}.max_appointments"
+                              wire:click="openCalculatorModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
+                              wire:key="patients-{{ $index }}-{{ $selectedDate ?? 'default' }}"
+                              data-index="{{ $index }}" readonly />
+                          </div>
+                          <div class="form-group position-relative">
+                            <x-custom-tooltip
+                              title="زمان‌های مخصوص منشی که می‌تواند برای شرایط خاص نگه دارد. این زمان‌ها غیرفعال می‌شوند تا زمانی که منشی یا پزشک آن‌ها را مجدداً فعال کند."
+                              placement="top">
+                              <button class="btn btn-light btn-sm emergency-slot-btn"
+                                data-day="{{ $workSchedule['data']['day'] }}"
+                                wire:click="openEmergencyModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
+                                data-index="{{ $index }}" @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
+                                <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت مخصوص منشی">
+                              </button>
+                            </x-custom-tooltip>
+                          </div>
+                          <div class="form-group position-relative">
+                            <x-custom-tooltip title="حذف برنامه کاری" placement="top">
+                              <button class="btn btn-light btn-sm remove-row-btn"
+                                wire:click="removeSlot({{ $index }})"
+                                @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
+                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                              </button>
+                            </x-custom-tooltip>
+                          </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                          <x-custom-tooltip title="زمان‌بندی باز شدن نوبت‌ها" placement="top">
+                            <button type="button" class="btn text-black btn-sm btn-outline-primary schedule-btn"
+                              wire:click="openScheduleModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
+                              data-day="{{ $workSchedule['data']['day'] }}" data-index="{{ $index }}"
+                              @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
+                              <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                            </button>
+                          </x-custom-tooltip>
+                        </div>
+                      </div>
+                    @endforeach
+                  </div>
+                  <div class="add-new-row mt-3">
+                    <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true" data-placement="bottom"
+                      data-original-title="اضافه کردن ساعت کاری جدید" wire:click="addSlot"
+                      @if ($isProcessing) disabled @endif>
+                      <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" srcset="">
+                      <span>افزودن ردیف جدید</span>
+                    </button>
+                  </div>
+                </div>
+              @else
+                <div class="alert alert-warning text-center">
+                  هیچ ساعت کاری برای این روز تعریف نشده است.
+                  <div class="mt-3">
+                    <button class="btn btn-primary w-100 h-50" wire:click="addSlot"
+                      @if ($isProcessing) disabled @endif>
+                      افزودن بازه زمانی
+                    </button>
+                  </div>
+                </div>
+              @endif
+            </div>
+          </div>
           <div class="d-flex justify-content-center gap-2 mt-3">
-            <button class="btn btn-primary w-100 h-50" wire:click="removeHoliday"
+            <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
               {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
-              خروج از تعطیلی
+              تعطیل کردن
             </button>
             <button class="btn btn-secondary w-100 h-50"
               x-on:click="$dispatch('close-modal', { name: 'holiday-modal' })" {{ $isProcessing ? 'disabled' : '' }}>
               لغو
             </button>
           </div>
-        </div>
-      @else
-        <div class="workhours-content w-100 d-flex justify-content-center mb-3">
-          <div class="workhours-wrapper-content p-3">
-            @if ($hasWorkHoursMessage)
-              <div class="alert alert-info" role="alert">
-                <p class="fw-bold text-center">شما از قبل برای این روز ساعات کاری تعریف کرده‌اید. در صورت تمایل
-                  می‌توانید آن را ویرایش کنید</p>
-              </div>
-            @endif
-            @if ($workSchedule['status'] && !empty($workSchedule['data']['work_hours']))
-              <div class="border-333 p-3 mt-3 border-radius-11">
-                <h6>ساعات کاری -
-                  {{ $selectedDate ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('d F Y') : '' }}
-                </h6>
-                <div class="mt-4">
-                  @foreach ($workSchedule['data']['work_hours'] as $index => $slot)
-                    <div class="form-row d-flex w-100 p-3 bg-active-slot border-radius-11"
-                      data-slot-id="{{ $index }}"
-                      wire:key="slot-{{ $index }}-{{ $selectedDate ?? 'default' }}">
-                      <div class="d-flex justify-content-start align-items-center gap-4">
-                        <div class="form-group position-relative timepicker-ui">
-                          <label class="label-top-input-special-takhasos" for="start-{{ $index }}">از</label>
-                          <input type="text" data-timepicker
-                            class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
-                            id="start-{{ $index }}"
-                            wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $index }}.start"
-                            wire:key="start-{{ $index }}-{{ $selectedDate ?? 'default' }}" />
-                        </div>
-                        <div class="form-group position-relative timepicker-ui">
-                          <label class="label-top-input-special-takhasos" for="end-{{ $index }}">تا</label>
-                          <input type="text" data-timepicker
-                            class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
-                            id="end-{{ $index }}"
-                            wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $index }}.end"
-                            wire:key="end-{{ $index }}-{{ $selectedDate ?? 'default' }}" />
-                        </div>
-                        <div class="form-group position-relative">
-                          <label class="label-top-input-special-takhasos" for="patients-{{ $index }}">تعداد
-                            نوبت</label>
-                          <input type="text" class="form-control h-50 text-center max-appointments bg-white"
-                            id="patients-{{ $index }}"
-                            wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $index }}.max_appointments"
-                            wire:click="openCalculatorModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
-                            wire:key="patients-{{ $index }}-{{ $selectedDate ?? 'default' }}"
-                            data-index="{{ $index }}" readonly />
-                        </div>
-                        <div class="form-group position-relative">
-                          <x-custom-tooltip
-                            title="زمان‌های مخصوص منشی که می‌تواند برای شرایط خاص نگه دارد. این زمان‌ها غیرفعال می‌شوند تا زمانی که منشی یا پزشک آن‌ها را مجدداً فعال کند."
-                            placement="top">
-                            <button class="btn btn-light btn-sm emergency-slot-btn"
-                              data-day="{{ $workSchedule['data']['day'] }}"
-                              wire:click="openEmergencyModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
-                              data-index="{{ $index }}" @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
-                              <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت مخصوص منشی">
-                            </button>
-                          </x-custom-tooltip>
-                        </div>
-                        <div class="form-group position-relative">
-                          <x-custom-tooltip title="حذف برنامه کاری" placement="top">
-                            <button class="btn btn-light btn-sm remove-row-btn"
-                              wire:click="removeSlot({{ $index }})"
-                              @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
-                              <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                            </button>
-                          </x-custom-tooltip>
-                        </div>
-                      </div>
-                      <div class="d-flex align-items-center">
-                        <x-custom-tooltip title="زمان‌بندی باز شدن نوبت‌ها" placement="top">
-                          <button type="button" class="btn text-black btn-sm btn-outline-primary schedule-btn"
-                            wire:click="openScheduleModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
-                            data-day="{{ $workSchedule['data']['day'] }}" data-index="{{ $index }}"
-                            @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
-                            <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
-                          </button>
-                        </x-custom-tooltip>
-                      </div>
-                    </div>
-                  @endforeach
-                </div>
-                <div class="add-new-row mt-3">
-                  <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true" data-placement="bottom"
-                    data-original-title="اضافه کردن ساعت کاری جدید" wire:click="addSlot"
-                    @if ($isProcessing) disabled @endif>
-                    <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" srcset="">
-                    <span>افزودن ردیف جدید</span>
-                  </button>
-                </div>
-              </div>
-            @else
-              <div class="alert alert-warning text-center">
-                هیچ ساعت کاری برای این روز تعریف نشده است.
-                <div class="mt-3">
-                  <button class="btn btn-primary w-100 h-50" wire:click="addSlot"
-                    @if ($isProcessing) disabled @endif>
-                    افزودن بازه زمانی
-                  </button>
-                </div>
-              </div>
-            @endif
-          </div>
-        </div>
-        <div class="d-flex justify-content-center gap-2 mt-3">
-          <button class="btn btn-danger w-100 h-50" wire:click="addHoliday"
-            {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
-            تعطیل کردن
-          </button>
-          <button class="btn btn-secondary w-100 h-50" x-on:click="$dispatch('close-modal', { name: 'holiday-modal' })"
-            {{ $isProcessing ? 'disabled' : '' }}>
-            لغو
-          </button>
-        </div>
-      @endif
+        @endif
+      </div>
     </x-slot>
   </x-modal>
 
   <!-- مودال جابجایی -->
   <x-modal name="transfer-modal" title="جابجایی نوبت‌ها" size="lg"
-    wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}" >
+    wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}">
     <x-slot:body>
       <div class="alert alert-info" role="alert">
         <p class="fw-bold">این روز دارای نوبت است. برای تعطیل کردن باید نوبت‌ها را جابجا کنید</p>
@@ -211,7 +227,7 @@
 
   <!-- مودال زمان‌های مخصوص منشی -->
   <x-modal name="emergencyModal" title="انتخاب زمان‌های مخصوص منشی" size="md"
-    wire:key="emergency-modal-{{ $selectedDate ?? 'default' }}" >
+    wire:key="emergency-modal-{{ $selectedDate ?? 'default' }}">
     <x-slot:body>
       <div class="emergency-times-container">
         <div class="d-flex flex-wrap gap-2 justify-content-center" id="emergency-times">
@@ -243,7 +259,7 @@
 
   <!-- مودال تنظیم زمان‌بندی -->
   <x-modal name="scheduleModal" title="تنظیم زمان‌بندی" size="lg"
-    wire:key="schedule-modal-{{ $selectedDate ?? 'default' }}" >
+    wire:key="schedule-modal-{{ $selectedDate ?? 'default' }}">
     <x-slot:body>
       <div class="position-relative">
         <div class="loading-overlay d-none" id="scheduleLoading">
@@ -372,8 +388,56 @@
     };
 
     document.addEventListener("livewire:initialized", () => {
+      Livewire.on('toggle-loading', ({
+        isLoading
+      }) => {
+        setTimeout(() => {
+          const $modal = $('#holidayModal');
+          if ($modal.length) {
+            const $loadingOverlay = $modal.find('.loading-overlay');
+            const $modalContent = $modal.find('.modal-content-inner');
+         
+            if (isLoading) {
+              $loadingOverlay.removeClass('d-none').addClass('d-flex');
+              $modalContent.removeClass('d-flex').addClass('d-none');
+            } else {
+              $loadingOverlay.removeClass('d-flex').addClass('d-none');
+              $modalContent.removeClass('d-none').addClass('d-flex');
+            }
+          } else {
+            console.warn('Holiday modal not found');
+          }
+        }, 100);
+      });
+
+      Livewire.on('open-modal', ({
+        id
+      }) => {
+        if (id === 'holiday-modal') {
+          setTimeout(() => {
+            const $modal = $('#holidayModal');
+            if ($modal.length) {
+              $modal.find('.loading-overlay').removeClass('d-none').addClass('d-flex');
+              $modal.find('.modal-content-inner').removeClass('d-flex').addClass('d-none');
+            } else {
+              console.warn('Holiday modal not found');
+            }
+          }, 100);
+        }
+      });
+
+      Livewire.on('close-modal', ({
+        id
+      }) => {
+        if (id === 'holiday-modal') {
+          const $modal = $('#holidayModal');
+          if ($modal.length) {
+            $modal.find('.loading-overlay').removeClass('d-flex').addClass('d-none');
+            $modal.find('.modal-content-inner').removeClass('d-none').addClass('d-flex');
+          }
+        }
+      });
       Livewire.on('confirm-add-slot', () => {
-        console.log('Received confirm-add-slot event');
         Swal.fire({
           title: 'آیا مایلید ساعات کاری قبلی ذخیره شوند؟',
           text: 'در صورت تأیید، ساعات کاری فعلی ذخیره شده و یک ردیف جدید اضافه می‌شود.',
@@ -385,25 +449,17 @@
           denyButtonText: 'بستن',
           reverseButtons: true
         }).then((result) => {
-          console.log('SweetAlert result:', result);
           if (result.isConfirmed) {
-            console.log('Dispatching confirmAddSlot with savePrevious: true');
-            console.log('Dispatch payload:', {
-              savePrevious: true
-            });
+          
             Livewire.dispatch('confirmAddSlot', {
               savePrevious: true
             });
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            console.log('Dispatching confirmAddSlot with savePrevious: false');
-            console.log('Dispatch payload:', {
-              savePrevious: false
-            });
+         
             Livewire.dispatch('confirmAddSlot', {
               savePrevious: false
             });
           } else if (result.isDenied) {
-            console.log('SweetAlert closed without action');
           }
         }).catch((error) => {
           console.error('SweetAlert error:', error);
@@ -422,7 +478,6 @@
           reverseButtons: true
         }).then((result) => {
           if (result.isConfirmed) {
-            console.log('Dispatching confirmDeleteSlot with index: ' + index);
             Livewire.dispatch('confirmDeleteSlot', {
               index: index
             });
@@ -516,6 +571,26 @@
             });
           }, 100);
         }
+        if (id === 'holiday-modal') {
+          // اطمینان از نمایش لودینگ موقع باز شدن مودال
+          const $modal = $('#holidayModal');
+          if ($modal.length) {
+            $modal.find('.loading-overlay').show();
+            $modal.find('.modal-content-inner').hide();
+          }
+        }
+      });
+      Livewire.on('close-modal', ({
+        id
+      }) => {
+        if (id === 'holiday-modal') {
+          // مخفی کردن لودینگ و نمایش محتوا موقع بستن مودال
+          const $modal = $('#holidayModal');
+          if ($modal.length) {
+            $modal.find('.loading-overlay').hide();
+            $modal.find('.modal-content-inner').show();
+          }
+        }
       });
       window.holidaysData = @json($holidaysData) || {
         status: true,
@@ -536,7 +611,6 @@
       Livewire.on('open-modal', ({
         id
       }) => {
-        console.log('Dispatching open-modal for:', id);
         window.dispatchEvent(new CustomEvent('open-modal', {
           detail: {
             name: id
@@ -546,14 +620,12 @@
           Livewire.dispatch('refreshWorkhours');
         }
         if (id === 'CalculatorModal') {
-          console.log('CalculatorModal open event dispatched successfully');
         }
       });
 
       Livewire.on('close-modal', ({
         id
       }) => {
-        console.log('Dispatching close-modal for:', id);
         window.dispatchEvent(new CustomEvent('close-modal', {
           detail: {
             name: id
@@ -594,8 +666,6 @@
           console.error('Error reinitializing special days calendar:', error);
         }
       });
-
-
 
       Livewire.on('initialize-calculator', ({
         start_time,
@@ -743,4 +813,5 @@
       tryInitialize();
     }
   </script>
+
 </div>

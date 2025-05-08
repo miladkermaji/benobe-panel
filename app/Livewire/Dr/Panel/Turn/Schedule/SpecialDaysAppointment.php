@@ -17,6 +17,7 @@ class SpecialDaysAppointment extends Component
 {
     public $time;
     public $calendarYear;
+    public $isLoading = false;
     public $calendarMonth;
     public $selectedClinicId = 'default';
     public $holidaysData = ['status' => true, 'holidays' => []];
@@ -30,6 +31,7 @@ class SpecialDaysAppointment extends Component
     public $emergencyModalDay;
     public $emergencyModalIndex;
     public $isEmergencyModalOpen = false;
+    public $isFromSpecialDailySchedule = false; // متغیر جدید
     public $calculator = [
         'day' => null,
         'index' => null,
@@ -70,13 +72,16 @@ class SpecialDaysAppointment extends Component
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
         $this->loadCalendarData();
     }
-
     public function selectDate($date)
     {
+        $this->isLoading = true;
+        $this->dispatch('toggle-loading', ['isLoading' => true]); // ارسال لودینگ
         $this->selectedDate = $date;
         $this->showModal = true;
         $this->workSchedule = $this->getWorkScheduleForDate($date);
         $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+        $this->isLoading = false;
+        $this->dispatch('toggle-loading', ['isLoading' => false]);
         $this->dispatch('open-modal', ['name' => 'holiday-modal']);
     }
 
@@ -221,6 +226,7 @@ class SpecialDaysAppointment extends Component
     public function handleOpenHolidayModal($modalId, $gregorianDate)
     {
         if ($modalId === 'holiday-modal' && $gregorianDate) {
+            $this->isLoading = true;
             $this->selectedDate = $gregorianDate;
             $this->showModal = true;
             $this->holidaysData = [
@@ -229,6 +235,8 @@ class SpecialDaysAppointment extends Component
             ];
             $this->workSchedule = $this->getWorkScheduleForDate($gregorianDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+            $this->isLoading = false;
+            $this->dispatch('toggle-loading', ['isLoading' => false]); // اضافه کردن رویداد
             $this->dispatch('updateSelectedDate', $gregorianDate, $this->workSchedule);
             $this->dispatch('open-modal', id: 'holiday-modal');
         } else {
@@ -436,6 +444,9 @@ class SpecialDaysAppointment extends Component
                 $appointmentSettings = json_decode($specialSchedule->appointment_settings, true) ?? [];
                 $emergencyTimes = json_decode($specialSchedule->emergency_times, true) ?? [];
 
+                // تنظیم متغیر برای نشان دادن منبع داده
+                $this->isFromSpecialDailySchedule = true;
+
                 return [
                     'status' => true,
                     'data' => [
@@ -454,6 +465,9 @@ class SpecialDaysAppointment extends Component
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
+
+            // تنظیم متغیر برای نشان دادن منبع داده
+            $this->isFromSpecialDailySchedule = false;
 
             if ($workSchedule && !empty($workSchedule->work_hours)) {
                 $workHours = json_decode($workSchedule->work_hours, true);
@@ -499,12 +513,19 @@ class SpecialDaysAppointment extends Component
             $this->selectedDate = $parsedDate->toDateString();
             if ($workSchedule) {
                 $this->workSchedule = $workSchedule;
+                // بررسی منبع داده‌ها برای تنظیم isFromSpecialDailySchedule
+                $specialSchedule = SpecialDailySchedule::where('doctor_id', $this->getAuthenticatedDoctor()->id)
+                    ->where('date', $this->selectedDate)
+                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                    ->first();
+                $this->isFromSpecialDailySchedule = $specialSchedule && !empty($specialSchedule->work_hours);
             } else {
                 $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             }
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
             $this->emergencyTimes = $this->getEmergencyTimes();
-            Log::info("Selected date updated in SpecialDaysAppointment: {$this->selectedDate}", ['workSchedule' => $this->workSchedule]);
+            Log::info("Selected date updated in SpecialDaysAppointment: {$this->selectedDate}", ['workSchedule' => $this->workSchedule, 'isFromSpecialDailySchedule' => $this->isFromSpecialDailySchedule]);
         } catch (\Exception $e) {
             Log::error("Error in updateSelectedDate: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در انتخاب تاریخ: ' . $e->getMessage());
@@ -639,13 +660,109 @@ class SpecialDaysAppointment extends Component
         $this->isProcessing = true;
 
         try {
-            $this->showAddSlotModal = true;
-            $this->savePreviousRows = true;
-            Log::info("addSlot triggered, opening confirmation modal", [
-                'selectedDate' => $this->selectedDate,
-                'workSchedule' => $this->workSchedule,
-            ]);
-            $this->dispatch('open-modal', id: 'add-slot-modal');
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+
+            // بررسی منبع داده‌ها
+            $specialSchedule = SpecialDailySchedule::where([
+                'doctor_id' => $doctorId,
+                'date' => $this->selectedDate,
+                'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+            ])->first();
+
+            $workHours = $specialSchedule && $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+            $isFromDoctorWorkSchedule = empty($workHours) && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+
+            if ($isFromDoctorWorkSchedule) {
+                // اگر داده‌ها از DoctorWorkSchedule لود شده باشند، مودال add-slot-modal را باز کن
+                $this->showAddSlotModal = true;
+                $this->savePreviousRows = true;
+                Log::info("addSlot triggered, opening add-slot-modal", [
+                    'selectedDate' => $this->selectedDate,
+                    'workSchedule' => $this->workSchedule,
+                ]);
+                $this->dispatch('open-modal', id: 'add-slot-modal');
+            } else {
+                // اگر داده‌ها از SpecialDailySchedule لود شده باشند، ردیف خالی اضافه کن
+
+                // بررسی تکمیل بودن ردیف قبلی
+                if (!empty($workHours)) {
+                    $lastIndex = count($workHours) - 1;
+                    $lastSlot = $workHours[$lastIndex];
+                    if (
+                        empty($lastSlot['start']) ||
+                        empty($lastSlot['end']) ||
+                        empty($lastSlot['max_appointments']) ||
+                        !is_numeric($lastSlot['max_appointments']) ||
+                        (int)$lastSlot['max_appointments'] <= 0
+                    ) {
+                        $this->dispatch('show-toastr', type: 'error', message: 'ابتدا ردیف قبلی را تکمیل کنید.');
+                        Log::warning("Previous slot is incomplete", ['lastSlot' => $lastSlot]);
+                        return;
+                    }
+                }
+
+                // ایجاد یا به‌روزرسانی SpecialDailySchedule
+                $specialSchedule = SpecialDailySchedule::firstOrCreate(
+                    [
+                        'doctor_id' => $doctorId,
+                        'date' => $this->selectedDate,
+                        'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    ],
+                    [
+                        'work_hours' => json_encode([]),
+                        'appointment_settings' => json_encode([]),
+                        'emergency_times' => json_encode([[]]),
+                    ]
+                );
+
+                $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+                $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
+                $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
+
+                // اضافه کردن ردیف خالی
+                $newIndex = count($workHours);
+                $workHours[$newIndex] = [
+                    'start' => '',
+                    'end' => '',
+                    'max_appointments' => '',
+                ];
+                $appointmentSettings[$newIndex] = [
+                    'start_time' => '00:00',
+                    'end_time' => '23:59',
+                    'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                    'work_hour_key' => $newIndex,
+                ];
+                $emergencyTimes[$newIndex] = [];
+
+                // ذخیره داده‌ها
+                $specialSchedule->work_hours = json_encode($workHours);
+                $specialSchedule->appointment_settings = json_encode($appointmentSettings);
+                $specialSchedule->emergency_times = json_encode($emergencyTimes);
+                $specialSchedule->save();
+
+                // پاک کردن کش
+                $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
+                Cache::forget($cacheKey);
+
+                // به‌روزرسانی workSchedule برای نمایش ردیف جدید در UI
+                $this->workSchedule = [
+                    'status' => true,
+                    'data' => [
+                        'day' => strtolower(Carbon::parse($this->selectedDate)->englishDayOfWeek),
+                        'work_hours' => $workHours,
+                        'appointment_settings' => $appointmentSettings,
+                        'emergency_times' => $emergencyTimes,
+                    ],
+                ];
+                $this->hasWorkHoursMessage = !empty($workHours);
+
+                $this->dispatch('show-toastr', type: 'success', message: 'ردیف جدید اضافه شد.');
+                $this->dispatch('refresh-timepicker');
+                Log::info("New slot added directly for SpecialDailySchedule", [
+                    'newIndex' => $newIndex,
+                    'workSchedule' => $this->workSchedule,
+                ]);
+            }
         } catch (\Exception $e) {
             Log::error("Error in addSlot: {$e->getMessage()}", ['trace' => $e->getTraceAsString()]);
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در افزودن بازه زمانی: ' . $e->getMessage());
