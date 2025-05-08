@@ -64,6 +64,7 @@ class AppointmentsList extends Component
     public $finalPrice = 0;
     public $insurances = [];
     public $services = [];
+    public $redirectBack;
     public $discountInputType = 'percentage';
     public $discountInputValue;
     #[Validate('required', message: 'لطفاً تاریخ شروع مسدودیت را وارد کنید.')]
@@ -107,8 +108,37 @@ class AppointmentsList extends Component
 
     public function mount()
     {
+        // مقدار پیش‌فرض تاریخ امروز
         $this->selectedDate = Carbon::now()->format('Y-m-d');
-        $this->blockedAt = Jalalian::now()->format('Y/m/d');
+
+        // خواندن selected_date از URL و دی‌کد کردن آن
+        $selectedDateFromUrl = request()->query('selected_date');
+        if ($selectedDateFromUrl) {
+            $decodedDate = urldecode($selectedDateFromUrl); // دی‌کد کردن 1404%2F02%2F05 به 1404/02/05 یا 1404-02-05
+            try {
+                // بررسی فرمت جلالی با خط تیره (مثل 1404-02-05)
+                if (preg_match('/^14\d{2}-\d{2}-\d{2}$/', $decodedDate)) {
+                    $this->selectedDate = Jalalian::fromFormat('Y-m-d', $decodedDate)->toCarbon()->format('Y-m-d');
+                }
+                // بررسی فرمت جلالی با اسلش (مثل 1404/02/05)
+                elseif (preg_match('/^14\d{2}\/\d{2}\/\d{2}$/', $decodedDate)) {
+                    $this->selectedDate = Jalalian::fromFormat('Y/m/d', $decodedDate)->toCarbon()->format('Y-m-d');
+                }
+                // بررسی فرمت میلادی (مثل 2025-05-13)
+                elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $decodedDate)) {
+                    $this->selectedDate = Carbon::parse($decodedDate)->format('Y-m-d');
+                } else {
+                    Log::warning('فرمت تاریخ نامعتبر در URL پس از دی‌کد: ' . $decodedDate);
+                }
+            } catch (\Exception $e) {
+                Log::error('خطا در تبدیل تاریخ از URL: ' . $e->getMessage() . ' | تاریخ خام: ' . $selectedDateFromUrl);
+            }
+        }
+
+        // ذخیره URL بازگشت
+        $this->redirectBack = urldecode(request()->query('redirect_back', url()->previous()));
+
+        $this->blockedAt = Jalalian::now()->format('Y-m-d'); // تغییر فرمت به Y-m-d
         $this->calendarYear = Jalalian::now()->getYear();
         $this->calendarMonth = Jalalian::now()->getMonth();
         $doctor = $this->getAuthenticatedDoctor();
@@ -120,6 +150,19 @@ class AppointmentsList extends Component
             $this->loadMessages();
             $this->loadCalendarData();
             $this->loadInsurances();
+        }
+    }
+
+    /**
+     * اعتبارسنجی فرمت تاریخ
+     */
+    private function isValidDate($date)
+    {
+        try {
+            Carbon::parse($date);
+            return preg_match('/^\d{4}-\d{2}-\d{2}$/', $date);
+        } catch (\Exception $e) {
+            return false;
         }
     }
 
@@ -374,17 +417,31 @@ class AppointmentsList extends Component
 
     private function convertToGregorian($date)
     {
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            return $date;
-        } elseif (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $date)) {
+        // دی‌کد کردن تاریخ در صورت URL-encoded بودن
+        $decodedDate = urldecode($date);
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $decodedDate)) {
+            return $decodedDate; // تاریخ میلادی است
+        } elseif (preg_match('/^14\d{2}-\d{2}-\d{2}$/', $decodedDate)) {
             try {
-                $gregorian = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
+                $gregorian = Jalalian::fromFormat('Y-m-d', $decodedDate)->toCarbon()->format('Y-m-d');
                 return $gregorian;
             } catch (\Exception $e) {
+                Log::error('خطا در تبدیل تاریخ جلالی به میلادی: ' . $e->getMessage() . ' | تاریخ خام: ' . $date . ' | تاریخ دی‌کدشده: ' . $decodedDate);
+                $this->dispatch('show-toastr', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
+                return Carbon::now()->format('Y-m-d');
+            }
+        } elseif (preg_match('/^14\d{2}\/\d{2}\/\d{2}$/', $decodedDate)) {
+            try {
+                $gregorian = Jalalian::fromFormat('Y/m/d', $decodedDate)->toCarbon()->format('Y-m-d');
+                return $gregorian;
+            } catch (\Exception $e) {
+                Log::error('خطا در تبدیل تاریخ جلالی به میلادی: ' . $e->getMessage() . ' | تاریخ خام: ' . $date . ' | تاریخ دی‌کدشده: ' . $decodedDate);
                 $this->dispatch('show-toastr', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
                 return Carbon::now()->format('Y-m-d');
             }
         } else {
+            Log::warning('فرمت تاریخ نامعتبر: ' . $decodedDate . ' | تاریخ خام: ' . $date);
             $this->dispatch('show-toastr', type: 'error', message: 'فرمت تاریخ نامعتبر است.');
             return Carbon::now()->format('Y-m-d');
         }
@@ -460,6 +517,7 @@ class AppointmentsList extends Component
         $result = $this->checkRescheduleConditions($newDate, $appointmentIds);
         if (!$result['success']) {
             if (isset($result['partial']) && $result['partial']) {
+                // این بخش در confirmPartialReschedule مدیریت می‌شود
             } else {
                 $this->dispatch('show-toastr', [
                     'type' => 'error',
@@ -479,6 +537,11 @@ class AppointmentsList extends Component
         $this->loadAppointments();
         $this->dispatch('close-modal');
         $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
+
+        // فقط اگر selected_date در URL وجود داشته باشد، ریدایرکت انجام شود
+        if (request()->query('selected_date') && !empty($this->redirectBack)) {
+            return redirect()->to($this->redirectBack);
+        }
     }
 
     private function checkRescheduleConditions($newDate, $appointmentIds)
@@ -594,7 +657,7 @@ class AppointmentsList extends Component
                 throw new \Exception('تاریخ‌های انتخاب‌شده نامعتبر هستند.');
             }
             if (empty($availableSlots) || !is_array($availableSlots)) {
-                throw new \Exception('زمان های کاری خالی نامعتبر هستند.');
+                throw new \Exception('زمان‌های کاری خالی نامعتبر هستند.');
             }
             $remainingIds = $this->processReschedule($appointmentIds, $newDate, $availableSlots);
             if (!empty($remainingIds) && $nextDate) {
@@ -611,10 +674,10 @@ class AppointmentsList extends Component
                 } else {
                     $this->dispatch('show-toastr', [
                         'type' => 'success',
-                        'message' => 'نوبت‌های باقی‌مانده با موفقیت به تاریخ ' . Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m/d') . ' منتقل شدند.'
+                        'message' => 'نوبت‌های باقی‌مانده با موفقیت به تاریخ ' . Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y-m-d') . ' منتقل شدند.'
                     ]);
                     $this->dispatch('appointments-rescheduled', [
-                        'message' => 'نوبت‌های باقی‌مانده با موفقیت به تاریخ ' . Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m/d') . ' منتقل شدند.'
+                        'message' => 'نوبت‌های باقی‌مانده با موفقیت به تاریخ ' . Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y-m-d') . ' منتقل شدند.'
                     ]);
                 }
             }
@@ -624,6 +687,11 @@ class AppointmentsList extends Component
             $this->loadAppointments();
             $this->dispatch('close-modal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
+
+            // فقط اگر selected_date در URL وجود داشته باشد، ریدایرکت انجام شود
+            if (request()->query('selected_date') && !empty($this->redirectBack)) {
+                return redirect()->to($this->redirectBack);
+            }
         } catch (\Exception $e) {
             $this->dispatch('show-toastr', [
                 'type' => 'error',
@@ -1136,8 +1204,8 @@ class AppointmentsList extends Component
         }
         if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $date)) {
             try {
-                $date = str_replace('/', '-', $date);
-                return Jalalian::fromFormat('Y-m-d', $date)->toCarbon();
+                $normalizedDate = str_replace('/', '-', $date); // تبدیل 1404/02/05 به 1404-02-05
+                return Jalalian::fromFormat('Y-m-d', $normalizedDate)->toCarbon();
             } catch (\Exception $e) {
                 throw new \Exception("فرمت تاریخ جلالی $fieldName معتبر نیست: $date");
             }
@@ -1562,7 +1630,8 @@ class AppointmentsList extends Component
             })->flatten()->filter()->map(function ($date) {
                 try {
                     if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $date)) {
-                        return Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
+                        $normalizedDate = str_replace('/', '-', $date); // تبدیل 1404/02/05 به 1404-02-05
+                        return Jalalian::fromFormat('Y-m-d', $normalizedDate)->toCarbon()->format('Y-m-d');
                     }
                     return Carbon::parse($date)->format('Y-m-d');
                 } catch (\Exception $e) {

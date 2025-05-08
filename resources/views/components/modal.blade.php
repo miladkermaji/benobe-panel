@@ -47,7 +47,7 @@
   }
 
   .xai-modal-container.xai-modal__dialog--lg {
-    width: 920px !important;
+    width: 900px !important;
   }
 
   .xai-modal-container.xai-modal__dialog--xl {

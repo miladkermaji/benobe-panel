@@ -156,55 +156,57 @@ class SpecialDaysAppointment extends Component
             return [];
         }
     }
-    public function getAppointmentsInMonth($year, $month)
-    {
-        try {
-            $doctorId = $this->getAuthenticatedDoctor()->id;
-            if (!is_numeric($year) || !is_numeric($month)) {
-                $year = (int) Jalalian::now()->getYear();
-                $month = (int) Jalalian::now()->getMonth();
-            }
-            $jalaliDateString = sprintf("%d/%02d/01", $year, $month);
-            $jalaliDate = Jalalian::fromFormat('Y/m/d', $jalaliDateString);
-            $startDate = $jalaliDate->toCarbon()->startOfDay();
-            $endDate = Jalalian::fromCarbon($startDate)->addMonths(1)->subDays(1)->toCarbon()->endOfDay();
-            $appointments = \App\Models\Appointment::where('doctor_id', $doctorId)
-                ->whereBetween('appointment_date', [$startDate, $endDate])
-                ->where('status', '!=', 'cancelled')
-                ->whereNull('deleted_at')
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
-                ->select('appointment_date')
-                ->groupBy('appointment_date')
-                ->get()
-                ->map(function ($appointment) {
-                    $date = Carbon::parse($appointment->appointment_date)->format('Y-m-d');
-                    $count = \App\Models\Appointment::where('doctor_id', $this->getAuthenticatedDoctor()->id)
-                        ->where('appointment_date', $appointment->appointment_date)
-                        ->where('status', '!=', 'cancelled')
-                        ->whereNull('deleted_at')
-                        ->count();
-                    return [
-                        'date' => $date,
-                        'count' => $count,
-                    ];
-                })
-                ->filter(function ($appointment) {
-                    return $appointment['count'] > 0;
-                })
-                ->values()
-                ->toArray();
-            return [
-                'status' => true,
-                'data' => $appointments,
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => false,
-                'data' => [],
-            ];
+ public function getAppointmentsInMonth($year, $month)
+{
+    try {
+        $doctorId = $this->getAuthenticatedDoctor()->id;
+        if (!is_numeric($year) || !is_numeric($month)) {
+            $year = (int) Jalalian::now()->getYear();
+            $month = (int) Jalalian::now()->getMonth();
         }
+        $jalaliDateString = sprintf("%d/%02d/01", $year, $month);
+        $jalaliDate = Jalalian::fromFormat('Y/m/d', $jalaliDateString);
+        $startDate = $jalaliDate->toCarbon()->startOfDay();
+        $endDate = Jalalian::fromCarbon($startDate)->addMonths(1)->subDays(1)->toCarbon()->endOfDay();
+        $appointments = \App\Models\Appointment::where('doctor_id', $doctorId)
+            ->whereBetween('appointment_date', [$startDate, $endDate])
+            ->where('status', 'scheduled')
+            ->whereNull('deleted_at')
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+            ->select('appointment_date')
+            ->groupBy('appointment_date')
+            ->get()
+            ->map(function ($appointment) {
+                $date = Carbon::parse($appointment->appointment_date)->format('Y-m-d');
+                $count = \App\Models\Appointment::where('doctor_id', $this->getAuthenticatedDoctor()->id)
+                    ->where('appointment_date', $appointment->appointment_date)
+                    ->where('status', 'scheduled')
+                    ->whereNull('deleted_at')
+                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                    ->count();
+                return [
+                    'date' => $date,
+                    'count' => $count,
+                ];
+            })
+            ->filter(function ($appointment) {
+                return $appointment['count'] > 0;
+            })
+            ->values()
+            ->toArray();
+        return [
+            'status' => true,
+            'data' => $appointments,
+        ];
+    } catch (\Exception $e) {
+        return [
+            'status' => false,
+            'data' => [],
+        ];
     }
+}
     public function handleOpenHolidayModal($modalId, $gregorianDate)
     {
         if ($modalId === 'holiday-modal' && $gregorianDate) {

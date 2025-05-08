@@ -29,11 +29,11 @@
             <p class="fw-bold text-center">روز {{ $jalaliDate }} تعطیل است. آیا می‌خواهید از تعطیلی خارج کنید؟</p>
           </div>
           <div class="d-flex justify-content-center gap-2 mt-3 w-100">
-              <button class="btn btn-primary w-100 h-50" wire:click="removeHoliday"
-                {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
-                خروج از تعطیلی
-              </button>
-            </div>
+            <button class="btn btn-primary w-100 h-50" wire:click="removeHoliday"
+              {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
+              خروج از تعطیلی
+            </button>
+          </div>
         @else
           <div class="workhours-content w-100 d-flex justify-content-center mb-3">
             <div class="workhours-wrapper-content p-3">
@@ -155,15 +155,20 @@
   </x-modal>
 
   <!-- مودال جابجایی -->
-  <x-modal name="transfer-modal" title="جابجایی نوبت‌ها" size="sm"
+<x-modal name="transfer-modal" title="جابجایی نوبت‌ها" size="sm"
     wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}">
     <x-slot:body>
       <div class="alert alert-info" role="alert">
-        <p class="fw-bold">این روز دارای نوبت است. برای تعطیل کردن باید نوبت‌ها را جابجا یا در صورت تمایل لغو کنید برای انجام عملیات روی جابجایی نوبت ها کلیک کنید و بعد  از جابجایی مجدد به همین صفحه بر گردید روز مورد نظر را تعطیل کنید </p>
+        <p class="fw-bold">این روز دارای نوبت است. برای تعطیل کردن باید نوبت‌ها را جابجا یا در صورت تمایل لغو کنید.
+          برای انجام عملیات روی جابجایی نوبت‌ها کلیک کنید و بعد از جابجایی مجدد به همین صفحه برگردید و روز مورد نظر را تعطیل کنید.</p>
       </div>
       <div class="d-flex justify-content-center gap-2 mt-3 w-100">
-        <a href="" class="btn btn-primary w-100 h-50 text-white">
-          جابجایی نوبت ها
+        <a href="{{ route('dr-appointments', [
+            'selected_date' => \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('Y-m-d'),
+            'redirect_back' => route('dr-mySpecialDays')
+        ]) }}"
+          class="btn btn-primary w-100 h-50 text-white">
+          جابجایی نوبت‌ها
         </a>
       </div>
     </x-slot>
