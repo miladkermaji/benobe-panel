@@ -269,41 +269,44 @@
           <p class="mt-2">در حال بارگذاری...</p>
         </div>
         <div class="modal-content-inner">
-          <div class="schedule-days-section">
-            <div class="day-schdule-wrapper">
-              <div class="day-checkbox">
-                <x-my-check-box id="select-all-schedule-days" is-checked="{{ $selectAllScheduleModal }}"
-                  day="انتخاب همه" wire:model.live="selectAllScheduleModal" />
-              </div>
-              @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+          <!-- بخش انتخاب روزها و تنظیمات زمان -->
+          <div class="schedule-input-section border p-3 rounded mb-3">
+            <div class="schedule-days-section">
+              <div class="day-schdule-wrapper">
                 <div class="day-checkbox">
-                  <x-my-check-box id="schedule-day-{{ $day }}"
-                    is-checked="{{ isset($selectedScheduleDays[$day]) && $selectedScheduleDays[$day] }}"
-                    day="{{ $label }}" wire:model.live="selectedScheduleDays.{{ $day }}"
-                    data-day="{{ $day }}" class="schedule-day-checkbox" />
+                  <x-schedule-check-box id="select-all-schedule-days" day="انتخاب همه"
+                    wire:model.live="selectAllScheduleModal" />
                 </div>
-              @endforeach
+                @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+                  <div class="day-checkbox">
+                    <x-schedule-check-box id="schedule-day-{{ $day }}" day="{{ $label }}"
+                      wire:model.live="selectedScheduleDays.{{ $day }}" data-day="{{ $day }}"
+                      class="schedule-day-checkbox" />
+                  </div>
+                @endforeach
+              </div>
+            </div>
+            <div class="timepicker-save-section mt-3 d-flex gap-3 align-items-end">
+              <div class="form-group position-relative">
+                <label class="label-top-input-special-takhasos">شروع</label>
+                <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
+                  id="schedule-start"
+                  wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.start">
+              </div>
+              <div class="form-group position-relative">
+                <label class="label-top-input-special-takhasos">پایان</label>
+                <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
+                  id="schedule-end"
+                  wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.end">
+              </div>
+              <button type="button" class="btn my-btn-primary d-flex justify-content-center align-items-center"
+                id="saveSchedule" wire:click="saveSchedule" @if ($isProcessing) disabled @endif>
+                <span class="button_text">ذخیره تغییرات</span>
+                <div class="loader" style="display: none;"></div>
+              </button>
             </div>
           </div>
-          <div class="timepicker-save-section">
-            <div class="form-group position-relative">
-              <label class="label-top-input-special-takhasos">شروع</label>
-              <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
-                id="schedule-start"
-                wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.start">
-            </div>
-            <div class="form-group position-relative">
-              <label class="label-top-input-special-takhasos">پایان</label>
-              <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
-                id="schedule-end"
-                wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.end">
-            </div>
-            <button type="button" class="btn my-btn-primary d-flex justify-content-center align-items-center"
-              id="saveSchedule" wire:click="saveSchedule" @if ($isProcessing) disabled @endif>
-              <span class="button_text">ذخیره تغییرات</span>
-              <div class="loader" style="display: none;"></div>
-            </button>
-          </div>
+          <!-- بخش لیست تنظیمات -->
           <div class="schedule-settings-section">
             <div class="schedule-settings-list">
               @if ($scheduleModalDay && $scheduleModalIndex !== null)

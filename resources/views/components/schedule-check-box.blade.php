@@ -1,0 +1,1 @@
+<x-my-check-box :id="$id" :day="$day" :is-checked="false" {{ $attributes }} />
