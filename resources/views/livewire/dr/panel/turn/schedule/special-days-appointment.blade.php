@@ -136,7 +136,7 @@
                   </div>
                 </div>
               @else
-                <div class="alert alert-warning text-center">
+                <div class="alert alert-warning text-center fw-bold">
                   هیچ ساعت کاری برای این روز تعریف نشده است.
                   <div class="mt-3">
                     <button class="btn btn-primary w-100 h-50" wire:click="addSlot"
@@ -171,13 +171,19 @@
         <p class="fw-bold">این روز دارای نوبت است. برای تعطیل کردن باید نوبت‌ها را جابجا کنید </p>
       </div>
       <div class="d-flex justify-content-center gap-2 mt-3 w-100">
-        <button class="btn btn-primary w-100 h-50">
-        جابجایی نوبت ها
+        <button class="btn btn-primary w-100 h-50" x-data @click="$dispatch('open-modal',{name: 'reschedule-modal'})">
+          جابجایی نوبت ها
         </button>
       </div>
     </x-slot>
   </x-modal>
 
+  <x-modal name="reschedule-modal" title="جابجایی نوبت‌ها" size="lg"
+    wire:key="transfer-modal-{{ $selectedDate ?? 'default' }}">
+    <x-slot:body>
+    <x-reschedule-calendar />
+    </x-slot>
+  </x-modal>
   <!-- مودال محاسبه‌گر -->
   <x-modal name="CalculatorModal" name="CalculatorModal" title="انتخاب تعداد نوبت یا زمان ویزیت" size="sm">
     <x-slot:body>
