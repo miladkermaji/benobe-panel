@@ -430,7 +430,7 @@ class SpecialDaysAppointment extends Component
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $cacheKey = "work_schedule_{$doctorId}_{$date}_{$this->selectedClinicId}";
 
-        Log::info("Fetching work schedule for date: {$date}, doctor_id: {$doctorId}, clinic_id: {$this->selectedClinicId}");
+       
 
         return Cache::remember($cacheKey, now()->addHours(1), function () use ($doctorId, $date) {
             // ابتدا بررسی SpecialDailySchedule
@@ -477,7 +477,7 @@ class SpecialDaysAppointment extends Component
 
                 // نرمال‌سازی emergency_times برای DoctorWorkSchedule
                 if (!is_array($emergencyTimes)) {
-                    Log::warning("Invalid emergency_times format in DoctorWorkSchedule", ['emergency_times' => $emergencyTimes]);
+                  
                     $emergencyTimes = [[]];
                 } else {
                     // اگر emergency_times یک آرایه تخت است، آن را به [[]] تبدیل می‌کنیم
@@ -540,9 +540,8 @@ class SpecialDaysAppointment extends Component
             }
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
             $this->emergencyTimes = $this->getEmergencyTimes();
-            Log::info("Selected date updated in SpecialDaysAppointment: {$this->selectedDate}", ['workSchedule' => $this->workSchedule, 'isFromSpecialDailySchedule' => $this->isFromSpecialDailySchedule]);
+           
         } catch (\Exception $e) {
-            Log::error("Error in updateSelectedDate: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در انتخاب تاریخ: ' . $e->getMessage());
         }
     }
@@ -552,7 +551,6 @@ class SpecialDaysAppointment extends Component
         $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
         $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
         $this->emergencyTimes = $this->getEmergencyTimes();
-        Log::info("Work schedule loaded: ", $this->workSchedule);
     }
 
     public function getEmergencyTimes()
@@ -580,11 +578,7 @@ class SpecialDaysAppointment extends Component
                         $start = Carbon::createFromFormat('H:i', $slot['start']);
                         $end = Carbon::createFromFormat('H:i', $slot['end']);
                     } catch (\Exception $e) {
-                        Log::error("Invalid time format in getEmergencyTimes", [
-                            'start' => $slot['start'],
-                            'end' => $slot['end'],
-                            'error' => $e->getMessage(),
-                        ]);
+                       
                         return [
                             'possible' => [],
                             'selected' => $emergencyTimes,
@@ -592,10 +586,7 @@ class SpecialDaysAppointment extends Component
                     }
 
                     if (!$start || !$end || $end->lessThanOrEqualTo($start)) {
-                        Log::warning("Invalid time range", [
-                            'start' => $slot['start'],
-                            'end' => $slot['end'],
-                        ]);
+                       
                         return [
                             'possible' => [],
                             'selected' => $emergencyTimes,
@@ -607,11 +598,7 @@ class SpecialDaysAppointment extends Component
                     $slotDuration = $maxAppointments > 0 ? floor($totalMinutes / $maxAppointments) : 0;
 
                     if ($slotDuration <= 0) {
-                        Log::warning("Invalid slot duration calculated", [
-                            'slotDuration' => $slotDuration,
-                            'totalMinutes' => $totalMinutes,
-                            'maxAppointments' => $maxAppointments,
-                        ]);
+                      
                         return [
                             'possible' => [],
                             'selected' => $emergencyTimes,
@@ -625,29 +612,16 @@ class SpecialDaysAppointment extends Component
                         $current->addMinutes($slotDuration);
                     }
 
-                    Log::info("Emergency times generated", [
-                        'possibleTimes' => $possibleTimes,
-                        'slotDuration' => $slotDuration,
-                        'start' => $slot['start'],
-                        'end' => $slot['end'],
-                        'maxAppointments' => $maxAppointments,
-                    ]);
+                  
                 } else {
-                    Log::warning("Missing or invalid slot data", [
-                        'slot' => $slot,
-                        'appointmentSettings' => $appointmentSettings,
-                        'emergencyModalIndex' => $this->emergencyModalIndex,
-                    ]);
+                   
                     return [
                         'possible' => [],
                         'selected' => $emergencyTimes,
                     ];
                 }
             } else {
-                Log::warning("No work hours available in workSchedule or emergencyModalIndex not set", [
-                    'workSchedule' => $this->workSchedule,
-                    'emergencyModalIndex' => $this->emergencyModalIndex,
-                ]);
+              
                 return [
                     'possible' => [],
                     'selected' => $emergencyTimes,
@@ -666,10 +640,7 @@ class SpecialDaysAppointment extends Component
                         $selectedEmergencyTimes[$time] = true;
                     }
                 } catch (\Exception $e) {
-                    Log::warning("Invalid time format in emergency_times", [
-                        'time' => $time,
-                        'error' => $e->getMessage(),
-                    ]);
+                 
                 }
             }
 
@@ -681,7 +652,6 @@ class SpecialDaysAppointment extends Component
                 'selected' => array_keys($selectedEmergencyTimes),
             ];
         } catch (\Exception $e) {
-            Log::error("Error in getEmergencyTimes: " . $e->getMessage());
             return [
                 'possible' => [],
                 'selected' => [],
@@ -692,7 +662,6 @@ class SpecialDaysAppointment extends Component
     public function addSlot()
     {
         if ($this->isProcessing) {
-            Log::warning("Processing already in progress, exiting addSlot");
             return;
         }
 
@@ -715,10 +684,7 @@ class SpecialDaysAppointment extends Component
                 // اگر داده‌ها از DoctorWorkSchedule لود شده باشند، مودال add-slot-modal را باز کن
                 $this->showAddSlotModal = true;
                 $this->savePreviousRows = true;
-                Log::info("addSlot triggered, opening add-slot-modal", [
-                    'selectedDate' => $this->selectedDate,
-                    'workSchedule' => $this->workSchedule,
-                ]);
+              
                 $this->dispatch('open-modal', id: 'add-slot-modal');
             } else {
                 // اگر داده‌ها از SpecialDailySchedule لود شده باشند، ردیف خالی اضافه کن
@@ -735,7 +701,6 @@ class SpecialDaysAppointment extends Component
                         (int)$lastSlot['max_appointments'] <= 0
                     ) {
                         $this->dispatch('show-toastr', type: 'error', message: 'ابتدا ردیف قبلی را تکمیل کنید.');
-                        Log::warning("Previous slot is incomplete", ['lastSlot' => $lastSlot]);
                         return;
                     }
                 }
@@ -797,13 +762,9 @@ class SpecialDaysAppointment extends Component
 
                 $this->dispatch('show-toastr', type: 'success', message: 'ردیف جدید اضافه شد.');
                 $this->dispatch('refresh-timepicker');
-                Log::info("New slot added directly for SpecialDailySchedule", [
-                    'newIndex' => $newIndex,
-                    'workSchedule' => $this->workSchedule,
-                ]);
+               
             }
         } catch (\Exception $e) {
-            Log::error("Error in addSlot: {$e->getMessage()}", ['trace' => $e->getTraceAsString()]);
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در افزودن بازه زمانی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -813,7 +774,6 @@ class SpecialDaysAppointment extends Component
     public function confirmAddSlot($savePrevious = true)
     {
         if ($this->isProcessing) {
-            Log::warning("Processing already in progress, exiting confirmAddSlot");
             return;
         }
 
@@ -822,7 +782,6 @@ class SpecialDaysAppointment extends Component
         try {
             $this->savePreviousRows = $savePrevious;
             $doctorId = $this->getAuthenticatedDoctor()->id;
-            Log::info("Authenticated doctor ID: {$doctorId}");
 
             $specialSchedule = SpecialDailySchedule::firstOrCreate(
                 [
@@ -842,12 +801,10 @@ class SpecialDaysAppointment extends Component
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
 
             if (!$this->savePreviousRows) {
-                Log::info("Clearing all rows as savePreviousRows is false");
                 $workHours = [];
                 $appointmentSettings = [];
                 $emergencyTimes = [[]];
             } else {
-                Log::info("Saving existing rows");
                 $validWorkHours = [];
                 $validAppointmentSettings = [];
                 $validEmergencyTimes = [];
@@ -855,7 +812,7 @@ class SpecialDaysAppointment extends Component
                 foreach ($this->workSchedule['data']['work_hours'] as $index => $slot) {
                     if (!empty($slot['start']) && !empty($slot['end']) && !empty($slot['max_appointments']) && $slot['max_appointments'] > 0) {
                         if ($this->hasTimeOverlap($slot['start'], $slot['end'], array_diff_key($validWorkHours, [$index => $slot]))) {
-                            Log::warning("Time overlap detected for slot at index {$index}", ['slot' => $slot]);
+                          
                             $this->dispatch('show-toastr', type: 'error', message: 'تداخل زمانی در ساعات کاری وجود دارد.');
                             return;
                         }
@@ -871,7 +828,7 @@ class SpecialDaysAppointment extends Component
                         // اطمینان از اینکه emergency_times فقط آرایه‌های معتبر را شامل می‌شود
                         $emergencyTime = $this->workSchedule['data']['emergency_times'][$index] ?? [];
                         if (!is_array($emergencyTime)) {
-                            Log::warning("Invalid emergency_times format at index {$index}", ['emergency_times' => $emergencyTime]);
+                         
                             $emergencyTime = [];
                         }
                         $validEmergencyTimes[$index] = $emergencyTime;
@@ -927,9 +884,8 @@ class SpecialDaysAppointment extends Component
             $this->dispatch('show-toastr', type: 'success', message: $this->savePreviousRows ? 'ردیف جدید اضافه شد.' : 'ردیف‌های قبلی حذف شدند و یک ردیف خالی اضافه شد.');
             $this->dispatch('refresh-timepicker');
             $this->dispatch('refresh');
-            Log::info("confirmAddSlot completed", ['workSchedule' => $this->workSchedule]);
         } catch (\Exception $e) {
-            Log::error("Exception in confirmAddSlot: {$e->getMessage()}", ['trace' => $e->getTraceAsString()]);
+           
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در افزودن بازه زمانی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -1021,7 +977,6 @@ class SpecialDaysAppointment extends Component
                 $this->dispatch('confirm-delete-slot', ['index' => $index]);
             }
         } catch (\Exception $e) {
-            Log::error("Error in removeSlot: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف بازه زمانی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -1030,10 +985,8 @@ class SpecialDaysAppointment extends Component
 
     public function confirmDeleteSlot($index)
     {
-        Log::info("confirmDeleteSlot called with index: " . $index);
 
         if ($this->isProcessing) {
-            Log::warning("Processing already in progress, exiting confirmDeleteSlot");
             return;
         }
 
@@ -1049,7 +1002,6 @@ class SpecialDaysAppointment extends Component
 
             if (!$specialSchedule) {
                 $this->dispatch('show-toastr', type: 'error', message: 'برنامه کاری برای این تاریخ یافت نشد.');
-                Log::warning("No SpecialDailySchedule found for date: " . $this->selectedDate);
                 return;
             }
 
@@ -1088,13 +1040,10 @@ class SpecialDaysAppointment extends Component
                 $this->dispatch('show-toastr', type: 'success', message: 'بازه زمانی حذف شد.');
                 $this->dispatch('refresh-timepicker');
                 $this->dispatch('refresh');
-                Log::info("Slot deleted from SpecialDailySchedule: " . $index);
             } else {
                 $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی نامعتبر است.');
-                Log::warning("Invalid slot index: " . $index);
             }
         } catch (\Exception $e) {
-            Log::error("Error in confirmDeleteSlot: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف بازه زمانی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -1112,7 +1061,7 @@ class SpecialDaysAppointment extends Component
             $endTime = $this->calculator['end_time'] ?? null;
 
             if (empty($startTime) || empty($endTime)) {
-                Log::error("Missing start or end time in calculator", ['start_time' => $startTime, 'end_time' => $endTime]);
+             
                 $this->dispatch('show-toastr', type: 'error', message: 'زمان شروع یا پایان مشخص نشده است.');
                 return;
             }
@@ -1120,7 +1069,7 @@ class SpecialDaysAppointment extends Component
             // اعتبارسنجی فرمت زمان
             if (!preg_match('/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/', $startTime) ||
                 !preg_match('/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/', $endTime)) {
-                Log::error("Invalid time format in calculator", ['start_time' => $startTime, 'end_time' => $endTime]);
+         
                 $this->dispatch('show-toastr', type: 'error', message: 'فرمت زمان نامعتبر است.');
                 return;
             }
@@ -1130,7 +1079,7 @@ class SpecialDaysAppointment extends Component
 
             // بررسی ترتیب زمانی
             if ($end->lte($start)) {
-                Log::error("End time is not after start time", ['start_time' => $startTime, 'end_time' => $endTime]);
+              
                 $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
                 return;
             }
@@ -1140,7 +1089,6 @@ class SpecialDaysAppointment extends Component
 
 
             if ($totalMinutes <= 0) {
-                Log::error("Invalid time range in calculator", ['total_minutes' => $totalMinutes]);
                 $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی نامعتبر است.');
                 return;
             }
@@ -1155,14 +1103,11 @@ class SpecialDaysAppointment extends Component
                 $this->calculator['time_per_appointment'] = (int) $values['time_per_appointment'];
                 $this->calculator['appointment_count'] = floor($totalMinutes / $this->calculator['time_per_appointment']);
             } else {
-                Log::warning("Invalid input values for calculator", ['values' => $values]);
                 return;
             }
 
-            Log::info("Calculator values updated", $this->calculator);
             $this->dispatch('update-calculator-ui', $this->calculator);
         } catch (\Exception $e) {
-            Log::error("Error in setCalculatorValues: " . $e->getMessage(), ['values' => $values]);
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در به‌روزرسانی  ساعت کاری: ' . $e->getMessage());
         }
     }
@@ -1196,7 +1141,6 @@ class SpecialDaysAppointment extends Component
                     return;
                 }
             } catch (\Exception $e) {
-                Log::error("Invalid time format in saveCalculator: " . $e->getMessage());
                 $this->dispatch('show-toastr', type: 'error', message: 'فرمت زمان نامعتبر است.');
                 return;
             }
@@ -1261,7 +1205,6 @@ class SpecialDaysAppointment extends Component
             $this->dispatch('close-modal', 'CalculatorModal');
             $this->dispatch('refresh-timepicker');
         } catch (\Exception $e) {
-            Log::error("Error in saveCalculator: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در ذخیره تنظیمات ساعت کاری: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -1297,7 +1240,6 @@ class SpecialDaysAppointment extends Component
 
             return false;
         } catch (\Exception $e) {
-            Log::error("Error in hasTimeOverlap: " . $e->getMessage());
             return false; // در صورت خطا، تداخل فرض نمی‌شود
         }
     }
@@ -1352,7 +1294,6 @@ class SpecialDaysAppointment extends Component
             // اعتبارسنجی emergencyModalIndex
             if (!isset($this->emergencyModalIndex)) {
                 $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی انتخاب‌شده نامعتبر است.');
-                Log::error("emergencyModalIndex is not set");
                 return;
             }
 
@@ -1360,7 +1301,6 @@ class SpecialDaysAppointment extends Component
             $currentSlot = $workHours[$this->emergencyModalIndex] ?? null;
             if (!$currentSlot || empty($currentSlot['start']) || empty($currentSlot['end'])) {
                 $this->dispatch('show-toastr', type: 'error', message: 'بازه کاری نامعتبر است.');
-                Log::error("Invalid work hours for index {$this->emergencyModalIndex}", ['workHours' => $workHours]);
                 return;
             }
 
@@ -1427,7 +1367,6 @@ class SpecialDaysAppointment extends Component
             $this->dispatch('show-toastr', type: 'success', message: 'زمان‌های اورژانسی ذخیره شد.');
             $this->dispatch('close-emergency-modal');
         } catch (\Exception $e) {
-            Log::error("Error in saveEmergencyTimes: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در ذخیره زمان‌های اورژانسی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -1573,7 +1512,6 @@ class SpecialDaysAppointment extends Component
             $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات زمان‌بندی ذخیره شد.');
             $this->dispatch('close-schedule-modal');
         } catch (\Exception $e) {
-            Log::error("Error in saveSchedule: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در ذخیره تنظیمات زمان‌بندی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -1582,9 +1520,7 @@ class SpecialDaysAppointment extends Component
 
     public function deleteScheduleSetting($day, $index)
     {
-        Log::info("deleteScheduleSetting called with day: {$day}, index: {$index}");
         if ($this->isProcessing) {
-            Log::warning("Processing already in progress, exiting deleteScheduleSetting");
             return;
         }
 
@@ -1613,7 +1549,6 @@ class SpecialDaysAppointment extends Component
                 // داده‌ها از SpecialDailySchedule
                 if (!$specialSchedule) {
                     $this->dispatch('show-toastr', type: 'error', message: 'برنامه کاری برای این تاریخ یافت نشد.');
-                    Log::warning("No SpecialDailySchedule found for date: " . $this->selectedDate);
                     return;
                 }
 
@@ -1632,7 +1567,6 @@ class SpecialDaysAppointment extends Component
                         // باز کردن مودال ویرایش برای تنظیم فعلی
                         $this->openScheduleModalForEdit($day, $index, $appointmentSettings[$index]);
                         $this->dispatch('show-toastr', type: 'warning', message: 'نمی‌توانید آخرین تنظیم زمان‌بندی را حذف کنید. لطفاً آن را ویرایش کنید.');
-                        Log::info("Attempt to delete last setting for work_hour_key: {$this->scheduleModalIndex}, opening edit modal");
                         return;
                     }
 
@@ -1670,14 +1604,11 @@ class SpecialDaysAppointment extends Component
 
                     $this->dispatch('refresh-schedule-settings');
                     $this->dispatch('show-toastr', type: 'success', message: 'تنظیم زمان‌بندی حذف شد.');
-                    Log::info("Schedule setting deleted from SpecialDailySchedule: index {$index}");
                 } else {
                     $this->dispatch('show-toastr', type: 'error', message: 'تنظیم زمان‌بندی نامعتبر است.');
-                    Log::warning("Invalid schedule setting index: " . $index);
                 }
             }
         } catch (\Exception $e) {
-            Log::error("Error in deleteScheduleSetting: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف تنظیم زمان‌بندی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -1711,9 +1642,7 @@ class SpecialDaysAppointment extends Component
 
             // باز کردن مودال
             $this->dispatch('open-modal', id: 'scheduleModal');
-            Log::info("Edit modal opened for setting index: {$index}", ['setting' => $setting]);
         } catch (\Exception $e) {
-            Log::error("Error in openScheduleModalForEdit: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال ویرایش: ' . $e->getMessage());
         }
     }
@@ -1725,7 +1654,6 @@ class SpecialDaysAppointment extends Component
         }
 
         $this->calculator['calculation_mode'] = $mode;
-        Log::info("Calculation mode set to: {$mode}");
     }
 
     public function openCalculatorModal($day, $index)
@@ -1733,7 +1661,7 @@ class SpecialDaysAppointment extends Component
         try {
             // بررسی وجود داده‌های work_hours
             if (!isset($this->workSchedule['data']['work_hours'][$index])) {
-                Log::error("Work schedule data not found for index: {$index}", ['workSchedule' => $this->workSchedule]);
+              
                 $this->dispatch('show-toastr', type: 'error', message: 'داده‌های برنامه کاری برای این بازه زمانی یافت نشد.');
                 return;
             }
@@ -1743,7 +1671,6 @@ class SpecialDaysAppointment extends Component
 
             // اعتبارسنجی زمان‌های شروع و پایان
             if (empty($startTime) || empty($endTime)) {
-                Log::warning("Empty start or end time", ['startTime' => $startTime, 'endTime' => $endTime]);
                 $this->dispatch('show-toastr', type: 'error', message: 'لطفاً ابتدا زمان شروع و پایان را وارد کنید.');
                 return;
             }
@@ -1753,13 +1680,12 @@ class SpecialDaysAppointment extends Component
                 $start = Carbon::createFromFormat('H:i', $startTime);
                 $end = Carbon::createFromFormat('H:i', $endTime);
             } catch (\Exception $e) {
-                Log::error("Invalid time format", ['startTime' => $startTime, 'endTime' => $endTime, 'error' => $e->getMessage()]);
+              
                 $this->dispatch('show-toastr', type: 'error', message: 'فرمت زمان نامعتبر است.');
                 return;
             }
 
             if (!$start || !$end) {
-                Log::error("Failed to parse time", ['startTime' => $startTime, 'endTime' => $endTime]);
                 $this->dispatch('show-toastr', type: 'error', message: 'زمان شروع یا پایان نامعتبر است.');
                 return;
             }
@@ -1770,7 +1696,7 @@ class SpecialDaysAppointment extends Component
 
 
             if ($end->lessThanOrEqualTo($start)) {
-                Log::warning("End time is not after start time", ['startTime' => $startTime, 'endTime' => $endTime, 'totalMinutes' => $totalMinutes]);
+                
                 $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
                 return;
             }
@@ -1786,7 +1712,6 @@ class SpecialDaysAppointment extends Component
                 'calculation_mode' => isset($this->workSchedule['data']['appointment_settings'][$index]['appointment_duration']) && $this->workSchedule['data']['appointment_settings'][$index]['appointment_duration'] > 0 ? 'time' : 'count',
             ];
 
-            Log::info("Opening CalculatorModal", ['calculator' => $this->calculator]);
 
             // باز کردن مودال با شناسه معتبر
             $this->dispatch('open-modal', id: 'CalculatorModal');
@@ -1797,7 +1722,7 @@ class SpecialDaysAppointment extends Component
                 'day' => $day,
             ]);
         } catch (\Exception $e) {
-            Log::error("Error in openCalculatorModal: " . $e->getMessage(), ['day' => $day, 'index' => $index]);
+           
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال ساعت کاری: ' . $e->getMessage());
         }
     }
@@ -1807,7 +1732,6 @@ class SpecialDaysAppointment extends Component
         try {
             if (!isset($this->workSchedule['data']['work_hours'][$index])) {
                 $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی انتخاب‌شده نامعتبر است.');
-                Log::error("Invalid work hours index: {$index}");
                 return;
             }
 
@@ -1822,7 +1746,6 @@ class SpecialDaysAppointment extends Component
             $this->selectedEmergencyTimes = array_fill_keys($emergencyData['selected'] ?? [], true);
             $this->dispatch('open-modal', id: 'emergencyModal');
         } catch (\Exception $e) {
-            Log::error("Error in openEmergencyModal: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال اورژانسی: ' . $e->getMessage());
         }
     }
@@ -1848,7 +1771,6 @@ class SpecialDaysAppointment extends Component
             $this->selectAllScheduleModal = count(array_filter($this->selectedScheduleDays)) === 7;
             $this->dispatch('open-modal', id: 'scheduleModal');
         } catch (\Exception $e) {
-            Log::error("Error in openScheduleModal: " . $e->getMessage());
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در باز کردن مودال زمان‌بندی: ' . $e->getMessage());
         }
     }
@@ -1893,7 +1815,6 @@ class SpecialDaysAppointment extends Component
 
     public function updatedSelectedEmergencyTimes()
     {
-        Log::info("Selected emergency times updated", ['emergencyTimes' => $this->emergencyTimes]);
     }
 
     public function updatedWorkScheduleDataWorkHours($value, $nested)
@@ -1944,7 +1865,6 @@ class SpecialDaysAppointment extends Component
 
             $this->dispatch('show-toastr', type: 'success', message: 'تغییرات ساعت کاری ذخیره شد.');
         } catch (\Exception $e) {
-            Log::error("Error in updatedWorkScheduleDataWorkHours: " . $e->getMessage());
 
         } finally {
             $this->isProcessing = false;
@@ -1953,7 +1873,6 @@ class SpecialDaysAppointment extends Component
 
     public function initializeCalculator($params)
     {
-        Log::info("Initialize calculator called with params", ['params' => $params]);
     }
 
     public function render()
