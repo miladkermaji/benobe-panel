@@ -12,7 +12,7 @@
     --text-discount: #008000;
     --text-original: #FF0000;
     --border-neutral: #E5E7EB;
-    --shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px !important;
+    --shadow: rgba(0, 0, 0, 0.08);
     --gradient-instagram-from: #F92CA7;
     --gradient-instagram-to: #6B1A93;
     --button-mobile: #4F9ACD;
@@ -20,18 +20,23 @@
     --support-section: #2E86C1;
     --support-text: #084D7C;
     --radius-button: 0.5rem;
+    --radius-card: 1.125rem;
     --radius-button-large: 1rem;
     --radius-button-xl: 1.25rem;
-    --radius-card: 1.125rem;
     --radius-footer: 1.875rem;
     --radius-nav: 1.25rem;
     --radius-circle: 9999px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
   }
 
   #mini-calendar-container .calendar {
     background: var(--background-card);
     padding: 8px;
-    margin-top: -29px
+    margin-top: -29px;
+    border-radius: var(--radius-card);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
   }
 
   #mini-calendar-container .calendar-header {
@@ -51,33 +56,35 @@
 
   #mini-calendar-container .calendar-select {
     background: var(--background-card);
-    border: none;
-    border-radius: 4px;
-    padding: 5px 10px;
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    border-radius: 6px;
+    padding: 5px 10px 5px 24px;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-primary);
     cursor: pointer;
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: var(--transition);
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: left 8px center;
-    padding-left: 24px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
 
   #mini-calendar-container .calendar-select:focus {
     outline: none;
-    background: var(--primary-light);
-    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--background-card);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
   }
 
   #mini-calendar-container .calendar-select:hover {
     background: var(--primary-light);
+    border-color: var(--primary);
   }
 
   #mini-calendar-container .nav-btn {
-    background: transparent;
+    background: var(--background-light);
     border: none;
     padding: 6px;
     cursor: pointer;
@@ -87,22 +94,24 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-circle);
-    transition: background 0.3s ease, transform 0.3s ease;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 
   #mini-calendar-container .nav-btn svg {
     stroke: var(--text-secondary);
-    width: 100px;
-    height: 100px;
+    width: 16px;
+    height: 16px;
   }
 
   #mini-calendar-container .nav-btn:hover {
-    background: var(--primary-light);
-    transform: scale(1.1);
+    background: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   #mini-calendar-container .nav-btn:hover svg {
-    stroke: var(--primary);
+    stroke: var(--background-card);
   }
 
   #mini-calendar-container .calendar-body {
@@ -114,7 +123,7 @@
   #mini-calendar-container .calendar-day-name {
     text-align: center;
     font-size: 13px;
-    font-weight: 600 !important;
+    font-weight: 700;
     color: var(--text-secondary);
     padding: 8px 0;
   }
@@ -126,11 +135,11 @@
     width: 40px;
     height: 40px;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-primary);
     cursor: pointer;
     border-radius: var(--radius-circle);
-    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    transition: var(--transition);
     position: relative;
     margin: 2px;
   }
@@ -138,11 +147,13 @@
   #mini-calendar-container .calendar-day.empty {
     background: transparent;
     cursor: default;
+    box-shadow: none;
   }
 
   #mini-calendar-container .calendar-day:hover:not(.empty) {
     background: var(--primary-light);
-    transform: scale(1.15);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
 
   #mini-calendar-container .calendar-day.friday {
@@ -150,49 +161,55 @@
   }
 
   #mini-calendar-container .calendar-day.today {
-    background: var(--primary-light);
-    color: var(--primary);
-    font-weight: 600;
+    background: var(--gradient-primary);
+    color: var(--background-card);
+    font-weight: 700;
     border-radius: var(--radius-circle);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
   }
 
   #mini-calendar-container .calendar-day.active {
     background: var(--primary-light);
-    color: #333;
+    color: var(--primary);
     font-weight: 600;
     border-radius: var(--radius-circle);
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.15);
   }
 
   #mini-calendar-container .calendar-day.selected {
-    background: var(--primary);
+    background: var(--secondary);
     color: var(--background-card);
-    font-weight: 600;
+    font-weight: 700;
     border-radius: var(--radius-circle);
-    box-shadow: 0 2px 4px rgba(0, 147, 255, 0.2);
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
+    transform: scale(1.02);
   }
 
   #mini-calendar-container .calendar-day.has-event::after {
     content: '';
     position: absolute;
     bottom: 4px;
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     background: var(--secondary);
     border-radius: var(--radius-circle);
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.3);
   }
 
   #mini-calendar-container .calendar-footer {
     text-align: center;
     padding-top: 12px;
     font-size: 14px;
+    font-weight: 600;
     color: var(--text-primary);
   }
 
   @media (max-width: 576px) {
     #mini-calendar-container .calendar {
       padding: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     }
-     
+
     #mini-calendar-container .calendar-header {
       gap: 6px;
     }
@@ -205,28 +222,86 @@
       font-size: 14px;
       padding: 4px 8px 4px 20px;
       background-position: left 6px center;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+
+    #mini-calendar-container .nav-btn {
+      width: 30px;
+      height: 30px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    #mini-calendar-container .nav-btn svg {
+      width: 14px;
+      height: 14px;
     }
 
     #mini-calendar-container .calendar-day {
       width: 36px;
       height: 36px;
       font-size: 14px;
+      border-radius: var(--radius-circle);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
     }
 
     #mini-calendar-container .calendar-day-name {
       font-size: 12px;
+      font-weight: 600;
+    }
+
+    #mini-calendar-container .calendar-day.has-event::after {
+      width: 5px;
+      height: 5px;
+      bottom: 3px;
     }
   }
 
   @media (max-width: 425px) {
+    #mini-calendar-container .calendar {
+      padding: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    #mini-calendar-container .calendar-select {
+      font-size: 13px;
+      padding: 3px 7px 3px 18px;
+      background-position: left 5px center;
+      border-radius: 4px;
+    }
+
+    #mini-calendar-container .nav-btn {
+      width: 28px;
+      height: 28px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    #mini-calendar-container .nav-btn svg {
+      width: 12px;
+      height: 12px;
+    }
+
     #mini-calendar-container .calendar-day {
       width: 32px;
       height: 32px;
       font-size: 13px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    }
+
+    #mini-calendar-container .calendar-day:hover:not(.empty) {
+      transform: scale(1.05);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
     }
 
     #mini-calendar-container .calendar-day-name {
       font-size: 11px;
+      font-weight: 600;
+    }
+
+    #mini-calendar-container .calendar-day.has-event::after {
+      width: 4px;
+      height: 4px;
+      bottom: 2px;
     }
   }
 </style>
