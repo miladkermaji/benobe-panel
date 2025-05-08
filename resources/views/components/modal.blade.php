@@ -47,11 +47,11 @@
   }
 
   .xai-modal-container.xai-modal__dialog--lg {
-    width: 720px !important;
+    width: 920px !important;
   }
 
   .xai-modal-container.xai-modal__dialog--xl {
-    width: 1080px !important;
+    width: 1100px !important;
   }
 
   .xai-modal-header {
@@ -111,7 +111,7 @@
   }
 
   .xai-modal-body {
-    padding: 2.25rem;
+    padding: 1.5rem;
   }
 
   [x-cloak] {
