@@ -1926,7 +1926,7 @@ public function deleteScheduleSetting($day, $index)
             $this->dispatch('show-toastr', type: 'success', message: 'تغییرات ساعت کاری ذخیره شد.');
         } catch (\Exception $e) {
             Log::error("Error in updatedWorkScheduleDataWorkHours: " . $e->getMessage());
-            $this->dispatch('show-toastr', type: 'error', message: 'خطا در ذخیره تغییرات: ' . $e->getMessage());
+           
         } finally {
             $this->isProcessing = false;
         }
