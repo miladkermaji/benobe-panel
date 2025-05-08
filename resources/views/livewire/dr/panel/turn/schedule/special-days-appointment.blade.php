@@ -490,6 +490,7 @@
       if (selectAllCheckbox) {
         selectAllCheckbox.addEventListener('change', function() {
           const isChecked = this.checked;
+          console.log('selectAllScheduleModal changed:', isChecked); // لاگ برای دیباگ
           document.querySelectorAll('.schedule-day-checkbox').forEach((checkbox) => {
             checkbox.checked = isChecked;
             const day = checkbox.dataset.day;
@@ -516,6 +517,7 @@
             value: allChecked
           });
           const day = checkbox.dataset.day;
+          console.log(`selectedScheduleDays.${day} changed:`, checkbox.checked); // لاگ برای دیباگ
           Livewire.dispatch('set', {
             key: `selectedScheduleDays.${day}`,
             value: checkbox.checked

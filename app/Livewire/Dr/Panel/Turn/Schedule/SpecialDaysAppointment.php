@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Livewire\Dr\Panel\Turn\Schedule;
+
 use Carbon\Carbon;
 use App\Models\Doctor;
 use Livewire\Component;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\Cache;
+
 class SpecialDaysAppointment extends Component
 {
     public $time;
@@ -1180,6 +1183,32 @@ class SpecialDaysAppointment extends Component
             $this->isProcessing = false;
         }
     }
+    public function updatedSelectAllScheduleModal($value)
+    {
+        // وقتی selectAllScheduleModal تغییر می‌کند، تمام روزها را تنظیم کن
+        $days = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        foreach ($days as $day) {
+            $this->selectedScheduleDays[$day] = $value;
+        }
+        Log::info('updatedSelectAllScheduleModal', [
+            'selectAllScheduleModal' => $value,
+            'selectedScheduleDays' => $this->selectedScheduleDays,
+        ]);
+    }
+
+    public function updatedSelectedScheduleDays($value, $day)
+    {
+        // بررسی اینکه آیا همه روزها انتخاب شده‌اند
+        $allSelected = count(array_filter($this->selectedScheduleDays)) === 7;
+        $this->selectAllScheduleModal = $allSelected;
+        Log::info('updatedSelectedScheduleDays', [
+            'day' => $day,
+            'value' => $value,
+            'selectedScheduleDays' => $this->selectedScheduleDays,
+            'selectAllScheduleModal' => $this->selectAllScheduleModal,
+        ]);
+    }
+
     public function saveSchedule()
     {
         if ($this->isProcessing) {
@@ -1187,25 +1216,39 @@ class SpecialDaysAppointment extends Component
         }
         $this->isProcessing = true;
         try {
-            // دریافت زمان‌ها از wire:model
+            // لاگ‌گذاری برای دیباگ
+            Log::info('saveSchedule started', [
+                'selectedScheduleDays' => $this->selectedScheduleDays,
+                'scheduleModalIndex' => $this->scheduleModalIndex,
+                'workSchedule' => $this->workSchedule,
+            ]);
+
+            // دریافت زمان‌ها
             $startTime = $this->workSchedule['data']['work_hours'][$this->scheduleModalIndex]['start'] ?? null;
             $endTime = $this->workSchedule['data']['work_hours'][$this->scheduleModalIndex]['end'] ?? null;
+
             // اعتبارسنجی ورودی‌ها
             if (empty($startTime) || empty($endTime)) {
                 $this->dispatch('show-toastr', type: 'error', message: 'لطفاً زمان شروع و پایان را وارد کنید.');
                 return;
             }
+
             $start = Carbon::createFromFormat('H:i', $startTime);
             $end = Carbon::createFromFormat('H:i', $endTime);
             if ($end->lessThanOrEqualTo($start)) {
                 $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
                 return;
             }
+
+            // بررسی انتخاب روزها
             $selectedDays = array_keys(array_filter($this->selectedScheduleDays, fn ($value) => $value));
+            Log::info('Selected days in saveSchedule', ['selectedDays' => $selectedDays]);
+
             if (empty($selectedDays)) {
                 $this->dispatch('show-toastr', type: 'error', message: 'لطفاً حداقل یک روز انتخاب کنید.');
                 return;
             }
+
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::firstOrCreate(
                 [
@@ -1219,11 +1262,13 @@ class SpecialDaysAppointment extends Component
                     'emergency_times' => json_encode([[]]),
                 ]
             );
+
             $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
+
             if (!$this->isFromSpecialDailySchedule && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours'])) {
-                // کپی تمام داده‌ها از DoctorWorkSchedule
+                // کپی داده‌ها از DoctorWorkSchedule
                 $workHours = $this->workSchedule['data']['work_hours'];
                 $appointmentSettings = [];
                 $emergencyTimes = array_pad([], count($workHours), []);
@@ -1239,7 +1284,7 @@ class SpecialDaysAppointment extends Component
                     $emergencyTimes[$index] = $this->workSchedule['data']['emergency_times'][$index] ?? [];
                 }
             } else {
-                // به‌روزرسانی تنظیمات برای بازه فعلی و حفظ سایر ردیف‌ها
+                // به‌روزرسانی تنظیمات برای بازه فعلی
                 $newSetting = [
                     'start_time' => $startTime,
                     'end_time' => $endTime,
@@ -1248,40 +1293,48 @@ class SpecialDaysAppointment extends Component
                     'max_appointments' => $workHours[$this->scheduleModalIndex]['max_appointments'] ?? 0,
                     'appointment_duration' => $appointmentSettings[$this->scheduleModalIndex]['appointment_duration'] ?? 0,
                 ];
-                // حذف تنظیمات قبلی برای روزهای انتخاب‌شده در بازه فعلی
+
+                // حذف تنظیمات قبلی برای روزهای انتخاب‌شده
                 $appointmentSettings = array_filter(
                     $appointmentSettings,
                     fn ($setting) => !isset($setting['work_hour_key']) ||
                         (int)$setting['work_hour_key'] !== (int)$this->scheduleModalIndex ||
                         empty(array_intersect($setting['days'], $selectedDays))
                 );
+
                 // اضافه کردن یا به‌روزرسانی تنظیم جدید
                 if (isset($this->editingSettingIndex) && isset($appointmentSettings[$this->editingSettingIndex])) {
                     $appointmentSettings[$this->editingSettingIndex] = $newSetting;
                 } else {
                     $appointmentSettings[] = $newSetting;
                 }
+
                 // به‌روزرسانی work_hours
                 $workHours[$this->scheduleModalIndex] = [
                     'start' => $startTime,
                     'end' => $endTime,
                     'max_appointments' => $workHours[$this->scheduleModalIndex]['max_appointments'] ?? 0,
                 ];
-                // اطمینان از وجود emergency_times برای این ردیف
+
+                // اطمینان از وجود emergency_times
                 $emergencyTimes[$this->scheduleModalIndex] = $emergencyTimes[$this->scheduleModalIndex] ?? [];
             }
+
             // ذخیره داده‌ها
             $specialSchedule->work_hours = json_encode(array_values($workHours));
             $specialSchedule->appointment_settings = json_encode(array_values($appointmentSettings));
             $emergencyTimes = array_values(array_map(fn ($times) => is_array($times) ? $times : [], $emergencyTimes));
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
+
             // پاک کردن کش
             $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
             Cache::forget($cacheKey);
+
             // به‌روزرسانی workSchedule
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+
             // به‌روزرسانی چک‌باکس‌ها
             $this->selectedScheduleDays = array_fill_keys(
                 ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
@@ -1295,12 +1348,22 @@ class SpecialDaysAppointment extends Component
                 }
             }
             $this->selectAllScheduleModal = count(array_filter($this->selectedScheduleDays)) === 7;
-            // ریست اندیس ویرایش
+
+            Log::info('saveSchedule completed', [
+                'selectedScheduleDays' => $this->selectedScheduleDays,
+                'selectAllScheduleModal' => $this->selectAllScheduleModal,
+                'appointmentSettings' => $appointmentSettings,
+            ]);
+
             $this->editingSettingIndex = null;
             $this->dispatch('refresh-schedule-settings');
             $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات زمان‌بندی ذخیره شد.');
             $this->dispatch('close-schedule-modal');
         } catch (\Exception $e) {
+            Log::error('saveSchedule failed', [
+                'error' => $e->getMessage(),
+                'selectedScheduleDays' => $this->selectedScheduleDays,
+            ]);
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در ذخیره تنظیمات زمان‌بندی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
