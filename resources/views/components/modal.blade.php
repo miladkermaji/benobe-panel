@@ -120,17 +120,19 @@
 </style>
 
 <div id="{{ $id ?? $name }}" x-data="{ show: false, name: '{{ $name }}' }" x-show="show" x-cloak
-  x-on:open-modal.window="show = ($event.detail.name === name)" x-on:close-modal.window="show = false"
-  x-on:keydown.escape.window="show = false" class="fixed z-[1000] inset-0 flex items-center justify-center"
-  x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
-  x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
-  x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-  <div x-on:click="show = false" class="xai-modal-overlay"></div>
+  x-on:open-modal.window="if ($event.detail.name === name) show = true"
+  x-on:close-modal.window="if ($event.detail.name === name) show = false"
+  x-on:keydown.escape.window="if (show) $dispatch('close-modal', { name: name })"
+  class="fixed z-[1000] inset-0 flex items-center justify-center" x-transition:enter="transition ease-out duration-200"
+  x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+  x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
+  x-transition:leave-end="opacity-0">
+  <div x-on:click="$dispatch('close-modal', { name: name })" class="xai-modal-overlay"></div>
   <div class="xai-modal-container {{ $sizeClass }}">
     @if (isset($title))
       <div class="xai-modal-header">
         <div class="xai-modal-title">{{ $title }}</div>
-        <button x-on:click="$dispatch('close-modal')" class="xai-modal-close">
+        <button x-on:click="$dispatch('close-modal', { name: name })" class="xai-modal-close">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" class="xai-modal-close-icon">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />

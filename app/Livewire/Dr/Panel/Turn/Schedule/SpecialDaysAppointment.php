@@ -77,7 +77,7 @@ class SpecialDaysAppointment extends Component
         $this->showModal = true;
         $this->workSchedule = $this->getWorkScheduleForDate($date);
         $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
-        $this->dispatch('open-modal', ['id' => 'holiday-modal']);
+        $this->dispatch('open-modal', ['name' => 'holiday-modal']);
     }
 
     public function loadCalendarData()
