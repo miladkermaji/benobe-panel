@@ -629,7 +629,7 @@ class SpecialDaysAppointment extends Component
         }
     }
 
-   public function addSlot()
+    public function addSlot()
     {
         if ($this->isProcessing) {
             Log::warning("Processing already in progress, exiting addSlot");
@@ -1030,6 +1030,20 @@ class SpecialDaysAppointment extends Component
                 return;
             }
 
+            // اعتبارسنجی فرمت زمان
+            try {
+                $start = Carbon::createFromFormat('H:i', $startTime);
+                $end = Carbon::createFromFormat('H:i', $endTime);
+                if ($end->lte($start)) {
+                    $this->dispatch('show-toastr', type: 'error', message: 'زمان پایان باید بعد از زمان شروع باشد.');
+                    return;
+                }
+            } catch (\Exception $e) {
+                Log::error("Invalid time format in saveCalculator: " . $e->getMessage());
+                $this->dispatch('show-toastr', type: 'error', message: 'فرمت زمان نامعتبر است.');
+                return;
+            }
+
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::firstOrCreate(
                 [
@@ -1040,7 +1054,7 @@ class SpecialDaysAppointment extends Component
                 [
                     'work_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
-                    'emergency_times' => json_encode([]),
+                    'emergency_times' => json_encode([[]]),
                 ]
             );
 
@@ -1048,31 +1062,42 @@ class SpecialDaysAppointment extends Component
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [];
 
-            $workHours[$index] = [
+            // بررسی تداخل زمانی
+            $newSlot = [
                 'start' => $startTime,
                 'end' => $endTime,
                 'max_appointments' => $appointmentCount,
             ];
+            if ($this->hasTimeOverlap($startTime, $endTime, array_diff_key($workHours, [$index => []]))) {
+                $this->dispatch('show-toastr', type: 'error', message: 'تداخل زمانی در ساعات کاری وجود دارد.');
+                return;
+            }
 
+            // به‌روزرسانی work_hours
+            $workHours[$index] = $newSlot;
+
+            // به‌روزرسانی appointment_settings با فرمت موردنظر
             $appointmentSettings[$index] = [
-                'max_appointments' => $appointmentCount,
-                'appointment_duration' => $timePerAppointment,
                 'start_time' => '00:00',
                 'end_time' => '23:59',
                 'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
                 'work_hour_key' => $index,
             ];
 
+            // اطمینان از وجود emergency_times برای این ردیف
             $emergencyTimes[$index] = $emergencyTimes[$index] ?? [];
 
+            // ذخیره داده‌ها در دیتابیس
             $specialSchedule->work_hours = json_encode($workHours);
             $specialSchedule->appointment_settings = json_encode($appointmentSettings);
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
 
+            // پاک کردن کش
             $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
             Cache::forget($cacheKey);
 
+            // به‌روزرسانی workSchedule
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
             $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات ساعت کاری ذخیره شد.');
@@ -1087,22 +1112,37 @@ class SpecialDaysAppointment extends Component
     }
     private function hasTimeOverlap($newStart, $newEnd, $existingWorkHours)
     {
-        $newStart = Carbon::createFromFormat('H:i', $newStart);
-        $newEnd = Carbon::createFromFormat('H:i', $newEnd);
+        try {
+            $newStart = Carbon::createFromFormat('H:i', $newStart);
+            $newEnd = Carbon::createFromFormat('H:i', $newEnd);
 
-        foreach ($existingWorkHours as $slot) {
-            if (!empty($slot['start']) && !empty($slot['end'])) {
-                $existingStart = Carbon::createFromFormat('H:i', $slot['start']);
-                $existingEnd = Carbon::createFromFormat('H:i', $slot['end']);
+            foreach ($existingWorkHours as $slot) {
+                if (!empty($slot['start']) && !empty($slot['end'])) {
+                    $existingStart = Carbon::createFromFormat('H:i', $slot['start']);
+                    $existingEnd = Carbon::createFromFormat('H:i', $slot['end']);
 
-                if ($newStart->between($existingStart, $existingEnd) || $newEnd->between($existingStart, $existingEnd) ||
-                    $existingStart->between($newStart, $newEnd) || $existingEnd->between($newStart, $newEnd)) {
-                    return true;
+                    // بررسی تداخل با شرط‌های اصلاح‌شده
+                    // تداخل زمانی رخ می‌دهد که:
+                    // 1. newStart در بازه existingStart و existingEnd باشد (به جز existingEnd)
+                    // 2. newEnd در بازه existingStart و existingEnd باشد (به جز existingStart)
+                    // 3. existingStart در بازه newStart و newEnd باشد (به جز newEnd)
+                    // 4. existingEnd در بازه newStart و newEnd باشد (به جز newStart)
+                    if (
+                        ($newStart->greaterThanOrEqualTo($existingStart) && $newStart->lessThan($existingEnd)) ||
+                        ($newEnd->greaterThan($existingStart) && $newEnd->lessThanOrEqualTo($existingEnd)) ||
+                        ($existingStart->greaterThanOrEqualTo($newStart) && $existingStart->lessThan($newEnd)) ||
+                        ($existingEnd->greaterThan($newStart) && $existingEnd->lessThanOrEqualTo($newEnd))
+                    ) {
+                        return true;
+                    }
                 }
             }
-        }
 
-        return false;
+            return false;
+        } catch (\Exception $e) {
+            Log::error("Error in hasTimeOverlap: " . $e->getMessage());
+            return false; // در صورت خطا، تداخل فرض نمی‌شود
+        }
     }
     public function saveEmergencyTimes()
     {
@@ -1114,6 +1154,8 @@ class SpecialDaysAppointment extends Component
 
         try {
             $doctorId = $this->getAuthenticatedDoctor()->id;
+
+            // دریافت یا ایجاد ردیف در SpecialDailySchedule
             $specialSchedule = SpecialDailySchedule::firstOrCreate(
                 [
                     'doctor_id' => $doctorId,
@@ -1123,22 +1165,104 @@ class SpecialDaysAppointment extends Component
                 [
                     'work_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
-                    'emergency_times' => json_encode([]),
+                    'emergency_times' => json_encode([[]]),
                 ]
             );
 
-            $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [];
-            // ذخیره فقط زمان‌های انتخاب‌شده
-            $selectedTimes = array_keys(array_filter($this->selectedEmergencyTimes, fn ($value) => $value));
-            $emergencyTimes[$this->emergencyModalIndex] = array_values(array_filter($selectedTimes, fn ($time) => in_array($time, $this->emergencyTimes['possible'] ?? [])));
+            // دریافت داده‌های فعلی
+            $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
+            $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+            $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
 
+            // بررسی منبع داده (SpecialDailySchedule یا DoctorWorkSchedule)
+            $isFromDoctorWorkSchedule = empty($workHours) && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+
+            if ($isFromDoctorWorkSchedule) {
+                // اگر از DoctorWorkSchedule لود شده، داده‌ها را از workSchedule کپی کن
+                $workHours = $this->workSchedule['data']['work_hours'];
+                $appointmentSettings = [];
+                $emergencyTimes = $this->workSchedule['data']['emergency_times'];
+
+                // ایجاد appointment_settings برای تمام ردیف‌های work_hours
+                foreach ($workHours as $index => $slot) {
+                    $appointmentSettings[$index] = [
+                        'start_time' => '00:00',
+                        'end_time' => '23:59',
+                        'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                        'work_hour_key' => $index,
+                    ];
+                }
+            } else {
+                // اگر از SpecialDailySchedule لود شده، فقط appointment_settings ردیف فعلی را به‌روزرسانی کن
+                if (!isset($appointmentSettings[$this->emergencyModalIndex])) {
+                    $appointmentSettings[$this->emergencyModalIndex] = [
+                        'start_time' => '00:00',
+                        'end_time' => '23:59',
+                        'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                        'work_hour_key' => $this->emergencyModalIndex,
+                    ];
+                } else {
+                    $appointmentSettings[$this->emergencyModalIndex] = [
+                        'start_time' => $appointmentSettings[$this->emergencyModalIndex]['start_time'] ?? '00:00',
+                        'end_time' => $appointmentSettings[$this->emergencyModalIndex]['end_time'] ?? '23:59',
+                        'days' => $appointmentSettings[$this->emergencyModalIndex]['days'] ?? ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                        'work_hour_key' => $this->emergencyModalIndex,
+                    ];
+                }
+            }
+
+            // اعتبارسنجی زمان‌های اورژانسی
+            $selectedTimes = array_keys(array_filter($this->selectedEmergencyTimes, fn ($value) => $value));
+            $validEmergencyTimes = array_values(array_filter($selectedTimes, fn ($time) => in_array($time, $this->emergencyTimes['possible'] ?? [])));
+
+            // بررسی تداخل زمانی برای زمان‌های اورژانسی
+            $currentSlot = $workHours[$this->emergencyModalIndex] ?? null;
+            if ($currentSlot && !empty($currentSlot['start']) && !empty($currentSlot['end'])) {
+                $slotStart = Carbon::createFromFormat('H:i', $currentSlot['start']);
+                $slotEnd = Carbon::createFromFormat('H:i', $currentSlot['end']);
+
+                foreach ($validEmergencyTimes as $time) {
+                    $emergencyTime = Carbon::createFromFormat('H:i', $time);
+                    if ($emergencyTime->lessThan($slotStart) || $emergencyTime->greaterThanOrEqualTo($slotEnd)) {
+                        $this->dispatch('show-toastr', type: 'error', message: "زمان اورژانسی $time خارج از بازه کاری است.");
+                        return;
+                    }
+                }
+
+                // بررسی تداخل با سایر بازه‌های work_hours
+                foreach (array_diff_key($workHours, [$this->emergencyModalIndex => []]) as $otherSlot) {
+                    if (!empty($otherSlot['start']) && !empty($otherSlot['end'])) {
+                        $otherStart = Carbon::createFromFormat('H:i', $otherSlot['start']);
+                        $otherEnd = Carbon::createFromFormat('H:i', $otherSlot['end']);
+                        foreach ($validEmergencyTimes as $time) {
+                            $emergencyTime = Carbon::createFromFormat('H:i', $time);
+                            if ($emergencyTime->between($otherStart, $otherEnd)) {
+                                $this->dispatch('show-toastr', type: 'error', message: "زمان اورژانسی $time با بازه کاری دیگر تداخل دارد.");
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ذخیره زمان‌های اورژانسی
+            $emergencyTimes[$this->emergencyModalIndex] = $validEmergencyTimes;
+
+            // ذخیره داده‌ها در دیتابیس
+            $specialSchedule->work_hours = json_encode($workHours);
+            $specialSchedule->appointment_settings = json_encode($appointmentSettings);
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
 
+            // پاک کردن کش
             $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
             Cache::forget($cacheKey);
 
+            // به‌روزرسانی workSchedule
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
+            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+
+            // ارسال اعلان موفقیت
             $this->dispatch('show-toastr', type: 'success', message: 'زمان‌های اورژانسی ذخیره شد.');
             $this->dispatch('close-emergency-modal');
         } catch (\Exception $e) {
