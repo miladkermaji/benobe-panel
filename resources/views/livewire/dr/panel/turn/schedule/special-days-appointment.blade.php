@@ -5,7 +5,7 @@
 
   <!-- مودال تعطیلات -->
   <x-modal name="holiday-modal" title="مدیریت تعطیلات و ساعات کاری" persistent="true"
-    size="{{ $selectedDate && in_array($selectedDate, $holidaysData['holidays']) ? 'sm' : 'lg' }}"
+    size="{{ $selectedDate && in_array($selectedDate, $holidaysData['holidays']) ? 'sm' : 'md' }}"
     wire:key="holiday-modal-{{ $selectedDate ?? 'default' }}" id="holidayModal">
     <x-slot:body>
       <!-- لودینگ -->

@@ -39,11 +39,11 @@
   }
 
   .xai-modal-container.xai-modal__dialog--sm {
-    width: 400px !important;
+    width: 420px !important;
   }
 
   .xai-modal-container.xai-modal__dialog--md {
-    width: 520px !important;
+    width: 620px !important;
   }
 
   .xai-modal-container.xai-modal__dialog--lg {
@@ -55,7 +55,7 @@
   }
 
   .xai-modal-header {
-    padding: 0.75rem 1.25rem;
+    padding: 0.70rem 1.20rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -71,7 +71,7 @@
 
   .xai-modal-close {
     position: relative;
-    padding: 0.75rem;
+    padding: 0.70rem;
     border: none;
     background: transparent;
     cursor: pointer;
@@ -111,7 +111,7 @@
   }
 
   .xai-modal-body {
-    padding: 1.5rem;
+    padding: 1.4rem;
   }
 
   [x-cloak] {
