@@ -829,7 +829,13 @@ class SpecialDaysAppointment extends Component
                             'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
                             'work_hour_key' => $index,
                         ];
-                        $validEmergencyTimes[$index] = $this->workSchedule['data']['emergency_times'][$index] ?? [];
+                        // اطمینان از اینکه emergency_times فقط آرایه‌های معتبر را شامل می‌شود
+                        $emergencyTime = $this->workSchedule['data']['emergency_times'][$index] ?? [];
+                        if (!is_array($emergencyTime)) {
+                            Log::warning("Invalid emergency_times format at index {$index}", ['emergency_times' => $emergencyTime]);
+                            $emergencyTime = [];
+                        }
+                        $validEmergencyTimes[$index] = $emergencyTime;
                     }
                 }
 
@@ -852,7 +858,12 @@ class SpecialDaysAppointment extends Component
                 'days' => ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
                 'work_hour_key' => $newIndex,
             ];
-            $emergencyTimes[$newIndex] = [];
+            $emergencyTimes[$newIndex] = []; // همیشه خالی برای ردیف جدید
+
+            // اطمینان از اینکه emergency_times یک آرایه از آرایه‌ها است
+            $emergencyTimes = array_values(array_map(function ($times) {
+                return is_array($times) ? $times : [];
+            }, $emergencyTimes));
 
             $specialSchedule->work_hours = json_encode($workHours);
             $specialSchedule->appointment_settings = json_encode($appointmentSettings);
