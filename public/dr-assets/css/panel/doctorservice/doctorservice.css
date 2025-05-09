@@ -14,9 +14,9 @@
     --border-neutral: #e5e7eb;
     --shadow: rgba(0, 0, 0, 0.06);
     --gradient-primary: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
-    --radius-button: 0.5rem;
-    --radius-card: 0.5rem;
-    --radius-circle: 9999px;
+    --radius-button: 0.375rem; /* کاهش رادیوس دکمه‌ها */
+    --radius-card: 0.375rem; /* کاهش رادیوس کارت‌ها */
+    --radius-circle: 0.75rem; /* کاهش رادیوس دایره‌ها */
 }
 
 /* استایل‌های عمومی */
@@ -30,6 +30,7 @@ body {
     background-color: var(--background-light);
     font-family: "IRANSans", sans-serif;
     color: var(--text-primary);
+    direction: rtl;
 }
 
 /* انیمیشن‌ها */
@@ -43,23 +44,18 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes scaleHover {
-    from { transform: scale(1); }
-    to { transform: scale(1.02); }
-}
-
 /* هدر */
 .service-header {
     background: var(--background-card);
     border-radius: var(--radius-card);
-    padding: 1.25rem;
+    padding: 1rem;
     border: 1px solid var(--border-neutral);
     animation: fadeIn 0.5s ease-in-out;
     display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1.5rem;
 }
 
 .header-title {
@@ -67,23 +63,21 @@ body {
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
-    line-height: 1.2;
+    flex: 0 0 auto;
 }
 
 .header-actions {
     display: flex;
-    align-items: center;
-    gap: 1rem;
+    flex-wrap: nowrap;
+    gap: 0.75rem;
     flex: 1;
-    justify-content: flex-end;
+    align-items: center;
 }
 
 .search-container {
     position: relative;
-    width: 100%;
-    max-width: 280px;
-    display: flex;
-    align-items: center;
+    flex: 1 1 300px;
+    max-width: 300px;
 }
 
 .search-input {
@@ -112,21 +106,21 @@ body {
 
 .action-buttons {
     display: flex;
-    gap: 0.75rem;
-    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
 }
 
 /* دکمه‌ها */
 .btn {
     border-radius: var(--radius-button);
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 500;
-    padding: 0.5rem 1.25rem;
+    padding: 0.5rem 1rem;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    height: 2.5rem;
+    height: 2.25rem;
 }
 
 .btn-primary {
@@ -138,7 +132,6 @@ body {
 .btn-primary:hover {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--shadow);
 }
 
 .btn-danger {
@@ -150,7 +143,6 @@ body {
 .btn-danger:hover:not(:disabled) {
     background: linear-gradient(135deg, #f87171, #ef4444);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--shadow);
 }
 
 .btn-danger:disabled {
@@ -159,7 +151,8 @@ body {
     cursor: not-allowed;
 }
 
-.btn-outline-primary, .btn-outline-danger {
+.btn-outline-primary,
+.btn-outline-danger {
     background: transparent;
     border: 1px solid;
     padding: 0.25rem 0.5rem;
@@ -183,31 +176,29 @@ body {
 
 .btn-outline-danger:hover {
     background: #ffe5e5;
-    color: #ef4444;
 }
 
 /* جدول خدمات */
 .services-container {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
     animation: fadeIn 0.5s ease-in-out;
+    margin: 0 0.5rem;
 }
 
 .insurance-section {
     background: var(--background-card);
     border: 1px solid var(--border-neutral);
     border-radius: var(--radius-card);
+    overflow: hidden;
 }
 
 .insurance-header {
     background: linear-gradient(135deg, #e6f0fa 0%, #f0f7ff 100%);
     padding: 1rem;
     border-bottom: 1px solid var(--border-neutral);
-    border-top-right-radius: 12px;
-    border-top-left-radius: 12px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 
 .insurance-title {
@@ -224,7 +215,7 @@ body {
 .table-header {
     display: grid;
     grid-template-columns: 2fr 3fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    gap: 1rem;
+    gap: 0.5rem;
     padding: 0.75rem 1rem;
     background: #f8fafc;
     border-bottom: 1px solid var(--border-neutral);
@@ -236,17 +227,15 @@ body {
 .service-row {
     display: grid;
     grid-template-columns: 2fr 3fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    gap: 1rem;
+    gap: 0.5rem;
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--border-neutral);
     align-items: center;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease;
 }
 
 .service-row:hover {
     background: #f0f7ff;
-    transform: scale(1.01);
-    box-shadow: 0 2px 8px var(--shadow);
 }
 
 .service-name {
@@ -258,14 +247,23 @@ body {
     font-size: 0.9375rem;
 }
 
-.service-description, .service-duration, .service-price, .service-discount, .service-final-price, .service-status {
+.service-description,
+.service-duration,
+.service-price,
+.service-discount,
+.service-final-price,
+.service-status {
     font-size: 0.875rem;
     color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .service-actions {
     display: flex;
     gap: 0.5rem;
+    justify-content: center;
 }
 
 .tree-line {
@@ -288,12 +286,12 @@ body {
 }
 
 .tree-toggle-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 24px;
     height: 24px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tree-toggle {
@@ -309,7 +307,6 @@ body {
 .tree-placeholder {
     width: 24px;
     height: 24px;
-    display: inline-block;
 }
 
 .service-child {
@@ -321,12 +318,10 @@ body {
 }
 
 .price-badge {
-    display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: var(--radius-circle);
     font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--text-price);
 }
 
 .price-badge.price-active {
@@ -335,12 +330,10 @@ body {
 
 .price-badge.discount-active {
     background: #fee2e2;
-    color: #000;
 }
 
 .price-badge.final-price-active {
     background: #d1fae5;
-    color: var(--text-final-price);
 }
 
 .status-badge {
@@ -350,7 +343,6 @@ body {
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
 }
 
 .status-badge.status-active {
@@ -363,12 +355,8 @@ body {
     color: #ef4444;
 }
 
-.status-badge:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px var(--shadow);
-}
-
-.empty-state, .loading-state {
+.empty-state,
+.loading-state {
     text-align: center;
     padding: 2rem;
     background: var(--background-card);
@@ -378,13 +366,15 @@ body {
 
 .pagination-container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
     background: var(--background-card);
     border: 1px solid var(--border-neutral);
     border-radius: var(--radius-card);
-    margin-top: 1.5rem;
+    margin: 1rem 0.5rem;
+    gap: 0.5rem;
 }
 
 /* چک‌باکس */
@@ -398,7 +388,9 @@ body {
 }
 
 .form-check-input:checked {
-    background: var(--primary) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 9 9"><path d="M3.5 6.5L1.5 4.5L0.5 5.5L3.5 8.5L8.5 3.5L7.5 2.5L3.5 6.5Z"/></svg>') no-repeat center;
+    background: var(--primary)
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 9 9"><path d="M3.5 6.5L1.5 4.5L0.5 5.5L3.5 8.5L8.5 3.5L7.5 2.5L3.5 6.5Z"/></svg>')
+        no-repeat center;
     background-size: 0.75rem;
     border-color: var(--primary);
 }
@@ -409,86 +401,254 @@ body {
 
 /* ریسپانسیو */
 @media (max-width: 1200px) {
-    .table-header, .service-row {
+    .table-header,
+    .service-row {
         grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr 1fr 1fr 1fr;
         gap: 0.5rem;
         padding: 0.5rem;
     }
+
+    .service-header {
+        flex-wrap: wrap;
+    }
+
+    .header-actions {
+        flex-wrap: wrap;
+    }
+
+    .search-container {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+
+    .action-buttons {
+        flex: 1 1 100%;
+        justify-content: space-between;
+    }
 }
 
 @media (max-width: 991px) {
+    :root {
+        --radius-button: 0.25rem;
+        --radius-card: 0.25rem;
+        --radius-circle: 0.5rem;
+    }
+
     .service-header {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
+        align-items: stretch;
+        padding: 0.75rem;
+        margin: 0 0.75rem;
     }
+
+    .header-title {
+        font-size: 1.25rem;
+        text-align: center;
+    }
+
     .header-actions {
-        width: 100%;
         flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
+        align-items: stretch;
     }
-    .search-container {
-        max-width: 100%;
-    }
+
     .action-buttons {
-        width: 100%;
         flex-direction: row;
         justify-content: space-between;
+        flex-wrap: wrap;
     }
+
+    .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .services-container {
+        margin: 0 0.75rem;
+    }
+
     .services-table {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
     }
+
     .table-header {
         display: none;
     }
+
     .service-row {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         padding: 1rem;
         border: 1px solid var(--border-neutral);
         border-radius: var(--radius-card);
+        gap: 0.75rem;
+        margin: 0 0.5rem;
     }
+
     .service-name {
         width: 100%;
-        margin-bottom: 0.5rem;
+        font-size: 0.9375rem;
+        flex-wrap: wrap;
     }
-    .service-description, .service-duration, .service-price, .service-discount, .service-final-price, .service-status, .service-actions {
-        width: 100%;
+
+    .service-description,
+    .service-duration,
+    .service-price,
+    .service-discount,
+    .service-final-price,
+    .service-status,
+    .service-actions {
         display: flex;
         justify-content: space-between;
-        padding: 0.25rem 0;
+        align-items: center;
+        padding: 0.5rem 0.5rem;
         border-top: 1px solid var(--border-neutral);
+        font-size: 0.875rem;
+        font-family: "Vazir", sans-serif;
+    }
+
+    .service-description::before {
+        content: "توضیحات: ";
+        font-weight: 600;
+        font-family: "Vazir", sans-serif;
+    }
+
+    .service-duration::before {
+        content: "زمان: ";
+        font-weight: 600;
+        font-family: "Vazir", sans-serif;
+    }
+
+    .service-price::before {
+        content: "قیمت: ";
+        font-weight: 600;
+        font-family: "Vazir", sans-serif;
+    }
+
+    .service-discount::before {
+        content: "تخفیف: ";
+        font-weight: 600;
+        font-family: "Vazir", sans-serif;
+    }
+
+    .service-final-price::before {
+        content: "قیمت نهایی: ";
+        font-weight: 600;
+        font-family: "Vazir", sans-serif;
+    }
+
+    .service-status::before {
+        content: "وضعیت: ";
+        font-weight: 600;
+        font-family: "Vazir", sans-serif;
+    }
+
+    .service-actions::before {
+        content: "عملیات: ";
+        font-weight: 600;
+        font-family: "Vazir", sans-serif;
+    }
+
+    .tree-line,
+    .tree-connector {
+        display: none;
+    }
+
+    .tree-toggle-wrapper,
+    .tree-placeholder {
+        width: 20px;
+        height: 20px;
+    }
+
+    .tree-toggle {
+        width: 16px;
+        height: 16px;
+    }
+
+    .service-child {
+        padding-right: 1rem;
+        margin: 0 0.5rem;
+        border-right: 2px solid var(--border-neutral);
     }
 }
 
 @media (max-width: 767px) {
+    :root {
+        --radius-button: 0.125rem;
+        --radius-card: 0.125rem;
+        --radius-circle: 0.375rem;
+    }
+
     .service-header {
-        padding: 1rem;
+        margin: 0 0.5rem;
     }
+
     .header-title {
-        font-size: 1.25rem;
-        text-align: center;
-        width: 100%;
+        font-size: 1.125rem;
     }
+
+    .search-input {
+        font-size: 0.875rem;
+        height: 2rem;
+    }
+
     .action-buttons {
         flex-direction: column;
         gap: 0.5rem;
     }
-    .insurance-title {
-        font-size: 1.125rem;
+
+    .btn {
+        font-size: 0.8125rem;
+        padding: 0.5rem;
+        height: 2rem;
     }
+
+    .insurance-title {
+        font-size: 1rem;
+    }
+
     .service-name {
         font-size: 0.875rem;
     }
-    .service-description, .service-duration, .service-price, .service-discount, .service-final-price, .service-status {
+
+    .service-description,
+    .service-duration,
+    .service-price,
+    .service-discount,
+    .service-final-price,
+    .service-status,
+    .service-actions {
         font-size: 0.8125rem;
+        padding: 0.5rem 0.75rem;
     }
-    .price-badge, .status-badge {
+
+    .price-badge,
+    .status-badge {
         font-size: 0.75rem;
         padding: 0.2rem 0.5rem;
+    }
+
+    .form-check-input {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .pagination-container {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+        margin: 0 0.5rem;
+    }
+
+    .pagination-container .text-muted {
+        font-size: 0.8125rem;
+    }
+
+    .pagination-container nav {
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
 }
