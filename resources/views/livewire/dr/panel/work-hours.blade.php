@@ -329,7 +329,7 @@
             <!-- بخش انتخاب روزها -->
             <div class="schedule-days-section border-section">
               <h6 class="section-title">انتخاب روزها</h6>
-              <div class="day-schedule-grid">
+              <div class="day-schedule-grid mt-2">
                 <div class="day-checkbox form-check select-all-checkbox">
                   <input type="checkbox" class="form-check-input" id="select-all-schedule-days"
                     wire:model.live="selectAllScheduleModal">
@@ -349,7 +349,7 @@
             <!-- بخش تنظیم بازه زمانی و دکمه ذخیره -->
             <div class="timepicker-save-section border-section">
               <h6 class="section-title">تنظیم بازه زمانی</h6>
-              <div class="timepicker-grid">
+              <div class="timepicker-grid mt-3">
                 <div class="form-group position-relative timepicker-ui">
                   <label class="label-top-input-special-takhasos">شروع</label>
                   <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
@@ -371,7 +371,7 @@
             <!-- بخش لیست تنظیمات ذخیره‌شده -->
             <div class="schedule-settings-section border-section">
               <h6 class="section-title">تنظیمات ذخیره‌شده</h6>
-              <div class="schedule-settings-list">
+              <div class="schedule-settings-list mt-3">
                 @if ($scheduleModalDay && $scheduleModalIndex !== null)
                   @php
                     $schedule = collect($this->workSchedules)->firstWhere('day', $scheduleModalDay);
