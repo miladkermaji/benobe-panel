@@ -7,7 +7,7 @@
                 </svg>
                 <h5 class="mb-0 fw-bold text-shadow">افزودن خدمت جدید</h5>
             </div>
-            <a href="{{ route('dr.panel.doctor-services.index') }}" class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">
+            <a href="{{ route('dr.panel.doctor-services.index') }}" class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center  hover:shadow-lg transition-all">
                 <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -17,10 +17,10 @@
 
         <div class="card-body p-4">
             <div class="row justify-content-center">
-                <div class="col-12 col-md-10 col-lg-8">
+                <div class=" col-lg-12">
                     <div class="row g-4">
                         <!-- خدمت -->
-                        <div class="col-md-6 col-sm-12 position-relative mt-5" wire:ignore>
+                        <div class="col-lg-4 col-md-6  position-relative mt-5" wire:ignore>
                             <select wire:model.live="selected_service" class="form-select select2" id="selected_service">
                                 <option value="" selected>انتخاب خدمت</option>
                                 <optgroup label="خدمات قبلی شما">
@@ -40,7 +40,7 @@
                             <label for="selected_service" class="form-label">خدمت</label>
                         </div>
                         <!-- کلینیک -->
-                        <div class="col-md-6 col-sm-12 position-relative mt-5" wire:ignore>
+                        <div class="col-lg-4 col-md-6  position-relative mt-5" wire:ignore>
                             <select wire:model.live="clinic_id" class="form-select select2" id="clinic_id">
                                 <option value="" selected>انتخاب کلینیک</option>
                                 @foreach ($clinics as $clinic)
@@ -50,22 +50,22 @@
                             <label for="clinic_id" class="form-label">کلینیک</label>
                         </div>
                         <!-- مدت زمان -->
-                        <div class="col-12 col-md-6 position-relative mt-5">
+                        <div class="col-lg-4 col-md-6  position-relative mt-5">
                             <input type="number" wire:model="duration" class="form-control" id="duration" placeholder=" " required>
                             <label for="duration" class="form-label">مدت زمان (دقیقه)</label>
                         </div>
                         <!-- توضیحات -->
-                        <div class="col-12 position-relative mt-5">
+                        <div class=" position-relative mt-5">
                             <textarea wire:model="description" class="form-control" id="description" rows="3" placeholder=" "></textarea>
                             <label for="description" class="form-label">توضیحات (اختیاری)</label>
                         </div>
                         <!-- بخش قیمت‌گذاری -->
-                        <div class="col-12 mt-5">
+                        <div class=" mt-5">
                             <h6 class="fw-bold">قیمت‌گذاری</h6>
                             <hr class="my-2">
                         </div>
                         <!-- بیمه -->
-                        <div class="col-md-6 col-sm-12 position-relative mt-5" wire:ignore>
+                        <div class="col-lg-3 col-md-6  position-relative mt-5" wire:ignore>
                             <select wire:model.live="insurance_id" class="form-select select2" id="insurance_id">
                                 <option value="" selected>انتخاب بیمه</option>
                                 @foreach ($insurances as $insurance)
@@ -75,22 +75,22 @@
                             <label for="insurance_id" class="form-label">بیمه</label>
                         </div>
                         <!-- قیمت -->
-                        <div class="col-md-6 col-sm-12 position-relative mt-5">
+                        <div class="col-lg-3 col-md-6  position-relative mt-5">
                             <input type="number" wire:model="price" class="form-control" id="price" placeholder=" " required>
                             <label for="price" class="form-label">قیمت (تومان)</label>
                         </div>
                         <!-- تخفیف -->
-                        <div class="col-md-6 col-sm-12 position-relative mt-5">
+                        <div class="col-lg-3 col-md-6  position-relative mt-5">
                             <input type="number" wire:model="discount" wire:click="openDiscountModal" class="form-control cursor-pointer" id="discount" placeholder=" " readonly>
                             <label for="discount" class="form-label">تخفیف (درصد)</label>
                         </div>
                         <!-- قیمت نهایی -->
-                        <div class="col-md-6 col-sm-12 position-relative mt-5">
+                        <div class="col-lg-3 col-md-6  position-relative mt-5">
                             <input type="number" wire:model="final_price" class="form-control" id="final_price" placeholder=" " readonly>
                             <label for="final_price" class="form-label">قیمت نهایی (تومان)</label>
                         </div>
                         <!-- دکمه افزودن -->
-                        <div class="col-12 text-end mt-4 w-100 d-flex justify-content-end">
+                        <div class=" text-end mt-4 d-flex justify-content-end">
                             <button wire:click="store" class="btn btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 5v14M5 12h14" />
@@ -136,14 +136,12 @@
     <script>
         document.addEventListener('livewire:init', function() {
             function initializeSelect2() {
-                // Destroy existing Select2 instances to prevent duplication
                 $('#selected_service, #insurance_id, #clinic_id').each(function() {
                     if ($(this).hasClass('select2-hidden-accessible')) {
                         $(this).select2('destroy');
                     }
                 });
 
-                // Initialize Select2 for selected_service
                 $('#selected_service').select2({
                     dir: 'rtl',
                     placeholder: 'انتخاب خدمت',
@@ -153,7 +151,6 @@
                     minimumResultsForSearch: 5
                 });
 
-                // Initialize Select2 for insurance_id
                 $('#insurance_id').select2({
                     dir: 'rtl',
                     placeholder: 'انتخاب بیمه',
@@ -163,7 +160,6 @@
                     minimumResultsForSearch: 5
                 });
 
-                // Initialize Select2 for clinic_id
                 $('#clinic_id').select2({
                     dir: 'rtl',
                     placeholder: 'انتخاب کلینیک',
@@ -173,79 +169,61 @@
                     minimumResultsForSearch: 5
                 });
 
-                // Set initial values
                 const selectedService = @json($selected_service);
                 const insuranceId = @json($insurance_id);
                 const clinicId = @json($clinic_id);
 
-                console.log('Initial values:', { selectedService, insuranceId, clinicId });
                 $('#selected_service').val(selectedService || '').trigger('change');
                 $('#insurance_id').val(insuranceId || '').trigger('change');
                 $('#clinic_id').val(clinicId || '').trigger('change');
             }
 
-            // Initialize Select2 on page load
             initializeSelect2();
 
-            // Handle change events for selected_service
             $('#selected_service').on('select2:select', function(e) {
                 const value = e.target.value === '' ? null : e.target.value;
-                console.log('Selected service:', value);
                 @this.set('selected_service', value);
             });
 
             $('#selected_service').on('select2:clear', function() {
-                console.log('Service cleared');
                 @this.set('selected_service', null);
             });
 
-            // Handle change events for insurance_id
             $('#insurance_id').on('select2:select', function(e) {
                 const value = e.target.value === '' ? null : e.target.value;
-                console.log('Selected insurance:', value);
                 @this.set('insurance_id', value);
             });
 
             $('#insurance_id').on('select2:clear', function() {
-                console.log('Insurance cleared');
                 @this.set('insurance_id', null);
             });
 
-            // Handle change events for clinic_id
             $('#clinic_id').on('select2:select', function(e) {
                 const value = e.target.value === '' ? null : e.target.value;
-                console.log('Clinic selected:', value);
                 @this.set('clinic_id', value);
             });
 
             $('#clinic_id').on('select2:clear', function() {
-                console.log('Clinic cleared');
                 @this.set('clinic_id', null);
             });
 
-            // Update only clinic_id without reinitializing all Select2 instances
             Livewire.on('update-select2', ({ clinicId }) => {
-                console.log('Updating Select2 with clinicId:', clinicId);
                 if (clinicId) {
                     $('#clinic_id').val(clinicId).trigger('change');
                 }
             });
 
-            // Handle alerts
             Livewire.on('show-alert', (event) => {
                 toastr[event.type](event.message);
             });
 
-            // Reinitialize Select2 only after specific Livewire updates
             document.addEventListener('livewire:updated', function() {
-                // Avoid reinitializing unnecessarily
                 const currentService = $('#selected_service').val();
                 const currentInsurance = $('#insurance_id').val();
                 const currentClinic = $('#clinic_id').val();
                 
                 initializeSelect2();
                 
-                // Restore current values after reinitialization
                 $('#selected_service').val(currentService).trigger('change');
                 $('#insurance_id').val(currentInsurance).trigger('change');
                 $('#clinic_id').val(currentClinic).trigger('change');
