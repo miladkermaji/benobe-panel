@@ -67,42 +67,6 @@
         </div>
       </div>
     </div>
-
-    <!-- جدول پیام‌های ارسالی -->
-    <div class="mt-4">
-      <div class="card-header">
-        <h5 class="mb-0 fw-bold">لیست پیام‌های ارسالی</h5>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table id="messagesTable" class="table text-center">
-            <thead>
-              <tr>
-                <th>عنوان پیام</th>
-                <th>متن پیام</th>
-                <th>تاریخ ارسال</th>
-                <th>عملیات</th>
-              </tr>
-            </thead>
-            <tbody id="messagesTableBody">
-              @foreach ($messages as $message)
-                <tr data-id="{{ $message->id }}">
-                  <td>{{ $message->title }}</td>
-                  <td>{{ $message->content }}</td>
-                  <td>{{ \Morilog\Jalali\Jalalian::fromDateTime($message->created_at)->format('Y/m/d') }}</td>
-                  <td>
-                    <button class="btn btn-light btn-sm delete-message-btn rounded-circle"
-                      onclick="deleteMessage({{ $message->id }}, this)">
-                      <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
-                    </button>
-                  </td>
-                </tr>
-              @endforeach
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- مودال افزودن کاربر -->
@@ -391,52 +355,7 @@
   });
 
   // بارگذاری پیام‌ها
-  function loadMessages() {
-    $.ajax({
-      url: "{{ route('doctor-blocking-users.messages') }}",
-      method: "GET",
-      data: {
-        selectedClinicId: localStorage.getItem('selectedClinicId')
-      },
-      success: function(messages) {
-        const tableBody = $('#messagesTableBody');
-        tableBody.empty();
-        messages.forEach(message => {
-          let recipientText = 'نامشخص';
-          if (message.recipient_type === 'all') {
-            recipientText = 'همه کاربران';
-          } else if (message.recipient_type === 'blocked') {
-            recipientText = 'کاربران مسدود';
-          } else if (message.recipient_type === 'specific' && message.user) {
-            recipientText = `${message.user.first_name} ${message.user.last_name} (${message.user.mobile})`;
-          }
 
-          const jalaliDate = new Intl.DateTimeFormat('fa-IR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-          }).format(new Date(message.created_at));
-
-          tableBody.append(`
-                    <tr data-id="${message.id}">
-                        <td>${message.title}</td>
-                        <td>${message.content}</td>
-                        <td>${jalaliDate}</td>
-                        <td>
-                            <button class="btn btn-light btn-sm delete-message-btn rounded-circle" onclick="deleteMessage(${message.id}, this)">
-                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="Delete">
-                            </button>
-                        </td>
-                    </tr>
-                `);
-        });
-      },
-      error: function() {
-        toastr.error("خطا در بارگذاری پیام‌ها!");
-      }
-    });
-  }
-  loadMessages();
 
   // تغییر وضعیت کاربر
   function toggleStatus(element) {
@@ -473,7 +392,6 @@
                 .text(statusText);
               $(element).data('status', newStatus);
               toastr.success(response.message);
-              loadMessages();
             } else {
               toastr.error(response.message);
             }

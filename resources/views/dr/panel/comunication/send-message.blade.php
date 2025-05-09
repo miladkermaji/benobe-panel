@@ -1,37 +1,36 @@
 @extends('dr.panel.layouts.master')
+
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
-    rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
-    rel="stylesheet" />
-  <link type="text/css"
-    href="{{ asset('dr-assets/panel/turn/schedule/schedule-setting/blocking-users/blocking-user.css') }}"
+   <link type="text/css"
+    href="{{ asset('dr-assets/panel/comunication/send-message/send-message.css') }}"
     rel="stylesheet" />
 @endsection
+
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
 @endsection
+
 @section('content')
 @section('bread-crumb-title', 'ارسال پیام')
 @include('dr.panel.my-tools.loader-btn')
+
 <div class="blocking_users_content">
   <div class="container-fluid mt-4">
     <!-- جدول پیام‌های ارسالی -->
     <div class="mt-4">
       <div class="border-0 shadow-sm rounded-3">
-        <div class="card-header bg-dark text-white p-4">
+        <div class="card-header text-white p-4">
           <h5 class="mb-0 fw-bold">پیام‌های ارسالی</h5>
         </div>
         <div class="card-body p-4">
           <div class="w-100 d-flex justify-content-end mb-3">
-            <button class="btn btn-success h-50 py-2 fw-bold" data-toggle="modal" data-bs-target="#sendSmsModal"
-              style="background: linear-gradient(to right, #2ecc71, #27ae60); border: none;">
+            <button class="btn my-btn-primary h-50 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#sendSmsModal">
               ارسال پیام جدید
             </button>
           </div>
           <div class="table-responsive">
-            <table id="messagesTable" class="table table-striped table-bordered table-hover align-middle text-center">
+            <table id="messagesTable" class="table  table-hover align-middle text-center">
               <thead class="table-light">
                 <tr>
                   <th>عنوان پیام</th>
@@ -60,12 +59,9 @@
                       @endif
                     </td>
                     <td>
-                      <button class="btn btn-outline-danger btn-sm delete-message-btn rounded-circle"
-                        onclick="deleteMessage({{ $message->id }}, this)">
-                        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24"
-                          fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                        </svg>
+                      <button class="btn btn-light btn-sm delete-message-btn rounded-circle"
+                        onclick="deleteMessage({{ $message->id }}, this)" aria-label="حذف پیام">
+                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
                       </button>
                     </td>
                   </tr>
@@ -82,9 +78,9 @@
   <div class="modal fade" id="sendSmsModal" tabindex="-1" aria-labelledby="sendSmsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-radius-6 shadow-sm">
-        <div class="modal-header bg-dark text-white">
+        <div class="modal-header">
           <h5 class="modal-title fw-bold" id="sendSmsModalLabel">ارسال پیام جدید</h5>
-          <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="بستن">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="بستن">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -115,8 +111,7 @@
             </div>
             <div class="mt-2 w-100">
               <button type="submit"
-                class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center"
-                style="background: linear-gradient(to right, #2ecc71, #27ae60); border: none;">
+                class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
                 <span class="button_text">ارسال</span>
                 <div class="loader" style="display: none;"></div>
               </button>
@@ -128,11 +123,9 @@
   </div>
 </div>
 @endsection
+
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/vacation/vacation.js') }}"></script>
 <script>
   $(document).ready(function() {
     let dropdownOpen = false;
@@ -241,7 +234,7 @@
           toastr.success(response.message);
           form[0].reset();
           $('#sendSmsModal').modal('hide');
-          $('#specificRecipientField').hide(); // مخفی کردن فیلد کاربر خاص بعد از ریست
+          $('#specificRecipientField').hide();
           loadMessages();
         }
       },
@@ -270,7 +263,7 @@
       specificField.show();
     } else {
       specificField.hide();
-      $('#specificRecipient').val(''); // خالی کردن فیلد در صورت تغییر گزینه
+      $('#specificRecipient').val('');
     }
   });
 
@@ -346,21 +339,18 @@
           }).format(new Date(message.created_at));
 
           tableBody.append(`
-                    <tr data-id="${message.id}">
-                        <td>${message.title}</td>
-                        <td>${message.content}</td>
-                        <td>${jalaliDate}</td>
-                        <td>${recipientText}</td>
-                        <td>
-                            <button class="btn btn-outline-danger btn-sm delete-message-btn rounded-circle" onclick="deleteMessage(${message.id}, this)">
-                                 <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
-     stroke="currentColor" stroke-width="2">
-                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                </svg>
-                            </button>
-                        </td>
-                    </tr>
-                `);
+                            <tr data-id="${message.id}">
+                                <td>${message.title}</td>
+                                <td>${message.content}</td>
+                                <td>${jalaliDate}</td>
+                                <td>${recipientText}</td>
+                                <td>
+                                    <button class="btn btn-light btn-sm delete-message-btn rounded-circle" onclick="deleteMessage(${message.id}, this)" aria-label="حذف پیام">
+                                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
         });
       },
       error: function() {
@@ -384,7 +374,7 @@
     }).then((result) => {
       if (result.isConfirmed) {
         $.ajax({
-          url: "{{ route('doctor-blocking-users.delete-message', '') }}/" + messageId,
+          url: "{{ route('doctor-blocking-users.delete-message', ':id') }}".replace(':id', messageId),
           method: "DELETE",
           data: {
             selectedClinicId: localStorage.getItem('selectedClinicId')

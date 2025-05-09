@@ -409,7 +409,7 @@ Route::prefix('dr')
                 Route::get('/edit/{id}', [\App\Http\Controllers\Dr\Panel\DoctorService\DoctorServiceController::class, 'edit'])->name('dr.panel.doctor-services.edit');
             });
 
-            Route::prefix('send-message')->group(function () {
+            Route::prefix('patient-contact/send-message')->group(function () {
                 Route::get('/', [DoctorSendMessageController::class, 'index'])->name('dr.panel.send-message');
 
             });
@@ -512,7 +512,7 @@ Route::prefix('dr')
                             ->middleware('secretary.permission:appointments')
                             ->name('doctor-blocking-users.send-message');
 
-                        Route::get('/messages', [BlockingUsersController::class, 'getMessages'])
+                        Route::get('/message-lists', [BlockingUsersController::class, 'getMessages'])
                             ->middleware('secretary.permission:appointments')
                             ->name('doctor-blocking-users.messages');
 
@@ -524,7 +524,7 @@ Route::prefix('dr')
                             ->middleware('secretary.permission:appointments')
                             ->name('doctor-blocking-users.update-status');
 
-                        Route::delete('/messages/{id}', [BlockingUsersController::class, 'deleteMessage'])
+                        Route::delete('/messages', [BlockingUsersController::class, 'deleteMessage'])
                             ->middleware('secretary.permission:appointments')
                             ->name('doctor-blocking-users.delete-message');
                     });
