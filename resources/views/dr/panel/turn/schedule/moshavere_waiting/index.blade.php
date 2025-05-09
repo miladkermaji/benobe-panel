@@ -15,7 +15,7 @@
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 @once
-  <script src="{{ asset('dr-assets/panel/js/calendar/reschedule-calendar.js') }}"></script>
+  <script src="{{ asset('dr-assets/panel/js/calendar/counseling-reschedule-calendar.js') }}"></script>
 
 @endonce
 @once

@@ -19,7 +19,7 @@
 
 @livewire('dr.panel.turn.schedule.counseling-special-days-apoointment')
 <script src="{{ asset('dr-assets/panel/js/jalali-moment/dist/jalali-moment.browser.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/calendar/special-days-calendar.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/calendar/counseling-special-days-calendar.js') }}"></script>
 
 <script>
   $(document).ready(function() {

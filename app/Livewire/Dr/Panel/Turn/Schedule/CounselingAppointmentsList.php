@@ -116,28 +116,38 @@ class CounselingAppointmentsList extends Component
         // مقدار پیش‌فرض تاریخ امروز
         $this->selectedDate = Carbon::now()->format('Y-m-d');
 
+        // خواندن selected_date از URL و دی‌کد کردن آن
         $selectedDateFromUrl = request()->query('selected_date');
         if ($selectedDateFromUrl) {
-            $decodedDate = urldecode($selectedDateFromUrl);
+            $decodedDate = urldecode($selectedDateFromUrl); // دی‌کد کردن 1404%2F02%2F05 به 1404/02/05 یا 1404-02-05
             try {
+                // بررسی فرمت جلالی با خط تیره (مثل 1404-02-05)
                 if (preg_match('/^14\d{2}-\d{2}-\d{2}$/', $decodedDate)) {
                     $this->selectedDate = Jalalian::fromFormat('Y-m-d', $decodedDate)->toCarbon()->format('Y-m-d');
-                } elseif (preg_match('/^14\d{2}\/\d{2}\/\d{2}$/', $decodedDate)) {
+                }
+                // بررسی فرمت جلالی با اسلش (مثل 1404/02/05)
+                elseif (preg_match('/^14\d{2}\/\d{2}\/\d{2}$/', $decodedDate)) {
                     $this->selectedDate = Jalalian::fromFormat('Y/m/d', $decodedDate)->toCarbon()->format('Y-m-d');
-                } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $decodedDate)) {
+                }
+                // بررسی فرمت میلادی (مثل 2025-05-13)
+                elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $decodedDate)) {
                     $this->selectedDate = Carbon::parse($decodedDate)->format('Y-m-d');
                 } else {
+                    Log::warning('فرمت تاریخ نامعتبر در URL پس از دی‌کد: ' . $decodedDate);
                 }
             } catch (\Exception $e) {
-
+                Log::error('خطا در تبدیل تاریخ از URL: ' . $e->getMessage() . ' | تاریخ خام: ' . $selectedDateFromUrl);
             }
         }
 
+        // ذخیره URL بازگشت
         $this->redirectBack = urldecode(request()->query('redirect_back', url()->previous()));
-        $this->blockedAt = Jalalian::now()->format('Y-m-d');
+
+        $this->blockedAt = Jalalian::now()->format('Y-m-d'); // تغییر فرمت به Y-m-d
         $this->calendarYear = Jalalian::now()->getYear();
         $this->calendarMonth = Jalalian::now()->getMonth();
         $doctor = $this->getAuthenticatedDoctor();
+        $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
         if ($doctor) {
             $this->loadClinics();
             $this->loadAppointments();
@@ -147,6 +157,7 @@ class CounselingAppointmentsList extends Component
             $this->loadInsurances();
         }
     }
+
 
     /**
      * اعتبارسنجی فرمت تاریخ
@@ -220,7 +231,7 @@ class CounselingAppointmentsList extends Component
             $endDate = $jalaliDate->toCarbon()->endOfMonth();
             $jalaliEndDate = Jalalian::fromCarbon($startDate)->addMonths(1)->subDays(1);
             $endDate = $jalaliEndDate->toCarbon()->endOfDay();
-            $appointmentsQuery = DB::table('appointments')
+            $appointmentsQuery = DB::table('counseling_appointments')
                 ->select(DB::raw('appointment_date, COUNT(*) as appointment_count'))
                 ->where('doctor_id', $doctorId)
                 ->where('status', '!=', 'cancelled')
@@ -1375,7 +1386,7 @@ class CounselingAppointmentsList extends Component
         $recipients = [];
         $userId = null;
         if ($this->recipientType === 'all') {
-            $recipients = DB::table('appointments')
+            $recipients = DB::table('counseling_appointments')
                 ->where('doctor_id', $doctorId)
                 ->join('users', 'appointments.patient_id', '=', 'users.id')
                 ->distinct()
