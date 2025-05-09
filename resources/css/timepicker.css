@@ -36,14 +36,14 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4); /* رنگ مشکی با شفافیت */
-    backdrop-filter: blur(4px); /* افکت تاری */
-    z-index: 9998; /* زیر تایم‌پیکر */
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 9999; /* افزایش z-index */
     animation: fadeIn 0.1s ease-in-out;
 }
 
 .timepicker {
-    z-index: 9999;
+    z-index: 10000; /* افزایش z-index */
     font-family: 'Vazir', sans-serif;
     position: fixed;
     top: 50%;

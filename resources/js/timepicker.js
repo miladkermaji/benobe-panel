@@ -1,7 +1,7 @@
 class TimePicker {
     constructor() {
         this.activePicker = null;
-        this.backdrop = null; // ذخیره بک‌دراپ
+        this.backdrop = null;
         this.showPickerBound = this.showPicker.bind(this);
         this.init();
     }
@@ -16,6 +16,20 @@ class TimePicker {
         document.addEventListener("livewire:initialized", () => {
             Livewire.on("refresh-timepicker", () => this.bindInputs());
             Livewire.on("component.updated", () => this.bindInputs());
+            Livewire.on("open-modal", ({ id }) => {
+                if (id === "holiday-modal" || id === "scheduleModal") {
+                    setTimeout(() => this.bindInputs(), 100); // تأخیر برای اطمینان از رندر DOM
+                }
+            });
+        });
+
+        // مشاهده تغییرات DOM برای ورودی‌های دینامیک
+        const observer = new MutationObserver(() => {
+            this.bindInputs();
+        });
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
         });
     }
 
@@ -29,7 +43,10 @@ class TimePicker {
 
         // اضافه کردن listenerهای جدید
         document.querySelectorAll("input[data-timepicker]").forEach((input) => {
-            const listener = () => this.showPickerBound(input);
+            const listener = (e) => {
+                e.stopPropagation(); // جلوگیری از تداخل با رویدادهای دیگر
+                this.showPickerBound(input);
+            };
             input._timePickerListener = listener;
             input.addEventListener("click", listener, { capture: true });
         });
@@ -65,7 +82,7 @@ class TimePicker {
         picker.style.top = "50%";
         picker.style.left = "50%";
         picker.style.transform = "translate(-50%, -50%)";
-        picker.style.zIndex = "9999";
+        picker.style.zIndex = "10000"; // افزایش z-index
 
         // خواندن مقدار اولیه
         const value = input.value ? input.value.split(":") : ["00", "00"];
