@@ -309,8 +309,8 @@
   <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel"
     aria-hidden="true" wire:ignore.self>
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
+      <div class="modal-content border-radius-6">
+        <div class="modal-header border-radius-6">
           <h5 class="modal-title fw-bold" id="scheduleModalLabel">تنظیم زمان‌بندی</h5>
           <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
@@ -326,39 +326,51 @@
           </div>
           <!-- محتوای اصلی -->
           <div class="modal-content-inner">
-            <div class="schedule-days-section">
-              <div class="day-schdule-wrapper">
-                <div class="day-checkbox">
-                  <x-my-check-box :is-checked="$selectAllScheduleModal" id="select-all-schedule-days" day="انتخاب همه"
-                    wire:model.live="selectAllScheduleModal" />
+            <!-- بخش انتخاب روزها -->
+            <div class="schedule-days-section border-section">
+              <h6 class="section-title">انتخاب روزها</h6>
+              <div class="day-schedule-grid">
+                <div class="day-checkbox form-check select-all-checkbox">
+                  <input type="checkbox" class="form-check-input" id="select-all-schedule-days"
+                    wire:model.live="selectAllScheduleModal">
+                  <label class="form-check-label" for="select-all-schedule-days">انتخاب همه</label>
                 </div>
                 @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
-                  <div class="day-checkbox">
-                    <x-my-check-box :is-checked="isset($selectedScheduleDays[$day]) && $selectedScheduleDays[$day]" id="schedule-day-{{ $day }}"
-                      day="{{ $label }}" wire:model.live="selectedScheduleDays.{{ $day }}"
-                      data-day="{{ $day }}" class="schedule-day-checkbox" />
+                  <div class="day-checkbox form-check">
+                    <input type="checkbox" class="form-check-input schedule-day-checkbox"
+                      id="schedule-day-{{ $day }}"
+                      wire:model.live="selectedScheduleDays.{{ $day }}" data-day="{{ $day }}">
+                    <label class="form-check-label"
+                      for="schedule-day-{{ $day }}">{{ $label }}</label>
                   </div>
                 @endforeach
               </div>
             </div>
-            <div class="timepicker-save-section">
-              <div class="form-group position-relative timepicker-ui">
-                <label class="label-top-input-special-takhasos">شروع</label>
-                <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
-                  id="schedule-start" value="00:00">
+            <!-- بخش تنظیم بازه زمانی و دکمه ذخیره -->
+            <div class="timepicker-save-section border-section">
+              <h6 class="section-title">تنظیم بازه زمانی</h6>
+              <div class="timepicker-grid">
+                <div class="form-group position-relative timepicker-ui">
+                  <label class="label-top-input-special-takhasos">شروع</label>
+                  <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
+                    id="schedule-start" value="00:00">
+                </div>
+                <div class="form-group position-relative timepicker-ui">
+                  <label class="label-top-input-special-takhasos">پایان</label>
+                  <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
+                    id="schedule-end" value="23:59">
+                </div>
+                <button type="button"
+                  class="btn my-btn-primary d-flex justify-content-center align-items-center save-schedule-btn"
+                  id="saveSchedule">
+                  <span class="button_text">ذخیره تغییرات</span>
+                  <div class="loader"></div>
+                </button>
               </div>
-              <div class="form-group position-relative timepicker-ui">
-                <label class="label-top-input-special-takhasos">پایان</label>
-                <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold" id="schedule-end"
-                  value="23:59">
-              </div>
-              <button type="button" class="btn my-btn-primary d-flex justify-content-center align-items-center"
-                id="saveSchedule">
-                <span class="button_text">ذخیره تغییرات</span>
-                <div class="loader"></div>
-              </button>
             </div>
-            <div class="schedule-settings-section">
+            <!-- بخش لیست تنظیمات ذخیره‌شده -->
+            <div class="schedule-settings-section border-section">
+              <h6 class="section-title">تنظیمات ذخیره‌شده</h6>
               <div class="schedule-settings-list">
                 @if ($scheduleModalDay && $scheduleModalIndex !== null)
                   @php
@@ -390,7 +402,7 @@
                     @foreach ($filteredSettings as $index => $setting)
                       <div class="schedule-setting-item"
                         wire:key="setting-{{ $scheduleModalDay }}-{{ $index }}">
-                        <span>
+                        <span class="setting-text">
                           از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }} (روزها:
                           {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
                         </span>
@@ -401,12 +413,12 @@
                       </div>
                     @endforeach
                   @else
-                    <div class="alert alert-danger text-center fw-bold">
+                    <div class="alert alert-info text-center">
                       هیچ تنظیم زمان‌بندی برای این بازه زمانی ذخیره نشده است.
                     </div>
                   @endif
                 @else
-                  <div class="alert alert-danger text-center fw-bold">
+                  <div class="alert alert-info text-center">
                     روز یا بازه زمانی انتخاب نشده است.
                   </div>
                 @endif
