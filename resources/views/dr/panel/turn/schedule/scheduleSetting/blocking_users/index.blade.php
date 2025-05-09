@@ -503,7 +503,7 @@
     }).then((result) => {
       if (result.isConfirmed) {
         $.ajax({
-          url: "{{ route('doctor-blocking-users.delete-message', '') }}/" + messageId,
+          url: "{{ route('doctor-blocking-users.delete-message', ':id') }}".replace(':id', messageId),
           method: "DELETE",
           data: {
             selectedClinicId: localStorage.getItem('selectedClinicId')
