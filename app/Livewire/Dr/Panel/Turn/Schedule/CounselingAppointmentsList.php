@@ -111,42 +111,42 @@ class CounselingAppointmentsList extends Component
     ];
     public $showNoResultsAlert = false;
 
- public function mount()
-{
-    // مقدار پیش‌فرض تاریخ امروز
-    $this->selectedDate = Carbon::now()->format('Y-m-d');
+    public function mount()
+    {
+        // مقدار پیش‌فرض تاریخ امروز
+        $this->selectedDate = Carbon::now()->format('Y-m-d');
 
-    $selectedDateFromUrl = request()->query('selected_date');
-    if ($selectedDateFromUrl) {
-        $decodedDate = urldecode($selectedDateFromUrl) ?? "";
-        try {
-            if (preg_match('/^14\d{2}-\d{2}-\d{2}$/', $decodedDate)) {
-                $this->selectedDate = Jalalian::fromFormat('Y-m-d', $decodedDate)->toCarbon()->format('Y-m-d');
-            } elseif (preg_match('/^14\d{2}\/\d{2}\/\d{2}$/', $decodedDate)) {
-                $this->selectedDate = Jalalian::fromFormat('Y/m/d', $decodedDate)->toCarbon()->format('Y-m-d');
-            } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $decodedDate)) {
-                $this->selectedDate = Carbon::parse($decodedDate)->format('Y-m-d');
-            } else {
+        $selectedDateFromUrl = request()->query('selected_date');
+        if ($selectedDateFromUrl) {
+            $decodedDate = urldecode($selectedDateFromUrl);
+            try {
+                if (preg_match('/^14\d{2}-\d{2}-\d{2}$/', $decodedDate)) {
+                    $this->selectedDate = Jalalian::fromFormat('Y-m-d', $decodedDate)->toCarbon()->format('Y-m-d');
+                } elseif (preg_match('/^14\d{2}\/\d{2}\/\d{2}$/', $decodedDate)) {
+                    $this->selectedDate = Jalalian::fromFormat('Y/m/d', $decodedDate)->toCarbon()->format('Y-m-d');
+                } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $decodedDate)) {
+                    $this->selectedDate = Carbon::parse($decodedDate)->format('Y-m-d');
+                } else {
+                }
+            } catch (\Exception $e) {
+
             }
-        } catch (\Exception $e) {
-            
+        }
+
+        $this->redirectBack = urldecode(request()->query('redirect_back', url()->previous()));
+        $this->blockedAt = Jalalian::now()->format('Y-m-d');
+        $this->calendarYear = Jalalian::now()->getYear();
+        $this->calendarMonth = Jalalian::now()->getMonth();
+        $doctor = $this->getAuthenticatedDoctor();
+        if ($doctor) {
+            $this->loadClinics();
+            $this->loadAppointments();
+            $this->loadBlockedUsers();
+            $this->loadMessages();
+            $this->loadCalendarData();
+            $this->loadInsurances();
         }
     }
-
-    $this->redirectBack = urldecode(request()->query('redirect_back', url()->previous()));
-    $this->blockedAt = Jalalian::now()->format('Y-m-d');
-    $this->calendarYear = Jalalian::now()->getYear();
-    $this->calendarMonth = Jalalian::now()->getMonth();
-    $doctor = $this->getAuthenticatedDoctor();
-    if ($doctor) {
-        $this->loadClinics();
-        $this->loadAppointments();
-        $this->loadBlockedUsers();
-        $this->loadMessages();
-        $this->loadCalendarData();
-        $this->loadInsurances();
-    }
-}
 
     /**
      * اعتبارسنجی فرمت تاریخ

@@ -835,7 +835,6 @@
             }));
 
           } else {
-            console.warn('Modal ID not found, attempting to close all open modals');
             document.querySelectorAll('.modal.show').forEach(modal => {
               if (modal.name) {
                 window.dispatchEvent(new CustomEvent('close-modal', {
@@ -851,7 +850,7 @@
 
         Livewire.on('discount-applied', () => {
           const discountInput = document.querySelector(
-            'input[wire\\:click*="$dispatch(\'open-modal\', { id: \'discount-modal\' })"]');
+            'input[wire\\:click*="$dispatch(\'open-modal\', { name: \'discount-modal\' })"]');
           if (discountInput) {
             const percentage = @this.get('discountPercentage');
             discountInput.value = percentage ? `${parseFloat(percentage).toFixed(2)}%` : '';
@@ -868,7 +867,7 @@
         Livewire.on('final-price-updated', () => {
           const priceInput = document.querySelector('input[value*="{{ number_format($finalPrice) }} تومان"]');
           const discountInput = document.querySelector(
-            'input[wire\\:click*="$dispatch(\'open-modal\', { id: \'discount-modal\' })"]'
+            'input[wire\\:click*="$dispatch(\'open-modal\', { name: \'discount-modal\' })"]'
           );
           const isFree = @this.get('isFree');
           const finalPrice = @this.get('finalPrice');
@@ -1054,7 +1053,12 @@
             }
 
             @this.set('rescheduleAppointmentIds', selectedIds);
-            window.open-modal('reschedule-modal');
+
+            window.dispatchEvent(new CustomEvent('open-modal', {
+              detail: {
+                name: 'reschedule-modal'
+              }
+            }));
           });
         } else {
           console.warn('دکمه جابجایی نوبت‌ها پیدا نشد');
@@ -1079,7 +1083,7 @@
             }
 
             @this.set('selectedMobiles', mobiles);
-            window.open-modal('block-user-modal');
+            window.open - modal('block-user-modal');
           });
         } else {
           console.warn('دکمه مسدود کردن کاربران پیدا نشد');
