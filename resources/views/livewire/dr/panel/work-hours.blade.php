@@ -59,7 +59,7 @@
                                     <label class="label-top-input-special-takhasos"
                                       for="morning-start-{{ $englishDay }}-{{ $index }}">از</label>
                                     <input type="text"
-                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white" data-timepicker
                                       id="morning-start-{{ $englishDay }}-{{ $index }}"
                                       wire:model.live="slots.{{ $englishDay }}.{{ $index }}.start_time" />
                                   </div>
@@ -67,7 +67,7 @@
                                     <label class="label-top-input-special-takhasos"
                                       for="morning-end-{{ $englishDay }}-{{ $index }}">تا</label>
                                     <input type="text"
-                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white" data-timepicker
                                       id="morning-end-{{ $englishDay }}-{{ $index }}"
                                       wire:model.live="slots.{{ $englishDay }}.{{ $index }}.end_time" />
                                   </div>
@@ -75,21 +75,18 @@
                                     <label class="label-top-input-special-takhasos"
                                       for="morning-patients-{{ $englishDay }}-{{ $index }}">تعداد
                                       نوبت</label>
-
                                     <input type="text"
                                       class="form-control h-50 text-center max-appointments bg-white"
                                       id="morning-patients-{{ $englishDay }}-{{ $index }}"
                                       wire:model.live="slots.{{ $englishDay }}.{{ $index }}.max_appointments"
                                       data-bs-toggle="modal" data-bs-target="#CalculatorModal"
                                       data-day="{{ $englishDay }}" data-index="{{ $index }}" readonly />
-
                                   </div>
                                   <!-- دکمه جدید برای نوبت‌های اورژانسی -->
                                   <div class="form-group position-relative">
                                     <x-custom-tooltip
                                       title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
                                       placement="top">
-
                                       <button class="btn btn-light btn-sm emergency-slot-btn" data-bs-toggle="modal"
                                         data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
                                         data-index="{{ $index }}"
@@ -129,7 +126,6 @@
                                       <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
                                     </button>
                                   </x-custom-tooltip>
-
                                 </div>
                               </div>
                             @endforeach
@@ -141,7 +137,7 @@
                                   <label class="label-top-input-special-takhasos"
                                     for="morning-start-{{ $englishDay }}-{{ $index }}">از</label>
                                   <input type="text"
-                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white" data-timepicker
                                     id="morning-start-{{ $englishDay }}-{{ $index }}"
                                     wire:model.live="slots.{{ $englishDay }}.{{ $index }}.start_time" />
                                 </div>
@@ -149,7 +145,7 @@
                                   <label class="label-top-input-special-takhasos"
                                     for="morning-end-{{ $englishDay }}-{{ $index }}">تا</label>
                                   <input type="text"
-                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white" data-timepicker
                                     id="morning-end-{{ $englishDay }}-{{ $index }}"
                                     wire:model.live="slots.{{ $englishDay }}.{{ $index }}.end_time" />
                                 </div>
@@ -225,8 +221,6 @@
                 </div>
               </div>
             </div>
-
-
           </div>
           <div class="d-flex w-100 justify-content-end mt-3">
             <button type="button"
@@ -244,7 +238,6 @@
                 <span class="button_text"> پایان فعالسازی</span>
                 <div class="loader"></div>
               </button>
-
             </div>
             <div class="modal fade" id="activation-modal" tabindex="-1" role="dialog"
               aria-labelledby="activation-modal-label" aria-hidden="true">
@@ -313,111 +306,117 @@
       </div>
     </div>
   </div>
-<div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true" wire:ignore.self>
+  <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel"
+    aria-hidden="true" wire:ignore.self>
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="scheduleModalLabel">تنظیم زمان‌بندی</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body position-relative">
-                <!-- لودینگ -->
-                <div class="loading-overlay d-none" id="scheduleLoading">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="sr-only">در حال بارگذاری...</span>
-                    </div>
-                    <p class="mt-2">در حال بارگذاری...</p>
-                </div>
-                <!-- محتوای اصلی -->
-                <div class="modal-content-inner">
-                    <div class="schedule-days-section">
-                        <div class="day-schdule-wrapper">
-                            <div class="day-checkbox">
-                                <x-my-check-box :is-checked="$selectAllScheduleModal" id="select-all-schedule-days" day="انتخاب همه" wire:model.live="selectAllScheduleModal" />
-                            </div>
-                            @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
-                                <div class="day-checkbox">
-                                    <x-my-check-box :is-checked="isset($selectedScheduleDays[$day]) && $selectedScheduleDays[$day]" id="schedule-day-{{ $day }}"
-                                        day="{{ $label }}" wire:model.live="selectedScheduleDays.{{ $day }}"
-                                        data-day="{{ $day }}" class="schedule-day-checkbox" />
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    <div class="timepicker-save-section">
-                        <div class="form-group position-relative timepicker-ui">
-                            <label class="label-top-input-special-takhasos">شروع</label>
-                            <input type="text" class="form-control timepicker-ui-input text-center fw-bold" id="schedule-start" value="00:00">
-                        </div>
-                        <div class="form-group position-relative timepicker-ui">
-                            <label class="label-top-input-special-takhasos">پایان</label>
-                            <input type="text" class="form-control timepicker-ui-input text-center fw-bold" id="schedule-end" value="23:59">
-                        </div>
-                        <button type="button" class="btn my-btn-primary d-flex justify-content-center align-items-center" id="saveSchedule">
-                            <span class="button_text">ذخیره تغییرات</span>
-                            <div class="loader"></div>
-                        </button>
-                    </div>
-                    <div class="schedule-settings-section">
-                        <div class="schedule-settings-list">
-                            @if ($scheduleModalDay && $scheduleModalIndex !== null)
-                                @php
-                                    $schedule = collect($this->workSchedules)->firstWhere('day', $scheduleModalDay);
-                                    $settings = $schedule && isset($schedule['appointment_settings'])
-                                        ? (is_array($schedule['appointment_settings'])
-                                            ? $schedule['appointment_settings']
-                                            : json_decode($schedule['appointment_settings'], true) ?? [])
-                                        : [];
-                                    $filteredSettings = array_values(
-                                        array_filter(
-                                            $settings,
-                                            fn($setting) => isset($setting['work_hour_key']) &&
-                                                (int) $setting['work_hour_key'] === (int) $this->scheduleModalIndex,
-                                        ),
-                                    );
-                                    $dayTranslations = [
-                                        'saturday' => 'شنبه',
-                                        'sunday' => 'یکشنبه',
-                                        'monday' => 'دوشنبه',
-                                        'tuesday' => 'سه‌شنبه',
-                                        'wednesday' => 'چهارشنبه',
-                                        'thursday' => 'پنج‌شنبه',
-                                        'friday' => 'جمعه',
-                                    ];
-                                @endphp
-                                @if (!empty($filteredSettings))
-                                    @foreach ($filteredSettings as $index => $setting)
-                                        <div class="schedule-setting-item" wire:key="setting-{{ $scheduleModalDay }}-{{ $index }}">
-                                            <span>
-                                                از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }} (روزها:
-                                                {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
-                                            </span>
-                                            <button class="btn btn-light delete-schedule-setting"
-                                                data-day="{{ $scheduleModalDay }}" data-index="{{ $index }}">
-                                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                                            </button>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <div class="alert alert-danger text-center fw-bold">
-                                        هیچ تنظیم زمان‌بندی برای این بازه زمانی ذخیره نشده است.
-                                    </div>
-                                @endif
-                            @else
-                                <div class="alert alert-danger text-center fw-bold">
-                                    روز یا بازه زمانی انتخاب نشده است.
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="scheduleModalLabel">تنظیم زمان‌بندی</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
         </div>
+        <div class="modal-body position-relative">
+          <!-- لودینگ -->
+          <div class="loading-overlay d-none" id="scheduleLoading">
+            <div class="spinner-border text-primary" role="status">
+              <span class="sr-only">در حال بارگذاری...</span>
+            </div>
+            <p class="mt-2">در حال بارگذاری...</p>
+          </div>
+          <!-- محتوای اصلی -->
+          <div class="modal-content-inner">
+            <div class="schedule-days-section">
+              <div class="day-schdule-wrapper">
+                <div class="day-checkbox">
+                  <x-my-check-box :is-checked="$selectAllScheduleModal" id="select-all-schedule-days" day="انتخاب همه"
+                    wire:model.live="selectAllScheduleModal" />
+                </div>
+                @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+                  <div class="day-checkbox">
+                    <x-my-check-box :is-checked="isset($selectedScheduleDays[$day]) && $selectedScheduleDays[$day]" id="schedule-day-{{ $day }}"
+                      day="{{ $label }}" wire:model.live="selectedScheduleDays.{{ $day }}"
+                      data-day="{{ $day }}" class="schedule-day-checkbox" />
+                  </div>
+                @endforeach
+              </div>
+            </div>
+            <div class="timepicker-save-section">
+              <div class="form-group position-relative timepicker-ui">
+                <label class="label-top-input-special-takhasos">شروع</label>
+                <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
+                  id="schedule-start" value="00:00">
+              </div>
+              <div class="form-group position-relative timepicker-ui">
+                <label class="label-top-input-special-takhasos">پایان</label>
+                <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold" id="schedule-end"
+                  value="23:59">
+              </div>
+              <button type="button" class="btn my-btn-primary d-flex justify-content-center align-items-center"
+                id="saveSchedule">
+                <span class="button_text">ذخیره تغییرات</span>
+                <div class="loader"></div>
+              </button>
+            </div>
+            <div class="schedule-settings-section">
+              <div class="schedule-settings-list">
+                @if ($scheduleModalDay && $scheduleModalIndex !== null)
+                  @php
+                    $schedule = collect($this->workSchedules)->firstWhere('day', $scheduleModalDay);
+                    $settings =
+                        $schedule && isset($schedule['appointment_settings'])
+                            ? (is_array($schedule['appointment_settings'])
+                                ? $schedule['appointment_settings']
+                                : json_decode($schedule['appointment_settings'], true) ?? [])
+                            : [];
+                    $filteredSettings = array_values(
+                        array_filter(
+                            $settings,
+                            fn($setting) => isset($setting['work_hour_key']) &&
+                                (int) $setting['work_hour_key'] === (int) $this->scheduleModalIndex,
+                        ),
+                    );
+                    $dayTranslations = [
+                        'saturday' => 'شنبه',
+                        'sunday' => 'یکشنبه',
+                        'monday' => 'دوشنبه',
+                        'tuesday' => 'سه‌شنبه',
+                        'wednesday' => 'چهارشنبه',
+                        'thursday' => 'پنج‌شنبه',
+                        'friday' => 'جمعه',
+                    ];
+                  @endphp
+                  @if (!empty($filteredSettings))
+                    @foreach ($filteredSettings as $index => $setting)
+                      <div class="schedule-setting-item"
+                        wire:key="setting-{{ $scheduleModalDay }}-{{ $index }}">
+                        <span>
+                          از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }} (روزها:
+                          {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
+                        </span>
+                        <button class="btn btn-light delete-schedule-setting" data-day="{{ $scheduleModalDay }}"
+                          data-index="{{ $index }}">
+                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                        </button>
+                      </div>
+                    @endforeach
+                  @else
+                    <div class="alert alert-danger text-center fw-bold">
+                      هیچ تنظیم زمان‌بندی برای این بازه زمانی ذخیره نشده است.
+                    </div>
+                  @endif
+                @else
+                  <div class="alert alert-danger text-center fw-bold">
+                    روز یا بازه زمانی انتخاب نشده است.
+                  </div>
+                @endif
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-
+  </div>
   <div class="modal fade" id="CalculatorModal" tabindex="-1" aria-labelledby="CalculatorModalLabel"
     aria-hidden="true" wire:ignore.self>
     <div class="modal-dialog modal-dialog-centered">
@@ -470,7 +469,6 @@
       </div>
     </div>
   </div>
-
   <div class="modal fade" id="checkboxModal" tabindex="-1" aria-labelledby="checkboxModalLabel" aria-hidden="true"
     wire:ignore.self>
     <div class="modal-dialog modal-dialog-centered">
@@ -511,7 +509,6 @@
         function toggleButtonLoading($button, isLoading) {
           const $loader = $button.find('.loader');
           const $text = $button.find('.button_text');
-
           if (isLoading) {
             $loader.show();
             $text.hide();
@@ -543,7 +540,6 @@
             }
           });
         });
-
         // متوقف کردن لودینگ هنگام بستن مودال‌ها
         ['#CalculatorModal', '#scheduleModal', '#emergencyModal', '#checkboxModal'].forEach(modalId => {
           $(document).on('hidden.bs.modal', modalId, function() {
@@ -555,53 +551,11 @@
             });
           });
         });
-
-
-
-        function initializeTimepicker() {
-          $('.timepicker-ui').each(function() {
-            if (!$(this).data('timepicker-initialized')) {
-              try {
-                const options = {
-                  clockType: '24h',
-                  theme: 'basic',
-                  mobile: true,
-                  enableScrollbar: true,
-                  disableTimeRangeValidation: false,
-                  autoClose: true,
-                };
-                const timepicker = new window.tui.TimepickerUI(this, options);
-                timepicker.create();
-                $(this).data('timepicker-initialized', true);
-              } catch (e) {
-                console.error('Error initializing timepicker:', e);
-              }
-            }
-          });
-        }
-
-
-        initializeTimepicker();
-
-        Livewire.on('refresh-work-hours', () => {
-          initializeTimepicker();
-
-        });
-
-        Livewire.on('refresh-timepicker', () => {
-          setTimeout(() => {
-            initializeTimepicker();
-
-          }, 100);
-        });
-
         $(document).on('click', '.remove-row-btn', function(e) {
           e.preventDefault();
           const day = $(this).closest('[data-slot-id]').find('.schedule-btn').data('day');
           const index = $(this).closest('[data-slot-id]').find('.schedule-btn').data('index');
-
           if ($(this).is(':disabled')) return;
-
           Swal.fire({
             title: 'آیا مطمئن هستید؟',
             text: 'این اسلات حذف خواهد شد و قابل بازگشت نیست!',
@@ -619,20 +573,16 @@
             }
           });
         });
-
         $(document).on('show.bs.modal', '#CalculatorModal', function(e) {
           const $modal = $(this);
           const button = $(e.relatedTarget);
           const day = button.data('day');
           const index = button.data('index');
-
           try {
             @this.set('calculator.day', day);
             @this.set('calculator.index', index);
-
             const startTime = $(`#morning-start-${day}-${index}`).val();
             const endTime = $(`#morning-end-${day}-${index}`).val();
-
             if (!startTime || !endTime) {
               @this.set('modalMessage', 'لطفاً ابتدا زمان شروع و پایان را وارد کنید');
               @this.set('modalType', 'error');
@@ -640,21 +590,17 @@
               $modal.modal('hide');
               return;
             }
-
             @this.set('calculator.start_time', startTime);
             @this.set('calculator.end_time', endTime);
-
             const $appointmentCount = $('#appointment-count');
             const $timeCount = $('#time-count');
             const $countRadio = $('#count-radio');
             const $timeRadio = $('#time-radio');
-
             const timeToMinutes = (time) => {
               const [hours, minutes] = time.split(':').map(Number);
               return hours * 60 + minutes;
             };
             const totalMinutes = timeToMinutes(endTime) - timeToMinutes(startTime);
-
             if (totalMinutes <= 0) {
               @this.set('modalMessage', 'زمان پایان باید بعد از زمان شروع باشد');
               @this.set('modalType', 'error');
@@ -662,7 +608,6 @@
               $modal.modal('hide');
               return;
             }
-
             const currentCount = @this.get('calculator.appointment_count');
             const currentTime = @this.get('calculator.time_per_appointment');
             if (currentCount) {
@@ -675,7 +620,6 @@
               $appointmentCount.val('');
               $timeCount.val('');
             }
-
             $appointmentCount.on('focus', function() {
               $countRadio.prop('checked', true).trigger('change');
               $timeRadio.prop('checked', false);
@@ -683,7 +627,6 @@
               $timeCount.prop('disabled', true);
               @this.set('calculationMode', 'count');
             });
-
             $timeCount.on('focus', function() {
               $timeRadio.prop('checked', true).trigger('change');
               $countRadio.prop('checked', false);
@@ -691,7 +634,6 @@
               $appointmentCount.prop('disabled', true);
               @this.set('calculationMode', 'time');
             });
-
             $appointmentCount.on('input', function() {
               const count = parseInt($(this).val());
               if (count && !isNaN(count) && count > 0) {
@@ -705,7 +647,6 @@
                 @this.set('calculator.time_per_appointment', null);
               }
             });
-
             $timeCount.on('input', function() {
               const time = parseInt($(this).val());
               if (time && !isNaN(time) && time > 0) {
@@ -719,7 +660,6 @@
                 @this.set('calculator.time_per_appointment', null);
               }
             });
-
             $countRadio.on('change', function() {
               if ($(this).is(':checked')) {
                 $appointmentCount.prop('disabled', false);
@@ -727,7 +667,6 @@
                 @this.set('calculationMode', 'count');
               }
             });
-
             $timeRadio.on('change', function() {
               if ($(this).is(':checked')) {
                 $timeCount.prop('disabled', false);
@@ -735,7 +674,6 @@
                 @this.set('calculationMode', 'time');
               }
             });
-
             const calculationMode = @this.get('calculationMode');
             if (calculationMode === 'count') {
               $countRadio.prop('checked', true);
@@ -770,26 +708,22 @@
           $('#count-radio').off('change');
           $('#time-radio').off('change');
         });
-
         $(document).on('show.bs.modal', '#checkboxModal', function(e) {
           const $modal = $(this);
           const button = $(e.relatedTarget);
           const day = button.data('day');
           const index = button.data('index');
-
           try {
             @this.set('copySource.day', day);
             @this.set('copySource.index', index);
             @this.set('selectedDays', []);
             @this.set('selectAllCopyModal', false);
-
             setTimeout(() => {
               const selector = `#day-checkboxes .form-check[data-day="${day}"]`;
               const $element = $(selector);
               if ($element.length > 0) {
                 $element.hide();
               }
-
             }, 100);
           } catch (error) {
             console.error('Error setting copySource:', error);
@@ -798,7 +732,6 @@
             $('body').removeClass('modal-open').css('padding-right', '');
           }
         });
-
         $(document).on('hidden.bs.modal', '#checkboxModal', function() {
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
@@ -809,24 +742,19 @@
             index: null
           });
           @this.set('selectAllCopyModal', false);
-
         });
-
         $(document).on('show.bs.modal', '#emergencyModal', function(e) {
           const $modal = $(this);
           const button = $(e.relatedTarget);
           const day = button.data('day');
           const index = button.data('index');
-
           try {
             @this.set('isEmergencyModalOpen', true);
             @this.set('emergencyModalDay', day);
             @this.set('emergencyModalIndex', index);
-
             const $startTimeInput = $(`#morning-start-${day}-${index}`);
             const $endTimeInput = $(`#morning-end-${day}-${index}`);
             const $maxAppointmentsInput = $(`#morning-patients-${day}-${index}`);
-
             if (!$startTimeInput.length || !$endTimeInput.length || !$maxAppointmentsInput.length) {
               @this.set('modalMessage', 'خطا: ورودی‌های زمان یا تعداد نوبت یافت نشدند');
               @this.set('modalType', 'error');
@@ -834,11 +762,9 @@
               $modal.modal('hide');
               return;
             }
-
             const startTime = $startTimeInput.val();
             const endTime = $endTimeInput.val();
             const maxAppointments = $maxAppointmentsInput.val();
-
             if (!startTime || !endTime || !maxAppointments) {
               @this.set('modalMessage', 'لطفاً ابتدا زمان شروع، پایان و تعداد نوبت را وارد کنید');
               @this.set('modalType', 'error');
@@ -846,27 +772,22 @@
               $modal.modal('hide');
               return;
             }
-
             const timeToMinutes = (time) => {
               const [hours, minutes] = time.split(':').map(Number);
               return hours * 60 + minutes;
             };
-
             const minutesToTime = (minutes) => {
               const hours = Math.floor(minutes / 60).toString().padStart(2, '0');
               const mins = (minutes % 60).toString().padStart(2, '0');
               return `${hours}:${mins}`;
             };
-
             const totalMinutes = timeToMinutes(endTime) - timeToMinutes(startTime);
             const slotDuration = Math.floor(totalMinutes / maxAppointments);
             const times = [];
-
             for (let i = 0; i < maxAppointments; i++) {
               const start = timeToMinutes(startTime) + (i * slotDuration);
               times.push(minutesToTime(start));
             }
-
             let currentEmergencyTimes = [];
             try {
               const workSchedule = @this.workSchedules.find(s => s.day === day);
@@ -876,12 +797,9 @@
               console.error('Error accessing emergency_times:', error);
               currentEmergencyTimes = [];
             }
-
             @this.set('emergencyTimes', currentEmergencyTimes);
-
             const $timesContainer = $('#emergency-times');
             $timesContainer.empty();
-
             times.forEach(time => {
               const isSaved = currentEmergencyTimes.includes(time);
               const $button = $(`
@@ -891,14 +809,11 @@
           `);
               $timesContainer.append($button);
             });
-
             $timesContainer.show();
-
             $timesContainer.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
               const $btn = $(this);
               const time = $btn.data('time');
               const isSelected = $btn.hasClass('btn-primary');
-
               if (isSelected) {
                 $btn.removeClass('btn-primary').addClass('btn-outline-primary');
                 @this.emergencyTimes = @this.emergencyTimes.filter(t => t !== time);
@@ -907,9 +822,7 @@
                 @this.emergencyTimes = [...@this.emergencyTimes, time];
               }
             });
-
             setTimeout(() => {
-
             }, 100);
           } catch (error) {
             console.error('Error in emergencyModal:', error);
@@ -918,64 +831,47 @@
             $('body').removeClass('modal-open').css('padding-right', '');
           }
         });
-
         $(document).on('hidden.bs.modal', '#emergencyModal', function() {
           @this.set('isEmergencyModalOpen', false);
           $('#emergency-times').empty();
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
-
         });
-
         Livewire.on('close-emergency-modal', () => {
           @this.set('isEmergencyModalOpen', false);
           $('#emergencyModal').modal('hide');
           $('#emergency-times').empty();
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
-
         });
-
         function cleanupModal() {
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
         }
-
         $(document).on('show.bs.modal', '#scheduleModal', function(e) {
           const $modal = $(this);
           const button = $(e.relatedTarget);
           const day = button.data('day');
           const index = button.data('index');
-
           try {
             if (!day || index === undefined) {
               throw new Error('Invalid day or index');
             }
-
             @this.call('openScheduleModal', day, index);
-
             $('#scheduleLoading').removeClass('d-none');
             $('.modal-content-inner').hide();
-
             const startTimeInput = $(`#morning-start-${day}-${index}`);
             const endTimeInput = $(`#morning-end-${day}-${index}`);
             const startTime = startTimeInput.length ? startTimeInput.val() : '00:00';
             const endTime = endTimeInput.length ? endTimeInput.val() : '23:59';
-
             if (!startTime || !endTime) {
               throw new Error('Start or end time is missing');
             }
-
-
-
             $('#schedule-start').val(startTime);
             $('#schedule-end').val(endTime);
-
             setTimeout(() => {
               $('#scheduleLoading').addClass('d-none');
               $('.modal-content-inner').show();
-
-              initializeTimepicker();
               const selectAllCheckbox = $('#select-all-schedule-days');
               const dayCheckboxes = $('.schedule-day-checkbox');
               selectAllCheckbox.prop('checked', false);
@@ -996,7 +892,6 @@
             cleanupModal();
           }
         });
-
         $(document).on('click', '#saveSchedule', function() {
           const $button = $(this);
           const startTime = $('#schedule-start').val();
@@ -1006,9 +901,6 @@
               return $(this).data('day');
             })
             .get();
-
-
-
           try {
             // اعتبارسنجی سمت کلاینت
             if (!selectedDays.length) {
@@ -1023,25 +915,20 @@
               toastr.error('لطفاً زمان پایان را وارد کنید');
               return;
             }
-
             const timeToMinutes = (time) => {
               const [hours, minutes] = time.split(':').map(Number);
               return hours * 60 + minutes;
             };
-
             if (timeToMinutes(endTime) <= timeToMinutes(startTime)) {
               toastr.error('زمان پایان باید بعد از زمان شروع باشد');
               return;
             }
-
             // همگام‌سازی selectedScheduleDays با سرور
             selectedDays.forEach(day => {
               @this.set(`selectedScheduleDays.${day}`, true);
             });
-
             // فعال کردن لودینگ
             toggleButtonLoading($button, true);
-
             // فراخوانی متد saveSchedule
             @this.call('saveSchedule', startTime, endTime).catch((error) => {
               toggleButtonLoading($button, false);
@@ -1054,12 +941,9 @@
             toastr.error('خطا در ذخیره زمان‌بندی: ' + error.message);
           }
         });
-
-
         $(document).on('click', '.delete-schedule-setting', function() {
           const day = $(this).data('day');
           const index = $(this).data('index');
-
           Swal.fire({
             title: 'آیا مطمئن هستید؟',
             text: 'این تنظیم زمان‌بندی حذف خواهد شد و قابل بازگشت نیست!',
@@ -1079,7 +963,6 @@
             }
           });
         });
-
         $(document).on('hidden.bs.modal', '#scheduleModal', function() {
           cleanupModal();
           @this.set('scheduleModalDay', null);
@@ -1088,45 +971,29 @@
           @this.set('selectAllScheduleModal', false);
           $('#schedule-settings-list').empty();
           $('.form-check-input').prop('disabled', false);
-
-          initializeTimepicker();
         });
-
-        Livewire.on('refresh-schedule-settings', () => {
-
-          initializeTimepicker();
-        });
-
         Livewire.on('close-schedule-modal', () => {
           $('#scheduleModal').modal('hide');
           cleanupModal();
-
         });
-
         $(document).on('change', '#select-all-days', function() {
           const isChecked = $(this).is(':checked');
           $('#day-checkboxes .form-check:visible input[type="checkbox"]').prop('checked', isChecked);
         });
-
         $('#checkboxModal').on('hidden.bs.modal', function() {
           $('#day-checkboxes .form-check').css('display', 'flex');
           $('#day-checkboxes input[type="checkbox"]').prop('checked', false);
-
         });
-
         Livewire.on('show-conflict-alert', (event) => {
-
           // استخراج شیء conflicts از داده‌های دریافتی
           let conflictsObj = Array.isArray(event) && event[0] && event[0].conflicts ? event[0].conflicts :
             event.conflicts || event;
-
           // بررسی معتبر بودن conflictsObj
           if (!conflictsObj || typeof conflictsObj !== 'object' || Object.keys(conflictsObj).length === 0) {
             console.warn('No valid conflicts data, proceeding with copySchedule');
             @this.call('copySchedule', false);
             return;
           }
-
           const persianDayMap = {
             saturday: 'شنبه',
             sunday: 'یک‌شنبه',
@@ -1136,10 +1003,8 @@
             thursday: 'پنج‌شنبه',
             friday: 'جمعه'
           };
-
           let conflictMessage = '<p>تداخل در روزهای زیر یافت شد:</p><ul>';
           let hasConflicts = false;
-
           // پردازش کلیدهای معتبر (روزهای هفته)
           Object.keys(conflictsObj).forEach(day => {
             // فقط روزهایی که در persianDayMap وجود دارند پردازش شوند
@@ -1147,17 +1012,14 @@
               console.warn(`Day ${day} not found in persianDayMap`);
               return;
             }
-
             const conflictDetails = conflictsObj[day];
             // بررسی وجود داده‌های تداخل
             if (!conflictDetails || (!conflictDetails.work_hours && !conflictDetails.emergency_times)) {
               console.warn(`No conflict details for day ${day}`);
               return;
             }
-
             hasConflicts = true;
             conflictMessage += `<li>${persianDayMap[day]}:<ul>`;
-
             // نمایش تداخل‌های ساعت کاری
             if (conflictDetails.work_hours && Array.isArray(conflictDetails.work_hours) && conflictDetails
               .work_hours.length > 0) {
@@ -1167,28 +1029,22 @@
                 conflictMessage += `<li>ساعت کاری: از ${start} تا ${end}</li>`;
               });
             }
-
             // نمایش تداخل‌های زمان‌های اورژانسی
             if (conflictDetails.emergency_times && Array.isArray(conflictDetails.emergency_times) &&
               conflictDetails.emergency_times.length > 0) {
               conflictMessage +=
                 `<li>زمان‌های اورژانسی: ${conflictDetails.emergency_times.join(', ')}</li>`;
             }
-
             conflictMessage += '</ul></li>';
           });
-
           conflictMessage += '</ul>';
-
           // اگر هیچ تداخل معتبری وجود نداشت، عملیات کپی ادامه یابد
           if (!hasConflicts) {
             console.warn('No valid conflicts found, proceeding with copySchedule');
             @this.call('copySchedule', false);
             return;
           }
-
           conflictMessage += '<p>آیا می‌خواهید داده‌های موجود را جایگزین کنید؟</p>';
-
           Swal.fire({
             title: 'تداخل در کپی برنامه کاری',
             html: conflictMessage,
@@ -1212,5 +1068,4 @@
       });
     });
   </script>
-
 </div>

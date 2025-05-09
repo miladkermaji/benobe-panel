@@ -848,7 +848,7 @@ h6 {
     }
 
     .timepicker-ui-input {
-        width: 90px;
+        width: 90px !important;
     }
 
     .max-appointments,

@@ -1,39 +1,54 @@
 :root {
-  /* پالت رنگی اصلی */
-  --primary: #2E86C1;
-  --primary-light: #84CAF9;
-  --secondary: #1DEB3C;
-  --secondary-hover: #15802A;
-  --background-light: #F0F8FF;
-  --background-footer: #D4ECFD;
-  --background-card: #FFFFFF;
-  --text-primary: #000000;
-  --text-secondary: #707070;
-  --text-discount: #008000;
-  --text-original: #FF0000;
-  --border-neutral: #E5E7EB;
-  --shadow: rgba(0, 0, 0, 0.35);
-  --gradient-instagram-from: #F92CA7;
-  --gradient-instagram-to: #6B1A93;
-  --button-mobile: #4F9ACD;
-  --button-mobile-light: #A2CDEB;
-  --support-section: #2E86C1;
-  --support-text: #084D7C;
-  --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%) !important;
-  /* شعاع گوشه‌ها */
-  --radius-button: 0.5rem;
-  --radius-button-large: 1rem;
-  --radius-button-xl: 1.25rem;
-  --radius-card: 1.125rem;
-  --radius-footer: 1.875rem;
-  --radius-nav: 1.25rem;
-  --radius-circle: 9999px;
+    /* پالت رنگی اصلی */
+    --primary: #2E86C1;
+    --primary-light: #84CAF9;
+    --secondary: #1DEB3C;
+    --secondary-hover: #15802A;
+    --background-light: #F0F8FF;
+    --background-footer: #D4ECFD;
+    --background-card: #FFFFFF;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --text-discount: #008000;
+    --text-original: #FF0000;
+    --border-neutral: #E5E7EB;
+    --shadow: rgba(0, 0, 0, 0.35);
+    --gradient-instagram-from: #F92CA7;
+    --gradient-instagram-to: #6B1A93;
+    --button-mobile: #4F9ACD;
+    --button-mobile-light: #A2CDEB;
+    --support-section: #2E86C1;
+    --support-text: #084D7C;
+    --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%) !important;
+    /* شعاع گوشه‌ها */
+    --radius-button: 0.5rem;
+    --radius-button-large: 1rem;
+    --radius-button-xl: 1.25rem;
+    --radius-card: 1.125rem;
+    --radius-footer: 1.875rem;
+    --radius-nav: 1.25rem;
+    --radius-circle: 9999px;
+}
+
+.timepicker-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* رنگ مشکی با شفافیت */
+    backdrop-filter: blur(4px); /* افکت تاری */
+    z-index: 9998; /* زیر تایم‌پیکر */
+    animation: fadeIn 0.1s ease-in-out;
 }
 
 .timepicker {
-    position: fixed;
-    z-index: 1001;
+    z-index: 9999;
     font-family: 'Vazir', sans-serif;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .timepicker-content {
@@ -42,12 +57,12 @@
     box-shadow: 0 8px 24px var(--shadow);
     padding: 24px;
     width: 320px;
-    max-width: calc(100vw - 20px); /* جلوگیری از خروج از viewport */
+    max-width: calc(100vw - 20px);
     display: flex;
     flex-direction: column;
     gap: 16px;
     direction: ltr;
-    animation: slideIn 0.2s ease-in-out; /* انیمیشن سریع‌تر */
+    animation: slideIn 0.05s ease-in-out;
 }
 
 .timepicker-time {
@@ -216,6 +231,11 @@
 }
 
 @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
+    from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

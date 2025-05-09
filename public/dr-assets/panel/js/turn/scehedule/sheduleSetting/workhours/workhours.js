@@ -6,20 +6,7 @@ $(document).ready(function () {
   $('.workhours-wrapper-content').toggleClass('d-none');
  });
 });
-$(document).ready(function () {
- const DOMElements = document.querySelectorAll('.timepicker-ui');
- const options = {
-  clockType: '24h',
-  theme: 'basic',
-  mobile: 'true',
-  enableScrollbar: 'true',
- };
- DOMElements.forEach((element) => {
-  const newTimepicker = new window.tui.TimepickerUI(element, options);
-  newTimepicker.create();
- });
- // Initialize Select2 on existing selects
-});
+;
 // cod for day bage active
 document.addEventListener('DOMContentLoaded', function () {
  // پیدا کردن همه اسپن‌هایی که کلاس badge-time-styles دارند  
