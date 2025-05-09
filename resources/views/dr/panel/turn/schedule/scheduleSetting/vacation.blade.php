@@ -1,15 +1,6 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
-  <style>
-    .timepicker-ui-wrapper.mobile {
-      direction: ltr !important;
-    }
 
-    input::placeholder {
-      color: #c3c3c3 !important;
-      font-size: 14px !important;
-    }
-  </style>
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
     rel="stylesheet" />
@@ -33,7 +24,7 @@
             <p class="alert alert-warning font-size-13 fw-bold mt-2">شما می‌توانید برای ساعاتی که طبق ساعت کاری
               خود حضور ندارید، مرخصی اعمال کنید.</p>
             <div class="w-100">
-              <button data-toggle="modal" data-bs-target="#exampleModalCenterAddVacation"
+              <button data-bs-toggle="modal" data-bs-target="#exampleModalCenterAddVacation"
                 class="h-50 w-100 btn btn-outline-primary" tabindex="0" type="button" id=":r18:">اضافه کردن
                 مرخصی<span class=""></span>
               </button>

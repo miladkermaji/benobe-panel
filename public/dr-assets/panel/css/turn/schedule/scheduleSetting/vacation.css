@@ -1,358 +1,445 @@
+:root {
+  --primary: #2E86C1;
+  --primary-light: #84CAF9;
+  --secondary: #1DEB3C;
+  --secondary-hover: #15802A;
+  --background-light: #F0F8FF;
+  --background-card: #FFFFFF;
+  --text-primary: #000000;
+  --text-secondary: #707070;
+  --border-neutral: #E5E7EB;
+  --shadow: rgba(0, 0, 0, 0.06);
+  --shadow-hover: rgba(46, 134, 193, 0.15);
+  --gradient-primary: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  --radius-card: 0.75rem;
+  --radius-card-small: 0.375rem;
+  --radius-circle: 9999px;
+}
+
 body {
-    direction: rtl;
-    background-color: #f9fafb;
-    font-family: "Vazir", sans-serif;
-    overflow-x: hidden;
+  direction: rtl;
+  background-color: var(--background-light);
+  font-family: "Vazir", sans-serif;
+  overflow-x: hidden;
 }
 
 /* استایل کلی صفحه */
 .vacation-content {
-    padding: 30px 15px;
-    max-width: 960px; /* عرض بهینه‌تر */
-    margin: 0 auto;
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .vacation-wrapper-content {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
-    padding: 20px;
-    width: 100%;
-    max-width: 650px; /* عرض ثابت */
-    animation: fadeIn 0.5s ease-in-out;
+  background: var(--background-card);
+  border-radius: var(--radius-card);
+  box-shadow: 0 0.5rem 1.5625rem var(--shadow);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 700px;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(0.9375rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* هدر و اعلان */
 .muirtl-60hgb7 .fw-bold.text-dark {
-    font-size: 16px;
-    color: #1e293b;
-    margin-bottom: 10px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
 }
 
 .alert-warning {
-    background: #fef3c7;
-    border: 1px solid #fde68a;
-    color: #92400e;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 15px;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  border-radius: var(--radius-card-small);
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 /* دکمه اضافه کردن مرخصی */
 .btn-outline-primary {
-    border: 1px solid #2b6cb0;
-    color: #2b6cb0;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.3s ease;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: var(--radius-card-small);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  width: 100%; /* تمام‌عرض */
+  transition: all 0.3s ease;
 }
 
 .btn-outline-primary:hover {
-    background: #2b6cb0;
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(43, 108, 176, 0.3);
+  background: var(--primary);
+  color: var(--background-card);
+  transform: translateY(-2px);
+  box-shadow: 0 0.25rem 0.75rem var(--shadow-hover);
 }
 
 /* مودال‌ها */
 .modal-content {
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    background: #fff;
+  border-radius: var(--radius-card);
+  border: none;
+  box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.1);
+  background: var(--background-card);
 }
 
 .modal-header {
-    background: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 15px 20px;
-    color: #1e293b;
-    font-weight: 700;
-    font-size: 16px;
+  background: var(--background-light);
+  border-bottom: 1px solid var(--border-neutral);
+  padding: 1rem 1.25rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1rem;
 }
 
 .modal-body {
-    padding: 20px;
+  padding: 1.25rem;
 }
 
 .modal-footer {
-    border-top: 1px solid #e5e7eb;
-    padding: 15px 20px;
+  border-top: 1px solid var(--border-neutral);
+  padding: 1rem 1.25rem;
 }
 
 .close {
-    font-size: 20px;
-    color: #64748b;
-    opacity: 1;
-    transition: all 0.3s ease;
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  opacity: 1;
+  transition: all 0.3s ease;
 }
 
 .close:hover {
-    color: #2b6cb0;
-    transform: rotate(90deg);
+  color: var(--primary);
+  transform: rotate(90deg);
 }
 
 /* فرم‌ها */
 .form-control {
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    padding: 10px 12px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #2d3748;
-    transition: all 0.3s ease;
+  border-radius: var(--radius-card-small);
+  border: 1px solid var(--border-neutral);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  width: 100%; /* تمام‌عرض */
+  transition: all 0.3s ease;
 }
 
 .form-control:focus {
-    border-color: #2b6cb0;
-    box-shadow: 0 0 6px rgba(43, 108, 176, 0.2);
-    outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0.375rem rgba(43, 108, 176, 0.2);
+  outline: none;
 }
 
 .form-control::placeholder {
-    color: #c3c3c3;
-    font-size: 13px; /* کمی کوچکتر برای هماهنگی */
+  color: #c3c3c3;
+  font-size: 0.875rem;
 }
 
 .label-top-input-special-takhasos {
-    position: absolute;
-    top: -10px;
-    right: 0px;
-    background: #fff;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #2d3748;
-    font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    z-index: 200;
+  position: absolute;
+  top: -0.625rem;
+  right: 0.5rem;
+  background: var(--background-card);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-card-small);
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: 0 0.0625rem 0.1875rem var(--shadow);
+  z-index: 200;
 }
 
 .form-check-label {
-    font-size: 13px;
-    color: #2d3748;
-    margin-right: 8px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-right: 0.5rem;
 }
 
 .form-check-input {
-    margin-top: 4px;
+  margin-top: 0.25rem;
 }
 
 /* دکمه ثبت */
 .my-btn-primary {
-    background: #2b6cb0;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #fff;
-    transition: all 0.3s ease;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius-card-small);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--background-card);
+  width: 100%; /* تمام‌عرض */
+  transition: all 0.3s ease;
 }
 
 .my-btn-primary:hover {
-    background: #1e497b;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(43, 108, 176, 0.3);
+  background: #1e497b;
+  transform: translateY(-2px);
+  box-shadow: 0 0.25rem 0.75rem var(--shadow-hover);
 }
 
 .loader {
-    width: 20px;
-    height: 20px;
-    border: 3px solid #fff;
-    border-top: 3px solid transparent;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 8px;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 0.1875rem solid var(--background-card);
+  border-top: 0.1875rem solid transparent;
+  border-radius: var(--radius-circle);
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* فیلترها */
 #filter-year,
 #filter-month {
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    padding: 8px 12px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #2d3748;
-    background: #fff;
-    transition: all 0.3s ease;
+  border-radius: var(--radius-card-small);
+  border: 1px solid var(--border-neutral);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--background-card);
+  width: 100%; /* تمام‌عرض */
+  transition: all 0.3s ease;
 }
 
 #filter-year:focus,
 #filter-month:focus {
-    border-color: #2b6cb0;
-    box-shadow: 0 0 6px rgba(43, 108, 176, 0.2);
-    outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0.375rem rgba(43, 108, 176, 0.2);
+  outline: none;
+}
+
+/* چیدمان فیلترها */
+.d-flex.gap-4 {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
 }
 
 /* لیست مرخصی‌ها */
 .vacation-list {
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    min-height: 200px;
-    max-height: 400px;
-    background: #f9fafb;
-    overflow-y: auto;
-    padding: 10px;
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--radius-card);
+  min-height: 12.5rem;
+  max-height: 25rem;
+  background: var(--background-light);
+  overflow-y: auto;
+  padding: 0.75rem;
 }
 
 .has-list-vacation {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    margin: 8px 0;
-    padding: 15px;
-    background: #fff;
-    transition: all 0.3s ease;
-    height: auto; /* حذف h-24 برای انعطاف‌پذیری */
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--radius-card-small);
+  margin: 0.5rem 0;
+  padding: 1rem;
+  background: var(--background-card);
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .has-list-vacation:hover {
-    background: #dbeafe;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(43, 108, 176, 0.1);
+  background: var(--gradient-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 0.25rem 0.75rem var(--shadow-hover);
+  color: #fff !important;
+}
+
+.has-list-vacation:hover .text-dark.fw-bold,
+.has-list-vacation:hover .text-black {
+  color: var(--background-card);
 }
 
 .has-list-vacation .text-dark.fw-bold {
-    font-size: 14px;
-    color: #1e293b;
+  font-size: 0.875rem;
+  color: var(--text-primary);
 }
 
 .has-list-vacation .text-black {
-    font-size: 13px;
-    color: #2d3748;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
 }
 
 /* دکمه‌های ویرایش و حذف */
 .btn-light.btn-sm {
-    padding: 6px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
+  padding: 0.375rem;
+  border-radius: var(--radius-circle);
+  transition: all 0.3s ease;
 }
 
 .btn-light.btn-sm:hover {
-    background: #2b6cb0;
+  background: var(--primary);
 }
 
 .btn-light.btn-sm:hover svg path {
-    fill: #fff; /* تغییر رنگ آیکون در هاور */
+  fill: var(--background-card);
 }
 
 .edit-vacation-btn svg {
-    width: 16px;
-    height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 
 .delete-vacation-btn svg {
-    width: 18px;
-    height: 18px;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .delete-vacation-btn:hover svg path {
-    fill: #ef4444; /* قرمز در هاور دکمه حذف */
+  fill: #ef4444;
 }
 
 /* پیام خالی */
 .nothing-vacation .fw-bold.text-dark {
-    font-size: 14px;
-    color: #64748b;
-    padding: 20px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding: 1.25rem;
+  text-align: center;
+}
+
+/* رفع مشکل جهت‌گیری در timepicker */
+.timepicker-ui-wrapper.mobile {
+  direction: ltr !important;
 }
 
 /* ریسپانسیو */
+@media only screen and (max-width: 991px) {
+  .vacation-wrapper-content {
+    padding: 1rem;
+    max-width: 100%;
+  }
+  .muirtl-60hgb7 .fw-bold.text-dark {
+    font-size: 0.9375rem;
+  }
+  .alert-warning {
+    font-size: 0.8125rem;
+  }
+  .btn-outline-primary,
+  .my-btn-primary {
+    font-size: 0.8125rem;
+    padding: 0.625rem 1rem;
+  }
+  .form-control,
+  #filter-year,
+  #filter-month {
+    font-size: 0.8125rem;
+    padding: 0.625rem 0.875rem;
+  }
+  .d-flex.gap-4 {
+    gap: 0.5rem;
+  }
+}
+
 @media only screen and (max-width: 768px) {
-    .vacation-wrapper-content {
-        padding: 15px;
-        margin: 0 15px;
-    }
-    .btn-outline-primary,
-    .my-btn-primary {
-        font-size: 13px;
-        padding: 10px 15px;
-    }
-    .form-control,
-    #filter-year,
-    #filter-month {
-        font-size: 12px;
-        padding: 8px 10px;
-    }
-    .has-list-vacation {
-        padding: 12px;
-    }
-    .muirtl-60hgb7 .fw-bold.text-dark {
-        font-size: 15px;
-    }
-    .alert-warning {
-        font-size: 12px;
-    }
+  .vacation-content {
+    padding: 1.5rem 0.1rem;
+  }
+  .vacation-wrapper-content {
+    padding: 0.1rem;
+    margin: 0 0.1rem;
+  }
+  .has-list-vacation {
+    padding: 0.75rem;
+    align-items: flex-start;
+  }
+  .muirtl-60hgb7 .fw-bold.text-dark {
+    font-size: 0.875rem;
+  }
+  .alert-warning {
+    font-size: 0.75rem;
+  }
+  .form-control,
+  #filter-year,
+  #filter-month {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .label-top-input-special-takhasos {
+    font-size: 0.6875rem;
+    top: -0.5rem;
+    right: 0.375rem;
+  }
+  .vacation-list {
+    min-height: 10rem;
+    max-height: 20rem;
+  }
 }
 
 @media only screen and (max-width: 425px) {
-    .vacation-content {
-        padding: 20px 10px;
-    }
-    .vacation-wrapper-content {
-        padding: 10px;
-        margin: 0 10px;
-    }
-    .d-flex.gap-4 {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .btn-outline-primary,
-    .my-btn-primary {
-        font-size: 12px;
-        padding: 8px 12px;
-    }
-    .form-control,
-    #filter-year,
-    #filter-month {
-        font-size: 11px;
-        padding: 6px 8px;
-    }
-    .label-top-input-special-takhasos {
-        font-size: 11px;
-        top: -8px;
-        right: 8px;
-    }
-    .alert-warning {
-        font-size: 11px;
-    }
-    .muirtl-60hgb7 .fw-bold.text-dark {
-        font-size: 14px;
-    }
-    .has-list-vacation .text-dark.fw-bold {
-        font-size: 13px;
-    }
-    .has-list-vacation .text-black {
-        font-size: 12px;
-    }
-    .vacation-list {
-        min-height: 150px;
-        max-height: 300px;
-    }
+  .vacation-content {
+    padding: 1rem 0.5rem;
+  }
+  .p-3{
+    padding: 0.2rem !important;
+
+  }
+  .vacation-wrapper-content {
+    margin: 0 0.1rem;
+  }
+  .btn-outline-primary,
+  .my-btn-primary {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .form-control,
+  #filter-year,
+  #filter-month {
+    font-size: 0.6875rem;
+    padding: 0.375rem 0.5rem;
+  }
+  .label-top-input-special-takhasos {
+    font-size: 0.625rem;
+    top: -0.375rem;
+    right: 0.25rem;
+  }
+  .alert-warning {
+    font-size: 0.6875rem;
+  }
+  .muirtl-60hgb7 .fw-bold.text-dark {
+    font-size: 0.8125rem;
+  }
+  .has-list-vacation .text-dark.fw-bold {
+    font-size: 0.8125rem;
+  }
+  .has-list-vacation .text-black {
+    font-size: 0.75rem;
+  }
+  .vacation-list {
+    min-height: 9.375rem;
+    max-height: 18.75rem;
+  }
+  .has-list-vacation:hover {
+    transform: scale(1);
+    box-shadow: 0 0.125rem 0.375rem var(--shadow-hover);
+  }
+  .d-flex.gap-4 {
+    gap: 0.3rem;
+  }
 }
