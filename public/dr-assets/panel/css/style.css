@@ -49,11 +49,11 @@
     background-color: var(--gradient-primary);
     color: #fff !important;
 }
-.btn-outline-primary{
+.btn-outline-primary {
     border-color: var(--primary) !important;
     color: var(--primary) !important;
 }
-.btn-outline-primary:hover{
+.btn-outline-primary:hover {
     background: var(--gradient-primary);
     color: #fff !important;
 }
@@ -605,7 +605,11 @@ svg {
 }
 .sidebar__nav {
     width: 250px;
-    background: linear-gradient(180deg, #fefefe 0%, #f9fbff 100%); /* گرادیان سفید ملایم */
+    background: linear-gradient(
+        180deg,
+        #fefefe 0%,
+        #f9fbff 100%
+    ); /* گرادیان سفید ملایم */
     backdrop-filter: blur(2px); /* بلور خیلی کم برای نرمی */
     height: 100vh;
     position: fixed;
@@ -1071,7 +1075,7 @@ svg {
     margin-right: 250px;
     transition: all 200ms ease;
 }
-.h-30{
+.h-30 {
     height: 30px !important;
 }
 .content.is-active {
@@ -1663,6 +1667,12 @@ span.tagRemove:hover {
         margin-bottom: 5px;
     }
 }
+@media (max-width: 425px) {
+    .modal-content{
+        max-width: 100% !important;
+        border-radius: 10px !important;
+    }
+}
 
 @media (max-width: 346px) {
     .dropdown__notification {
@@ -1879,7 +1889,7 @@ span.tagRemove:hover {
     transform: rotate(-180deg);
     top: 37%;
 }
-.sidebar__scrollable ol ul{
+.sidebar__scrollable ol ul {
     padding-right: 0 !important;
 }
 .t-header-search-content {
@@ -2142,7 +2152,9 @@ span.tagRemove:hover {
     -webkit-box-align: center;
     align-items: center;
 }
-
+.modal-header {
+    border-radius: 20px !important;
+}
 .content .posts .card-body img {
     width: 23px;
     height: 23px;

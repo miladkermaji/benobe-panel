@@ -1,113 +1,8 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <style>
-    .field-wrapper {
-      position: relative;
-    }
+  <link type="text/css" href="{{ asset('dr-assets/panel/css/secretary/secretaries.css') }}" rel="stylesheet" />
 
-    .field-wrapper.has-error .label-top-input-special-takhasos {
-      position: absolute;
-      bottom: 56px;
-      /* موقعیت پیش‌فرض برای لیبل‌ها در صورت وجود خطا */
-    }
-
-    .label-top-input-special-takhasos {
-      min-height: 10px;
-      min-width: 20px;
-      background-color: #fff;
-      box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px,
-        rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
-      border-radius: 4px;
-      position: absolute;
-      z-index: 2;
-      padding: 2px;
-      font-weight: bold;
-      right: inherit;
-      font-size: 12px;
-      bottom: 58px;
-    }
-
-    .field-wrapper.has-error .error-message {
-      display: block;
-    }
-
-    /* اگر ردیف اول خطا داشته باشد، لیبل‌های هر دو فیلد (نام و نام خانوادگی) جابه‌جا شوند */
-    .upper-row.upper-row-error .field-first_name .label-top-input-special-takhasos,
-    .upper-row.upper-row-error .field-last_name .label-top-input-special-takhasos {
-      position: absolute;
-      bottom: 56px !important;
-    }
-
-    /* تنظیم موقعیت لیبل‌های پایینی فقط وقتی هر دو فیلد بالایی (نام و نام خانوادگی) خطا داشته باشند */
-    .both-upper-fields-error .field-row .field-national_code .label-top-input-special-takhasos {
-      position: absolute;
-      bottom: 58px !important;
-    }
-
-    .both-upper-fields-error .field-row .field-gender .sex-label {
-      position: absolute;
-      bottom: 58px !important;
-    }
-
-    .both-upper-fields-error .field-mobile .mobile-label {
-      position: absolute;
-      bottom: 56px !important;
-    }
-
-    .both-upper-fields-error .field-password .password-label {
-      position: absolute;
-      bottom: 32px !important;
-    }
-
-    /* تنظیم موقعیت لیبل‌های پایینی بر اساس خطاهای دیگر */
-    .field-national_code.has-error~.field-gender .sex-label {
-      position: absolute;
-      bottom: 58px !important;
-    }
-
-    .field-national_code.has-error~.field-mobile .mobile-label,
-    .field-gender.has-error~.field-mobile .mobile-label {
-      position: absolute;
-      bottom: 56px !important;
-    }
-
-    .field-national_code.has-error~.field-password .password-label,
-    .field-gender.has-error~.field-password .password-label,
-    .field-mobile.has-error~.field-password .password-label {
-      position: absolute;
-      bottom: 32px !important;
-    }
-
-    /* تنظیم موقعیت لیبل کلمه عبور در صورت وجود خطا در خودش */
-    .field-password.has-error .password-label {
-      position: absolute;
-      bottom: 32px !important;
-    }
-
-    /* استایل‌های جدول */
-    .table-modern th,
-    .table-modern td {
-      vertical-align: middle;
-      text-align: center;
-    }
-
-    .table-modern .btn-sm {
-      padding: 5px;
-      margin: 0 2px;
-    }
-
-    .table-modern {
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .table-modern thead {
-      background-color: #007bff;
-      color: white;
-    }
-  </style>
 @endsection
 
 @section('site-header')
@@ -264,8 +159,8 @@
     <div class="p-3">
       <h4 class="text-dark fw-bold">لیست منشی‌ها</h4>
     </div>
-    <div class="mt-2">
-      <table class="table table-modern table-striped table-bordered table-hover" id="secretary-list">
+    <div class="mt-2 table-responsive">
+      <table class="table table-modern table-hover" id="secretary-list">
         <thead>
           <tr>
             <th>ردیف</th>
