@@ -46,7 +46,7 @@
                 </div>
                 <!-- انواع مشاوره -->
                 <div class="mt-3">
-                  <div class="d-flex flex-wrap justify-content-start mt-2 gap-40 bg-light p-3">
+                  <div class="d-flex flex-wrap justify-content-start mt-2 gap-40 bg-light p-3 counseling-types-wrapper">
                     <x-my-check :isChecked="$has_phone_counseling" id="phone-counseling" day="مشاوره تلفنی"
                       model="has_phone_counseling" />
                     <x-my-check :isChecked="$has_text_counseling" id="text-counseling" day="مشاوره متنی" model="has_text_counseling" />
@@ -80,39 +80,41 @@
                       </x-custom-tooltip>
                     </div>
                   </div>
-                  <div class="row mt-3 w-100">
-                    <div class="col-md-6">
-                      <div class="input-group position-relative">
-                        <span class="input-group-text">15 دقیقه</span>
-                        <input type="tel" class="form-control numberkey ltr text-center border-radius-0"
-                          style="height: 50px;" wire:model.live="price_15min">
-                        <span class="input-group-text">تومان</span>
+                  <div class="taerafe-wrapper">
+                    <div class="row mt-3 w-100">
+                      <div class="col-md-6">
+                        <div class="input-group position-relative">
+                          <span class="input-group-text">15 دقیقه</span>
+                          <input type="tel" class="form-control numberkey ltr text-center border-radius-0"
+                            style="height: 50px;" wire:model.live="price_15min">
+                          <span class="input-group-text">تومان</span>
+                        </div>
+                      </div>
+                      <div class="col-md-6 therty-min-768">
+                        <div class="input-group position-relative">
+                          <span class="input-group-text">30 دقیقه</span>
+                          <input type="tel" class="form-control numberkey ltr text-center border-radius-0"
+                            style="height: 50px;" wire:model.live="price_30min">
+                          <span class="input-group-text">تومان</span>
+                        </div>
                       </div>
                     </div>
-                    <div class="col-md-6 therty-min-768">
-                      <div class="input-group position-relative">
-                        <span class="input-group-text">30 دقیقه</span>
-                        <input type="tel" class="form-control numberkey ltr text-center border-radius-0"
-                          style="height: 50px;" wire:model.live="price_30min">
-                        <span class="input-group-text">تومان</span>
+                    <div class="row mt-3">
+                      <div class="col-md-6">
+                        <div class="input-group position-relative">
+                          <span class="input-group-text">45 دقیقه</span>
+                          <input type="tel" class="form-control numberkey ltr text-center border-radius-0"
+                            style="height: 50px;" wire:model.live="price_45min">
+                          <span class="input-group-text">تومان</span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div class="row mt-3">
-                    <div class="col-md-6">
-                      <div class="input-group position-relative">
-                        <span class="input-group-text">45 دقیقه</span>
-                        <input type="tel" class="form-control numberkey ltr text-center border-radius-0"
-                          style="height: 50px;" wire:model.live="price_45min">
-                        <span class="input-group-text">تومان</span>
-                      </div>
-                    </div>
-                    <div class="col-md-6 sixty-min-768">
-                      <div class="input-group position-relative">
-                        <span class="input-group-text">60 دقیقه</span>
-                        <input type="tel" class="form-control numberkey ltr text-center border-radius-0"
-                          style="height: 50px;" wire:model.live="price_60min">
-                        <span class="input-group-text">تومان</span>
+                      <div class="col-md-6 sixty-min-768">
+                        <div class="input-group position-relative">
+                          <span class="input-group-text">60 دقیقه</span>
+                          <input type="tel" class="form-control numberkey ltr text-center border-radius-0"
+                            style="height: 50px;" wire:model.live="price_60min">
+                          <span class="input-group-text">تومان</span>
+                        </div>
                       </div>
                     </div>
                   </div>
