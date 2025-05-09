@@ -24,7 +24,7 @@
       </div>
       <div class="card-body">
         <div class="d-flex justify-content-end mb-3">
-          <button class="btn my-btn-primary h-50" data-toggle="modal" data-bs-target="#addUserModal">افزودن
+          <button class="btn my-btn-primary h-50" data-bs-toggle="modal" data-bs-target="#addUserModal">افزودن
             کاربر</button>
         </div>
         <div class="table-responsive">
