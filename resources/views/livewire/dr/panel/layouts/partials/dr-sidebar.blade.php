@@ -226,9 +226,9 @@
             </li>
           </ul>
         </li>
-        <li class="item-li i-checkout__request {{ Request::routeIs('dr-bime') ? 'is-active' : '' }}">
+       {{--  <li class="item-li i-checkout__request {{ Request::routeIs('dr-bime') ? 'is-active' : '' }}">
           <a href="{{ route('dr-bime') }}">بیمه‌ها</a>
-        </li>
+        </li> --}}
         <li class="item-li i-checkout__request {{ Request::routeIs('dr-secretary-permissions') ? 'is-active' : '' }}">
           <a href="{{ route('dr-secretary-permissions') }}">دسترسی‌ها</a>
         </li>
