@@ -10,7 +10,7 @@
         <h5 class="mb-0 fw-bold">مدارک من</h5>
       </div>
       <a href="{{ route('dr-clinic-management') }}"
-        class="btn btn-outline-light btn-sm rounded-pill d-flex align-items-center gap-2 text-white hover:shadow-md transition-all text-white">
+        class="btn btn-outline-light btn-sm rounded-pill d-flex align-items-center gap- hover:shadow-md transition-all text-white">
         <svg width="16" style="transform: rotate(180deg)" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">
           <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -65,7 +65,7 @@
                     </p>
                     <div class="d-flex justify-content-center gap-2">
                       @if (str_starts_with($document->file_type, 'image'))
-                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" data-toggle="modal"
+                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" data-bs-toggle="modal"
                           data-bs-target="#previewModal" data-image="{{ asset(Storage::url($document->file_path)) }}"
                           data-title="{{ $document->title ?? 'مدرک بدون عنوان' }}">
                           مشاهده

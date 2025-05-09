@@ -13,11 +13,11 @@
 @section('bread-crumb-title', 'مدیریت کاربران مسدود')
 @include('dr.panel.my-tools.loader-btn')
 <div class="blocking_users_content">
-  <div class="container-fluid mt-4">
+  <div class="container-fluid">
     <!-- جدول کاربران مسدود -->
     <div class="">
       <div class="card-header">
-        <h5 class="mb-0">مدیریت کاربران مسدود</h5>
+        <h5 class="mb-0 fw-bold">مدیریت کاربران مسدود</h5>
       </div>
       <div class="card-body">
         <div class="d-flex justify-content-end mb-3">
@@ -25,7 +25,7 @@
             کاربر</button>
         </div>
         <div class="table-responsive">
-          <table id="blockedUsersTable" class="table table-striped table-bordered text-center">
+          <table id="blockedUsersTable" class="table text-center">
             <thead>
               <tr>
                 <th>نام کاربر</th>
@@ -71,11 +71,11 @@
     <!-- جدول پیام‌های ارسالی -->
     <div class="mt-4">
       <div class="card-header">
-        <h5 class="mb-0">لیست پیام‌های ارسالی</h5>
+        <h5 class="mb-0 fw-bold">لیست پیام‌های ارسالی</h5>
       </div>
       <div class="card-body">
         <div class="table-responsive">
-          <table id="messagesTable" class="table table-striped table-bordered text-center">
+          <table id="messagesTable" class="table text-center">
             <thead>
               <tr>
                 <th>عنوان پیام</th>
