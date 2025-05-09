@@ -220,44 +220,91 @@ class MySpecialDaysCounselingController extends Controller
     public function getAppointmentsCountPerDay(Request $request)
     {
         try {
-            // دریافت شناسه پزشک یا منشی
-            $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-            $selectedClinicId = $request->input('selectedClinicId'); // کلینیک انتخابی
+            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+            $selectedClinicId = $request->input('selectedClinicId');
 
-            // استخراج تعداد نوبت‌های هر روز با شرط خاص برای 'default'
+
+            // دریافت تنظیمات تقویم
+            $appointmentConfig = DoctorCounselingConfig::where('doctor_id', $doctorId)
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->first();
+
+            $calendarDays = $appointmentConfig ? $appointmentConfig->calendar_days : 30;
+
+            // دریافت روزهای کاری
+            $workSchedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
+                ->where('is_working', true)
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->pluck('day')
+                ->toArray();
+
+            // دریافت تعداد نوبت‌ها
             $appointments = DB::table('counseling_appointments')
                 ->select(DB::raw('appointment_date, COUNT(*) as appointment_count'))
                 ->where('doctor_id', $doctorId)
                 ->where('status', 'scheduled')
-                ->whereNull('deleted_at') // فیلتر برای نوبت‌های فعال
+                ->whereNull('deleted_at')
                 ->when($selectedClinicId === 'default', function ($query) use ($doctorId) {
-                    // در صورت 'default' فقط نوبت‌های بدون کلینیک (clinic_id = NULL) مرتبط با پزشک
                     $query->whereNull('clinic_id')->where('doctor_id', $doctorId);
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    // در صورت ارسال کلینیک خاص
                     $query->where('clinic_id', $selectedClinicId);
                 })
                 ->groupBy('appointment_date')
                 ->get();
 
-            // قالب‌بندی داده‌ها
             $data = $appointments->map(function ($item) {
                 return [
-                    'appointment_date'  => $item->appointment_date,
+                    'appointment_date' => $item->appointment_date,
                     'appointment_count' => $item->appointment_count,
                 ];
-            });
+            })->toArray();
+
+            // دریافت تنظیمات نوبت‌دهی
+            $appointmentSettings = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
+                ->where('is_working', true)
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->select('day', 'appointment_settings')
+                ->get()
+                ->map(function ($schedule) {
+                    return [
+                        'day' => $schedule->day,
+                        'settings' => $schedule->appointment_settings ? json_decode($schedule->appointment_settings, true) : [],
+                    ];
+                })
+                ->toArray();
 
             return response()->json([
                 'status' => true,
-                'data'   => $data,
+                'data' => $data,
+                'working_days' => $workSchedules,
+                'calendar_days' => $calendarDays,
+                'appointment_settings' => $appointmentSettings,
             ]);
         } catch (\Exception $e) {
+
             return response()->json([
-                'status'  => false,
+                'status' => false,
                 'message' => 'خطا در دریافت داده‌ها',
-                'error'   => $e->getMessage(), // نمایش پیام خطا برای دیباگ بهتر
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

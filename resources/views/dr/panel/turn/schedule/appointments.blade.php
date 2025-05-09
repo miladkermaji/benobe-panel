@@ -19,6 +19,7 @@
 
 @endonce
 @once
+<script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar-row.js') }}"></script>
 
   <script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
 @endonce

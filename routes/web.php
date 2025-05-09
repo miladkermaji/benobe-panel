@@ -91,17 +91,17 @@ Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('manager')
     ->group(function () {
-    Route::prefix('clinic-deposit-settings')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'index'])->name('admin.panel.clinic-deposit-settings.index');
-        Route::get('/create', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'create'])->name('admin.panel.clinic-deposit-settings.create');
-        Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'edit'])->name('admin.panel.clinic-deposit-settings.edit');
-    });
+        Route::prefix('clinic-deposit-settings')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'index'])->name('admin.panel.clinic-deposit-settings.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'create'])->name('admin.panel.clinic-deposit-settings.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'edit'])->name('admin.panel.clinic-deposit-settings.edit');
+        });
 
-Route::prefix('doctor-wallets')->group(function () {
+        Route::prefix('doctor-wallets')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'index'])->name('admin.panel.doctor-wallets.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'create'])->name('admin.panel.doctor-wallets.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'edit'])->name('admin.panel.doctor-wallets.edit');
-});
+        });
 
         Route::prefix('blogs')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Blogs\BlogsController::class, 'index'])->name('admin.panel.blogs.index');
@@ -418,6 +418,9 @@ Route::prefix('dr')
 
             Route::post('appointments/{id}/end-visit-counseling', [MoshavereWaitingController::class, 'endVisit'])->name('doctor.end-visit-counseling');
 
+            Route::get('/search-appointments-counseling', [MoshavereWaitingController::class, 'searchAppointments'])->middleware('secretary.permission:appointments')->name('search.appointments.counseling');
+
+
             Route::post('appointments/{id}/end-visit', [DrScheduleController::class, 'endVisit'])->name('doctor.end-visit');
 
 
@@ -563,8 +566,8 @@ Route::prefix('dr')
 
                     Route::post('/doctor/update-work-schedule-counseling', [MySpecialDaysCounselingController::class, 'updateWorkSchedule'])->name('doctor.update_work_schedule_counseling');
                     Route::get('/appointments-count', [ScheduleSettingController::class, 'getAppointmentsCountPerDay'])->middleware('secretary.permission:appointments')->name('appointments.count');
-                    
-Route::get('/work-days-and-config', [ScheduleSettingController::class, 'getWorkDaysAndConfig'])->name('work.days.config');
+
+                    Route::get('/work-days-and-config', [ScheduleSettingController::class, 'getWorkDaysAndConfig'])->name('work.days.config');
 
                     Route::get('/appointments-count-counseling', [MySpecialDaysCounselingController::class, 'getAppointmentsCountPerDay'])->middleware('secretary.permission:appointments')->name('appointments.count.counseling');
                     Route::get('/appointments/by-date', [ScheduleSettingController::class, 'getAppointmentsByDate'])->middleware('secretary.permission:appointments')->name('appointments.by_date');
@@ -604,7 +607,7 @@ Route::get('/work-days-and-config', [ScheduleSettingController::class, 'getWorkD
                 Route::prefix('Counseling')->group(function () {
                     Route::get('/consult-term', [ConsultTermController::class, 'index'])->middleware('secretary.permission:appointments')->name('consult-term.index');
                 });
-                
+
                 Route::post('/update-auto-schedule', [DrScheduleController::class, 'updateAutoSchedule'])->middleware('secretary.permission:appointments')->name('update-auto-schedule');
                 Route::get('/check-auto-schedule', [DrScheduleController::class, 'checkAutoSchedule'])->middleware('secretary.permission:appointments')->name('check-auto-schedule');
                 Route::get('get-available-times', [DrScheduleController::class, 'getAvailableTimes'])->middleware('secretary.permission:appointments')->name('getAvailableTimes');

@@ -43,6 +43,89 @@ class MoshavereWaitingController extends Controller
 
         return view("dr.panel.turn.schedule.moshavere_waiting.index", compact('totalPatientsToday', 'visitedPatients', 'remainingPatients'));
     }
+    public function searchAppointments(Request $request)
+    {
+        $request->validate([
+            'date'             => 'nullable|string',
+            'user_mobile'      => 'nullable|string',
+            'user_name'        => 'nullable|string',
+            'user_national_id' => 'nullable|string',
+            'selectedClinicId' => 'nullable|string',
+        ]);
+
+        $date             = $request->input('date');
+        $userMobile       = $request->input('user_mobile');
+        $userName         = $request->input('user_name');
+        $userNationalId   = $request->input('user_national_id');
+        $selectedClinicId = $request->input('selectedClinicId');
+        $doctorId         = auth('doctor')->user()->id;
+
+        $gregorianDate = null;
+        if ($date) {
+            $dateParts = explode(' ', str_replace('  ', ' ', $date));
+            if (count($dateParts) === 3) {
+                list($day, $monthName, $year) = $dateParts;
+                $monthNames                   = [
+                    'فروردین'  => 1,
+                    'اردیبهشت' => 2,
+                    'خرداد'    => 3,
+                    'تیر'      => 4,
+                    'مرداد'    => 5,
+                    'شهریور'   => 6,
+                    'مهر'      => 7,
+                    'آبان'     => 8,
+                    'آذر'      => 9,
+                    'دی'       => 10,
+                    'بهمن'     => 11,
+                    'اسفند'    => 12,
+                ];
+                if (isset($monthNames[$monthName])) {
+                    $month = $monthNames[$monthName];
+                    // استفاده از Jalalian به جای Verta
+                    $gregorianDate = Jalalian::fromFormat('Y/m/d', "$year/$month/$day")->toCarbon()->format('Y-m-d');
+                }
+            }
+        }
+
+        $appointments = CounselingAppointment::with('patient')
+            ->where('doctor_id', $doctorId)
+            ->when($selectedClinicId === 'default', function ($query) {
+                return $query->whereNull('clinic_id');
+            })
+            ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                return $query->where('clinic_id', $selectedClinicId);
+            })
+            ->when($gregorianDate, function ($query) use ($gregorianDate) {
+                return $query->where('appointment_date', $gregorianDate);
+            })
+            ->when($userMobile, function ($query, $userMobile) {
+                return $query->whereHas('patient', function ($query) use ($userMobile) {
+                    $query->where('mobile', 'like', '%' . $userMobile . '%');
+                });
+            })
+            ->when($userName, function ($query, $userName) {
+                return $query->whereHas('patient', function ($query) use ($userName) {
+                    $query->where(function ($query) use ($userName) {
+                        $query->where('first_name', 'like', '%' . $userName . '%')
+                            ->orWhere('last_name', 'like', '%' . $userName . '%');
+                    });
+                });
+            })
+            ->when($userNationalId, function ($query, $userNationalId) {
+                return $query->whereHas('patient', function ($query) use ($userNationalId) {
+                    $query->where('national_code', 'like', '%' . $userNationalId . '%');
+                });
+            })
+            ->paginate(10);
+
+        return response()->json([
+            'data'         => $appointments->items(),
+            'current_page' => $appointments->currentPage(),
+            'last_page'    => $appointments->lastPage(),
+            'per_page'     => $appointments->perPage(),
+            'total'        => $appointments->total(),
+        ]);
+    }
     public function getAppointmentsByDateSpecial(Request $request)
     {
         $date = $request->input('date');

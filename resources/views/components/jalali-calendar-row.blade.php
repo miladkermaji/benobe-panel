@@ -35,6 +35,5 @@
 </div>
 
 <script src="{{ asset('dr-assets/panel/js/jquery-easing/1.4.1/jquery.easing.min.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar-row.js') }}"></script>
 
 <meta name="csrf-token" content="{{ csrf_token() }}">

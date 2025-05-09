@@ -1,13 +1,14 @@
 <?php
 namespace App\Models;
 
+use App\Models\User;
 use App\Models\Clinic;
 use App\Models\Doctor;
 use App\Models\Insurance;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Morilog\Jalali\Jalalian;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CounselingAppointment extends Model
 {
@@ -48,20 +49,23 @@ class CounselingAppointment extends Model
     ];
 
     // نوع‌های داده‌ای که باید به صورت تاریخ شناخته شوند
-    protected $dates = [
-        'appointment_date',
-        'reserved_at',
-        'confirmed_at',
-        'deleted_at',
+    protected $casts = [
+        'appointment_date' => 'date',           // تبدیل به Carbon برای تاریخ
+        'appointment_time' => 'datetime:H:i:s', // تبدیل به Carbon برای زمان
     ];
-
-    // رابطه با پزشک
-   public function doctor()
+    public function doctor()
     {
-        return $this->belongsTo(Doctor::class, 'doctor_id')
-            ->with(['specialty']);
+        return $this->belongsTo(Doctor::class);
+    }
+    public function specialty()
+    {
+        return $this->belongsTo(Specialty::class);
     }
 
+    public function clinic()
+    {
+        return $this->belongsTo(Clinic::class);
+    }
     public function patient()
     {
         return $this->belongsTo(User::class, 'patient_id');
@@ -69,61 +73,29 @@ class CounselingAppointment extends Model
 
     public function insurance()
     {
-        return $this->belongsTo(Insurance::class, 'insurance_id');
+        return $this->belongsTo(Insurance::class);
+    }
+    public function pattern()
+    {
+        return $this->belongsTo(AppointmentPattern::class);
+    }
+    public function getJalaliAppointmentDateAttribute()
+    {
+        return Jalalian::fromCarbon($this->appointment_date)->format('Y/m/d');
     }
 
-    public function clinic()
-    {
-        return $this->belongsTo(Clinic::class, 'clinic_id');
-    }
-    /**
-     * وضعیت پرداخت خوانا
-     */
+    // Accessor برای وضعیت پرداخت (اگر وجود داشته باشه)
     public function getPaymentStatusLabelAttribute()
     {
-        return match ($this->payment_status) {
-            'pending'   => 'در انتظار پرداخت',
-            'paid'      => 'پرداخت‌شده',
-            'unpaid'    => 'پرداخت‌نشده',
-            default     => 'نامشخص',
-        };
-    }
-
-    /**
-     * وضعیت مشاوره خوانا
-     */
-    public function getStatusLabelAttribute()
-    {
-        return match ($this->status) {
-            'scheduled' => 'زمان‌بندی‌شده',
-            'cancelled' => 'لغوشده',
-            'attended'  => 'حضور یافته',
-            'missed'    => 'غایب',
-            default     => 'نامشخص',
-        };
-    }
-
-    /**
-     * دامنه عمومی برای مشاوره‌های فعال
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('status', 'scheduled');
-    }
-
-    /**
-     * دامنه عمومی برای مشاوره‌های امروز
-     */
-    public function scopeToday($query)
-    {
-        return $query->whereDate('appointment_date', now()->toDateString());
-    }
-
-    /**
-     * دامنه عمومی برای مشاوره‌های آینده
-     */
-    public function scopeUpcoming($query)
-    {
-        return $query->whereDate('appointment_date', '>', now()->toDateString());
+        switch ($this->payment_status) {
+            case 'paid':
+                return 'پرداخت شده';
+            case 'unpaid':
+                return 'پرداخت نشده';
+            case 'pending':
+                return 'در انتظار پرداخت';
+            default:
+                return 'نامشخص';
+        }
     }
 }
