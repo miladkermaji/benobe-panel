@@ -1,0 +1,246 @@
+:root {
+    --primary: #2e86c1;
+    --primary-light: #84caf9;
+    --secondary: #1deb3c;
+    --secondary-hover: #15802a;
+    --background-light: #f0f8ff;
+    --background-card: #ffffff;
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --border-neutral: #e2e8f0;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    --table-hover: #edf2f7;
+    --radius-button: 0.5rem;
+    --radius-button-large: 0.75rem;
+    --radius-card: 1rem;
+    --transition: all 0.3s ease;
+}
+
+body {
+    direction: rtl;
+    background-color: var(--background-light);
+    font-family: "Vazir", sans-serif;
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.container-fluid {
+    padding: 2rem 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.card {
+    background: var(--background-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 4px 12px var(--shadow-light);
+    border: none;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: var(--gradient-primary);
+    color: #ffffff;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-neutral);
+}
+
+.card-header h5 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 1.25rem;
+    text-align: right;
+    background: var(--background-light);
+}
+
+.table td {
+    padding: 1.25rem;
+    vertical-align: middle;
+    text-align: right;
+    border-bottom: 1px solid var(--border-neutral);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--table-hover);
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.btn-icon:hover {
+    background: var(--primary-light);
+    transform: scale(1.1);
+}
+
+.btn-icon img {
+    width: 24px;
+    height: 24px;
+}
+
+.my-btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-button-large);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    transition: var(--transition);
+}
+
+.my-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(46, 134, 193, 0.4);
+}
+
+.form-select,
+.form-control {
+    height: 48px;
+    border-radius: var(--radius-button);
+    border: 1px solid var(--border-neutral);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    background: #fafafa;
+    transition: var(--transition);
+}
+
+.form-select:focus,
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0.3rem rgba(46, 134, 193, 0.3);
+    background: #ffffff;
+}
+
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: 0.5rem;
+    transition: var(--transition);
+}
+
+.form-check-label {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+.modal-content {
+    border-radius: var(--radius-card);
+    box-shadow: 0 8px 24px var(--shadow-light);
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-neutral);
+    padding: 1rem 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* کارت‌ها برای موبایل */
+.table-card .card {
+    border-radius: var(--radius-card);
+    margin-bottom: 1rem;
+    transition: var(--transition);
+}
+
+.table-card .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.table-card .card-body {
+    padding: 1rem;
+}
+
+/* ریسپانسیو */
+@media (max-width: 1200px) {
+    .container-fluid {
+        padding: 1.5rem 1rem;
+    }
+    .card-header h5 {
+        font-size: 1.125rem;
+    }
+    .table th,
+    .table td {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .container-fluid {
+        padding: 1rem 0.75rem;
+    }
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    .my-btn-primary {
+        width: 100%;
+        font-size: 0.875rem;
+    }
+    .form-select,
+    .form-control {
+        height: 46px;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding: 0.75rem 0.5rem;
+    }
+    .card-header h5 {
+        font-size: 1rem;
+    }
+    .my-btn-primary {
+        font-size: 0.825rem;
+        padding: 0.5rem 1rem;
+    }
+    .form-select,
+    .form-control {
+        height: 44px;
+        font-size: 0.825rem;
+    }
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+}

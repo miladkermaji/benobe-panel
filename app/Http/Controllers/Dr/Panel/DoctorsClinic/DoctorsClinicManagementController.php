@@ -230,18 +230,29 @@ class DoctorsClinicManagementController extends Controller
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $selectedClinicId = $request->input('selectedClinicId', 'default');
 
-            $validated = $request->validate([
-                'deposit_amount' => 'nullable|numeric|min:0',
-                'custom_price' => 'nullable|numeric|min:0',
+            // قوانین اعتبارسنجی پویا
+            $rules = [
                 'is_custom_price' => 'required|boolean',
                 'no_deposit' => 'nullable|boolean',
-            ], [
-                'deposit_amount.numeric' => 'مبلغ بیعانه باید عدد باشد.',
+            ];
+
+            if ($request->is_custom_price && !$request->no_deposit) {
+                $rules['custom_price'] = 'required|numeric|min:0';
+            } elseif (!$request->no_deposit) {
+                $rules['deposit_amount'] = 'required|numeric|min:0';
+            }
+
+            $messages = [
+                'deposit_amount.required' => 'مبلغ بیعانه الزامی است.',
+                'deposit_amount.numeric' => 'مبلغ بیعانه باید یک عدد معتبر باشد.',
                 'deposit_amount.min' => 'مبلغ بیعانه نمی‌تواند منفی باشد.',
-                'custom_price.numeric' => 'مبلغ دلخواه باید عدد باشد.',
+                'custom_price.required' => 'مبلغ دلخواه الزامی است.',
+                'custom_price.numeric' => 'مبلغ دلخواه باید یک عدد معتبر باشد.',
                 'custom_price.min' => 'مبلغ دلخواه نمی‌تواند منفی باشد.',
-                'is_custom_price.required' => 'نوع قیمت الزامی است.',
-            ]);
+                'is_custom_price.required' => 'نوع قیمت (دلخواه یا پیش‌فرض) الزامی است.',
+            ];
+
+            $validated = $request->validate($rules, $messages);
 
             $clinicId = $selectedClinicId === 'default' ? null : $selectedClinicId;
             if ($clinicId && !Clinic::where('id', $clinicId)->where('doctor_id', $doctorId)->exists()) {
@@ -251,7 +262,7 @@ class DoctorsClinicManagementController extends Controller
                 ], 422);
             }
 
-            // بررسی وجود بیعانه قبلی برای این مطب و دکتر
+            // بررسی وجود بیعانه قبلی
             $existingDeposit = ClinicDepositSetting::where('doctor_id', $doctorId)
                 ->where(function ($query) use ($clinicId) {
                     if ($clinicId) {
@@ -269,9 +280,16 @@ class DoctorsClinicManagementController extends Controller
                 ], 422);
             }
 
-            $noDeposit = isset($validated['no_deposit']) ? $validated['no_deposit'] : false;
-            $depositAmount = $noDeposit ? null :
+            $noDeposit = $validated['no_deposit'] ?? false;
+            $depositAmount = $noDeposit ? 0 : // اگر بدون بیعانه باشد، مقدار 0 ذخیره شود
                 ($validated['is_custom_price'] ? $validated['custom_price'] : $validated['deposit_amount']);
+
+            if (!$noDeposit && is_null($depositAmount)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لطفاً مبلغ بیعانه یا قیمت دلخواه را وارد کنید.'
+                ], 422);
+            }
 
             $deposit = ClinicDepositSetting::create([
                 'clinic_id' => $clinicId,
@@ -287,7 +305,6 @@ class DoctorsClinicManagementController extends Controller
                 'message' => 'بیعانه با موفقیت ثبت شد.',
                 'deposit' => $deposit
             ], 201);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -308,12 +325,29 @@ class DoctorsClinicManagementController extends Controller
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $selectedClinicId = $request->input('selectedClinicId', 'default');
 
-            $validated = $request->validate([
-                'deposit_amount' => 'nullable|numeric|min:0',
-                'custom_price' => 'nullable|numeric|min:0',
+            // قوانین اعتبارسنجی پویا
+            $rules = [
                 'is_custom_price' => 'required|boolean',
                 'no_deposit' => 'nullable|boolean',
-            ]);
+            ];
+
+            if ($request->is_custom_price && !$request->no_deposit) {
+                $rules['custom_price'] = 'required|numeric|min:0';
+            } elseif (!$request->no_deposit) {
+                $rules['deposit_amount'] = 'required|numeric|min:0';
+            }
+
+            $messages = [
+                'deposit_amount.required' => 'مبلغ بیعانه الزامی است.',
+                'deposit_amount.numeric' => 'مبلغ بیعانه باید یک عدد معتبر باشد.',
+                'deposit_amount.min' => 'مبلغ بیعانه نمی‌تواند منفی باشد.',
+                'custom_price.required' => 'مبلغ دلخواه الزامی است.',
+                'custom_price.numeric' => 'مبلغ دلخواه باید یک عدد معتبر باشد.',
+                'custom_price.min' => 'مبلغ دلخواه نمی‌تواند منفی باشد.',
+                'is_custom_price.required' => 'نوع قیمت (دلخواه یا پیش‌فرض) الزامی است.',
+            ];
+
+            $validated = $request->validate($rules, $messages);
 
             $deposit = ClinicDepositSetting::where('id', $id)
                 ->where('doctor_id', $doctorId)
@@ -331,9 +365,16 @@ class DoctorsClinicManagementController extends Controller
                 ], 404);
             }
 
-            $noDeposit = isset($validated['no_deposit']) ? $validated['no_deposit'] : false;
-            $depositAmount = $noDeposit ? null :
+            $noDeposit = $validated['no_deposit'] ?? false;
+            $depositAmount = $noDeposit ? 0 : // اگر بدون بیعانه باشد، مقدار 0 ذخیره شود
                 ($validated['is_custom_price'] ? $validated['custom_price'] : $validated['deposit_amount']);
+
+            if (!$noDeposit && is_null($depositAmount)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لطفاً مبلغ بیعانه یا قیمت دلخواه را وارد کنید.'
+                ], 422);
+            }
 
             $deposit->update([
                 'deposit_amount' => $depositAmount,
@@ -345,7 +386,6 @@ class DoctorsClinicManagementController extends Controller
                 'message' => 'بیعانه با موفقیت ویرایش شد.',
                 'deposit' => $deposit
             ]);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
