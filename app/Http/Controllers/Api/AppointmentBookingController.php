@@ -8,14 +8,19 @@ use App\Models\Doctor;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Morilog\Jalali\Jalalian;
+use App\Models\DoctorHoliday;
 use App\Models\InfrastructureFee;
 use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\ClinicDepositSetting;
+use App\Models\SpecialDailySchedule;
 use App\Models\CounselingAppointment;
 use Illuminate\Support\Facades\Cache;
+use App\Models\DoctorCounselingConfig;
+use App\Models\CounselingDailySchedule;
 use App\Models\DoctorAppointmentConfig;
+use App\Models\DoctorCounselingHoliday;
 use App\Models\DoctorCounselingWorkSchedule;
 use Modules\Payment\Services\PaymentService;
 use Modules\Payment\App\Http\Models\Transaction;
@@ -96,7 +101,6 @@ class AppointmentBookingController extends Controller
                 ->where('clinic_id', $mainClinic->id)
                 ->where('is_active', true)
                 ->first();
-
             $depositAmount     = $depositSetting ? $depositSetting->deposit_amount : 0;
             $infrastructureFee = InfrastructureFee::where('appointment_type', $serviceType)
                 ->where('is_active', true)
@@ -131,7 +135,6 @@ class AppointmentBookingController extends Controller
                 'status' => 'success',
                 'data'   => $data,
             ], 200);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'status'  => 'error',
@@ -167,7 +170,6 @@ class AppointmentBookingController extends Controller
                 'appointment_time' => 'required|date_format:H:i',
                 'service_type'     => 'required|in:in_person,phone,text,video',
                 'patient_type'     => 'required|in:self,relative',
-                'user_id'          => 'required_if:patient_type,relative|nullable|integer|exists:users,id',
                 'first_name'       => 'required_if:patient_type,relative|string|max:255',
                 'last_name'        => 'required_if:patient_type,relative|string|max:255',
                 'national_code'    => 'required_if:patient_type,relative|string|size:10|unique:users,national_code',
@@ -182,16 +184,14 @@ class AppointmentBookingController extends Controller
                 'service_type.in'              => 'نوع سرویس باید یکی از مقادیر in_person, phone, text, video باشد.',
                 'patient_type.required'        => 'نوع بیمار الزامی است.',
                 'patient_type.in'              => 'نوع بیمار باید یکی از مقادیر self یا relative باشد.',
-                'user_id.required_if'          => 'آیدی کاربر الزامی است وقتی نوع بیمار relative باشد.',
-                'user_id.exists'               => 'کاربر با این آیدی وجود ندارد.',
-                'first_name.required_if'       => 'نام بیمار الزامی است وقتی نوع بیمار relative باشد و کاربر جدیدی ایجاد می‌کنید.',
+                'first_name.required_if'       => 'نام بیمار الزامی است وقتی نوع بیمار relative باشد.',
                 'first_name.max'               => 'نام بیمار نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-                'last_name.required_if'        => 'نام خانوادگی بیمار الزامی است وقتی نوع بیمار relative باشد و کاربر جدیدی ایجاد می‌کنید.',
+                'last_name.required_if'        => 'نام خانوادگی بیمار الزامی است وقتی نوع بیمار relative باشد.',
                 'last_name.max'                => 'نام خانوادگی بیمار نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-                'national_code.required_if'    => 'کدملی بیمار الزامی است وقتی نوع بیمار relative باشد و کاربر جدیدی ایجاد می‌کنید.',
+                'national_code.required_if'    => 'کدملی بیمار الزامی است وقتی نوع بیمار relative باشد.',
                 'national_code.size'           => 'کدملی بیمار باید دقیقاً 10 رقم باشد.',
                 'national_code.unique'         => 'این کدملی قبلاً ثبت شده است.',
-                'mobile.required_if'           => 'شماره موبایل بیمار الزامی است وقتی نوع بیمار relative باشد و کاربر جدیدی ایجاد می‌کنید.',
+                'mobile.required_if'           => 'شماره موبایل بیمار الزامی است وقتی نوع بیمار relative باشد.',
                 'mobile.max'                   => 'شماره موبایل بیمار نمی‌تواند بیشتر از 15 رقم باشد.',
                 'mobile.unique'                => 'این شماره موبایل قبلاً ثبت شده است.',
                 'email.email'                  => 'ایمیل باید فرمت معتبر داشته باشد.',
@@ -230,151 +230,9 @@ class AppointmentBookingController extends Controller
             // بررسی در دسترس بودن نوبت
             $isSlotAvailable = $this->checkSlotAvailability($doctor, $appointmentDate, $appointmentTime, $serviceType);
             if (! $isSlotAvailable) {
-                // پیدا کردن روز هفته برای پیام خطای دقیق‌تر
-                $appointmentDateCarbon = Carbon::parse($appointmentDate, 'Asia/Tehran');
-                $dayOfWeek = strtolower($appointmentDateCarbon->format('l'));
-
-                // پیدا کردن کلینیک اصلی
-                $mainClinic = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
-
-                // بررسی ساعات کاری
-                $workSchedule = null;
-                if ($serviceType === 'in_person') {
-                    $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
-                        ->where('clinic_id', $mainClinic->id)
-                        ->where('day', $dayOfWeek)
-                        ->first();
-
-                    if (! $workSchedule) {
-                        $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
-                            ->whereNull('clinic_id')
-                            ->where('day', $dayOfWeek)
-                            ->first();
-                    }
-                } else {
-                    $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
-                        ->where('clinic_id', $mainClinic->id)
-                        ->where('day', $dayOfWeek)
-                        ->first();
-
-                    if (! $workSchedule) {
-                        $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
-                            ->whereNull('clinic_id')
-                            ->where('day', $dayOfWeek)
-                            ->first();
-                    }
-                }
-
-                if (! $workSchedule || ! $workSchedule->is_working) {
-                    return response()->json([
-                        'status'  => 'error',
-                        'message' => "پزشک در روز {$this->getPersianDay($dayOfWeek)} کار نمی‌کند.",
-                        'data'    => null,
-                    ], 400);
-                }
-
-                // بررسی زمان باز شدن نوبت‌ها
-                $appointmentSettings = $workSchedule->appointment_settings;
-                if (is_string($appointmentSettings)) {
-                    $appointmentSettings = json_decode($appointmentSettings, true);
-                }
-
-                if ($appointmentSettings && is_array($appointmentSettings) && !empty($appointmentSettings)) {
-                    $bookingOpening = $appointmentSettings[0];
-
-                    $currentDateTime = Carbon::now('Asia/Tehran');
-                    $currentDayOfWeek = strtolower($currentDateTime->format('l'));
-                    $currentTime = $currentDateTime->format('H:i');
-                    $currentTimeCarbon = Carbon::parse($currentTime, 'Asia/Tehran');
-
-                    if (!in_array($currentDayOfWeek, $bookingOpening['days'])) {
-                        return response()->json([
-                            'status'  => 'error',
-                            'message' => "نوبت‌ها فقط در روزهای " . implode('، ', array_map([$this, 'getPersianDay'], $bookingOpening['days'])) . " قابل رزرو هستند.",
-                            'data'    => null,
-                        ], 400);
-                    }
-
-                    $bookingStart = Carbon::parse($bookingOpening['start_time'], 'Asia/Tehran');
-                    $bookingEnd = Carbon::parse($bookingOpening['end_time'], 'Asia/Tehran');
-
-                    if (!$currentTimeCarbon->between($bookingStart, $bookingEnd)) {
-                        return response()->json([
-                            'status'  => 'error',
-                            'message' => "نوبت‌ها فقط در بازه {$bookingOpening['start_time']} تا {$bookingOpening['end_time']} قابل رزرو هستند.",
-                            'data'    => null,
-                        ], 400);
-                    }
-                }
-
-                // بررسی ساعات کاری
-                $appointmentTimeCarbon = Carbon::parse($appointmentTime, 'Asia/Tehran');
-                $workHours = $workSchedule->work_hours;
-                if (is_string($workHours)) {
-                    $workHours = json_decode($workHours, true);
-                }
-
-                $isWithinWorkHours = false;
-                if ($workHours && is_array($workHours)) {
-                    foreach ($workHours as $slot) {
-                        $start = Carbon::parse($slot['start'], 'Asia/Tehran');
-                        $end = Carbon::parse($slot['end'], 'Asia/Tehran');
-
-                        if ($appointmentTimeCarbon->between($start, $end)) {
-                            $isWithinWorkHours = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!$isWithinWorkHours) {
-                    return response()->json([
-                        'status'  => 'error',
-                        'message' => "زمان انتخاب‌شده ({$appointmentTime}) خارج از ساعات کاری پزشک است.",
-                        'data'    => null,
-                    ], 400);
-                }
-
-                // بررسی تعداد حداکثر نوبت‌ها
-                foreach ($workHours as $slot) {
-                    if ($appointmentTimeCarbon->between(
-                        Carbon::parse($slot['start'], 'Asia/Tehran'),
-                        Carbon::parse($slot['end'], 'Asia/Tehran')
-                    )) {
-                        $maxAppointments = $slot['max_appointments'] ?? null;
-                        if ($maxAppointments !== null) {
-                            $existingAppointments = $serviceType === 'in_person'
-                                ? Appointment::where('doctor_id', $doctor->id)
-                                    ->where('clinic_id', $mainClinic->id)
-                                    ->where('appointment_date', $appointmentDate)
-                                    ->where('appointment_time', '>=', $slot['start'])
-                                    ->where('appointment_time', '<', $slot['end'])
-                                    ->where('status', 'scheduled')
-                                    ->count()
-                                : CounselingAppointment::where('doctor_id', $doctor->id)
-                                    ->where('clinic_id', $mainClinic->id)
-                                    ->where('appointment_date', $appointmentDate)
-                                    ->where('appointment_time', '>=', $slot['start'])
-                                    ->where('appointment_time', '<', $slot['end'])
-                                    ->where('status', 'scheduled')
-                                    ->count();
-
-                            if ($existingAppointments >= $maxAppointments) {
-                                return response()->json([
-                                    'status'  => 'error',
-                                    'message' => "حداکثر تعداد نوبت‌ها برای این بازه زمانی پر شده است.",
-                                    'data'    => null,
-                                ], 400);
-                            }
-                        }
-                        break;
-                    }
-                }
-
-                // اگر به اینجا رسید، مشکل از رزرو قبلی است
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'این نوبت قبلاً رزرو شده است.',
+                    'message' => 'این نوبت دیگر در دسترس نیست.',
                     'data'    => null,
                 ], 400);
             }
@@ -384,27 +242,16 @@ class AppointmentBookingController extends Controller
             if ($patientType === 'self') {
                 $patient = $authenticatedUser;
             } else {
-                if ($request->has('user_id')) {
-                    $patient = User::find($request->input('user_id'));
-                    if ($patient && $patient->created_by !== $authenticatedUser->id) {
-                        return response()->json([
-                            'status'  => 'error',
-                            'message' => 'شما اجازه دسترسی به این کاربر را ندارید.',
-                            'data'    => null,
-                        ], 403);
-                    }
-                } else {
-                    $patient = User::create([
-                        'first_name'    => $request->input('first_name'),
-                        'last_name'     => $request->input('last_name'),
-                        'national_code' => $request->input('national_code'),
-                        'mobile'        => $request->input('mobile'),
-                        'email'         => $request->input('email'),
-                        'created_by'    => $authenticatedUser->id,
-                        'user_type'     => 0,
-                        'status'        => 1,
-                    ]);
-                }
+                $patient = User::create([
+                    'first_name'    => $request->input('first_name'),
+                    'last_name'     => $request->input('last_name'),
+                    'national_code' => $request->input('national_code'),
+                    'mobile'        => $request->input('mobile'),
+                    'email'         => $request->input('email'),
+                    'created_by'    => $authenticatedUser->id,
+                    'user_type'     => 0,
+                    'status'        => 1,
+                ]);
             }
 
             if (! $patient) {
@@ -415,17 +262,14 @@ class AppointmentBookingController extends Controller
                 ], 400);
             }
 
-            ros://www.youtube.com/watch?v=ZgqW0d6y2b8&t=1s
-
-             // اطلاعات کلینیک
-             $mainClinic = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
+            // اطلاعات کلینیک
+            $mainClinic = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
 
             // محاسبه هزینه‌ها
             $depositSetting = ClinicDepositSetting::where('doctor_id', $doctor->id)
                 ->where('clinic_id', $mainClinic->id)
                 ->where('is_active', true)
                 ->first();
-
             $depositAmount = $depositSetting ? $depositSetting->deposit_amount : 0;
             $infrastructureFee = InfrastructureFee::where('appointment_type', $serviceType)
                 ->where('is_active', true)
@@ -434,14 +278,14 @@ class AppointmentBookingController extends Controller
 
             // تولید کد رهگیری (فقط عدد)
             $trackingCode = null;
-            $maxAttempts = 10; // حداکثر تعداد تلاش برای پیدا کردن کد یکتا
+            $maxAttempts = 10;
             for ($i = 0; $i < $maxAttempts; $i++) {
-                $trackingCode = mt_rand(10000000, 99999999); // تولید عدد 8 رقمی
+                $trackingCode = mt_rand(10000000, 99999999);
                 $exists = $serviceType === 'in_person'
                     ? Appointment::where('tracking_code', $trackingCode)->exists()
                     : CounselingAppointment::where('tracking_code', $trackingCode)->exists();
                 if (! $exists) {
-                    break; // کد یکتاست، از حلقه خارج شو
+                    break;
                 }
                 if ($i === $maxAttempts - 1) {
                     throw new \Exception('نمی‌توان کد رهگیری یکتا تولید کرد. لطفاً دوباره تلاش کنید.');
@@ -473,20 +317,19 @@ class AppointmentBookingController extends Controller
             $meta = [
                 'appointment_id'     => $appointment->id,
                 'appointment_type'   => $serviceType === 'in_person' ? 'in_person' : 'counseling',
-                'infrastructure_fee' => $infrastructureFee, // برای محاسبه در صفحه نتیجه
+                'infrastructure_fee' => $infrastructureFee,
             ];
 
             // دریافت URL درگاه پرداخت
             $redirection = $this->paymentService->pay($totalFee, route('payment.callback'), $meta);
 
-            // برگرداندن URL درگاه به صورت JSON
+            // پاسخ مینیمال
             return response()->json([
                 'status'        => 'success',
                 'message'       => 'نوبت با موفقیت ثبت شد. لطفاً به درگاه پرداخت هدایت شوید.',
-                'payment_url'   => $redirection->getTargetUrl(), // URL درگاه پرداخت
-                'tracking_code' => $trackingCode,                // کد رهگیری (فقط عدد)
+                'payment_url'   => $redirection->getTargetUrl(),
+                'tracking_code' => $trackingCode,
             ], 200);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'status'  => 'error',
@@ -520,7 +363,6 @@ class AppointmentBookingController extends Controller
             'thursday'  => 'پنج‌شنبه',
             'friday'    => 'جمعه',
         ];
-
         return $days[$dayOfWeek] ?? $dayOfWeek;
     }
 
@@ -685,7 +527,7 @@ class AppointmentBookingController extends Controller
     {
         // پیدا کردن روز هفته از تاریخ نوبت
         $appointmentDateCarbon = Carbon::parse($appointmentDate, 'Asia/Tehran');
-        $dayOfWeek = strtolower($appointmentDateCarbon->format('l')); // مثلاً 'thursday'
+        $dayOfWeek = strtolower($appointmentDateCarbon->format('l'));
 
         // پیدا کردن کلینیک اصلی پزشک
         $mainClinic = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
@@ -694,92 +536,109 @@ class AppointmentBookingController extends Controller
             return false;
         }
 
-        // بررسی ساعات کاری پزشک با استفاده از مدل‌ها
-        $workSchedule = null;
+        // بررسی تعطیلات
+        $isHoliday = false;
         if ($serviceType === 'in_person') {
-            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
+            $holidays = DoctorHoliday::where('doctor_id', $doctor->id)
                 ->where('clinic_id', $mainClinic->id)
-                ->where('day', $dayOfWeek)
+                ->where('status', 'active')
                 ->first();
-
-            if (! $workSchedule) {
-                $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
-                    ->whereNull('clinic_id')
-                    ->where('day', $dayOfWeek)
-                    ->first();
+            if ($holidays && $holidays->holiday_dates) {
+                $holidayDates = json_decode($holidays->holiday_dates, true);
+                if (in_array($appointmentDate, $holidayDates)) {
+                    Log::warning("CheckSlotAvailability - Date {$appointmentDate} is a holiday for doctor {$doctor->id}");
+                    return false;
+                }
             }
         } else {
-            $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
+            $holidays = DoctorCounselingHoliday::where('doctor_id', $doctor->id)
                 ->where('clinic_id', $mainClinic->id)
-                ->where('day', $dayOfWeek)
+                ->where('status', 'active')
                 ->first();
-
-            if (! $workSchedule) {
-                $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
-                    ->whereNull('clinic_id')
-                    ->where('day', $dayOfWeek)
-                    ->first();
+            if ($holidays && $holidays->holiday_dates) {
+                $holidayDates = json_decode($holidays->holiday_dates, true);
+                if (in_array($appointmentDate, $holidayDates)) {
+                    Log::warning("CheckSlotAvailability - Date {$appointmentDate} is a counseling holiday for doctor {$doctor->id}");
+                    return false;
+                }
             }
         }
 
-        if (! $workSchedule || ! $workSchedule->is_working) {
-            Log::warning("CheckSlotAvailability - Doctor {$doctor->id} is not working on {$dayOfWeek} for service type {$serviceType}");
-            return false;
+        // بررسی برنامه روزانه خاص
+        $specialSchedule = null;
+        if ($serviceType === 'in_person') {
+            $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctor->id)
+                ->where('clinic_id', $mainClinic->id)
+                ->where('date', $appointmentDate)
+                ->first();
+        } else {
+            $specialSchedule = CounselingDailySchedule::where('doctor_id', $doctor->id)
+                ->where('clinic_id', $mainClinic->id)
+                ->where('date', $appointmentDate)
+                ->first();
         }
 
-        // بررسی زمان باز شدن نوبت‌ها (appointment_settings)
-        $appointmentSettings = $workSchedule->appointment_settings;
-        if (is_string($appointmentSettings)) {
-            $appointmentSettings = json_decode($appointmentSettings, true);
-            Log::debug("CheckSlotAvailability - appointment_settings after json_decode: ", ['appointment_settings' => $appointmentSettings]);
-        }
+        // اگر برنامه روزانه خاص وجود دارد، از آن استفاده کن
+        if ($specialSchedule) {
+            $workHours = json_decode($specialSchedule->work_hours, true);
+            $appointmentSettings = json_decode($specialSchedule->appointment_settings, true);
+            $emergencyTimes = json_decode($specialSchedule->emergency_times, true) ?? [];
+        } else {
+            // استفاده از برنامه کاری عادی
+            $workSchedule = null;
+            if ($serviceType === 'in_person') {
+                $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
+                    ->where('clinic_id', $mainClinic->id)
+                    ->where('day', $dayOfWeek)
+                    ->first();
+                if (! $workSchedule) {
+                    $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
+                        ->whereNull('clinic_id')
+                        ->where('day', $dayOfWeek)
+                        ->first();
+                }
+            } else {
+                $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
+                    ->where('clinic_id', $mainClinic->id)
+                    ->where('day', $dayOfWeek)
+                    ->first();
+                if (! $workSchedule) {
+                    $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
+                        ->whereNull('clinic_id')
+                        ->where('day', $dayOfWeek)
+                        ->first();
+                }
+            }
 
-        if ($appointmentSettings && is_array($appointmentSettings) && !empty($appointmentSettings)) {
-            $bookingOpening = $appointmentSettings[0];
-
-            $currentDateTime = Carbon::now('Asia/Tehran');
-            $currentDayOfWeek = strtolower($currentDateTime->format('l'));
-            $currentTime = $currentDateTime->format('H:i');
-
-            // بررسی اینکه روز جاری در لیست روزهای مجاز برای رزرو هست یا نه
-            if (!in_array($currentDayOfWeek, $bookingOpening['days'])) {
-                Log::warning("CheckSlotAvailability - Booking is not open today for doctor {$doctor->id}. Current day: {$currentDayOfWeek}, Booking days: " . json_encode($bookingOpening['days']));
+            if (! $workSchedule || ! $workSchedule->is_working) {
+                Log::warning("CheckSlotAvailability - Doctor {$doctor->id} is not working on {$dayOfWeek} for service type {$serviceType}");
                 return false;
             }
 
-            $currentTimeCarbon = Carbon::parse($currentTime, 'Asia/Tehran');
-            $bookingStart = Carbon::parse($bookingOpening['start_time'], 'Asia/Tehran');
-            $bookingEnd = Carbon::parse($bookingOpening['end_time'], 'Asia/Tehran');
+            $workHours = json_decode($workSchedule->work_hours, true);
+            $appointmentSettings = json_decode($workSchedule->appointment_settings, true);
+            $emergencyTimes = json_decode($workSchedule->emergency_times, true) ?? [];
+        }
 
-            if (!$currentTimeCarbon->between($bookingStart, $bookingEnd)) {
-                Log::warning("CheckSlotAvailability - Current time {$currentTime} is outside booking opening hours for doctor {$doctor->id}. Booking hours: {$bookingOpening['start_time']} to {$bookingOpening['end_time']}");
+        // بررسی زمان‌های اورژانسی
+        $appointmentTimeCarbon = Carbon::parse($appointmentTime, 'Asia/Tehran');
+        foreach ($emergencyTimes as $emergency) {
+            $start = Carbon::parse($emergency['start'], 'Asia/Tehran');
+            $end = Carbon::parse($emergency['end'], 'Asia/Tehran');
+            if ($appointmentTimeCarbon->between($start, $end)) {
+                Log::warning("CheckSlotAvailability - Appointment time {$appointmentTime} is within emergency time for doctor {$doctor->id}");
                 return false;
             }
         }
 
         // بررسی اینکه زمان نوبت در ساعات کاری پزشک قرار دارد یا خیر
-        $workHours = $workSchedule->work_hours;
-        Log::debug("CheckSlotAvailability - work_hours for doctor {$doctor->id} on {$dayOfWeek}: ", ['work_hours' => $workHours]);
-
-        if (is_string($workHours)) {
-            $workHours = json_decode($workHours, true);
-            Log::debug("CheckSlotAvailability - work_hours after json_decode: ", ['work_hours' => $workHours]);
-        }
-
         $isWithinWorkHours = false;
-
-
-
         if ($workHours && is_array($workHours)) {
             foreach ($workHours as $slot) {
-                Log::debug("CheckSlotAvailability - Processing slot: ", ['slot' => $slot]);
                 $start = Carbon::parse("{$appointmentDate} {$slot['start']}", 'Asia/Tehran');
                 $end = Carbon::parse("{$appointmentDate} {$slot['end']}", 'Asia/Tehran');
                 $appointmentTimeFull = Carbon::parse("{$appointmentDate} {$appointmentTime}", 'Asia/Tehran');
 
-                Log::debug("CheckSlotAvailability - Start: {$start->toDateTimeString()}, End: {$end->toDateTimeString()}, Appointment Time: {$appointmentTimeFull->toDateTimeString()}");
-
-                // استفاده از greaterThanOrEqualTo و lessThanOrEqualTo
                 if ($appointmentTimeFull->greaterThanOrEqualTo($start) && $appointmentTimeFull->lessThanOrEqualTo($end)) {
                     $isWithinWorkHours = true;
 
@@ -791,14 +650,14 @@ class AppointmentBookingController extends Controller
                                 ->where('clinic_id', $mainClinic->id)
                                 ->where('appointment_date', $appointmentDate)
                                 ->where('appointment_time', '>=', $slot['start'])
-                                ->where('appointment_time', '<=', $slot['end']) // شامل زمان پایان
+                                ->where('appointment_time', '<=', $slot['end'])
                                 ->where('status', 'scheduled')
                                 ->count()
                             : CounselingAppointment::where('doctor_id', $doctor->id)
                                 ->where('clinic_id', $mainClinic->id)
                                 ->where('appointment_date', $appointmentDate)
                                 ->where('appointment_time', '>=', $slot['start'])
-                                ->where('appointment_time', '<=', $slot['end']) // شامل زمان پایان
+                                ->where('appointment_time', '<=', $slot['end'])
                                 ->where('status', 'scheduled')
                                 ->count();
 
@@ -812,8 +671,6 @@ class AppointmentBookingController extends Controller
             }
         }
 
-
-
         if (! $isWithinWorkHours) {
             Log::warning("CheckSlotAvailability - Appointment time {$appointmentTime} is outside working hours for doctor {$doctor->id} on {$dayOfWeek}");
             return false;
@@ -826,7 +683,7 @@ class AppointmentBookingController extends Controller
                 ->where('clinic_id', $mainClinic->id)
                 ->first();
         } elseif (in_array($serviceType, ['phone', 'text', 'video'])) {
-            $config = DoctorAppointmentConfig::where('doctor_id', $doctor->id)
+            $config = DoctorCounselingConfig::where('doctor_id', $doctor->id)
                 ->where('clinic_id', $mainClinic->id)
                 ->first();
         }
@@ -852,13 +709,11 @@ class AppointmentBookingController extends Controller
             }
         }
 
-        // استفاده از appointment_duration از appointment_settings یا config
+        // بررسی رزروهای قبلی
         $duration = $appointmentSettings[0]['appointment_duration'] ?? ($config->appointment_duration ?? 15);
-
         $startTime = Carbon::parse("$appointmentDate $appointmentTime", 'Asia/Tehran');
         $endTime = $startTime->copy()->addMinutes($duration);
 
-        // بررسی رزروهای قبلی
         $existingAppointment = null;
         if ($serviceType === 'in_person') {
             $existingAppointment = Appointment::where('doctor_id', $doctor->id)
@@ -900,7 +755,6 @@ class AppointmentBookingController extends Controller
     private function clearDoctorCaches($doctorId = null, $serviceType = null)
     {
         Cache::forget("doctors_list_*_*_*_*_*_*_*_*");
-
         if ($doctorId) {
             $types = $serviceType ? [$serviceType] : ['in_person', 'phone', 'text', 'video'];
             foreach ($types as $type) {
