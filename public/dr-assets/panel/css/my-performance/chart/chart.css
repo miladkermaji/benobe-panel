@@ -87,3 +87,95 @@ canvas {
 .chart-container {
     width: 100% !important;
 }
+:root {
+    --chart-bg: #ffffff;
+    --chart-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --chart-border-radius: 16px;
+    --primary-color: #4a90e2;
+    --gradient-bg: linear-gradient(145deg, #f8fafc, #ffffff);
+    --text-color: #2d3748;
+    --hover-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.chart-content {
+    padding: 30px;
+    max-width: 1440px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%);
+    border-radius: 20px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 25px;
+}
+
+.chart-container {
+    background: var(--gradient-bg);
+    border-radius: var(--chart-border-radius);
+    box-shadow: var(--chart-shadow);
+    padding: 25px;
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-container:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+.chart-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), transparent);
+    opacity: 0.8;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(90deg, var(--primary-color), #7fbfff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+    font-family: IRANSans, sans-serif !important;
+}
+
+@media only screen and (max-width: 768px) {
+    .chart-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .chart-container {
+        height: 380px;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+    }
+}
