@@ -1265,17 +1265,18 @@ function verifyOtpCode() {
   // فراخوانی در زمان بارگذاری اولیه صفحه
   document.addEventListener('DOMContentLoaded', checkProfileCompleteness);
 
-  function togglePassword(inputId) {
+ function togglePassword(inputId) {
     const input = document.getElementById(inputId);
-    const icon = input.nextElementSibling; // آیکون کنار ورودی
+    const icon = input.parentElement.querySelector('.show-pass');
+    
     if (input.type === 'password') {
-      input.type = 'text';
-      icon.src = 'http://127.0.0.1:8000/dr-assets/icons/hide-pass.svg'; // تغییر به آیکون "نمایش"
+        input.type = 'text';
+        icon.src = "{{ asset('dr-assets/icons/show-pass.svg') }}"; // آیکون نمایش
     } else {
-      input.type = 'password';
-      icon.src = 'http://127.0.0.1:8000/dr-assets/icons/show-pass.svg'; // تغییر به آیکون "مخفی"
+        input.type = 'password';
+        icon.src = "{{ asset('dr-assets/icons/hide-pass.svg') }}"; // آیکون مخفی
     }
-  }
+}
 
 
   // تابع حذف تخصص بدون رفرش

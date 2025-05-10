@@ -493,67 +493,73 @@
         </div>
       </div>
     </div>
-    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8">
-      <div class="d-flex justify-content-between align-items-center">
+<div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8">
+    <div class="d-flex justify-content-between align-items-center">
         <div>
-          <img src="{{ asset('dr-assets/icons/lock.svg') }}" alt="">
-
-          <span class="txt-card-span mx-1">رمز عبور ثابت</span>
+            <img src="{{ asset('dr-assets/icons/lock.svg') }}" alt="">
+            <span class="txt-card-span mx-1">رمز عبور ثابت</span>
         </div>
         <div>
-          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="">
-
+            <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="">
         </div>
-      </div>
-      <div class="drop-toggle-styles password-data-drop-toggle">
+    </div>
+    <div class="drop-toggle-styles password-data-drop-toggle">
         <div class="loading-spinner d-none"></div>
         <div>
-          <div class="accordion_content__bS0xm">
-            <form class="w-100" action="{{ route('dr-static-password-update') }}" method="POST"
-              id="staticPasswordForm">
-              @csrf
-              <div class="d-flex align-items-center mt-2">
-                <div class="password_toggle__AXK9v d-flex align-items-center">
-                  <input type="checkbox" id="static_password_enabled" name="static_password_enabled" value="1"
-                    {{ Auth::guard('doctor')->user()->static_password_enabled ? 'checked' : '' }}>
-                  <label for="static_password_enabled">Toggle</label>
-                  <span class="mx-1">رمزعبور ثابت فعال است</span>
-                </div>
-              </div>
-              <div class="w-100 d-flex justify-content-between gap-4 flex-xs-wrap flex-xs-column">
-                <div class="w-100">
-                  <label for="password" class="label-top-input"> کلمه عبور</label>
-                  <input type="password"
-                    class="form-control h-50 w-100 border-radius-6 mt-3 col-12 position-relative daraje"
-                    id="password" name="password" placeholder="رمز عبور"
-                    {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
-
-                  <img onclick="togglePassword('password')" class="show-pass"
-                    src="{{ asset('dr-assets/icons/hide-pass.svg') }}" alt="">
-
-                </div>
-                <div class="w-100">
-                  <label for="password_confirmation" class="label-top-input">تکرار کلمه عبور</label>
-                  <input type="password" class="form-control h-50 w-100 border-radius-6 mt-3 col-12 position-relative"
-                    id="password_confirmation" name="password_confirmation" placeholder="تکرار رمز عبور"
-                    {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
-                  <img onclick="togglePassword('password_confirmation')" class="hide-pass"
-                    src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="">
-                </div>
-              </div>
-              <div class="w-100 mt-3">
-                <button type="submit"
-                  class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-                  id="btn-save-pass" {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
-                  <span class="button_text">ذخیره تغیرات</span>
-                  <div class="loader"></div>
-                </button>
-              </div>
-            </form>
-          </div>
+            <div class="accordion_content__bS0xm">
+                <form class="w-100" action="{{ route('dr-static-password-update') }}" method="POST" id="staticPasswordForm">
+                    @csrf
+                    <div class="d-flex align-items-center mt-2">
+                        <div class="password_toggle__AXK9v d-flex align-items-center">
+                            <input type="checkbox" id="static_password_enabled" name="static_password_enabled" value="1"
+                                {{ Auth::guard('doctor')->user()->static_password_enabled ? 'checked' : '' }}>
+                            <label for="static_password_enabled">Toggle</label>
+                            <span class="mx-1">رمزعبور ثابت فعال است</span>
+                        </div>
+                    </div>
+                    <div class="w-100 d-flex justify-content-between gap-4 flex-xs-wrap flex-xs-column">
+                        <!-- فیلد رمز عبور -->
+                        <div class="w-100 position-relative">
+                            <label for="password" class="label-top-input">کلمه عبور</label>
+                            <div class="input-group">
+                                <input type="password"
+                                       class="form-control h-50 w-100 border-radius-6 mt-3"
+                                       id="password" name="password" placeholder="رمز عبور"
+                                       {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
+                                <span class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2  top-64">
+                                    <img onclick="togglePassword('password')" class="show-pass cursor-pointer"
+                                         src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی" style="width: 20px; height: 20px;">
+                                </span>
+                            </div>
+                        </div>
+                        <!-- فیلد تکرار رمز عبور -->
+                        <div class="w-100 position-relative">
+                            <label for="password_confirmation" class="label-top-input">تکرار کلمه عبور</label>
+                            <div class="input-group">
+                                <input type="password"
+                                       class="form-control h-50 w-100 border-radius-6 mt-3"
+                                       id="password_confirmation" name="password_confirmation" placeholder="تکرار رمز عبور"
+                                       {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
+                                <span class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2 top-64">
+                                    <img onclick="togglePassword('password_confirmation')" class="show-pass cursor-pointer"
+                                         src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی" style="width: 20px; height: 20px;">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100 mt-3">
+                        <button type="submit"
+                                class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
+                                id="btn-save-pass" {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
+                            <span class="button_text">ذخیره تغییرات</span>
+                            <div class="loader"></div>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
     </div>
+</div>
     <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8">
       <div class="d-flex justify-content-between align-items-center">
         <div>

@@ -1,356 +1,527 @@
-.top-profile-info {
-    margin-top: 10px;
-    border-radius: 8px;
-    box-shadow: 0 4px 40px rgba(63, 63, 121, 0.13);
+:root {
+  /* پالت رنگی اصلی */
+  --primary: #2E86C1;
+  --primary-light: #84CAF9;
+  --secondary: #1DEB3C;
+  --secondary-hover: #15802A;
+  --background-light: #F0F8FF;
+  --background-footer: #D4ECFD;
+  --background-card: #FFFFFF;
+  --text-primary: #000000;
+  --text-secondary: #707070;
+  --text-discount: #008000;
+  --text-original: #FF0000;
+  --border-neutral: #E5E7EB;
+  --shadow: rgba(0, 0, 0, 0.35);
+  --gradient-instagram-from: #F92CA7;
+  --gradient-instagram-to: #6B1A93;
+  --button-mobile: #4F9ACD;
+  --button-mobile-light: #A2CDEB;
+  --support-section: #2E86C1;
+  --support-text: #084D7C;
+  --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%) !important;
+
+  /* شعاع گوشه‌ها */
+  --radius-button: 0.5rem;
+  --radius-button-large: 1rem;
+  --radius-button-xl: 1.25rem;
+  --radius-card: 1.125rem;
+  --radius-footer: 1.875rem;
+  --radius-nav: 1.25rem;
+  --radius-circle: 9999px;
 }
+
+.top-profile-info {
+  margin-top: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 40px rgba(63, 63, 121, 0.13);
+  background: var(--gradient-primary); /* استفاده از گرادیان پالت */
+  padding: 1.25rem; /* پدینگ کمی بیشتر برای زیبایی */
+  transition: all 0.3s ease;
+}
+
 .top-profile-info .avatar___img-main {
-    width: 80px;
-    border-radius: 50%;
+  width: 80px;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
 }
+
+.top-profile-info .avatar___img-main:hover {
+  transform: scale(1.1);
+}
+
 .show-profile-badge {
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    height: 25px;
-    padding: 2px 5px;
-}
-.option-card-box-shodow {
-    border-radius: 8px;
-    box-shadow: 0 4px 40px rgba(63, 63, 121, 0.13);
-    margin-top: 10px;
-    cursor: pointer;
-}
-.txt-card-span {
-    font-weight: bold;
-    font-size: 14px;
-}
-.drop-toggle-styles {
-    min-height: 15vh;
-    /* border-top: 1px solid #efefef; */
-    margin-top: 5px;
-    width: 100%;
-}
-.border-radius-6 {
-    border-radius: 6px !important;
-}
-.label-top-input-city {
-    min-height: 10px;
-    min-width: 20px;
-    background-color: #fff;
-    box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px,
-        rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
-    border-radius: 4px;
-    position: absolute;
-    z-index: 2;
-    padding: 2px;
-    font-weight: bold;
-    right: inherit;
-    font-size: 12px;
-    top: -17px;
-}
-.label-top-input {
-    min-height: 10px;
-    min-width: 20px;
-    background-color: #fff;
-    box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px,
-        rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
-    border-radius: 4px;
-    position: absolute;
-    z-index: 2;
-    padding: 2px;
-    font-weight: bold;
-    right: inherit;
-    font-size: 12px;
-    top: inherit;
-}
-.label-top-input-modal {
-    min-height: 10px;
-    min-width: 20px;
-    background-color: #fff;
-    box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px,
-        rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
-    border-radius: 4px;
-    position: absolute;
-    z-index: 2;
-    padding: 2px;
-    font-weight: bold;
-    right: 18px;
-    font-size: 12px;
-    top: 0;
-}
-.label-top-input-special {
-    min-height: 10px;
-    min-width: 20px;
-    background-color: #fff;
-    box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px,
-        rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
-    border-radius: 4px;
-    position: absolute;
-    z-index: 2;
-    padding: 2px;
-    font-weight: bold;
-    right: inherit;
-    font-size: 12px;
-    bottom: 212px;
-}
-.label-top-input-special-takhasos {
-    min-height: 10px;
-    min-width: 20px;
-    background-color: #fff;
-    box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px,
-        rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
-    border-radius: 4px;
-    position: absolute;
-    z-index: 2;
-    padding: 2px;
-    font-weight: bold;
-    right: inherit;
-    font-size: 12px;
-    bottom: 35px;
-}
-.label-top-input-special-takhasos-elem-create {
-    min-height: 10px;
-    min-width: 20px;
-    background-color: #fff;
-    box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px,
-        rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
-    border-radius: 4px;
-    position: absolute;
-    z-index: 2;
-    padding: 2px;
-    font-weight: bold;
-    right: inherit;
-    font-size: 12px;
-    bottom: 110px;
-}
-.show-pass-1 {
-    position: absolute;
-    left: 22px;
-    right: inherit;
-    top: 112px;
-    z-index: 3;
-}
-.show-pass-2 {
-    position: absolute;
-    left: 51%;
-    top: 112px;
-    right: inherit;
-    z-index: 3;
-}
-input {
-    font-size: 14px !important;
-    color: #3d3d3d;
-    font-weight: bold;
-}
-/* .show-pass-1 {
-  position: absolute;
-  left: 27px;
-  right: inherit;
-  top: 112px;
-  z-index: 3;
-}
-.show-pass-2 {
-  position: absolute;
-  right: 46%; 
-  top: 112px;
-  z-index: 3;
-} */
-
-.loading-spinner {
-    border: 4px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 4px solid #3498db;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-    margin: 10px auto;
+  border: 1px solid var(--border-neutral);
+  border-radius: 20px;
+  height: 25px;
+  padding: 2px 5px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-primary);
+  transition: background-color 0.3s ease;
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-@media screen and (max-width: 426px) {
-    .top-profile-info span {
-        font-size: 12px !important;
-    }
-    .show-profile-badge {
-        text-wrap: nowrap;
-    }
-    .avatar___img-main {
-        width: 60px !important;
-    }
-    .show-profile-badge span {
-        font-size: 9px !important;
-    }
-    .show-profile-badge svg {
-        width: 11px;
-        height: 11px;
-    }
-    .col-12 {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
-}
-@media screen and (max-width: 769px) {
-    .svg-plus {
-        width: 10px;
-        height: 10px;
-    }
-    .flex-xs-wrap {
-        display: flex !important;
-        flex-wrap: wrap !important;
-    }
-    .flex-xs-column {
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    .show-pass-2 {
-        position: absolute;
-        left: 22px;
-        top: 182px;
-        right: inherit;
-        z-index: 3;
-    }
-}
-@media screen and (max-width: 575px) {
-    .flex-xs-wrap {
-        display: flex !important;
-        flex-wrap: wrap !important;
-    }
-    .flex-xs-column {
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    .help-svg {
-        display: none !important;
-    }
-}
-.show-pass {
-    position: absolute;
-    right: 536px;
-    top: 114px;
-    z-index: 500;
-    left: inherit;
-    bottom: inherit;
-}
-.hide-pass {
-    position: absolute;
-    left: 22px;
-    top: 114px;
-    z-index: 500;
-}
-.main-content {
-    animation: fadeIn 0.5s ease-in-out;
-}
-.option-card-box-shodow {
-    transition: all 0.3s ease;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-.option-card-box-shodow:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-.drop-toggle-styles {
-    transition: max-height 0.4s ease-in-out, opacity 0.3s ease;
-    overflow: hidden;
-}
-.my-btn-primary {
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-.my-btn-primary:hover {
-    background-color: #0056b3;
-    transform: scale(1.02);
-}
-.avatar___img-main {
-    transition: transform 0.3s ease;
-}
-.avatar___img-main:hover {
-    transform: scale(1.1);
-}
-.top-profile-info {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    border-radius: 12px;
-}
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.show-profile-badge:hover {
+  background-color: var(--background-light);
 }
 
-/* استایل کارت‌ها */
 .option-card-box-shodow {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
+  border-radius: 8px;
+  box-shadow: 0 4px 40px rgba(63, 63, 121, 0.13);
+  margin-top: 10px;
+  background-color: var(--background-card);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .option-card-box-shodow:hover {
-    transform: translateY(-5px);
-}
-
-.personal-data-clicked {
-    cursor: pointer;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px var(--shadow);
 }
 
 .txt-card-span {
-    font-size: 16px;
-    color: #333;
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-right: 8px; /* فاصله بهتر برای تراز متن */
 }
 
 .drop-toggle-styles {
-    display: none;
-    background-color: #f8f9fa;
-    border-top: 1px solid #e9ecef;
-    border-radius: 0 0 12px 12px;
+  min-height: 15vh;
+  margin-top: 5px;
+  width: 100%;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  border-radius: 0 0 8px 8px;
+  padding: 1.25rem;
+  transition: max-height 0.4s ease-in-out, opacity 0.3s ease;
+  overflow: hidden;
+  display: none;
 }
 
 .drop-toggle-styles p {
-    font-size: 14px;
-    color: #6c757d;
-    margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
 .drop-toggle-styles a {
-    font-size: 14px;
-    font-weight: 600;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
 }
+
+.border-radius-6 {
+  border-radius: 6px !important; /* حفظ ردیوس اینپوت‌ها */
+}
+
+/* استایل هشدار پروفایل ناقص */
+.alert.alert-warning {
+  background: linear-gradient(90deg, #FFE5B4 0%, #FFF3CD 100%);
+  border: 1px solid #FFD700;
+  border-radius: var(--radius-button-large);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert.alert-warning .fw-bold {
+  color: var(--text-primary);
+  font-size: 16px;
+  margin-bottom: 0.5rem;
+}
+
+.alert.alert-warning ul {
+  justify-content: center;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  gap: 8px; /* فاصله بین بج‌ها */
+}
+
+.alert.alert-warning .badge.badge-danger {
+  background-color: var(--text-original);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: var(--radius-button);
+}
+
+/* استایل اینپوت‌ها و فرم‌ها */
+input,
+select,
+textarea {
+  font-size: 14px !important;
+  color: #3d3d3d;
+  font-weight: bold;
+  border: 1px solid var(--border-neutral);
+  border-radius: 6px !important; /* دقیقاً 6px */
+  padding: 10px 12px; /* پدینگ برای جلوگیری از چسبیدن متن */
+  height: 50px; /* حفظ ارتفاع */
+  transition: border-color 0.3s ease;
+}
+
+textarea {
+  height: auto; /* برای textarea */
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 5px rgba(46, 134, 193, 0.3);
+}
+
+.my-form-control,
+.my-form-control-light {
+  height: 50px; /* بدون تغییر */
+}
+
+/* استایل دکمه‌ها */
+.my-btn-primary {
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 4px !important; /* بدون تغییر */
+  height: 50px; /* بدون تغییر */
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.my-btn-primary:hover {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  transform: scale(1.02);
+}
+
+/* استایل لیبل‌ها - دقیقاً مثل استایل قدیمی */
+.label-top-input-city {
+  min-height: 10px;
+  min-width: 20px;
+  background-color: #fff;
+  box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px, rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 2;
+  padding: 2px;
+  font-weight: bold;
+  right: inherit;
+  font-size: 12px;
+  top: -17px;
+}
+
+.label-top-input {
+  min-height: 10px;
+  min-width: 20px;
+  background-color: #fff;
+  box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px, rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 2;
+  padding: 2px;
+  font-weight: bold;
+  right: inherit;
+  font-size: 12px;
+  top: inherit;
+}
+
+.label-top-input-modal {
+  min-height: 10px;
+  min-width: 20px;
+  background-color: #fff;
+  box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px, rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 2;
+  padding: 2px;
+  font-weight: bold;
+  right: 18px;
+  font-size: 12px;
+  top: 0;
+}
+
+.label-top-input-special {
+  min-height: 10px;
+  min-width: 20px;
+  background-color: #fff;
+  box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px, rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 2;
+  padding: 2px;
+  font-weight: bold;
+  right: inherit;
+  font-size: 12px;
+  bottom: 212px;
+}
+
+.label-top-input-special-takhasos {
+  min-height: 10px;
+  min-width: 20px;
+  background-color: #fff;
+  box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px, rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 2;
+  padding: 2px;
+  font-weight: bold;
+  right: inherit;
+  font-size: 12px;
+  bottom: 35px;
+}
+
+.label-top-input-special-takhasos-elem-create {
+  min-height: 10px;
+  min-width: 20px;
+  background-color: #fff;
+  box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px, rgba(255, 255, 255, 0.25) 0px 1px 0px inset;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 2;
+  padding: 2px;
+  font-weight: bold;
+  right: inherit;
+  font-size: 12px;
+  bottom: 110px;
+}
+
+/* استایل آیکون‌های نمایش رمز */
+.top-64{
+    top: 64% !important;
+}
+
+
 
 /* لودینگ */
 .loading-spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #007bff;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 10px auto;
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.myPanelOption {
-    display: none;
+/* انیمیشن‌ها */
+.main-content {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* استایل کارت‌ها */
+.personal-data-clicked {
+  cursor: pointer;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ریسپانسیو */
+@media screen and (max-width: 769px) {
+  .top-profile-info {
+    padding: 1rem;
+  }
+
+  .top-profile-info .avatar___img-main {
+    width: 60px;
+  }
+
+  .show-profile-badge {
+    height: 24px;
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+
+  .option-card-box-shodow {
+    padding: 1rem;
+    margin-top: 8px;
+  }
+
+  .txt-card-span {
+    font-size: 13px;
+    margin-right: 6px;
+  }
+
+  .drop-toggle-styles {
+    padding: 1rem;
+  }
+
+  .alert.alert-warning {
+    padding: 1rem;
+  }
+
+  .alert.alert-warning .fw-bold {
+    font-size: 14px;
+  }
+
+  .alert.alert-warning .badge.badge-danger {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 13px !important;
+    padding: 8px 10px;
+    border-radius: 6px !important;
+  }
+
+  .my-btn-primary {
+    font-size: 13px;
+    height: 48px; /* کمی کاهش برای تبلت */
+  }
+
+  .label-top-input-city,
+  .label-top-input,
+  .label-top-input-modal,
+  .label-top-input-special,
+  .label-top-input-special-takhasos,
+  .label-top-input-special-takhasos-elem-create {
+    font-size: 11px;
+    padding: 2px 5px;
+  }
+
+  .svg-plus {
+    width: 10px;
+    height: 10px;
+  }
+
+  .flex-xs-wrap {
+    display: flex !important;
+    flex-wrap: wrap !important;
+  }
+
+  .flex-xs-column {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  
+}
+
+@media screen and (max-width: 426px) {
+  .top-profile-info {
+    padding: 0.75rem;
+  }
+
+  .top-profile-info span {
+    font-size: 12px !important;
+  }
+
+  .top-profile-info .avatar___img-main {
+    width: 60px !important;
+  }
+
+  .show-profile-badge {
+    text-wrap: nowrap;
+    height: 22px;
+    padding: 2px 5px;
+  }
+
+  .show-profile-badge span {
+    font-size: 9px !important;
+  }
+
+  .show-profile-badge svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .option-card-box-shodow {
+    padding: 0.75rem;
+    margin-top: 6px;
+  }
+
+  .txt-card-span {
+    font-size: 12px;
+    margin-right: 5px;
+  }
+
+  .drop-toggle-styles {
+    padding: 0.75rem;
+  }
+
+  .alert.alert-warning {
+    padding: 0.75rem;
+  }
+
+  .alert.alert-warning .fw-bold {
+    font-size: 13px;
+  }
+
+  .alert.alert-warning .badge.badge-danger {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 12px !important;
+    padding: 6px 8px;
+    border-radius: 6px !important;
+  }
+
+  .my-btn-primary {
+    font-size: 12px;
+    height: 45px; /* کاهش برای موبایل */
+  }
+
+  .label-top-input-city,
+  .label-top-input,
+  .label-top-input-modal,
+  .label-top-input-special,
+  .label-top-input-special-takhasos,
+  .label-top-input-special-takhasos-elem-create {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+
+  .col-12 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .help-svg {
+    display: none !important;
+  }
+
+}
+
+
+/* اطمینان از اینکه اینپوت‌ها فضای کافی برای آیکون داشته باشن */
+input[type="password"] {
+  padding-left: 40px !important; /* فضای کافی برای آیکون سمت چپ */
+}
+
+/* ریسپانسیو - حفظ تراز در موبایل و تبلت */
+@media screen and (max-width: 769px) {
+
+
+  input[type="password"] {
+    padding-left: 36px !important;
+  }
+}
+
+@media screen and (max-width: 426px) {
+
+
+  input[type="password"] {
+    padding-left: 32px !important;
+  }
 }
