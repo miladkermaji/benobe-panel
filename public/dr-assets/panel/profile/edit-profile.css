@@ -334,6 +334,7 @@ textarea:focus {
 @media screen and (max-width: 769px) {
   .top-profile-info {
     padding: 1rem;
+    width: 98%;
   }
 
   .top-profile-info .avatar___img-main {
@@ -344,11 +345,14 @@ textarea:focus {
     height: 24px;
     padding: 3px 6px;
     font-size: 10px;
+    
   }
 
   .option-card-box-shodow {
     padding: 1rem;
     margin-top: 8px;
+    width: 98%;
+
   }
 
   .txt-card-span {
@@ -383,7 +387,11 @@ textarea:focus {
 
   .my-btn-primary {
     font-size: 13px;
+    width: 100%;
     height: 48px; /* کمی کاهش برای تبلت */
+  }
+  .my-form-control{
+    width: 100%;
   }
 
   .label-top-input-city,

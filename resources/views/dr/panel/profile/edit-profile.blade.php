@@ -37,7 +37,7 @@
             <img src="{{ asset('dr-assets/panel/img/pro.jpg') }}" class="avatar___img-main">
           </div>
           <div class="mx-2 mt-3">
-            <span class="d-block fw-bold font-size-15 profile-header-name">
+            <span class="d-block fw-bold font-size-15 profile-header-name text-dark">
               {{ Auth::guard('doctor')->user()->first_name . ' ' . Auth::guard('doctor')->user()->last_name }}</span>
             <span class="badge badge-light p-2 border-radius-8 mt-3 mx-3 font-size-13 cursor-pointer">
               {{ $specialtyName }}
@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="show-profile-badge">
-          <a href="" class="d-flex">
+          <a href="" class="d-flex align-items-center">
 
             <img src="{{ asset('dr-assets/icons/eye.svg') }}" alt="" srcset="">
 
@@ -414,14 +414,13 @@
             @csrf
             @method('PUT')
             <div>
-              <h6 class="text-left fw-bold d-block font-size-13">پیام رسان های داخلی</h6>
+              <h6 class="text-right fw-bold d-block font-size-13">پیام رسان های داخلی</h6>
             </div>
             <div class="d-flex align-items-center justify-content-start gap-20">
               <div
                 class="d-flex justify-content-start gap-1 align-items-center  border border-solid py-2 px-4 rounded-lg">
-                <img
-                  src="{{ asset('dr-assets/icons/eitaa-icon-colorful.svg') }}"
-                  alt=""><span class="text-sm mx-1">ایتا</span>
+                <img src="{{ asset('dr-assets/icons/eitaa-icon-colorful.svg') }}" alt=""><span
+                  class="text-sm mx-1">ایتا</span>
               </div>
               <div class="w-100">
                 <div class="w-100">
@@ -437,14 +436,12 @@
               </div>
             </div>
             <div class="mt-2">
-              <h6 class="text-left fw-bold d-block font-size-13">پیام رسان های خارجی</h6>
+              <h6 class="text-right fw-bold d-block font-size-13">پیام رسان های خارجی</h6>
             </div>
             <div class="d-flex align-items-center justify-content-start gap-20 mt-2">
               <div
                 class="d-flex justify-content-center gap-1 align-items-center border border-solid py-2 px-3 rounded-lg">
-                <img
-                  src="{{ asset('dr-assets/icons/whatsapp-svgrepo-com.svg') }}"
-                  alt="">
+                <img src="{{ asset('dr-assets/icons/whatsapp-svgrepo-com.svg') }}" alt="">
                 <span class="text-sm mx-1 font-size-13">واتساپ</span>
               </div>
               <div class="w-100">
@@ -456,7 +453,7 @@
               </div>
             </div>
             <div class="mt-2">
-              <h6 class="text-left fw-bold d-block font-size-13"> تماس امن</h6>
+              <h6 class="text-right fw-bold d-block font-size-13"> تماس امن</h6>
             </div>
             <div
               class="d-flex gap-4 justify-content-between align-items-center p-3 border border-solid rounded-lg border-slate-200 mt-2">
@@ -493,73 +490,76 @@
         </div>
       </div>
     </div>
-<div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8">
+      <div class="d-flex justify-content-between align-items-center">
         <div>
-            <img src="{{ asset('dr-assets/icons/lock.svg') }}" alt="">
-            <span class="txt-card-span mx-1">رمز عبور ثابت</span>
+          <img src="{{ asset('dr-assets/icons/lock.svg') }}" alt="">
+          <span class="txt-card-span mx-1">رمز عبور ثابت</span>
         </div>
         <div>
-            <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="">
+          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="">
         </div>
-    </div>
-    <div class="drop-toggle-styles password-data-drop-toggle">
+      </div>
+      <div class="drop-toggle-styles password-data-drop-toggle">
         <div class="loading-spinner d-none"></div>
         <div>
-            <div class="accordion_content__bS0xm">
-                <form class="w-100" action="{{ route('dr-static-password-update') }}" method="POST" id="staticPasswordForm">
-                    @csrf
-                    <div class="d-flex align-items-center mt-2">
-                        <div class="password_toggle__AXK9v d-flex align-items-center">
-                            <input type="checkbox" id="static_password_enabled" name="static_password_enabled" value="1"
-                                {{ Auth::guard('doctor')->user()->static_password_enabled ? 'checked' : '' }}>
-                            <label for="static_password_enabled">Toggle</label>
-                            <span class="mx-1">رمزعبور ثابت فعال است</span>
-                        </div>
-                    </div>
-                    <div class="w-100 d-flex justify-content-between gap-4 flex-xs-wrap flex-xs-column">
-                        <!-- فیلد رمز عبور -->
-                        <div class="w-100 position-relative">
-                            <label for="password" class="label-top-input">کلمه عبور</label>
-                            <div class="input-group">
-                                <input type="password"
-                                       class="form-control h-50 w-100 border-radius-6 mt-3"
-                                       id="password" name="password" placeholder="رمز عبور"
-                                       {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
-                                <span class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2  top-64">
-                                    <img onclick="togglePassword('password')" class="show-pass cursor-pointer"
-                                         src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی" style="width: 20px; height: 20px;">
-                                </span>
-                            </div>
-                        </div>
-                        <!-- فیلد تکرار رمز عبور -->
-                        <div class="w-100 position-relative">
-                            <label for="password_confirmation" class="label-top-input">تکرار کلمه عبور</label>
-                            <div class="input-group">
-                                <input type="password"
-                                       class="form-control h-50 w-100 border-radius-6 mt-3"
-                                       id="password_confirmation" name="password_confirmation" placeholder="تکرار رمز عبور"
-                                       {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
-                                <span class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2 top-64">
-                                    <img onclick="togglePassword('password_confirmation')" class="show-pass cursor-pointer"
-                                         src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی" style="width: 20px; height: 20px;">
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-100 mt-3">
-                        <button type="submit"
-                                class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-                                id="btn-save-pass" {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
-                            <span class="button_text">ذخیره تغییرات</span>
-                            <div class="loader"></div>
-                        </button>
-                    </div>
-                </form>
-            </div>
+          <div class="accordion_content__bS0xm">
+            <form class="w-100" action="{{ route('dr-static-password-update') }}" method="POST"
+              id="staticPasswordForm">
+              @csrf
+              <div class="d-flex align-items-center mt-2">
+                <div class="password_toggle__AXK9v d-flex align-items-center">
+                  <input type="checkbox" id="static_password_enabled" name="static_password_enabled" value="1"
+                    {{ Auth::guard('doctor')->user()->static_password_enabled ? 'checked' : '' }}>
+                  <label for="static_password_enabled">Toggle</label>
+                  <span class="mx-1">رمزعبور ثابت فعال است</span>
+                </div>
+              </div>
+              <div class="w-100 d-flex justify-content-between gap-4 flex-xs-wrap flex-xs-column mt-3">
+                <!-- فیلد رمز عبور -->
+                <div class="w-100 position-relative">
+                  <label for="password" class="label-top-input">کلمه عبور</label>
+                  <div class="input-group">
+                    <input type="password" class="form-control h-50 w-100 border-radius-6 mt-3" id="password"
+                      name="password" placeholder="رمز عبور"
+                      {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
+                    <span
+                      class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2  top-64">
+                      <img onclick="togglePassword('password')" class="show-pass cursor-pointer"
+                        src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی"
+                        style="width: 20px; height: 20px;">
+                    </span>
+                  </div>
+                </div>
+                <!-- فیلد تکرار رمز عبور -->
+                <div class="w-100 position-relative">
+                  <label for="password_confirmation" class="label-top-input">تکرار کلمه عبور</label>
+                  <div class="input-group">
+                    <input type="password" class="form-control h-50 w-100 border-radius-6 mt-3"
+                      id="password_confirmation" name="password_confirmation" placeholder="تکرار رمز عبور"
+                      {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
+                    <span
+                      class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2 top-64">
+                      <img onclick="togglePassword('password_confirmation')" class="show-pass cursor-pointer"
+                        src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی"
+                        style="width: 20px; height: 20px;">
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="w-100 mt-3">
+                <button type="submit"
+                  class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
+                  id="btn-save-pass" {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
+                  <span class="button_text">ذخیره تغییرات</span>
+                  <div class="loader"></div>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
-</div>
     <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8">
       <div class="d-flex justify-content-between align-items-center">
         <div>
@@ -584,27 +584,6 @@
               </div>
               <span class="mx-1"> گذرواژه دو مرحله ای فعال است</span>
             </div>
-            <form class="w-100" action="{{ route('dr-two-factor-update') }}" method="POST" id="twoFactorForm">
-              @csrf
-              <div class="w-100 d-flex justify-content-between gap-4 flex-xs-wrap flex-xs-column">
-                <div class="w-100">
-                  <label for="two_factor_secret" class="label-top-input"> کلید مخفی</label>
-                  <input type="text"
-                    class="form-control h-50 w-100 border-radius-6 mt-3 col-12 position-relative daraje"
-                    id="two_factor_secret" name="two_factor_secret" placeholder="کلید مخفی"
-                    {{ Auth::guard('doctor')->user()->two_factor_secret_enabled ? '' : 'disabled' }}>
-                </div>
-              </div>
-              <div class="w-100 mt-3">
-                <button type="submit"
-                  class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-                  id="btn-save-two-factor"
-                  {{ Auth::guard('doctor')->user()->two_factor_secret_enabled ? '' : 'disabled' }}>
-                  <span class="button_text">ذخیره تغیرات</span>
-                  <div class="loader"></div>
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       </div>
