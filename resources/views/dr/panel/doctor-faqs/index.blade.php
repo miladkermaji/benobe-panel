@@ -13,6 +13,6 @@
 @section('bread-crumb-title', 'لیست سوالات متداول')
 <livewire:dr.panel.doctor-faqs.doctor-faqs-list />
 @section('scripts')
-
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 @endsection
 @endsection
