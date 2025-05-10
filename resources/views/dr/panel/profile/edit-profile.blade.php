@@ -102,7 +102,7 @@
                 disabled>
               <button
                 class="btn btn-dark h-50 col-lg-1 col-xs-2 col-md-1 col-sm-1 d-flex justify-content-center align-items-center fs-6 add-form-item"
-                type="button" id="editButton" data-toggle="modal" data-bs-target="#mobileEditModal">
+                type="button" id="editButton" data-bs-toggle="modal" data-bs-target="#mobileEditModal">
 
                 <img src="{{ asset('dr-assets/icons/pencil-edit.svg') }}" alt="" srcset="">
 
@@ -660,7 +660,8 @@
       placeholder: 'انتخاب استان'
     });
     const cityTomSelect = initializeTomSelect('city_id', {
-      placeholder: 'انتخاب شهر'
+      placeholder: 'انتخاب شهر',
+      
     });
 
     if (!provinceTomSelect || !cityTomSelect) {
