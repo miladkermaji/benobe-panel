@@ -240,6 +240,16 @@ body {
     .modal-content {
         border-radius: 12px;
     }
+    .p-4 {
+        padding: .2rem !important;
+    }
+    .my-container-fluid-cost{
+        border-radius: 0 !important;
+        border: none !important;
+    }
+    .card{
+        border-radius: 0 !important;
+    }
     .modal-body {
         padding: 15px;
     }

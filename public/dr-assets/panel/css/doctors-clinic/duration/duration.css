@@ -373,6 +373,13 @@ h6 {
         padding: 6px 12px;
         height: 32px;
     }
+    .my-container-fluid{
+        padding: 0 !important;
+    }
+    h6{
+        font-size: 13px !important;
+        font-weight: bold !important;
+    }
 }
 
 @media only screen and (max-width: 425px) {
