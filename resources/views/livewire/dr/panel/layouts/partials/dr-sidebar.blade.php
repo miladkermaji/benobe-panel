@@ -250,8 +250,11 @@
             <li class="item-li {{ Request::routeIs('dr-edit-profile') ? 'is-active' : '' }}">
               <a href="{{ route('dr-edit-profile') }}">حساب کاربری</a>
             </li>
-            <li class="item-li {{ Request::routeIs('my-dr-appointments') ? 'is-active' : '' }}">
+            <li class="item-li {{ Request::routeIs('dr.panel.doctor-faqs.index') ? 'is-active' : '' }}">
               <a href="{{ route('my-dr-appointments') }}">نوبت‌های من</a>
+            </li>
+             <li class="item-li {{ Request::routeIs('my-dr-appointments') ? 'is-active' : '' }}">
+              <a href="{{ route('dr.panel.doctor-faqs.index') }}">سوالات متداول</a>
             </li>
             <li class="item-li {{ Request::routeIs('dr-edit-profile-security') ? 'is-active' : '' }}">
               <a href="{{ route('dr-edit-profile-security') }}">امنیت</a>

@@ -396,6 +396,12 @@ Route::prefix('admin')
 Route::prefix('dr')
     ->namespace('Dr')
     ->group(function () {
+        Route::prefix('doctor-faqs')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController::class, 'index'])->name('dr.panel.doctor-faqs.index');
+            Route::get('/create', [\App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController::class, 'create'])->name('dr.panel.doctor-faqs.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController::class, 'edit'])->name('dr.panel.doctor-faqs.edit');
+        });
+
         Route::prefix('doctor-comments')->group(function () {
             Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorComments\DoctorCommentController::class, 'index'])->name('dr.panel.doctor-comments.index');
         });
