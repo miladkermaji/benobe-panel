@@ -1,141 +1,10 @@
 @extends('dr.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
+
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/tickets/tickets.css') }}" rel="stylesheet" />
-  <style>
-    .myPanelOption {
-      display: none;
-    }
 
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    }
-
-    .card-header {
-      background: linear-gradient(135deg, #007bff, #0056b3);
-      border-radius: 12px 12px 0 0;
-      padding: 1.5rem;
-    }
-
-    .card-title {
-      color: white;
-      font-weight: 600;
-    }
-
-    .table-modern {
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .table-modern thead {
-      background: #f8f9fa;
-      color: #333;
-    }
-
-    .table-modern th,
-    .table-modern td {
-      vertical-align: middle;
-      text-align: center;
-      padding: 1rem;
-    }
-
-    .btn-custom {
-      transition: all 0.3s ease;
-    }
-
-    .btn-custom:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .badge {
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-      border-radius: 20px;
-    }
-
-    /* استایل مودال */
-    .modal-content {
-      border-radius: 12px;
-      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
-      border: none;
-    }
-
-    .modal-header {
-      background: linear-gradient(135deg, #6f42c1, #5a32a3);
-      border-radius: 12px 12px 0 0;
-      border-bottom: none;
-      padding: 1.5rem;
-    }
-
-    .modal-title {
-      color: white;
-      font-weight: 600;
-    }
-
-    .modal-body {
-      padding: 2rem;
-    }
-
-    .form-group {
-      position: relative;
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-      font-weight: 500;
-      color: #444;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .form-control,
-    .form-control:focus {
-      border-radius: 8px;
-      border: 1px solid #ced4da;
-      box-shadow: none;
-      padding: 0.75rem;
-      height: 45px;
-    }
-
-    textarea.form-control {
-      height: 120px;
-      resize: none;
-    }
-
-    .form-group.has-error .form-control {
-      border-color: #dc3545;
-    }
-
-    .form-group.has-error .error-message {
-      display: block;
-      color: #dc3545;
-      font-size: 0.85rem;
-      margin-top: 0.25rem;
-    }
-
-    .error-message {
-      display: none;
-    }
-
-    .modal-footer-btn {
-      background: linear-gradient(135deg, #6f42c1, #5a32a3);
-      border: none;
-      border-radius: 8px;
-      padding: 0.75rem 2rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .modal-footer-btn:hover {
-      background: linear-gradient(135deg, #5a32a3, #6f42c1);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-  </style>
 @endsection
 
 @section('site-header')
@@ -186,12 +55,12 @@
                       @endif
                     </td>
                     <td>
-                      <button class="btn btn-light rounded-circle btn-sm btn-custom delete-btn"
+                      <button class="btn btn-light rounded-circle btn-sm  delete-btn"
                         data-id="{{ $ticket->id }}">
                         <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
                       </button>
                       <button onclick="location.href='{{ route('dr-panel-tickets.show', $ticket->id) }}'"
-                        class="btn btn-light rounded-circle btn-sm btn-custom view-btn" data-id="{{ $ticket->id }}">
+                        class="btn btn-light rounded-circle btn-sm  view-btn" data-id="{{ $ticket->id }}">
                         <img src="{{ asset('dr-assets/icons/eye.svg') }}" alt="مشاهده">
                       </button>
                     </td>
@@ -216,7 +85,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="add-ticket-modal-label">ایجاد تیکت جدید</h5>
-        <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
+        <button type="button" class="close text-dark" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
       </div>
@@ -229,7 +98,7 @@
               placeholder="عنوان تیکت را وارد کنید">
             <small class="error-message error-title"></small>
           </div>
-          <div class="form-group">
+          <div class="form-group mt-2">
             <label for="description">توضیحات</label>
             <textarea class="form-control" id="description" name="description" placeholder="توضیحات تیکت را وارد کنید"></textarea>
             <small class="error-message error-description"></small>
