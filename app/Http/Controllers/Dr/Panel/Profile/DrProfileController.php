@@ -320,7 +320,7 @@ class DrProfileController extends Controller
 
     public function updateStaticPassword(Request $request)
     {
-        $key      = 'update_static_password_' . $request->ip();
+        $key = 'update_static_password_' . $request->ip();
         $response = $this->checkRateLimit($key);
         if ($response) {
             return $response;
@@ -328,25 +328,26 @@ class DrProfileController extends Controller
 
         $validator = Validator::make($request->all(), [
             'static_password_enabled' => 'required|boolean',
-            'password'                => 'required_if:static_password_enabled,true|string|min:6|confirmed',
+            'password' => 'required_if:static_password_enabled,true|string|min:6|confirmed',
         ], [
             'static_password_enabled.required' => 'وضعیت رمز عبور ثابت الزامی است.',
-            'static_password_enabled.boolean'  => 'وضعیت رمز عبور ثابت باید یک مقدار بولین باشد.',
-            'password.required_if'             => 'رمز عبور الزامی است.',
-            'password.string'                  => 'رمز عبور باید یک رشته باشد.',
-            'password.min'                     => 'رمز عبور باید حداقل ۶ کاراکتر باشد.',
-            'password.confirmed'               => 'تکرار رمز عبور با رمز عبور اصلی مطابقت ندارد.',
+            'static_password_enabled.boolean' => 'وضعیت رمز عبور ثابت باید یک مقدار بولین باشد.',
+            'password.required_if' => 'رمز عبور الزامی است.',
+            'password.string' => 'رمز عبور باید یک رشته باشد.',
+            'password.min' => 'رمز عبور باید حداقل ۶ کاراکتر باشد.',
+            'password.confirmed' => 'تکرار رمز عبور با رمز عبور اصلی مطابقت ندارد.',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
+                'message' => 'لطفاً خطاهای فرم را بررسی کنید.',
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
-            $doctor                          = $this->getAuthenticatedDoctor();
+            $doctor = $this->getAuthenticatedDoctor();
             $doctor->static_password_enabled = $request->static_password_enabled;
             if ($request->static_password_enabled) {
                 $doctor->password = Hash::make($request->password);
@@ -362,8 +363,8 @@ class DrProfileController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطای سرور در به‌روزرسانی رمز عبور ثابت',
-                'error'   => $e->getMessage(),
+                'message' => 'خطای سرور در به‌روزرسانی رمز عبور ثابت.',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -382,32 +383,37 @@ class DrProfileController extends Controller
     }
     public function updateTwoFactorAuth(Request $request)
     {
-        $key      = 'update_two_factor_auth_' . $request->ip();
+        $key = 'update_two_factor_auth_' . $request->ip();
         $response = $this->checkRateLimit($key);
         if ($response) {
             return $response;
         }
 
         $request->validate([
-            'two_factor_enabled' => 'required|boolean',
-            'two_factor_secret'  => $request->two_factor_enabled ? 'required|string|min:6' : 'nullable',
+            'two_factor_secret_enabled' => 'required|in:0,1,true,false',
         ], [
-            'two_factor_enabled.required' => 'وضعیت احراز هویت دو مرحله‌ای الزامی است.',
-            'two_factor_enabled.boolean'  => 'وضعیت احراز هویت دو مرحله‌ای باید یک مقدار بولین باشد.',
-            'two_factor_secret.required'  => 'رمز احراز هویت دو مرحله‌ای الزامی است.',
-            'two_factor_secret.string'    => 'رمز احراز هویت دو مرحله‌ای باید یک رشته باشد.',
-            'two_factor_secret.min'       => 'رمز احراز هویت دو مرحله‌ای باید حداقل ۶ کاراکتر باشد.',
+            'two_factor_secret_enabled.required' => 'وضعیت احراز هویت دو مرحله‌ای الزامی است.',
+            'two_factor_secret_enabled.in' => 'وضعیت احراز هویت دو مرحله‌ای باید یکی از مقادیر ۰، ۱، true یا false باشد.',
         ]);
 
-        $doctor                            = $this->getAuthenticatedDoctor();
-        $doctor->two_factor_secret_enabled = $request->two_factor_enabled;
-        $doctor->two_factor_secret         = $request->two_factor_enabled ? Hash::make($request->two_factor_secret) : null;
-        $doctor->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تنظیمات گذرواژه دو مرحله‌ای با موفقیت به‌روزرسانی شد.',
-        ]);
+        try {
+            $doctor = $this->getAuthenticatedDoctor();
+            $doctor->two_factor_secret_enabled = $request->two_factor_secret_enabled;
+            $doctor->two_factor_secret = null; // اطمینان از خالی بودن فیلد رمز
+            $doctor->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تنظیمات گذرواژه دو مرحله‌ای با موفقیت به‌روزرسانی شد.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در به‌روزرسانی تنظیمات گذرواژه دو مرحله‌ای',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function niceId()

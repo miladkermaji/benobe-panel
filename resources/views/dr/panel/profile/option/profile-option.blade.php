@@ -804,7 +804,7 @@
     });
   }
   // تابع تایید کد OTP
-function verifyOtpCode() {
+  function verifyOtpCode() {
     const otpInputs = document.querySelectorAll('.otp-input');
     const otpCode = Array.from(otpInputs).map(input => input.value).join('');
     const newMobile = $('#newMobileNumber').val();
@@ -814,14 +814,14 @@ function verifyOtpCode() {
 
     // بررسی کامل بودن کد
     if (otpCode.length !== 4) {
-        toastr.error("لطفاً تمام ارقام کد را وارد کنید");
-        return;
+      toastr.error("لطفاً تمام ارقام کد را وارد کنید");
+      return;
     }
 
     // اطمینان از وجود otpToken
     if (!otpToken) {
-        toastr.error("توکن OTP در دسترس نیست. لطفاً دوباره کد را درخواست کنید.");
-        return;
+      toastr.error("توکن OTP در دسترس نیست. لطفاً دوباره کد را درخواست کنید.");
+      return;
     }
 
     // مخفی کردن متن دکمه و نمایش لودینگ
@@ -830,46 +830,46 @@ function verifyOtpCode() {
 
     // تولید URL با استفاده از route و otpToken
     $.ajax({
-        url: "{{ route('dr-mobile-confirm', ':token') }}".replace(':token', otpToken),
-        method: 'POST',
-        data: {
-            otp: otpCode.split('').map(Number),
-            mobile: newMobile
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-            // بررسی دقیق پاسخ موفقیت
-            if (response.success) {
-                toastr.success(response.message);
-                // به‌روزرسانی المان‌های موبایل در صفحه
-                $('input[name="mobile"]').val(response.mobile);
-                // بستن مودال
-                $('#mobileEditModal').modal('hide');
-                // رفرش صفحه برای اطمینان
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            } else {
-                toastr.error(response.message || "خطا در تغییر شماره موبایل");
-            }
-        },
-        error: function(xhr) {
-            // مدیریت خطاهای سرور
-            let errorMessage = "خطا در تایید کد";
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                errorMessage = xhr.responseJSON.message;
-            }
-            toastr.error(errorMessage);
-        },
-        complete: function() {
-            // بازگردانی دکمه به حالت اولیه
-            buttonText.style.display = 'block';
-            loader.style.display = 'none';
+      url: "{{ route('dr-mobile-confirm', ':token') }}".replace(':token', otpToken),
+      method: 'POST',
+      data: {
+        otp: otpCode.split('').map(Number),
+        mobile: newMobile
+      },
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      success: function(response) {
+        // بررسی دقیق پاسخ موفقیت
+        if (response.success) {
+          toastr.success(response.message);
+          // به‌روزرسانی المان‌های موبایل در صفحه
+          $('input[name="mobile"]').val(response.mobile);
+          // بستن مودال
+          $('#mobileEditModal').modal('hide');
+          // رفرش صفحه برای اطمینان
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          toastr.error(response.message || "خطا در تغییر شماره موبایل");
         }
+      },
+      error: function(xhr) {
+        // مدیریت خطاهای سرور
+        let errorMessage = "خطا در تایید کد";
+        if (xhr.responseJSON && xhr.responseJSON.message) {
+          errorMessage = xhr.responseJSON.message;
+        }
+        toastr.error(errorMessage);
+      },
+      complete: function() {
+        // بازگردانی دکمه به حالت اولیه
+        buttonText.style.display = 'block';
+        loader.style.display = 'none';
+      }
     });
-}
+  }
   // تابع شروع تایمر ارسال مجدد
   function startResendTimer() {
     let seconds = 120;
@@ -959,7 +959,8 @@ function verifyOtpCode() {
         });
     });
   });
-  document.getElementById("staticPasswordForm").addEventListener('submit', function(e) {
+// مدیریت ارسال فرم
+document.getElementById("staticPasswordForm").addEventListener('submit', function(e) {
     e.preventDefault();
     const form = this;
     const submitButton = form.querySelector('button[type="submit"]');
@@ -970,78 +971,125 @@ function verifyOtpCode() {
     loader.style.display = 'block';
 
     fetch(form.action, {
-        method: form.method,
+        method: 'POST',
         body: new FormData(form),
         headers: {
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-          'X-Requested-With': 'XMLHttpRequest'
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                throw {
+                    status: response.status,
+                    data: errorData
+                };
+            });
         }
-      })
-      .then(response => {
-        return response.json().then(data => {
-          if (!response.ok) {
-            throw {
-              status: response.status,
-              data: data
-            };
-          }
-          return data;
-        });
-      })
-      .then(data => {
+        return response.json();
+    })
+    .then(data => {
         buttonText.style.display = 'block';
         loader.style.display = 'none';
         if (data.success) {
-          toastr.success(data.message || "تنظیمات با موفقیت به‌روزرسانی شد");
+            toastr.success(data.message || 'تنظیمات رمز عبور ثابت با موفقیت به‌روزرسانی شد.');
+            passwordInput.value = '';
+            confirmPasswordInput.value = '';
+            passwordInput.placeholder = 'رمز عبور تنظیم شده است';
+            confirmPasswordInput.placeholder = 'رمز عبور تنظیم شده است';
+            clearPreviousErrors();
         } else {
-          toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
+            toastr.error(data.message || 'خطا در به‌روزرسانی تنظیمات');
         }
-      })
-      .catch(error => {
+    })
+    .catch(error => {
         buttonText.style.display = 'block';
         loader.style.display = 'none';
         if (error.status === 422 && error.data.errors) {
-          handleValidationErrors(error.data.errors, error.data.message);
-        } else {
-          toastr.error(error.data?.message || 'خطا در برقراری ارتباط با سرور');
+            handleValidationErrors(error.data.errors);
         }
-      });
-  });
+    });
+});
 
-  function handleValidationErrors(errors, message) {
+// تابع مدیریت خطاهای اعتبارسنجی
+function handleValidationErrors(errors) {
     clearPreviousErrors();
     Object.keys(errors).forEach(field => {
-      const inputElement = document.querySelector(`[name="${field}"]`);
-      if (inputElement) {
-        const errorElement = document.createElement('div');
-        errorElement.className = 'text-danger validation-error mt-1 font-size-13';
-        errorElement.textContent = errors[field][0];
-        inputElement.classList.add('is-invalid');
-        inputElement.parentNode.insertBefore(errorElement, inputElement.nextSibling);
-      }
+        const inputElement = document.querySelector(`[name="${field}"]`);
+        if (inputElement) {
+            // پیدا کردن div.validation-error با رفتن به parent بالاتر
+            const errorElement = inputElement.closest('.position-relative').querySelector('.validation-error');
+            if (errorElement) {
+                errorElement.textContent = errors[field][0];
+                inputElement.classList.add('is-invalid');
+            }
+        }
+        // اگر خطا برای password باشه و به password_confirmation مربوط باشه
+        if (field === 'password' && errors[field][0].includes('تکرار رمز عبور')) {
+            const confirmInput = document.querySelector('[name="password_confirmation"]');
+            const confirmErrorElement = confirmInput.closest('.position-relative').querySelector('.validation-error');
+            if (confirmErrorElement) {
+                confirmErrorElement.textContent = errors[field][0];
+                confirmInput.classList.add('is-invalid');
+            }
+        }
     });
-    toastr.error(message || "لطفاً خطاهای فرم را بررسی کنید.");
-  }
+    toastr.error('لطفاً خطاهای فرم را بررسی کنید.');
+}
 
-  function clearPreviousErrors() {
-    document.querySelectorAll('.validation-error').forEach(el => el.remove());
+// تابع پاک کردن خطاهای قبلی
+function clearPreviousErrors() {
+    document.querySelectorAll('.validation-error').forEach(el => el.textContent = '');
     document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-  }
+}
+  // تنظیم اولیه وضعیت اینپوت‌ها بر اساس تاگل
+
   document.addEventListener('DOMContentLoaded', function() {
     const toggleSwitch = document.querySelector('input[name="static_password_enabled"]');
     const passwordInput = document.querySelector('input[name="password"]');
     const confirmPasswordInput = document.querySelector('input[name="password_confirmation"]');
     const saveButton = document.getElementById('btn-save-pass');
-    toggleSwitch.addEventListener('change', function() {
-      if (this.checked) {
+    const statusText = document.querySelector('#static_password_status');
+
+    // تابع آپدیت متن وضعیت
+    function updateStatusText(isEnabled) {
+      statusText.textContent = isEnabled ? 'رمز عبور ثابت فعال است' : 'رمز عبور ثابت غیرفعال است';
+    }
+
+    // تابع مدیریت وضعیت اینپوت‌ها
+    function updateInputsState(isEnabled) {
+      if (isEnabled) {
         passwordInput.removeAttribute('disabled');
         confirmPasswordInput.removeAttribute('disabled');
         saveButton.removeAttribute('disabled');
+        passwordInput.placeholder = 'رمز عبور جدید را وارد کنید';
+        confirmPasswordInput.placeholder = 'تکرار رمز عبور جدید';
       } else {
         passwordInput.setAttribute('disabled', 'disabled');
         confirmPasswordInput.setAttribute('disabled', 'disabled');
         saveButton.setAttribute('disabled', 'disabled');
-        // ارسال درخواست Ajax برای غیرفعال کردن رمز عبور ثابت
+        passwordInput.value = '';
+        confirmPasswordInput.value = '';
+        passwordInput.placeholder = 'رمز عبور';
+        confirmPasswordInput.placeholder = 'تکرار رمز عبور';
+        clearPreviousErrors();
+      }
+    }
+
+    // مدیریت تغییر تاگل
+    toggleSwitch.addEventListener('change', function() {
+      const isEnabled = this.checked;
+      updateStatusText(isEnabled);
+      updateInputsState(isEnabled);
+
+      // اگر تاگل غیرفعال شد، درخواست به سرور برای غیرفعال کردن رمز عبور
+      if (!isEnabled) {
+        const loader = document.createElement('div');
+        loader.className = 'loader';
+        loader.style.display = 'block';
+        this.parentElement.appendChild(loader);
+
         fetch("{{ route('dr-static-password-update') }}", {
             method: 'POST',
             headers: {
@@ -1050,116 +1098,84 @@ function verifyOtpCode() {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              static_password_enabled: false
+              static_password_enabled: false,
             }),
           })
           .then(response => response.json())
           .then(data => {
+            loader.remove();
             if (data.success) {
-              toastr.success(data.message);
+              toastr.success(data.message || 'رمز عبور ثابت با موفقیت غیرفعال شد.');
+              updateStatusText(false);
+              updateInputsState(false);
             } else {
-              toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
+              toastr.error(data.message || 'خطا در غیرفعال کردن رمز عبور ثابت');
+              toggleSwitch.checked = true;
+              updateStatusText(true);
+              updateInputsState(true);
             }
           })
           .catch(error => {
-            toastr.error("خطا در برقراری ارتباط با سرور");
+            loader.remove();
+            toastr.error('خطا در برقراری ارتباط با سرور');
+            toggleSwitch.checked = true;
+            updateStatusText(true);
+            updateInputsState(true);
           });
       }
     });
+    updateStatusText(toggleSwitch.checked);
+    updateInputsState(toggleSwitch.checked);
   });
   document.addEventListener('DOMContentLoaded', function() {
-    const toggleSwitch = document.querySelector('input[name="two_factor_enabled"]');
+    const toggleSwitch = document.querySelector('input[name="two_factor_secret_enabled"]');
     const secretInput = document.querySelector('input[name="two_factor_secret"]');
     const saveButton = document.getElementById('btn-save-two-factor');
+    const statusText = document.querySelector('#two_factor_status');
+
+    // تابع آپدیت متن وضعیت
+    function updateStatusText(isEnabled) {
+      statusText.textContent = isEnabled ? 'گذرواژه دو مرحله‌ای فعال است' : 'گذرواژه دو مرحله‌ای غیرفعال است';
+    }
     toggleSwitch.addEventListener('change', function() {
-      if (this.checked) {
-        secretInput.removeAttribute('disabled');
-        saveButton.removeAttribute('disabled');
-      } else {
-        secretInput.setAttribute('disabled', 'disabled');
-        saveButton.setAttribute('disabled', 'disabled');
-        // ارسال درخواست Ajax برای غیرفعال کردن گذرواژه دو مرحله‌ای
-        fetch("{{ route('dr-two-factor-update') }}", {
-            method: 'POST',
-            headers: {
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              two_factor_enabled: 0, // غیرفعال کردن
-              two_factor_secret: null // ارسال null به جای رشته خالی
-            }),
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              toastr.success(data.message);
-
-            } else {
-              toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
-            }
-          })
-          .catch(error => {
-            toastr.error("خطا در برقراری ارتباط با سرور");
-          });
-      }
-    });
-    // ارسال فرم گذرواژه دو مرحله‌ای
-    document.getElementById("twoFactorForm").addEventListener('submit', function(e) {
-      e.preventDefault();
-      const form = this;
-      const submitButton = form.querySelector('button[type="submit"]');
-      const loader = submitButton.querySelector('.loader');
-      const buttonText = submitButton.querySelector('.button_text');
-      // Show loading state
-      buttonText.style.display = 'none';
+      const isEnabled = this.checked;
+      updateStatusText(isEnabled);
+      const loader = document.createElement('div');
+      loader.className = 'loader';
       loader.style.display = 'block';
-      // اعتبارسنجی کلید مخفی اگر تاگل فعال باشد
-      if (toggleSwitch.checked && !secretInput.value) {
-        toastr.error("لطفاً کلید مخفی را وارد کنید");
+      this.parentElement.appendChild(loader);
 
-        buttonText.style.display = 'block';
-        loader.style.display = 'none';
-        return;
-      }
-      fetch(form.action, {
-          method: form.method,
+      fetch("{{ route('dr-two-factor-update') }}", {
+          method: 'POST',
           headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            two_factor_enabled: toggleSwitch.checked ? 1 : 0,
-            two_factor_secret: secretInput.value
+            two_factor_secret_enabled: isEnabled ? 1 : 0,
           }),
         })
         .then(response => response.json())
         .then(data => {
-          // Reset button to initial state
-          buttonText.style.display = 'block';
-          loader.style.display = 'none';
+          loader.remove();
           if (data.success) {
-            // Show success toast
-            toastr.success(data.message || "تنظیمات با موفقیت به‌روزرسانی شد");
-
+            toastr.success(data.message || 'تنظیمات گذرواژه دو مرحله‌ای با موفقیت به‌روزرسانی شد.');
+            updateStatusText(isEnabled);
           } else {
-            // Show error toast
-            toastr.error(data.message || "خطا در به‌روزرسانی تنظیمات");
+            toastr.error(data.message || 'خطا در به‌روزرسانی تنظیمات');
+            // بازگرداندن تاگل به حالت قبلی در صورت خطا
+            toggleSwitch.checked = !isEnabled;
+            updateStatusText(!isEnabled);
           }
         })
         .catch(error => {
-          // Reset button to initial state
-          buttonText.style.display = 'block';
-          loader.style.display = 'none';
-          // نمایش خطاهای اعتبارسنجی
-          if (error.errors) {
-            handleValidationErrors(error.errors);
-          } else {
-            toastr.error(error.message || 'خطا در برقراری ارتباط با سرور');
+          loader.remove();
+          toastr.error('خطا در برقراری ارتباط با سرور');
+          // بازگرداندن تاگل به حالت قبلی
+          toggleSwitch.checked = !isEnabled;
+          updateStatusText(!isEnabled);
 
-          }
         });
     });
   });
@@ -1265,18 +1281,18 @@ function verifyOtpCode() {
   // فراخوانی در زمان بارگذاری اولیه صفحه
   document.addEventListener('DOMContentLoaded', checkProfileCompleteness);
 
- function togglePassword(inputId) {
+  function togglePassword(inputId) {
     const input = document.getElementById(inputId);
     const icon = input.parentElement.querySelector('.show-pass');
-    
+
     if (input.type === 'password') {
-        input.type = 'text';
-        icon.src = "{{ asset('dr-assets/icons/show-pass.svg') }}"; // آیکون نمایش
+      input.type = 'text';
+      icon.src = "{{ asset('dr-assets/icons/show-pass.svg') }}"; // آیکون نمایش
     } else {
-        input.type = 'password';
-        icon.src = "{{ asset('dr-assets/icons/hide-pass.svg') }}"; // آیکون مخفی
+      input.type = 'password';
+      icon.src = "{{ asset('dr-assets/icons/hide-pass.svg') }}"; // آیکون مخفی
     }
-}
+  }
 
 
   // تابع حذف تخصص بدون رفرش

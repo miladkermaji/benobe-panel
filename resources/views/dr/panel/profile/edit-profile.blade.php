@@ -512,7 +512,9 @@
                   <input type="checkbox" id="static_password_enabled" name="static_password_enabled" value="1"
                     {{ Auth::guard('doctor')->user()->static_password_enabled ? 'checked' : '' }}>
                   <label for="static_password_enabled">Toggle</label>
-                  <span class="mx-1">رمزعبور ثابت فعال است</span>
+                  <span id="static_password_status" class="mx-1">
+                    {{ Auth::guard('doctor')->user()->static_password_enabled ? 'رمز عبور ثابت فعال است' : 'رمز عبور ثابت غیرفعال است' }}
+                  </span>
                 </div>
               </div>
               <div class="w-100 d-flex justify-content-between gap-4 flex-xs-wrap flex-xs-column mt-3">
@@ -521,22 +523,25 @@
                   <label for="password" class="label-top-input">کلمه عبور</label>
                   <div class="input-group">
                     <input type="password" class="form-control h-50 w-100 border-radius-6 mt-3" id="password"
-                      name="password" placeholder="رمز عبور"
+                      name="password" value=""
+                      placeholder="{{ Auth::guard('doctor')->user()->static_password_enabled ? 'رمز عبور تنظیم شده است' : 'رمز عبور' }}"
                       {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
                     <span
-                      class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2  top-64">
+                      class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2 top-64">
                       <img onclick="togglePassword('password')" class="show-pass cursor-pointer"
                         src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی"
                         style="width: 20px; height: 20px;">
                     </span>
                   </div>
+                  <div class="text-danger validation-error mt-1 font-size-13"></div>
                 </div>
                 <!-- فیلد تکرار رمز عبور -->
                 <div class="w-100 position-relative">
                   <label for="password_confirmation" class="label-top-input">تکرار کلمه عبور</label>
                   <div class="input-group">
                     <input type="password" class="form-control h-50 w-100 border-radius-6 mt-3"
-                      id="password_confirmation" name="password_confirmation" placeholder="تکرار رمز عبور"
+                      id="password_confirmation" name="password_confirmation" value=""
+                      placeholder="{{ Auth::guard('doctor')->user()->static_password_enabled ? 'رمز عبور تنظیم شده است' : 'تکرار رمز عبور' }}"
                       {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
                     <span
                       class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2 top-64">
@@ -545,6 +550,7 @@
                         style="width: 20px; height: 20px;">
                     </span>
                   </div>
+                  <div class="text-danger validation-error mt-1 font-size-13"></div>
                 </div>
               </div>
               <div class="w-100 mt-3">
@@ -564,12 +570,10 @@
       <div class="d-flex justify-content-between align-items-center">
         <div>
           <img src="{{ asset('dr-assets/icons/lock.svg') }}" alt="" srcset="">
-
           <span class="txt-card-span mx-1">فعال‌سازی گذرواژه دو مرحله‌ای</span>
         </div>
         <div>
           <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="" srcset="">
-
         </div>
       </div>
       <div class="drop-toggle-styles two-factor-data-drop-toggle">
@@ -577,12 +581,16 @@
         <div>
           <div class="accordion_content__bS0xm">
             <div class="d-flex align-items-center mt-3">
-              <div class="password_toggle__AXK9v d-flex align-items-center">
-                <input type="checkbox" id="two_factor_enabled" name="two_factor_enabled" value="1"
-                  {{ Auth::guard('doctor')->user()->two_factor_secret_enabled ? 'checked' : '' }}>
-                <label for="two_factor_enabled">Toggle</label>
+              <div class="d-flex align-items-center mt-3">
+                <div class="password_toggle__AXK9v d-flex align-items-center">
+                  <input type="checkbox" id="two_factor_secret_enabled" name="two_factor_secret_enabled"
+                    value="1" {{ Auth::guard('doctor')->user()->two_factor_secret_enabled ? 'checked' : '' }}>
+                  <label for="two_factor_secret_enabled">Toggle</label>
+                </div>
+                <span id="two_factor_status" class="mx-1">
+                  {{ Auth::guard('doctor')->user()->two_factor_secret_enabled ? 'گذرواژه دو مرحله‌ای فعال است' : 'گذرواژه دو مرحله‌ای غیرفعال است' }}
+                </span>
               </div>
-              <span class="mx-1"> گذرواژه دو مرحله ای فعال است</span>
             </div>
           </div>
         </div>

@@ -64,7 +64,7 @@ class Doctor extends Authenticatable
         'status',
         'api_token',
         'two_factor_secret',
-        'two_factor_enabled',
+        'two_factor_secret_enabled',
         'views_count',
     ];
 
