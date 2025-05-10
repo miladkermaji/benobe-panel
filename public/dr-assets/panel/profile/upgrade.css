@@ -1,221 +1,351 @@
-/* استایل‌های کلی صفحه */
+:root {
+  --primary: #2E86C1;
+  --primary-light: #84CAF9;
+  --secondary: #1DEB3C;
+  --secondary-hover: #15802A;
+  --background-light: #F0F8FF;
+  --background-footer: #D4ECFD;
+  --background-card: #FFFFFF;
+  --text-primary: #000000;
+  --text-secondary: #707070;
+  --text-discount: #008000;
+  --text-original: #FF0000;
+  --border-neutral: #E5E7EB;
+  --shadow: rgba(0, 0, 0, 0.15);
+  --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+  --radius-button: 0.5rem;
+  --radius-button-large: 1rem;
+  --radius-card: 1.125rem;
+  --radius-footer: 1.875rem;
+  --radius-nav: 1.25rem;
+  --radius-circle: 9999px;
+  --success: #28a745;
+  --danger: #dc3545;
+}
+
+.myPanelOption {
+  display: none !important;
+}
+
 .main-content {
-    padding: 20px;
-    background-color: #f5f7fa;
-    min-height: 100vh;
+  padding: 30px 20px;
+  background: var(--background-light);
+  min-height: 100vh;
 }
 
 .user-panel-content {
-    max-width: 1400px; /* عرض مناسب برای محتوا */
-    margin: 0 auto;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* استایل کارت */
 .card-header {
-    background-color: #f8f9fa;
-    padding: 15px 20px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    border-bottom: 1px solid #e9ecef;
-    border-radius: 12px 12px 0 0;
+  background: var(--gradient-primary);
+  color: var(--background-card);
+  padding: 15px 20px;
+  font-size: 18px;
+  font-weight: 600;
+  border-bottom: none;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 
 .card-body {
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  background: var(--background-card);
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+  box-shadow: 0 4px 16px var(--shadow);
 }
 
-/* استایل الرت */
 .alert.bg-light-blue {
-    background-color: #e7f1ff;
-    border: 1px solid #d0e3ff;
-    border-radius: 8px;
-    padding: 15px;
-    color: #1a73e8;
-    margin-bottom: 20px;
+  background: var(--background-light);
+  border: 1px solid var(--primary-light);
+  border-radius: var(--radius-button);
+  padding: 15px;
+  color: var(--text-primary);
+  margin-bottom: 20px;
 }
 
 .alert strong {
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--primary);
 }
 
 .alert p {
-    font-size: 14px;
-    color: #333;
-    margin: 0 0 10px;
+  font-size: 14px;
+  color: var(--text-primary);
+  margin: 0 0 10px;
 }
 
 .alert ul {
-    padding-right: 20px;
-    margin: 0;
-    font-size: 14px;
-    color: #333;
+  padding-right: 20px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-primary);
 }
 
 .alert ul li {
-    margin-bottom: 8px;
+  margin-bottom: 8px;
 }
 
-/* استایل تعرفه‌ها */
 .tarifms {
-    font-size: 14px;
-    color: #495057;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .tarifms strong {
-    font-weight: 600;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-/* دکمه پرداخت */
 .my-btn-primary {
-    background-color: #007bff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  background: var(--primary);
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-button);
+  color: var(--background-card);
+  transition: background 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .my-btn-primary:hover {
-    background-color: #0056b3;
+  background: var(--primary-light);
+  transform: translateY(-2px);
 }
 
-/* استایل جدول */
+.clrfix {
+  margin-top: 20px;
+  width: 100%;
+  text-align: right;
+}
+
 .table-responsive {
-    margin-top: 20px;
+  margin-top: 20px;
+  overflow-x: auto;
 }
 
 .table {
-    margin-bottom: 0;
-    border-collapse: separate;
-    border-spacing: 0;
-    width: 100%;
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  width: 100%;
 }
 
 .table thead th {
-    background-color: #f1f3f5;
-    color: #495057;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 12px 15px;
-    border-bottom: 2px solid #dee2e6;
-    text-align: right;
-    position: sticky;
-    top: 0;
-    z-index: 1;
+  background: var(--background-light);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 15px;
+  border-bottom: none;
+  text-align: right;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .table tbody tr {
-    transition: background-color 0.2s ease;
+  background: var(--background-card);
+  box-shadow: 0 2px 8px var(--shadow);
+  border-radius: var(--radius-button);
+  transition: box-shadow 0.3s ease;
 }
 
 .table tbody tr:hover {
-    background-color: #f8f9fa;
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .table tbody td {
-    padding: 12px 15px;
-    font-size: 13px;
-    color: #6c757d;
-    border-bottom: 1px solid #e9ecef;
-    text-align: right;
+  padding: 12px 15px;
+  font-size: 13px;
+  color: var(--text-primary);
+  border: none;
+  text-align: right;
+  vertical-align: middle;
 }
 
-/* دکمه حذف */
 .btn-light.btn-sm {
-    padding: 5px 10px;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
+  padding: 6px;
+  border-radius: var(--radius-button);
+  background: var(--background-light);
+  border: none;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .btn-light.btn-sm:hover {
-    background-color: #f1f3f5;
+  background: var(--danger);
+  transform: scale(1.1);
 }
 
 .btn-light.btn-sm img {
-    width: 16px;
-    height: 16px;
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) invert(1);
 }
 
-/* پیجینیشن */
 .d-flex.justify-content-center.mt-3 {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .pagination .page-link {
-    border-radius: 6px;
-    margin: 0 3px;
-    color: #007bff;
-    border: 1px solid #dee2e6;
-    transition: all 0.2s ease;
+  border-radius: var(--radius-button);
+  margin: 0 4px;
+  color: var(--primary);
+  border: 1px solid var(--border-neutral);
+  padding: 8px 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
 }
 
 .pagination .page-link:hover {
-    background-color: #e9ecef;
-    border-color: #007bff;
+  background: var(--primary);
+  color: var(--background-card);
+  border-color: var(--primary);
 }
 
 .pagination .page-item.active .page-link {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--background-card);
 }
 
-/* پاسخگویی برای موبایل */
-@media (max-width: 768px) {
-    .main-content {
-        padding: 10px;
-    }
+.pagination .page-item.disabled .page-link {
+  color: var(--text-secondary);
+  border-color: var(--border-neutral);
+  background: var(--background-card);
+}
 
-    .user-panel-content {
-        padding: 0 10px;
-    }
+/* Responsive Design */
+@media only screen and (max-width: 991px) {
+  .main-content {
+    padding: 20px 15px;
+  }
+  .user-panel-content {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+  .card-header {
+    font-size: 16px;
+    padding: 12px 15px;
+  }
+  .card-body {
+    padding: 15px;
+  }
+  .alert strong {
+    font-size: 14px;
+  }
+  .alert p,
+  .alert ul,
+  .tarifms {
+    font-size: 13px;
+  }
+  .my-btn-primary {
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+  .table thead th {
+    font-size: 13px;
+    padding: 10px;
+  }
+  .table tbody td {
+    font-size: 12px;
+    padding: 10px;
+  }
+  .btn-light.btn-sm {
+    padding: 5px;
+  }
+}
 
-    .card-header {
-        font-size: 16px;
-    }
-
-    .alert strong {
-        font-size: 14px;
-    }
-
-    .alert p,
-    .alert ul,
-    .tarifms {
-        font-size: 13px;
-    }
-
-    .my-btn-primary {
-        font-size: 13px;
-        padding: 8px 16px;
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-    }
-
-    .table {
-        min-width: 700px; /* حداقل عرض جدول برای جلوگیری از به‌هم‌ریختگی */
-    }
-
-    .table thead th,
-    .table tbody td {
-        font-size: 12px;
-        padding: 10px;
-    }
+@media only screen and (max-width: 425px) {
+  .main-content {
+    padding: 10px 0; /* کاهش پدینگ */
+    width: 100%;
+    margin: 0;
+  }
+  .user-panel-content {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+  .card {
+    width: 100%;
+    border-radius: 0.25rem; /* ردیوس کم */
+    margin: 0;
+  }
+  .card-header {
+    font-size: 14px;
+    padding: 6px 8px; /* کاهش پدینگ */
+  }
+  .card-body {
+    padding: 8px; /* کاهش پدینگ */
+  }
+  .alert {
+    padding: 8px; /* کاهش پدینگ */
+    margin-bottom: 10px;
+  }
+  .alert strong {
+    font-size: 13px;
+  }
+  .alert p,
+  .alert ul,
+  .tarifms {
+    font-size: 12px;
+  }
+  .alert ul {
+    padding-right: 10px;
+  }
+  .my-btn-primary {
+    font-size: 12px;
+    padding: 5px 10px; /* کاهش پدینگ */
+    border-radius: 0.25rem;
+  }
+  .clrfix {
+    margin-top: 10px;
+  }
+  .table-responsive {
+    width: 100%;
+    margin: 10px 0;
+  }
+  .table {
+    border-spacing: 0 4px;
+  }
+  .table thead th {
+    font-size: 11px;
+    padding: 4px 6px; /* کاهش پدینگ */
+    border-radius: 0.25rem;
+  }
+  .table tbody tr {
+    border-radius: 0.25rem;
+  }
+  .table tbody td {
+    font-size: 11px;
+    padding: 4px 6px; /* کاهش پدینگ */
+  }
+  .btn-light.btn-sm {
+    padding: 5px; /* پدینگ مناسب برای لمس */
+    border-radius: 0.25rem;
+  }
+  .btn-light.btn-sm img {
+    width: 20px;
+    height: 20px;
+  }
+  .d-flex.justify-content-center.mt-3 {
+    margin-top: 10px;
+  }
+  .pagination .page-link {
+    padding: 3px 6px; /* کاهش پدینگ */
+    font-size: 11px;
+    border-radius: 0.25rem;
+    margin: 0 2px;
+  }
 }

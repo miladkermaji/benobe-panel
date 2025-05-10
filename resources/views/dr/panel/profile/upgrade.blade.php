@@ -2,17 +2,8 @@
 
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
-    rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
-
-  <link type="text/css" href="{{ asset('dr-assets/panel/bime/bime.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/profile/upgrade.css') }}" rel="stylesheet" />
-  <style>
-    .myPanelOption {
-      display: none;
-    }
-  </style>
+
 @endsection
 
 @section('site-header')
@@ -67,7 +58,7 @@
 
       <!-- جدول -->
       <div class="table-responsive w-100">
-        <table class="table table-bordered table-striped">
+        <table class="table">
           <thead>
             <tr>
               <th>ردیف</th>
@@ -101,7 +92,7 @@
                 <td>{{ number_format($payment->amount) }} تومان</td>
                 <td>{{ $payment->days }}</td>
                 <td>
-                  <button class="btn btn-light btn-sm delete-payment" data-id="{{ $payment->id }}">
+                  <button class="btn  rounded-circle btn-sm delete-payment" data-id="{{ $payment->id }}">
                     <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="">
                   </button>
                 </td>
