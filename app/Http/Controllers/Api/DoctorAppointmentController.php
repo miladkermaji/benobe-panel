@@ -503,168 +503,269 @@ class DoctorAppointmentController extends Controller
         ];
     }
 
-    private function getNextAvailableOnlineSlot($doctor, $type)
-    {
-        $doctorId = $doctor->id;
-        $today = Carbon::today('Asia/Tehran');
-        $now = Carbon::now('Asia/Tehran');
-        $daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-        $currentDayIndex = $today->dayOfWeek;
+  private function getNextAvailableOnlineSlot($doctor, $type)
+{
+    $doctorId = $doctor->id;
+    $today = Carbon::today('Asia/Tehran');
+    $now = Carbon::now('Asia/Tehran');
+    $daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    $currentDayIndex = $today->dayOfWeek;
 
-        $counselingConfig = DoctorCounselingConfig::where('doctor_id', $doctorId)->first();
-        $calendarDays = $counselingConfig ? ($counselingConfig->calendar_days ?? 30) : 30;
-        $duration = $counselingConfig ? ($counselingConfig->appointment_duration ?? 15) : 15;
+    // دریافت تنظیمات مشاوره
+    $counselingConfig = DoctorCounselingConfig::where('doctor_id', $doctorId)->first();
+    if (!$counselingConfig || !$counselingConfig->{"has_{$type}_counseling"}) {
+        Log::warning("GetNextAvailableOnlineSlot - Counseling type {$type} is not enabled for doctor {$doctorId}");
+        return [
+            'next_available_slot' => null,
+            'next_available_datetime' => null,
+            'slots' => [],
+        ];
+    }
+    $calendarDays = $counselingConfig->calendar_days ?? 30;
+    $defaultDuration = $counselingConfig->appointment_duration ?? 15;
 
-        $bookedAppointments = CounselingAppointment::where('doctor_id', $doctorId)
-            ->where('appointment_type', $type)
-            ->where(function ($query) {
-                $query->where('status', 'scheduled')
-                    ->orWhere('status', 'pending_review');
-            })
-            ->where('appointment_date', '>=', $today->toDateString())
-            ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
-            ->get();
+    // دریافت نوبت‌های رزروشده
+    $bookedAppointments = CounselingAppointment::where('doctor_id', $doctorId)
+        ->where('appointment_type', $type)
+        ->where(function ($query) {
+            $query->where('status', 'scheduled')
+                ->orWhere('status', 'pending_review');
+        })
+        ->where('appointment_date', '>=', $today->toDateString())
+        ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
+        ->get();
 
-        $slots = [];
-        $nextAvailableSlot = null;
-        $nextAvailableDateTime = null;
+    $slots = [];
+    $nextAvailableSlot = null;
+    $nextAvailableDateTime = null;
 
-        for ($i = 0; $i < $calendarDays; $i++) {
-            $checkDayIndex = ($currentDayIndex + $i) % 7;
-            $dayName = $daysOfWeek[$checkDayIndex];
-            $checkDate = $today->copy()->addDays($i);
-            $checkDateString = $checkDate->toDateString();
-            $jalaliDate = Jalalian::fromCarbon($checkDate)->format('j F Y');
-            $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
+    for ($i = 0; $i < $calendarDays; $i++) {
+        $checkDayIndex = ($currentDayIndex + $i) % 7;
+        $dayName = $daysOfWeek[$checkDayIndex];
+        $checkDate = $today->copy()->addDays($i);
+        $checkDateString = $checkDate->toDateString();
+        $jalaliDate = Jalalian::fromCarbon($checkDate)->format('j F Y');
+        $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
 
-            // بررسی تعطیلات
-            $holidays = DoctorCounselingHoliday::where('doctor_id', $doctorId)
-                ->where('status', 'active')
-                ->first();
-            if ($holidays && $holidays->holiday_dates) {
-                $holidayDates = is_string($holidays->holiday_dates) ? json_decode($holidays->holiday_dates, true) : $holidays->holiday_dates;
-                if (in_array($checkDateString, $holidayDates)) {
-                    Log::warning("GetNextAvailableOnlineSlot - Date {$checkDateString} is a counseling holiday for doctor {$doctorId}");
-                    continue;
-                }
-            }
-
-            // بررسی برنامه روزانه خاص
-            $specialSchedule = CounselingDailySchedule::where('doctor_id', $doctorId)
-                ->where('date', $checkDateString)
-                ->first();
-
-            $schedule = null;
-            $workHours = [];
-            $emergencyTimes = [];
-            if ($specialSchedule) {
-                $workHours = is_string($specialSchedule->consultation_hours) ? json_decode($specialSchedule->consultation_hours, true) : $specialSchedule->consultation_hours;
-                // emergency_times برای CounselingDailySchedules تعریف نشده، پس نادیده گرفته می‌شه
-            } else {
-                $schedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
-                    ->where('day', $dayName)
-                    ->where('is_working', true)
-                    ->first();
-                if ($schedule) {
-                    $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
-                    $emergencyTimes = is_string($schedule->emergency_times) ? json_decode($schedule->emergency_times, true) : ($schedule->emergency_times ?? []);
-                }
-            }
-
-            if (empty($workHours)) {
-                Log::warning("GetNextAvailableOnlineSlot - No work hours for doctor {$doctorId} on {$dayName}");
+        // بررسی تعطیلات
+        $holidays = DoctorCounselingHoliday::where('doctor_id', $doctorId)
+            ->where('status', 'active')
+            ->first();
+        if ($holidays && $holidays->holiday_dates) {
+            $holidayDates = is_string($holidays->holiday_dates) ? json_decode($holidays->holiday_dates, true) : $holidays->holiday_dates;
+            if (in_array($checkDateString, $holidayDates)) {
+                Log::warning("GetNextAvailableOnlineSlot - Date {$checkDateString} is a counseling holiday for doctor {$doctorId}");
                 continue;
-            }
-
-            $dayAppointments = $bookedAppointments->filter(function ($appointment) use ($checkDate) {
-                return Carbon::parse($appointment->appointment_date)->isSameDay($checkDate);
-            });
-            $activeSlots = [];
-            $inactiveSlots = [];
-
-            foreach ($workHours as $workHour) {
-                $startTime = Carbon::parse($checkDateString . ' ' . $workHour['start'], 'Asia/Tehran');
-                $endTime = Carbon::parse($checkDateString . ' ' . $workHour['end'], 'Asia/Tehran');
-
-                $currentTime = $startTime->copy();
-                while ($currentTime->lessThan($endTime)) {
-                    $nextTime = $currentTime->copy()->addMinutes($duration);
-                    $slotTime = $currentTime->format('H:i');
-
-                    // بررسی زمان‌های اورژانسی
-                    $isEmergency = false;
-                    foreach ($emergencyTimes as $emergencyTime) {
-                        if (is_array($emergencyTime)) {
-                            $emergencyStart = Carbon::parse($checkDateString . ' ' . $emergencyTime['start'], 'Asia/Tehran');
-                            $emergencyEnd = Carbon::parse($checkDateString . ' ' . $emergencyTime['end'], 'Asia/Tehran');
-                            if ($currentTime->between($emergencyStart, $emergencyEnd)) {
-                                $isEmergency = true;
-                                break;
-                            }
-                        } else {
-                            $emergencyTimeParsed = Carbon::parse($checkDateString . ' ' . $emergencyTime, 'Asia/Tehran');
-                            if ($currentTime->equalTo($emergencyTimeParsed)) {
-                                $isEmergency = true;
-                                break;
-                            }
-                        }
-                    }
-                    if ($isEmergency) {
-                        $inactiveSlots[] = $slotTime;
-                        $currentTime->addMinutes($duration);
-                        continue;
-                    }
-
-                    // بررسی رزروهای قبلی
-                    $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
-                        $apptStart = Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time, 'Asia/Tehran');
-                        $apptEnd = $apptStart->copy()->addMinutes($duration);
-                        return $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
-                    });
-
-                    if ($checkDate->isToday()) {
-                        if ($isBooked || $currentTime->lt($now)) {
-                            $inactiveSlots[] = $slotTime;
-                        } else {
-                            $activeSlots[] = $slotTime;
-                            if (!$nextAvailableSlot) {
-                                $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
-                                $nextAvailableDateTime = $currentTime->toDateTimeString();
-                            }
-                        }
-                    } else {
-                        if ($isBooked) {
-                            $inactiveSlots[] = $slotTime;
-                        } else {
-                            $activeSlots[] = $slotTime;
-                            if (!$nextAvailableSlot) {
-                                $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
-                                $nextAvailableDateTime = $currentTime->toDateTimeString();
-                            }
-                        }
-                    }
-
-                    $currentTime->addMinutes($duration);
-                }
-            }
-
-            if (!empty($activeSlots) || !empty($inactiveSlots)) {
-                $slotData = [
-                    'date'            => $jalaliDate,
-                    'day_name'        => $persianDayName,
-                    'available_slots' => $activeSlots,
-                    'available_count' => count($activeSlots),
-                    'inactive_slots'  => $inactiveSlots,
-                    'inactive_count'  => count($inactiveSlots),
-                ];
-                $slots[] = $slotData;
             }
         }
 
-        return [
-            'next_available_slot' => $nextAvailableSlot,
-            'next_available_datetime' => $nextAvailableDateTime,
-            'slots' => $slots,
-        ];
+        // بررسی برنامه روزانه خاص
+        $specialSchedule = CounselingDailySchedule::where('doctor_id', $doctorId)
+            ->where('date', $checkDateString)
+            ->first();
+
+        $schedule = null;
+        $workHours = [];
+        $emergencyTimes = [];
+        $duration = $defaultDuration; // مقدار پیش‌فرض
+        $maxAppointments = null;
+
+        if ($specialSchedule) {
+            $workHours = is_string($specialSchedule->consultation_hours) ? json_decode($specialSchedule->consultation_hours, true) : $specialSchedule->consultation_hours;
+            $emergencyTimes = is_string($specialSchedule->emergency_times) ? json_decode($specialSchedule->emergency_times, true) : ($specialSchedule->emergency_times ?? []);
+            if (!empty($workHours) && isset($workHours[0]['max_appointments'])) {
+                $maxAppointments = $workHours[0]['max_appointments'];
+            }
+            // بررسی appointment_settings برای max_appointments یا duration
+            $appointmentSettings = is_string($specialSchedule->appointment_settings) ? json_decode($specialSchedule->appointment_settings, true) : $specialSchedule->appointment_settings;
+            if (!empty($appointmentSettings) && isset($appointmentSettings[0]['max_appointments'])) {
+                $maxAppointments = $appointmentSettings[0]['max_appointments'];
+            }
+            if (!empty($appointmentSettings) && isset($appointmentSettings[0]['appointment_duration']) && $appointmentSettings[0]['appointment_duration'] > 0) {
+                $duration = $appointmentSettings[0]['appointment_duration'];
+            }
+        } else {
+            $schedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
+                ->where('day', $dayName)
+                ->where('is_working', true)
+                ->first();
+            if ($schedule) {
+                $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
+                $emergencyTimes = is_string($schedule->emergency_times) ? json_decode($schedule->emergency_times, true) : ($schedule->emergency_times ?? []);
+                if (!empty($workHours) && isset($workHours[0]['max_appointments'])) {
+                    $maxAppointments = $workHours[0]['max_appointments'];
+                }
+                // بررسی appointment_settings برای max_appointments یا duration
+                $appointmentSettings = is_string($schedule->appointment_settings) ? json_decode($schedule->appointment_settings, true) : $schedule->appointment_settings;
+                if (!empty($appointmentSettings) && isset($appointmentSettings['max_appointments'])) {
+                    $maxAppointments = $appointmentSettings['max_appointments'];
+                }
+                if (!empty($appointmentSettings) && isset($appointmentSettings['appointment_duration']) && $appointmentSettings['appointment_duration'] > 0) {
+                    $duration = $appointmentSettings['appointment_duration'];
+                }
+            }
+        }
+
+        if (empty($workHours)) {
+            Log::warning("GetNextAvailableOnlineSlot - No work hours for doctor {$doctorId} on {$dayName}");
+            continue;
+        }
+
+        // نرمال‌سازی emergency_times
+        $normalizedEmergencyTimes = [];
+        if (is_array($emergencyTimes)) {
+            if (!empty($emergencyTimes) && is_array($emergencyTimes[0])) {
+                $normalizedEmergencyTimes = $emergencyTimes[0]; // فرض: [["00:00","00:21","00:42"]] → ["00:00","00:21","00:42"]
+            } else {
+                $normalizedEmergencyTimes = $emergencyTimes;
+            }
+        }
+
+        Log::debug("GetNextAvailableOnlineSlot - Work hours and max appointments", [
+            'doctor_id' => $doctorId,
+            'day' => $dayName,
+            'work_hours' => $workHours,
+            'max_appointments' => $maxAppointments,
+        ]);
+
+        Log::debug("GetNextAvailableOnlineSlot - Normalized emergency times", [
+            'doctor_id' => $doctorId,
+            'day' => $dayName,
+            'original_emergency_times' => $emergencyTimes,
+            'normalized_emergency_times' => $normalizedEmergencyTimes,
+        ]);
+
+        $dayAppointments = $bookedAppointments->filter(function ($appointment) use ($checkDate) {
+            return Carbon::parse($appointment->appointment_date)->isSameDay($checkDate);
+        });
+
+        $activeSlots = [];
+        $inactiveSlots = [];
+
+        foreach ($workHours as $workHour) {
+            if (!isset($workHour['start']) || !isset($workHour['end'])) {
+                Log::warning("Invalid work_hours structure", [
+                    'doctor_id' => $doctorId,
+                    'day' => $dayName,
+                    'work_hour' => $workHour,
+                ]);
+                continue;
+            }
+
+            $startTime = Carbon::parse($checkDateString . ' ' . $workHour['start'], 'Asia/Tehran');
+            $endTime = Carbon::parse($checkDateString . ' ' . $workHour['end'], 'Asia/Tehran');
+
+            // محاسبه appointment_duration بر اساس max_appointments، اگر در appointment_settings تنظیم نشده باشد
+            if ($duration === $defaultDuration && isset($workHour['max_appointments']) && $workHour['max_appointments'] > 0) {
+                $totalMinutes = $startTime->diffInMinutes($endTime);
+                $duration = floor($totalMinutes / $workHour['max_appointments']);
+            }
+
+            Log::debug("GetNextAvailableOnlineSlot - Calculated duration", [
+                'doctor_id' => $doctorId,
+                'day' => $dayName,
+                'total_minutes' => $startTime->diffInMinutes($endTime),
+                'max_appointments' => $workHour['max_appointments'] ?? null,
+                'duration' => $duration,
+            ]);
+
+            $currentTime = $startTime->copy();
+            while ($currentTime->lessThan($endTime)) {
+                $slotTime = $currentTime->format('H:i');
+
+                // بررسی زمان‌های اورژانسی
+                $isEmergency = false;
+                foreach ($normalizedEmergencyTimes as $emergencyTime) {
+                    try {
+                        if (is_string($emergencyTime)) {
+                            $emergencyTimeParsed = Carbon::parse($checkDateString . ' ' . $emergencyTime, 'Asia/Tehran');
+                            if ($currentTime->format('H:i') === $emergencyTimeParsed->format('H:i')) {
+                                $isEmergency = true;
+                                break;
+                            }
+                        } else {
+                            Log::warning("Invalid emergency_time format after normalization", [
+                                'doctor_id' => $doctorId,
+                                'day' => $dayName,
+                                'emergency_time' => $emergencyTime,
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::error("Error parsing emergency_time", [
+                            'doctor_id' => $doctorId,
+                            'day' => $dayName,
+                            'emergency_time' => $emergencyTime,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+
+                if ($isEmergency) {
+                    $inactiveSlots[] = $slotTime;
+                    $currentTime->addMinutes($duration);
+                    continue;
+                }
+
+                // بررسی رزروهای قبلی
+                $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $duration) {
+                    try {
+                        $apptStart = Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time, 'Asia/Tehran');
+                        $apptEnd = $apptStart->copy()->addMinutes($duration);
+                        return $currentTime->lt($apptEnd) && $currentTime->gte($apptStart);
+                    } catch (\Exception $e) {
+                        Log::error("Error parsing booked appointment time", [
+                            'appointment_id' => $appointment->id,
+                            'appointment_date' => $appointment->appointment_date,
+                            'appointment_time' => $appointment->appointment_time,
+                            'error' => $e->getMessage(),
+                        ]);
+                        return false;
+                    }
+                });
+
+                if ($checkDate->isToday()) {
+                    if ($isBooked || $currentTime->lt($now)) {
+                        $inactiveSlots[] = $slotTime;
+                    } else {
+                        $activeSlots[] = $slotTime;
+                        if (!$nextAvailableSlot) {
+                            $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                            $nextAvailableDateTime = $currentTime->toDateTimeString();
+                        }
+                    }
+                } else {
+                    if ($isBooked) {
+                        $inactiveSlots[] = $slotTime;
+                    } else {
+                        $activeSlots[] = $slotTime;
+                        if (!$nextAvailableSlot) {
+                            $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                            $nextAvailableDateTime = $currentTime->toDateTimeString();
+                        }
+                    }
+                }
+
+                $currentTime->addMinutes($duration);
+            }
+        }
+
+        if (!empty($activeSlots) || !empty($inactiveSlots)) {
+            $slotData = [
+                'date'            => $jalaliDate,
+                'day_name'        => $persianDayName,
+                'available_slots' => $activeSlots,
+                'available_count' => count($activeSlots),
+                'inactive_slots'  => $inactiveSlots,
+                'inactive_count'  => count($inactiveSlots),
+            ];
+            $slots[] = $slotData;
+        }
     }
+
+    return [
+        'next_available_slot' => $nextAvailableSlot,
+        'next_available_datetime' => $nextAvailableDateTime,
+        'slots' => $slots,
+    ];
+}
 }

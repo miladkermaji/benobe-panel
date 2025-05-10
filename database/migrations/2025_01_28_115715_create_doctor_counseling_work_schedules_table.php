@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -35,6 +34,9 @@ return new class extends Migration
             // مثال: [{"start": "08:00", "end": "12:00"}, {"start": "14:00", "end": "18:00"}]
 
             $table->json('appointment_settings')->nullable()->comment('تنظیمات نوبت‌دهی');
+
+            $table->json('emergency_times')->nullable()->comment(' زمان های اورژانسی');
+
             // تنظیمات اختصاصی نوبت‌دهی برای هر روز
             // مثال: {"max_appointments": 10, "appointment_duration": 15}
 
