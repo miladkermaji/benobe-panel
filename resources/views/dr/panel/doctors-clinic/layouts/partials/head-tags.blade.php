@@ -11,7 +11,7 @@
 
 {{-- persian calander --}}
 
-{{-- persian calander --}}timepicker
+{{-- persian calander --}}
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/dr-panel.css') }}">
 
 <script src="{{ asset('dr-assets/panel/js/jquery-3.4.1.min.js') }}"></script>
