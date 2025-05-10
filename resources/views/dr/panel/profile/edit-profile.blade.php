@@ -353,7 +353,7 @@
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="mx-auto mt-2">
-            <div class="bg-white py-3 rounded">
+            <div class="bg-white rounded p-3">
               <ul>
                 <li><small> آی دی ، عدد یا واژه ایست که با تایپ مستقیم پس از / benobe.ir صفحه اینترنتی شما را نشان میدهد
                   </small></li>
