@@ -1,290 +1,204 @@
-/* استفاده از متغیرهای ریشه */
+/* متغیرهای ریشه */
 :root {
-    --primary: #2e86c1;
-    --primary-light: #84caf9;
-    --secondary: #1deb3c;
-    --secondary-hover: #15802a;
-    --background-light: #f0f8ff;
-    --background-footer: #d4ecfd;
-    --background-card: #ffffff;
-    --text-primary: #000000;
-    --text-secondary: #707070;
-    --text-discount: #008000;
-    --text-original: #ff0000;
-    --border-neutral: #e5e7eb;
-    --shadow: rgba(0, 0, 0, 0.35);
-    --gradient-primary: linear-gradient(
-        90deg,
-        var(--primary-light) 0%,
-        var(--primary) 100%
-    );
-    --radius-button: 0.5rem;
-    --radius-card: 1.125rem;
-    --radius-circle: 9999px;
+  --primary: #2e86c1;
+  --primary-light: #84caf9;
+  --secondary: #1deb3c;
+  --secondary-hover: #15802a;
+  --background-light: #f0f8ff;
+  --background-card: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: #707070;
+  --border-neutral: #e5e7eb;
+  --shadow: rgba(0, 0, 0, 0.15);
+  --radius-button: 0.3rem; /* کاهش ردیوس */
+  --radius-card: 0.6rem; /* کاهش ردیوس */
 }
 
 /* پایه‌های کلی */
 .container-fluid {
-    padding-right: 12px;
-    padding-left: 12px;
+  padding-right: 10px;
+  padding-left: 10px;
 }
 
 /* هدر */
 .header-custom {
-    background: var(--background-light);
-    border: 1px solid var(--border-neutral);
-    border-radius: var(--radius-card);
-    box-shadow: 0 4px 12px var(--shadow);
+  border-radius: var(--radius-card);
+  box-shadow: 0 2px 6px var(--shadow);
+  padding: 1.25rem; /* افزایش فاصله داخلی */
 }
 
 /* کارت */
 .card {
-    border-radius: var(--radius-card);
-    box-shadow: 0 4px 12px var(--shadow);
-    background: var(--background-card);
-    transition: all 0.2s ease;
-}
-
-.card:hover {
-    box-shadow: 0 6px 16px var(--shadow);
+  border-radius: var(--radius-card);
+  box-shadow: 0 2px 6px var(--shadow);
 }
 
 /* فرم‌ها */
 .form-control {
-    border: 1px solid var(--border-neutral);
-    border-radius: var(--radius-button);
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-    background: var(--background-card);
-    color: var(--text-primary);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--radius-button);
+  padding: 8px 12px; /* افزایش پدینگ */
+  font-size: clamp(0.85rem, 2vw, 0.9rem);
+  font-weight: 500; /* متن بولدتر */
+  height: 36px;
 }
 
 .form-control:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.2);
-    outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.2);
+  outline: none;
 }
 
 .form-control::placeholder {
-    color: var(--text-secondary);
-}
-
-.input-group .form-control {
-    padding-left: 2.2rem;
-    height: 36px;
-}
-
-.search-icon {
-    z-index: 5;
+  color: var(--text-secondary);
+  font-weight: 500; /* بولدتر */
 }
 
 /* دکمه‌ها */
 .btn {
-    font-size: 0.9rem;
-    padding: 6px 12px;
-    border-radius: var(--radius-button);
-    transition: all 0.2s ease;
+  font-size: clamp(0.85rem, 2vw, 0.9rem); /* بزرگ‌تر */
+  padding: 6px 12px; /* بزرگ‌تر */
+  border-radius: var(--radius-button);
+  font-weight: 600; /* متن بولدتر */
 }
 
 .btn-primary {
-    background: var(--gradient-primary);
-    color: #ffffff;
-    border: none;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: var(--primary);
-    transform: translateY(-1px);
+  background: var(--primary-light);
 }
 
 .btn-secondary {
-    background: var(--secondary);
-    color: #ffffff;
-    border: none;
+  background: var(--secondary);
+  color: #ffffff;
+  border: none;
 }
 
 .btn-secondary:hover:not(:disabled) {
-    background: var(--secondary-hover);
-    transform: translateY(-1px);
+  background: var(--secondary-hover);
 }
 
 .btn-danger {
-    background: var(--text-original);
-    color: #ffffff;
-    border: none;
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
 }
 
 .btn-danger:hover:not(:disabled) {
-    background: #cc0000;
-    transform: translateY(-1px);
+  background: #cc0000;
 }
 
 .btn-danger:disabled {
-    background: #ff6666;
-    cursor: not-allowed;
+  background: #ff6666;
+  cursor: not-allowed;
 }
 
 /* جدول */
 .table-modern {
-    border: none;
-    border-radius: var(--radius-card);
-    overflow: hidden;
+  border-radius: var(--radius-card);
+  overflow: hidden;
 }
 
 .table-modern th,
 .table-modern td {
-    border: none;
-    padding: 12px;
-    vertical-align: middle;
+  padding: 10px; /* افزایش فاصله */
+  vertical-align: middle;
 }
 
 .table-modern th {
-    background: var(--primary);
-    color: #ffffff;
-    font-weight: 500;
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 600; /* بولدتر */
+  font-size: clamp(0.85rem, 2vw, 0.9rem);
 }
 
 .table-modern tbody tr {
-    border-bottom: 1px solid var(--border-neutral);
-}
-
-.table-modern tbody tr:hover {
-    background: var(--background-light);
+  border-bottom: 1px solid var(--border-neutral);
 }
 
 /* دکمه‌های وضعیت */
 .toggle-btn {
-    min-width: 80px;
-    padding: 5px 12px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    border-radius: var(--radius-button);
-    text-align: center;
+  min-width: 4px; /* بزرگ‌تر */
+  padding: 2px 8px; /* بزرگ‌تر */
+  font-size: clamp(0.8rem, 2vw, 0.85rem);
+  border-radius: var(--radius-button);
+  font-weight: 600; /* بولدتر */
 }
 
 .toggle-active {
-    background: var(--secondary);
-    color: #ffffff;
+  background: var(--secondary);
+  color: #ffffff;
 }
 
 .toggle-inactive {
-    background: var(--text-original);
-    color: #ffffff;
-}
-
-.toggle-btn:hover {
-    transform: translateY(-1px);
+  background: #ef4444;
+  color: #ffffff;
 }
 
 /* پاسخ */
 .form-control.reply-textarea {
-    min-height: 80px;
-    padding: 10px 12px;
-    font-size: 0.9rem;
-    border-radius: var(--radius-button);
-}
-
-.form-control.reply-textarea:focus {
-    border-color: var(--secondary);
-    box-shadow: 0 0 8px rgba(29, 235, 60, 0.2);
+  min-height: 70px; /* کمی بزرگ‌تر */
+  font-size: clamp(0.85rem, 2vw, 0.9rem);
+  font-weight: 500; /* بولدتر */
 }
 
 /* چک‌باکس */
 .form-check-input:checked {
-    background-color: var(--primary);
-    border-color: var(--primary);
+  background-color: var(--primary);
+  border-color: var(--primary);
 }
 
 /* ریسپانسیو */
 @media (max-width: 991px) {
-    .header-custom {
-        padding: 1.5rem;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-        border-radius: calc(var(--radius-card) * 0.8);
-    }
+  .header-custom {
+    padding: 1.5rem; /* افزایش فاصله */
+    gap: 1.25rem; /* فاصله بیشتر */
+  }
 
-    .input-group {
-        max-width: 100%;
-        margin-top: 0.5rem;
-    }
+  .btn {
+    padding: 5px 10px; /* کمی بزرگ‌تر */
+    font-size: clamp(0.8rem, 2vw, 0.85rem);
+  }
 
-    .btn {
-        width: 100%;
-        max-width: 200px;
-        padding: 6px 10px;
-        font-size: 0.85rem;
-        border-radius: calc(var(--radius-button) * 0.8);
-    }
-
-    .table-modern th,
-    .table-modern td {
-        padding: 10px;
-    }
-
-    .card {
-        border-radius: calc(var(--radius-card) * 0.8);
-    }
+  .table-modern th,
+  .table-modern td {
+    padding: 8px;
+  }
 }
 
 @media (max-width: 767px) {
-    .container-fluid {
-        padding-right: 8px;
-        padding-left: 8px;
-    }
+  .container-fluid {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
 
-    .header-custom {
-        padding: 1rem;
-        border-radius: calc(var(--radius-card) * 0.6);
-    }
+  .header-custom {
+    padding: 1rem;
+  }
 
-    h1.h4 {
-        font-size: 1.2rem;
-        text-align: center;
-        width: 100%;
-    }
+  h1.h5 {
+    font-size: clamp(1.1rem, 3vw, 1.2rem);
+    font-weight: 600; /* بولدتر */
+  }
 
-    .input-group {
-        margin-top: 0.75rem;
-    }
+  .form-control {
+    height: 34px;
+    font-size: clamp(0.8rem, 2vw, 0.85rem);
+  }
 
-    .btn {
-        max-width: 100%;
-        padding: 5px 8px;
-        font-size: 0.8rem;
-        border-radius: calc(var(--radius-button) * 0.6);
-    }
+  .btn {
+    padding: 4px 8px;
+  }
 
-    .table-modern th,
-    .table-modern td {
-        padding: 8px;
-        font-size: 0.8rem;
-    }
-
-    .toggle-btn {
-    min-width: 70px;
-    padding: 4px 10px;
-    font-size: 0.8rem;
-    border-radius: calc(var(--radius-button) * 0.6);
-    }
-
-}
-
-.form-control {
-    font-size: 0.85rem;
-    padding: 6px 10px;
-    height: 32px;
-    border-radius: calc(var(--radius-button) * 0.6);
-}
-
-.form-control.reply-textarea {
-    min-height: 70px;
-}
-
-.card {
-    border-radius: calc(var(--radius-card) * 0.6);
+  .toggle-btn {
+    min-width: 60px;
+    padding: 4px 8px;
+    font-size: clamp(0.75rem, 2vw, 0.8rem);
+  }
 }
 .myPanelOption{
     display: none !important;
