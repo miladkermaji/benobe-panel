@@ -384,8 +384,8 @@ class CounselingSpecialDaysApoointment extends Component
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
-            if ($specialSchedule && !empty($specialSchedule->work_hours)) {
-                $workHours = json_decode($specialSchedule->work_hours, true);
+            if ($specialSchedule && !empty($specialSchedule->consultation_hours)) {
+                $consultationHours = json_decode($specialSchedule->consultation_hours, true);
                 $appointmentSettings = json_decode($specialSchedule->appointment_settings, true) ?? [];
                 $emergencyTimes = json_decode($specialSchedule->emergency_times, true) ?? [[]];
                 // تنظیم متغیر برای نشان دادن منبع داده
@@ -394,7 +394,7 @@ class CounselingSpecialDaysApoointment extends Component
                     'status' => true,
                     'data' => [
                         'day' => strtolower(Carbon::parse($date)->englishDayOfWeek),
-                        'work_hours' => $workHours,
+                        'consultation_hours' => $consultationHours,
                         'appointment_settings' => $appointmentSettings,
                         'emergency_times' => $emergencyTimes,
                     ],
@@ -440,7 +440,7 @@ class CounselingSpecialDaysApoointment extends Component
                 'status' => false,
                 'data' => [
                     'day' => $dayOfWeek,
-                    'work_hours' => [[
+                    'consultation_hours' => [[
                         'start' => '',
                         'end' => '',
                         'max_appointments' => '',
@@ -468,7 +468,7 @@ class CounselingSpecialDaysApoointment extends Component
                     ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                     ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                     ->first();
-                $this->isFromSpecialDailySchedule = $specialSchedule && !empty($specialSchedule->work_hours);
+                $this->isFromSpecialDailySchedule = $specialSchedule && !empty($specialSchedule->consultation_hours);
             } else {
                 $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             }
@@ -583,8 +583,8 @@ class CounselingSpecialDaysApoointment extends Component
                 'date' => $this->selectedDate,
                 'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
             ])->first();
-            $workHours = $specialSchedule && $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
-            $isFromDoctorWorkSchedule = empty($workHours) && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+            $consultationHours = $specialSchedule && $specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : [];
+            $isFromDoctorWorkSchedule = empty($consultationHours) && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
             if ($isFromDoctorWorkSchedule) {
                 // اگر داده‌ها از DoctorWorkSchedule لود شده باشند، مودال add-slot-modal را باز کن
                 $this->showAddSlotModal = true;
@@ -593,9 +593,9 @@ class CounselingSpecialDaysApoointment extends Component
             } else {
                 // اگر داده‌ها از SpecialDailySchedule لود شده باشند، ردیف خالی اضافه کن
                 // بررسی تکمیل بودن ردیف قبلی
-                if (!empty($workHours)) {
-                    $lastIndex = count($workHours) - 1;
-                    $lastSlot = $workHours[$lastIndex];
+                if (!empty($consultationHours)) {
+                    $lastIndex = count($consultationHours) - 1;
+                    $lastSlot = $consultationHours[$lastIndex];
                     if (
                         empty($lastSlot['start']) ||
                         empty($lastSlot['end']) ||
@@ -615,17 +615,17 @@ class CounselingSpecialDaysApoointment extends Component
                         'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                     ],
                     [
-                        'work_hours' => json_encode([]),
+                        'consultation_hours' => json_encode([]),
                         'appointment_settings' => json_encode([]),
                         'emergency_times' => json_encode([[]]),
                     ]
                 );
-                $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+                $consultationHours = $specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : [];
                 $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
                 $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
                 // اضافه کردن ردیف خالی
-                $newIndex = count($workHours);
-                $workHours[$newIndex] = [
+                $newIndex = count($consultationHours);
+                $consultationHours[$newIndex] = [
                     'start' => '',
                     'end' => '',
                     'max_appointments' => '',
@@ -638,7 +638,7 @@ class CounselingSpecialDaysApoointment extends Component
                 ];
                 $emergencyTimes[$newIndex] = [];
                 // ذخیره داده‌ها
-                $specialSchedule->work_hours = json_encode($workHours);
+                $specialSchedule->consultation_hours = json_encode($consultationHours);
                 $specialSchedule->appointment_settings = json_encode($appointmentSettings);
                 $specialSchedule->emergency_times = json_encode($emergencyTimes);
                 $specialSchedule->save();
@@ -650,12 +650,12 @@ class CounselingSpecialDaysApoointment extends Component
                     'status' => true,
                     'data' => [
                         'day' => strtolower(Carbon::parse($this->selectedDate)->englishDayOfWeek),
-                        'work_hours' => $workHours,
+                        'consultation_hours' => $consultationHours,
                         'appointment_settings' => $appointmentSettings,
                         'emergency_times' => $emergencyTimes,
                     ],
                 ];
-                $this->hasWorkHoursMessage = !empty($workHours);
+                $this->hasWorkHoursMessage = !empty($consultationHours);
                 $this->dispatch('show-toastr', type: 'success', message: 'ردیف جدید اضافه شد.');
                 $this->dispatch('refresh-timepicker');
             }
@@ -681,29 +681,29 @@ class CounselingSpecialDaysApoointment extends Component
                     'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
-                    'work_hours' => json_encode([]),
+                    'consultation_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
                     'emergency_times' => json_encode([[]]),
                 ]
             );
-            $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+            $consultationHours = $specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : [];
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
             if (!$this->savePreviousRows) {
-                $workHours = [];
+                $consultationHours = [];
                 $appointmentSettings = [];
                 $emergencyTimes = [[]];
             } else {
-                $validWorkHours = [];
+                $validConsultationHours = [];
                 $validAppointmentSettings = [];
                 $validEmergencyTimes = [];
                 foreach ($this->workSchedule['data']['work_hours'] as $index => $slot) {
                     if (!empty($slot['start']) && !empty($slot['end']) && !empty($slot['max_appointments']) && $slot['max_appointments'] > 0) {
-                        if ($this->hasTimeOverlap($slot['start'], $slot['end'], array_diff_key($validWorkHours, [$index => $slot]))) {
+                        if ($this->hasTimeOverlap($slot['start'], $slot['end'], array_diff_key($validConsultationHours, [$index => $slot]))) {
                             $this->dispatch('show-toastr', type: 'error', message: 'تداخل زمانی در ساعات کاری وجود دارد.');
                             return;
                         }
-                        $validWorkHours[$index] = $slot;
+                        $validConsultationHours[$index] = $slot;
                         $validAppointmentSettings[$index] = $this->workSchedule['data']['appointment_settings'][$index] ?? [
                             'max_appointments' => $slot['max_appointments'],
                             'appointment_duration' => 0,
@@ -720,12 +720,12 @@ class CounselingSpecialDaysApoointment extends Component
                         $validEmergencyTimes[$index] = $emergencyTime;
                     }
                 }
-                $workHours = $validWorkHours;
+                $consultationHours = $validConsultationHours;
                 $appointmentSettings = $validAppointmentSettings;
                 $emergencyTimes = $validEmergencyTimes;
             }
-            $newIndex = count($workHours);
-            $workHours[$newIndex] = [
+            $newIndex = count($consultationHours);
+            $consultationHours[$newIndex] = [
                 'start' => '',
                 'end' => '',
                 'max_appointments' => '',
@@ -743,7 +743,7 @@ class CounselingSpecialDaysApoointment extends Component
             $emergencyTimes = array_values(array_map(function ($times) {
                 return is_array($times) ? $times : [];
             }, $emergencyTimes));
-            $specialSchedule->work_hours = json_encode($workHours);
+            $specialSchedule->consultation_hours = json_encode($consultationHours);
             $specialSchedule->appointment_settings = json_encode($appointmentSettings);
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
@@ -751,12 +751,12 @@ class CounselingSpecialDaysApoointment extends Component
                 'status' => true,
                 'data' => [
                     'day' => strtolower(Carbon::parse($this->selectedDate)->englishDayOfWeek),
-                    'work_hours' => $workHours,
+                    'consultation_hours' => $consultationHours,
                     'appointment_settings' => $appointmentSettings,
                     'emergency_times' => $emergencyTimes,
                 ],
             ];
-            $this->hasWorkHoursMessage = !empty($workHours);
+            $this->hasWorkHoursMessage = !empty($consultationHours);
             $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
             Cache::forget($cacheKey);
             $this->showAddSlotModal = false;
@@ -775,21 +775,21 @@ class CounselingSpecialDaysApoointment extends Component
         $this->savePreviousRows = true;
         $this->dispatch('close-modal', id: 'add-slot-modal');
     }
-    private function addNewSlot($specialSchedule, $doctorId, $workHours = null, $appointmentSettings = null, $emergencyTimes = null)
+    private function addNewSlot($specialSchedule, $doctorId, $consultationHours = null, $appointmentSettings = null, $emergencyTimes = null)
     {
-        $workHours = $workHours ?? ($specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : []);
+        $consultationHours = $consultationHours ?? ($specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : []);
         $appointmentSettings = $appointmentSettings ?? ($specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : []);
         $emergencyTimes = $emergencyTimes ?? ($specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : []);
         // اعتبارسنجی تداخل زمانی برای ردیف جدید
-        $newIndex = count($workHours);
-        foreach ($workHours as $slot) {
+        $newIndex = count($consultationHours);
+        foreach ($consultationHours as $slot) {
             if (!empty($slot['start']) && !empty($slot['end'])) {
                 $existingStart = Carbon::createFromFormat('H:i', $slot['start']);
                 $existingEnd = Carbon::createFromFormat('H:i', $slot['end']);
                 // برای جلوگیری از تداخل، ردیف جدید خالی اضافه می‌شه و کاربر باید زمان‌ها رو وارد کنه
             }
         }
-        $workHours[$newIndex] = [
+        $consultationHours[$newIndex] = [
             'start' => '',
             'end' => '',
             'max_appointments' => '',
@@ -803,14 +803,14 @@ class CounselingSpecialDaysApoointment extends Component
             'work_hour_key' => $newIndex,
         ];
         $emergencyTimes[$newIndex] = [];
-        $specialSchedule->work_hours = json_encode($workHours);
+        $specialSchedule->consultation_hours = json_encode($consultationHours);
         $specialSchedule->appointment_settings = json_encode($appointmentSettings);
         $specialSchedule->emergency_times = json_encode($emergencyTimes);
         $specialSchedule->save();
         $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
         Cache::forget($cacheKey);
         $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
-        $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+        $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['consultation_hours']);
         $this->dispatch('show-toastr', type: 'success', message: 'بازه زمانی جدید اضافه شد.');
         $this->dispatch('refresh-timepicker');
     }
@@ -829,7 +829,6 @@ class CounselingSpecialDaysApoointment extends Component
                 ->first();
             $isFromDoctorWorkSchedule = !$specialSchedule;
             if ($isFromDoctorWorkSchedule) {
-                
                 $this->workSchedule['data']['work_hours'][$index] = [
                     'start' => '',
                     'end' => '',
@@ -838,11 +837,9 @@ class CounselingSpecialDaysApoointment extends Component
                 $this->dispatch('show-toastr', type: 'success', message: 'بازه زمانی خالی شد. لطفاً مقادیر جدید را وارد کنید.');
                 $this->dispatch('refresh-timepicker');
             } else {
-                
-                $this->dispatch('confirm-delete-slot', index: $index); // ← فرمت واضح‌تر
+                $this->dispatch('confirm-delete-slot', index: $index);
             }
         } catch (\Exception $e) {
-            
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف بازه زمانی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -851,82 +848,60 @@ class CounselingSpecialDaysApoointment extends Component
 
     public function confirmDeleteSlot($index)
     {
-       
-
         if ($this->isProcessing) {
-    
             return;
         }
         $this->isProcessing = true;
-
         try {
             if (!isset($index) || $index === null || $index === 'undefined') {
                 $this->dispatch('show-toastr', type: 'error', message: 'اندیس بازه زمانی نامعتبر است.');
                 return;
             }
-
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = CounselingDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
-
             if (!$specialSchedule) {
                 $this->dispatch('show-toastr', type: 'error', message: 'برنامه کاری برای این تاریخ یافت نشد.');
                 return;
             }
-
-            $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+            $consultationHours = $specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : [];
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
-
-        
-
-            if (!isset($workHours[$index])) {
+            if (!isset($consultationHours[$index])) {
                 $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی نامعتبر است.');
                 return;
             }
-
             // حذف بازه
-            unset($workHours[$index]);
+            unset($consultationHours[$index]);
             unset($appointmentSettings[$index]);
             unset($emergencyTimes[$index]);
-
             // بازسازی اندیس‌ها
-            $workHours = array_values($workHours);
+            $consultationHours = array_values($consultationHours);
             $appointmentSettings = array_values($appointmentSettings);
             $emergencyTimes = array_values(array_map(fn ($times) => is_array($times) ? array_values($times) : [], $emergencyTimes));
-
-           
-
             // ذخیره یا حذف
-            if (empty($workHours)) {
-             
+            if (empty($consultationHours)) {
                 $specialSchedule->delete();
             } else {
-             
-                $specialSchedule->work_hours = json_encode($workHours);
+                $specialSchedule->consultation_hours = json_encode($consultationHours);
                 $specialSchedule->appointment_settings = json_encode($appointmentSettings);
                 $specialSchedule->emergency_times = json_encode($emergencyTimes);
                 $specialSchedule->save();
             }
-
             // پاک کردن کش
             $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
             Cache::forget($cacheKey);
-
             // به‌روزرسانی workSchedule
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
-            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
-           
-
+            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['consultation_hours']);
             $this->dispatch('show-toastr', type: 'success', message: 'بازه زمانی حذف شد.');
             $this->dispatch('refresh-timepicker');
             $this->dispatch('refresh');
             $this->dispatch('refreshWorkhours');
         } catch (\Exception $e) {
-           
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف بازه زمانی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -1014,12 +989,12 @@ class CounselingSpecialDaysApoointment extends Component
                     'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
-                    'work_hours' => json_encode([]),
+                    'consultation_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
                     'emergency_times' => json_encode([[]]),
                 ]
             );
-            $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+            $consultationHours = $specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : [];
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [];
             // بررسی تداخل زمانی
@@ -1028,12 +1003,12 @@ class CounselingSpecialDaysApoointment extends Component
                 'end' => $endTime,
                 'max_appointments' => $appointmentCount,
             ];
-            if ($this->hasTimeOverlap($startTime, $endTime, array_diff_key($workHours, [$index => []]))) {
+            if ($this->hasTimeOverlap($startTime, $endTime, array_diff_key($consultationHours, [$index => []]))) {
                 $this->dispatch('show-toastr', type: 'error', message: 'تداخل زمانی در ساعات کاری وجود دارد.');
                 return;
             }
-            // به‌روزرسانی work_hours
-            $workHours[$index] = $newSlot;
+            // به‌روزرسانی consultation_hours
+            $consultationHours[$index] = $newSlot;
             // به‌روزرسانی appointment_settings با فرمت موردنظر
             $appointmentSettings[$index] = [
                 'start_time' => '00:00',
@@ -1044,7 +1019,7 @@ class CounselingSpecialDaysApoointment extends Component
             // اطمینان از وجود emergency_times برای این ردیف
             $emergencyTimes[$index] = $emergencyTimes[$index] ?? [];
             // ذخیره داده‌ها در دیتابیس
-            $specialSchedule->work_hours = json_encode($workHours);
+            $specialSchedule->consultation_hours = json_encode($consultationHours);
             $specialSchedule->appointment_settings = json_encode($appointmentSettings);
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
@@ -1053,7 +1028,7 @@ class CounselingSpecialDaysApoointment extends Component
             Cache::forget($cacheKey);
             // به‌روزرسانی workSchedule
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
-            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['consultation_hours']);
             $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات ساعت کاری ذخیره شد.');
             $this->dispatch('close-modal', 'CalculatorModal');
             $this->dispatch('refresh-timepicker');
@@ -1109,21 +1084,21 @@ class CounselingSpecialDaysApoointment extends Component
                     'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
-                    'work_hours' => json_encode([]),
+                    'consultation_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
                     'emergency_times' => json_encode([[]]),
                 ]
             );
             // دریافت داده‌های فعلی
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
-            $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+            $consultationHours = $specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : [];
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             if (!$this->isFromSpecialDailySchedule && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours'])) {
                 // کپی داده‌ها از DoctorWorkSchedule
-                $workHours = $this->workSchedule['data']['work_hours'];
+                $consultationHours = $this->workSchedule['data']['work_hours'];
                 $appointmentSettings = [];
-                $emergencyTimes = array_pad([], count($workHours), []);
-                foreach ($workHours as $index => $slot) {
+                $emergencyTimes = array_pad([], count($consultationHours), []);
+                foreach ($consultationHours as $index => $slot) {
                     $appointmentSettings[$index] = [
                         'start_time' => '00:00',
                         'end_time' => '23:59',
@@ -1140,8 +1115,8 @@ class CounselingSpecialDaysApoointment extends Component
                 $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی انتخاب‌شده نامعتبر است.');
                 return;
             }
-            // اعتبارسنجی work_hours
-            $currentSlot = $workHours[$this->emergencyModalIndex] ?? null;
+            // اعتبارسنجی consultation_hours
+            $currentSlot = $consultationHours[$this->emergencyModalIndex] ?? null;
             if (!$currentSlot || empty($currentSlot['start']) || empty($currentSlot['end'])) {
                 $this->dispatch('show-toastr', type: 'error', message: 'بازه کاری نامعتبر است.');
                 return;
@@ -1160,7 +1135,7 @@ class CounselingSpecialDaysApoointment extends Component
                 }
             }
             // بررسی تداخل با سایر بازه‌ها
-            foreach (array_diff_key($workHours, [$this->emergencyModalIndex => []]) as $otherSlot) {
+            foreach (array_diff_key($consultationHours, [$this->emergencyModalIndex => []]) as $otherSlot) {
                 if (!empty($otherSlot['start']) && !empty($otherSlot['end'])) {
                     $otherStart = Carbon::createFromFormat('H:i', $otherSlot['start']);
                     $otherEnd = Carbon::createFromFormat('H:i', $otherSlot['end']);
@@ -1188,7 +1163,7 @@ class CounselingSpecialDaysApoointment extends Component
             $emergencyTimes[$this->emergencyModalIndex] = $validEmergencyTimes;
             $emergencyTimes = array_values(array_map(fn ($times) => is_array($times) ? array_values($times) : [], $emergencyTimes));
             // ذخیره داده‌ها
-            $specialSchedule->work_hours = json_encode($workHours);
+            $specialSchedule->consultation_hours = json_encode($consultationHours);
             $specialSchedule->appointment_settings = json_encode($appointmentSettings);
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
@@ -1197,7 +1172,7 @@ class CounselingSpecialDaysApoointment extends Component
             Cache::forget($cacheKey);
             // به‌روزرسانی workSchedule
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
-            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['consultation_hours']);
             $this->dispatch('show-toastr', type: 'success', message: 'زمان‌های اورژانسی ذخیره شد.');
             $this->dispatch('close-emergency-modal');
         } catch (\Exception $e) {
@@ -1256,20 +1231,20 @@ class CounselingSpecialDaysApoointment extends Component
                     'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
-                    'work_hours' => json_encode([]),
+                    'consultation_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
                     'emergency_times' => json_encode([[]]),
                 ]
             );
-            $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+            $consultationHours = $specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : [];
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
             if (!$this->isFromSpecialDailySchedule && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours'])) {
                 // کپی داده‌ها از DoctorWorkSchedule
-                $workHours = $this->workSchedule['data']['work_hours'];
+                $consultationHours = $this->workSchedule['data']['work_hours'];
                 $appointmentSettings = [];
-                $emergencyTimes = array_pad([], count($workHours), []);
-                foreach ($workHours as $index => $slot) {
+                $emergencyTimes = array_pad([], count($consultationHours), []);
+                foreach ($consultationHours as $index => $slot) {
                     $appointmentSettings[$index] = [
                         'start_time' => $slot['start'] ?? '00:00',
                         'end_time' => $slot['end'] ?? '23:59',
@@ -1287,7 +1262,7 @@ class CounselingSpecialDaysApoointment extends Component
                     'end_time' => $endTime,
                     'days' => $selectedDays,
                     'work_hour_key' => $this->scheduleModalIndex,
-                    'max_appointments' => $workHours[$this->scheduleModalIndex]['max_appointments'] ?? 0,
+                    'max_appointments' => $consultationHours[$this->scheduleModalIndex]['max_appointments'] ?? 0,
                     'appointment_duration' => $appointmentSettings[$this->scheduleModalIndex]['appointment_duration'] ?? 0,
                 ];
                 // حذف تنظیمات قبلی برای روزهای انتخاب‌شده
@@ -1303,17 +1278,17 @@ class CounselingSpecialDaysApoointment extends Component
                 } else {
                     $appointmentSettings[] = $newSetting;
                 }
-                // به‌روزرسانی work_hours
-                $workHours[$this->scheduleModalIndex] = [
+                // به‌روزرسانی consultation_hours
+                $consultationHours[$this->scheduleModalIndex] = [
                     'start' => $startTime,
                     'end' => $endTime,
-                    'max_appointments' => $workHours[$this->scheduleModalIndex]['max_appointments'] ?? 0,
+                    'max_appointments' => $consultationHours[$this->scheduleModalIndex]['max_appointments'] ?? 0,
                 ];
                 // اطمینان از وجود emergency_times
                 $emergencyTimes[$this->scheduleModalIndex] = $emergencyTimes[$this->scheduleModalIndex] ?? [];
             }
             // ذخیره داده‌ها
-            $specialSchedule->work_hours = json_encode(array_values($workHours));
+            $specialSchedule->consultation_hours = json_encode(array_values($consultationHours));
             $specialSchedule->appointment_settings = json_encode(array_values($appointmentSettings));
             $emergencyTimes = array_values(array_map(fn ($times) => is_array($times) ? $times : [], $emergencyTimes));
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
@@ -1323,7 +1298,7 @@ class CounselingSpecialDaysApoointment extends Component
             Cache::forget($cacheKey);
             // به‌روزرسانی workSchedule
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
-            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['consultation_hours']);
             // به‌روزرسانی چک‌باکس‌ها
             $this->selectedScheduleDays = array_fill_keys(
                 ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
@@ -1614,26 +1589,26 @@ class CounselingSpecialDaysApoointment extends Component
                     'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
-                    'work_hours' => json_encode([]),
+                    'consultation_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
                     'emergency_times' => json_encode([]),
                 ]
             );
-            $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
+            $consultationHours = $specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : [];
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             [$index, $field] = explode('.', $nested);
-            $workHours[$index][$field] = $value;
+            $consultationHours[$index][$field] = $value;
             if (!isset($appointmentSettings[$index])) {
                 $appointmentSettings[$index] = [
-                    'max_appointments' => $workHours[$index]['max_appointments'] ?? 0,
+                    'max_appointments' => $consultationHours[$index]['max_appointments'] ?? 0,
                     'appointment_duration' => 0,
                 ];
             }
-            $specialSchedule->work_hours = json_encode($workHours);
+            $specialSchedule->consultation_hours = json_encode($consultationHours);
             $specialSchedule->appointment_settings = json_encode($appointmentSettings);
             $specialSchedule->save();
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
-            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
+            $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['consultation_hours']);
             $cacheKey = "work_schedule_{$doctorId}_{$this->selectedDate}_{$this->selectedClinicId}";
             Cache::forget($cacheKey);
             $this->dispatch('show-toastr', type: 'success', message: 'تغییرات ساعت کاری ذخیره شد.');

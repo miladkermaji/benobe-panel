@@ -18,6 +18,9 @@ class CounselingDailySchedule extends Model
         'clinic_id',
         'date',
         'consultation_hours',
+        'appointment_settings',
+        'emergency_times',
+        'consultation_hours',
         'consultation_type',
     ];
 
@@ -27,6 +30,8 @@ class CounselingDailySchedule extends Model
     // نوع داده‌های JSON
     protected $casts = [
         'consultation_hours' => 'array',
+        'appointment_settings' => 'array',
+        'emergency_times' => 'array',
     ];
 
     /**
