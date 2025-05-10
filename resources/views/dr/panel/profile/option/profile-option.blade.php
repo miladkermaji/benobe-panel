@@ -804,65 +804,72 @@
     });
   }
   // تابع تایید کد OTP
-  function verifyOtpCode() {
+function verifyOtpCode() {
     const otpInputs = document.querySelectorAll('.otp-input');
     const otpCode = Array.from(otpInputs).map(input => input.value).join('');
     const newMobile = $('#newMobileNumber').val();
     const verifyButton = document.querySelector('#otpInputStep button');
     const loader = verifyButton.querySelector('.loader');
     const buttonText = verifyButton.querySelector('.button_text');
+
     // بررسی کامل بودن کد
     if (otpCode.length !== 4) {
-      toastr.error("لطفاً تمام ارقام کد را وارد کنید");
-
-      return;
+        toastr.error("لطفاً تمام ارقام کد را وارد کنید");
+        return;
     }
+
+    // اطمینان از وجود otpToken
+    if (!otpToken) {
+        toastr.error("توکن OTP در دسترس نیست. لطفاً دوباره کد را درخواست کنید.");
+        return;
+    }
+
     // مخفی کردن متن دکمه و نمایش لودینگ
     buttonText.style.display = 'none';
     loader.style.display = 'block';
-    // ادامه عملیات تایید کد
-    $.ajax({
-      url: `{{ route('dr-mobile-confirm', '') }}/${otpToken}`,
-      method: 'POST',
-      data: {
-        otp: otpCode.split('').map(Number),
-        mobile: newMobile
-      },
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      success: function(response) {
-        // بررسی دقیق پاسخ موفقیت
-        if (response.success) {
-          toastr.success(response.message);
 
-          // به‌روزرسانی المان‌های موبایل در صفحه
-          $('input[name="mobile"]').val(response.mobile);
-          // بستن مودال
-          $('#mobileEditModal').modal('hide');
-          // رفرش صفحه برای اطمینان
-          setTimeout(() => {
-            location.reload();
-          }, 1000);
-        } else {
-          toastr.error(response.message || "خطا در تغییر شماره موبایل");
+    // تولید URL با استفاده از route و otpToken
+    $.ajax({
+        url: "{{ route('dr-mobile-confirm', ':token') }}".replace(':token', otpToken),
+        method: 'POST',
+        data: {
+            otp: otpCode.split('').map(Number),
+            mobile: newMobile
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            // بررسی دقیق پاسخ موفقیت
+            if (response.success) {
+                toastr.success(response.message);
+                // به‌روزرسانی المان‌های موبایل در صفحه
+                $('input[name="mobile"]').val(response.mobile);
+                // بستن مودال
+                $('#mobileEditModal').modal('hide');
+                // رفرش صفحه برای اطمینان
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                toastr.error(response.message || "خطا در تغییر شماره موبایل");
+            }
+        },
+        error: function(xhr) {
+            // مدیریت خطاهای سرور
+            let errorMessage = "خطا در تایید کد";
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMessage = xhr.responseJSON.message;
+            }
+            toastr.error(errorMessage);
+        },
+        complete: function() {
+            // بازگردانی دکمه به حالت اولیه
+            buttonText.style.display = 'block';
+            loader.style.display = 'none';
         }
-      },
-      error: function(xhr) {
-        // مدیریت خطاهای سرور
-        let errorMessage = "خطا در تایید کد";
-        if (xhr.responseJSON && xhr.responseJSON.message) {
-          errorMessage = xhr.responseJSON.message;
-        }
-        toastr.error(errorMessage);
-      },
-      complete: function() {
-        // بازگردانی دکمه به حالت اولیه
-        buttonText.style.display = 'block';
-        loader.style.display = 'none';
-      }
     });
-  }
+}
   // تابع شروع تایمر ارسال مجدد
   function startResendTimer() {
     let seconds = 120;

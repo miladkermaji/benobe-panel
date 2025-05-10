@@ -366,10 +366,10 @@
           </div>
           <div class="form-group  position-relative">
             <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
-            <input type="text" class="form-control h-50 text-center max-appointments bg-white" name="nobat-count" min="0" id="morning-patients-${day}" data-toggle="modal" data-bs-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
+            <input type="text" class="form-control h-50 text-center max-appointments bg-white" name="nobat-count" min="0" id="morning-patients-${day}" data-bs-toggle="modal" data-bs-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
           </div>
           <div class="form-group  position-relative">
-            <button class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
+            <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
               <img src="${svgUrl}">
             </button>
           </div>
@@ -381,7 +381,7 @@
         </div>
         <div class="d-flex align-items-center">
           <div class="d-flex align-items-center">
-            <button type="button" class="btn text-black btn-sm btn-outline-primary schedule-btn" data-toggle="modal" data-bs-target="#scheduleModal" data-day="${day}" disabled>زمانبندی باز شدن نوبت‌ها</button>
+            <button type="button" class="btn text-black btn-sm btn-outline-primary schedule-btn" data-bs-toggle="modal" data-bs-target="#scheduleModal" data-day="${day}" disabled>زمانبندی باز شدن نوبت‌ها</button>
           </div>
         </div>
       </div>
@@ -646,10 +646,10 @@
         </div>
         <div class="form-group  position-relative">
           <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
-          <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-toggle="modal" data-bs-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly ${slot ? 'disabled' : ''}>
+          <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-bs-toggle="modal" data-bs-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly ${slot ? 'disabled' : ''}>
         </div>
          <div class="form-group  position-relative">
-            <button class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" data-start-time="${start_time}" data-end-time="${end_time}" data-max-appointments="${max_appointments}" data-slot-id="${slotId}">
+            <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" data-start-time="${start_time}" data-end-time="${end_time}" data-max-appointments="${max_appointments}" data-slot-id="${slotId}">
                 <img src="${svgUrl}">
             </button>
           </div>
@@ -661,7 +661,7 @@
       </div>
       <div class="d-flex align-items-center">
         <button type="button" class="btn btn-outline-primary btn-sm schedule-btn"
-          data-toggle="modal"
+          data-bs-toggle="modal"
           data-bs-target="#scheduleModal"
           data-day="${day}" data-start-time="${start_time}" data-end-time="${end_time}" data-max-appointments="${max_appointments}">
           زمانبندی باز شدن نوبت‌ها
@@ -751,11 +751,11 @@
                     </div>
                     <div class="form-group  position-relative">
                         <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
-                        <input type="text" name="nobat-count" id="morning-patients-${day}"  class="form-control h-50 text-center max-appointments bg-white" value="${maxAppointments}" data-toggle="modal" data-bs-target="#CalculatorModal" data-start-time="" data-end-time="" readonly ${maxAppointments ? 'disabled' : ''}>
+                        <input type="text" name="nobat-count" id="morning-patients-${day}"  class="form-control h-50 text-center max-appointments bg-white" value="${maxAppointments}" data-bs-toggle="modal" data-bs-target="#CalculatorModal" data-start-time="" data-end-time="" readonly ${maxAppointments ? 'disabled' : ''}>
                     </div>
                     <div class="form-group  position-relative">
                         <button class="btn btn-light btn-sm copy-single-slot-btn"
-                            data-toggle="modal" data-bs-target="#checkboxModal"
+                            data-bs-toggle="modal" data-bs-target="#checkboxModal"
                             data-day="${day}"
                             data-start-time="${startTime}"
                             data-end-time="${endTime}"
@@ -777,7 +777,7 @@
                 </div>
                 <div class="d-flex align-items-center">
                     <button type="button" class="btn btn-outline-primary btn-sm schedule-btn"
-                        data-toggle="modal"
+                        data-bs-toggle="modal"
                         data-bs-target="#scheduleModal"
                         data-day="${day}"
                         data-start-time="${startTime}"
@@ -1010,10 +1010,10 @@
                 </div>
                 <div class="form-group  position-relative">
                     <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
-                    <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-toggle="modal" data-bs-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
+                    <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-bs-toggle="modal" data-bs-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
                 </div>
                  <div class="form-group  position-relative">
-            <button class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
+            <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
                 <img src="${svgUrl}">
             </button>
           </div>
@@ -1598,10 +1598,10 @@
                 </div>
                 <div class="form-group  position-relative">
                     <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
-                    <input type="text" class="form-control h-50 text-center max-appointments bg-white" data-day="${day}" name="nobat-count" id="morning-patients-${day}" data-start-time="" data-end-time="" value="" data-toggle="modal" data-bs-target="#CalculatorModal" readonly>
+                    <input type="text" class="form-control h-50 text-center max-appointments bg-white" data-day="${day}" name="nobat-count" id="morning-patients-${day}" data-start-time="" data-end-time="" value="" data-bs-toggle="modal" data-bs-target="#CalculatorModal" readonly>
                 </div>
                 <div class="form-group  position-relative">
-                    <button class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" disabled>
+                    <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" disabled>
                         <img src="${svgUrl}">
                     </button>
                 </div>
@@ -1612,7 +1612,7 @@
                 </div>
             </div>
             <div class="d-flex align-items-center">
-                <button type="button" class="btn text-black btn-sm btn-outline-primary schedule-btn" data-toggle="modal" data-start-time="" data-end-time="" data-max-appointments="" data-bs-target="#scheduleModal" data-day="${day}">زمانبندی باز شدن نوبت‌ها</button>
+                <button type="button" class="btn text-black btn-sm btn-outline-primary schedule-btn" data-bs-toggle="modal" data-start-time="" data-end-time="" data-max-appointments="" data-bs-target="#scheduleModal" data-day="${day}">زمانبندی باز شدن نوبت‌ها</button>
             </div>
         </div>
     `);
@@ -1660,10 +1660,10 @@
           </div>
           <div class="form-group  position-relative">
             <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
-           <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-toggle="modal" data-bs-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
+           <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-bs-toggle="modal" data-bs-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
           </div>
            <div class="form-group  position-relative">
-            <button class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
+            <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
                 <img src="${svgUrl}">
             </button>
           </div>
@@ -1675,7 +1675,7 @@
         </div>
         <div class="d-flex align-items-center">
           <div class="d-flex align-items-center">
-              <button type="button" class="btn text-black  btn-sm btn-outline-primary schedule-btn" data-toggle="modal" data-bs-target="#scheduleModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>زمانبندی باز شدن نوبت‌ها</button>
+              <button type="button" class="btn text-black  btn-sm btn-outline-primary schedule-btn" data-bs-toggle="modal" data-bs-target="#scheduleModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>زمانبندی باز شدن نوبت‌ها</button>
           </div>
         </div>
       </div>
@@ -1708,10 +1708,10 @@
           </div>
           <div class="form-group  position-relative">
             <label class="label-top-input-special-takhasos" for="morning-patients-${day}">تعداد نوبت</label>
-           <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-toggle="modal" data-bs-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
+           <input type="text" class="form-control h-50 text-center max-appointments bg-white"  name="nobat-count" min="0" id="morning-patients-${day}"  data-bs-toggle="modal" data-bs-target="#CalculatorModal" data-day="${day}" data-start-time="" data-end-time="" value="" readonly>
           </div>
            <div class="form-group  position-relative">
-            <button class="btn btn-light btn-sm copy-single-slot-btn" data-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
+            <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal" data-bs-target="#checkboxModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>
                 <img src="${svgUrl}">
             </button>
           </div>
@@ -1723,7 +1723,7 @@
         </div>
         <div class="d-flex align-items-center">
           <div class="d-flex align-items-center">
-              <button type="button" class="btn text-black  btn-sm btn-outline-primary schedule-btn" data-toggle="modal" data-bs-target="#scheduleModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>زمانبندی باز شدن نوبت‌ها</button>
+              <button type="button" class="btn text-black  btn-sm btn-outline-primary schedule-btn" data-bs-toggle="modal" data-bs-target="#scheduleModal" data-day="${day}" data-start-time="" data-end-time="" data-max-appointments="" data-slot-id="" disabled>زمانبندی باز شدن نوبت‌ها</button>
           </div>
         </div>
       </div>

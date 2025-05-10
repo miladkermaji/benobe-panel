@@ -51,7 +51,7 @@
             <div>
               <div class="d-flex align-items-center gap-2">
                 <span class="fw-bold">یاسر محمدی</span>
-                <a href="#" data-toggle="modal" data-bs-target="#exampleModalCenterAddSick">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModalCenterAddSick">
                   <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd"
@@ -157,7 +157,7 @@
             <div>
               <div class="d-flex align-items-center gap-2">
                 <span class="fw-bold">مشاوره آنلاین به نوبه</span>
-                <a href="#" data-toggle="modal" data-bs-target="#exampleModalCenterEdit">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModalCenterEdit">
                   <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd"

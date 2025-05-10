@@ -151,7 +151,7 @@
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h4 class="card-title">تیکت‌های من</h4>
-          <button type="button" class="btn btn-light btn-custom h-50" data-toggle="modal"
+          <button type="button" class="btn btn-light btn-custom h-50" data-bs-toggle="modal"
             data-bs-target="#add-ticket-modal">
             <i class="fas fa-plus mr-2"></i> افزودن تیکت جدید
           </button>
