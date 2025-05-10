@@ -249,14 +249,9 @@ h4.text-dark {
 
 .label-top-input-special-takhasos {
     position: absolute;
-    top: -0.625rem;
-    right: 1rem;
-    background: var(--background-card);
-    border-radius: var(--radius-button);
-    font-size: 0.75rem;
+    top: -1rem;
     color: var(--text-primary);
     font-weight: 500;
-    padding: 0.25rem 0.625rem;
     z-index: 1;
 }
 

@@ -2,7 +2,6 @@
 
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/profile/subuser.css') }}" rel="stylesheet" />
 @endsection
 
@@ -92,8 +91,8 @@
     <div class="p-3">
       <h4 class="text-dark fw-bold">لیست کاربران زیرمجموعه</h4>
     </div>
-    <div class="mt-2">
-      <table class="table table-modern table-striped table-bordered table-hover" id="subuser-list">
+    <div class="mt-2 table-responsive">
+      <table class="table table-modern table-hover" id="subuser-list">
         <thead>
           <tr>
             <th>ردیف</th>
