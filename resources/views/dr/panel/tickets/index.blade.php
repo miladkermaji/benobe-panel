@@ -55,8 +55,7 @@
                       @endif
                     </td>
                     <td>
-                      <button class="btn btn-light rounded-circle btn-sm  delete-btn"
-                        data-id="{{ $ticket->id }}">
+                      <button class="btn btn-light rounded-circle btn-sm  delete-btn" data-id="{{ $ticket->id }}">
                         <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
                       </button>
                       <button onclick="location.href='{{ route('dr-panel-tickets.show', $ticket->id) }}'"
@@ -123,7 +122,7 @@
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
 </script>
 <script>
-  $(document).ready(function() {
+$(document).ready(function() {
     // مدیریت بستن مودال
     $('#add-ticket-modal').on('hidden.bs.modal', function() {
       $('body').removeClass('modal-open');
@@ -175,17 +174,43 @@
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function(response) {
-          toastr.success('تیکت با موفقیت اضافه شد!');
+          // نمایش SweetAlert موفقیت
+          Swal.fire({
+            title: 'پزشک گرامی، تیکت شما با موفقیت ثبت شد!',
+            text: 'تیکت شما با موفقیت در سیستم ثبت گردید و به زودی توسط تیم پشتیبانی بررسی خواهد شد. از صبوری شما سپاسگزاریم.',
+            icon: 'success',
+            confirmButtonText: 'بسیار خوب',
+            confirmButtonColor: '#2E86C1',
+            timer: 5000,
+            timerProgressBar: true,
+            backdrop: 'rgba(0,0,0,0.4)' // پس‌زمینه ساده‌تر
+          });
+
           $('#add-ticket-modal').modal('hide');
           updateTicketList(response.tickets);
         },
         error: function(xhr) {
           if (xhr.status === 422) {
             const errors = xhr.responseJSON.errors;
-            Object.keys(errors).forEach(function(key) {
-              form.find(`.error-${key}`).text(errors[key][0]);
-              form.find(`.form-group:has(#${key})`).addClass('has-error');
-            });
+            if (errors.limit) {
+              // نمایش SweetAlert برای محدودیت تیکت
+              Swal.fire({
+                title: 'پزشک گرامی، شما بیش از 2 تیکت باز یا پاسخ‌نشده دارید!',
+                text: 'لطفاً ابتدا تیکت‌های موجود را تکمیل یا بررسی کنید تا بتوانید تیکت جدید ثبت کنید.',
+                icon: 'warning',
+                confirmButtonText: 'متوجه شدم',
+                confirmButtonColor: '#2E86C1',
+                timer: 5000,
+                timerProgressBar: true,
+                backdrop: 'rgba(0,0,0,0.4)'
+              });
+            } else {
+              // خطاهای اعتبارسنجی فرم
+              Object.keys(errors).forEach(function(key) {
+                form.find(`.error-${key}`).text(errors[key][0]);
+                form.find(`.form-group:has(#${key})`).addClass('has-error');
+              });
+            }
           } else {
             toastr.error('خطا در افزودن تیکت!');
           }
@@ -254,11 +279,11 @@
               <td>${ticket.description.substring(0, 50)}${ticket.description.length > 50 ? '...' : ''}</td>
               <td>${statusBadge}</td>
               <td>
-                <button class="btn btn-light rounded-circle btn-sm btn-custom delete-btn" data-id="${ticket.id}">
+                <button class="btn btn-light rounded-circle btn-sm  delete-btn" data-id="${ticket.id}">
                   <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
                 </button>
                 <button onclick="window.location.href='${getShowRoute(ticket.id)}'"
-                  class="btn btn-light rounded-circle btn-sm btn-custom view-btn">
+                  class="btn btn-light rounded-circle btn-sm  view-btn">
                   <img src="{{ asset('dr-assets/icons/eye.svg') }}" alt="مشاهده">
                 </button>
               </td>

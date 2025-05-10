@@ -33,8 +33,22 @@ class TicketsController extends Controller
             'description.string' => 'توضیحات تیکت باید یک متن باشد.',
         ]);
 
+        // بررسی تعداد تیکت‌های باز یا پاسخ‌نشده
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $openOrAnsweredTickets = Ticket::where('doctor_id', $doctorId)
+            ->whereIn('status', ['open', 'answered'])
+            ->count();
+
+        if ($openOrAnsweredTickets >= 2) {
+            return response()->json([
+                'message' => 'شما بیش از 2 تیکت باز یا پاسخ‌نشده دارید. لطفاً ابتدا تیکت‌های موجود را تکمیل کنید.',
+                'errors' => ['limit' => 'محدودیت تعداد تیکت‌ها']
+            ], 422);
+        }
+
+        // ایجاد تیکت جدید
         $ticket = Ticket::create([
-            'doctor_id' => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id,
+            'doctor_id' => $doctorId,
             'title' => $request->title,
             'description' => $request->description,
             'status' => 'open',
@@ -42,7 +56,7 @@ class TicketsController extends Controller
 
         return response()->json([
             'message' => 'تیکت با موفقیت اضافه شد!',
-            'tickets' => Ticket::latest()->get()
+            'tickets' => Ticket::where('doctor_id', $doctorId)->latest()->get()
         ]);
     }
 

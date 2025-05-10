@@ -70,6 +70,15 @@
 
       <h5 class="mt-5 mb-3 text-dark fw-bold">پاسخ‌ها</h5>
       <div class="response-list">
+        <!-- نمایش پیام اصلی تیکت به‌عنوان اولین پاسخ -->
+        <div class="response-card doctor p-3 mb-3">
+          <strong>دکتر: {{ Auth::guard('doctor')->user()->first_name ?? 'نامشخص' }}
+            {{ Auth::guard('doctor')->user()->last_name ?? '' }}</strong>
+          <p>{{ $ticket->description }}</p>
+          <small class="text-muted">{{ \Morilog\Jalali\Jalalian::forge($ticket->created_at)->ago() }}</small>
+        </div>
+
+        <!-- نمایش پاسخ‌های بعدی -->
         @forelse ($ticket->responses as $response)
           <div class="response-card {{ $response->manager_id ? 'manager' : 'doctor' }} p-3 mb-3">
             <strong>
@@ -85,7 +94,7 @@
             </small>
           </div>
         @empty
-          <div class="alert alert-info text-center">هیچ پاسخی برای این تیکت ثبت نشده است.</div>
+          <div class="alert alert-info text-center">هیچ پاسخ دیگری برای این تیکت ثبت نشده است.</div>
         @endforelse
       </div>
 
