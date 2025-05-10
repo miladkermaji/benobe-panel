@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -25,9 +24,9 @@ return new class extends Migration
             $table->date('appointment_date');
             $table->time('appointment_time');
 
-                                                              // لینک یا شناسه جلسه برای مشاوره تصویری
+            // لینک یا شناسه جلسه برای مشاوره تصویری
             $table->string('video_meeting_link')->nullable(); // لینک جلسه ویدئویی
-                                                              // متن یا تاریخچه چت برای مشاوره متنی
+            // متن یا تاریخچه چت برای مشاوره متنی
             $table->text('chat_history')->nullable();         // تاریخچه چت
 
             // زمان دقیق رزرو و تأیید
@@ -58,6 +57,9 @@ return new class extends Migration
             $table->string('tracking_code')->nullable()->unique();
             $table->integer('max_appointments')->nullable();
             $table->decimal('fee', 8, 2)->nullable();
+
+            $table->decimal('final_price', 14, 2)->nullable();
+
             $table->decimal('doctor_rating', 3, 1)->nullable(); // میانگین امتیاز پزشک
             $table->enum('appointment_category', ['initial', 'follow_up'])->nullable();
             $table->string('location')->nullable();

@@ -39,6 +39,7 @@ return new class () extends Migration {
             $table->string('tracking_code')->nullable()->unique();
             $table->integer('max_appointments')->nullable();
             $table->decimal('fee', 8, 2)->nullable();
+            $table->decimal('final_price', 14, 2)->nullable();
             $table->enum('appointment_category', ['initial', 'follow_up'])->nullable();
             $table->string('location')->nullable();
             $table->boolean('notification_sent')->default(false);
