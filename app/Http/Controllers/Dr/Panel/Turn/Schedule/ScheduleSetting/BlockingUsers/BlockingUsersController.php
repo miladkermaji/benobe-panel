@@ -481,11 +481,47 @@ class BlockingUsersController extends Controller
                 ->where('clinic_id', $clinicId)
                 ->firstOrFail();
 
+            // بررسی درخواست برای تغییر وضعیت (فقط برای کاربران مسدود)
+            if ($request->input('update_status') && $userBlocking->status == 1) {
+                $userBlocking->status = 0; // تغییر به آزاد
+                $userBlocking->save();
+
+                // ارسال پیامک به کاربر
+                $user = $userBlocking->user;
+                $doctor = $userBlocking->doctor;
+                $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+
+                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.";
+                $defaultTemplateId = 100255;
+
+                $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+                $templateId = ($gatewayName === 'pishgamrayan') ? $defaultTemplateId : null;
+
+                SendSmsNotificationJob::dispatch(
+                    $message,
+                    [$user->mobile],
+                    $templateId,
+                    [$doctorName]
+                )->delay(now()->addSeconds(5));
+
+                // ثبت پیام در SmsTemplate
+                SmsTemplate::create([
+                    'doctor_id' => $doctor->id,
+                    'clinic_id' => $clinicId,
+                    'user_id' => $user->id,
+                    'identifier' => Str::random(11),
+                    'title' => 'رفع مسدودی',
+                    'content' => $message,
+                ]);
+            }
+
+            // حذف رکورد
             $userBlocking->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'کاربر با موفقیت از لیست مسدودی حذف شد.',
+                'message' => 'کاربر با موفقیت از لیست مسدودی حذف شد' . ($request->input('update_status') ? ' و وضعیت به آزاد تغییر کرد.' : '.'),
             ]);
         } catch (\Exception $e) {
             return response()->json([

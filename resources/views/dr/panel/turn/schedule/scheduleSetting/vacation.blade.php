@@ -46,12 +46,12 @@
                         <div class="d-flex justify-content-between gap-4 mt-3">
                           <div class="mt-3 position-relative timepicker-ui w-100">
                             <label class="label-top-input-special-takhasos"> از ساعت:</label>
-                            <input type="text" name="start_time" id="start-time"
+                            <input data-timepicker type="text" name="start_time" id="start-time"
                               class="form-control w-100 h-50 timepicker-ui-input" style="width: 100% !important">
                           </div>
                           <div class="mt-3 position-relative timepicker-ui w-100">
                             <label class="label-top-input-special-takhasos"> تا ساعت:</label>
-                            <input type="text" name="end_time" id="end-time"
+                            <input data-timepicker type="text" name="end_time" id="end-time"
                               class="form-control w-100 h-50 timepicker-ui-input" style="width: 100% !important">
                           </div>
                         </div>
@@ -147,12 +147,12 @@
           <div class="d-flex justify-content-between gap-4 mt-3">
             <div class="mt-3 position-relative timepicker-ui w-100">
               <label class="label-top-input-special-takhasos">از ساعت:</label>
-              <input id="edit-start-time" type="text" name="start_time" class="form-control w-100 h-50"
+              <input data-timepicker id="edit-start-time" type="text" name="start_time" class="form-control w-100 h-50"
                 style="width: 100% !important">
             </div>
             <div class="mt-3 position-relative timepicker-ui w-100">
               <label class="label-top-input-special-takhasos">تا ساعت:</label>
-              <input id="edit-end-time" type="text" name="end_time" class="form-control w-100 h-50"
+              <input data-timepicker id="edit-end-time" type="text" name="end_time" class="form-control w-100 h-50"
                 style="width: 100% !important">
             </div>
           </div>

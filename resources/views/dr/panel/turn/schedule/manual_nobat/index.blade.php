@@ -79,7 +79,7 @@
             <div class="col-12">
               <div class="position-relative timepicker-ui w-100">
                 <label class="label-top-input">ساعت مراجعه:</label>
-                <input type="text" class="form-control timepicker-ui-input" name="appointment_time"
+                <input data-timepicker type="text" class="form-control timepicker-ui-input" name="appointment_time"
                   style="width: 100% !important">
               </div>
               <small class="text-danger error-appointment_time mt-1 text-start"></small>
@@ -160,7 +160,7 @@
             <div class="col-12">
               <div class="position-relative timepicker-ui w-100">
                 <label class="label-top-input">ساعت مراجعه:</label>
-                <input type="text" name="appointment_time" id="edit-appointment-time" class="form-control"
+                <input data-timepicker type="text" name="appointment_time" id="edit-appointment-time" class="form-control"
                   style="width: 100% !important">
               </div>
               <small class="text-danger error-appointment_time mt-1 text-start"></small>
@@ -221,7 +221,7 @@
             </div>
             <div class="col-12 position-relative timepicker-ui w-100">
               <label class="label-top-input">ساعت مراجعه:</label>
-              <input type="text" class="form-control timepicker-ui-input text-end fw-bold" id="appointment-time"
+              <input data-timepicker type="text" class="form-control timepicker-ui-input text-end fw-bold" id="appointment-time"
                 value="00:00" style="width: 100% !important">
             </div>
             <div class="col-12 position-relative">

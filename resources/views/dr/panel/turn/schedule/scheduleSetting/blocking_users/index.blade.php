@@ -353,24 +353,36 @@
     e.preventDefault();
     const row = $(this).closest('tr');
     const userId = row.data('id');
+    const currentStatus = row.find('.cursor-pointer').data('status');
 
-    Swal.fire({
+    let swalConfig = {
       title: 'آیا مطمئن هستید؟',
-      text: 'این کاربر برای همیشه حذف خواهد شد!',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'بله، حذف شود!',
       cancelButtonText: 'لغو'
-    }).then((result) => {
+    };
+
+    // اگر کاربر مسدود باشد، پیام تغییر وضعیت نمایش داده شود
+    if (currentStatus === 1) {
+      swalConfig.text = 'با حذف این آیتم، وضعیت کاربر به "آزاد" تغییر خواهد کرد. آیا می‌خواهید ادامه دهید؟';
+      swalConfig.confirmButtonText = 'بله، ادامه بده!';
+    } else {
+      swalConfig.text = 'این کاربر برای همیشه از لیست مسدودیت حذف خواهد شد!';
+    }
+
+    Swal.fire(swalConfig).then((result) => {
       if (result.isConfirmed) {
         $.ajax({
           url: "{{ route('doctor-blocking-users.destroy', ['id' => ':userId']) }}".replace(':userId',
             userId),
           method: 'DELETE',
           data: {
-            selectedClinicId: localStorage.getItem('selectedClinicId')
+            selectedClinicId: localStorage.getItem('selectedClinicId'),
+            update_status: currentStatus === 1 ? true : false, // فقط برای کاربران مسدود تغییر وضعیت
+            new_status: 0 // اگر تغییر وضعیت باشد، به آزاد تغییر کند
           },
           headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
