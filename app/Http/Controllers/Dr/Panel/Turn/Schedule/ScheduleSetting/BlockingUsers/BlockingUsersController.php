@@ -25,12 +25,23 @@ class BlockingUsersController extends Controller
     {
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
+        $search = $request->input('search');
 
-        $blockedUsers = UserBlocking::with('user')
+        $query = UserBlocking::with('user')
             ->where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId)
-            ->get();
+            ->where('clinic_id', $clinicId);
 
+        // اعمال جستجو
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%$search%"])
+                        ->orWhere('mobile', 'LIKE', "%$search%");
+                })->orWhere('reason', 'LIKE', "%$search%");
+            });
+        }
+
+        $blockedUsers = $query->get();
         $messages = SmsTemplate::with('user')->latest()->get();
 
         if ($request->ajax()) {
@@ -173,7 +184,7 @@ class BlockingUsersController extends Controller
 
             // پردازش تاریخ‌ها
             $blockedAt = $this->processDate($validated['blocked_at'], 'شروع مسدودیت');
-            // بررسی صریح وجود unblocked_at
+            // بررسی Eager Loading برای بهبود عملکرد
             $unblockedAt = isset($validated['unblocked_at']) && !empty($validated['unblocked_at'])
                 ? $this->processDate($validated['unblocked_at'], 'پایان مسدودیت')
                 : null;
@@ -252,6 +263,7 @@ class BlockingUsersController extends Controller
             ], 500);
         }
     }
+
     public function updateStatus(Request $request)
     {
         try {

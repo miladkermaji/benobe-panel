@@ -1,10 +1,10 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
-
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css"
     href="{{ asset('dr-assets/panel/turn/schedule/schedule-setting/blocking-users/blocking-user.css') }}"
     rel="stylesheet" />
+
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -20,9 +20,20 @@
         <h5 class="mb-0 fw-bold">مدیریت کاربران مسدود</h5>
       </div>
       <div class="card-body">
-        <div class="d-flex justify-content-end mb-3">
-          <button class="btn my-btn-primary h-50" data-bs-toggle="modal" data-bs-target="#addUserModal">افزودن
-            کاربر</button>
+        <!-- فیلد جستجو -->
+        <div class="d-flex justify-content-between p-2 mb-3">
+          <div class="search-container w-100">
+            <input type="text" id="searchInput" class="search-input" placeholder="جستجو (نام، موبایل، دلیل)...">
+            <span class="search-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+                <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+              </svg>
+            </span>
+          </div>
+          <div class="btn-container">
+            <button class="btn my-btn-primary h-50" data-bs-toggle="modal" data-bs-target="#addUserModal">افزودن
+              کاربر</button>
+          </div>
         </div>
         <div class="table-responsive">
           <table id="blockedUsersTable" class="table text-center">
@@ -112,8 +123,6 @@
       </div>
     </div>
   </div>
-
-
 </div>
 @endsection
 @section('scripts')
@@ -187,7 +196,42 @@
       window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
     });
 
+    // جستجوی AJAX
+    let searchTimeout;
+    $('#searchInput').on('input', function() {
+      clearTimeout(searchTimeout);
+      const searchTerm = $(this).val().trim();
+      searchTimeout = setTimeout(() => {
+        searchBlockedUsers(searchTerm);
+      }, 300); // تأخیر 300 میلی‌ثانیه برای جلوگیری از ارسال درخواست‌های مکرر
+    });
 
+    function searchBlockedUsers(searchTerm) {
+      const selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
+      $.ajax({
+        url: "{{ route('doctor-blocking-users.index') }}",
+        method: "GET",
+        data: {
+          search: searchTerm,
+          selectedClinicId: selectedClinicId
+        },
+        success: function(response) {
+          const tableBody = $('#blockedUsersTable tbody');
+          tableBody.empty();
+          if (response.blockedUsers.length === 0) {
+            tableBody.append('<tr><td colspan="7" class="text-center">هیچ کاربر مسدودی یافت نشد.</td></tr>');
+            return;
+          }
+          response.blockedUsers.forEach(user => {
+            appendBlockedUser(user);
+          });
+          $('[data-toggle="tooltip"]').tooltip();
+        },
+        error: function() {
+          toastr.error("خطا در جستجوی کاربران!");
+        }
+      });
+    }
   });
 
   // ثبت کاربر مسدود
@@ -226,13 +270,10 @@
       },
       error: function(xhr) {
         const response = xhr.responseJSON;
-
         toastr.error(response.error);
-
         if (xhr.status === 422 && response.errors) {
           for (const field in response.errors) {
             toastr.error(response.errors[field][0]);
-
           }
         } else if (response && response.message) {
           toastr.error(response.message);
@@ -247,9 +288,6 @@
       }
     });
   });
-
-
-
 
   // اضافه کردن کاربر به جدول
   function appendBlockedUser(user) {
@@ -353,9 +391,6 @@
       }
     });
   });
-
-  // بارگذاری پیام‌ها
-
 
   // تغییر وضعیت کاربر
   function toggleStatus(element) {
