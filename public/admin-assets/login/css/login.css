@@ -143,9 +143,7 @@ button {
     overflow: hidden;
 }
 
-.login-card:not(.no-animation) {
-    animation: fadeInUp 0.7s ease-out;
-}
+
 
 @keyframes fadeInUp {
     from {

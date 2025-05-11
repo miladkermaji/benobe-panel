@@ -13,7 +13,7 @@
             style="max-width: 24px;">
         </a>
       </div>
-      <form wire:submit.prevent="loginWithMobilePass">
+      <form wire:submit.prevent="loginWithMobilePass" class="login-user-pass-form">
         <div class="mb-3">
           <div class="d-flex align-items-center mb-2">
             <img src="{{ asset('dr-assets/login/images/password.svg') }}" alt="آیکون رمز" class="me-2">
@@ -56,8 +56,11 @@
 
     Livewire.on('rateLimitExceeded', (data) => {
       let remainingTime = Math.round(data.remainingTime);
-      let timerInterval;
+      if (remainingTime <= 0) {
+        return; // اگر زمان قفل صفر یا منفی است، پیام نمایش داده نشود
+      }
 
+      let timerInterval;
       Swal.fire({
         icon: 'error',
         title: 'تلاش بیش از حد',
@@ -74,13 +77,8 @@
             if (remainingTime >= 0) {
               remainingTimeElement.innerHTML =
                 `لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید`;
-              if (remainingTime > 180) {
-                remainingTimeElement.style.color = '#16a34a'; // سبز
-              } else if (remainingTime > 60) {
-                remainingTimeElement.style.color = '#f59e0b'; // زرد
-              } else {
-                remainingTimeElement.style.color = '#dc2626'; // قرمز
-              }
+              remainingTimeElement.style.color = remainingTime > 180 ? '#16a34a' : remainingTime > 60 ?
+                '#f59e0b' : '#dc2626';
             }
             if (remainingTime <= 0) {
               clearInterval(timerInterval);
@@ -99,11 +97,9 @@
     Livewire.on('password-error', () => {
       toastr.error('کلمه عبور اشتباه است.');
     });
-    Livewire.on('password-success', () => {
-      toastr.success('موفقیت آمیز');
-    });
     Livewire.on('loginSuccess', () => {
       toastr.success('با موفقیت وارد شدید');
+      localStorage.removeItem('rateLimitTimerData');
     });
 
     Livewire.on('navigateTo', (event) => {

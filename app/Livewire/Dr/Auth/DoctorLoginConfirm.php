@@ -63,7 +63,8 @@ class DoctorLoginConfirm extends Component
 
     public function goBack()
     {
-        session(['current_step' => 1]);
+        session(['current_step' => 1, 'from_back' => true]);
+
         $this->dispatch('navigateTo', url: route('dr.auth.login-register-form'));
     }
 
@@ -172,9 +173,13 @@ class DoctorLoginConfirm extends Component
         $loginAttempts = new LoginAttemptsService();
         $mobile = $otp->doctor?->mobile ?? $otp->secretary?->mobile ?? $otp->login_id ?? 'unknown';
 
+        // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($mobile)) {
-            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($mobile));
-            return;
+            $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
+            if ($remainingTime > 0) {
+                $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+                return;
+            }
         }
 
         $otpCode = rand(1000, 9999);

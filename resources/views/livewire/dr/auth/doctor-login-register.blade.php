@@ -1,6 +1,6 @@
 <div class="justify-content-center align-items-center">
   <div class="col-md-6 login-container position-relative">
-    <div class="login-card custom-rounded custom-shadow p-7">
+    <div class="login-card custom-rounded custom-shadow p-7 {{ session('from_back') ? 'no-animation' : '' }}">
       <div class="logo-wrapper w-100 d-flex justify-content-center">
         <img class="position-absolute  cursor-pointer" onclick="location.href='/'" width="85px"
           src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
@@ -11,7 +11,7 @@
           <span class="text-custom-gray px-1 fw-bold">ورود کاربر</span>
         </div>
       </div>
-      <form wire:submit.prevent="loginRegister">
+      <form wire:submit.prevent="loginRegister" class="login-register-form">
         <div class="mb-3">
           <div class="d-flex align-items-center mb-2">
             <img src="{{ asset('dr-assets/login/images/phone.svg') }}" alt="آیکون تلفن" class="me-2">
@@ -19,7 +19,7 @@
           </div>
           <input wire:model="mobile" dir="ltr"
             class="form-control custom-rounded h-50 border-3 border-gray-300 @error('mobile') is-invalid @enderror"
-            type="text" placeholder="09181234567" maxlength="11" autofocus>
+            type="text" placeholder="09181234567" maxlength="11">
           @error('mobile')
             <div class="invalid-feedback">{{ $message }}</div>
           @enderror
@@ -108,7 +108,9 @@
     }
 
     document.addEventListener('livewire:initialized', () => {
-      document.querySelector('input[wire\\:model="mobile"]').focus();
+      if (!window.location.href.includes('from_back')) { // فقط در بارگذاری اولیه
+        document.querySelector('input[wire\\:model="mobile"]').focus();
+      }
     });
   </script>
 @endpush

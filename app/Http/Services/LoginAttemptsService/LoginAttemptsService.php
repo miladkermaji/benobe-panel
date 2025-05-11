@@ -66,18 +66,26 @@ class LoginAttemptsService
     public function isLocked($mobile)
     {
         $attempt = LoginAttempt::where('mobile', $mobile)->first();
-        if ($attempt && $attempt->lockout_until && $attempt->lockout_until <= now()) {
+    
+        if (!$attempt) {
+            return false; // هیچ تلاشی ثبت نشده، پس قفل نیست
+        }
+    
+        // بررسی منقضی شدن قفل
+        if ($attempt->lockout_until && $attempt->lockout_until <= now()) {
             $this->resetLoginAttempts($mobile);
             Log::info("Lock expired and reset for mobile: $mobile");
-            return false;
+            return false; // قفل منقضی شده، حساب آزاد است
         }
-        $isLocked = $attempt && $attempt->lockout_until && $attempt->lockout_until > now();
+    
+        $isLocked = $attempt->lockout_until && $attempt->lockout_until > now();
         Log::info("isLocked for mobile $mobile: ", [
             'attempt_exists' => !!$attempt,
             'lockout_until' => $attempt?->lockout_until,
             'now' => now(),
             'is_locked' => $isLocked
         ]);
+    
         return $isLocked;
     }
 

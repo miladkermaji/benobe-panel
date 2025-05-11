@@ -80,8 +80,11 @@ class DoctorLoginUserPass extends Component
 
         // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($formattedMobile)) {
-            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
-            return;
+            $remainingTime = $loginAttempts->getRemainingLockTime($formattedMobile);
+            if ($remainingTime > 0) {
+                $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+                return;
+            }
         }
 
         $doctor = Doctor::where('mobile', $formattedMobile)->first();
@@ -97,33 +100,22 @@ class DoctorLoginUserPass extends Component
 
         // بررسی فعال بودن قابلیت ورود با رمز عبور
         if (($user->static_password_enabled ?? 0) !== 1) {
-            $loginAttempts->incrementLoginAttempt(
-                $user->id,
-                $formattedMobile,
-                $doctor ? $doctor->id : null,
-                $secretary ? $secretary->id : null,
-                null
-            );
+            $loginAttempts->incrementLoginAttempt($user->id, $formattedMobile, $doctor ? $doctor->id : null, $secretary ? $secretary->id : null, null);
             $this->addError('password', 'شما قابلیت ورود با رمز عبور را فعال نکرده‌اید.');
             return;
         }
 
         // بررسی رمز عبور و وضعیت حساب
         if (!Hash::check($this->password, $user->password) || $user->status !== 1) {
-            $loginAttempts->incrementLoginAttempt(
-                $user->id,
-                $formattedMobile,
-                $doctor ? $doctor->id : null,
-                $secretary ? $secretary->id : null,
-                null
-            );
+            $loginAttempts->incrementLoginAttempt($user->id, $formattedMobile, $doctor ? $doctor->id : null, $secretary ? $secretary->id : null, null);
             $this->addError('password', 'رمز عبور نادرست است یا حساب غیرفعال است.');
             $this->dispatch('password-error');
-
             return;
         }
-            $this->dispatch('password-success');
-          
+
+        // ادامه فرآیند ورود (مانند احراز هویت دو مرحله‌ای یا ورود مستقیم)
+        $this->dispatch('password-success');
+
         // بررسی احراز هویت دو مرحله‌ای
         if (($user->two_factor_secret_enabled ?? 0) === 1) {
             $token = Str::random(60);
@@ -145,9 +137,7 @@ class DoctorLoginUserPass extends Component
                 'type' => 0,
             ]);
 
-            $messagesService = new MessageService(
-                SmsService::create(100253, $user->mobile, [$otpCode])
-            );
+            $messagesService = new MessageService(SmsService::create(100253, $user->mobile, [$otpCode]));
             $response = $messagesService->send();
             Log::info('SMS send response', ['response' => $response]);
 
@@ -191,6 +181,7 @@ class DoctorLoginUserPass extends Component
 
         // ریست کردن تعداد تلاش‌ها پس از ورود موفق
         $loginAttempts->resetLoginAttempts($formattedMobile);
+
         session()->forget(['step1_completed', 'login_mobile']);
         $this->dispatch('loginSuccess');
         $this->redirect($redirectRoute);

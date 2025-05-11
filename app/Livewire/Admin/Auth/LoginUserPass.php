@@ -78,8 +78,11 @@ class LoginUserPass extends Component
 
         // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($formattedMobile)) {
-            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
-            return;
+            $remainingTime = $loginAttempts->getRemainingLockTime($formattedMobile);
+            if ($remainingTime > 0) {
+                $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+                return;
+            }
         }
 
         $manager = Manager::where('mobile', $formattedMobile)->first();
@@ -107,7 +110,6 @@ class LoginUserPass extends Component
 
         // بررسی رمز عبور و وضعیت حساب
         if (!Hash::check($this->password, $user->password) || $user->status !== 1) {
-
             $loginAttempts->incrementLoginAttempt(
                 $user->id,
                 $formattedMobile,
@@ -118,7 +120,6 @@ class LoginUserPass extends Component
 
             $this->addError('password', 'رمز عبور نادرست است یا حساب غیرفعال است.');
             $this->dispatch('password-error');
-
             return;
         }
 

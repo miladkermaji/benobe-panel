@@ -29,7 +29,9 @@ class DoctorLoginRegister extends Component
         } elseif (session('current_step') === 3) {
             $this->redirect(route('dr.auth.login-user-pass-form'), navigate: true);
         }
+
         session(['current_step' => 1]);
+        session()->forget('from_back'); // حذف فلگ پس از استفاده
     }
 
     private function formatTime($seconds)
@@ -44,6 +46,9 @@ class DoctorLoginRegister extends Component
 
     public function loginRegister()
     {
+        if (!$this->mobile) { // جلوگیری از سابمیت با ورودی خالی
+            return;
+        }
         $this->validate([
             'mobile' => [
                 'required',

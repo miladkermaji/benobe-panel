@@ -1,35 +1,35 @@
 @import url("./../../fonts/yekan-bakh/stylesheet.css");
 @import url("./../../fonts/IRANSans/style.css");
 :root {
-  /* پالت رنگی اصلی */
-  --primary: #2E86C1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
-  --primary-light: #84CAF9; /* آبی روشن - در گرادیان‌ها */
-  --secondary: #1DEB3C; /* سبز - برای دکمه‌های ثانویه */
-  --secondary-hover: #15802A; /* سبز تیره‌تر برای هاور */
-  --background-light: #F0F8FF; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
-  --background-footer: #D4ECFD; /* آبی روشن‌تر - فوتر */
-  --background-card: #FFFFFF; /* سفید - کارت‌ها */
-  --text-primary: #000000; /* مشکی - متن اصلی */
-  --text-secondary: #707070; /* خاکستری - متن ثانویه */
-  --text-discount: #008000; /* سبز - قیمت با تخفیف */
-  --text-original: #FF0000; /* قرمز - قیمت اولیه */
-  --border-neutral: #E5E7EB; /* خاکستری روشن - حاشیه‌ها */
-  --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
-  --gradient-instagram-from: #F92CA7; /* گرادیان اینستاگرام - شروع */
-  --gradient-instagram-to: #6B1A93; /* گرادیان اینستاگرام - پایان */
-  --button-mobile: #4F9ACD; /* آبی متوسط - دکمه‌های موبایل */
-  --button-mobile-light: #A2CDEB; /* آبی روشن‌تر - دکمه‌های موبایل */
-  --support-section: #2E86C1; /* آبی - بخش پشتیبانی */
-  --support-text: #084D7C; /* آبی تیره - متن پشتیبانی */
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
+    --primary-light: #84caf9; /* آبی روشن - در گرادیان‌ها */
+    --secondary: #1deb3c; /* سبز - برای دکمه‌های ثانویه */
+    --secondary-hover: #15802a; /* سبز تیره‌تر برای هاور */
+    --background-light: #f0f8ff; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
+    --background-footer: #d4ecfd; /* آبی روشن‌تر - فوتر */
+    --background-card: #ffffff; /* سفید - کارت‌ها */
+    --text-primary: #000000; /* مشکی - متن اصلی */
+    --text-secondary: #707070; /* خاکستری - متن ثانویه */
+    --text-discount: #008000; /* سبز - قیمت با تخفیف */
+    --text-original: #ff0000; /* قرمز - قیمت اولیه */
+    --border-neutral: #e5e7eb; /* خاکستری روشن - حاشیه‌ها */
+    --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
+    --gradient-instagram-from: #f92ca7; /* گرادیان اینستاگرام - شروع */
+    --gradient-instagram-to: #6b1a93; /* گرادیان اینستاگرام - پایان */
+    --button-mobile: #4f9acd; /* آبی متوسط - دکمه‌های موبایل */
+    --button-mobile-light: #a2cdeb; /* آبی روشن‌تر - دکمه‌های موبایل */
+    --support-section: #2e86c1; /* آبی - بخش پشتیبانی */
+    --support-text: #084d7c; /* آبی تیره - متن پشتیبانی */
 
-  /* شعاع گوشه‌ها (border-radius) */
-  --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
-  --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
-  --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
-  --radius-card: 1.125rem; /* 18px - کارت‌ها */
-  --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
-  --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
-  --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
+    /* شعاع گوشه‌ها (border-radius) */
+    --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
+    --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
+    --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
+    --radius-card: 1.125rem; /* 18px - کارت‌ها */
+    --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
+    --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
+    --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
 }
 /* Reset and Base Styles */
 * {
@@ -42,7 +42,11 @@
 }
 
 body {
-    background: linear-gradient(135deg, var(--background-light) 0%, var(--background-footer) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--background-light) 0%,
+        var(--background-footer) 100%
+    );
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -86,7 +90,11 @@ button {
 }
 
 .btn.custom-gradient {
-    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+    background: linear-gradient(
+        90deg,
+        var(--primary) 0%,
+        var(--primary-light) 100%
+    );
     color: var(--background-card);
     font-weight: 700;
     font-size: 1.1rem;
@@ -100,7 +108,11 @@ button {
 }
 
 .btn.custom-gradient:hover {
-    background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    background: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
     box-shadow: 0 8px 20px rgba(46, 134, 193, 0.4);
     transform: translateY(-2px);
 }
@@ -143,9 +155,7 @@ button {
     overflow: hidden;
 }
 
-.login-card:not(.no-animation) {
-    animation: fadeInUp 0.7s ease-out;
-}
+/*  */
 
 @keyframes fadeInUp {
     from {
@@ -344,7 +354,11 @@ button {
 
 #progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, var(--secondary) 0%, var(--secondary-hover) 100%);
+    background: linear-gradient(
+        90deg,
+        var(--secondary) 0%,
+        var(--secondary-hover) 100%
+    );
     transition: width 0.6s ease, background-color 0.6s ease;
 }
 

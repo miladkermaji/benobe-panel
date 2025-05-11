@@ -87,11 +87,15 @@ class LoginConfirm extends Component
             ->first();
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile = $otp?->manager?->mobile  ?? $otp->login_id ?? 'unknown';
+        $mobile = $otp?->manager?->mobile ?? $otp->login_id ?? 'unknown';
 
+        // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($mobile)) {
-            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($mobile));
-            return;
+            $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
+            if ($remainingTime > 0) {
+                $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+                return;
+            }
         }
 
         if (!$otp) {
@@ -101,7 +105,7 @@ class LoginConfirm extends Component
         }
 
         if ($otp->otp_code !== $otpCode) {
-            $userId = $otp->manager_id  ?? null;
+            $userId = $otp->manager_id ?? null;
             $loginAttempts->incrementLoginAttempt(
                 $userId,
                 $mobile,
@@ -114,7 +118,7 @@ class LoginConfirm extends Component
         }
 
         $otp->update(['used' => 1]);
-        $user = $otp->manager ;
+        $user = $otp->manager;
 
         if (empty($user->mobile_verified_at)) {
             $user->update(['mobile_verified_at' => Carbon::now()]);
@@ -163,11 +167,15 @@ class LoginConfirm extends Component
         }
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile = $otp->manager?->mobile  ?? $otp->login_id ?? 'unknown';
+        $mobile = $otp->manager?->mobile ?? $otp->login_id ?? 'unknown';
 
+        // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($mobile)) {
-            $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($mobile));
-            return;
+            $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
+            if ($remainingTime > 0) {
+                $this->dispatch('rateLimitExceeded', remainingTime: $remainingTime);
+                return;
+            }
         }
 
         $otpCode = rand(1000, 9999);
@@ -176,7 +184,6 @@ class LoginConfirm extends Component
         Otp::create([
             'token' => $newToken,
             'manager_id' => $otp->manager_id,
-            
             'otp_code' => $otpCode,
             'login_id' => $mobile,
             'type' => 0,
@@ -186,12 +193,11 @@ class LoginConfirm extends Component
         LoginSession::create([
             'token' => $newToken,
             'manager_id' => $otp->manager_id,
-            
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
 
-        $user = $otp->manager ;
+        $user = $otp->manager;
         $messagesService = new MessageService(
             SmsService::create(100253, $user->mobile, [$otpCode])
         );

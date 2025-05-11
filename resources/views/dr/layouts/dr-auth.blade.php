@@ -74,13 +74,37 @@
           timeOut: 10000,
           progressBar: true,
           positionClass: 'toast-top-right',
-          preventDuplicates: true,
+          preventDuplicates: true, // جلوگیری از نمایش توسترهای تکراری
+          newestOnTop: true,
+          maxOpened: 1, // فقط یک توستر در هر لحظه
+          closeButton: false
         };
       }
     });
 
     Livewire.on('otpSent', (data) => {
       localStorage.removeItem('otpTimerData');
+    });
+
+    // تعریف متغیر isSubmitting در اسکوپ جهانی فقط یک‌بار
+    window.isSubmitting = false;
+
+    document.addEventListener('livewire:initialized', () => {
+      // انتخاب فرم‌های مختلف با کلاس‌های منحصربه‌فرد
+      const forms = document.querySelectorAll(
+        'form.login-register-form, form.login-confirm-form, form.login-user-pass-form');
+      forms.forEach((form) => {
+        form.addEventListener('submit', (e) => {
+          if (window.isSubmitting) {
+            e.preventDefault();
+            return;
+          }
+          window.isSubmitting = true;
+          setTimeout(() => {
+            window.isSubmitting = false;
+          }, 1000); // ریست فلگ پس از 1 ثانیه
+        });
+      });
     });
   </script>
   @stack('scripts')

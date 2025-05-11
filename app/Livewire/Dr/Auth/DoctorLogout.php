@@ -12,7 +12,7 @@ class DoctorLogout extends Component
     {
         $user = null;
         $guard = null;
-
+    
         if (Auth::guard('doctor')->check()) {
             $user = Auth::guard('doctor')->user();
             $guard = 'doctor';
@@ -22,18 +22,22 @@ class DoctorLogout extends Component
             $guard = 'secretary';
             Auth::guard('secretary')->logout();
         }
-
+    
         if ($user) {
             LoginLog::where('doctor_id', $guard === 'doctor' ? $user->id : null)
                 ->where('secretary_id', $guard === 'secretary' ? $user->id : null)
                 ->whereNull('logout_at')
                 ->latest()
                 ->first()
-                    ?->update(['logout_at' => now()]);
+                ?->update(['logout_at' => now()]);
         }
-
+    
         session()->forget(['current_step', 'step1_completed', 'step3_completed', 'otp_token', 'doctor_temp_login', 'secretary_temp_login']);
         session()->flash('swal-success', 'شما با موفقیت از سایت خارج شدید');
+    
+        // اعلان برای پاکسازی localStorage
+        $this->dispatch('clearStorage');
+    
         $this->redirect(route('dr.auth.login-register-form'));
     }
 

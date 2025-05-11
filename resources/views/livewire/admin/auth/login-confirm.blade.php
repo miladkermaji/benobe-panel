@@ -145,16 +145,20 @@
       const now = new Date().getTime();
 
       if (!storedCountDownDate || storedCountDownDate <= now) {
-        window.timerState.rateLimitCountDownDate = new Date().getTime() + (remainingTime * 1000);
+        window.timerState.rateLimitCountDownDate = now + (remainingTime * 1000);
         localStorage.setItem('rateLimitTimerData', JSON.stringify({
           countDownDate: window.timerState.rateLimitCountDownDate
         }));
       } else {
         window.timerState.rateLimitCountDownDate = Number(storedCountDownDate);
+        remainingTime = Math.round((window.timerState.rateLimitCountDownDate - now) / 1000); // به‌روزرسانی remainingTime
       }
+
       window.timerState.isRateLimitTimerRunning = true;
 
+      // محاسبه زمان اولیه به صورت دقیق
       const initialTimeText = formatConditionalTime(remainingTime);
+
       Swal.fire({
         icon: 'error',
         title: 'تلاش بیش از حد',
@@ -173,10 +177,10 @@
 
             if (secondsLeft >= 0) {
               remainingTimeElement.innerHTML = `لطفاً ${formatConditionalTime(secondsLeft)} دیگر تلاش کنید`;
-              if (secondsLeft > 180) remainingTimeElement.style.color = '#16a34a';
-              else if (secondsLeft > 60) remainingTimeElement.style.color = '#f59e0b';
-              else remainingTimeElement.style.color = '#dc3546';
+              remainingTimeElement.style.color = secondsLeft > 180 ? '#16a34a' : secondsLeft > 60 ? '#f59e0b' :
+                '#dc2626';
             }
+
             if (distance <= 0) {
               clearInterval(window.timerState.rateLimitInterval);
               window.timerState.rateLimitInterval = null;
