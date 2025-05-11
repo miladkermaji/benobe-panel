@@ -1,13 +1,10 @@
 @extends('errors.layout')
 
 @section('title', 'صفحه پیدا نشد - به نوبه')
+@section('code', '404')
+@section('message', 'صفحه مورد نظر یافت نشد')
+@section('icon', '⏰')
 
 @section('content')
- <span class="error-icon">⏰</span>
- <p class="text-gray-500 mt-4">متأسفیم! انگار این صفحه مثل یه نوبت گم‌شده پیدا نمی‌شه.</p>
+    <p>متأسفیم! انگار این صفحه مثل یه نوبت گم‌شده پیدا نمی‌شه.</p>
 @endsection
-
-<?php
-$code = '404';
-$message = 'صفحه مورد نظر یافت نشد';
-?>
