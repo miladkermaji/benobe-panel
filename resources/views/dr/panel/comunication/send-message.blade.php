@@ -130,167 +130,221 @@
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 <script>
-  $(document).ready(function() {
-    let dropdownOpen = false;
-    let selectedClinic = localStorage.getItem('selectedClinic');
-    let selectedClinicId = localStorage.getItem('selectedClinicId');
-    if (selectedClinic && selectedClinicId) {
-      $('.dropdown-label').text(selectedClinic);
-      $('.option-card').each(function() {
-        if ($(this).attr('data-id') === selectedClinicId) {
-          $('.option-card').removeClass('card-active');
-          $(this).addClass('card-active');
+  function deleteMessage(messageId, element) {
+    Swal.fire({
+      title: 'آیا مطمئن هستید؟',
+      text: 'این پیام برای همیشه حذف خواهد شد!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'بله، حذف کن',
+      cancelButtonText: 'لغو',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: "{{ route('doctor-blocking-users.delete-message') }}",
+          method: "POST",
+          data: {
+            message_ids: [messageId],
+            selectedClinicId: localStorage.getItem('selectedClinicId'),
+            _token: '{{ csrf_token() }}'
+          },
+          success: function(response) {
+            if (response.success) {
+              $(element).closest('tr').remove();
+              toastr.success(response.message);
+              toggleDeleteButton();
+            } else {
+              toastr.error(response.message);
+            }
+          },
+          error: function(xhr) {
+            toastr.error(xhr.responseJSON?.message || 'خطا در حذف پیام!');
+          }
+        });
+      }
+    });
+  }
+
+  function validateForm() {
+    const title = $('#smsTitle').val().trim();
+    const content = $('#smsMessage').val().trim();
+    const recipientType = $('#smsRecipient').val();
+    const specificRecipient = $('#specificRecipient').val().trim();
+
+    // پاک کردن پیام‌های خطای قبلی
+    $('.error-message').remove();
+
+    let isValid = true;
+    let errors = [];
+
+    // اعتبارسنجی عنوان
+    if (!title) {
+      errors.push('لطفاً عنوان پیام را وارد کنید.');
+      $('#smsTitle').after('<div class="error-message text-danger mt-1">لطفاً عنوان پیام را وارد کنید.</div>');
+      isValid = false;
+    } else if (title.length > 255) {
+      errors.push('عنوان پیام نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.');
+      $('#smsTitle').after(
+        '<div class="error-message text-danger mt-1">عنوان پیام نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.</div>');
+      isValid = false;
+    }
+
+    // اعتبارسنجی متن پیام
+    if (!content) {
+      errors.push('لطفاً متن پیام را وارد کنید.');
+      $('#smsMessage').after('<div class="error-message text-danger mt-1">لطفاً متن پیام را وارد کنید.</div>');
+      isValid = false;
+    } else if (content.length > 1000) {
+      errors.push('متن پیام نمی‌تواند بیش از ۱۰۰۰ کاراکتر باشد.');
+      $('#smsMessage').after(
+        '<div class="error-message text-danger mt-1">متن پیام نمی‌تواند بیش از ۱۰۰۰ کاراکتر باشد.</div>');
+      isValid = false;
+    }
+
+    // اعتبارسنجی نوع گیرنده
+    if (!recipientType) {
+      errors.push('لطفاً نوع گیرنده را انتخاب کنید.');
+      $('#smsRecipient').after(
+        '<div class="error-message text-danger mt-1">لطفاً نوع گیرنده را انتخاب کنید.</div>');
+      isValid = false;
+    } else if (!['all', 'blocked', 'specific'].includes(recipientType)) {
+      errors.push('نوع گیرنده انتخاب‌شده معتبر نیست.');
+      $('#smsRecipient').after(
+        '<div class="error-message text-danger mt-1">نوع گیرنده انتخاب‌شده معتبر نیست.</div>');
+      isValid = false;
+    }
+
+    // اعتبارسنجی شماره موبایل گیرنده خاص
+    if (recipientType === 'specific' && !specificRecipient) {
+      errors.push('لطفاً شماره موبایل گیرنده را وارد کنید.');
+      $('#specificRecipient').after(
+        '<div class="error-message text-danger mt-1">لطفاً شماره موبایل گیرنده را وارد کنید.</div>');
+      isValid = false;
+    } else if (recipientType === 'specific' && !/^\d{11}$/.test(specificRecipient)) {
+      errors.push('شماره موبایل باید ۱۱ رقم باشد (مثال: 09123456789).');
+      $('#specificRecipient').after(
+        '<div class="error-message text-danger mt-1">شماره موبایل باید ۱۱ رقم باشد (مثال: 09123456789).</div>');
+      isValid = false;
+    }
+
+    // نمایش خطاها با toastr
+    if (errors.length > 0) {
+      errors.forEach(error => toastr.error(error));
+    }
+
+    return isValid;
+  }
+
+  function toggleDeleteButton() {
+    const checkedCount = $('#messagesTableBody .form-check-input:checked').length;
+    $('#delete-multiple').prop('disabled', checkedCount === 0);
+  }
+
+  function deleteMultipleMessages(messageIds) {
+    $.ajax({
+      url: "{{ route('doctor-blocking-users.delete-message') }}",
+      method: "POST",
+      data: {
+        message_ids: messageIds,
+        selectedClinicId: localStorage.getItem('selectedClinicId'),
+        _token: '{{ csrf_token() }}'
+      },
+      success: function(response) {
+        if (response.success) {
+          messageIds.forEach(id => {
+            $(`tr[data-id="${id}"]`).remove();
+          });
+          toastr.success(response.message);
+          $('#select-all').prop('checked', false);
+          toggleDeleteButton();
+        } else {
+          toastr.error(response.message);
         }
-      });
-    } else {
-      localStorage.setItem('selectedClinic', 'مشاوره آنلاین به نوبه');
-      localStorage.setItem('selectedClinicId', 'default');
-    }
-
-    function checkInactiveClinics() {
-      var hasInactiveClinics = $('.option-card[data-active="0"]').length > 0;
-      if (hasInactiveClinics) {
-        $('.dropdown-trigger').addClass('warning');
-      } else {
-        $('.dropdown-trigger').removeClass('warning');
-      }
-    }
-    checkInactiveClinics();
-
-    $('.dropdown-trigger').on('click', function(event) {
-      event.stopPropagation();
-      dropdownOpen = !dropdownOpen;
-      $(this).toggleClass('border border-primary');
-      $('.my-dropdown-menu').toggleClass('d-none');
-      setTimeout(() => {
-        dropdownOpen = $('.my-dropdown-menu').is(':visible');
-      }, 100);
-    });
-
-    $(document).on('click', function() {
-      if (dropdownOpen) {
-        $('.dropdown-trigger').removeClass('border border-primary');
-        $('.my-dropdown-menu').addClass('d-none');
-        dropdownOpen = false;
+      },
+      error: function(xhr) {
+        toastr.error(xhr.responseJSON?.message || 'خطا در حذف پیام‌ها!');
       }
     });
+  }
 
-    $('.my-dropdown-menu').on('click', function(event) {
-      event.stopPropagation();
+  // بارگذاری پیام‌ها
+  function loadMessages() {
+    $.ajax({
+      url: "{{ route('doctor-blocking-users.messages') }}",
+      method: "GET",
+      data: {
+        selectedClinicId: localStorage.getItem('selectedClinicId')
+      },
+      success: function(messages) {
+        const tableBody = $('#messagesTableBody');
+        tableBody.empty();
+        messages.forEach(message => {
+          let recipientText = 'نامشخص';
+          if (message.recipient_type === 'all') {
+            recipientText = 'همه کاربران';
+          } else if (message.recipient_type === 'blocked') {
+            recipientText = 'کاربران مسدود';
+          } else if (message.recipient_type === 'specific' && message.user) {
+            recipientText =
+              `${message.user.first_name} ${message.user.last_name} (${message.user.mobile})`;
+          }
+
+          const jalaliDate = new Intl.DateTimeFormat('fa-IR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          }).format(new Date(message.created_at));
+
+          tableBody.append(`
+              <tr data-id="${message.id}">
+                <td><input type="checkbox" class="form-check-input" id="select-single"></td>
+                <td>${message.title}</td>
+                <td>${message.content}</td>
+                <td>${jalaliDate}</td>
+                <td>${recipientText}</td>
+                <td>
+                  <button class="btn btn-light btn-sm delete-message-btn rounded-circle" onclick="deleteMessage(${message.id}, this)" aria-label="حذف پیام">
+                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                  </button>
+                </td>
+              </tr>
+            `);
+        });
+        toggleDeleteButton();
+      },
+      error: function() {
+        toastr.error("خطا در بارگذاری پیام‌ها!");
+      }
     });
-
-    $('.option-card').on('click', function() {
-      var selectedText = $(this).find('.fw-bold.d-block.fs-15').text().trim();
-      var selectedId = $(this).attr('data-id');
-      $('.option-card').removeClass('card-active');
-      $(this).addClass('card-active');
-      $('.dropdown-label').text(selectedText);
-
-      localStorage.setItem('selectedClinic', selectedText);
-      localStorage.setItem('selectedClinicId', selectedId);
-      checkInactiveClinics();
-      $('.dropdown-trigger').removeClass('border border-primary');
-      $('.my-dropdown-menu').addClass('d-none');
-      dropdownOpen = false;
-      window.location.href = window.location.pathname + "?selectedClinicId=" + selectedId;
-    });
-
+  }
+  $(document).ready(function() {
     // نمایش/مخفی کردن فیلد گیرنده خاص
     $('#smsRecipient').on('change', function() {
       const specificField = $('#specificRecipientField');
+      const specificInput = $('#specificRecipient');
       if ($(this).val() === 'specific') {
         specificField.show();
+        specificInput.prop('required', true);
       } else {
         specificField.hide();
+        specificInput.prop('required', false).val('');
       }
     });
 
-    // مدیریت انتخاب همه چک‌باکس‌ها
-    $('#select-all').on('change', function() {
-      const isChecked = $(this).is(':checked');
-      $('#messagesTableBody .form-check-input').prop('checked', isChecked);
-      toggleDeleteButton();
-    });
+    // اعتبارسنجی سمت کلاینت
 
-    // مدیریت تغییر وضعیت چک‌باکس‌های تکی
-    $(document).on('change', '#messagesTableBody .form-check-input', function() {
-      // اگر یکی از چک‌باکس‌ها unchecked شد، select-all را unchecked کن
-      if (!$(this).is(':checked')) {
-        $('#select-all').prop('checked', false);
-      }
-      // اگر همه چک‌باکس‌ها انتخاب شدند، select-all را checked کن
-      const allChecked = $('#messagesTableBody .form-check-input').length === $(
-        '#messagesTableBody .form-check-input:checked').length;
-      $('#select-all').prop('checked', allChecked);
-      toggleDeleteButton();
-    });
 
-    // فعال/غیرفعال کردن دکمه حذف
-    function toggleDeleteButton() {
-      const checkedCount = $('#messagesTableBody .form-check-input:checked').length;
-      $('#delete-multiple').prop('disabled', checkedCount === 0);
-    }
+    // ارسال فرم
+    $('#sendSmsForm').on('submit', function(e) {
+      e.preventDefault();
 
-    // حذف گروهی پیام‌ها
-    $('#delete-multiple').on('click', function() {
-      const selectedIds = [];
-      $('#messagesTableBody .form-check-input:checked').each(function() {
-        selectedIds.push($(this).closest('tr').data('id'));
-      });
-
-      if (selectedIds.length === 0) {
-        toastr.warning('هیچ پیامی انتخاب نشده است!');
+      // اعتبارسنجی فرم
+      if (!validateForm()) {
         return;
       }
 
-      Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: `می‌خواهید ${selectedIds.length} پیام را حذف کنید؟`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'بله، حذف کن',
-        cancelButtonText: 'لغو',
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          deleteMultipleMessages(selectedIds);
-        }
-      });
-    });
-
-    // تابع حذف گروهی پیام‌ها
-    // تابع حذف گروهی پیام‌ها
-    function deleteMultipleMessages(messageIds) {
-      $.ajax({
-        url: "{{ route('doctor-blocking-users.delete-message') }}",
-        method: "POST",
-        data: {
-          message_ids: messageIds,
-          selectedClinicId: localStorage.getItem('selectedClinicId'),
-          _token: '{{ csrf_token() }}' // اضافه کردن CSRF token
-        },
-        success: function(response) {
-          if (response.success) {
-            messageIds.forEach(id => {
-              $(`tr[data-id="${id}"]`).remove();
-            });
-            toastr.success(response.message);
-            $('#select-all').prop('checked', false);
-            toggleDeleteButton();
-          } else {
-            toastr.error(response.message);
-          }
-        },
-        error: function(xhr) {
-          toastr.error(xhr.responseJSON?.message || 'خطا در حذف پیام‌ها!');
-        }
-      });
-    }
-
-    // ارسال پیام
-    $('#sendSmsForm').on('submit', function(e) {
-      e.preventDefault();
       const form = $(this);
       const formData = form.serializeArray();
       const selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
@@ -341,75 +395,42 @@
       });
     });
 
-    // نمایش/مخفی کردن فیلد گیرنده خاص
-    $('#smsRecipient').on('change', function() {
-      const specificField = $('#specificRecipientField');
-      if ($(this).val() === 'specific') {
-        specificField.show();
-      } else {
-        specificField.hide();
-        $('#specificRecipient').val('');
-      }
+    // مدیریت انتخاب همه چک‌باکس‌ها
+    $('#select-all').on('change', function() {
+      const isChecked = $(this).is(':checked');
+      $('#messagesTableBody .form-check-input').prop('checked', isChecked);
+      toggleDeleteButton();
     });
 
-    // بارگذاری پیام‌ها
-    function loadMessages() {
-      $.ajax({
-        url: "{{ route('doctor-blocking-users.messages') }}",
-        method: "GET",
-        data: {
-          selectedClinicId: localStorage.getItem('selectedClinicId')
-        },
-        success: function(messages) {
-          const tableBody = $('#messagesTableBody');
-          tableBody.empty();
-          messages.forEach(message => {
-            let recipientText = 'نامشخص';
-            if (message.recipient_type === 'all') {
-              recipientText = 'همه کاربران';
-            } else if (message.recipient_type === 'blocked') {
-              recipientText = 'کاربران مسدود';
-            } else if (message.recipient_type === 'specific' && message.user) {
-              recipientText =
-                `${message.user.first_name} ${message.user.last_name} (${message.user.mobile})`;
-            }
+    // مدیریت تغییر وضعیت چک‌باکس‌های تکی
+    $(document).on('change', '#messagesTableBody .form-check-input', function() {
+      if (!$(this).is(':checked')) {
+        $('#select-all').prop('checked', false);
+      }
+      const allChecked = $('#messagesTableBody .form-check-input').length === $(
+        '#messagesTableBody .form-check-input:checked').length;
+      $('#select-all').prop('checked', allChecked);
+      toggleDeleteButton();
+    });
 
-            const jalaliDate = new Intl.DateTimeFormat('fa-IR', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit'
-            }).format(new Date(message.created_at));
+    // فعال/غیرفعال کردن دکمه حذف
 
-            tableBody.append(`
-                        <tr data-id="${message.id}">
-                            <td><input type="checkbox" class="form-check-input" id="select-single"></td>
-                            <td>${message.title}</td>
-                            <td>${message.content}</td>
-                            <td>${jalaliDate}</td>
-                            <td>${recipientText}</td>
-                            <td>
-                                <button class="btn btn-light btn-sm delete-message-btn rounded-circle" onclick="deleteMessage(${message.id}, this)" aria-label="حذف پیام">
-                                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                                </button>
-                            </td>
-                        </tr>
-                    `);
-          });
-          toggleDeleteButton();
-        },
-        error: function() {
-          toastr.error("خطا در بارگذاری پیام‌ها!");
-        }
+
+    // حذف گروهی پیام‌ها
+    $('#delete-multiple').on('click', function() {
+      const selectedIds = [];
+      $('#messagesTableBody .form-check-input:checked').each(function() {
+        selectedIds.push($(this).closest('tr').data('id'));
       });
-    }
-    loadMessages();
 
-    // حذف پیام تکی
-    // حذف پیام تکی
-    function deleteMessage(messageId, element) {
+      if (selectedIds.length === 0) {
+        toastr.warning('هیچ پیامی انتخاب نشده است!');
+        return;
+      }
+
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
-        text: 'این پیام برای همیشه حذف خواهد شد!',
+        text: `می‌خواهید ${selectedIds.length} پیام را حذف کنید؟`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'بله، حذف کن',
@@ -418,30 +439,17 @@
         cancelButtonColor: '#3085d6',
       }).then((result) => {
         if (result.isConfirmed) {
-          $.ajax({
-            url: "{{ route('doctor-blocking-users.delete-message') }}",
-            method: "POST",
-            data: {
-              message_ids: [messageId], // ارسال به‌صورت آرایه
-              selectedClinicId: localStorage.getItem('selectedClinicId'),
-              _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-              if (response.success) {
-                $(element).closest('tr').remove();
-                toastr.success(response.message);
-                toggleDeleteButton();
-              } else {
-                toastr.error(response.message);
-              }
-            },
-            error: function(xhr) {
-              toastr.error(xhr.responseJSON?.message || 'خطا در حذف پیام!');
-            }
-          });
+          deleteMultipleMessages(selectedIds);
         }
       });
-    }
+    });
+
+    // تابع حذف گروهی پیام‌ها
+
+    loadMessages();
+
+    // حذف پیام تکی
+
 
     $(document).ready(function() {
       $('[data-toggle="tooltip"]').tooltip();

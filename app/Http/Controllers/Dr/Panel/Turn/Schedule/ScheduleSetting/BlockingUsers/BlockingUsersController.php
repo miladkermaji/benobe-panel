@@ -325,25 +325,30 @@ class BlockingUsersController extends Controller
     {
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
-
+    
+        // تعریف پیام‌های خطای فارسی
         $messages = [
-            'title.required' => 'عنوان پیام را وارد کنید.',
-            'title.max' => 'عنوان پیام نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
-            'content.required' => 'متن پیام را وارد کنید.',
-            'content.max' => 'متن پیام نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد.',
-            'recipient_type.required' => 'نوع گیرنده را انتخاب کنید.',
-            'recipient_type.in' => 'نوع گیرنده انتخاب‌شده نامعتبر است.',
-            'specific_recipient.required_if' => 'شماره موبایل گیرنده را وارد کنید.',
-            'specific_recipient.exists' => 'شماره موبایل واردشده در سیستم ثبت نشده یا نوبت نگرفته است.',
+            'title.required' => 'لطفاً عنوان پیام را وارد کنید.',
+            'title.string' => 'عنوان پیام باید یک متن معتبر باشد.',
+            'title.max' => 'عنوان پیام نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
+            'content.required' => 'لطفاً متن پیام را وارد کنید.',
+            'content.string' => 'متن پیام باید یک متن معتبر باشد.',
+            'content.max' => 'متن پیام نمی‌تواند بیش از ۱۰۰۰ کاراکتر باشد.',
+            'recipient_type.required' => 'لطفاً نوع گیرنده را انتخاب کنید.',
+            'recipient_type.in' => 'نوع گیرنده انتخاب‌شده معتبر نیست.',
+            'specific_recipient.required_if' => 'لطفاً شماره موبایل گیرنده را وارد کنید.',
+            'specific_recipient.exists' => 'شماره موبایل وارد‌شده در سیستم ثبت نشده یا نوبت فعالی با شما ندارد.',
         ];
-
+    
         try {
+            // تعریف قوانین اعتبارسنجی
             $rules = [
                 'title' => 'required|string|max:255',
                 'content' => 'required|string|max:1000',
                 'recipient_type' => 'required|in:all,blocked,specific',
             ];
-
+    
+            // اضافه کردن قانون برای specific_recipient در صورت انتخاب نوع گیرنده 'specific'
             if ($request->input('recipient_type') === 'specific') {
                 $rules['specific_recipient'] = [
                     'required',
@@ -352,12 +357,14 @@ class BlockingUsersController extends Controller
                     }),
                 ];
             }
-
+    
+            // انجام اعتبارسنجی
             $validated = $request->validate($rules, $messages);
-
+    
+            // ادامه منطق برنامه...
             $recipients = [];
             $userId = null;
-
+    
             if ($validated['recipient_type'] === 'all') {
                 $recipients = DB::table('appointments')
                     ->where('doctor_id', $doctorId)
@@ -389,54 +396,54 @@ class BlockingUsersController extends Controller
                 $recipients[] = $validated['specific_recipient'];
                 $userId = $user->id;
             }
-
-            // ذخیره پیام در SmsTemplate با اضافه کردن recipient_type
+    
+            // ذخیره پیام در SmsTemplate
             $smsTemplate = SmsTemplate::create([
                 'doctor_id' => $doctorId,
                 'user_id' => $userId,
                 'title' => $validated['title'],
                 'content' => $validated['content'],
                 'type' => 'manual',
-                'recipient_type' => $validated['recipient_type'], // اضافه کردن نوع گیرنده
+                'recipient_type' => $validated['recipient_type'],
                 'identifier' => uniqid(),
             ]);
-
+    
             // ارسال پیامک
             $doctor = Doctor::find($doctorId);
             $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-
+    
             $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
             $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
             $templateId = ($gatewayName === 'pishgamrayan') ? null : null;
-
+    
             SendSmsNotificationJob::dispatch(
                 $validated['content'],
                 $recipients,
                 $templateId,
                 [$doctorName]
             )->delay(now()->addSeconds(5));
-
+    
             return response()->json([
                 'success' => true,
                 'message' => 'پیام با موفقیت در صف ارسال قرار گرفت.',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation failed in sendMessage', [
+            Log::error('خطا در اعتبارسنجی هنگام ارسال پیام', [
                 'errors' => $e->errors(),
                 'request_data' => $request->all(),
             ]);
-
+    
             return response()->json([
                 'success' => false,
                 'message' => 'خطا در اطلاعات ارسالی!',
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
-            Log::error('Error in sendMessage', [
+            Log::error('خطا در ارسال پیام', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-
+    
             return response()->json([
                 'success' => false,
                 'message' => 'خطایی در ارسال پیام رخ داد. لطفاً دوباره تلاش کنید.',
