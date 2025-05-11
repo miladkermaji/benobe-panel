@@ -18,6 +18,11 @@ class DoctorFaqsEdit extends Component
      */
     public function mount($id)
     {
+
+        if (!Auth::guard('doctor')->check()) {
+            return redirect()->route('dr.auth.login-register-form');
+        }
+
         $this->faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id)->findOrFail($id);
         $this->form = $this->faq->toArray();
     }

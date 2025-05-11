@@ -55,12 +55,22 @@ class DoctorFaqsCreate extends Component
         $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت ایجاد شد!');
         return redirect()->route('dr.panel.doctor-faqs.index');
     }
+public function mount()
+{
+    
+if (!Auth::guard('doctor')->check()) {
+    return redirect()->route('dr.auth.login-register-form');
+}
 
+}
     /**
      * رندر صفحه ایجاد
      */
     public function render()
     {
+
+      
+
         return view('livewire.dr.panel.doctor-faqs.doctor-faqs-create');
     }
 }
