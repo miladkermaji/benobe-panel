@@ -13,7 +13,7 @@
             style="max-width: 24px;">
         </a>
       </div>
-      <form wire:submit.prevent="loginConfirm">
+      <form wire:submit.prevent="loginConfirm" class="login-confirm-form">
         <div class="d-flex justify-content-between mb-3" dir="rtl">
           @for ($i = 0; $i < 4; $i++)
             <input wire:model="otpCode.{{ $i }}" type="text" maxlength="1"

@@ -13,7 +13,7 @@
             style="max-width: 24px;">
         </a>
       </div>
-      <form wire:submit.prevent="loginWithMobilePass">
+      <form wire:submit.prevent="loginWithMobilePass" class="login-user-pass-form">
         <div class="mb-3">
           <div class="d-flex align-items-center mb-2">
             <img src="{{ asset('admin-assets/login/images/password.svg') }}" alt="آیکون رمز" class="me-2">

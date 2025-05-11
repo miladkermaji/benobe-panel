@@ -11,7 +11,7 @@
           <span class="text-custom-gray px-1 fw-bold">ورود کاربر</span>
         </div>
       </div>
-      <form wire:submit.prevent="loginRegister">
+      <form wire:submit.prevent="loginRegister" class="login-register-form">
         <div class="mb-3">
           <div class="d-flex align-items-center mb-2">
             <img src="{{ asset('admin-assets/login/images/phone.svg') }}" alt="آیکون تلفن" class="me-2">
