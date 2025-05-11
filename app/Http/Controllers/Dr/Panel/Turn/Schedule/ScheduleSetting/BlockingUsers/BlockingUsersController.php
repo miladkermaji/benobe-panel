@@ -451,20 +451,27 @@ class BlockingUsersController extends Controller
         return response()->json($messages);
     }
 
-    public function deleteMessage($id)
+    public function deleteMessage(Request $request)
     {
         try {
-            $message = SmsTemplate::findOrFail($id);
-            $message->delete();
-
+            $messageIds = $request->input('message_ids', []);
+            if (empty($messageIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'هیچ پیامی برای حذف انتخاب نشده است.',
+                ], 422);
+            }
+    
+            SmsTemplate::whereIn('id', $messageIds)->delete();
+    
             return response()->json([
                 'success' => true,
-                'message' => 'پیام با موفقیت حذف شد.',
+                'message' => 'پیام‌ها با موفقیت حذف شدند.',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در حذف پیام!',
+                'message' => 'خطا در حذف پیام‌ها!',
                 'error' => $e->getMessage(),
             ], 500);
         }

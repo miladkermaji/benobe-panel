@@ -530,9 +530,9 @@ Route::prefix('dr')
                             ->middleware('secretary.permission:appointments')
                             ->name('doctor-blocking-users.update-status');
 
-                        Route::delete('/messages/{id}', [BlockingUsersController::class, 'deleteMessage'])
-                            ->middleware('secretary.permission:appointments')
-                            ->name('doctor-blocking-users.delete-message');
+                        Route::post('/messages/delete', [BlockingUsersController::class, 'deleteMessage'])
+                        ->middleware('secretary.permission:appointments')
+                        ->name('doctor-blocking-users.delete-message');
                     });
 
                     Route::get('/scheduleSetting/workhours', [ScheduleSettingController::class, 'workhours'])->middleware('secretary.permission:appointments')->name('dr-workhours');
