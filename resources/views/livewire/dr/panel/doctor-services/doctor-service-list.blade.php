@@ -1,8 +1,12 @@
 <div class="container-fluid py-4" dir="rtl" wire:init="loadDoctorServices">
   <!-- هدر -->
-  <div class="service-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <div class="service-header d-flex justify-content-between  flex-wrap mb-3">
+
+    <div>
     <h1 class="header-title">مدیریت خدمات و بیمه‌ها</h1>
-    <div class="header-actions d-flex align-items-center gap-3 flex-wrap">
+      
+    </div>
+    <div class="header-actions d-flex">
       <div class="search-container">
         <input type="text" class="search-input" wire:model.live="search" placeholder="جستجو در خدمات...">
         <span class="search-icon">
