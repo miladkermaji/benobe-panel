@@ -268,48 +268,7 @@
   });
 
   // حذف کاربر مسدود
-  $(document).on('click', '#blockedUsersTable .delete-user-btn', function(e) {
-    e.preventDefault();
-    const row = $(this).closest('tr');
-    const userId = row.data('id');
 
-    Swal.fire({
-      title: 'آیا مطمئن هستید؟',
-      text: 'این کاربر برای همیشه حذف خواهد شد!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'بله، حذف شود!',
-      cancelButtonText: 'لغو'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        $.ajax({
-          url: "{{ route('doctor-blocking-users.destroy', ['id' => ':userId']) }}".replace(':userId',
-            userId),
-          method: 'DELETE',
-          data: {
-            selectedClinicId: localStorage.getItem('selectedClinicId')
-          },
-          headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-          },
-          success: function(response) {
-            if (response.success) {
-              toastr.success(response.message);
-              row.remove();
-            } else {
-              toastr.error(response.message);
-            }
-          },
-          error: function(xhr) {
-            const response = xhr.responseJSON;
-            toastr.error(response?.message || 'خطا در حذف کاربر!');
-          }
-        });
-      }
-    });
-  });
 
   // بارگذاری پیام‌ها
   function loadMessages() {
@@ -373,11 +332,12 @@
       cancelButtonColor: '#3085d6',
     }).then((result) => {
       if (result.isConfirmed) {
+        const url = "{{ route('doctor-blocking-users.delete-message', ':id') }}".replace(':id', messageId);
         $.ajax({
-          url: "{{ route('doctor-blocking-users.delete-message', ':id') }}".replace(':id', messageId),
+          url: url,
           method: "DELETE",
           data: {
-            selectedClinicId: localStorage.getItem('selectedClinicId')
+            selectedClinicId: localStorage.getItem('selectedClinicId'),
           },
           headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}'

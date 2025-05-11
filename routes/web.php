@@ -530,7 +530,7 @@ Route::prefix('dr')
                             ->middleware('secretary.permission:appointments')
                             ->name('doctor-blocking-users.update-status');
 
-                        Route::delete('/messages', [BlockingUsersController::class, 'deleteMessage'])
+                        Route::delete('/messages/{id}', [BlockingUsersController::class, 'deleteMessage'])
                             ->middleware('secretary.permission:appointments')
                             ->name('doctor-blocking-users.delete-message');
                     });
