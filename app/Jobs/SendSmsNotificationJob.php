@@ -66,11 +66,11 @@ class SendSmsNotificationJob implements ShouldQueue
 
                     // تنظیم مستقیم پراپرتی‌ها
                     if ($gatewayName === 'pishgamrayan' && $this->templateId) {
-                        $smsService->message->otpId = $this->templateId;
-                        $smsService->message->parameters = $this->params;
+                        $smsService->message->setOtpId($this->templateId); // استفاده از متد
+                        $smsService->message->setParameters($this->params); // استفاده از متد
                     } else {
-                        $smsService->message->otpId = null;
-                        $smsService->message->parameters = [];
+                        $smsService->message->setOtpId(null); // استفاده از متد
+                        $smsService->message->setParameters([]); // استفاده از متد
                     }
 
                     $response = $smsService->send();
