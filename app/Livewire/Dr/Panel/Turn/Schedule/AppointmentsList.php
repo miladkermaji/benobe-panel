@@ -31,6 +31,7 @@ class AppointmentsList extends Component
     use WithPagination;
     public $selectedServiceIds = [];
     public $calendarYear;
+    public $paymentMethod = 'online';
     public $calendarMonth;
     public $holidaysData = ['status' => true, 'holidays' => []];
     public $appointmentsData = ['status' => true, 'data' => [], 'working_days' => [], 'calendar_days' => 30, 'appointment_settings' => []];
@@ -1021,7 +1022,6 @@ class AppointmentsList extends Component
         $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
 
         if (!$appointmentId) {
-
             $this->dispatch('show-toastr', [
                 'type' => 'error',
                 'message' => 'شناسه نوبت نامعتبر است.'
@@ -1033,12 +1033,15 @@ class AppointmentsList extends Component
             $this->validate([
                 'selectedInsuranceId' => 'required|exists:insurances,id',
                 'selectedServiceIds' => 'required|array|min:1',
+                'paymentMethod' => 'required|in:online,cash,card_to_card,pos',
             ], [
                 'selectedInsuranceId.required' => 'لطفاً یک بیمه انتخاب کنید.',
                 'selectedInsuranceId.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
                 'selectedServiceIds.required' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
                 'selectedServiceIds.array' => 'خدمات انتخاب‌شده باید به‌صورت آرایه باشد.',
                 'selectedServiceIds.min' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
+                'paymentMethod.required' => 'لطفاً نوع پرداخت را انتخاب کنید.',
+                'paymentMethod.in' => 'نوع پرداخت انتخاب‌شده معتبر نیست.',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $firstError = collect($e->errors())->flatten()->first();
@@ -1059,7 +1062,8 @@ class AppointmentsList extends Component
             'discount_amount' => $this->discountAmount,
             'status' => 'attended',
             'description' => $this->endVisitDescription,
-            'payment_status' => $appointment->payment_status === 'pending' ? 'paid' : $appointment->payment_status,
+            'payment_status' => $this->isFree ? 'paid' : ($appointment->payment_status === 'pending' ? 'paid' : $appointment->payment_status),
+            'payment_method' => $this->paymentMethod,
         ]);
 
         $this->dispatch('close-modal', ['id' => 'end-visit-modal']);
@@ -1082,7 +1086,8 @@ class AppointmentsList extends Component
             'discountAmount',
             'finalPrice',
             'endVisitDescription',
-            'endVisitAppointmentId'
+            'endVisitAppointmentId',
+            'paymentMethod',
         ]);
     }
 

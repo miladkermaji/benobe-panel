@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\User;
@@ -21,7 +22,7 @@ class Appointment extends Model
         'status',
         'notes',
         'description',
-
+'payment_method',
         'tracking_code',
         'fee',
         'final_price',

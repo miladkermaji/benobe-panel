@@ -87,6 +87,7 @@
                 <th scope="col" class="px-6 py-3 fw-bolder">وضعیت نوبت</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">بیعانه</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">وضعیت پرداخت</th>
+                <th scope="col" class="px-6 py-3 fw-bolder">نوع پرداخت</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">بیمه</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">قیمت نهایی</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">پایان ویزیت</th>
@@ -142,6 +143,18 @@
                       @endphp
                       <span
                         class="{{ $paymentStatusInfo['class'] }} fw-bold">{{ $paymentStatusInfo['label'] }}</span>
+                    </td>
+                    <td>
+                      @php
+                        $paymentMethodLabels = [
+                            'online' => 'آنلاین',
+                            'cash' => 'نقدی',
+                            'card_to_card' => 'کارت به کارت',
+                            'pos' => 'کارتخوان',
+                        ];
+                        $paymentMethod = $appointment->payment_method ?? 'online';
+                      @endphp
+                      {{ $paymentMethodLabels[$paymentMethod] ?? '-' }}
                     </td>
                     <td>{{ $appointment->insurance ? $appointment->insurance->name : '-' }}</td>
                     <td>{{ $appointment->final_price ? number_format($appointment->final_price) . ' تومان' : '-' }}
@@ -258,6 +271,10 @@
                       ];
                     @endphp
                     <span class="{{ $paymentStatusInfo['class'] }} fw-bold">{{ $paymentStatusInfo['label'] }}</span>
+                  </div>
+                  <div class="card-item d-none details">
+                    <span class="label">نوع پرداخت:</span>
+                    <span>{{ $paymentMethodLabels[$appointment->payment_method ?? 'online'] ?? '-' }}</span>
                   </div>
                   <div class="card-item d-none details">
                     <span class="label">بیمه:</span>
@@ -439,7 +456,7 @@
       </x-modal>
     </div>
 
-    <div wire:ignore>
+    <div>
       <x-modal name="end-visit-modal" title="پایان ویزیت" size="lg">
         <x-slot:body>
 
@@ -502,9 +519,8 @@
               <div class="col-md-6">
                 <div class="border rounded p-2 bg-light">
                   <label class="form-label fw-bold mb-1">تخفیف</label>
-                  <input type="text" class="form-control" readonly x-data
-                    @click="$dispatch('open-modal', { name: 'discount-modal' })"
-                    value="{{ $discountPercentage ? number_format($discountPercentage, 2) . '%' : '' }}"
+                  <input type="text" class="form-control" readonly wire:model.live="discountPercentage" x-data
+                    @click="$dispatch('open-modal', { name: 'discount-modal' })" placeholder="تخفیف (٪)"
                     @if ($isFree) disabled @endif>
                   @error('discountPercentage')
                     <span class="text-danger small">{{ $message }}</span>
@@ -517,6 +533,21 @@
                   <input type="text" class="form-control" readonly value="{{ number_format($finalPrice) }} تومان"
                     @if ($isFree) disabled @endif>
                   @error('finalPrice')
+                    <span class="text-danger small">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="border rounded p-2 bg-light">
+                  <label class="form-label fw-bold mb-1">نوع پرداخت</label>
+                  <select class="form-control" wire:model.live="paymentMethod"
+                    @if ($isFree) disabled @endif>
+                    <option value="online">آنلاین</option>
+                    <option value="cash">نقدی</option>
+                    <option value="card_to_card">کارت به کارت</option>
+                    <option value="pos">کارتخوان</option>
+                  </select>
+                  @error('paymentMethod')
                     <span class="text-danger small">{{ $message }}</span>
                   @enderror
                 </div>
@@ -816,14 +847,7 @@
           }
         });
 
-        Livewire.on('discount-updated', () => {
-          const percentageInput = document.querySelector('input[wire\\:model\\.live="discountInputPercentage"]');
-          const amountInput = document.querySelector('input[wire\\:model\\.live="discountInputAmount"]');
-          if (percentageInput && amountInput) {
-            percentageInput.value = @this.get('discountInputPercentage') || 0;
-            amountInput.value = @this.get('discountInputAmount') || 0;
-          }
-        });
+   
 
         Livewire.on('close-modal', (event) => {
           const modalId = event?.name || (event && event[0]?.name) || null;
@@ -847,13 +871,15 @@
             });
           }
         });
-
-        Livewire.on('discount-applied', () => {
-          const discountInput = document.querySelector(
-            'input[wire\\:click*="$dispatch(\'open-modal\', { name: \'discount-modal\' })"]');
+        Livewire.on('discount-applied', (event) => {
+          const percentage = event[0]?.percentage || @this.get('discountPercentage') || 0;
+          @this.set('discountPercentage', percentage); // آپدیت پراپرتی Livewire
+          const discountInput = document.querySelector('input[wire\\:model\\.live="discountPercentage"]');
           if (discountInput) {
-            const percentage = @this.get('discountPercentage');
             discountInput.value = percentage ? `${parseFloat(percentage).toFixed(2)}%` : '';
+            discountInput.dispatchEvent(new Event('input')); // تحریک آپدیت Livewire
+          } else {
+            console.warn('اینپوت تخفیف پیدا نشد');
           }
 
           window.dispatchEvent(new CustomEvent('close-modal', {
@@ -861,7 +887,6 @@
               name: 'discount-modal'
             }
           }));
-
         });
 
         Livewire.on('final-price-updated', () => {
