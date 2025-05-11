@@ -9,8 +9,8 @@
       </div>
 
       <!-- متن -->
-      <div class="mb-5">
-        <h5 class="fw-bold text-dark">مطمئنید که می‌خواهید از حساب خود خارج شوید؟</h5>
+      <div class="mb-5 text-center">
+        <h5 class="fw-bold text-dark text-center">مطمئنید که می‌خواهید از حساب خود خارج شوید؟</h5>
       </div>
 
       <!-- دکمه‌ها -->
