@@ -28,6 +28,7 @@ class Appointment extends Model
         'final_price',
         'appointment_category',
         'location',
+        'payment_status',
         'notification_sent',
         'include_holidays',
         'disabled_days',

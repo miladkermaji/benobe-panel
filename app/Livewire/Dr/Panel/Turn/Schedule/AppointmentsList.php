@@ -1096,7 +1096,7 @@ class AppointmentsList extends Component
     public function endVisit($appointmentId = null)
     {
         $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
-
+    
         if (!$appointmentId) {
             $this->dispatch('show-toastr', [
                 'type' => 'error',
@@ -1104,7 +1104,7 @@ class AppointmentsList extends Component
             ]);
             return;
         }
-
+    
         try {
             $this->validate([
                 'selectedInsuranceId' => 'required|exists:insurances,id',
@@ -1127,9 +1127,9 @@ class AppointmentsList extends Component
             ]);
             return;
         }
-
+    
         $appointment = Appointment::findOrFail($appointmentId);
-
+    
         $appointment->update([
             'insurance_id' => $this->selectedInsuranceId,
             'service_ids' => json_encode($this->selectedServiceIds),
@@ -1138,21 +1138,26 @@ class AppointmentsList extends Component
             'discount_amount' => $this->discountAmount,
             'status' => 'attended',
             'description' => $this->endVisitDescription,
-            'payment_status' => $this->isFree ? 'paid' : ($appointment->payment_status === 'pending' ? 'paid' : $appointment->payment_status),
+            'payment_status' => 'paid', // همیشه به paid تنظیم می‌شود
             'payment_method' => $this->paymentMethod,
         ]);
-
+    
+        // پاک کردن کش مرتبط با نوبت‌ها
+        $doctor = $this->getAuthenticatedDoctor();
+        $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
+        Cache::forget($cacheKey);
+    
         $this->dispatch('close-modal', ['name' => 'end-visit-modal']);
         $this->dispatch('show-toastr', [
             'type' => 'success',
             'message' => 'ویزیت با موفقیت ثبت شد.'
         ]);
-
+    
         $this->dispatch('visited', [
             'type' => 'success',
             'message' => 'ویزیت با موفقیت ثبت شد.'
         ]);
-
+    
         $this->loadAppointments();
         $this->reset([
             'selectedInsuranceId',
