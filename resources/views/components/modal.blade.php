@@ -18,7 +18,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(17, 24, 39, 0.65);
+    background-color: rgba(17, 24, 39, 0.75);
+    /* opacity کمی افزایش یافت */
+    z-index: 1000;
+    /* اطمینان از پوشش کل صفحه */
     transition: opacity 0.2s ease-out;
   }
 
@@ -32,6 +35,8 @@
     transition: transform 0.2s ease-out, opacity 0.2s ease-out;
     transform: scale(0.95);
     opacity: 0;
+    z-index: 1001;
+    /* بالاتر از بک‌دراپ و سایر المان‌ها */
   }
 
   [x-show="show"] .xai-modal-container {
@@ -65,6 +70,8 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #e5e7eb;
+    z-index: 1002;
+    /* بالاتر از محتوای مودال */
   }
 
   .xai-modal-title {
@@ -82,6 +89,8 @@
     cursor: pointer;
     border-radius: 50%;
     transition: background-color 0.2s ease-out;
+    z-index: 1003;
+    /* بالاتر از هدر مودال */
   }
 
   .xai-modal-close:hover {
@@ -117,12 +126,32 @@
 
   .xai-modal-body {
     padding: 1.4rem;
+    z-index: 1001;
+    /* هم‌سطح با کانتینر مودال */
   }
 
   [x-cloak] {
     display: none;
   }
+
+  /* غیرفعال کردن اسکرول صفحه هنگام باز بودن مودال */
+  body.modal-open {
+    overflow: hidden;
+  }
 </style>
+
+@props(['name', 'id', 'title', 'size' => 'md'])
+
+@php
+  $sizes = [
+      'sm' => 'xai-modal__dialog--sm',
+      'md' => 'xai-modal__dialog--md',
+      'md-medium' => 'xai-modal__dialog--md-medium',
+      'lg' => 'xai-modal__dialog--lg',
+      'xl' => 'xai-modal__dialog--xl',
+  ];
+  $sizeClass = $sizes[$size] ?? $sizes['md'];
+@endphp
 
 <div id="{{ $id ?? $name }}" x-data="{ show: false, name: '{{ $name }}' }" x-show="show" x-cloak
   x-on:open-modal.window="if ($event.detail.name === name) show = true"
@@ -150,3 +179,13 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('open-modal', () => {
+    document.body.classList.add('modal-open');
+  });
+
+  document.addEventListener('close-modal', () => {
+    document.body.classList.remove('modal-open');
+  });
+</script>

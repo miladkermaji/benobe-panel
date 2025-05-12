@@ -227,7 +227,24 @@
         closeAllTooltips();
       }
     });
+    // بستن تولتیپ‌ها هنگام باز شدن مودال
+    document.addEventListener('open-modal', () => {
+      closeAllTooltips();
+    });
 
+    // اصلاح z-index هنگام باز شدن مودال
+    document.addEventListener('open-modal', () => {
+      document.querySelectorAll('.x-tooltip__content').forEach(content => {
+        content.style.zIndex = '999'; // کمتر از z-index مودال (1000)
+      });
+    });
+
+    // بازگرداندن z-index هنگام بسته شدن مودال
+    document.addEventListener('close-modal', () => {
+      document.querySelectorAll('.x-tooltip__content').forEach(content => {
+        content.style.zIndex = '5001'; // بازگشت به مقدار اصلی
+      });
+    });
     const handleResize = debounce(() => {
       document.querySelectorAll('.x-tooltip--active').forEach(tooltip => {
         const content = document.body.querySelector(`.x-tooltip__content[data-tooltip-id="${tooltip.id}"]`);
@@ -256,7 +273,8 @@
     --tooltip-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --tooltip-arrow-size: 8px;
     --tooltip-arrow-color: #2e3b4e;
-    /* رنگ متضاد برای فلش */
+    --tooltip-z-index: 999;
+    /* کاهش z-index پیش‌فرض */
   }
 
   .x-tooltip {
@@ -264,12 +282,7 @@
     display: inline-block;
     font-family: var(--tooltip-font);
     isolation: isolate;
-    z-index: 5000;
-  }
-
-  .x-tooltip__trigger {
-    display: inline-block;
-    cursor: pointer;
+    z-index: var(--tooltip-z-index);
   }
 
   .x-tooltip__content {
@@ -291,12 +304,19 @@
     visibility: hidden;
     transform: scale(0.95);
     transition: var(--tooltip-transition);
-    z-index: 5001;
+    z-index: var(--tooltip-z-index);
     box-shadow: 0 8px 24px var(--tooltip-shadow);
     pointer-events: none;
     backdrop-filter: blur(4px);
     contain: content;
   }
+
+  .x-tooltip__trigger {
+    display: inline-block;
+    cursor: pointer;
+  }
+
+
 
   .x-tooltip__content::before {
     content: '';
@@ -304,7 +324,7 @@
     width: 0;
     height: 0;
     border: var(--tooltip-arrow-size) solid transparent;
-    z-index:5002;
+    z-index: 5002;
     box-sizing: border-box;
     pointer-events: none;
     display: block !important;

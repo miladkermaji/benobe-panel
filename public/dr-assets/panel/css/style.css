@@ -620,7 +620,7 @@ svg {
     display: inline-block;
     font-size: 20px;
     padding: 5.5px 9px 0px 9px;
-    z-index: 4001;
+    z-index: 901;
 }
 
 .sidebar__nav ul li {
@@ -1070,7 +1070,7 @@ svg {
     position: fixed;
     top: 0;
     width: calc(100% - 250px);
-    z-index: 4000;
+    z-index: 900;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* سایه خیلی نرم */
     transition: width 200ms ease;
     border: 1px solid rgba(0, 0, 0, 0.03); /* حاشیه ظریف برای بافت */
@@ -1087,7 +1087,7 @@ svg {
     right: 0;
     bottom: 0;
     top: 0;
-    z-index: 4001 !important;
+    z-index: 901 !important;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1499,7 +1499,7 @@ svg {
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: 999;
+    z-index: 899;
     max-height: 250px;
     overflow: auto;
     border: 2px solid #e2e2e2;

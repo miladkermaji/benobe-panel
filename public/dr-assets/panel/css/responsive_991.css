@@ -1,6 +1,6 @@
 .sidebar__nav {
  right: -250px;
- z-index: 40001 !important;
+ z-index: 901 !important;
 }
 
 .sidebar__nav.is-active {
@@ -19,7 +19,7 @@
 
 .bars {
  display: block !important;
- z-index: 4001;
+ z-index: 901;
 }
 
 .sidebar__nav.is-active ul li a::before {
