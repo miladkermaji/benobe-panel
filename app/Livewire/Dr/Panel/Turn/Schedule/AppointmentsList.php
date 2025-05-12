@@ -915,7 +915,19 @@ class AppointmentsList extends Component
 
     public function updatedIsFree()
     {
-        $this->calculateFinalPrice();
+        Log::info('updatedIsFree called', [
+            'isFree' => $this->isFree,
+            'discountPercentage' => $this->discountPercentage,
+            'finalPrice' => $this->finalPrice
+        ]);
+        if ($this->isFree) {
+            $this->discountPercentage = 0;
+            $this->discountAmount = 0;
+            $this->finalPrice = 0;
+        } else {
+            $this->calculateFinalPrice();
+        }
+        $this->dispatch('final-price-updated');
     }
 
     public function refreshEndVisitModal()
@@ -925,40 +937,46 @@ class AppointmentsList extends Component
 
     public function calculateFinalPrice()
     {
+        Log::info('calculateFinalPrice called', [
+            'isFree' => $this->isFree,
+            'selectedServiceIds' => $this->selectedServiceIds,
+            'discountPercentage' => $this->discountPercentage,
+            'discountAmount' => $this->discountAmount,
+            'finalPrice' => $this->finalPrice
+        ]);
+
         if ($this->isFree) {
             $this->finalPrice = 0;
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
-            $this->dispatch('final-price-updated');
-            return;
-        }
+        } else {
+            $basePrice = $this->getBasePrice();
 
-        if (empty($this->selectedServiceIds)) {
-            $this->finalPrice = 0;
-            $this->discountPercentage = 0;
-            $this->discountAmount = 0;
-            $this->dispatch('final-price-updated');
-            return;
-        }
+            if (empty($this->selectedServiceIds)) {
+                $this->finalPrice = 0;
+                $this->discountPercentage = 0;
+                $this->discountAmount = 0;
+            } else {
+                // تبدیل discountPercentage به عدد و حذف علامت درصد
+                $discountPercentage = is_numeric($this->discountPercentage)
+                    ? floatval($this->discountPercentage)
+                    : floatval(str_replace('%', '', $this->discountPercentage));
 
-        $basePrice = 0;
-        foreach ($this->selectedServiceIds as $serviceId) {
-            $service = DoctorService::find($serviceId);
-            if ($service) {
-                $basePrice += $service->price ?? 0;
+                if ($discountPercentage > 0) {
+                    $this->discountAmount = round(($basePrice * $discountPercentage) / 100, 2); // رند به 2 رقم اعشار
+                    $this->discountPercentage = round($discountPercentage, 2); // رند درصد به 2 رقم اعشار
+                } elseif ($this->discountAmount > 0 && $basePrice > 0) {
+                    $this->discountPercentage = round(($this->discountAmount / $basePrice) * 100, 2); // رند درصد
+                    $this->discountAmount = round($this->discountAmount, 2); // رند مبلغ تخفیف
+                } else {
+                    $this->discountPercentage = 0;
+                    $this->discountAmount = 0;
+                }
+
+                $this->finalPrice = round(max(0, $basePrice - $this->discountAmount), 0); // رند قیمت نهایی به عدد صحیح
             }
         }
 
-        if ($this->discountPercentage > 0) {
-            $this->discountAmount = ($basePrice * $this->discountPercentage) / 100;
-        } elseif ($this->discountAmount > 0 && $basePrice > 0) {
-            $this->discountPercentage = ($this->discountAmount / $basePrice) * 100;
-        } else {
-            $this->discountPercentage = 0;
-            $this->discountAmount = 0;
-        }
-
-        $this->finalPrice = max(0, $basePrice - $this->discountAmount);
         $this->dispatch('final-price-updated');
     }
 
@@ -997,24 +1015,43 @@ class AppointmentsList extends Component
         $this->dispatch('discount-updated');
     }
 
-    private function getBasePrice()
+    public function getBasePrice()
     {
         $basePrice = 0;
-        foreach ($this->selectedServiceIds as $serviceId) {
-            $service = DoctorService::find($serviceId);
-            if ($service) {
-                $basePrice += $service->price ?? 0;
-            }
+        if (!empty($this->selectedServiceIds)) {
+            $serviceIds = collect($this->selectedServiceIds)->flatten()->all();
+            $basePrice = DoctorService::whereIn('id', $serviceIds)
+                ->sum('price');
         }
-        return $basePrice;
+        Log::info('getBasePrice called', ['basePrice' => $basePrice]);
+        return floatval($basePrice);
     }
 
     public function applyDiscount()
     {
-        $this->calculateFinalPrice();
-        $this->dispatch('discount-applied');
-        // فقط مودال تخفیف بسته می‌شه
-        $this->dispatch('close-modal', ['id' => 'discount-modal']);
+        Log::info('applyDiscount called', [
+            'isFree' => $this->isFree,
+            'discountInputPercentage' => $this->discountInputPercentage,
+            'discountInputAmount' => $this->discountInputAmount
+        ]);
+
+        if (!$this->isFree) {
+            // تبدیل و رند کردن discountInputPercentage
+            $this->discountPercentage = is_numeric($this->discountInputPercentage)
+                ? round(floatval($this->discountInputPercentage), 2)
+                : round(floatval(str_replace('%', '', $this->discountInputPercentage)), 2);
+
+            $this->discountAmount = round(floatval($this->discountInputAmount), 2);
+            $this->calculateFinalPrice();
+        } else {
+            $this->finalPrice = 0;
+            $this->discountPercentage = 0;
+            $this->discountAmount = 0;
+        }
+
+        $this->dispatch('discount-applied', ['percentage' => $this->discountPercentage]);
+        $this->dispatch('final-price-updated');
+        $this->dispatch('close-modal', ['name' => 'discount-modal']);
     }
 
     public function endVisit($appointmentId = null)
@@ -1066,7 +1103,7 @@ class AppointmentsList extends Component
             'payment_method' => $this->paymentMethod,
         ]);
 
-        $this->dispatch('close-modal', ['id' => 'end-visit-modal']);
+        $this->dispatch('close-modal', ['name' => 'end-visit-modal']);
         $this->dispatch('show-toastr', [
             'type' => 'success',
             'message' => 'ویزیت با موفقیت ثبت شد.'
@@ -1091,26 +1128,38 @@ class AppointmentsList extends Component
         ]);
     }
 
-    public function updatedDiscountPercentage()
+    public function updatedDiscountPercentage($value)
     {
-        if ($this->discountPercentage > 100) {
-            $this->discountPercentage = 100;
+        Log::info('updatedDiscountPercentage called', ['value' => $value, 'discountPercentage' => $this->discountPercentage]);
+
+        // حذف علامت درصد و تبدیل به عدد
+        $discountPercentage = is_numeric($value)
+            ? floatval($value)
+            : floatval(str_replace('%', '', $value));
+
+        // محدود کردن و رند کردن به 2 رقم اعشار
+        if ($discountPercentage > 100) {
+            $discountPercentage = 100;
+        } elseif ($discountPercentage < 0) {
+            $discountPercentage = 0;
+        } else {
+            $discountPercentage = round($discountPercentage, 2);
         }
+
+        $this->discountPercentage = $discountPercentage;
+        $this->discountInputPercentage = $discountPercentage;
         $this->calculateFinalPrice();
     }
 
     public function updatedDiscountAmount()
     {
-        $basePrice = 0;
-        foreach ($this->selectedServiceIds as $serviceId) {
-            $service = DoctorService::find($serviceId);
-            if ($service) {
-                $basePrice += $service->price ?? 0;
-            }
-        }
+        $basePrice = $this->getBasePrice();
         if ($this->discountAmount > $basePrice) {
             $this->discountAmount = $basePrice;
+        } elseif ($this->discountAmount < 0) {
+            $this->discountAmount = 0;
         }
+        $this->discountInputAmount = $this->discountAmount;
         $this->calculateFinalPrice();
     }
 
@@ -1352,7 +1401,7 @@ class AppointmentsList extends Component
                 'type' => 'success',
                 'message' => 'کاربر(ان) با موفقیت مسدود شدند.',
             ]);
-            $this->dispatch('close-modal', ['id' => 'block-user-modal']);
+            $this->dispatch('close-modal', ['name' => 'block-user-modal']);
             $this->loadBlockedUsers();
             $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId', 'selectedMobiles']);
         } catch (\Exception $e) {

@@ -519,9 +519,10 @@
               <div class="col-md-6">
                 <div class="border rounded p-2 bg-light">
                   <label class="form-label fw-bold mb-1">تخفیف</label>
-                  <input type="text" class="form-control" readonly wire:model.live="discountPercentage" x-data
+                  <input type="number" step="0.01" min="0" max="100" class="form-control"
+                    wire:model.live="discountPercentage" x-data
                     @click="$dispatch('open-modal', { name: 'discount-modal' })" placeholder="تخفیف (٪)"
-                    @if ($isFree) disabled @endif>
+                    @if ($isFree) disabled @endif readonly>
                   @error('discountPercentage')
                     <span class="text-danger small">{{ $message }}</span>
                   @enderror
@@ -530,8 +531,9 @@
               <div class="col-md-6">
                 <div class="border rounded p-2 bg-light">
                   <label class="form-label fw-bold mb-1">قیمت نهایی</label>
-                  <input type="text" class="form-control" readonly value="{{ number_format($finalPrice) }} تومان"
-                    @if ($isFree) disabled @endif>
+                  <input type="text" class="form-control" wire:model.live="finalPrice"
+                    value="{{ number_format($finalPrice, 0, '.', ',') }} تومان"
+                    @if ($isFree) disabled @endif readonly>
                   @error('finalPrice')
                     <span class="text-danger small">{{ $message }}</span>
                   @enderror
@@ -847,7 +849,7 @@
           }
         });
 
-   
+
 
         Livewire.on('close-modal', (event) => {
           const modalId = event?.name || (event && event[0]?.name) || null;
@@ -872,14 +874,27 @@
           }
         });
         Livewire.on('discount-applied', (event) => {
-          const percentage = event[0]?.percentage || @this.get('discountPercentage') || 0;
-          @this.set('discountPercentage', percentage); // آپدیت پراپرتی Livewire
+          const percentage = parseFloat(event[0]?.percentage) || parseFloat(@this.get('discountPercentage')) || 0;
+          const finalPrice = parseFloat(@this.get('finalPrice'));
+          const isFree = @this.get('isFree');
+
+          // تنظیم مقادیر در Livewire
+          @this.set('discountPercentage', percentage);
+          @this.set('finalPrice', finalPrice);
+
+          // به‌روزرسانی اینپوت‌ها در UI
           const discountInput = document.querySelector('input[wire\\:model\\.live="discountPercentage"]');
+          const priceInput = document.querySelector('input[value*="{{ number_format($finalPrice) }} تومان"]');
+
           if (discountInput) {
-            discountInput.value = percentage ? `${parseFloat(percentage).toFixed(2)}%` : '';
-            discountInput.dispatchEvent(new Event('input')); // تحریک آپدیت Livewire
-          } else {
-            console.warn('اینپوت تخفیف پیدا نشد');
+            discountInput.value = isFree ? '' : (percentage ? `${percentage.toFixed(2)}%` : '0.00%');
+            discountInput.disabled = isFree;
+            discountInput.dispatchEvent(new Event('input'));
+          }
+
+          if (priceInput) {
+            priceInput.value = isFree ? '0 تومان' : `${new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان`;
+            priceInput.disabled = isFree;
           }
 
           window.dispatchEvent(new CustomEvent('close-modal', {
