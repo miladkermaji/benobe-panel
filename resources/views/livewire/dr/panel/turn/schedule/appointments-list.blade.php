@@ -419,8 +419,11 @@
           <form wire:submit.prevent="endVisit({{ $endVisitAppointmentId ?? 'null' }})">
             <div class="row g-2">
               <div class="col-12">
-                <div class="border rounded p-2 bg-light">
+                <div class="border rounded p-2 bg-light position-relative">
                   <label class="form-label fw-bold mb-1">انتخاب بیمه</label>
+                  <div wire:loading wire:target="selectedInsuranceId" class="loading-overlay">
+                    <div class="spinner"></div>
+                  </div>
                   @if (count($insurances) > 0)
                     @foreach ($insurances as $index => $insurance)
                       <div class="form-check mb-1">
@@ -440,8 +443,11 @@
                 </div>
               </div>
               <div class="col-12">
-                <div class="border rounded p-2 bg-light services-checkbox-container">
+                <div class="border rounded p-2 bg-light services-checkbox-container position-relative">
                   <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
+                  <div wire:loading wire:target="selectedInsuranceId,selectedServiceIds" class="loading-overlay">
+                    <div class="spinner"></div>
+                  </div>
                   <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
                     @if (count($services) > 0)
                       @foreach ($services as $service)
@@ -450,8 +456,7 @@
                             wire:model.live="selectedServiceIds" value="{{ $service['id'] }}"
                             wire:key="service-{{ $service['id'] }}">
                           <label class="form-check-label" for="service_{{ $service['id'] }}">
-                            {{ $service['name'] }} ({{ number_format($service['price']) }}
-                            تومان)
+                            {{ $service['name'] }} ({{ number_format($service['price']) }} تومان)
                           </label>
                         </div>
                       @endforeach
@@ -473,10 +478,13 @@
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="border rounded p-2 bg-light">
+                <div class="border rounded p-2 bg-light position-relative">
                   <label class="form-label fw-bold mb-1">تخفیف</label>
+                  <div wire:loading wire:target="discountPercentage,discountInputPercentage" class="loading-overlay">
+                    <div class="spinner"></div>
+                  </div>
                   <input type="number" step="0.01" min="0" max="100" class="form-control"
-                    wire:model.live="discountPercentage" x-data
+                    wire:model.live.debounce.500ms="discountPercentage" x-data
                     @click="$dispatch('open-modal', { name: 'discount-modal' })" placeholder="تخفیف (٪)"
                     @if ($isFree) disabled @endif readonly>
                   @error('discountPercentage')
@@ -485,8 +493,12 @@
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="border rounded p-2 bg-light">
+                <div class="border rounded p-2 bg-light position-relative">
                   <label class="form-label fw-bold mb-1">قیمت نهایی</label>
+                  <div wire:loading wire:target="finalPrice,discountPercentage,discountInputPercentage"
+                    class="loading-overlay">
+                    <div class="spinner"></div>
+                  </div>
                   <input type="text" class="form-control" wire:model.live="finalPrice"
                     value="{{ number_format($finalPrice, 0, '.', ',') }} تومان"
                     @if ($isFree) disabled @endif readonly>
@@ -528,20 +540,25 @@
     <div wire:ignore>
       <x-modal name="discount-modal" title="اعمال تخفیف" size="md">
         <x-slot:body>
-
           <form wire:submit.prevent="applyDiscount">
-            <div class="mb-3">
+            <div class="mb-3 position-relative">
               <label class="form-label">درصد تخفیف</label>
-              <input type="number" class="form-control" wire:model.live="discountInputPercentage"
+              <div wire:loading wire:target="discountInputPercentage" class="loading-overlay">
+                <div class="spinner"></div>
+              </div>
+              <input type="number" class="form-control" wire:model.live.debounce.500ms="discountInputPercentage"
                 placeholder="درصد تخفیف را وارد کنید" min="0" max="100" step="0.01"
                 @if ($isFree) disabled @endif>
               @error('discountInputPercentage')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
-            <div class="mb-3">
+            <div class="mb-3 position-relative">
               <label class="form-label">مبلغ تخفیف</label>
-              <input type="number" class="form-control" wire:model.live="discountInputAmount"
+              <div wire:loading wire:target="discountInputAmount" class="loading-overlay">
+                <div class="spinner"></div>
+              </div>
+              <input type="number" class="form-control" wire:model.live.debounce.500ms="discountInputAmount"
                 placeholder="مبلغ تخفیف را وارد کنید" min="0" step="1"
                 @if ($isFree) disabled @endif>
               @error('discountInputAmount')
@@ -553,7 +570,6 @@
             </button>
           </form>
         </x-slot:body>
-
       </x-modal>
     </div>
 

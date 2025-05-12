@@ -3,9 +3,13 @@
 namespace App\Providers;
 
 use App\Models\Clinic;
+use App\Models\Appointment;
+use App\Models\DoctorService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use App\Observers\AppointmentObserver;
 use Illuminate\Support\ServiceProvider;
+use App\Observers\DoctorServiceObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,6 +40,9 @@ class AppServiceProvider extends ServiceProvider
             $view->with('clinics', $clinics);
         });
 
+        Appointment::observe(AppointmentObserver::class);
+
+        DoctorService::observe(DoctorServiceObserver::class);
 
     }
 }

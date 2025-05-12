@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Log;
 use App\Jobs\SendSmsNotificationJob;
 use App\Models\SpecialDailySchedule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
 
@@ -330,6 +331,7 @@ class AppointmentsList extends Component
         }
     }
 
+
     public function loadAppointments()
     {
         $doctor = $this->getAuthenticatedDoctor();
@@ -338,59 +340,64 @@ class AppointmentsList extends Component
         }
 
         $gregorianDate = $this->convertToGregorian($this->selectedDate);
-        $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
-            ->withTrashed()
-            ->where('doctor_id', $doctor->id);
+        $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$gregorianDate}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
 
-        if ($this->dateFilter) {
-            $today = Carbon::today();
-            if ($this->dateFilter === 'current_week') {
-                $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
-                $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
-                $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
-            } elseif ($this->dateFilter === 'current_month') {
-                $startOfMonth = $today->copy()->startOfMonth();
-                $endOfMonth = $today->copy()->endOfMonth();
-                $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
-            } elseif ($this->dateFilter === 'current_year') {
-                $startOfYear = $today->copy()->startOfYear();
-                $endOfYear = $today->copy()->endOfYear();
-                $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
+        // لود از کش یا دیتابیس
+        $appointments = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($doctor, $gregorianDate) {
+            $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
+                ->withTrashed()
+                ->where('doctor_id', $doctor->id);
+
+            if ($this->dateFilter) {
+                $today = Carbon::today();
+                if ($this->dateFilter === 'current_week') {
+                    $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
+                    $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
+                    $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
+                } elseif ($this->dateFilter === 'current_month') {
+                    $startOfMonth = $today->copy()->startOfMonth();
+                    $endOfMonth = $today->copy()->endOfMonth();
+                    $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
+                } elseif ($this->dateFilter === 'current_year') {
+                    $startOfYear = $today->copy()->startOfYear();
+                    $endOfYear = $today->copy()->endOfYear();
+                    $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
+                }
+            } elseif ($this->filterStatus !== 'all' && !$this->isSearchingAllDates) {
+                $query->whereDate('appointment_date', $gregorianDate);
             }
-        } elseif ($this->filterStatus !== 'all' && !$this->isSearchingAllDates) {
-            $query->whereDate('appointment_date', $gregorianDate);
-        }
 
-        if ($this->selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
-        } elseif ($this->selectedClinicId) {
-            $query->where('clinic_id', $this->selectedClinicId);
-        }
+            if ($this->selectedClinicId === 'default') {
+                $query->whereNull('clinic_id');
+            } elseif ($this->selectedClinicId) {
+                $query->where('clinic_id', $this->selectedClinicId);
+            }
 
-        if ($this->filterStatus && $this->filterStatus !== 'all') {
-            $query->where('status', $this->filterStatus);
-        }
+            if ($this->filterStatus && $this->filterStatus !== 'all') {
+                $query->where('status', $this->filterStatus);
+            }
 
-        if ($this->attendanceStatus) {
-            $query->where('attendance_status', $this->attendanceStatus);
-        }
+            if ($this->attendanceStatus) {
+                $query->where('attendance_status', $this->attendanceStatus);
+            }
 
-        if ($this->searchQuery) {
-            $query->whereHas('patient', function ($q) {
-                $q->where('first_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
-                    ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
-            });
-        }
+            if ($this->searchQuery) {
+                $query->whereHas('patient', function ($q) {
+                    $q->where('first_name', 'like', "%{$this->searchQuery}%")
+                        ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
+                        ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
+                        ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
+                });
+            }
 
-        $appointments = $query->orderBy('appointment_date', 'desc')->paginate($this->pagination['per_page'], ['*'], 'page', $this->pagination['current_page']);
+            return $query->orderBy('appointment_date', 'desc')
+                        ->paginate($this->pagination['per_page'], ['*'], 'page', $this->pagination['current_page']);
+        });
 
         $jalaliDate = Jalalian::fromCarbon(Carbon::parse($gregorianDate));
         $appointmentData = $this->getAppointmentsInMonth($jalaliDate->getYear(), $jalaliDate->getMonth());
 
-        // ادغام نوبت‌ها برای Lazy Loading
         $this->appointments = array_merge($this->appointments, $appointments->items());
         $this->pagination = [
             'current_page' => $appointments->currentPage(),
@@ -872,15 +879,21 @@ class AppointmentsList extends Component
     public function loadInsurances()
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
-        $this->insurances = DoctorService::where('doctor_id', $doctorId)
-            ->where('clinic_id', $this->selectedClinicId === 'default' ? null : $this->selectedClinicId)
-            ->with('insurance')
-            ->distinct('insurance_id')
-            ->get()
-            ->pluck('insurance')
-            ->filter()
-            ->values()
-            ->toArray();
+        $cacheKey = "insurances_doctor_{$doctorId}_clinic_{$this->selectedClinicId}";
+
+        $this->insurances = Cache::remember($cacheKey, now()->addHours(1), function () use ($doctorId) {
+            return DoctorService::where('doctor_id', $doctorId)
+                ->where('clinic_id', $this->selectedClinicId === 'default' ? null : $this->selectedClinicId)
+                ->with('insurance')
+                ->distinct('insurance_id')
+                ->get()
+                ->pluck('insurance')
+                ->filter()
+                ->values()
+                ->toArray();
+        });
+
+        $this->dispatch('insurances-updated');
     }
 
     public function updatedSelectedInsuranceId()
@@ -898,17 +911,21 @@ class AppointmentsList extends Component
             $this->dispatch('services-updated');
             return;
         }
+    
         $doctorId = $this->getAuthenticatedDoctor()->id;
-        $query = DoctorService::where('doctor_id', $doctorId)
-            ->where('insurance_id', $this->selectedInsuranceId);
-        if ($this->selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
-        } else {
-            $query->where('clinic_id', $this->selectedClinicId);
-        }
-        $services = $query->get();
-
-        $this->services = $services->toArray();
+        $cacheKey = "services_doctor_{$doctorId}_clinic_{$this->selectedClinicId}_insurance_{$this->selectedInsuranceId}";
+    
+        $this->services = Cache::remember($cacheKey, now()->addHours(1), function () use ($doctorId) {
+            $query = DoctorService::where('doctor_id', $doctorId)
+                ->where('insurance_id', $this->selectedInsuranceId);
+            if ($this->selectedClinicId === 'default') {
+                $query->whereNull('clinic_id');
+            } else {
+                $query->where('clinic_id', $this->selectedClinicId);
+            }
+            return $query->get()->toArray();
+        });
+    
         $this->dispatch('services-updated');
     }
 
@@ -1018,13 +1035,16 @@ class AppointmentsList extends Component
 
     public function getBasePrice()
     {
-        $basePrice = 0;
-        if (!empty($this->selectedServiceIds)) {
-            $serviceIds = collect($this->selectedServiceIds)->flatten()->all();
-            $basePrice = DoctorService::whereIn('id', $serviceIds)
-                ->sum('price');
+        if (empty($this->selectedServiceIds)) {
+            return 0;
         }
-        return floatval($basePrice);
+
+        $cacheKey = 'base_price_' . md5(json_encode($this->selectedServiceIds));
+        return Cache::remember($cacheKey, now()->addMinutes(10), function () {
+            return collect($this->services)
+                ->whereIn('id', $this->selectedServiceIds)
+                ->sum('price');
+        });
     }
 
     public function applyDiscount()
