@@ -3,7 +3,6 @@
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/dashboard.css') }}" rel="stylesheet" />
-
 @endsection
 
 @section('site-header')
@@ -30,20 +29,20 @@
         <span class="fw-bold mr-2 ml-2 text-dark">بیماران باقی مانده</span>
         <span class="font-medium">{{ $remainingPatients }} بیمار</span>
       </div>
-      <div onclick="location.href='{{ route('dr-clinic-management') }}'" class="cursor-pointer">
-        <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد کلینیک">
-        <span class="fw-bold mr-2 ml-2 text-dark"> درآمد این هفته</span>
-        <span class="font-medium">{{ $clinicsCount }} کلینیک</span>
+      <div onclick="#" class="cursor-pointer">
+        <img src="{{ asset('dr-assets/icons/money.svg') }}" alt="درآمد این هفته">
+        <span class="fw-bold mr-2 ml-2 text-dark">درآمد این هفته</span>
+        <span class="font-medium">{{ number_format($weeklyIncome) }} تومان</span>
       </div>
-      <div onclick="location.href='{{ route('dr-clinic-management') }}'" class="cursor-pointer">
-        <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد کلینیک">
-        <span class="fw-bold mr-2 ml-2 text-dark"> درآمد این ماه</span>
-        <span class="font-medium">{{ $clinicsCount }} کلینیک</span>
+      <div onclick="#" class="cursor-pointer">
+        <img src="{{ asset('dr-assets/icons/money.svg') }}" alt="درآمد این ماه">
+        <span class="fw-bold mr-2 ml-2 text-dark">درآمد این ماه</span>
+        <span class="font-medium">{{ number_format($monthlyIncome) }} تومان</span>
       </div>
-      <div onclick="location.href='{{ route('dr-clinic-management') }}'" class="cursor-pointer">
-        <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد کلینیک">
-        <span class="fw-bold mr-2 ml-2 text-dark"> درآمد کلی</span>
-        <span class="font-medium">{{ $clinicsCount }} کلینیک</span>
+      <div onclick="#" class="cursor-pointer">
+        <img src="{{ asset('dr-assets/icons/money.svg') }}" alt="درآمد کلی">
+        <span class="fw-bold mr-2 ml-2 text-dark">درآمد کلی</span>
+        <span class="font-medium">{{ number_format($totalIncome) }} تومان</span>
       </div>
     </div>
   </div>
@@ -81,10 +80,28 @@
       <canvas id="doctor-status-pie-chart"></canvas>
     </div>
 
-    <!-- 📉 نمودار ۶: روند بیماران جدید -->
+    <!-- 📉 نمودار ۶: روند بیماران -->
     <div class="chart-container">
       <h4 class="section-title">📉 روند بیماران</h4>
       <canvas id="doctor-patient-trend-chart"></canvas>
+    </div>
+
+    <!-- 🗣️ نمودار ۷: نوبت‌های مشاوره -->
+    <div class="chart-container">
+      <h4 class="section-title">🗣️ نوبت‌های مشاوره</h4>
+      <canvas id="doctor-counseling-chart"></canvas>
+    </div>
+
+    <!-- ✍️ نمودار ۸: نوبت‌های دستی -->
+    <div class="chart-container">
+      <h4 class="section-title">✍️ نوبت‌های دستی</h4>
+      <canvas id="doctor-manual-chart"></canvas>
+    </div>
+
+    <!-- 💸 نمودار ۹: درآمد کلی -->
+    <div class="chart-container">
+      <h4 class="section-title">💸 درآمد کلی</h4>
+      <canvas id="doctor-total-income-chart"></canvas>
     </div>
   </div>
 </div>

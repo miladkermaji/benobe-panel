@@ -17,25 +17,58 @@ class DrPanelController extends Controller
 {
     public function index()
     {
-        $today = Carbon::today();
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // ID دکتر لاگین‌شده
+        $doctorId = Auth::guard('doctor')->id();
+
+        // تعداد بیماران امروز
+
         $totalPatientsToday = Appointment::where('doctor_id', $doctorId)
-            ->whereDate('appointment_date', $today)
-            ->count();
+               ->whereDate('appointment_date', Carbon::today())
+               ->where('status', '!=', 'cancelled')
+               ->count();
+
+
+        // بیماران ویزیت‌شده
         $visitedPatients = Appointment::where('doctor_id', $doctorId)
-            ->whereDate('appointment_date', $today)
-            ->where('attendance_status', 'attended')
+            ->where('status', 'attended')
+            ->whereDate('appointment_date', Carbon::today())
             ->count();
-        $remainingPatients = $totalPatientsToday - $visitedPatients;
 
-        $secretriesCount = Secretary::where('doctor_id', $doctorId)
-                  ->count();
+        // بیماران باقی‌مانده
+        $remainingPatients = Appointment::where('doctor_id', $doctorId)
+            ->where('status', 'scheduled')
+            ->whereDate('appointment_date', Carbon::today())
+            ->where('attendance_status', null)
+            ->count();
 
-        $clinicsCount = Clinic::where('doctor_id', $doctorId)
-                          ->count();
+        // درآمد این هفته
+        $weeklyIncome = Appointment::where('doctor_id', $doctorId)
+            ->where('payment_status', 'paid')
+            ->where('status', 'attended')
+            ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->sum('final_price');
 
+        // درآمد این ماه
+        $monthlyIncome = Appointment::where('doctor_id', $doctorId)
+            ->where('payment_status', 'paid')
+            ->where('status', 'attended')
+            ->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
+            ->sum('final_price');
 
-        return view("dr.panel.index", compact('totalPatientsToday', 'visitedPatients', 'remainingPatients', 'secretriesCount', 'clinicsCount'));
+        // درآمد کلی
+        $totalIncome = Appointment::where('doctor_id', $doctorId)
+            ->where('payment_status', 'paid')
+            ->where('status', 'attended')
+            ->sum('final_price');
+
+        return view('dr.panel.index', compact(
+            'totalPatientsToday',
+            'visitedPatients',
+            'remainingPatients',
+            'weeklyIncome',
+            'monthlyIncome',
+            'totalIncome'
+        ));
     }
 
 }

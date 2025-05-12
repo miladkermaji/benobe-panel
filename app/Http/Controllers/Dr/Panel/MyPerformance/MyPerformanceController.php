@@ -6,8 +6,10 @@ use App\Models\User;
 use App\Models\Clinic;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
+use App\Models\ManualAppointment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CounselingAppointment;
 use App\Http\Controllers\Dr\Controller;
 
 class MyPerformanceController extends Controller
@@ -219,65 +221,112 @@ class MyPerformanceController extends Controller
 
         // اعتبارسنجی clinic_id
         if ($clinicId !== 'default' && !is_numeric($clinicId)) {
-            Log::warning('مقدار clinic_id نامعتبر:', ['clinicId' => $clinicId]);
             return response()->json(['error' => 'مقدار clinic_id نامعتبر است'], 400);
         }
 
         $clinicCondition = function ($query) use ($clinicId) {
             if ($clinicId === 'default') {
-                Log::debug('اعمال فیلتر whereNull برای clinic_id');
                 $query->whereNull('clinic_id');
             } else {
-                Log::debug('اعمال فیلتر where برای clinic_id:', ['clinicId' => $clinicId]);
                 $query->whereNotNull('clinic_id')->where('clinic_id', $clinicId);
             }
         };
 
-        Log::info('داده‌های دریافتی برای نمودارها:', [
-            'clinicId' => $clinicId,
-            'doctorId' => $doctorId,
-        ]);
-
+        // 1. نوبت‌های معمولی (appointments)
         $appointments = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
-                     COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
-                     COUNT(CASE WHEN status = 'attended' THEN 1 END) as attended_count,
-                     COUNT(CASE WHEN status = 'missed' THEN 1 END) as missed_count,
-                     COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count")
+                         COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
+                         COUNT(CASE WHEN status = 'attended' THEN 1 END) as attended_count,
+                         COUNT(CASE WHEN status = 'missed' THEN 1 END) as missed_count,
+                         COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count")
             ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
             ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
             ->get();
 
-        Log::info('نتایج نوبت‌ها:', ['appointments' => $appointments]);
-
+        // 2. درآمد ماهانه (اصلاح‌شده با final_price)
         $monthlyIncome = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
-                     COALESCE(SUM(CASE WHEN payment_status = 'paid' THEN fee ELSE 0 END), 0) as total_paid_income,
-                     COALESCE(SUM(CASE WHEN payment_status = 'unpaid' THEN fee ELSE 0 END), 0) as total_unpaid_income")
+                         COALESCE(SUM(CASE WHEN payment_status = 'paid' THEN final_price ELSE 0 END), 0) as total_paid_income,
+                         COALESCE(SUM(CASE WHEN payment_status = 'unpaid' THEN final_price ELSE 0 END), 0) as total_unpaid_income")
             ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
             ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
             ->get();
 
-        Log::info('نتایج درآمد ماهانه:', ['monthlyIncome' => $monthlyIncome]);
-
+        // 3. بیماران جدید
         $newPatients = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->join('users', 'appointments.patient_id', '=', 'users.id')
             ->selectRaw("DATE_FORMAT(appointments.appointment_date, '%m') as month,
-                     COUNT(DISTINCT appointments.patient_id) as total_patients")
+                         COUNT(DISTINCT appointments.patient_id) as total_patients")
             ->groupByRaw("DATE_FORMAT(appointments.appointment_date, '%m')")
             ->orderByRaw("DATE_FORMAT(appointments.appointment_date, '%m')")
             ->get();
 
+        // 4. نوبت‌های مشاوره (counseling_appointments)
+        $counselingAppointments = CounselingAppointment::where('doctor_id', $doctorId)
+            ->where($clinicCondition)
+            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+                         COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
+                         COUNT(CASE WHEN status = 'attended' THEN 1 END) as attended_count,
+                         COUNT(CASE WHEN status = 'missed' THEN 1 END) as missed_count,
+                         COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count")
+            ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
+            ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
+            ->get();
+
+        // 5. نوبت‌های دستی (manual_appointments)
+        $manualAppointments = ManualAppointment::where('doctor_id', $doctorId)
+            ->where($clinicCondition)
+            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+                         COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
+                         COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed_count")
+            ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
+            ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
+            ->get();
+
+        // 6. درآمد کلی (از appointments و counseling_appointments)
+        $totalIncome = Appointment::where('doctor_id', $doctorId)
+            ->where($clinicCondition)
+            ->where('payment_status', 'paid')
+            ->where('status', 'attended')
+            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+                         COALESCE(SUM(final_price), 0) as total_income")
+            ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
+            ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
+            ->union(
+                CounselingAppointment::where('doctor_id', $doctorId)
+                    ->where($clinicCondition)
+                    ->where('payment_status', 'paid')
+                    ->where('status', 'attended')
+                    ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+                                 COALESCE(SUM(fee), 0) as total_income")
+                    ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
+            )
+            ->get()
+            ->groupBy('month')
+            ->map(function ($group) {
+                return [
+                    'month' => $group->first()->month,
+                    'total_income' => $group->sum('total_income')
+                ];
+            })
+            ->values();
+
         Log::info('نتایج بیماران جدید:', ['newPatients' => $newPatients]);
+        Log::info('نتایج نوبت‌های مشاوره:', ['counselingAppointments' => $counselingAppointments]);
+        Log::info('نتایج نوبت‌های دستی:', ['manualAppointments' => $manualAppointments]);
+        Log::info('نتایج درآمد کلی:', ['totalIncome' => $totalIncome]);
 
         return response()->json([
-            'appointments'             => $appointments->isEmpty() ? [] : $appointments,
-            'monthlyIncome'            => $monthlyIncome->isEmpty() ? [] : $monthlyIncome,
-            'newPatients'              => $newPatients->isEmpty() ? [] : $newPatients,
+            'appointments' => $appointments->isEmpty() ? [] : $appointments,
+            'monthlyIncome' => $monthlyIncome->isEmpty() ? [] : $monthlyIncome,
+            'newPatients' => $newPatients->isEmpty() ? [] : $newPatients,
             'appointmentStatusByMonth' => $appointments->isEmpty() ? [] : $appointments,
+            'counselingAppointments' => $counselingAppointments->isEmpty() ? [] : $counselingAppointments,
+            'manualAppointments' => $manualAppointments->isEmpty() ? [] : $manualAppointments,
+            'totalIncome' => $totalIncome->isEmpty() ? [] : $totalIncome,
         ]);
     }
 }

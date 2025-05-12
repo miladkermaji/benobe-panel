@@ -1,5 +1,5 @@
 <script>
- $(document).ready(function() {
+  $(document).ready(function() {
   let dropdownOpen = false;
   let selectedClinic = localStorage.getItem('selectedClinic');
   let selectedClinicId = localStorage.getItem('selectedClinicId');
@@ -94,13 +94,16 @@ function loadCharts() {
       $('#chart-container .loader').remove();
       setTimeout(() => {
         const defaultData = [
-          { month: 'ماه قبل', scheduled_count: 0, attended_count: 0, missed_count: 0, cancelled_count: 0, total_paid_income: 0, total_unpaid_income: 0, total_patients: 0 },
-          { month: 'این ماه', scheduled_count: 0, attended_count: 0, missed_count: 0, cancelled_count: 0, total_paid_income: 0, total_unpaid_income: 0, total_patients: 0 }
+          { month: 'ماه قبل', scheduled_count: 0, attended_count: 0, missed_count: 0, cancelled_count: 0, total_paid_income: 0, total_unpaid_income: 0, total_patients: 0, total_income: 0 },
+          { month: 'این ماه', scheduled_count: 0, attended_count: 0, missed_count: 0, cancelled_count: 0, total_paid_income: 0, total_unpaid_income: 0, total_patients: 0, total_income: 0 }
         ];
         const appointments = response.appointments?.length > 1 ? response.appointments : defaultData;
         const monthlyIncome = response.monthlyIncome?.length > 1 ? response.monthlyIncome : defaultData;
         const newPatients = response.newPatients?.length > 1 ? response.newPatients : defaultData;
         const appointmentStatusByMonth = response.appointmentStatusByMonth?.length > 1 ? response.appointmentStatusByMonth : defaultData;
+        const counselingAppointments = response.counselingAppointments?.length > 1 ? response.counselingAppointments : defaultData;
+        const manualAppointments = response.manualAppointments?.length > 1 ? response.manualAppointments : defaultData;
+        const totalIncome = response.totalIncome?.length > 1 ? response.totalIncome : defaultData;
 
         renderPerformanceChart(appointments);
         renderIncomeChart(monthlyIncome);
@@ -108,6 +111,9 @@ function loadCharts() {
         renderStatusChart(appointmentStatusByMonth);
         renderStatusPieChart(appointmentStatusByMonth);
         renderPatientTrendChart(newPatients);
+        renderCounselingChart(counselingAppointments);
+        renderManualChart(manualAppointments);
+        renderTotalIncomeChart(totalIncome);
         $('#chart-container').hide().show();
       }, 0);
     },
@@ -137,7 +143,7 @@ function renderPerformanceChart(data) {
       labels: labels,
       datasets: [
         {
-          label: 'برنامه‌ریزی‌شده',
+          label: 'ویزیت شده',
           data: data.map(item => item.scheduled_count || 0),
           borderColor: '#2e86c1',
           backgroundColor: 'rgba(46, 134, 193, 0.2)',
@@ -332,7 +338,7 @@ function renderStatusChart(data) {
       labels: labels,
       datasets: [
         {
-          label: 'برنامه‌ریزی‌شده',
+          label: 'ویزیت شده',
           data: data.map(item => item.scheduled_count || 0),
           borderColor: '#2e86c1',
           backgroundColor: 'rgba(46, 134, 193, 0.2)',
@@ -417,7 +423,7 @@ function renderStatusPieChart(data) {
       labels: labels,
       datasets: [
         {
-          label: 'برنامه‌ریزی‌شده',
+          label: 'ویزیت شده',
           data: data.map(item => item.scheduled_count || 0),
           borderColor: '#2e86c1',
           backgroundColor: 'rgba(46, 134, 193, 0.2)',
@@ -504,14 +510,209 @@ function renderPatientTrendChart(data) {
         {
           label: 'بیماران جدید',
           data: data.map(item => item.total_patients || 0),
-          borderColor: '#f59e0b',
-          backgroundColor: 'rgba(245, 158, 11, 0.2)',
+          borderColor: '#f97316',
+          backgroundColor: 'rgba(249, 115, 22, 0.2)',
           fill: true,
           tension: 0.4,
           pointRadius: 4,
           pointHoverRadius: 6,
           pointBackgroundColor: '#fff',
-          pointBorderColor: '#f59e0b'
+          pointBorderColor: '#f97316'
+        }
+      ]
+    },
+    options: {
+      ...commonOptions,
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(0, 0, 0, 0.05)' },
+          ticks: { font: { size: 10 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10 }, maxRotation: 0, minRotation: 0 },
+          type: 'category',
+          labels: labels.length === 1 ? [labels[0], ''] : labels
+        }
+      }
+    }
+  });
+}
+
+// 🗣️ نمودار نوبت‌های مشاوره
+function renderCounselingChart(data) {
+  let ctx = document.getElementById('doctor-counseling-chart').getContext('2d');
+  if (window.counselingChart) {
+    window.counselingChart.destroy();
+  }
+  if (!data || data.length === 0) {
+    ctx.canvas.parentNode.innerHTML = '<p>داده‌ای برای نمایش وجود ندارد</p>';
+    return;
+  }
+  let labels = data.map(item => item.month);
+  window.counselingChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'ویزیت شده',
+          data: data.map(item => item.scheduled_count || 0),
+          borderColor: '#8b5cf6',
+          backgroundColor: 'rgba(139, 92, 246, 0.2)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#8b5cf6'
+        },
+        {
+          label: 'انجام‌شده',
+          data: data.map(item => item.attended_count || 0),
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#3b82f6'
+        },
+        {
+          label: 'غیبت',
+          data: data.map(item => item.missed_count || 0),
+          borderColor: '#ec4899',
+          backgroundColor: 'rgba(236, 72, 153, 0.2)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#ec4899'
+        },
+        {
+          label: 'لغو‌شده',
+          data: data.map(item => item.cancelled_count || 0),
+          borderColor: '#facc15',
+          backgroundColor: 'rgba(250, 204, 21, 0.2)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#facc15'
+        }
+      ]
+    },
+    options: {
+      ...commonOptions,
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(0, 0, 0, 0.05)' },
+          ticks: { font: { size: 10 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10 }, maxRotation: 0, minRotation: 0 },
+          type: 'category',
+          labels: labels.length === 1 ? [labels[0], ''] : labels
+        }
+      }
+    }
+  });
+}
+
+// ✍️ نمودار نوبت‌های دستی
+function renderManualChart(data) {
+  let ctx = document.getElementById('doctor-manual-chart').getContext('2d');
+  if (window.manualChart) {
+    window.manualChart.destroy();
+  }
+  if (!data || data.length === 0) {
+    ctx.canvas.parentNode.innerHTML = '<p>داده‌ای برای نمایش وجود ندارد</p>';
+    return;
+  }
+  let labels = data.map(item => item.month);
+  window.manualChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'ویزیت شده',
+          data: data.map(item => item.scheduled_count || 0),
+          borderColor: '#14b8a6',
+          backgroundColor: 'rgba(20, 184, 166, 0.2)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#14b8a6'
+        },
+        {
+          label: 'تأیید‌شده',
+          data: data.map(item => item.confirmed_count || 0),
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99, 102, 241, 0.2)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#6366f1'
+        }
+      ]
+    },
+    options: {
+      ...commonOptions,
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(0, 0, 0, 0.05)' },
+          ticks: { font: { size: 10 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10 }, maxRotation: 0, minRotation: 0 },
+          type: 'category',
+          labels: labels.length === 1 ? [labels[0], ''] : labels
+        }
+      }
+    }
+  });
+}
+
+// 💸 نمودار درآمد کلی
+function renderTotalIncomeChart(data) {
+  let ctx = document.getElementById('doctor-total-income-chart').getContext('2d');
+  if (window.totalIncomeChart) {
+    window.totalIncomeChart.destroy();
+  }
+  if (!data || data.length === 0) {
+    ctx.canvas.parentNode.innerHTML = '<p>داده‌ای برای نمایش وجود ندارد</p>';
+    return;
+  }
+  let labels = data.map(item => item.month);
+  window.totalIncomeChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'درآمد کلی',
+          data: data.map(item => item.total_income || 0),
+          borderColor: '#d946ef',
+          backgroundColor: 'rgba(217, 70, 239, 0.2)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#d946ef'
         }
       ]
     },
