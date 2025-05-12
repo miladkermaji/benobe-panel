@@ -110,12 +110,17 @@ class AppointmentsList extends Component
 
     public function mount()
     {
-
-        $this->pagination['per_page'] = 100;
-
+        // مقداردهی اولیه pagination با مقادیر پیش‌فرض
+        $this->pagination = [
+            'current_page' => 1,
+            'per_page' => 100, // مقدار پیش‌فرض مناسب برای تعداد آیتم‌ها در هر صفحه
+            'last_page' => 1,
+            'total' => 0,
+        ];
+    
         // مقدار پیش‌فرض تاریخ امروز
         $this->selectedDate = Carbon::now()->format('Y-m-d');
-
+    
         // خواندن selected_date از URL و دی‌کد کردن آن
         $selectedDateFromUrl = request()->query('selected_date');
         if ($selectedDateFromUrl) {
@@ -134,16 +139,20 @@ class AppointmentsList extends Component
                     $this->selectedDate = Carbon::parse($decodedDate)->format('Y-m-d');
                 }
             } catch (\Exception $e) {
-
+                // در صورت خطا، تاریخ امروز استفاده می‌شود
+                $this->dispatch('show-toastr', type: 'error', message: 'فرمت تاریخ انتخاب‌شده نامعتبر است.');
             }
         }
-
+    
         // ذخیره URL بازگشت
         $this->redirectBack = urldecode(request()->query('redirect_back', url()->previous()));
-
-        $this->blockedAt = Jalalian::now()->format('Y-m-d'); // تغییر فرمت به Y-m-d
+    
+        // تنظیم تاریخ‌های پیش‌فرض برای مسدودیت
+        $this->blockedAt = Jalalian::now()->format('Y-m-d');
         $this->calendarYear = Jalalian::now()->getYear();
         $this->calendarMonth = Jalalian::now()->getMonth();
+    
+        // لود داده‌های اولیه
         $doctor = $this->getAuthenticatedDoctor();
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
         if ($doctor) {
@@ -338,16 +347,17 @@ class AppointmentsList extends Component
         if (!$doctor) {
             return [];
         }
-
-        $gregorianDate = $this->convertToGregorian($this->selectedDate);
-        $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$gregorianDate}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
-
+    
+        // کلید کش با توجه به فیلترها
+        $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
+    
         // لود از کش یا دیتابیس
-        $appointments = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($doctor, $gregorianDate) {
+        $appointments = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($doctor) {
             $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
                 ->withTrashed()
                 ->where('doctor_id', $doctor->id);
-
+    
+            // اعمال فیلترهای زمانی
             if ($this->dateFilter) {
                 $today = Carbon::today();
                 if ($this->dateFilter === 'current_week') {
@@ -363,24 +373,30 @@ class AppointmentsList extends Component
                     $endOfYear = $today->copy()->endOfYear();
                     $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
                 }
-            } elseif ($this->filterStatus !== 'all' && !$this->isSearchingAllDates) {
+            } elseif (!$this->isSearchingAllDates) {
+                // فقط در صورتی که dateFilter فعال نیست، از selectedDate استفاده شود
+                $gregorianDate = $this->convertToGregorian($this->selectedDate);
                 $query->whereDate('appointment_date', $gregorianDate);
             }
-
+    
+            // اعمال فیلتر کلینیک
             if ($this->selectedClinicId === 'default') {
                 $query->whereNull('clinic_id');
             } elseif ($this->selectedClinicId) {
                 $query->where('clinic_id', $this->selectedClinicId);
             }
-
+    
+            // اعمال فیلتر وضعیت (فقط اگر صراحتاً تنظیم شده باشد)
             if ($this->filterStatus && $this->filterStatus !== 'all') {
                 $query->where('status', $this->filterStatus);
             }
-
+    
+            // اعمال فیلتر وضعیت حضور
             if ($this->attendanceStatus) {
                 $query->where('attendance_status', $this->attendanceStatus);
             }
-
+    
+            // اعمال جستجو
             if ($this->searchQuery) {
                 $query->whereHas('patient', function ($q) {
                     $q->where('first_name', 'like', "%{$this->searchQuery}%")
@@ -390,24 +406,30 @@ class AppointmentsList extends Component
                         ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
                 });
             }
-
+    
+            // اطمینان از وجود per_page
+            $perPage = $this->pagination['per_page'] ?? 100;
+    
             return $query->orderBy('appointment_date', 'desc')
-                        ->paginate($this->pagination['per_page'], ['*'], 'page', $this->pagination['current_page']);
+                        ->orderBy('appointment_time', 'desc')
+                        ->paginate($perPage, ['*'], 'page', $this->pagination['current_page']);
         });
-
-        $jalaliDate = Jalalian::fromCarbon(Carbon::parse($gregorianDate));
+    
+        // لود داده‌های تقویم برای ماه جاری
+        $jalaliDate = Jalalian::fromCarbon(Carbon::today());
         $appointmentData = $this->getAppointmentsInMonth($jalaliDate->getYear(), $jalaliDate->getMonth());
-
-        $this->appointments = array_merge($this->appointments, $appointments->items());
+    
+        $this->appointments = $appointments->items();
         $this->pagination = [
             'current_page' => $appointments->currentPage(),
             'last_page' => $appointments->lastPage(),
-            'per_page' => $appointments->perPage(),
+            'per_page' => $appointments->perPage(), // اصلاح: استفاده از per_page به جای peracrossPage
             'total' => $appointments->total(),
         ];
-
+    
         $this->dispatch('setAppointments', ['appointments' => $appointmentData]);
-
+    
+        // بررسی عدم وجود نتیجه برای نمایش هشدار
         if (empty($this->appointments) && $this->searchQuery) {
             if ($this->isSearchingAllDates) {
                 $this->dispatch('no-results-found', ['date' => $jalaliDate->format('Y/m/d'), 'searchAll' => true]);
@@ -419,7 +441,7 @@ class AppointmentsList extends Component
             $this->showNoResultsAlert = false;
             $this->dispatch('hide-no-results-alert');
         }
-
+    
         return $appointmentData;
     }
 

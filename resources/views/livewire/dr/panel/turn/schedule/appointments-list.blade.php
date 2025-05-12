@@ -109,7 +109,11 @@
                     <td>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</td>
                     <td>{{ $appointment->patient ? $appointment->patient->national_code : '-' }}</td>
                     <td>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
-                      {{ $appointment->appointment_time->format('H:i') ?? '-' }}</td>
+                      
+                      <span class="fw-bold d-block">
+                      {{ $appointment->appointment_time->format('H:i') ?? '-' }}
+                    </span>
+                    </td>
                     <td>
                       @php
                         $statusLabels = [
@@ -233,7 +237,9 @@
                   <div class="card-item">
                     <span class="label">زمان نوبت:</span>
                     <span>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
-                      {{ $appointment->appointment_time->format('H:i') ?? '-' }}</span>
+                      {{ '  ('.$appointment->appointment_time->format('H:i').')' ?? '-' }}
+                    
+                    </span>
                   </div>
                   <div class="card-item">
                     <span class="label">وضعیت نوبت:</span>
