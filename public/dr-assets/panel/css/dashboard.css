@@ -142,7 +142,6 @@ canvas {
     transition: all 0.3s ease;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
     min-width: 220px;
-    flex: 1;
 }
 
 .top-s-a-wrapper > div:hover {
@@ -175,7 +174,7 @@ canvas {
     }
 
     .chart-grid {
-        grid-template-columns: 1fr; /* تک‌ستونی در تبلت و موبایل */
+        grid-template-columns: 1fr; /* تک‌ستونی برای نمودارها */
         gap: 20px;
     }
 
@@ -188,22 +187,60 @@ canvas {
         gap: 6px;
     }
 
+    .top-s-a-wrapper {
+        display: flex;
+        flex-wrap: nowrap; /* جلوگیری از wrap شدن کارت‌ها */
+        overflow-x: auto; /* فعال کردن اسکرول افقی */
+        gap: 12px; /* فاصله بین کارت‌ها */
+        padding: 10px 0; /* padding برای ظاهر بهتر */
+        scroll-snap-type: x mandatory; /* اسنپ کردن اسکرول برای تجربه بهتر */
+        -webkit-overflow-scrolling: touch; /* اسکرول روان در iOS */
+        scrollbar-width: thin; /* عرض اسکرول‌بار در فایرفاکس */
+        scrollbar-color: var(--primary-light) var(--background-light); /* رنگ اسکرول‌بار */
+    }
+
+    .top-s-a-wrapper::-webkit-scrollbar {
+        height: 8px; /* ارتفاع اسکرول‌بار در کروم/سافاری */
+    }
+
+    .top-s-a-wrapper::-webkit-scrollbar-thumb {
+        background: var(--primary-light); /* رنگ اسکرول‌بار */
+        border-radius: 4px;
+    }
+
+    .top-s-a-wrapper::-webkit-scrollbar-track {
+        background: var(--background-light); /* پس‌زمینه اسکرول‌بار */
+    }
+
     .top-s-a-wrapper > div {
-        min-width: 100%;
-        padding: 12px;
+        flex: 0 0 auto; /* جلوگیری از کشیده شدن کارت‌ها */
+        width: 180px; /* عرض ثابت برای کارت‌ها */
+        min-width: 160px; /* حداقل عرض برای جلوگیری از فشردگی بیش از حد */
+        padding: 10px; /* padding کمتر برای فشردگی */
+        box-sizing: border-box;
+        text-align: center; /* وسط‌چین کردن محتوا */
+        scroll-snap-align: start; /* اسنپ کردن کارت‌ها هنگام اسکرول */
+        display: flex;
+        flex-direction: column; /* چیدمان عمودی محتوا در هر کارت */
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem; /* کاهش اندازه فونت */
     }
 
     .top-s-a-wrapper img {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
+        margin-bottom: 6px; /* فاصله زیر آیکون */
     }
 
     .fw-bold {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        line-height: 1.2;
     }
 
     .font-medium {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+        line-height: 1.2;
     }
 }
 
@@ -225,10 +262,26 @@ canvas {
     }
 
     .top-s-a-wrapper {
-        gap: 12px;
+        gap: 10px;
+        padding: 8px 0;
     }
 
     .top-s-a-wrapper > div {
-        padding: 10px;
+        width: 150px; /* عرض کمتر برای موبایل */
+        min-width: 140px;
+        padding: 8px;
+    }
+
+    .top-s-a-wrapper img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .fw-bold {
+        font-size: 0.85rem;
+    }
+
+    .font-medium {
+        font-size: 0.8rem;
     }
 }
