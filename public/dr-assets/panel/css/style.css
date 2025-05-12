@@ -603,26 +603,6 @@ svg {
 .mlg-15 {
     margin-left: 15px;
 }
-.sidebar__nav {
-    width: 250px;
-    background: linear-gradient(
-        180deg,
-        #fefefe 0%,
-        #f9fbff 100%
-    ); /* گرادیان سفید ملایم */
-    backdrop-filter: blur(2px); /* بلور خیلی کم برای نرمی */
-    height: 100vh;
-    position: fixed;
-    transition: all 200ms ease;
-    right: 0;
-    bottom: 0;
-    z-index: 4000 !important;
-    top: -1px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); /* سایه کاستوم قوی‌تر */
-}
 
 .sidebar__nav.is-active {
     right: -170px;
@@ -640,6 +620,7 @@ svg {
     display: inline-block;
     font-size: 20px;
     padding: 5.5px 9px 0px 9px;
+    z-index: 4001;
 }
 
 .sidebar__nav ul li {
@@ -1073,8 +1054,46 @@ svg {
 
 .content {
     margin-right: 250px;
+    padding-top: 70px; /* فاصله برای جلوگیری از پوشیده شدن محتوا توسط هدر */
     transition: all 200ms ease;
 }
+
+
+.header {
+    background: #fafafa; /* سفید مایل به خاکستری روشن */
+    padding: 5px 25px;
+    border-radius: var(--border-radius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    position: fixed;
+    top: 0;
+    width: calc(100% - 250px);
+    z-index: 4000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* سایه خیلی نرم */
+    transition: width 200ms ease;
+    border: 1px solid rgba(0, 0, 0, 0.03); /* حاشیه ظریف برای بافت */
+}
+
+/* سایدبار با رنگ روشن و سایه نرم */
+.sidebar__nav {
+    width: 250px;
+    background: #fdfdfd; /* سفید خیلی روشن */
+    height: 100vh;
+    position: fixed;
+    transition: all 200ms ease;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    z-index: 4001 !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* سایه نرم */
+    border-left: 1px solid rgba(0, 0, 0, 0.02); /* حاشیه ظریف برای بافت */
+}
+
 .h-30 {
     height: 30px !important;
 }
@@ -1082,14 +1101,8 @@ svg {
     margin-right: 80px;
     transition: all 200ms ease;
 }
-.header {
-    background: white;
-    padding: 5px 25px;
-    border-radius: var(--border-radius);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+.content.is-active .header {
+    width: calc(100% - 80px); /* عرض هدر هنگام کوچک شدن سایدبار */
 }
 .header__logo {
     height: 44px;
@@ -1668,7 +1681,7 @@ span.tagRemove:hover {
     }
 }
 @media (max-width: 425px) {
-    .modal-content{
+    .modal-content {
         max-width: 100% !important;
         border-radius: 10px !important;
     }

@@ -1,6 +1,6 @@
 .sidebar__nav {
  right: -250px;
- z-index: 4000 !important;
+ z-index: 40001 !important;
 }
 
 .sidebar__nav.is-active {
@@ -10,13 +10,16 @@
 .sidebar__nav .header__logo {
  margin-right: 15px !important;
 }
-
+.header{
+  width: calc(100%) !important;
+}
 .content {
  margin-right: 0 !important;
 }
 
 .bars {
  display: block !important;
+ z-index: 4001;
 }
 
 .sidebar__nav.is-active ul li a::before {
