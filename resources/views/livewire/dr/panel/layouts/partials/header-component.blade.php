@@ -20,8 +20,9 @@
         <div class="myPanelOption p-3 d-md-block d-none">
           <div class="d-flex align-items-center">
             <div class="my-tooltip mx-2">
-              <svg data-toggle="tooltip" data-placement="bottom"
-                title="از این قسمت، مرکزی که در آن مشغول تجویز و طبابت هستید را انتخاب کنید" width="16"
+              <x-custom-tooltip title="از این قسمت، مرکزی که در آن مشغول تجویز و طبابت هستید را انتخاب کنید" placement="bottom">
+              <svg
+                 width="16"
                 height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg"
                 class="lg:block svg-help" color="#3f4079" data-tip="true" data-for="centerSelect" currentItem="false">
                 <path
@@ -31,6 +32,7 @@
                   stroke-linejoin="round"></path>
                 <circle cx="8" cy="8.99445" r="7.25" stroke="#3f4079" stroke-width="1.5"></circle>
               </svg>
+            </x-custom-tooltip>
             </div>
             <div class="">
               <div class="dropdown">
