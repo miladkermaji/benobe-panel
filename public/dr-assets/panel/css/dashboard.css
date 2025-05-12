@@ -1,75 +1,70 @@
 :root {
-    /* پالت رنگی اصلی */
-    --primary: #2e86c1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
-    --primary-light: #84caf9; /* آبی روشن - در گرادیان‌ها */
-    --secondary: #1deb3c; /* سبز - برای دکمه‌های ثانویه */
-    --secondary-hover: #15802a; /* سبز تیره‌تر برای هاور */
-    --background-light: #f0f8ff; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
-    --background-footer: #d4ecfd; /* آبی روشن‌تر - فوتر */
-    --background-card: #ffffff; /* سفید - کارت‌ها */
-    --text-primary: #000000; /* مشکی - متن اصلی */
-    --text-secondary: #707070; /* خاکستری - متن ثانویه */
-    --text-discount: #008000; /* سبز - قیمت با تخفیف */
-    --text-original: #ff0000; /* قرمز - قیمت اولیه */
-    --border-neutral: #e5e7eb; /* خاکستری روشن - حاشیه‌ها */
-    --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
-    --gradient-instagram-from: #f92ca7; /* گرادیان اینستاگرام - شروع */
-    --gradient-instagram-to: #6b1a93; /* گرادیان اینستاگرام - پایان */
-    --button-mobile: #4f9acd; /* آبی متوسط - دکمه‌های موبایل */
-    --button-mobile-light: #a2cdeb; /* آبی روشن‌تر - دکمه‌های موبایل */
-    --support-section: #2e86c1; /* آبی - بخش پشتیبانی */
-    --support-text: #084d7c; /* آبی تیره - متن پشتیبانی */
-    --glass-border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    /* شعاع گوشه‌ها (border-radius) */
-    --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
-    --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
-    --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
-    --radius-card: 1.125rem; /* 18px - کارت‌ها */
-    --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
-    --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
-    --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
-    --gradient-primary: linear-gradient(
-        90deg,
-        var(--primary-light) 0%,
-        var(--primary) 100%
-    ) !important;
+    --primary: #2e86c1;
+    --primary-light: #84caf9;
+    --secondary: #1deb3c;
+    --secondary-hover: #15802a;
+    --background-light: #f0f8ff;
+    --background-footer: #d4ecfd;
+    --background-card: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --text-discount: #008000;
+    --text-original: #ff0000;
+    --border-neutral: #e5e7eb;
+    --shadow: rgba(0, 0, 0, 0.35);
+    --gradient-instagram-from: #f92ca7;
+    --gradient-instagram-to: #6b1a93;
+    --button-mobile: #4f9acd;
+    --button-mobile-light: #a2cdeb;
+    --support-section: #2e86c1;
+    --support-text: #084d7c;
+    --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+    --radius-button: 0.5rem;
+    --radius-button-large: 1rem;
+    --radius-button-xl: 1.25rem;
+    --radius-card: 1.125rem;
+    --radius-footer: 1.875rem;
+    --radius-nav: 1.25rem;
+    --radius-circle: 9999px;
+    --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    --gradient-bg: linear-gradient(145deg, #f8fafc, #ffffff);
+    --text-color: #2d3748;
+    --hover-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .chart-content {
-    padding: 40px;
-    max-width: 1440px;
-    margin: 40px auto;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    border-radius: 24px;
-    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(10px);
+    padding: 20px;
+    max-width: 1400px;
+    margin: 20px auto;
+    background: linear-gradient(135deg, #f9fafb 0%, #ebedf0 100%);
+    border-radius: 16px;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .chart-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
 }
 
 .chart-container {
-    background: var(--glass-bg);
-    border-radius: var(--chart-border-radius);
-    box-shadow: var(--chart-shadow);
-    padding: 30px;
-    height: 400px;
+    background: var(--gradient-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 15px;
+    height: 210px; /* نصف ارتفاع قبلی */
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: all 0.3s ease-in-out;
-    border: var(--glass-border);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.5);
     position: relative;
     overflow: hidden;
-    backdrop-filter: blur(8px);
 }
 
 .chart-container:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--hover-shadow);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .chart-container::before {
@@ -78,38 +73,29 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 6px;
-    background: var(--gradient-border);
-    opacity: 0.9;
-    transition: opacity 0.3s ease;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), transparent);
+    opacity: 0.8;
 }
 
 .chart-container:hover::before {
     opacity: 1;
 }
 
-.chart-container.full-width {
-    grid-column: 1 / -1;
-    height: 500px;
-}
-
 .section-title {
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 1.1rem;
+    font-weight: 600;
     color: var(--text-color);
-    margin-bottom: 25px;
+    margin-bottom: 10px;
     text-align: center;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    background: var(--gradient-border);
-    transition: transform 0.3s ease;
-}
-
-.section-title:hover {
-    transform: scale(1.05);
+    gap: 6px;
+    background: linear-gradient(90deg, var(--primary), #7fbfff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 canvas {
@@ -119,93 +105,157 @@ canvas {
 }
 
 .top-panel-bg {
-    border-radius: 20px;
-    margin: 20px 0;
+    border-radius: 16px;
+    margin: 15px 0;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .top-details-sicks-cards {
-    padding: 20px;
+    padding: 15px;
 }
 
 .top-s-a-wrapper {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 15px;
     justify-content: center;
 }
 
 .top-s-a-wrapper > div {
-    background: var(--glass-bg);
-    border: 1px solid beige;
-    border-radius: 16px;
-    padding: 20px;
+    background: linear-gradient(145deg, #ffffff, #f0f6ff);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    padding: 15px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    transition: all 0.3s ease-in-out;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    min-width: 220px;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+    min-width: 200px;
 }
 
 .top-s-a-wrapper > div:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
 }
 
 .top-s-a-wrapper img {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
 .fw-bold {
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-color);
+    font-size: 0.95rem;
 }
 
 .font-medium {
     font-weight: 500;
     color: var(--primary);
+    font-size: 0.9rem;
 }
 
 @media only screen and (max-width: 768px) {
     .chart-content {
-        padding: 20px;
-        margin: 20px auto;
+        padding: 15px;
+        margin: 15px auto;
     }
 
     .chart-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 15px;
     }
 
     .chart-container {
-        height: 360px;
-    }
-
-    .chart-container.full-width {
-        height: 400px;
+        height: 180px; /* ارتفاع کمتر برای موبایل */
     }
 
     .section-title {
-        font-size: 1.2rem;
+        font-size: 0.95rem;
+        gap: 5px;
     }
 
     .top-s-a-wrapper > div {
         min-width: 100%;
+        padding: 12px;
+    }
+
+    .top-s-a-wrapper img {
+        width: 18px;
+        height: 18px;
+    }
+
+    .fw-bold {
+        font-size: 0.9rem;
+    }
+
+    .font-medium {
+        font-size: 0.85rem;
     }
 }
 
 @media only screen and (max-width: 480px) {
     .chart-content {
-        padding: 15px;
+        padding: 10px;
+    }
+
+    .chart-grid {
+        grid-template-columns: repeat(auto-fit, minmax(90vw, 1fr));
+        gap: 10px;
+    }
+
+    .chart-container {
+        height: 160px;
     }
 
     .section-title {
-        font-size: 1rem;
+        font-size: 0.85rem;
     }
 
     .top-s-a-wrapper {
-        gap: 15px;
+        gap: 10px;
+    }
+
+    .top-s-a-wrapper > div {
+        padding: 10px;
+    }
+}
+:root {
+    --chart-bg: #ffffff;
+    --chart-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --chart-border-radius: 12px;
+    --primary-color: #4a90e2;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+    font-family: IRANSans, sans-serif !important;
+}
+
+.chart-container {
+    background: linear-gradient(145deg, #f8fafc, #ffffff);
+    border-radius: var(--chart-border-radius);
+    box-shadow: var(--chart-shadow);
+    padding: 15px;
+    height: 210px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+@media only screen and (max-width: 768px) {
+    .chart-container {
+        height: 180px;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .chart-container {
+        height: 160px;
     }
 }

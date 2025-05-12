@@ -3,7 +3,7 @@
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/dashboard.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/my-performance/chart/chart.css') }}" rel="stylesheet" />
+
 @endsection
 
 @section('site-header')
@@ -15,29 +15,34 @@
 <div class="d-flex flex-column justify-content-center p-3 top-panel-bg">
   <div class="top-details-sicks-cards">
     <div class="top-s-a-wrapper">
-      <div>
+      <div onclick="location.href='{{ route('dr-appointments') }}'" class="cursor-pointer">
         <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد بیماران امروز">
         <span class="fw-bold mr-2 ml-2 text-dark">تعداد بیماران امروز</span>
         <span class="font-medium">{{ $totalPatientsToday }} بیمار</span>
       </div>
-      <div>
+      <div onclick="location.href='{{ route('dr-appointments') }}'" class="cursor-pointer">
         <img src="{{ asset('dr-assets/icons/dashboard-tick.svg') }}" alt="بیماران ویزیت شده">
         <span class="fw-bold mr-2 ml-2 text-dark">بیماران ویزیت شده</span>
         <span class="font-medium">{{ $visitedPatients }} بیمار</span>
       </div>
-      <div>
+      <div onclick="location.href='{{ route('dr-appointments') }}'" class="cursor-pointer">
         <img src="{{ asset('dr-assets/icons/dashboard-timer.svg') }}" alt="بیماران باقی مانده">
         <span class="fw-bold mr-2 ml-2 text-dark">بیماران باقی مانده</span>
         <span class="font-medium">{{ $remainingPatients }} بیمار</span>
       </div>
-      <div>
-        <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد منشی ها">
-        <span class="fw-bold mr-2 ml-2 text-dark">تعداد منشی ها</span>
-        <span class="font-medium">{{ $secretriesCount }} نفر</span>
-      </div>
-      <div>
+      <div onclick="location.href='{{ route('dr-clinic-management') }}'" class="cursor-pointer">
         <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد کلینیک">
-        <span class="fw-bold mr-2 ml-2 text-dark">تعداد کلینیک</span>
+        <span class="fw-bold mr-2 ml-2 text-dark"> درآمد این هفته</span>
+        <span class="font-medium">{{ $clinicsCount }} کلینیک</span>
+      </div>
+      <div onclick="location.href='{{ route('dr-clinic-management') }}'" class="cursor-pointer">
+        <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد کلینیک">
+        <span class="fw-bold mr-2 ml-2 text-dark"> درآمد این ماه</span>
+        <span class="font-medium">{{ $clinicsCount }} کلینیک</span>
+      </div>
+      <div onclick="location.href='{{ route('dr-clinic-management') }}'" class="cursor-pointer">
+        <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد کلینیک">
+        <span class="fw-bold mr-2 ml-2 text-dark"> درآمد کلی</span>
         <span class="font-medium">{{ $clinicsCount }} کلینیک</span>
       </div>
     </div>
@@ -46,7 +51,7 @@
 
 <div class="chart-content">
   <div class="chart-grid">
-    <!-- 📊 نمودار ۱: تعداد ویزیت‌ها (تمام صفحه) -->
+    <!-- 📊 نمودار ۱: تعداد ویزیت‌ها -->
     <div class="chart-container">
       <h4 class="section-title">📊 تعداد ویزیت‌ها</h4>
       <canvas id="doctor-performance-chart"></canvas>
@@ -70,7 +75,7 @@
       <canvas id="doctor-status-chart"></canvas>
     </div>
 
-    <!-- 🥧 نمودار ۵: درصد وضعیت نوبت‌ها -->
+    <!-- 🥧 نمودار ۵: درصد نوبت‌ها -->
     <div class="chart-container">
       <h4 class="section-title">🥧 درصد نوبت‌ها</h4>
       <canvas id="doctor-status-pie-chart"></canvas>

@@ -1079,7 +1079,8 @@ svg {
 /* سایدبار با رنگ روشن و سایه نرم */
 .sidebar__nav {
     width: 250px;
-    background: #fdfdfd; /* سفید خیلی روشن */
+    background: linear-gradient(145deg, #ffffff, #f0f6ff);
+
     height: 100vh;
     position: fixed;
     transition: all 200ms ease;
