@@ -133,11 +133,16 @@ $(document).ready(function () {
             );
             currentDate = moment().startOf("day").subtract(9, "days");
         }
+
         calendar.empty();
         let badgeCount = 0;
         let displayedDays = 0;
         let current = moment(currentDate);
         let i = 0;
+
+        // دریافت روزهای خاص از پاسخ AJAX
+        const specialDays = window.appointmentsData.special_days || [];
+
         while (displayedDays < visibleDays && i < calendarDays * 2) {
             const dayOfWeek = current.format("dddd").toLowerCase();
             const appointmentDate = current.format("YYYY-MM-DD");
@@ -145,13 +150,14 @@ $(document).ready(function () {
             const isPast = current.isBefore(today, "day");
             const isWorkingDay = workingDays.includes(dayOfWeek);
             const isSelected = appointmentDate === selectedDate;
-            // بررسی آیا این تاریخ تعطیل است یا خیر
             const isHoliday =
                 window.holidaysData && window.holidaysData.holidays
                     ? window.holidaysData.holidays.includes(appointmentDate)
                     : false;
+            // بررسی آیا این روز خاص است
+            const isSpecialDay = specialDays.includes(appointmentDate);
 
-            if (isWorkingDay || isToday) {
+            if (isWorkingDay || isToday || isSpecialDay) {
                 const persianDate = moment(current).locale("fa").format("dddd");
                 const persianFormattedDate = moment(current)
                     .locale("fa")
@@ -163,10 +169,12 @@ $(document).ready(function () {
                     ]).format("YYYY-MM-DD");
                     return apptDate === appointmentDate;
                 });
+
                 let appointmentCount =
                     appointment && !isPast && appointment.appointment_count > 0
                         ? appointment.appointment_count
                         : 0;
+
                 const badgeHtml =
                     appointmentCount > 0
                         ? `<span class="appointment-badge">${appointmentCount}</span>`
@@ -176,22 +184,39 @@ $(document).ready(function () {
                     : isSelected
                     ? "card-selected"
                     : "";
-                // اضافه کردن کلاس برای بورد قرمز در صورت تعطیل بودن
                 const holidayClass = isHoliday ? "holiday-card" : "";
+                const specialClass = isSpecialDay ? "special-day" : ""; // کلاس برای روزهای خاص
+
                 const cardContent = `
-                <div class="calendar-card btn btn-light ${cardClass} ${holidayClass}" data-date="${appointmentDate}" style="--delay: ${displayedDays}">
+                <div class="calendar-card btn btn-light ${cardClass} ${holidayClass} ${specialClass}" data-date="${appointmentDate}" style="--delay: ${displayedDays}">
                     ${badgeHtml}
                     <div class="day-name">${persianDate}</div>
                     <div class="date">${persianFormattedDate}</div>
                     ${isToday ? '<div class="current-day-icon"></div>' : ""}
+                    ${
+                        isSpecialDay
+                            ? '<div class="special-day-icon"></div>'
+                            : ""
+                    }
                 </div>
             `;
-                // اگر تعطیل است، کارت را داخل x-custom-tooltip قرار می‌دهیم
-                const card = isHoliday
+
+                const tooltipContent = isHoliday
+                    ? "این روز تعطیل است"
+                    : isSpecialDay
+                    ? "این روز برنامه خاص دارد"
+                    : "";
+
+                const card = tooltipContent
                     ? `
-                    <x-custom-tooltip title="این روز تعطیل است" placement="top">
-                        ${cardContent}
-                    </x-custom-tooltip>
+                    <div x-tooltip id="tooltip-day-${appointmentDate}" data-trigger="hover" data-placement="top" class="x-tooltip">
+                        <div class="x-tooltip__trigger">
+                            ${cardContent}
+                        </div>
+                        <div class="x-tooltip__content" data-tooltip-id="tooltip-day-${appointmentDate}">
+                            ${tooltipContent}
+                        </div>
+                    </div>
                 `
                     : cardContent;
 
@@ -199,14 +224,17 @@ $(document).ready(function () {
                 if (appointmentCount > 0) badgeCount++;
                 displayedDays++;
             }
+
             current.add(1, "days");
             i++;
         }
+
         if (displayedDays === 0) {
             console.warn(
-                "No days displayed. Check workingDays or appointmentsData."
+                "No days displayed. Check workingDays, specialDays or appointmentsData."
             );
         }
+
         updateButtonState();
     }
 

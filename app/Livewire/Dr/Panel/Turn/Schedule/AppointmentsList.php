@@ -211,6 +211,7 @@ class AppointmentsList extends Component
             $selectedClinicId = $this->selectedClinicId;
             $year = $this->calendarYear ?? Jalalian::now()->getYear();
             $month = $this->calendarMonth ?? Jalalian::now()->getMonth();
+    
             $appointmentConfig = DoctorAppointmentConfig::where('doctor_id', $doctorId)
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
@@ -220,6 +221,7 @@ class AppointmentsList extends Component
                     }
                 })
                 ->first();
+    
             $calendarDays = $appointmentConfig ? $appointmentConfig->calendar_days : 30;
             $workSchedules = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('is_working', true)
@@ -232,31 +234,53 @@ class AppointmentsList extends Component
                 })
                 ->pluck('day')
                 ->toArray();
+    
             $jalaliDate = Jalalian::fromFormat('Y/m/d', sprintf('%d/%02d/01', $year, $month));
             $startDate = $jalaliDate->toCarbon()->startOfDay();
             $endDate = $jalaliDate->toCarbon()->endOfMonth();
             $jalaliEndDate = Jalalian::fromCarbon($startDate)->addMonths(1)->subDays(1);
             $endDate = $jalaliEndDate->toCarbon()->endOfDay();
+    
+            // دریافت روزهای خاص
+            $specialSchedules = SpecialDailySchedule::where('doctor_id', $doctorId)
+                ->whereBetween('date', [$startDate, $endDate])
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->pluck('date')
+                ->map(function ($date) {
+                    return Carbon::parse($date)->format('Y-m-d');
+                })
+                ->toArray();
+    
             $appointmentsQuery = DB::table('appointments')
                 ->select(DB::raw('appointment_date, COUNT(*) as appointment_count'))
                 ->where('doctor_id', $doctorId)
                 ->where('status', '!=', 'cancelled')
                 ->whereNull('deleted_at');
+    
             if ($selectedClinicId === 'default') {
                 $appointmentsQuery->whereNull('clinic_id');
             } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
                 $appointmentsQuery->where('clinic_id', $selectedClinicId);
             }
+    
             $appointments = $appointmentsQuery
                 ->whereBetween('appointment_date', [$startDate, $endDate])
                 ->groupBy('appointment_date')
                 ->get();
+    
             $data = $appointments->map(function ($item) {
                 return [
                     'appointment_date' => Carbon::parse($item->appointment_date)->format('Y-m-d'),
                     'appointment_count' => (int) $item->appointment_count,
                 ];
             })->toArray();
+    
             $appointmentSettings = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('is_working', true)
                 ->where(function ($query) use ($selectedClinicId) {
@@ -275,12 +299,14 @@ class AppointmentsList extends Component
                     ];
                 })
                 ->toArray();
+    
             return [
                 'status' => true,
                 'data' => $data,
                 'working_days' => $workSchedules,
                 'calendar_days' => $calendarDays,
                 'appointment_settings' => $appointmentSettings,
+                'special_days' => $specialSchedules, // اضافه کردن روزهای خاص
             ];
         } catch (\Exception $e) {
             return [

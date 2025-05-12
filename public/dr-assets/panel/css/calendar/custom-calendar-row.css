@@ -14,6 +14,21 @@
     --radius-button: 6px;
     --radius-circle: 50%;
 }
+.special-day {
+    border: 2px solid #ff9900 !important; /* حاشیه نارنجی برای روزهای خاص */
+    background-color: #fff3e0 !important; /* پس‌زمینه روشن */
+    position: relative;
+}
+
+.special-day-icon {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 10px;
+    height: 10px;
+    background-color: #ff9900;
+    border-radius: 50%;
+}
 .holiday-card {
     border: 2px solid #ef4444 !important; /* رنگ قرمز برای بورد */
     box-sizing: border-box;
