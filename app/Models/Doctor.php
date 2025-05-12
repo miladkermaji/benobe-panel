@@ -62,6 +62,7 @@ class Doctor extends Authenticatable
         'is_verified',
         'profile_completed',
         'status',
+        'average_rating',
         'api_token',
         'two_factor_secret',
         'two_factor_secret_enabled',

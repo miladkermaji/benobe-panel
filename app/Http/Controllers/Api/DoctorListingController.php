@@ -1,13 +1,14 @@
 <?php
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Appointment;
-use App\Models\Doctor;
 use Carbon\Carbon;
+use App\Models\Doctor;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Morilog\Jalali\Jalalian;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 
 class DoctorListingController extends Controller
 {
@@ -16,7 +17,7 @@ class DoctorListingController extends Controller
         try {
             // اعتبارسنجی ورودی‌ها
             $validated = $request->validate([
-                'province_id'                => 'nullable|integer|exists:zones,id',
+                'province_id'                => 'nullable|integer|exists:zone,id',
                 'specialty_id'               => 'nullable|integer|exists:specialties,id',
                 'sex'                        => 'nullable|in:male,female,both',
                 'has_available_appointments' => 'nullable|boolean',
@@ -271,7 +272,7 @@ class DoctorListingController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
-            \Log::error('GetDoctors - Error: ' . $e->getMessage(), [
+            Log::error('GetDoctors - Error: ' . $e->getMessage(), [
                 'request'   => $request->all(),
                 'exception' => $e->getTraceAsString(),
             ]);
