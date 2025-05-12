@@ -19,6 +19,10 @@ class ManualAppointment extends Model
         'appointment_time',
         'description',
         'status',
+        'payment_method',
+        'tracking_code',
+        'fee',
+        'final_price',
     ];
 
     public function user()

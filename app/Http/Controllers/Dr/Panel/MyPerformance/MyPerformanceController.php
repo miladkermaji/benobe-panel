@@ -287,32 +287,42 @@ class MyPerformanceController extends Controller
             ->get();
 
         // 6. درآمد کلی (از appointments و counseling_appointments)
+
+        // 6. درآمد کلی (از appointments، counseling_appointments، و manual_appointments)
         $totalIncome = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition)
-            ->where('payment_status', 'paid')
-            ->where('status', 'attended')
-            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
-                         COALESCE(SUM(final_price), 0) as total_income")
-            ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-            ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
-            ->union(
-                CounselingAppointment::where('doctor_id', $doctorId)
-                    ->where($clinicCondition)
-                    ->where('payment_status', 'paid')
-                    ->where('status', 'attended')
-                    ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
-                                 COALESCE(SUM(fee), 0) as total_income")
-                    ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-            )
-            ->get()
-            ->groupBy('month')
-            ->map(function ($group) {
-                return [
-                    'month' => $group->first()->month,
-                    'total_income' => $group->sum('total_income')
-                ];
-            })
-            ->values();
+        ->where($clinicCondition)
+        ->where('payment_status', 'paid')
+        ->where('status', 'attended')
+        ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+             COALESCE(SUM(final_price), 0) as total_income")
+        ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
+        ->union(
+            CounselingAppointment::where('doctor_id', $doctorId)
+                ->where($clinicCondition)
+                ->where('payment_status', 'paid')
+                ->where('status', 'attended')
+                ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+                     COALESCE(SUM(fee), 0) as total_income")
+                ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
+        )
+        ->union(
+            ManualAppointment::where('doctor_id', $doctorId)
+                ->where($clinicCondition)
+                ->where('status', 'confirmed') // معادل attended برای نوبت‌های دستی
+                ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+                     COALESCE(SUM(final_price), 0) as total_income")
+                ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
+        )
+        ->get()
+        ->groupBy('month')
+        ->map(function ($group) {
+            return [
+                'month' => $group->first()->month,
+                'total_income' => $group->sum('total_income')
+            ];
+        })
+        ->values();
+
 
         Log::info('نتایج بیماران جدید:', ['newPatients' => $newPatients]);
         Log::info('نتایج نوبت‌های مشاوره:', ['counselingAppointments' => $counselingAppointments]);
