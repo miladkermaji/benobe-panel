@@ -93,7 +93,6 @@ function loadCharts() {
       console.log('AJAX response:', response);
       $('#chart-container .loader').remove();
       setTimeout(() => {
-        // اگر داده‌ها کم باشن، داده‌های پیش‌فرض اضافه می‌کنیم
         const defaultData = [
           { month: 'ماه قبل', scheduled_count: 0, attended_count: 0, missed_count: 0, cancelled_count: 0, total_paid_income: 0, total_unpaid_income: 0, total_patients: 0 },
           { month: 'این ماه', scheduled_count: 0, attended_count: 0, missed_count: 0, cancelled_count: 0, total_paid_income: 0, total_unpaid_income: 0, total_patients: 0 }
@@ -138,14 +137,16 @@ function renderPerformanceChart(data) {
       labels: labels,
       datasets: [
         {
-          label: 'ویزیت شده',
+          label: 'برنامه‌ریزی‌شده',
           data: data.map(item => item.scheduled_count || 0),
-          borderColor: '#60a5fa',
-          backgroundColor: 'rgba(96, 165, 250, 0.2)',
+          borderColor: '#2e86c1',
+          backgroundColor: 'rgba(46, 134, 193, 0.2)',
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#2e86c1'
         },
         {
           label: 'انجام‌شده',
@@ -155,7 +156,9 @@ function renderPerformanceChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#34d399'
         },
         {
           label: 'غیبت',
@@ -165,7 +168,9 @@ function renderPerformanceChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#f87171'
         },
         {
           label: 'لغو‌شده',
@@ -175,7 +180,9 @@ function renderPerformanceChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#fbbf24'
         }
       ]
     },
@@ -190,8 +197,8 @@ function renderPerformanceChart(data) {
         x: {
           grid: { display: false },
           ticks: { font: { size: 10 }, maxRotation: 0, minRotation: 0 },
-          type: 'category', // اطمینان از نوع محور
-          labels: labels.length === 1 ? [labels[0], ''] : labels // افزودن برچسب خالی برای داده‌های تکی
+          type: 'category',
+          labels: labels.length === 1 ? [labels[0], ''] : labels
         }
       }
     }
@@ -222,7 +229,9 @@ function renderIncomeChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#10b981'
         },
         {
           label: 'پرداخت‌نشده',
@@ -232,7 +241,9 @@ function renderIncomeChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#ef4444'
         }
       ]
     },
@@ -279,7 +290,9 @@ function renderPatientChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#f59e0b'
         }
       ]
     },
@@ -319,14 +332,16 @@ function renderStatusChart(data) {
       labels: labels,
       datasets: [
         {
-          label: 'ویزیت شده',
+          label: 'برنامه‌ریزی‌شده',
           data: data.map(item => item.scheduled_count || 0),
-          borderColor: '#60a5fa',
-          backgroundColor: 'rgba(96, 165, 250, 0.2)',
+          borderColor: '#2e86c1',
+          backgroundColor: 'rgba(46, 134, 193, 0.2)',
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#2e86c1'
         },
         {
           label: 'انجام‌شده',
@@ -336,7 +351,9 @@ function renderStatusChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#34d399'
         },
         {
           label: 'غیبت',
@@ -346,7 +363,9 @@ function renderStatusChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#f87171'
         },
         {
           label: 'لغو‌شده',
@@ -356,7 +375,9 @@ function renderStatusChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#fbbf24'
         }
       ]
     },
@@ -396,14 +417,16 @@ function renderStatusPieChart(data) {
       labels: labels,
       datasets: [
         {
-          label: 'ویزیت شده',
+          label: 'برنامه‌ریزی‌شده',
           data: data.map(item => item.scheduled_count || 0),
-          borderColor: '#60a5fa',
-          backgroundColor: 'rgba(96, 165, 250, 0.2)',
+          borderColor: '#2e86c1',
+          backgroundColor: 'rgba(46, 134, 193, 0.2)',
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#2e86c1'
         },
         {
           label: 'انجام‌شده',
@@ -413,7 +436,9 @@ function renderStatusPieChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#34d399'
         },
         {
           label: 'غیبت',
@@ -423,7 +448,9 @@ function renderStatusPieChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#f87171'
         },
         {
           label: 'لغو‌شده',
@@ -433,7 +460,9 @@ function renderStatusPieChart(data) {
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#fbbf24'
         }
       ]
     },
@@ -475,12 +504,14 @@ function renderPatientTrendChart(data) {
         {
           label: 'بیماران جدید',
           data: data.map(item => item.total_patients || 0),
-          borderColor: '#f97316',
-          backgroundColor: 'rgba(249, 115, 22, 0.2)',
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.2)',
           fill: true,
           tension: 0.4,
           pointRadius: 4,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#f59e0b'
         }
       ]
     },
@@ -511,23 +542,33 @@ const commonOptions = {
     legend: {
       position: 'top',
       labels: {
-        font: { family: 'IRANSans', size: 11, weight: '500' },
-        padding: 10,
-        color: '#2d3748'
+        font: { family: 'IRANSans', size: 12, weight: '500' },
+        padding: 12,
+        color: '#1e293b',
+        boxWidth: 12,
+        usePointStyle: true
       }
     },
     tooltip: {
       enabled: true,
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      titleFont: { family: 'IRANSans', size: 12 },
-      bodyFont: { family: 'IRANSans', size: 10 },
-      padding: 8,
-      cornerRadius: 6
+      backgroundColor: 'rgba(30, 41, 59, 0.9)',
+      titleFont: { family: 'IRANSans', size: 13 },
+      bodyFont: { family: 'IRANSans', size: 11 },
+      padding: 10,
+      cornerRadius: 8,
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+      borderWidth: 1
     }
   },
   animation: {
-    duration: 1000,
-    easing: 'easeOutQuart'
+    duration: 1200,
+    easing: 'easeOutQuart',
+    delay: 200
+  },
+  hover: {
+    mode: 'nearest',
+    intersect: true,
+    animationDuration: 400
   }
 };
 
