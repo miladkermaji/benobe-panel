@@ -109,6 +109,9 @@ class AppointmentsList extends Component
 
     public function mount()
     {
+
+        $this->pagination['per_page'] = 100;
+
         // مقدار پیش‌فرض تاریخ امروز
         $this->selectedDate = Carbon::now()->format('Y-m-d');
 
@@ -130,7 +133,7 @@ class AppointmentsList extends Component
                     $this->selectedDate = Carbon::parse($decodedDate)->format('Y-m-d');
                 }
             } catch (\Exception $e) {
-               
+
             }
         }
 
@@ -333,10 +336,12 @@ class AppointmentsList extends Component
         if (!$doctor) {
             return [];
         }
+
         $gregorianDate = $this->convertToGregorian($this->selectedDate);
         $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
             ->withTrashed()
             ->where('doctor_id', $doctor->id);
+
         if ($this->dateFilter) {
             $today = Carbon::today();
             if ($this->dateFilter === 'current_week') {
@@ -355,17 +360,21 @@ class AppointmentsList extends Component
         } elseif ($this->filterStatus !== 'all' && !$this->isSearchingAllDates) {
             $query->whereDate('appointment_date', $gregorianDate);
         }
+
         if ($this->selectedClinicId === 'default') {
             $query->whereNull('clinic_id');
         } elseif ($this->selectedClinicId) {
             $query->where('clinic_id', $this->selectedClinicId);
         }
+
         if ($this->filterStatus && $this->filterStatus !== 'all') {
             $query->where('status', $this->filterStatus);
         }
+
         if ($this->attendanceStatus) {
             $query->where('attendance_status', $this->attendanceStatus);
         }
+
         if ($this->searchQuery) {
             $query->whereHas('patient', function ($q) {
                 $q->where('first_name', 'like', "%{$this->searchQuery}%")
@@ -375,20 +384,23 @@ class AppointmentsList extends Component
                     ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
             });
         }
-        $appointments = $query->orderBy('appointment_date', 'desc')->paginate($this->pagination['per_page']);
+
+        $appointments = $query->orderBy('appointment_date', 'desc')->paginate($this->pagination['per_page'], ['*'], 'page', $this->pagination['current_page']);
+
         $jalaliDate = Jalalian::fromCarbon(Carbon::parse($gregorianDate));
-        $appointmentData = $this->getAppointmentsInMonth(
-            $jalaliDate->getYear(),
-            $jalaliDate->getMonth()
-        );
-        $this->appointments = $appointments->items();
+        $appointmentData = $this->getAppointmentsInMonth($jalaliDate->getYear(), $jalaliDate->getMonth());
+
+        // ادغام نوبت‌ها برای Lazy Loading
+        $this->appointments = array_merge($this->appointments, $appointments->items());
         $this->pagination = [
             'current_page' => $appointments->currentPage(),
             'last_page' => $appointments->lastPage(),
             'per_page' => $appointments->perPage(),
             'total' => $appointments->total(),
         ];
+
         $this->dispatch('setAppointments', ['appointments' => $appointmentData]);
+
         if (empty($this->appointments) && $this->searchQuery) {
             if ($this->isSearchingAllDates) {
                 $this->dispatch('no-results-found', ['date' => $jalaliDate->format('Y/m/d'), 'searchAll' => true]);
@@ -400,6 +412,7 @@ class AppointmentsList extends Component
             $this->showNoResultsAlert = false;
             $this->dispatch('hide-no-results-alert');
         }
+
         return $appointmentData;
     }
 
@@ -426,7 +439,7 @@ class AppointmentsList extends Component
                 $gregorian = Jalalian::fromFormat('Y-m-d', $decodedDate)->toCarbon()->format('Y-m-d');
                 return $gregorian;
             } catch (\Exception $e) {
-              
+
                 $this->dispatch('show-toastr', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
                 return Carbon::now()->format('Y-m-d');
             }
@@ -435,7 +448,7 @@ class AppointmentsList extends Component
                 $gregorian = Jalalian::fromFormat('Y/m/d', $decodedDate)->toCarbon()->format('Y-m-d');
                 return $gregorian;
             } catch (\Exception $e) {
-                
+
                 $this->dispatch('show-toastr', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
                 return Carbon::now()->format('Y-m-d');
             }
@@ -912,7 +925,7 @@ class AppointmentsList extends Component
 
     public function updatedIsFree()
     {
-       
+
         if ($this->isFree) {
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
@@ -930,15 +943,15 @@ class AppointmentsList extends Component
 
     public function calculateFinalPrice()
     {
-      
-    
+
+
         if ($this->isFree) {
             $this->finalPrice = 0;
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
         } else {
             $basePrice = $this->getBasePrice();
-    
+
             if (empty($this->selectedServiceIds)) {
                 $this->finalPrice = 0;
                 $this->discountPercentage = 0;
@@ -948,7 +961,7 @@ class AppointmentsList extends Component
                 $discountPercentage = is_numeric($this->discountPercentage)
                     ? floatval($this->discountPercentage)
                     : floatval(str_replace('%', '', $this->discountPercentage));
-    
+
                 if ($discountPercentage > 0) {
                     $this->discountAmount = round(($basePrice * $discountPercentage) / 100, 2); // رند به 2 رقم اعشار
                     $this->discountPercentage = round($discountPercentage, 2); // رند درصد
@@ -960,11 +973,11 @@ class AppointmentsList extends Component
                     $this->discountPercentage = 0;
                     $this->discountAmount = 0;
                 }
-    
+
                 $this->finalPrice = round(max(0, $basePrice - $this->discountAmount), 0); // رند قیمت نهایی به عدد صحیح
             }
         }
-    
+
         $this->dispatch('final-price-updated');
     }
 
@@ -1016,14 +1029,14 @@ class AppointmentsList extends Component
 
     public function applyDiscount()
     {
-       
-    
+
+
         if (!$this->isFree) {
             // تبدیل و رند کردن discountInputPercentage
             $this->discountPercentage = is_numeric($this->discountInputPercentage)
                 ? round(floatval($this->discountInputPercentage), 2)
                 : round(floatval(str_replace('%', '', $this->discountInputPercentage)), 2);
-    
+
             // تبدیل و رند کردن discountInputAmount
             $this->discountAmount = round(floatval($this->discountInputAmount), 2);
             $this->calculateFinalPrice();
@@ -1032,7 +1045,7 @@ class AppointmentsList extends Component
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
         }
-    
+
         $this->dispatch('discount-applied', ['percentage' => $this->discountPercentage]);
         $this->dispatch('final-price-updated');
         $this->dispatch('close-modal', ['id' => 'discount-modal']);
@@ -1114,7 +1127,7 @@ class AppointmentsList extends Component
 
     public function updatedDiscountPercentage($value)
     {
-        
+
 
         // حذف علامت درصد و تبدیل به عدد
         $discountPercentage = is_numeric($value)
@@ -1137,21 +1150,21 @@ class AppointmentsList extends Component
 
     public function updatedDiscountAmount($value)
     {
-      
-    
+
+
         // تبدیل مقدار ورودی به عدد و رند کردن
         $discountAmount = is_numeric($value) ? floatval($value) : 0;
         $basePrice = $this->getBasePrice();
-    
+
         if ($discountAmount > $basePrice) {
             $discountAmount = $basePrice;
         } elseif ($discountAmount < 0) {
             $discountAmount = 0;
         }
-    
+
         $this->discountAmount = round($discountAmount, 2); // رند مبلغ تخفیف
         $this->discountInputAmount = $this->discountAmount;
-    
+
         // محاسبه و رند کردن درصد
         if ($basePrice > 0) {
             $this->discountPercentage = round(($this->discountAmount / $basePrice) * 100, 2); // رند به 2 رقم اعشار
@@ -1160,7 +1173,7 @@ class AppointmentsList extends Component
             $this->discountPercentage = 0;
             $this->discountInputPercentage = 0;
         }
-    
+
         $this->calculateFinalPrice();
     }
 

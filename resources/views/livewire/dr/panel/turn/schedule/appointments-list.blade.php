@@ -74,7 +74,10 @@
         </div>
       </div>
       <div class="appointments-container">
-        <div class="table-responsive position-relative  w-100 d-none d-md-block">
+        <div class="loading-overlay" wire:loading wire:loading.class="show">
+          <div class="spinner"></div>
+        </div>
+        <div class="table-responsive position-relative w-100 d-none d-md-block">
           <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
             <thead class="bg-light">
               <tr>
@@ -82,12 +85,10 @@
                 <th scope="col" class="px-6 py-3 fw-bolder">نام بیمار</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">شماره‌ موبایل</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">کد ملی</th>
-                <th scope="col" class="px-6 py-3 fw-bolder">تاریخ نوبت</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">زمان نوبت</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">وضعیت نوبت</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">بیعانه</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">وضعیت پرداخت</th>
-                <th scope="col" class="px-6 py-3 fw-bolder">نوع پرداخت</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">بیمه</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">قیمت نهایی</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">پایان ویزیت</th>
@@ -98,19 +99,17 @@
               @if (count($appointments) > 0)
                 @foreach ($appointments as $appointment)
                   <tr>
-                    <td>
-                      <input type="checkbox" class="appointment-checkbox form-check-input"
+                    <td><input type="checkbox" class="appointment-checkbox form-check-input"
                         value="{{ $appointment->id }}" data-status="{{ $appointment->status }}"
                         data-mobile="{{ $appointment->patient->mobile ?? '' }}"
-                        wire:model="cancelIds.{{ $appointment->id }}">
-                    </td>
+                        wire:model="cancelIds.{{ $appointment->id }}"></td>
                     <td class="fw-bold">
                       {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
                     </td>
                     <td>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</td>
                     <td>{{ $appointment->patient ? $appointment->patient->national_code : '-' }}</td>
-                    <td>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}</td>
-                    <td>{{ $appointment->appointment_time->format('H:i') ?? '-' }}</td>
+                    <td>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
+                      {{ $appointment->appointment_time->format('H:i') ?? '-' }}</td>
                     <td>
                       @php
                         $statusLabels = [
@@ -125,9 +124,7 @@
                       @endphp
                       <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
                     </td>
-                    <td>
-                      {{ $appointment->fee ? $appointment->fee . ' ' . 'تومان' : '---' }}
-                    </td>
+                    <td>{{ $appointment->fee ? $appointment->fee . ' ' . 'تومان' : '---' }}</td>
                     <td>
                       @php
                         $paymentStatusLabels = [
@@ -140,12 +137,6 @@
                             'label' => 'نامشخص',
                             'class' => 'text-muted',
                         ];
-                      @endphp
-                      <span
-                        class="{{ $paymentStatusInfo['class'] }} fw-bold">{{ $paymentStatusInfo['label'] }}</span>
-                    </td>
-                    <td>
-                      @php
                         $paymentMethodLabels = [
                             'online' => 'آنلاین',
                             'cash' => 'نقدی',
@@ -154,7 +145,12 @@
                         ];
                         $paymentMethod = $appointment->payment_method ?? 'online';
                       @endphp
-                      {{ $paymentMethodLabels[$paymentMethod] ?? '-' }}
+                      <span class="{{ $paymentStatusInfo['class'] }} fw-bold">
+                        {{ $paymentStatusInfo['label'] }}
+                        @if ($paymentStatus === 'paid')
+                          ({{ $paymentMethodLabels[$paymentMethod] ?? '-' }})
+                        @endif
+                      </span>
                     </td>
                     <td>{{ $appointment->insurance ? $appointment->insurance->name : '-' }}</td>
                     <td>{{ $appointment->final_price ? number_format($appointment->final_price) . ' تومان' : '-' }}
@@ -162,9 +158,8 @@
                     <td>
                       @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
                         <button class="btn btn-sm btn-primary-sm shadow-sm end-visit-btn" x-data
-                          @click="$dispatch('open-modal', { name: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">
-                          پایان ویزیت
-                        </button>
+                          @click="$dispatch('open-modal', { name: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">پایان
+                          ویزیت</button>
                       @else
                         -
                       @endif
@@ -197,7 +192,7 @@
                 @endforeach
               @else
                 <tr>
-                  <td colspan="13" class="text-center">
+                  <td colspan="12" class="text-center">
                     @if ($isSearchingAllDates && $searchQuery)
                       نتیجه‌ای یافت نشد
                     @else
@@ -222,14 +217,13 @@
                     wire:model="cancelIds.{{ $appointment->id }}">
                   <span
                     class="fw-bold">{{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}</span>
-                  <button class="toggle-details">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  <button class="toggle-details" type="button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                       xmlns="http://www.w3.org/2000/svg">
                       <path d="M6 9l6 6 6-6" stroke="#4a5568" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" />
                     </svg>
                   </button>
-
                 </div>
                 <div class="card-body">
                   <div class="card-item">
@@ -237,12 +231,9 @@
                     <span>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</span>
                   </div>
                   <div class="card-item">
-                    <span class="label">تاریخ نوبت:</span>
-                    <span>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}</span>
-                  </div>
-                  <div class="card-item">
                     <span class="label">زمان نوبت:</span>
-                    <span>{{ $appointment->appointment_time->format('H:i') ?? '-' }}</span>
+                    <span>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
+                      {{ $appointment->appointment_time->format('H:i') ?? '-' }}</span>
                   </div>
                   <div class="card-item">
                     <span class="label">وضعیت نوبت:</span>
@@ -269,12 +260,14 @@
                           'label' => 'نامشخص',
                           'class' => 'text-muted',
                       ];
+                      $paymentMethod = $appointment->payment_method ?? 'online';
                     @endphp
-                    <span class="{{ $paymentStatusInfo['class'] }} fw-bold">{{ $paymentStatusInfo['label'] }}</span>
-                  </div>
-                  <div class="card-item d-none details">
-                    <span class="label">نوع پرداخت:</span>
-                    <span>{{ $paymentMethodLabels[$appointment->payment_method ?? 'online'] ?? '-' }}</span>
+                    <span class="{{ $paymentStatusInfo['class'] }} fw-bold">
+                      {{ $paymentStatusInfo['label'] }}
+                      @if ($appointment->payment_status === 'paid')
+                        ({{ $paymentMethodLabels[$paymentMethod] ?? '-' }})
+                      @endif
+                    </span>
                   </div>
                   <div class="card-item d-none details">
                     <span class="label">بیمه:</span>
@@ -288,9 +281,8 @@
                     <span class="label">پایان ویزیت:</span>
                     @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
                       <button class="btn btn-sm btn-primary shadow-sm end-visit-btn" x-data
-                        @click="$dispatch('open-modal', { name: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">
-                        پایان ویزیت
-                      </button>
+                        @click="$dispatch('open-modal', { name: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">پایان
+                        ویزیت</button>
                     @else
                       <span>-</span>
                     @endif
@@ -334,43 +326,7 @@
 
 
     </div>
-    <div class="pagination-container mt-3 d-flex justify-content-center">
-      <nav aria-label="Page navigation">
-        <ul class="pagination" id="pagination-links">
-          @if ($pagination['current_page'] > 1)
-            <li class="page-item">
-              <a class="page-link" href="#" wire:click="previousPage" wire:loading.attr="disabled">قبلی</a>
-            </li>
-          @else
-            <li class="page-item disabled">
-              <span class="page-link">قبلی</span>
-            </li>
-          @endif
-          @php
-            $startPage = max(1, $pagination['current_page'] - 2);
-            $endPage = min($pagination['last_page'], $pagination['current_page'] + 2);
-          @endphp
-          @for ($i = $startPage; $i <= $endPage; $i++)
-            <li class="page-item {{ $pagination['current_page'] == $i ? 'active' : '' }}">
-              <a class="page-link" href="#" wire:click="gotoPage({{ $i }})"
-                wire:loading.attr="disabled">{{ $i }}</a>
-            </li>
-          @endfor
-          @if ($pagination['current_page'] < $pagination['last_page'])
-            <li class="page-item">
-              <a class="page-link" href="#" wire:click="nextPage" wire:loading.attr="disabled">بعدی</a>
-            </li>
-          @else
-            <li class="page-item disabled">
-              <span class="page-link">بعدی</span>
-            </li>
-          @endif
-        </ul>
-      </nav>
-    </div>
 
-    <!-- مودال‌ها -->
-    <!-- مودال‌ها -->
     <div wire:ignore>
       <x-modal name="mini-calendar-modal" title="انتخاب تاریخ" size="sm">
         <x-slot:body>
@@ -605,21 +561,16 @@
 
     <script>
       const toggleButtons = document.querySelectorAll('.appointment-card .toggle-details');
-
       toggleButtons.forEach(button => {
         button.addEventListener('click', () => {
-
-          console.log('Toggle button clicked');
           const card = button.closest('.appointment-card');
           if (!card) {
             console.error('No appointment card found');
             return;
           }
-
           const details = card.querySelectorAll('.card-item.details');
           const isExpanded = card.classList.contains('expanded');
           const toggleIcon = button.querySelector('svg');
-
           if (isExpanded) {
             details.forEach(item => item.classList.add('d-none'));
             card.classList.remove('expanded');
@@ -629,6 +580,25 @@
             card.classList.add('expanded');
             toggleIcon.style.transform = 'rotate(180deg)';
           }
+        });
+        // پشتیبانی از دستگاه‌های لمسی
+        button.addEventListener('touchstart', () => {
+          const card = button.closest('.appointment-card');
+          if (!card) return;
+          const details = card.querySelectorAll('.card-item.details');
+          const isExpanded = card.classList.contains('expanded');
+          const toggleIcon = button.querySelector('svg');
+          if (isExpanded) {
+            details.forEach(item => item.classList.add('d-none'));
+            card.classList.remove('expanded');
+            toggleIcon.style.transform = 'rotate(0deg)';
+          } else {
+            details.forEach(item => item.classList.remove('d-none'));
+            card.classList.add('expanded');
+            toggleIcon.style.transform = 'rotate(180deg)';
+          }
+        }, {
+          passive: true
         });
       });
       window.holidaysData = @json($holidaysData);
@@ -1130,9 +1100,23 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-          checkCheckboxes();
+          const loadMoreTrigger = document.createElement('div');
+          loadMoreTrigger.id = 'load-more-trigger';
+          loadMoreTrigger.style.height = '1px';
+          document.querySelector('.appointments-container').appendChild(loadMoreTrigger);
 
-          // انتخاب همه دکمه‌های دراپ اپشن
+          const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && @this.pagination.current_page < @this.pagination.last_page) {
+              @this.nextPage();
+            }
+          }, {
+            threshold: 0.1
+          });
+
+          observer.observe(loadMoreTrigger);
+
+          // به‌روزرسانی چک‌باکس‌ها
+          checkCheckboxes();
 
         });
 
@@ -1154,5 +1138,6 @@
 
 
       });
+      // Lazy Loading با IntersectionObserver
     </script>
   </div>

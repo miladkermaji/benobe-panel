@@ -9,7 +9,11 @@
     --text-secondary: #64748b;
     --border-neutral: #e2e8f0;
     --shadow: rgba(0, 0, 0, 0.1);
-    --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
     --radius-button: 0.375rem;
     --radius-card: 0.5rem;
     --success: #10b981;
@@ -126,7 +130,8 @@
     transform: translateY(-50%);
     width: 20px;
     height: 20px;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%2364748b"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>') no-repeat center;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%2364748b"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>')
+        no-repeat center;
     background-size: contain;
 }
 
@@ -145,6 +150,7 @@
     flex: 1;
     min-width: 120px;
 }
+
 .btn-primary {
     background: var(--gradient-primary);
     border: none;
@@ -157,10 +163,11 @@
     white-space: nowrap;
     height: 48px;
 }
+
 .btn-primary-sm {
     background: var(--gradient-primary);
     border: none;
-    padding: 0 .2rem;
+    padding: 0 0.2rem;
     border-radius: var(--radius-button);
     font-size: 0.475rem;
     font-weight: 500;
@@ -173,6 +180,7 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 8px var(--shadow);
 }
+
 .btn-primary:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 8px var(--shadow);
@@ -242,7 +250,9 @@
 }
 
 /* Bottom action buttons */
-#cancel-appointments-btn, #move-appointments-btn, #block-users-btn {
+#cancel-appointments-btn,
+#move-appointments-btn,
+#block-users-btn {
     background: var(--background-card);
     border: 1px solid var(--border-neutral);
     padding: 0.5rem 1rem;
@@ -256,18 +266,24 @@
     transition: all 0.2s ease;
 }
 
-#cancel-appointments-btn:hover, #move-appointments-btn:hover, #block-users-btn:hover {
+#cancel-appointments-btn:hover,
+#move-appointments-btn:hover,
+#block-users-btn:hover {
     background: var(--primary);
     color: var(--background-card);
     border-color: var(--primary);
 }
 
-#cancel-appointments-btn:disabled, #move-appointments-btn:disabled, #block-users-btn:disabled {
+#cancel-appointments-btn:disabled,
+#move-appointments-btn:disabled,
+#block-users-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-#cancel-appointments-btn img, #move-appointments-btn img, #block-users-btn img {
+#cancel-appointments-btn img,
+#move-appointments-btn img,
+#block-users-btn img {
     width: 20px;
     height: 20px;
 }
@@ -311,7 +327,7 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-primary);
-    padding: 1rem;
+    padding: 0.75rem;
     border-bottom: 1px solid var(--border-neutral);
     text-align: center;
 }
@@ -326,7 +342,7 @@
 
 .table td {
     font-size: 0.875rem;
-    padding: 1rem;
+    padding: 0.75rem;
     vertical-align: middle;
     border-bottom: 1px solid var(--border-neutral);
     text-align: center;
@@ -339,14 +355,14 @@
 
 /* Card styling for mobile */
 .appointments-cards {
-    padding: 0.75rem;
+    padding: 0.5rem;
 }
 
 .appointment-card {
     background: var(--background-card);
     border: 1px solid var(--border-neutral);
     border-radius: var(--radius-card);
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     box-shadow: 0 2px 6px var(--shadow);
     transition: all 0.2s ease;
 }
@@ -359,14 +375,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 0.75rem;
     background: var(--background-light);
     border-bottom: 1px solid var(--border-neutral);
     cursor: pointer;
 }
 
 .appointment-card .card-header .fw-bold {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: var(--text-primary);
 }
 
@@ -379,8 +395,8 @@
 }
 
 .appointment-card .card-header .toggle-details svg {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     transition: transform 0.3s ease-in-out;
 }
 
@@ -389,23 +405,23 @@
 }
 
 .appointment-card .card-body {
-    padding: 1rem;
+    padding: 0.75rem;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .appointment-card .card-item {
     display: flex;
     justify-content: space-between;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: var(--text-primary);
 }
 
 .appointment-card .card-item .label {
     font-weight: 600;
     color: var(--text-secondary);
-    min-width: 100px;
+    min-width: 80px;
 }
 
 .appointment-card .card-item.d-none {
@@ -420,18 +436,36 @@
 .appointment-card .card-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 0.75rem;
-    padding-top: 0.75rem;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
     border-top: 1px solid var(--border-neutral);
 }
 
 /* Status and payment labels */
-.text-primary-link { color: var(--primary) !important; }
-.text-primary { color: var(--primary) !important; background-color: rgba(37, 99, 235, 0.1); }
-.text-success { color: var(--success) !important; background-color: rgba(16, 185, 129, 0.1); }
-.text-danger { color: var(--danger) !important; background-color: rgba(239, 68, 68, 0.1); }
-.text-warning { color: var(--warning) !important; background-color: rgba(245, 158, 11, 0.1); }
-.text-secondary, .text-muted { color: var(--text-secondary) !important; background-color: rgba(100, 116, 139, 0.1); }
+.text-primary-link {
+    color: var(--primary) !important;
+}
+.text-primary {
+    color: var(--primary) !important;
+    background-color: rgba(37, 99, 235, 0.1);
+}
+.text-success {
+    color: var(--success) !important;
+    background-color: rgba(16, 185, 129, 0.1);
+}
+.text-danger {
+    color: var(--danger) !important;
+    background-color: rgba(239, 68, 68, 0.1);
+}
+.text-warning {
+    color: var(--warning) !important;
+    background-color: rgba(245, 158, 11, 0.1);
+}
+.text-secondary,
+.text-muted {
+    color: var(--text-secondary) !important;
+    background-color: rgba(100, 116, 139, 0.1);
+}
 
 .table td .text-primary,
 .table td .text-success,
@@ -471,9 +505,11 @@
 }
 
 /* Action buttons */
-.reschedule-btn, .cancel-btn, .block-btn {
-    width: 36px;
-    height: 36px;
+.reschedule-btn,
+.cancel-btn,
+.block-btn {
+    width: 32px;
+    height: 32px;
     padding: 0;
     display: flex;
     align-items: center;
@@ -484,27 +520,32 @@
     transition: all 0.2s ease;
 }
 
-.reschedule-btn:hover, .cancel-btn:hover, .block-btn:hover {
+.reschedule-btn:hover,
+.cancel-btn:hover,
+.block-btn:hover {
     background: var(--primary);
     border-color: var(--primary);
     transform: scale(1.1);
 }
 
-.reschedule-btn:disabled, .cancel-btn:disabled {
+.reschedule-btn:disabled,
+.cancel-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.reschedule-btn img, .cancel-btn img, .block-btn img {
-    width: 20px;
-    height: 20px;
+.reschedule-btn img,
+.cancel-btn img,
+.block-btn img {
+    width: 16px;
+    height: 16px;
 }
 
 .end-visit-btn {
     background: var(--primary);
     border: none;
     border-radius: var(--radius-button);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 500;
     color: var(--background-card);
     padding: 0.5rem 1rem;
@@ -516,38 +557,44 @@
     transform: translateY(-1px);
 }
 
-/* Pagination */
-
-
-.pagination {
+/* Loading Overlay */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
     display: flex;
-    gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.page-item .page-link {
-    background: var(--background-card);
-    border: 1px solid var(--border-neutral);
-    border-radius: var(--radius-button);
-    color: var(--text-primary);
-    font-size: 0.875rem;
-    padding: 0.5rem 1rem;
-    transition: all 0.2s ease;
+.loading-overlay.show {
+    opacity: 1;
+    visibility: visible;
 }
 
-.page-item.active .page-link {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: var(--background-card);
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--primary-light);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-.page-item .page-link:hover {
-    background: var(--primary-light);
-    color: var(--background-card);
-}
-
-.page-item.disabled .page-link {
-    opacity: 0.5;
-    cursor: not-allowed;
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Modal styling */
@@ -570,7 +617,8 @@
 }
 
 /* Form inputs in modals */
-.form-control, .form-control-sm {
+.form-control,
+.form-control-sm {
     height: 48px;
     font-size: 0.875rem;
     padding: 0.75rem;
@@ -639,14 +687,26 @@ textarea.form-control {
 
 /* Animation for dropdown */
 @keyframes slideDown {
-    0% { opacity: 0; transform: translateY(-10px); }
-    100% { opacity: 1; transform: translateY(0); }
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Animation for card details */
 @keyframes slideIn {
-    0% { opacity: 0; transform: translateY(-10px); }
-    100% { opacity: 1; transform: translateY(0); }
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Responsive adjustments */
@@ -661,7 +721,9 @@ textarea.form-control {
         gap: 0.5rem;
     }
 
-    .selectDate_datepicker__xkZeS, .my-btn-primary, .my-form-control {
+    .selectDate_datepicker__xkZeS,
+    .my-btn-primary,
+    .my-form-control {
         height: 44px;
         font-size: 0.875rem;
         min-width: unset;
@@ -678,7 +740,9 @@ textarea.form-control {
         gap: 0.5rem;
     }
 
-    #cancel-appointments-btn, #move-appointments-btn, #block-users-btn {
+    #cancel-appointments-btn,
+    #move-appointments-btn,
+    #block-users-btn {
         padding: 0.5rem;
         font-size: 0.75rem;
     }
@@ -700,7 +764,7 @@ textarea.form-control {
     }
 
     .appointment-card .card-body {
-        padding: 0.75rem;
+        padding: 0.5rem;
     }
 
     .appointment-card .card-item {
@@ -711,22 +775,24 @@ textarea.form-control {
         min-width: 80px;
     }
 
-    .reschedule-btn, .cancel-btn, .block-btn {
-        width: 32px;
-        height: 32px;
+    .reschedule-btn,
+    .cancel-btn,
+    .block-btn {
+        width: 28px;
+        height: 28px;
     }
 
-    .reschedule-btn img, .cancel-btn img, .block-btn img {
-        width: 16px;
-        height: 16px;
+    .reschedule-btn img,
+    .cancel-btn img,
+    .block-btn img {
+        width: 14px;
+        height: 14px;
     }
 
     .end-visit-btn {
         font-size: 0.75rem;
         padding: 0.5rem 0.75rem;
     }
-
-   
 }
 
 @media (max-width: 425px) {
@@ -742,7 +808,9 @@ textarea.form-control {
         gap: 0.5rem;
     }
 
-    .selectDate_datepicker__xkZeS, .my-btn-primary, .my-form-control {
+    .selectDate_datepicker__xkZeS,
+    .my-btn-primary,
+    .my-form-control {
         height: 40px;
         font-size: 0.75rem;
         max-width: 100%;
@@ -764,12 +832,16 @@ textarea.form-control {
         min-width: 70px;
     }
 
-    .reschedule-btn, .cancel-btn, .block-btn {
+    .reschedule-btn,
+    .cancel-btn,
+    .block-btn {
         width: 28px;
         height: 28px;
     }
 
-    .reschedule-btn img, .cancel-btn img, .block-btn img {
+    .reschedule-btn img,
+    .cancel-btn img,
+    .block-btn img {
         width: 14px;
         height: 14px;
     }
@@ -781,15 +853,6 @@ textarea.form-control {
 
     .nobat-option {
         gap: 0.5rem;
-    }
-
-    .pagination-container {
-        padding: 0.5rem;
-    }
-
-    .page-item .page-link {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.75rem;
     }
 
     .table-responsive {
