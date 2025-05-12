@@ -117,10 +117,10 @@ class AppointmentsList extends Component
             'last_page' => 1,
             'total' => 0,
         ];
-    
+
         // مقدار پیش‌فرض تاریخ امروز
         $this->selectedDate = Carbon::now()->format('Y-m-d');
-    
+
         // خواندن selected_date از URL و دی‌کد کردن آن
         $selectedDateFromUrl = request()->query('selected_date');
         if ($selectedDateFromUrl) {
@@ -143,15 +143,15 @@ class AppointmentsList extends Component
                 $this->dispatch('show-toastr', type: 'error', message: 'فرمت تاریخ انتخاب‌شده نامعتبر است.');
             }
         }
-    
+
         // ذخیره URL بازگشت
         $this->redirectBack = urldecode(request()->query('redirect_back', url()->previous()));
-    
+
         // تنظیم تاریخ‌های پیش‌فرض برای مسدودیت
         $this->blockedAt = Jalalian::now()->format('Y-m-d');
         $this->calendarYear = Jalalian::now()->getYear();
         $this->calendarMonth = Jalalian::now()->getMonth();
-    
+
         // لود داده‌های اولیه
         $doctor = $this->getAuthenticatedDoctor();
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
@@ -347,16 +347,18 @@ class AppointmentsList extends Component
         if (!$doctor) {
             return [];
         }
-    
+
         // کلید کش با توجه به فیلترها
-        $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
-    
+
+        $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
+
+
         // لود از کش یا دیتابیس
-        $appointments = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($doctor) {
+        $appointments = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($doctor) {
             $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
                 ->withTrashed()
                 ->where('doctor_id', $doctor->id);
-    
+
             // اعمال فیلترهای زمانی
             if ($this->dateFilter) {
                 $today = Carbon::today();
@@ -378,24 +380,24 @@ class AppointmentsList extends Component
                 $gregorianDate = $this->convertToGregorian($this->selectedDate);
                 $query->whereDate('appointment_date', $gregorianDate);
             }
-    
+
             // اعمال فیلتر کلینیک
             if ($this->selectedClinicId === 'default') {
                 $query->whereNull('clinic_id');
             } elseif ($this->selectedClinicId) {
                 $query->where('clinic_id', $this->selectedClinicId);
             }
-    
+
             // اعمال فیلتر وضعیت (فقط اگر صراحتاً تنظیم شده باشد)
             if ($this->filterStatus && $this->filterStatus !== 'all') {
                 $query->where('status', $this->filterStatus);
             }
-    
+
             // اعمال فیلتر وضعیت حضور
             if ($this->attendanceStatus) {
                 $query->where('attendance_status', $this->attendanceStatus);
             }
-    
+
             // اعمال جستجو
             if ($this->searchQuery) {
                 $query->whereHas('patient', function ($q) {
@@ -406,19 +408,19 @@ class AppointmentsList extends Component
                         ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
                 });
             }
-    
+
             // اطمینان از وجود per_page
             $perPage = $this->pagination['per_page'] ?? 100;
-    
+
             return $query->orderBy('appointment_date', 'desc')
                         ->orderBy('appointment_time', 'desc')
                         ->paginate($perPage, ['*'], 'page', $this->pagination['current_page']);
         });
-    
+
         // لود داده‌های تقویم برای ماه جاری
         $jalaliDate = Jalalian::fromCarbon(Carbon::today());
         $appointmentData = $this->getAppointmentsInMonth($jalaliDate->getYear(), $jalaliDate->getMonth());
-    
+
         $this->appointments = $appointments->items();
         $this->pagination = [
             'current_page' => $appointments->currentPage(),
@@ -426,9 +428,9 @@ class AppointmentsList extends Component
             'per_page' => $appointments->perPage(), // اصلاح: استفاده از per_page به جای peracrossPage
             'total' => $appointments->total(),
         ];
-    
+
         $this->dispatch('setAppointments', ['appointments' => $appointmentData]);
-    
+
         // بررسی عدم وجود نتیجه برای نمایش هشدار
         if (empty($this->appointments) && $this->searchQuery) {
             if ($this->isSearchingAllDates) {
@@ -441,7 +443,7 @@ class AppointmentsList extends Component
             $this->showNoResultsAlert = false;
             $this->dispatch('hide-no-results-alert');
         }
-    
+
         return $appointmentData;
     }
 
@@ -903,7 +905,7 @@ class AppointmentsList extends Component
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $cacheKey = "insurances_doctor_{$doctorId}_clinic_{$this->selectedClinicId}";
 
-        $this->insurances = Cache::remember($cacheKey, now()->addHours(1), function () use ($doctorId) {
+        $this->insurances = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctorId) {
             return DoctorService::where('doctor_id', $doctorId)
                 ->where('clinic_id', $this->selectedClinicId === 'default' ? null : $this->selectedClinicId)
                 ->with('insurance')
@@ -933,11 +935,11 @@ class AppointmentsList extends Component
             $this->dispatch('services-updated');
             return;
         }
-    
+
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $cacheKey = "services_doctor_{$doctorId}_clinic_{$this->selectedClinicId}_insurance_{$this->selectedInsuranceId}";
-    
-        $this->services = Cache::remember($cacheKey, now()->addHours(1), function () use ($doctorId) {
+
+        $this->services = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctorId) {
             $query = DoctorService::where('doctor_id', $doctorId)
                 ->where('insurance_id', $this->selectedInsuranceId);
             if ($this->selectedClinicId === 'default') {
@@ -947,7 +949,7 @@ class AppointmentsList extends Component
             }
             return $query->get()->toArray();
         });
-    
+
         $this->dispatch('services-updated');
     }
 
@@ -1062,7 +1064,7 @@ class AppointmentsList extends Component
         }
 
         $cacheKey = 'base_price_' . md5(json_encode($this->selectedServiceIds));
-        return Cache::remember($cacheKey, now()->addMinutes(10), function () {
+        return Cache::remember($cacheKey, now()->addMinutes(5), function () {
             return collect($this->services)
                 ->whereIn('id', $this->selectedServiceIds)
                 ->sum('price');
@@ -1096,7 +1098,7 @@ class AppointmentsList extends Component
     public function endVisit($appointmentId = null)
     {
         $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
-    
+
         if (!$appointmentId) {
             $this->dispatch('show-toastr', [
                 'type' => 'error',
@@ -1104,7 +1106,7 @@ class AppointmentsList extends Component
             ]);
             return;
         }
-    
+
         try {
             $this->validate([
                 'selectedInsuranceId' => 'required|exists:insurances,id',
@@ -1127,9 +1129,9 @@ class AppointmentsList extends Component
             ]);
             return;
         }
-    
+
         $appointment = Appointment::findOrFail($appointmentId);
-    
+
         $appointment->update([
             'insurance_id' => $this->selectedInsuranceId,
             'service_ids' => json_encode($this->selectedServiceIds),
@@ -1141,23 +1143,23 @@ class AppointmentsList extends Component
             'payment_status' => 'paid', // همیشه به paid تنظیم می‌شود
             'payment_method' => $this->paymentMethod,
         ]);
-    
+
         // پاک کردن کش مرتبط با نوبت‌ها
         $doctor = $this->getAuthenticatedDoctor();
         $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
         Cache::forget($cacheKey);
-    
+
         $this->dispatch('close-modal', ['name' => 'end-visit-modal']);
         $this->dispatch('show-toastr', [
             'type' => 'success',
             'message' => 'ویزیت با موفقیت ثبت شد.'
         ]);
-    
+
         $this->dispatch('visited', [
             'type' => 'success',
             'message' => 'ویزیت با موفقیت ثبت شد.'
         ]);
-    
+
         $this->loadAppointments();
         $this->reset([
             'selectedInsuranceId',
