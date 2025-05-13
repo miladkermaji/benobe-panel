@@ -352,7 +352,7 @@
       </x-modal>
     </div>
 
-    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="md">
+    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="sm">
       <x-slot:body>
         <form action="" method="post">
           <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع">
@@ -370,7 +370,7 @@
 
     </x-modal>
 
-    <x-modal name="paziresh-modal" title="ارجاع" size="md">
+    <x-modal name="paziresh-modal" title="ارجاع" size="sm">
       <x-slot:body>
 
         <form action="" method="post">
