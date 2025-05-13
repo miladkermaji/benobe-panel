@@ -360,7 +360,6 @@
 .appointment-card {
     background: var(--background-card);
     border: 1px solid var(--border-neutral);
-    border-radius: var(--radius-card);
     margin-bottom: 0.5rem;
     box-shadow: 0 2px 6px var(--shadow);
     transition: all 0.2s ease;
