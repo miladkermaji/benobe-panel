@@ -388,10 +388,15 @@ function initializeRescheduleCalendar() {
             monthSelect.value = currentMonth;
             if (loadingOverlay) loadingOverlay.style.display = "flex";
             if (calendarBody) calendarBody.style.display = "none";
+            
             generateCalendar(currentYear, currentMonth);
         });
 
         nextMonthBtn.addEventListener("click", () => {
+          console.log(
+              document.getElementById("reschedule-calendar-body").innerHTML
+          );
+
             const yearSelect = modalScope.querySelector("#reschedule-year");
             const monthSelect = modalScope.querySelector("#reschedule-month");
             let currentMonth = parseInt(monthSelect.value);
@@ -446,18 +451,6 @@ document.addEventListener("livewire:initialized", () => {
                 Livewire.dispatch("setSelectedClinicId", { clinicId });
             }
             window.selectedSingleAppointmentId = appointmentId;
-            initializeRescheduleCalendar();
-        }
-    });
-
-    window.addEventListener("showModal", (event) => {
-        if (event.detail === "reschedule-modal") {
-            const clinicId =
-                localStorage.getItem("selectedClinicId") || "default";
-            if (clinicId !== "default") {
-                Livewire.dispatch("setSelectedClinicId", { clinicId });
-            }
-            window.selectedSingleAppointmentId = null;
             initializeRescheduleCalendar();
         }
     });

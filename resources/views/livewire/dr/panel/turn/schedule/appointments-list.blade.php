@@ -61,8 +61,7 @@
             <span class="d-none d-md-block">لغو نوبت</span>
           </button>
           <button id="move-appointments-btn"
-            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" x-data
-            @click="$dispatch('open-modal', { name: 'reschedule-modal' })" disabled>
+            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
             <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="" srcset="">
             <span class="d-none d-md-block">جابجایی نوبت</span>
           </button>
@@ -649,31 +648,6 @@ function handleToggle(event) {
         if (clinicId && clinicId !== 'default') {
           localStorage.setItem('selectedClinicId', clinicId);
         }
-
-        window.addEventListener('open-modal', event => {
-
-          const modalId = event.detail.name;
-          const appointmentId = event.detail.appointmentId || null;
-
-          // Alpine خودش این ایونت رو هندل می‌کنه با x-on:open-modal.window
-
-          // حالا Livewire
-          if (appointmentId && modalId === 'reschedule-modal') {
-            @this.set('rescheduleAppointmentId', appointmentId);
-            @this.set('rescheduleAppointmentIds', [appointmentId]);
-          } else if (modalId === 'reschedule-modal') {
-            const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
-            const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
-            @this.set('rescheduleAppointmentIds', selectedIds);
-            @this.call('loadCalendarData');
-          } else if (modalId === 'end-visit-modal' && appointmentId) {
-            @this.set('endVisitAppointmentId', appointmentId);
-          } else if (appointmentId && modalId === 'block-user-modal') {
-            @this.set('blockAppointmentId', appointmentId);
-          }
-        });
-
-
         Livewire.on('calendarDataUpdated', () => {
           window.holidaysData = @json($holidaysData);
           window.appointmentsData = @json($appointmentsData);
@@ -855,6 +829,7 @@ function handleToggle(event) {
 
         Livewire.on('close-modal', (event) => {
           const modalId = event?.name || (event && event[0]?.name) || null;
+          
           if (modalId) {
             window.dispatchEvent(new CustomEvent('close-modal', {
               detail: {
