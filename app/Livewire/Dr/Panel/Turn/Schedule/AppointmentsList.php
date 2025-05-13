@@ -584,6 +584,9 @@ class AppointmentsList extends Component
 
     public function handleRescheduleAppointment($appointmentIds, $newDate)
     {
+        
+$this->isLoading = true;
+
         $result = $this->checkRescheduleConditions($newDate, $appointmentIds);
         if (!$result['success']) {
             if (isset($result['partial']) && $result['partial']) {
