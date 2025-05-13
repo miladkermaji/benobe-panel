@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Livewire\Dr\Panel\Turn\Schedule;
+
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Doctor;
@@ -24,6 +26,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
+
 class AppointmentsList extends Component
 {
     use WithPagination;
@@ -175,7 +178,7 @@ class AppointmentsList extends Component
     {
         $this->showNoResultsAlert = false;
     }
- public function searchAllDates()
+    public function searchAllDates()
     {
         $this->isSearchingAllDates = true;
         $this->dateFilter = '';
@@ -345,7 +348,7 @@ class AppointmentsList extends Component
         $doctor = $this->getAuthenticatedDoctor();
         if (!$doctor) {
             return [];
-        $this->isLoading = false;
+            $this->isLoading = false;
         }
         // کلید کش با توجه به فیلترها
         $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
@@ -1211,6 +1214,9 @@ class AppointmentsList extends Component
             'endVisitAppointmentId',
             'paymentMethod',
         ]);
+
+        Cache::forget($cacheKey);
+
     }
     public function updatedDiscountPercentage($value)
     {
