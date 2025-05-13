@@ -109,10 +109,10 @@
                     <td>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</td>
                     <td>{{ $appointment->patient ? $appointment->patient->national_code : '-' }}</td>
                     <td>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
-                      
+
                       <span class="fw-bold d-block">
-                      {{ $appointment->appointment_time->format('H:i') ?? '-' }}
-                    </span>
+                        {{ $appointment->appointment_time->format('H:i') ?? '-' }}
+                      </span>
                     </td>
                     <td>
                       @php
@@ -128,7 +128,13 @@
                       @endphp
                       <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
                     </td>
-                    <td>{{ $appointment->fee ? $appointment->fee . ' ' . 'تومان' : '---' }}</td>
+                    <td>
+                      @if ($appointment->fee)
+                        {{ number_format($appointment->fee) . ' تومان' }}
+                      @else
+                        ---
+                      @endif
+                    </td>
                     <td>
                       @php
                         $paymentStatusLabels = [
@@ -237,8 +243,8 @@
                   <div class="card-item">
                     <span class="label">زمان نوبت:</span>
                     <span>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
-                      {{ '  ('.$appointment->appointment_time->format('H:i').')' ?? '-' }}
-                    
+                      {{ '  (' . $appointment->appointment_time->format('H:i') . ')' ?? '-' }}
+
                     </span>
                   </div>
                   <div class="card-item">
@@ -257,7 +263,13 @@
                   </div>
                   <div class="card-item d-none details">
                     <span class="label">بیعانه:</span>
-                    <span>{{ $appointment->fee ? $appointment->fee . ' تومان' : '---' }}</span>
+                    <span>
+                      @if ($appointment->fee)
+                        {{ number_format($appointment->fee) . ' تومان' }}
+                      @else
+                        ---
+                      @endif
+                    </span>
                   </div>
                   <div class="card-item d-none details">
                     <span class="label">وضعیت پرداخت:</span>
@@ -420,125 +432,125 @@
 
     <div>
       <x-modal name="end-visit-modal" title="پایان ویزیت" size="lg">
-          <x-slot:body>
-              <form wire:submit.prevent="endVisit({{ $endVisitAppointmentId ?? 'null' }})">
-                  <div class="row g-2">
-                      <div class="col-12">
-                          <div class="border rounded p-2 bg-light position-relative">
-                              <label class="form-label fw-bold mb-1">انتخاب بیمه</label>
-                              @if (count($insurances) > 0)
-                                  @foreach ($insurances as $index => $insurance)
-                                      <div class="form-check mb-1">
-                                          <input class="form-check-input" type="radio" name="selectedInsuranceId"
-                                                 id="insurance_{{ $insurance['id'] }}" wire:model.live="selectedInsuranceId"
-                                                 value="{{ $insurance['id'] }}">
-                                          <label class="form-check-label"
-                                                 for="insurance_{{ $insurance['id'] }}">{{ $insurance['name'] }}</label>
-                                      </div>
-                                  @endforeach
-                              @else
-                                  <p class="text-danger small mb-0">هیچ بیمه‌ای یافت نشد.</p>
-                              @endif
-                              @error('selectedInsuranceId')
-                                  <span class="text-danger small">{{ $message }}</span>
-                              @enderror
-                          </div>
+        <x-slot:body>
+          <form wire:submit.prevent="endVisit({{ $endVisitAppointmentId ?? 'null' }})">
+            <div class="row g-2">
+              <div class="col-12">
+                <div class="border rounded p-2 bg-light position-relative">
+                  <label class="form-label fw-bold mb-1">انتخاب بیمه</label>
+                  @if (count($insurances) > 0)
+                    @foreach ($insurances as $index => $insurance)
+                      <div class="form-check mb-1">
+                        <input class="form-check-input" type="radio" name="selectedInsuranceId"
+                          id="insurance_{{ $insurance['id'] }}" wire:model.live="selectedInsuranceId"
+                          value="{{ $insurance['id'] }}">
+                        <label class="form-check-label"
+                          for="insurance_{{ $insurance['id'] }}">{{ $insurance['name'] }}</label>
                       </div>
-                      <div class="col-12">
-                          <div class="border rounded p-2 bg-light services-checkbox-container position-relative">
-                              <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
-                              <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
-                                  @if (count($services) > 0)
-                                      @foreach ($services as $service)
-                                          <div class="form-check mb-1">
-                                              <input class="form-check-input" type="checkbox" id="service_{{ $service['id'] }}"
-                                                     wire:model.live="selectedServiceIds" value="{{ $service['id'] }}"
-                                                     wire:key="service-{{ $service['id'] }}">
-                                              <label class="form-check-label" for="service_{{ $service['id'] }}">
-                                                  {{ $service['name'] }} ({{ number_format($service['price']) }} تومان)
-                                              </label>
-                                          </div>
-                                      @endforeach
-                                  @else
-                                      <p class="text-danger small mb-0">هیچ خدمتی یافت نشد.</p>
-                                  @endif
-                              </div>
-                              @error('selectedServiceIds')
-                                  <span class="text-danger small">{{ $message }}</span>
-                              @enderror
-                          </div>
-                      </div>
-                      <!-- ترکیب ویزیت رایگان و نوع پرداخت در یک ردیف -->
-                      <div class="col-12">
-                          <div class="row g-2">
-                              <div class="col-md-6">
-                                  <div class="border rounded p-2 bg-light">
-                                      <div class="form-check mb-0">
-                                          <input type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
-                                          <label class="form-check-label" for="isFree">ویزیت رایگان</label>
-                                      </div>
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <div class="border rounded p-2 bg-light">
-                                      <label class="form-label fw-bold mb-1">نوع پرداخت</label>
-                                      <select class="form-control" wire:model.live="paymentMethod"
-                                              @if ($isFree) disabled @endif>
-                                          <option value="online">آنلاین</option>
-                                          <option value="cash">نقدی</option>
-                                          <option value="card_to_card">کارت به کارت</option>
-                                          <option value="pos">کارتخوان</option>
-                                      </select>
-                                      @error('paymentMethod')
-                                          <span class="text-danger small">{{ $message }}</span>
-                                      @enderror
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-md-6">
-                          <div class="border rounded p-2 bg-light position-relative">
-                              <label class="form-label fw-bold mb-1">تخفیف</label>
-                              <div wire:loading wire:target="discountPercentage,discountInputPercentage" class="loading-overlay">
-                                  <div class="spinner"></div>
-                              </div>
-                              <input type="number" step="0.01" min="0" max="100" class="form-control"
-                                     wire:model.live.debounce.500ms="discountPercentage" x-data
-                                     @click="$dispatch('open-modal', { name: 'discount-modal' })" placeholder="تخفیف (٪)"
-                                     @if ($isFree) disabled @endif readonly>
-                              @error('discountPercentage')
-                                  <span class="text-danger small">{{ $message }}</span>
-                              @enderror
-                          </div>
-                      </div>
-                      <div class="col-md-6">
-                          <div class="border rounded p-2 bg-light position-relative">
-                              <label class="form-label fw-bold mb-1">قیمت نهایی</label>
-                              <div wire:loading wire:target="finalPrice,discountPercentage,discountInputPercentage"
-                                   class="loading-overlay">
-                                  <div class="spinner"></div>
-                              </div>
-                              <input type="text" class="form-control" wire:model.live="finalPrice"
-                                     value="{{ number_format($finalPrice, 0, '.', ',') }} تومان"
-                                     @if ($isFree) disabled @endif readonly>
-                              @error('finalPrice')
-                                  <span class="text-danger small">{{ $message }}</span>
-                              @enderror
-                          </div>
-                      </div>
-                      <div class="col-12">
-                          <div class="border rounded p-2 bg-light">
-                              <label class="form-label fw-bold mb-1">توضیحات درمان</label>
-                              <textarea class="form-control" rows="2" wire:model.live="endVisitDescription"
-                                        placeholder="توضیحات درمان را وارد کنید..."></textarea>
-                          </div>
-                      </div>
+                    @endforeach
+                  @else
+                    <p class="text-danger small mb-0">هیچ بیمه‌ای یافت نشد.</p>
+                  @endif
+                  @error('selectedInsuranceId')
+                    <span class="text-danger small">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="border rounded p-2 bg-light services-checkbox-container position-relative">
+                  <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
+                  <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
+                    @if (count($services) > 0)
+                      @foreach ($services as $service)
+                        <div class="form-check mb-1">
+                          <input class="form-check-input" type="checkbox" id="service_{{ $service['id'] }}"
+                            wire:model.live="selectedServiceIds" value="{{ $service['id'] }}"
+                            wire:key="service-{{ $service['id'] }}">
+                          <label class="form-check-label" for="service_{{ $service['id'] }}">
+                            {{ $service['name'] }} ({{ number_format($service['price']) }} تومان)
+                          </label>
+                        </div>
+                      @endforeach
+                    @else
+                      <p class="text-danger small mb-0">هیچ خدمتی یافت نشد.</p>
+                    @endif
                   </div>
-                  <button type="submit" class="btn my-btn-primary w-100 mt-2">ثبت</button>
-              </form>
-          </x-slot:body>
+                  @error('selectedServiceIds')
+                    <span class="text-danger small">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <!-- ترکیب ویزیت رایگان و نوع پرداخت در یک ردیف -->
+              <div class="col-12">
+                <div class="row g-2">
+                  <div class="col-md-6">
+                    <div class="border rounded p-2 bg-light">
+                      <div class="form-check mb-0">
+                        <input type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
+                        <label class="form-check-label" for="isFree">ویزیت رایگان</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="border rounded p-2 bg-light">
+                      <label class="form-label fw-bold mb-1">نوع پرداخت</label>
+                      <select class="form-control" wire:model.live="paymentMethod"
+                        @if ($isFree) disabled @endif>
+                        <option value="online">آنلاین</option>
+                        <option value="cash">نقدی</option>
+                        <option value="card_to_card">کارت به کارت</option>
+                        <option value="pos">کارتخوان</option>
+                      </select>
+                      @error('paymentMethod')
+                        <span class="text-danger small">{{ $message }}</span>
+                      @enderror
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="border rounded p-2 bg-light position-relative">
+                  <label class="form-label fw-bold mb-1">تخفیف</label>
+                  <div wire:loading wire:target="discountPercentage,discountInputPercentage" class="loading-overlay">
+                    <div class="spinner"></div>
+                  </div>
+                  <input type="number" step="0.01" min="0" max="100" class="form-control"
+                    wire:model.live.debounce.500ms="discountPercentage" x-data
+                    @click="$dispatch('open-modal', { name: 'discount-modal' })" placeholder="تخفیف (٪)"
+                    @if ($isFree) disabled @endif readonly>
+                  @error('discountPercentage')
+                    <span class="text-danger small">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="border rounded p-2 bg-light position-relative">
+                  <label class="form-label fw-bold mb-1">قیمت نهایی</label>
+                  <div wire:loading wire:target="finalPrice,discountPercentage,discountInputPercentage"
+                    class="loading-overlay">
+                    <div class="spinner"></div>
+                  </div>
+                  <input type="text" class="form-control" wire:model.live="finalPrice"
+                    value="{{ number_format($finalPrice, 0, '.', ',') }} تومان"
+                    @if ($isFree) disabled @endif readonly>
+                  @error('finalPrice')
+                    <span class="text-danger small">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="border rounded p-2 bg-light">
+                  <label class="form-label fw-bold mb-1">توضیحات درمان</label>
+                  <textarea class="form-control" rows="2" wire:model.live="endVisitDescription"
+                    placeholder="توضیحات درمان را وارد کنید..."></textarea>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn my-btn-primary w-100 mt-2">ثبت</button>
+          </form>
+        </x-slot:body>
       </x-modal>
-  </div>
+    </div>
 
     <div wire:ignore>
       <x-modal name="discount-modal" title="اعمال تخفیف" size="md">
