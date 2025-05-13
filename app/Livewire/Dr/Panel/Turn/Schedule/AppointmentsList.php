@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Livewire\Dr\Panel\Turn\Schedule;
-
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Doctor;
@@ -26,7 +24,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
-
 class AppointmentsList extends Component
 {
     use WithPagination;
@@ -56,7 +53,6 @@ class AppointmentsList extends Component
         'per_page' => 10,
         'total' => 0,
     ];
-
     public $isSearchingAllDates = false;
     public $selectedMobiles = [];
     public $selectedInsuranceId;
@@ -108,12 +104,8 @@ class AppointmentsList extends Component
         'get-services' => 'getServices',
     ];
     public $showNoResultsAlert = false;
-
     public function mount()
     {
-
-        
-
         // مقداردهی اولیه pagination با مقادیر پیش‌فرض
         $this->pagination = [
             'current_page' => 1,
@@ -121,10 +113,8 @@ class AppointmentsList extends Component
             'last_page' => 1,
             'total' => 0,
         ];
-
         // مقدار پیش‌فرض تاریخ امروز
         $this->selectedDate = Carbon::now()->format('Y-m-d');
-
         // خواندن selected_date از URL و دی‌کد کردن آن
         $selectedDateFromUrl = request()->query('selected_date');
         if ($selectedDateFromUrl) {
@@ -147,15 +137,12 @@ class AppointmentsList extends Component
                 $this->dispatch('show-toastr', type: 'error', message: 'فرمت تاریخ انتخاب‌شده نامعتبر است.');
             }
         }
-
         // ذخیره URL بازگشت
         $this->redirectBack = urldecode(request()->query('redirect_back', url()->previous()));
-
         // تنظیم تاریخ‌های پیش‌فرض برای مسدودیت
         $this->blockedAt = Jalalian::now()->format('Y-m-d');
         $this->calendarYear = Jalalian::now()->getYear();
         $this->calendarMonth = Jalalian::now()->getMonth();
-
         // لود داده‌های اولیه
         $doctor = $this->getAuthenticatedDoctor();
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
@@ -167,11 +154,7 @@ class AppointmentsList extends Component
             $this->loadCalendarData();
             $this->loadInsurances();
         }
-
-        
-
     }
-
     /**
      * اعتبارسنجی فرمت تاریخ
      */
@@ -184,17 +167,14 @@ class AppointmentsList extends Component
             return false;
         }
     }
-
     public function showNoResultsAlert()
     {
         $this->showNoResultsAlert = true;
     }
-
     public function hideNoResultsAlert()
     {
         $this->showNoResultsAlert = false;
     }
-
  public function searchAllDates()
     {
         $this->isSearchingAllDates = true;
@@ -213,7 +193,6 @@ class AppointmentsList extends Component
         ];
         $this->appointmentsData = $this->getAppointmentsCountData();
     }
-
     public function getAppointmentsCountData()
     {
         try {
@@ -221,7 +200,6 @@ class AppointmentsList extends Component
             $selectedClinicId = $this->selectedClinicId;
             $year = $this->calendarYear ?? Jalalian::now()->getYear();
             $month = $this->calendarMonth ?? Jalalian::now()->getMonth();
-
             $appointmentConfig = DoctorAppointmentConfig::where('doctor_id', $doctorId)
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
@@ -231,7 +209,6 @@ class AppointmentsList extends Component
                     }
                 })
                 ->first();
-
             $calendarDays = $appointmentConfig ? $appointmentConfig->calendar_days : 30;
             $workSchedules = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('is_working', true)
@@ -244,13 +221,11 @@ class AppointmentsList extends Component
                 })
                 ->pluck('day')
                 ->toArray();
-
             $jalaliDate = Jalalian::fromFormat('Y/m/d', sprintf('%d/%02d/01', $year, $month));
             $startDate = $jalaliDate->toCarbon()->startOfDay();
             $endDate = $jalaliDate->toCarbon()->endOfMonth();
             $jalaliEndDate = Jalalian::fromCarbon($startDate)->addMonths(1)->subDays(1);
             $endDate = $jalaliEndDate->toCarbon()->endOfDay();
-
             // دریافت روزهای خاص
             $specialSchedules = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->whereBetween('date', [$startDate, $endDate])
@@ -266,31 +241,26 @@ class AppointmentsList extends Component
                     return Carbon::parse($date)->format('Y-m-d');
                 })
                 ->toArray();
-
             $appointmentsQuery = DB::table('appointments')
                 ->select(DB::raw('appointment_date, COUNT(*) as appointment_count'))
                 ->where('doctor_id', $doctorId)
                 ->where('status', '!=', 'cancelled')
                 ->whereNull('deleted_at');
-
             if ($selectedClinicId === 'default') {
                 $appointmentsQuery->whereNull('clinic_id');
             } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
                 $appointmentsQuery->where('clinic_id', $selectedClinicId);
             }
-
             $appointments = $appointmentsQuery
                 ->whereBetween('appointment_date', [$startDate, $endDate])
                 ->groupBy('appointment_date')
                 ->get();
-
             $data = $appointments->map(function ($item) {
                 return [
                     'appointment_date' => Carbon::parse($item->appointment_date)->format('Y-m-d'),
                     'appointment_count' => (int) $item->appointment_count,
                 ];
             })->toArray();
-
             $appointmentSettings = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('is_working', true)
                 ->where(function ($query) use ($selectedClinicId) {
@@ -309,7 +279,6 @@ class AppointmentsList extends Component
                     ];
                 })
                 ->toArray();
-
             return [
                 'status' => true,
                 'data' => $data,
@@ -326,7 +295,6 @@ class AppointmentsList extends Component
             ];
         }
     }
-
     public function handleBlockUser($data)
     {
         $this->blockAppointmentId = $data['appointmentId'];
@@ -335,7 +303,6 @@ class AppointmentsList extends Component
         $this->blockReason = $data['blockReason'];
         $this->blockUser();
     }
-
     public function handleBlockMultipleUsers($data)
     {
         $this->blockedAt = $data['blockedAt'];
@@ -343,7 +310,6 @@ class AppointmentsList extends Component
         $this->blockReason = $data['blockReason'];
         $this->blockMultipleUsers();
     }
-
     public function updateSelectedDate($date)
     {
         $selectedDate = is_array($date) && isset($date['date']) ? $date['date'] : $date;
@@ -355,7 +321,6 @@ class AppointmentsList extends Component
         $this->appointments = [];
         $this->loadAppointments();
     }
-
     private function getAuthenticatedDoctor()
     {
         $doctor = Auth::guard('doctor')->user();
@@ -367,7 +332,6 @@ class AppointmentsList extends Component
         }
         return $doctor;
     }
-
     private function loadClinics()
     {
         $doctor = $this->getAuthenticatedDoctor();
@@ -375,28 +339,21 @@ class AppointmentsList extends Component
             $this->clinics = $doctor->clinics()->where('is_active', 0)->get()->toArray();
         }
     }
-
-
     public function loadAppointments()
     {
-
-
+        $this->isLoading = true;
         $doctor = $this->getAuthenticatedDoctor();
         if (!$doctor) {
             return [];
+        $this->isLoading = false;
         }
-
         // کلید کش با توجه به فیلترها
-
         $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
-
-
         // لود از کش یا دیتابیس
         $appointments = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($doctor) {
             $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
                 ->withTrashed()
                 ->where('doctor_id', $doctor->id);
-
             // اعمال فیلترهای زمانی
             if ($this->dateFilter) {
                 $today = Carbon::today();
@@ -418,24 +375,20 @@ class AppointmentsList extends Component
                 $gregorianDate = $this->convertToGregorian($this->selectedDate);
                 $query->whereDate('appointment_date', $gregorianDate);
             }
-
             // اعمال فیلتر کلینیک
             if ($this->selectedClinicId === 'default') {
                 $query->whereNull('clinic_id');
             } elseif ($this->selectedClinicId) {
                 $query->where('clinic_id', $this->selectedClinicId);
             }
-
             // اعمال فیلتر وضعیت (فقط اگر صراحتاً تنظیم شده باشد)
             if ($this->filterStatus && $this->filterStatus !== 'all') {
                 $query->where('status', $this->filterStatus);
             }
-
             // اعمال فیلتر وضعیت حضور
             if ($this->attendanceStatus) {
                 $query->where('attendance_status', $this->attendanceStatus);
             }
-
             // اعمال جستجو
             if ($this->searchQuery) {
                 $query->whereHas('patient', function ($q) {
@@ -446,19 +399,15 @@ class AppointmentsList extends Component
                         ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
                 });
             }
-
             // اطمینان از وجود per_page
             $perPage = $this->pagination['per_page'] ?? 100;
-
             return $query->orderBy('appointment_date', 'desc')
                         ->orderBy('appointment_time', 'desc')
                         ->paginate($perPage, ['*'], 'page', $this->pagination['current_page']);
         });
-
         // لود داده‌های تقویم برای ماه جاری
         $jalaliDate = Jalalian::fromCarbon(Carbon::today());
         $appointmentData = $this->getAppointmentsInMonth($jalaliDate->getYear(), $jalaliDate->getMonth());
-
         $this->appointments = $appointments->items();
         $this->pagination = [
             'current_page' => $appointments->currentPage(),
@@ -466,9 +415,7 @@ class AppointmentsList extends Component
             'per_page' => $appointments->perPage(), // اصلاح: استفاده از per_page به جای peracrossPage
             'total' => $appointments->total(),
         ];
-
         $this->dispatch('setAppointments', ['appointments' => $appointmentData]);
-
         // بررسی عدم وجود نتیجه برای نمایش هشدار
         if (empty($this->appointments) && $this->searchQuery) {
             if ($this->isSearchingAllDates) {
@@ -484,14 +431,10 @@ class AppointmentsList extends Component
         $this->isLoading = false;
         return $appointmentData;
     }
-
-   
-
     private function convertToGregorian($date)
     {
         // دی‌کد کردن تاریخ در صورت URL-encoded بودن
         $decodedDate = urldecode($date);
-
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $decodedDate)) {
             return $decodedDate; // تاریخ میلادی است
         } elseif (preg_match('/^14\d{2}-\d{2}-\d{2}$/', $decodedDate)) {
@@ -499,7 +442,6 @@ class AppointmentsList extends Component
                 $gregorian = Jalalian::fromFormat('Y-m-d', $decodedDate)->toCarbon()->format('Y-m-d');
                 return $gregorian;
             } catch (\Exception $e) {
-
                 $this->dispatch('show-toastr', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
                 return Carbon::now()->format('Y-m-d');
             }
@@ -508,7 +450,6 @@ class AppointmentsList extends Component
                 $gregorian = Jalalian::fromFormat('Y/m/d', $decodedDate)->toCarbon()->format('Y-m-d');
                 return $gregorian;
             } catch (\Exception $e) {
-
                 $this->dispatch('show-toastr', type: 'error', message: 'خطا در تبدیل تاریخ جلالی به میلادی.');
                 return Carbon::now()->format('Y-m-d');
             }
@@ -517,7 +458,6 @@ class AppointmentsList extends Component
             return Carbon::now()->format('Y-m-d');
         }
     }
-
     public function updatedSelectedDate()
     {
         $this->isSearchingAllDates = false;
@@ -527,20 +467,17 @@ class AppointmentsList extends Component
         $this->appointments = [];
         $this->loadAppointments();
     }
-
     public function updatedSelectedClinicId()
     {
         $this->isSearchingAllDates = false;
         $this->loadAppointments();
         $this->loadBlockedUsers();
     }
-
     public function updatedSearchQuery()
     {
         $this->isSearchingAllDates = false;
         $this->loadAppointments();
     }
-
     public function updatedFilterStatus()
     {
         $this->isSearchingAllDates = false;
@@ -549,13 +486,11 @@ class AppointmentsList extends Component
         $this->appointments = [];
         $this->loadAppointments();
     }
-
     public function updatedAttendanceStatus()
     {
         $this->isSearchingAllDates = false;
         $this->loadAppointments();
     }
-
     public function updatedDateFilter()
     {
         $this->isSearchingAllDates = false;
@@ -569,24 +504,18 @@ class AppointmentsList extends Component
         $this->setPage($page);
         $this->loadAppointments();
     }
-
     public function previousPage()
     {
         $this->setPage($this->pagination['current_page'] - 1);
         $this->loadAppointments();
     }
-
     public function nextPage()
     {
         $this->setPage($this->pagination['current_page'] + 1);
         $this->loadAppointments();
     }
-
     public function handleRescheduleAppointment($appointmentIds, $newDate)
     {
-        
-$this->isLoading = true;
-
         $result = $this->checkRescheduleConditions($newDate, $appointmentIds);
         if (!$result['success']) {
             if (isset($result['partial']) && $result['partial']) {
@@ -607,18 +536,15 @@ $this->isLoading = true;
         $this->dispatch('appointments-rescheduled', [
             'message' => 'نوبت‌ها با موفقیت جابجا شدند.'
         ]);
-
         // پاک کردن کش مرتبط با نوبت‌ها
         $doctor = $this->getAuthenticatedDoctor();
         if ($doctor) {
             $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
             Cache::forget($cacheKey);
         }
-
         $this->loadAppointments();
         $this->dispatch('close-modal');
         $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
-
         // فقط اگر selected_date در URL وجود داشته باشد، ریدایرکت انجام شود
         if (request()->query('selected_date') && !empty($this->redirectBack)) {
             return redirect()->to($this->redirectBack);
@@ -629,7 +555,6 @@ $this->isLoading = true;
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $currentTime = Carbon::now();
         $targetDate = Carbon::parse($date);
-
         // اگه تاریخ مقصد امروز نیست، نیازی به بررسی زمان نیست
         if (!$targetDate->isToday()) {
             return [
@@ -637,7 +562,6 @@ $this->isLoading = true;
                 'message' => 'تاریخ مقصد معتبر است.',
             ];
         }
-
         // دریافت برنامه کاری یا برنامه خاص
         $dayOfWeek = strtolower($targetDate->format('l'));
         $workScheduleQuery = DoctorWorkSchedule::where('doctor_id', $doctorId)
@@ -646,20 +570,17 @@ $this->isLoading = true;
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $workSchedule = $workScheduleQuery->first();
-
         $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctorId)
             ->where('date', $date)
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $specialSchedule = $specialScheduleQuery->first();
-
         if (!$workSchedule && !$specialSchedule) {
             return [
                 'success' => false,
                 'message' => 'پزشک در این روز ساعات کاری ندارد.',
             ];
         }
-
         // دریافت work_hours
         $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : ($workSchedule ? json_decode($workSchedule->work_hours, true) : []);
         if (empty($workHours)) {
@@ -668,7 +589,6 @@ $this->isLoading = true;
                 'message' => 'هیچ ساعات کاری برای این روز تعریف نشده است.',
             ];
         }
-
         // محاسبه آخرین زمان پایان
         $latestEndTime = null;
         $totalMaxAppointments = 0;
@@ -679,10 +599,8 @@ $this->isLoading = true;
             }
             $totalMaxAppointments += $period['max_appointments'] ?? PHP_INT_MAX;
         }
-
         // تنظیم تاریخ برای مقایسه صحیح
         $latestEndTime->setDate($targetDate->year, $targetDate->month, $targetDate->day);
-
         // بررسی اینکه زمان پایان از زمان فعلی بیشتر باشد
         if ($latestEndTime->lte($currentTime)) {
             return [
@@ -690,7 +608,6 @@ $this->isLoading = true;
                 'message' => 'زمان پایان ساعات کاری این روز گذشته است.',
             ];
         }
-
         // بررسی تعداد نوبت‌های مجاز
         if ($totalMaxAppointments < $requiredSlots) {
             return [
@@ -698,7 +615,6 @@ $this->isLoading = true;
                 'message' => "تعداد نوبت‌های مجاز ($totalMaxAppointments) کمتر از تعداد درخواستی ($requiredSlots) است.",
             ];
         }
-
         return [
             'success' => true,
             'message' => 'ساعات کاری و تعداد نوبت‌ها معتبر است.',
@@ -710,26 +626,22 @@ $this->isLoading = true;
         if (!$doctor) {
             return ['success' => false, 'message' => 'دکتر معتبر یافت نشد.'];
         }
-
         // بررسی زمان پایان و تعداد نوبت‌ها
         $workHoursCheck = $this->checkWorkHoursAndSlots($newDate, count($appointmentIds));
         if (!$workHoursCheck['success']) {
             return ['success' => false, 'message' => $workHoursCheck['message']];
         }
-
         $newDateCarbon = Carbon::parse($newDate);
         $today = Carbon::today();
         if ($newDateCarbon->lt($today)) {
             return ['success' => false, 'message' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'];
         }
-
         $calendarDays = DoctorAppointmentConfig::where('doctor_id', $doctor->id)
             ->value('calendar_days') ?? 30;
         $maxDate = $today->copy()->addDays($calendarDays);
         if ($newDateCarbon->gt($maxDate)) {
             return ['success' => false, 'message' => 'تاریخ مقصد خارج از بازه تقویم مجاز است.'];
         }
-
         $holidaysQuery = DoctorHoliday::where('doctor_id', $doctor->id)
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
@@ -738,7 +650,6 @@ $this->isLoading = true;
         if (in_array($newDate, $holidayDates)) {
             return ['success' => false, 'message' => 'تاریخ مقصد تعطیل است.'];
         }
-
         $dayOfWeek = strtolower($newDateCarbon->format('l'));
         $workScheduleQuery = DoctorWorkSchedule::where('doctor_id', $doctor->id)
             ->where('day', $dayOfWeek)
@@ -746,28 +657,23 @@ $this->isLoading = true;
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $workSchedule = $workScheduleQuery->first();
-
         $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctor->id)
             ->where('date', $newDate)
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $specialSchedule = $specialScheduleQuery->first();
-
         if (!$workSchedule && !$specialSchedule) {
             return ['success' => false, 'message' => 'پزشک در این روز ساعات کاری ندارد.'];
         }
-
         $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : ($workSchedule ? json_decode($workSchedule->work_hours, true) : []);
         $appointmentSettings = $workSchedule ? (json_decode($workSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ($specialSchedule ? (json_decode($specialSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ['appointment_duration' => 15]);
         $maxAppointments = 0;
         foreach ($workHours as $period) {
             $maxAppointments += $period['max_appointments'] ?? 0;
         }
-
         $availableSlots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $newDate, $doctor->id);
         $availableSlotsCount = count($availableSlots);
         $requiredSlots = count($appointmentIds);
-
         if ($availableSlotsCount < $requiredSlots || $maxAppointments < $requiredSlots) {
             $nextAvailableDate = $this->getNextAvailableDateAfter($newDate);
             $remainingAppointments = $requiredSlots - min($availableSlotsCount, $maxAppointments);
@@ -787,13 +693,11 @@ $this->isLoading = true;
                 'partial' => true,
             ];
         }
-
         return [
             'success' => true,
             'available_slots' => $availableSlots,
         ];
     }
-
     public function calculateAvailableSlots($workHours, $appointmentSettings, $date, $doctorId)
     {
         $slots = [];
@@ -822,7 +726,6 @@ $this->isLoading = true;
         }
         return $slots;
     }
-
     public function confirmPartialReschedule($appointmentIds, $newDate, $nextDate, $availableSlots)
     {
         try {
@@ -835,13 +738,11 @@ $this->isLoading = true;
             if (empty($availableSlots) || !is_array($availableSlots)) {
                 throw new \Exception('زمان‌های کاری خالی نامعتبر هستند.');
             }
-
             // بررسی زمان پایان و تعداد نوبت‌ها برای تاریخ جدید
             $workHoursCheck = $this->checkWorkHoursAndSlots($newDate, count($appointmentIds));
             if (!$workHoursCheck['success']) {
                 throw new \Exception($workHoursCheck['message']);
             }
-
             $remainingIds = $this->processReschedule($appointmentIds, $newDate, $availableSlots);
             if (!empty($remainingIds) && $nextDate) {
                 // بررسی زمان پایان و تعداد نوبت‌ها برای تاریخ بعدی
@@ -849,7 +750,6 @@ $this->isLoading = true;
                 if (!$workHoursCheckNext['success']) {
                     throw new \Exception($workHoursCheckNext['message']);
                 }
-
                 $nextDateSlots = $this->getAvailableSlotsForDate($nextDate);
                 if (empty($nextDateSlots)) {
                     throw new \Exception('هیچ زمان کاری خالی برای تاریخ بعدی یافت نشد.');
@@ -870,22 +770,18 @@ $this->isLoading = true;
                     ]);
                 }
             }
-
             $this->dispatch('appointments-rescheduled', [
                 'message' => 'نوبت‌ها با موفقیت جابجا شدند.'
             ]);
-
             // پاک کردن کش مرتبط با نوبت‌ها
             $doctor = $this->getAuthenticatedDoctor();
             if ($doctor) {
                 $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
                 Cache::forget($cacheKey);
             }
-
             $this->loadAppointments();
             $this->dispatch('close-modal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
-
             // فقط اگر selected_date در URL وجود داشته باشد، ریدایرکت انجام شود
             if (request()->query('selected_date') && !empty($this->redirectBack)) {
                 return redirect()->to($this->redirectBack);
@@ -898,7 +794,6 @@ $this->isLoading = true;
             $this->dispatch('showModal', 'reschedule-modal');
         }
     }
-
     private function getAvailableSlotsForDate($date)
     {
         $doctor = $this->getAuthenticatedDoctor();
@@ -922,7 +817,6 @@ $this->isLoading = true;
         $slots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $date, $doctor->id);
         return $slots;
     }
-
     private function getNextAvailableDateAfter($startDate)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -935,21 +829,18 @@ $this->isLoading = true;
         $holidays = $holidaysQuery->first();
         $holidayDates = json_decode($holidays->holiday_dates ?? '[]', true);
         $currentDate = Carbon::parse($startDate)->addDay();
-
         while ($currentDate->lte($maxDate)) {
             $dateStr = $currentDate->format('Y-m-d');
             if (in_array($dateStr, $holidayDates)) {
                 $currentDate->addDay();
                 continue;
             }
-
             // بررسی زمان پایان و تعداد نوبت‌ها
             $workHoursCheck = $this->checkWorkHoursAndSlots($dateStr, 1); // حداقل یه نوبت نیازه
             if (!$workHoursCheck['success']) {
                 $currentDate->addDay();
                 continue;
             }
-
             $dayOfWeek = strtolower($currentDate->format('l'));
             $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $dayOfWeek)
@@ -957,32 +848,25 @@ $this->isLoading = true;
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
-
             if (!$workSchedule) {
                 $currentDate->addDay();
                 continue;
             }
-
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $dateStr)
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
-
             $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
             $appointmentSettings = json_decode($workSchedule->appointment_settings, true) ?? ['appointment_duration' => 15];
             $availableSlots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $dateStr, $doctorId);
-
             if (!empty($availableSlots)) {
                 return $dateStr;
             }
-
             $currentDate->addDay();
         }
-
         return null;
     }
-
     public function updateAppointmentDate($ids, $newDate)
     {
         try {
@@ -990,7 +874,6 @@ $this->isLoading = true;
             if (empty($appointmentIds)) {
                 return;
             }
-
             $validator = Validator::make(['newDate' => $newDate], [
                 'newDate' => 'required|date_format:Y-m-d',
             ]);
@@ -998,7 +881,6 @@ $this->isLoading = true;
                 $this->dispatch('show-toastr', ['type' => 'error', 'message' => $validator->errors()->first()]);
                 return;
             }
-
             // بررسی زمان پایان و تعداد نوبت‌ها
             $workHoursCheck = $this->checkWorkHoursAndSlots($newDate, count($appointmentIds));
             if (!$workHoursCheck['success']) {
@@ -1006,7 +888,6 @@ $this->isLoading = true;
                 $this->dispatch('showModal', 'reschedule-modal');
                 return;
             }
-
             $conditions = $this->checkRescheduleConditions($newDate, $appointmentIds);
             if (!$conditions['success']) {
                 if (isset($conditions['partial']) && $conditions['partial']) {
@@ -1027,7 +908,6 @@ $this->isLoading = true;
                 $this->dispatch('showModal', 'reschedule-modal');
                 return;
             }
-
             $remainingIds = $this->processReschedule($appointmentIds, $newDate, $conditions['available_slots']);
             if (!empty($remainingIds)) {
                 $this->dispatch('show-toastr', [
@@ -1043,14 +923,12 @@ $this->isLoading = true;
                     'message' => count($appointmentIds) > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.'
                 ]);
             }
-
             // پاک کردن کش مرتبط با نوبت‌ها
             $doctor = $this->getAuthenticatedDoctor();
             if ($doctor) {
                 $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
                 Cache::forget($cacheKey);
             }
-
             $this->loadAppointments();
             $this->dispatch('close-modal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
@@ -1058,7 +936,6 @@ $this->isLoading = true;
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطایی در جابجایی نوبت رخ داد: ' . $e->getMessage()]);
         }
     }
-
     private function processReschedule($appointmentIds, $newDate, $availableSlots)
     {
         $remainingIds = [];
@@ -1086,32 +963,26 @@ $this->isLoading = true;
                 $remainingIds[] = $appointmentId;
             }
         }
-
         // پاک کردن کش برای تاریخ امروز و تاریخ مقصد
         $doctor = $this->getAuthenticatedDoctor();
         if ($doctor) {
             // پاک کردن کش برای تاریخ انتخاب‌شده فعلی
             $cacheKeyCurrent = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
             Cache::forget($cacheKeyCurrent);
-
             // پاک کردن کش برای تاریخ مقصد (newDate)
             $cacheKeyNew = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$newDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
             Cache::forget($cacheKeyNew);
-
             // پاک کردن کش برای تاریخ امروز (اگر newDate امروز باشد)
             $today = Carbon::today()->format('Y-m-d');
             $cacheKeyToday = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$today}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
             Cache::forget($cacheKeyToday);
         }
-
         return $remainingIds;
     }
-
     public function loadInsurances()
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $cacheKey = "insurances_doctor_{$doctorId}_clinic_{$this->selectedClinicId}";
-
         $this->insurances = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctorId) {
             return DoctorService::where('doctor_id', $doctorId)
                 ->where('clinic_id', $this->selectedClinicId === 'default' ? null : $this->selectedClinicId)
@@ -1123,18 +994,14 @@ $this->isLoading = true;
                 ->values()
                 ->toArray();
         });
-
         $this->dispatch('insurances-updated');
     }
-
     public function updatedSelectedInsuranceId()
     {
-
         $this->loadServices();
         $this->reset(['selectedServiceIds', 'isFree', 'discountPercentage', 'discountAmount', 'finalPrice']);
         $this->dispatch('services-updated');
     }
-
     public function loadServices()
     {
         if (!$this->selectedInsuranceId) {
@@ -1142,10 +1009,8 @@ $this->isLoading = true;
             $this->dispatch('services-updated');
             return;
         }
-
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $cacheKey = "services_doctor_{$doctorId}_clinic_{$this->selectedClinicId}_insurance_{$this->selectedInsuranceId}";
-
         $this->services = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctorId) {
             $query = DoctorService::where('doctor_id', $doctorId)
                 ->where('insurance_id', $this->selectedInsuranceId);
@@ -1156,24 +1021,19 @@ $this->isLoading = true;
             }
             return $query->get()->toArray();
         });
-
         $this->dispatch('services-updated');
     }
-
     #[On('get-services')]
     public function getServices()
     {
         $this->dispatch('services-received', $this->services);
     }
-
     public function updatedSelectedServiceIds()
     {
         $this->calculateFinalPrice();
     }
-
     public function updatedIsFree()
     {
-
         if ($this->isFree) {
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
@@ -1183,23 +1043,18 @@ $this->isLoading = true;
         }
         $this->dispatch('final-price-updated');
     }
-
     public function refreshEndVisitModal()
     {
         $this->dispatch('services-updated');
     }
-
     public function calculateFinalPrice()
     {
-
-
         if ($this->isFree) {
             $this->finalPrice = 0;
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
         } else {
             $basePrice = $this->getBasePrice();
-
             if (empty($this->selectedServiceIds)) {
                 $this->finalPrice = 0;
                 $this->discountPercentage = 0;
@@ -1209,7 +1064,6 @@ $this->isLoading = true;
                 $discountPercentage = is_numeric($this->discountPercentage)
                     ? floatval($this->discountPercentage)
                     : floatval(str_replace('%', '', $this->discountPercentage));
-
                 if ($discountPercentage > 0) {
                     $this->discountAmount = round(($basePrice * $discountPercentage) / 100, 2); // رند به 2 رقم اعشار
                     $this->discountPercentage = round($discountPercentage, 2); // رند درصد
@@ -1221,19 +1075,15 @@ $this->isLoading = true;
                     $this->discountPercentage = 0;
                     $this->discountAmount = 0;
                 }
-
                 $this->finalPrice = round(max(0, $basePrice - $this->discountAmount), 0); // رند قیمت نهایی به عدد صحیح
             }
         }
-
         $this->dispatch('final-price-updated');
     }
-
     public function updatedDiscountInputPercentage()
     {
         // تبدیل ورودی به عدد، اگه خالی یا غیرعددی بود 0 می‌ذاریم
         $percentage = is_numeric($this->discountInputPercentage) ? floatval($this->discountInputPercentage) : 0;
-
         // مطمئن می‌شیم درصد بین 0 تا 100 باشه
         if ($percentage > 100) {
             $percentage = 100;
@@ -1242,7 +1092,6 @@ $this->isLoading = true;
             $percentage = 0;
             $this->discountInputPercentage = 0;
         }
-
         $basePrice = $this->getBasePrice();
         $this->discountInputAmount = ($basePrice * $percentage) / 100;
         $this->discountPercentage = $percentage;
@@ -1250,7 +1099,6 @@ $this->isLoading = true;
         $this->calculateFinalPrice();
         $this->dispatch('discount-updated');
     }
-
     public function updatedDiscountInputAmount()
     {
         $basePrice = $this->getBasePrice();
@@ -1263,13 +1111,11 @@ $this->isLoading = true;
         $this->calculateFinalPrice();
         $this->dispatch('discount-updated');
     }
-
     public function getBasePrice()
     {
         if (empty($this->selectedServiceIds)) {
             return 0;
         }
-
         $cacheKey = 'base_price_' . md5(json_encode($this->selectedServiceIds));
         return Cache::remember($cacheKey, now()->addMinutes(5), function () {
             return collect($this->services)
@@ -1277,17 +1123,13 @@ $this->isLoading = true;
                 ->sum('price');
         });
     }
-
     public function applyDiscount()
     {
-
-
         if (!$this->isFree) {
             // تبدیل و رند کردن discountInputPercentage
             $this->discountPercentage = is_numeric($this->discountInputPercentage)
                 ? round(floatval($this->discountInputPercentage), 2)
                 : round(floatval(str_replace('%', '', $this->discountInputPercentage)), 2);
-
             // تبدیل و رند کردن discountInputAmount
             $this->discountAmount = round(floatval($this->discountInputAmount), 2);
             $this->calculateFinalPrice();
@@ -1296,16 +1138,13 @@ $this->isLoading = true;
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
         }
-
         $this->dispatch('discount-applied', ['percentage' => $this->discountPercentage]);
         $this->dispatch('final-price-updated');
         $this->dispatch('close-modal', ['id' => 'discount-modal']);
     }
-
     public function endVisit($appointmentId = null)
     {
         $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
-
         if (!$appointmentId) {
             $this->dispatch('show-toastr', [
                 'type' => 'error',
@@ -1313,7 +1152,6 @@ $this->isLoading = true;
             ]);
             return;
         }
-
         try {
             $this->validate([
                 'selectedInsuranceId' => 'required|exists:insurances,id',
@@ -1336,9 +1174,7 @@ $this->isLoading = true;
             ]);
             return;
         }
-
         $appointment = Appointment::findOrFail($appointmentId);
-
         $appointment->update([
             'insurance_id' => $this->selectedInsuranceId,
             'service_ids' => json_encode($this->selectedServiceIds),
@@ -1350,23 +1186,19 @@ $this->isLoading = true;
             'payment_status' => 'paid', // همیشه به paid تنظیم می‌شود
             'payment_method' => $this->paymentMethod,
         ]);
-
         // پاک کردن کش مرتبط با نوبت‌ها
         $doctor = $this->getAuthenticatedDoctor();
         $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
         Cache::forget($cacheKey);
-
         $this->dispatch('close-modal', ['name' => 'end-visit-modal']);
         $this->dispatch('show-toastr', [
             'type' => 'success',
             'message' => 'ویزیت با موفقیت ثبت شد.'
         ]);
-
         $this->dispatch('visited', [
             'type' => 'success',
             'message' => 'ویزیت با موفقیت ثبت شد.'
         ]);
-
         $this->loadAppointments();
         $this->reset([
             'selectedInsuranceId',
@@ -1380,16 +1212,12 @@ $this->isLoading = true;
             'paymentMethod',
         ]);
     }
-
     public function updatedDiscountPercentage($value)
     {
-
-
         // حذف علامت درصد و تبدیل به عدد
         $discountPercentage = is_numeric($value)
             ? floatval($value)
             : floatval(str_replace('%', '', $value));
-
         // محدود کردن و رند کردن به 2 رقم اعشار
         if ($discountPercentage > 100) {
             $discountPercentage = 100;
@@ -1398,29 +1226,22 @@ $this->isLoading = true;
         } else {
             $discountPercentage = round($discountPercentage, 2);
         }
-
         $this->discountPercentage = $discountPercentage;
         $this->discountInputPercentage = $discountPercentage;
         $this->calculateFinalPrice();
     }
-
     public function updatedDiscountAmount($value)
     {
-
-
         // تبدیل مقدار ورودی به عدد و رند کردن
         $discountAmount = is_numeric($value) ? floatval($value) : 0;
         $basePrice = $this->getBasePrice();
-
         if ($discountAmount > $basePrice) {
             $discountAmount = $basePrice;
         } elseif ($discountAmount < 0) {
             $discountAmount = 0;
         }
-
         $this->discountAmount = round($discountAmount, 2); // رند مبلغ تخفیف
         $this->discountInputAmount = $this->discountAmount;
-
         // محاسبه و رند کردن درصد
         if ($basePrice > 0) {
             $this->discountPercentage = round(($this->discountAmount / $basePrice) * 100, 2); // رند به 2 رقم اعشار
@@ -1429,21 +1250,17 @@ $this->isLoading = true;
             $this->discountPercentage = 0;
             $this->discountInputPercentage = 0;
         }
-
         $this->calculateFinalPrice();
     }
-
     public function cancelSingleAppointment($id)
     {
         $this->dispatch('confirm-cancel-single', id: $id);
     }
-
     public function triggerCancelAppointments()
     {
         $this->cancelAppointments($this->cancelIds);
         $this->cancelIds = [];
     }
-
     public function cancelAppointments($ids = [])
     {
         $requestData = request()->all();
@@ -1498,7 +1315,6 @@ $this->isLoading = true;
             $this->dispatch('show-toastr', type: 'error', message: 'خطایی در لغو نوبت رخ داد: ' . $e->getMessage());
         }
     }
-
     private function loadBlockedUsers()
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -1508,12 +1324,10 @@ $this->isLoading = true;
             ->where('clinic_id', $clinicId)
             ->get()->toArray();
     }
-
     private function loadMessages()
     {
         $this->messages = SmsTemplate::with('user')->latest()->get()->toArray();
     }
-
     private function processDate($date, $fieldName)
     {
         if (empty($date)) {
@@ -1536,14 +1350,12 @@ $this->isLoading = true;
         }
         throw new \Exception("فرمت تاریخ $fieldName ناشناخته است: $date");
     }
-
     public function setSelectedClinicId($clinicId)
     {
         $this->selectedClinicId = $clinicId;
         session(['selectedClinicId' => $clinicId]);
         $this->loadCalendarData();
     }
-
     public function setCalendarDate($year, $month)
     {
         $this->calendarYear = (int) $year;
@@ -1551,12 +1363,8 @@ $this->isLoading = true;
         $this->loadCalendarData();
         $this->dispatch('calendarDataUpdated');
     }
-
-
     public function blockMultipleUsers()
     {
-
-
         try {
             $this->validate([
                 'blockedAt' => [
@@ -1582,11 +1390,8 @@ $this->isLoading = true;
                 'blockReason.string' => 'دلیل مسدود کردن باید متن باشد.',
                 'blockReason.max' => 'دلیل مسدود کردن نمی‌تواند بیشتر از 255 کاراکتر باشد.',
             ]);
-
             if ($this->blockAppointmentId && empty($this->selectedMobiles)) {
                 $appointment = Appointment::with('patient')->find($this->blockAppointmentId);
-
-
                 if (!$appointment) {
                     $this->dispatch('show-toastr', [
                         'type' => 'error',
@@ -1595,7 +1400,6 @@ $this->isLoading = true;
                     $this->dispatch('showModal', 'block-user-modal');
                     return;
                 }
-
                 if (!$appointment->patient || !$appointment->patient->mobile) {
                     $this->dispatch('show-toastr', [
                         'type' => 'error',
@@ -1604,10 +1408,8 @@ $this->isLoading = true;
                     $this->dispatch('showModal', 'block-user-modal');
                     return;
                 }
-
                 $this->selectedMobiles = [$appointment->patient->mobile];
             }
-
             if (empty($this->selectedMobiles)) {
                 $this->dispatch('show-toastr', [
                     'type' => 'error',
@@ -1616,12 +1418,10 @@ $this->isLoading = true;
                 $this->dispatch('showModal', 'block-user-modal');
                 return;
             }
-
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
             $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
             $unblockedAt = $this->unblockedAt ? $this->processDate($this->unblockedAt, 'پایان مسدودیت') : null;
-
             $blockedUsers = [];
             $alreadyBlocked = [];
             foreach ($this->selectedMobiles as $mobile) {
@@ -1649,7 +1449,6 @@ $this->isLoading = true;
                 ]);
                 $blockedUsers[] = $blockingUser;
             }
-
             if (empty($blockedUsers) && !empty($alreadyBlocked)) {
                 $this->dispatch('show-toastr', [
                     'type' => 'error',
@@ -1666,7 +1465,6 @@ $this->isLoading = true;
                 $this->dispatch('showModal', 'block-user-modal');
                 return;
             }
-
             $this->dispatch('show-toastr', [
                 'type' => 'success',
                 'message' => 'کاربر(ان) با موفقیت مسدود شدند.',
@@ -1675,7 +1473,6 @@ $this->isLoading = true;
             $this->loadBlockedUsers();
             $this->reset(['blockedAt', 'unblockedAt', 'blockReason', 'blockAppointmentId', 'selectedMobiles']);
         } catch (\Exception $e) {
-
             $this->dispatch('show-toastr', [
                 'type' => 'error',
                 'message' => 'خطایی رخ داد: ' . $e->getMessage(),
@@ -1683,7 +1480,6 @@ $this->isLoading = true;
             $this->dispatch('showModal', 'block-user-modal');
         }
     }
-
     public function updateBlockStatus($id, $status)
     {
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
@@ -1695,7 +1491,6 @@ $this->isLoading = true;
         $this->dispatch('show-toastr', type: 'success', message: 'وضعیت با موفقیت به‌روزرسانی شد.');
         $this->loadBlockedUsers();
     }
-
     public function sendMessage()
     {
         $this->validate();
@@ -1757,7 +1552,6 @@ $this->isLoading = true;
         $this->loadMessages();
         $this->reset(['messageTitle', 'messageContent', 'recipientType', 'specificRecipient']);
     }
-
     public function deleteMessage($id)
     {
         $message = SmsTemplate::findOrFail($id);
@@ -1765,7 +1559,6 @@ $this->isLoading = true;
         $this->dispatch('show-toastr', type: 'success', message: 'پیام با موفقیت حذف شد.');
         $this->loadMessages();
     }
-
     public function unblockUser($id)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -1778,7 +1571,6 @@ $this->isLoading = true;
         $this->dispatch('show-toastr', type: 'success', message: 'کاربر با موفقیت از لیست مسدودی حذف شد.');
         $this->loadBlockedUsers();
     }
-
     public function getNextAvailableDate()
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -1820,7 +1612,6 @@ $this->isLoading = true;
         });
         return $nextAvailableDate ?? null;
     }
-
     public function goToFirstAvailableDate()
     {
         try {
@@ -1841,7 +1632,6 @@ $this->isLoading = true;
             $firstAvailableDate = null;
             $availableSlots = [];
             $nextAvailableDate = null;
-
             while ($currentDate <= $maxDate) {
                 $dateStr = $currentDate->toDateString();
                 // بررسی زمان پایان و تعداد نوبت‌ها
@@ -1850,7 +1640,6 @@ $this->isLoading = true;
                     $currentDate->addDay();
                     continue;
                 }
-
                 $result = $this->checkRescheduleConditions($dateStr, $appointmentIds);
                 if ($result['success']) {
                     $firstAvailableDate = $dateStr;
@@ -1865,11 +1654,9 @@ $this->isLoading = true;
                 }
                 $currentDate->addDay();
             }
-
             if (!$firstAvailableDate) {
                 throw new \Exception('هیچ تاریخ خالی در بازه مجاز یافت نشد.');
             }
-
             $jalaliDate = Jalalian::fromCarbon(Carbon::parse($firstAvailableDate))->format('Y/m/d');
             $availableSlotsCount = count($availableSlots);
             if ($availableSlotsCount >= $requiredSlots) {
@@ -1901,7 +1688,6 @@ $this->isLoading = true;
             ]);
         }
     }
-
     public function getAppointmentsByDateSpecial($date)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -1918,7 +1704,6 @@ $this->isLoading = true;
             'count' => $appointments->count(),
         ];
     }
-
     public function getAppointmentsInMonth($year, $month)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -1944,7 +1729,6 @@ $this->isLoading = true;
             });
         return $appointments->toArray();
     }
-
     public function getHolidays()
     {
         try {
@@ -1978,7 +1762,6 @@ $this->isLoading = true;
             return [];
         }
     }
-
     public function toggleHoliday($date)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -2010,7 +1793,6 @@ $this->isLoading = true;
         $this->dispatch('show-toastr', type: 'success', message: $message);
         return ['is_holiday' => $isHoliday, 'holiday_dates' => $holidayDates];
     }
-
     public function getDefaultSchedule($date)
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -2032,7 +1814,6 @@ $this->isLoading = true;
         $workSchedule = $workScheduleQuery->first();
         return $workSchedule ? json_decode($workSchedule->work_hours, true) ?? [] : [];
     }
-
     public function render()
     {
         return view('livewire.dr.panel.turn.schedule.appointments-list');

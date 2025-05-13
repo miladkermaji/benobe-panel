@@ -73,7 +73,7 @@
         </div>
       </div>
       <div class="appointments-container">
-        <div class="loading-overlay-custom {{ !$isLoading ? 'show-custom' : '' }}">
+        <div class="loading-overlay-custom {{ $isLoading ? 'show-custom' : '' }}">
           <div class="spinner-custom"></div>
         </div>
         <div class="table-responsive position-relative w-100 d-none d-md-block">
