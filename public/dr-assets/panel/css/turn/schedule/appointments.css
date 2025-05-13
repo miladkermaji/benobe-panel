@@ -559,18 +559,16 @@
 /* Loading Overlay */
 .loading-overlay-custom {
     position: absolute;
-    top: 0;
+    top: 50%;
     left: 0;
     width: 100%;
     height: 100%;
     background: rgba(255, 255, 255, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 1000;
-    opacity: .4;
+    opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    height: auto;
 }
 
 .loading-overlay-custom.show-custom {
@@ -581,6 +579,43 @@
 .spinner-custom {
     width: 30px;
     height: 30px;
+    border: 5px solid var(--primary-light);
+    border-top: 5px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+.loading-overlay-custom-small {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    height: auto;
+}
+
+.loading-overlay-custom-small.show-custom-small {
+    opacity: 1;
+    visibility: visible;
+}
+.loading-spinner{
+    width: 10px;
+    height: 10px;
+    border: 5px solid var(--primary-light);
+    border-top: 5px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.spinner-custom-small {
+    width: 20px;
+    height: 20px;
     border: 5px solid var(--primary-light);
     border-top: 5px solid var(--primary);
     border-radius: 50%;

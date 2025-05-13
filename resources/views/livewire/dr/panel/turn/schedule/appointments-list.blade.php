@@ -73,7 +73,11 @@
         </div>
       </div>
       <div class="appointments-container">
-        <div class="loading-overlay-custom {{ $isLoading ? 'show-custom' : '' }}">
+        {{--  <div class="loading-overlay-custom {{ $isLoading ? 'show-custom' : '' }}">
+          <div class="spinner-custom"></div>
+        </div> --}}
+        <div class="loading-overlay-custom" wire:loading.class="show-custom"
+          wire:loading.target="loadAppointments,nextPage,prevPage">
           <div class="spinner-custom"></div>
         </div>
         <div class="table-responsive position-relative w-100 d-none d-md-block">
@@ -456,7 +460,11 @@
                 </div>
               </div>
               <div class="col-12">
+
                 <div class="border rounded p-2 bg-light services-checkbox-container position-relative">
+                  <div class="loading-overlay-custom-small" wire:loading.class="show-custom-small">
+                    <div class="spinner-custom-small"></div>
+                  </div>
                   <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
                   <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
                     @if (count($services) > 0)
@@ -475,7 +483,7 @@
                     @endif
                   </div>
                   @error('selectedServiceIds')
-                    <span class="text-danger small">{{ $message }}</span>
+                    <span class="alert alert-danger small">{{ $message }}</span>
                   @enderror
                 </div>
               </div>
@@ -510,8 +518,10 @@
               <div class="col-md-6">
                 <div class="border rounded p-2 bg-light position-relative">
                   <label class="form-label fw-bold mb-1">تخفیف</label>
-                  <div wire:loading wire:target="discountPercentage,discountInputPercentage" class="loading-overlay">
-                    <div class="spinner"></div>
+
+                  <div class="loading-overlay-custom-small" wire:loading.class="show-custom-small"
+                    wire:target="discountPercentage,discountInputPercentage">
+                    <div class="spinner-custom-small"></div>
                   </div>
                   <input type="number" step="0.01" min="0" max="100" class="form-control"
                     wire:model.live.debounce.500ms="discountPercentage" x-data
@@ -525,9 +535,10 @@
               <div class="col-md-6">
                 <div class="border rounded p-2 bg-light position-relative">
                   <label class="form-label fw-bold mb-1">قیمت نهایی</label>
-                  <div wire:loading wire:target="finalPrice,discountPercentage,discountInputPercentage"
-                    class="loading-overlay">
-                    <div class="spinner"></div>
+
+                  <div class="loading-overlay-custom-small" wire:loading.class="show-custom-small"
+                    wire:target="finalPrice,discountPercentage,discountInputPercentage">
+                    <div class="spinner-custom-small"></div>
                   </div>
                   <input type="text" class="form-control" wire:model.live="finalPrice"
                     value="{{ number_format($finalPrice, 0, '.', ',') }} تومان"
@@ -557,8 +568,10 @@
           <form wire:submit.prevent="applyDiscount">
             <div class="mb-3 position-relative">
               <label class="form-label">درصد تخفیف</label>
-              <div wire:loading wire:target="discountInputPercentage" class="loading-overlay">
-                <div class="spinner"></div>
+
+              <div class="loading-overlay-custom-small" wire:loading.class="show-custom-small"
+                wire:target="discountInputPercentage">
+                <div class="spinner-custom-small"></div>
               </div>
               <input type="number" class="form-control" wire:model.live.debounce.500ms="discountInputPercentage"
                 placeholder="درصد تخفیف را وارد کنید" min="0" max="100" step="0.01"
@@ -569,8 +582,9 @@
             </div>
             <div class="mb-3 position-relative">
               <label class="form-label">مبلغ تخفیف</label>
-              <div wire:loading wire:target="discountInputAmount" class="loading-overlay">
-                <div class="spinner"></div>
+             
+              <div class="loading-overlay-custom-small" wire:loading.class="show-custom-small" wire:target="discountInputAmount">
+                <div class="spinner-custom-small"></div>
               </div>
               <input type="number" class="form-control" wire:model.live.debounce.500ms="discountInputAmount"
                 placeholder="مبلغ تخفیف را وارد کنید" min="0" step="1"
@@ -579,8 +593,11 @@
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
-            <button type="submit" class="btn my-btn-primary w-100 h-50"
+            <button  type="submit" class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center"
               @if ($isFree) disabled @endif>تأیید
+              <span wire:loading.class="loading-spinner">
+
+              </span>
             </button>
           </form>
         </x-slot:body>

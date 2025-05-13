@@ -59,16 +59,16 @@
                                     <label class="label-top-input-special-takhasos"
                                       for="morning-start-{{ $englishDay }}-{{ $index }}">از</label>
                                     <input type="text"
-                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white" data-timepicker
-                                      id="morning-start-{{ $englishDay }}-{{ $index }}"
+                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                                      data-timepicker id="morning-start-{{ $englishDay }}-{{ $index }}"
                                       wire:model.live="slots.{{ $englishDay }}.{{ $index }}.start_time" />
                                   </div>
                                   <div class="form-group position-relative timepicker-ui">
                                     <label class="label-top-input-special-takhasos"
                                       for="morning-end-{{ $englishDay }}-{{ $index }}">تا</label>
                                     <input type="text"
-                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white" data-timepicker
-                                      id="morning-end-{{ $englishDay }}-{{ $index }}"
+                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                                      data-timepicker id="morning-end-{{ $englishDay }}-{{ $index }}"
                                       wire:model.live="slots.{{ $englishDay }}.{{ $index }}.end_time" />
                                   </div>
                                   <div class="form-group position-relative">
@@ -137,16 +137,16 @@
                                   <label class="label-top-input-special-takhasos"
                                     for="morning-start-{{ $englishDay }}-{{ $index }}">از</label>
                                   <input type="text"
-                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white" data-timepicker
-                                    id="morning-start-{{ $englishDay }}-{{ $index }}"
+                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                                    data-timepicker id="morning-start-{{ $englishDay }}-{{ $index }}"
                                     wire:model.live="slots.{{ $englishDay }}.{{ $index }}.start_time" />
                                 </div>
                                 <div class="form-group position-relative timepicker-ui">
                                   <label class="label-top-input-special-takhasos"
                                     for="morning-end-{{ $englishDay }}-{{ $index }}">تا</label>
                                   <input type="text"
-                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white" data-timepicker
-                                    id="morning-end-{{ $englishDay }}-{{ $index }}"
+                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                                    data-timepicker id="morning-end-{{ $englishDay }}-{{ $index }}"
                                     wire:model.live="slots.{{ $englishDay }}.{{ $index }}.end_time" />
                                 </div>
                                 <div class="form-group position-relative">
@@ -834,8 +834,7 @@
                 @this.emergencyTimes = [...@this.emergencyTimes, time];
               }
             });
-            setTimeout(() => {
-            }, 100);
+            setTimeout(() => {}, 100);
           } catch (error) {
             console.error('Error in emergencyModal:', error);
             $modal.modal('hide');
@@ -856,6 +855,7 @@
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
         });
+
         function cleanupModal() {
           $('.modal-backdrop').remove();
           $('body').removeClass('modal-open').css('padding-right', '');
