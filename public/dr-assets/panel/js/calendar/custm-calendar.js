@@ -259,16 +259,17 @@ document.addEventListener("livewire:initialized", () => {
             }, 100);
         }
     });
+    // اطمینان از اجرای تقویم بعد از به‌روزرسانی DOM
+    Livewire.hook("morph.updated", () => {
+        const modal = document.querySelector(
+            "#mini-calendar-modal.x-modal--visible"
+        );
+        if (modal) {
+            setTimeout(() => {
+                initializeCalendar();
+            }, 100);
+        }
+    });
 });
 
-// اطمینان از اجرای تقویم بعد از به‌روزرسانی DOM
-Livewire.hook("morph.updated", () => {
-    const modal = document.querySelector(
-        "#mini-calendar-modal.x-modal--visible"
-    );
-    if (modal) {
-        setTimeout(() => {
-            initializeCalendar();
-        }, 100);
-    }
-});
+

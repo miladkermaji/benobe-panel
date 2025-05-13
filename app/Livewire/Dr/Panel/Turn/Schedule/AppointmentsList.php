@@ -602,10 +602,18 @@ class AppointmentsList extends Component
         $this->dispatch('appointments-rescheduled', [
             'message' => 'نوبت‌ها با موفقیت جابجا شدند.'
         ]);
+        
+        // پاک کردن کش مرتبط با نوبت‌ها
+        $doctor = $this->getAuthenticatedDoctor();
+        if ($doctor) {
+            $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
+            Cache::forget($cacheKey);
+        }
+        
         $this->loadAppointments();
         $this->dispatch('close-modal');
         $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
-
+    
         // فقط اگر selected_date در URL وجود داشته باشد، ریدایرکت انجام شود
         if (request()->query('selected_date') && !empty($this->redirectBack)) {
             return redirect()->to($this->redirectBack);
@@ -642,18 +650,22 @@ class AppointmentsList extends Component
             ->where('day', $dayOfWeek)
             ->where('is_working', true)
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->
+    
+    where('clinic_id', $this->selectedClinicId));
         $workSchedule = $workScheduleQuery->first();
-        if (!$workSchedule) {
-            return ['success' => false, 'message' => 'پزشک در این روز ساعات کاری ندارد.'];
-        }
+    
         $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctor->id)
             ->where('date', $newDate)
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $specialSchedule = $specialScheduleQuery->first();
-        $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
-        $appointmentSettings = json_decode($workSchedule->appointment_settings, true) ?? ['appointment_duration' => 15];
+    
+        if (!$workSchedule && !$specialSchedule) {
+            return ['success' => false, 'message' => 'پزشک در این روز ساعات کاری ندارد.'];
+        }
+        $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : ($workSchedule ? json_decode($workSchedule->work_hours, true) : []);
+        $appointmentSettings = $workSchedule ? (json_decode($workSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ($specialSchedule ? (json_decode($specialSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ['appointment_duration' => 15]);
         $maxAppointments = 0;
         foreach ($workHours as $period) {
             $maxAppointments += $period['max_appointments'] ?? 0;
@@ -752,10 +764,18 @@ class AppointmentsList extends Component
             $this->dispatch('appointments-rescheduled', [
                 'message' => 'نوبت‌ها با موفقیت جابجا شدند.'
             ]);
+            
+            // پاک کردن کش مرتبط با نوبت‌ها
+            $doctor = $this->getAuthenticatedDoctor();
+            if ($doctor) {
+                $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
+                Cache::forget($cacheKey);
+            }
+            
             $this->loadAppointments();
             $this->dispatch('close-modal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
-
+    
             // فقط اگر selected_date در URL وجود داشته باشد، ریدایرکت انجام شود
             if (request()->query('selected_date') && !empty($this->redirectBack)) {
                 return redirect()->to($this->redirectBack);
@@ -888,6 +908,14 @@ class AppointmentsList extends Component
                     'message' => count($appointmentIds) > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.'
                 ]);
             }
+            
+            // پاک کردن کش مرتبط با نوبت‌ها
+            $doctor = $this->getAuthenticatedDoctor();
+            if ($doctor) {
+                $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
+                Cache::forget($cacheKey);
+            }
+            
             $this->loadAppointments();
             $this->dispatch('close-modal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
@@ -896,7 +924,7 @@ class AppointmentsList extends Component
         }
     }
 
-    public function processReschedule($appointmentIds, $newDate, $availableSlots)
+    private function processReschedule($appointmentIds, $newDate, $availableSlots)
     {
         $remainingIds = [];
         $usedSlots = [];
@@ -923,6 +951,24 @@ class AppointmentsList extends Component
                 $remainingIds[] = $appointmentId;
             }
         }
+    
+        // پاک کردن کش برای تاریخ امروز و تاریخ مقصد
+        $doctor = $this->getAuthenticatedDoctor();
+        if ($doctor) {
+            // پاک کردن کش برای تاریخ انتخاب‌شده فعلی
+            $cacheKeyCurrent = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
+            Cache::forget($cacheKeyCurrent);
+            
+            // پاک کردن کش برای تاریخ مقصد (newDate)
+            $cacheKeyNew = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$newDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
+            Cache::forget($cacheKeyNew);
+            
+            // پاک کردن کش برای تاریخ امروز (اگر newDate امروز باشد)
+            $today = Carbon::today()->format('Y-m-d');
+            $cacheKeyToday = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$today}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
+            Cache::forget($cacheKeyToday);
+        }
+    
         return $remainingIds;
     }
 

@@ -346,4 +346,5 @@
   </div>
   <div class="calendar-body" id="calendar-body"></div>
 </div>
+<script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
 

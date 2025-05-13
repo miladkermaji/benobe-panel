@@ -713,3 +713,4 @@
     }
   }
 </style>
+<script src="{{ asset('dr-assets/panel/js/calendar/reschedule-calendar.js') }}"></script>
