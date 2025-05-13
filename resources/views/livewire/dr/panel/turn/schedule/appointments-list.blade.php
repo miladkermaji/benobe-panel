@@ -9,7 +9,7 @@
       <div class="c-a-wrapper">
         <button class="selectDate_datepicker__xkZeS" x-data @click="$dispatch('open-modal',{name:'mini-calendar-modal'})">
           <span class="mx-1">{{ Jalalian::fromCarbon(Carbon::parse($selectedDate))->format('Y/m/d') }}</span>
-          <img src="http://127.0.0.1:8000/dr-assets/icons/calendar.svg" alt="تقویم">
+          <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="تقویم">
         </button>
         <div class="turning_search-wrapper__loGVc">
           <input type="text" class="my-form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ..."
