@@ -73,9 +73,9 @@
         </div>
       </div>
       <div class="appointments-container">
-        <div class="loading-overlay" wire:loading wire:loading.class="show">
+        <div class="loading-overlay" @if($isLoading) class="show" @endif>
           <div class="spinner"></div>
-        </div>
+      </div>
         <div class="table-responsive position-relative w-100 d-none d-md-block">
           <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
             <thead class="bg-light">

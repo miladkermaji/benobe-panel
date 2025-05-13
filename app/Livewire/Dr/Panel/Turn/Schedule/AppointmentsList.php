@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Validator;
 class AppointmentsList extends Component
 {
     use WithPagination;
+    public $isLoading = false;
     public $selectedServiceIds = [];
     public $calendarYear;
     public $paymentMethod = 'online';
@@ -110,6 +111,9 @@ class AppointmentsList extends Component
 
     public function mount()
     {
+
+        $this->isLoading = true;
+
         // مقداردهی اولیه pagination با مقادیر پیش‌فرض
         $this->pagination = [
             'current_page' => 1,
@@ -163,6 +167,9 @@ class AppointmentsList extends Component
             $this->loadCalendarData();
             $this->loadInsurances();
         }
+
+        $this->isLoading = false;
+
     }
 
     /**
@@ -188,12 +195,16 @@ class AppointmentsList extends Component
         $this->showNoResultsAlert = false;
     }
 
-    public function confirmSearchAllDates()
+ public function searchAllDates()
     {
-        // منطق جستجو در همه تاریخ‌ها
+        $this->isLoading = true;
         $this->isSearchingAllDates = true;
+        $this->dateFilter = '';
+        $this->filterStatus = '';
+        $this->resetPage();
+        $this->appointments = [];
         $this->showNoResultsAlert = false;
-        // به‌روزرسانی لیست نوبت‌ها
+        $this->loadAppointments();
     }
     public function loadCalendarData()
     {
@@ -369,6 +380,9 @@ class AppointmentsList extends Component
 
     public function loadAppointments()
     {
+
+        $this->isLoading = true;
+
         $doctor = $this->getAuthenticatedDoctor();
         if (!$doctor) {
             return [];
@@ -469,20 +483,11 @@ class AppointmentsList extends Component
             $this->showNoResultsAlert = false;
             $this->dispatch('hide-no-results-alert');
         }
-
+        $this->isLoading = false;
         return $appointmentData;
     }
 
-    public function searchAllDates()
-    {
-        $this->isSearchingAllDates = true;
-        $this->dateFilter = '';
-        $this->filterStatus = '';
-        $this->resetPage();
-        $this->appointments = [];
-        $this->showNoResultsAlert = false;
-        $this->loadAppointments();
-    }
+   
 
     private function convertToGregorian($date)
     {
@@ -517,6 +522,7 @@ class AppointmentsList extends Component
 
     public function updatedSelectedDate()
     {
+        $this->isLoading = true;
         $this->isSearchingAllDates = false;
         $this->filterStatus = '';
         $this->dateFilter = '';
@@ -527,6 +533,7 @@ class AppointmentsList extends Component
 
     public function updatedSelectedClinicId()
     {
+        $this->isLoading = true;
         $this->isSearchingAllDates = false;
         $this->loadAppointments();
         $this->loadBlockedUsers();
@@ -534,12 +541,14 @@ class AppointmentsList extends Component
 
     public function updatedSearchQuery()
     {
+        $this->isLoading = true;
         $this->isSearchingAllDates = false;
         $this->loadAppointments();
     }
 
     public function updatedFilterStatus()
     {
+        $this->isLoading = true;
         $this->isSearchingAllDates = false;
         $this->dateFilter = '';
         $this->resetPage();
@@ -555,27 +564,30 @@ class AppointmentsList extends Component
 
     public function updatedDateFilter()
     {
+        $this->isLoading = true;
         $this->isSearchingAllDates = false;
         $this->filterStatus = '';
         $this->resetPage();
         $this->appointments = [];
         $this->loadAppointments();
     }
-
     public function gotoPage($page)
     {
+        $this->isLoading = true;
         $this->setPage($page);
         $this->loadAppointments();
     }
 
     public function previousPage()
     {
+        $this->isLoading = true;
         $this->setPage($this->pagination['current_page'] - 1);
         $this->loadAppointments();
     }
 
     public function nextPage()
     {
+        $this->isLoading = true;
         $this->setPage($this->pagination['current_page'] + 1);
         $this->loadAppointments();
     }
@@ -705,26 +717,26 @@ class AppointmentsList extends Component
         if (!$doctor) {
             return ['success' => false, 'message' => 'دکتر معتبر یافت نشد.'];
         }
-    
+
         // بررسی زمان پایان و تعداد نوبت‌ها
         $workHoursCheck = $this->checkWorkHoursAndSlots($newDate, count($appointmentIds));
         if (!$workHoursCheck['success']) {
             return ['success' => false, 'message' => $workHoursCheck['message']];
         }
-    
+
         $newDateCarbon = Carbon::parse($newDate);
         $today = Carbon::today();
         if ($newDateCarbon->lt($today)) {
             return ['success' => false, 'message' => 'امکان جابجایی به تاریخ گذشته وجود ندارد.'];
         }
-    
+
         $calendarDays = DoctorAppointmentConfig::where('doctor_id', $doctor->id)
             ->value('calendar_days') ?? 30;
         $maxDate = $today->copy()->addDays($calendarDays);
         if ($newDateCarbon->gt($maxDate)) {
             return ['success' => false, 'message' => 'تاریخ مقصد خارج از بازه تقویم مجاز است.'];
         }
-    
+
         $holidaysQuery = DoctorHoliday::where('doctor_id', $doctor->id)
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
@@ -733,7 +745,7 @@ class AppointmentsList extends Component
         if (in_array($newDate, $holidayDates)) {
             return ['success' => false, 'message' => 'تاریخ مقصد تعطیل است.'];
         }
-    
+
         $dayOfWeek = strtolower($newDateCarbon->format('l'));
         $workScheduleQuery = DoctorWorkSchedule::where('doctor_id', $doctor->id)
             ->where('day', $dayOfWeek)
@@ -741,28 +753,28 @@ class AppointmentsList extends Component
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $workSchedule = $workScheduleQuery->first();
-    
+
         $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctor->id)
             ->where('date', $newDate)
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $specialSchedule = $specialScheduleQuery->first();
-    
+
         if (!$workSchedule && !$specialSchedule) {
             return ['success' => false, 'message' => 'پزشک در این روز ساعات کاری ندارد.'];
         }
-    
+
         $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : ($workSchedule ? json_decode($workSchedule->work_hours, true) : []);
         $appointmentSettings = $workSchedule ? (json_decode($workSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ($specialSchedule ? (json_decode($specialSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ['appointment_duration' => 15]);
         $maxAppointments = 0;
         foreach ($workHours as $period) {
             $maxAppointments += $period['max_appointments'] ?? 0;
         }
-    
+
         $availableSlots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $newDate, $doctor->id);
         $availableSlotsCount = count($availableSlots);
         $requiredSlots = count($appointmentIds);
-    
+
         if ($availableSlotsCount < $requiredSlots || $maxAppointments < $requiredSlots) {
             $nextAvailableDate = $this->getNextAvailableDateAfter($newDate);
             $remainingAppointments = $requiredSlots - min($availableSlotsCount, $maxAppointments);
@@ -782,7 +794,7 @@ class AppointmentsList extends Component
                 'partial' => true,
             ];
         }
-    
+
         return [
             'success' => true,
             'available_slots' => $availableSlots,
@@ -830,13 +842,13 @@ class AppointmentsList extends Component
             if (empty($availableSlots) || !is_array($availableSlots)) {
                 throw new \Exception('زمان‌های کاری خالی نامعتبر هستند.');
             }
-    
+
             // بررسی زمان پایان و تعداد نوبت‌ها برای تاریخ جدید
             $workHoursCheck = $this->checkWorkHoursAndSlots($newDate, count($appointmentIds));
             if (!$workHoursCheck['success']) {
                 throw new \Exception($workHoursCheck['message']);
             }
-    
+
             $remainingIds = $this->processReschedule($appointmentIds, $newDate, $availableSlots);
             if (!empty($remainingIds) && $nextDate) {
                 // بررسی زمان پایان و تعداد نوبت‌ها برای تاریخ بعدی
@@ -844,7 +856,7 @@ class AppointmentsList extends Component
                 if (!$workHoursCheckNext['success']) {
                     throw new \Exception($workHoursCheckNext['message']);
                 }
-    
+
                 $nextDateSlots = $this->getAvailableSlotsForDate($nextDate);
                 if (empty($nextDateSlots)) {
                     throw new \Exception('هیچ زمان کاری خالی برای تاریخ بعدی یافت نشد.');
@@ -865,22 +877,22 @@ class AppointmentsList extends Component
                     ]);
                 }
             }
-    
+
             $this->dispatch('appointments-rescheduled', [
                 'message' => 'نوبت‌ها با موفقیت جابجا شدند.'
             ]);
-    
+
             // پاک کردن کش مرتبط با نوبت‌ها
             $doctor = $this->getAuthenticatedDoctor();
             if ($doctor) {
                 $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
                 Cache::forget($cacheKey);
             }
-    
+
             $this->loadAppointments();
             $this->dispatch('close-modal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
-    
+
             // فقط اگر selected_date در URL وجود داشته باشد، ریدایرکت انجام شود
             if (request()->query('selected_date') && !empty($this->redirectBack)) {
                 return redirect()->to($this->redirectBack);
@@ -930,21 +942,21 @@ class AppointmentsList extends Component
         $holidays = $holidaysQuery->first();
         $holidayDates = json_decode($holidays->holiday_dates ?? '[]', true);
         $currentDate = Carbon::parse($startDate)->addDay();
-    
+
         while ($currentDate->lte($maxDate)) {
             $dateStr = $currentDate->format('Y-m-d');
             if (in_array($dateStr, $holidayDates)) {
                 $currentDate->addDay();
                 continue;
             }
-    
+
             // بررسی زمان پایان و تعداد نوبت‌ها
             $workHoursCheck = $this->checkWorkHoursAndSlots($dateStr, 1); // حداقل یه نوبت نیازه
             if (!$workHoursCheck['success']) {
                 $currentDate->addDay();
                 continue;
             }
-    
+
             $dayOfWeek = strtolower($currentDate->format('l'));
             $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $dayOfWeek)
@@ -952,29 +964,29 @@ class AppointmentsList extends Component
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
-    
+
             if (!$workSchedule) {
                 $currentDate->addDay();
                 continue;
             }
-    
+
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $dateStr)
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
-    
+
             $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
             $appointmentSettings = json_decode($workSchedule->appointment_settings, true) ?? ['appointment_duration' => 15];
             $availableSlots = $this->calculateAvailableSlots($workHours, $appointmentSettings, $dateStr, $doctorId);
-    
+
             if (!empty($availableSlots)) {
                 return $dateStr;
             }
-    
+
             $currentDate->addDay();
         }
-    
+
         return null;
     }
 
@@ -985,7 +997,7 @@ class AppointmentsList extends Component
             if (empty($appointmentIds)) {
                 return;
             }
-    
+
             $validator = Validator::make(['newDate' => $newDate], [
                 'newDate' => 'required|date_format:Y-m-d',
             ]);
@@ -993,7 +1005,7 @@ class AppointmentsList extends Component
                 $this->dispatch('show-toastr', ['type' => 'error', 'message' => $validator->errors()->first()]);
                 return;
             }
-    
+
             // بررسی زمان پایان و تعداد نوبت‌ها
             $workHoursCheck = $this->checkWorkHoursAndSlots($newDate, count($appointmentIds));
             if (!$workHoursCheck['success']) {
@@ -1001,7 +1013,7 @@ class AppointmentsList extends Component
                 $this->dispatch('showModal', 'reschedule-modal');
                 return;
             }
-    
+
             $conditions = $this->checkRescheduleConditions($newDate, $appointmentIds);
             if (!$conditions['success']) {
                 if (isset($conditions['partial']) && $conditions['partial']) {
@@ -1022,7 +1034,7 @@ class AppointmentsList extends Component
                 $this->dispatch('showModal', 'reschedule-modal');
                 return;
             }
-    
+
             $remainingIds = $this->processReschedule($appointmentIds, $newDate, $conditions['available_slots']);
             if (!empty($remainingIds)) {
                 $this->dispatch('show-toastr', [
@@ -1038,14 +1050,14 @@ class AppointmentsList extends Component
                     'message' => count($appointmentIds) > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.'
                 ]);
             }
-    
+
             // پاک کردن کش مرتبط با نوبت‌ها
             $doctor = $this->getAuthenticatedDoctor();
             if ($doctor) {
                 $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
                 Cache::forget($cacheKey);
             }
-    
+
             $this->loadAppointments();
             $this->dispatch('close-modal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
@@ -1836,7 +1848,7 @@ class AppointmentsList extends Component
             $firstAvailableDate = null;
             $availableSlots = [];
             $nextAvailableDate = null;
-    
+
             while ($currentDate <= $maxDate) {
                 $dateStr = $currentDate->toDateString();
                 // بررسی زمان پایان و تعداد نوبت‌ها
@@ -1845,7 +1857,7 @@ class AppointmentsList extends Component
                     $currentDate->addDay();
                     continue;
                 }
-    
+
                 $result = $this->checkRescheduleConditions($dateStr, $appointmentIds);
                 if ($result['success']) {
                     $firstAvailableDate = $dateStr;
@@ -1860,11 +1872,11 @@ class AppointmentsList extends Component
                 }
                 $currentDate->addDay();
             }
-    
+
             if (!$firstAvailableDate) {
                 throw new \Exception('هیچ تاریخ خالی در بازه مجاز یافت نشد.');
             }
-    
+
             $jalaliDate = Jalalian::fromCarbon(Carbon::parse($firstAvailableDate))->format('Y/m/d');
             $availableSlotsCount = count($availableSlots);
             if ($availableSlotsCount >= $requiredSlots) {
