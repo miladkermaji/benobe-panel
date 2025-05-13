@@ -72,10 +72,10 @@
           </button>
         </div>
       </div>
-      <div class="appointments-container">
-        <div class="loading-overlay" @if($isLoading) class="show" @endif>
-          <div class="spinner"></div>
-      </div>
+      <div class="appointments-container" wire:ignore.self>
+        <div class="loading-overlay-custom {{ $isLoading ? 'show-custom' : '' }}">
+          <div class="spinner-custom"></div>
+        </div>
         <div class="table-responsive position-relative w-100 d-none d-md-block">
           <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
             <thead class="bg-light">
@@ -590,48 +590,50 @@
 
 
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // استفاده از Event Delegation برای مدیریت کلیک و لمس
-  document.body.addEventListener('click', handleToggle);
-  document.body.addEventListener('touchstart', handleToggle, { passive: false });
+      document.addEventListener('DOMContentLoaded', () => {
+        // استفاده از Event Delegation برای مدیریت کلیک و لمس
+        document.body.addEventListener('click', handleToggle);
+        document.body.addEventListener('touchstart', handleToggle, {
+          passive: false
+        });
 
-  // به‌روزرسانی پس از رندر Livewire
-  Livewire.on('refresh', () => {
-    console.log('Livewire refreshed, re-checking toggle buttons');
-  });
-});
+        // به‌روزرسانی پس از رندر Livewire
+        Livewire.on('refresh', () => {
+          console.log('Livewire refreshed, re-checking toggle buttons');
+        });
+      });
 
-function handleToggle(event) {
-  const button = event.target.closest('.appointment-card .toggle-details');
-  if (!button) return; // اگر کلیک روی دکمه toggle-details نبود، خارج شو
+      function handleToggle(event) {
+        const button = event.target.closest('.appointment-card .toggle-details');
+        if (!button) return; // اگر کلیک روی دکمه toggle-details نبود، خارج شو
 
-  event.preventDefault(); // جلوگیری از رفتار پیش‌فرض
+        event.preventDefault(); // جلوگیری از رفتار پیش‌فرض
 
 
-  const card = button.closest('.appointment-card');
-  if (!card) {
-    return;
-  }
+        const card = button.closest('.appointment-card');
+        if (!card) {
+          return;
+        }
 
-  const details = card.querySelectorAll('.card-item.details');
-  const isExpanded = card.classList.contains('expanded');
-  const toggleIcon = button.querySelector('svg');
+        const details = card.querySelectorAll('.card-item.details');
+        const isExpanded = card.classList.contains('expanded');
+        const toggleIcon = button.querySelector('svg');
 
-  if (!toggleIcon) {
-    console.warn('Toggle icon (svg) not found in button');
-    return;
-  }
+        if (!toggleIcon) {
+          console.warn('Toggle icon (svg) not found in button');
+          return;
+        }
 
-  if (isExpanded) {
-    details.forEach(item => item.classList.add('d-none'));
-    card.classList.remove('expanded');
-    toggleIcon.style.transform = 'rotate(0deg)';
-  } else {
-    details.forEach(item => item.classList.remove('d-none'));
-    card.classList.add('expanded');
-    toggleIcon.style.transform = 'rotate(180deg)';
-  }
-}
+        if (isExpanded) {
+          details.forEach(item => item.classList.add('d-none'));
+          card.classList.remove('expanded');
+          toggleIcon.style.transform = 'rotate(0deg)';
+        } else {
+          details.forEach(item => item.classList.remove('d-none'));
+          card.classList.add('expanded');
+          toggleIcon.style.transform = 'rotate(180deg)';
+        }
+      }
       window.holidaysData = @json($holidaysData);
       window.appointmentsData = @json($appointmentsData);
 

@@ -112,7 +112,7 @@ class AppointmentsList extends Component
     public function mount()
     {
 
-        $this->isLoading = true;
+        
 
         // مقداردهی اولیه pagination با مقادیر پیش‌فرض
         $this->pagination = [
@@ -168,7 +168,7 @@ class AppointmentsList extends Component
             $this->loadInsurances();
         }
 
-        $this->isLoading = false;
+        
 
     }
 
@@ -197,7 +197,6 @@ class AppointmentsList extends Component
 
  public function searchAllDates()
     {
-        $this->isLoading = true;
         $this->isSearchingAllDates = true;
         $this->dateFilter = '';
         $this->filterStatus = '';
@@ -381,7 +380,6 @@ class AppointmentsList extends Component
     public function loadAppointments()
     {
 
-        $this->isLoading = true;
 
         $doctor = $this->getAuthenticatedDoctor();
         if (!$doctor) {
@@ -522,7 +520,6 @@ class AppointmentsList extends Component
 
     public function updatedSelectedDate()
     {
-        $this->isLoading = true;
         $this->isSearchingAllDates = false;
         $this->filterStatus = '';
         $this->dateFilter = '';
@@ -533,7 +530,6 @@ class AppointmentsList extends Component
 
     public function updatedSelectedClinicId()
     {
-        $this->isLoading = true;
         $this->isSearchingAllDates = false;
         $this->loadAppointments();
         $this->loadBlockedUsers();
@@ -541,14 +537,12 @@ class AppointmentsList extends Component
 
     public function updatedSearchQuery()
     {
-        $this->isLoading = true;
         $this->isSearchingAllDates = false;
         $this->loadAppointments();
     }
 
     public function updatedFilterStatus()
     {
-        $this->isLoading = true;
         $this->isSearchingAllDates = false;
         $this->dateFilter = '';
         $this->resetPage();
@@ -564,7 +558,6 @@ class AppointmentsList extends Component
 
     public function updatedDateFilter()
     {
-        $this->isLoading = true;
         $this->isSearchingAllDates = false;
         $this->filterStatus = '';
         $this->resetPage();
@@ -573,21 +566,18 @@ class AppointmentsList extends Component
     }
     public function gotoPage($page)
     {
-        $this->isLoading = true;
         $this->setPage($page);
         $this->loadAppointments();
     }
 
     public function previousPage()
     {
-        $this->isLoading = true;
         $this->setPage($this->pagination['current_page'] - 1);
         $this->loadAppointments();
     }
 
     public function nextPage()
     {
-        $this->isLoading = true;
         $this->setPage($this->pagination['current_page'] + 1);
         $this->loadAppointments();
     }
