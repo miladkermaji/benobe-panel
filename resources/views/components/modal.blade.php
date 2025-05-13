@@ -125,7 +125,7 @@
   }
 
   .xai-modal-body {
-    padding: 1.4rem;
+    padding: 1rem;
     z-index: 1001;
     /* هم‌سطح با کانتینر مودال */
   }

@@ -130,7 +130,7 @@
     direction: rtl;
     margin: 0 auto;
     font-family: var(--font-family);
-    padding: 1.5rem;
+    padding: 1.1rem;
     position: relative;
     transition: var(--transition);
   }
@@ -139,7 +139,6 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.75rem 0;
     flex-wrap: wrap;
   }
 
@@ -205,9 +204,8 @@
   .reschedule-calendar-container .btn-primary {
     background: var(--primary);
     color: var(--background-card);
-    padding: 0.5rem 1.5rem;
     border-radius: var(--radius-button);
-    font-size: 0.95rem;
+    font-size: 0.75rem;
     font-weight: 600;
     border: none;
     cursor: pointer;
@@ -224,8 +222,8 @@
   .reschedule-calendar-container .calendar-body {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0.5rem;
-    padding: 0.75rem 0;
+    gap: 0.4rem;
+    padding: 0.2rem 0;
   }
 
   .reschedule-calendar-container .calendar-day-name {
@@ -426,14 +424,13 @@
     }
 
     .reschedule-calendar-container .btn-primary {
-      font-size: 0.9rem;
-      padding: 0.4rem 1.2rem;
+      font-size: 0.6rem;
       border-radius: var(--radius-button-mobile);
     }
 
     .reschedule-calendar-container .calendar-body {
       gap: 0.4rem;
-      padding: 0.5rem 0;
+      padding: 0.2rem 0;
     }
 
     .reschedule-calendar-container .calendar-day-name {
@@ -526,14 +523,13 @@
     }
 
     .reschedule-calendar-container .btn-primary {
-      font-size: 0.85rem;
-      padding: 0.35rem 1rem;
+      font-size: 0.65rem;
       border-radius: var(--radius-button-mobile);
     }
 
     .reschedule-calendar-container .calendar-body {
       gap: 0.3rem;
-      padding: 0.4rem 0;
+      padding: 0.2rem 0;
     }
 
     .reschedule-calendar-container .calendar-day-name {
@@ -639,13 +635,12 @@
     }
 
     .reschedule-calendar-container .btn-primary {
-      font-size: 0.8rem;
-      padding: 0.3rem 0.8rem;
+      font-size: 0.6rem;
       border-radius: var(--radius-button-mobile);
     }
 
     .reschedule-calendar-container .calendar-body {
-      gap: 0.2rem;
+      gap: 0.15rem;
       padding: 0.3rem 0;
     }
 
