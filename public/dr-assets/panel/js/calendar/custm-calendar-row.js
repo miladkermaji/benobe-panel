@@ -17,8 +17,7 @@ $(document).ready(function () {
     let lastTime = 0;
     const visibleDays = 18;
     let selectedDate = null;
-
-  
+    let touchMoved = false; // برای تشخیص حرکت انگشت
 
     // رویداد Livewire برای آپدیت DOM
     document.addEventListener("livewire:updated", function () {
@@ -55,7 +54,7 @@ $(document).ready(function () {
         fetchAppointmentsCount();
     });
 
-    // گوش دادن به رویداد لغو نوبت
+    // گوش دادن به رویدادهای Livewire
     Livewire.on("appointments-cancelled", (event) => {
         fetchAppointmentsCount();
     });
@@ -92,7 +91,6 @@ $(document).ready(function () {
                     $("#calendar-error").hide();
                     loadCalendar();
                 } else {
-                   
                     $("#calendar-error").show();
                     loadingOverlay.hide();
                     calendar.show();
@@ -109,6 +107,7 @@ $(document).ready(function () {
             },
         });
     }
+
     function loadCalendar() {
         if (!calendar.length) {
             return;
@@ -185,7 +184,6 @@ $(document).ready(function () {
                     ? "این روز برنامه خاص دارد"
                     : "";
 
-                // ایجاد کارت با پشتیبانی از تولتیپ بوت‌استرپ
                 const cardContent = `
                     <div class="calendar-card btn btn-light ${cardClass} ${holidayClass} ${specialClass}" 
                          data-date="${appointmentDate}" 
@@ -222,12 +220,11 @@ $(document).ready(function () {
             );
         }
 
-        // فعال‌سازی تولتیپ‌های بوت‌استرپ با jQuery
+        // فعال‌سازی تولتیپ‌های بوت‌استرپ
         $('[data-bs-toggle="tooltip"]').tooltip({
-            trigger: "hover", // فقط با هاور نمایش داده شود
-            delay: { show: 100, hide: 0 }, // تأخیر صفر برای مخفی شدن سریع
+            trigger: "hover",
+            delay: { show: 100, hide: 0 },
         });
-
 
         updateButtonState();
     }
@@ -283,8 +280,10 @@ $(document).ready(function () {
         }, 300);
     }
 
-    calendar.on("mousedown touchstart", function (e) {
+    // رویدادهای لمسی و ماوس
+    calendar.on("touchstart mousedown", function (e) {
         isDragging = true;
+        touchMoved = false;
         calendar.addClass("grabbing");
         startX =
             e.type === "touchstart"
@@ -294,11 +293,14 @@ $(document).ready(function () {
         velocity = 0;
         lastX = startX;
         lastTime = Date.now();
-        e.preventDefault();
+        if (e.type === "mousedown") {
+            e.preventDefault();
+        }
     });
 
-    calendar.on("mousemove touchmove", function (e) {
+    calendar.on("touchmove mousemove", function (e) {
         if (!isDragging) return;
+        touchMoved = true;
         const x =
             e.type === "touchmove" ? e.originalEvent.touches[0].pageX : e.pageX;
         const deltaX = x - startX;
@@ -313,7 +315,7 @@ $(document).ready(function () {
         e.preventDefault();
     });
 
-    calendar.on("mouseup touchend", function () {
+    calendar.on("touchend mouseup", function () {
         isDragging = false;
         calendar.removeClass("grabbing");
         const inertiaDuration = 500;
@@ -333,8 +335,13 @@ $(document).ready(function () {
         }
     });
 
-    calendar.on("click", ".calendar-card", function (e) {
-        if (Math.abs(velocity) > 0.1) return;
+    // مدیریت کلیک و لمس روی کارت‌ها
+    calendar.on("click touchend", ".calendar-card", function (e) {
+        e.preventDefault();
+        if (e.type === "touchend" && touchMoved) {
+            return;
+        }
+
         $(".calendar-card").not(".my-active").removeClass("card-selected");
         $(this).addClass("card-selected");
         const date = $(this).data("date");
