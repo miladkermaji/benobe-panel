@@ -18,13 +18,7 @@ $(document).ready(function () {
     const visibleDays = 18;
     let selectedDate = null;
 
-    // چک کردن وجود المنت‌ها
-    if (!calendar.length) {
-        console.error("Calendar element (#calendar) not found in DOM");
-    }
-    if (!loadingOverlay.length) {
-        console.error("Loading overlay (#calendar-loading) not found in DOM");
-    }
+  
 
     // رویداد Livewire برای آپدیت DOM
     document.addEventListener("livewire:updated", function () {
@@ -74,7 +68,6 @@ $(document).ready(function () {
 
     function fetchAppointmentsCount() {
         if (!calendar.length) {
-            console.error("Calendar element not found, aborting AJAX");
             return;
         }
         loadingOverlay.show();
@@ -99,17 +92,13 @@ $(document).ready(function () {
                     $("#calendar-error").hide();
                     loadCalendar();
                 } else {
-                    console.error(
-                        "Error fetching appointments:",
-                        response.message
-                    );
+                   
                     $("#calendar-error").show();
                     loadingOverlay.hide();
                     calendar.show();
                 }
             },
             error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error, xhr.responseText);
                 $("#calendar-error").show();
                 loadingOverlay.hide();
                 calendar.show();
@@ -120,10 +109,8 @@ $(document).ready(function () {
             },
         });
     }
-
     function loadCalendar() {
         if (!calendar.length) {
-            console.error("Calendar element not found in DOM");
             return;
         }
         if (!moment(currentDate).isValid()) {
@@ -133,6 +120,12 @@ $(document).ready(function () {
             );
             currentDate = moment().startOf("day").subtract(9, "days");
         }
+
+        // تخریب نمونه‌های قبلی تولتیپ
+        const existingTooltips = $('[data-bs-toggle="tooltip"]');
+        existingTooltips.each(function () {
+            $(this).tooltip("dispose");
+        });
 
         calendar.empty();
         let badgeCount = 0;
@@ -154,7 +147,6 @@ $(document).ready(function () {
                 window.holidaysData && window.holidaysData.holidays
                     ? window.holidaysData.holidays.includes(appointmentDate)
                     : false;
-            // بررسی آیا این روز خاص است
             const isSpecialDay = specialDays.includes(appointmentDate);
 
             if (isWorkingDay || isToday || isSpecialDay) {
@@ -185,21 +177,7 @@ $(document).ready(function () {
                     ? "card-selected"
                     : "";
                 const holidayClass = isHoliday ? "holiday-card" : "";
-                const specialClass = isSpecialDay ? "special-day" : ""; // کلاس برای روزهای خاص
-
-                const cardContent = `
-                <div class="calendar-card btn btn-light ${cardClass} ${holidayClass} ${specialClass}" data-date="${appointmentDate}" style="--delay: ${displayedDays}">
-                    ${badgeHtml}
-                    <div class="day-name">${persianDate}</div>
-                    <div class="date">${persianFormattedDate}</div>
-                    ${isToday ? '<div class="current-day-icon"></div>' : ""}
-                    ${
-                        isSpecialDay
-                            ? '<div class="special-day-icon"></div>'
-                            : ""
-                    }
-                </div>
-            `;
+                const specialClass = isSpecialDay ? "special-day" : "";
 
                 const tooltipContent = isHoliday
                     ? "این روز تعطیل است"
@@ -207,20 +185,29 @@ $(document).ready(function () {
                     ? "این روز برنامه خاص دارد"
                     : "";
 
-                const card = tooltipContent
-                    ? `
-                    <div x-tooltip id="tooltip-day-${appointmentDate}" data-trigger="hover" data-placement="top" class="x-tooltip">
-                        <div class="x-tooltip__trigger">
-                            ${cardContent}
-                        </div>
-                        <div class="x-tooltip__content" data-tooltip-id="tooltip-day-${appointmentDate}">
-                            ${tooltipContent}
-                        </div>
+                // ایجاد کارت با پشتیبانی از تولتیپ بوت‌استرپ
+                const cardContent = `
+                    <div class="calendar-card btn btn-light ${cardClass} ${holidayClass} ${specialClass}" 
+                         data-date="${appointmentDate}" 
+                         style="--delay: ${displayedDays}"
+                         ${
+                             tooltipContent
+                                 ? `data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltipContent}"`
+                                 : ""
+                         }>
+                        ${badgeHtml}
+                        <div class="day-name">${persianDate}</div>
+                        <div class="date">${persianFormattedDate}</div>
+                        ${isToday ? '<div class="current-day-icon"></div>' : ""}
+                        ${
+                            isSpecialDay
+                                ? '<div class="special-day-icon"></div>'
+                                : ""
+                        }
                     </div>
-                `
-                    : cardContent;
+                `;
 
-                calendar.append(card);
+                calendar.append(cardContent);
                 if (appointmentCount > 0) badgeCount++;
                 displayedDays++;
             }
@@ -234,6 +221,13 @@ $(document).ready(function () {
                 "No days displayed. Check workingDays, specialDays or appointmentsData."
             );
         }
+
+        // فعال‌سازی تولتیپ‌های بوت‌استرپ با jQuery
+        $('[data-bs-toggle="tooltip"]').tooltip({
+            trigger: "hover", // فقط با هاور نمایش داده شود
+            delay: { show: 100, hide: 0 }, // تأخیر صفر برای مخفی شدن سریع
+        });
+
 
         updateButtonState();
     }
@@ -348,8 +342,6 @@ $(document).ready(function () {
             Livewire.dispatch("updateSelectedDate", { date: date });
             selectedDate = date;
             loadCalendar();
-        } else {
-            console.error("Livewire is not defined");
         }
     });
 

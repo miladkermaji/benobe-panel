@@ -37,7 +37,6 @@
 
 /* Calendar and add sick section */
 .calendar-and-add-sick-section {
-    background: var(--background-light);
     border-radius: var(--radius-card);
     width: 100%;
     display: flex;
