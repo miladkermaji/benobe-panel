@@ -73,11 +73,7 @@
         </div>
       </div>
       <div class="appointments-container">
-        {{--  <div class="loading-overlay-custom {{ $isLoading ? 'show-custom' : '' }}">
-          <div class="spinner-custom"></div>
-        </div> --}}
-        <div class="loading-overlay-custom" wire:loading.class="show-custom"
-          wire:loading.target="loadAppointments,nextPage,prevPage">
+        <div class="loading-overlay-custom {{ $isLoading ? 'show-custom' : '' }}">
           <div class="spinner-custom"></div>
         </div>
         <div class="table-responsive position-relative w-100 d-none d-md-block">
@@ -460,10 +456,9 @@
                 </div>
               </div>
               <div class="col-12">
-
                 <div class="border rounded p-2 bg-light services-checkbox-container position-relative">
-                  <div class="loading-overlay-custom-small" wire:loading.class="show-custom-small">
-                    <div class="spinner-custom-small"></div>
+                  <div class="loading-overlay-custom {{ $isLoadingServices ? 'show-custom' : '' }}">
+                    <div class="spinner-custom"></div>
                   </div>
                   <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
                   <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
@@ -487,7 +482,6 @@
                   @enderror
                 </div>
               </div>
-              <!-- ترکیب ویزیت رایگان و نوع پرداخت در یک ردیف -->
               <div class="col-12">
                 <div class="row g-2">
                   <div class="col-md-6">
@@ -518,15 +512,13 @@
               <div class="col-md-6">
                 <div class="border rounded p-2 bg-light position-relative">
                   <label class="form-label fw-bold mb-1">تخفیف</label>
-
-                  <div class="loading-overlay-custom-small" wire:loading.class="show-custom-small"
-                    wire:target="discountPercentage,discountInputPercentage">
-                    <div class="spinner-custom-small"></div>
+                  <div class="input-with-spinner">
+                    <input type="number" step="0.01" min="0" max="100" class="form-control"
+                      wire:model.live.debounce.500ms="discountPercentage" x-data
+                      @click="$dispatch('open-modal', { name: 'discount-modal' })" placeholder="تخفیف (٪)"
+                      @if ($isFree) disabled @endif readonly>
+                    <div class="spinner-custom-small {{ $isLoadingDiscount ? 'show-spinner' : '' }}"></div>
                   </div>
-                  <input type="number" step="0.01" min="0" max="100" class="form-control"
-                    wire:model.live.debounce.500ms="discountPercentage" x-data
-                    @click="$dispatch('open-modal', { name: 'discount-modal' })" placeholder="تخفیف (٪)"
-                    @if ($isFree) disabled @endif readonly>
                   @error('discountPercentage')
                     <span class="text-danger small">{{ $message }}</span>
                   @enderror
@@ -535,14 +527,12 @@
               <div class="col-md-6">
                 <div class="border rounded p-2 bg-light position-relative">
                   <label class="form-label fw-bold mb-1">قیمت نهایی</label>
-
-                  <div class="loading-overlay-custom-small" wire:loading.class="show-custom-small"
-                    wire:target="finalPrice,discountPercentage,discountInputPercentage">
-                    <div class="spinner-custom-small"></div>
+                  <div class="input-with-spinner">
+                    <input type="text" class="form-control" wire:model.live="finalPrice"
+                      value="{{ number_format($finalPrice, 0, '.', ',') }} تومان"
+                      @if ($isFree) disabled @endif readonly>
+                    <div class="spinner-custom-small {{ $isLoadingFinalPrice ? 'show-spinner' : '' }}"></div>
                   </div>
-                  <input type="text" class="form-control" wire:model.live="finalPrice"
-                    value="{{ number_format($finalPrice, 0, '.', ',') }} تومان"
-                    @if ($isFree) disabled @endif readonly>
                   @error('finalPrice')
                     <span class="text-danger small">{{ $message }}</span>
                   @enderror
@@ -556,7 +546,10 @@
                 </div>
               </div>
             </div>
-            <button type="submit" class="btn my-btn-primary w-100 mt-2">ثبت</button>
+            <button type="submit" class="btn my-btn-primary w-100 mt-2 position-relative">
+              <span class="{{ $isSaving ? 'd-none' : '' }}">ثبت</span>
+              <div class="spinner-custom-small {{ $isSaving ? 'show-spinner' : '' }} mx-auto"></div>
+            </button>
           </form>
         </x-slot:body>
       </x-modal>
@@ -568,36 +561,33 @@
           <form wire:submit.prevent="applyDiscount">
             <div class="mb-3 position-relative">
               <label class="form-label">درصد تخفیف</label>
-
-              <div class="loading-overlay-custom-small" wire:loading.class="show-custom-small"
-                wire:target="discountInputPercentage">
-                <div class="spinner-custom-small"></div>
+              <div class="input-with-spinner">
+                <input type="number" class="form-control" wire:model.live.debounce.500ms="discountInputPercentage"
+                  placeholder="درصد تخفیف را وارد کنید" min="0" max="100" step="0.01"
+                  @if ($isFree) disabled @endif>
+                <div class="spinner-custom-small {{ $isLoadingDiscount ? 'show-spinner' : '' }}"></div>
               </div>
-              <input type="number" class="form-control" wire:model.live.debounce.500ms="discountInputPercentage"
-                placeholder="درصد تخفیف را وارد کنید" min="0" max="100" step="0.01"
-                @if ($isFree) disabled @endif>
               @error('discountInputPercentage')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
             <div class="mb-3 position-relative">
               <label class="form-label">مبلغ تخفیف</label>
-             
-              <div class="loading-overlay-custom-small" wire:loading.class="show-custom-small" wire:target="discountInputAmount">
-                <div class="spinner-custom-small"></div>
+              <div class="input-with-spinner">
+                <input type="number" class="form-control" wire:model.live.debounce.500ms="discountInputAmount"
+                  placeholder="مبلغ تخفیف را وارد کنید" min="0" step="1"
+                  @if ($isFree) disabled @endif>
+                <div class="spinner-custom-small {{ $isLoadingDiscount ? 'show-spinner' : '' }}"></div>
               </div>
-              <input type="number" class="form-control" wire:model.live.debounce.500ms="discountInputAmount"
-                placeholder="مبلغ تخفیف را وارد کنید" min="0" step="1"
-                @if ($isFree) disabled @endif>
               @error('discountInputAmount')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
-            <button  type="submit" class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center"
-              @if ($isFree) disabled @endif>تأیید
-              <span wire:loading.class="loading-spinner">
-
-              </span>
+            <button type="submit"
+              class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center position-relative"
+              @if ($isFree) disabled @endif>
+              <span class="{{ $isSaving ? 'd-none' : '' }}">تأیید</span>
+              <div class="spinner-custom-small {{ $isSaving ? 'show-spinner' : '' }} mx-auto"></div>
             </button>
           </form>
         </x-slot:body>
@@ -893,25 +883,41 @@
             });
           }
         });
+        Livewire.on('final-price-updated', () => {
+          const priceInput = document.querySelector('input[wire\\:model\\.live="finalPrice"]');
+          const discountInput = document.querySelector(
+            'input[wire\\:click*="$dispatch(\'open-modal\', { name: \'discount-modal\' })"]');
+          const isFree = @this.get('isFree');
+          const finalPrice = @this.get('finalPrice');
+          const discountPercentage = @this.get('discountPercentage');
+
+          if (priceInput) {
+            priceInput.value = isFree ? '0 تومان' : `${new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان`;
+            priceInput.disabled = isFree;
+          }
+          if (discountInput) {
+            discountInput.value = isFree ? '' : (discountPercentage ?
+              `${parseFloat(discountPercentage).toFixed(2)}%` : '');
+            discountInput.disabled = isFree;
+          }
+        });
+
         Livewire.on('discount-applied', (event) => {
           const percentage = parseFloat(event[0]?.percentage) || parseFloat(@this.get('discountPercentage')) || 0;
           const finalPrice = parseFloat(@this.get('finalPrice'));
           const isFree = @this.get('isFree');
 
-          // تنظیم مقادیر در Livewire
           @this.set('discountPercentage', percentage);
           @this.set('finalPrice', finalPrice);
 
-          // به‌روزرسانی اینپوت‌ها در UI
           const discountInput = document.querySelector('input[wire\\:model\\.live="discountPercentage"]');
-          const priceInput = document.querySelector('input[value*="{{ number_format($finalPrice) }} تومان"]');
+          const priceInput = document.querySelector('input[wire\\:model\\.live="finalPrice"]');
 
           if (discountInput) {
             discountInput.value = isFree ? '' : (percentage ? `${percentage.toFixed(2)}%` : '0.00%');
             discountInput.disabled = isFree;
             discountInput.dispatchEvent(new Event('input'));
           }
-
           if (priceInput) {
             priceInput.value = isFree ? '0 تومان' : `${new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان`;
             priceInput.disabled = isFree;
@@ -922,25 +928,6 @@
               name: 'discount-modal'
             }
           }));
-        });
-
-        Livewire.on('final-price-updated', () => {
-          const priceInput = document.querySelector('input[value*="{{ number_format($finalPrice) }} تومان"]');
-          const discountInput = document.querySelector(
-            'input[wire\\:click*="$dispatch(\'open-modal\', { name: \'discount-modal\' })"]'
-          );
-          const isFree = @this.get('isFree');
-          const finalPrice = @this.get('finalPrice');
-          const discountPercentage = @this.get('discountPercentage');
-
-          if (priceInput) {
-            priceInput.value = `${new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان`;
-            priceInput.disabled = isFree;
-          }
-          if (discountInput) {
-            discountInput.value = discountPercentage ? `${parseFloat(discountPercentage).toFixed(2)}%` : '';
-            discountInput.disabled = isFree;
-          }
         });
 
         function initializeDropdowns() {

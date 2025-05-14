@@ -560,7 +560,8 @@
 .loading-overlay-custom {
     position: absolute;
     top: 50%;
-    left: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 100%;
     height: 100%;
     background: rgba(255, 255, 255, 0.8);
@@ -568,7 +569,9 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.4s ease, visibility 0.4s ease;
-    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .loading-overlay-custom.show-custom {
@@ -579,56 +582,50 @@
 .spinner-custom {
     width: 30px;
     height: 30px;
-    border: 5px solid var(--primary-light);
-    border-top: 5px solid var(--primary);
+    border: 4px solid var(--primary-light);
+    border-top: 4px solid var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
-.loading-overlay-custom-small {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.8);
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
-    height: auto;
+
+.input-with-spinner {
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
-.loading-overlay-custom-small.show-custom-small {
+.spinner-custom-small {
+    width: 16px;
+    height: 16px;
+    border: 3px solid var(--primary-light);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    visibility: hidden;
+}
+
+.spinner-custom-small.show-spinner {
     opacity: 1;
     visibility: visible;
 }
-.loading-spinner{
-    width: 10px;
-    height: 10px;
-    border: 5px solid var(--primary-light);
-    border-top: 5px solid var(--primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.spinner-custom-small {
-    width: 20px;
-    height: 20px;
-    border: 5px solid var(--primary-light);
-    border-top: 5px solid var(--primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* دکمه‌های ذخیره */
+.my-btn-primary {
+    position: relative;
+}
+
+.my-btn-primary .spinner-custom-small {
+    margin: 0 auto;
 }
 
 /* Modal styling */

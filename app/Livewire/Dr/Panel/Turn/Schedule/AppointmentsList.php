@@ -30,6 +30,10 @@ use Illuminate\Support\Facades\Validator;
 class AppointmentsList extends Component
 {
     use WithPagination;
+    public $isLoadingServices = false;
+    public $isLoadingFinalPrice = false;
+    public $isLoadingDiscount = false;
+    public $isSaving = false;
     public $isLoading = false;
     public $selectedServiceIds = [];
     public $calendarYear;
@@ -344,19 +348,22 @@ class AppointmentsList extends Component
     }
     public function loadAppointments()
     {
-        $this->isLoading = true;
+        $this->isLoading = true; // فعال کردن لودینگ
         $doctor = $this->getAuthenticatedDoctor();
         if (!$doctor) {
-            return [];
             $this->isLoading = false;
+            return [];
         }
+
         // کلید کش با توجه به فیلترها
         $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
+
         // لود از کش یا دیتابیس
         $appointments = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($doctor) {
             $query = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
                 ->withTrashed()
                 ->where('doctor_id', $doctor->id);
+
             // اعمال فیلترهای زمانی
             if ($this->dateFilter) {
                 $today = Carbon::today();
@@ -374,24 +381,27 @@ class AppointmentsList extends Component
                     $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
                 }
             } elseif (!$this->isSearchingAllDates) {
-                // فقط در صورتی که dateFilter فعال نیست، از selectedDate استفاده شود
                 $gregorianDate = $this->convertToGregorian($this->selectedDate);
                 $query->whereDate('appointment_date', $gregorianDate);
             }
+
             // اعمال فیلتر کلینیک
             if ($this->selectedClinicId === 'default') {
                 $query->whereNull('clinic_id');
             } elseif ($this->selectedClinicId) {
                 $query->where('clinic_id', $this->selectedClinicId);
             }
-            // اعمال فیلتر وضعیت (فقط اگر صراحتاً تنظیم شده باشد)
+
+            // اعمال فیلتر وضعیت
             if ($this->filterStatus && $this->filterStatus !== 'all') {
                 $query->where('status', $this->filterStatus);
             }
+
             // اعمال فیلتر وضعیت حضور
             if ($this->attendanceStatus) {
                 $query->where('attendance_status', $this->attendanceStatus);
             }
+
             // اعمال جستجو
             if ($this->searchQuery) {
                 $query->whereHas('patient', function ($q) {
@@ -402,23 +412,27 @@ class AppointmentsList extends Component
                         ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
                 });
             }
-            // اطمینان از وجود per_page
+
             $perPage = $this->pagination['per_page'] ?? 100;
             return $query->orderBy('appointment_date', 'desc')
-                        ->orderBy('appointment_time', 'desc')
-                        ->paginate($perPage, ['*'], 'page', $this->pagination['current_page']);
+                ->orderBy('appointment_time', 'desc')
+                ->paginate($perPage, ['*'], 'page', $this->pagination['current_page']);
         });
+
         // لود داده‌های تقویم برای ماه جاری
         $jalaliDate = Jalalian::fromCarbon(Carbon::today());
         $appointmentData = $this->getAppointmentsInMonth($jalaliDate->getYear(), $jalaliDate->getMonth());
+
         $this->appointments = $appointments->items();
         $this->pagination = [
             'current_page' => $appointments->currentPage(),
             'last_page' => $appointments->lastPage(),
-            'per_page' => $appointments->perPage(), // اصلاح: استفاده از per_page به جای peracrossPage
+            'per_page' => $appointments->perPage(),
             'total' => $appointments->total(),
         ];
+
         $this->dispatch('setAppointments', ['appointments' => $appointmentData]);
+
         // بررسی عدم وجود نتیجه برای نمایش هشدار
         if (empty($this->appointments) && $this->searchQuery) {
             if ($this->isSearchingAllDates) {
@@ -431,7 +445,8 @@ class AppointmentsList extends Component
             $this->showNoResultsAlert = false;
             $this->dispatch('hide-no-results-alert');
         }
-        $this->isLoading = false;
+
+        $this->isLoading = false; // غیرفعال کردن لودینگ
         return $appointmentData;
     }
     private function convertToGregorian($date)
@@ -1007,13 +1022,17 @@ class AppointmentsList extends Component
     }
     public function loadServices()
     {
+        $this->isLoadingServices = true; // فعال کردن لودینگ خدمات
         if (!$this->selectedInsuranceId) {
             $this->services = [];
+            $this->isLoadingServices = false;
             $this->dispatch('services-updated');
             return;
         }
+
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $cacheKey = "services_doctor_{$doctorId}_clinic_{$this->selectedClinicId}_insurance_{$this->selectedInsuranceId}";
+
         $this->services = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctorId) {
             $query = DoctorService::where('doctor_id', $doctorId)
                 ->where('insurance_id', $this->selectedInsuranceId);
@@ -1024,6 +1043,8 @@ class AppointmentsList extends Component
             }
             return $query->get()->toArray();
         });
+
+        $this->isLoadingServices = false; // غیرفعال کردن لودینگ خدمات
         $this->dispatch('services-updated');
     }
     #[On('get-services')]
@@ -1052,6 +1073,7 @@ class AppointmentsList extends Component
     }
     public function calculateFinalPrice()
     {
+        $this->isLoadingFinalPrice = true; // فعال کردن لودینگ قیمت نهایی
         if ($this->isFree) {
             $this->finalPrice = 0;
             $this->discountPercentage = 0;
@@ -1063,24 +1085,21 @@ class AppointmentsList extends Component
                 $this->discountPercentage = 0;
                 $this->discountAmount = 0;
             } else {
-                // تبدیل discountPercentage به عدد و حذف علامت درصد
-                $discountPercentage = is_numeric($this->discountPercentage)
-                    ? floatval($this->discountPercentage)
-                    : floatval(str_replace('%', '', $this->discountPercentage));
+                $discountPercentage = is_numeric($this->discountPercentage) ? floatval($this->discountPercentage) : floatval(str_replace('%', '', $this->discountPercentage));
                 if ($discountPercentage > 0) {
-                    $this->discountAmount = round(($basePrice * $discountPercentage) / 100, 2); // رند به 2 رقم اعشار
-                    $this->discountPercentage = round($discountPercentage, 2); // رند درصد
+                    $this->discountAmount = round(($basePrice * $discountPercentage) / 100, 2);
+                    $this->discountPercentage = round($discountPercentage, 2);
                 } elseif ($this->discountAmount > 0 && $basePrice > 0) {
-                    // رند کردن درصد محاسبه‌شده به 2 رقم اعشار
                     $this->discountPercentage = round(($this->discountAmount / $basePrice) * 100, 2);
-                    $this->discountAmount = round($this->discountAmount, 2); // رند مبلغ تخفیف
+                    $this->discountAmount = round($this->discountAmount, 2);
                 } else {
                     $this->discountPercentage = 0;
                     $this->discountAmount = 0;
                 }
-                $this->finalPrice = round(max(0, $basePrice - $this->discountAmount), 0); // رند قیمت نهایی به عدد صحیح
+                $this->finalPrice = round(max(0, $basePrice - $this->discountAmount), 0);
             }
         }
+        $this->isLoadingFinalPrice = false; // غیرفعال کردن لودینگ قیمت نهایی
         $this->dispatch('final-price-updated');
     }
     public function updatedDiscountInputPercentage()
@@ -1128,12 +1147,9 @@ class AppointmentsList extends Component
     }
     public function applyDiscount()
     {
+        $this->isLoadingDiscount = true; // فعال کردن لودینگ تخفیف
         if (!$this->isFree) {
-            // تبدیل و رند کردن discountInputPercentage
-            $this->discountPercentage = is_numeric($this->discountInputPercentage)
-                ? round(floatval($this->discountInputPercentage), 2)
-                : round(floatval(str_replace('%', '', $this->discountInputPercentage)), 2);
-            // تبدیل و رند کردن discountInputAmount
+            $this->discountPercentage = is_numeric($this->discountInputPercentage) ? round(floatval($this->discountInputPercentage), 2) : round(floatval(str_replace('%', '', $this->discountInputPercentage)), 2);
             $this->discountAmount = round(floatval($this->discountInputAmount), 2);
             $this->calculateFinalPrice();
         } else {
@@ -1141,20 +1157,21 @@ class AppointmentsList extends Component
             $this->discountPercentage = 0;
             $this->discountAmount = 0;
         }
+        $this->isLoadingDiscount = false; // غیرفعال کردن لودینگ تخفیف
         $this->dispatch('discount-applied', ['percentage' => $this->discountPercentage]);
         $this->dispatch('final-price-updated');
         $this->dispatch('close-modal', ['id' => 'discount-modal']);
     }
     public function endVisit($appointmentId = null)
     {
+        $this->isSaving = true; // فعال کردن لودینگ ذخیره
         $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
         if (!$appointmentId) {
-            $this->dispatch('show-toastr', [
-                'type' => 'error',
-                'message' => 'شناسه نوبت نامعتبر است.'
-            ]);
+            $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'شناسه نوبت نامعتبر است.']);
+            $this->isSaving = false;
             return;
         }
+    
         try {
             $this->validate([
                 'selectedInsuranceId' => 'required|exists:insurances,id',
@@ -1171,12 +1188,11 @@ class AppointmentsList extends Component
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $firstError = collect($e->errors())->flatten()->first();
-            $this->dispatch('show-toastr', [
-                'type' => 'error',
-                'message' => $firstError
-            ]);
+            $this->dispatch('show-toastr', ['type' => 'error', 'message' => $firstError]);
+            $this->isSaving = false;
             return;
         }
+    
         $appointment = Appointment::findOrFail($appointmentId);
         $appointment->update([
             'insurance_id' => $this->selectedInsuranceId,
@@ -1186,22 +1202,17 @@ class AppointmentsList extends Component
             'discount_amount' => $this->discountAmount,
             'status' => 'attended',
             'description' => $this->endVisitDescription,
-            'payment_status' => 'paid', // همیشه به paid تنظیم می‌شود
+            'payment_status' => 'paid',
             'payment_method' => $this->paymentMethod,
         ]);
-        // پاک کردن کش مرتبط با نوبت‌ها
+    
         $doctor = $this->getAuthenticatedDoctor();
         $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
         Cache::forget($cacheKey);
+    
         $this->dispatch('close-modal', ['name' => 'end-visit-modal']);
-        $this->dispatch('show-toastr', [
-            'type' => 'success',
-            'message' => 'ویزیت با موفقیت ثبت شد.'
-        ]);
-        $this->dispatch('visited', [
-            'type' => 'success',
-            'message' => 'ویزیت با موفقیت ثبت شد.'
-        ]);
+        $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'ویزیت با موفقیت ثبت شد.']);
+        $this->dispatch('visited', ['type' => 'success', 'message' => 'ویزیت با موفقیت ثبت شد.']);
         $this->loadAppointments();
         $this->reset([
             'selectedInsuranceId',
@@ -1214,9 +1225,8 @@ class AppointmentsList extends Component
             'endVisitAppointmentId',
             'paymentMethod',
         ]);
-
+        $this->isSaving = false; // غیرفعال کردن لودینگ ذخیره
         Cache::forget($cacheKey);
-
     }
     public function updatedDiscountPercentage($value)
     {
