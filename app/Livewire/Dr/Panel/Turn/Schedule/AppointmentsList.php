@@ -113,6 +113,12 @@ class AppointmentsList extends Component
     public $showNoResultsAlert = false;
     public function mount()
     {
+
+        $this->isLoading = true;
+
+        $this->dispatch('toggle-loading', isLoading: true);
+
+
         // مقداردهی اولیه pagination با مقادیر پیش‌فرض
         $this->pagination = [
             'current_page' => 1,
@@ -165,6 +171,13 @@ class AppointmentsList extends Component
             $this->loadCalendarData();
             $this->loadInsurances();
         }
+
+        $this->isLoading = false;
+
+        $this->dispatch('toggle-loading', isLoading: false);
+
+
+
     }
     /**
      * اعتبارسنجی فرمت تاریخ
@@ -352,10 +365,16 @@ class AppointmentsList extends Component
     }
     public function loadAppointments()
     {
-        $this->isLoading = true; // فعال کردن لودینگ
+
+        Log::info('Starting loadAppointments, isLoading: true');
+        $this->isLoading = true;
+        $this->dispatch('toggle-loading', isLoading: true);
         $doctor = $this->getAuthenticatedDoctor();
         if (!$doctor) {
+
             $this->isLoading = false;
+            $this->dispatch('toggle-loading', ['isLoading' => false]);
+
             return [];
         }
 
@@ -450,7 +469,12 @@ class AppointmentsList extends Component
             $this->dispatch('hide-no-results-alert');
         }
 
-        $this->isLoading = false; // غیرفعال کردن لودینگ
+
+        Log::info('Finished loadAppointments, isLoading: false');
+        $this->isLoading = false;
+        $this->dispatch('toggle-loading', isLoading: false);
+
+
         return $appointmentData;
     }
     private function convertToGregorian($date)

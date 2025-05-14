@@ -72,10 +72,10 @@
           </button>
         </div>
       </div>
-      <div class="appointments-container" x-data wire:refresh-appointments-list="loadAppointments">
-        <div class="loading-overlay-custom {{ $isLoading ? 'show-custom' : '' }}">
+      <div class="appointments-container">
+        <div class="loading-overlay-custom">
           <div class="spinner-custom"></div>
-        </div>
+      </div>
         <div class="table-responsive position-relative w-100 d-none d-md-block">
           <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
             <thead class="bg-light">
@@ -645,6 +645,37 @@
       window.appointmentsData = @json($appointmentsData);
 
       document.addEventListener('livewire:initialized', () => {
+        Livewire.on('toggle-loading', (event) => {
+    const isLoading = event.isLoading !== undefined ? event.isLoading : false;
+    setTimeout(() => {
+        const loadingOverlay = document.querySelector('.loading-overlay-custom');
+        if (loadingOverlay) {
+            loadingOverlay.classList.toggle('show-custom', isLoading);
+        } else {
+            console.error('Loading overlay not found after timeout');
+        }
+    }, 200); // تاخیر 100 میلی‌ثانیه
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const loadingOverlay = document.querySelector('.loading-overlay-custom');
+    console.log('Loading overlay exists:', !!loadingOverlay);
+});
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.target.classList.contains('loading-overlay-custom')) {
+            console.log('Loading overlay class changed:', mutation.target.classList.toString());
+        }
+    });
+});
+const loadingOverlay = document.querySelector('.loading-overlay-custom');
+if (loadingOverlay) {
+    observer.observe(loadingOverlay, {
+        attributes: true,
+        attributeFilter: ['class']
+    });
+} else {
+    console.warn('Loading overlay not found for observer');
+}
         Livewire.on('refresh-appointments-list', () => {
           // اطمینان از رفرش کامل کامپوننت
           Livewire.dispatch('loadAppointments');
