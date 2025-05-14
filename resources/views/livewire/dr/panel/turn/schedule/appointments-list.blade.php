@@ -72,7 +72,7 @@
           </button>
         </div>
       </div>
-      <div class="appointments-container">
+      <div class="appointments-container" x-data wire:refresh-appointments-list="loadAppointments">
         <div class="loading-overlay-custom {{ $isLoading ? 'show-custom' : '' }}">
           <div class="spinner-custom"></div>
         </div>
@@ -645,6 +645,10 @@
       window.appointmentsData = @json($appointmentsData);
 
       document.addEventListener('livewire:initialized', () => {
+        Livewire.on('refresh-appointments-list', () => {
+          // اطمینان از رفرش کامل کامپوننت
+          Livewire.dispatch('loadAppointments');
+        });
         window.holidaysData = window.holidaysData || {
           status: false,
           holidays: []

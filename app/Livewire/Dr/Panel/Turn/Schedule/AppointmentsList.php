@@ -154,6 +154,10 @@ class AppointmentsList extends Component
         $doctor = $this->getAuthenticatedDoctor();
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
         if ($doctor) {
+
+            $cacheKeyPattern = "appointments_doctor_{$doctor->id}_*";
+            Cache::forget($cacheKeyPattern);
+
             $this->loadClinics();
             $this->loadAppointments();
             $this->loadBlockedUsers();
@@ -1171,7 +1175,7 @@ class AppointmentsList extends Component
             $this->isSaving = false;
             return;
         }
-    
+
         try {
             $this->validate([
                 'selectedInsuranceId' => 'required|exists:insurances,id',
@@ -1192,7 +1196,7 @@ class AppointmentsList extends Component
             $this->isSaving = false;
             return;
         }
-    
+
         $appointment = Appointment::findOrFail($appointmentId);
         $appointment->update([
             'insurance_id' => $this->selectedInsuranceId,
@@ -1205,11 +1209,15 @@ class AppointmentsList extends Component
             'payment_status' => 'paid',
             'payment_method' => $this->paymentMethod,
         ]);
-    
+
         $doctor = $this->getAuthenticatedDoctor();
         $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
         Cache::forget($cacheKey);
-    
+
+        $cacheKeyPattern = "appointments_doctor_{$doctor->id}_*"; // حذف تمام کش‌های مرتبط با پزشک
+        Cache::forget($cacheKeyPattern);
+
+
         $this->dispatch('close-modal', ['name' => 'end-visit-modal']);
         $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'ویزیت با موفقیت ثبت شد.']);
         $this->dispatch('visited', ['type' => 'success', 'message' => 'ویزیت با موفقیت ثبت شد.']);
@@ -1227,6 +1235,8 @@ class AppointmentsList extends Component
         ]);
         $this->isSaving = false; // غیرفعال کردن لودینگ ذخیره
         Cache::forget($cacheKey);
+        $this->dispatch('refresh-appointments-list');
+
     }
     public function updatedDiscountPercentage($value)
     {
