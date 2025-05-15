@@ -1,12 +1,11 @@
 @php
-  use Morilog\Jalali\Jalalian;
-  use Illuminate\Support\Carbon;
-
+use Morilog\Jalali\Jalalian;
+use Illuminate\Support\Carbon;
 @endphp
 
 <div class="container" dir="rtl" wire:init="loadReports">
   <!-- Top Section -->
-  <div class="top-section mb-2 mt-4">
+  <div class="top-section mb-2 mt-2">
     <div class="top-section-content">
       <h1 class="top-section-title">گزارش مالی</h1>
       <div class="top-section-actions">
@@ -60,7 +59,12 @@
   <!-- Filters -->
   <div class="filters-card mb-2">
     <div class="filters-header">
-      <button class="filters-toggle" onclick="toggleFilters()">نمایش/مخفی</button>
+      <h4>فیلترها</h4>
+      <button class="filters-toggle" data-tooltip="نمایش یا مخفی کردن فیلترها" onclick="toggleFilters()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
     </div>
     <div class="filters-body" id="filters-body">
       <div class="filter-group">
@@ -157,11 +161,10 @@
     </div>
   </div>
 
-
-  <!-- Transactions Table -->
+  <!-- Transactions Table/Card -->
   <div class="table-card">
     <div class="table-responsive">
-      <table class="transactions-table">
+      <table class="transactions-table desktop-only">
         <thead>
           <tr>
             <th>ردیف</th>
@@ -170,9 +173,9 @@
             <th>نوع</th>
             <th>وضعیت</th>
             <th>مبلغ (تومان)</th>
-            <th class="hidden-mobile">روش پرداخت</th>
-            <th class="hidden-mobile">بیمه</th>
-            <th class="hidden-mobile">توضیحات</th>
+            <th>روش پرداخت</th>
+            <th>بیمه</th>
+            <th>توضیحات</th>
           </tr>
         </thead>
         <tbody>
@@ -191,15 +194,15 @@
                 <td>{{ $this->formatTransactionType($transaction['transaction_type']) }}</td>
                 <td>{{ $this->formatStatus($transaction['status']) }}</td>
                 <td>{{ number_format($transaction['amount']) }}</td>
-                <td class="hidden-mobile">{{ $this->formatPaymentMethod($transaction['payment_method']) }}</td>
-                <td class="hidden-mobile">
+                <td>{{ $this->formatPaymentMethod($transaction['payment_method']) }}</td>
+                <td>
                   @if ($transaction['insurance_id'])
                     {{ \App\Models\Insurance::find($transaction['insurance_id']) ? \App\Models\Insurance::find($transaction['insurance_id'])->name : '-' }}
                   @else
                     -
                   @endif
                 </td>
-                <td class="hidden-mobile">{{ $transaction['description'] }}</td>
+                <td>{{ $transaction['description'] }}</td>
               </tr>
             @empty
               <tr>
@@ -222,6 +225,84 @@
           @endif
         </tfoot>
       </table>
+
+      <!-- Mobile/Tablet Card View -->
+      <div class="transaction-cards mobile-only" id="transaction-cards">
+        @if ($readyToLoad)
+          @forelse ($transactions as $index => $transaction)
+            <div class="transaction-card" data-index="{{ $index }}">
+              <div class="transaction-card-header">
+                <span class="transaction-index">{{ $transactions->firstItem() + $index }}</span>
+                <span class="transaction-date">{{ Jalalian::fromCarbon(Carbon::parse($transaction['date']))->format('Y/m/d H:i') }}</span>
+              </div>
+              <div class="transaction-card-body">
+                <div class="transaction-item">
+                  <span class="transaction-label">کلینیک:</span>
+                  <span class="transaction-value">
+                    @if ($transaction['clinic_id'])
+                      {{ \App\Models\Clinic::find($transaction['clinic_id']) ? \App\Models\Clinic::find($transaction['clinic_id'])->name : 'بدون کلینیک' }}
+                    @else
+                      بدون کلینیک
+                    @endif
+                  </span>
+                </div>
+                <div class="transaction-item">
+                  <span class="transaction-label">نوع:</span>
+                  <span class="transaction-value">{{ $this->formatTransactionType($transaction['transaction_type']) }}</span>
+                </div>
+                <div class="transaction-item">
+                  <span class="transaction-label">وضعیت:</span>
+                  <span class="transaction-value">{{ $this->formatStatus($transaction['status']) }}</span>
+                </div>
+                <div class="transaction-item">
+                  <span class="transaction-label">مبلغ:</span>
+                  <span class="transaction-value">{{ number_format($transaction['amount']) }} تومان</span>
+                </div>
+                <div class="transaction-item">
+                  <span class="transaction-label">روش پرداخت:</span>
+                  <span class="transaction-value">{{ $this->formatPaymentMethod($transaction['payment_method']) }}</span>
+                </div>
+                <div class="transaction-item">
+                  <span class="transaction-label">بیمه:</span>
+                  <span class="transaction-value">
+                    @if ($transaction['insurance_id'])
+                      {{ \App\Models\Insurance::find($transaction['insurance_id']) ? \App\Models\Insurance::find($transaction['insurance_id'])->name : '-' }}
+                    @else
+                      -
+                    @endif
+                  </span>
+                </div>
+                <div class="transaction-item">
+                  <span class="transaction-label">توضیحات:</span>
+                  <span class="transaction-value">{{ $transaction['description'] }}</span>
+                </div>
+              </div>
+            </div>
+          @empty
+            <div class="no-data">هیچ تراکنشی یافت نشد.</div>
+          @endforelse
+          @if ($readyToLoad && $transactions->isNotEmpty())
+            <div class="total-card mobile-only">
+              <div class="total-item">
+                <span class="total-label">جمع کل:</span>
+                <span class="total-value">{{ number_format($totalAmount) }} تومان</span>
+              </div>
+              <div class="total-item">
+                <span class="total-label">جمع امروز:</span>
+                <span class="total-value">{{ number_format($todayAmount) }} تومان</span>
+              </div>
+            </div>
+          @endif
+          @if ($transactions->count() > 2)
+            <div class="toggle-buttons">
+              <button class="btn btn-toggle" onclick="showMore()">بیشتر...</button>
+              <button class="btn btn-toggle" onclick="showLess()" style="display: none;">کمتر...</button>
+            </div>
+          @endif
+        @else
+          <div class="no-data">در حال بارگذاری...</div>
+        @endif
+      </div>
     </div>
     <div class="table-footer">
       @if ($readyToLoad)
@@ -240,15 +321,33 @@
     </div>
   </div>
 
-
-
   <!-- JavaScript Scripts -->
   <script>
-    document.addEventListener('livewire:initialized', function() {
-      function toggleFilters() {
+  function toggleFilters() {
         const filtersBody = document.getElementById('filters-body');
         filtersBody.classList.toggle('active');
       }
-    });
+
+      function showMore() {
+        const cards = document.querySelectorAll('.transaction-card');
+        cards.forEach(card => card.style.display = 'block');
+        document.querySelector('.btn-toggle[onclick="showMore()"]').style.display = 'none';
+        document.querySelector('.btn-toggle[onclick="showLess()"]').style.display = 'inline-flex';
+      }
+
+      function showLess() {
+        const cards = document.querySelectorAll('.transaction-card');
+        cards.forEach((card, index) => {
+          if (index >= 2) card.style.display = 'none';
+        });
+        document.querySelector('.btn-toggle[onclick="showMore()"]').style.display = 'inline-flex';
+        document.querySelector('.btn-toggle[onclick="showLess()"]').style.display = 'none';
+      }
+
+      // Initially hide cards beyond the first two
+      const cards = document.querySelectorAll('.transaction-card');
+      cards.forEach((card, index) => {
+        if (index >= 2) card.style.display = 'none';
+      });
   </script>
 </div>
