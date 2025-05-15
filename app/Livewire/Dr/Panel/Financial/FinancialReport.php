@@ -3,18 +3,19 @@
 namespace App\Livewire\Dr\Panel\Financial;
 
 use App\Models\Clinic;
-use App\Models\Insurance;
-use App\Models\Transaction;
-use App\Models\DoctorWalletTransaction;
-use App\Models\Appointment;
-use App\Models\ManualAppointment;
-use App\Models\CounselingAppointment;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use App\Models\Insurance;
+use App\Models\Appointment;
+use App\Models\Transaction;
 use Livewire\WithPagination;
 use Morilog\Jalali\Jalalian;
+use Illuminate\Support\Carbon;
+use App\Models\ManualAppointment;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Models\CounselingAppointment;
+use App\Models\DoctorWalletTransaction;
 
 class FinancialReport extends Component
 {
@@ -62,7 +63,10 @@ class FinancialReport extends Component
     {
         $this->startDate = Jalalian::now()->format('Y/m/d');
         $this->endDate = Jalalian::now()->format('Y/m/d');
-        $this->readyToLoad = false;
+        $this->readyToLoad = true; // فوراً داده‌ها لود بشن
+        $this->updateDateRange();
+        $this->updateChartData();
+        $this->updateSummary();
         Log::info('FinancialReport component mounted', ['doctor_id' => Auth::guard('doctor')->user()->id]);
     }
 
@@ -389,7 +393,7 @@ class FinancialReport extends Component
         if ($this->paymentMethod) {
             if ($modelType === 'Transaction') {
                 $query->whereJsonContains('meta->payment_method', $this->paymentMethod);
-            } elseif ($modelType === 'Appointment' || $modelType === 'ManualAppointment' || $modelType === 'CounselingAppointment') {
+            } elseif ($modelType === 'Appointment' || $modelType === 'ManualAppointment') {
                 $query->where('payment_method', $this->paymentMethod);
             }
         }
@@ -412,23 +416,23 @@ class FinancialReport extends Component
     public function exportPdf()
     {
         Log::info('PDF export initiated', ['doctor_id' => Auth::guard('doctor')->user()->id, 'filters' => $this->getFilters()]);
-    
+
         // گرفتن داده‌های تراکنش‌ها
         $transactions = $this->getTransactions()->items();
-        
+
         // ذخیره داده‌ها و فیلترها در session
         session([
             'financial_report_data' => $transactions,
             'financial_report_filters' => $this->getFilters()
         ]);
-    
+
         return redirect()->route('dr.panel.financial-reports.export-pdf', $this->getFilters());
     }
 
     private function getTransactions()
     {
         $doctorId = Auth::guard('doctor')->user()->id;
-    
+
         $transactionsQuery = Transaction::whereJsonContains('meta->doctor_id', $doctorId);
         $walletTransactionsQuery = DoctorWalletTransaction::where('doctor_id', $doctorId);
         $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
@@ -437,13 +441,13 @@ class FinancialReport extends Component
             ->whereNotNull('final_price');
         $counselingAppointmentsQuery = CounselingAppointment::where('doctor_id', $doctorId)
             ->where('payment_status', 'paid');
-    
+
         $this->applyFilters($transactionsQuery, 'Transaction');
         $this->applyFilters($walletTransactionsQuery, 'DoctorWalletTransaction');
         $this->applyFilters($appointmentsQuery, 'Appointment');
         $this->applyFilters($manualAppointmentsQuery, 'ManualAppointment');
         $this->applyFilters($counselingAppointmentsQuery, 'CounselingAppointment');
-    
+
         // استخراج و فرمت داده‌ها
         $transactions = $transactionsQuery->get()->map(function ($item) {
             $meta = json_decode($item->meta, true);
@@ -460,7 +464,7 @@ class FinancialReport extends Component
                 'transaction_type' => $meta['type'] ?? 'unknown',
             ];
         });
-    
+
         $walletTransactions = $walletTransactionsQuery->get()->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -475,7 +479,7 @@ class FinancialReport extends Component
                 'transaction_type' => $item->type,
             ];
         });
-    
+
         $appointments = $appointmentsQuery->get()->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -490,7 +494,7 @@ class FinancialReport extends Component
                 'transaction_type' => $item->appointment_type,
             ];
         });
-    
+
         $manualAppointments = $manualAppointmentsQuery->get()->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -505,7 +509,7 @@ class FinancialReport extends Component
                 'transaction_type' => $item->payment_method ?? 'manual',
             ];
         });
-    
+
         $counselingAppointments = $counselingAppointmentsQuery->get()->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -515,12 +519,12 @@ class FinancialReport extends Component
                 'status' => $item->payment_status,
                 'description' => $item->description ?? 'بدون توضیح',
                 'clinic_id' => $item->clinic_id,
-                'payment_method' => $item->payment_method,
+                'payment_method' => null, // CounselingAppointment ستون payment_method نداره
                 'insurance_id' => $item->insurance_id,
                 'transaction_type' => $item->appointment_type,
             ];
         });
-    
+
         // ادغام و مرتب‌سازی نتایج
         $allTransactions = collect()
             ->concat($transactions)
@@ -529,7 +533,7 @@ class FinancialReport extends Component
             ->concat($manualAppointments)
             ->concat($counselingAppointments)
             ->sortByDesc('date');
-    
+
         // لاگ تعداد تراکنش‌ها
         Log::info('Transactions retrieved', [
             'transactions_count' => $transactions->count(),
@@ -539,13 +543,13 @@ class FinancialReport extends Component
             'counseling_appointments_count' => $counselingAppointments->count(),
             'total_count' => $allTransactions->count(),
         ]);
-    
+
         // صفحه‌بندی دستی
         $perPage = $this->perPage;
         $currentPage = $this->page;
         $paginated = $allTransactions->forPage($currentPage, $perPage);
         $total = $allTransactions->count();
-    
+
         return new \Illuminate\Pagination\LengthAwarePaginator(
             $paginated,
             $total,
@@ -600,26 +604,50 @@ class FinancialReport extends Component
         }
     }
 
-    public function render()
-    {
-        $doctorId = Auth::guard('doctor')->user()->id;
-        $transactions = $this->readyToLoad ? $this->getTransactions() : collect([]);
-        $totalAmount = $this->readyToLoad ? $this->getTotalAmount() : 0;
-        $clinics = Clinic::where('doctor_id', $doctorId)->get();
-        $insurances = Insurance::whereHas('doctors', fn ($q) => $q->where('doctor_id', $doctorId))->get();
+public function render()
+{
+    $doctorId = Auth::guard('doctor')->user()->id;
+    $transactions = $this->readyToLoad ? $this->getTransactions() : collect([]);
+    $totalAmount = $this->readyToLoad ? $this->getTotalAmount() : 0;
 
-        Log::info('Rendering FinancialReport view', [
-            'doctor_id' => $doctorId,
-            'transaction_count' => $this->readyToLoad ? $transactions->total() : 0,
-            'total_amount' => $totalAmount,
-        ]);
+    // محاسبه جمع مبالغ امروز
+    $todayStart = Carbon::today()->startOfDay();
+    $todayEnd = Carbon::today()->endOfDay();
+    $todayAmount = $this->readyToLoad ? $this->getTotalAmount($todayStart, $todayEnd) : 0;
 
-        return view('livewire.dr.panel.financial.financial-report', [
-            'transactions' => $transactions,
-            'totalAmount' => $totalAmount,
-            'clinics' => $clinics,
-            'insurances' => $insurances,
-            'summary' => $this->summary,
-        ]);
-    }
+    $clinics = Clinic::where('doctor_id', $doctorId)->get();
+
+    // گرفتن بیمه‌هایی که در نوبت‌ها برای این دکتر استفاده شدن
+    $insurances = Insurance::whereIn('id', function ($query) use ($doctorId) {
+        $query->select('insurance_id')
+            ->from('appointments')
+            ->where('doctor_id', $doctorId)
+            ->whereNotNull('insurance_id')
+            ->union(
+                DB::table('counseling_appointments')
+                    ->select('insurance_id')
+                    ->where('doctor_id', $doctorId)
+                    ->whereNotNull('insurance_id')
+            );
+    })->get();
+
+    Log::info('Rendering FinancialReport view', [
+        'doctor_id' => $doctorId,
+        'transaction_count' => $this->readyToLoad ? $transactions->total() : 0,
+        'total_amount' => $totalAmount,
+        'today_amount' => $todayAmount,
+        'start_date' => $this->startDate,
+        'end_date' => $this->endDate,
+        'insurances_count' => $insurances->count(),
+    ]);
+
+    return view('livewire.dr.panel.financial.financial-report', [
+        'transactions' => $transactions,
+        'totalAmount' => $totalAmount,
+        'todayAmount' => $todayAmount, // مقدار جدید
+        'clinics' => $clinics,
+        'insurances' => $insurances,
+        'summary' => $this->summary,
+    ]);
+}
 }
