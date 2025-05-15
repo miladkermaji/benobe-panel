@@ -386,3 +386,6 @@ body {
 .top-section, .summary-card, .filters-card, .chart-card, .table-card, .total-card {
   animation: fadeIn 0.3s ease-out;
 }
+.myPanelOption{
+  display: none !important;
+}
