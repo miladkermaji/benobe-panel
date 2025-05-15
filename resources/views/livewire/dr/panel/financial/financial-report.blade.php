@@ -36,23 +36,23 @@ use Illuminate\Support\Carbon;
     <div class="summary-container mb-2">
         <div class="summary-card">
             <span class="summary-label">روزانه</span>
-            <span class="summary-value">{{ number_format($summary['daily']) }} <small>ریال</small></span>
+            <span class="summary-value">{{ number_format($summary['daily']) }} <small>تومان</small></span>
         </div>
         <div class="summary-card">
             <span class="summary-label">هفتگی</span>
-            <span class="summary-value">{{ number_format($summary['weekly']) }} <small>ریال</small></span>
+            <span class="summary-value">{{ number_format($summary['weekly']) }} <small>تومان</small></span>
         </div>
         <div class="summary-card">
             <span class="summary-label">ماهانه</span>
-            <span class="summary-value">{{ number_format($summary['monthly']) }} <small>ریال</small></span>
+            <span class="summary-value">{{ number_format($summary['monthly']) }} <small>تومان</small></span>
         </div>
         <div class="summary-card">
             <span class="summary-label">سالانه</span>
-            <span class="summary-value">{{ number_format($summary['yearly']) }} <small>ریال</small></span>
+            <span class="summary-value">{{ number_format($summary['yearly']) }} <small>تومان</small></span>
         </div>
         <div class="summary-card">
             <span class="summary-label">کل</span>
-            <span class="summary-value">{{ number_format($summary['total']) }} <small>ریال</small></span>
+            <span class="summary-value">{{ number_format($summary['total']) }} <small>تومان</small></span>
         </div>
     </div>
 
@@ -144,11 +144,11 @@ use Illuminate\Support\Carbon;
                 </select>
             </div>
             <div class="filter-group">
-                <label>حداقل مبلغ (ریال)</label>
+                <label>حداقل مبلغ (تومان)</label>
                 <input type="number" class="filter-input" wire:model.live.debounce.500ms="minAmount" placeholder="0">
             </div>
             <div class="filter-group">
-                <label>حداکثر مبلغ (ریال)</label>
+                <label>حداکثر مبلغ (تومان)</label>
                 <input type="number" class="filter-input" wire:model.live.debounce.500ms="maxAmount" placeholder="0">
             </div>
         </div>
@@ -173,7 +173,7 @@ use Illuminate\Support\Carbon;
                         <th>کلینیک</th>
                         <th>نوع</th>
                         <th>وضعیت</th>
-                        <th>مبلغ (ریال)</th>
+                        <th>مبلغ (تومان)</th>
                         <th class="hidden-mobile">روش پرداخت</th>
                         <th class="hidden-mobile">بیمه</th>
                         <th class="hidden-mobile">توضیحات</th>
@@ -237,7 +237,7 @@ use Illuminate\Support\Carbon;
     <!-- Total Summary -->
     <div class="total-card mt-2">
         <h4>جمع‌بندی</h4>
-        <p>مجموع تراکنش‌ها: <strong>{{ number_format($totalAmount) }}</strong> ریال</p>
+        <p>مجموع تراکنش‌ها: <strong>{{ number_format($totalAmount) }}</strong> تومان</p>
     </div>
 
     <!-- JavaScript Scripts -->
@@ -281,7 +281,7 @@ use Illuminate\Support\Carbon;
                         data: {
                             labels: chartData.labels,
                             datasets: [{
-                                label: 'مبلغ تراکنش‌ها (ریال)',
+                                label: 'مبلغ تراکنش‌ها (تومان)',
                                 data: chartData.values,
                                 borderColor: 'var(--primary)',
                                 backgroundColor: 'var(--primary-light)',
@@ -328,7 +328,7 @@ use Illuminate\Support\Carbon;
                                     borderWidth: 1,
                                     callbacks: {
                                         label: function(context) {
-                                            return new Intl.NumberFormat('fa-IR').format(context.parsed.y) + ' ریال';
+                                            return new Intl.NumberFormat('fa-IR').format(context.parsed.y) + ' تومان';
                                         }
                                     }
                                 }
@@ -374,7 +374,7 @@ use Illuminate\Support\Carbon;
                                     },
                                     title: {
                                         display: true,
-                                        text: 'مبلغ (ریال)',
+                                        text: 'مبلغ (تومان)',
                                         color: 'var(--text-primary)',
                                         font: {
                                             family: 'Vazir',

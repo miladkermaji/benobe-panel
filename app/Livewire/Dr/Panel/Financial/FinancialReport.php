@@ -41,7 +41,7 @@ class FinancialReport extends Component
         'yearly' => 0,
         'total' => 0,
     ];
-    public $page = 1; // اضافه کردن پراپرتی page برای صفحه‌بندی
+    public $page = 1;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -55,7 +55,7 @@ class FinancialReport extends Component
         'endDate' => ['except' => ''],
         'paymentMethod' => ['except' => ''],
         'insuranceId' => ['except' => ''],
-        'page' => ['except' => 1], // اضافه کردن page به queryString
+        'page' => ['except' => 1],
     ];
 
     public function mount()
@@ -99,7 +99,7 @@ class FinancialReport extends Component
                 $this->endDate = Jalalian::now()->format('Y/m/d');
                 break;
             case 'monthly':
-                $this->startDate = Jalalian::now()->subMonths(1)->format('Y/m/d');
+                $this->startDate = Jalalian::now()->subDays(30)->format('Y/m/d');
                 $this->endDate = Jalalian::now()->format('Y/m/d');
                 break;
             case 'yearly':
@@ -107,7 +107,7 @@ class FinancialReport extends Component
                 $this->endDate = Jalalian::now()->format('Y/m/d');
                 break;
             case 'custom':
-                $this->startDate = $this->startDate ?: Jalalian::now()->format('Y/m/d');
+                $this->startDate = $this->startDate ?: Jalalian::now()->subDays(30)->format('Y/m/d');
                 $this->endDate = $this->endDate ?: Jalalian::now()->format('Y/m/d');
                 break;
             default:
@@ -141,9 +141,8 @@ class FinancialReport extends Component
 
         Log::info('Chart data date range', ['start' => $start, 'end' => $end]);
 
-        // کوئری برای ترکیب داده‌ها از تمام جداول
-        $transactionsQuery = Transaction::where('transactable_type', 'App\Models\Doctor')
-            ->where('transactable_id', $doctorId)
+        // کوئری برای ترکیب داده‌ها
+        $transactionsQuery = Transaction::whereJsonContains('meta->doctor_id', $doctorId)
             ->selectRaw('DATE(created_at) as date, SUM(amount) as total')
             ->whereBetween('created_at', [$start, $end])
             ->groupBy('date');
@@ -178,7 +177,7 @@ class FinancialReport extends Component
         $this->applyFilters($manualAppointmentsQuery, 'ManualAppointment');
         $this->applyFilters($counselingAppointmentsQuery, 'CounselingAppointment');
 
-        // لاگ کوئری‌ها برای دیباگ
+        // لاگ کوئری‌ها
         Log::info('Transactions Query', ['sql' => $transactionsQuery->toSql(), 'bindings' => $transactionsQuery->getBindings()]);
         Log::info('Wallet Transactions Query', ['sql' => $walletTransactionsQuery->toSql(), 'bindings' => $walletTransactionsQuery->getBindings()]);
         Log::info('Appointments Query', ['sql' => $appointmentsQuery->toSql(), 'bindings' => $appointmentsQuery->getBindings()]);
@@ -200,6 +199,14 @@ class FinancialReport extends Component
             })
             ->sortBy('date')
             ->values();
+
+        // بررسی خالی بودن داده‌ها
+        if ($data->isEmpty()) {
+            Log::warning('No chart data found for range', ['start' => $start, 'end' => $end]);
+            $this->chartData = ['labels' => [], 'values' => []];
+            $this->dispatch('updateChart', $this->chartData);
+            return;
+        }
 
         $this->chartData = [
             'labels' => $data->pluck('date')->map(fn ($date) => Jalalian::fromCarbon(Carbon::parse($date))->format('Y/m/d'))->toArray(),
@@ -234,8 +241,7 @@ class FinancialReport extends Component
     {
         $doctorId = Auth::guard('doctor')->user()->id;
 
-        $transactionsTotal = Transaction::where('transactable_type', 'App\Models\Doctor')
-            ->where('transactable_id', $doctorId);
+        $transactionsTotal = Transaction::whereJsonContains('meta->doctor_id', $doctorId);
         $walletTransactionsTotal = DoctorWalletTransaction::where('doctor_id', $doctorId);
         $appointmentsTotal = Appointment::where('doctor_id', $doctorId)
             ->where('payment_status', 'paid');
@@ -252,7 +258,7 @@ class FinancialReport extends Component
             $counselingAppointmentsTotal->whereBetween('appointment_date', [$start, $end]);
         }
 
-        // اعمال فیلترها برای جمع‌بندی
+        // اعمال فیلترها
         $this->applyFilters($transactionsTotal, 'Transaction');
         $this->applyFilters($walletTransactionsTotal, 'DoctorWalletTransaction');
         $this->applyFilters($appointmentsTotal, 'Appointment');
@@ -357,18 +363,23 @@ class FinancialReport extends Component
             }
         }
 
-        // حذف شرط تکراری whereBetween
-        // فقط اگر تاریخ‌ها در کوئری اصلی اعمال نشده باشند، اینجا اضافه می‌شوند
+        // اعمال شرط زمانی فقط برای ستون مناسب هر مدل
         if ($this->startDate && $this->endDate && $this->dateFilter !== 'all') {
             try {
                 $start = Jalalian::fromFormat('Y/m/d', $this->startDate)->toCarbon()->startOfDay();
                 $end = Jalalian::fromFormat('Y/m/d', $this->endDate)->toCarbon()->endOfDay();
-                if ($modelType === 'Transaction' && !$query->getQuery()->wheres) {
-                    $query->whereBetween('created_at', [$start, $end]);
-                } elseif ($modelType === 'DoctorWalletTransaction' && !$query->getQuery()->wheres) {
-                    $query->whereBetween('registered_at', [$start, $end]);
-                } elseif (!$query->getQuery()->wheres) {
-                    $query->whereBetween('appointment_date', [$start, $end]);
+                if ($modelType === 'Transaction') {
+                    if (!collect($query->getQuery()->wheres)->contains('column', 'created_at')) {
+                        $query->whereBetween('created_at', [$start, $end]);
+                    }
+                } elseif ($modelType === 'DoctorWalletTransaction') {
+                    if (!collect($query->getQuery()->wheres)->contains('column', 'registered_at')) {
+                        $query->whereBetween('registered_at', [$start, $end]);
+                    }
+                } elseif (in_array($modelType, ['Appointment', 'ManualAppointment', 'CounselingAppointment'])) {
+                    if (!collect($query->getQuery()->wheres)->contains('column', 'appointment_date')) {
+                        $query->whereBetween('appointment_date', [$start, $end]);
+                    }
                 }
             } catch (\Exception $e) {
                 Log::error('Error applying date filter', ['error' => $e->getMessage(), 'startDate' => $this->startDate, 'endDate' => $this->endDate]);
@@ -407,9 +418,8 @@ class FinancialReport extends Component
     private function getTransactions()
     {
         $doctorId = Auth::guard('doctor')->user()->id;
-
-        $transactionsQuery = Transaction::where('transactable_type', 'App\Models\Doctor')
-            ->where('transactable_id', $doctorId);
+    
+        $transactionsQuery = Transaction::whereJsonContains('meta->doctor_id', $doctorId);
         $walletTransactionsQuery = DoctorWalletTransaction::where('doctor_id', $doctorId);
         $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
             ->where('payment_status', 'paid');
@@ -417,29 +427,30 @@ class FinancialReport extends Component
             ->whereNotNull('final_price');
         $counselingAppointmentsQuery = CounselingAppointment::where('doctor_id', $doctorId)
             ->where('payment_status', 'paid');
-
+    
         $this->applyFilters($transactionsQuery, 'Transaction');
         $this->applyFilters($walletTransactionsQuery, 'DoctorWalletTransaction');
         $this->applyFilters($appointmentsQuery, 'Appointment');
         $this->applyFilters($manualAppointmentsQuery, 'ManualAppointment');
         $this->applyFilters($counselingAppointmentsQuery, 'CounselingAppointment');
-
+    
         // استخراج و فرمت داده‌ها
         $transactions = $transactionsQuery->get()->map(function ($item) {
+            $meta = json_decode($item->meta, true);
             return [
                 'id' => $item->id,
                 'type' => 'transaction',
                 'date' => $item->created_at,
                 'amount' => $item->amount,
                 'status' => $item->status,
-                'description' => $item->meta['description'] ?? 'بدون توضیح',
-                'clinic_id' => $item->meta['clinic_id'] ?? null,
-                'payment_method' => $item->meta['payment_method'] ?? null,
-                'insurance_id' => $item->meta['insurance_id'] ?? null,
-                'transaction_type' => $item->meta['type'] ?? 'unknown',
+                'description' => $meta['description'] ?? 'بدون توضیح',
+                'clinic_id' => $meta['clinic_id'] ?? null,
+                'payment_method' => $meta['payment_method'] ?? null,
+                'insurance_id' => $meta['insurance_id'] ?? null,
+                'transaction_type' => $meta['type'] ?? 'unknown',
             ];
         });
-
+    
         $walletTransactions = $walletTransactionsQuery->get()->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -454,7 +465,7 @@ class FinancialReport extends Component
                 'transaction_type' => $item->type,
             ];
         });
-
+    
         $appointments = $appointmentsQuery->get()->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -469,7 +480,7 @@ class FinancialReport extends Component
                 'transaction_type' => $item->appointment_type,
             ];
         });
-
+    
         $manualAppointments = $manualAppointmentsQuery->get()->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -484,7 +495,7 @@ class FinancialReport extends Component
                 'transaction_type' => $item->payment_method ?? 'manual',
             ];
         });
-
+    
         $counselingAppointments = $counselingAppointmentsQuery->get()->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -499,15 +510,16 @@ class FinancialReport extends Component
                 'transaction_type' => $item->appointment_type,
             ];
         });
-
+    
         // ادغام و مرتب‌سازی نتایج
-        $allTransactions = $transactions
-            ->merge($walletTransactions)
-            ->merge($appointments)
-            ->merge($manualAppointments)
-            ->merge($counselingAppointments)
+        $allTransactions = collect()
+            ->concat($transactions)
+            ->concat($walletTransactions)
+            ->concat($appointments)
+            ->concat($manualAppointments)
+            ->concat($counselingAppointments)
             ->sortByDesc('date');
-
+    
         // لاگ تعداد تراکنش‌ها
         Log::info('Transactions retrieved', [
             'transactions_count' => $transactions->count(),
@@ -517,13 +529,13 @@ class FinancialReport extends Component
             'counseling_appointments_count' => $counselingAppointments->count(),
             'total_count' => $allTransactions->count(),
         ]);
-
+    
         // صفحه‌بندی دستی
         $perPage = $this->perPage;
-        $currentPage = $this->page; // استفاده از پراپرتی page
+        $currentPage = $this->page;
         $paginated = $allTransactions->forPage($currentPage, $perPage);
         $total = $allTransactions->count();
-
+    
         return new \Illuminate\Pagination\LengthAwarePaginator(
             $paginated,
             $total,
