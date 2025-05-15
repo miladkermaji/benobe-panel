@@ -4,7 +4,7 @@
 
 <div class="container" dir="rtl" wire:init="loadReports">
   <!-- Top Section -->
-  <div class="top-section mb-2">
+  <div class="top-section mb-2 mt-4">
     <div class="top-section-content">
       <h1 class="top-section-title">گزارش مالی</h1>
       <div class="top-section-actions">
@@ -58,7 +58,6 @@
   <!-- Filters -->
   <div class="filters-card mb-2">
     <div class="filters-header">
-      <h4>فیلترها</h4>
       <button class="filters-toggle" onclick="toggleFilters()">نمایش/مخفی</button>
     </div>
     <div class="filters-body" id="filters-body">
@@ -258,10 +257,8 @@
     <!-- اسکریپت‌های جاوااسکریپت -->
     <script>
       document.addEventListener('livewire:initialized', function() {
-        // متغیر جهانی برای نمودار
         window.financialChart = null;
 
-        // تابع تخریب نمودار
         function destroyChart() {
           if (window.financialChart) {
             window.financialChart.destroy();
@@ -269,12 +266,10 @@
           }
         }
 
-        // Cleanup هنگام dehydrate کامپوننت
         Livewire.on('component.dehydrated', () => {
           destroyChart();
         });
 
-        // رندر نمودار
         Livewire.on('updateChart', (chartData) => {
           const renderChart = () => {
             const canvas = document.getElementById('financialChart');
@@ -288,21 +283,134 @@
               return;
             }
 
-            // Destroy previous chart
             destroyChart();
 
-            // Check for valid data
             if (!chartData.labels || !chartData.values || chartData.labels.length === 0) {
               canvas.parentNode.innerHTML = '<p>داده‌ای برای نمایش وجود ندارد</p>';
               return;
             }
 
             window.financialChart = new Chart(ctx, {
-              // ... existing chart configuration ...
+              type: 'line',
+              data: {
+                labels: chartData.labels,
+                datasets: [{
+                  label: 'مبلغ تراکنش‌ها (ریال)',
+                  data: chartData.values,
+                  borderColor: 'var(--primary)',
+                  backgroundColor: 'var(--primary-light)',
+                  fill: true,
+                  tension: 0.4,
+                  pointRadius: 4,
+                  pointHoverRadius: 6,
+                  pointBackgroundColor: '#fff',
+                  pointBorderColor: 'var(--primary)'
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'top',
+                    labels: {
+                      font: {
+                        family: 'Vazir',
+                        size: 12,
+                        weight: '500'
+                      },
+                      padding: 12,
+                      color: 'var(--text-primary)',
+                      boxWidth: 12,
+                      usePointStyle: true
+                    }
+                  },
+                  tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                    titleFont: {
+                      family: 'Vazir',
+                      size: 13
+                    },
+                    bodyFont: {
+                      family: 'Vazir',
+                      size: 11
+                    },
+                    padding: 10,
+                    cornerRadius: 8,
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1,
+                    callbacks: {
+                      label: function(context) {
+                        return new Intl.NumberFormat('fa-IR').format(context.parsed.y) + ' ریال';
+                      }
+                    }
+                  }
+                },
+                scales: {
+                  x: {
+                    grid: {
+                      display: false
+                    },
+                    ticks: {
+                      font: {
+                        family: 'Vazir',
+                        size: 10
+                      },
+                      color: 'var(--text-secondary)',
+                      maxRotation: 45,
+                      minRotation: 45
+                    },
+                    title: {
+                      display: true,
+                      text: 'تاریخ',
+                      color: 'var(--text-primary)',
+                      font: {
+                        family: 'Vazir',
+                        size: 12
+                      }
+                    }
+                  },
+                  y: {
+                    beginAtZero: true,
+                    grid: {
+                      color: 'var(--border-neutral)'
+                    },
+                    ticks: {
+                      font: {
+                        family: 'Vazir',
+                        size: 10
+                      },
+                      color: 'var(--text-secondary)',
+                      callback: function(value) {
+                        return new Intl.NumberFormat('fa-IR').format(value);
+                      }
+                    },
+                    title: {
+                      display: true,
+                      text: 'مبلغ (ریال)',
+                      color: 'var(--text-primary)',
+                      font: {
+                        family: 'Vazir',
+                        size: 12
+                      }
+                    }
+                  }
+                },
+                animation: {
+                  duration: 1200,
+                  easing: 'easeOutQuart',
+                  delay: 200
+                },
+                hover: {
+                  mode: 'nearest',
+                  intersect: true,
+                  animationDuration: 400
+                }
+              }
             });
           };
 
-          // Observe DOM for canvas element
           const targetNode = document.querySelector('.chart-container');
           if (!targetNode) {
             console.error('Chart container not found');
@@ -313,7 +421,7 @@
             const canvas = document.getElementById('financialChart');
             if (canvas) {
               renderChart();
-              obs.disconnect(); // Stop observing once canvas is found
+              obs.disconnect();
             }
           });
 
@@ -322,11 +430,10 @@
             subtree: true
           });
 
-          // Fallback: Try rendering immediately in case canvas is already present
+          // Fallback: Try rendering immediately
           renderChart();
         });
 
-        // Initialize Jalali Datepicker
 
       });
 
