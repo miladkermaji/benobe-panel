@@ -412,6 +412,16 @@ class FinancialReport extends Component
     public function exportPdf()
     {
         Log::info('PDF export initiated', ['doctor_id' => Auth::guard('doctor')->user()->id, 'filters' => $this->getFilters()]);
+    
+        // گرفتن داده‌های تراکنش‌ها
+        $transactions = $this->getTransactions()->items();
+        
+        // ذخیره داده‌ها و فیلترها در session
+        session([
+            'financial_report_data' => $transactions,
+            'financial_report_filters' => $this->getFilters()
+        ]);
+    
         return redirect()->route('dr.panel.financial-reports.export-pdf', $this->getFilters());
     }
 
