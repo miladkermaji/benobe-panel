@@ -3,8 +3,12 @@
 namespace App\Livewire\Dr\Panel\Financial;
 
 use App\Models\Clinic;
-use App\Models\DoctorWalletTransaction;
 use App\Models\Insurance;
+use App\Models\Transaction;
+use App\Models\DoctorWalletTransaction;
+use App\Models\Appointment;
+use App\Models\ManualAppointment;
+use App\Models\CounselingAppointment;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -37,6 +41,7 @@ class FinancialReport extends Component
         'yearly' => 0,
         'total' => 0,
     ];
+    public $page = 1; // اضافه کردن پراپرتی page برای صفحه‌بندی
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -50,13 +55,14 @@ class FinancialReport extends Component
         'endDate' => ['except' => ''],
         'paymentMethod' => ['except' => ''],
         'insuranceId' => ['except' => ''],
+        'page' => ['except' => 1], // اضافه کردن page به queryString
     ];
 
     public function mount()
     {
         $this->startDate = Jalalian::now()->format('Y/m/d');
         $this->endDate = Jalalian::now()->format('Y/m/d');
-        $this->readyToLoad = false; // Lazy loading
+        $this->readyToLoad = false;
         Log::info('FinancialReport component mounted', ['doctor_id' => Auth::guard('doctor')->user()->id]);
     }
 
@@ -117,21 +123,92 @@ class FinancialReport extends Component
             return;
         }
 
-        $query = DoctorWalletTransaction::where('doctor_id', Auth::guard('doctor')->user()->id);
-        $this->applyFilters($query);
+        $doctorId = Auth::guard('doctor')->user()->id;
 
-        $data = $query->selectRaw('DATE(registered_at) as date, SUM(amount) as total')
+        // تبدیل تاریخ‌های جلالی به میلادی
+        try {
+            $start = $this->startDate && $this->dateFilter !== 'all'
+                ? Jalalian::fromFormat('Y/m/d', $this->startDate)->toCarbon()->startOfDay()
+                : Carbon::now()->subYears(1);
+            $end = $this->endDate && $this->dateFilter !== 'all'
+                ? Jalalian::fromFormat('Y/m/d', $this->endDate)->toCarbon()->endOfDay()
+                : Carbon::now();
+        } catch (\Exception $e) {
+            Log::error('Error converting Jalali dates', ['error' => $e->getMessage(), 'startDate' => $this->startDate, 'endDate' => $this->endDate]);
+            $start = Carbon::now()->subYears(1);
+            $end = Carbon::now();
+        }
+
+        Log::info('Chart data date range', ['start' => $start, 'end' => $end]);
+
+        // کوئری برای ترکیب داده‌ها از تمام جداول
+        $transactionsQuery = Transaction::where('transactable_type', 'App\Models\Doctor')
+            ->where('transactable_id', $doctorId)
+            ->selectRaw('DATE(created_at) as date, SUM(amount) as total')
+            ->whereBetween('created_at', [$start, $end])
+            ->groupBy('date');
+
+        $walletTransactionsQuery = DoctorWalletTransaction::where('doctor_id', $doctorId)
+            ->selectRaw('DATE(registered_at) as date, SUM(amount) as total')
+            ->whereBetween('registered_at', [$start, $end])
+            ->groupBy('date');
+
+        $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
+            ->where('payment_status', 'paid')
+            ->selectRaw('DATE(appointment_date) as date, SUM(final_price) as total')
+            ->whereBetween('appointment_date', [$start, $end])
+            ->groupBy('date');
+
+        $manualAppointmentsQuery = ManualAppointment::where('doctor_id', $doctorId)
+            ->whereNotNull('final_price')
+            ->selectRaw('DATE(appointment_date) as date, SUM(final_price) as total')
+            ->whereBetween('appointment_date', [$start, $end])
+            ->groupBy('date');
+
+        $counselingAppointmentsQuery = CounselingAppointment::where('doctor_id', $doctorId)
+            ->where('payment_status', 'paid')
+            ->selectRaw('DATE(appointment_date) as date, SUM(final_price) as total')
+            ->whereBetween('appointment_date', [$start, $end])
+            ->groupBy('date');
+
+        // اعمال فیلترها
+        $this->applyFilters($transactionsQuery, 'Transaction');
+        $this->applyFilters($walletTransactionsQuery, 'DoctorWalletTransaction');
+        $this->applyFilters($appointmentsQuery, 'Appointment');
+        $this->applyFilters($manualAppointmentsQuery, 'ManualAppointment');
+        $this->applyFilters($counselingAppointmentsQuery, 'CounselingAppointment');
+
+        // لاگ کوئری‌ها برای دیباگ
+        Log::info('Transactions Query', ['sql' => $transactionsQuery->toSql(), 'bindings' => $transactionsQuery->getBindings()]);
+        Log::info('Wallet Transactions Query', ['sql' => $walletTransactionsQuery->toSql(), 'bindings' => $walletTransactionsQuery->getBindings()]);
+        Log::info('Appointments Query', ['sql' => $appointmentsQuery->toSql(), 'bindings' => $appointmentsQuery->getBindings()]);
+        Log::info('Manual Appointments Query', ['sql' => $manualAppointmentsQuery->toSql(), 'bindings' => $manualAppointmentsQuery->getBindings()]);
+        Log::info('Counseling Appointments Query', ['sql' => $counselingAppointmentsQuery->toSql(), 'bindings' => $counselingAppointmentsQuery->getBindings()]);
+
+        // ترکیب نتایج
+        $data = $transactionsQuery->get()
+            ->merge($walletTransactionsQuery->get())
+            ->merge($appointmentsQuery->get())
+            ->merge($manualAppointmentsQuery->get())
+            ->merge($counselingAppointmentsQuery->get())
             ->groupBy('date')
-            ->orderBy('date')
-            ->get();
+            ->map(function ($group) {
+                return [
+                    'date' => $group->first()->date,
+                    'total' => $group->sum('total'),
+                ];
+            })
+            ->sortBy('date')
+            ->values();
 
         $this->chartData = [
             'labels' => $data->pluck('date')->map(fn ($date) => Jalalian::fromCarbon(Carbon::parse($date))->format('Y/m/d'))->toArray(),
             'values' => $data->pluck('total')->toArray(),
         ];
 
+        Log::info('Chart data prepared', ['labels' => $this->chartData['labels'], 'values' => $this->chartData['values']]);
+
         $this->dispatch('updateChart', $this->chartData);
-        Log::info('Chart data updated', ['chartData' => $this->chartData]);
     }
 
     private function updateSummary()
@@ -143,21 +220,61 @@ class FinancialReport extends Component
         $doctorId = Auth::guard('doctor')->user()->id;
 
         $this->summary = [
-            'daily' => DoctorWalletTransaction::where('doctor_id', $doctorId)
-                ->whereDate('registered_at', Carbon::today())
-                ->sum('amount'),
-            'weekly' => DoctorWalletTransaction::where('doctor_id', $doctorId)
-                ->whereBetween('registered_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-                ->sum('amount'),
-            'monthly' => DoctorWalletTransaction::where('doctor_id', $doctorId)
-                ->whereBetween('registered_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
-                ->sum('amount'),
-            'yearly' => DoctorWalletTransaction::where('doctor_id', $doctorId)
-                ->whereBetween('registered_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()])
-                ->sum('amount'),
-            'total' => DoctorWalletTransaction::where('doctor_id', $doctorId)
-                ->sum('amount'),
+            'daily' => $this->getTotalAmount(Carbon::today(), Carbon::today()->endOfDay()),
+            'weekly' => $this->getTotalAmount(Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()),
+            'monthly' => $this->getTotalAmount(Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()),
+            'yearly' => $this->getTotalAmount(Carbon::now()->startOfYear(), Carbon::now()->endOfYear()),
+            'total' => $this->getTotalAmount(null, null),
         ];
+
+        Log::info('Summary updated', ['summary' => $this->summary]);
+    }
+
+    private function getTotalAmount($start = null, $end = null)
+    {
+        $doctorId = Auth::guard('doctor')->user()->id;
+
+        $transactionsTotal = Transaction::where('transactable_type', 'App\Models\Doctor')
+            ->where('transactable_id', $doctorId);
+        $walletTransactionsTotal = DoctorWalletTransaction::where('doctor_id', $doctorId);
+        $appointmentsTotal = Appointment::where('doctor_id', $doctorId)
+            ->where('payment_status', 'paid');
+        $manualAppointmentsTotal = ManualAppointment::where('doctor_id', $doctorId)
+            ->whereNotNull('final_price');
+        $counselingAppointmentsTotal = CounselingAppointment::where('doctor_id', $doctorId)
+            ->where('payment_status', 'paid');
+
+        if ($start && $end) {
+            $transactionsTotal->whereBetween('created_at', [$start, $end]);
+            $walletTransactionsTotal->whereBetween('registered_at', [$start, $end]);
+            $appointmentsTotal->whereBetween('appointment_date', [$start, $end]);
+            $manualAppointmentsTotal->whereBetween('appointment_date', [$start, $end]);
+            $counselingAppointmentsTotal->whereBetween('appointment_date', [$start, $end]);
+        }
+
+        // اعمال فیلترها برای جمع‌بندی
+        $this->applyFilters($transactionsTotal, 'Transaction');
+        $this->applyFilters($walletTransactionsTotal, 'DoctorWalletTransaction');
+        $this->applyFilters($appointmentsTotal, 'Appointment');
+        $this->applyFilters($manualAppointmentsTotal, 'ManualAppointment');
+        $this->applyFilters($counselingAppointmentsTotal, 'CounselingAppointment');
+
+        $total = $transactionsTotal->sum('amount')
+            + $walletTransactionsTotal->sum('amount')
+            + $appointmentsTotal->sum('final_price')
+            + $manualAppointmentsTotal->sum('final_price')
+            + $counselingAppointmentsTotal->sum('final_price');
+
+        Log::info('Total amount calculated', [
+            'transactions' => $transactionsTotal->sum('amount'),
+            'wallet_transactions' => $walletTransactionsTotal->sum('amount'),
+            'appointments' => $appointmentsTotal->sum('final_price'),
+            'manual_appointments' => $manualAppointmentsTotal->sum('final_price'),
+            'counseling_appointments' => $counselingAppointmentsTotal->sum('final_price'),
+            'total' => $total,
+        ]);
+
+        return $total;
     }
 
     private function getFilters()
@@ -177,36 +294,101 @@ class FinancialReport extends Component
         ];
     }
 
-    private function applyFilters($query)
+    private function applyFilters($query, $modelType)
     {
         if ($this->search) {
-            $query->where('description', 'like', '%' . $this->search . '%');
+            if ($modelType === 'Transaction') {
+                $query->where('meta', 'like', '%' . $this->search . '%');
+            } elseif ($modelType === 'DoctorWalletTransaction') {
+                $query->where('description', 'like', '%' . $this->search . '%');
+            } else {
+                $query->where(function ($q) {
+                    $q->where('description', 'like', '%' . $this->search . '%')
+                      ->orWhere('title', 'like', '%' . $this->search . '%');
+                });
+            }
         }
+
         if ($this->transactionType) {
-            $query->where('type', $this->transactionType);
+            if ($modelType === 'Transaction') {
+                $query->whereJsonContains('meta->type', $this->transactionType);
+            } elseif ($modelType === 'DoctorWalletTransaction') {
+                $query->where('type', $this->transactionType);
+            } elseif ($modelType === 'Appointment' || $modelType === 'CounselingAppointment') {
+                $query->where('appointment_type', $this->transactionType);
+            } elseif ($modelType === 'ManualAppointment') {
+                $query->where('payment_method', $this->transactionType);
+            }
         }
+
         if ($this->transactionStatus) {
-            $query->where('status', $this->transactionStatus);
+            if ($modelType === 'Transaction') {
+                $query->where('status', $this->transactionStatus);
+            } elseif ($modelType === 'DoctorWalletTransaction') {
+                $query->where('status', $this->transactionStatus);
+            } elseif ($modelType === 'Appointment' || $modelType === 'CounselingAppointment') {
+                $query->where('payment_status', $this->transactionStatus);
+            } elseif ($modelType === 'ManualAppointment') {
+                $query->where('status', $this->transactionStatus);
+            }
         }
+
         if ($this->clinicId) {
-            $query->where('clinic_id', $this->clinicId);
+            if ($modelType === 'Transaction') {
+                $query->whereJsonContains('meta->clinic_id', (int) $this->clinicId);
+            } else {
+                $query->where('clinic_id', $this->clinicId);
+            }
         }
+
         if ($this->minAmount) {
-            $query->where('amount', '>=', $this->minAmount);
+            if ($modelType === 'Transaction' || $modelType === 'DoctorWalletTransaction') {
+                $query->where('amount', '>=', $this->minAmount);
+            } else {
+                $query->where('final_price', '>=', $this->minAmount);
+            }
         }
+
         if ($this->maxAmount) {
-            $query->where('amount', '<=', $this->maxAmount);
+            if ($modelType === 'Transaction' || $modelType === 'DoctorWalletTransaction') {
+                $query->where('amount', '<=', $this->maxAmount);
+            } else {
+                $query->where('final_price', '<=', $this->maxAmount);
+            }
         }
+
+        // حذف شرط تکراری whereBetween
+        // فقط اگر تاریخ‌ها در کوئری اصلی اعمال نشده باشند، اینجا اضافه می‌شوند
         if ($this->startDate && $this->endDate && $this->dateFilter !== 'all') {
-            $start = Carbon::createFromFormat('Y/m/d', $this->startDate)->startOfDay();
-            $end = Carbon::createFromFormat('Y/m/d', $this->endDate)->endOfDay();
-            $query->whereBetween('registered_at', [$start, $end]);
+            try {
+                $start = Jalalian::fromFormat('Y/m/d', $this->startDate)->toCarbon()->startOfDay();
+                $end = Jalalian::fromFormat('Y/m/d', $this->endDate)->toCarbon()->endOfDay();
+                if ($modelType === 'Transaction' && !$query->getQuery()->wheres) {
+                    $query->whereBetween('created_at', [$start, $end]);
+                } elseif ($modelType === 'DoctorWalletTransaction' && !$query->getQuery()->wheres) {
+                    $query->whereBetween('registered_at', [$start, $end]);
+                } elseif (!$query->getQuery()->wheres) {
+                    $query->whereBetween('appointment_date', [$start, $end]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Error applying date filter', ['error' => $e->getMessage(), 'startDate' => $this->startDate, 'endDate' => $this->endDate]);
+            }
         }
+
         if ($this->paymentMethod) {
-            $query->whereHas('appointment', fn ($q) => $q->where('payment_method', $this->paymentMethod));
+            if ($modelType === 'Transaction') {
+                $query->whereJsonContains('meta->payment_method', $this->paymentMethod);
+            } elseif ($modelType === 'Appointment' || $modelType === 'ManualAppointment' || $modelType === 'CounselingAppointment') {
+                $query->where('payment_method', $this->paymentMethod);
+            }
         }
+
         if ($this->insuranceId) {
-            $query->whereHas('appointment', fn ($q) => $q->where('insurance_id', $this->insuranceId));
+            if ($modelType === 'Transaction') {
+                $query->whereJsonContains('meta->insurance_id', (int) $this->insuranceId);
+            } elseif ($modelType === 'Appointment' || $modelType === 'CounselingAppointment') {
+                $query->where('insurance_id', $this->insuranceId);
+            }
         }
     }
 
@@ -224,10 +406,131 @@ class FinancialReport extends Component
 
     private function getTransactions()
     {
-        $query = DoctorWalletTransaction::where('doctor_id', Auth::guard('doctor')->user()->id)
-            ->with(['clinic', 'appointment', 'appointment.insurance']);
-        $this->applyFilters($query);
-        return $query->orderBy('registered_at', 'desc');
+        $doctorId = Auth::guard('doctor')->user()->id;
+
+        $transactionsQuery = Transaction::where('transactable_type', 'App\Models\Doctor')
+            ->where('transactable_id', $doctorId);
+        $walletTransactionsQuery = DoctorWalletTransaction::where('doctor_id', $doctorId);
+        $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
+            ->where('payment_status', 'paid');
+        $manualAppointmentsQuery = ManualAppointment::where('doctor_id', $doctorId)
+            ->whereNotNull('final_price');
+        $counselingAppointmentsQuery = CounselingAppointment::where('doctor_id', $doctorId)
+            ->where('payment_status', 'paid');
+
+        $this->applyFilters($transactionsQuery, 'Transaction');
+        $this->applyFilters($walletTransactionsQuery, 'DoctorWalletTransaction');
+        $this->applyFilters($appointmentsQuery, 'Appointment');
+        $this->applyFilters($manualAppointmentsQuery, 'ManualAppointment');
+        $this->applyFilters($counselingAppointmentsQuery, 'CounselingAppointment');
+
+        // استخراج و فرمت داده‌ها
+        $transactions = $transactionsQuery->get()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'type' => 'transaction',
+                'date' => $item->created_at,
+                'amount' => $item->amount,
+                'status' => $item->status,
+                'description' => $item->meta['description'] ?? 'بدون توضیح',
+                'clinic_id' => $item->meta['clinic_id'] ?? null,
+                'payment_method' => $item->meta['payment_method'] ?? null,
+                'insurance_id' => $item->meta['insurance_id'] ?? null,
+                'transaction_type' => $item->meta['type'] ?? 'unknown',
+            ];
+        });
+
+        $walletTransactions = $walletTransactionsQuery->get()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'type' => 'wallet_transaction',
+                'date' => $item->registered_at,
+                'amount' => $item->amount,
+                'status' => $item->status,
+                'description' => $item->description ?? 'بدون توضیح',
+                'clinic_id' => $item->clinic_id,
+                'payment_method' => null,
+                'insurance_id' => null,
+                'transaction_type' => $item->type,
+            ];
+        });
+
+        $appointments = $appointmentsQuery->get()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'type' => 'appointment',
+                'date' => $item->appointment_date,
+                'amount' => $item->final_price,
+                'status' => $item->payment_status,
+                'description' => $item->description ?? 'بدون توضیح',
+                'clinic_id' => $item->clinic_id,
+                'payment_method' => $item->payment_method,
+                'insurance_id' => $item->insurance_id,
+                'transaction_type' => $item->appointment_type,
+            ];
+        });
+
+        $manualAppointments = $manualAppointmentsQuery->get()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'type' => 'manual_appointment',
+                'date' => $item->appointment_date,
+                'amount' => $item->final_price,
+                'status' => $item->status,
+                'description' => $item->description ?? 'بدون توضیح',
+                'clinic_id' => $item->clinic_id,
+                'payment_method' => $item->payment_method,
+                'insurance_id' => null,
+                'transaction_type' => $item->payment_method ?? 'manual',
+            ];
+        });
+
+        $counselingAppointments = $counselingAppointmentsQuery->get()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'type' => 'counseling_appointment',
+                'date' => $item->appointment_date,
+                'amount' => $item->final_price,
+                'status' => $item->payment_status,
+                'description' => $item->description ?? 'بدون توضیح',
+                'clinic_id' => $item->clinic_id,
+                'payment_method' => $item->payment_method,
+                'insurance_id' => $item->insurance_id,
+                'transaction_type' => $item->appointment_type,
+            ];
+        });
+
+        // ادغام و مرتب‌سازی نتایج
+        $allTransactions = $transactions
+            ->merge($walletTransactions)
+            ->merge($appointments)
+            ->merge($manualAppointments)
+            ->merge($counselingAppointments)
+            ->sortByDesc('date');
+
+        // لاگ تعداد تراکنش‌ها
+        Log::info('Transactions retrieved', [
+            'transactions_count' => $transactions->count(),
+            'wallet_transactions_count' => $walletTransactions->count(),
+            'appointments_count' => $appointments->count(),
+            'manual_appointments_count' => $manualAppointments->count(),
+            'counseling_appointments_count' => $counselingAppointments->count(),
+            'total_count' => $allTransactions->count(),
+        ]);
+
+        // صفحه‌بندی دستی
+        $perPage = $this->perPage;
+        $currentPage = $this->page; // استفاده از پراپرتی page
+        $paginated = $allTransactions->forPage($currentPage, $perPage);
+        $total = $allTransactions->count();
+
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $paginated,
+            $total,
+            $perPage,
+            $currentPage,
+            ['path' => url()->current()]
+        );
     }
 
     public function formatPaymentMethod($method)
@@ -237,24 +540,58 @@ class FinancialReport extends Component
             case 'cash': return 'نقدی';
             case 'card_to_card': return 'کارت به کارت';
             case 'pos': return 'POS';
-            default: return $method;
+            case 'card': return 'کارت';
+            case 'insurance': return 'بیمه';
+            default: return $method ?: '-';
+        }
+    }
+
+    public function formatTransactionType($type)
+    {
+        switch ($type) {
+            case 'wallet_charge': return 'شارژ کیف پول';
+            case 'profile_upgrade': return 'ارتقای حساب';
+            case 'appointment': return 'نوبت‌دهی';
+            case 'online': return 'آنلاین';
+            case 'in_person': return 'حضوری';
+            case 'charge': return 'شارژ';
+            case 'phone': return 'تلفنی';
+            case 'video': return 'تصویری';
+            case 'text': return 'متنی';
+            case 'manual': return 'دستی';
+            default: return $type ?: 'نامشخص';
+        }
+    }
+
+    public function formatStatus($status)
+    {
+        switch ($status) {
+            case 'pending': return 'در انتظار';
+            case 'paid': return 'پرداخت‌شده';
+            case 'failed': return 'ناموفق';
+            case 'available': return 'موجود';
+            case 'requested': return 'درخواست‌شده';
+            case 'unpaid': return 'پرداخت‌نشده';
+            case 'scheduled': return 'برنامه‌ریزی‌شده';
+            case 'cancelled': return 'لغو شده';
+            default: return $status ?: 'نامشخص';
         }
     }
 
     public function render()
     {
         $doctorId = Auth::guard('doctor')->user()->id;
-        $transactions = $this->readyToLoad ? $this->getTransactions()->paginate($this->perPage) : collect([]);
-        $totalAmount = $this->readyToLoad ? $this->getTransactions()->sum('amount') : 0;
+        $transactions = $this->readyToLoad ? $this->getTransactions() : collect([]);
+        $totalAmount = $this->readyToLoad ? $this->getTotalAmount() : 0;
         $clinics = Clinic::where('doctor_id', $doctorId)->get();
         $insurances = Insurance::whereHas('doctors', fn ($q) => $q->where('doctor_id', $doctorId))->get();
-    
+
         Log::info('Rendering FinancialReport view', [
             'doctor_id' => $doctorId,
-            'transaction_count' => $this->readyToLoad ? $transactions->total() : 0, // اصلاح خطا
+            'transaction_count' => $this->readyToLoad ? $transactions->total() : 0,
             'total_amount' => $totalAmount,
         ]);
-    
+
         return view('livewire.dr.panel.financial.financial-report', [
             'transactions' => $transactions,
             'totalAmount' => $totalAmount,
