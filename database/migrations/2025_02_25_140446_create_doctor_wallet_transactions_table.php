@@ -18,6 +18,7 @@ return new class () extends Migration {
             $table->timestamp('registered_at')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['doctor_id', 'registered_at']);
             $table->index(['type', 'status']);
