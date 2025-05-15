@@ -146,6 +146,9 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.financial-reports.index') ? 'is-active' : '' }}">
+              <a href="{{ route('dr.panel.financial-reports.index') }}">گزارش مالی</a>
+            </li>
             <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-payment-setting') ? 'is-active' : '' }}">
               <a href="{{ route('dr-payment-setting') }}">پرداخت</a>
             </li>

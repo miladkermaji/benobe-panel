@@ -732,6 +732,16 @@ Route::prefix('dr')
                 Route::get('/charge', function () {
                     return view('dr.panel.payment.charge');
                 })->middleware('secretary.permission:financial_reports')->name('dr-wallet-charge');
+
+
+                Route::get('/financial-reports', [App\Http\Controllers\Dr\Panel\FinancialReport\FinancialReportController::class, 'index'])
+                                       ->name('dr.panel.financial-reports.index');
+                Route::get('/financial-reports/export-excel', [App\Http\Controllers\Dr\Panel\FinancialReport\FinancialReportController::class, 'exportExcel'])
+                    ->name('dr.panel.financial-reports.export-excel');
+                Route::get('/financial-reports/export-pdf', [App\Http\Controllers\Dr\Panel\FinancialReport\FinancialReportController::class, 'exportPdf'])
+                    ->name('dr.panel.financial-reports.export-pdf');
+
+
             });
 
             Route::prefix('profile')->group(function () {

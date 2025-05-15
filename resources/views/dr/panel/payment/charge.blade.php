@@ -23,7 +23,7 @@
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
-    $(document).ready(function() {
+  $(document).ready(function() {
     let dropdownOpen = false;
     let selectedClinic = localStorage.getItem('selectedClinic');
     let selectedClinicId = localStorage.getItem('selectedClinicId');

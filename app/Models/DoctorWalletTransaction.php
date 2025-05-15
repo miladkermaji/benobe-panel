@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Clinic;
@@ -35,5 +36,9 @@ class DoctorWalletTransaction extends Model
     public function clinic()
     {
         return $this->belongsTo(Clinic::class, 'clinic_id');
+    }
+    public function appointment()
+    {
+        return $this->belongsTo(Appointment::class);
     }
 }
