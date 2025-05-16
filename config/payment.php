@@ -347,6 +347,7 @@ return [
             /* normal api */
             'apiPurchaseUrl' => 'https://api.zarinpal.com/pg/v4/payment/request.json',
             'apiPaymentUrl' => 'https://www.zarinpal.com/pg/StartPay/',
+           /*  'apiPaymentUrl' => 'https://sandbox.zarinpal.com/pg/StartPay/', */
             'apiVerificationUrl' => 'https://api.zarinpal.com/pg/v4/payment/verify.json',
 
             /* sandbox api */
@@ -522,7 +523,7 @@ return [
         'behpardakht' => \Shetabit\Multipay\Drivers\Behpardakht\Behpardakht::class,
         'digipay' => \Shetabit\Multipay\Drivers\Digipay\Digipay::class,
         'etebarino' => \Shetabit\Multipay\Drivers\Etebarino\Etebarino::class,
-        'idpay' => \Shetabit\Multipay\Drivers\Idpay\Idpay::class,
+        /* 'idpay' => \Shetabit\Multipay\Drivers\Idpay\Idpay::class, */
         'irandargah' => \Shetabit\Multipay\Drivers\IranDargah\IranDargah::class,
         'irankish' => \Shetabit\Multipay\Drivers\Irankish\Irankish::class,
         'jibit' => \Shetabit\Multipay\Drivers\Jibit\Jibit::class,
@@ -531,7 +532,7 @@ return [
         'parsian' => \Shetabit\Multipay\Drivers\Parsian\Parsian::class,
         'parspal' => \Shetabit\Multipay\Drivers\Parspal\Parspal::class,
         'pasargad' => \Shetabit\Multipay\Drivers\Pasargad\Pasargad::class,
-        'payir' => \Shetabit\Multipay\Drivers\Payir\Payir::class,
+        /* 'payir' => \Shetabit\Multipay\Drivers\Payir\Payir::class, */
         'paypal' => \Shetabit\Multipay\Drivers\Paypal\Paypal::class,
         'payping' => \Shetabit\Multipay\Drivers\Payping\Payping::class,
         'paystar' => \Shetabit\Multipay\Drivers\Paystar\Paystar::class,
@@ -540,7 +541,7 @@ return [
         'saman' => \Shetabit\Multipay\Drivers\Saman\Saman::class,
         'sep' => \Shetabit\Multipay\Drivers\SEP\SEP::class,
         'sepehr' => \Shetabit\Multipay\Drivers\Sepehr\Sepehr::class,
-        'walleta' => \Shetabit\Multipay\Drivers\Walleta\Walleta::class,
+        /* 'walleta' => \Shetabit\Multipay\Drivers\Walleta\Walleta::class, */
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,

@@ -22,7 +22,7 @@ class Appointment extends Model
         'status',
         'notes',
         'description',
-'payment_method',
+        'payment_method',
         'tracking_code',
         'fee',
         'final_price',
