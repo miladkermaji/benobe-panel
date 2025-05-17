@@ -1,29 +1,26 @@
-<div class="container-fluid py-4" dir="rtl">
-  <div class="card shadow-lg border-0 rounded-3 overflow-hidden" style="background: #ffffff;">
-    <div
-      class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
-      <div class="d-flex align-items-center gap-3">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          class="animate-bounce">
+<div class="container-fluid py-2" dir="rtl">
+  <div class="card shadow-lg border-0 rounded-2 overflow-hidden" style="background: #ffffff;">
+    <div class="card-header bg-gradient-primary text-white p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">افزودن یادداشت جدید</h5>
       </div>
       <a href="{{ route('dr.panel.doctornotes.index') }}"
-        class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">
-        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
+        class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 d-flex align-items-center gap-1 hover:shadow-lg transition-all">
+        <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         بازگشت
       </a>
     </div>
 
-    <div class="card-body p-4">
+    <div class="card-body p-3">
       <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-          <div class="row g-4">
-            <div class="col-md-6 col-sm-12 position-relative mt-5" wire:ignore>
+        <div class="col-12">
+          <div class="row g-3">
+            <div class="col-12 position-relative mt-4" wire:ignore>
               <select wire:model="appointment_type" class="form-select select2-type" id="appointment_type" required>
                 <option value="in_person">حضوری</option>
                 <option value="online_phone">تلفنی</option>
@@ -32,7 +29,7 @@
               </select>
               <label for="appointment_type" class="form-label">نوع نوبت</label>
             </div>
-            <div class="col-md-6 col-sm-12 position-relative mt-5" wire:ignore>
+            <div class="col-12 position-relative mt-4" wire:ignore>
               <select wire:model="clinic_id" class="form-select select2-clinic" id="clinic_id">
                 <option value="">بدون کلینیک</option>
                 @foreach ($clinics as $clinic)
@@ -41,15 +38,14 @@
               </select>
               <label for="clinic_id" class="form-label">کلینیک (اختیاری)</label>
             </div>
-            <div class="col-12 position-relative mt-5">
+            <div class="col-12 position-relative mt-4">
               <textarea wire:model="notes" class="form-control" id="notes" rows="3" placeholder=" "></textarea>
               <label for="notes" class="form-label">یادداشت (اختیاری)</label>
             </div>
-            <div class="col-12 text-end mt-4 w-100 d-flex justify-content-end">
+            <div class="col-12 text-end mt-3 w-100 d-flex justify-content-end">
               <button wire:click="store"
-                class="btn my-btn-primary  py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2">
+                class="btn my-btn-primary py-2 px-3 d-flex align-items-center gap-1 shadow-lg hover:shadow-xl transition-all">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
                 افزودن یادداشت
@@ -65,7 +61,6 @@
           toastr[event.type](event.message);
         });
 
-        // Initialize Select2
         $('#clinic_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کلینیک',
@@ -74,12 +69,11 @@
         });
         $('#appointment_type').select2({
           dir: 'rtl',
-          placeholder: ' نوع نوبت',
+          placeholder: 'نوع نوبت',
           allowClear: true,
           width: '100%',
         });
 
-        // Sync Select2 with Livewire
         $('#clinic_id').on('change', function() {
           @this.set('clinic_id', this.value);
         });
@@ -87,10 +81,10 @@
           @this.set('appointment_type', this.value);
         });
 
-        // Update Select2 when Livewire updates
         Livewire.on('update-clinic-id', (event) => {
           $('#clinic_id').val(event.value).trigger('change');
         });
       });
     </script>
   </div>
+</div>

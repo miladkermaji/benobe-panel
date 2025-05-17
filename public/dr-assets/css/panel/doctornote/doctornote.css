@@ -1,73 +1,74 @@
 /* تعریف متغیرهای پالت رنگی */
 :root {
-    /* پالت رنگی اصلی */
-    --primary: #2E86C1; /* آبی اصلی - دکمه‌ها و لینک‌ها */
-    --primary-light: #84CAF9; /* آبی روشن - گرادیان‌ها */
-    --secondary: #1DEB3C; /* سبز - دکمه‌های ثانویه */
-    --secondary-hover: #15802A; /* سبز تیره‌تر برای هاور */
-    --background-light: #F0F8FF; /* آبی بسیار روشن - پس‌زمینه */
-    --background-footer: #D4ECFD; /* آبی روشن‌تر - فوتر */
-    --background-card: #FFFFFF; /* سفید - کارت‌ها */
-    --text-primary: #000000; /* مشکی - متن اصلی */
-    --text-secondary: #707070; /* خاکستری - متن ثانویه */
-    --text-discount: #008000; /* سبز - قیمت با تخفیف */
-    --text-original: #FF0000; /* قرمز - قیمت اولیه */
-    --border-neutral: #E5E7EB; /* خاکستری روشن - حاشیه‌ها */
-    --shadow: rgba(0, 0, 0, 0.15); /* سایه‌ها */
-    --gradient-instagram-from: #F92CA7; /* گرادیان اینستاگرام - شروع */
-    --gradient-instagram-to: #6B1A93; /* گرادیان اینستاگرام - پایان */
-    --button-mobile: #4F9ACD; /* آبی متوسط - دکمه‌های موبایل */
-    --button-mobile-light: #A2CDEB; /* آبی روشن‌تر - دکمه‌های موبایل */
-    --support-section: #2E86C1; /* آبی - بخش پشتیبانی */
-    --support-text: #084D7C; /* آبی تیره - متن پشتیبانی */
+    --primary: #2E86C1;
+    --primary-light: #84CAF9;
+    --secondary: #1DEB3C;
+    --secondary-hover: #15802A;
+    --background-light: #F0F8FF;
+    --background-footer: #D4ECFD;
+    --background-card: #FFFFFF;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --text-discount: #008000;
+    --text-original: #FF0000;
+    --border-neutral: #E5E7EB;
+    --shadow: rgba(0, 0, 0, 0.15);
+    --gradient-instagram-from: #F92CA7;
+    --gradient-instagram-to: #6B1A93;
+    --button-mobile: #4F9ACD;
+    --button-mobile-light: #A2CDEB;
+    --support-section: #2E86C1;
+    --support-text: #084D7C;
     --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
-    --gradient-header: linear-gradient(90deg, #1B6FA6 0%, #2E86C1 100%); /* هدر پررنگ‌تر */
-    
-    /* شعاع گوشه‌ها */
-    --radius-button: 0.5rem; /* 8px - دکمه‌ها (کاهش یافته) */
-    --radius-card: 1.25rem; /* 20px - کارت‌ها */
-    --radius-nav: 1.5rem; /* 24px - نوار ناوبری */
-    --radius-circle: 9999px; /* دایره کامل */
+    --gradient-header: linear-gradient(90deg, #1B6FA6 0%, #2E86C1 100%);
+    --radius-button: 0.375rem; /* کاهش برای موبایل */
+    --radius-card: 0.75rem; /* کاهش برای موبایل */
+    --radius-nav: 1rem; /* کاهش برای موبایل */
+    --radius-circle: 9999px;
 }
 
 /* استایل‌های عمومی */
 body {
     background-color: var(--background-light);
     color: var(--text-primary);
-    font-size: 16px;
+    font-size: 15px;
     direction: rtl;
-    font-family: 'Vazir', sans-serif; /* فونت مدرن */
+    font-family: 'Vazir', sans-serif;
+    margin: 0;
+    width: 100vw;
+    overflow-x: hidden;
 }
 
 /* کارت‌ها */
 .card {
     background: var(--background-card);
     border-radius: var(--radius-card);
-    box-shadow: 0 6px 18px var(--shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px var(--shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     overflow: hidden;
+    margin: 0;
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px var(--shadow);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px var(--shadow);
 }
 
 /* هدر کارت */
 .card-header {
     background: var(--gradient-primary);
     color: #ffffff;
-    padding: 1.25rem 1.5rem;
+    padding: 0.75rem 1rem;
     border-radius: var(--radius-card) var(--radius-card) 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
 }
 
 /* بدنه کارت */
 .card-body {
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 /* دکمه‌ها */
@@ -76,13 +77,13 @@ body {
     color: #ffffff;
     border: none;
     border-radius: var(--radius-button);
-    padding: 0.5rem 1.25rem; /* کاهش پدینگ برای کوچکتر شدن */
+    padding: 0.375rem 1rem;
     font-weight: 500;
-    font-size: 13px; /* کاهش سایز فونت */
+    font-size: 12px;
     transition: transform 0.2s ease, background 0.2s ease;
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.375rem;
 }
 
 .my-btn-primary:hover {
@@ -94,8 +95,8 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.9);
     color: #ffffff;
     border-radius: var(--radius-button);
-    padding: 0.375rem 1rem; /* کاهش پدینگ برای کوچکتر شدن */
-    font-size: 12px; /* کاهش سایز فونت */
+    padding: 0.25rem 0.75rem;
+    font-size: 11px;
     transition: background 0.2s ease, transform 0.2s ease;
 }
 
@@ -109,8 +110,8 @@ body {
     color: #ffffff;
     border: none;
     border-radius: var(--radius-button);
-    padding: 0.5rem 1.25rem; /* کاهش پدینگ برای کوچکتر شدن */
-    font-size: 13px; /* کاهش سایز فونت */
+    padding: 0.375rem 1rem;
+    font-size: 12px;
     transition: transform 0.2s ease, background 0.2s ease;
 }
 
@@ -124,8 +125,8 @@ body {
     color: #ffffff;
     border: none;
     border-radius: var(--radius-button);
-    padding: 0.5rem 1.25rem; /* کاهش پدینگ برای کوچکتر شدن */
-    font-size: 13px; /* کاهش سایز فونت */
+    padding: 0.375rem 1rem;
+    font-size: 12px;
     transition: transform 0.2s ease, background 0.2s ease;
 }
 
@@ -144,29 +145,27 @@ body {
 .form-select {
     border: 1px solid var(--border-neutral);
     border-radius: var(--radius-button);
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 0.75rem;
     background: var(--background-card);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     width: 100%;
-    height: 44px;
-    font-size: 14px;
+    height: 38px;
+    font-size: 13px;
 }
 
 .form-control:focus,
 .form-select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.25);
+    box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.25);
     background: var(--background-card);
 }
 
 .form-label {
     position: absolute;
-    top: -18px;
-    right: 10px;
+    top: -17px;
+    right: 8px;
     color: var(--text-secondary);
-    font-size: 12px;
-    background: var(--background-card);
-    padding: 0 6px;
+    font-size: 11px;
     transition: all 0.2s ease;
 }
 
@@ -174,25 +173,25 @@ body {
 .select2-container--default .select2-selection--single {
     border: 1px solid var(--border-neutral);
     border-radius: var(--radius-button);
-    height: 44px;
+    height: 38px;
     background: var(--background-card);
-    padding: 0.5rem;
+    padding: 0.375rem;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 32px;
+    line-height: 28px;
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 44px;
-    right: 10px;
+    height: 38px;
+    right: 8px;
 }
 
 .select2-container--default .select2-selection--single:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.25);
+    box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.25);
 }
 
 .select2-container--default .select2-dropdown {
@@ -202,7 +201,7 @@ body {
 }
 
 .select2-container--default .select2-results__option {
-    padding: 8px 12px;
+    padding: 6px 10px;
     color: var(--text-primary);
 }
 
@@ -215,13 +214,13 @@ body {
 .glass-header {
     background: var(--gradient-header);
     border-radius: var(--radius-nav);
-    padding: 1.25rem;
-    box-shadow: 0 6px 20px var(--shadow);
+    padding: 0.75rem;
+    box-shadow: 0 4px 16px var(--shadow);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
 }
 
 /* جدول */
@@ -232,7 +231,7 @@ body {
     background: var(--background-card);
     border-radius: var(--radius-button);
     overflow: hidden;
-    box-shadow: 0 4px 12px var(--shadow);
+    box-shadow: 0 3px 10px var(--shadow);
     margin: 0;
 }
 
@@ -243,7 +242,7 @@ body {
 
 .table th,
 .table td {
-    padding: 1rem;
+    padding: 0.75rem;
     text-align: right;
     vertical-align: middle;
     border-bottom: 1px solid var(--border-neutral);
@@ -251,13 +250,13 @@ body {
 
 .table th {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .table td {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-primary);
 }
 
@@ -277,7 +276,7 @@ body {
 .search-icon {
     position: absolute;
     top: 50%;
-    right: 12px;
+    right: 10px;
     transform: translateY(-50%);
     color: var(--text-secondary);
 }
@@ -288,72 +287,89 @@ body {
 }
 
 @keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-6px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }
 
 /* تنظیمات ریسپانسیو */
-@media (max-width: 1200px) {
+@media (max-width: 991px) {
+    .container-fluid {
+        padding: 0 0.5rem;
+    }
+
     .glass-header {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 1rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .glass-header h1 {
+        font-size: 1.1rem;
+        flex-grow: 1;
+        text-align: right;
+    }
+
+    .input-group {
+        max-width: 100%;
+        flex-grow: 1;
     }
 
     .buttons-container {
-        flex-direction: column;
-        gap: 0.75rem;
-        margin-top: 1rem;
+        flex-direction: row;
+        gap: 0.5rem;
+        justify-content: flex-end;
     }
 
-    .btn {
-        width: 100%;
-        max-width: none;
-    }
-}
-
-@media (max-width: 991px) {
-    .card-body {
-        padding: 1.25rem;
+    .card {
+        border-radius: 0.5rem;
     }
 
     .card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 1rem;
-        gap: 0.75rem;
+        padding: 0.5rem;
+    }
+
+    .card-body {
+        padding: 0.75rem;
     }
 
     .form-control,
     .form-select,
     .select2-container--default .select2-selection--single {
-        height: 40px;
-        font-size: 13px;
+        height: 36px;
+        font-size: 12px;
+        padding: 0.375rem 0.75rem;
     }
 
     .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 28px;
+        line-height: 26px;
     }
 
-    .table th,
-    .table td {
-        padding: 0.75rem;
+    .form-label {
+        font-size: 10px;
+        top: -14px;
     }
 
     .my-btn-primary,
     .btn-gradient-success,
     .btn-gradient-danger {
-        padding: 0.375rem 1rem; /* کوچکتر در موبایل */
-        font-size: 12px;
+        padding: 0.25rem 0.75rem;
+        font-size: 11px;
     }
 
     .btn-outline-light {
-        padding: 0.25rem 0.75rem; /* کوچکتر در موبایل */
+        padding: 0.2rem 0.5rem;
+        font-size: 10px;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.5rem;
         font-size: 11px;
+    }
+
+    .table th {
+        font-size: 12px;
     }
 }
 
@@ -362,81 +378,181 @@ body {
         font-size: 14px;
     }
 
+    .container-fluid {
+        padding: 0 0.25rem;
+        margin: 0;
+    }
+
     .card {
-        border-radius: 1rem;
+        border-radius: 0.375rem;
+        margin: 0;
     }
 
     .card-body {
-        padding: 1rem;
+        padding: 0.5rem;
     }
 
     .card-header {
-        padding: 0.75rem;
+        padding: 0.5rem;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 0.25rem;
     }
 
     .glass-header {
-        padding: 0.75rem;
+        padding: 0.5rem;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .glass-header h1 {
-        font-size: 1.25rem;
-        text-align: center;
+        font-size: 1rem;
+        text-align: right;
+        flex-grow: 1;
+    }
+
+    .input-group {
+        max-width: 50%;
+        flex-grow: 1;
+    }
+
+    .buttons-container {
+        flex-direction: row;
+        gap: 0.25rem;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+    }
+
+    .form-control,
+    .form-select,
+    .select2-container--default .select2-selection--single {
+        height: 34px;
+        font-size: 11px;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 24px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 34px;
+        right: 6px;
     }
 
     .form-label {
-        font-size: 11px;
-        top: -16px;
+        font-size: 9px;
+        top: -12px;
+        right: 6px;
     }
 
     .my-btn-primary,
     .btn-gradient-success,
     .btn-gradient-danger {
-        padding: 0.375rem 1rem; /* کوچکتر در موبایل */
-        font-size: 12px;
+        padding: 0.2rem 0.5rem;
+        font-size: 10px;
     }
 
     .btn-outline-light {
-        padding: 0.25rem 0.75rem; /* کوچکتر در موبایل */
-        font-size: 11px;
-    }
-
-    .col-md-6 {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-
-    .table {
-        font-size: 12px;
+        padding: 0.15rem 0.4rem;
+        font-size: 9px;
     }
 
     .table th,
     .table td {
-        padding: 0.5rem;
+        padding: 0.4rem;
+        font-size: 10px;
+    }
+
+    .table th {
+        font-size: 11px;
+    }
+
+    .container-fluid .row.g-3 {
+        margin: 0;
+    }
+
+    .container-fluid .row.g-3 > div {
+        padding: 0.25rem;
     }
 }
 
 @media (max-width: 575px) {
+    body {
+        font-size: 13px;
+    }
+    .row > *{
+        padding-left: .1rem !important;
+        padding-right: .1rem !important;
+    }
+
+    .container-fluid {
+        padding: 0 0.2rem;
+    }
+
     .card {
-        border-radius: 0.75rem;
+        border-radius: 0.25rem;
     }
 
     .card-body {
-        padding: 0.75rem;
+        padding: 0.4rem;
+    }
+
+    .card-header {
+        padding: 0.4rem;
     }
 
     .glass-header {
-        border-radius: 1rem;
+        padding: 0.4rem;
     }
 
-    .btn {
-        width: 100%;
-        justify-content: center;
+    .glass-header h1 {
+        font-size: 0.9rem;
+    }
+
+    .input-group {
+        max-width: 100%;
+    }
+
+    .buttons-container {
+        gap: 0.2rem;
+    }
+
+    .form-control,
+    .form-select,
+    .select2-container--default .select2-selection--single {
+        height: 32px;
+        font-size: 10px;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 22px;
+    }
+
+    .form-label {
+        font-size: 8px;
+        top: -10px;
+    }
+
+    .my-btn-primary,
+    .btn-gradient-success,
+    .btn-gradient-danger {
+        padding: 0.15rem 0.4rem;
+        font-size: 9px;
+    }
+
+    .btn-outline-light {
+        padding: 0.1rem 0.3rem;
+        font-size: 8px;
     }
 
     .table th,
     .table td {
-        font-size: 11px;
-        padding: 0.4rem;
+        padding: 0.3rem;
+        font-size: 9px;
     }
 }
 
