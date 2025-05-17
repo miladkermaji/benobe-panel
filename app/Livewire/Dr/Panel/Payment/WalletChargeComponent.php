@@ -2,13 +2,14 @@
 
 namespace App\Livewire\Dr\Panel\Payment;
 
-use App\Models\DoctorWallet;
-use App\Models\DoctorWalletTransaction;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
-use Livewire\Features\SupportRedirects\Redirector;
+use App\Models\Transaction;
+use App\Models\DoctorWallet;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Models\DoctorWalletTransaction;
 use Modules\Payment\Services\PaymentService;
+use Livewire\Features\SupportRedirects\Redirector;
 
 class WalletChargeComponent extends Component
 {
@@ -17,11 +18,11 @@ class WalletChargeComponent extends Component
     public $isLoading     = false;
     public $transactionId;
 
-    protected $paymentService;
+    private $paymentService; // از private استفاده می‌کنیم
 
-    public function boot(PaymentService $paymentService)
+    public function __construct()
     {
-        $this->paymentService = $paymentService;
+        $this->paymentService = resolve(PaymentService::class); // تزریق دستی
     }
 
     protected $rules = [
@@ -38,7 +39,7 @@ class WalletChargeComponent extends Component
     {
         $this->amount        = 0;
         $this->displayAmount = '';
-        $this->transactionId = null;
+        $this->transactionId = request()->query('transaction_id') ?? request()->query('Authority');
     }
 
     public function render()
@@ -51,10 +52,22 @@ class WalletChargeComponent extends Component
         $wallet          = DoctorWallet::firstOrCreate(['doctor_id' => $doctorId], ['balance' => 0]);
         $availableAmount = $wallet->balance;
 
+        // بررسی پیام‌های session
         if (session('success')) {
             $this->dispatch('toast', message: session('success'), type: 'success');
         } elseif (session('error')) {
             $this->dispatch('toast', message: session('error'), type: 'error');
+        }
+
+        // بررسی پارامتر from_payment
+        $fromPayment = request()->query('from_payment');
+        if ($fromPayment === 'success' && $this->transactionId) {
+            $transaction = \App\Models\Transaction::where('transaction_id', $this->transactionId)->first();
+            if ($transaction && $transaction->status === 'paid' && json_decode($transaction->meta, true)['type'] === 'wallet_charge') {
+                $this->dispatch('toast', message: 'کیف‌پول شما با موفقیت شارژ شد.', type: 'success');
+            }
+        } elseif ($fromPayment === 'error') {
+            $this->dispatch('toast', message: 'پرداخت ناموفق بود.', type: 'error');
         }
 
         return view('livewire.dr.panel.payment.wallet-charge-component', [
@@ -71,6 +84,8 @@ class WalletChargeComponent extends Component
 
         $doctorId    = Auth::guard('doctor')->user()->id;
         $callbackUrl = route('payment.callback');
+        $successRedirect = route('dr-wallet-verify');
+        $errorRedirect = route('dr-wallet-charge') . '?from_payment=error';
 
         try {
             $activeGateway = \App\Models\PaymentGateway::active()->first();
@@ -85,10 +100,12 @@ class WalletChargeComponent extends Component
                 $this->amount,
                 $callbackUrl,
                 [
-                    'doctor_id'   => $doctorId,
-                    'type'        => 'wallet_charge',
-                    'description' => 'شارژ کیف پول',
-                ]
+                    'doctor_id'       => $doctorId,
+                    'type'            => 'wallet_charge',
+                    'description'     => 'شارژ کیف پول',
+                ],
+                $successRedirect,
+                $errorRedirect
             );
 
             if ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
@@ -112,11 +129,26 @@ class WalletChargeComponent extends Component
 
     public function verifyPayment()
     {
-        $transaction = $this->paymentService->verify();
-
         $this->isLoading = false;
 
-        if ($transaction) {
+        try {
+            $authority = request()->query('Authority');
+            if (!$authority) {
+                Log::error('WalletChargeComponent::verifyPayment - No Authority provided in request');
+                return redirect()->route('dr-wallet-charge')->with('error', 'پارامتر تراکنش نامعتبر است.');
+            }
+
+            $transaction = Transaction::where('transaction_id', $authority)->first();
+            if (!$transaction) {
+                Log::error("WalletChargeComponent::verifyPayment - No transaction found for Authority: {$authority}");
+                return redirect()->route('dr-wallet-charge')->with('error', 'تراکنش یافت نشد.');
+            }
+
+            if ($transaction->status !== 'paid') {
+                Log::warning("WalletChargeComponent::verifyPayment - Transaction {$authority} is not paid: {$transaction->status}");
+                return redirect()->route('dr-wallet-charge')->with('error', 'تراکنش تأیید نشده است.');
+            }
+
             $doctorId = Auth::guard('doctor')->user()->id;
             $meta = json_decode($transaction->meta, true);
 
@@ -128,24 +160,26 @@ class WalletChargeComponent extends Component
                 $wallet = DoctorWallet::firstOrCreate(['doctor_id' => $doctorId], ['balance' => 0]);
                 $wallet->increment('balance', $transaction->amount);
 
-                // ثبت تراکنش در جدول DoctorWalletTransaction
                 DoctorWalletTransaction::create([
                     'doctor_id'    => $doctorId,
                     'amount'       => $transaction->amount,
                     'status'       => 'paid',
-                    'type'         => 'wallet_charge',
+                    'type'         => 'wallet_charge', // یا 'charge' اگه مایگریشن اجرا نشد
                     'description'  => 'شارژ کیف پول',
                     'registered_at' => now(),
                     'paid_at'      => now(),
                 ]);
 
-                return redirect()->route('doctor.wallet')->with('success', 'کیف‌پول شما با موفقیت شارژ شد.');
+                return redirect()->route('dr-wallet-charge')->with('success', 'کیف‌پول شما با موفقیت شارژ شد.');
             }
 
-            return redirect()->route('doctor.wallet')->with('error', 'تراکنش یافت شد اما با شارژ کیف‌پول شما مطابقت ندارد.');
+            return redirect()->route('dr-wallet-charge')->with('error', 'تراکنش یافت شد اما با شارژ کیف‌پول شما مطابقت ندارد.');
+        } catch (\Exception $e) {
+            Log::error("WalletChargeComponent::verifyPayment - Error: {$e->getMessage()}", [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return redirect()->route('dr-wallet-charge')->with('error', 'خطا در تأیید پرداخت: ' . $e->getMessage());
         }
-
-        return redirect()->route('doctor.wallet')->with('error', 'پرداخت ناموفق بود.');
     }
 
     public function deleteTransaction($transactionId)
@@ -169,7 +203,6 @@ class WalletChargeComponent extends Component
 
             $transaction->delete();
             $this->dispatch('toast', message: 'تراکنش با موفقیت حذف شد.', type: 'success');
-
         } catch (\Exception $e) {
             Log::error("DeleteTransaction - Error: {$e->getMessage()}", ['transaction_id' => $transactionId]);
             $this->dispatch('toast', message: 'خطایی در حذف تراکنش رخ داد: ' . $e->getMessage(), type: 'error');

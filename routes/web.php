@@ -15,6 +15,7 @@ use App\Livewire\Dr\Auth\DoctorLoginRegister;
 use App\Livewire\Dr\Auth\DoctorLoginUserPass;
 use App\Http\Controllers\Dr\Panel\DrPanelController;
 use App\Http\Controllers\Dr\Panel\Bime\DRBimeController;
+use App\Livewire\Dr\Panel\Payment\WalletChargeComponent;
 use App\Http\Controllers\Admin\Panel\Users\UserController;
 use Modules\SendOtp\App\Http\Controllers\SendOtpController;
 use App\Http\Controllers\Dr\Panel\Profile\SubUserController;
@@ -728,6 +729,7 @@ Route::prefix('dr')
 
             Route::prefix('payment')->group(function () {
                 Route::get('/wallet', [DrPaymentSettingController::class, 'wallet'])->middleware('secretary.permission:financial_reports')->name('dr-wallet');
+                Route::get('/dr-wallet/verify', [WalletChargeComponent::class, 'verifyPayment'])->name('dr-wallet-verify');
                 Route::get('/setting', [DrPaymentSettingController::class, 'index'])->middleware('secretary.permission:financial_reports')->name('dr-payment-setting');
                 Route::get('/charge', function () {
                     return view('dr.panel.payment.charge');

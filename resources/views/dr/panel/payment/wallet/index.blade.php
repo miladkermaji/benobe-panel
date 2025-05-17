@@ -17,7 +17,7 @@
 @endsection
 @section('content')
 @section('bread-crumb-title', 'کیف پول')
-<livewire:dr.wallet-component />
+@livewire('dr.panel.payment.wallet-charge-component')
 @endsection
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>

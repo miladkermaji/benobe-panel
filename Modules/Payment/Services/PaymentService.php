@@ -14,24 +14,25 @@ use Modules\Payment\App\Http\Models\Transaction;
 
 class PaymentService
 {
-    /**
-     * دریافت درگاه فعال از دیتابیس
-     */
     protected function getActiveGateway()
     {
         $activeGateway = DB::table('payment_gateways')->where('is_active', true)->first();
         return $activeGateway ? $activeGateway->name : 'zarinpal';
     }
 
-    /**
-     * ایجاد پرداخت و هدایت کاربر به درگاه
-     */
     public function pay($amount, $callbackUrl = null, $meta = [], $successRedirect = null, $errorRedirect = null)
     {
         $gateway = $this->getActiveGateway();
         $callbackUrl = $callbackUrl ?? route('payment.callback');
 
-        // تعیین نوع و شناسه موجودیت
+        Log::info('PaymentService::pay - Initiating payment', [
+            'amount' => $amount,
+            'callback_url' => $callbackUrl,
+            'meta' => $meta,
+            'success_redirect' => $successRedirect,
+            'error_redirect' => $errorRedirect,
+        ]);
+
         $transactableType = 'App\Models\User';
         $transactableId = null;
 
@@ -46,26 +47,34 @@ class PaymentService
             $transactableId = $user->id;
         }
 
-        // ذخیره URLهای موفقیت و شکست در متا
-        $meta['success_redirect'] = $successRedirect;
-        $meta['error_redirect'] = $errorRedirect;
+        // اطمینان از اینکه success_redirect و error_redirect از پارامترها اولویت دارن
+        $metaData = array_merge($meta, [
+            'success_redirect' => $successRedirect ?? ($meta['success_redirect'] ?? null),
+            'error_redirect' => $errorRedirect ?? ($meta['error_redirect'] ?? null),
+        ]);
 
-        // ایجاد تراکنش در دیتابیس
+        $metaJson = json_encode($metaData, JSON_UNESCAPED_UNICODE);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::error('PaymentService::pay - JSON encoding error', [
+                'meta' => $metaData,
+                'error' => json_last_error_msg(),
+            ]);
+            throw new \Exception('خطا در ذخیره متا: ' . json_last_error_msg());
+        }
+
         $transaction = Transaction::create([
             'transactable_type' => $transactableType,
             'transactable_id'   => $transactableId,
             'amount'            => $amount,
             'gateway'           => $gateway,
             'status'            => 'pending',
-            'meta'              => json_encode($meta),
+            'meta'              => $metaJson,
         ]);
 
-        // ایجاد فاکتور پرداخت
         $invoice = new Invoice();
         $invoice->amount($amount);
 
         try {
-            // اجرای پرداخت
             $redirection = Payment::via($gateway)
                 ->callbackUrl($callbackUrl)
                 ->purchase(
@@ -80,12 +89,10 @@ class PaymentService
                     }
                 )->pay();
 
-            // لاگ‌گذاری پاسخ
             Log::info('PaymentService::pay - Redirection response', [
                 'redirection' => $redirection instanceof RedirectResponse ? 'RedirectResponse' : (is_string($redirection) ? $redirection : get_class($redirection)),
             ]);
 
-            // بررسی پاسخ درگاه
             if ($redirection instanceof RedirectResponse) {
                 return $redirection;
             }
@@ -108,57 +115,63 @@ class PaymentService
                 'callback_url' => $callbackUrl,
             ]);
             $transaction->update(['status' => 'failed']);
-            return redirect()->route('doctor.upgrade')->with('error', 'خطا در انتقال به درگاه پرداخت: ' . $e->getMessage());
+            if (isset($meta['type']) && $meta['type'] === 'wallet_charge') {
+                return redirect()->route('dr-wallet-charge')->with('error', 'خطا در انتقال به درگاه پرداخت: ' . $e->getMessage());
+            }
+            return redirect()->route('appointment.payment.result')->with('error', 'خطا در انتقال به درگاه پرداخت: ' . $e->getMessage());
         }
     }
 
-    /**
-     * تأیید تراکنش
-     */
     public function verify()
     {
         try {
-            // دریافت Authority از درخواست
             $authority = request()->input('Authority');
             if (!$authority) {
                 Log::error('PaymentService::verify - No Authority provided in callback request');
                 return false;
             }
 
-            // بررسی وجود تراکنش با transaction_id
             $transaction = Transaction::where('transaction_id', $authority)->first();
             if (!$transaction) {
                 Log::error("PaymentService::verify - No transaction found for Authority: {$authority}");
                 return false;
             }
 
-            // بررسی وضعیت تراکنش
             if ($transaction->status !== 'pending') {
                 Log::warning("PaymentService::verify - Transaction {$authority} is not in pending status: {$transaction->status}");
                 return $transaction->status === 'paid' ? $transaction : false;
             }
 
-            // تأیید پرداخت از درگاه
             $receipt = Payment::amount($transaction->amount)->transactionId($authority)->verify();
             $transactionId = $receipt->getReferenceId();
 
-            // استخراج اطلاعات رسید به صورت دستی
             $receiptDetails = [
                 'reference_id' => $receipt->getReferenceId(),
                 'transaction_id' => $authority,
             ];
 
-            // به‌روزرسانی تراکنش
-            $transaction->update([
-                'status' => 'paid',
-                'meta' => json_encode(array_merge(json_decode($transaction->meta, true), [
-                    'verified_at' => now()->toDateTimeString(),
-                    'receipt_details' => $receiptDetails,
-                ])),
+            // حفظ تمام کلیدهای متا
+            $meta = json_decode($transaction->meta, true) ?? [];
+            $updatedMeta = array_merge($meta, [
+                'verified_at' => now()->toDateTimeString(),
+                'receipt_details' => $receiptDetails,
             ]);
 
-            // به‌روزرسانی وضعیت نوبت
-            $meta = json_decode($transaction->meta, true);
+            $metaJson = json_encode($updatedMeta, JSON_UNESCAPED_UNICODE);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('PaymentService::verify - JSON encoding error', [
+                    'meta' => $updatedMeta,
+                    'error' => json_last_error_msg(),
+                ]);
+                throw new \Exception('خطا در ذخیره متا: ' . json_last_error_msg());
+            }
+
+            $transaction->update([
+                'status' => 'paid',
+                'meta' => $metaJson,
+            ]);
+
+            // استفاده از متا اصلی برای نوبت‌ها
             $appointmentId = $meta['appointment_id'] ?? null;
             $appointmentType = $meta['appointment_type'] ?? null;
 
@@ -173,18 +186,26 @@ class PaymentService
                 ]);
             }
 
-            Log::info("PaymentService::verify - Transaction {$authority} verified successfully");
+            Log::info("PaymentService::verify - Transaction {$authority} verified successfully", [
+                'meta' => $updatedMeta,
+            ]);
             return $transaction;
         } catch (\Shetabit\Multipay\Exceptions\InvalidPaymentException $e) {
             Log::error("PaymentService::verify - InvalidPaymentException: {$e->getMessage()}", [
                 'authority' => request()->input('Authority'),
             ]);
+            if ($transaction) {
+                $transaction->update(['status' => 'failed']);
+            }
             return false;
         } catch (\Exception $e) {
             Log::error("PaymentService::verify - General error: {$e->getMessage()}", [
                 'authority' => request()->input('Authority'),
                 'trace' => $e->getTraceAsString(),
             ]);
+            if ($transaction) {
+                $transaction->update(['status' => 'failed']);
+            }
             return false;
         }
     }
