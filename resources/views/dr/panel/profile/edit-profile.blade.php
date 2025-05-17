@@ -16,7 +16,7 @@
 @section('content')
 
 @section('bread-crumb-title', ' ویرایش پروفایل ')
-<div class="main-content mb-5">
+<div class="main-content mb-5 mt-3">
   @if (!$doctor->profile_completed && count($incompleteSections) > 0)
     <div class="alert alert-warning text-center">
       <span class="fw-bold">

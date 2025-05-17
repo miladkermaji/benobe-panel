@@ -399,7 +399,7 @@
     <div class="main-content">
       <div class="row g-0">
         <div class="user-panel-content w-100">
-          <div class="table-responsive position-relative w-100 d-none d-md-block">
+          <div class="table-responsive position-relative w-100 ">
             <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
               <thead class="bg-light">
                 <tr>

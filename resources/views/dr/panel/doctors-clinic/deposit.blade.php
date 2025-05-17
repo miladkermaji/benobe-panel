@@ -2,31 +2,8 @@
 
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <style>
-    /* استایل‌های اضافی برای بهبود انیمیشن‌ها و ریسپانسیو */
-    .modal.fade .modal-dialog {
-      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-      transform: translateY(-50px);
-    }
+  <link type="text/css" href="{{ asset('dr-assets/panel/css/doctor-clinic/deposite.css') }}" rel="stylesheet" />
 
-    .modal.show .modal-dialog {
-      transform: translateY(0);
-    }
-
-    .table-card {
-      display: none;
-    }
-
-    @media (max-width: 767px) {
-      .table-responsive {
-        display: none;
-      }
-
-      .table-card {
-        display: block;
-      }
-    }
-  </style>
 @endsection
 
 @section('site-header')
@@ -36,7 +13,7 @@
 @section('content')
 @section('bread-crumb-title', 'مدیریت بیعانه')
 <div class="container-fluid">
-  <div class="header d-flex justify-content-between align-items-center mb-4">
+  <div class="mt-5 d-flex justify-content-between align-items-center mb-4">
     <h1 class="fs-4 fw-bold">مدیریت بیعانه‌ها</h1>
     <button class="btn my-btn-primary h-50" data-bs-toggle="modal" data-bs-target="#depositModal">
       <i class="fas fa-plus me-2"></i> افزودن بیعانه
