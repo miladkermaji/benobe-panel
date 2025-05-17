@@ -579,34 +579,38 @@ class ManualNobatController extends Controller
             ], 500);
         }
     }
-
     public function endVisit(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'insurance_id' => 'required|exists:insurances,id',
-            'service_ids' => 'required|array|min:1', // اصلاح قانون اعتبارسنجی
+            'service_ids' => 'required_if:is_free,0|array|min:1',
             'service_ids.*' => 'exists:doctor_services,id',
-            'payment_method' => 'required|in:online,cash,card_to_card,pos',
+            'payment_method' => 'required_unless:is_free,1|in:online,cash,card_to_card,pos',
             'is_free' => 'nullable|boolean',
             'discount_percentage' => 'nullable|numeric|min:0|max:100',
             'discount_amount' => 'nullable|numeric|min:0',
-            'final_price' => 'required|numeric|min:0',
+            'final_price' => [
+                'required',
+                'numeric',
+                \Illuminate\Validation\Rule::when(!$request->input('is_free', false), 'gt:0', 'gte:0')
+            ],
             'description' => 'nullable|string|max:1000',
             'selectedClinicId' => 'nullable|string',
         ], [
             'insurance_id.required' => 'لطفاً یک بیمه انتخاب کنید.',
             'insurance_id.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
-            'service_ids.required' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
+            'service_ids.required_if' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
             'service_ids.array' => 'خدمات باید به‌صورت آرایه باشند.',
             'service_ids.min' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
             'service_ids.*.exists' => 'یکی از خدمات انتخاب‌شده معتبر نیست.',
-            'payment_method.required' => 'لطفاً نوع پرداخت را انتخاب کنید.',
+            'payment_method.required_unless' => 'لطفاً نوع پرداخت را انتخاب کنید.',
             'payment_method.in' => 'نوع پرداخت انتخاب‌شده معتبر نیست.',
             'discount_percentage.min' => 'درصد تخفیف نمی‌تواند منفی باشد.',
             'discount_percentage.max' => 'درصد تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد.',
             'discount_amount.min' => 'مبلغ تخفیف نمی‌تواند منفی باشد.',
             'final_price.required' => 'قیمت نهایی الزامی است.',
-            'final_price.min' => 'قیمت نهایی نمی‌تواند منفی باشد.',
+            'final_price.gt' => 'قیمت نهایی باید بیشتر از صفر باشد، مگر اینکه ویزیت رایگان باشد.',
+            'final_price.gte' => 'قیمت نهایی نمی‌تواند منفی باشد.',
         ]);
     
         if ($validator->fails()) {
@@ -621,14 +625,12 @@ class ManualNobatController extends Controller
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $selectedClinicId = $request->input('selectedClinicId', 'default');
     
-            // لاگ‌گیری برای دیباگ
             Log::info('Attempting to find appointment', [
                 'appointment_id' => $id,
                 'doctor_id' => $doctorId,
                 'selectedClinicId' => $selectedClinicId,
             ]);
     
-            // بررسی وجود نوبت بدون شرط‌های اضافی
             $appointment = ManualAppointment::find($id);
     
             if (!$appointment) {
@@ -639,7 +641,6 @@ class ManualNobatController extends Controller
                 ], 404);
             }
     
-            // بررسی تطابق doctor_id و clinic_id
             if ($appointment->doctor_id != $doctorId) {
                 Log::warning('Doctor ID mismatch', [
                     'appointment_doctor_id' => $appointment->doctor_id,
@@ -674,7 +675,6 @@ class ManualNobatController extends Controller
     
             $data = $validator->validated();
     
-            // لاگ‌گیری داده‌های ورودی
             Log::info('End visit data', [
                 'appointment_id' => $id,
                 'data' => $data,
@@ -682,17 +682,15 @@ class ManualNobatController extends Controller
                 'selectedClinicId' => $selectedClinicId,
             ]);
     
-            // به‌روزرسانی نوبت
             $appointment->update([
                 'insurance_id' => $data['insurance_id'],
                 'final_price' => $data['final_price'],
                 'status' => 'attended',
-                'payment_status' => 'paid',
-                'payment_method' => $data['payment_method'],
+                'payment_status' => $data['is_free'] ? 'unpaid' : 'paid',
+                'payment_method' => $data['is_free'] ? null : $data['payment_method'],
                 'description' => $data['description'],
             ]);
     
-            // پاک کردن کش مرتبط
             $cacheKey = "appointments_doctor_{$doctorId}_clinic_{$selectedClinicId}";
             Cache::forget($cacheKey);
     

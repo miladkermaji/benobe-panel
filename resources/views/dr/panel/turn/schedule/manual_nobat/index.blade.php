@@ -401,103 +401,113 @@
         <div class="user-panel-content w-100">
           <div class="table-responsive position-relative w-100 d-none d-md-block">
             <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
-                <thead class="bg-light">
+              <thead class="bg-light">
+                <tr>
+                  <th><input class="form-check-input" type="checkbox" id="select-all-row"></th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">نام بیمار</th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">شماره‌ موبایل</th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">کد ملی</th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">زمان نوبت</th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">وضعیت نوبت</th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">بیعانه</th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">وضعیت پرداخت</th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">بیمه</th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">قیمت نهایی</th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">پایان ویزیت</th>
+                  <th scope="col" class="px-6 py-3 fw-bolder">عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="result_nobat">
+                @if (count($appointments) > 0)
+                  @foreach ($appointments as $appointment)
                     <tr>
-                        <th><input class="form-check-input" type="checkbox" id="select-all-row"></th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">نام بیمار</th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">شماره‌ موبایل</th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">کد ملی</th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">زمان نوبت</th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">وضعیت نوبت</th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">بیعانه</th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">وضعیت پرداخت</th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">بیمه</th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">قیمت نهایی</th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">پایان ویزیت</th>
-                        <th scope="col" class="px-6 py-3 fw-bolder">عملیات</th>
+                      <td><input type="checkbox" class="appointment-checkbox form-check-input"
+                          value="{{ $appointment->id }}" data-status="{{ $appointment->status }}"
+                          data-mobile="{{ $appointment->user->mobile ?? '' }}"></td>
+                      <td class="fw-bold">
+                        {{ $appointment->user ? $appointment->user->first_name . ' ' . $appointment->user->last_name : '-' }}
+                      </td>
+                      <td>{{ $appointment->user ? $appointment->user->mobile : '-' }}</td>
+                      <td>{{ $appointment->user ? $appointment->user->national_code : '-' }}</td>
+                      <td>
+                        {{ \Morilog\Jalali\Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d') }}
+                        <span class="fw-bold d-block">{{ substr($appointment->appointment_time, 0, 5) }}</span>
+                      </td>
+                      <td>
+                        @php
+                          $statusLabels = [
+                              'scheduled' => ['label' => 'در انتظار', 'class' => 'text-primary'],
+                              'attended' => ['label' => 'ویزیت شده', 'class' => 'text-success'],
+                              'cancelled' => ['label' => 'لغو شده', 'class' => 'text-danger'],
+                              'missed' => ['label' => 'عدم حضور', 'class' => 'text-warning'],
+                              'pending_review' => ['label' => 'در انتظار بررسی', 'class' => 'text-secondary'],
+                          ];
+                          $status = $appointment->status ?? 'scheduled';
+                          $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
+                        @endphp
+                        <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
+                      </td>
+                      <td>{{ $appointment->fee ? number_format($appointment->fee, 0, '.', ',') . ' تومان' : '-' }}</td>
+                      <td>
+                        @php
+                          $paymentStatusLabels = [
+                              'paid' => ['label' => 'پرداخت شده', 'class' => 'text-success'],
+                              'unpaid' => ['label' => 'پرداخت نشده', 'class' => 'text-danger'],
+                              'pending' => ['label' => 'در انتظار پرداخت', 'class' => 'text-primary'],
+                          ];
+                          $paymentStatus = $appointment->payment_status;
+                          $paymentStatusInfo = $paymentStatusLabels[$paymentStatus] ?? [
+                              'label' => 'نامشخص',
+                              'class' => 'text-muted',
+                          ];
+                          $paymentMethodLabels = [
+                              'online' => 'آنلاین',
+                              'cash' => 'نقدی',
+                              'card_to_card' => 'کارت به کارت',
+                              'pos' => 'کارتخوان',
+                          ];
+                          $paymentMethod = $appointment->payment_method ?? 'online';
+                        @endphp
+                        <span class="{{ $paymentStatusInfo['class'] }} fw-bold">
+                          {{ $paymentStatusInfo['label'] }}
+                          @if ($paymentStatus === 'paid')
+                            ({{ $paymentMethodLabels[$paymentMethod] ?? '-' }})
+                          @endif
+                        </span>
+                      </td>
+                      <td>{{ $appointment->insurance ? $appointment->insurance->name : '-' }}</td>
+                      <td>
+                        {{ $appointment->final_price ? number_format($appointment->final_price, 0, '.', ',') . ' تومان' : '-' }}
+                      </td>
+                      <td>
+                        @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
+                          <button class="btn btn-sm btn-primary shadow-sm end-visit-btn"
+                            data-id="{{ $appointment->id }}"
+                            data-clinic-id="{{ $appointment->clinic_id ?? '1' }}">پایان ویزیت</button>
+                        @else
+                          -
+                        @endif
+                      </td>
+                      <td>
+                        <button class="btn btn-sm btn-light edit-btn rounded-circle shadow-sm"
+                          data-id="{{ $appointment->id }}">
+                          <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                        </button>
+                        <button class="btn btn-sm btn-light delete-btn rounded-circle shadow-sm"
+                          data-id="{{ $appointment->id }}">
+                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                        </button>
+                      </td>
                     </tr>
-                </thead>
-                <tbody id="result_nobat">
-                    @if (count($appointments) > 0)
-                        @foreach ($appointments as $appointment)
-                            <tr>
-                                <td><input type="checkbox" class="appointment-checkbox form-check-input" value="{{ $appointment->id }}" data-status="{{ $appointment->status }}" data-mobile="{{ $appointment->user->mobile ?? '' }}"></td>
-                                <td class="fw-bold">{{ $appointment->user ? $appointment->user->first_name . ' ' . $appointment->user->last_name : '-' }}</td>
-                                <td>{{ $appointment->user ? $appointment->user->mobile : '-' }}</td>
-                                <td>{{ $appointment->user ? $appointment->user->national_code : '-' }}</td>
-                                <td>
-                                    {{ \Morilog\Jalali\Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d') }}
-                                    <span class="fw-bold d-block">{{ substr($appointment->appointment_time, 0, 5) }}</span>
-                                </td>
-                                <td>
-                                    @php
-                                        $statusLabels = [
-                                            'scheduled' => ['label' => 'در انتظار', 'class' => 'text-primary'],
-                                            'attended' => ['label' => 'ویزیت شده', 'class' => 'text-success'],
-                                            'cancelled' => ['label' => 'لغو شده', 'class' => 'text-danger'],
-                                            'missed' => ['label' => 'عدم حضور', 'class' => 'text-warning'],
-                                            'pending_review' => ['label' => 'در انتظار بررسی', 'class' => 'text-secondary'],
-                                        ];
-                                        $status = $appointment->status ?? 'scheduled';
-                                        $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
-                                    @endphp
-                                    <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
-                                </td>
-                                <td>{{ $appointment->fee ? number_format($appointment->fee) . ' تومان' : '-' }}</td>
-                                <td>
-                                    @php
-                                        $paymentStatusLabels = [
-                                            'paid' => ['label' => 'پرداخت شده', 'class' => 'text-success'],
-                                            'unpaid' => ['label' => 'پرداخت نشده', 'class' => 'text-danger'],
-                                            'pending' => ['label' => 'در انتظار پرداخت', 'class' => 'text-primary'],
-                                        ];
-                                        $paymentStatus = $appointment->payment_status;
-                                        $paymentStatusInfo = $paymentStatusLabels[$paymentStatus] ?? [
-                                            'label' => 'نامشخص',
-                                            'class' => 'text-muted',
-                                        ];
-                                        $paymentMethodLabels = [
-                                            'online' => 'آنلاین',
-                                            'cash' => 'نقدی',
-                                            'card_to_card' => 'کارت به کارت',
-                                            'pos' => 'کارتخوان',
-                                        ];
-                                        $paymentMethod = $appointment->payment_method ?? 'online';
-                                    @endphp
-                                    <span class="{{ $paymentStatusInfo['class'] }} fw-bold">
-                                        {{ $paymentStatusInfo['label'] }}
-                                        @if ($paymentStatus === 'paid')
-                                            ({{ $paymentMethodLabels[$paymentMethod] ?? '-' }})
-                                        @endif
-                                    </span>
-                                </td>
-                                <td>{{ $appointment->insurance ? $appointment->insurance->name : '-' }}</td>
-                                <td>{{ $appointment->final_price ? number_format($appointment->final_price) . ' تومان' : '-' }}</td>
-                                <td>
-                                    @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
-                                        <button class="btn btn-sm btn-primary shadow-sm end-visit-btn" data-id="{{ $appointment->id }}" data-clinic-id="{{ $appointment->clinic_id ?? '1' }}">پایان ویزیت</button>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-light edit-btn rounded-circle shadow-sm" data-id="{{ $appointment->id }}">
-                                        <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
-                                    </button>
-                                    <button class="btn btn-sm btn-light delete-btn rounded-circle shadow-sm" data-id="{{ $appointment->id }}">
-                                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="12" class="text-center">نتیجه‌ای یافت نشد</td>
-                        </tr>
-                    @endif
-                </tbody>
+                  @endforeach
+                @else
+                  <tr>
+                    <td colspan="12" class="text-center">نتیجه‌ای یافت نشد</td>
+                  </tr>
+                @endif
+              </tbody>
             </table>
-        </div>
+          </div>
         </div>
       </div>
     </div>
@@ -670,43 +680,80 @@
   });
 </script>
 <script>
-function addRowToTable(data) {
+  function addRowToTable(data) {
     const jalaliDate = moment(data.appointment_date, 'YYYY-MM-DD').format('jYYYY/jMM/jDD');
     const time = data.appointment_time ? data.appointment_time.substring(0, 5) : '---'; // فرمت HH:MM
 
+    // تابع فرمت‌کننده قیمت
+    function formatPrice(price) {
+      if (!price) return '-';
+      // تبدیل به عدد صحیح و اضافه کردن جداکننده
+      return parseInt(price).toLocaleString('fa-IR') + ' تومان';
+    }
+
     // تبدیل وضعیت نوبت به فارسی
     const statusMap = {
-        'scheduled': { label: 'در انتظار', class: 'text-primary' },
-        'attended': { label: 'ویزیت شده', class: 'text-success' },
-        'cancelled': { label: 'لغو شده', class: 'text-danger' },
-        'missed': { label: 'عدم حضور', class: 'text-warning' },
-        'pending_review': { label: 'در انتظار بررسی', class: 'text-secondary' }
+      'scheduled': {
+        label: 'در انتظار',
+        class: 'text-primary'
+      },
+      'attended': {
+        label: 'ویزیت شده',
+        class: 'text-success'
+      },
+      'cancelled': {
+        label: 'لغو شده',
+        class: 'text-danger'
+      },
+      'missed': {
+        label: 'عدم حضور',
+        class: 'text-warning'
+      },
+      'pending_review': {
+        label: 'در انتظار بررسی',
+        class: 'text-secondary'
+      }
     };
-    const statusInfo = statusMap[data.status] || { label: 'نامشخص', class: 'text-muted' };
+    const statusInfo = statusMap[data.status] || {
+      label: 'نامشخص',
+      class: 'text-muted'
+    };
 
     // تبدیل وضعیت پرداخت به فارسی
     const paymentStatusMap = {
-        'paid': { label: 'پرداخت شده', class: 'text-success' },
-        'unpaid': { label: 'پرداخت نشده', class: 'text-danger' },
-        'pending': { label: 'در انتظار پرداخت', class: 'text-primary' }
+      'paid': {
+        label: 'پرداخت شده',
+        class: 'text-success'
+      },
+      'unpaid': {
+        label: 'پرداخت نشده',
+        class: 'text-danger'
+      },
+      'pending': {
+        label: 'در انتظار پرداخت',
+        class: 'text-primary'
+      }
     };
-    const paymentStatusInfo = paymentStatusMap[data.payment_status] || { label: 'نامشخص', class: 'text-muted' };
+    const paymentStatusInfo = paymentStatusMap[data.payment_status] || {
+      label: 'نامشخص',
+      class: 'text-muted'
+    };
 
     // تبدیل نوع پرداخت به فارسی
     const paymentMethodMap = {
-        'online': 'آنلاین',
-        'cash': 'نقدی',
-        'card_to_card': 'کارت به کارت',
-        'pos': 'کارتخوان'
+      'online': 'آنلاین',
+      'cash': 'نقدی',
+      'card_to_card': 'کارت به کارت',
+      'pos': 'کارتخوان'
     };
-    const paymentMethod = data.payment_status === 'paid' && data.payment_method
-        ? ` (${paymentMethodMap[data.payment_method] || 'نامشخص'})`
-        : '';
+    const paymentMethod = data.payment_status === 'paid' && data.payment_method ?
+      ` (${paymentMethodMap[data.payment_method] || 'نامشخص'})` :
+      '';
 
     // HTML دکمه پایان ویزیت
-    const endVisitHtml = (data.status !== 'attended' && data.status !== 'cancelled')
-        ? `<button class="btn btn-sm btn-primary shadow-sm end-visit-btn" data-id="${data.id}" data-clinic-id="${data.clinic_id || '1'}">پایان ویزیت</button>`
-        : '-';
+    const endVisitHtml = (data.status !== 'attended' && data.status !== 'cancelled') ?
+      `<button class="btn btn-sm btn-primary shadow-sm end-visit-btn" data-id="${data.id}" data-clinic-id="${data.clinic_id || '1'}">پایان ویزیت</button>` :
+      '-';
 
     const newRow = `
         <tr>
@@ -719,10 +766,10 @@ function addRowToTable(data) {
                 <span class="fw-bold d-block">${time}</span>
             </td>
             <td><span class="${statusInfo.class} fw-bold">${statusInfo.label}</span></td>
-            <td>${data.fee ? data.fee.toLocaleString('fa-IR') + ' تومان' : '-'}</td>
+            <td>${formatPrice(data.fee)}</td>
             <td><span class="${paymentStatusInfo.class} fw-bold">${paymentStatusInfo.label}${paymentMethod}</span></td>
             <td>${data.insurance?.name || '-'}</td>
-            <td>${data.final_price ? data.final_price.toLocaleString('fa-IR') + ' تومان' : '-'}</td>
+            <td>${formatPrice(data.final_price)}</td>
             <td>${endVisitHtml}</td>
             <td>
                 <button class="btn btn-sm btn-light edit-btn rounded-circle shadow-sm" data-id="${data.id}">
@@ -734,7 +781,7 @@ function addRowToTable(data) {
             </td>
         </tr>`;
     $('#result_nobat').append(newRow);
-}
+  }
 
   function loadAppointments() {
     $.ajax({
@@ -1078,8 +1125,25 @@ function addRowToTable(data) {
   function formatPrice(price) {
     return price.toLocaleString('fa-IR') + ' تومان';
   }
+  let rawFinalPrice = 0;
 
-  // محاسبه قیمت نهایی
+  function cleanNumber(input) {
+    if (!input || typeof input !== 'string') return 0;
+
+    // تبدیل اعداد فارسی به انگلیسی
+    const persianNumbers = [/۰/g, /۱/g, /۲/g, /۳/g, /۴/g, /۵/g, /۶/g, /۷/g, /۸/g, /۹/g];
+    let cleaned = input;
+    for (let i = 0; i < 10; i++) {
+      cleaned = cleaned.replace(persianNumbers[i], i);
+    }
+
+    // حذف کاراکترهای غیرعددی به جز اعشار
+    cleaned = cleaned.replace(/[^\d.]/g, '');
+
+    const number = parseFloat(cleaned);
+    return isNaN(number) ? 0 : number;
+  }
+
   function calculateFinalPrice() {
     const serviceIds = $('input[name="service_ids[]"]:checked').map(function() {
       return $(this).val();
@@ -1110,11 +1174,16 @@ function addRowToTable(data) {
       },
       success: function(response) {
         if (response.success) {
-          basePrice = response.data.final_price + response.data.discount_amount; // ذخیره قیمت پایه
+          basePrice = response.data.final_price + response.data.discount_amount;
+          rawFinalPrice = response.data.final_price; // ذخیره مقدار خام
           $('#final_price').val(formatPrice(response.data.final_price));
-          $('#discount_percentage').val(response.data.discount_percentage);
-          $('#discount_input_percentage').val(response.data.discount_percentage);
-          $('#discount_input_amount').val(response.data.discount_amount);
+
+          if (!$('#discountModal').hasClass('show')) {
+            $('#discount_percentage').val(response.data.discount_percentage);
+            $('#discount_input_percentage').val(response.data.discount_percentage);
+            $('#discount_input_amount').val(response.data.discount_amount);
+          }
+
         } else {
           toastr.error(response.message || 'خطا در محاسبه قیمت!');
         }
@@ -1239,54 +1308,74 @@ function addRowToTable(data) {
     $('#discountModal').modal('show');
   });
 
+  // تابع Debounce
+  // تابع Debounce
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
   // محاسبه پویا هنگام تغییر درصد تخفیف
-  $(document).on('input', '#discount_input_percentage', function() {
-    const percentage = parseFloat($(this).val()) || 0;
+  $(document).on('input', '#discount_input_percentage', debounce(function(e) {
+    const $input = $(e.target);
+    if (!$input.length) {
+      console.error('Input element not found for discount_input_percentage');
+      return;
+    }
+    const percentage = parseFloat($input.val()) || 0;
     if (percentage > 100) {
-      $(this).val(100);
+      $input.val(100);
       toastr.warning('درصد تخفیف نمی‌تواند بیش از ۱۰۰ باشد!');
       return;
     } else if (percentage < 0) {
-      $(this).val(0);
+      $input.val(0);
       toastr.warning('درصد تخفیف نمی‌تواند منفی باشد!');
       return;
     }
 
-    // محاسبه مبلغ تخفیف بر اساس قیمت پایه
-    const discountAmount = basePrice ? round((basePrice * percentage) / 100, 2) : 0;
+    const discountAmount = basePrice ? Math.round((basePrice * percentage) / 100) : 0;
     $('#discount_input_amount').val(discountAmount);
-
-    // محاسبه قیمت نهایی
     calculateFinalPrice();
-  });
+  }, 750));
 
   // محاسبه پویا هنگام تغییر مبلغ تخفیف
-  $(document).on('input', '#discount_input_amount', function() {
-    const amount = parseFloat($(this).val()) || 0;
+  $(document).on('input', '#discount_input_amount', debounce(function(e) {
+    const $input = $(e.target);
+    if (!$input.length) {
+      console.error('Input element not found for discount_input_amount');
+      return;
+    }
+    const amount = parseFloat($input.val()) || 0;
     if (amount < 0) {
-      $(this).val(0);
+      $input.val(0);
       toastr.warning('مبلغ تخفیف نمی‌تواند منفی باشد!');
       return;
     } else if (amount > basePrice) {
-      $(this).val(basePrice);
+      $input.val(basePrice);
       toastr.warning('مبلغ تخفیف نمی‌تواند بیشتر از قیمت پایه باشد!');
       return;
     }
 
-    // محاسبه درصد تخفیف بر اساس قیمت پایه
-    const discountPercentage = basePrice ? round((amount / basePrice) * 100, 2) : 0;
+    const discountPercentage = basePrice ? Math.round((amount / basePrice) * 100 * 100) / 100 : 0;
     $('#discount_input_percentage').val(discountPercentage);
-
-    // محاسبه قیمت نهایی
     calculateFinalPrice();
-  });
+  }, 750));
+
+  // محاسبه پویا هنگام تغییر مبلغ تخفیف
+
 
   // تابع گرد کردن
   function round(value, decimals) {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
   }
 
-  // ثبت تخفیف
   $('#apply-discount-form').on('submit', function(e) {
     e.preventDefault();
     const percentage = parseFloat($('#discount_input_percentage').val()) || 0;
@@ -1297,6 +1386,7 @@ function addRowToTable(data) {
     $('#discountModal').modal('hide');
     calculateFinalPrice();
   });
+
 
   $('#end-visit-form').on('submit', function(e) {
     e.preventDefault();
@@ -1310,19 +1400,37 @@ function addRowToTable(data) {
     buttonText.hide();
     loader.show();
 
-    // آماده‌سازی داده‌ها
     const formData = form.serializeArray();
+    const finalPriceInput = $('#final_price').val();
+    let finalPriceValue = rawFinalPrice; // استفاده از rawFinalPrice
+
+    // اگر rawFinalPrice صفر است، از cleanNumber استفاده کن
+    if (finalPriceValue === 0) {
+      finalPriceValue = cleanNumber(finalPriceInput);
+    }
+
+    const isFree = $('#is_free').is(':checked') ? 1 : 0;
+
+
+    if (!isFree && finalPriceValue <= 0) {
+      toastr.error('قیمت نهایی باید بیشتر از صفر باشد، مگر اینکه ویزیت رایگان باشد.');
+      buttonText.show();
+      loader.hide();
+      return;
+    }
+
     formData.push({
       name: 'final_price',
-      value: parseFloat($('#final_price').val().replace(/[^\d.-]/g, '')) || 0
+      value: finalPriceValue
+    }, {
+      name: 'is_free',
+      value: isFree
     });
 
-    // اضافه کردن service_ids به‌صورت آرایه
     const serviceIds = $('input[name="service_ids[]"]:checked').map(function() {
       return $(this).val();
     }).get();
 
-    // اضافه کردن هر service_id به‌صورت جداگانه با کلید service_ids[]
     serviceIds.forEach(function(serviceId) {
       formData.push({
         name: 'service_ids[]',
@@ -1330,7 +1438,6 @@ function addRowToTable(data) {
       });
     });
 
-    // اضافه کردن selectedClinicId
     formData.push({
       name: 'selectedClinicId',
       value: localStorage.getItem('selectedClinicId') || '1'
@@ -1359,7 +1466,8 @@ function addRowToTable(data) {
           'لطفاً حداقل یک خدمت انتخاب کنید.': 'service_ids',
           'خدمات باید به‌صورت آرایه باشند.': 'service_ids',
           'لطفاً نوع پرداخت را انتخاب کنید.': 'payment_method',
-          'قیمت نهایی الزامی است.': 'final_price'
+          'قیمت نهایی الزامی است.': 'final_price',
+          'قیمت نهایی باید بیشتر از صفر باشد، مگر اینکه ویزیت رایگان باشد.': 'final_price'
         };
 
         errors.forEach(errorMsg => {
