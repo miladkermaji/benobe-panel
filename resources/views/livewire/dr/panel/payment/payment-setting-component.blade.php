@@ -52,9 +52,8 @@
 
   <div class="mt-3 w-100">
     <div class="alert alert-warning">
-      <p><i class="fa fa-info-circle fa-2x"></i> صرفاً مبالغ هزینه‌های نوبت حضوری که تاریخ آنها رسیده است و مشاوره‌های
-        آنلاینی که پاسخ داده شده‌اند، قابل برداشت می‌باشند و مابقی در حالت انتظار می‌باشند.</p>
-    </div>
+      <p><i class="fa fa-info-circle fa-2x"></i> موجودی قابل برداشت شامل هزینه‌های نوبت‌های حضوری ویزیت‌شده و مشاوره‌های آنلاین تکمیل‌شده (پاسخ‌داده‌شده) است که هنوز تسویه نشده‌اند.</p>
+  </div>
     <div class="card border-0 shadow-sm rounded-3">
       <div class="card-header bg-white p-4 border-bottom">
         <span class="fw-bold">درخواست‌های من</span>
@@ -95,7 +94,7 @@
                   <td class="text-center">
                     <button class="btn btn-outline-danger btn-sm rounded-circle delete-transaction"
                       data-id="{{ $request->id }}">
-                      <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24"
+                      <svg  width="16" height="16" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                       </svg>
