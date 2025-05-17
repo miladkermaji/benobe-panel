@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ManualNobat;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\DoctorService;
 use App\Models\ManualAppointment;
 use Morilog\Jalali\CalendarUtils;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Dr\Controller;
 use App\Models\ManualAppointmentSetting;
 use Illuminate\Support\Facades\Validator;
@@ -58,7 +61,7 @@ class ManualNobatController extends Controller
 
     public function showSettings(Request $request)
     {
-        $doctorId         = auth('doctor')->id() ?? auth('secretary')->id();
+        $doctorId         = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $selectedClinicId = $request->input('selectedClinicId', 'default');
 
         // جستجوی تنظیمات با در نظر گرفتن کلینیک
@@ -105,7 +108,7 @@ class ManualNobatController extends Controller
 
         try {
             // گرفتن آیدی پزشک یا منشی
-            $doctorId = auth('doctor')->id() ?? auth('secretary')->id();
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $selectedClinicId = $request->input('selectedClinicId', 'default');
 
             // ذخیره یا به‌روزرسانی تنظیمات نوبت‌دهی دستی
@@ -280,7 +283,7 @@ class ManualNobatController extends Controller
 
             $appointment = ManualAppointment::create([
                 'user_id' => $user->id,
-                'doctor_id' => auth('doctor')->id() ?? auth('secretary')->id(),
+                'doctor_id' => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id,
                 'clinic_id' => $data['selectedClinicId'] === 'default' ? null : $data['selectedClinicId'],
                 'appointment_date' => $data['appointment_date'],
                 'appointment_time' => $data['appointment_time'],
@@ -410,5 +413,303 @@ class ManualNobatController extends Controller
             return response()->json(['success' => false, 'message' => 'خطا در حذف نوبت!'], 500);
         }
     }
+    public function getInsurances(Request $request)
+    {
+        try {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $selectedClinicId = $request->input('selectedClinicId', 'default');
+    
+            $insurances = DoctorService::where('doctor_services.doctor_id', $doctorId)
+                ->where('doctor_services.status', true)
+                ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                    $query->where('doctor_services.clinic_id', $selectedClinicId);
+                })
+                ->when($selectedClinicId === 'default', function ($query) {
+                    $query->whereNull('doctor_services.clinic_id');
+                })
+                ->distinct()
+                ->join('insurances', 'doctor_services.insurance_id', '=', 'insurances.id')
+                ->select('insurances.id', 'insurances.name')
+                ->get();
+    
+            Log::info('Insurances fetched successfully', ['insurances' => $insurances]);
+    
+            return response()->json([
+                'success' => true,
+                'data' => $insurances,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching insurances: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در بارگذاری بیمه‌ها!',
+            ], 500);
+        }
+    }
 
+    public function getServices(Request $request, $insuranceId)
+    {
+        try {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $selectedClinicId = $request->input('selectedClinicId', 'default');
+
+            $services = DoctorService::where('doctor_id', $doctorId)
+                ->where('insurance_id', $insuranceId)
+                ->where('status', true)
+                ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                    $query->where('clinic_id', $selectedClinicId);
+                })
+                ->when($selectedClinicId === 'default', function ($query) {
+                    $query->whereNull('clinic_id');
+                })
+                ->select('id', 'name', 'price')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $services,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching services: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در بارگذاری خدمات!',
+            ], 500);
+        }
+    }
+
+    public function calculateFinalPrice(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'service_ids' => 'required|array|min:1',
+            'service_ids.*' => 'exists:doctor_services,id',
+            'is_free' => 'nullable|boolean',
+            'discount_percentage' => 'nullable|numeric|min:0|max:100',
+            'discount_amount' => 'nullable|numeric|min:0',
+            'selectedClinicId' => 'nullable|string',
+        ], [
+            'service_ids.required' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
+            'service_ids.array' => 'خدمات باید به‌صورت آرایه باشند.',
+            'service_ids.min' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
+            'service_ids.*.exists' => 'یکی از خدمات انتخاب‌شده معتبر نیست.',
+            'is_free.boolean' => 'مقدار ویزیت رایگان باید بولین باشد.',
+            'discount_percentage.min' => 'درصد تخفیف نمی‌تواند منفی باشد.',
+            'discount_percentage.max' => 'درصد تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد.',
+            'discount_amount.min' => 'مبلغ تخفیف نمی‌تواند منفی باشد.',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در اعتبارسنجی!',
+                'errors' => $validator->errors()->all(),
+            ], 422);
+        }
+    
+        try {
+            $isFree = $request->input('is_free', false);
+            $serviceIds = $request->input('service_ids', []);
+            $discountPercentage = $request->input('discount_percentage', 0);
+            $discountAmount = $request->input('discount_amount', 0);
+    
+            Log::info('Calculating final price', [
+                'service_ids' => $serviceIds,
+                'is_free' => $isFree,
+                'discount_percentage' => $discountPercentage,
+                'discount_amount' => $discountAmount,
+            ]);
+    
+            if ($isFree) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'final_price' => 0,
+                        'discount_percentage' => 0,
+                        'discount_amount' => 0,
+                    ],
+                ]);
+            }
+    
+            $basePrice = DoctorService::whereIn('id', $serviceIds)
+                ->where('status', true)
+                ->sum('price');
+    
+            if (empty($serviceIds) || $basePrice == 0) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'final_price' => 0,
+                        'discount_percentage' => 0,
+                        'discount_amount' => 0,
+                    ],
+                ]);
+            }
+    
+            if ($discountPercentage > 0) {
+                $discountAmount = round(($basePrice * $discountPercentage) / 100, 2);
+            } elseif ($discountAmount > 0) {
+                $discountPercentage = round(($discountAmount / $basePrice) * 100, 2);
+            } else {
+                $discountPercentage = 0;
+                $discountAmount = 0;
+            }
+    
+            $finalPrice = round(max(0, $basePrice - $discountAmount), 0);
+    
+            Log::info('Final price calculated', [
+                'base_price' => $basePrice,
+                'final_price' => $finalPrice,
+                'discount_percentage' => $discountPercentage,
+                'discount_amount' => $discountAmount,
+            ]);
+    
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'final_price' => $finalPrice,
+                    'discount_percentage' => round($discountPercentage, 2),
+                    'discount_amount' => round($discountAmount, 2),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error calculating final price: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در محاسبه قیمت نهایی!',
+            ], 500);
+        }
+    }
+
+    public function endVisit(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'insurance_id' => 'required|exists:insurances,id',
+            'service_ids' => 'required|array|min:1', // اصلاح قانون اعتبارسنجی
+            'service_ids.*' => 'exists:doctor_services,id',
+            'payment_method' => 'required|in:online,cash,card_to_card,pos',
+            'is_free' => 'nullable|boolean',
+            'discount_percentage' => 'nullable|numeric|min:0|max:100',
+            'discount_amount' => 'nullable|numeric|min:0',
+            'final_price' => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:1000',
+            'selectedClinicId' => 'nullable|string',
+        ], [
+            'insurance_id.required' => 'لطفاً یک بیمه انتخاب کنید.',
+            'insurance_id.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+            'service_ids.required' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
+            'service_ids.array' => 'خدمات باید به‌صورت آرایه باشند.',
+            'service_ids.min' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
+            'service_ids.*.exists' => 'یکی از خدمات انتخاب‌شده معتبر نیست.',
+            'payment_method.required' => 'لطفاً نوع پرداخت را انتخاب کنید.',
+            'payment_method.in' => 'نوع پرداخت انتخاب‌شده معتبر نیست.',
+            'discount_percentage.min' => 'درصد تخفیف نمی‌تواند منفی باشد.',
+            'discount_percentage.max' => 'درصد تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد.',
+            'discount_amount.min' => 'مبلغ تخفیف نمی‌تواند منفی باشد.',
+            'final_price.required' => 'قیمت نهایی الزامی است.',
+            'final_price.min' => 'قیمت نهایی نمی‌تواند منفی باشد.',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در اعتبارسنجی!',
+                'errors' => $validator->errors()->all(),
+            ], 422);
+        }
+    
+        try {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $selectedClinicId = $request->input('selectedClinicId', 'default');
+    
+            // لاگ‌گیری برای دیباگ
+            Log::info('Attempting to find appointment', [
+                'appointment_id' => $id,
+                'doctor_id' => $doctorId,
+                'selectedClinicId' => $selectedClinicId,
+            ]);
+    
+            // بررسی وجود نوبت بدون شرط‌های اضافی
+            $appointment = ManualAppointment::find($id);
+    
+            if (!$appointment) {
+                Log::warning('Appointment not found', ['appointment_id' => $id]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'نوبت یافت نشد!',
+                ], 404);
+            }
+    
+            // بررسی تطابق doctor_id و clinic_id
+            if ($appointment->doctor_id != $doctorId) {
+                Log::warning('Doctor ID mismatch', [
+                    'appointment_doctor_id' => $appointment->doctor_id,
+                    'auth_doctor_id' => $doctorId,
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'دسترسی غیرمجاز: این نوبت متعلق به پزشک دیگری است!',
+                ], 403);
+            }
+    
+            if ($selectedClinicId !== 'default' && $appointment->clinic_id != $selectedClinicId) {
+                Log::warning('Clinic ID mismatch', [
+                    'appointment_clinic_id' => $appointment->clinic_id,
+                    'selectedClinicId' => $selectedClinicId,
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'کلینیک انتخاب‌شده با نوبت مطابقت ندارد!',
+                ], 422);
+            }
+    
+            if ($selectedClinicId === 'default' && !is_null($appointment->clinic_id)) {
+                Log::warning('Clinic ID expected to be null', [
+                    'appointment_clinic_id' => $appointment->clinic_id,
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'کلینیک انتخاب‌شده با نوبت مطابقت ندارد!',
+                ], 422);
+            }
+    
+            $data = $validator->validated();
+    
+            // لاگ‌گیری داده‌های ورودی
+            Log::info('End visit data', [
+                'appointment_id' => $id,
+                'data' => $data,
+                'doctor_id' => $doctorId,
+                'selectedClinicId' => $selectedClinicId,
+            ]);
+    
+            // به‌روزرسانی نوبت
+            $appointment->update([
+                'insurance_id' => $data['insurance_id'],
+                'final_price' => $data['final_price'],
+                'status' => 'attended',
+                'payment_status' => 'paid',
+                'payment_method' => $data['payment_method'],
+                'description' => $data['description'],
+            ]);
+    
+            // پاک کردن کش مرتبط
+            $cacheKey = "appointments_doctor_{$doctorId}_clinic_{$selectedClinicId}";
+            Cache::forget($cacheKey);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'ویزیت با موفقیت ثبت شد!',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error ending visit: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ثبت ویزیت!',
+                'error_details' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

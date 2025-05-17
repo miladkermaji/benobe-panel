@@ -94,7 +94,8 @@
           </div>
         </div>
         <div class="modal-footer p-3">
-          <button type="submit" class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2">
+          <button type="submit"
+            class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2 h-50">
             <span class="button_text">ثبت تغییرات</span>
             <div class="loader" style="display: none;"></div>
           </button>
@@ -160,8 +161,8 @@
             <div class="col-12">
               <div class="position-relative timepicker-ui w-100">
                 <label class="label-top-input">ساعت مراجعه:</label>
-                <input data-timepicker type="text" name="appointment_time" id="edit-appointment-time" class="form-control"
-                  style="width: 100% !important">
+                <input data-timepicker type="text" name="appointment_time" id="edit-appointment-time"
+                  class="form-control" style="width: 100% !important">
               </div>
               <small class="text-danger error-appointment_time mt-1 text-start"></small>
             </div>
@@ -184,7 +185,144 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="endVisitModal" tabindex="-1" aria-labelledby="endVisitLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <form id="end-visit-form">
+        @csrf
+        <div class="modal-header p-3">
+          <h5 class="modal-title" id="endVisitLabel">پایان ویزیت</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <input type="hidden" name="appointment_id" id="end-visit-appointment-id">
+          <div class="row g-2">
+            <div class="col-12">
+              <div class="border rounded p-2 bg-light position-relative">
+                <label class="form-label fw-bold mb-1">انتخاب بیمه</label>
+                <div id="insurance-options"></div>
+                <small class="text-danger error-insurance_id mt-1 text-start"></small>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="border rounded p-2 bg-light services-checkbox-container position-relative">
+                <div class="loading-overlay-custom" id="services-loading">
+                  <div class="spinner-custom-small"></div>
+                </div>
+                <label class="form-label fw-bold mb-1">انتخاب خدمت</label>
+                <div class="checkbox-area" style="max-height: 100px; overflow-y: auto; padding: 0.25rem;">
+                  <div id="service-options"></div>
+                </div>
+                <small class="text-danger error-service_ids mt-1 text-start"></small>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <div class="border rounded p-2 bg-light">
+                    <div class="form-check mb-0">
+                      <input type="checkbox" class="form-check-input" id="is_free" name="is_free">
+                      <label class="form-check-label" for="is_free">ویزیت رایگان</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="border rounded p-2 bg-light">
+                    <label class="form-label fw-bold mb-1">نوع پرداخت</label>
+                    <select class="form-control" name="payment_method" id="payment_method">
+                      <option value="online">آنلاین</option>
+                      <option value="cash">نقدی</option>
+                      <option value="card_to_card">کارت به کارت</option>
+                      <option value="pos">کارتخوان</option>
+                    </select>
+                    <small class="text-danger error-payment_method mt-1 text-start"></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="border rounded p-2 bg-light position-relative">
+                <label class="form-label fw-bold mb-1">تخفیف</label>
+                <div class="input-with-spinner">
+                  <input type="number" step="0.01" min="0" max="100" class="form-control"
+                    name="discount_percentage" id="discount_percentage" placeholder="تخفیف (٪)">
+                  <div class="spinner-custom-small" id="discount-loading"></div>
+                </div>
+                <small class="text-danger error-discount_percentage mt-1 text-start"></small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="border rounded p-2 bg-light position-relative">
+                <label class="form-label fw-bold mb-1">قیمت نهایی</label>
+                <div class="input-with-spinner">
+                  <input type="text" class="form-control" name="final_price" id="final_price" readonly>
+                  <div class="spinner-custom-small" id="final-price-loading"></div>
+                </div>
+                <small class="text-danger error-final_price mt-1 text-start"></small>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="border rounded p-2 bg-light">
+                <label class="form-label fw-bold mb-1">توضیحات درمان</label>
+                <textarea class="form-control" rows="2" name="description" id="end_visit_description"
+                  placeholder="توضیحات درمان را وارد کنید..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer p-3">
+          <button type="submit"
+            class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2 h-50">
+            <span class="button_text">ثبت</span>
+            <div class="loader" style="display: none;"></div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
+<!-- مودال تخفیف -->
+<div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content">
+      <form id="apply-discount-form">
+        @csrf
+        <div class="modal-header p-3">
+          <h5 class="modal-title" id="discountModalLabel">اعمال تخفیف</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3 position-relative">
+            <label class="form-label">درصد تخفیف</label>
+            <div class="input-with-spinner">
+              <input type="number" class="form-control" name="discount_input_percentage"
+                id="discount_input_percentage" placeholder="درصد تخفیف را وارد کنید" min="0" max="100"
+                step="0.01">
+              <div class="spinner-custom-small" id="discount-input-loading"></div>
+            </div>
+            <small class="text-danger error-discount_input_percentage mt-1 text-start"></small>
+          </div>
+          <div class="mb-3 position-relative">
+            <label class="form-label">مبلغ تخفیف</label>
+            <div class="input-with-spinner">
+              <input type="number" class="form-control" name="discount_input_amount" id="discount_input_amount"
+                placeholder="مبلغ تخفیف را وارد کنید" min="0" step="1">
+              <div class="spinner-custom-small" id="discount-amount-loading"></div>
+            </div>
+            <small class="text-danger error-discount_input_amount mt-1 text-start"></small>
+          </div>
+        </div>
+        <div class="modal-footer p-3">
+          <button type="submit" class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2">
+            <span class="button_text">تأیید</span>
+            <div class="loader" style="display: none;"></div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 <div class="patient-information-content w-100 d-flex justify-content-center">
   <div class="my-patient-content d-none w-100">
     <div class="card">
@@ -213,7 +351,8 @@
             </div>
             <div class="col-12 position-relative">
               <label class="label-top-input">کد ملی بیمار:</label>
-              <input type="text" name="codemeli" class="form-control text-end" placeholder="کدملی بیمار را وارد کنید">
+              <input type="text" name="codemeli" class="form-control text-end"
+                placeholder="کدملی بیمار را وارد کنید">
             </div>
             <div class="col-12 position-relative">
               <label class="label-top-input">تاریخ مراجعه:</label>
@@ -221,8 +360,8 @@
             </div>
             <div class="col-12 position-relative timepicker-ui w-100">
               <label class="label-top-input">ساعت مراجعه:</label>
-              <input data-timepicker type="text" class="form-control timepicker-ui-input text-end fw-bold" id="appointment-time"
-                value="00:00" style="width: 100% !important">
+              <input data-timepicker type="text" class="form-control timepicker-ui-input text-end fw-bold"
+                id="appointment-time" value="00:00" style="width: 100% !important">
             </div>
             <div class="col-12 position-relative">
               <label class="label-top-input">توضیحات:</label>
@@ -230,7 +369,7 @@
             </div>
             <div class="col-12">
               <button type="submit"
-                class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2">
+                class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2 h-50">
                 <span class="button_text">ثبت تغییرات</span>
                 <div class="loader" style="display: none;"></div>
               </button>
@@ -260,44 +399,105 @@
     <div class="main-content">
       <div class="row g-0">
         <div class="user-panel-content w-100">
-          <div class="table-responsive">
-            <table class="table table-light table-hover">
-              <thead>
-                <tr>
-                  <th>ردیف</th>
-                  <th>نام</th>
-                  <th>موبایل</th>
-                  <th>کدملی</th>
-                  <th>تاریخ</th>
-                  <th>ساعت</th>
-                  <th>توضیحات</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody id="result_nobat">
-                @foreach ($appointments as $appointment)
-                  <tr>
-                    <td>{{ $appointment->id }}</td>
-                    <td>{{ $appointment->user->first_name }} {{ $appointment->user->last_name }}</td>
-                    <td>{{ $appointment->user->mobile }}</td>
-                    <td>{{ $appointment->user->national_code }}</td>
-                    <td>{{ $appointment->appointment_date }}</td>
-                    <td>{{ $appointment->appointment_time }}</td>
-                    <td>{{ $appointment->description ?? '---' }}</td>
-                    <td>
-                      <button class="btn btn-sm btn-light edit-btn rounded-circle" data-id="{{ $appointment->id }}">
-                        <img src="{{ asset('dr-assets/icons/edit.svg') }}">
-                      </button>
-                      <button class="btn btn-sm btn-light delete-btn rounded-circle"
-                        data-id="{{ $appointment->id }}">
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}">
-                      </button>
-                    </td>
-                  </tr>
-                @endforeach
-              </tbody>
+          <div class="table-responsive position-relative w-100 d-none d-md-block">
+            <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
+                <thead class="bg-light">
+                    <tr>
+                        <th><input class="form-check-input" type="checkbox" id="select-all-row"></th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">نام بیمار</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">شماره‌ موبایل</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">کد ملی</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">زمان نوبت</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">وضعیت نوبت</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">بیعانه</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">وضعیت پرداخت</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">بیمه</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">قیمت نهایی</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">پایان ویزیت</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">عملیات</th>
+                    </tr>
+                </thead>
+                <tbody id="result_nobat">
+                    @if (count($appointments) > 0)
+                        @foreach ($appointments as $appointment)
+                            <tr>
+                                <td><input type="checkbox" class="appointment-checkbox form-check-input" value="{{ $appointment->id }}" data-status="{{ $appointment->status }}" data-mobile="{{ $appointment->user->mobile ?? '' }}"></td>
+                                <td class="fw-bold">{{ $appointment->user ? $appointment->user->first_name . ' ' . $appointment->user->last_name : '-' }}</td>
+                                <td>{{ $appointment->user ? $appointment->user->mobile : '-' }}</td>
+                                <td>{{ $appointment->user ? $appointment->user->national_code : '-' }}</td>
+                                <td>
+                                    {{ \Morilog\Jalali\Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d') }}
+                                    <span class="fw-bold d-block">{{ substr($appointment->appointment_time, 0, 5) }}</span>
+                                </td>
+                                <td>
+                                    @php
+                                        $statusLabels = [
+                                            'scheduled' => ['label' => 'در انتظار', 'class' => 'text-primary'],
+                                            'attended' => ['label' => 'ویزیت شده', 'class' => 'text-success'],
+                                            'cancelled' => ['label' => 'لغو شده', 'class' => 'text-danger'],
+                                            'missed' => ['label' => 'عدم حضور', 'class' => 'text-warning'],
+                                            'pending_review' => ['label' => 'در انتظار بررسی', 'class' => 'text-secondary'],
+                                        ];
+                                        $status = $appointment->status ?? 'scheduled';
+                                        $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
+                                    @endphp
+                                    <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
+                                </td>
+                                <td>{{ $appointment->fee ? number_format($appointment->fee) . ' تومان' : '-' }}</td>
+                                <td>
+                                    @php
+                                        $paymentStatusLabels = [
+                                            'paid' => ['label' => 'پرداخت شده', 'class' => 'text-success'],
+                                            'unpaid' => ['label' => 'پرداخت نشده', 'class' => 'text-danger'],
+                                            'pending' => ['label' => 'در انتظار پرداخت', 'class' => 'text-primary'],
+                                        ];
+                                        $paymentStatus = $appointment->payment_status;
+                                        $paymentStatusInfo = $paymentStatusLabels[$paymentStatus] ?? [
+                                            'label' => 'نامشخص',
+                                            'class' => 'text-muted',
+                                        ];
+                                        $paymentMethodLabels = [
+                                            'online' => 'آنلاین',
+                                            'cash' => 'نقدی',
+                                            'card_to_card' => 'کارت به کارت',
+                                            'pos' => 'کارتخوان',
+                                        ];
+                                        $paymentMethod = $appointment->payment_method ?? 'online';
+                                    @endphp
+                                    <span class="{{ $paymentStatusInfo['class'] }} fw-bold">
+                                        {{ $paymentStatusInfo['label'] }}
+                                        @if ($paymentStatus === 'paid')
+                                            ({{ $paymentMethodLabels[$paymentMethod] ?? '-' }})
+                                        @endif
+                                    </span>
+                                </td>
+                                <td>{{ $appointment->insurance ? $appointment->insurance->name : '-' }}</td>
+                                <td>{{ $appointment->final_price ? number_format($appointment->final_price) . ' تومان' : '-' }}</td>
+                                <td>
+                                    @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
+                                        <button class="btn btn-sm btn-primary shadow-sm end-visit-btn" data-id="{{ $appointment->id }}" data-clinic-id="{{ $appointment->clinic_id ?? '1' }}">پایان ویزیت</button>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-light edit-btn rounded-circle shadow-sm" data-id="{{ $appointment->id }}">
+                                        <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                                    </button>
+                                    <button class="btn btn-sm btn-light delete-btn rounded-circle shadow-sm" data-id="{{ $appointment->id }}">
+                                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="12" class="text-center">نتیجه‌ای یافت نشد</td>
+                        </tr>
+                    @endif
+                </tbody>
             </table>
-          </div>
+        </div>
         </div>
       </div>
     </div>
@@ -470,29 +670,71 @@
   });
 </script>
 <script>
-  // نمونه استفاده
-  function addRowToTable(data) {
+function addRowToTable(data) {
     const jalaliDate = moment(data.appointment_date, 'YYYY-MM-DD').format('jYYYY/jMM/jDD');
+    const time = data.appointment_time ? data.appointment_time.substring(0, 5) : '---'; // فرمت HH:MM
+
+    // تبدیل وضعیت نوبت به فارسی
+    const statusMap = {
+        'scheduled': { label: 'در انتظار', class: 'text-primary' },
+        'attended': { label: 'ویزیت شده', class: 'text-success' },
+        'cancelled': { label: 'لغو شده', class: 'text-danger' },
+        'missed': { label: 'عدم حضور', class: 'text-warning' },
+        'pending_review': { label: 'در انتظار بررسی', class: 'text-secondary' }
+    };
+    const statusInfo = statusMap[data.status] || { label: 'نامشخص', class: 'text-muted' };
+
+    // تبدیل وضعیت پرداخت به فارسی
+    const paymentStatusMap = {
+        'paid': { label: 'پرداخت شده', class: 'text-success' },
+        'unpaid': { label: 'پرداخت نشده', class: 'text-danger' },
+        'pending': { label: 'در انتظار پرداخت', class: 'text-primary' }
+    };
+    const paymentStatusInfo = paymentStatusMap[data.payment_status] || { label: 'نامشخص', class: 'text-muted' };
+
+    // تبدیل نوع پرداخت به فارسی
+    const paymentMethodMap = {
+        'online': 'آنلاین',
+        'cash': 'نقدی',
+        'card_to_card': 'کارت به کارت',
+        'pos': 'کارتخوان'
+    };
+    const paymentMethod = data.payment_status === 'paid' && data.payment_method
+        ? ` (${paymentMethodMap[data.payment_method] || 'نامشخص'})`
+        : '';
+
+    // HTML دکمه پایان ویزیت
+    const endVisitHtml = (data.status !== 'attended' && data.status !== 'cancelled')
+        ? `<button class="btn btn-sm btn-primary shadow-sm end-visit-btn" data-id="${data.id}" data-clinic-id="${data.clinic_id || '1'}">پایان ویزیت</button>`
+        : '-';
+
     const newRow = `
         <tr>
-          <td>${data.id || '---'}</td>
-          <td>${data.user?.first_name || '---'} ${data.user?.last_name || '---'}</td>
-          <td>${data.user?.mobile || '---'}</td>
-          <td>${data.user?.national_code || '---'}</td>
-          <td>${jalaliDate || '---'}</td>
-          <td>${data.appointment_time || '---'}</td>
-          <td>${data.description || '---'}</td>
-          <td>
-            <button class="btn btn-sm btn-light edit-btn rounded-circle" data-id="${data.id}">
-              <img src="{{ asset('dr-assets/icons/edit.svg') }}">
-            </button>
-            <button class="btn btn-sm btn-light delete-btn rounded-circle" data-id="${data.id}">
-              <img src="{{ asset('dr-assets/icons/trash.svg') }}">
-            </button>
-          </td>
+            <td><input type="checkbox" class="appointment-checkbox form-check-input" value="${data.id}" data-status="${data.status}" data-mobile="${data.user?.mobile || ''}"></td>
+            <td class="fw-bold">${data.user?.first_name || '-'} ${data.user?.last_name || '-'}</td>
+            <td>${data.user?.mobile || '-'}</td>
+            <td>${data.user?.national_code || '-'}</td>
+            <td>
+                ${jalaliDate || '-'}
+                <span class="fw-bold d-block">${time}</span>
+            </td>
+            <td><span class="${statusInfo.class} fw-bold">${statusInfo.label}</span></td>
+            <td>${data.fee ? data.fee.toLocaleString('fa-IR') + ' تومان' : '-'}</td>
+            <td><span class="${paymentStatusInfo.class} fw-bold">${paymentStatusInfo.label}${paymentMethod}</span></td>
+            <td>${data.insurance?.name || '-'}</td>
+            <td>${data.final_price ? data.final_price.toLocaleString('fa-IR') + ' تومان' : '-'}</td>
+            <td>${endVisitHtml}</td>
+            <td>
+                <button class="btn btn-sm btn-light edit-btn rounded-circle shadow-sm" data-id="${data.id}">
+                    <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                </button>
+                <button class="btn btn-sm btn-light delete-btn rounded-circle shadow-sm" data-id="${data.id}">
+                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                </button>
+            </td>
         </tr>`;
     $('#result_nobat').append(newRow);
-  }
+}
 
   function loadAppointments() {
     $.ajax({
@@ -830,6 +1072,312 @@
           });
         }
       });
+    });
+  });
+
+  function formatPrice(price) {
+    return price.toLocaleString('fa-IR') + ' تومان';
+  }
+
+  // محاسبه قیمت نهایی
+  function calculateFinalPrice() {
+    const serviceIds = $('input[name="service_ids[]"]:checked').map(function() {
+      return $(this).val();
+    }).get();
+    const isFree = $('#is_free').is(':checked');
+    const discountPercentage = parseFloat($('#discount_percentage').val()) || 0;
+    const discountAmount = parseFloat($('#discount_input_amount').val()) || 0;
+
+    if (!serviceIds.length && !isFree) {
+      toastr.error('لطفاً حداقل یک خدمت انتخاب کنید یا ویزیت رایگان را فعال کنید.');
+      $('#final-price-loading').removeClass('show-spinner');
+      return;
+    }
+
+    $('#final-price-loading').addClass('show-spinner');
+    $.ajax({
+      url: "{{ route('manual-nobat.calculate-final-price') }}",
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      data: {
+        service_ids: serviceIds,
+        is_free: isFree ? 1 : 0,
+        discount_percentage: discountPercentage,
+        discount_amount: discountAmount,
+        selectedClinicId: localStorage.getItem('selectedClinicId')
+      },
+      success: function(response) {
+        if (response.success) {
+          basePrice = response.data.final_price + response.data.discount_amount; // ذخیره قیمت پایه
+          $('#final_price').val(formatPrice(response.data.final_price));
+          $('#discount_percentage').val(response.data.discount_percentage);
+          $('#discount_input_percentage').val(response.data.discount_percentage);
+          $('#discount_input_amount').val(response.data.discount_amount);
+        } else {
+          toastr.error(response.message || 'خطا در محاسبه قیمت!');
+        }
+      },
+      error: function(xhr) {
+        const errors = xhr.responseJSON?.errors || [];
+        errors.forEach(error => toastr.error(error));
+        toastr.error(xhr.responseJSON?.message || 'خطا در محاسبه قیمت!');
+      },
+      complete: function() {
+        $('#final-price-loading').removeClass('show-spinner');
+      }
+    });
+  }
+
+  // بارگذاری بیمه‌ها
+  function loadInsurances(appointmentId) {
+    $.ajax({
+      url: "{{ route('manual-nobat.insurances') }}",
+      method: 'GET',
+      data: {
+        selectedClinicId: localStorage.getItem('selectedClinicId')
+      },
+      success: function(response) {
+        if (response.success && response.data.length > 0) {
+          let html = '';
+          response.data.forEach(insurance => {
+            html += `
+                            <div class="form-check mb-1">
+                                <input class="form-check-input" type="radio" name="insurance_id" id="insurance_${insurance.id}" value="${insurance.id}">
+                                <label class="form-check-label" for="insurance_${insurance.id}">${insurance.name}</label>
+                            </div>`;
+          });
+          $('#insurance-options').html(html);
+        } else {
+          $('#insurance-options').html('<p class="text-danger small mb-0">هیچ بیمه‌ای یافت نشد.</p>');
+        }
+      },
+      error: function() {
+        toastr.error('خطا در بارگذاری بیمه‌ها!');
+      }
+    });
+  }
+
+  // بارگذاری خدمات
+  function loadServices(insuranceId) {
+    $('#services-loading').addClass('show-custom');
+    $('#service-options').html('');
+    $.ajax({
+      url: "{{ route('manual-nobat.services', ':insuranceId') }}".replace(':insuranceId', insuranceId),
+      method: 'GET',
+      data: {
+        selectedClinicId: localStorage.getItem('selectedClinicId')
+      },
+      success: function(response) {
+        if (response.success && response.data.length > 0) {
+          let html = '';
+          response.data.forEach(service => {
+            html += `
+                            <div class="form-check mb-1">
+                                <input class="form-check-input" type="checkbox" name="service_ids[]" id="service_${service.id}" value="${service.id}">
+                                <label class="form-check-label" for="service_${service.id}">
+                                    ${service.name} (${formatPrice(service.price)})
+                                </label>
+                            </div>`;
+          });
+          $('#service-options').html(html);
+        } else {
+          $('#service-options').html('<p class="text-danger small mb-0">هیچ خدمتی یافت نشد.</p>');
+        }
+      },
+      error: function() {
+        toastr.error('خطا در بارگذاری خدمات!');
+      },
+      complete: function() {
+        $('#services-loading').removeClass('show-custom');
+      }
+    });
+  }
+
+  // باز کردن مودال پایان ویزیت
+  $(document).on('click', '.end-visit-btn', function() {
+    const appointmentId = $(this).data('id');
+    $('#end-visit-appointment-id').val(appointmentId);
+    $('#end-visit-form')[0].reset();
+    $('#insurance-options, #service-options').empty();
+    $('#final_price').val('');
+    $('#discount_percentage').val('');
+    $('#discount_input_amount').val('');
+    $('#is_free').prop('checked', false);
+    $('#payment_method').prop('disabled', false);
+    $('#discount_percentage').prop('disabled', false);
+    basePrice = 0; // ریست قیمت پایه
+    loadInsurances(appointmentId);
+    $('#endVisitModal').modal('show');
+  });
+
+  // تغییر بیمه و بارگذاری خدمات
+  $(document).on('change', 'input[name="insurance_id"]', function() {
+    const insuranceId = $(this).val();
+    loadServices(insuranceId);
+  });
+
+  // محاسبه قیمت هنگام تغییر خدمات یا ویزیت رایگان
+  $(document).on('change', 'input[name="service_ids[]"], #is_free', function() {
+    if ($('#is_free').is(':checked')) {
+      $('#final_price').val(formatPrice(0));
+      $('#discount_percentage').val(0).prop('disabled', true);
+      $('#discount_input_amount').val(0);
+      $('#payment_method').prop('disabled', true);
+    } else {
+      $('#discount_percentage').prop('disabled', false);
+      $('#payment_method').prop('disabled', false);
+      calculateFinalPrice();
+    }
+  });
+
+  // باز کردن مودال تخفیف
+  $(document).on('click', '#discount_percentage', function() {
+    $('#discount_input_percentage').val($(this).val());
+    $('#discount_input_amount').val($('#discount_input_amount').val() || 0);
+    $('#discountModal').modal('show');
+  });
+
+  // محاسبه پویا هنگام تغییر درصد تخفیف
+  $(document).on('input', '#discount_input_percentage', function() {
+    const percentage = parseFloat($(this).val()) || 0;
+    if (percentage > 100) {
+      $(this).val(100);
+      toastr.warning('درصد تخفیف نمی‌تواند بیش از ۱۰۰ باشد!');
+      return;
+    } else if (percentage < 0) {
+      $(this).val(0);
+      toastr.warning('درصد تخفیف نمی‌تواند منفی باشد!');
+      return;
+    }
+
+    // محاسبه مبلغ تخفیف بر اساس قیمت پایه
+    const discountAmount = basePrice ? round((basePrice * percentage) / 100, 2) : 0;
+    $('#discount_input_amount').val(discountAmount);
+
+    // محاسبه قیمت نهایی
+    calculateFinalPrice();
+  });
+
+  // محاسبه پویا هنگام تغییر مبلغ تخفیف
+  $(document).on('input', '#discount_input_amount', function() {
+    const amount = parseFloat($(this).val()) || 0;
+    if (amount < 0) {
+      $(this).val(0);
+      toastr.warning('مبلغ تخفیف نمی‌تواند منفی باشد!');
+      return;
+    } else if (amount > basePrice) {
+      $(this).val(basePrice);
+      toastr.warning('مبلغ تخفیف نمی‌تواند بیشتر از قیمت پایه باشد!');
+      return;
+    }
+
+    // محاسبه درصد تخفیف بر اساس قیمت پایه
+    const discountPercentage = basePrice ? round((amount / basePrice) * 100, 2) : 0;
+    $('#discount_input_percentage').val(discountPercentage);
+
+    // محاسبه قیمت نهایی
+    calculateFinalPrice();
+  });
+
+  // تابع گرد کردن
+  function round(value, decimals) {
+    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+  }
+
+  // ثبت تخفیف
+  $('#apply-discount-form').on('submit', function(e) {
+    e.preventDefault();
+    const percentage = parseFloat($('#discount_input_percentage').val()) || 0;
+    const amount = parseFloat($('#discount_input_amount').val()) || 0;
+
+    $('#discount_percentage').val(percentage);
+    $('#discount_input_amount').val(amount);
+    $('#discountModal').modal('hide');
+    calculateFinalPrice();
+  });
+
+  $('#end-visit-form').on('submit', function(e) {
+    e.preventDefault();
+    const form = $(this);
+    const submitButton = form.find('button[type="submit"]');
+    const loader = submitButton.find('.loader');
+    const buttonText = submitButton.find('.button_text');
+    const appointmentId = $('#end-visit-appointment-id').val();
+
+    form.find('small.text-danger').text('');
+    buttonText.hide();
+    loader.show();
+
+    // آماده‌سازی داده‌ها
+    const formData = form.serializeArray();
+    formData.push({
+      name: 'final_price',
+      value: parseFloat($('#final_price').val().replace(/[^\d.-]/g, '')) || 0
+    });
+
+    // اضافه کردن service_ids به‌صورت آرایه
+    const serviceIds = $('input[name="service_ids[]"]:checked').map(function() {
+      return $(this).val();
+    }).get();
+
+    // اضافه کردن هر service_id به‌صورت جداگانه با کلید service_ids[]
+    serviceIds.forEach(function(serviceId) {
+      formData.push({
+        name: 'service_ids[]',
+        value: serviceId
+      });
+    });
+
+    // اضافه کردن selectedClinicId
+    formData.push({
+      name: 'selectedClinicId',
+      value: localStorage.getItem('selectedClinicId') || '1'
+    });
+
+    $.ajax({
+      url: "{{ route('manual-nobat.end-visit', ':id') }}".replace(':id', appointmentId),
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      data: formData,
+      success: function(response) {
+        if (response.success) {
+          toastr.success(response.message);
+          $('#endVisitModal').modal('hide');
+          loadAppointments();
+        } else {
+          toastr.error(response.message);
+        }
+      },
+      error: function(xhr) {
+        const errors = xhr.responseJSON?.errors || [];
+        const errorMapping = {
+          'لطفاً یک بیمه انتخاب کنید.': 'insurance_id',
+          'لطفاً حداقل یک خدمت انتخاب کنید.': 'service_ids',
+          'خدمات باید به‌صورت آرایه باشند.': 'service_ids',
+          'لطفاً نوع پرداخت را انتخاب کنید.': 'payment_method',
+          'قیمت نهایی الزامی است.': 'final_price'
+        };
+
+        errors.forEach(errorMsg => {
+          const field = errorMapping[errorMsg];
+          if (field) {
+            form.find(`.error-${field}`).text(errorMsg);
+          }
+          toastr.error(errorMsg);
+        });
+
+        if (errors.length === 0) {
+          toastr.error(xhr.responseJSON?.error_details || xhr.responseJSON?.message || 'خطا در ثبت ویزیت!');
+        }
+      },
+      complete: function() {
+        buttonText.show();
+        loader.hide();
+      }
     });
   });
 </script>

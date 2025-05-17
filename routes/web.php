@@ -493,6 +493,12 @@ Route::prefix('dr')
                     Route::get('/manual_nobat_setting', [ManualNobatController::class, 'showSettings'])->middleware('secretary.permission:appointments')->name('dr-manual_nobat_setting');
                     Route::get('/search-users', [ManualNobatController::class, 'searchUsers'])->middleware('secretary.permission:appointments')->name('dr-panel-search.users');
                     Route::get('/scheduleSetting', [ScheduleSettingController::class, 'index'])->middleware('secretary.permission:appointments')->name('dr-scheduleSetting');
+
+                    Route::get('/insurances', [ManualNobatController::class, 'getInsurances'])->name('manual-nobat.insurances');
+                    Route::get('/services/{insuranceId}', [ManualNobatController::class, 'getServices'])->name('manual-nobat.services');
+                    Route::post('/calculate-final-price', [ManualNobatController::class, 'calculateFinalPrice'])->name('manual-nobat.calculate-final-price');
+                    Route::post('/{id}/end-visit', [ManualNobatController::class, 'endVisit'])->name('manual-nobat.end-visit');
+
                     Route::prefix('scheduleSetting/vacation')->group(function () {
                         Route::get('/', [VacationController::class, 'index'])->middleware('secretary.permission:appointments')->name('dr-vacation');
                         Route::post('/store', [VacationController::class, 'store'])->middleware('secretary.permission:appointments')->name('doctor.vacation.store');

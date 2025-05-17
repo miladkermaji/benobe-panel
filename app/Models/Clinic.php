@@ -76,4 +76,8 @@ class Clinic extends Model
     {
         return $this->hasMany(ManualAppointmentSetting::class);
     }
+    public function doctorServices()
+    {
+        return $this->hasMany(DoctorService::class);
+    }
 }

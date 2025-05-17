@@ -15,11 +15,13 @@ class ManualAppointment extends Model
         'user_id',
         'doctor_id',
         'clinic_id',
+        'insurance_id',
         'appointment_date',
         'appointment_time',
         'description',
         'status',
         'payment_method',
+        'payment_status',
         'tracking_code',
         'fee',
         'final_price',
@@ -33,5 +35,9 @@ class ManualAppointment extends Model
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);
+    }
+    public function insurance()
+    {
+        return $this->belongsTo(Insurance::class);
     }
 }
