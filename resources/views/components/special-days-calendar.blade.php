@@ -128,9 +128,8 @@
   .calendar-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: .5rem;
     padding: 1rem 0;
-    flex-wrap: wrap;
   }
 
   .btn-nav {
@@ -269,6 +268,7 @@
     background: var(--appointment-bg);
     border-color: var(--appointment-border);
     box-shadow: 0 3px 10px rgba(72, 187, 120, 0.2);
+    z-index: 50;
   }
 
   .calendar-day.has-appointment::before {
@@ -288,6 +288,8 @@
     border-color: var(--holiday-border);
     color: var(--holiday-dot);
     box-shadow: 0 3px 10px rgba(245, 101, 101, 0.2);
+    z-index: 50;
+
   }
 
   .calendar-day.holiday::after {
@@ -452,7 +454,6 @@
     }
 
     .calendar-header {
-      flex-wrap: wrap;
       gap: 0.5rem;
       padding: 0.5rem 0;
     }
@@ -558,7 +559,6 @@
 
     .select-wrapper {
       flex: 1 1 100%;
-      min-width: 100%;
     }
 
     .btn-nav {

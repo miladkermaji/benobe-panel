@@ -139,7 +139,6 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    flex-wrap: wrap;
   }
 
   .reschedule-calendar-container .btn-nav {
@@ -207,6 +206,7 @@
     border-radius: var(--radius-button);
     font-size: 0.75rem;
     font-weight: 600;
+    height: 38px;
     border: none;
     cursor: pointer;
     transition: var(--transition);
@@ -492,8 +492,11 @@
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     }
 
+    .calendar-controls .btn-primary {
+      height: 30px !important;
+    }
+
     .reschedule-calendar-container .calendar-header {
-      flex-wrap: wrap;
       gap: 0.4rem;
       padding: 0.4rem 0;
     }
@@ -607,7 +610,6 @@
 
     .reschedule-calendar-container .select-wrapper {
       flex: 1 1 100%;
-      min-width: 100%;
     }
 
     .reschedule-calendar-container .btn-nav {
