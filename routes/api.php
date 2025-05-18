@@ -118,8 +118,11 @@ Route::prefix('tele-counseling')->group(function () {
 Route::get('/mag/latest-posts', [MagController::class, 'getLatestPosts']);
 Route::get('/doctors', [DoctorListingController::class, 'getDoctors']);
 Route::get('/doctor-filters', [DoctorFilterController::class, 'getFilterOptions']);
-Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
-Route::get('/appointments/payment/result', [AppointmentBookingController::class, 'paymentResult'])->name('appointment.payment.result');
+
+Route::middleware(['api'])->group(function () {
+    Route::get('/payment/result', [AppointmentBookingController::class, 'paymentResult'])->name('api.payment.result');
+    Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+});
 
 Route::prefix('doctors')->group(function () {
     Route::get('/{doctorId}/profile', [DoctorProfileController::class, 'getDoctorProfile'])->name('api.doctors.profile');

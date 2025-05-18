@@ -124,6 +124,7 @@ class PaymentService
 
     public function verify()
     {
+        $transaction = null;
         try {
             $authority = request()->input('Authority');
             if (!$authority) {
@@ -193,6 +194,7 @@ class PaymentService
         } catch (\Shetabit\Multipay\Exceptions\InvalidPaymentException $e) {
             Log::error("PaymentService::verify - InvalidPaymentException: {$e->getMessage()}", [
                 'authority' => request()->input('Authority'),
+                'transaction' => $transaction ? $transaction->toArray() : null,
             ]);
             if ($transaction) {
                 $transaction->update(['status' => 'failed']);
@@ -202,6 +204,7 @@ class PaymentService
             Log::error("PaymentService::verify - General error: {$e->getMessage()}", [
                 'authority' => request()->input('Authority'),
                 'trace' => $e->getTraceAsString(),
+                'transaction' => $transaction ? $transaction->toArray() : null,
             ]);
             if ($transaction) {
                 $transaction->update(['status' => 'failed']);

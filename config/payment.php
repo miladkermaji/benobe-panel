@@ -347,7 +347,6 @@ return [
             /* normal api */
             'apiPurchaseUrl' => 'https://api.zarinpal.com/pg/v4/payment/request.json',
             'apiPaymentUrl' => 'https://www.zarinpal.com/pg/StartPay/',
-           /*  'apiPaymentUrl' => 'https://sandbox.zarinpal.com/pg/StartPay/', */
             'apiVerificationUrl' => 'https://api.zarinpal.com/pg/v4/payment/verify.json',
 
             /* sandbox api */
@@ -355,11 +354,11 @@ return [
             'sandboxApiPaymentUrl' => 'https://sandbox.zarinpal.com/pg/StartPay/',
             'sandboxApiVerificationUrl' => 'https://sandbox.zarinpal.com/pg/v4/payment/verify.json',
 
-            'mode' => env('ZARINPAL_MODE', 'sandbox'), // مقدار باید `sandbox` یا `normal` یا `zaringate` باشد
+            'mode' => env('ZARINPAL_MODE', 'sandbox'),
             'merchantId' => env('ZARINPAL_MERCHANT_ID'),
-            'callbackUrl' => env('ZARINPAL_CALLBACK_URL', 'http://127.0.0.1:8000/payment/callback'),
-            'description' => 'پرداخت تستی از طریق زرین پال',
-            'currency' => 'T', // Can be R, T (Rial, Toman)
+            'callbackUrl' => env('ZARINPAL_CALLBACK_URL', 'http://127.0.0.1:8000/api/payment/callback'),
+            'description' => 'پرداخت از طریق زرین پال',
+            'currency' => 'T',
         ],
 
 
