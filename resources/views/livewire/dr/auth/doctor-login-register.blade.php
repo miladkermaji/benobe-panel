@@ -19,7 +19,7 @@
           </div>
           <input wire:model="mobile" dir="ltr"
             class="form-control custom-rounded h-50 border-3 border-gray-300 @error('mobile') is-invalid @enderror"
-            type="text" placeholder="09181234567" maxlength="11">
+            type="text" placeholder="09123456789" maxlength="11">
           @error('mobile')
             <div class="invalid-feedback">{{ $message }}</div>
           @enderror
