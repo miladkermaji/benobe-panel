@@ -699,7 +699,7 @@
       </x-modal>
     </div>
 
-    <div wire:ignore>
+    <div>
       <x-modal name="time-selection-modal" title="انتخاب ساعت نوبت" size="md">
         <x-slot:body>
           <div class="time-selection-container">
@@ -719,7 +719,7 @@
             </div>
           </div>
           <div class="w-100 d-flex justify-content-end mt-3">
-            <button type="button" class="btn my-btn-primary h-50 col-12" wire:click="selectAppointmentTime">
+            <button type="button" class="btn my-btn-primary h-50 col-12" wire:click="selectTime">
               <span class="button_text">انتخاب ساعت</span>
             </button>
           </div>
@@ -1354,6 +1354,7 @@
         });
 
         // Handle available times loaded event
+        /*
         Livewire.on('available-times-loaded', (event) => {
           console.log('Available times loaded:', event);
           const times = event.times || [];
@@ -1367,11 +1368,11 @@
           }
 
           times.forEach(time => {
-            const $button = $(`
-              <button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
-                ${time}
-              </button>
-            `);
+            const $button = $(
+              `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
+        ${time}
+      </button>`
+            );
             $container.append($button);
           });
 
@@ -1390,6 +1391,7 @@
             @this.set('appointmentTime', time);
           });
         });
+        */
 
         // Handle modal close
         Livewire.on('close-modal', (event) => {

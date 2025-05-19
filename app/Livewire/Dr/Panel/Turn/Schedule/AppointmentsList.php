@@ -2074,8 +2074,16 @@ class AppointmentsList extends Component
         $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
     }
 
-    public function selectAppointmentTime()
+    public function selectTime($time = null)
     {
+        if ($time) {
+            $this->selectedTime = $time;
+            $this->appointmentTime = $time;
+            $this->dispatch('close-modal', ['name' => 'time-selection-modal']);
+            $this->isTimeSelectionModalOpen = false;
+            return;
+        }
+
         if (!$this->selectedTime) {
             $this->dispatch('show-toastr', ['message' => 'لطفاً یک ساعت را انتخاب کنید', 'type' => 'error']);
             return;
