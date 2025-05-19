@@ -2017,6 +2017,17 @@ class AppointmentsList extends Component
             return;
         }
 
+        // Check if the selected date is in the past
+        $now = Carbon::now('Asia/Tehran');
+        $selectedDate = Carbon::parse($gregorianDate, 'Asia/Tehran')->startOfDay();
+
+        if ($selectedDate->lt($now->startOfDay())) {
+            Log::info('Selected date is in the past');
+            $this->dispatch('show-toastr', ['message' => 'امکان ثبت نوبت برای تاریخ گذشته وجود ندارد', 'type' => 'error']);
+            $this->availableTimes = [];
+            return;
+        }
+
         Log::info('Converted Gregorian date: ' . $gregorianDate);
 
         // Get day of week from Gregorian date
@@ -2068,12 +2079,19 @@ class AppointmentsList extends Component
         // Generate all possible time slots
         $allTimeSlots = [];
         foreach ($workHours as $period) {
-            $start = strtotime($period['start']);
-            $end = strtotime($period['end']);
+            $start = Carbon::parse($period['start'], 'Asia/Tehran');
+            $end = Carbon::parse($period['end'], 'Asia/Tehran');
 
-            while ($start < $end) {
-                $allTimeSlots[] = date('H:i', $start);
-                $start += ($appointmentDuration * 60); // Add appointment duration in seconds
+            while ($start->lt($end)) {
+                // If the date is today, only show future times
+                if ($selectedDate->isSameDay($now)) {
+                    if ($start->gt($now)) {
+                        $allTimeSlots[] = $start->format('H:i');
+                    }
+                } else {
+                    $allTimeSlots[] = $start->format('H:i');
+                }
+                $start->addMinutes($appointmentDuration);
             }
         }
 
