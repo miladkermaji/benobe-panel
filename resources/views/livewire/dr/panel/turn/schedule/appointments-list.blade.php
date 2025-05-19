@@ -348,7 +348,7 @@
           <div class="row g-3">
             <div class="col-12">
               <div class="position-relative">
-                <input type="text" class="form-control" wire:model.live.debounce.500ms="searchQuery"
+                <input type="text" class="form-control h-50" wire:model.live.debounce.500ms="searchQuery"
                   placeholder="جستجو با نام، نام خانوادگی، کد ملی یا شماره موبایل...">
                 @if ($searchQuery && !$isSearching)
                   <div class="search-results position-absolute w-100 bg-white border rounded shadow-sm mt-1"
@@ -377,49 +377,49 @@
               </div>
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label">نام</label>
-              <input type="text" class="form-control" wire:model="firstName" required>
+            <div class="col-md-6 position-relative">
+              <label class="label-top-input-special-takhasos">نام</label>
+              <input type="text" class="form-control h-50" wire:model="firstName" required>
               @error('firstName')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label">نام خانوادگی</label>
-              <input type="text" class="form-control" wire:model="lastName" required>
+            <div class="col-md-6 position-relative">
+              <label class="label-top-input-special-takhasos">نام خانوادگی</label>
+              <input type="text" class="form-control h-50" wire:model="lastName" required>
               @error('lastName')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label">شماره موبایل</label>
-              <input type="text" class="form-control" wire:model="mobile" required>
+            <div class="col-md-6 position-relative">
+              <label class="label-top-input-special-takhasos">شماره موبایل</label>
+              <input type="text" class="form-control h-50" wire:model="mobile" required>
               @error('mobile')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label">کد ملی</label>
-              <input type="text" class="form-control" wire:model="nationalCode" required>
+            <div class="col-md-6 position-relative">
+              <label class="label-top-input-special-takhasos">کد ملی</label>
+              <input type="text" class="form-control h-50" wire:model="nationalCode" required>
               @error('nationalCode')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label">تاریخ نوبت</label>
-              <input type="text" class="form-control" data-jdp wire:model="appointmentDate" required>
+            <div class="col-md-6 position-relative">
+              <label class="label-top-input-special-takhasos">تاریخ نوبت</label>
+              <input type="text" class="form-control h-50" data-jdp wire:model="appointmentDate" required>
               @error('appointmentDate')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label">ساعت نوبت</label>
-              <input type="text" class="form-control" wire:model="appointmentTime" required readonly>
+            <div class="col-md-6 position-relative">
+              <label class="label-top-input-special-takhasos">ساعت نوبت</label>
+              <input type="text" class="form-control h-50" wire:model="appointmentTime" required readonly>
               @error('appointmentTime')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
@@ -437,33 +437,33 @@
       <x-slot:body>
         <form wire:submit.prevent="storeNewUser">
           <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">نام</label>
-              <input type="text" class="form-control" wire:model="newUser.firstName" required>
+            <div class="col-md-6 position-relative">
+              <label class="label-top-input-special-takhasos">نام</label>
+              <input type="text" class="form-control h-50" wire:model="newUser.firstName" required>
               @error('newUser.firstName')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label">نام خانوادگی</label>
-              <input type="text" class="form-control" wire:model="newUser.lastName" required>
+            <div class="col-md-6 position-relative">
+              <label class="label-top-input-special-takhasos">نام خانوادگی</label>
+              <input type="text" class="form-control h-50" wire:model="newUser.lastName" required>
               @error('newUser.lastName')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label">شماره موبایل</label>
-              <input type="text" class="form-control" wire:model="newUser.mobile" required>
+            <div class="col-md-6 position-relative">
+              <label class="label-top-input-special-takhasos">شماره موبایل</label>
+              <input type="text" class="form-control h-50" wire:model="newUser.mobile" required>
               @error('newUser.mobile')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label">کد ملی</label>
-              <input type="text" class="form-control" wire:model="newUser.nationalCode" required>
+            <div class="col-md-6 position-relative">
+              <label class="label-top-input-special-takhasos">کد ملی</label>
+              <input type="text" class="form-control h-50" wire:model="newUser.nationalCode" required>
               @error('newUser.nationalCode')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
@@ -523,7 +523,7 @@
               @enderror
             </div>
             <div class="mb-4 position-relative">
-              <textarea class="form-control" id="blockReason" rows="3" wire:model.live="blockReason"
+              <textarea class="form-control h-50" id="blockReason" rows="3" wire:model.live="blockReason"
                 placeholder="دلیل مسدودیت را وارد کنید..."></textarea>
               @error('blockReason')
                 <span class="text-danger">{{ $message }}</span>
@@ -591,7 +591,7 @@
               </div>
               <div class="col-12">
                 <div class="row g-2">
-                  <div class="col-md-6">
+                  <div class="col-md-6 position-relative">
                     <div class="border rounded p-2 bg-light">
                       <div class="form-check mb-0">
                         <input type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
@@ -599,10 +599,10 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6 position-relative">
                     <div class="border rounded p-2 bg-light">
                       <label class="form-label fw-bold mb-1">نوع پرداخت</label>
-                      <select class="form-control" wire:model.live="paymentMethod"
+                      <select class="form-control h-50" wire:model.live="paymentMethod"
                         @if ($isFree) disabled @endif>
                         <option value="online">آنلاین</option>
                         <option value="cash">نقدی</option>
@@ -616,11 +616,11 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 position-relative">
                 <div class="border rounded p-2 bg-light position-relative">
                   <label class="form-label fw-bold mb-1">تخفیف</label>
                   <div class="input-with-spinner">
-                    <input type="number" step="0.01" min="0" max="100" class="form-control"
+                    <input type="number" step="0.01" min="0" max="100" class="form-control h-50"
                       wire:model.live.debounce.500ms="discountPercentage" x-data
                       @click="$dispatch('open-modal', { name: 'discount-modal' })" placeholder="تخفیف (٪)"
                       @if ($isFree) disabled @endif readonly>
@@ -631,11 +631,11 @@
                   @enderror
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 position-relative">
                 <div class="border rounded p-2 bg-light position-relative">
                   <label class="form-label fw-bold mb-1">قیمت نهایی</label>
                   <div class="input-with-spinner">
-                    <input type="text" class="form-control" wire:model.live="finalPrice"
+                    <input type="text" class="form-control h-50" wire:model.live="finalPrice"
                       value="{{ number_format($finalPrice, 0, '.', ',') }} تومان"
                       @if ($isFree) disabled @endif readonly>
                     <div class="spinner-custom-small {{ $isLoadingFinalPrice ? 'show-spinner' : '' }}"></div>
@@ -648,7 +648,7 @@
               <div class="col-12">
                 <div class="border rounded p-2 bg-light">
                   <label class="form-label fw-bold mb-1">توضیحات درمان</label>
-                  <textarea class="form-control" rows="2" wire:model.live="endVisitDescription"
+                  <textarea class="form-control h-50" rows="2" wire:model.live="endVisitDescription"
                     placeholder="توضیحات درمان را وارد کنید..."></textarea>
                 </div>
               </div>
@@ -667,9 +667,9 @@
         <x-slot:body>
           <form wire:submit.prevent="applyDiscount">
             <div class="mb-3 position-relative">
-              <label class="form-label">درصد تخفیف</label>
+              <label class="label-top-input-special-takhasos">درصد تخفیف</label>
               <div class="input-with-spinner">
-                <input type="number" class="form-control" wire:model.live.debounce.500ms="discountInputPercentage"
+                <input type="number" class="form-control h-50" wire:model.live.debounce.500ms="discountInputPercentage"
                   placeholder="درصد تخفیف را وارد کنید" min="0" max="100" step="0.01"
                   @if ($isFree) disabled @endif>
                 <div class="spinner-custom-small {{ $isLoadingDiscount ? 'show-spinner' : '' }}"></div>
@@ -679,9 +679,9 @@
               @enderror
             </div>
             <div class="mb-3 position-relative">
-              <label class="form-label">مبلغ تخفیف</label>
+              <label class="label-top-input-special-takhasos">مبلغ تخفیف</label>
               <div class="input-with-spinner">
-                <input type="number" class="form-control" wire:model.live.debounce.500ms="discountInputAmount"
+                <input type="number" class="form-control h-50" wire:model.live.debounce.500ms="discountInputAmount"
                   placeholder="مبلغ تخفیف را وارد کنید" min="0" step="1"
                   @if ($isFree) disabled @endif>
                 <div class="spinner-custom-small {{ $isLoadingDiscount ? 'show-spinner' : '' }}"></div>
@@ -1357,43 +1357,43 @@
 
         // Handle available times loaded event
         /*
-                    Livewire.on('available-times-loaded', (event) => {
-                      console.log('Available times loaded:', event);
-                      const times = event.times || [];
-                      const $container = $('#available-times');
-                      $container.empty();
+                        Livewire.on('available-times-loaded', (event) => {
+                          console.log('Available times loaded:', event);
+                          const times = event.times || [];
+                          const $container = $('#available-times');
+                          $container.empty();
 
-                      if (times.length === 0) {
-                        $container.html(
-                          '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
-                        return;
-                      }
+                          if (times.length === 0) {
+                            $container.html(
+                              '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
+                            return;
+                          }
 
-                      times.forEach(time => {
-                        const $button = $(
-                          `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
+                          times.forEach(time => {
+                            const $button = $(
+                              `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
         ${time}
       </button>`
-                        );
-                        $container.append($button);
-                      });
+                            );
+                            $container.append($button);
+                          });
 
-                      // Handle time selection
-                      $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
-                        const $btn = $(this);
-                        const time = $btn.data('time');
+                          // Handle time selection
+                          $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+                            const $btn = $(this);
+                            const time = $btn.data('time');
 
-                        // Remove selection from other buttons
-                        $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+                            // Remove selection from other buttons
+                            $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
 
-                        // Select this button
-                        $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+                            // Select this button
+                            $btn.removeClass('btn-outline-primary').addClass('btn-primary');
 
-                        // Update Livewire component
-                        @this.set('appointmentTime', time);
-                      });
-                    });
-                    */
+                            // Update Livewire component
+                            @this.set('appointmentTime', time);
+                          });
+                        });
+                        */
 
         // Handle modal close
         Livewire.on('close-modal', (event) => {
