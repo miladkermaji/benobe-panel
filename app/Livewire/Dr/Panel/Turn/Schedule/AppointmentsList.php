@@ -1965,8 +1965,8 @@ class AppointmentsList extends Component
         }
 
         $doctor = $this->getAuthenticatedDoctor();
-        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
-
+        $clinicId = $this->selectedClinicId;
+        Log::info($clinicId);
         $appointment = Appointment::create([
             'patient_id' => $user->id,
             'doctor_id' => $doctor->id,
