@@ -1929,12 +1929,25 @@ class AppointmentsList extends Component
 
     public function storeWithUser()
     {
+        // Convert Jalali date to Gregorian before validation
+        $gregorianDate = null;
+        if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $this->appointmentDate)) {
+            try {
+                $normalizedDate = str_replace('/', '-', $this->appointmentDate);
+                $gregorianDate = Jalalian::fromFormat('Y-m-d', $normalizedDate)->toCarbon()->format('Y-m-d');
+            } catch (\Exception $e) {
+                $this->dispatch('show-toastr', ['message' => 'فرمت تاریخ نامعتبر است', 'type' => 'error']);
+                return;
+            }
+        } else {
+            $gregorianDate = $this->appointmentDate;
+        }
+
         $this->validate([
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
             'mobile' => 'required|string|size:11',
             'nationalCode' => 'required|string|size:10',
-            'appointmentDate' => 'required|date',
             'appointmentTime' => 'required',
         ]);
 
@@ -1954,8 +1967,8 @@ class AppointmentsList extends Component
         $appointment = Appointment::create([
             'user_id' => $user->id,
             'doctor_id' => $this->getAuthenticatedDoctor()->id,
-            'clinic_id' => $this->selectedClinicId,
-            'appointment_date' => $this->appointmentDate,
+            'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+            'appointment_date' => $gregorianDate,
             'appointment_time' => $this->appointmentTime,
             'status' => 'scheduled',
             'payment_status' => 'unpaid',
@@ -1963,7 +1976,7 @@ class AppointmentsList extends Component
 
         $this->reset(['firstName', 'lastName', 'mobile', 'nationalCode', 'appointmentDate', 'appointmentTime']);
         $this->dispatch('close-modal', ['name' => 'add-sick-modal']);
-        $this->dispatch('show-toast', ['message' => 'نوبت با موفقیت ثبت شد']);
+        $this->dispatch('show-toastr', ['message' => 'نوبت با موفقیت ثبت شد', 'type' => 'success']);
         $this->loadAppointments();
     }
 
