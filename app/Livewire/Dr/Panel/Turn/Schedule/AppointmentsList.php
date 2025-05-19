@@ -2079,19 +2079,19 @@ class AppointmentsList extends Component
         // Generate all possible time slots
         $allTimeSlots = [];
         foreach ($workHours as $period) {
-            $start = Carbon::parse($period['start'], 'Asia/Tehran');
-            $end = Carbon::parse($period['end'], 'Asia/Tehran');
+            $startTime = Carbon::createFromFormat('H:i', $period['start'], 'Asia/Tehran');
+            $endTime = Carbon::createFromFormat('H:i', $period['end'], 'Asia/Tehran');
 
-            while ($start->lt($end)) {
+            while ($startTime->lt($endTime)) {
                 // If the date is today, only show future times
                 if ($selectedDate->isSameDay($now)) {
-                    if ($start->gt($now)) {
-                        $allTimeSlots[] = $start->format('H:i');
+                    if ($startTime->gt($now)) {
+                        $allTimeSlots[] = $startTime->format('H:i');
                     }
                 } else {
-                    $allTimeSlots[] = $start->format('H:i');
+                    $allTimeSlots[] = $startTime->format('H:i');
                 }
-                $start->addMinutes($appointmentDuration);
+                $startTime->addMinutes($appointmentDuration);
             }
         }
 
@@ -2109,9 +2109,9 @@ class AppointmentsList extends Component
             ->whereDate('appointment_date', $gregorianDate)
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
-            ->pluck('appointment_time')
-            ->map(function ($time) {
-                return substr($time, 0, 5); // Get only HH:mm part
+            ->get()
+            ->map(function ($appointment) {
+                return Carbon::parse($appointment->appointment_time)->format('H:i');
             })
             ->toArray();
 
