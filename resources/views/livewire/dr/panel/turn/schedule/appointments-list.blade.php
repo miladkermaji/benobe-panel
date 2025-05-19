@@ -27,55 +27,69 @@
 
     <div class="sicks-content h-100 w-100 position-relative border">
       <div class="d-flex justify-content-start gap-10 nobat-option w-100" wire:ignore>
-        <div class="d-flex align-items-center m-2 gap-4">
-          <div class="turning_filterWrapper__2cOOi">
-            <div class="dropdown">
-              <button class="btn btn-light dropdown-toggle h-30 fs-13" type="button" id="filterDropdown"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                فیلتر
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', '')">همه
-                    نوبت‌ها</a>
-                </li>
-                <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'scheduled')">در
-                    انتظار</a></li>
-                <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'cancelled')">لغو
-                    شده</a>
-                </li>
-                <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'attended')">ویزیت
-                    شده</a>
-                </li>
-                <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_week')">هفته
-                    جاری</a></li>
-                <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_month')">ماه
-                    جاری</a></li>
-                <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_year')">سال
-                    جاری</a></li>
-              </ul>
+        <div class="d-flex align-items-center m-2 gap-4 justify-content-between w-100">
+          <div class="d-flex">
+            <div class="turning_filterWrapper__2cOOi">
+              <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle h-30 fs-13" type="button" id="filterDropdown"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+                  فیلتر
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                  <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', '')">همه نوبت‌ها</a></li>
+                  <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'scheduled')">در
+                      انتظار</a>
+                  </li>
+                  <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'cancelled')">لغو شده</a>
+                  </li>
+                  <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'attended')">ویزیت
+                      شده</a>
+                  </li>
+                </ul>
+              </div>
             </div>
+            <div class="d-flex">
+              <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
+                wire:click="$set('dateFilter', 'current_year')">
+                <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
+                <span class="d-none d-md-block">سال جاری</span>
+              </button>
+              <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
+                wire:click="$set('dateFilter', 'current_month')">
+                <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
+                <span class="d-none d-md-block">ماه جاری</span>
+              </button>
+              <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
+                wire:click="$set('dateFilter', 'current_week')">
+                <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
+                <span class="d-none d-md-block">هفته جاری</span>
+              </button>
+            </div>
+
           </div>
-          <button id="cancel-appointments-btn"
-            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
-            <img src="{{ asset('dr-assets/icons/cancle-appointment.svg') }}" alt="" srcset="">
-            <span class="d-none d-md-block">لغو نوبت</span>
-          </button>
-          <button id="move-appointments-btn"
-            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
-            <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="" srcset="">
-            <span class="d-none d-md-block">جابجایی نوبت</span>
-          </button>
-          <button id="block-users-btn" x-data @click="$dispatch('open-modal', { name: 'block-user-modal' })"
-            class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
-            <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="" srcset="">
-            <span class="d-none d-md-block">مسدود کردن کاربر</span>
-          </button>
+          <div class="d-flex">
+            <button id="block-users-btn" x-data @click="$dispatch('open-modal', { name: 'block-user-modal' })"
+              class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
+              <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="" srcset="">
+              <span class="d-none d-md-block">مسدود کردن کاربر</span>
+            </button>
+            <button id="move-appointments-btn"
+              class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
+              <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="" srcset="">
+              <span class="d-none d-md-block">جابجایی نوبت</span>
+            </button>
+            <button id="cancel-appointments-btn"
+              class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
+              <img src="{{ asset('dr-assets/icons/cancle-appointment.svg') }}" alt="" srcset="">
+              <span class="d-none d-md-block">لغو نوبت</span>
+            </button>
+          </div>
         </div>
       </div>
       <div class="appointments-container">
         <div class="loading-overlay-custom">
           <div class="spinner-custom"></div>
-      </div>
+        </div>
         <div class="table-responsive position-relative w-100 d-none d-md-block">
           <table class="table table-hover w-100 text-sm text-center bg-white shadow-sm rounded">
             <thead class="bg-light">
@@ -85,7 +99,6 @@
                 <th scope="col" class="px-6 py-3 fw-bolder">شماره‌ موبایل</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">کد ملی</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">زمان نوبت</th>
-                <th scope="col" class="px-6 py-3 fw-bolder">وضعیت نوبت</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">بیعانه</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">وضعیت پرداخت</th>
                 <th scope="col" class="px-6 py-3 fw-bolder">بیمه</th>
@@ -108,25 +121,11 @@
                     <td>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</td>
                     <td>{{ $appointment->patient ? $appointment->patient->national_code : '-' }}</td>
                     <td>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
-
                       <span class="fw-bold d-block">
                         {{ $appointment->appointment_time->format('H:i') ?? '-' }}
                       </span>
                     </td>
-                    <td>
-                      @php
-                        $statusLabels = [
-                            'scheduled' => ['label' => 'در انتظار', 'class' => 'text-primary'],
-                            'attended' => ['label' => 'ویزیت شده', 'class' => 'text-success'],
-                            'cancelled' => ['label' => 'لغو شده', 'class' => 'text-danger'],
-                            'missed' => ['label' => 'عدم حضور', 'class' => 'text-warning'],
-                            'pending_review' => ['label' => 'در انتظار بررسی', 'class' => 'text-secondary'],
-                        ];
-                        $status = $appointment->status ?? 'scheduled';
-                        $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
-                      @endphp
-                      <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
-                    </td>
+
                     <td>
                       @if ($appointment->fee)
                         {{ number_format($appointment->fee) . ' تومان' }}
@@ -165,32 +164,43 @@
                     <td>{{ $appointment->final_price ? number_format($appointment->final_price) . ' تومان' : '-' }}
                     </td>
                     <td>
-                      @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
+                      @php
+                      $statusLabels = [
+                          'scheduled' => ['label' => 'در انتظار', 'class' => 'text-primary'],
+                          'attended' => ['label' => 'ویزیت شده', 'class' => 'text-success'],
+                          'cancelled' => ['label' => 'لغو شده', 'class' => 'text-danger'],
+                          'missed' => ['label' => 'عدم حضور', 'class' => 'text-warning'],
+                          'pending_review' => ['label' => 'در انتظار بررسی', 'class' => 'text-secondary'],
+                      ];
+                      $status = $appointment->status ?? 'scheduled';
+                      $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
+                    @endphp
+                      @if ($status === 'scheduled')
                         <button class="btn btn-sm btn-primary-sm shadow-sm end-visit-btn" x-data
                           @click="$dispatch('open-modal', { name: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">پایان
                           ویزیت</button>
                       @else
-                        -
+                        <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
                       @endif
                     </td>
                     <td>
                       <div class="d-flex justify-content-center gap-2">
                         <x-custom-tooltip title="جابجایی نوبت" placement="top">
-                          <button class="btn btn-light rounded-circle shadow-sm reschedule-btn" x-data
+                          <button class="btn btn-light shadow-sm reschedule-btn" x-data
                             @click="$dispatch('open-modal', { name: 'reschedule-modal', appointmentId: {{ $appointment->id }} })"
                             {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
                             <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="جابجایی">
                           </button>
                         </x-custom-tooltip>
                         <x-custom-tooltip title="لغو نوبت" placement="top">
-                          <button class="btn btn-light rounded-circle shadow-sm cancel-btn"
+                          <button class="btn btn-light shadow-sm cancel-btn"
                             wire:click="cancelSingleAppointment({{ $appointment->id }})"
                             {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
                             <img src="{{ asset('dr-assets/icons/cancle-appointment.svg') }}" alt="حذف">
                           </button>
                         </x-custom-tooltip>
                         <x-custom-tooltip title="مسدود کردن کاربر" placement="top">
-                          <button class="btn btn-light rounded-circle shadow-sm block-btn" x-data
+                          <button class="btn btn-light shadow-sm block-btn" x-data
                             @click="$dispatch('open-modal', { name: 'block-user-modal', appointmentId: {{ $appointment->id }} })">
                             <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="مسدود کردن">
                           </button>
@@ -243,18 +253,7 @@
                     <span class="label">زمان نوبت:</span>
                     <span>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
                       {{ '  (' . $appointment->appointment_time->format('H:i') . ')' ?? '-' }}
-
                     </span>
-                  </div>
-                  <div class="card-item">
-                    <span class="label">وضعیت نوبت:</span>
-                    @php
-                      $statusInfo = $statusLabels[$appointment->status ?? 'scheduled'] ?? [
-                          'label' => 'نامشخص',
-                          'class' => 'text-muted',
-                      ];
-                    @endphp
-                    <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
                   </div>
                   <div class="card-item d-none details">
                     <span class="label">کد ملی:</span>
@@ -294,37 +293,19 @@
                     <span class="label">قیمت نهایی:</span>
                     <span>{{ $appointment->final_price ? number_format($appointment->final_price) . ' تومان' : '-' }}</span>
                   </div>
-                  <div class="card-item d-none details">
+                  <div class="card-item">
                     <span class="label">پایان ویزیت:</span>
-                    @if ($appointment->status !== 'attended' && $appointment->status !== 'cancelled')
-                      <button class="btn btn-sm btn-primary shadow-sm end-visit-btn" x-data
+                    @php
+                      $status = $appointment->status ?? 'scheduled';
+                      $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
+                    @endphp
+                    @if ($status === 'scheduled')
+                      <button class="btn btn-sm btn-primary-sm shadow-sm end-visit-btn" x-data
                         @click="$dispatch('open-modal', { name: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">پایان
                         ویزیت</button>
                     @else
-                      <span>-</span>
+                      <span class="{{ $statusInfo['class'] }} fw-bold">{{ $statusInfo['label'] }}</span>
                     @endif
-                  </div>
-                  <div class="card-actions">
-                    <x-custom-tooltip title="جابجایی نوبت" placement="top">
-                      <button class="btn btn-light rounded-circle shadow-sm reschedule-btn" x-data
-                        @click="$dispatch('open-modal', { name: 'reschedule-modal', appointmentId: {{ $appointment->id }} })"
-                        {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
-                        <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="جابجایی">
-                      </button>
-                    </x-custom-tooltip>
-                    <x-custom-tooltip title="لغو نوبت" placement="top">
-                      <button class="btn btn-light rounded-circle shadow-sm cancel-btn"
-                        wire:click="cancelSingleAppointment({{ $appointment->id }})"
-                        {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
-                        <img src="{{ asset('dr-assets/icons/cancle-appointment.svg') }}" alt="حذف">
-                      </button>
-                    </x-custom-tooltip>
-                    <x-custom-tooltip title="مسدود کردن کاربر" placement="top">
-                      <button class="btn btn-light rounded-circle shadow-sm block-btn" x-data
-                        @click="$dispatch('open-modal', { name: 'block-user-modal', appointmentId: {{ $appointment->id }} })">
-                        <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="مسدود کردن">
-                      </button>
-                    </x-custom-tooltip>
                   </div>
                 </div>
               </div>
@@ -646,36 +627,36 @@
 
       document.addEventListener('livewire:initialized', () => {
         Livewire.on('toggle-loading', (event) => {
-    const isLoading = event.isLoading !== undefined ? event.isLoading : false;
-    setTimeout(() => {
+          const isLoading = event.isLoading !== undefined ? event.isLoading : false;
+          setTimeout(() => {
+            const loadingOverlay = document.querySelector('.loading-overlay-custom');
+            if (loadingOverlay) {
+              loadingOverlay.classList.toggle('show-custom', isLoading);
+            } else {
+              console.error('Loading overlay not found after timeout');
+            }
+          }, 200); // تاخیر 100 میلی‌ثانیه
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+          const loadingOverlay = document.querySelector('.loading-overlay-custom');
+          console.log('Loading overlay exists:', !!loadingOverlay);
+        });
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.target.classList.contains('loading-overlay-custom')) {
+              console.log('Loading overlay class changed:', mutation.target.classList.toString());
+            }
+          });
+        });
         const loadingOverlay = document.querySelector('.loading-overlay-custom');
         if (loadingOverlay) {
-            loadingOverlay.classList.toggle('show-custom', isLoading);
+          observer.observe(loadingOverlay, {
+            attributes: true,
+            attributeFilter: ['class']
+          });
         } else {
-            console.error('Loading overlay not found after timeout');
+          console.warn('Loading overlay not found for observer');
         }
-    }, 200); // تاخیر 100 میلی‌ثانیه
-});
-document.addEventListener('DOMContentLoaded', () => {
-    const loadingOverlay = document.querySelector('.loading-overlay-custom');
-    console.log('Loading overlay exists:', !!loadingOverlay);
-});
-const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        if (mutation.target.classList.contains('loading-overlay-custom')) {
-            console.log('Loading overlay class changed:', mutation.target.classList.toString());
-        }
-    });
-});
-const loadingOverlay = document.querySelector('.loading-overlay-custom');
-if (loadingOverlay) {
-    observer.observe(loadingOverlay, {
-        attributes: true,
-        attributeFilter: ['class']
-    });
-} else {
-    console.warn('Loading overlay not found for observer');
-}
         Livewire.on('refresh-appointments-list', () => {
           // اطمینان از رفرش کامل کامپوننت
           Livewire.dispatch('loadAppointments');
