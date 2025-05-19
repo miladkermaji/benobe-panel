@@ -14,35 +14,59 @@
 <div class="d-flex flex-column justify-content-center p-3 top-panel-bg">
   <div class="top-details-sicks-cards">
     <div class="top-s-a-wrapper">
-      <div onclick="location.href='{{ route('dr-appointments') }}'" class="cursor-pointer">
-        <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد بیماران امروز">
-        <span class="fw-bold mr-2 ml-2 text-dark">تعداد بیماران امروز</span>
-        <span class="font-medium">{{ $totalPatientsToday }} بیمار</span>
+      <div onclick="location.href='{{ route('dr-appointments') }}'" class="stat-card cursor-pointer">
+        <div class="stat-icon">
+          <img src="{{ asset('dr-assets/icons/count.svg') }}" alt="تعداد بیماران امروز">
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">تعداد بیماران امروز</div>
+          <div class="stat-value">{{ $totalPatientsToday }} بیمار</div>
+        </div>
       </div>
-      <div onclick="location.href='{{ route('dr-appointments') }}'" class="cursor-pointer">
-        <img src="{{ asset('dr-assets/icons/dashboard-tick.svg') }}" alt="بیماران ویزیت شده">
-        <span class="fw-bold mr-2 ml-2 text-dark">بیماران ویزیت شده</span>
-        <span class="font-medium">{{ $visitedPatients }} بیمار</span>
+      <div onclick="location.href='{{ route('dr-appointments') }}'" class="stat-card cursor-pointer">
+        <div class="stat-icon">
+          <img src="{{ asset('dr-assets/icons/dashboard-tick.svg') }}" alt="بیماران ویزیت شده">
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">بیماران ویزیت شده</div>
+          <div class="stat-value">{{ $visitedPatients }} بیمار</div>
+        </div>
       </div>
-      <div onclick="location.href='{{ route('dr-appointments') }}'" class="cursor-pointer">
-        <img src="{{ asset('dr-assets/icons/dashboard-timer.svg') }}" alt="بیماران باقی مانده">
-        <span class="fw-bold mr-2 ml-2 text-dark">بیماران باقی مانده</span>
-        <span class="font-medium">{{ $remainingPatients }} بیمار</span>
+      <div onclick="location.href='{{ route('dr-appointments') }}'" class="stat-card cursor-pointer">
+        <div class="stat-icon">
+          <img src="{{ asset('dr-assets/icons/dashboard-timer.svg') }}" alt="بیماران باقی مانده">
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">بیماران باقی مانده</div>
+          <div class="stat-value">{{ $remainingPatients }} بیمار</div>
+        </div>
       </div>
-      <div onclick="#" class="cursor-pointer">
-        <img src="{{ asset('dr-assets/icons/money.svg') }}" alt="درآمد این هفته">
-        <span class="fw-bold mr-2 ml-2 text-dark">درآمد این هفته</span>
-        <span class="font-medium">{{ number_format($weeklyIncome) }} تومان</span>
+      <div onclick="location.href='{{ route('dr.panel.financial-reports.index') }}'" class="stat-card cursor-pointer">
+        <div class="stat-icon">
+          <img src="{{ asset('dr-assets/icons/money.svg') }}" alt="درآمد این هفته">
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">درآمد این هفته</div>
+          <div class="stat-value">{{ number_format($weeklyIncome) }} تومان</div>
+        </div>
       </div>
-      <div onclick="#" class="cursor-pointer">
-        <img src="{{ asset('dr-assets/icons/money.svg') }}" alt="درآمد این ماه">
-        <span class="fw-bold mr-2 ml-2 text-dark">درآمد این ماه</span>
-        <span class="font-medium">{{ number_format($monthlyIncome) }} تومان</span>
+      <div onclick="location.href='{{ route('dr.panel.financial-reports.index') }}'" class="stat-card cursor-pointer">
+        <div class="stat-icon">
+          <img src="{{ asset('dr-assets/icons/money.svg') }}" alt="درآمد این ماه">
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">درآمد این ماه</div>
+          <div class="stat-value">{{ number_format($monthlyIncome) }} تومان</div>
+        </div>
       </div>
-      <div onclick="#" class="cursor-pointer">
-        <img src="{{ asset('dr-assets/icons/money.svg') }}" alt="درآمد کلی">
-        <span class="fw-bold mr-2 ml-2 text-dark">درآمد کلی</span>
-        <span class="font-medium">{{ number_format($totalIncome) }} تومان</span>
+      <div onclick="location.href='{{ route('dr.panel.financial-reports.index') }}'" class="stat-card cursor-pointer">
+        <div class="stat-icon">
+          <img src="{{ asset('dr-assets/icons/money.svg') }}" alt="درآمد کلی">
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">درآمد کلی</div>
+          <div class="stat-value">{{ number_format($totalIncome) }} تومان</div>
+        </div>
       </div>
     </div>
   </div>
@@ -50,58 +74,76 @@
 
 <div class="chart-content">
   <div class="chart-grid">
-    <!-- 📊 نمودار ۱: تعداد ویزیت‌ها -->
+    <!-- نمودار ۱: تعداد ویزیت‌ها -->
     <div class="chart-container">
-      <h4 class="section-title">📊 تعداد ویزیت‌ها</h4>
-      <canvas id="doctor-performance-chart"></canvas>
+      <div class="chart-title">📊 تعداد ویزیت‌ها</div>
+      <div class="chart-wrapper">
+        <canvas id="doctor-performance-chart"></canvas>
+      </div>
     </div>
 
-    <!-- 💰 نمودار ۲: درآمد ماهانه -->
+    <!-- نمودار ۲: درآمد ماهانه -->
     <div class="chart-container">
-      <h4 class="section-title">💰 درآمد ماهانه</h4>
-      <canvas id="doctor-income-chart"></canvas>
+      <div class="chart-title">💰 درآمد ماهانه</div>
+      <div class="chart-wrapper">
+        <canvas id="doctor-income-chart"></canvas>
+      </div>
     </div>
 
-    <!-- 👨‍⚕️ نمودار ۳: تعداد بیماران جدید -->
+    <!-- نمودار ۳: تعداد بیماران جدید -->
     <div class="chart-container">
-      <h4 class="section-title">👨‍⚕️ بیماران جدید</h4>
-      <canvas id="doctor-patient-chart"></canvas>
+      <div class="chart-title">👨‍⚕️ بیماران جدید</div>
+      <div class="chart-wrapper">
+        <canvas id="doctor-patient-chart"></canvas>
+      </div>
     </div>
 
-    <!-- 📈 نمودار ۴: وضعیت نوبت‌ها -->
+    <!-- نمودار ۴: وضعیت نوبت‌ها -->
     <div class="chart-container">
-      <h4 class="section-title">📈 وضعیت نوبت‌ها</h4>
-      <canvas id="doctor-status-chart"></canvas>
+      <div class="chart-title">📈 وضعیت نوبت‌ها</div>
+      <div class="chart-wrapper">
+        <canvas id="doctor-status-chart"></canvas>
+      </div>
     </div>
 
-    <!-- 🥧 نمودار ۵: درصد نوبت‌ها -->
+    <!-- نمودار ۵: درصد نوبت‌ها -->
     <div class="chart-container">
-      <h4 class="section-title">🥧 درصد نوبت‌ها</h4>
-      <canvas id="doctor-status-pie-chart"></canvas>
+      <div class="chart-title">🥧 درصد نوبت‌ها</div>
+      <div class="chart-wrapper">
+        <canvas id="doctor-status-pie-chart"></canvas>
+      </div>
     </div>
 
-    <!-- 📉 نمودار ۶: روند بیماران -->
+    <!-- نمودار ۶: روند بیماران -->
     <div class="chart-container">
-      <h4 class="section-title">📉 روند بیماران</h4>
-      <canvas id="doctor-patient-trend-chart"></canvas>
+      <div class="chart-title">📉 روند بیماران</div>
+      <div class="chart-wrapper">
+        <canvas id="doctor-patient-trend-chart"></canvas>
+      </div>
     </div>
 
-    <!-- 🗣️ نمودار ۷: نوبت‌های مشاوره -->
+    <!-- نمودار ۷: نوبت‌های مشاوره -->
     <div class="chart-container">
-      <h4 class="section-title">🗣️ نوبت‌های مشاوره</h4>
-      <canvas id="doctor-counseling-chart"></canvas>
+      <div class="chart-title">🗣️ نوبت‌های مشاوره</div>
+      <div class="chart-wrapper">
+        <canvas id="doctor-counseling-chart"></canvas>
+      </div>
     </div>
 
-    <!-- ✍️ نمودار ۸: نوبت‌های دستی -->
+    <!-- نمودار ۸: نوبت‌های دستی -->
     <div class="chart-container">
-      <h4 class="section-title">✍️ نوبت‌های دستی</h4>
-      <canvas id="doctor-manual-chart"></canvas>
+      <div class="chart-title">✍️ نوبت‌های دستی</div>
+      <div class="chart-wrapper">
+        <canvas id="doctor-manual-chart"></canvas>
+      </div>
     </div>
 
-    <!-- 💸 نمودار ۹: درآمد کلی -->
+    <!-- نمودار ۹: درآمد کلی -->
     <div class="chart-container">
-      <h4 class="section-title">💸 درآمد کلی</h4>
-      <canvas id="doctor-total-income-chart"></canvas>
+      <div class="chart-title">💸 درآمد کلی</div>
+      <div class="chart-wrapper">
+        <canvas id="doctor-total-income-chart"></canvas>
+      </div>
     </div>
   </div>
 </div>
