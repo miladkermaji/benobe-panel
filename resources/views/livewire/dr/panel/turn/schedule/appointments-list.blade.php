@@ -38,17 +38,24 @@
                 <ul class="dropdown-menu" aria-labelledby="filterDropdown">
                   <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', '')">همه نوبت‌ها</a></li>
                   <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'scheduled')">در
-                      انتظار</a>
-                  </li>
+                      انتظار</a></li>
                   <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'cancelled')">لغو شده</a>
                   </li>
                   <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'attended')">ویزیت
-                      شده</a>
+                      شده</a></li>
+                  <li>
+                    <hr class="dropdown-divider">
                   </li>
+                  <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_year')">سال
+                      جاری</a></li>
+                  <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_month')">ماه
+                      جاری</a></li>
+                  <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_week')">هفته
+                      جاری</a></li>
                 </ul>
               </div>
             </div>
-            <div class="d-flex">
+            <div class="d-flex d-none d-md-flex">
               <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
                 wire:click="$set('dateFilter', 'current_year')">
                 <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
@@ -165,16 +172,16 @@
                     </td>
                     <td>
                       @php
-                      $statusLabels = [
-                          'scheduled' => ['label' => 'در انتظار', 'class' => 'text-primary'],
-                          'attended' => ['label' => 'ویزیت شده', 'class' => 'text-success'],
-                          'cancelled' => ['label' => 'لغو شده', 'class' => 'text-danger'],
-                          'missed' => ['label' => 'عدم حضور', 'class' => 'text-warning'],
-                          'pending_review' => ['label' => 'در انتظار بررسی', 'class' => 'text-secondary'],
-                      ];
-                      $status = $appointment->status ?? 'scheduled';
-                      $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
-                    @endphp
+                        $statusLabels = [
+                            'scheduled' => ['label' => 'در انتظار', 'class' => 'text-primary'],
+                            'attended' => ['label' => 'ویزیت شده', 'class' => 'text-success'],
+                            'cancelled' => ['label' => 'لغو شده', 'class' => 'text-danger'],
+                            'missed' => ['label' => 'عدم حضور', 'class' => 'text-warning'],
+                            'pending_review' => ['label' => 'در انتظار بررسی', 'class' => 'text-secondary'],
+                        ];
+                        $status = $appointment->status ?? 'scheduled';
+                        $statusInfo = $statusLabels[$status] ?? ['label' => 'نامشخص', 'class' => 'text-muted'];
+                      @endphp
                       @if ($status === 'scheduled')
                         <button class="btn btn-sm btn-primary-sm shadow-sm end-visit-btn" x-data
                           @click="$dispatch('open-modal', { name: 'end-visit-modal', appointmentId: {{ $appointment->id }} })">پایان
