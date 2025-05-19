@@ -1975,6 +1975,7 @@ class AppointmentsList extends Component
             'appointment_time' => $this->appointmentTime,
             'status' => 'scheduled',
             'payment_status' => 'unpaid',
+            'appointment_type' => 'manual'
         ]);
 
         // Clear cache for this date
@@ -2029,7 +2030,7 @@ class AppointmentsList extends Component
 
         // Get doctor's work schedule for this day
         $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-            ->where(function($query) use ($clinicId) {
+            ->where(function ($query) use ($clinicId) {
                 if ($clinicId === null) {
                     $query->whereNull('clinic_id');
                 } else {
@@ -2080,7 +2081,7 @@ class AppointmentsList extends Component
 
         // Get reserved appointments for this date
         $reservedTimes = Appointment::where('doctor_id', $doctorId)
-            ->where(function($query) use ($clinicId) {
+            ->where(function ($query) use ($clinicId) {
                 if ($clinicId === null) {
                     $query->whereNull('clinic_id');
                 } else {
