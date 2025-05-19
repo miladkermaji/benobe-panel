@@ -42,29 +42,27 @@
 }
 
 .chart-content {
-    padding: 25px;
+    padding: 15px;
     width: 100%;
-    margin: 25px 0;
+    margin: 15px 0;
     background: linear-gradient(135deg, #f9fafb 0%, #ebedf0 100%);
-    border-radius: 20px;
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
-    backdrop-filter: blur(8px);
 }
 
 .chart-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 15px;
     width: 100%;
 }
 
 .chart-container {
     background: white;
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     border: 1px solid #e5e7eb;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
     display: flex;
     flex-direction: column;
 }
@@ -273,7 +271,7 @@ canvas {
 
 .chart-wrapper {
     flex: 1;
-    min-height: 220px;
+    min-height: 180px;
 }
 
 @media only screen and (max-width: 1400px) {
@@ -309,6 +307,10 @@ canvas {
     .chart-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .chart-wrapper {
+        min-height: 160px;
+    }
 }
 
 @media only screen and (max-width: 768px) {
@@ -318,6 +320,15 @@ canvas {
 
     .chart-grid {
         grid-template-columns: 1fr;
+    }
+
+    .chart-content {
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    .chart-wrapper {
+        min-height: 140px;
     }
 }
 
