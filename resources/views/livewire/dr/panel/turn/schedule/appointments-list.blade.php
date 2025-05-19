@@ -417,7 +417,7 @@
 
             <div class="col-md-6">
               <label class="form-label">ساعت نوبت</label>
-              <input type="time" class="form-control" wire:model="appointmentTime" required>
+              <input type="time" class="form-control" wire:model="appointmentTime" required readonly>
               @error('appointmentTime')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
@@ -699,7 +699,25 @@
       </x-modal>
     </div>
 
-
+    <div wire:ignore>
+      <x-modal name="time-selection-modal" title="انتخاب ساعت نوبت" size="md">
+        <x-slot:body>
+          <div class="time-selection-container">
+            <div class="d-flex flex-wrap gap-2 justify-content-center" id="available-times" wire:ignore>
+              <!-- زمان‌ها به‌صورت داینامیک با جاوااسکریپت اضافه می‌شن -->
+            </div>
+          </div>
+          <div class="w-100 d-flex justify-content-end mt-3">
+            <button type="button"
+              class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
+              wire:click="selectAppointmentTime">
+              <span class="button_text">انتخاب ساعت</span>
+              <div class="loader"></div>
+            </button>
+          </div>
+        </x-slot:body>
+      </x-modal>
+    </div>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -1313,6 +1331,65 @@
           });
         });
 
+        // Add event listener for time input click
+        $(document).on('click', 'input[type="time"]', function(e) {
+          e.preventDefault();
+          const $input = $(this);
+          if ($input.attr('readonly')) {
+            window.dispatchEvent(new CustomEvent('open-modal', {
+              detail: {
+                name: 'time-selection-modal'
+              }
+            }));
+            @this.call('openTimeSelectionModal');
+          }
+        });
+
+        // Handle available times loaded event
+        Livewire.on('available-times-loaded', (event) => {
+          const times = event.times || [];
+          const $container = $('#available-times');
+          $container.empty();
+
+          if (times.length === 0) {
+            $container.html(
+              '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
+            return;
+          }
+
+          times.forEach(time => {
+            const $button = $(`
+              <button type="button" class="btn btn-sm time-slot-btn btn-outline-primary" data-time="${time}">
+                ${time}
+              </button>
+            `);
+            $container.append($button);
+          });
+
+          // Handle time selection
+          $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+            const $btn = $(this);
+            const time = $btn.data('time');
+
+            // Remove selection from other buttons
+            $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+
+            // Select this button
+            $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+
+            // Update Livewire component
+            @this.set('selectedTime', time);
+          });
+        });
+
+        // Handle modal close
+        Livewire.on('close-modal', (event) => {
+          const modalId = event?.name || (event && event[0]?.name) || null;
+          if (modalId === 'time-selection-modal') {
+            $('#available-times').empty();
+            @this.set('isTimeSelectionModalOpen', false);
+          }
+        });
 
       });
       // Lazy Loading با IntersectionObserver

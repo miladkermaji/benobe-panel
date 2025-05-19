@@ -125,6 +125,9 @@ class AppointmentsList extends Component
         'mobile' => '',
         'nationalCode' => ''
     ];
+    public $selectedTime = null;
+    public $availableTimes = [];
+    public $isTimeSelectionModalOpen = false;
 
     public function mount()
     {
@@ -1963,6 +1966,86 @@ class AppointmentsList extends Component
         $this->dispatch('show-toast', ['message' => 'نوبت با موفقیت ثبت شد']);
         $this->loadAppointments();
     }
+
+    public function openTimeSelectionModal()
+    {
+        if (!$this->appointmentDate) {
+            $this->dispatch('show-toastr', ['message' => 'لطفاً ابتدا تاریخ را انتخاب کنید', 'type' => 'error']);
+            return;
+        }
+
+        $this->isTimeSelectionModalOpen = true;
+        $this->loadAvailableTimes();
+    }
+
+    private function loadAvailableTimes()
+    {
+        $date = Carbon::parse($this->appointmentDate);
+        $dayOfWeek = strtolower($date->format('l'));
+
+        // Get work schedule for the selected day
+        $workSchedule = DoctorWorkSchedule::where('doctor_id', $this->getAuthenticatedDoctor()->id)
+            ->where('day', $dayOfWeek)
+            ->first();
+
+        if (!$workSchedule) {
+            $this->dispatch('show-toastr', ['message' => 'برای این روز برنامه کاری تعریف نشده است', 'type' => 'error']);
+            return;
+        }
+
+        // Get all slots for this day
+        $slots = json_decode($workSchedule->slots, true) ?? [];
+        $availableTimes = [];
+
+        foreach ($slots as $slot) {
+            if (empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments'])) {
+                continue;
+            }
+
+            $startTime = Carbon::parse($slot['start_time']);
+            $endTime = Carbon::parse($slot['end_time']);
+            $duration = $endTime->diffInMinutes($startTime) / $slot['max_appointments'];
+
+            // Generate all possible times in this slot
+            $currentTime = $startTime->copy();
+            while ($currentTime->addMinutes($duration) <= $endTime) {
+                $timeStr = $currentTime->format('H:i');
+
+                // Check if this time is already booked
+                $isBooked = Appointment::where('doctor_id', $this->getAuthenticatedDoctor()->id)
+                    ->where('appointment_date', $date->format('Y-m-d'))
+                    ->where('appointment_time', $timeStr)
+                    ->exists();
+
+                if (!$isBooked) {
+                    $availableTimes[] = $timeStr;
+                }
+            }
+        }
+
+        $this->availableTimes = $availableTimes;
+        $this->dispatch('available-times-loaded', ['times' => $availableTimes]);
+    }
+
+    public function selectAppointmentTime()
+    {
+        if (!$this->selectedTime) {
+            $this->dispatch('show-toastr', ['message' => 'لطفاً یک ساعت را انتخاب کنید', 'type' => 'error']);
+            return;
+        }
+
+        $this->appointmentTime = $this->selectedTime;
+        $this->dispatch('close-modal', ['name' => 'time-selection-modal']);
+        $this->isTimeSelectionModalOpen = false;
+        $this->selectedTime = null;
+    }
+
+    public function updatedAppointmentDate()
+    {
+        $this->appointmentTime = null;
+        $this->selectedTime = null;
+    }
+
     public function render()
     {
         return view('livewire.dr.panel.turn.schedule.appointments-list');
