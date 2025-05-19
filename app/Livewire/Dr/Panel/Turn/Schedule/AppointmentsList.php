@@ -1980,51 +1980,98 @@ class AppointmentsList extends Component
 
     private function loadAvailableTimes()
     {
-        $date = Carbon::parse($this->appointmentDate);
-        $dayOfWeek = strtolower($date->format('l'));
-
-        // Get work schedule for the selected day
-        $workSchedule = DoctorWorkSchedule::where('doctor_id', $this->getAuthenticatedDoctor()->id)
-            ->where('day', $dayOfWeek)
-            ->first();
-
-        if (!$workSchedule) {
-            $this->dispatch('show-toastr', ['message' => 'برای این روز برنامه کاری تعریف نشده است', 'type' => 'error']);
+        if (!$this->appointmentDate) {
+            Log::info('No appointment date selected');
+            $this->availableTimes = [];
             return;
         }
 
-        // Get all slots for this day
-        $slots = json_decode($workSchedule->slots, true) ?? [];
-        $availableTimes = [];
+        Log::info('Selected Jalali date: ' . $this->appointmentDate);
 
-        foreach ($slots as $slot) {
-            if (empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments'])) {
-                continue;
-            }
+        // Convert Jalali date to Gregorian
+        $gregorianDate = $this->convertToGregorian($this->appointmentDate);
+        if (!$gregorianDate) {
+            Log::error('Failed to convert Jalali date to Gregorian');
+            $this->availableTimes = [];
+            return;
+        }
 
-            $startTime = Carbon::parse($slot['start_time']);
-            $endTime = Carbon::parse($slot['end_time']);
-            $duration = $endTime->diffInMinutes($startTime) / $slot['max_appointments'];
+        Log::info('Converted Gregorian date: ' . $gregorianDate);
 
-            // Generate all possible times in this slot
-            $currentTime = $startTime->copy();
-            while ($currentTime->addMinutes($duration) <= $endTime) {
-                $timeStr = $currentTime->format('H:i');
+        // Get day of week from Gregorian date
+        $dayOfWeek = strtolower(date('l', strtotime($gregorianDate)));
+        Log::info('Day of week: ' . $dayOfWeek);
 
-                // Check if this time is already booked
-                $isBooked = Appointment::where('doctor_id', $this->getAuthenticatedDoctor()->id)
-                    ->where('appointment_date', $date->format('Y-m-d'))
-                    ->where('appointment_time', $timeStr)
-                    ->exists();
+        $doctorId = $this->getAuthenticatedDoctor()->id;
+        $clinicId = $this->selectedClinicId;
 
-                if (!$isBooked) {
-                    $availableTimes[] = $timeStr;
-                }
+        Log::info("Searching work schedule for doctor_id: {$doctorId}, clinic_id: {$clinicId}, day: {$dayOfWeek}");
+
+        // Get doctor's work schedule for this day
+        $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+            ->where('clinic_id', $clinicId)
+            ->where('day', $dayOfWeek)
+            ->where('is_working', true)
+            ->first();
+
+        if (!$workSchedule) {
+            Log::info('No work schedule found for this day');
+            $this->availableTimes = [];
+            return;
+        }
+
+        Log::info('Work schedule found: ' . json_encode($workSchedule->toArray()));
+
+        // Get work hours from schedule
+        $workHours = json_decode($workSchedule->work_hours, true);
+        if (empty($workHours)) {
+            Log::info('No work hours found in schedule');
+            $this->availableTimes = [];
+            return;
+        }
+
+        Log::info('Work hours: ' . json_encode($workHours));
+
+        // Get appointment settings
+        $appointmentSettings = json_decode($workSchedule->appointment_settings, true);
+        $appointmentDuration = $appointmentSettings['appointment_duration'] ?? 15; // Default 15 minutes
+
+        Log::info('Appointment duration: ' . $appointmentDuration . ' minutes');
+
+        // Generate all possible time slots
+        $allTimeSlots = [];
+        foreach ($workHours as $period) {
+            $start = strtotime($period['start']);
+            $end = strtotime($period['end']);
+
+            while ($start < $end) {
+                $allTimeSlots[] = date('H:i', $start);
+                $start += ($appointmentDuration * 60); // Add appointment duration in seconds
             }
         }
 
-        $this->availableTimes = $availableTimes;
-        $this->dispatch('available-times-loaded', ['times' => $availableTimes]);
+        Log::info('Generated time slots: ' . json_encode($allTimeSlots));
+
+        // Get reserved appointments for this date
+        $reservedTimes = Appointment::where('doctor_id', $doctorId)
+            ->where('clinic_id', $clinicId)
+            ->whereDate('appointment_date', $gregorianDate)
+            ->where('status', '!=', 'cancelled')
+            ->pluck('appointment_time')
+            ->map(function ($time) {
+                return substr($time, 0, 5); // Get only HH:mm part
+            })
+            ->toArray();
+
+        Log::info('Reserved times: ' . json_encode($reservedTimes));
+
+        // Remove reserved times from available slots
+        $this->availableTimes = array_values(array_diff($allTimeSlots, $reservedTimes));
+
+        Log::info('Final available times: ' . json_encode($this->availableTimes));
+
+        // Dispatch event to notify frontend
+        $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
     }
 
     public function selectAppointmentTime()

@@ -703,16 +703,24 @@
       <x-modal name="time-selection-modal" title="انتخاب ساعت نوبت" size="md">
         <x-slot:body>
           <div class="time-selection-container">
-            <div class="d-flex flex-wrap gap-2 justify-content-center" id="available-times" wire:ignore>
-              <!-- زمان‌ها به‌صورت داینامیک با جاوااسکریپت اضافه می‌شن -->
+            <div class="d-flex flex-wrap gap-2 justify-content-center" id="available-times">
+              @if (empty($availableTimes))
+                <div class="alert alert-info w-100 text-center">
+                  هیچ ساعت خالی برای این تاریخ یافت نشد
+                </div>
+              @else
+                @foreach ($availableTimes as $time)
+                  <button type="button" class="btn btn-outline-primary m-1"
+                    wire:click="selectTime('{{ $time }}')" wire:loading.attr="disabled">
+                    {{ $time }}
+                  </button>
+                @endforeach
+              @endif
             </div>
           </div>
           <div class="w-100 d-flex justify-content-end mt-3">
-            <button type="button"
-              class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-              wire:click="selectAppointmentTime">
+            <button type="button" class="btn my-btn-primary h-50 col-12" wire:click="selectAppointmentTime">
               <span class="button_text">انتخاب ساعت</span>
-              <div class="loader"></div>
             </button>
           </div>
         </x-slot:body>
@@ -1347,6 +1355,7 @@
 
         // Handle available times loaded event
         Livewire.on('available-times-loaded', (event) => {
+          console.log('Available times loaded:', event);
           const times = event.times || [];
           const $container = $('#available-times');
           $container.empty();
@@ -1359,7 +1368,7 @@
 
           times.forEach(time => {
             const $button = $(`
-              <button type="button" class="btn btn-sm time-slot-btn btn-outline-primary" data-time="${time}">
+              <button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
                 ${time}
               </button>
             `);
@@ -1378,7 +1387,7 @@
             $btn.removeClass('btn-outline-primary').addClass('btn-primary');
 
             // Update Livewire component
-            @this.set('selectedTime', time);
+            @this.set('appointmentTime', time);
           });
         });
 
