@@ -111,6 +111,21 @@ class AppointmentsList extends Component
         'get-services' => 'getServices',
     ];
     public $showNoResultsAlert = false;
+    public $searchResults = [];
+    public $isSearching = false;
+    public $firstName = '';
+    public $lastName = '';
+    public $mobile = '';
+    public $nationalCode = '';
+    public $appointmentDate = '';
+    public $appointmentTime = '';
+    public $newUser = [
+        'firstName' => '',
+        'lastName' => '',
+        'mobile' => '',
+        'nationalCode' => ''
+    ];
+
     public function mount()
     {
 
@@ -521,8 +536,19 @@ class AppointmentsList extends Component
     }
     public function updatedSearchQuery()
     {
-        $this->isSearchingAllDates = false;
-        $this->loadAppointments();
+        if (strlen($this->searchQuery) < 2) {
+            $this->searchResults = [];
+            return;
+        }
+
+        $this->isSearching = true;
+        $this->searchResults = User::where(function ($query) {
+            $query->where('first_name', 'like', '%' . $this->searchQuery . '%')
+                  ->orWhere('last_name', 'like', '%' . $this->searchQuery . '%')
+                  ->orWhere('mobile', 'like', '%' . $this->searchQuery . '%')
+                  ->orWhere('national_code', 'like', '%' . $this->searchQuery . '%');
+        })->limit(10)->get();
+        $this->isSearching = false;
     }
     public function updatedFilterStatus()
     {
@@ -1863,6 +1889,79 @@ class AppointmentsList extends Component
         }
         $workSchedule = $workScheduleQuery->first();
         return $workSchedule ? json_decode($workSchedule->work_hours, true) ?? [] : [];
+    }
+    public function selectUser($userId)
+    {
+        $user = User::find($userId);
+        if ($user) {
+            $this->firstName = $user->first_name;
+            $this->lastName = $user->last_name;
+            $this->mobile = $user->mobile;
+            $this->nationalCode = $user->national_code;
+            $this->searchQuery = '';
+            $this->searchResults = [];
+        }
+    }
+
+    public function storeNewUser()
+    {
+        $this->validate([
+            'newUser.firstName' => 'required|string|max:255',
+            'newUser.lastName' => 'required|string|max:255',
+            'newUser.mobile' => 'required|string|size:11|unique:users,mobile',
+            'newUser.nationalCode' => 'required|string|size:10|unique:users,national_code',
+        ]);
+
+        $user = User::create([
+            'first_name' => $this->newUser['firstName'],
+            'last_name' => $this->newUser['lastName'],
+            'mobile' => $this->newUser['mobile'],
+            'national_code' => $this->newUser['nationalCode'],
+        ]);
+
+        $this->selectUser($user->id);
+        $this->dispatch('close-modal', ['name' => 'add-new-patient-modal']);
+        $this->dispatch('show-toast', ['message' => 'بیمار با موفقیت ثبت شد']);
+    }
+
+    public function storeWithUser()
+    {
+        $this->validate([
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
+            'mobile' => 'required|string|size:11',
+            'nationalCode' => 'required|string|size:10',
+            'appointmentDate' => 'required|date',
+            'appointmentTime' => 'required',
+        ]);
+
+        $user = User::where('mobile', $this->mobile)
+                   ->orWhere('national_code', $this->nationalCode)
+                   ->first();
+
+        if (!$user) {
+            $user = User::create([
+                'first_name' => $this->firstName,
+                'last_name' => $this->lastName,
+                'mobile' => $this->mobile,
+                'national_code' => $this->nationalCode,
+            ]);
+        }
+
+        $appointment = Appointment::create([
+            'user_id' => $user->id,
+            'doctor_id' => $this->getAuthenticatedDoctor()->id,
+            'clinic_id' => $this->selectedClinicId,
+            'appointment_date' => $this->appointmentDate,
+            'appointment_time' => $this->appointmentTime,
+            'status' => 'scheduled',
+            'payment_status' => 'unpaid',
+        ]);
+
+        $this->reset(['firstName', 'lastName', 'mobile', 'nationalCode', 'appointmentDate', 'appointmentTime']);
+        $this->dispatch('close-modal', ['name' => 'add-sick-modal']);
+        $this->dispatch('show-toast', ['message' => 'نوبت با موفقیت ثبت شد']);
+        $this->loadAppointments();
     }
     public function render()
     {

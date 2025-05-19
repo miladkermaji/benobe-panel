@@ -340,22 +340,139 @@
       </x-modal>
     </div>
 
-    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="sm">
+    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="lg">
       <x-slot:body>
-        <form action="" method="post">
-          <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع">
-          <div class="mt-2">
-            <a class="text-decoration-none text-primary-link fw-bold" href="#" x-data
-              @click="$dispatch('open-modal', { name: 'paziresh-modal' })">پذیرش از مسیر ارجاع</a>
-          </div>
-          <div class="d-flex mt-3 gap-20">
-            <button class="btn my-btn-primary w-100 h-50">تجویز نسخه</button>
-            <button class="btn btn-outline-info w-100 h-50">ثبت ویزیت</button>
+        <form wire:submit.prevent="storeWithUser">
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="position-relative">
+                <input type="text" class="form-control" wire:model.live.debounce.500ms="searchQuery"
+                  placeholder="جستجو با نام، نام خانوادگی، کد ملی یا شماره موبایل...">
+                @if ($searchQuery && !$isSearching)
+                  <div class="search-results position-absolute w-100 bg-white border rounded shadow-sm mt-1"
+                    style="z-index: 1000; max-height: 300px; overflow-y: auto;">
+                    @if (count($searchResults) > 0)
+                      @foreach ($searchResults as $user)
+                        <div class="p-2 hover-bg-light cursor-pointer" wire:click="selectUser({{ $user->id }})">
+                          <div class="d-flex justify-content-between">
+                            <span>{{ $user->first_name }} {{ $user->last_name }}</span>
+                            <span class="text-muted">{{ $user->mobile }}</span>
+                          </div>
+                          <small class="text-muted">{{ $user->national_code }}</small>
+                        </div>
+                      @endforeach
+                    @else
+                      <div class="p-3 text-center">
+                        <p class="mb-2">نتیجه‌ای یافت نشد</p>
+                        <button type="button" class="btn btn-primary btn-sm"
+                          wire:click="$dispatch('open-modal', { name: 'add-new-patient-modal' })">
+                          افزودن بیمار جدید
+                        </button>
+                      </div>
+                    @endif
+                  </div>
+                @endif
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">نام</label>
+              <input type="text" class="form-control" wire:model="firstName" required>
+              @error('firstName')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">نام خانوادگی</label>
+              <input type="text" class="form-control" wire:model="lastName" required>
+              @error('lastName')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">شماره موبایل</label>
+              <input type="text" class="form-control" wire:model="mobile" required>
+              @error('mobile')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">کد ملی</label>
+              <input type="text" class="form-control" wire:model="nationalCode" required>
+              @error('nationalCode')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">تاریخ نوبت</label>
+              <input type="text" class="form-control" data-jdp wire:model="appointmentDate" required>
+              @error('appointmentDate')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">ساعت نوبت</label>
+              <input type="time" class="form-control" wire:model="appointmentTime" required>
+              @error('appointmentTime')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary w-100">ثبت نوبت</button>
+            </div>
           </div>
         </form>
       </x-slot:body>
+    </x-modal>
 
+    <x-modal name="add-new-patient-modal" title="افزودن بیمار جدید" size="lg">
+      <x-slot:body>
+        <form wire:submit.prevent="storeNewUser">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">نام</label>
+              <input type="text" class="form-control" wire:model="newUser.firstName" required>
+              @error('newUser.firstName')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
 
+            <div class="col-md-6">
+              <label class="form-label">نام خانوادگی</label>
+              <input type="text" class="form-control" wire:model="newUser.lastName" required>
+              @error('newUser.lastName')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">شماره موبایل</label>
+              <input type="text" class="form-control" wire:model="newUser.mobile" required>
+              @error('newUser.mobile')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">کد ملی</label>
+              <input type="text" class="form-control" wire:model="newUser.nationalCode" required>
+              @error('newUser.nationalCode')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary w-100">ثبت بیمار</button>
+            </div>
+          </div>
+        </form>
+      </x-slot:body>
     </x-modal>
 
     <x-modal name="paziresh-modal" title="ارجاع" size="sm">
