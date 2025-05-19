@@ -1964,17 +1964,24 @@ class AppointmentsList extends Component
             ]);
         }
 
+        $doctor = $this->getAuthenticatedDoctor();
+        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+
         $appointment = Appointment::create([
-            'user_id' => $user->id,
-            'doctor_id' => $this->getAuthenticatedDoctor()->id,
-            'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+            'patient_id' => $user->id,
+            'doctor_id' => $doctor->id,
+            'clinic_id' => $clinicId,
             'appointment_date' => $gregorianDate,
             'appointment_time' => $this->appointmentTime,
             'status' => 'scheduled',
             'payment_status' => 'unpaid',
         ]);
 
-        $this->reset(['firstName', 'lastName', 'mobile', 'nationalCode', 'appointmentDate', 'appointmentTime']);
+        // Clear cache for this date
+        $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$clinicId}_date_{$gregorianDate}";
+        Cache::forget($cacheKey);
+
+        $this->reset(['firstName', 'lastName', 'mobile', 'nationalCode', 'appointmentDate', 'appointmentTime', 'selectedTime']);
         $this->dispatch('close-modal', ['name' => 'add-sick-modal']);
         $this->dispatch('show-toastr', ['message' => 'نوبت با موفقیت ثبت شد', 'type' => 'success']);
         $this->loadAppointments();
@@ -2016,13 +2023,19 @@ class AppointmentsList extends Component
         Log::info('Day of week: ' . $dayOfWeek);
 
         $doctorId = $this->getAuthenticatedDoctor()->id;
-        $clinicId = $this->selectedClinicId;
+        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
 
         Log::info("Searching work schedule for doctor_id: {$doctorId}, clinic_id: {$clinicId}, day: {$dayOfWeek}");
 
         // Get doctor's work schedule for this day
         $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId)
+            ->where(function($query) use ($clinicId) {
+                if ($clinicId === null) {
+                    $query->whereNull('clinic_id');
+                } else {
+                    $query->where('clinic_id', $clinicId);
+                }
+            })
             ->where('day', $dayOfWeek)
             ->where('is_working', true)
             ->first();
@@ -2067,9 +2080,16 @@ class AppointmentsList extends Component
 
         // Get reserved appointments for this date
         $reservedTimes = Appointment::where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId)
+            ->where(function($query) use ($clinicId) {
+                if ($clinicId === null) {
+                    $query->whereNull('clinic_id');
+                } else {
+                    $query->where('clinic_id', $clinicId);
+                }
+            })
             ->whereDate('appointment_date', $gregorianDate)
             ->where('status', '!=', 'cancelled')
+            ->whereNull('deleted_at')
             ->pluck('appointment_time')
             ->map(function ($time) {
                 return substr($time, 0, 5); // Get only HH:mm part
