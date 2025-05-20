@@ -228,9 +228,9 @@
 
   .reschedule-calendar-container .calendar-day-name {
     text-align: center;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-secondary);
+    font-size: 1.01rem;
+    font-weight: bolder;
+    color: #000;
   }
 
   .reschedule-calendar-container .calendar-grid {
