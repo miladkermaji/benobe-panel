@@ -2219,8 +2219,12 @@ class AppointmentsList extends Component
                 'selectedTime' => $selectedTime
             ]));
 
-            // تبدیل تاریخ به میلادی
-            $gregorianDate = Jalalian::fromFormat('Y-m-d', $newDate)->toCarbon();
+            // تبدیل تاریخ میلادی به شمسی برای لاگ
+            $jalaliDate = Jalalian::fromFormat('Y-m-d', $newDate)->format('Y/m/d');
+            Log::info('Converting date from Gregorian: ' . $newDate . ' to Jalali: ' . $jalaliDate);
+
+            // تبدیل تاریخ به میلادی با حفظ زمان
+            $gregorianDate = Carbon::parse($newDate);
             if (!$gregorianDate) {
                 throw new \Exception('Invalid date format');
             }
@@ -2276,18 +2280,26 @@ class AppointmentsList extends Component
             foreach ($appointmentIds as $appointmentId) {
                 $appointment = Appointment::find($appointmentId);
                 if ($appointment) {
+                    // ذخیره تاریخ به صورت میلادی
                     $appointment->appointment_date = $gregorianDate->format('Y-m-d');
                     if ($selectedTime) {
                         $appointment->appointment_time = Carbon::createFromFormat('H:i', $selectedTime);
                     }
                     $appointment->save();
                     $updatedCount++;
+
+                    // لاگ برای اطمینان از صحت تاریخ
+                    Log::info('Updated appointment ' . $appointmentId . ' to date: ' .
+                        $gregorianDate->format('Y-m-d') . ' (' .
+                        Jalalian::fromDateTime($gregorianDate)->format('Y/m/d') . ')');
                 }
             }
 
             if ($updatedCount > 0) {
-                // پاک کردن کش
-                Cache::tags(['appointments', 'calendar'])->flush();
+                // پاک کردن کش به صورت مستقیم
+                Cache::forget('appointments_' . $this->selectedClinicId);
+                Cache::forget('calendar_data_' . $this->selectedClinicId);
+                Cache::forget('available_times_' . $gregorianDate->format('Y-m-d'));
 
                 $this->dispatch('appointments-updated');
                 $this->dispatch('close-modal', ['name' => 'reschedule-modal']);
