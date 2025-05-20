@@ -339,7 +339,6 @@
   }
 
   .reschedule-calendar-container .calendar-day.today.has-appointment {
-
     box-shadow: 0 4px 12px rgba(72, 187, 120, 0.2);
   }
 
@@ -347,6 +346,47 @@
     background: var(--secondary);
     border-color: var(--secondary);
     box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
+  }
+
+  .reschedule-calendar-container .calendar-day.holiday {
+    background: var(--holiday-bg);
+    border: 2px solid var(--holiday-border);
+    position: relative;
+    cursor: not-allowed;
+  }
+
+  .reschedule-calendar-container .calendar-day.holiday::before {
+    content: 'این روز تعطیل است';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .reschedule-calendar-container .calendar-day.holiday:hover::before {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .reschedule-calendar-container .calendar-day.holiday:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .reschedule-calendar-container .calendar-day.holiday .day-number {
+    color: var(--holiday-border);
+    font-weight: 600;
   }
 
   .reschedule-calendar-container .calendar-legend {
@@ -615,6 +655,11 @@
       height: 30px;
       border-width: 3px;
     }
+
+    .reschedule-calendar-container .calendar-day.holiday::before {
+      font-size: 11px;
+      padding: 3px 6px;
+    }
   }
 
   /* ریسپانسیو برای موبایل‌های کوچک (425px و کمتر) */
@@ -750,6 +795,11 @@
       width: 28px;
       height: 28px;
       border-width: 2px;
+    }
+
+    .reschedule-calendar-container .calendar-day.holiday::before {
+      font-size: 10px;
+      padding: 2px 4px;
     }
   }
 </style>
