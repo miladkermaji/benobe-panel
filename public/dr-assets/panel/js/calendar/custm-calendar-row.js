@@ -245,11 +245,8 @@ $(document).ready(function () {
         updateButtonState();
 
         // Add event listener for appointments rescheduled
-        window.addEventListener("appointments-rescheduled", (event) => {
-            console.log(
-                "Appointments rescheduled event received:",
-                event.detail
-            );
+        window.addEventListener('appointments-rescheduled', (event) => {
+            console.log('Appointments rescheduled event received:', event.detail);
             // Refresh the calendar data
             fetchAppointmentsCount();
         });
