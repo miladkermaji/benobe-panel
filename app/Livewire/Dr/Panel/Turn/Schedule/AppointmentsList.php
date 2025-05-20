@@ -1968,6 +1968,20 @@ class AppointmentsList extends Component
                 'message' => 'نوبت با موفقیت ثبت شد'
             ]);
 
+            // ریست کردن تمام فیلدها و مخفی کردن فرم
+            $this->reset([
+                'firstName',
+                'lastName',
+                'mobile',
+                'nationalCode',
+                'appointmentDate',
+                'appointmentTime',
+                'selectedTime',
+                'selectedUserId',
+                'searchQuery',
+                'searchResults'
+            ]);
+
             session()->flash('message', 'نوبت با موفقیت ثبت شد.');
         } catch (\Exception $e) {
             session()->flash('error', 'خطا در ثبت نوبت: ' . $e->getMessage());
