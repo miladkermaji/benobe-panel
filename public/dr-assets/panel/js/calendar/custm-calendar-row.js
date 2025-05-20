@@ -56,12 +56,28 @@ $(document).ready(function () {
 
     // گوش دادن به رویدادهای Livewire
     Livewire.on("appointments-cancelled", (event) => {
+        console.log("Appointments cancelled, updating counts...");
         fetchAppointmentsCount();
     });
-    Livewire.on("appointments-rescheduled", (event) => {
-        fetchAppointmentsCount();
+
+    Livewire.on("appointment-rescheduled", (event) => {
+        console.log("Appointment rescheduled event received:", event);
+        // اضافه کردن تاخیر کوتاه برای اطمینان از به‌روزرسانی داده‌ها
+        setTimeout(() => {
+            console.log("Updating appointment counts after reschedule...");
+            fetchAppointmentsCount();
+            // بروزرسانی تقویم بعد از دریافت داده‌های جدید
+            setTimeout(() => {
+                if (typeof loadCalendar === "function") {
+                    console.log("Reloading calendar after count update...");
+                    loadCalendar();
+                }
+            }, 100);
+        }, 500);
     });
+
     Livewire.on("visited", (event) => {
+        console.log("Visit status updated, refreshing counts...");
         fetchAppointmentsCount();
     });
 
@@ -374,6 +390,7 @@ $(document).ready(function () {
         console.log("Appointment registered event received:", event);
         // اضافه کردن تاخیر کوتاه برای اطمینان از به‌روزرسانی داده‌ها
         setTimeout(() => {
+            console.log("Updating counts after new appointment...");
             fetchAppointmentsCount();
         }, 500);
     });

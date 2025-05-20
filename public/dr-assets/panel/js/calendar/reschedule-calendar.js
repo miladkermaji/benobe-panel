@@ -726,6 +726,34 @@ document.addEventListener("livewire:initialized", () => {
         Livewire.dispatch("setSelectedClinicId", { clinicId });
     }
 
+    // اضافه کردن لیسنر برای موفقیت جابجایی نوبت
+    window.addEventListener("appointment-rescheduled", (event) => {
+        console.log("Appointment rescheduled successfully:", event.detail);
+
+        // نمایش توستر موفقیت
+        if (typeof Toastify === "function") {
+            Toastify({
+                text: event.detail.message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "#4CAF50",
+                },
+            }).showToast();
+        }
+
+        // بروزرسانی تعداد نوبت‌ها
+        if (typeof fetchAppointmentsCount === "function") {
+            fetchAppointmentsCount();
+        }
+
+        // بروزرسانی تقویم
+        if (typeof loadCalendar === "function") {
+            loadCalendar();
+        }
+    });
+
     window.addEventListener("open-modal", (event) => {
         const modalId = event.detail.name;
         const appointmentId = event.detail.appointmentId || null;

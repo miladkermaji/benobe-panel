@@ -2301,13 +2301,19 @@ class AppointmentsList extends Component
                 Cache::forget('calendar_data_' . $this->selectedClinicId);
                 Cache::forget('available_times_' . $gregorianDate->format('Y-m-d'));
 
-                $this->dispatch('appointments-updated');
-                $this->dispatch('close-modal', ['name' => 'reschedule-modal']);
-
                 $message = $updatedCount > 1
                     ? "{$updatedCount} نوبت با موفقیت جابجا شدند."
                     : "نوبت با موفقیت جابجا شد.";
 
+                // ارسال رویداد موفقیت
+                $this->dispatch('appointment-rescheduled', [
+                    'message' => $message,
+                    'appointmentIds' => $appointmentIds,
+                    'newDate' => $newDate,
+                    'selectedTime' => $selectedTime
+                ]);
+
+                $this->dispatch('close-modal', ['name' => 'reschedule-modal']);
                 $this->dispatch('notify', [
                     'type' => 'success',
                     'message' => $message
