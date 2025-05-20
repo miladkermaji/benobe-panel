@@ -246,6 +246,7 @@
     border-radius: 8px;
     aspect-ratio: 1.5;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     font-size: 1rem;
@@ -255,6 +256,68 @@
     transition: var(--transition);
     position: relative;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 4px;
+  }
+
+  .reschedule-calendar-container .calendar-day .day-number {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .reschedule-calendar-container .calendar-day .today-label {
+    font-size: 0.7rem;
+    color: var(--primary);
+    margin-top: 2px;
+  }
+
+  .reschedule-calendar-container .calendar-day .appointment-count {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .reschedule-calendar-container .calendar-day.today {
+    position: relative;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    background: transparent;
+  }
+
+  .reschedule-calendar-container .calendar-day.today::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background-color: var(--primary);
+    border-radius: 50%;
+  }
+
+  .reschedule-calendar-container .calendar-day.today-label {
+    font-size: 0.7rem;
+    color: var(--primary);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+
+  .reschedule-calendar-container .calendar-day.has-appointment {
+    background: var(--appointment-bg);
+    border-color: var(--appointment-border);
+    box-shadow: 0 3px 10px rgba(72, 187, 120, 0.2);
+  }
+
+  .reschedule-calendar-container .calendar-day.has-appointment::before {
+    display: none;
   }
 
   .reschedule-calendar-container .calendar-day:hover:not(.empty) {
@@ -275,70 +338,8 @@
     color: #ef4444;
   }
 
-  .reschedule-calendar-container .calendar-day.today {
-    background: var(--gradient-primary);
-    border-color: var(--primary);
-    color: var(--background-card);
-    font-weight: 700;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-  }
-
-  .reschedule-calendar-container .calendar-day.active {
-    background: var(--primary);
-    color: var(--background-card);
-    border-color: var(--primary);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-  }
-
-  .reschedule-calendar-container .calendar-day.selected {
-    background: var(--secondary);
-    color: var(--background-card);
-    border-color: var(--secondary);
-    box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
-    transform: scale(1.02);
-  }
-
-  .reschedule-calendar-container .calendar-day.has-appointment {
-    background: var(--appointment-bg);
-    border-color: var(--appointment-border);
-    box-shadow: 0 3px 10px rgba(72, 187, 120, 0.2);
-  }
-
-  .reschedule-calendar-container .calendar-day.has-appointment::before {
-    content: '';
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 8px;
-    height: 8px;
-    background: var(--appointment-dot);
-    border-radius: 50%;
-    box-shadow: 0 0 6px rgba(72, 187, 120, 0.3);
-  }
-
-  .reschedule-calendar-container .calendar-day.holiday {
-    background: var(--holiday-bg);
-    border-color: var(--holiday-border);
-    color: var(--holiday-dot);
-    box-shadow: 0 3px 10px rgba(245, 101, 101, 0.2);
-  }
-
-  .reschedule-calendar-container .calendar-day.holiday::after {
-    content: '';
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    width: 8px;
-    height: 8px;
-    background: var(--holiday-dot);
-    border-radius: 50%;
-    box-shadow: 0 0 6px rgba(245, 101, 101, 0.3);
-  }
-
   .reschedule-calendar-container .calendar-day.today.has-appointment {
-    background: var(--gradient-primary);
-    border-color: var(--appointment-border);
-    color: var(--background-card);
+
     box-shadow: 0 4px 12px rgba(72, 187, 120, 0.2);
   }
 
@@ -550,6 +551,27 @@
       border-radius: 5px;
       aspect-ratio: 1.3;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+      padding: 3px;
+    }
+
+    .reschedule-calendar-container .calendar-day .day-number {
+      font-size: 0.9rem;
+    }
+
+    .reschedule-calendar-container .calendar-day .today-label {
+      font-size: 0.65rem;
+    }
+
+    .reschedule-calendar-container .calendar-day .appointment-count {
+      font-size: 0.65rem;
+      padding: 1px 4px;
+      min-width: 18px;
+    }
+
+    .reschedule-calendar-container .calendar-day.today::after {
+      width: 5px;
+      height: 5px;
+      bottom: 3px;
     }
 
     .reschedule-calendar-container .calendar-day:hover:not(.empty) {
@@ -661,6 +683,27 @@
       border-radius: 4px;
       aspect-ratio: 1.2;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+      padding: 2px;
+    }
+
+    .reschedule-calendar-container .calendar-day .day-number {
+      font-size: 0.85rem;
+    }
+
+    .reschedule-calendar-container .calendar-day .today-label {
+      font-size: 0.6rem;
+    }
+
+    .reschedule-calendar-container .calendar-day .appointment-count {
+      font-size: 0.6rem;
+      padding: 1px 3px;
+      min-width: 16px;
+    }
+
+    .reschedule-calendar-container .calendar-day.today::after {
+      width: 4px;
+      height: 4px;
+      bottom: 2px;
     }
 
     .reschedule-calendar-container .calendar-day:hover:not(.empty) {

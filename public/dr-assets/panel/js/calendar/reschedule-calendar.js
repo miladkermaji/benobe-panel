@@ -267,46 +267,28 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 const appointmentCount = appointmentData
                     ? appointmentData.count
                     : 0;
-                if (appointmentCount > 0)
+                if (appointmentCount > 0) {
                     dayElement.classList.add("has-appointment");
+                    const countElement = document.createElement("span");
+                    countElement.classList.add("appointment-count");
+                    countElement.textContent = appointmentCount;
+                    dayElement.appendChild(countElement);
+                }
 
-                const spanElement = document.createElement("span");
-                spanElement.textContent = currentDay.format("jD");
+                const dayNumberElement = document.createElement("span");
+                dayNumberElement.classList.add("day-number");
+                dayNumberElement.textContent = currentDay.format("jD");
+                dayElement.appendChild(dayNumberElement);
 
-                const tooltipContent = isHoliday
-                    ? "این روز تعطیل است"
-                    : appointmentCount > 0
-                    ? `تعداد نوبت‌ها: ${appointmentCount}`
-                    : "";
-                if (tooltipContent) {
-                    const tooltipWrapper = document.createElement("div");
-                    tooltipWrapper.setAttribute("x-tooltip", "");
-                    tooltipWrapper.setAttribute(
-                        "id",
-                        `tooltip-day-${gregorianString}`
-                    );
-                    tooltipWrapper.setAttribute("data-trigger", "hover");
-                    tooltipWrapper.setAttribute("data-placement", "top");
-                    tooltipWrapper.classList.add("x-tooltip");
-
-                    const triggerDiv = document.createElement("div");
-                    triggerDiv.classList.add("x-tooltip__trigger");
-                    triggerDiv.appendChild(spanElement);
-
-                    const contentDiv = document.createElement("div");
-                    contentDiv.classList.add("x-tooltip__content");
-                    contentDiv.textContent = tooltipContent;
-
-                    tooltipWrapper.appendChild(triggerDiv);
-                    tooltipWrapper.appendChild(contentDiv);
-                    dayElement.appendChild(tooltipWrapper);
-                } else {
-                    dayElement.appendChild(spanElement);
+                if (currentDay.isSame(today, "day")) {
+                    dayElement.classList.add("today");
+                    const todayLabel = document.createElement("span");
+                    todayLabel.classList.add("today-label");
+                    todayLabel.textContent = "امروز";
+                    dayElement.appendChild(todayLabel);
                 }
 
                 if (currentDay.day() === 5) dayElement.classList.add("friday");
-                if (currentDay.isSame(today, "day"))
-                    dayElement.classList.add("today");
 
                 fragment.appendChild(dayElement);
             }
