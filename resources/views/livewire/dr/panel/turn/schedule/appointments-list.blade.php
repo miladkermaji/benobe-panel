@@ -540,7 +540,7 @@
           <form wire:submit.prevent="endVisit({{ $endVisitAppointmentId ?? 'null' }})">
             <div class="row g-2">
               <div class="col-12">
-                <div class="border rounded p-2 bg-light position-relative">
+                <div class="border rounded p-2 bg-light">
                   <label class="form-label fw-bold mb-1">انتخاب بیمه</label>
                   @if (count($insurances) > 0)
                     @foreach ($insurances as $index => $insurance)
@@ -560,6 +560,7 @@
                   @enderror
                 </div>
               </div>
+
               <div class="col-12">
                 <div class="border rounded p-2 bg-light services-checkbox-container position-relative">
                   <div class="loading-overlay-custom {{ $isLoadingServices ? 'show-custom' : '' }}">
@@ -587,23 +588,38 @@
                   @enderror
                 </div>
               </div>
+
+              <!-- ویزیت رایگان و تخفیف در یک ردیف -->
+              <div class="col-12">
+                <div class="border rounded p-2 bg-light mb-2">
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
+                    <label class="form-check-label text-success fw-bold" for="isFree">ویزیت رایگان</label>
+                  </div>
+                </div>
+              </div>
+
               <div class="col-12">
                 <div class="row g-2">
-                  <div class="col-md-6 position-relative">
+                  <div class="col-md-6">
                     <div class="border rounded p-2 bg-light">
-                      <div class="form-check mb-0">
-                        <input type="checkbox" class="form-check-input" id="isFree" wire:model.live="isFree">
-                        <label class="form-check-label" for="isFree">ویزیت رایگان</label>
+                      <label class="form-label fw-bold mb-1">تخفیف</label>
+                      <div class="input-group input-group-sm align-items-center">
+                        <input type="number" step="0.01" min="0" max="100" class="form-control"
+                          style="height: 40px;" wire:model.live.debounce.500ms="discountPercentage" x-data
+                          @click="$dispatch('open-modal', { name: 'discount-modal' })" placeholder="تخفیف (٪)"
+                          @if ($isFree) disabled @endif readonly>
+                        <span class="input-group-text" style="height: 40px;">٪</span>
                       </div>
                     </div>
                   </div>
-                  <div class="col-md-6 position-relative">
+                  <div class="col-md-6">
                     <div class="border rounded p-2 bg-light">
                       <label class="form-label fw-bold mb-1">نوع پرداخت</label>
-                      <select class="form-control h-50" wire:model.live="paymentMethod"
+                      <select class="form-select" wire:model.live="paymentMethod"
                         @if ($isFree) disabled @endif>
-                        <option value="online">آنلاین</option>
-                        <option value="cash">نقدی</option>
+                        <option value="online">پرداخت آنلاین</option>
+                        <option value="cash">پرداخت نقدی</option>
                         <option value="card_to_card">کارت به کارت</option>
                         <option value="pos">کارتخوان</option>
                       </select>
@@ -614,35 +630,36 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 position-relative">
-                <div class="border rounded p-2 bg-light position-relative">
-                  <label class="form-label fw-bold mb-1">تخفیف</label>
-                  <div class="input-with-spinner">
-                    <input type="number" step="0.01" min="0" max="100" class="form-control h-50"
-                      wire:model.live.debounce.500ms="discountPercentage" x-data
-                      @click="$dispatch('open-modal', { name: 'discount-modal' })" placeholder="تخفیف (٪)"
-                      @if ($isFree) disabled @endif readonly>
-                    <div class="spinner-custom-small {{ $isLoadingDiscount ? 'show-spinner' : '' }}"></div>
+
+              <div class="col-12">
+                <div class="border rounded p-4 bg-white shadow-sm">
+                  <h6 class="fw-bold mb-4 text-primary">جزئیات فاکتور</h6>
+
+                  <!-- قیمت پایه -->
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">قیمت پایه:</span>
+                    <span>{{ number_format($this->getBasePrice(), 0, '.', ',') }} تومان</span>
                   </div>
-                  @error('discountPercentage')
-                    <span class="text-danger small">{{ $message }}</span>
-                  @enderror
+
+                  <!-- نمایش مبلغ تخفیف -->
+                  @if ($discountPercentage > 0)
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <span class="text-danger">مبلغ تخفیف:</span>
+                      <span class="text-danger">-{{ number_format($discountAmount, 0, '.', ',') }} تومان</span>
+                    </div>
+                  @endif
+
+                  <!-- قیمت نهایی -->
+                  <div class="border-top border-bottom border-success py-3 mt-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="fw-bold text-success">قیمت نهایی:</span>
+                      <span class="fw-bold text-success fs-5">{{ number_format($finalPrice, 0, '.', ',') }}
+                        تومان</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="col-md-6 position-relative">
-                <div class="border rounded p-2 bg-light position-relative">
-                  <label class="form-label fw-bold mb-1">قیمت نهایی</label>
-                  <div class="input-with-spinner">
-                    <input type="text" class="form-control h-50" wire:model.live="finalPrice"
-                      value="{{ number_format($finalPrice, 0, '.', ',') }} تومان"
-                      @if ($isFree) disabled @endif readonly>
-                    <div class="spinner-custom-small {{ $isLoadingFinalPrice ? 'show-spinner' : '' }}"></div>
-                  </div>
-                  @error('finalPrice')
-                    <span class="text-danger small">{{ $message }}</span>
-                  @enderror
-                </div>
-              </div>
+
               <div class="col-12">
                 <div class="border rounded p-2 bg-light">
                   <label class="form-label fw-bold mb-1">توضیحات درمان</label>
@@ -1355,43 +1372,43 @@
 
         // Handle available times loaded event
         /*
-                                Livewire.on('available-times-loaded', (event) => {
-                                  console.log('Available times loaded:', event);
-                                  const times = event.times || [];
-                                  const $container = $('#available-times');
-                                  $container.empty();
+                                                        Livewire.on('available-times-loaded', (event) => {
+                                                          console.log('Available times loaded:', event);
+                                                          const times = event.times || [];
+                                                          const $container = $('#available-times');
+                                                          $container.empty();
 
-                                  if (times.length === 0) {
-                                    $container.html(
-                                      '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
-                                    return;
-                                  }
+                                                          if (times.length === 0) {
+                                                            $container.html(
+                                                              '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
+                                                            return;
+                                                          }
 
-                                  times.forEach(time => {
-                                    const $button = $(
-                                      `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
+                                                          times.forEach(time => {
+                                                            const $button = $(
+                                                              `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
         ${time}
       </button>`
-                                    );
-                                    $container.append($button);
-                                  });
+                                                            );
+                                                            $container.append($button);
+                                                          });
 
-                                  // Handle time selection
-                                  $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
-                                    const $btn = $(this);
-                                    const time = $btn.data('time');
+                                                          // Handle time selection
+                                                          $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+                                                            const $btn = $(this);
+                                                            const time = $btn.data('time');
 
-                                    // Remove selection from other buttons
-                                    $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+                                                            // Remove selection from other buttons
+                                                            $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
 
-                                    // Select this button
-                                    $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+                                                            // Select this button
+                                                            $btn.removeClass('btn-outline-primary').addClass('btn-primary');
 
-                                    // Update Livewire component
-                                    @this.set('appointmentTime', time);
-                                  });
-                                });
-                                */
+                                                            // Update Livewire component
+                                                            @this.set('appointmentTime', time);
+                                                          });
+                                                        });
+                                                        */
 
         // Handle modal close
         Livewire.on('close-modal', (event) => {
