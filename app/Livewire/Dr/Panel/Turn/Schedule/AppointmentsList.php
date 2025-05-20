@@ -1904,63 +1904,74 @@ class AppointmentsList extends Component
 
     public function storeWithUser()
     {
-        // Convert Jalali date to Gregorian before validation
-        $gregorianDate = null;
-        if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $this->appointmentDate)) {
-            try {
-                $normalizedDate = str_replace('/', '-', $this->appointmentDate);
-                $gregorianDate = Jalalian::fromFormat('Y-m-d', $normalizedDate)->toCarbon()->format('Y-m-d');
-            } catch (\Exception $e) {
-                $this->dispatch('show-toastr', ['message' => 'فرمت تاریخ نامعتبر است', 'type' => 'error']);
-                return;
+        try {
+            // Convert Jalali date to Gregorian before validation
+            $gregorianDate = null;
+            if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $this->appointmentDate)) {
+                try {
+                    $normalizedDate = str_replace('/', '-', $this->appointmentDate);
+                    $gregorianDate = Jalalian::fromFormat('Y-m-d', $normalizedDate)->toCarbon()->format('Y-m-d');
+                } catch (\Exception $e) {
+                    $this->dispatch('show-toastr', ['message' => 'فرمت تاریخ نامعتبر است', 'type' => 'error']);
+                    return;
+                }
+            } else {
+                $gregorianDate = $this->appointmentDate;
             }
-        } else {
-            $gregorianDate = $this->appointmentDate;
-        }
 
-        $this->validate([
-            'firstName' => 'required|string|max:255',
-            'lastName' => 'required|string|max:255',
-            'mobile' => 'required|string|size:11',
-            'nationalCode' => 'required|string|size:10',
-            'appointmentTime' => 'required',
-        ]);
-
-        $user = User::where('mobile', $this->mobile)
-                   ->orWhere('national_code', $this->nationalCode)
-                   ->first();
-
-        if (!$user) {
-            $user = User::create([
-                'first_name' => $this->firstName,
-                'last_name' => $this->lastName,
-                'mobile' => $this->mobile,
-                'national_code' => $this->nationalCode,
+            $this->validate([
+                'firstName' => 'required|string|max:255',
+                'lastName' => 'required|string|max:255',
+                'mobile' => 'required|string|size:11',
+                'nationalCode' => 'required|string|size:10',
+                'appointmentTime' => 'required',
             ]);
+
+            $user = User::where('mobile', $this->mobile)
+                       ->orWhere('national_code', $this->nationalCode)
+                       ->first();
+
+            if (!$user) {
+                $user = User::create([
+                    'first_name' => $this->firstName,
+                    'last_name' => $this->lastName,
+                    'mobile' => $this->mobile,
+                    'national_code' => $this->nationalCode,
+                ]);
+            }
+
+            $doctor = $this->getAuthenticatedDoctor();
+            $clinicId = $this->selectedClinicId;
+            Log::info($clinicId);
+            $appointment = Appointment::create([
+                'patient_id' => $user->id,
+                'doctor_id' => $doctor->id,
+                'clinic_id' => $clinicId,
+                'appointment_date' => $gregorianDate,
+                'appointment_time' => $this->appointmentTime,
+                'status' => 'scheduled',
+                'payment_status' => 'unpaid',
+                'appointment_type' => 'manual'
+            ]);
+
+            // Clear cache for this date
+            $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$clinicId}_date_{$gregorianDate}";
+            Cache::forget($cacheKey);
+
+            $this->reset(['firstName', 'lastName', 'mobile', 'nationalCode', 'appointmentDate', 'appointmentTime', 'selectedTime']);
+            $this->dispatch('close-modal', ['name' => 'add-sick-modal']);
+            $this->dispatch('show-toastr', ['message' => 'نوبت با موفقیت ثبت شد', 'type' => 'success']);
+            $this->loadAppointments();
+
+            // تغییر dispatch به فرمت صحیح
+            $this->dispatch('appointment-registered', [
+                'message' => 'نوبت با موفقیت ثبت شد'
+            ]);
+
+            session()->flash('message', 'نوبت با موفقیت ثبت شد.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'خطا در ثبت نوبت: ' . $e->getMessage());
         }
-
-        $doctor = $this->getAuthenticatedDoctor();
-        $clinicId = $this->selectedClinicId;
-        Log::info($clinicId);
-        $appointment = Appointment::create([
-            'patient_id' => $user->id,
-            'doctor_id' => $doctor->id,
-            'clinic_id' => $clinicId,
-            'appointment_date' => $gregorianDate,
-            'appointment_time' => $this->appointmentTime,
-            'status' => 'scheduled',
-            'payment_status' => 'unpaid',
-            'appointment_type' => 'manual'
-        ]);
-
-        // Clear cache for this date
-        $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$clinicId}_date_{$gregorianDate}";
-        Cache::forget($cacheKey);
-
-        $this->reset(['firstName', 'lastName', 'mobile', 'nationalCode', 'appointmentDate', 'appointmentTime', 'selectedTime']);
-        $this->dispatch('close-modal', ['name' => 'add-sick-modal']);
-        $this->dispatch('show-toastr', ['message' => 'نوبت با موفقیت ثبت شد', 'type' => 'success']);
-        $this->loadAppointments();
     }
 
     public function openTimeSelectionModal()

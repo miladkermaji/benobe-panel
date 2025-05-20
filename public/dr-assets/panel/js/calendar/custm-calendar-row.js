@@ -369,5 +369,14 @@ $(document).ready(function () {
         fetchAppointmentsCount();
     });
 
+    // Add event listener for appointment registration
+    Livewire.on("appointment-registered", (event) => {
+        console.log("Appointment registered event received:", event);
+        // اضافه کردن تاخیر کوتاه برای اطمینان از به‌روزرسانی داده‌ها
+        setTimeout(() => {
+            fetchAppointmentsCount();
+        }, 500);
+    });
+
     fetchAppointmentsCount();
 });
