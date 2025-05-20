@@ -342,7 +342,7 @@
       </x-modal>
     </div>
 
-    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="lg">
+    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="md">
       <x-slot:body>
         <form wire:submit.prevent="storeWithUser">
           <div class="row g-3">
