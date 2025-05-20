@@ -1972,128 +1972,135 @@ class AppointmentsList extends Component
         $this->loadAvailableTimes();
     }
 
-    private function loadAvailableTimes()
-    {
-        if (!$this->appointmentDate) {
-            Log::info('No appointment date selected');
-            $this->availableTimes = [];
-            return;
-        }
-
-        Log::info('Selected Jalali date: ' . $this->appointmentDate);
-
-        // Convert Jalali date to Gregorian
-        $gregorianDate = $this->convertToGregorian($this->appointmentDate);
-        if (!$gregorianDate) {
-            Log::error('Failed to convert Jalali date to Gregorian');
-            $this->availableTimes = [];
-            return;
-        }
-
-        // Check if the selected date is in the past
-        $now = Carbon::now('Asia/Tehran');
-        $selectedDate = Carbon::parse($gregorianDate, 'Asia/Tehran')->startOfDay();
-
-        if ($selectedDate->lt($now->startOfDay())) {
-            Log::info('Selected date is in the past');
-            $this->dispatch('show-toastr', ['message' => 'امکان ثبت نوبت برای تاریخ گذشته وجود ندارد', 'type' => 'error']);
-            $this->availableTimes = [];
-            return;
-        }
-
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
-
-        // Get doctor's work schedule for this day
-        $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-            ->where(function ($query) use ($clinicId) {
-                if ($clinicId === null) {
-                    $query->whereNull('clinic_id');
-                } else {
-                    $query->where('clinic_id', $clinicId);
-                }
-            })
-            ->where('day', strtolower(date('l', strtotime($gregorianDate))))
-            ->where('is_working', true)
-            ->first();
-
-        if (!$workSchedule) {
-            Log::info('No work schedule found for this day');
-            $this->availableTimes = [];
-            return;
-        }
-
-        // Get work hours from schedule
-        $workHours = json_decode($workSchedule->work_hours, true);
-
-        if (empty($workHours)) {
-            Log::info('No work hours found in schedule');
-            $this->availableTimes = [];
-            return;
-        }
-
-        // Get reserved appointments for this date
-        $reservedAppointments = Appointment::where('doctor_id', $doctorId)
-            ->where(function ($query) use ($clinicId) {
-                if ($clinicId === null) {
-                    $query->whereNull('clinic_id');
-                } else {
-                    $query->where('clinic_id', $clinicId);
-                }
-            })
-            ->whereDate('appointment_date', $gregorianDate)
-            ->where('status', '!=', 'cancelled')
-            ->whereNull('deleted_at')
-            ->get()
-            ->pluck('appointment_time')
-            ->map(function ($time) {
-                return Carbon::parse($time)->format('H:i');
-            })
-            ->toArray();
-
-        // Generate available time slots for each period
-        $availableTimes = [];
-        foreach ($workHours as $period) {
-            $periodStart = Carbon::createFromFormat('H:i', $period['start'], 'Asia/Tehran');
-            $periodEnd = Carbon::createFromFormat('H:i', $period['end'], 'Asia/Tehran');
-            $maxAppointments = $period['max_appointments'] ?? 0;
-
-            // Calculate total minutes in period
-            $totalMinutes = $periodStart->diffInMinutes($periodEnd);
-
-            // Calculate interval between appointments based on max_appointments
-            $intervalMinutes = floor($totalMinutes / $maxAppointments);
-
-            // Generate time slots
-            $currentTime = $periodStart->copy();
-            $slotsGenerated = 0;
-
-            while ($currentTime->lt($periodEnd) && $slotsGenerated < $maxAppointments) {
-                $timeStr = $currentTime->format('H:i');
-
-                // Skip if time is in the past (for today)
-                if ($selectedDate->isSameDay($now) && $currentTime->lte($now)) {
-                    $currentTime->addMinutes($intervalMinutes);
-                    continue;
-                }
-
-                // Skip if time is already reserved
-                if (in_array($timeStr, $reservedAppointments)) {
-                    $currentTime->addMinutes($intervalMinutes);
-                    continue;
-                }
-
-                $availableTimes[] = $timeStr;
-                $slotsGenerated++;
-                $currentTime->addMinutes($intervalMinutes);
-            }
-        }
-
-        Log::info('Final available times: ' . json_encode($availableTimes));
-
-        $this->availableTimes = $availableTimes;
-        $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
+private function loadAvailableTimes()
+{
+    if (!$this->appointmentDate) {
+        Log::info('No appointment date selected');
+        $this->availableTimes = [];
+        return;
     }
+
+    Log::info('Selected Jalali date: ' . $this->appointmentDate);
+
+    // Convert Jalali date to Gregorian
+    $gregorianDate = $this->convertToGregorian($this->appointmentDate);
+    if (!$gregorianDate) {
+        Log::error('Failed to convert Jalali date to Gregorian');
+        $this->availableTimes = [];
+        return;
+    }
+
+    // Get current time with proper timezone
+    $now = Carbon::now('Asia/Tehran');
+    $currentTimeStr = $now->format('H:i');
+    Log::info('Current time: ' . $currentTimeStr);
+    
+    $selectedDate = Carbon::parse($gregorianDate, 'Asia/Tehran')->startOfDay();
+
+    if ($selectedDate->lt($now->startOfDay())) {
+        Log::info('Selected date is in the past');
+        $this->dispatch('show-toastr', ['message' => 'امکان ثبت نوبت برای تاریخ گذشته وجود ندارد', 'type' => 'error']);
+        $this->availableTimes = [];
+        return;
+    }
+
+    $doctorId = $this->getAuthenticatedDoctor()->id;
+    $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+
+    // Get doctor's work schedule for this day
+    $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+        ->where(function ($query) use ($clinicId) {
+            if ($clinicId === null) {
+                $query->whereNull('clinic_id');
+            } else {
+                $query->where('clinic_id', $clinicId);
+            }
+        })
+        ->where('day', strtolower(date('l', strtotime($gregorianDate))))
+        ->where('is_working', true)
+        ->first();
+
+    if (!$workSchedule) {
+        Log::info('No work schedule found for this day');
+        $this->availableTimes = [];
+        return;
+    }
+
+    // Get work hours from schedule
+    $workHours = json_decode($workSchedule->work_hours, true);
+
+    if (empty($workHours)) {
+        Log::info('No work hours found in schedule');
+        $this->availableTimes = [];
+        return;
+    }
+
+    // Get reserved appointments for this date
+    $reservedAppointments = Appointment::where('doctor_id', $doctorId)
+        ->where(function ($query) use ($clinicId) {
+            if ($clinicId === null) {
+                $query->whereNull('clinic_id');
+            } else {
+                $query->where('clinic_id', $clinicId);
+            }
+        })
+        ->whereDate('appointment_date', $gregorianDate)
+        ->where('status', '!=', 'cancelled')
+        ->whereNull('deleted_at')
+        ->get()
+        ->pluck('appointment_time')
+        ->map(function ($time) {
+            return Carbon::parse($time)->format('H:i');
+        })
+        ->toArray();
+
+    // Generate available time slots for each period
+    $availableTimes = [];
+    foreach ($workHours as $period) {
+        $periodStart = Carbon::createFromFormat('H:i', $period['start'], 'Asia/Tehran');
+        $periodEnd = Carbon::createFromFormat('H:i', $period['end'], 'Asia/Tehran');
+        $maxAppointments = $period['max_appointments'] ?? 0;
+
+        // Calculate total minutes in period
+        $totalMinutes = $periodStart->diffInMinutes($periodEnd);
+
+        // Calculate interval between appointments based on max_appointments
+        $intervalMinutes = floor($totalMinutes / $maxAppointments);
+
+        // Generate time slots
+        $slotTime = $periodStart->copy();
+        $slotsGenerated = 0;
+
+        while ($slotTime->lt($periodEnd) && $slotsGenerated < $maxAppointments) {
+            $timeStr = $slotTime->format('H:i');
+            
+            // Skip if time is in the past (for today)
+            if ($selectedDate->isSameDay($now)) {
+                // For today, compare with current time
+                if ($timeStr <= $currentTimeStr) {
+                    Log::info("Skipping past time slot: {$timeStr} (current time: {$currentTimeStr})");
+                    $slotTime->addMinutes($intervalMinutes);
+                    continue;
+                }
+            }
+
+            // Skip if time is already reserved
+            if (in_array($timeStr, $reservedAppointments)) {
+                $slotTime->addMinutes($intervalMinutes);
+                continue;
+            }
+
+            $availableTimes[] = $timeStr;
+            $slotsGenerated++;
+            $slotTime->addMinutes($intervalMinutes);
+        }
+    }
+
+    Log::info('Final available times: ' . json_encode($availableTimes));
+
+    $this->availableTimes = $availableTimes;
+    $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
+}
 
     public function selectTime($time = null)
     {
