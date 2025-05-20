@@ -285,6 +285,19 @@ class DoctorAppointmentController extends Controller
                 $emergencyTimes = is_string($specialSchedule->emergency_times) ? json_decode($specialSchedule->emergency_times, true) : ($specialSchedule->emergency_times ?? []);
                 if (!empty($workHours) && isset($workHours[0]['max_appointments'])) {
                     $maxAppointments = $workHours[0]['max_appointments'];
+                    // محاسبه duration بر اساس max_appointments
+                    $startTime = Carbon::parse($checkDateString . ' ' . $workHours[0]['start'], 'Asia/Tehran');
+                    $endTime = Carbon::parse($checkDateString . ' ' . $workHours[0]['end'], 'Asia/Tehran');
+                    $totalMinutes = $startTime->diffInMinutes($endTime);
+                    $duration = floor($totalMinutes / $maxAppointments);
+                    Log::debug("GetNextAvailableSlot - Calculated duration", [
+                        'doctor_id' => $doctorId,
+                        'clinic_id' => $clinicId,
+                        'day' => $dayName,
+                        'total_minutes' => $totalMinutes,
+                        'max_appointments' => $maxAppointments,
+                        'duration' => $duration,
+                    ]);
                 }
             } else {
                 $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
@@ -401,16 +414,23 @@ class DoctorAppointmentController extends Controller
                 if (isset($workHour['max_appointments']) && $workHour['max_appointments'] > 0) {
                     $totalMinutes = $startTime->diffInMinutes($endTime);
                     $duration = floor($totalMinutes / $workHour['max_appointments']);
+                    Log::debug("GetNextAvailableSlot - Calculated duration", [
+                        'doctor_id' => $doctorId,
+                        'clinic_id' => $clinicId,
+                        'day' => $dayName,
+                        'total_minutes' => $totalMinutes,
+                        'max_appointments' => $workHour['max_appointments'],
+                        'duration' => $duration,
+                    ]);
+                } else {
+                    Log::warning("GetNextAvailableSlot - No max_appointments set for work hour", [
+                        'doctor_id' => $doctorId,
+                        'clinic_id' => $clinicId,
+                        'day' => $dayName,
+                        'work_hour' => $workHour,
+                    ]);
+                    continue;
                 }
-
-                Log::debug("GetNextAvailableSlot - Calculated duration", [
-                    'doctor_id' => $doctorId,
-                    'clinic_id' => $clinicId,
-                    'day' => $dayName,
-                    'total_minutes' => $startTime->diffInMinutes($endTime),
-                    'max_appointments' => $workHour['max_appointments'] ?? null,
-                    'duration' => $duration,
-                ]);
 
                 $currentTime = $startTime->copy();
                 while ($currentTime->lessThan($endTime)) {

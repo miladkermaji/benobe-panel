@@ -651,6 +651,22 @@ class AppointmentBookingController extends Controller
             $appointmentSettings = json_decode($workSchedule->appointment_settings, true);
             $duration = $appointmentSettings[0]['appointment_duration'] ?? 15;
 
+            // محاسبه duration بر اساس max_appointments
+            if (!empty($workHours) && isset($workHours[0]['max_appointments'])) {
+                $startTime = Carbon::parse("{$date} {$workHours[0]['start']}", 'Asia/Tehran');
+                $endTime = Carbon::parse("{$date} {$workHours[0]['end']}", 'Asia/Tehran');
+                $totalMinutes = $startTime->diffInMinutes($endTime);
+                $duration = floor($totalMinutes / $workHours[0]['max_appointments']);
+                Log::debug("GetAppointmentOptions - Calculated duration", [
+                    'doctor_id' => $doctorId,
+                    'clinic_id' => $mainClinic->id,
+                    'date' => $date,
+                    'total_minutes' => $totalMinutes,
+                    'max_appointments' => $workHours[0]['max_appointments'],
+                    'duration' => $duration,
+                ]);
+            }
+
             // دریافت زمان‌های رزروشده
             $reservedTimes = $serviceType === 'in_person'
                 ? Appointment::where('doctor_id', $doctor->id)
@@ -728,6 +744,36 @@ class AppointmentBookingController extends Controller
         $mainClinic = $clinicId ? $doctor->clinics->where('id', $clinicId)->first() :
             ($doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first());
         $clinicId = $mainClinic ? $mainClinic->id : $clinicId;
+
+        // دریافت زمان‌های مجاز از getAppointmentOptions
+        $request = new Request([
+            'service_type' => $serviceType,
+            'date' => $appointmentDate,
+            'clinic_id' => $clinicId
+        ]);
+
+        $appointmentOptions = $this->getAppointmentOptions($request, $doctor->id);
+        if ($appointmentOptions->getStatusCode() !== 200) {
+            Log::warning("CheckSlotAvailability - Failed to get appointment options for doctor {$doctor->id}");
+            return false;
+        }
+
+        $responseData = json_decode($appointmentOptions->getContent(), true);
+        if (!isset($responseData['data']['available_times'])) {
+            Log::warning("CheckSlotAvailability - Invalid response format from getAppointmentOptions for doctor {$doctor->id}");
+            return false;
+        }
+
+        $availableTimes = $responseData['data']['available_times'];
+
+        // بررسی اینکه زمان درخواستی در لیست زمان‌های مجاز هست یا نه
+        if (!in_array($appointmentTime, $availableTimes)) {
+            Log::warning("CheckSlotAvailability - Requested time {$appointmentTime} is not in available times list for doctor {$doctor->id}", [
+                'available_times' => $availableTimes,
+                'requested_time' => $appointmentTime
+            ]);
+            return false;
+        }
 
         // بررسی تعطیلات
         if ($serviceType === 'in_person') {
