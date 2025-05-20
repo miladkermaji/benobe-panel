@@ -1033,13 +1033,15 @@ class AppointmentsList extends Component
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $cacheKey = "insurances_doctor_{$doctorId}_clinic_{$this->selectedClinicId}";
         $this->insurances = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctorId) {
-            return DoctorService::where('doctor_id', $doctorId)
+            return DoctorService::select('insurance_id')
+                ->where('doctor_id', $doctorId)
                 ->where('clinic_id', $this->selectedClinicId === 'default' ? null : $this->selectedClinicId)
+                ->distinct()
                 ->with('insurance')
-                ->distinct('insurance_id')
                 ->get()
                 ->pluck('insurance')
                 ->filter()
+                ->unique('id')
                 ->values()
                 ->toArray();
         });
