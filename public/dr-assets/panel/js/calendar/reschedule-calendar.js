@@ -543,7 +543,6 @@ async function handleDayClick(dayElement) {
             });
 
             console.log("Available times response:", response);
-            // اصلاح: دسترسی به آرایه times از پاسخ
             const availableTimes =
                 Array.isArray(response) && response.length > 0
                     ? response[0].times
@@ -559,41 +558,58 @@ async function handleDayClick(dayElement) {
                 return;
             }
 
-            const timeOptions = availableTimes
-                .map((time) => `<option value="${time}">${time}</option>`)
-                .join("");
-
-            console.log(
-                "Showing time selection modal with options:",
-                timeOptions
+            // نمایش مودال زمان‌ها به جای SweetAlert
+            window.dispatchEvent(
+                new CustomEvent("open-modal", {
+                    detail: {
+                        name: "reschedule-time-modal",
+                    },
+                })
             );
-            const { value: selectedTime } = await Swal.fire({
-                title: "انتخاب زمان",
-                html: `
-                    <div class="mb-3">
-                        <label class="form-label">زمان نوبت را انتخاب کنید:</label>
-                        <select id="timeSelect" class="form-select">
-                            ${timeOptions}
-                        </select>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: "تایید",
-                cancelButtonText: "انصراف",
-                focusConfirm: false,
-                didOpen: () => {
-                    const select = document.getElementById("timeSelect");
-                    select.focus();
-                },
-                preConfirm: () => document.getElementById("timeSelect").value,
-            });
 
-            if (selectedTime) {
-                console.log("Selected time:", selectedTime);
-                Livewire.dispatch("rescheduleAppointment", {
-                    appointmentIds: selectedIds,
-                    newDate: date,
-                    selectedTime: selectedTime,
+            // پاک کردن زمان‌های قبلی و اضافه کردن زمان‌های جدید
+            const container = document.getElementById(
+                "reschedule-available-times"
+            );
+            if (container) {
+                container.innerHTML = "";
+                availableTimes.forEach((time) => {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className =
+                        "btn btn-outline-primary m-1 reschedule-time-btn";
+                    button.setAttribute("data-time", time);
+                    button.textContent = time;
+                    button.onclick = async () => {
+                        // بستن مودال زمان‌ها
+                        window.dispatchEvent(
+                            new CustomEvent("close-modal", {
+                                detail: {
+                                    name: "reschedule-time-modal",
+                                },
+                            })
+                        );
+
+                        // نمایش تأییدیه با SweetAlert
+                        const result = await Swal.fire({
+                            title: "تأیید جابجایی نوبت",
+                            html: `آیا مایلید نوبت ${time} تاریخ ${jalaliDate} را به ساعت ${time} تاریخ ${jalaliDate} منتقل کنید؟`,
+                            icon: "question",
+                            showCancelButton: true,
+                            confirmButtonText: "بله، منتقل کن",
+                            cancelButtonText: "خیر",
+                            reverseButtons: true,
+                        });
+
+                        if (result.isConfirmed) {
+                            Livewire.dispatch("rescheduleAppointment", {
+                                appointmentIds: selectedIds,
+                                newDate: date,
+                                selectedTime: time,
+                            });
+                        }
+                    };
+                    container.appendChild(button);
                 });
             }
         } catch (error) {

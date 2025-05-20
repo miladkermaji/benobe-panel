@@ -757,6 +757,30 @@
       </x-modal>
     </div>
 
+    <!-- Add new modal for reschedule time selection -->
+    <div wire:ignore>
+      <x-modal name="reschedule-time-modal" title="انتخاب ساعت نوبت جدید" size="md">
+        <x-slot:body>
+          <div class="time-selection-container">
+            <div class="d-flex flex-wrap gap-2 justify-content-center" id="reschedule-available-times">
+              @if (empty($availableTimes))
+                <div class="alert alert-info w-100 text-center">
+                  هیچ ساعت خالی برای این تاریخ یافت نشد
+                </div>
+              @else
+                @foreach ($availableTimes as $time)
+                  <button type="button" class="btn btn-outline-primary m-1 reschedule-time-btn"
+                    data-time="{{ $time }}">
+                    {{ $time }}
+                  </button>
+                @endforeach
+              @endif
+            </div>
+          </div>
+        </x-slot:body>
+      </x-modal>
+    </div>
+
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         // استفاده از Event Delegation برای مدیریت کلیک و لمس
@@ -1385,43 +1409,43 @@
 
         // Handle available times loaded event
         /*
-                                                                    Livewire.on('available-times-loaded', (event) => {
-                                                                      console.log('Available times loaded:', event);
-                                                                      const times = event.times || [];
-                                                                      const $container = $('#available-times');
-                                                                      $container.empty();
+                                                                            Livewire.on('available-times-loaded', (event) => {
+                                                                              console.log('Available times loaded:', event);
+                                                                              const times = event.times || [];
+                                                                              const $container = $('#available-times');
+                                                                              $container.empty();
 
-                                                                      if (times.length === 0) {
-                                                                        $container.html(
-                                                                          '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
-                                                                        return;
-                                                                      }
+                                                                              if (times.length === 0) {
+                                                                                $container.html(
+                                                                                  '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
+                                                                                return;
+                                                                              }
 
-                                                                      times.forEach(time => {
-                                                                        const $button = $(
-                                                                          `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
+                                                                              times.forEach(time => {
+                                                                                const $button = $(
+                                                                                  `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
         ${time}
       </button>`
-                                                                        );
-                                                                        $container.append($button);
-                                                                      });
+                                                                                );
+                                                                                $container.append($button);
+                                                                              });
 
-                                                                      // Handle time selection
-                                                                      $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
-                                                                        const $btn = $(this);
-                                                                        const time = $btn.data('time');
+                                                                              // Handle time selection
+                                                                              $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+                                                                                const $btn = $(this);
+                                                                                const time = $btn.data('time');
 
-                                                                        // Remove selection from other buttons
-                                                                        $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+                                                                                // Remove selection from other buttons
+                                                                                $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
 
-                                                                        // Select this button
-                                                                        $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+                                                                                // Select this button
+                                                                                $btn.removeClass('btn-outline-primary').addClass('btn-primary');
 
-                                                                        // Update Livewire component
-                                                                        @this.set('appointmentTime', time);
-                                                                      });
-                                                                    });
-                                                                    */
+                                                                                // Update Livewire component
+                                                                                @this.set('appointmentTime', time);
+                                                                              });
+                                                                            });
+                                                                            */
 
         // Handle modal close
         Livewire.on('close-modal', (event) => {
