@@ -111,6 +111,7 @@ class AppointmentsList extends Component
         'applyDiscount' => 'applyDiscount',
         'get-services' => 'getServices',
         'getAvailableTimesForDate' => 'getAvailableTimesForDate',
+        'getAppointmentDetails' => 'getAppointmentDetails',
     ];
     public $showNoResultsAlert = false;
     public $searchResults = [];
@@ -2244,9 +2245,9 @@ class AppointmentsList extends Component
             // اگر زمان انتخاب شده باشد، بررسی می‌کنیم که در برنامه کاری باشد
             if ($selectedTime) {
                 $isTimeValid = false;
-                foreach ($workSchedule as $schedule) {
-                    $startTime = Carbon::parse($schedule['start_time']);
-                    $endTime = Carbon::parse($schedule['end_time']);
+                foreach ($workSchedule['work_hours'] as $period) {
+                    $startTime = Carbon::parse($period['start']);
+                    $endTime = Carbon::parse($period['end']);
                     $selectedDateTime = Carbon::parse($selectedTime);
 
                     if ($selectedDateTime->between($startTime, $endTime)) {
@@ -2275,9 +2276,9 @@ class AppointmentsList extends Component
             foreach ($appointmentIds as $appointmentId) {
                 $appointment = Appointment::find($appointmentId);
                 if ($appointment) {
-                    $appointment->appointment_date = $gregorianDate;
+                    $appointment->appointment_date = $gregorianDate->format('Y-m-d');
                     if ($selectedTime) {
-                        $appointment->appointment_time = $selectedTime;
+                        $appointment->appointment_time = Carbon::createFromFormat('H:i', $selectedTime);
                     }
                     $appointment->save();
                     $updatedCount++;
@@ -2436,5 +2437,40 @@ class AppointmentsList extends Component
     public function render()
     {
         return view('livewire.dr.panel.turn.schedule.appointments-list');
+    }
+
+    #[On('getAppointmentDetails')]
+    public function getAppointmentDetails($appointmentId = null, $appointmentIds = null)
+    {
+        $doctor = $this->getAuthenticatedDoctor();
+        if (!$doctor) {
+            return;
+        }
+
+        $query = Appointment::query()
+            ->where('doctor_id', $doctor->id)
+            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', 'deleted')
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
+
+        if ($appointmentId) {
+            $query->where('id', $appointmentId);
+        } elseif ($appointmentIds) {
+            $query->whereIn('id', $appointmentIds);
+        }
+
+        $appointments = $query->get(['id', 'appointment_date', 'appointment_time'])->map(function ($appointment) {
+            // Convert UTC time to local time and format it
+            $localTime = Carbon::parse($appointment->appointment_time)->format('H:i');
+            $localDate = Carbon::parse($appointment->appointment_date)->format('Y-m-d');
+
+            return [
+                'id' => $appointment->id,
+                'appointment_date' => $localDate,
+                'appointment_time' => $localTime,
+            ];
+        });
+
+        $this->dispatch('appointment-details-received', $appointments->toArray());
     }
 }

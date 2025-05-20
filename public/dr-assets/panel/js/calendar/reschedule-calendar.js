@@ -516,11 +516,54 @@ async function handleDayClick(dayElement) {
         try {
             console.log("Fetching available times for date:", date);
 
-            // استفاده از Livewire.dispatch به جای dispatchTo
-            Livewire.dispatch("getAvailableTimesForDate", { date });
+            // Get the original appointment details using dispatchTo
+            const appointmentDetails = await new Promise((resolve, reject) => {
+                const timeoutId = setTimeout(() => {
+                    window.removeEventListener(
+                        "appointment-details-received",
+                        handler
+                    );
+                    reject(
+                        new Error("Timeout waiting for appointment details")
+                    );
+                }, 10000);
 
-            // منتظر پاسخ از Livewire
-            const response = await new Promise((resolve, reject) => {
+                const handler = (event) => {
+                    console.log("Received appointment details:", event.detail);
+                    clearTimeout(timeoutId);
+                    window.removeEventListener(
+                        "appointment-details-received",
+                        handler
+                    );
+                    resolve(event.detail[0]);
+                };
+
+                window.addEventListener(
+                    "appointment-details-received",
+                    handler
+                );
+                Livewire.dispatchTo(
+                    "dr.panel.turn.schedule.appointments-list",
+                    "getAppointmentDetails",
+                    {
+                        appointmentId: selectedIds[0],
+                    }
+                );
+            });
+
+            if (!appointmentDetails || !appointmentDetails[0]) {
+                throw new Error("No appointment details received");
+            }
+
+            const appointment = appointmentDetails[0];
+            const originalDate = appointment.appointment_date;
+            const originalTime = appointment.appointment_time;
+            const originalJalaliDate = moment(originalDate)
+                .locale("fa")
+                .format("jYYYY/jMM/jDD");
+
+            // Get available times
+            const availableTimes = await new Promise((resolve, reject) => {
                 const timeoutId = setTimeout(() => {
                     window.removeEventListener(
                         "available-times-updated",
@@ -536,19 +579,20 @@ async function handleDayClick(dayElement) {
                         "available-times-updated",
                         handler
                     );
-                    resolve(event.detail);
+                    resolve(event.detail[0]);
                 };
 
                 window.addEventListener("available-times-updated", handler);
+                Livewire.dispatchTo(
+                    "dr.panel.turn.schedule.appointments-list",
+                    "getAvailableTimesForDate",
+                    { date }
+                );
             });
 
-            console.log("Available times response:", response);
-            const availableTimes =
-                Array.isArray(response) && response.length > 0
-                    ? response[0].times
-                    : [];
+            const times = availableTimes?.times || [];
 
-            if (!availableTimes || availableTimes.length === 0) {
+            if (!times || times.length === 0) {
                 Swal.fire({
                     title: "هشدار",
                     text: "هیچ زمان کاری خالی برای این تاریخ وجود ندارد.",
@@ -573,7 +617,7 @@ async function handleDayClick(dayElement) {
             );
             if (container) {
                 container.innerHTML = "";
-                availableTimes.forEach((time) => {
+                times.forEach((time) => {
                     const button = document.createElement("button");
                     button.type = "button";
                     button.className =
@@ -593,7 +637,7 @@ async function handleDayClick(dayElement) {
                         // نمایش تأییدیه با SweetAlert
                         const result = await Swal.fire({
                             title: "تأیید جابجایی نوبت",
-                            html: `آیا مایلید نوبت ${time} تاریخ ${jalaliDate} را به ساعت ${time} تاریخ ${jalaliDate} منتقل کنید؟`,
+                            html: `آیا مایلید نوبت ${originalTime} تاریخ ${originalJalaliDate} را به ساعت ${time} تاریخ ${jalaliDate} منتقل کنید؟`,
                             icon: "question",
                             showCancelButton: true,
                             confirmButtonText: "بله، منتقل کن",
@@ -602,11 +646,20 @@ async function handleDayClick(dayElement) {
                         });
 
                         if (result.isConfirmed) {
-                            Livewire.dispatch("rescheduleAppointment", {
+                            console.log("Rescheduling appointment:", {
                                 appointmentIds: selectedIds,
                                 newDate: date,
                                 selectedTime: time,
                             });
+                            Livewire.dispatchTo(
+                                "dr.panel.turn.schedule.appointments-list",
+                                "rescheduleAppointment",
+                                {
+                                    appointmentIds: selectedIds,
+                                    newDate: date,
+                                    selectedTime: time,
+                                }
+                            );
                         }
                     };
                     container.appendChild(button);
@@ -622,9 +675,26 @@ async function handleDayClick(dayElement) {
             });
         }
     } else {
+        // Get original appointment details for multiple appointments
+        const appointments = await Livewire.dispatch("getAppointmentDetails", {
+            appointmentIds: selectedIds,
+        });
+        const originalDates =
+            appointments[0]?.map((app) => ({
+                date: moment(app.appointment_date)
+                    .locale("fa")
+                    .format("jYYYY/jMM/jDD"),
+                time: app.appointment_time,
+            })) || [];
+
         const result = await Swal.fire({
             title: "تایید جابجایی",
-            text: `آیا از جابجایی ${selectedIds.length} نوبت به تاریخ ${jalaliDate} اطمینان دارید؟`,
+            html: `آیا از جابجایی ${
+                selectedIds.length
+            } نوبت به تاریخ ${jalaliDate} اطمینان دارید؟<br><br>
+                  <small>نوبت‌های فعلی:<br>${originalDates
+                      .map((d) => `${d.time} تاریخ ${d.date}`)
+                      .join("<br>")}</small>`,
             icon: "question",
             showCancelButton: true,
             confirmButtonText: "بله",
