@@ -7,10 +7,11 @@ use App\Models\Specialty;
 use Morilog\Jalali\Jalalian;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Appointment extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes,HasFactory;
     protected $fillable = [
         'doctor_id',
         'patient_id',
