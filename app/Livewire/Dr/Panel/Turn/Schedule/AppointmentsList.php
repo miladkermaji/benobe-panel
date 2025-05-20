@@ -359,13 +359,17 @@ class AppointmentsList extends Component
     public function updateSelectedDate($date)
     {
         $selectedDate = is_array($date) && isset($date['date']) ? $date['date'] : $date;
-        $this->selectedDate = $selectedDate;
-        $this->isSearchingAllDates = false;
-        $this->filterStatus = '';
-        $this->dateFilter = '';
-        $this->resetPage();
-        $this->appointments = [];
-        $this->loadAppointments();
+
+        // Only update if the date has actually changed
+        if ($this->selectedDate !== $selectedDate) {
+            $this->selectedDate = $selectedDate;
+            $this->isSearchingAllDates = false;
+            $this->filterStatus = '';
+            $this->dateFilter = '';
+            $this->resetPage();
+            $this->appointments = [];
+            $this->loadAppointments();
+        }
     }
     private function getAuthenticatedDoctor()
     {
