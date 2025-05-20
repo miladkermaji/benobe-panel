@@ -62,13 +62,6 @@ class AppointmentBookingController extends Controller
             // پیدا کردن پزشک
             $doctor = Doctor::where('id', $doctorId)
                 ->where('status', true)
-                ->with([
-                    'specialty' => fn ($q) => $q->select('id', 'name'),
-                    'province'  => fn ($q) => $q->select('id', 'name'),
-                    'clinics'   => fn ($q) => $q->where('is_active', true)
-                        ->with(['city' => fn ($q) => $q->select('id', 'name')])
-                        ->select('id', 'doctor_id', 'address', 'province_id', 'city_id', 'is_main_clinic'),
-                ])
                 ->first();
 
             if (! $doctor) {
@@ -90,8 +83,9 @@ class AppointmentBookingController extends Controller
             }
 
             // اطلاعات کلینیک
-            $mainClinic = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
-            $city       = $mainClinic && $mainClinic->city ? $mainClinic->city->name : 'نامشخص';
+            $mainClinic = $doctor->clinics()->where('is_active', true)->where('is_main_clinic', true)->first()
+                ?? $doctor->clinics()->where('is_active', true)->first();
+            $city = $mainClinic ? $mainClinic->city()->value('name') : 'نامشخص';
 
             // تبدیل تاریخ به شمسی
             $jalaliDate        = Jalalian::fromCarbon(Carbon::parse("$appointmentDate $appointmentTime", 'Asia/Tehran'));
@@ -112,10 +106,10 @@ class AppointmentBookingController extends Controller
                 'doctor'      => [
                     'id'           => $doctor->id,
                     'name'         => $doctor->display_name ?? ($doctor->first_name . ' ' . $doctor->last_name),
-                    'specialty'    => $doctor->specialty?->name ?? 'نامشخص',
+                    'specialty'    => $doctor->specialty()->value('name') ?? 'نامشخص',
                     'avatar'       => $doctor->profile_photo_path ? asset('storage/' . $doctor->profile_photo_path) : '/default-avatar.png',
                     'location'     => [
-                        'province' => $doctor->province?->name ?? 'نامشخص',
+                        'province' => $doctor->province()->value('name') ?? 'نامشخص',
                         'city'     => $city,
                         'address'  => $mainClinic?->address ?? 'نامشخص',
                     ],
@@ -172,7 +166,7 @@ class AppointmentBookingController extends Controller
                 'email'            => 'nullable|email|unique:users,email',
                 'success_redirect' => 'nullable|url',
                 'error_redirect'   => 'nullable|url',
-                'clinic_id'        => 'nullable|integer|exists:clinics,id', // clinic_id اختیاری
+                'clinic_id'        => 'nullable|integer|exists:clinics,id',
             ], [
                 'appointment_date.required'    => 'تاریخ نوبت الزامی است.',
                 'appointment_date.date_format' => 'فرمت تاریخ نوبت باید به شکل YYYY-MM-DD باشد (مثلاً 2025-03-22).',
@@ -210,7 +204,7 @@ class AppointmentBookingController extends Controller
                 $patientType = $request->input('patient_type');
                 $successRedirect = $request->input('success_redirect');
                 $errorRedirect = $request->input('error_redirect');
-                $clinicId = $request->input('clinic_id'); // دریافت clinic_id از بدن درخواست
+                $clinicId = $request->input('clinic_id');
 
                 // گرفتن کاربر احراز هویت‌شده
                 $authenticatedUser = $request->attributes->get('user');
@@ -225,7 +219,6 @@ class AppointmentBookingController extends Controller
                 // پیدا کردن پزشک
                 $doctor = Doctor::where('id', $doctorId)
                     ->where('status', true)
-                    ->with(['clinics' => fn ($q) => $q->where('is_active', true)])
                     ->first();
 
                 if (!$doctor) {
@@ -240,7 +233,7 @@ class AppointmentBookingController extends Controller
                 $mainClinic = null;
                 if ($clinicId) {
                     // اگر clinic_id در درخواست ارسال شده، کلینیک مربوطه را پیدا کن
-                    $mainClinic = $doctor->clinics->where('id', $clinicId)->first();
+                    $mainClinic = $doctor->clinics()->where('id', $clinicId)->where('is_active', true)->first();
                     if (!$mainClinic) {
                         return response()->json([
                             'status' => 'error',
@@ -250,10 +243,11 @@ class AppointmentBookingController extends Controller
                     }
                 } else {
                     // اگر clinic_id ارسال نشده، کلینیک اصلی یا اولین کلینیک فعال را انتخاب کن
-                    $mainClinic = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
+                    $mainClinic = $doctor->clinics()->where('is_active', true)->where('is_main_clinic', true)->first()
+                        ?? $doctor->clinics()->where('is_active', true)->first();
                 }
 
-                // اگر کلینیک پیدا نشد، clinic_id را NULL تنظیم کن (سازگار با دیتابیس فعلی)
+                // اگر کلینیک پیدا نشد، clinic_id را NULL تنظیم کن
                 $clinicId = $mainClinic ? $mainClinic->id : null;
 
                 // بررسی در دسترس بودن نوبت
@@ -330,7 +324,7 @@ class AppointmentBookingController extends Controller
                 $appointmentData = [
                     'doctor_id' => $doctor->id,
                     'patient_id' => $patient->id,
-                    'clinic_id' => $clinicId, // استفاده از clinic_id اختیاری
+                    'clinic_id' => $clinicId,
                     'appointment_date' => $appointmentDate,
                     'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),
                     'fee' => $totalFee,
@@ -617,7 +611,8 @@ class AppointmentBookingController extends Controller
             $serviceType = $request->input('service_type', 'in_person');
             $date = $request->input('date', now()->format('Y-m-d'));
 
-            $mainClinic = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
+            $mainClinic = $doctor->clinics()->where('is_active', true)->where('is_main_clinic', true)->first()
+                ?? $doctor->clinics()->where('is_active', true)->first();
             if (!$mainClinic) {
                 return response()->json([
                     'status' => 'error',
@@ -683,9 +678,11 @@ class AppointmentBookingController extends Controller
                     ->where('payment_status', 'paid')
                     ->pluck('appointment_time')
                     ->toArray();
+
             Log::debug("GetAppointmentOptions - Reserved times for doctor {$doctorId} on {$date} for service type {$serviceType}", [
                 'reserved_times' => $reservedTimes,
             ]);
+
             // محاسبه زمان‌های فعال
             $availableTimes = [];
             foreach ($workHours as $slot) {
@@ -700,9 +697,11 @@ class AppointmentBookingController extends Controller
                     $start->addMinutes($duration);
                 }
             }
+
             Log::debug("GetAppointmentOptions - Available times for doctor {$doctorId} on {$date} for service type {$serviceType}", [
                 'available_times' => $availableTimes,
             ]);
+
             return response()->json([
                 'status' => 'success',
                 'data' => [

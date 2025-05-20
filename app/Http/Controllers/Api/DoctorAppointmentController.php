@@ -29,7 +29,7 @@ class DoctorAppointmentController extends Controller
     public function getAppointmentOptions(Request $request, $doctorId)
     {
         try {
-            $doctor = Doctor::with(['province', 'city', 'specialty'])->find($doctorId);
+            $doctor = Doctor::find($doctorId);
             if (!$doctor) {
                 return response()->json([
                     'status'  => 'error',
@@ -38,8 +38,7 @@ class DoctorAppointmentController extends Controller
                 ], 404);
             }
 
-            $clinics = Clinic::with(['province', 'city'])
-                ->where('doctor_id', $doctorId)
+            $clinics = Clinic::where('doctor_id', $doctorId)
                 ->where('is_active', true)
                 ->select('id', 'name', 'province_id', 'city_id', 'address', 'phone_number', 'is_main_clinic')
                 ->get();
@@ -81,9 +80,9 @@ class DoctorAppointmentController extends Controller
                     'doctor' => [
                         'name'        => $doctor->full_name,
                         'slug'        => $doctor->slug,
-                        'specialty'   => $doctor->specialty ? $doctor->specialty->name : 'نامشخص',
-                        'province'    => $doctor->province ? $doctor->province->name : null,
-                        'city'        => $doctor->city ? $doctor->city->name : null,
+                        'specialty'   => $doctor->specialty()->value('name') ?? 'نامشخص',
+                        'province'    => $doctor->province()->value('name'),
+                        'city'        => $doctor->city()->value('name'),
                         'views_count' => $doctor->views_count ?? 0,
                         'rating'      => $doctor->rating ?? 0,
                     ],
