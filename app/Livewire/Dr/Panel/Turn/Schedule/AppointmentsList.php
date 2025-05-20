@@ -2624,12 +2624,18 @@ class AppointmentsList extends Component
         $currentTime = now()->format('H:i');
         $isSpecial = $workSchedule['is_special'] ?? false;
 
+        // تبدیل زمان‌های رزرو شده به آرایه ساده برای مقایسه راحت‌تر
+        $reservedTimes = array_map(function ($appointment) {
+            return $appointment['appointment_time'];
+        }, $reservedAppointments);
+
         Log::info("Generating available times with work schedule:", [
             'work_hours' => $workSchedule['work_hours'],
             'is_today' => $isToday,
             'current_time' => $currentTime,
             'schedule_date' => $workSchedule['schedule_date'] ?? now()->format('Y-m-d'),
-            'is_special' => $isSpecial
+            'is_special' => $isSpecial,
+            'reserved_times' => $reservedTimes
         ]);
 
         foreach ($workSchedule['work_hours'] as $period) {
@@ -2650,29 +2656,24 @@ class AppointmentsList extends Component
                     continue;
                 }
 
-                // Count reserved appointments for this time slot
-                $reservedCount = collect($reservedAppointments)
-                    ->filter(function ($appointment) use ($timeSlot) {
-                        return $appointment['appointment_time'] === $timeSlot;
-                    })
-                    ->count();
-
-                if ($reservedCount < $maxAppointments) {
-                    $availableTimes[] = $timeSlot;
-                    Log::info("Added available time slot: {$timeSlot}");
+                // اگر این زمان قبلاً رزرو شده است، آن را رد کن
+                if (in_array($timeSlot, $reservedTimes)) {
+                    Log::info("Time slot {$timeSlot} is already reserved, skipping");
+                    $current->addMinutes($interval);
+                    continue;
                 }
 
+                $availableTimes[] = $timeSlot;
+                Log::info("Added available time slot: {$timeSlot}");
                 $current->addMinutes($interval);
             }
         }
 
-        Log::info("Generated available times", [
-            'work_schedule' => $workSchedule['work_hours'],
-            'slots' => $availableTimes,
-            'total_slots' => count($availableTimes),
-            'reserved_appointments' => $reservedAppointments,
-            'is_today' => $isToday,
-            'is_special' => $isSpecial
+        Log::info("Generated available times:", [
+            'available_times' => $availableTimes,
+            'reserved_times' => $reservedTimes,
+            'total_available' => count($availableTimes),
+            'total_reserved' => count($reservedTimes)
         ]);
 
         return $availableTimes;
