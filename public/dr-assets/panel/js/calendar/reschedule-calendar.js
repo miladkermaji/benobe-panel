@@ -266,7 +266,12 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 const appointmentCount = appointmentData
                     ? appointmentData.count
                     : 0;
-                if (appointmentCount > 0) {
+
+                // فقط اگر تاریخ امروز یا آینده باشد، تعداد نوبت‌ها را نمایش بده
+                if (
+                    appointmentCount > 0 &&
+                    !currentDay.isBefore(today, "day")
+                ) {
                     dayElement.classList.add("has-appointment");
                     const countElement = document.createElement("span");
                     countElement.classList.add("appointment-count");
