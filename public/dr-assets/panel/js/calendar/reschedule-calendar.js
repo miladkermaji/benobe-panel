@@ -23,6 +23,46 @@ function removeEventListeners(element, eventType) {
 // کش محلی برای داده‌های تقویم
 const calendarDataCache = new Map();
 
+// تابع جمع‌آوری نوبت‌های انتخاب شده
+function collectSelectedAppointments() {
+    const selectedCheckboxes = document.querySelectorAll(
+        ".appointment-checkbox:checked"
+    );
+    const selectedIds = Array.from(selectedCheckboxes).map((cb) =>
+        parseInt(cb.value)
+    );
+    const selectedDates = Array.from(selectedCheckboxes).map((cb) => {
+        const row = cb.closest("tr");
+        const dateCell = row ? row.querySelector("td:nth-child(5)") : null;
+        return dateCell ? dateCell.textContent.trim() : "";
+    });
+
+    if (selectedIds.length > 0) {
+        window.selectedAppointmentIds = selectedIds;
+        window.selectedAppointmentDates = selectedDates;
+    } else if (window.selectedSingleAppointmentId) {
+        const checkbox = document.querySelector(
+            `.appointment-checkbox[value="${window.selectedSingleAppointmentId}"]`
+        );
+        if (checkbox) {
+            const row = checkbox.closest("tr");
+            const dateCell = row ? row.querySelector("td:nth-child(5)") : null;
+            window.selectedAppointmentIds = [
+                window.selectedSingleAppointmentId,
+            ];
+            window.selectedAppointmentDates = [
+                dateCell ? dateCell.textContent.trim() : "",
+            ];
+        } else {
+            window.selectedAppointmentIds = [];
+            window.selectedAppointmentDates = [];
+        }
+    } else {
+        window.selectedAppointmentIds = [];
+        window.selectedAppointmentDates = [];
+    }
+}
+
 // تابع اصلی تقویم
 function initializeRescheduleCalendar(appointmentId = null) {
     const modalScope = document.querySelector("#reschedule-modal") || document;
@@ -81,47 +121,6 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 func.apply(this, args);
             }, wait);
         };
-    }
-
-    function collectSelectedAppointments() {
-        const selectedCheckboxes = document.querySelectorAll(
-            ".appointment-checkbox:checked"
-        );
-        const selectedIds = Array.from(selectedCheckboxes).map((cb) =>
-            parseInt(cb.value)
-        );
-        const selectedDates = Array.from(selectedCheckboxes).map((cb) => {
-            const row = cb.closest("tr");
-            const dateCell = row ? row.querySelector("td:nth-child(5)") : null;
-            return dateCell ? dateCell.textContent.trim() : "";
-        });
-
-        if (selectedIds.length > 0) {
-            window.selectedAppointmentIds = selectedIds;
-            window.selectedAppointmentDates = selectedDates;
-        } else if (window.selectedSingleAppointmentId) {
-            const checkbox = document.querySelector(
-                `.appointment-checkbox[value="${window.selectedSingleAppointmentId}"]`
-            );
-            if (checkbox) {
-                const row = checkbox.closest("tr");
-                const dateCell = row
-                    ? row.querySelector("td:nth-child(5)")
-                    : null;
-                window.selectedAppointmentIds = [
-                    window.selectedSingleAppointmentId,
-                ];
-                window.selectedAppointmentDates = [
-                    dateCell ? dateCell.textContent.trim() : "",
-                ];
-            } else {
-                window.selectedAppointmentIds = [];
-                window.selectedAppointmentDates = [];
-            }
-        } else {
-            window.selectedAppointmentIds = [];
-            window.selectedAppointmentDates = [];
-        }
     }
 
     async function fetchCalendarData(year, month) {
@@ -296,81 +295,13 @@ function initializeRescheduleCalendar(appointmentId = null) {
             calendarBody.innerHTML = "";
             calendarBody.appendChild(fragment);
 
-            calendarBody.onclick = function (event) {
-                const dayElement = event.target.closest(".calendar-day");
-                if (!dayElement || dayElement.classList.contains("empty"))
-                    return;
-
-                document
-                    .querySelectorAll(".calendar-day")
-                    .forEach((el) => el.classList.remove("selected"));
-                dayElement.classList.add("selected");
-
-                const selectedGregorianDate =
-                    dayElement.getAttribute("data-gregorian");
-                const selectedJalaliDate = dayElement.getAttribute("data-date");
-                const formattedSelectedJalaliDate = moment(
-                    selectedJalaliDate,
-                    "jYYYY/jMM/jDD"
-                )
-                    .locale("fa")
-                    .format("jD jMMMM jYYYY");
-
-                collectSelectedAppointments();
-
-                if (window.selectedAppointmentDates.length === 0) {
-                    Swal.fire({
-                        title: "خطا",
-                        text: "هیچ نوبت انتخاب‌شده‌ای یافت نشد. لطفاً حداقل یک نوبت را انتخاب کنید.",
-                        icon: "error",
-                        confirmButtonText: "باشه",
-                    });
-                    return;
-                }
-
-                const oldDate = window.selectedAppointmentDates[0];
-                const formattedOldDate = moment(oldDate, "jYYYY/jMM/jDD")
-                    .locale("fa")
-                    .format("jD jMMMM jYYYY");
-                const message = `آیا می‌خواهید نوبت‌ها از تاریخ ${formattedOldDate} به تاریخ ${formattedSelectedJalaliDate} منتقل شوند؟`;
-
-                Swal.fire({
-                    title: "تأیید جابجایی نوبت",
-                    text: message,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "بله، منتقل کن",
-                    cancelButtonText: "خیر",
-                    reverseButtons: true,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        if (window.selectedAppointmentIds.length === 0) {
-                            Swal.fire({
-                                title: "خطا",
-                                text: "هیچ نوبت انتخاب‌شده‌ای یافت نشد.",
-                                icon: "error",
-                                confirmButtonText: "باشه",
-                            });
-                            return;
-                        }
-
-                        Livewire.dispatchTo(
-                            "dr.panel.turn.schedule.appointments-list",
-                            "rescheduleAppointment",
-                            [
-                                window.selectedAppointmentIds,
-                                selectedGregorianDate,
-                            ]
-                        );
-
-                        window.dispatchEvent(
-                            new CustomEvent("close-modal", {
-                                detail: { name: "reschedule-modal" },
-                            })
-                        );
-                    }
-                });
-            };
+            // Add click handlers to days
+            const days = calendarBody.querySelectorAll(
+                ".calendar-day:not(.empty)"
+            );
+            days.forEach((day) => {
+                day.onclick = () => handleDayClick(day);
+            });
 
             const renderedDays = calendarBody.querySelectorAll(
                 ".calendar-day:not(.empty)"
@@ -378,11 +309,6 @@ function initializeRescheduleCalendar(appointmentId = null) {
             console.debug(
                 `Total rendered days: ${renderedDays.length} for ${targetYear}/${targetMonth}`
             );
-            if (renderedDays.length > daysInMonth) {
-                console.warn(
-                    `Excess days rendered: ${renderedDays.length} instead of ${daysInMonth}`
-                );
-            }
         } finally {
             isRendering = false;
         }
@@ -563,6 +489,139 @@ function initializeRescheduleCalendar(appointmentId = null) {
         );
         debouncedGenerateCalendar(currentYear, currentMonth);
     }, 0);
+}
+
+async function handleDayClick(dayElement) {
+    console.log("Day clicked:", dayElement);
+
+    collectSelectedAppointments();
+    const selectedIds = window.selectedAppointmentIds || [];
+    console.log("Selected IDs:", selectedIds);
+
+    if (selectedIds.length === 0) {
+        Swal.fire({
+            title: "هشدار",
+            text: "لطفاً حداقل یک نوبت را انتخاب کنید.",
+            icon: "warning",
+            confirmButtonText: "باشه",
+        });
+        return;
+    }
+
+    const date = dayElement.getAttribute("data-gregorian");
+    const jalaliDate = dayElement.getAttribute("data-date");
+    console.log("Selected date:", date, "Jalali:", jalaliDate);
+
+    if (selectedIds.length === 1) {
+        try {
+            console.log("Fetching available times for date:", date);
+
+            // استفاده از Livewire.dispatch به جای dispatchTo
+            Livewire.dispatch("getAvailableTimesForDate", { date });
+
+            // منتظر پاسخ از Livewire
+            const response = await new Promise((resolve, reject) => {
+                const timeoutId = setTimeout(() => {
+                    window.removeEventListener(
+                        "available-times-updated",
+                        handler
+                    );
+                    reject(new Error("Timeout waiting for available times"));
+                }, 10000);
+
+                const handler = (event) => {
+                    console.log("Received times update:", event.detail);
+                    clearTimeout(timeoutId);
+                    window.removeEventListener(
+                        "available-times-updated",
+                        handler
+                    );
+                    resolve(event.detail);
+                };
+
+                window.addEventListener("available-times-updated", handler);
+            });
+
+            console.log("Available times response:", response);
+            // اصلاح: دسترسی به آرایه times از پاسخ
+            const availableTimes =
+                Array.isArray(response) && response.length > 0
+                    ? response[0].times
+                    : [];
+
+            if (!availableTimes || availableTimes.length === 0) {
+                Swal.fire({
+                    title: "هشدار",
+                    text: "هیچ زمان کاری خالی برای این تاریخ وجود ندارد.",
+                    icon: "warning",
+                    confirmButtonText: "باشه",
+                });
+                return;
+            }
+
+            const timeOptions = availableTimes
+                .map((time) => `<option value="${time}">${time}</option>`)
+                .join("");
+
+            console.log(
+                "Showing time selection modal with options:",
+                timeOptions
+            );
+            const { value: selectedTime } = await Swal.fire({
+                title: "انتخاب زمان",
+                html: `
+                    <div class="mb-3">
+                        <label class="form-label">زمان نوبت را انتخاب کنید:</label>
+                        <select id="timeSelect" class="form-select">
+                            ${timeOptions}
+                        </select>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: "تایید",
+                cancelButtonText: "انصراف",
+                focusConfirm: false,
+                didOpen: () => {
+                    const select = document.getElementById("timeSelect");
+                    select.focus();
+                },
+                preConfirm: () => document.getElementById("timeSelect").value,
+            });
+
+            if (selectedTime) {
+                console.log("Selected time:", selectedTime);
+                Livewire.dispatch("rescheduleAppointment", {
+                    appointmentIds: selectedIds,
+                    newDate: date,
+                    selectedTime: selectedTime,
+                });
+            }
+        } catch (error) {
+            console.error("Error in handleDayClick:", error);
+            Swal.fire({
+                title: "خطا",
+                text: "خطایی در دریافت زمان‌های موجود رخ داد. لطفاً دوباره تلاش کنید.",
+                icon: "error",
+                confirmButtonText: "باشه",
+            });
+        }
+    } else {
+        const result = await Swal.fire({
+            title: "تایید جابجایی",
+            text: `آیا از جابجایی ${selectedIds.length} نوبت به تاریخ ${jalaliDate} اطمینان دارید؟`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "بله",
+            cancelButtonText: "خیر",
+        });
+
+        if (result.isConfirmed) {
+            Livewire.dispatch("rescheduleAppointment", {
+                appointmentIds: selectedIds,
+                newDate: date,
+            });
+        }
+    }
 }
 
 // مدیریت رویدادهای باز و بسته شدن مودال
