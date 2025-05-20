@@ -389,92 +389,104 @@ class AppointmentsList extends Component
             $this->clinics = $doctor->clinics()->where('is_active', 0)->get()->toArray();
         }
     }
-    public function loadAppointments()
-    {
-        $doctor = $this->getAuthenticatedDoctor();
-        if (!$doctor) {
-            return;
-        }
+/**
+ * لود نوبت‌ها با Lazy Loading
+ */
+/**
+ * لود نوبت‌ها با Lazy Loading
+ */
+public function loadAppointments()
+{
+    $doctor = $this->getAuthenticatedDoctor();
+    if (!$doctor) {
+        Log::warning('Doctor not authenticated in loadAppointments');
+        return;
+    }
 
-        $query = Appointment::query()
-            ->where('doctor_id', $doctor->id)
-            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
-                return $query->where('clinic_id', $this->selectedClinicId);
-            });
+    $query = Appointment::query()
+        ->where('doctor_id', $doctor->id)
+        ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
+            return $query->where('clinic_id', $this->selectedClinicId);
+        });
 
-        if ($this->filterStatus === 'manual') {
-            $query->where('appointment_type', 'manual')
-                ->when($this->selectedDate, function ($query) {
-                    return $query->whereDate('appointment_date', $this->selectedDate);
-                });
-        } else {
-            $query->when($this->selectedDate, function ($query) {
+    if ($this->filterStatus === 'manual') {
+        $query->where('appointment_type', 'manual')
+            ->when($this->selectedDate, function ($query) {
                 return $query->whereDate('appointment_date', $this->selectedDate);
             });
-        }
-
-        $query->when($this->filterStatus && $this->filterStatus !== 'manual', function ($query) {
-            return $query->where('status', $this->filterStatus);
+    } else {
+        $query->when($this->selectedDate, function ($query) {
+            return $query->whereDate('appointment_date', $this->selectedDate);
         });
-
-        $query->when($this->dateFilter, function ($query) {
-            $today = Carbon::today();
-            if ($this->dateFilter === 'current_week') {
-                $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
-                $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
-                $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
-            } elseif ($this->dateFilter === 'current_month') {
-                $startOfMonth = $today->copy()->startOfMonth();
-                $endOfMonth = $today->copy()->endOfMonth();
-                $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
-            } elseif ($this->dateFilter === 'current_year') {
-                $startOfYear = $today->copy()->startOfYear();
-                $endOfYear = $today->copy()->endOfYear();
-                $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
-            }
-        });
-
-        $query->when($this->searchQuery, function ($query) {
-            $query->whereHas('patient', function ($q) {
-                $q->where('first_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
-                    ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
-            });
-        });
-
-        $perPage = $this->pagination['per_page'] ?? 100;
-        $appointments = $query->orderBy('appointment_date', 'desc')
-            ->orderBy('appointment_time', 'desc')
-            ->paginate($perPage, ['*'], 'page', $this->pagination['current_page']);
-
-        $this->appointments = $appointments->items();
-        $this->pagination = [
-            'current_page' => $appointments->currentPage(),
-            'last_page' => $appointments->lastPage(),
-            'per_page' => $appointments->perPage(),
-            'total' => $appointments->total(),
-        ];
-
-        $this->dispatch('setAppointments', ['appointments' => $this->appointments]);
-
-        // بررسی عدم وجود نتیجه برای نمایش هشدار
-        if (empty($this->appointments) && $this->searchQuery) {
-            $jalaliDate = Jalalian::fromCarbon(Carbon::parse($this->selectedDate));
-            if ($this->isSearchingAllDates) {
-                $this->dispatch('no-results-found', ['date' => $jalaliDate->format('Y/m/d'), 'searchAll' => true]);
-            } else {
-                $this->showNoResultsAlert = true;
-                $this->dispatch('show-no-results-alert', ['date' => $jalaliDate->format('Y/m/d')]);
-            }
-        } else {
-            $this->showNoResultsAlert = false;
-            $this->dispatch('hide-no-results-alert');
-        }
-
-        return $this->appointments;
     }
+
+    $query->when($this->filterStatus && $this->filterStatus !== 'manual', function ($query) {
+        return $query->where('status', $this->filterStatus);
+    });
+
+    $query->when($this->dateFilter, function ($query) {
+        $today = Carbon::today();
+        if ($this->dateFilter === 'current_week') {
+            $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
+            $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
+            $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
+        } elseif ($this->dateFilter === 'current_month') {
+            $startOfMonth = $today->copy()->startOfMonth();
+            $endOfMonth = $today->copy()->endOfMonth();
+            $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
+        } elseif ($this->dateFilter === 'current_year') {
+            $startOfYear = $today->copy()->startOfYear();
+            $endOfYear = $today->copy()->endOfYear();
+            $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
+        }
+    });
+
+    $query->when($this->searchQuery, function ($query) {
+        $query->whereHas('patient', function ($q) {
+            $q->where('first_name', 'like', "%{$this->searchQuery}%")
+                ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
+                ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
+                ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
+                ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
+        });
+    });
+
+    try {
+        // استفاده از cursor برای Lazy Loading
+        $this->appointments = [];
+        foreach ($query->orderBy('appointment_date', 'desc')
+                      ->orderBy('appointment_time', 'desc')
+                      ->cursor() as $appointment) {
+            $this->appointments[] = $appointment;
+        }
+    } catch (\Exception $e) {
+        Log::error('Error in loadAppointments', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'query' => $query->toSql(),
+            'bindings' => $query->getBindings(),
+        ]);
+        $this->appointments = [];
+    }
+
+    $this->dispatch('setAppointments', ['appointments' => $this->appointments]);
+
+    // بررسی عدم وجود نتیجه برای نمایش هشدار
+    if (empty($this->appointments) && $this->searchQuery) {
+        $jalaliDate = Jalalian::fromCarbon(Carbon::parse($this->selectedDate));
+        if ($this->isSearchingAllDates) {
+            $this->dispatch('no-results-found', ['date' => $jalaliDate->format('Y/m/d'), 'searchAll' => true]);
+        } else {
+            $this->showNoResultsAlert = true;
+            $this->dispatch('show-no-results-alert', ['date' => $jalaliDate->format('Y/m/d')]);
+        }
+    } else {
+        $this->showNoResultsAlert = false;
+        $this->dispatch('hide-no-results-alert');
+    }
+
+    return $this->appointments;
+}
     private function convertToGregorian($date)
     {
         // دی‌کد کردن تاریخ در صورت URL-encoded بودن
@@ -1190,34 +1202,42 @@ class AppointmentsList extends Component
             return $appointmentIds;
         }
     }
-    public function loadInsurances()
-    {
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $cacheKey = "insurances_doctor_{$doctorId}_clinic_{$this->selectedClinicId}";
-        $this->insurances = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctorId) {
-            return DoctorService::select('insurance_id')
-                ->where('doctor_id', $doctorId)
-                ->where('clinic_id', $this->selectedClinicId === 'default' ? null : $this->selectedClinicId)
-                ->distinct()
-                ->with('insurance')
-                ->get()
-                ->pluck('insurance')
-                ->filter()
-                ->unique('id')
-                ->values()
-                ->toArray();
-        });
-        $this->dispatch('insurances-updated');
-    }
+ 
     public function updatedSelectedInsuranceId()
     {
         $this->loadServices();
         $this->reset(['selectedServiceIds', 'isFree', 'discountPercentage', 'discountAmount', 'finalPrice']);
         $this->dispatch('services-updated');
     }
+    public function loadInsurances()
+    {
+        $doctorId = $this->getAuthenticatedDoctor()->id;
+        $cacheKey = "insurances_doctor_{$doctorId}_clinic_{$this->selectedClinicId}";
+
+        $this->insurances = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctorId) {
+            return DoctorService::select('insurance_id')
+                ->where('doctor_id', $doctorId)
+                ->where('clinic_id', $this->selectedClinicId === 'default' ? null : $this->selectedClinicId)
+                ->distinct()
+                ->with('insurance')
+                ->cursor() // استفاده از Lazy Loading با cursor
+                ->pluck('insurance')
+                ->filter()
+                ->unique('id')
+                ->values()
+                ->toArray();
+        });
+
+        $this->dispatch('insurances-updated');
+    }
+
+    /**
+     * لود خدمات با Lazy Loading
+     */
     public function loadServices()
     {
-        $this->isLoadingServices = true; // فعال کردن لودینگ خدمات
+        $this->isLoadingServices = true;
+
         if (!$this->selectedInsuranceId) {
             $this->services = [];
             $this->isLoadingServices = false;
@@ -1236,10 +1256,10 @@ class AppointmentsList extends Component
             } else {
                 $query->where('clinic_id', $this->selectedClinicId);
             }
-            return $query->get()->toArray();
+            return $query->cursor()->toArray(); // استفاده از Lazy Loading با cursor
         });
 
-        $this->isLoadingServices = false; // غیرفعال کردن لودینگ خدمات
+        $this->isLoadingServices = false;
         $this->dispatch('services-updated');
     }
     #[On('get-services')]
