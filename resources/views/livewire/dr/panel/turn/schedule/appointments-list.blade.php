@@ -377,56 +377,54 @@
               </div>
             </div>
 
-            <div class="col-md-6 position-relative">
-              <label class="label-top-input-special-takhasos">نام</label>
-              <input type="text" class="form-control h-50" wire:model="firstName" required>
-              @error('firstName')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-
-            <div class="col-md-6 position-relative">
-              <label class="label-top-input-special-takhasos">نام خانوادگی</label>
-              <input type="text" class="form-control h-50" wire:model="lastName" required>
-              @error('lastName')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-
-            <div class="col-md-6 position-relative">
-              <label class="label-top-input-special-takhasos">شماره موبایل</label>
-              <input type="text" class="form-control h-50" wire:model="mobile" required>
-              @error('mobile')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-
-            <div class="col-md-6 position-relative">
-              <label class="label-top-input-special-takhasos">کد ملی</label>
-              <input type="text" class="form-control h-50" wire:model="nationalCode" required>
-              @error('nationalCode')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-
-            <div class="col-md-6 position-relative">
-              <label class="label-top-input-special-takhasos">تاریخ نوبت</label>
-              <input type="text" class="form-control h-50" data-jdp wire:model="appointmentDate" required>
-              @error('appointmentDate')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-
-            <div class="col-md-6 position-relative">
-              <label class="label-top-input-special-takhasos">ساعت نوبت</label>
-              <input type="text" class="form-control h-50" wire:model="appointmentTime" required readonly>
-              @error('appointmentTime')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
+            @if ($selectedUserId)
+              <div class="col-md-6 position-relative">
+                <label class="label-top-input-special-takhasos">نام</label>
+                <input type="text" class="form-control h-50" wire:model="firstName" required>
+                @error('firstName')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
+              <div class="col-md-6 position-relative">
+                <label class="label-top-input-special-takhasos">نام خانوادگی</label>
+                <input type="text" class="form-control h-50" wire:model="lastName" required>
+                @error('lastName')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
+              <div class="col-md-6 position-relative">
+                <label class="label-top-input-special-takhasos">شماره موبایل</label>
+                <input type="text" class="form-control h-50" wire:model="mobile" required>
+                @error('mobile')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
+              <div class="col-md-6 position-relative">
+                <label class="label-top-input-special-takhasos">کد ملی</label>
+                <input type="text" class="form-control h-50" wire:model="nationalCode" required>
+                @error('nationalCode')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
+              <div class="col-md-6 position-relative">
+                <label class="label-top-input-special-takhasos">تاریخ نوبت</label>
+                <input type="text" class="form-control h-50" data-jdp wire:model="appointmentDate" required>
+                @error('appointmentDate')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
+              <div class="col-md-6 position-relative">
+                <label class="label-top-input-special-takhasos">ساعت نوبت</label>
+                <input type="text" class="form-control h-50" wire:model="appointmentTime" required readonly>
+                @error('appointmentTime')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
+            @endif
 
             <div class="col-12">
-              <button type="submit" class="btn btn-primary w-100">ثبت نوبت</button>
+              <button type="submit" class="btn btn-primary w-100"
+                @if (!$selectedUserId) disabled @endif>ثبت نوبت</button>
             </div>
           </div>
         </form>
@@ -669,9 +667,9 @@
             <div class="mb-3 position-relative">
               <label class="label-top-input-special-takhasos">درصد تخفیف</label>
               <div class="input-with-spinner">
-                <input type="number" class="form-control h-50" wire:model.live.debounce.500ms="discountInputPercentage"
-                  placeholder="درصد تخفیف را وارد کنید" min="0" max="100" step="0.01"
-                  @if ($isFree) disabled @endif>
+                <input type="number" class="form-control h-50"
+                  wire:model.live.debounce.500ms="discountInputPercentage" placeholder="درصد تخفیف را وارد کنید"
+                  min="0" max="100" step="0.01" @if ($isFree) disabled @endif>
                 <div class="spinner-custom-small {{ $isLoadingDiscount ? 'show-spinner' : '' }}"></div>
               </div>
               @error('discountInputPercentage')
@@ -1357,43 +1355,43 @@
 
         // Handle available times loaded event
         /*
-                        Livewire.on('available-times-loaded', (event) => {
-                          console.log('Available times loaded:', event);
-                          const times = event.times || [];
-                          const $container = $('#available-times');
-                          $container.empty();
+                            Livewire.on('available-times-loaded', (event) => {
+                              console.log('Available times loaded:', event);
+                              const times = event.times || [];
+                              const $container = $('#available-times');
+                              $container.empty();
 
-                          if (times.length === 0) {
-                            $container.html(
-                              '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
-                            return;
-                          }
+                              if (times.length === 0) {
+                                $container.html(
+                                  '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
+                                return;
+                              }
 
-                          times.forEach(time => {
-                            const $button = $(
-                              `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
+                              times.forEach(time => {
+                                const $button = $(
+                                  `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
         ${time}
       </button>`
-                            );
-                            $container.append($button);
-                          });
+                                );
+                                $container.append($button);
+                              });
 
-                          // Handle time selection
-                          $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
-                            const $btn = $(this);
-                            const time = $btn.data('time');
+                              // Handle time selection
+                              $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+                                const $btn = $(this);
+                                const time = $btn.data('time');
 
-                            // Remove selection from other buttons
-                            $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+                                // Remove selection from other buttons
+                                $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
 
-                            // Select this button
-                            $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+                                // Select this button
+                                $btn.removeClass('btn-outline-primary').addClass('btn-primary');
 
-                            // Update Livewire component
-                            @this.set('appointmentTime', time);
-                          });
-                        });
-                        */
+                                // Update Livewire component
+                                @this.set('appointmentTime', time);
+                              });
+                            });
+                            */
 
         // Handle modal close
         Livewire.on('close-modal', (event) => {
