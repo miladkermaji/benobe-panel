@@ -492,7 +492,24 @@ function initializeRescheduleCalendar(appointmentId = null) {
 }
 
 async function handleDayClick(dayElement) {
-    console.log("Day clicked:", dayElement);
+    // Get the date from data-date attribute which is in Jalali format
+    const jalaliDate = dayElement.getAttribute("data-date");
+    const [year, month, day] = jalaliDate.split("-").map(Number);
+
+    // Convert Jalali date to Gregorian
+    const gregorianDate = moment(jalaliDate, "jYYYY-jMM-jDD");
+    const today = moment().startOf("day");
+
+    // Check if the selected date is in the past
+    if (gregorianDate.isBefore(today)) {
+        Swal.fire({
+            title: "توجه",
+            text: "نوبت دهی این روز به اتمام رسیده است",
+            icon: "warning",
+            confirmButtonText: "باشه",
+        });
+        return;
+    }
 
     collectSelectedAppointments();
     const selectedIds = window.selectedAppointmentIds || [];
@@ -509,14 +526,12 @@ async function handleDayClick(dayElement) {
     }
 
     const date = dayElement.getAttribute("data-gregorian");
-    const jalaliDate = dayElement.getAttribute("data-date");
     console.log("Selected date:", date, "Jalali:", jalaliDate);
 
-    const selectedDate = moment(date, "jYYYY-jMM-jDD");
+    const selectedDateObj = moment(date, "jYYYY-jMM-jDD");
 
     // Check if selected date is in the past
-    const today = moment().startOf("day");
-    if (selectedDate.isBefore(today)) {
+    if (selectedDateObj.isBefore(today)) {
         Swal.fire({
             title: "خطا",
             text: "امکان جابجایی نوبت به تاریخ‌های گذشته وجود ندارد",
