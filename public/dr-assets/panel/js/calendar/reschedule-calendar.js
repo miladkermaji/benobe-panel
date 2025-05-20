@@ -512,6 +512,20 @@ async function handleDayClick(dayElement) {
     const jalaliDate = dayElement.getAttribute("data-date");
     console.log("Selected date:", date, "Jalali:", jalaliDate);
 
+    const selectedDate = moment(date, "jYYYY-jMM-jDD");
+
+    // Check if selected date is in the past
+    const today = moment().startOf("day");
+    if (selectedDate.isBefore(today)) {
+        Swal.fire({
+            title: "خطا",
+            text: "امکان جابجایی نوبت به تاریخ‌های گذشته وجود ندارد",
+            icon: "error",
+            confirmButtonText: "باشه",
+        });
+        return;
+    }
+
     if (selectedIds.length === 1) {
         try {
             console.log("Fetching available times for date:", date);

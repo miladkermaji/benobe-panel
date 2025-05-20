@@ -2391,11 +2391,17 @@ class AppointmentsList extends Component
     public function rescheduleAppointment($appointmentIds, $newDate, $selectedTime = null)
     {
         try {
-            Log::info('Rescheduling appointments: ' . json_encode([
+            Log::info('Rescheduling appointments:', [
                 'appointmentIds' => $appointmentIds,
                 'newDate' => $newDate,
                 'selectedTime' => $selectedTime
-            ]));
+            ]);
+
+            // Check if the new date is in the past
+            $newDateCarbon = Carbon::parse($newDate);
+            if ($newDateCarbon->isPast() && !$newDateCarbon->isToday()) {
+                throw new \Exception('امکان جابجایی نوبت به تاریخ‌های گذشته وجود ندارد');
+            }
 
             // تبدیل تاریخ میلادی به شمسی برای لاگ
             $jalaliDate = Jalalian::fromFormat('Y-m-d', $newDate)->format('Y/m/d');
