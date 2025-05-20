@@ -271,5 +271,3 @@ document.addEventListener("livewire:initialized", () => {
         }
     });
 });
-
-
