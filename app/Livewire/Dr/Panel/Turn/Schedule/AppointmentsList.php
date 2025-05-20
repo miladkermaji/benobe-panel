@@ -805,75 +805,70 @@ public function calculateAvailableSlots($workHours, $appointmentSettings, $date,
 
     return array_values($slots); // بازگشت آرایه ایندکس‌شده
 }
-    public function confirmPartialReschedule($appointmentIds, $newDate, $nextDate, $availableSlots)
-    {
-        try {
-            if (empty($appointmentIds) || !is_array($appointmentIds)) {
-                throw new \Exception('شناسه‌های نوبت نامعتبر است.');
-            }
-            if (!$newDate || !$nextDate) {
-                throw new \Exception('تاریخ‌های انتخاب‌شده نامعتبر هستند.');
-            }
-            if (empty($availableSlots) || !is_array($availableSlots)) {
-                throw new \Exception('زمان‌های کاری خالی نامعتبر هستند.');
-            }
-            // بررسی زمان پایان و تعداد نوبت‌ها برای تاریخ جدید
-            $workHoursCheck = $this->checkWorkHoursAndSlots($newDate, count($appointmentIds));
-            if (!$workHoursCheck['success']) {
-                throw new \Exception($workHoursCheck['message']);
-            }
-            $remainingIds = $this->processReschedule($appointmentIds, $newDate, $availableSlots);
-            if (!empty($remainingIds) && $nextDate) {
-                // بررسی زمان پایان و تعداد نوبت‌ها برای تاریخ بعدی
-                $remainingIdsArray = is_array($remainingIds) ? $remainingIds : [];
-                $workHoursCheckNext = $this->checkWorkHoursAndSlots($nextDate, count($remainingIdsArray));
-                if (!$workHoursCheckNext['success']) {
-                    throw new \Exception($workHoursCheckNext['message']);
-                }
-                $nextDateSlots = $this->getAvailableSlotsForDate($nextDate);
-                if (empty($nextDateSlots)) {
-                    throw new \Exception('هیچ زمان کاری خالی برای تاریخ بعدی یافت نشد.');
-                }
-                $remainingRemainingIds = $this->processReschedule($remainingIds, $nextDate, $nextDateSlots);
-                if (!empty($remainingRemainingIds)) {
-                    $this->dispatch('show-toastr', [
-                        'type' => 'warning',
-                        'message' => 'برخی نوبت‌ها به دلیل عدم وجود زمان کاری خالی جابجا نشدند.'
-                    ]);
-                } else {
-                    $this->dispatch('show-toastr', [
-                        'type' => 'success',
-                        'message' => 'نوبت‌های باقی‌مانده با موفقیت به تاریخ ' . Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y-m-d') . ' منتقل شدند.'
-                    ]);
-                    $this->dispatch('appointments-rescheduled', [
-                        'message' => 'نوبت‌های باقی‌مانده با موفقیت به تاریخ ' . Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y-m-d') . ' منتقل شدند.'
-                    ]);
-                }
-            }
-            $this->dispatch('appointments-rescheduled', [
-                'message' => 'نوبت‌ها با موفقیت جابجا شدند.'
-            ]);
-            // پاک کردن کش مرتبط با نوبت‌ها
-            $doctor = $this->getAuthenticatedDoctor();
-            if ($doctor) {
-                $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_date_{$this->selectedDate}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
-                Cache::forget($cacheKey);
-            }
-            $this->loadAppointments();
-            $this->dispatch('close-modal');
-            $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
-            // فقط اگر selected_date در URL وجود داشته باشد، ریدایرکت انجام شود
-            if (request()->query('selected_date') && !empty($this->redirectBack)) {
-                return redirect()->to($this->redirectBack);
-            }
-        } catch (\Exception $e) {
-            $this->dispatch('show-toastr', [
-                'type' => 'error',
-                'message' => 'خطایی در جابجایی نوبت رخ داد: ' . $e->getMessage()
-            ]);
-            $this->dispatch('showModal', 'reschedule-modal');
+ public function confirmPartialReschedule($appointmentIds, $newDate, $nextDate, $availableSlots)
+{
+    try {
+        if (empty($appointmentIds) || !is_array($appointmentIds)) {
+            throw new \Exception('شناسه‌های نوبت نامعتبر است.');
         }
+        if (!$newDate || !$nextDate) {
+            throw new \Exception('تاریخ‌های انتخاب‌شده نامعتبر هستند.');
+        }
+        if (empty($availableSlots) || !is_array($availableSlots)) {
+            throw new \Exception('زمان‌های کاری خالی نامعتبر هستند.');
+        }
+
+        // بررسی زمان کاری برای تاریخ جدید
+        $workHoursCheck = $this->checkWorkHoursAndSlots($newDate, count($appointmentIds));
+        if (!$workHoursCheck['success']) {
+            throw new \Exception($workHoursCheck['message']);
+        }
+
+        // جابجایی نوبت‌های ممکن به تاریخ جدید
+        $remainingIds = $this->processReschedule($appointmentIds, $newDate, $availableSlots);
+
+        // جابجایی نوبت‌های باقی‌مانده به تاریخ بعدی
+        if (!empty($remainingIds) && $nextDate) {
+            $workHoursCheckNext = $this->checkWorkHoursAndSlots($nextDate, count($remainingIds));
+            if (!$workHoursCheckNext['success']) {
+                throw new \Exception($workHoursCheckNext['message']);
+            }
+
+            $nextDateSlots = $this->getAvailableSlotsForDate($nextDate);
+            if (empty($nextDateSlots)) {
+                throw new \Exception('هیچ زمان کاری خالی برای تاریخ بعدی یافت نشد.');
+            }
+
+            $remainingRemainingIds = $this->processReschedule($remainingIds, $nextDate, $nextDateSlots);
+            if (!empty($remainingRemainingIds)) {
+                $this->dispatch('show-toastr', [
+                    'type' => 'warning',
+                    'message' => 'برخی نوبت‌ها به دلیل عدم وجود زمان کاری خالی جابجا نشدند.'
+                ]);
+            } else {
+                $this->dispatch('show-toastr', [
+                    'type' => 'success',
+                    'message' => 'نوبت‌های باقی‌مانده با موفقیت به تاریخ ' . Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m/d') . ' منتقل شدند.'
+                ]);
+                $this->dispatch('appointments-rescheduled', [
+                    'message' => 'نوبت‌های باقی‌مانده با موفقیت به تاریخ ' . Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m/d') . ' منتقل شدند.'
+                ]);
+            }
+        }
+
+        // بارگذاری مجدد نوبت‌ها
+        $this->loadAppointments();
+        $this->dispatch('close-modal');
+        $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
+    } catch (\Exception $e) {
+        Log::error('Error in confirmPartialReschedule: ' . $e->getMessage());
+        $this->dispatch('show-toastr', [
+            'type' => 'error',
+            'message' => 'خطایی در جابجایی نوبت رخ داد: ' . $e->getMessage()
+        ]);
+        $this->dispatch('showModal', 'reschedule-modal');
     }
+}
     private function getAvailableSlotsForDate($date)
     {
         $doctor = $this->getAuthenticatedDoctor();
@@ -1016,59 +1011,79 @@ public function calculateAvailableSlots($workHours, $appointmentSettings, $date,
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطایی در جابجایی نوبت رخ داد: ' . $e->getMessage()]);
         }
     }
-    private function processReschedule($appointmentIds, $newDate, $availableSlots)
-    {
-        try {
-            DB::beginTransaction();
+private function processReschedule($appointmentIds, $newDate, $availableSlots)
+{
+    try {
+        DB::beginTransaction();
 
-            $appointments = Appointment::whereIn('id', $appointmentIds)
-                ->where('status', '!=', 'cancelled')
-                ->get();
+        $appointments = Appointment::whereIn('id', $appointmentIds)
+            ->where('status', '!=', 'cancelled')
+            ->get();
 
-            if ($appointments->isEmpty()) {
-                throw new \Exception('هیچ نوبت فعالی برای جابجایی یافت نشد.');
+        if ($appointments->isEmpty()) {
+            throw new \Exception('هیچ نوبت فعالی برای جابجایی یافت نشد.');
+        }
+
+        $doctor = $this->getAuthenticatedDoctor();
+        if (!$doctor) {
+            throw new \Exception('اطلاعات پزشک یافت نشد.');
+        }
+
+        $remainingIds = [];
+        $updatedCount = 0;
+
+        // به‌روزرسانی نوبت‌ها با استفاده از اسلات‌های خالی
+        foreach ($appointments as $index => $appointment) {
+            if ($index < count($availableSlots)) {
+                $appointment->appointment_date = $newDate;
+                $appointment->appointment_time = $availableSlots[$index];
+                $appointment->save();
+                $updatedCount++;
+            } else {
+                $remainingIds[] = $appointment->id;
             }
+        }
 
-            $doctor = $this->getAuthenticatedDoctor();
-            if (!$doctor) {
-                throw new \Exception('اطلاعات پزشک یافت نشد.');
-            }
+        DB::commit();
 
-            $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+        // لاگ برای دیباگ
+        Log::info('Rescheduled appointments', [
+            'date' => $newDate,
+            'appointment_ids' => $appointmentIds,
+            'updated_count' => $updatedCount,
+            'remaining_ids' => $remainingIds,
+            'used_slots' => array_slice($availableSlots, 0, $updatedCount),
+        ]);
 
-            // Update appointments
-            foreach ($appointments as $index => $appointment) {
-                if ($index < count($availableSlots)) {
-                    $appointment->appointment_date = $newDate;
-                    $appointment->appointment_time = $availableSlots[$index];
-                    $appointment->save();
-                }
-            }
+        // پاک کردن کش مرتبط
+        $cacheKeyPattern = "appointments_doctor_{$doctor->id}_*";
+        Cache::forget($cacheKeyPattern);
 
-            DB::commit();
+        // ارسال رویداد به‌روزرسانی
+        $this->dispatch('appointments-rescheduled', [
+            'date' => $newDate,
+            'appointmentIds' => array_slice($appointmentIds, 0, $updatedCount),
+            'message' => $updatedCount > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.'
+        ]);
 
-            // Dispatch event to update row calendar
-            $this->dispatch('appointments-rescheduled', [
-                'date' => $newDate,
-                'appointmentIds' => $appointmentIds
-            ]);
-
+        if ($updatedCount > 0) {
             $this->dispatch('show-toastr', [
-                'message' => 'نوبت‌ها با موفقیت جابجا شدند.',
+                'message' => $updatedCount > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.',
                 'type' => 'success'
             ]);
-
-            return true;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in processReschedule: ' . $e->getMessage());
-            $this->dispatch('show-toastr', [
-                'message' => 'خطا در جابجایی نوبت‌ها: ' . $e->getMessage(),
-                'type' => 'error'
-            ]);
-            return false;
         }
+
+        return $remainingIds; // بازگشت شناسه‌های نوبت‌هایی که جابجا نشدند
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error in processReschedule: ' . $e->getMessage());
+        $this->dispatch('show-toastr', [
+            'message' => 'خطا در جابجایی نوبت‌ها: ' . $e->getMessage(),
+            'type' => 'error'
+        ]);
+        return $appointmentIds; // در صورت خطا، همه شناسه‌ها به عنوان باقی‌مانده بازگشت داده می‌شوند
     }
+}
     public function loadInsurances()
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
@@ -1733,7 +1748,6 @@ public function goToFirstAvailableDate()
         $firstAvailableDate = null;
         $availableSlots = [];
         $nextAvailableDate = null;
-        $firstAvailableTime = null;
 
         while ($currentDate <= $maxDate) {
             $dateStr = $currentDate->toDateString();
@@ -1752,7 +1766,6 @@ public function goToFirstAvailableDate()
                 $availableSlots = $this->filterSlotsForToday($result['available_slots'], $isToday, $currentTime);
                 if (!empty($availableSlots)) {
                     $firstAvailableDate = $dateStr;
-                    $firstAvailableTime = $availableSlots[0] ?? null;
                     break;
                 }
             } elseif (isset($result['partial']) && $result['partial']) {
@@ -1760,7 +1773,6 @@ public function goToFirstAvailableDate()
                     $availableSlots = $this->filterSlotsForToday($result['available_slots'], $isToday, $currentTime);
                     if (!empty($availableSlots)) {
                         $firstAvailableDate = $dateStr;
-                        $firstAvailableTime = $availableSlots[0] ?? null;
                         $nextAvailableDate = $result['next_available_date'];
                     }
                 }
@@ -1776,6 +1788,7 @@ public function goToFirstAvailableDate()
         $availableSlotsCount = count($availableSlots);
 
         if ($availableSlotsCount >= $requiredSlots) {
+            $firstAvailableTime = $availableSlots[0] ?? null;
             $timeStr = $firstAvailableTime ? " ساعت {$firstAvailableTime}" : "";
             $message = "اولین تاریخ خالی در {$jalaliDate}{$timeStr} با {$availableSlotsCount} زمان کاری خالی یافت شد. آیا می‌خواهید نوبت‌ها به این تاریخ منتقل شوند؟";
             $this->dispatch('show-first-available-confirm', [
@@ -1789,6 +1802,7 @@ public function goToFirstAvailableDate()
         } else {
             $remainingSlots = $requiredSlots - $availableSlotsCount;
             $jalaliNextDate = Jalalian::fromCarbon(Carbon::parse($nextAvailableDate))->format('Y/m/d');
+            $firstAvailableTime = $availableSlots[0] ?? null;
             $timeStr = $firstAvailableTime ? " ساعت {$firstAvailableTime}" : "";
             $message = "اولین تاریخ خالی در {$jalaliDate}{$timeStr} فقط {$availableSlotsCount} زمان کاری خالی دارد. آیا می‌خواهید {$availableSlotsCount} نوبت به این تاریخ و {$remainingSlots} نوبت به {$jalaliNextDate} منتقل شوند؟ یا همه نوبت‌ها به اولین تاریخ با ظرفیت کامل منتقل شوند؟";
             $this->dispatch('show-first-available-confirm', [
@@ -1802,6 +1816,7 @@ public function goToFirstAvailableDate()
             ]);
         }
     } catch (\Exception $e) {
+        Log::error('Error in goToFirstAvailableDate: ' . $e->getMessage());
         $this->dispatch('show-toastr', [
             'type' => 'error',
             'message' => 'خطایی رخ داد: ' . $e->getMessage(),
@@ -2080,135 +2095,129 @@ private function filterSlotsForToday($slots, $isToday, $currentTime)
         $this->loadAvailableTimes();
     }
 
-    private function loadAvailableTimes()
-    {
-        if (!$this->appointmentDate) {
-            Log::info('No appointment date selected');
-            $this->availableTimes = [];
-            return;
-        }
-
-        Log::info('Selected Jalali date: ' . $this->appointmentDate);
-
-        // Convert Jalali date to Gregorian
-        $gregorianDate = $this->convertToGregorian($this->appointmentDate);
-        if (!$gregorianDate) {
-            Log::error('Failed to convert Jalali date to Gregorian');
-            $this->availableTimes = [];
-            return;
-        }
-
-        // Get current time with proper timezone
-        $now = Carbon::now('Asia/Tehran');
-        $currentTimeStr = $now->format('H:i');
-        Log::info('Current time: ' . $currentTimeStr);
-
-        $selectedDate = Carbon::parse($gregorianDate, 'Asia/Tehran')->startOfDay();
-
-        if ($selectedDate->lt($now->startOfDay())) {
-            Log::info('Selected date is in the past');
-            $this->dispatch('show-toastr', ['message' => 'امکان ثبت نوبت برای تاریخ گذشته وجود ندارد', 'type' => 'error']);
-            $this->availableTimes = [];
-            return;
-        }
-
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
-
-        // Get doctor's work schedule for this day
-        $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-            ->where(function ($query) use ($clinicId) {
-                if ($clinicId === null) {
-                    $query->whereNull('clinic_id');
-                } else {
-                    $query->where('clinic_id', $clinicId);
-                }
-            })
-            ->where('day', strtolower(date('l', strtotime($gregorianDate))))
-            ->where('is_working', true)
-            ->first();
-
-        if (!$workSchedule) {
-            Log::info('No work schedule found for this day');
-            $this->availableTimes = [];
-            return;
-        }
-
-        // Get work hours from schedule
-        $workHours = json_decode($workSchedule->work_hours, true);
-
-        if (empty($workHours)) {
-            Log::info('No work hours found in schedule');
-            $this->availableTimes = [];
-            return;
-        }
-
-        // Get reserved appointments for this date
-        $reservedAppointments = Appointment::where('doctor_id', $doctorId)
-            ->where(function ($query) use ($clinicId) {
-                if ($clinicId === null) {
-                    $query->whereNull('clinic_id');
-                } else {
-                    $query->where('clinic_id', $clinicId);
-                }
-            })
-            ->whereDate('appointment_date', $gregorianDate)
-            ->where('status', '!=', 'cancelled')
-            ->whereNull('deleted_at')
-            ->get()
-            ->pluck('appointment_time')
-            ->map(function ($time) {
-                return Carbon::parse($time)->format('H:i');
-            })
-            ->toArray();
-
-        // Generate available time slots for each period
-        $availableTimes = [];
-        foreach ($workHours as $period) {
-            $periodStart = Carbon::createFromFormat('H:i', $period['start'], 'Asia/Tehran');
-            $periodEnd = Carbon::createFromFormat('H:i', $period['end'], 'Asia/Tehran');
-            $maxAppointments = $period['max_appointments'] ?? 0;
-
-            // Calculate total minutes in period
-            $totalMinutes = $periodStart->diffInMinutes($periodEnd);
-
-            // Calculate interval between appointments based on max_appointments
-            $intervalMinutes = floor($totalMinutes / $maxAppointments);
-
-            // Generate time slots
-            $slotTime = $periodStart->copy();
-            $slotsGenerated = 0;
-
-            while ($slotTime->lt($periodEnd) && $slotsGenerated < $maxAppointments) {
-                $timeStr = $slotTime->format('H:i');
-
-                // Skip if time is in the past (for today)
-                if ($selectedDate->isSameDay($now)) {
-                    // For today, compare with current time
-                    if ($timeStr <= $currentTimeStr) {
-                        Log::info("Skipping past time slot: {$timeStr} (current time: {$currentTimeStr})");
-                        $slotTime->addMinutes($intervalMinutes);
-                        continue;
-                    }
-                }
-
-                // Skip if time is already reserved
-                if (in_array($timeStr, $reservedAppointments)) {
-                    $slotTime->addMinutes($intervalMinutes);
-                    continue;
-                }
-
-                $availableTimes[] = $timeStr;
-                $slotsGenerated++;
-                $slotTime->addMinutes($intervalMinutes);
-            }
-        }
-
-        Log::info('Final available times: ' . json_encode($availableTimes));
-
-        $this->availableTimes = $availableTimes;
+private function loadAvailableTimes()
+{
+    if (!$this->appointmentDate) {
+        Log::info('No appointment date selected');
+        $this->availableTimes = [];
         $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
+        return;
     }
+
+    Log::info('Selected Jalali date: ' . $this->appointmentDate);
+
+    // Convert Jalali date to Gregorian
+    $gregorianDate = $this->convertToGregorian($this->appointmentDate);
+    if (!$gregorianDate) {
+        Log::error('Failed to convert Jalali date to Gregorian');
+        $this->availableTimes = [];
+        $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
+        return;
+    }
+
+    // Get current time with proper timezone
+    $now = Carbon::now('Asia/Tehran');
+    $currentTimeStr = $now->format('H:i');
+    Log::info('Current time: ' . $currentTimeStr);
+
+    $selectedDate = Carbon::parse($gregorianDate, 'Asia/Tehran')->startOfDay();
+
+    if ($selectedDate->lt($now->startOfDay())) {
+        Log::info('Selected date is in the past');
+        $this->dispatch('show-toastr', ['message' => 'امکان ثبت نوبت برای تاریخ گذشته وجود ندارد', 'type' => 'error']);
+        $this->availableTimes = [];
+        $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
+        return;
+    }
+
+    $doctorId = $this->getAuthenticatedDoctor()->id;
+    $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+
+    // Get doctor's work schedule for this day
+    $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+        ->where(function ($query) use ($clinicId) {
+            if ($clinicId === null) {
+                $query->whereNull('clinic_id');
+            } else {
+                $query->where('clinic_id', $clinicId);
+            }
+        })
+        ->where('day', strtolower(date('l', strtotime($gregorianDate))))
+        ->where('is_working', true)
+        ->first();
+
+    // Check for special schedule
+    $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
+        ->where('date', $gregorianDate)
+        ->when($clinicId === null, fn ($q) => $q->whereNull('clinic_id'))
+        ->when($clinicId !== null, fn ($q) => $q->where('clinic_id', $clinicId))
+        ->first();
+
+    $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : ($workSchedule ? json_decode($workSchedule->work_hours, true) : []);
+    $appointmentSettings = $specialSchedule ? (json_decode($specialSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ($workSchedule ? (json_decode($workSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ['appointment_duration' => 15]);
+
+    if (empty($workHours)) {
+        Log::info('No work hours found for date: ' . $gregorianDate);
+        $this->availableTimes = [];
+        $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
+        return;
+    }
+
+    // Calculate available slots
+    $slots = [];
+    $existingAppointments = Appointment::where('doctor_id', $doctorId)
+        ->where('appointment_date', $gregorianDate)
+        ->where('status', '!=', 'cancelled')
+        ->whereNull('deleted_at')
+        ->when($clinicId === null, fn ($q) => $q->whereNull('clinic_id'))
+        ->when($clinicId !== null, fn ($q) => $q->where('clinic_id', $clinicId))
+        ->pluck('appointment_time')
+        ->map(fn ($time) => Carbon::parse($time)->format('H:i'))
+        ->toArray();
+
+    $currentTime = Carbon::now('Asia/Tehran');
+    $isToday = Carbon::parse($gregorianDate)->isSameDay($currentTime);
+
+    foreach ($workHours as $period) {
+        $start = Carbon::parse($period['start']);
+        $end = Carbon::parse($period['end']);
+        $maxAppointments = $period['max_appointments'] ?? PHP_INT_MAX;
+
+        // Calculate slot interval
+        $totalMinutes = $start->diffInMinutes($end);
+        $slotInterval = $maxAppointments > 0 ? max(1, floor($totalMinutes / $maxAppointments)) : 15;
+
+        $currentSlot = $start->copy();
+        $slotsGenerated = 0;
+
+        while ($currentSlot->lt($end) && $slotsGenerated < $maxAppointments) {
+            $slotTime = $currentSlot->format('H:i');
+
+            // Skip past times for today only
+            if ($isToday && $slotTime <= $currentTime->format('H:i')) {
+                $currentSlot->addMinutes($slotInterval);
+                continue;
+            }
+
+            // Check for existing appointments
+            if (!in_array($slotTime, $existingAppointments)) {
+                $slots[] = $slotTime;
+                $slotsGenerated++;
+            }
+
+            $currentSlot->addMinutes($slotInterval);
+        }
+    }
+
+    Log::info('Calculated available slots', [
+        'date' => $gregorianDate,
+        'slots' => $slots,
+        'total_slots' => count($slots),
+    ]);
+
+    $this->availableTimes = array_values($slots);
+    $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
+}
 
     public function selectTime($time = null)
     {
@@ -2468,65 +2477,64 @@ private function filterSlotsForToday($slots, $isToday, $currentTime)
             ->toArray();
     }
 
-    private function generateAvailableTimes($workSchedule, $reservedAppointments)
-    {
-        if (!$workSchedule || empty($workSchedule['work_hours'])) {
-            return [];
-        }
-
-        $availableTimes = [];
-        $duration = $workSchedule['appointment_settings']['appointment_duration'] ?? 15;
-        $now = Carbon::now('Asia/Tehran');
-        $currentTimeStr = $now->format('H:i');
-
-        // Check if the selected date is today
-        $isToday = false;
-        if (!empty($workSchedule['work_hours'])) {
-            $firstPeriodStart = Carbon::parse($workSchedule['work_hours'][0]['start']);
-            $isToday = $now->isSameDay($firstPeriodStart);
-        }
-
-        foreach ($workSchedule['work_hours'] as $period) {
-            $start = Carbon::parse($period['start']);
-            $end = Carbon::parse($period['end']);
-            $maxAppointments = $period['max_appointments'] ?? PHP_INT_MAX;
-            $slotsGenerated = 0;
-
-            while ($start->lt($end) && $slotsGenerated < $maxAppointments) {
-                $timeStr = $start->format('H:i');
-
-                // Skip past times only if the selected date is today
-                if ($isToday) {
-                    // For today, compare with current time
-                    if ($timeStr <= $currentTimeStr) {
-                        Log::info("Skipping past time slot for today: {$timeStr} (current time: {$currentTimeStr})");
-                        $start->addMinutes($duration);
-                        continue;
-                    }
-                }
-
-                // Skip if time is already reserved
-                $isReserved = false;
-                foreach ($reservedAppointments as $appointment) {
-                    if ($appointment['appointment_time'] === $timeStr) {
-                        $isReserved = true;
-                        Log::info("Skipping reserved time slot: {$timeStr}");
-                        break;
-                    }
-                }
-
-                if (!$isReserved) {
-                    $availableTimes[] = $timeStr;
-                    $slotsGenerated++;
-                }
-
-                $start->addMinutes($duration);
-            }
-        }
-
-        Log::info("Generated available times: " . json_encode($availableTimes));
-        return $availableTimes;
+private function generateAvailableTimes($workSchedule, $reservedAppointments)
+{
+    if (!$workSchedule || empty($workSchedule['work_hours'])) {
+        Log::info('No work hours provided for generating available times');
+        return [];
     }
+
+    $slots = [];
+    $currentTime = Carbon::now('Asia/Tehran');
+    $isToday = Carbon::parse($workSchedule['work_hours'][0]['start'])->isSameDay($currentTime);
+
+    foreach ($workSchedule['work_hours'] as $period) {
+        $start = Carbon::parse($period['start']);
+        $end = Carbon::parse($period['end']);
+        $maxAppointments = $period['max_appointments'] ?? PHP_INT_MAX;
+
+        // Calculate slot interval
+        $totalMinutes = $start->diffInMinutes($end);
+        $slotInterval = $maxAppointments > 0 ? max(1, floor($totalMinutes / $maxAppointments)) : 15;
+
+        $currentSlot = $start->copy();
+        $slotsGenerated = 0;
+
+        while ($currentSlot->lt($end) && $slotsGenerated < $maxAppointments) {
+            $slotTime = $currentSlot->format('H:i');
+
+            // Skip past times for today only
+            if ($isToday && $slotTime <= $currentTime->format('H:i')) {
+                $currentSlot->addMinutes($slotInterval);
+                continue;
+            }
+
+            // Check for existing appointments
+            $isReserved = false;
+            foreach ($reservedAppointments as $appointment) {
+                if ($appointment['appointment_time'] === $slotTime) {
+                    $isReserved = true;
+                    Log::info("Skipping reserved time slot: {$slotTime}");
+                    break;
+                }
+            }
+
+            if (!$isReserved) {
+                $slots[] = $slotTime;
+                $slotsGenerated++;
+            }
+
+            $currentSlot->addMinutes($slotInterval);
+        }
+    }
+
+    Log::info('Generated available times', [
+        'slots' => $slots,
+        'total_slots' => count($slots),
+    ]);
+
+    return array_values($slots);
+}
 
     public function render()
     {
