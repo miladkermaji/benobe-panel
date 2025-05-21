@@ -89,32 +89,43 @@
   #loading-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.98);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 9999;
     border-radius: var(--radius-card);
     backdrop-filter: blur(4px);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
-  }
-
-  #loading-overlay.active {
     opacity: 1;
     visibility: visible;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+  }
+
+  #loading-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
   }
 
   #loading-overlay::after {
     content: '';
-    width: 36px;
-    height: 36px;
-    border: 4px solid transparent;
+    width: 40px;
+    height: 40px;
+    border: 3px solid transparent;
     border-top-color: var(--primary);
     border-right-color: var(--primary-light);
     border-radius: 50%;
-    animation: spin 0.7s ease-in-out infinite;
+    animation: spin 0.8s linear infinite;
+  }
+
+  #loading-overlay::before {
+    content: 'در حال بارگذاری تقویم...';
+    position: absolute;
+    bottom: calc(50% + 35px);
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
   }
 
   @keyframes spin {

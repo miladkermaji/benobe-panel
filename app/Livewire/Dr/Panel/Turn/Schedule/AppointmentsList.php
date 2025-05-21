@@ -150,8 +150,8 @@ class AppointmentsList extends Component
             'total' => 0,
         ];
         // مقدار پیش‌فرض تاریخ امروز
-        
-$this->selectedDate = Carbon::now()->setTimezone('Asia/Tehran')->format('Y-m-d');
+
+        $this->selectedDate = Carbon::now()->setTimezone('Asia/Tehran')->format('Y-m-d');
 
         // خواندن selected_date از URL و دی‌کد کردن آن
         $selectedDateFromUrl = request()->query('selected_date');
@@ -2574,6 +2574,67 @@ $this->selectedDate = Carbon::now()->setTimezone('Asia/Tehran')->format('Y-m-d')
                 'success' => false,
                 'message' => 'خطا در دریافت تعداد نوبت‌ها'
             ], 500);
+        }
+    }
+
+    public function getAppointmentsCountWithCache($date)
+    {
+        try {
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                return 0;
+            }
+
+            $cacheKey = "appointments_count_{$doctor->id}_{$date}";
+
+            return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($doctor, $date) {
+                return Appointment::where('doctor_id', $doctor->id)
+                    ->where('appointment_date', $date)
+                    ->where('status', '!=', 'cancelled')
+                    ->whereNull('deleted_at')
+                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                    ->count();
+            });
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    public function getAppointmentsCountForMonth($year, $month)
+    {
+        try {
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                return [];
+            }
+
+            $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+            $endDate = $startDate->copy()->endOfMonth();
+
+            $cacheKey = "appointments_count_month_{$doctor->id}_{$year}_{$month}_{$this->selectedClinicId}";
+
+            return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($doctor, $startDate, $endDate) {
+                return DB::table('appointments')
+                    ->select('appointment_date', DB::raw('count(*) as count'))
+                    ->where('doctor_id', $doctor->id)
+                    ->whereBetween('appointment_date', [$startDate, $endDate])
+                    ->where('status', '!=', 'cancelled')
+                    ->whereNull('deleted_at')
+                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                    ->groupBy('appointment_date')
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'date' => Carbon::parse($item->appointment_date)->format('Y-m-d'),
+                            'count' => (int) $item->count
+                        ];
+                    })
+                    ->toArray();
+            });
+        } catch (\Exception $e) {
+            return [];
         }
     }
 }

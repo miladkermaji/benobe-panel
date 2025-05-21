@@ -129,31 +129,10 @@ function initializeRescheduleCalendar(appointmentId = null) {
     async function fetchCalendarData(year, month) {
         const cacheKey = `${year}-${month}`;
         if (calendarDataCache.has(cacheKey)) {
-            console.debug(`Using cached data for ${cacheKey}`);
             return calendarDataCache.get(cacheKey);
         }
 
         try {
-            if (
-                typeof Livewire !== "undefined" &&
-                typeof Livewire.dispatch === "function"
-            ) {
-                console.log("Dispatching setCalendarDate event with:", {
-                    year,
-                    month,
-                });
-                await new Promise((resolve) => {
-                    Livewire.dispatchTo(
-                        "dr.panel.turn.schedule.appointments-list",
-                        "setCalendarDate",
-                        { year, month }
-                    );
-                    setTimeout(resolve, 100);
-                });
-            } else {
-                console.warn("Livewire.dispatch is not available");
-            }
-
             // Get appointments data from the server
             const response = await $.ajax({
                 url: appointmentsCountUrl,
@@ -174,42 +153,23 @@ function initializeRescheduleCalendar(appointmentId = null) {
                     ? window.holidaysData.holidays
                     : [];
 
-                console.log("Raw appointments data:", response);
-                console.log("Processed appointments:", appointments);
-                console.log("Processed holidays:", holidays);
-
                 const data = { holidays, appointments };
                 calendarDataCache.set(cacheKey, data);
                 return data;
-            } else {
-                console.error("Error fetching appointments:", response.message);
-                return { holidays: [], appointments: [] };
             }
+            return { holidays: [], appointments: [] };
         } catch (error) {
             console.error("Error in fetchCalendarData:", error);
-            if (loadingOverlay) loadingOverlay.style.display = "none";
-            if (calendarBody) calendarBody.style.display = "grid";
             return { holidays: [], appointments: [] };
         }
     }
 
     async function generateCalendar(year, month) {
-        if (!calendarBody) {
-            console.error("Cannot generate calendar: Calendar body is missing");
-            if (loadingOverlay) loadingOverlay.style.display = "none";
-            return;
-        }
-
-        if (isRendering) {
-            console.warn(
-                `Calendar is already rendering for ${year}/${month}, skipping...`
-            );
-            return;
-        }
-        if (lastRender.year === year && lastRender.month === month) {
-            console.debug(`Skipping duplicate render for ${year}/${month}`);
-            if (loadingOverlay) loadingOverlay.style.display = "none";
-            if (calendarBody) calendarBody.style.display = "grid";
+        if (
+            !calendarBody ||
+            isRendering ||
+            (lastRender.year === year && lastRender.month === month)
+        ) {
             return;
         }
 
@@ -218,30 +178,19 @@ function initializeRescheduleCalendar(appointmentId = null) {
 
         try {
             const fragment = document.createDocumentFragment();
-            console.debug(`Cleared calendarBody for ${year}/${month}`);
-
             const targetYear = parseInt(year);
             const targetMonth = parseInt(month);
-            console.debug(
-                `Generating calendar for year: ${targetYear}, month: ${targetMonth}`
-            );
 
             const firstDayOfMonth = moment(
                 `${targetYear}/${targetMonth}/01`,
                 "jYYYY/jMM/jDD"
             ).locale("fa");
             if (!firstDayOfMonth.isValid()) {
-                console.error(
-                    `Invalid date for ${targetYear}/${targetMonth}/01`
-                );
                 return;
             }
 
             const daysInMonth = firstDayOfMonth.jDaysInMonth();
             let firstDayWeekday = firstDayOfMonth.weekday();
-            console.debug(
-                `First day weekday: ${firstDayWeekday}, Days in month: ${daysInMonth}`
-            );
             const today = moment().locale("fa");
 
             const { holidays, appointments } = await fetchCalendarData(
@@ -249,24 +198,31 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 targetMonth
             );
 
-            console.log("Calendar data received:", { holidays, appointments });
-
-            if (loadingOverlay) loadingOverlay.style.display = "none";
-            if (calendarBody) calendarBody.style.display = "grid";
-
+            // Create empty days for first week
             for (let i = 0; i < firstDayWeekday; i++) {
                 const emptyDay = document.createElement("div");
                 emptyDay.classList.add("calendar-day", "empty");
                 fragment.appendChild(emptyDay);
             }
 
+            // Create a map of appointments for faster lookup
+            const appointmentMap = new Map(
+                appointments.map((appt) => [
+                    moment(appt.appointment_date, [
+                        "YYYY-MM-DD",
+                        "YYYY-MM-DD HH:mm:ss",
+                    ]).format("YYYY-MM-DD"),
+                    appt,
+                ])
+            );
+
+            // Create days
             for (let day = 1; day <= daysInMonth; day++) {
                 const currentDay = firstDayOfMonth.clone().add(day - 1, "days");
                 const jalaliDate = currentDay.format("jYYYY/jMM/jDD");
-                const formattedJalaliDate = currentDay.format("jD jMMMM jYYYY");
-                const gregorianDate = currentDay.toDate();
-                const gregorianString =
-                    moment(gregorianDate).format("YYYY-MM-DD");
+                const gregorianString = moment(currentDay.toDate()).format(
+                    "YYYY-MM-DD"
+                );
 
                 const currentJalaliYear = parseInt(currentDay.format("jYYYY"));
                 const currentJalaliMonth = parseInt(currentDay.format("jMM"));
@@ -274,9 +230,6 @@ function initializeRescheduleCalendar(appointmentId = null) {
                     currentJalaliYear !== targetYear ||
                     currentJalaliMonth !== targetMonth
                 ) {
-                    console.warn(
-                        `Skipping invalid date ${jalaliDate} (expected ${targetYear}/${targetMonth})`
-                    );
                     continue;
                 }
 
@@ -285,18 +238,13 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 dayElement.setAttribute("data-date", jalaliDate);
                 dayElement.setAttribute("data-gregorian", gregorianString);
 
-                const isHoliday = holidays.includes(gregorianString);
-                if (isHoliday) dayElement.classList.add("holiday");
+                // Add holiday class if needed
+                if (holidays.includes(gregorianString)) {
+                    dayElement.classList.add("holiday");
+                }
 
-                // Find appointment data for this date
-                const appointment = appointments.find((appt) => {
-                    const apptDate = moment(appt.appointment_date, [
-                        "YYYY-MM-DD",
-                        "YYYY-MM-DD HH:mm:ss",
-                    ]).format("YYYY-MM-DD");
-                    return apptDate === gregorianString;
-                });
-
+                // Get appointment data from map
+                const appointment = appointmentMap.get(gregorianString);
                 const appointmentCount =
                     appointment &&
                     !currentDay.isBefore(today, "day") &&
@@ -304,29 +252,25 @@ function initializeRescheduleCalendar(appointmentId = null) {
                         ? appointment.appointment_count
                         : 0;
 
-                console.log(`Processing day ${gregorianString}:`, {
-                    isHoliday,
-                    appointment,
-                    appointmentCount,
-                    isPast: currentDay.isBefore(today, "day"),
-                });
-
-                // Show appointment count for all days (except past days)
-                if (!currentDay.isBefore(today, "day")) {
-                    if (appointmentCount > 0) {
-                        dayElement.classList.add("has-appointment");
-                        const countElement = document.createElement("span");
-                        countElement.classList.add("appointment-count");
-                        countElement.textContent = appointmentCount;
-                        dayElement.appendChild(countElement);
-                    }
+                // Add appointment count if needed
+                if (
+                    !currentDay.isBefore(today, "day") &&
+                    appointmentCount > 0
+                ) {
+                    dayElement.classList.add("has-appointment");
+                    const countElement = document.createElement("span");
+                    countElement.classList.add("appointment-count");
+                    countElement.textContent = appointmentCount;
+                    dayElement.appendChild(countElement);
                 }
 
+                // Add day number
                 const dayNumberElement = document.createElement("span");
                 dayNumberElement.classList.add("day-number");
                 dayNumberElement.textContent = currentDay.format("jD");
                 dayElement.appendChild(dayNumberElement);
 
+                // Add today label if needed
                 if (currentDay.isSame(today, "day")) {
                     dayElement.classList.add("today");
                     const todayLabel = document.createElement("span");
@@ -335,35 +279,36 @@ function initializeRescheduleCalendar(appointmentId = null) {
                     dayElement.appendChild(todayLabel);
                 }
 
-                if (currentDay.day() === 5) dayElement.classList.add("friday");
+                // Add friday class if needed
+                if (currentDay.day() === 5) {
+                    dayElement.classList.add("friday");
+                }
 
                 fragment.appendChild(dayElement);
             }
 
+            // Update calendar body
             calendarBody.innerHTML = "";
             calendarBody.appendChild(fragment);
 
-            // Add click handlers to days
+            // Add click handlers
             const days = calendarBody.querySelectorAll(
                 ".calendar-day:not(.empty)"
             );
             days.forEach((day) => {
                 day.onclick = () => handleDayClick(day);
             });
-
-            const renderedDays = calendarBody.querySelectorAll(
-                ".calendar-day:not(.empty)"
-            );
-            console.debug(
-                `Total rendered days: ${renderedDays.length} for ${targetYear}/${targetMonth}`
-            );
         } finally {
             isRendering = false;
+            if (loadingOverlay) loadingOverlay.style.display = "none";
+            if (calendarBody) calendarBody.style.display = "grid";
         }
     }
 
+    // Optimize debounce function
     const debouncedGenerateCalendar = debounce(generateCalendar, 300);
 
+    // Optimize select box population
     function populateSelectBoxes() {
         const yearSelect = ensureRescheduleElementExists(
             "#reschedule-year",
@@ -379,22 +324,20 @@ function initializeRescheduleCalendar(appointmentId = null) {
 
         const currentYear = moment().jYear();
         const currentMonth = moment().jMonth() + 1;
-        console.debug(
-            `Populating select boxes with year: ${currentYear}, month: ${currentMonth}`
-        );
 
-        // پاک‌سازی منوهای کشویی
-        yearSelect.innerHTML = "";
-        monthSelect.innerHTML = "";
-
-        // پر کردن منوی سال
+        // Create year options
+        const yearFragment = document.createDocumentFragment();
         for (let year = currentYear - 10; year <= currentYear + 10; year++) {
             const option = document.createElement("option");
             option.value = year;
             option.textContent = year;
-            yearSelect.appendChild(option);
+            yearFragment.appendChild(option);
         }
+        yearSelect.innerHTML = "";
+        yearSelect.appendChild(yearFragment);
 
+        // Create month options
+        const monthFragment = document.createDocumentFragment();
         const persianMonths = [
             "فروردین",
             "اردیبهشت",
@@ -409,49 +352,38 @@ function initializeRescheduleCalendar(appointmentId = null) {
             "بهمن",
             "اسفند",
         ];
-
-        // پر کردن منوی ماه
-        for (let month = 1; month <= 12; month++) {
+        persianMonths.forEach((month, index) => {
             const option = document.createElement("option");
-            option.value = month;
-            option.textContent = persianMonths[month - 1];
-            monthSelect.appendChild(option);
-        }
+            option.value = index + 1;
+            option.textContent = month;
+            monthFragment.appendChild(option);
+        });
+        monthSelect.innerHTML = "";
+        monthSelect.appendChild(monthFragment);
 
-        // تنظیم مقادیر پیش‌فرض
+        // Set default values
         yearSelect.value = currentYear;
         monthSelect.value = currentMonth;
-        console.debug(
-            `Year select set to: ${yearSelect.value}, Month select set to: ${monthSelect.value}`
-        );
 
-        // اصلاح: استفاده از Event Delegation برای مدیریت رویدادهای سلکت‌باکس
+        // Add event listener
         let isProcessing = false;
-        const handleSelectChange = (event) => {
+        const handleSelectChange = debounce((event) => {
             if (isProcessing) return;
             isProcessing = true;
-            const target = event.target;
-            if (target.matches("#reschedule-year")) {
-                console.debug(`Year changed to: ${target.value}`);
-            } else if (target.matches("#reschedule-month")) {
-                console.debug(`Month changed to: ${target.value}`);
-            }
+
             if (loadingOverlay) loadingOverlay.style.display = "flex";
             if (calendarBody) calendarBody.style.display = "none";
+
             debouncedGenerateCalendar(
                 parseInt(yearSelect.value),
                 parseInt(monthSelect.value)
             );
-            setTimeout(() => (isProcessing = false), 300);
-        };
 
-        // اصلاح: حذف رویدادهای قبلی و بایندینگ با Event Delegation
+            setTimeout(() => (isProcessing = false), 300);
+        }, 300);
+
         modalScope.removeEventListener("change", handleSelectChange);
         modalScope.addEventListener("change", handleSelectChange);
-
-        // اصلاح: اطمینان از تنظیم مقادیر پس از ریست
-        yearSelect.value = currentYear;
-        monthSelect.value = currentMonth;
     }
 
     let prevMonthBtn = ensureRescheduleElementExists(
