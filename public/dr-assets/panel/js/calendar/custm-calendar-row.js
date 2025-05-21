@@ -104,7 +104,7 @@ $(document).ready(function () {
                 .startOf("day")
                 .subtract(9, "days");
             fetchAppointmentsCount();
-        })
+        }, 1000)
     );
 
     // گوش دادن به رویدادهای Livewire
@@ -113,7 +113,7 @@ $(document).ready(function () {
         debounceUpdate(function (event) {
             console.log("Appointments cancelled, updating counts...");
             fetchAppointmentsCount();
-        })
+        }, 1000)
     );
 
     Livewire.on(
@@ -121,7 +121,7 @@ $(document).ready(function () {
         debounceUpdate(function (event) {
             console.log("Appointment rescheduled event received:", event);
             fetchAppointmentsCount();
-        })
+        }, 1000)
     );
 
     Livewire.on(
@@ -129,11 +129,15 @@ $(document).ready(function () {
         debounceUpdate(function (event) {
             console.log("Visit status updated, refreshing counts...");
             fetchAppointmentsCount();
-        })
+        }, 1000)
     );
 
     function fetchAppointmentsCount() {
         if (!calendar.length) {
+            return;
+        }
+        if (isAnimating) {
+            console.log("Animation in progress, skipping fetch");
             return;
         }
         loadingOverlay.show();
@@ -294,16 +298,6 @@ $(document).ready(function () {
         });
 
         updateButtonState();
-
-        // Add event listener for appointments rescheduled
-        window.addEventListener("appointments-rescheduled", (event) => {
-            console.log(
-                "Appointments rescheduled event received:",
-                event.detail
-            );
-            // Refresh the calendar data
-            fetchAppointmentsCount();
-        });
     }
 
     function updateButtonState() {
@@ -320,7 +314,10 @@ $(document).ready(function () {
     }
 
     function animateAndLoadCalendar(direction) {
-        if (isAnimating) return;
+        if (isAnimating) {
+            console.log("Animation already in progress, skipping");
+            return;
+        }
         isAnimating = true;
         const offset = direction === "nextRow" ? 5 : -5;
         const newDate = moment(currentDate).add(offset, "days").startOf("day");

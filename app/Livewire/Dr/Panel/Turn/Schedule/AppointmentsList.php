@@ -2377,53 +2377,43 @@ class AppointmentsList extends Component
     public function rescheduleAppointment($appointmentIds, $newDate, $selectedTime = null)
     {
         try {
-            Log::info('Rescheduling appointments:', [
-                'appointmentIds' => $appointmentIds,
-                'newDate' => $newDate,
-                'selectedTime' => $selectedTime
-            ]);
-
             $doctor = $this->getAuthenticatedDoctor();
             if (!$doctor) {
-                throw new Exception('دکتر یافت نشد');
+                throw new Exception('دکتر یافت نشد.');
             }
 
-            // تبدیل تاریخ به فرمت مناسب
-            $gregorianDate = $this->convertToGregorian($newDate);
-            Log::info('Converting date from Gregorian: ' . $newDate . ' to Jalali: ' . $gregorianDate);
-
-            // بررسی شرایط جابجایی
-            $checkResult = $this->checkRescheduleConditions($gregorianDate, $appointmentIds);
-            if (!$checkResult['success'] || !$checkResult['canReschedule']) {
-                throw new Exception($checkResult['message']);
+            $conditions = $this->checkRescheduleConditions($newDate, $appointmentIds);
+            if (!$conditions['success'] || !$conditions['canReschedule']) {
+                if (isset($conditions['partial']) && $conditions['partial']) {
+                    $nextDate = $conditions['next_available_date'];
+                    $nextDateJalali = Jalalian::fromCarbon(Carbon::parse($nextDate))->format('Y/m/d');
+                    $message = $conditions['message'];
+                    $this->dispatch('show-partial-reschedule-confirm', [
+                        'message' => $message,
+                        'appointmentIds' => $appointmentIds,
+                        'newDate' => $newDate,
+                        'nextDate' => $nextDate,
+                        'availableSlots' => $conditions['available_slots'],
+                    ]);
+                    $this->dispatch('showModal', 'reschedule-modal');
+                    return;
+                }
+                $this->dispatch('show-toastr', ['type' => 'error', 'message' => $conditions['message']]);
+                $this->dispatch('showModal', 'reschedule-modal');
+                return;
             }
 
-            // دریافت زمان‌های خالی
-            $availableSlots = $this->getAvailableSlotsForDate($gregorianDate);
-            if (empty($availableSlots)) {
-                throw new Exception('هیچ زمان خالی برای این تاریخ یافت نشد');
-            }
+            $availableSlots = $conditions['available_slots'];
+            $this->processReschedule($appointmentIds, $newDate, $availableSlots, $selectedTime);
 
-            // اگر زمان انتخاب نشده باشد، اولین زمان خالی را انتخاب کن
-            if (!$selectedTime) {
-                $selectedTime = $availableSlots[0];
-                Log::info('No time selected, using first available time: ' . $selectedTime);
-            }
+            $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'نوبت‌ها با موفقیت جابجا شدند.']);
+            $this->dispatch('close-modal', ['name' => 'reschedule-modal']);
+            $this->dispatch('appointment-rescheduled');
+            $this->dispatch('refresh-appointments-list');
 
-            // پردازش جابجایی
-            $remainingIds = $this->processReschedule($appointmentIds, $gregorianDate, $availableSlots, $selectedTime);
-
-            if (empty($remainingIds)) {
-                $this->dispatch('appointments-rescheduled', [
-                    'message' => 'نوبت‌ها با موفقیت جابجا شدند',
-                    'dates' => [$gregorianDate]
-                ]);
-            } else {
-                throw new Exception('برخی از نوبت‌ها جابجا نشدند');
-            }
         } catch (Exception $e) {
-            Log::error('Error in rescheduleAppointment: ' . $e->getMessage());
-            throw new Exception('خطا در جابجایی نوبت: ' . $e->getMessage());
+            $this->dispatch('show-toastr', ['type' => 'error', 'message' => $e->getMessage()]);
+            $this->dispatch('showModal', 'reschedule-modal');
         }
     }
 
