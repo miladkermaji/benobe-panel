@@ -683,11 +683,21 @@ async function handleDayClick(dayElement) {
                         });
 
                         if (result.isConfirmed) {
-                            console.log("Rescheduling appointment:", {
+                            console.log("Rescheduling appointment with data:", {
+                                appointmentIds: selectedIds,
+                                newDate: date,
+                                selectedTime: time,
+                                originalTime: originalTime,
+                                originalDate: originalDate,
+                            });
+
+                            // اضافه کردن لاگ برای بررسی داده‌های ارسالی
+                            console.log("Dispatching reschedule event with:", {
                                 appointmentIds: selectedIds,
                                 newDate: date,
                                 selectedTime: time,
                             });
+
                             Livewire.dispatchTo(
                                 "dr.panel.turn.schedule.appointments-list",
                                 "rescheduleAppointment",
