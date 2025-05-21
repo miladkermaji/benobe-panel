@@ -48,18 +48,15 @@ $(document).ready(function () {
 
         const now = Date.now();
         if (now - lastUpdateTime < UPDATE_COOLDOWN) {
-            console.log("Skipping update due to cooldown");
             return;
         }
 
         const { dates } = event.detail;
         if (!dates || !Array.isArray(dates)) {
-            console.warn("Invalid dates array in event detail");
             return;
         }
 
         if (isUpdating) {
-            console.log("Update already in progress, skipping");
             return;
         }
 
@@ -111,7 +108,6 @@ $(document).ready(function () {
     Livewire.on(
         "appointments-cancelled",
         debounceUpdate(function (event) {
-            console.log("Appointments cancelled, updating counts...");
             fetchAppointmentsCount();
         }, 1000)
     );
@@ -119,7 +115,6 @@ $(document).ready(function () {
     Livewire.on(
         "appointment-rescheduled",
         debounceUpdate(function (event) {
-            console.log("Appointment rescheduled event received:", event);
             fetchAppointmentsCount();
         }, 1000)
     );
@@ -127,7 +122,6 @@ $(document).ready(function () {
     Livewire.on(
         "visited",
         debounceUpdate(function (event) {
-            console.log("Visit status updated, refreshing counts...");
             fetchAppointmentsCount();
         }, 1000)
     );
@@ -137,7 +131,6 @@ $(document).ready(function () {
             return;
         }
         if (isAnimating) {
-            console.log("Animation in progress, skipping fetch");
             return;
         }
         loadingOverlay.show();
@@ -315,7 +308,6 @@ $(document).ready(function () {
 
     function animateAndLoadCalendar(direction) {
         if (isAnimating) {
-            console.log("Animation already in progress, skipping");
             return;
         }
         isAnimating = true;
@@ -483,7 +475,6 @@ $(document).ready(function () {
     Livewire.on(
         "appointment-registered",
         debounceUpdate(function (event) {
-            console.log("Appointment registered event received:", event);
             fetchAppointmentsCount();
         })
     );

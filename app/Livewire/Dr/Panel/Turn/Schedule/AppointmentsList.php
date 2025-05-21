@@ -400,7 +400,6 @@ class AppointmentsList extends Component
     {
         $doctor = $this->getAuthenticatedDoctor();
         if (!$doctor) {
-            Log::warning('Doctor not authenticated in loadAppointments');
             return;
         }
 
@@ -461,12 +460,7 @@ class AppointmentsList extends Component
                 $this->appointments[] = $appointment;
             }
         } catch (\Exception $e) {
-            Log::error('Error in loadAppointments', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'query' => $query->toSql(),
-                'bindings' => $query->getBindings(),
-            ]);
+           
             $this->appointments = [];
         }
 
@@ -585,10 +579,7 @@ class AppointmentsList extends Component
     public function handleRescheduleAppointment($appointmentIds, $newDate)
     {
         try {
-            Log::info('Handling reschedule appointment request', [
-                'appointmentIds' => $appointmentIds,
-                'newDate' => $newDate
-            ]);
+         
 
             // بررسی اعتبار تاریخ
             $validator = Validator::make(['newDate' => $newDate], [
@@ -628,10 +619,7 @@ class AppointmentsList extends Component
 
             // استفاده از اولین زمان خالی
             $selectedTime = $availableTimes[0];
-            Log::info('Using first available time for rescheduling', [
-                'selectedTime' => $selectedTime,
-                'availableTimes' => $availableTimes
-            ]);
+           
 
             // بررسی شرایط جابجایی
             $conditions = $this->checkRescheduleConditions($newDate, $appointmentIds);
@@ -689,7 +677,6 @@ class AppointmentsList extends Component
             }
 
         } catch (\Exception $e) {
-            Log::error('Error in handleRescheduleAppointment: ' . $e->getMessage());
             $this->dispatch('show-toastr', [
                 'type' => 'error',
                 'message' => 'خطا در جابجایی نوبت: ' . $e->getMessage()
@@ -890,12 +877,7 @@ class AppointmentsList extends Component
             }
         }
 
-        // لاگ برای دیباگ
-        Log::info('Calculated available slots', [
-            'date' => $date,
-            'slots' => $slots,
-            'total_slots' => count($slots),
-        ]);
+      
 
         return array_values($slots); // بازگشت آرایه ایندکس‌شده
     }
@@ -955,7 +937,6 @@ class AppointmentsList extends Component
             $this->dispatch('close-modal');
             $this->reset(['rescheduleAppointmentIds', 'rescheduleAppointmentId']);
         } catch (\Exception $e) {
-            Log::error('Error in confirmPartialReschedule: ' . $e->getMessage());
             $this->dispatch('show-toastr', [
                 'type' => 'error',
                 'message' => 'خطایی در جابجایی نوبت رخ داد: ' . $e->getMessage()
@@ -1129,7 +1110,6 @@ class AppointmentsList extends Component
                 }
 
                 $selectedTime = $availableSlots[0];
-                Log::info('No time selected, using first available time: ' . $selectedTime);
             }
 
             // دریافت نوبت‌ها
@@ -1160,7 +1140,6 @@ class AppointmentsList extends Component
 
             return array_diff($appointmentIds, $updatedIds);
         } catch (Exception $e) {
-            Log::error('Error in processReschedule: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -1904,7 +1883,6 @@ class AppointmentsList extends Component
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('Error in goToFirstAvailableDate: ' . $e->getMessage());
             $this->dispatch('show-toastr', [
                 'type' => 'error',
                 'message' => 'خطایی رخ داد: ' . $e->getMessage(),
@@ -2126,7 +2104,6 @@ class AppointmentsList extends Component
 
             $doctor = $this->getAuthenticatedDoctor();
             $clinicId = $this->selectedClinicId;
-            Log::info($clinicId);
             $appointment = Appointment::create([
                 'patient_id' => $user->id,
                 'doctor_id' => $doctor->id,
@@ -2186,18 +2163,15 @@ class AppointmentsList extends Component
     private function loadAvailableTimes()
     {
         if (!$this->appointmentDate) {
-            Log::info('No appointment date selected');
             $this->availableTimes = [];
             $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
             return;
         }
 
-        Log::info('Selected Jalali date: ' . $this->appointmentDate);
 
         // Convert Jalali date to Gregorian
         $gregorianDate = $this->convertToGregorian($this->appointmentDate);
         if (!$gregorianDate) {
-            Log::error('Failed to convert Jalali date to Gregorian');
             $this->availableTimes = [];
             $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
             return;
@@ -2206,12 +2180,10 @@ class AppointmentsList extends Component
         // Get current time with proper timezone
         $now = Carbon::now('Asia/Tehran');
         $currentTimeStr = $now->format('H:i');
-        Log::info('Current time: ' . $currentTimeStr);
 
         $selectedDate = Carbon::parse($gregorianDate, 'Asia/Tehran')->startOfDay();
 
         if ($selectedDate->lt($now->startOfDay())) {
-            Log::info('Selected date is in the past');
             $this->dispatch('show-toastr', ['message' => 'امکان ثبت نوبت برای تاریخ گذشته وجود ندارد', 'type' => 'error']);
             $this->availableTimes = [];
             $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
@@ -2245,7 +2217,6 @@ class AppointmentsList extends Component
         $appointmentSettings = $specialSchedule ? (json_decode($specialSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ($workSchedule ? (json_decode($workSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ['appointment_duration' => 15]);
 
         if (empty($workHours)) {
-            Log::info('No work hours found for date: ' . $gregorianDate);
             $this->availableTimes = [];
             $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
             return;
@@ -2297,11 +2268,7 @@ class AppointmentsList extends Component
             }
         }
 
-        Log::info('Calculated available slots', [
-            'date' => $gregorianDate,
-            'slots' => $slots,
-            'total_slots' => count($slots),
-        ]);
+   
 
         $this->availableTimes = array_values($slots);
         $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
@@ -2348,7 +2315,6 @@ class AppointmentsList extends Component
     public function getAvailableTimesForDate($date)
     {
         try {
-            Log::info("Getting available times for date: {$date}");
 
             $workSchedule = $this->getWorkSchedule($date);
             if (!$workSchedule) {
@@ -2360,14 +2326,12 @@ class AppointmentsList extends Component
 
             $availableTimes = $this->generateAvailableTimes($workSchedule, $reservedAppointments);
 
-            Log::info("Available times for date {$date}:", [$availableTimes]);
 
             // Dispatch the event with the flat array of times
             $this->dispatch('available-times-updated', ['times' => $availableTimes]);
 
             return $availableTimes;
         } catch (\Exception $e) {
-            Log::error("Error in getAvailableTimesForDate: " . $e->getMessage());
             $this->dispatch('available-times-updated', ['times' => []]);
             return [];
         }
@@ -2437,9 +2401,7 @@ class AppointmentsList extends Component
                 json_decode(json_decode($specialSchedule->work_hours, true), true) :
                 json_decode($specialSchedule->work_hours, true);
 
-            Log::info("Using special schedule for date: {$date}", [
-                'work_hours' => $workHours
-            ]);
+         
 
             return [
                 'work_hours' => $workHours,
@@ -2462,10 +2424,7 @@ class AppointmentsList extends Component
                 json_decode(json_decode($regularSchedule->work_hours, true), true) :
                 json_decode($regularSchedule->work_hours, true);
 
-            Log::info("Using regular schedule for date: {$date}", [
-                'day' => $dayOfWeek,
-                'work_hours' => $workHours
-            ]);
+         
 
             return [
                 'work_hours' => $workHours,
