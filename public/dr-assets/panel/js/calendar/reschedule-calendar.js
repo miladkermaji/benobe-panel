@@ -836,4 +836,108 @@ document.addEventListener("livewire:initialized", () => {
             window.selectedSingleAppointmentId = null;
         }
     });
+
+    // Add Livewire event listeners
+    Livewire.on("available-times-updated", (event) => {
+        const times = event.times || [];
+        updateAvailableTimes(times);
+    });
+
+    Livewire.on("appointment-details-received", (event) => {
+        console.log("Received appointment details:", event);
+        const details = event.details || [];
+        if (details.length > 0) {
+            selectedAppointmentIds = details.map((d) => d.id);
+            console.log("Selected IDs:", selectedAppointmentIds);
+        }
+    });
 });
+
+function handleDateSelection(date) {
+    const selectedDate = moment(date).format("YYYY-MM-DD");
+    console.log(
+        "Selected date:",
+        selectedDate,
+        "Jalali:",
+        moment(date).locale("fa").format("YYYY/MM/DD")
+    );
+
+    // Fetch available times for the selected date
+    fetchAvailableTimes(selectedDate);
+}
+
+function fetchAvailableTimes(date) {
+    console.log("Fetching available times for date:", date);
+    Livewire.dispatch("getAvailableTimesForDate", { date: date });
+}
+
+function updateAvailableTimes(times) {
+    console.log("Received times update:", times);
+    const timeContainer = document.getElementById("reschedule-available-times");
+    if (!timeContainer) return;
+
+    timeContainer.innerHTML = "";
+
+    if (!times || times.length === 0) {
+        timeContainer.innerHTML =
+            '<div class="alert alert-info w-100 text-center">هیچ ساعت خالی برای این تاریخ یافت نشد</div>';
+        return;
+    }
+
+    times.forEach((time) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "btn btn-outline-primary m-1 reschedule-time-btn";
+        button.dataset.time = time;
+        button.textContent = time;
+
+        button.addEventListener("click", () => {
+            // Remove selection from other buttons
+            document.querySelectorAll(".reschedule-time-btn").forEach((btn) => {
+                btn.classList.remove("btn-primary");
+                btn.classList.add("btn-outline-primary");
+            });
+
+            // Select this button
+            button.classList.remove("btn-outline-primary");
+            button.classList.add("btn-primary");
+
+            // Store selected time
+            selectedTime = time;
+        });
+
+        timeContainer.appendChild(button);
+    });
+}
+
+function rescheduleAppointment() {
+    if (!selectedDate) {
+        Swal.fire({
+            title: "خطا",
+            text: "لطفاً یک تاریخ را انتخاب کنید",
+            icon: "error",
+            confirmButtonText: "باشه",
+        });
+        return;
+    }
+
+    const appointmentIds = selectedAppointmentIds;
+    console.log("Rescheduling appointment:", {
+        appointmentIds,
+        newDate: selectedDate,
+        selectedTime: selectedTime,
+    });
+
+    if (typeof Livewire !== "undefined") {
+        Livewire.dispatch("rescheduleAppointment", [
+            appointmentIds,
+            selectedDate,
+            selectedTime,
+        ]);
+    } else {
+        console.error("Livewire is not available");
+    }
+
+    // Close modal and cleanup
+    closeModal();
+}
