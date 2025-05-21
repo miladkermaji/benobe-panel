@@ -798,6 +798,13 @@ async function handleDayClick(dayElement) {
                 return;
             }
 
+            // Sort times based on work hours
+            const sortedTimes = [...times].sort((a, b) => {
+                const [aHour, aMin] = a.split(":").map(Number);
+                const [bHour, bMin] = b.split(":").map(Number);
+                return aHour * 60 + aMin - (bHour * 60 + bMin);
+            });
+
             // Create time mapping for confirmation message
             const timeMapping = selectedIds
                 .map((id, index) => {
@@ -815,18 +822,11 @@ async function handleDayClick(dayElement) {
                         },
                         to: {
                             date: jalaliDate,
-                            time: times[index],
+                            time: sortedTimes[index], // Use sorted times
                         },
                     };
                 })
                 .filter(Boolean);
-
-            // Sort times based on work hours
-            const sortedTimes = [...times].sort((a, b) => {
-                const [aHour, aMin] = a.split(":").map(Number);
-                const [bHour, bMin] = b.split(":").map(Number);
-                return aHour * 60 + aMin - (bHour * 60 + bMin);
-            });
 
             const result = await Swal.fire({
                 title: "تایید جابجایی",
@@ -835,8 +835,8 @@ async function handleDayClick(dayElement) {
                 } نوبت به تاریخ ${jalaliDate} اطمینان دارید؟<br><br>
                       <small>نوبت‌های فعلی و زمان‌های جدید:<br>${timeMapping
                           .map(
-                              (m, index) =>
-                                  `${m.from.time} تاریخ ${m.from.date} → ${sortedTimes[index]} تاریخ ${m.to.date}`
+                              (m) =>
+                                  `${m.from.time} تاریخ ${m.from.date} → ${m.to.time} تاریخ ${m.to.date}`
                           )
                           .join("<br>")}</small>`,
                 icon: "question",
@@ -846,15 +846,39 @@ async function handleDayClick(dayElement) {
             });
 
             if (result.isConfirmed) {
-                // Send reschedule request with sequential times
+                // Create a map of appointment IDs to their new times
+                const appointmentTimeMap = selectedIds.reduce(
+                    (map, id, index) => {
+                        map[id] = sortedTimes[index];
+                        return map;
+                    },
+                    {}
+                );
+
+                console.log(
+                    "Sending appointment time map:",
+                    appointmentTimeMap
+                );
+
+                // Send reschedule request with mapped times
                 Livewire.dispatchTo(
                     "dr.panel.turn.schedule.appointments-list",
                     "rescheduleAppointment",
                     {
                         appointmentIds: selectedIds,
                         newDate: date,
-                        selectedTimes: sortedTimes.slice(0, selectedIds.length), // Send sorted times
+                        selectedTimes: appointmentTimeMap,
+                        isMultiple: true, // Add flag to indicate multiple appointments
                     }
+                );
+
+                // Close the modal after sending the request
+                window.dispatchEvent(
+                    new CustomEvent("close-modal", {
+                        detail: {
+                            name: "reschedule-modal",
+                        },
+                    })
                 );
             }
         } catch (error) {

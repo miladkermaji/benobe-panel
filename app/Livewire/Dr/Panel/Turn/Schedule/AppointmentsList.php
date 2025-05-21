@@ -460,7 +460,7 @@ class AppointmentsList extends Component
                 $this->appointments[] = $appointment;
             }
         } catch (\Exception $e) {
-           
+
             $this->appointments = [];
         }
 
@@ -579,7 +579,7 @@ class AppointmentsList extends Component
     public function handleRescheduleAppointment($appointmentIds, $newDate)
     {
         try {
-         
+
 
             // بررسی اعتبار تاریخ
             $validator = Validator::make(['newDate' => $newDate], [
@@ -619,7 +619,7 @@ class AppointmentsList extends Component
 
             // استفاده از اولین زمان خالی
             $selectedTime = $availableTimes[0];
-           
+
 
             // بررسی شرایط جابجایی
             $conditions = $this->checkRescheduleConditions($newDate, $appointmentIds);
@@ -877,7 +877,7 @@ class AppointmentsList extends Component
             }
         }
 
-      
+
 
         return array_values($slots); // بازگشت آرایه ایندکس‌شده
     }
@@ -1091,56 +1091,43 @@ class AppointmentsList extends Component
         try {
             $doctor = $this->getAuthenticatedDoctor();
             if (!$doctor) {
-                throw new Exception('دکتر یافت نشد');
+                throw new Exception('دکتر یافت نشد.');
             }
 
-            $workSchedule = $this->getWorkSchedule($newDate);
-            if (!$workSchedule) {
-                throw new Exception('برنامه کاری برای این تاریخ یافت نشد');
-            }
+            $remainingIds = [];
+            $appointments = Appointment::whereIn('id', $appointmentIds)->get();
 
-            // اگر زمان انتخاب نشده باشد، اولین زمان خالی را انتخاب کن
-            if (!$selectedTime) {
-                if (empty($availableSlots)) {
-                    $availableSlots = $this->getAvailableSlotsForDate($newDate);
+            // If we have selected times for multiple appointments
+            if (is_array($selectedTime)) {
+                foreach ($appointments as $appointment) {
+                    $newTime = $selectedTime[$appointment->id] ?? null;
+                    if (!$newTime || !in_array($newTime, $availableSlots)) {
+                        $remainingIds[] = $appointment->id;
+                        continue;
+                    }
+
+                    $appointment->appointment_date = $newDate;
+                    $appointment->appointment_time = $newTime;
+                    $appointment->save();
                 }
+            } else {
+                // Single appointment or no specific times provided
+                foreach ($appointments as $index => $appointment) {
+                    $newTime = $selectedTime ?? ($availableSlots[$index] ?? null);
+                    if (!$newTime) {
+                        $remainingIds[] = $appointment->id;
+                        continue;
+                    }
 
-                if (empty($availableSlots)) {
-                    throw new Exception('هیچ زمان خالی برای این تاریخ یافت نشد');
+                    $appointment->appointment_date = $newDate;
+                    $appointment->appointment_time = $newTime;
+                    $appointment->save();
                 }
-
-                $selectedTime = $availableSlots[0];
             }
 
-            // دریافت نوبت‌ها
-            $appointments = Appointment::whereIn('id', $appointmentIds)
-                ->where('status', '!=', 'cancelled')
-                ->where('doctor_id', $doctor->id)
-                ->get();
-
-            if ($appointments->isEmpty()) {
-                throw new Exception('نوبت‌های انتخاب شده یافت نشدند');
-            }
-
-            $updatedIds = [];
-            foreach ($appointments as $appointment) {
-                $appointment->appointment_date = $newDate;
-                $appointment->appointment_time = $selectedTime;
-                $appointment->save();
-                $updatedIds[] = $appointment->id;
-            }
-
-            // ارسال رویداد برای به‌روزرسانی تقویم
-            $this->dispatch('appointments-count-updated', [
-                'dates' => array_unique([
-                    $newDate,
-                    ...$appointments->pluck('appointment_date')->toArray()
-                ])
-            ]);
-
-            return array_diff($appointmentIds, $updatedIds);
+            return $remainingIds;
         } catch (Exception $e) {
-            throw $e;
+            throw new Exception('خطا در جابجایی نوبت: ' . $e->getMessage());
         }
     }
 
@@ -2268,7 +2255,7 @@ class AppointmentsList extends Component
             }
         }
 
-   
+
 
         $this->availableTimes = array_values($slots);
         $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
@@ -2338,7 +2325,7 @@ class AppointmentsList extends Component
     }
 
     #[On('rescheduleAppointment')]
-    public function rescheduleAppointment($appointmentIds, $newDate, $selectedTime = null)
+    public function rescheduleAppointment($appointmentIds, $newDate, $selectedTimes = null, $isMultiple = false)
     {
         try {
             $doctor = $this->getAuthenticatedDoctor();
@@ -2368,11 +2355,22 @@ class AppointmentsList extends Component
             }
 
             $availableSlots = $conditions['available_slots'];
-            $this->processReschedule($appointmentIds, $newDate, $availableSlots, $selectedTime);
+            $remainingIds = $this->processReschedule($appointmentIds, $newDate, $availableSlots, $selectedTimes);
 
-            $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'نوبت‌ها با موفقیت جابجا شدند.']);
+            if (!empty($remainingIds)) {
+                $this->dispatch('show-toastr', [
+                    'type' => 'warning',
+                    'message' => 'برخی نوبت‌ها به دلیل عدم وجود زمان کاری خالی جابجا نشدند.'
+                ]);
+            }
+
+            $message = count($appointmentIds) - count($remainingIds) > 1
+                ? (count($appointmentIds) - count($remainingIds)) . " نوبت با موفقیت جابجا شدند."
+                : "نوبت با موفقیت جابجا شد.";
+
+            $this->dispatch('show-toastr', ['type' => 'success', 'message' => $message]);
             $this->dispatch('close-modal', ['name' => 'reschedule-modal']);
-            $this->dispatch('appointment-rescheduled');
+            $this->dispatch('appointment-rescheduled', ['message' => $message]);
             $this->dispatch('refresh-appointments-list');
 
         } catch (Exception $e) {
@@ -2401,7 +2399,7 @@ class AppointmentsList extends Component
                 json_decode(json_decode($specialSchedule->work_hours, true), true) :
                 json_decode($specialSchedule->work_hours, true);
 
-         
+
 
             return [
                 'work_hours' => $workHours,
@@ -2424,7 +2422,7 @@ class AppointmentsList extends Component
                 json_decode(json_decode($regularSchedule->work_hours, true), true) :
                 json_decode($regularSchedule->work_hours, true);
 
-         
+
 
             return [
                 'work_hours' => $workHours,
