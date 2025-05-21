@@ -18,6 +18,9 @@ $(document).ready(function () {
     const visibleDays = 18;
     let selectedDate = null;
     let touchMoved = false; // برای تشخیص حرکت انگشت
+    let isUpdating = false;
+    let lastUpdateTime = 0;
+    const UPDATE_COOLDOWN = 1000; // 1 second cooldown between updates
 
     // رویداد Livewire برای آپدیت DOM
     document.addEventListener("livewire:updated", function () {
@@ -37,49 +40,97 @@ $(document).ready(function () {
         }, 5000);
     }
 
-    // رویداد آپدیت تقویم ردیفی
-    $(document).on("updateCalendarRow", function (e) {
-        const selectedDate = e.originalEvent.detail;
-        if (!moment(selectedDate, "YYYY-MM-DD", true).isValid()) {
-            console.warn(
-                "Invalid selectedDate, using currentDate:",
-                currentDate.format("YYYY-MM-DD")
-            );
-            fetchAppointmentsCount();
+    function updateTimeout(event) {
+        if (!event || !event.detail) {
+            console.warn("Invalid event received in updateTimeout");
             return;
         }
-        currentDate = moment(selectedDate, "YYYY-MM-DD")
-            .startOf("day")
-            .subtract(9, "days");
-        fetchAppointmentsCount();
-    });
+
+        const now = Date.now();
+        if (now - lastUpdateTime < UPDATE_COOLDOWN) {
+            console.log("Skipping update due to cooldown");
+            return;
+        }
+
+        const { dates } = event.detail;
+        if (!dates || !Array.isArray(dates)) {
+            console.warn("Invalid dates array in event detail");
+            return;
+        }
+
+        if (isUpdating) {
+            console.log("Update already in progress, skipping");
+            return;
+        }
+
+        isUpdating = true;
+        lastUpdateTime = now;
+
+        Promise.all(dates.map((date) => updateAppointmentCount(date))).finally(
+            () => {
+                setTimeout(() => {
+                    isUpdating = false;
+                }, 500);
+            }
+        );
+    }
+
+    function debounceUpdate(func, delay = 500) {
+        let timeout;
+        return function (event) {
+            if (!event) {
+                console.warn("No event provided to debounceUpdate");
+                return;
+            }
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func(event), delay);
+        };
+    }
+
+    // رویداد آپدیت تقویم ردیفی
+    $(document).on(
+        "updateCalendarRow",
+        debounceUpdate(function (e) {
+            const selectedDate = e.originalEvent.detail;
+            if (!moment(selectedDate, "YYYY-MM-DD", true).isValid()) {
+                console.warn(
+                    "Invalid selectedDate, using currentDate:",
+                    currentDate.format("YYYY-MM-DD")
+                );
+                fetchAppointmentsCount();
+                return;
+            }
+            currentDate = moment(selectedDate, "YYYY-MM-DD")
+                .startOf("day")
+                .subtract(9, "days");
+            fetchAppointmentsCount();
+        })
+    );
 
     // گوش دادن به رویدادهای Livewire
-    Livewire.on("appointments-cancelled", (event) => {
-        console.log("Appointments cancelled, updating counts...");
-        fetchAppointmentsCount();
-    });
-
-    Livewire.on("appointment-rescheduled", (event) => {
-        console.log("Appointment rescheduled event received:", event);
-        // اضافه کردن تاخیر کوتاه برای اطمینان از به‌روزرسانی داده‌ها
-        setTimeout(() => {
-            console.log("Updating appointment counts after reschedule...");
+    Livewire.on(
+        "appointments-cancelled",
+        debounceUpdate(function (event) {
+            console.log("Appointments cancelled, updating counts...");
             fetchAppointmentsCount();
-            // بروزرسانی تقویم بعد از دریافت داده‌های جدید
-            setTimeout(() => {
-                if (typeof loadCalendar === "function") {
-                    console.log("Reloading calendar after count update...");
-                    loadCalendar();
-                }
-            }, 100);
-        }, 500);
-    });
+        })
+    );
 
-    Livewire.on("visited", (event) => {
-        console.log("Visit status updated, refreshing counts...");
-        fetchAppointmentsCount();
-    });
+    Livewire.on(
+        "appointment-rescheduled",
+        debounceUpdate(function (event) {
+            console.log("Appointment rescheduled event received:", event);
+            fetchAppointmentsCount();
+        })
+    );
+
+    Livewire.on(
+        "visited",
+        debounceUpdate(function (event) {
+            console.log("Visit status updated, refreshing counts...");
+            fetchAppointmentsCount();
+        })
+    );
 
     function fetchAppointmentsCount() {
         if (!calendar.length) {
@@ -245,8 +296,11 @@ $(document).ready(function () {
         updateButtonState();
 
         // Add event listener for appointments rescheduled
-        window.addEventListener('appointments-rescheduled', (event) => {
-            console.log('Appointments rescheduled event received:', event.detail);
+        window.addEventListener("appointments-rescheduled", (event) => {
+            console.log(
+                "Appointments rescheduled event received:",
+                event.detail
+            );
             // Refresh the calendar data
             fetchAppointmentsCount();
         });
@@ -392,15 +446,51 @@ $(document).ready(function () {
         fetchAppointmentsCount();
     });
 
-    // Add event listener for appointment registration
-    Livewire.on("appointment-registered", (event) => {
-        console.log("Appointment registered event received:", event);
-        // اضافه کردن تاخیر کوتاه برای اطمینان از به‌روزرسانی داده‌ها
-        setTimeout(() => {
-            console.log("Updating counts after new appointment...");
-            fetchAppointmentsCount();
-        }, 500);
-    });
+    // Event listener for appointments-count-updated
+    document.addEventListener(
+        "appointments-count-updated",
+        debounceUpdate(updateTimeout)
+    );
 
+    // Function to update appointment count for a specific date
+    function updateAppointmentCount(date) {
+        const doctorId = document.querySelector(
+            'meta[name="doctor-id"]'
+        )?.content;
+        if (!doctorId) return;
+
+        fetch(
+            `/dr/panel/turn/schedule/get-appointments-count/${doctorId}/${date}`
+        )
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const dateElement = document.querySelector(
+                        `[data-date="${date}"]`
+                    );
+                    if (dateElement) {
+                        const countElement =
+                            dateElement.querySelector(".appointment-count");
+                        if (countElement) {
+                            countElement.textContent = data.count;
+                        }
+                    }
+                }
+            })
+            .catch((error) =>
+                console.error("Error fetching appointments count:", error)
+            );
+    }
+
+    // Add event listener for appointment registration
+    Livewire.on(
+        "appointment-registered",
+        debounceUpdate(function (event) {
+            console.log("Appointment registered event received:", event);
+            fetchAppointmentsCount();
+        })
+    );
+
+    // Initial load
     fetchAppointmentsCount();
 });

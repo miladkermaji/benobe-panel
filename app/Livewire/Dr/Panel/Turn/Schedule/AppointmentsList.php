@@ -389,104 +389,104 @@ class AppointmentsList extends Component
             $this->clinics = $doctor->clinics()->where('is_active', 0)->get()->toArray();
         }
     }
-/**
- * لود نوبت‌ها با Lazy Loading
- */
-/**
- * لود نوبت‌ها با Lazy Loading
- */
-public function loadAppointments()
-{
-    $doctor = $this->getAuthenticatedDoctor();
-    if (!$doctor) {
-        Log::warning('Doctor not authenticated in loadAppointments');
-        return;
-    }
+    /**
+     * لود نوبت‌ها با Lazy Loading
+     */
+    /**
+     * لود نوبت‌ها با Lazy Loading
+     */
+    public function loadAppointments()
+    {
+        $doctor = $this->getAuthenticatedDoctor();
+        if (!$doctor) {
+            Log::warning('Doctor not authenticated in loadAppointments');
+            return;
+        }
 
-    $query = Appointment::query()
-        ->where('doctor_id', $doctor->id)
-        ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
-            return $query->where('clinic_id', $this->selectedClinicId);
-        });
+        $query = Appointment::query()
+            ->where('doctor_id', $doctor->id)
+            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
+                return $query->where('clinic_id', $this->selectedClinicId);
+            });
 
-    if ($this->filterStatus === 'manual') {
-        $query->where('appointment_type', 'manual')
-            ->when($this->selectedDate, function ($query) {
+        if ($this->filterStatus === 'manual') {
+            $query->where('appointment_type', 'manual')
+                ->when($this->selectedDate, function ($query) {
+                    return $query->whereDate('appointment_date', $this->selectedDate);
+                });
+        } else {
+            $query->when($this->selectedDate, function ($query) {
                 return $query->whereDate('appointment_date', $this->selectedDate);
             });
-    } else {
-        $query->when($this->selectedDate, function ($query) {
-            return $query->whereDate('appointment_date', $this->selectedDate);
-        });
-    }
-
-    $query->when($this->filterStatus && $this->filterStatus !== 'manual', function ($query) {
-        return $query->where('status', $this->filterStatus);
-    });
-
-    $query->when($this->dateFilter, function ($query) {
-        $today = Carbon::today();
-        if ($this->dateFilter === 'current_week') {
-            $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
-            $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
-            $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
-        } elseif ($this->dateFilter === 'current_month') {
-            $startOfMonth = $today->copy()->startOfMonth();
-            $endOfMonth = $today->copy()->endOfMonth();
-            $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
-        } elseif ($this->dateFilter === 'current_year') {
-            $startOfYear = $today->copy()->startOfYear();
-            $endOfYear = $today->copy()->endOfYear();
-            $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
         }
-    });
 
-    $query->when($this->searchQuery, function ($query) {
-        $query->whereHas('patient', function ($q) {
-            $q->where('first_name', 'like', "%{$this->searchQuery}%")
-                ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
-                ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
-                ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
-                ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
+        $query->when($this->filterStatus && $this->filterStatus !== 'manual', function ($query) {
+            return $query->where('status', $this->filterStatus);
         });
-    });
 
-    try {
-        // استفاده از cursor برای Lazy Loading
-        $this->appointments = [];
-        foreach ($query->orderBy('appointment_date', 'desc')
-                      ->orderBy('appointment_time', 'desc')
-                      ->cursor() as $appointment) {
-            $this->appointments[] = $appointment;
+        $query->when($this->dateFilter, function ($query) {
+            $today = Carbon::today();
+            if ($this->dateFilter === 'current_week') {
+                $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
+                $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
+                $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
+            } elseif ($this->dateFilter === 'current_month') {
+                $startOfMonth = $today->copy()->startOfMonth();
+                $endOfMonth = $today->copy()->endOfMonth();
+                $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
+            } elseif ($this->dateFilter === 'current_year') {
+                $startOfYear = $today->copy()->startOfYear();
+                $endOfYear = $today->copy()->endOfYear();
+                $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
+            }
+        });
+
+        $query->when($this->searchQuery, function ($query) {
+            $query->whereHas('patient', function ($q) {
+                $q->where('first_name', 'like', "%{$this->searchQuery}%")
+                    ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
+                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
+                    ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
+                    ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
+            });
+        });
+
+        try {
+            // استفاده از cursor برای Lazy Loading
+            $this->appointments = [];
+            foreach ($query->orderBy('appointment_date', 'desc')
+                          ->orderBy('appointment_time', 'desc')
+                          ->cursor() as $appointment) {
+                $this->appointments[] = $appointment;
+            }
+        } catch (\Exception $e) {
+            Log::error('Error in loadAppointments', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'query' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+            ]);
+            $this->appointments = [];
         }
-    } catch (\Exception $e) {
-        Log::error('Error in loadAppointments', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'query' => $query->toSql(),
-            'bindings' => $query->getBindings(),
-        ]);
-        $this->appointments = [];
-    }
 
-    $this->dispatch('setAppointments', ['appointments' => $this->appointments]);
+        $this->dispatch('setAppointments', ['appointments' => $this->appointments]);
 
-    // بررسی عدم وجود نتیجه برای نمایش هشدار
-    if (empty($this->appointments) && $this->searchQuery) {
-        $jalaliDate = Jalalian::fromCarbon(Carbon::parse($this->selectedDate));
-        if ($this->isSearchingAllDates) {
-            $this->dispatch('no-results-found', ['date' => $jalaliDate->format('Y/m/d'), 'searchAll' => true]);
+        // بررسی عدم وجود نتیجه برای نمایش هشدار
+        if (empty($this->appointments) && $this->searchQuery) {
+            $jalaliDate = Jalalian::fromCarbon(Carbon::parse($this->selectedDate));
+            if ($this->isSearchingAllDates) {
+                $this->dispatch('no-results-found', ['date' => $jalaliDate->format('Y/m/d'), 'searchAll' => true]);
+            } else {
+                $this->showNoResultsAlert = true;
+                $this->dispatch('show-no-results-alert', ['date' => $jalaliDate->format('Y/m/d')]);
+            }
         } else {
-            $this->showNoResultsAlert = true;
-            $this->dispatch('show-no-results-alert', ['date' => $jalaliDate->format('Y/m/d')]);
+            $this->showNoResultsAlert = false;
+            $this->dispatch('hide-no-results-alert');
         }
-    } else {
-        $this->showNoResultsAlert = false;
-        $this->dispatch('hide-no-results-alert');
-    }
 
-    return $this->appointments;
-}
+        return $this->appointments;
+    }
     private function convertToGregorian($date)
     {
         // دی‌کد کردن تاریخ در صورت URL-encoded بودن
@@ -1108,101 +1108,53 @@ public function loadAppointments()
     private function processReschedule($appointmentIds, $newDate, $availableSlots, $selectedTime = null)
     {
         try {
-            DB::beginTransaction();
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                throw new \Exception('دکتر یافت نشد');
+            }
+
+            $workSchedule = $this->getWorkSchedule($newDate);
+            if (!$workSchedule) {
+                throw new \Exception('برنامه کاری برای این تاریخ یافت نشد');
+            }
+
+            if (!$selectedTime) {
+                $availableTimes = $this->generateAvailableTimes($workSchedule, []);
+                if (empty($availableTimes)) {
+                    throw new \Exception('هیچ زمان خالی برای این تاریخ یافت نشد');
+                }
+                $selectedTime = $availableTimes[0];
+                Log::info("No time selected, using first available time: " . $selectedTime);
+            }
 
             $appointments = Appointment::whereIn('id', $appointmentIds)
+                ->where('doctor_id', $doctor->id)
                 ->where('status', '!=', 'cancelled')
                 ->get();
 
             if ($appointments->isEmpty()) {
-                throw new \Exception('هیچ نوبت فعالی برای جابجایی یافت نشد.');
+                throw new \Exception('نوبت‌های انتخاب شده یافت نشدند');
             }
 
-            $doctor = $this->getAuthenticatedDoctor();
-            if (!$doctor) {
-                throw new \Exception('اطلاعات پزشک یافت نشد.');
+            $updatedIds = [];
+            foreach ($appointments as $appointment) {
+                $appointment->appointment_date = $newDate;
+                $appointment->appointment_time = $selectedTime;
+                $appointment->save();
+                $updatedIds[] = $appointment->id;
             }
 
-            $remainingIds = [];
-            $updatedCount = 0;
-
-            // اگر زمان انتخاب شده باشد، فقط از آن زمان استفاده کن
-            if ($selectedTime !== null) {
-                if (!in_array($selectedTime, $availableSlots)) {
-                    throw new \Exception('زمان انتخاب شده در برنامه کاری موجود نیست.');
-                }
-                // فقط اولین نوبت را با زمان انتخاب شده به‌روز کن
-                if ($appointments->isNotEmpty()) {
-                    $appointment = $appointments->first();
-                    $appointment->appointment_date = $newDate;
-                    $appointment->appointment_time = $selectedTime;
-                    $appointment->save();
-                    $updatedCount++;
-                }
-                // بقیه نوبت‌ها را به لیست باقی‌مانده اضافه کن
-                $remainingIds = $appointments->skip(1)->pluck('id')->toArray();
-            } else {
-                // اگر زمان انتخاب نشده باشد، از اولین زمان خالی استفاده کن
-                if (!empty($availableSlots)) {
-                    $selectedTime = $availableSlots[0];
-                    // به‌روزرسانی نوبت‌ها با استفاده از اسلات‌های خالی
-                    foreach ($appointments as $index => $appointment) {
-                        if ($index < count($availableSlots)) {
-                            $appointment->appointment_date = $newDate;
-                            $appointment->appointment_time = $availableSlots[$index];
-                            $appointment->save();
-                            $updatedCount++;
-                        } else {
-                            $remainingIds[] = $appointment->id;
-                        }
-                    }
-                } else {
-                    throw new \Exception('هیچ زمان خالی برای جابجایی نوبت وجود ندارد.');
-                }
-            }
-
-            DB::commit();
-
-            // لاگ برای دیباگ
-            Log::info('Rescheduled appointments', [
-                'date' => $newDate,
-                'appointment_ids' => $appointmentIds,
-                'updated_count' => $updatedCount,
-                'remaining_ids' => $remainingIds,
-                'selected_time' => $selectedTime,
-                'available_slots' => $availableSlots
+            $this->dispatch('appointments-count-updated', [
+                'dates' => array_unique([$newDate, $appointments->first()->getOriginal('appointment_date')])
             ]);
 
-            // پاک کردن کش مرتبط
-            $cacheKeyPattern = "appointments_doctor_{$doctor->id}_*";
-            Cache::forget($cacheKeyPattern);
-
-            // ارسال رویداد به‌روزرسانی
-            $this->dispatch('appointments-rescheduled', [
-                'date' => $newDate,
-                'appointmentIds' => array_slice($appointmentIds, 0, $updatedCount),
-                'message' => $updatedCount > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.'
-            ]);
-
-            if ($updatedCount > 0) {
-                $this->dispatch('show-toastr', [
-                    'message' => $updatedCount > 1 ? 'نوبت‌ها با موفقیت جابجا شدند.' : 'نوبت با موفقیت جابجا شد.',
-                    'type' => 'success'
-                ]);
-            }
-
-            return $remainingIds;
+            return array_diff($appointmentIds, $updatedIds);
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Error in processReschedule: ' . $e->getMessage());
-            $this->dispatch('show-toastr', [
-                'message' => 'خطا در جابجایی نوبت‌ها: ' . $e->getMessage(),
-                'type' => 'error'
-            ]);
-            return $appointmentIds;
+            throw $e;
         }
     }
- 
+
     public function updatedSelectedInsuranceId()
     {
         $this->loadServices();
@@ -2644,23 +2596,15 @@ public function loadAppointments()
     private function generateAvailableTimes($workSchedule, $reservedAppointments)
     {
         $availableTimes = [];
-        $isToday = Carbon::parse($workSchedule['schedule_date'] ?? now())->isToday();
-        $currentTime = now()->format('H:i');
+        $now = Carbon::now();
+        $isToday = $now->format('Y-m-d') === ($workSchedule['schedule_date'] ?? now()->format('Y-m-d'));
+        $currentTime = $now->format('H:i');
         $isSpecial = $workSchedule['is_special'] ?? false;
 
         // تبدیل زمان‌های رزرو شده به آرایه ساده برای مقایسه راحت‌تر
         $reservedTimes = array_map(function ($appointment) {
             return $appointment['appointment_time'];
         }, $reservedAppointments);
-
-        Log::info("Generating available times with work schedule:", [
-            'work_hours' => $workSchedule['work_hours'],
-            'is_today' => $isToday,
-            'current_time' => $currentTime,
-            'schedule_date' => $workSchedule['schedule_date'] ?? now()->format('Y-m-d'),
-            'is_special' => $isSpecial,
-            'reserved_times' => $reservedTimes
-        ]);
 
         foreach ($workSchedule['work_hours'] as $period) {
             $start = Carbon::parse($period['start']);
@@ -2682,23 +2626,14 @@ public function loadAppointments()
 
                 // اگر این زمان قبلاً رزرو شده است، آن را رد کن
                 if (in_array($timeSlot, $reservedTimes)) {
-                    Log::info("Time slot {$timeSlot} is already reserved, skipping");
                     $current->addMinutes($interval);
                     continue;
                 }
 
                 $availableTimes[] = $timeSlot;
-                Log::info("Added available time slot: {$timeSlot}");
                 $current->addMinutes($interval);
             }
         }
-
-        Log::info("Generated available times:", [
-            'available_times' => $availableTimes,
-            'reserved_times' => $reservedTimes,
-            'total_available' => count($availableTimes),
-            'total_reserved' => count($reservedTimes)
-        ]);
 
         return $availableTimes;
     }
@@ -2741,5 +2676,25 @@ public function loadAppointments()
         });
 
         $this->dispatch('appointment-details-received', $appointments->toArray());
+    }
+
+    public function getAppointmentsCount($doctorId, $date)
+    {
+        try {
+            $count = Appointment::where('doctor_id', $doctorId)
+                ->where('appointment_date', $date)
+                ->where('status', '!=', 'cancelled')
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'count' => $count
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در دریافت تعداد نوبت‌ها'
+            ], 500);
+        }
     }
 }
