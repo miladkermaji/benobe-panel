@@ -28,9 +28,12 @@ function collectSelectedAppointments() {
     const selectedCheckboxes = document.querySelectorAll(
         ".appointment-checkbox:checked"
     );
-    const selectedIds = Array.from(selectedCheckboxes).map((cb) =>
-        parseInt(cb.value)
-    );
+    // حذف تکراری‌ها با استفاده از Set
+    const selectedIds = [
+        ...new Set(
+            Array.from(selectedCheckboxes).map((cb) => parseInt(cb.value))
+        ),
+    ];
     const selectedDates = Array.from(selectedCheckboxes).map((cb) => {
         const row = cb.closest("tr");
         const dateCell = row ? row.querySelector("td:nth-child(5)") : null;
@@ -818,6 +821,13 @@ async function handleDayClick(dayElement) {
                 })
                 .filter(Boolean);
 
+            // Sort times based on work hours
+            const sortedTimes = [...times].sort((a, b) => {
+                const [aHour, aMin] = a.split(":").map(Number);
+                const [bHour, bMin] = b.split(":").map(Number);
+                return aHour * 60 + aMin - (bHour * 60 + bMin);
+            });
+
             const result = await Swal.fire({
                 title: "تایید جابجایی",
                 html: `آیا از جابجایی ${
@@ -825,8 +835,8 @@ async function handleDayClick(dayElement) {
                 } نوبت به تاریخ ${jalaliDate} اطمینان دارید؟<br><br>
                       <small>نوبت‌های فعلی و زمان‌های جدید:<br>${timeMapping
                           .map(
-                              (m) =>
-                                  `${m.from.time} تاریخ ${m.from.date} → ${m.to.time} تاریخ ${m.to.date}`
+                              (m, index) =>
+                                  `${m.from.time} تاریخ ${m.from.date} → ${sortedTimes[index]} تاریخ ${m.to.date}`
                           )
                           .join("<br>")}</small>`,
                 icon: "question",
@@ -843,7 +853,7 @@ async function handleDayClick(dayElement) {
                     {
                         appointmentIds: selectedIds,
                         newDate: date,
-                        selectedTimes: times.slice(0, selectedIds.length), // Send only needed time slots
+                        selectedTimes: sortedTimes.slice(0, selectedIds.length), // Send sorted times
                     }
                 );
             }
