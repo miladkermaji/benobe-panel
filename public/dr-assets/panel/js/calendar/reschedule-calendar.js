@@ -709,67 +709,152 @@ async function handleDayClick(dayElement) {
             });
         }
     } else {
-        // Get original appointment details for multiple appointments
-        const appointments = await new Promise((resolve, reject) => {
-            const timeoutId = setTimeout(() => {
-                window.removeEventListener(
+        try {
+            // Get original appointment details for multiple appointments
+            const appointments = await new Promise((resolve, reject) => {
+                const timeoutId = setTimeout(() => {
+                    window.removeEventListener(
+                        "appointment-details-received",
+                        handler
+                    );
+                    reject(
+                        new Error("Timeout waiting for appointment details")
+                    );
+                }, 10000);
+
+                const handler = (event) => {
+                    console.log("Received appointment details:", event.detail);
+                    clearTimeout(timeoutId);
+                    window.removeEventListener(
+                        "appointment-details-received",
+                        handler
+                    );
+                    resolve(event.detail[0]);
+                };
+
+                window.addEventListener(
                     "appointment-details-received",
                     handler
                 );
-                reject(new Error("Timeout waiting for appointment details"));
-            }, 10000);
-
-            const handler = (event) => {
-                console.log("Received appointment details:", event.detail);
-                clearTimeout(timeoutId);
-                window.removeEventListener(
-                    "appointment-details-received",
-                    handler
+                Livewire.dispatchTo(
+                    "dr.panel.turn.schedule.appointments-list",
+                    "getAppointmentDetails",
+                    {
+                        appointmentIds: selectedIds,
+                    }
                 );
-                resolve(event.detail[0]);
-            };
+            });
 
-            window.addEventListener("appointment-details-received", handler);
-            Livewire.dispatchTo(
-                "dr.panel.turn.schedule.appointments-list",
-                "getAppointmentDetails",
-                {
-                    appointmentIds: selectedIds,
-                }
-            );
-        });
+            // Get available times for the selected date
+            const availableTimes = await new Promise((resolve, reject) => {
+                const timeoutId = setTimeout(() => {
+                    window.removeEventListener(
+                        "available-times-updated",
+                        handler
+                    );
+                    reject(new Error("Timeout waiting for available times"));
+                }, 10000);
 
-        const originalDates =
-            appointments?.map((app) => ({
-                date: moment(app.appointment_date)
-                    .locale("fa")
-                    .format("jYYYY/jMM/jDD"),
-                time: app.appointment_time,
-            })) || [];
+                const handler = (event) => {
+                    console.log("Received times update:", event.detail);
+                    clearTimeout(timeoutId);
+                    window.removeEventListener(
+                        "available-times-updated",
+                        handler
+                    );
+                    resolve(event.detail[0]);
+                };
 
-        const result = await Swal.fire({
-            title: "تایید جابجایی",
-            html: `آیا از جابجایی ${
-                selectedIds.length
-            } نوبت به تاریخ ${jalaliDate} اطمینان دارید؟<br><br>
-                  <small>نوبت‌های فعلی:<br>${originalDates
-                      .map((d) => `${d.time} تاریخ ${d.date}`)
-                      .join("<br>")}</small>`,
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonText: "بله",
-            cancelButtonText: "خیر",
-        });
+                window.addEventListener("available-times-updated", handler);
+                Livewire.dispatchTo(
+                    "dr.panel.turn.schedule.appointments-list",
+                    "getAvailableTimesForDate",
+                    { date }
+                );
+            });
 
-        if (result.isConfirmed) {
-            Livewire.dispatchTo(
-                "dr.panel.turn.schedule.appointments-list",
-                "rescheduleAppointment",
-                {
-                    appointmentIds: selectedIds,
-                    newDate: date,
-                }
-            );
+            const times = availableTimes?.times || [];
+            if (!times || times.length === 0) {
+                Swal.fire({
+                    title: "هشدار",
+                    text: "هیچ زمان کاری خالی برای این تاریخ وجود ندارد.",
+                    icon: "warning",
+                    confirmButtonText: "باشه",
+                });
+                return;
+            }
+
+            // Check if we have enough time slots
+            if (times.length < selectedIds.length) {
+                Swal.fire({
+                    title: "هشدار",
+                    text: `تعداد زمان‌های خالی (${times.length}) کمتر از تعداد نوبت‌های انتخاب شده (${selectedIds.length}) است.`,
+                    icon: "warning",
+                    confirmButtonText: "باشه",
+                });
+                return;
+            }
+
+            // Create time mapping for confirmation message
+            const timeMapping = selectedIds
+                .map((id, index) => {
+                    const appointment = appointments.find(
+                        (app) => app.id === id
+                    );
+                    if (!appointment) return null;
+
+                    return {
+                        from: {
+                            date: moment(appointment.appointment_date)
+                                .locale("fa")
+                                .format("jYYYY/jMM/jDD"),
+                            time: appointment.appointment_time,
+                        },
+                        to: {
+                            date: jalaliDate,
+                            time: times[index],
+                        },
+                    };
+                })
+                .filter(Boolean);
+
+            const result = await Swal.fire({
+                title: "تایید جابجایی",
+                html: `آیا از جابجایی ${
+                    selectedIds.length
+                } نوبت به تاریخ ${jalaliDate} اطمینان دارید؟<br><br>
+                      <small>نوبت‌های فعلی و زمان‌های جدید:<br>${timeMapping
+                          .map(
+                              (m) =>
+                                  `${m.from.time} تاریخ ${m.from.date} → ${m.to.time} تاریخ ${m.to.date}`
+                          )
+                          .join("<br>")}</small>`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "بله",
+                cancelButtonText: "خیر",
+            });
+
+            if (result.isConfirmed) {
+                // Send reschedule request with sequential times
+                Livewire.dispatchTo(
+                    "dr.panel.turn.schedule.appointments-list",
+                    "rescheduleAppointment",
+                    {
+                        appointmentIds: selectedIds,
+                        newDate: date,
+                        selectedTimes: times.slice(0, selectedIds.length), // Send only needed time slots
+                    }
+                );
+            }
+        } catch (error) {
+            console.error("Error in handleDayClick:", error);
+            Swal.fire({
+                title: "خطا",
+                text: "خطایی در دریافت اطلاعات رخ داد. لطفاً دوباره تلاش کنید.",
+                icon: "error",
+                confirmButtonText: "باشه",
+            });
         }
     }
 }
