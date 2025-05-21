@@ -150,7 +150,9 @@ class AppointmentsList extends Component
             'total' => 0,
         ];
         // مقدار پیش‌فرض تاریخ امروز
-        $this->selectedDate = Carbon::now()->format('Y-m-d');
+        
+$this->selectedDate = Carbon::now()->setTimezone('Asia/Tehran')->format('Y-m-d');
+
         // خواندن selected_date از URL و دی‌کد کردن آن
         $selectedDateFromUrl = request()->query('selected_date');
         if ($selectedDateFromUrl) {
