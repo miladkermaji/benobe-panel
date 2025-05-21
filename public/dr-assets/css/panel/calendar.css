@@ -1,0 +1,93 @@
+.calendar-day {
+    position: relative;
+    min-height: 80px;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.calendar-day:hover {
+    background-color: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.calendar-day.has-appointment {
+    background-color: #e0f2fe;
+    border-color: #3b82f6;
+}
+
+.calendar-day.has-appointment:hover {
+    background-color: #bae6fd;
+}
+
+.appointment-count {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: #3b82f6;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 12px;
+    min-width: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-day.holiday {
+    background-color: #fee2e2;
+    border-color: #fecaca;
+}
+
+.calendar-day.holiday:hover {
+    background-color: #fecaca;
+}
+
+.calendar-day.today {
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.calendar-day.today:hover {
+    background-color: #bfdbfe;
+}
+
+.day-number {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.today-label {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    font-size: 12px;
+    color: #3b82f6;
+    font-weight: 500;
+}
+
+.calendar-day.empty {
+    background-color: transparent;
+    border: none;
+    cursor: default;
+}
+
+.calendar-day.empty:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.calendar-day.friday {
+    background-color: #fef2f2;
+}
+
+.calendar-day.friday:hover {
+    background-color: #fee2e2;
+}

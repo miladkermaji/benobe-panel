@@ -583,7 +583,7 @@
     let current = moment(currentDate).locale('en');
     let i = 0;
 
-    // اضافه کردن تاریخ امروز به‌صورت اجباری
+    // Add today's date
     const persianDateToday = today.locale('fa').format('dddd');
     const persianFormattedDateToday = today.locale('fa').format('D MMMM YYYY');
     const appointmentDateToday = today.locale('en').format('YYYY-MM-DD');
@@ -594,29 +594,10 @@
       return apptDate === appointmentDateToday;
     });
 
-    // تعداد نوبت‌ها برای امروز (اگر روز کاری باشد)
+    // Appointment count for today
     let appointmentCountToday = 0;
     if (workingDays.includes(dayOfWeekToday) && appointmentToday) {
-      // بررسی appointment_settings
-      const settingsForDay = appointmentSettings.find(setting => setting.day === dayOfWeekToday);
-      let isReservable = true; // پیش‌فرض: قابل رزرو
-      if (settingsForDay && settingsForDay.settings.length > 0) {
-        isReservable = false; // اگر تنظیمات وجود دارد، بررسی می‌کنیم
-        settingsForDay.settings.forEach(setting => {
-          const settingDay = setting.selected_day;
-          const settingStart = moment(setting.start_time, 'HH:mm');
-          const settingEnd = moment(setting.end_time, 'HH:mm');
-          const currentTime = moment();
-
-          if (currentTime.format('dddd').toLowerCase() === settingDay &&
-            currentTime.isBetween(settingStart, settingEnd)) {
-            isReservable = true;
-          }
-        });
-      }
-      if (isReservable) {
-        appointmentCountToday = appointmentToday.appointment_count;
-      }
+      appointmentCountToday = appointmentToday.appointment_count;
     }
 
     const badgeHtmlToday = appointmentCountToday > 0 ?
@@ -624,18 +605,18 @@
     if (appointmentCountToday > 0) badgeCount++;
 
     const cardToday = `
-            <div class="calendar-card btn btn-light my-active" data-date="${appointmentDateToday}" style="--delay: ${displayedDays}">
-                ${badgeHtmlToday}
-                <div class="day-name">${persianDateToday}</div>
-                <div class="date">${persianFormattedDateToday}</div>
-                <div class="current-day-icon"></div>
-            </div>`;
+        <div class="calendar-card btn btn-light my-active" data-date="${appointmentDateToday}" style="--delay: ${displayedDays}">
+            ${badgeHtmlToday}
+            <div class="day-name">${persianDateToday}</div>
+            <div class="date">${persianFormattedDateToday}</div>
+            <div class="current-day-icon"></div>
+        </div>`;
     calendar.append(cardToday);
     displayedDays++;
 
-    // ادامه برای سایر روزها
+    // Continue for other days
     while (displayedDays < calendarDays && i < calendarDays * 2) {
-      if (!current.isSame(today, 'day')) { // جلوگیری از تکرار امروز
+      if (!current.isSame(today, 'day')) { // Prevent today's repetition
         const dayOfWeek = current.format('dddd').toLowerCase();
         if (workingDays.includes(dayOfWeek)) {
           const persianDate = current.locale('fa').format('dddd');
@@ -647,39 +628,21 @@
             return apptDate === appointmentDate;
           });
 
-          // تعداد نوبت‌ها برای روزهای کاری و امروز یا آینده
+          // Appointment count for working days
           let appointmentCount = 0;
           if (workingDays.includes(dayOfWeek) && current.isSameOrAfter(today, 'day') && appointment) {
-            const settingsForDay = appointmentSettings.find(setting => setting.day === dayOfWeek);
-            let isReservable = true; // پیش‌فرض: قابل رزرو
-            if (settingsForDay && settingsForDay.settings.length > 0) {
-              isReservable = false; // اگر تنظیمات وجود دارد، بررسی می‌کنیم
-              settingsForDay.settings.forEach(setting => {
-                const settingDay = setting.selected_day;
-                const settingStart = moment(setting.start_time, 'HH:mm');
-                const settingEnd = moment(setting.end_time, 'HH:mm');
-                const currentTime = moment();
-
-                if (currentTime.format('dddd').toLowerCase() === settingDay &&
-                  currentTime.isBetween(settingStart, settingEnd)) {
-                  isReservable = true;
-                }
-              });
-            }
-            if (isReservable) {
-              appointmentCount = appointment.appointment_count;
-            }
+            appointmentCount = appointment.appointment_count;
           }
 
           const badgeHtml = appointmentCount > 0 ? `<span class="appointment-badge">${appointmentCount}</span>` : '';
           if (appointmentCount > 0) badgeCount++;
 
           const card = `
-                        <div class="calendar-card btn btn-light" data-date="${appointmentDate}" style="--delay: ${displayedDays}">
-                            ${badgeHtml}
-                            <div class="day-name">${persianDate}</div>
-                            <div class="date">${persianFormattedDate}</div>
-                        </div>`;
+                    <div class="calendar-card btn btn-light" data-date="${appointmentDate}" style="--delay: ${displayedDays}">
+                        ${badgeHtml}
+                        <div class="day-name">${persianDate}</div>
+                        <div class="date">${persianFormattedDate}</div>
+                    </div>`;
           calendar.append(card);
           displayedDays++;
         }

@@ -138,6 +138,10 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 typeof Livewire !== "undefined" &&
                 typeof Livewire.dispatch === "function"
             ) {
+                console.log("Dispatching setCalendarDate event with:", {
+                    year,
+                    month,
+                });
                 await new Promise((resolve) => {
                     Livewire.dispatchTo(
                         "dr.panel.turn.schedule.appointments-list",
@@ -150,19 +154,37 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 console.warn("Livewire.dispatch is not available");
             }
 
-            const holidays = window.holidaysData.status
-                ? window.holidaysData.holidays
-                : [];
-            const appointments = window.appointmentsData.status
-                ? window.appointmentsData.data.map((item) => ({
-                      date: item.appointment_date,
-                      count: item.appointment_count,
-                  }))
-                : [];
+            // Get appointments data from the server
+            const response = await $.ajax({
+                url: appointmentsCountUrl,
+                method: "GET",
+                data: {
+                    selectedClinicId: localStorage.getItem("selectedClinicId"),
+                },
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
+            });
 
-            const data = { holidays, appointments };
-            calendarDataCache.set(cacheKey, data);
-            return data;
+            if (response.status) {
+                const appointments = response.data || [];
+                const holidays = window.holidaysData.status
+                    ? window.holidaysData.holidays
+                    : [];
+
+                console.log("Raw appointments data:", response);
+                console.log("Processed appointments:", appointments);
+                console.log("Processed holidays:", holidays);
+
+                const data = { holidays, appointments };
+                calendarDataCache.set(cacheKey, data);
+                return data;
+            } else {
+                console.error("Error fetching appointments:", response.message);
+                return { holidays: [], appointments: [] };
+            }
         } catch (error) {
             console.error("Error in fetchCalendarData:", error);
             if (loadingOverlay) loadingOverlay.style.display = "none";
@@ -227,6 +249,8 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 targetMonth
             );
 
+            console.log("Calendar data received:", { holidays, appointments });
+
             if (loadingOverlay) loadingOverlay.style.display = "none";
             if (calendarBody) calendarBody.style.display = "grid";
 
@@ -241,7 +265,8 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 const jalaliDate = currentDay.format("jYYYY/jMM/jDD");
                 const formattedJalaliDate = currentDay.format("jD jMMMM jYYYY");
                 const gregorianDate = currentDay.toDate();
-                const gregorianString = moment(gregorianDate).format("Y-MM-DD");
+                const gregorianString =
+                    moment(gregorianDate).format("YYYY-MM-DD");
 
                 const currentJalaliYear = parseInt(currentDay.format("jYYYY"));
                 const currentJalaliMonth = parseInt(currentDay.format("jMM"));
@@ -263,23 +288,38 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 const isHoliday = holidays.includes(gregorianString);
                 if (isHoliday) dayElement.classList.add("holiday");
 
-                const appointmentData = appointments.find(
-                    (appt) => appt.date === gregorianString
-                );
-                const appointmentCount = appointmentData
-                    ? appointmentData.count
-                    : 0;
+                // Find appointment data for this date
+                const appointment = appointments.find((appt) => {
+                    const apptDate = moment(appt.appointment_date, [
+                        "YYYY-MM-DD",
+                        "YYYY-MM-DD HH:mm:ss",
+                    ]).format("YYYY-MM-DD");
+                    return apptDate === gregorianString;
+                });
 
-                // فقط اگر تاریخ امروز یا آینده باشد، تعداد نوبت‌ها را نمایش بده
-                if (
-                    appointmentCount > 0 &&
-                    !currentDay.isBefore(today, "day")
-                ) {
-                    dayElement.classList.add("has-appointment");
-                    const countElement = document.createElement("span");
-                    countElement.classList.add("appointment-count");
-                    countElement.textContent = appointmentCount;
-                    dayElement.appendChild(countElement);
+                const appointmentCount =
+                    appointment &&
+                    !currentDay.isBefore(today, "day") &&
+                    appointment.appointment_count > 0
+                        ? appointment.appointment_count
+                        : 0;
+
+                console.log(`Processing day ${gregorianString}:`, {
+                    isHoliday,
+                    appointment,
+                    appointmentCount,
+                    isPast: currentDay.isBefore(today, "day"),
+                });
+
+                // Show appointment count for all days (except past days)
+                if (!currentDay.isBefore(today, "day")) {
+                    if (appointmentCount > 0) {
+                        dayElement.classList.add("has-appointment");
+                        const countElement = document.createElement("span");
+                        countElement.classList.add("appointment-count");
+                        countElement.textContent = appointmentCount;
+                        dayElement.appendChild(countElement);
+                    }
                 }
 
                 const dayNumberElement = document.createElement("span");
