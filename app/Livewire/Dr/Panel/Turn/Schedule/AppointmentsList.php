@@ -655,9 +655,7 @@ class AppointmentsList extends Component
                     Cache::forget($cacheKeyPattern);
                 }
 
-                $message = count($appointmentIds) - count($remainingIds) > 1
-                    ? (count($appointmentIds) - count($remainingIds)) . " نوبت با موفقیت جابجا شدند."
-                    : "نوبت با موفقیت جابجا شد.";
+                $message = "نوبت ها با موفقیت جابجا شدند";
 
                 // ارسال رویداد موفقیت
                 $this->dispatch('appointments-rescheduled', [
@@ -2364,9 +2362,9 @@ class AppointmentsList extends Component
                 ]);
             }
 
-            $message = count($appointmentIds) - count($remainingIds) > 1
-                ? (count($appointmentIds) - count($remainingIds)) . " نوبت با موفقیت جابجا شدند."
-                : "نوبت با موفقیت جابجا شد.";
+
+            $message = "نوبت ها با موفقیت جابجا شدند";
+
 
             $this->dispatch('show-toastr', ['type' => 'success', 'message' => $message]);
             $this->dispatch('close-modal', ['name' => 'reschedule-modal']);
