@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Dr\Panel\Turn\Schedule;
 
-
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Doctor;
@@ -28,7 +27,6 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
 use Exception;
-
 
 class ManualNobatList extends Component
 {
@@ -407,15 +405,15 @@ class ManualNobatList extends Component
 
         $query = Appointment::query()
             ->where('doctor_id', $doctor->id)
+            ->where('appointment_type', 'manual')  // اضافه کردن فیلتر برای نوبت‌های منوال
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
                 return $query->where('clinic_id', $this->selectedClinicId);
             });
 
         if ($this->filterStatus === 'manual') {
-            $query->where('appointment_type', 'manual')
-                ->when($this->selectedDate, function ($query) {
-                    return $query->whereDate('appointment_date', $this->selectedDate);
-                });
+            $query->when($this->selectedDate, function ($query) {
+                return $query->whereDate('appointment_date', $this->selectedDate);
+            });
         } else {
             $query->when($this->selectedDate, function ($query) {
                 return $query->whereDate('appointment_date', $this->selectedDate);
@@ -462,7 +460,6 @@ class ManualNobatList extends Component
                 $this->appointments[] = $appointment;
             }
         } catch (\Exception $e) {
-
             $this->appointments = [];
         }
 
