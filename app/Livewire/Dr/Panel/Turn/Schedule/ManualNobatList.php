@@ -2058,7 +2058,26 @@ class ManualNobatList extends Component
     public function storeWithUser()
     {
         try {
-            // Convert Jalali date to Gregorian before validation
+            // Validate required fields
+            $this->validate([
+                'firstName' => 'required|string|max:255',
+                'lastName' => 'required|string|max:255',
+                'mobile' => 'required|digits:11',
+                'nationalCode' => 'required|digits:10',
+                'appointmentDate' => 'required',
+                'appointmentTime' => 'required',
+            ], [
+                'firstName.required' => 'نام الزامی است',
+                'lastName.required' => 'نام خانوادگی الزامی است',
+                'mobile.required' => 'شماره موبایل الزامی است',
+                'mobile.digits' => 'شماره موبایل باید 11 رقم باشد',
+                'nationalCode.required' => 'کد ملی الزامی است',
+                'nationalCode.digits' => 'کد ملی باید 10 رقم باشد',
+                'appointmentDate.required' => 'تاریخ نوبت الزامی است',
+                'appointmentTime.required' => 'ساعت نوبت الزامی است',
+            ]);
+
+            // Convert Jalali date to Gregorian
             $gregorianDate = null;
             if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $this->appointmentDate)) {
                 try {
@@ -2072,14 +2091,7 @@ class ManualNobatList extends Component
                 $gregorianDate = $this->appointmentDate;
             }
 
-            $this->validate([
-                'firstName' => 'required|string|max:255',
-                'lastName' => 'required|string|max:255',
-                'mobile' => 'required|string|size:11',
-                'nationalCode' => 'required|string|size:10',
-                'appointmentTime' => 'required',
-            ]);
-
+            // Check if user exists
             $user = User::where('mobile', $this->mobile)
                        ->orWhere('national_code', $this->nationalCode)
                        ->first();
@@ -2094,7 +2106,13 @@ class ManualNobatList extends Component
             }
 
             $doctor = $this->getAuthenticatedDoctor();
-            $clinicId = $this->selectedClinicId;
+            if (!$doctor) {
+                throw new \Exception('دکتر معتبر یافت نشد.');
+            }
+
+            $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+
+            // Create the appointment
             $appointment = Appointment::create([
                 'patient_id' => $user->id,
                 'doctor_id' => $doctor->id,
@@ -2106,21 +2124,11 @@ class ManualNobatList extends Component
                 'appointment_type' => 'manual'
             ]);
 
-            // Clear cache for this date
+            // Clear cache
             $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$clinicId}_date_{$gregorianDate}";
             Cache::forget($cacheKey);
 
-            $this->reset(['firstName', 'lastName', 'mobile', 'nationalCode', 'appointmentDate', 'appointmentTime', 'selectedTime']);
-            $this->dispatch('close-modal', ['name' => 'add-sick-modal']);
-            $this->dispatch('show-toastr', ['message' => 'نوبت با موفقیت ثبت شد', 'type' => 'success']);
-            $this->loadAppointments();
-
-            // تغییر dispatch به فرمت صحیح
-            $this->dispatch('appointment-registered', [
-                'message' => 'نوبت با موفقیت ثبت شد'
-            ]);
-
-            // ریست کردن تمام فیلدها و مخفی کردن فرم
+            // Reset form fields
             $this->reset([
                 'firstName',
                 'lastName',
@@ -2134,9 +2142,16 @@ class ManualNobatList extends Component
                 'searchResults'
             ]);
 
-            session()->flash('message', 'نوبت با موفقیت ثبت شد.');
+            // Close modal and show success message
+            $this->dispatch('close-modal', ['name' => 'add-sick-modal']);
+            $this->dispatch('show-toastr', ['message' => 'نوبت با موفقیت ثبت شد', 'type' => 'success']);
+            $this->dispatch('appointment-registered', ['message' => 'نوبت با موفقیت ثبت شد']);
+
+            // Reload appointments list
+            $this->loadAppointments();
+
         } catch (\Exception $e) {
-            session()->flash('error', 'خطا در ثبت نوبت: ' . $e->getMessage());
+            $this->dispatch('show-toastr', ['message' => 'خطا در ثبت نوبت: ' . $e->getMessage(), 'type' => 'error']);
         }
     }
 
