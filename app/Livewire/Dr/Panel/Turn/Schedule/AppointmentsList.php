@@ -2152,8 +2152,7 @@ class AppointmentsList extends Component
             $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
             return;
         }
-
-
+    
         // Convert Jalali date to Gregorian
         $gregorianDate = $this->convertToGregorian($this->appointmentDate);
         if (!$gregorianDate) {
@@ -2161,23 +2160,23 @@ class AppointmentsList extends Component
             $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
             return;
         }
-
+    
         // Get current time with proper timezone
         $now = Carbon::now('Asia/Tehran');
         $currentTimeStr = $now->format('H:i');
-
+    
         $selectedDate = Carbon::parse($gregorianDate, 'Asia/Tehran')->startOfDay();
-
+    
         if ($selectedDate->lt($now->startOfDay())) {
             $this->dispatch('show-toastr', ['message' => 'امکان ثبت نوبت برای تاریخ گذشته وجود ندارد', 'type' => 'error']);
             $this->availableTimes = [];
             $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
             return;
         }
-
+    
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
-
+    
         // Get doctor's work schedule for this day
         $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
             ->where(function ($query) use ($clinicId) {
@@ -2190,23 +2189,23 @@ class AppointmentsList extends Component
             ->where('day', strtolower(date('l', strtotime($gregorianDate))))
             ->where('is_working', true)
             ->first();
-
+    
         // Check for special schedule
         $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
             ->where('date', $gregorianDate)
             ->when($clinicId === null, fn ($q) => $q->whereNull('clinic_id'))
             ->when($clinicId !== null, fn ($q) => $q->where('clinic_id', $clinicId))
             ->first();
-
+    
         $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : ($workSchedule ? json_decode($workSchedule->work_hours, true) : []);
         $appointmentSettings = $specialSchedule ? (json_decode($specialSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ($workSchedule ? (json_decode($workSchedule->appointment_settings, true) ?? ['appointment_duration' => 15]) : ['appointment_duration' => 15]);
-
+    
         if (empty($workHours)) {
             $this->availableTimes = [];
             $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
             return;
         }
-
+    
         // Calculate available slots
         $slots = [];
         $existingAppointments = Appointment::where('doctor_id', $doctorId)
@@ -2218,43 +2217,41 @@ class AppointmentsList extends Component
             ->pluck('appointment_time')
             ->map(fn ($time) => Carbon::parse($time)->format('H:i'))
             ->toArray();
-
+    
         $currentTime = Carbon::now('Asia/Tehran');
         $isToday = Carbon::parse($gregorianDate)->isSameDay($currentTime);
-
+    
         foreach ($workHours as $period) {
             $start = Carbon::parse($period['start']);
             $end = Carbon::parse($period['end']);
             $maxAppointments = $period['max_appointments'] ?? PHP_INT_MAX;
-
+    
             // Calculate slot interval
             $totalMinutes = $start->diffInMinutes($end);
             $slotInterval = $maxAppointments > 0 ? max(1, floor($totalMinutes / $maxAppointments)) : 15;
-
+    
             $currentSlot = $start->copy();
             $slotsGenerated = 0;
-
+    
             while ($currentSlot->lt($end) && $slotsGenerated < $maxAppointments) {
                 $slotTime = $currentSlot->format('H:i');
-
+    
                 // Skip past times for today only
-                if ($isToday && $slotTime <= $currentTime->format('H:i')) {
+                if ($isToday && Carbon::parse($slotTime, 'Asia/Tehran')->lte($currentTime)) {
                     $currentSlot->addMinutes($slotInterval);
                     continue;
                 }
-
+    
                 // Check for existing appointments
                 if (!in_array($slotTime, $existingAppointments)) {
                     $slots[] = $slotTime;
                     $slotsGenerated++;
                 }
-
+    
                 $currentSlot->addMinutes($slotInterval);
             }
         }
-
-
-
+    
         $this->availableTimes = array_values($slots);
         $this->dispatch('available-times-loaded', ['times' => $this->availableTimes]);
     }
@@ -2459,46 +2456,49 @@ class AppointmentsList extends Component
     private function generateAvailableTimes($workSchedule, $reservedAppointments)
     {
         $availableTimes = [];
-        $now = Carbon::now();
-        $isToday = $now->format('Y-m-d') === ($workSchedule['schedule_date'] ?? now()->format('Y-m-d'));
+        $now = Carbon::now('Asia/Tehran');
         $currentTime = $now->format('H:i');
+        $isToday = $now->format('Y-m-d') === ($workSchedule['schedule_date'] ?? now()->format('Y-m-d'));
         $isSpecial = $workSchedule['is_special'] ?? false;
-
+    
         // تبدیل زمان‌های رزرو شده به آرایه ساده برای مقایسه راحت‌تر
         $reservedTimes = array_map(function ($appointment) {
             return $appointment['appointment_time'];
         }, $reservedAppointments);
-
+    
         foreach ($workSchedule['work_hours'] as $period) {
             $start = Carbon::parse($period['start']);
             $end = Carbon::parse($period['end']);
-            $maxAppointments = $period['max_appointments'] ?? 90;
-
-            // For special schedules, use 16-minute intervals
+            $maxAppointments = $period['max_appointments'] ?? PHP_INT_MAX;
+    
+            // برای برنامه‌های خاص، فاصله 16 دقیقه‌ای استفاده می‌شود
             $interval = $isSpecial ? 16 : 15;
-
+    
             $current = $start->copy();
-            while ($current->copy()->addMinutes($interval) <= $end) {
+            $slotsGenerated = 0;
+    
+            while ($current->copy()->addMinutes($interval)->lte($end) && $slotsGenerated < $maxAppointments) {
                 $timeSlot = $current->format('H:i');
-
-                // Skip past times for today
-                if ($isToday && $timeSlot <= $currentTime) {
+    
+                // رد کردن زمان‌های گذشته برای امروز
+                if ($isToday && Carbon::parse($timeSlot, 'Asia/Tehran')->lte($now)) {
                     $current->addMinutes($interval);
                     continue;
                 }
-
+    
                 // اگر این زمان قبلاً رزرو شده است، آن را رد کن
                 if (in_array($timeSlot, $reservedTimes)) {
                     $current->addMinutes($interval);
                     continue;
                 }
-
+    
                 $availableTimes[] = $timeSlot;
+                $slotsGenerated++;
                 $current->addMinutes($interval);
             }
         }
-
-        return $availableTimes;
+    
+        return array_values($availableTimes);
     }
 
     public function render()
