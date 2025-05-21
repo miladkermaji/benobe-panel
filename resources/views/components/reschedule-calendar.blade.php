@@ -98,7 +98,8 @@
     backdrop-filter: blur(4px);
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+    font-family: var(--font-family);
   }
 
   #loading-overlay.hidden {
@@ -108,24 +109,25 @@
 
   #loading-overlay::after {
     content: '';
-    width: 40px;
-    height: 40px;
-    border: 3px solid transparent;
+    width: 35px;
+    height: 35px;
+    border: 2.5px solid transparent;
     border-top-color: var(--primary);
     border-right-color: var(--primary-light);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.6s linear infinite;
   }
 
   #loading-overlay::before {
     content: 'در حال بارگذاری تقویم...';
     position: absolute;
-    bottom: calc(50% + 35px);
+    bottom: calc(50% + 30px);
     color: var(--primary);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     text-align: center;
     white-space: nowrap;
+    font-family: var(--font-family);
   }
 
   @keyframes spin {

@@ -3,6 +3,15 @@ document.addEventListener("livewire:initialized", () => {
     // Show loading immediately
     showCalendarLoading();
 
+    // Preload next month's data
+    const currentDate = new Date();
+    const nextMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        1
+    );
+    preloadMonthData(nextMonth.getFullYear(), nextMonth.getMonth() + 1);
+
     Livewire.on("appointments-count-updated", (data) => {
         requestAnimationFrame(() => {
             updateCalendarAppointments(data);
@@ -10,6 +19,15 @@ document.addEventListener("livewire:initialized", () => {
         });
     });
 });
+
+// Function to preload month data
+async function preloadMonthData(year, month) {
+    try {
+        await Livewire.dispatch("getAppointmentsCountForMonth", [year, month]);
+    } catch (error) {
+        console.error("Error preloading month data:", error);
+    }
+}
 
 // Function to show loading state
 function showCalendarLoading() {
