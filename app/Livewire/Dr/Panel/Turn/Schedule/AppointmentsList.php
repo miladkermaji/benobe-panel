@@ -410,10 +410,7 @@ class AppointmentsList extends Component
             });
 
         if ($this->filterStatus === 'manual') {
-            $query->where('appointment_type', 'manual')
-                ->when($this->selectedDate, function ($query) {
-                    return $query->whereDate('appointment_date', $this->selectedDate);
-                });
+            $query->where('appointment_type', 'manual');
         } else {
             $query->when($this->selectedDate, function ($query) {
                 return $query->whereDate('appointment_date', $this->selectedDate);
@@ -452,7 +449,6 @@ class AppointmentsList extends Component
         });
 
         try {
-            // استفاده از cursor برای Lazy Loading
             $this->appointments = [];
             foreach ($query->orderBy('appointment_date', 'desc')
                           ->orderBy('appointment_time', 'desc')
@@ -460,13 +456,11 @@ class AppointmentsList extends Component
                 $this->appointments[] = $appointment;
             }
         } catch (\Exception $e) {
-
             $this->appointments = [];
         }
 
         $this->dispatch('setAppointments', ['appointments' => $this->appointments]);
 
-        // بررسی عدم وجود نتیجه برای نمایش هشدار
         if (empty($this->appointments) && $this->searchQuery) {
             $jalaliDate = Jalalian::fromCarbon(Carbon::parse($this->selectedDate));
             if ($this->isSearchingAllDates) {
