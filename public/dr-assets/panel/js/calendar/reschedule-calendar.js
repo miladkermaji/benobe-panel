@@ -710,11 +710,37 @@ async function handleDayClick(dayElement) {
         }
     } else {
         // Get original appointment details for multiple appointments
-        const appointments = await Livewire.dispatch("getAppointmentDetails", {
-            appointmentIds: selectedIds,
+        const appointments = await new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+                window.removeEventListener(
+                    "appointment-details-received",
+                    handler
+                );
+                reject(new Error("Timeout waiting for appointment details"));
+            }, 10000);
+
+            const handler = (event) => {
+                console.log("Received appointment details:", event.detail);
+                clearTimeout(timeoutId);
+                window.removeEventListener(
+                    "appointment-details-received",
+                    handler
+                );
+                resolve(event.detail[0]);
+            };
+
+            window.addEventListener("appointment-details-received", handler);
+            Livewire.dispatchTo(
+                "dr.panel.turn.schedule.appointments-list",
+                "getAppointmentDetails",
+                {
+                    appointmentIds: selectedIds,
+                }
+            );
         });
+
         const originalDates =
-            appointments[0]?.map((app) => ({
+            appointments?.map((app) => ({
                 date: moment(app.appointment_date)
                     .locale("fa")
                     .format("jYYYY/jMM/jDD"),
@@ -736,10 +762,14 @@ async function handleDayClick(dayElement) {
         });
 
         if (result.isConfirmed) {
-            Livewire.dispatch("rescheduleAppointment", {
-                appointmentIds: selectedIds,
-                newDate: date,
-            });
+            Livewire.dispatchTo(
+                "dr.panel.turn.schedule.appointments-list",
+                "rescheduleAppointment",
+                {
+                    appointmentIds: selectedIds,
+                    newDate: date,
+                }
+            );
         }
     }
 }
