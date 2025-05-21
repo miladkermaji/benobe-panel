@@ -18,7 +18,7 @@
 
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-  var appointmentsCountUrl = "{{ route('appointments.count') }}";
+  var appointmentsCountUrl = "{{ route('appointments.count') }}?manual_only=true";
   var getHolidaysUrl = "{{ route('doctor.get_holidays') }}";
   var updateStatusAppointmentUrl =
     "{{ route('updateStatusAppointment', ':id') }}";

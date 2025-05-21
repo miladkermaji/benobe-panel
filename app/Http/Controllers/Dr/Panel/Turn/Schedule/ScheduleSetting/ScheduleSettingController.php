@@ -20,6 +20,7 @@ use App\Http\Controllers\Dr\Controller;
 use App\Models\DoctorAppointmentConfig;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use Illuminate\Support\Facades\Route;
 
 class ScheduleSettingController extends Controller
 {
@@ -949,7 +950,6 @@ class ScheduleSettingController extends Controller
         try {
             $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
             $selectedClinicId = $request->input('selectedClinicId');
-          
 
             // دریافت تنظیمات تقویم
             $appointmentConfig = DoctorAppointmentConfig::where('doctor_id', $doctorId)
@@ -978,17 +978,24 @@ class ScheduleSettingController extends Controller
                 ->toArray();
 
             // دریافت تعداد نوبت‌ها
-            $appointments = DB::table('appointments')
+            $appointmentsQuery = DB::table('appointments')
                 ->select(DB::raw('appointment_date, COUNT(*) as appointment_count'))
                 ->where('doctor_id', $doctorId)
                 ->where('status', 'scheduled')
-                ->whereNull('deleted_at')
-                ->when($selectedClinicId === 'default', function ($query) use ($doctorId) {
-                    $query->whereNull('clinic_id')->where('doctor_id', $doctorId);
-                })
-                ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
-                })
+                ->whereNull('deleted_at');
+
+            if ($selectedClinicId === 'default') {
+                $appointmentsQuery->whereNull('clinic_id');
+            } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
+                $appointmentsQuery->where('clinic_id', $selectedClinicId);
+            }
+
+            // اگر در صفحه نوبت دستی هستیم فقط نوبت‌های manual را بشمار
+            if ($request->has('manual_only') && $request->manual_only) {
+                $appointmentsQuery->where('appointment_type', 'manual');
+            }
+
+            $appointments = $appointmentsQuery
                 ->groupBy('appointment_date')
                 ->get();
 
@@ -1027,7 +1034,7 @@ class ScheduleSettingController extends Controller
                 'appointment_settings' => $appointmentSettings,
             ]);
         } catch (\Exception $e) {
-          
+
             return response()->json([
                 'status' => false,
                 'message' => 'خطا در دریافت داده‌ها',
@@ -1348,7 +1355,7 @@ class ScheduleSettingController extends Controller
             $appointments = $appointmentsQuery->get();
 
             if ($appointments->isEmpty()) {
-              
+
                 return response()->json(['status' => false, 'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.'], 404);
             }
 
@@ -1404,7 +1411,7 @@ class ScheduleSettingController extends Controller
                 'total_recipients' => count($recipients),
             ]);
         } catch (\Exception $e) {
-           
+
             return response()->json([
                 'status' => false,
                 'message' => 'خطا در جابجایی نوبت‌ها: ' . $e->getMessage(),
