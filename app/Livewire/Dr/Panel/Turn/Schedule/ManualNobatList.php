@@ -410,11 +410,8 @@ class ManualNobatList extends Component
                 return $query->where('clinic_id', $this->selectedClinicId);
             });
 
-        if ($this->filterStatus === 'manual') {
-            $query->when($this->selectedDate, function ($query) {
-                return $query->whereDate('appointment_date', $this->selectedDate);
-            });
-        } else {
+        // Only apply date filter if not searching all dates and not filtering by manual
+        if (!$this->isSearchingAllDates && $this->filterStatus !== 'manual') {
             $query->when($this->selectedDate, function ($query) {
                 return $query->whereDate('appointment_date', $this->selectedDate);
             });
