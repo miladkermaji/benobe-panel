@@ -124,35 +124,33 @@ class Workhours extends Component
     public function mount($clinicId = null)
     {
         $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-        $this->clinicId = $clinicId; // clinicId از پراپرتی‌های کامپوننت
+        $this->clinicId = $clinicId;
 
-        // دریافت selectedClinicId از درخواست URL یا localStorage
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
-
-        // انتخاب clinicId فعال: اولویت با clinicId از URL، سپس selectedClinicId
         $this->activeClinicId = $this->clinicId ?? $this->selectedClinicId;
-
-        // ذخیره selectedClinicId در session برای استفاده‌های بعدی
         session(['selectedClinicId' => $this->selectedClinicId]);
 
-        $this->appointmentConfig = DoctorAppointmentConfig::firstOrCreate(
-            [
-                'doctor_id' => $doctorId,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-            ],
-            [
-                'auto_scheduling' => true,
-                'online_consultation' => false,
-                'holiday_availability' => false,
-            ]
-        );
+        // Lazy load appointment config
+        $this->appointmentConfig = DoctorAppointmentConfig::withoutGlobalScopes()
+            ->firstOrCreate(
+                [
+                    'doctor_id' => $doctorId,
+                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                ],
+                [
+                    'auto_scheduling' => true,
+                    'online_consultation' => false,
+                    'holiday_availability' => false,
+                ]
+            );
 
         $this->refreshWorkSchedules();
 
+        // Lazy load work schedules
         $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
         foreach ($daysOfWeek as $day) {
             if (!collect($this->workSchedules)->firstWhere('day', $day)) {
-                DoctorWorkSchedule::create([
+                DoctorWorkSchedule::withoutGlobalScopes()->create([
                     'doctor_id' => $doctorId,
                     'day' => $day,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
@@ -168,6 +166,8 @@ class Workhours extends Component
 
         $this->isWorking = array_fill_keys($daysOfWeek, false);
         $this->slots = array_fill_keys($daysOfWeek, []);
+
+        // Lazy load slots
         foreach ($daysOfWeek as $day) {
             $schedule = collect($this->workSchedules)->firstWhere('day', $day);
             if ($schedule) {
@@ -201,7 +201,6 @@ class Workhours extends Component
 
         $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
 
-        // ارسال رویداد برای رفرش داده‌ها
         $this->dispatch('refresh-clinic-data');
     }
 
@@ -485,7 +484,11 @@ class Workhours extends Component
     public function refreshWorkSchedules()
     {
         $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-        $this->workSchedules = DoctorWorkSchedule::where('doctor_id', $doctorId)
+
+        // Optimize query by selecting only needed fields
+        $this->workSchedules = DoctorWorkSchedule::withoutGlobalScopes()
+            ->select(['id', 'day', 'is_working', 'work_hours', 'appointment_settings', 'emergency_times'])
+            ->where('doctor_id', $doctorId)
             ->where(function ($query) {
                 if ($this->activeClinicId !== 'default') {
                     $query->where('clinic_id', $this->activeClinicId);
@@ -573,18 +576,20 @@ class Workhours extends Component
 
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
 
-            DoctorAppointmentConfig::updateOrCreate(
-                [
-                    'doctor_id' => $doctor->id,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                ],
-                [
-                    'calendar_days' => $this->calendarDays,
-                    'holiday_availability' => $this->holidayAvailability,
-                    'auto_scheduling' => $this->autoScheduling,
-                    'online_consultation' => $this->onlineConsultation,
-                ]
-            );
+            // Remove cache and use withoutGlobalScopes
+            DoctorAppointmentConfig::withoutGlobalScopes()
+                ->updateOrCreate(
+                    [
+                        'doctor_id' => $doctor->id,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    ],
+                    [
+                        'calendar_days' => $this->calendarDays,
+                        'holiday_availability' => $this->holidayAvailability,
+                        'auto_scheduling' => $this->autoScheduling,
+                        'online_consultation' => $this->onlineConsultation,
+                    ]
+                );
 
             $this->modalMessage = 'تنظیمات با موفقیت ذخیره شد';
             $this->modalType = 'success';
@@ -1494,17 +1499,18 @@ class Workhours extends Component
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
 
         try {
-            DoctorAppointmentConfig::updateOrCreate(
-                [
-                    'doctor_id' => $doctor->id,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                ],
-                [
-                    'auto_scheduling' => $this->autoScheduling,
-                    'doctor_id' => $doctor->id,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                ]
-            );
+            DoctorAppointmentConfig::withoutGlobalScopes()
+                ->updateOrCreate(
+                    [
+                        'doctor_id' => $doctor->id,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    ],
+                    [
+                        'auto_scheduling' => $this->autoScheduling,
+                        'doctor_id' => $doctor->id,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    ]
+                );
 
             $this->dispatch('show-toastr', [
                 'message' => $this->autoScheduling ? 'نوبت‌دهی خودکار فعال شد' : 'نوبت‌دهی خودکار غیرفعال شد',

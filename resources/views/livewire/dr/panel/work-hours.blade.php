@@ -1,6 +1,6 @@
 <div>
   <div>
-    <div class="w-100 d-flex justify-content-center mt-3" dir="ltr">
+    <div class="w-100 d-flex justify-content-center mt-5" dir="ltr">
       <div class="auto-scheule-content-top">
         <x-my-toggle-appointment :isChecked="$autoScheduling" id="appointment-toggle" day="نوبت دهی خودکار" class="mt-3"
           wire:model="autoScheduling" wire:change="updateAutoScheduling" />
@@ -119,7 +119,7 @@
                                 <div class="d-flex align-items-center">
                                   <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
                                     <button type="button"
-                                      class="btn text-black btn-sm btn-outline-primary schedule-btn"
+                                      class="btn text-black btn-sm  schedule-btn"
                                       data-bs-toggle="modal" data-bs-target="#scheduleModal"
                                       data-day="{{ $englishDay }}" data-index="{{ $index }}"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
@@ -196,7 +196,7 @@
                               <div class="d-flex align-items-center">
                                 <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
                                   <button type="button"
-                                    class="btn text-black btn-sm btn-outline-primary schedule-btn"
+                                    class="btn text-black btn-sm  schedule-btn"
                                     data-bs-toggle="modal" data-bs-target="#scheduleModal"
                                     data-day="{{ $englishDay }}" data-index="{{ $index }}"
                                     {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
