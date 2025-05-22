@@ -120,7 +120,7 @@
     margin: 1.5rem auto;
     font-family: var(--font-family);
     max-width: 1000px;
-    padding: 2rem;
+    padding: 1rem;
     position: relative;
     transition: var(--transition);
   }
@@ -195,32 +195,50 @@
   .calendar-day-name {
     text-align: center;
     font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text-secondary);
+    font-weight: 700 !important;
+    color: #000;
   }
 
   .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0.75rem;
-    padding-bottom: 1.5rem;
+    gap: 0.45rem;
+    padding-bottom: .8rem;
   }
 
   .calendar-day {
     background: var(--background-card);
     border: 1px solid rgba(229, 231, 235, 0.5);
     border-radius: 10px;
-    aspect-ratio: 1.5;
+    aspect-ratio: 1.6;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-weight: 700 !important;
+    color: #000;
     cursor: pointer;
     transition: var(--transition);
     position: relative;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .appointment-count {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .calendar-day:hover:not(.empty) {
@@ -242,11 +260,41 @@
   }
 
   .calendar-day.today {
-    background: var(--gradient-primary);
-    border-color: var(--primary);
-    color: var(--background-card);
+    border: 2px solid var(--primary);
+    color: var(--primary);
     font-weight: 700;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    position: relative;
+  }
+
+  .calendar-day.today::after {
+    content: 'امروز';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: var(--font-family);
+    color: var(--primary);
+    white-space: nowrap;
+  }
+
+  .calendar-day.today .appointment-count {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .calendar-day.today.has-appointment {
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    background: var(--appointment-bg);
+  }
+
+  .calendar-day.today.holiday {
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    background: var(--holiday-bg);
   }
 
   .calendar-day.active {
@@ -289,7 +337,6 @@
     color: var(--holiday-dot);
     box-shadow: 0 3px 10px rgba(245, 101, 101, 0.2);
     z-index: 50;
-
   }
 
   .calendar-day.holiday::after {
@@ -302,13 +349,6 @@
     background: var(--holiday-dot);
     border-radius: 50%;
     box-shadow: 0 0 6px rgba(245, 101, 101, 0.3);
-  }
-
-  .calendar-day.today.has-appointment {
-    background: var(--gradient-primary);
-    border-color: var(--appointment-border);
-    color: var(--background-card);
-    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.2);
   }
 
   .calendar-day.selected.has-appointment {
@@ -361,7 +401,7 @@
   @media (max-width: 960px) {
     .special-days-calendar-container {
       max-width: 100%;
-      padding: 1.5rem;
+      padding: 1rem;
       border-radius: var(--radius-card-mobile);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
@@ -447,7 +487,7 @@
   /* ریسپانسیو برای موبایل و تبلت کوچک (768px و کمتر) */
   @media (max-width: 768px) {
     .special-days-calendar-container {
-      padding: 1rem;
+      padding: .8rem;
       margin: 1rem auto;
       border-radius: var(--radius-card-mobile);
       box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);

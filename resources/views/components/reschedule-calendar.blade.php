@@ -263,7 +263,7 @@
     align-items: center;
     justify-content: center;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
     cursor: pointer;
     transition: var(--transition);

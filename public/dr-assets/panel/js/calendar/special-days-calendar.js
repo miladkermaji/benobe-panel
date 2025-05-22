@@ -154,38 +154,14 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
 
             const spanElement = document.createElement("span");
             spanElement.textContent = currentDay.format("jD");
+            dayElement.appendChild(spanElement);
 
-            const tooltipContent =
-                !isPastDate && isHoliday
-                    ? "این روز تعطیل است"
-                    : !isPastDate && appointmentCount > 0
-                    ? `تعداد نوبت‌ها: ${appointmentCount}`
-                    : "";
-
-            if (tooltipContent) {
-                const tooltipWrapper = document.createElement("div");
-                tooltipWrapper.setAttribute("x-tooltip", "");
-                tooltipWrapper.setAttribute(
-                    "id",
-                    `tooltip-day-${gregorianString}`
-                );
-                tooltipWrapper.setAttribute("data-trigger", "hover");
-                tooltipWrapper.setAttribute("data-placement", "top");
-                tooltipWrapper.classList.add("x-tooltip");
-
-                const triggerDiv = document.createElement("div");
-                triggerDiv.classList.add("x-tooltip__trigger");
-                triggerDiv.appendChild(spanElement);
-
-                const contentDiv = document.createElement("div");
-                contentDiv.classList.add("x-tooltip__content");
-                contentDiv.textContent = tooltipContent;
-
-                tooltipWrapper.appendChild(triggerDiv);
-                tooltipWrapper.appendChild(contentDiv);
-                dayElement.appendChild(tooltipWrapper);
-            } else {
-                dayElement.appendChild(spanElement);
+            // Add appointment count badge if there are appointments
+            if (!isPastDate && appointmentCount > 0) {
+                const countElement = document.createElement("span");
+                countElement.classList.add("appointment-count");
+                countElement.textContent = appointmentCount;
+                dayElement.appendChild(countElement);
             }
 
             if (currentDay.day() === 5) {
@@ -366,129 +342,131 @@ function initializeSpecialDaysCalendar({ initialYear, initialMonth } = {}) {
         });
     }
 
-  Livewire.on("holidayUpdated", (event) => {
-      if (
-          !event ||
-          typeof event !== "object" ||
-          !event.date ||
-          typeof event.isHoliday === "undefined"
-      ) {
-          console.error("Invalid holidayUpdated event data", event);
-          return;
-      }
+    Livewire.on("holidayUpdated", (event) => {
+        if (
+            !event ||
+            typeof event !== "object" ||
+            !event.date ||
+            typeof event.isHoliday === "undefined"
+        ) {
+            console.error("Invalid holidayUpdated event data", event);
+            return;
+        }
 
-      const { date, isHoliday } = event;
+        const { date, isHoliday } = event;
 
-      // به‌روزرسانی holidaysData
-      if (!window.holidaysData) {
-          window.holidaysData = { holidays: [] };
-      }
-      if (isHoliday) {
-          if (!window.holidaysData.holidays.includes(date)) {
-              window.holidaysData.holidays.push(date);
-          }
-      } else {
-          window.holidaysData.holidays = window.holidaysData.holidays.filter(
-              (holiday) => holiday !== date
-          );
-      }
+        // به‌روزرسانی holidaysData
+        if (!window.holidaysData) {
+            window.holidaysData = { holidays: [] };
+        }
+        if (isHoliday) {
+            if (!window.holidaysData.holidays.includes(date)) {
+                window.holidaysData.holidays.push(date);
+            }
+        } else {
+            window.holidaysData.holidays = window.holidaysData.holidays.filter(
+                (holiday) => holiday !== date
+            );
+        }
 
-      // پیدا کردن المان روز
-      const dayElement = document.querySelector(
-          `.calendar-day[data-gregorian="${date}"]`
-      );
+        // پیدا کردن المان روز
+        const dayElement = document.querySelector(
+            `.calendar-day[data-gregorian="${date}"]`
+        );
 
-      // بررسی سال و ماه فعلی
-      const yearSelect = document.querySelector("#special-days-year");
-      const monthSelect = document.querySelector("#special-days-month");
-      let year = parseInt(yearSelect?.value);
-      let month = parseInt(monthSelect?.value);
+        // بررسی سال و ماه فعلی
+        const yearSelect = document.querySelector("#special-days-year");
+        const monthSelect = document.querySelector("#special-days-month");
+        let year = parseInt(yearSelect?.value);
+        let month = parseInt(monthSelect?.value);
 
-      if (isNaN(year) || isNaN(month)) {
-          console.warn("Invalid year or month, using initial values");
-          year = initialYear || moment().jYear();
-          month = initialMonth || moment().jMonth() + 1;
-      }
+        if (isNaN(year) || isNaN(month)) {
+            console.warn("Invalid year or month, using initial values");
+            year = initialYear || moment().jYear();
+            month = initialMonth || moment().jMonth() + 1;
+        }
 
-      // بررسی اینکه تاریخ در ماه فعلی است
-      const eventDate = moment(date, "YYYY-MM-DD").locale("fa");
-      const eventYear = eventDate.jYear();
-      const eventMonth = eventDate.jMonth() + 1;
+        // بررسی اینکه تاریخ در ماه فعلی است
+        const eventDate = moment(date, "YYYY-MM-DD").locale("fa");
+        const eventYear = eventDate.jYear();
+        const eventMonth = eventDate.jMonth() + 1;
 
-      if (dayElement) {
-          // اطمینان از وجود window.appointmentsData
-          const appointmentData =
-              window.appointmentsData?.data?.find(
-                  (appt) => appt.date === date
-              ) || null;
-          const appointmentCount = appointmentData
-              ? parseInt(appointmentData.count) || 0
-              : 0;
+        if (dayElement) {
+            // اطمینان از وجود window.appointmentsData
+            const appointmentData =
+                window.appointmentsData?.data?.find(
+                    (appt) => appt.date === date
+                ) || null;
+            const appointmentCount = appointmentData
+                ? parseInt(appointmentData.count) || 0
+                : 0;
 
-          // به‌روزرسانی استایل و کلاس‌ها
-          dayElement.classList.remove("holiday", "has-appointment");
-          if (isHoliday) {
-              dayElement.classList.add("holiday");
-          } else if (appointmentCount > 0) {
-              dayElement.classList.add("has-appointment");
-          }
+            // به‌روزرسانی استایل و کلاس‌ها
+            dayElement.classList.remove("holiday", "has-appointment");
+            if (isHoliday) {
+                dayElement.classList.add("holiday");
+            } else if (appointmentCount > 0) {
+                dayElement.classList.add("has-appointment");
+            }
 
-          // تنظیم محتوای تولتیپ
-          const tooltipContent = isHoliday
-              ? "این روز تعطیل است"
-              : appointmentCount > 0
-              ? `تعداد نوبت‌ها: ${appointmentCount}`
-              : "";
+            // تنظیم محتوای تولتیپ
+            const tooltipContent = isHoliday
+                ? "این روز تعطیل است"
+                : appointmentCount > 0
+                ? `تعداد نوبت‌ها: ${appointmentCount}`
+                : "";
 
-          const span = dayElement.querySelector("span");
-          dayElement.innerHTML = "";
+            const span = dayElement.querySelector("span");
+            dayElement.innerHTML = "";
 
-          if (tooltipContent) {
-              const tooltipWrapper = document.createElement("div");
-              tooltipWrapper.setAttribute("x-tooltip", "");
-              tooltipWrapper.setAttribute("id", `tooltip-day-${date}`);
-              tooltipWrapper.setAttribute("data-trigger", "hover");
-              tooltipWrapper.setAttribute("data-placement", "top");
-              tooltipWrapper.classList.add("x-tooltip");
+            if (tooltipContent) {
+                const tooltipWrapper = document.createElement("div");
+                tooltipWrapper.setAttribute("x-tooltip", "");
+                tooltipWrapper.setAttribute("id", `tooltip-day-${date}`);
+                tooltipWrapper.setAttribute("data-trigger", "hover");
+                tooltipWrapper.setAttribute("data-placement", "top");
+                tooltipWrapper.classList.add("x-tooltip");
 
-              const triggerDiv = document.createElement("div");
-              triggerDiv.classList.add("x-tooltip__trigger");
-              triggerDiv.appendChild(span);
+                const triggerDiv = document.createElement("div");
+                triggerDiv.classList.add("x-tooltip__trigger");
+                triggerDiv.appendChild(span);
 
-              const contentDiv = document.createElement("div");
-              contentDiv.classList.add("x-tooltip__content");
-              contentDiv.setAttribute("data-tooltip-id", `tooltip-day-${date}`);
-              contentDiv.textContent = tooltipContent;
+                const contentDiv = document.createElement("div");
+                contentDiv.classList.add("x-tooltip__content");
+                contentDiv.setAttribute(
+                    "data-tooltip-id",
+                    `tooltip-day-${date}`
+                );
+                contentDiv.textContent = tooltipContent;
 
-              tooltipWrapper.appendChild(triggerDiv);
-              tooltipWrapper.appendChild(contentDiv);
-              dayElement.appendChild(tooltipWrapper);
-          } else {
-              dayElement.appendChild(span);
-          }
+                tooltipWrapper.appendChild(triggerDiv);
+                tooltipWrapper.appendChild(contentDiv);
+                dayElement.appendChild(tooltipWrapper);
+            } else {
+                dayElement.appendChild(span);
+            }
 
-          // اجبار به رفرش DOM
-          dayElement.style.display = "none";
-          void dayElement.offsetHeight;
-          dayElement.style.display = "flex";
+            // اجبار به رفرش DOM
+            dayElement.style.display = "none";
+            void dayElement.offsetHeight;
+            dayElement.style.display = "flex";
+        } else if (eventYear === year && eventMonth === month) {
+            // فقط اگر تاریخ در ماه فعلی بود و المان پیدا نشد، تقویم رو رندر کن
+            console.warn(
+                `Day element for date ${date} not found, re-rendering calendar`
+            );
+            if (!isRendering) {
+                generateCalendar(year, month);
+            }
+        }
 
-      } else if (eventYear === year && eventMonth === month) {
-          // فقط اگر تاریخ در ماه فعلی بود و المان پیدا نشد، تقویم رو رندر کن
-          console.warn(
-              `Day element for date ${date} not found, re-rendering calendar`
-          );
-          if (!isRendering) {
-              generateCalendar(year, month);
-          }
-      }
-
-      // بستن مودال
-      window.dispatchEvent(
-          new CustomEvent("close-modal", {
-              detail: { name: "holiday-modal" },
-          })
-      );
-  });
+        // بستن مودال
+        window.dispatchEvent(
+            new CustomEvent("close-modal", {
+                detail: { name: "holiday-modal" },
+            })
+        );
+    });
 
     Livewire.on("calendarDataUpdated", () => {
         // فقط اگر تغییر از جای دیگه (مثل تغییر ماه/سال) بود، تقویم رو رندر کن
