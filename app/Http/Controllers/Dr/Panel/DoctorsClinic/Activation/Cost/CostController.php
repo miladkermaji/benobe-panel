@@ -40,7 +40,7 @@ class CostController extends Controller
     {
         $request->validate([
             'clinic_id'       => 'required|exists:clinics,id',
-            'doctor_id'       => 'required|exists:users,id',
+            'doctor_id'       => 'required|exists:doctors,id',
             'deposit_amount'  => 'nullable|numeric|min:0', // تغییر به nullable و حداقل 0
             'is_custom_price' => 'required|boolean',
             'no_deposit'      => 'nullable|boolean', // اضافه کردن فیلد جدید

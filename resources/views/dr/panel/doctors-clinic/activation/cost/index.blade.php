@@ -9,6 +9,7 @@
   بیعانه
 @endsection
 
+
 @section('backUrl')
   {{ route('activation-doctor-clinic', $clinicId) }}
 @endsection
@@ -295,43 +296,77 @@
 
       const form = document.getElementById('depositForm');
       const formData = new FormData(form);
+      const data = {};
+
+      // Convert FormData to object
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
 
       // اگه "بدون بیعانه" انتخاب شده، مقدار deposit_amount رو صفر بفرست
       if (document.getElementById('noDeposit').checked) {
-        formData.set('deposit_amount', 0);
-        formData.set('is_custom_price', 0);
+        data.deposit_amount = 0;
+        data.is_custom_price = 0;
       }
+
+      // If custom price is selected, use its value
+      if (data.deposit_amount === 'custom') {
+        data.deposit_amount = document.getElementById('customPrice').value;
+      }
+
+      // Log the data being sent
+      console.log('Sending data:', data);
 
       fetch("{{ route('cost.store') }}", {
           method: "POST",
           headers: {
             "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value,
+            "Content-Type": "application/json",
+            "Accept": "application/json"
           },
-          body: formData,
+          body: JSON.stringify(data)
         })
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => {
+              throw new Error(JSON.stringify(err));
+            });
+          }
+          return response.json();
+        })
         .then(data => {
           if (data.success) {
             Swal.fire({
               icon: "success",
               title: "ذخیره موفقیت‌آمیز",
               text: data.message,
+            }).then(() => {
+              loadDeposits();
+              location.href = "{{ route('duration.index', $clinicId) }}";
             });
-            loadDeposits();
-            location.href = "{{ route('duration.index', $clinicId) }}";
           } else {
             Swal.fire({
               icon: "error",
               title: "خطا",
-              text: data.message,
+              text: data.message || "خطایی رخ داد",
             });
           }
         })
         .catch(error => {
+          console.error('Error:', error);
+          let errorMessage = "مشکلی در ارسال اطلاعات رخ داد. لطفا دوباره تلاش کنید.";
+          try {
+            const errorData = JSON.parse(error.message);
+            if (errorData.errors) {
+              errorMessage = Object.values(errorData.errors).flat().join('\n');
+            }
+          } catch (e) {
+            console.error('Error parsing error message:', e);
+          }
           Swal.fire({
             icon: "error",
             title: "خطا",
-            text: "مشکلی در ارسال اطلاعات رخ داد.",
+            text: errorMessage,
           });
         });
     });
