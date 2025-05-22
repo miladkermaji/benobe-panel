@@ -1,5 +1,39 @@
 @import url("./../../../app-assets/fonts/IRANSans/style.css");
-
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
+    --primary-light: #84caf9; /* آبی روشن - در گرادیان‌ها */
+    --secondary: #1deb3c; /* سبز - برای دکمه‌های ثانویه */
+    --secondary-hover: #15802a; /* سبز تیره‌تر برای هاور */
+    --background-light: #f0f8ff; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
+    --background-footer: #d4ecfd; /* آبی روشن‌تر - فوتر */
+    --background-card: #ffffff; /* سفید - کارت‌ها */
+    --text-primary: #000000; /* مشکی - متن اصلی */
+    --text-secondary: #707070; /* خاکستری - متن ثانویه */
+    --text-discount: #008000; /* سبز - قیمت با تخفیف */
+    --text-original: #ff0000; /* قرمز - قیمت اولیه */
+    --border-neutral: #e5e7eb; /* خاکستری روشن - حاشیه‌ها */
+    --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
+    --gradient-instagram-from: #f92ca7; /* گرادیان اینستاگرام - شروع */
+    --gradient-instagram-to: #6b1a93; /* گرادیان اینستاگرام - پایان */
+    --button-mobile: #4f9acd; /* آبی متوسط - دکمه‌های موبایل */
+    --button-mobile-light: #a2cdeb; /* آبی روشن‌تر - دکمه‌های موبایل */
+    --support-section: #2e86c1; /* آبی - بخش پشتیبانی */
+    --support-text: #084d7c; /* آبی تیره - متن پشتیبانی */
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    ) !important;
+    /* شعاع گوشه‌ها (border-radius) */
+    --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
+    --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
+    --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
+    --radius-card: 1.125rem !important; /* 18px - کارت‌ها */
+    --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
+    --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
+    --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
+}
 * {
     padding: 0;
     margin: 0;
@@ -11,9 +45,22 @@
     font-family: IRANSans !important;
     font-weight: 400;
 }
-
+.my-btn-primary {
+    background-color: var(--gradient-primary);
+    color: #fff !important;
+}
+.btn-outline-primary {
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
+}
+.btn-outline-primary:hover {
+    background: var(--gradient-primary);
+    color: #fff !important;
+}
 .selectDate_datepicker__xkZeS span {
     font-family: IRANSans !important;
+    font-size: 14px;
+    font-weight: bold;
 }
 select {
     font-family: IRANSans, sans-serif !important;
@@ -178,20 +225,9 @@ textarea {
     margin-bottom: 0 !important;
 }
 
-:root {
-    --primary: #3b82f6; /* Softer, modern blue */
-    --secondary: #f8fafc; /* Light gray for background */
-    --text: #1e293b; /* Darker, elegant text color */
-    --danger: #ef4444; /* Vibrant red */
-    --shadow: 0 6px 15px rgba(0, 0, 0, 0.05); /* Softer shadow */
-    --border-radius: 12px; /* More rounded corners */
-    --transition: all 0.3s ease; /* Smooth transitions */
-}
 .custom-border-bottom {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px,
         rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
-    padding: 20px 28px;
-    box-shadow: var(--shadow);
     border-bottom-right-radius: 0 !important;
 }
 
@@ -567,30 +603,10 @@ svg {
 .mlg-15 {
     margin-left: 15px;
 }
-.sidebar__nav {
-    width: 250px;
-    background: linear-gradient(
-        180deg,
-        #ffffff 0%,
-        #f8fafc 100%
-    ); /* گرادیان نرم سفید به خاکستری روشن */
-    height: 100vh;
-    position: fixed;
-    transition: all 200ms ease;
-    right: 0;
-    bottom: 0;
-    z-index: 4000 !important;
-    top: -1px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--shadow); /* سایه شیک و نرم */
-   
-}
 
 .sidebar__nav.is-active {
     right: -170px;
-    transition: all 200ms ease;
+    transition: all 250ms ease;
 }
 
 .padding-12-30 {
@@ -604,6 +620,7 @@ svg {
     display: inline-block;
     font-size: 20px;
     padding: 5.5px 9px 0px 9px;
+    z-index: 901;
 }
 
 .sidebar__nav ul li {
@@ -613,7 +630,7 @@ svg {
 
 .sidebar__nav ul li a {
     font-size: 14.5px;
-    font-weight: 600;
+    font-weight: 700;
     width: 100%;
     margin: 5px 0;
     padding: 10px 50px;
@@ -621,9 +638,9 @@ svg {
     border-radius: 8px;
     display: flex;
     justify-content: start;
-    color: #4a5568;
+    color: #212121;
     align-items: center;
-    transition: all 0.3s ease;
+    transition: all 0.8s ease;
 }
 
 .sidebar__nav ul li.is-active a {
@@ -933,7 +950,7 @@ svg {
 }
 
 .mt-65 {
-    margin-top: 8px !important;
+    margin-top: 65px !important;
 }
 
 .fs-11 {
@@ -1037,14 +1054,56 @@ svg {
 
 .content {
     margin-right: 250px;
+    padding-top: 70px; /* فاصله برای جلوگیری از پوشیده شدن محتوا توسط هدر */
     transition: all 200ms ease;
 }
 
+
+.header {
+    background: #fafafa; /* سفید مایل به خاکستری روشن */
+    border-radius: var(--border-radius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    position: fixed;
+    top: 0;
+    width: calc(100% - 250px);
+    z-index: 900;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* سایه خیلی نرم */
+    transition: width 200ms ease;
+    border: 1px solid rgba(0, 0, 0, 0.03); /* حاشیه ظریف برای بافت */
+}
+
+/* سایدبار با رنگ روشن و سایه نرم */
+.sidebar__nav {
+    width: 250px;
+    background: linear-gradient(145deg, #ffffff, #f0f6ff);
+
+    height: 100vh;
+    position: fixed;
+    transition: all 200ms ease;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    z-index: 901 !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* سایه نرم */
+    border-left: 1px solid rgba(0, 0, 0, 0.02); /* حاشیه ظریف برای بافت */
+}
+
+.h-30 {
+    height: 30px !important;
+}
 .content.is-active {
     margin-right: 80px;
     transition: all 200ms ease;
 }
-
+.content.is-active .header {
+    width: calc(100% - 80px); /* عرض هدر هنگام کوچک شدن سایدبار */
+}
 .header__logo {
     height: 44px;
     width: 200px;
@@ -1058,6 +1117,7 @@ svg {
     font-size: 20px;
     padding-top: 3px;
     display: inline-block;
+    color: red;
 }
 
 .margin-15 {
@@ -1438,7 +1498,7 @@ svg {
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: 999;
+    z-index: 899;
     max-height: 250px;
     overflow: auto;
     border: 2px solid #e2e2e2;
@@ -1618,6 +1678,12 @@ span.tagRemove:hover {
         width: 100%;
         text-align: center;
         margin-bottom: 5px;
+    }
+}
+@media (max-width: 425px) {
+    .modal-content {
+        max-width: 100% !important;
+        border-radius: 10px !important;
     }
 }
 
@@ -1836,7 +1902,9 @@ span.tagRemove:hover {
     transform: rotate(-180deg);
     top: 37%;
 }
-
+.sidebar__scrollable ol ul {
+    padding-right: 0 !important;
+}
 .t-header-search-content {
     position: absolute;
     display: none;
@@ -1965,16 +2033,7 @@ span.tagRemove:hover {
     width: 50px;
     height: 50px;
 }
-.header {
-    background: white;
-    padding: 20px 28px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
+
 .transition-ticket .transition-ticket-header .nav-ticket-status,
 .nav-comment-status {
     margin-right: 10px;
@@ -2081,7 +2140,6 @@ span.tagRemove:hover {
 .card-body,
 .card-details {
     text-align: right;
-    margin: 10px 15px 0 15px;
     line-height: 31px;
 }
 
@@ -2107,7 +2165,9 @@ span.tagRemove:hover {
     -webkit-box-align: center;
     align-items: center;
 }
-
+.modal-header {
+    border-radius: 20px !important;
+}
 .content .posts .card-body img {
     width: 23px;
     height: 23px;
@@ -2160,7 +2220,6 @@ span.tagRemove:hover {
     z-index: 10;
     background: inherit;
     padding-bottom: 18px;
-
 }
 
 /* بخش اسکرول‌پذیر */
@@ -2180,7 +2239,6 @@ span.tagRemove:hover {
 }
 /* تنظیمات منوها */
 /* جلوگیری از به‌هم‌ریختگی در منوهای بازشو */
-
 /* breadcrub styles */
 /* Container styling with lighter shadow */
 .stylish-breadcrumb {
@@ -2189,8 +2247,6 @@ span.tagRemove:hover {
     border-radius: 10px; /* Slightly smaller radius */
     transition: box-shadow 0.3s ease; /* Smooth transition */
 }
-
-
 
 /* Breadcrumb list for better alignment */
 .breadcrumb {

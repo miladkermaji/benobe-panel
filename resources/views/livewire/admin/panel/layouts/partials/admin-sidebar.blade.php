@@ -19,7 +19,7 @@
   </div>
   <!-- بخش اسکرول‌پذیر -->
   <div class="sidebar__scrollable">
-    <ul class="mt-65" id="mt-65">
+    <ul class="" id="">
       @if (Auth::guard('manager')->check())
         <!-- داشبورد -->
         <li class="item-li i-dashboard {{ Request::routeIs('admin-panel') ? 'is-active' : '' }}">

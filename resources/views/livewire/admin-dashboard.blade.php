@@ -1,4 +1,4 @@
-<div class="container-fluid py-4" dir="rtl">
+<div class="container-fluid " dir="rtl">
   <!-- Statistics Cards -->
   <div class="row mb-6 justify-content-center">
     <div class="col-xl-2 col-md-4 col-sm-6 mb-4">

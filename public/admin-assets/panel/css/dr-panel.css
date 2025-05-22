@@ -1,75 +1,139 @@
-@import url('./../../../app-assets/fonts/IRANSans/style.css');
+@import url("./../../../app-assets/fonts/IRANSans/style.css");
 
 .badge-font-size {
- font-size: 17px !important;
+    font-size: 17px !important;
 }
 .main-content .row .col-3 {
- box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
 }
 .p-10 {
- padding: 10px;
+    padding: 10px;
 }
 .center {
- display: flex;
- justify-content: center;
- align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .dropdown-select {
- display: none !important;
+    display: none !important;
 }
 option,
 select {
- font-family: 'IRANSans' !important;
+    font-family: "IRANSans" !important;
 }
 
-
- .timepicker-ui-modal {
-      direction: ltr;
-    }
-
-    .timepicker-ui-modal .timepicker-ui-hour,
-    .timepicker-ui-modal .timepicker-ui-minute {
-      text-align: left;
-    }
-
-
+.normalize {
+    direction: ltr !important;
+}
 
 /* نقطه قرمز روی کلینیک‌های غیرفعال */
 .inactive-dot {
- width: 8px;
- height: 8px;
- background-color: red;
- border-radius: 50%;
- position: absolute;
- top: 10px;
- right: 10px;
+    width: 8px;
+    height: 8px;
+    background-color: red;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 
 /* انیمیشن لرزش برای دراپ‌داون */
 @keyframes shake {
- 0% {
-  transform: translateX(0);
- }
+    0% {
+        transform: translateX(0);
+    }
 
- 25% {
-  transform: translateX(-2px);
- }
+    25% {
+        transform: translateX(-2px);
+    }
 
- 50% {
-  transform: translateX(2px);
- }
+    50% {
+        transform: translateX(2px);
+    }
 
- 75% {
-  transform: translateX(-2px);
- }
+    75% {
+        transform: translateX(-2px);
+    }
 
- 100% {
-  transform: translateX(0);
- }
+    100% {
+        transform: translateX(0);
+    }
 }
 
 /* کلاس هشدار برای دراپ‌داون */
 .dropdown-trigger.warning {
- border: 2px solid red;
- animation: shake 0.5s infinite;
+    border: 2px solid red;
+    animation: shake 0.5s infinite;
+}
+.provider-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.provider-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content {
+    border-radius: 10px !important;
+}
+
+.form-control:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+}
+
+.my-btn-primary {
+    background: linear-gradient(
+        90deg,
+        var(--primary) 0%,
+        var(--primary-light) 100%
+    );
+    color: var(--background-card);
+    border: none;
+}
+.btn-primary {
+    background: linear-gradient(
+        90deg,
+        var(--primary) 0%,
+        var(--primary-light) 100%
+    );
+    color: var(--background-card);
+    border: none;
+}
+
+.my-btn-primary:hover {
+    background: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
+    box-shadow: 0 8px 20px rgba(46, 134, 193, 0.4);
+    transform: translateY(-2px);
+}
+.top-panel-bg {
+    box-shadow: var(--shadow);
+    border-radius: 8px;
+}
+.btn-end-visit {
+    font-size: 12px;
+    background: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
+    border: none;
+    color: #ffff;
+    border-radius: 8px;
+    padding: 5px 10px;
+}
+
+.btn-end-visit:hover {
+    background: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
+    box-shadow: 0 8px 20px rgba(46, 134, 193, 0.4);
+    transform: translateY(-2px);
 }
