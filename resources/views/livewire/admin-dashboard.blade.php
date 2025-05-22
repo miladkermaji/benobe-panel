@@ -132,237 +132,189 @@
       </div>
     </div>
   </div>
-  <style>
-  :root {
-    --primary-color: #4a90e2;
-    --shadow-light: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.12);
-    --gradient-dark: linear-gradient(135deg, #2d3748 0%, #4b5563 100%);
-    --gradient-light: linear-gradient(145deg, #ffffff, #f8fafc);
-  }
-
-  .container-fluid {
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%);
-    min-height: 100vh;
-    padding: 30px;
-  }
-
-  /* Card Styling */
-  .bg-dark-gradient {
-    background: var(--gradient-dark);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .bg-dark-gradient::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary-color), transparent);
-    opacity: 0.8;
-  }
-
-  .card {
-    border-radius: 20px;
-    transition: all 0.3s ease;
-  }
-
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
-  }
-
-  .card-body {
-    padding: 2.5rem;
-  }
-
-  svg {
-    transition: transform 0.3s ease;
-  }
-
-  .card:hover svg {
-    transform: scale(1.1);
-  }
-
-  .text-primary { color: #60a5fa !important; }
-  .text-success { color: #4ade80 !important; }
-  .text-info { color: #22d3ee !important; }
-  .text-warning { color: #fbbf24 !important; }
-  .text-danger { color: #f87171 !important; }
-  .text-purple { color: #a78bfa !important; }
-  .text-gray-200 { color: #e5e7eb !important; }
-  .text-gray-800 { color: #2d3748 !important; }
-
-  /* Chart Cards */
-  .bg-white {
-    background: var(--gradient-light);
-  }
-
-  .card-header {
-    padding: 0;
-  }
-
-  .text-right {
-    text-align: right !important;
-  }
-
-  canvas {
-    width: 100% !important;
-    height: 100% !important;
-    font-family: IRANSans, sans-serif !important;
-  }
-
-  @media only screen and (max-width: 768px) {
-    .card-body {
-      padding: 1.5rem;
-    }
-
-    .h2 {
-      font-size: 1.5rem;
-    }
-
-    svg {
-      width: 40px;
-      height: 40px;
-    }
-  }
-</style>
 
 
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const persianMonths = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
-    const persianDays = ['دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه', 'یک‌شنبه'];
 
-    const commonOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            font: { family: 'IRANSans', size: 14, weight: '500' },
-            padding: 20,
-            color: '#2d3748'
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const persianMonths = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی',
+        'بهمن', 'اسفند'
+      ];
+      const persianDays = ['دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه', 'یک‌شنبه'];
+
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: {
+                family: 'IRANSans',
+                size: 14,
+                weight: '500'
+              },
+              padding: 20,
+              color: '#2d3748'
+            }
+          },
+          tooltip: {
+            enabled: true,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleFont: {
+              family: 'IRANSans',
+              size: 14
+            },
+            bodyFont: {
+              family: 'IRANSans',
+              size: 12
+            },
+            padding: 10,
+            cornerRadius: 8
           }
         },
-        tooltip: {
-          enabled: true,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleFont: { family: 'IRANSans', size: 14 },
-          bodyFont: { family: 'IRANSans', size: 12 },
-          padding: 10,
-          cornerRadius: 8
+        animation: {
+          duration: 1200,
+          easing: 'easeOutQuart'
         }
-      },
-      animation: {
-        duration: 1200,
-        easing: 'easeOutQuart'
-      }
-    };
+      };
 
-    // Appointments by Month Chart
-    const appointmentsByMonthCtx = document.getElementById('appointmentsByMonthChart').getContext('2d');
-    new Chart(appointmentsByMonthCtx, {
-      type: 'bar',
-      data: {
-        labels: persianMonths,
-        datasets: [{
-          label: 'تعداد نوبت‌ها',
-          data: @json(array_values($appointmentsByMonth)),
-          backgroundColor: '#60a5fa',
-          borderColor: '#3b82f6',
-          borderWidth: 1,
-          borderRadius: 12,
-          barThickness: 20
-        }]
-      },
-      options: {
-        ...commonOptions,
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
-          x: { grid: { display: false } }
+      // Appointments by Month Chart
+      const appointmentsByMonthCtx = document.getElementById('appointmentsByMonthChart').getContext('2d');
+      new Chart(appointmentsByMonthCtx, {
+        type: 'bar',
+        data: {
+          labels: persianMonths,
+          datasets: [{
+            label: 'تعداد نوبت‌ها',
+            data: @json(array_values($appointmentsByMonth)),
+            backgroundColor: '#60a5fa',
+            borderColor: '#3b82f6',
+            borderWidth: 1,
+            borderRadius: 12,
+            barThickness: 20
+          }]
         },
-        plugins: { legend: { display: false } }
-      }
-    });
+        options: {
+          ...commonOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
 
-    // Appointment Statuses Chart
-    const appointmentStatusesCtx = document.getElementById('appointmentStatusesChart').getContext('2d');
-    new Chart(appointmentStatusesCtx, {
-      type: 'doughnut',
-      data: {
-        labels: @json(array_keys($appointmentStatuses)),
-        datasets: [{
-          data: @json(array_values($appointmentStatuses)),
-          backgroundColor: ['#60a5fa', '#f87171', '#34d399', '#fbbf24'],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        ...commonOptions,
-        cutout: '60%'
-      }
-    });
-
-    // Appointments by Day of Week Chart
-    const appointmentsByDayOfWeekCtx = document.getElementById('appointmentsByDayOfWeekChart').getContext('2d');
-    new Chart(appointmentsByDayOfWeekCtx, {
-      type: 'bar',
-      data: {
-        labels: persianDays,
-        datasets: [{
-          label: 'تعداد نوبت‌ها',
-          data: @json(array_values($appointmentsByDayOfWeek)),
-          backgroundColor: '#34d399',
-          borderColor: '#10b981',
-          borderWidth: 1,
-          borderRadius: 12,
-          barThickness: 20
-        }]
-      },
-      options: {
-        ...commonOptions,
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
-          x: { grid: { display: false } }
+      // Appointment Statuses Chart
+      const appointmentStatusesCtx = document.getElementById('appointmentStatusesChart').getContext('2d');
+      new Chart(appointmentStatusesCtx, {
+        type: 'doughnut',
+        data: {
+          labels: @json(array_keys($appointmentStatuses)),
+          datasets: [{
+            data: @json(array_values($appointmentStatuses)),
+            backgroundColor: ['#60a5fa', '#f87171', '#34d399', '#fbbf24'],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
         },
-        plugins: { legend: { display: false } }
-      }
-    });
+        options: {
+          ...commonOptions,
+          cutout: '60%'
+        }
+      });
 
-    // Clinic Activity Chart
-    const clinicActivityCtx = document.getElementById('clinicActivityChart').getContext('2d');
-    new Chart(clinicActivityCtx, {
-      type: 'bar',
-      data: {
-        labels: @json($clinicActivityLabels),
-        datasets: [{
-          label: 'تعداد نوبت‌ها',
-          data: @json(array_values($clinicActivity)),
-          backgroundColor: ['#60a5fa', '#f87171', '#34d399', '#fbbf24', '#a78bfa', '#f59e0b'],
-          borderColor: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#d97706'],
-          borderWidth: 1,
-          borderRadius: 12,
-          barThickness: 20
-        }]
-      },
-      options: {
-        ...commonOptions,
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
-          x: { grid: { display: false } }
+      // Appointments by Day of Week Chart
+      const appointmentsByDayOfWeekCtx = document.getElementById('appointmentsByDayOfWeekChart').getContext('2d');
+      new Chart(appointmentsByDayOfWeekCtx, {
+        type: 'bar',
+        data: {
+          labels: persianDays,
+          datasets: [{
+            label: 'تعداد نوبت‌ها',
+            data: @json(array_values($appointmentsByDayOfWeek)),
+            backgroundColor: '#34d399',
+            borderColor: '#10b981',
+            borderWidth: 1,
+            borderRadius: 12,
+            barThickness: 20
+          }]
         },
-        plugins: { legend: { display: false } }
-      }
+        options: {
+          ...commonOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+
+      // Clinic Activity Chart
+      const clinicActivityCtx = document.getElementById('clinicActivityChart').getContext('2d');
+      new Chart(clinicActivityCtx, {
+        type: 'bar',
+        data: {
+          labels: @json($clinicActivityLabels),
+          datasets: [{
+            label: 'تعداد نوبت‌ها',
+            data: @json(array_values($clinicActivity)),
+            backgroundColor: ['#60a5fa', '#f87171', '#34d399', '#fbbf24', '#a78bfa', '#f59e0b'],
+            borderColor: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#d97706'],
+            borderWidth: 1,
+            borderRadius: 12,
+            barThickness: 20
+          }]
+        },
+        options: {
+          ...commonOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
     });
-  });
-</script>
+  </script>
 </div>
