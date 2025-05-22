@@ -1,7 +1,7 @@
 <div class="special-days-calendar-container" style="position: relative;">
   <!-- لودینگ اورلی -->
   <div id="loading-overlay"></div>
-  <div class="calendar-header">
+  <div class="calendar-header" loading="lazy">
     <button id="special-days-prev-month" class="btn-nav" aria-label="Previous Month">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
         transform="rotate(180)">
@@ -23,7 +23,7 @@
       </svg>
     </button>
   </div>
-  <div class="calendar-body" id="calendar-body">
+  <div class="calendar-body" id="calendar-body" loading="lazy">
     <div class="calendar-day-name">ش</div>
     <div class="calendar-day-name">ی</div>
     <div class="calendar-day-name">د</div>
@@ -32,8 +32,8 @@
     <div class="calendar-day-name">پ</div>
     <div class="calendar-day-name">ج</div>
   </div>
-  <div id="special-days-calendar-body" class="calendar-grid"></div>
-  <div class="calendar-legend">
+  <div id="special-days-calendar-body" class="calendar-grid" loading="lazy"></div>
+  <div class="calendar-legend" loading="lazy">
     <div class="legend-item">
       <span class="legend-color selected"></span>
       <span class="legend-text">روز انتخاب‌شده</span>

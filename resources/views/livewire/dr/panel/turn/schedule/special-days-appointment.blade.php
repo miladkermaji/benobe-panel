@@ -109,7 +109,7 @@
                         </div>
                         <div class="d-flex align-items-center">
                           <x-custom-tooltip title="زمان‌بندی باز شدن نوبت‌ها" placement="top">
-                            <button type="button" class="btn text-black btn-sm btn-outline-primary schedule-btn"
+                            <button type="button" class="btn text-black btn-sm  schedule-btn"
                               wire:click="openScheduleModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
                               data-day="{{ $workSchedule['data']['day'] }}" data-index="{{ $index }}"
                               @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
