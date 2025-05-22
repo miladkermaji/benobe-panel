@@ -10,7 +10,7 @@
 
   <style>
     .checkbox-wrapper-34 {
-      --blue: #0D7EFF;
+      --blue: #2E86C1;
       --g08: #E1E5EB;
       --g04: #848ea1;
     }

@@ -49,14 +49,14 @@
   }
 
   .checkbox-wrapper-1 [type=checkbox].substituted:checked+label:before {
-    background-color: #3B99FC;
+    background-color: #2E86C1;
     background-size: 0.75em;
     color: rgba(0, 0, 0, 0.075);
   }
 
   .checkbox-wrapper-1 [type=checkbox].substituted:checked:enabled:active+label:before,
   .checkbox-wrapper-1 [type=checkbox].substituted:checked:enabled+label:active:before {
-    background-color: #0a7ffb;
+    background-color: #2E86C1;
     color: rgba(0, 0, 0, 0.275);
   }
 
