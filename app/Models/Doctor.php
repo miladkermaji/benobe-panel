@@ -153,6 +153,7 @@ class Doctor extends Authenticatable
 
     public function tariff()
     {
+
         return $this->hasOne(DoctorTariff::class, 'doctor_id');
     }
 
@@ -283,7 +284,7 @@ class Doctor extends Authenticatable
     public function comments()
     {
         return $this->hasMany(DoctorComment::class);
-    } 
+    }
     public function depositSettings()
     {
         return $this->hasMany(ClinicDepositSetting::class);

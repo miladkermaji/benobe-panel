@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CounselingAppointment;
 use App\Http\Controllers\Dr\Controller;
+use App\Models\Doctor;
 
 class MyPerformanceController extends Controller
 {
@@ -28,8 +29,14 @@ class MyPerformanceController extends Controller
      */
     public function getPerformanceData(Request $request)
     {
-        $doctor = Auth::guard('doctor')->user();
-        $clinics = Clinic::where('doctor_id', $doctor->id)->get();
+        $doctor = Doctor::with([
+            'clinics',
+            'messengers',
+            'reviews',
+            'appointments' => function ($query) {
+                $query->whereDate('appointment_date', now()->toDateString());
+            }
+        ])->find(Auth::guard('doctor')->id());
 
         // محاسبه امتیاز عملکرد (فرضی)
         $performanceScore = $this->calculatePerformanceScore($doctor);
@@ -41,17 +48,15 @@ class MyPerformanceController extends Controller
         // بررسی وضعیت ویزیت آنلاین
         $onlineVisitEnabled = $doctor->appointmentConfig->auto_scheduling ?? false;
 
-        // تعداد نظرات (فرضی)
-        $reviewsCount = $doctor->reviews()->count() ?? 0;
+        // تعداد نظرات
+        $reviewsCount = $doctor->reviews->count();
         $hasEnoughReviews = $reviewsCount >= 150;
 
         // وضعیت آنلاین بودن
         $isOnline = $doctor->appointmentConfig->auto_scheduling ?? false;
 
         // نوبت‌دهی حضوری برای امروز
-        $hasInPersonAppointmentsToday = Appointment::where('doctor_id', $doctor->id)
-            ->whereDate('appointment_date', now()->toDateString())
-            ->exists();
+        $hasInPersonAppointmentsToday = $doctor->appointments->isNotEmpty();
 
         // آدرس واضح
         $hasClearAddress = !empty($doctor->address) && !preg_match('/\d{10,}/', $doctor->address);
@@ -63,7 +68,7 @@ class MyPerformanceController extends Controller
         $hasValidOfficePhone = !empty($doctor->office_phone) && preg_match('/^09\d{9}$/', $doctor->office_phone);
 
         // موقعیت مطب
-        $hasClinicLocationSet = $clinics->every(function ($clinic) {
+        $hasClinicLocationSet = $doctor->clinics->every(function ($clinic) {
             return !empty($clinic->latitude) && !empty($clinic->longitude);
         });
 
@@ -73,23 +78,23 @@ class MyPerformanceController extends Controller
         // عنوان بی‌ربط در تخصص
         $hasIrrelevantSpecialty = $this->checkIrrelevantSpecialty($doctor->specialties);
 
-        // سایر موارد (فرضی)
+        // سایر موارد
         $hasLowerDegrees = !empty($doctor->lower_degrees);
         $hasProperSpecialtyTitle = $this->checkProperSpecialtyTitle($doctor->specialties);
         $hasRealisticTitles = !$this->checkUnrealisticTitles($doctor->specialties);
         $satisfactionRate = $this->calculateSatisfactionRate($doctor);
         $hasManipulatedReviews = $this->checkManipulatedReviews($doctor);
         $hasProfilePicture = !empty($doctor->profile_picture);
-        $hasClinicGallery = $this->checkClinicGallery($clinics);
-        $hasFacilityImages = $this->checkFacilityImages($clinics);
+        $hasClinicGallery = $this->checkClinicGallery($doctor->clinics);
+        $hasFacilityImages = $this->checkFacilityImages($doctor->clinics);
         $hasBiography = !empty($doctor->biography);
         $hasKeywordsInBiography = $this->checkKeywordsInBiography($doctor->biography);
-        $hasMultipleMessengers = $this->checkMultipleMessengers($doctor);
+        $hasMultipleMessengers = $doctor->messengers->count() >= 2;
         $hasSecureCall = $doctor->secure_call_enabled ?? false;
         $hasMissedReports = $this->checkMissedReports($doctor);
 
         // تولید URL برای کلینیک‌ها
-        $clinicsData = $clinics->map(function ($clinic) {
+        $clinicsData = $doctor->clinics->map(function ($clinic) {
             return [
                 'id' => $clinic->id,
                 'name' => $clinic->name,
@@ -191,12 +196,6 @@ class MyPerformanceController extends Controller
         return !empty($biography) && preg_match('/(بیماری|درمان|پروسیجر)/u', $biography);
     }
 
-    private function checkMultipleMessengers($doctor)
-    {
-        // بررسی تنوع پیام‌رسان‌ها
-        return count($doctor->messengers ?? []) >= 2;
-    }
-
     private function checkMissedReports($doctor)
     {
         // بررسی گزارش عدم مراجعه
@@ -219,8 +218,15 @@ class MyPerformanceController extends Controller
         $clinicId = $request->input('clinic_id', 'default');
         $doctorId = Auth::guard('doctor')->user()->id;
 
+        Log::info('Chart Data Request', [
+            'clinic_id' => $clinicId,
+            'doctor_id' => $doctorId,
+            'request_all' => $request->all()
+        ]);
+
         // اعتبارسنجی clinic_id
         if ($clinicId !== 'default' && !is_numeric($clinicId)) {
+            Log::error('Invalid clinic_id', ['clinic_id' => $clinicId]);
             return response()->json(['error' => 'مقدار clinic_id نامعتبر است'], 400);
         }
 
@@ -233,110 +239,222 @@ class MyPerformanceController extends Controller
         };
 
         // 1. نوبت‌های معمولی (appointments)
-        $appointments = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition)
-            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+        $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
+            ->where($clinicCondition);
+
+        Log::info('Appointments Base Query', [
+            'sql' => $appointmentsQuery->toSql(),
+            'bindings' => $appointmentsQuery->getBindings()
+        ]);
+
+        $appointments = $appointmentsQuery
+            ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
                          COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
                          COUNT(CASE WHEN status = 'attended' THEN 1 END) as attended_count,
                          COUNT(CASE WHEN status = 'missed' THEN 1 END) as missed_count,
                          COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count")
-            ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-            ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
+            ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
+            ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-        // 2. درآمد ماهانه (اصلاح‌شده با final_price)
-        $monthlyIncome = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition)
-            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+        Log::info('Appointments Raw Data', [
+            'count' => $appointments->count(),
+            'data' => $appointments->toArray()
+        ]);
+
+        // 2. درآمد ماهانه
+        $monthlyIncomeQuery = Appointment::where('doctor_id', $doctorId)
+            ->where($clinicCondition);
+
+        Log::info('Monthly Income Base Query', [
+            'sql' => $monthlyIncomeQuery->toSql(),
+            'bindings' => $monthlyIncomeQuery->getBindings()
+        ]);
+
+        $monthlyIncome = $monthlyIncomeQuery
+            ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
                          COALESCE(SUM(CASE WHEN payment_status = 'paid' THEN final_price ELSE 0 END), 0) as total_paid_income,
                          COALESCE(SUM(CASE WHEN payment_status = 'unpaid' THEN final_price ELSE 0 END), 0) as total_unpaid_income")
-            ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-            ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
+            ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
+            ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
+
+        Log::info('Monthly Income Raw Data', [
+            'count' => $monthlyIncome->count(),
+            'data' => $monthlyIncome->toArray()
+        ]);
 
         // 3. بیماران جدید
-        $newPatients = Appointment::where('doctor_id', $doctorId)
+        $newPatientsQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
-            ->join('users', 'appointments.patient_id', '=', 'users.id')
-            ->selectRaw("DATE_FORMAT(appointments.appointment_date, '%m') as month,
+            ->join('users', 'appointments.patient_id', '=', 'users.id');
+
+        Log::info('New Patients Base Query', [
+            'sql' => $newPatientsQuery->toSql(),
+            'bindings' => $newPatientsQuery->getBindings()
+        ]);
+
+        $newPatients = $newPatientsQuery
+            ->selectRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%m') as month,
                          COUNT(DISTINCT appointments.patient_id) as total_patients")
-            ->groupByRaw("DATE_FORMAT(appointments.appointment_date, '%m')")
-            ->orderByRaw("DATE_FORMAT(appointments.appointment_date, '%m')")
+            ->groupByRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%m')")
+            ->orderByRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%m')")
             ->get();
 
-        // 4. نوبت‌های مشاوره (counseling_appointments)
-        $counselingAppointments = CounselingAppointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition)
-            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+        Log::info('New Patients Raw Data', [
+            'count' => $newPatients->count(),
+            'data' => $newPatients->toArray()
+        ]);
+
+        // 4. نوبت‌های مشاوره
+        $counselingQuery = CounselingAppointment::where('doctor_id', $doctorId)
+            ->where($clinicCondition);
+
+        Log::info('Counseling Base Query', [
+            'sql' => $counselingQuery->toSql(),
+            'bindings' => $counselingQuery->getBindings()
+        ]);
+
+        $counselingAppointments = $counselingQuery
+            ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
                          COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
                          COUNT(CASE WHEN status = 'attended' THEN 1 END) as attended_count,
                          COUNT(CASE WHEN status = 'missed' THEN 1 END) as missed_count,
                          COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count")
-            ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-            ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
+            ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
+            ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-        // 5. نوبت‌های دستی (manual_appointments)
-        $manualAppointments = ManualAppointment::where('doctor_id', $doctorId)
+        Log::info('Counseling Raw Data', [
+            'count' => $counselingAppointments->count(),
+            'data' => $counselingAppointments->toArray()
+        ]);
+
+        // 5. نوبت‌های دستی
+        $manualQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
-            ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
+            ->where('appointment_type', 'manual');
+
+        Log::info('Manual Base Query', [
+            'sql' => $manualQuery->toSql(),
+            'bindings' => $manualQuery->getBindings()
+        ]);
+
+        $manualAppointments = $manualQuery
+            ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
                          COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
                          COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed_count")
-            ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-            ->orderByRaw("DATE_FORMAT(appointment_date, '%m')")
+            ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
+            ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-        // 6. درآمد کلی (از appointments و counseling_appointments)
-
-        // 6. درآمد کلی (از appointments، counseling_appointments، و manual_appointments)
-        $totalIncome = Appointment::where('doctor_id', $doctorId)
-        ->where($clinicCondition)
-        ->where('payment_status', 'paid')
-        ->where('status', 'attended')
-        ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
-             COALESCE(SUM(final_price), 0) as total_income")
-        ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-        ->union(
-            CounselingAppointment::where('doctor_id', $doctorId)
-                ->where($clinicCondition)
-                ->where('payment_status', 'paid')
-                ->where('status', 'attended')
-                ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
-                     COALESCE(SUM(fee), 0) as total_income")
-                ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-        )
-        ->union(
-            ManualAppointment::where('doctor_id', $doctorId)
-                ->where($clinicCondition)
-                ->where('status', 'confirmed') // معادل attended برای نوبت‌های دستی
-                ->selectRaw("DATE_FORMAT(appointment_date, '%m') as month,
-                     COALESCE(SUM(final_price), 0) as total_income")
-                ->groupByRaw("DATE_FORMAT(appointment_date, '%m')")
-        )
-        ->get()
-        ->groupBy('month')
-        ->map(function ($group) {
-            return [
-                'month' => $group->first()->month,
-                'total_income' => $group->sum('total_income')
-            ];
-        })
-        ->values();
-
-
-        Log::info('نتایج بیماران جدید:', ['newPatients' => $newPatients]);
-        Log::info('نتایج نوبت‌های مشاوره:', ['counselingAppointments' => $counselingAppointments]);
-        Log::info('نتایج نوبت‌های دستی:', ['manualAppointments' => $manualAppointments]);
-        Log::info('نتایج درآمد کلی:', ['totalIncome' => $totalIncome]);
-
-        return response()->json([
-            'appointments' => $appointments->isEmpty() ? [] : $appointments,
-            'monthlyIncome' => $monthlyIncome->isEmpty() ? [] : $monthlyIncome,
-            'newPatients' => $newPatients->isEmpty() ? [] : $newPatients,
-            'appointmentStatusByMonth' => $appointments->isEmpty() ? [] : $appointments,
-            'counselingAppointments' => $counselingAppointments->isEmpty() ? [] : $counselingAppointments,
-            'manualAppointments' => $manualAppointments->isEmpty() ? [] : $manualAppointments,
-            'totalIncome' => $totalIncome->isEmpty() ? [] : $totalIncome,
+        Log::info('Manual Raw Data', [
+            'count' => $manualAppointments->count(),
+            'data' => $manualAppointments->toArray()
         ]);
+
+        // 6. درآمد کلی
+        $totalIncomeQuery = Appointment::where('doctor_id', $doctorId)
+            ->where($clinicCondition)
+            ->where('payment_status', 'paid')
+            ->where('status', 'attended');
+
+        Log::info('Total Income Base Query', [
+            'sql' => $totalIncomeQuery->toSql(),
+            'bindings' => $totalIncomeQuery->getBindings()
+        ]);
+
+        $totalIncome = $totalIncomeQuery
+            ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
+                         COALESCE(SUM(final_price), 0) as total_income")
+            ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
+            ->union(
+                CounselingAppointment::where('doctor_id', $doctorId)
+                    ->where($clinicCondition)
+                    ->where('payment_status', 'paid')
+                    ->where('status', 'attended')
+                    ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
+                         COALESCE(SUM(fee), 0) as total_income")
+                    ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
+            )
+            ->get()
+            ->groupBy('month')
+            ->map(function ($group) {
+                return [
+                    'month' => $group->first()->month,
+                    'total' => (float)$group->sum('total_income')
+                ];
+            })
+            ->values();
+
+        Log::info('Total Income Raw Data', [
+            'count' => $totalIncome->count(),
+            'data' => $totalIncome->toArray()
+        ]);
+
+        $response = [
+            'appointments' => $appointments->map(function ($item) {
+                return [
+                    'month' => $item->month,
+                    'scheduled' => (int)$item->scheduled_count,
+                    'attended' => (int)$item->attended_count,
+                    'missed' => (int)$item->missed_count,
+                    'cancelled' => (int)$item->cancelled_count
+                ];
+            })->values()->toArray(),
+            'monthlyIncome' => $monthlyIncome->map(function ($item) {
+                return [
+                    'month' => $item->month,
+                    'paid' => (float)$item->total_paid_income,
+                    'unpaid' => (float)$item->total_unpaid_income
+                ];
+            })->values()->toArray(),
+            'newPatients' => $newPatients->map(function ($item) {
+                return [
+                    'month' => $item->month,
+                    'count' => (int)$item->total_patients
+                ];
+            })->values()->toArray(),
+            'appointmentStatusByMonth' => $appointments->map(function ($item) {
+                return [
+                    'month' => $item->month,
+                    'scheduled' => (int)$item->scheduled_count,
+                    'attended' => (int)$item->attended_count,
+                    'missed' => (int)$item->missed_count,
+                    'cancelled' => (int)$item->cancelled_count
+                ];
+            })->values()->toArray(),
+            'counselingAppointments' => $counselingAppointments->map(function ($item) {
+                return [
+                    'month' => $item->month,
+                    'scheduled' => (int)$item->scheduled_count,
+                    'attended' => (int)$item->attended_count,
+                    'missed' => (int)$item->missed_count,
+                    'cancelled' => (int)$item->cancelled_count
+                ];
+            })->values()->toArray(),
+            'manualAppointments' => $manualAppointments->map(function ($item) {
+                return [
+                    'month' => $item->month,
+                    'scheduled' => (int)$item->scheduled_count,
+                    'confirmed' => (int)$item->confirmed_count
+                ];
+            })->values()->toArray(),
+            'totalIncome' => $totalIncome->toArray(),
+        ];
+
+        Log::info('Final Response', [
+            'data' => $response,
+            'has_data' => [
+                'appointments' => !empty($response['appointments']),
+                'monthlyIncome' => !empty($response['monthlyIncome']),
+                'newPatients' => !empty($response['newPatients']),
+                'counselingAppointments' => !empty($response['counselingAppointments']),
+                'manualAppointments' => !empty($response['manualAppointments']),
+                'totalIncome' => !empty($response['totalIncome'])
+            ]
+        ]);
+
+        return response()->json($response);
     }
 }
