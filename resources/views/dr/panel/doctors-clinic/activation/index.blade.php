@@ -442,16 +442,52 @@
   </script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      // مقداردهی اولیه نقشه
+      // مقداردهی اولیه نقشه با مختصات پیش‌فرض
       var map = L.map('map').setView([35.6892, 51.3890], 13);
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
       }).addTo(map);
 
+      // ایجاد مارکر با مختصات پیش‌فرض
       var marker = L.marker([35.6892, 51.3890], {
         draggable: true
       }).addTo(map);
+
+      // اگر شهر و استان وجود داشته باشند، موقعیت را پیدا کن
+      @if ($clinic->city && $clinic->province)
+        var cityName = "{{ $clinic->city->name ?? '' }}";
+        var provinceName = "{{ $clinic->province->name ?? '' }}";
+
+        if (cityName && provinceName) {
+          // جستجوی موقعیت با استفاده از نام شهر و استان
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${cityName},${provinceName},Iran`)
+            .then(response => response.json())
+            .then(data => {
+              if (data && data.length > 0) {
+                var lat = parseFloat(data[0].lat);
+                var lon = parseFloat(data[0].lon);
+
+                // به‌روزرسانی نقشه و مارکر
+                map.setView([lat, lon], 13);
+                marker.setLatLng([lat, lon]);
+
+                // به‌روزرسانی فیلدهای مخفی
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lon;
+
+                // به‌روزرسانی آدرس
+                document.querySelector('.my-form-control').value = data[0].display_name;
+              }
+            });
+        }
+      @endif
+
+      // اگر آدرس کلینیک وجود دارد، آن را در فیلد آدرس نمایش بده
+      @if ($clinic->address)
+        document.querySelector('.my-form-control').value = "{{ $clinic->address }}";
+      @endif
 
       // جستجوی آدرس با استفاده از Nominatim
       var searchInput = document.getElementById('searchInput');
