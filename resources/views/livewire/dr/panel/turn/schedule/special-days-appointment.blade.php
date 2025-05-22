@@ -147,7 +147,9 @@
               {{ $isProcessing || $isPastDate ? 'disabled' : '' }}>
               تعطیل کردن
             </button>
-
+            <button class="btn btn-primary w-100 h-50" wire:click="$dispatch('close-modal', { id: 'holiday-modal' })">
+              ذخیره
+            </button>
           </div>
         @endif
       </div>
