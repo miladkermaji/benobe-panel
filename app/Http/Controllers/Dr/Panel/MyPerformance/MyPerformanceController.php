@@ -218,15 +218,9 @@ class MyPerformanceController extends Controller
         $clinicId = $request->input('clinic_id', 'default');
         $doctorId = Auth::guard('doctor')->user()->id;
 
-        Log::info('Chart Data Request', [
-            'clinic_id' => $clinicId,
-            'doctor_id' => $doctorId,
-            'request_all' => $request->all()
-        ]);
 
         // اعتبارسنجی clinic_id
         if ($clinicId !== 'default' && !is_numeric($clinicId)) {
-            Log::error('Invalid clinic_id', ['clinic_id' => $clinicId]);
             return response()->json(['error' => 'مقدار clinic_id نامعتبر است'], 400);
         }
 
@@ -242,10 +236,7 @@ class MyPerformanceController extends Controller
         $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition);
 
-        Log::info('Appointments Base Query', [
-            'sql' => $appointmentsQuery->toSql(),
-            'bindings' => $appointmentsQuery->getBindings()
-        ]);
+    
 
         $appointments = $appointmentsQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -257,19 +248,12 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-        Log::info('Appointments Raw Data', [
-            'count' => $appointments->count(),
-            'data' => $appointments->toArray()
-        ]);
 
         // 2. درآمد ماهانه
         $monthlyIncomeQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition);
 
-        Log::info('Monthly Income Base Query', [
-            'sql' => $monthlyIncomeQuery->toSql(),
-            'bindings' => $monthlyIncomeQuery->getBindings()
-        ]);
+    
 
         $monthlyIncome = $monthlyIncomeQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -279,20 +263,14 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-        Log::info('Monthly Income Raw Data', [
-            'count' => $monthlyIncome->count(),
-            'data' => $monthlyIncome->toArray()
-        ]);
+      
 
         // 3. بیماران جدید
         $newPatientsQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->join('users', 'appointments.patient_id', '=', 'users.id');
 
-        Log::info('New Patients Base Query', [
-            'sql' => $newPatientsQuery->toSql(),
-            'bindings' => $newPatientsQuery->getBindings()
-        ]);
+     
 
         $newPatients = $newPatientsQuery
             ->selectRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%m') as month,
@@ -301,19 +279,13 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%m')")
             ->get();
 
-        Log::info('New Patients Raw Data', [
-            'count' => $newPatients->count(),
-            'data' => $newPatients->toArray()
-        ]);
+       
 
         // 4. نوبت‌های مشاوره
         $counselingQuery = CounselingAppointment::where('doctor_id', $doctorId)
             ->where($clinicCondition);
 
-        Log::info('Counseling Base Query', [
-            'sql' => $counselingQuery->toSql(),
-            'bindings' => $counselingQuery->getBindings()
-        ]);
+       
 
         $counselingAppointments = $counselingQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -325,20 +297,14 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-        Log::info('Counseling Raw Data', [
-            'count' => $counselingAppointments->count(),
-            'data' => $counselingAppointments->toArray()
-        ]);
+       
 
         // 5. نوبت‌های دستی
         $manualQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->where('appointment_type', 'manual');
 
-        Log::info('Manual Base Query', [
-            'sql' => $manualQuery->toSql(),
-            'bindings' => $manualQuery->getBindings()
-        ]);
+        
 
         $manualAppointments = $manualQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -348,10 +314,7 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-        Log::info('Manual Raw Data', [
-            'count' => $manualAppointments->count(),
-            'data' => $manualAppointments->toArray()
-        ]);
+     
 
         // 6. درآمد کلی
         $totalIncomeQuery = Appointment::where('doctor_id', $doctorId)
@@ -359,10 +322,7 @@ class MyPerformanceController extends Controller
             ->where('payment_status', 'paid')
             ->where('status', 'attended');
 
-        Log::info('Total Income Base Query', [
-            'sql' => $totalIncomeQuery->toSql(),
-            'bindings' => $totalIncomeQuery->getBindings()
-        ]);
+     
 
         $totalIncome = $totalIncomeQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -387,10 +347,7 @@ class MyPerformanceController extends Controller
             })
             ->values();
 
-        Log::info('Total Income Raw Data', [
-            'count' => $totalIncome->count(),
-            'data' => $totalIncome->toArray()
-        ]);
+     
 
         $response = [
             'appointments' => $appointments->map(function ($item) {
@@ -443,17 +400,7 @@ class MyPerformanceController extends Controller
             'totalIncome' => $totalIncome->toArray(),
         ];
 
-        Log::info('Final Response', [
-            'data' => $response,
-            'has_data' => [
-                'appointments' => !empty($response['appointments']),
-                'monthlyIncome' => !empty($response['monthlyIncome']),
-                'newPatients' => !empty($response['newPatients']),
-                'counselingAppointments' => !empty($response['counselingAppointments']),
-                'manualAppointments' => !empty($response['manualAppointments']),
-                'totalIncome' => !empty($response['totalIncome'])
-            ]
-        ]);
+    
 
         return response()->json($response);
     }
