@@ -37,6 +37,8 @@
     border-radius: var(--radius-card);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
     transition: var(--transition);
+    min-height: 330px;
+
   }
 
   #mini-calendar-container .calendar-header {
@@ -203,6 +205,11 @@
     font-weight: 600;
     color: var(--text-primary);
   }
+  #mini-calendar-modal .xai-modal-body {
+  padding: 1rem;
+  z-index: 1001;
+  height: 381px;
+}
 
   @media (max-width: 576px) {
     #mini-calendar-container .calendar {
