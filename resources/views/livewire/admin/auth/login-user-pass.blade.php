@@ -1,6 +1,15 @@
-<div class="justify-content-center align-items-center">
-  <div class="col-md-6 login-container position-relative">
-    <div class="login-card custom-rounded custom-shadow p-7">
+<div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
+  style="background-color: #f8f9fa;">
+  <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4 mx-auto d-flex justify-content-center">
+    <div class="login-card custom-rounded custom-shadow p-4 p-md-7 bg-white w-100">
+      <div class="logo-wrapper w-100 d-flex justify-content-center mb-4">
+        <img class="cursor-pointer" onclick="location.href='/'" width="100px"
+          src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
+      </div>
+      <div class="text-center mb-4 d-none">
+        <h2 class="text-primary fw-bold mb-2" style="font-weight: 700 !important;">پنل مدیریت به نوبه</h2>
+        <p class="text-muted fw-bold">به پنل مدیریت  به نوبه خوش آمدید</p>
+      </div>
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
           <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
@@ -21,7 +30,7 @@
           </div>
           <div class="position-relative">
             <input wire:model="password"
-              class="form-control custom-rounded custom-shadow h-50 text-end @error('password') is-invalid @enderror"
+              class="form-control  custom-shadow h-50 text-end @error('password') is-invalid @enderror"
               type="password" placeholder="رمز عبور خود را وارد کنید" id="password-input">
             <img src="{{ asset('admin-assets/login/images/visible.svg') }}" alt="نمایش رمز" class="password-toggle"
               onclick="togglePasswordVisibility('password-input')">
@@ -31,7 +40,7 @@
           @enderror
         </div>
         <button type="submit" wire:loading.attr="disabled" wire:target="loginWithMobilePass"
-          class="btn my-btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+          class="btn  w-100 custom-gradient custom-rounded h-50 d-flex justify-content-center">
           <span wire:loading.remove wire:target="loginWithMobilePass">ادامه</span>
           <div wire:loading wire:target="loginWithMobilePass" class="loader"></div>
         </button>
@@ -56,8 +65,11 @@
 
     Livewire.on('rateLimitExceeded', (data) => {
       let remainingTime = Math.round(data.remainingTime);
-      let timerInterval;
+      if (remainingTime <= 0) {
+        return; // اگر زمان قفل صفر یا منفی است، پیام نمایش داده نشود
+      }
 
+      let timerInterval;
       Swal.fire({
         icon: 'error',
         title: 'تلاش بیش از حد',
@@ -74,13 +86,8 @@
             if (remainingTime >= 0) {
               remainingTimeElement.innerHTML =
                 `لطفاً ${formatConditionalTime(remainingTime)} دیگر تلاش کنید`;
-              if (remainingTime > 180) {
-                remainingTimeElement.style.color = '#16a34a'; // سبز
-              } else if (remainingTime > 60) {
-                remainingTimeElement.style.color = '#f59e0b'; // زرد
-              } else {
-                remainingTimeElement.style.color = '#dc2626'; // قرمز
-              }
+              remainingTimeElement.style.color = remainingTime > 180 ? '#16a34a' : remainingTime > 60 ?
+                '#f59e0b' : '#dc2626';
             }
             if (remainingTime <= 0) {
               clearInterval(timerInterval);
@@ -99,11 +106,9 @@
     Livewire.on('password-error', () => {
       toastr.error('کلمه عبور اشتباه است.');
     });
-    Livewire.on('password-success', () => {
-      toastr.success('موفقیت آمیز');
-    });
     Livewire.on('loginSuccess', () => {
       toastr.success('با موفقیت وارد شدید');
+      localStorage.removeItem('rateLimitTimerData');
     });
 
     Livewire.on('navigateTo', (event) => {

@@ -2887,7 +2887,7 @@ textarea.form-control.is-invalid {
     --bs-btn-line-height: 1.5;
     --bs-btn-color: var(--bs-body-color);
     --bs-btn-bg: transparent;
-    --bs-btn-border-width: var(--bs-border-width);
+    
     --bs-btn-border-color: transparent;
     --bs-btn-border-radius: var(--bs-border-radius);
     --bs-btn-hover-border-color: transparent;

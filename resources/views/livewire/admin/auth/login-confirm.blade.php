@@ -1,6 +1,15 @@
-<div class="justify-content-center align-items-center">
-  <div class="col-md-6 login-container position-relative">
-    <div class="login-card custom-rounded custom-shadow p-7">
+<div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
+  style="background-color: #f8f9fa;">
+  <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4 mx-auto d-flex justify-content-center">
+    <div class="login-card custom-rounded custom-shadow p-4 p-md-7 bg-white w-100">
+      <div class="logo-wrapper w-100 d-flex justify-content-center mb-4">
+        <img class="cursor-pointer" onclick="location.href='/'" width="100px"
+          src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
+      </div>
+      <div class="text-center mb-4 d-none">
+        <h2 class="text-primary fw-bold mb-2">پنل مدیریت  به نوبه</h2>
+        <p class="text-muted fw-bold">به پنل مدیریت  به نوبه خوش آمدید</p>
+      </div>
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
           <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
@@ -14,10 +23,11 @@
         </a>
       </div>
       <form wire:submit.prevent="loginConfirm" class="login-confirm-form">
-        <div class="d-flex justify-content-between mb-3" dir="rtl">
+        <div class="d-flex justify-content-center mb-3 gap-4" dir="rtl">
           @for ($i = 0; $i < 4; $i++)
             <input wire:model="otpCode.{{ $i }}" type="text" maxlength="1"
-              class="form-control otp-input text-center custom-rounded border">
+              class="form-control otp-input text-center custom-rounded border"
+              style="width: 60px; height: 60px; font-size: 1.5rem;">
           @endfor
         </div>
         @error('otpCode')
@@ -25,7 +35,7 @@
             {{ $message }}</div>
         @enderror
         <button type="submit" wire:loading.attr="disabled" wire:target="loginConfirm"
-          class="btn my-btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+          class="btn  w-100 custom-gradient custom-rounded h-50 d-flex justify-content-center">
           <span wire:loading.remove wire:target="loginConfirm">ادامه</span>
           <div wire:loading wire:target="loginConfirm" class="loader"></div>
         </button>

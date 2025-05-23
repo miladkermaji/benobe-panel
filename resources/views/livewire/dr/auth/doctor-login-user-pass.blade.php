@@ -6,7 +6,7 @@
         <img class="cursor-pointer" onclick="location.href='/'" width="100px"
           src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
       </div>
-      <div class="text-center mb-4">
+      <div class="text-center mb-4 d-none">
         <h2 class="text-primary fw-bold mb-2" style="font-weight: 700 !important;">پنل پزشکان به نوبه</h2>
         <p class="text-muted fw-bold">به پنل مدیریت پزشکان به نوبه خوش آمدید</p>
       </div>
