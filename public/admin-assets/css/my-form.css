@@ -1,13 +1,37 @@
 /* استایل کلی */
 body {
-    font-family: "Vazir", sans-serif; /* فونت فارسی شیک، جایگزین کنید اگر فونت دیگری دارید */
+    font-family: "Vazir", sans-serif; /* فونت فارسی شیک */
     background: var(--background-light);
     direction: rtl;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* متغیرهای CSS برای استفاده در تم‌های مختلف */
+:root {
+    --background-light: #f8f9fa;
+    --background-card: #ffffff;
+    --gradient-primary: linear-gradient(135deg, #007bff, #0056b3);
+    --primary: #007bff;
+    --primary-light: rgba(0, 123, 255, 0.2);
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-original: #dc3545;
+    --border-neutral: #dee2e6;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --radius-card: 12px;
+    --radius-button: 8px;
+    --radius-button-large: 10px;
+    --radius-circle: 50%;
 }
 
 /* کانتینر اصلی */
 .container-fluid {
     padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 /* کارت فرم */
@@ -97,6 +121,8 @@ textarea {
     font-size: 0.95rem;
     transition: all 0.3s ease;
     resize: vertical;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .form-control:focus,
@@ -112,9 +138,11 @@ textarea::placeholder {
     color: var(--text-secondary);
     font-weight: 500;
 }
+
 input:not([type="checkbox"]) {
     height: 50px !important;
 }
+
 /* سوئیچ وضعیت */
 .form-check-input {
     width: 2.5rem;
@@ -154,6 +182,7 @@ input:not([type="checkbox"]) {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    cursor: pointer;
 }
 
 .my-btn-primary:hover {
@@ -174,6 +203,7 @@ input:not([type="checkbox"]) {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    cursor: pointer;
 }
 
 .btn-outline-light:hover {
@@ -228,89 +258,6 @@ input:not([type="checkbox"]) {
     }
 }
 
-/* ریسپانسیو */
-@media (max-width: 991px) {
-    .container-fluid {
-        padding: 1.5rem;
-    }
-
-    .card-header {
-        padding: 1.25rem;
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    .my-btn-primary {
-        padding: 0.65rem 1.5rem;
-        font-size: 0.95rem;
-    }
-
-    .btn-outline-light {
-        padding: 0.4rem 1rem;
-        font-size: 0.85rem;
-    }
-
-    .form-control,
-    .form-select,
-    textarea {
-        font-size: 0.9rem;
-    }
-
-    .form-label {
-        font-size: 0.9rem;
-    }
-}
-
-@media (max-width: 767px) {
-    .container-fluid {
-        padding: 1rem;
-    }
-
-    .card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 1rem;
-        gap: 1rem;
-    }
-
-    .card-body {
-        padding: 1.25rem;
-    }
-
-    .my-btn-primary,
-    .btn-outline-light {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .form-group,
-    .bg-light {
-        padding: 1rem;
-    }
-
-    .form-label {
-        font-size: 0.85rem;
-    }
-
-    .form-control,
-    .form-select,
-    textarea {
-        font-size: 0.875rem;
-        padding: 0.65rem 0.75rem;
-    }
-
-    .gateway-logo {
-        width: 40px;
-        height: 40px;
-    }
-
-    .card-header h5 {
-        font-size: 1.1rem;
-    }
-}
-
 /* پیجینیشن */
 .pagination-container {
     display: flex;
@@ -328,6 +275,8 @@ input:not([type="checkbox"]) {
     padding: 0.75rem;
     border-radius: var(--radius-button);
     box-shadow: 0 3px 10px var(--shadow);
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .pagination .page-item {
@@ -348,6 +297,7 @@ input:not([type="checkbox"]) {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    cursor: pointer;
 }
 
 .pagination .page-link:hover {
@@ -379,22 +329,213 @@ input:not([type="checkbox"]) {
     box-shadow: 0 2px 8px var(--shadow);
 }
 
-/* ریسپانسیو */
-@media (max-width: 767px) {
+/* ریسپانسیو برای تبلت */
+@media (max-width: 991px) {
+    .container-fluid {
+        padding: 1.5rem;
+    }
+
+    .card-header {
+        padding: 1.25rem;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .my-btn-primary {
+        padding: 0.65rem 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .btn-outline-light {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .form-control,
+    .form-select,
+    textarea {
+        font-size: 0.9rem;
+        padding: 0.65rem 0.9rem;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+    }
+
+    .gateway-logo {
+        width: 42px;
+        height: 42px;
+    }
+
+    .card-header h5 {
+        font-size: 1.15rem;
+    }
+
     .pagination {
         padding: 0.5rem;
-        gap: 0.25rem;
+        gap: 0.3rem;
     }
 
     .pagination .page-link {
-        padding: 0.4rem 0.75rem;
-        min-width: 2rem;
-        height: 2rem;
+        padding: 0.4rem 0.85rem;
+        min-width: 2.2rem;
+        height: 2.2rem;
         font-size: 0.9rem;
     }
 
     .pagination-info {
         font-size: 0.85rem;
         padding: 0.5rem 1rem;
+    }
+}
+
+/* ریسپانسیو برای موبایل */
+@media (max-width: 767px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+    .card-body.p-4 {
+        padding-right: 0.1rem !important;
+        padding-left: 0.1rem !important;
+    }
+    .card {
+        margin: 0;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    .form-group,
+    .bg-light {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+    }
+
+    .form-control,
+    .form-select,
+    textarea {
+        font-size: 0.875rem;
+        padding: 0.6rem 0.75rem;
+        height: 45px !important; /* کاهش ارتفاع ورودی‌ها برای موبایل */
+    }
+
+    .my-btn-primary,
+    .btn-outline-light {
+        width: 100%;
+        justify-content: center;
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .gateway-logo {
+        width: 36px;
+        height: 36px;
+    }
+
+    .card-header h5 {
+        font-size: 1.1rem;
+    }
+
+    .pagination {
+        padding: 0.5rem;
+        gap: 0.2rem;
+        flex-wrap: wrap;
+    }
+
+    .pagination .page-link {
+        padding: 0.35rem 0.7rem;
+        min-width: 2rem;
+        height: 2rem;
+        font-size: 0.85rem;
+    }
+
+    .pagination-info {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* ریسپانسیو برای موبایل‌های خیلی کوچک (زیر 576px) */
+@media (max-width: 576px) {
+    .container-fluid {
+        padding: 0.75rem;
+    }
+
+    .card {
+        margin: 0 0.25rem;
+    }
+
+    .card-header {
+        padding: 0.75rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .form-group,
+    .bg-light {
+        padding: 0.75rem;
+    }
+
+    .form-label {
+        font-size: 0.8rem;
+    }
+
+    .form-control,
+    .form-select,
+    textarea {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.65rem;
+        height: 40px !important;
+    }
+
+    .my-btn-primary,
+    .btn-outline-light {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .gateway-logo {
+        width: 32px;
+        height: 32px;
+    }
+
+    .card-header h5 {
+        font-size: 1rem;
+    }
+
+    .pagination {
+        padding: 0.4rem;
+        gap: 0.15rem;
+    }
+
+    .pagination .page-link {
+        padding: 0.3rem 0.6rem;
+        min-width: 1.8rem;
+        height: 1.8rem;
+        font-size: 0.8rem;
+    }
+
+    .pagination-info {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.6rem;
     }
 }
