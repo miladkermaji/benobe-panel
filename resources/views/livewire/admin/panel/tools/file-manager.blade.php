@@ -27,13 +27,16 @@
     <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
       <div class="row g-3">
         <div class="col-md-4">
-          <div class="input-group align-items-center">
-            <span class="input-group-text bg-transparent border-0 pe-2"><img
-                src="{{ asset('admin-assets/icons/folder-add-svgrepo-com.svg') }}"
-                class="fs-4 text-primary animate-bounce" alt=""></span>
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-0 pe-2">
+              <img src="{{ asset('admin-assets/icons/folder-add-svgrepo-com.svg') }}"
+                class="fs-4 text-primary animate-bounce" alt="">
+            </span>
             <input type="text" class="form-control rounded-lg shadow-sm" wire:model="newFolderName"
               placeholder="نام پوشه جدید">
-            <button wire:click="createFolder" class="btn btn-gradient-success px-3 rounded-lg">
+            <button wire:click="createFolder"
+              class="btn btn-success px-3 rounded-lg border-0 d-flex align-items-center"
+              style=" margin-right: -1px; border-top-right-radius: 0; border-bottom-right-radius: 0; box-shadow: none;">
               <i class="fas fa-plus me-1"></i> ایجاد
             </button>
           </div>
@@ -212,7 +215,6 @@
       </div>
     </div>
   @endif
-  <link rel="stylesheet" href="{{ asset('admin-assets/panel/cee/tools/file-manager/file-manager.css') }}">
   <script>
     document.addEventListener('livewire:init', () => {
       Livewire.on('toast', (message, options = {}) => {

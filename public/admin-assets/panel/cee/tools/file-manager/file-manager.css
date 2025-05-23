@@ -1,9 +1,44 @@
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
+    --primary-light: #84caf9; /* آبی روشن - در گرادیان‌ها */
+    --secondary: #1deb3c; /* سبز - برای دکمه‌های ثانویه */
+    --secondary-hover: #15802a; /* سبز تیره‌تر برای هاور */
+    --background-light: #f0f8ff; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
+    --background-footer: #d4ecfd; /* آبی روشن‌تر - فوتر */
+    --background-card: #ffffff; /* سفید - کارت‌ها */
+    --text-primary: #000000; /* مشکی - متن اصلی */
+    --text-secondary: #707070; /* خاکستری - متن ثانویه */
+    --text-discount: #008000; /* سبز - قیمت با تخفیف */
+    --text-original: #ff0000; /* قرمز - قیمت اولیه */
+    --border-neutral: #e5e7eb; /* خاکستری روشن - حاشیه‌ها */
+    --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
+    --gradient-instagram-from: #f92ca7; /* گرادیان اینستاگرام - شروع */
+    --gradient-instagram-to: #6b1a93; /* گرادیان اینستاگرام - پایان */
+    --button-mobile: #4f9acd; /* آبی متوسط - دکمه‌های موبایل */
+    --button-mobile-light: #a2cdeb; /* آبی روشن‌تر - دکمه‌های موبایل */
+    --support-section: #2e86c1; /* آبی - بخش پشتیبانی */
+    --support-text: #084d7c; /* آبی تیره - متن پشتیبانی */
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    ) !important;
+    /* شعاع گوشه‌ها (border-radius) */
+    --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
+    --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
+    --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
+    --radius-card: 1.125rem !important; /* 18px - کارت‌ها */
+    --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
+    --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
+    --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
+}
 /* هدر شیشه‌ای */
 .glass-header {
     background: linear-gradient(
         135deg,
-        rgba(30, 41, 59, 0.95),
-        rgba(71, 85, 105, 0.85)
+        rgba(11, 107, 203, 0.95),
+        rgba(24, 94, 165, 0.85)
     );
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -18,7 +53,11 @@
 
 /* پس‌زمینه کارت‌ها */
 .bg-gradient-card {
-    background: linear-gradient(145deg, #ffffff, #f1f5f9);
+    background: linear-gradient(
+        145deg,
+        var(--joy-palette-neutral-50),
+        var(--joy-palette-neutral-100)
+    );
     border: none;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
@@ -36,87 +75,128 @@
 
 /* دکمه‌های گرادینت */
 .btn-gradient-primary {
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    background: linear-gradient(
+        90deg,
+        var(--joy-palette-primary-500),
+        var(--joy-palette-primary-400)
+    );
     border: none;
-    color: white;
-    box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
+    color: var(--joy-palette-common-white);
+    box-shadow: 0 3px 8px rgba(11, 107, 203, 0.3);
     transition: all 0.3s ease;
 }
 
 .btn-gradient-primary:hover {
-    background: linear-gradient(90deg, #2563eb, #3b82f6);
+    background: linear-gradient(
+        90deg,
+        var(--joy-palette-primary-600),
+        var(--joy-palette-primary-500)
+    );
     transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 5px 12px rgba(11, 107, 203, 0.4);
+    color: var(--joy-palette-common-white);
 }
 
 .btn-gradient-danger {
-    background: linear-gradient(90deg, #ef4444, #f87171);
+    background: linear-gradient(
+        90deg,
+        var(--joy-palette-danger-500),
+        var(--joy-palette-danger-400)
+    );
     border: none;
     color: white;
-    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 3px 8px rgba(196, 28, 28, 0.3);
     transition: all 0.3s ease;
 }
 
 .btn-gradient-danger:hover {
-    background: linear-gradient(90deg, #dc2626, #ef4444);
+    background: linear-gradient(
+        90deg,
+        var(--joy-palette-danger-600),
+        var(--joy-palette-danger-500)
+    );
     transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 5px 12px rgba(196, 28, 28, 0.4);
 }
 
 .btn-gradient-success {
-    background: linear-gradient(90deg, #22c55e, #4ade80);
+    background: linear-gradient(
+        90deg,
+        var(--joy-palette-success-500),
+        var(--joy-palette-success-400)
+    );
     border: none;
     color: white;
-    box-shadow: 0 3px 8px rgba(34, 197, 94, 0.3);
+    box-shadow: 0 3px 8px rgba(31, 122, 31, 0.3);
     transition: all 0.3s ease;
 }
 
 .btn-gradient-success:hover {
-    background: linear-gradient(90deg, #16a34a, #22c55e);
+    background: linear-gradient(
+        90deg,
+        var(--joy-palette-success-600),
+        var(--joy-palette-success-500)
+    );
     transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(34, 197, 94, 0.4);
+    box-shadow: 0 5px 12px rgba(31, 122, 31, 0.4);
 }
 
 .btn-gradient-warning {
-    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    background: linear-gradient(
+        90deg,
+        var(--joy-palette-warning-500),
+        var(--joy-palette-warning-400)
+    );
     border: none;
     color: white;
-    box-shadow: 0 3px 8px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 3px 8px rgba(154, 91, 19, 0.3);
     transition: all 0.3s ease;
 }
 
 .btn-gradient-warning:hover {
-    background: linear-gradient(90deg, #d97706, #f59e0b);
+    background: linear-gradient(
+        90deg,
+        var(--joy-palette-warning-600),
+        var(--joy-palette-warning-500)
+    );
     transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(245, 158, 11, 0.4);
+    box-shadow: 0 5px 12px rgba(154, 91, 19, 0.4);
 }
 
 .btn-gradient-secondary {
-    background: linear-gradient(90deg, #6b7280, #9ca3af);
+    background: linear-gradient(
+        90deg,
+        var(--joy-palette-neutral-500),
+        var(--joy-palette-neutral-400)
+    );
     border: none;
     color: white;
-    box-shadow: 0 3px 8px rgba(107, 114, 128, 0.3);
+    box-shadow: 0 3px 8px rgba(99, 107, 116, 0.3);
     transition: all 0.3s ease;
 }
 
 .btn-gradient-secondary:hover {
-    background: linear-gradient(90deg, #4b5563, #6b7280);
+    background: linear-gradient(
+        90deg,
+        var(--joy-palette-neutral-600),
+        var(--joy-palette-neutral-500)
+    );
     transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(107, 114, 128, 0.4);
+    box-shadow: 0 5px 12px rgba(99, 107, 116, 0.4);
 }
 
 /* فرم‌ها */
 .form-control {
     border-radius: 10px;
-    border: 1px solid #e5e7eb;
-    background: #fafafa;
+    border: 1px solid var(--joy-palette-neutral-200);
+    background: var(--joy-palette-neutral-50);
     transition: all 0.3s ease;
 }
 
 .form-control:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-    background: #ffffff;
+    border-color: var(--joy-palette-primary-500);
+    box-shadow: 0 0 0 4px rgba(11, 107, 203, 0.15);
+    background: var(--joy-palette-common-white);
 }
 
 /* کوتاه کردن متن */
@@ -160,7 +240,7 @@
 
 /* اصلاح جداکننده‌های breadcrumb */
 .breadcrumb-item + .breadcrumb-item::before {
-    color: #94a3b8;
+    color: var(--joy-palette-neutral-400);
     content: "›";
     font-size: 1.5rem;
     padding: 0 8px;
