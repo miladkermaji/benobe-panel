@@ -1,306 +1,392 @@
-/* هدر شیشه‌ای */
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1;
+    --primary-light: #84caf9;
+    --secondary: #1deb3c;
+    --secondary-hover: #15802a;
+    --background-light: #f0f8ff;
+    --background-card: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --border-neutral: #e5e7eb;
+    --shadow: rgba(0, 0, 0, 0.15);
+    --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+}
+
+/* استایل‌های هدر */
 .glass-header {
- background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.85));
- backdrop-filter: blur(15px);
- border: 1px solid rgba(255, 255, 255, 0.1);
- box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
- border-radius: 16px;
- transition: all 0.4s ease;
- padding: 1.5rem;
+    background: var(--gradient-primary);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px var(--shadow);
+    transition: all 0.3s ease;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
 }
 
-.glass-header:hover {
- box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
- transform: translateY(-3px);
+/* استایل‌های هشدار */
+.alert-custom {
+    background: var(--background-light);
+    border: 1px solid var(--primary-light);
+    color: var(--text-primary);
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 4px var(--shadow);
 }
 
-.glass-header h1 {
- color: #ffffff;
- font-weight: 500;
- font-size: 1.75rem;
- text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
- margin: 0;
+.alert-custom svg {
+    color: var(--primary);
+    margin-left: 0.5rem;
 }
 
-/* ورودی جستجو */
-.input-group {
- position: relative;
- max-width: 420px;
-}
-
-.form-control {
- background: #ffffff;
- border: none;
- border-radius: 12px;
- padding: 0.75rem 1rem 0.75rem 2.5rem;
- font-size: 0.95rem;
- box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
- transition: all 0.3s ease;
-}
-
-.form-control:focus {
- box-shadow: 0 0 0 4px rgba(31, 41, 55, 0.15);
- outline: none;
-}
-
-.form-control::placeholder {
- color: #9ca3af;
- font-weight: 500;
-}
-
-.search-icon {
- position: absolute;
- top: 50%;
- left: 1rem;
- transform: translateY(-50%);
- z-index: 5;
-}
-
-/* دکمه‌ها */
-.btn-gradient-success {
- background: linear-gradient(90deg, #10b981, #34d399);
- border: none;
- color: white;
- border-radius: 9999px;
- padding: 0.65rem 1.5rem;
- font-size: 0.95rem;
- font-weight: 500;
- box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
- transition: all 0.3s ease;
-}
-
-.btn-gradient-success:hover {
- background: linear-gradient(90deg, #059669, #10b981);
- transform: translateY(-2px);
- box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-}
-
-.btn-gradient-danger {
- background: linear-gradient(90deg, #f43f5e, #fb7185);
- border: none;
- color: white;
- border-radius: 9999px;
- padding: 0.65rem 1.5rem;
- font-size: 0.95rem;
- font-weight: 500;
- box-shadow: 0 3px 10px rgba(244, 63, 94, 0.2);
- transition: all 0.3s ease;
-}
-
-.btn-gradient-danger:hover:not(:disabled) {
- background: linear-gradient(90deg, #e11d48, #f43f5e);
- transform: translateY(-2px);
- box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3);
-}
-
-.btn-gradient-danger:disabled {
- background: #e5e7eb;
- color: #9ca3af;
- cursor: not-allowed;
- box-shadow: none;
-}
-
-.buttons-container {
- display: flex;
- gap: 1rem;
- flex-wrap: wrap;
- justify-content: flex-end;
-}
-
-/* جدول */
-.card {
- background: #ffffff;
- border-radius: 16px;
- box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
- transition: all 0.3s ease;
-}
-
-.card:hover {
- box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+/* استایل‌های جدول (دسکتاپ) */
+.table-container {
+    background: var(--background-card);
+    border-radius: 4px;
+    box-shadow: 0 1px 4px var(--shadow);
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-neutral);
 }
 
 .table {
- margin: 0;
- border-collapse: separate;
- border-spacing: 0;
-}
-
-.table-bordered {
- border: none;
-}
-
-.table-bordered th,
-.table-bordered td {
- border: none;
- border-bottom: 1px solid #e5e7eb;
- padding: 1rem;
- vertical-align: middle;
-}
-
-.table-hover tbody tr:hover {
- background: #f9fafb;
- transition: background 0.2s ease;
+    margin-bottom: 0;
 }
 
 .table thead th {
- background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.85));
- color: #ffffff;
- font-weight: 600;
- border-bottom: none;
+    background: var(--background-light);
+    color: var(--text-primary);
+    font-weight: 600;
+    border: none;
+    padding: 0.75rem;
+    text-align: right;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border-neutral);
 }
 
-/* وضعیت */
-.bg-label-success {
- background: #d1fae5;
- color: #10b981;
- border-radius: 9999px;
- padding: 0.35rem 0.75rem;
- font-weight: 500;
- transition: all 0.3s ease;
+.table tbody td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-neutral);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    text-align: right;
 }
 
-.bg-label-success:hover {
- background: #a7f3d0;
+.table tbody tr:last-child td {
+    border-bottom: none;
 }
 
-.bg-label-danger {
- background: #fee2e2;
- color: #f43f5e;
- border-radius: 9999px;
- padding: 0.35rem 0.75rem;
- font-weight: 500;
- transition: all 0.3s ease;
+.table tbody tr:hover {
+    background-color: var(--background-light);
 }
 
-.bg-label-danger:hover {
- background: #fecaca;
+/* استایل‌های کارت (موبایل و تبلت) */
+.card {
+    background: var(--background-card);
+    border-radius: 4px;
+    border: 1px solid var(--border-neutral);
+    box-shadow: 0 1px 4px var(--shadow);
+    margin-bottom: 0.75rem;
 }
 
-.cursor-pointer {
- cursor: pointer;
+.card-body {
+    padding: 0.75rem;
 }
 
-/* چک‌باکس */
-.form-check-input {
- width: 1.25rem;
- height: 1.25rem;
- border-radius: 4px;
- border: 1px solid #d1d5db;
- transition: all 0.3s ease;
+/* استایل‌های آیکون درگاه */
+.gateway-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 0 1px 2px var(--shadow);
 }
 
-.form-check-input:checked {
- background-color: #374151;
- border-color: #374151;
+/* استایل‌های دکمه‌ها */
+.btn-custom {
+    background: var(--primary);
+    color: white;
+    transition: all 0.2s ease;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
 }
 
-/* دکمه‌های عملیات در جدول */
-.btn-gradient-success.rounded-pill,
-.btn-gradient-danger.rounded-pill {
- padding: 0.5rem 1rem;
+.btn-custom:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
 }
 
-.btn-gradient-success.rounded-pill svg,
-.btn-gradient-danger.rounded-pill svg {
- width: 18px;
- height: 18px;
+.btn-success {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
 }
 
-/* صفحه‌بندی */
-.pagination .page-item.active .page-link {
- background: #374151;
- border-color: #374151;
- color: white;
- border-radius: 8px;
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    transition: all 0.2s ease;
+    padding: 0.5rem;
 }
 
-.pagination .page-link {
- color: #6b7280;
- background: #ffffff;
- border-radius: 8px;
- border: 1px solid #e5e7eb;
- transition: all 0.3s ease;
+.btn-danger:hover {
+    background: #bb2d3b;
+    transform: translateY(-1px);
 }
 
-.pagination .page-link:hover {
- background: #f3f4f6;
- color: #374151;
- border-color: #d1d5db;
+/* استایل‌های وضعیت */
+.status-switch {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
 }
 
-/* متن خالی */
-.text-muted {
- color: #6b7280;
- font-weight: 500;
+.status-switch.active {
+    background: var(--secondary);
+    color: white;
 }
 
-/* ریسپانسیو */
-@media (max-width: 991px) {
- .glass-header {
-  padding: 1.25rem;
- }
-
- .buttons-container {
-  width: 100%;
-  margin-top: 1.5rem;
-  flex-direction: row;
-  justify-content: center;
-  gap: 1rem;
- }
-
- .btn {
-  width: auto;
-  min-width: 150px;
- }
-
- .input-group {
-  max-width: 100%;
-  margin-top: 1rem;
- }
-
- h1.h3 {
-  font-size: 1.5rem;
-  text-align: center;
-  width: 100%;
- }
+.status-switch.inactive {
+    background: #dc3545;
+    color: white;
 }
 
-@media (max-width: 767px) {
- .glass-header {
-  padding: 1rem;
- }
+.status-switch:hover {
+    transform: translateY(-1px);
+}
 
- .buttons-container {
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
- }
+/* استایل‌های جستجو */
+.search-box {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+}
 
- .btn {
-  width: 100%;
-  max-width: 200px;
- }
+.search-box input {
+    width: 100%;
+    padding: 0.65rem 0.75rem 0.65rem 2.5rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-neutral);
+    background: #ffffff;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px var(--shadow);
+}
 
- .input-group {
-  margin-top: 1rem;
- }
+.search-box input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.2);
+    outline: none;
+}
 
- h1.h3 {
-  font-size: 1.35rem;
- }
+.search-box input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
 
- .table-responsive {
-  font-size: 0.9rem;
- }
+.search-box svg.search-icon {
+    position: absolute;
+    right: 1.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    width: 16px;
+    height: 16px;
+}
 
- .btn-gradient-success.rounded-pill,
- .btn-gradient-danger.rounded-pill {
-  padding: 0.4rem 0.75rem;
- }
+/* استایل‌های بج */
+.badge {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
 
- .btn-gradient-success.rounded-pill svg,
- .btn-gradient-danger.rounded-pill svg {
-  width: 16px;
-  height: 16px;
- }
+/* استایل‌های پیجینیشن */
+.pagination-container {
+    margin-top: 1rem;
+    overflow-x: auto;
+    padding: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pagination {
+    justify-content: center;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+}
+
+.page-item .page-link {
+    color: var(--primary);
+    border: 1px solid var(--border-neutral);
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    background: white;
+    min-width: 34px;
+    text-align: center;
+}
+
+.page-item.active .page-link {
+    background: var(--gradient-primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 1px 4px rgba(46, 134, 193, 0.2);
+}
+
+.page-item .page-link:hover {
+    background: var(--background-light);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+
+/* استایل‌های موبایل و تبلت */
+@media (max-width: 768px) {
+    .d-flex.flex-column.flex-md-row.align-items-center.gap-2.w-md-auto {
+        width: 100% !important;
+    }
+
+    .search-box {
+        max-width: 100%;
+        margin-bottom: 0.75rem;
+    }
+
+    .search-box input {
+        padding: 0.5rem 0.75rem 0.5rem 2rem;
+        font-size: 0.85rem;
+    }
+
+    .search-box svg.search-icon {
+        width: 14px;
+        height: 14px;
+        left: 0.65rem;
+    }
+
+    .btn-success {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .badge {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .glass-header {
+        padding: 0.6rem;
+        border-radius: 4px;
+        margin-bottom: 0.75rem;
+    }
+
+    .glass-header .header-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .glass-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .alert-custom {
+        padding: 0.6rem 0.75rem;
+        border-radius: 4px;
+        margin-bottom: 0.75rem;
+    }
+
+    .alert-custom svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .gateway-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .card-body h6 {
+        font-size: 0.85rem;
+    }
+
+    .status-switch {
+        width: 20px;
+        height: 20px;
+    }
+
+    .status-switch svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .btn-custom,
+    .btn-danger {
+        padding: 0.4rem;
+    }
+
+    .btn-custom svg,
+    .btn-danger svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .pagination-container {
+        padding: 0.3rem;
+    }
+
+    .page-item .page-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+        min-width: 30px;
+        border-radius: 4px;
+    }
+}
+
+/* استایل‌های RTL */
+[dir="rtl"] .table thead th,
+[dir="rtl"] .table tbody td {
+    text-align: right;
+}
+
+[dir="rtl"] .search-box input {
+    padding-right: 2.5rem;
+    padding-left: 0.75rem;
+}
+
+[dir="rtl"] .search-box svg.search-icon {
+    left: auto;
+    right: 0.75rem;
+}
+
+[dir="rtl"] .pagination {
+    padding-right: 0;
+}
+
+[dir="rtl"] .page-item:first-child .page-link {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+[dir="rtl"] .page-item:last-child .page-link {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
 }

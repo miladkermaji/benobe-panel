@@ -1,43 +1,42 @@
 <div>
   <div class="container-fluid py-3" wire:init="loadGateways">
     <!-- Header -->
-    <header class="glass-header text-white p-3 rounded-3 mb-3 shadow-lg">
-      <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-        <!-- Title Section -->
-        <div class="d-flex align-items-center gap-2 flex-shrink-0">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            class="header-icon">
-            <path d="M3 10h18M3 14h18M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" />
-          </svg>
-          <h2 class="mb-0 fw-bold fs-5">پنل‌های پیامکی</h2>
-        </div>
-        <!-- Search and Actions -->
-        <div class="d-flex flex-column flex-md-row align-items-center gap-2  w-md-auto">
-          <div class="search-box position-relative w-100 w-md-50">
-            <input type="text" wire:model.live="search" class="form-control rounded-pill ps-4 pe-2"
-              placeholder="جستجو...">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              class="search-icon">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-          </div>
-          <div class="d-flex align-items-center gap-2 w-100 w-md-auto justify-content-end">
-            <a href="{{ route('admin.panel.tools.sms_gateways.create') }}"
-              class="btn btn-success rounded-pill px-3 py-1 d-flex align-items-center gap-1 flex-shrink-0">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              <span>پنل جدید</span>
-            </a>
-            <span class="badge bg-white text-primary rounded-pill px-2 py-1 fw-medium flex-shrink-0">
-              {{ $readyToLoad ? $gateways->total() : 0 }}
-            </span>
-          </div>
-        </div>
+<header class="glass-header text-white p-3 rounded-3 mb-3 shadow-lg">
+  <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+    <!-- Title Section -->
+    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        class="header-icon">
+        <path d="M3 10h18M3 14h18M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" />
+      </svg>
+      <h2 class="mb-0 fw-bold fs-5">پنل‌های پیامکی</h2>
+    </div>
+    <!-- Search and Actions -->
+    <div class="d-flex flex-column flex-md-row align-items-center gap-2 w-100 w-md-auto">
+      <div class="search-box position-relative">
+        <input type="text" wire:model.live="search" class="form-control  ps-5"
+          placeholder="جستجو...">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="search-icon">
+          <circle cx="11" cy="11" r="8" />
+          <path d="M21 21l-4.35-4.35" />
+        </svg>
       </div>
-    </header>
+      <div class="d-flex align-items-center gap-2 w-100 w-md-auto justify-content-end">
+        <a href="{{ route('admin.panel.tools.sms_gateways.create') }}"
+          class="btn btn-success  px-3 py-1 d-flex align-items-center gap-1 flex-shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          <span>پنل جدید</span>
+        </a>
+        <span class="badge bg-white text-primary  px-2 py-1 fw-medium flex-shrink-0">
+          {{ $readyToLoad ? $gateways->total() : 0 }}
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
 
     <!-- Alert -->
     <div class="alert alert-custom rounded-3 mb-3 shadow-sm">

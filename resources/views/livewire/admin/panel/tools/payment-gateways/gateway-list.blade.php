@@ -12,9 +12,9 @@
           <h2 class="mb-0 fw-bold fs-5">درگاه‌های پرداخت</h2>
         </div>
         <!-- Search and Actions -->
-        <div class="d-flex flex-column flex-md-row align-items-center gap-2  w-md-auto">
-          <div class="search-box position-relative w-100 w-md-50">
-            <input type="text" wire:model.live="search" class="form-control rounded-pill ps-4 pe-2"
+        <div class="d-flex flex-column flex-md-row align-items-center gap-2 w-100 w-md-auto">
+          <div class="search-box position-relative">
+            <input type="text" wire:model.live="search" class="form-control ps-5 "
               placeholder="جستجو...">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               class="search-icon">
@@ -24,13 +24,13 @@
           </div>
           <div class="d-flex align-items-center gap-2 w-100 w-md-auto justify-content-end">
             <a href="{{ route('admin.panel.tools.payment_gateways.create') }}"
-              class="btn btn-success rounded-pill px-3 py-1 d-flex align-items-center gap-1 flex-shrink-0">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              class="btn btn-success px-3 py-1 d-flex align-items-center gap-1 flex-shrink-0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" stroke="#fff" stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
               </svg>
-              <span>درگاه جدید</span>
+              <span class="text-white">درگاه جدید</span>
             </a>
-            <span class="badge bg-white text-primary rounded-pill px-2 py-1 fw-medium flex-shrink-0">
+            <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
               {{ $readyToLoad ? $gateways->total() : 0 }}
             </span>
           </div>

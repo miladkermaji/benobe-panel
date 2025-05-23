@@ -145,8 +145,7 @@ input:not([type="checkbox"]) {
 
 /* سوئیچ وضعیت */
 .form-check-input {
-    width: 2.5rem;
-    height: 1.25rem;
+ 
     border-radius: var(--radius-circle);
     border: 1px solid var(--border-neutral);
     transition: all 0.3s ease;

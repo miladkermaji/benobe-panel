@@ -1,31 +1,28 @@
 <div class="container-fluid py-2" dir="rtl" wire:init="loadRedirects">
-  <!-- هدر و ابزارها در یک ردیف -->
   <div
     class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
     <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت ریدایرکت‌ها</h1>
-    <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
-      <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
-        wire:model.live="search" placeholder="جستجو در ریدایرکت‌ها..." style="padding-right: 23px">
-      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3"
-        style="z-index: 5;">
+    <div class="search-box position-relative flex-grow-1" style="max-width: 400px;">
+      <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 " wire:model.live="search"
+        placeholder="جستجو در ریدایرکت‌ها...">
+      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
-          <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+          <circle cx="11" cy="11" r="8" />
+          <path d="M21 21l-4.35-4.35" />
         </svg>
       </span>
     </div>
-    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
+    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center buttons-container">
       <a href="{{ route('admin.panel.tools.redirects.create') }}"
-        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
-        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
+        class="btn btn-success text-white px-4 d-flex align-items-center gap-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14" />
         </svg>
         <span>افزودن ریدایرکت</span>
       </a>
-      <button wire:click="deleteSelected"
-        class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
+      <button wire:click="deleteSelected" class="btn btn-gradient-danger  px-4 d-flex align-items-center gap-2"
         @if (empty($selectedRedirects)) disabled @endif>
-        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        <svg  width="16" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">
           <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
         </svg>
@@ -67,22 +64,21 @@
                     <td class="text-center align-middle">{{ $redirect->status_code }}</td>
                     <td class="text-center align-middle">
                       <button wire:click="toggleStatus({{ $redirect->id }})"
-                        class="badge {{ $redirect->is_active ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                        class="badge {{ $redirect->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
                         {{ $redirect->is_active ? 'فعال' : 'غیرفعال' }}
                       </button>
                     </td>
                     <td class="text-center align-middle">
                       <div class="d-flex justify-content-center gap-2">
                         <a href="{{ route('admin.panel.tools.redirects.edit', $redirect->id) }}"
-                          class="btn btn-gradient-success rounded-pill px-3">
+                          class="btn btn-custom rounded-circle p-2 d-flex align-items-center justify-content-center">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path
                               d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg>
                         </a>
-                        <button wire:click="confirmDelete({{ $redirect->id }})"
-                          class="btn btn-gradient-danger rounded-pill px-3">
+                        <button wire:click="confirmDelete({{ $redirect->id }})" class="btn btn-danger rounded-circle p-2 d-flex align-items-center justify-content-center">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
