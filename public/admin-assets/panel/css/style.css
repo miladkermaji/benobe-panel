@@ -645,8 +645,6 @@ svg {
 
 .sidebar__nav ul li.is-active a {
     color: #3182ce; /* آبی ملایم و شیک */
-    background: #edf2f7; /* پس‌زمینه روشن‌تر */
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05); /* سایه داخلی ظریف */
 }
 
 .sidebar__nav ul li.is-active a:before {
@@ -667,44 +665,121 @@ svg {
 }
 
 .no-background::before {
-    background: url("") !important;
-    width: 10px !important;
-    height: 10px !important;
-    border-radius: 50% !important;
-    border: 1px solid #333;
-    position: absolute !important;
-    top: 14px !important;
-    right: 34px !important;
+    display: none !important;
+}
+
+.drop-toggle {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    display: none;
+    background: rgba(49, 130, 206, 0.06);
+
+}
+
+.drop-toggle.is-active {
+    display: block;
 }
 
 .drop-toggle a {
     font-size: 13px !important;
-    padding: 0 15px;
-    background: #f7fafc; /* پس‌زمینه کمی روشن‌تر */
-    border-radius: 0 0 12px 12px;
-    margin: 0 0 8px 0;
-    color: #4a5568;
+    padding: 12px 20px;
+    margin: 0;
+    color: #1a202c;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    display: block;
+    border-radius: 8px;
+    margin: 4px 8px;
 }
+
+.drop-toggle li {
+    position: relative;
+    margin: 0;
+    list-style: none;
+}
+
 .drop-toggle li a {
     font-size: 13px;
-    padding: 10px 20px 10px 40px;
-    color: #4a5568;
+    padding: 12px 20px 12px 40px;
+    color: #1a202c;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 4px 8px;
+    background: transparent;
+    text-decoration: none;
+}
+
+.drop-toggle li a::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to bottom, #2d3748, #4a5568);
+    opacity: 0;
+    transition: all 0.3s ease;
+    border-radius: 0 4px 4px 0;
+}
+
+.drop-toggle li a::after {
+    content: "";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: #a0aec0;
+    border-radius: 50%;
+    transition: all 0.3s ease;
 }
 
 .drop-toggle li.is-active a {
-    color: #3182ce;
-    background: #e2e8f0;
+    color: #000000;
+    background: rgba(45, 55, 72, 0.05);
+    font-weight: 700;
+}
+
+.drop-toggle li.is-active a::before {
+    opacity: 1;
+}
+
+.drop-toggle li.is-active a::after {
+    background: #2d3748;
+    box-shadow: 0 0 0 4px rgba(45, 55, 72, 0.1);
+}
+
+.drop-toggle li a:hover {
+    color: #000000;
+    background: rgba(45, 55, 72, 0.05);
+    transform: translateX(-4px);
+    font-weight: 700;
+}
+
+.drop-toggle li a:hover::before {
+    opacity: 1;
+}
+
+.drop-toggle li a:hover::after {
+    background: #2d3748;
+    box-shadow: 0 0 0 4px rgba(45, 55, 72, 0.1);
 }
 
 /* آیکون فلش بازشونده */
 .svg-caret-left {
     width: 8px;
     height: 10px;
-    fill: #718096;
+    fill: #4a5568;
     transition: transform 0.3s ease;
 }
-.sidebar__nav ul li a:hover:before {
-    color: #2b4a83;
+
+/* افکت موج برای کلیک */
+.drop-toggle li a:active {
+    transform: scale(0.98);
 }
 
 .padding-0-18 {
@@ -1058,9 +1133,9 @@ svg {
     transition: all 200ms ease;
 }
 
-
 .header {
     background: #fafafa; /* سفید مایل به خاکستری روشن */
+    padding: 5px 25px;
     border-radius: var(--border-radius);
     display: flex;
     justify-content: space-between;
