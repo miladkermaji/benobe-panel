@@ -1,6 +1,15 @@
-<div class="justify-content-center align-items-center">
-  <div class="col-md-6 login-container position-relative">
-    <div class="login-card custom-rounded custom-shadow p-7">
+<div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
+  style="background-color: #f8f9fa;">
+  <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4 mx-auto">
+    <div class="login-card custom-rounded custom-shadow p-4 p-md-7 bg-white">
+      <div class="logo-wrapper w-100 d-flex justify-content-center mb-4">
+        <img class="cursor-pointer" onclick="location.href='/'" width="100px"
+          src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
+      </div>
+      <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold mb-2" style="font-weight: 700 !important;">پنل پزشکان به نوبه</h2>
+        <p class="text-muted fw-semibold">به پنل مدیریت پزشکان به نوبه خوش آمدید</p>
+      </div>
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
           <div class="rounded-circle bg-primary me-2" style="width: 16px; height: 16px;"></div>
