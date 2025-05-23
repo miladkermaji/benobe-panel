@@ -728,8 +728,8 @@ svg {
 .drop-toggle li a::after {
     content: "";
     position: absolute;
-    right: 12px;
-    top: 50%;
+    right: 35px;
+    top: 47%;
     transform: translateY(-50%);
     width: 6px;
     height: 6px;
