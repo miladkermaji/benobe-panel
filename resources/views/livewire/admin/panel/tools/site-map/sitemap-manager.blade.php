@@ -148,7 +148,8 @@
   </div>
 
   <!-- Modal -->
-  <div wire:ignore class="modal fade" id="addUrlModal" tabindex="-1" aria-labelledby="addUrlModalLabel" aria-hidden="true">
+  <div wire:ignore class="modal fade" id="addUrlModal" tabindex="-1" aria-labelledby="addUrlModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
