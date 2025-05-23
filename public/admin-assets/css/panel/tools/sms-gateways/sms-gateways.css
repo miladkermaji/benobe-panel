@@ -1,15 +1,32 @@
-/* هدر شیشه‌ای */
-.glass-header {
-    background: linear-gradient(
-        135deg,
-        rgba(31, 41, 55, 0.95),
-        rgba(55, 65, 81, 0.85)
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1;
+    --primary-light: #84caf9;
+    --secondary: #1deb3c;
+    --secondary-hover: #15802a;
+    --background-light: #f0f8ff;
+    --background-card: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --border-neutral: #e5e7eb;
+    --shadow: rgba(0, 0, 0, 0.25);
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
     );
-    backdrop-filter: blur(15px);
+}
+
+/* استایل‌های هدر */
+.glass-header {
+    background: var(--gradient-primary);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-radius: 16px;
-    transition: all 0.4s ease;
+    box-shadow: 0 3px 10px var(--shadow);
+    transition: all 0.3s ease;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
 }
 
 .glass-header:hover {
@@ -25,310 +42,358 @@
     transform: scale(1.15) rotate(10deg);
 }
 
-/* اعلان */
+/* استایل‌های هشدار */
 .alert-custom {
-    background: #fff1f2;
-    border-left: 6px solid #f43f5e;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    padding: 1rem 1.5rem;
-    transition: all 0.3s ease;
+    background: var(--background-light);
+    border: 1px solid var(--primary-light);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 6px var(--shadow);
 }
 
-.alert-custom:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+.alert-custom svg {
+    color: var(--primary);
+    margin-left: 0.5rem;
 }
 
-/* جستجو */
-.search-box {
-    width: 340px;
-    position: relative;
-}
-
-.search-box input {
-    background: #ffffff;
-    border: none;
-    border-radius: 9999px;
-    padding: 0.75rem 1rem 0.75rem 3rem;
-    font-size: 0.95rem;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
-
-.search-box input:focus {
-    box-shadow: 0 0 0 4px rgba(31, 41, 55, 0.15);
-    outline: none;
-}
-
-.search-box input::placeholder {
-    color: #9ca3af;
-    font-weight: 500;
-}
-
-/* کارت درگاه */
-.gateway-card {
-    width: 360px;
-    height: 200px;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    position: relative;
+/* استایل‌های جدول (دسکتاپ) */
+.table-container {
+    background: var(--background-card);
+    border-radius: 6px;
+    box-shadow: 0 1px 4px var(--shadow);
     overflow: hidden;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border-neutral);
 }
 
-.gateway-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+.table {
+    margin-bottom: 0;
 }
 
-.card-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.06;
-    transition: opacity 0.3s ease;
-    z-index: 0;
-}
-
-.bg-active {
-    background: linear-gradient(45deg, #6ee7b7, #34d399);
-}
-
-.bg-inactive {
-    background: linear-gradient(45deg, #f87171, #fb7185);
-}
-
-.gateway-card:hover .card-bg {
-    opacity: 0.12;
-}
-
-.gateway-logo {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    z-index: 1;
-}
-
-.gateway-card:hover .gateway-logo {
-    transform: scale(1.08);
-}
-
-.gateway-title {
-    font-size: 1.25rem;
+.table thead th {
+    background: var(--background-light);
+    color: var(--text-primary);
     font-weight: 600;
-    color: #1f2937;
-    transition: color 0.3s ease;
-    z-index: 1;
+    border: none;
+    padding: 0.5rem;
+    text-align: right;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--border-neutral);
 }
 
-.gateway-card:hover .gateway-title {
-    color: #374151;
+.table tbody td {
+    padding: 0.5rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-neutral);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    text-align: right;
 }
 
-/* سوئیچ وضعیت */
-.status-switch {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr:hover {
+    background-color: var(--background-light);
+}
+
+/* استایل‌های کارت (موبایل و تبلت) */
+.card {
+    background: var(--background-card);
+    border-radius: 6px;
+    border: 1px solid var(--border-neutral);
+    box-shadow: 0 1px 4px var(--shadow);
+    margin-bottom: 0.5rem;
+}
+
+.card-body {
+    padding: 0.5rem;
+}
+
+/* استایل‌های آیکون درگاه */
+.gateway-icon {
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 0 1px 2px var(--shadow);
+}
+
+/* استایل‌های دکمه‌ها */
+.btn-custom {
+    background: var(--primary);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.btn-custom:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    background: #bb2d3b;
+    transform: translateY(-1px);
+}
+
+/* استایل‌های وضعیت */
+.status-switch {
     cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
 }
 
 .status-switch.active {
-    background: #10b981;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    background: var(--secondary);
     color: white;
 }
 
 .status-switch.inactive {
-    background: #f87171;
-    box-shadow: 0 0 10px rgba(248, 113, 113, 0.4);
+    background: #dc3545;
     color: white;
 }
 
 .status-switch:hover {
-    transform: scale(1.1);
+    transform: translateY(-1px);
 }
 
-.status-icon {
-    transition: transform 0.3s ease;
+/* استایل‌های جستجو */
+.search-box {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
 }
 
-.status-switch:hover .status-icon {
-    transform: rotate(15deg);
-}
-
-/* دکمه‌ها */
-.btn-custom {
-    background: linear-gradient(90deg, #374151, #4b5563);
+.search-box input {
+    width: 100%;
+    padding: 0.5rem 0.7rem 0.5rem 2rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
     color: white;
-    border: none;
-    border-radius: 9999px;
-    padding: 0.5rem 1.25rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    box-shadow: 0 3px 10px rgba(55, 65, 81, 0.2);
+    font-size: 0.85rem;
     transition: all 0.3s ease;
 }
 
-.btn-custom:hover {
-    background: linear-gradient(90deg, #1f2937, #374151);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(55, 65, 81, 0.3);
+.search-box input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
 }
 
-.btn-danger {
-    background: linear-gradient(90deg, #f43f5e, #fb7185);
-    border: none;
-    border-radius: 9999px;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    box-shadow: 0 3px 10px rgba(244, 63, 94, 0.2);
-    transition: all 0.3s ease;
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
 }
 
-.btn-danger:hover {
-    background: linear-gradient(90deg, #e11d48, #f43f5e);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3);
+.search-box svg.search-icon {
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    width: 14px;
+    height: 14px;
 }
 
-.btn-success {
-    background: linear-gradient(90deg, #10b981, #34d399);
-    border: none;
-    border-radius: 9999px;
-    padding: 0.5rem 1.5rem;
-    font-size: 0.95rem;
-    font-weight: 500;
-    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
-    transition: all 0.3s ease;
-}
-
-.btn-success:hover {
-    background: linear-gradient(90deg, #059669, #10b981);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-}
-
-/* صفحه‌بندی */
+/* استایل‌های پیجینیشن */
 .pagination-container {
-    padding: 1rem;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    margin-top: 2rem;
+    margin-top: 0.75rem;
+    overflow-x: auto;
+    padding: 0.3rem;
+    -webkit-overflow-scrolling: touch;
 }
 
-.pagination .page-item.active .page-link {
-    background: #374151;
-    border-color: #374151;
-    color: white;
-    border-radius: 8px;
+.pagination {
+    justify-content: center;
+    gap: 0.2rem;
+    flex-wrap: wrap;
 }
 
-.pagination .page-link {
-    color: #6b7280;
-    background: #ffffff;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
+.page-item .page-link {
+    color: var(--primary);
+    border: 1px solid var(--border-neutral);
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
     transition: all 0.3s ease;
+    font-size: 0.8rem;
+    background: white;
+    min-width: 32px;
+    text-align: center;
 }
 
-.pagination .page-link:hover {
-    background: #f3f4f6;
-    color: #374151;
-    border-color: #d1d5db;
+.page-item.active .page-link {
+    background: var(--gradient-primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 1px 6px rgba(46, 134, 193, 0.2);
 }
 
-/* انیمیشن‌ها */
-.animate-pulse {
-    animation: pulse 1.5s infinite ease-in-out;
+.page-item .page-link:hover {
+    background: var(--background-light);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
 }
 
-@keyframes pulse {
-    0% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.6;
-    }
-    100% {
-        opacity: 1;
-    }
+/* استایل‌های بج */
+.badge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
 }
 
-.animate__zoomIn {
-    animation: zoomIn 0.5s ease;
-}
-
-@keyframes zoomIn {
-    0% {
-        transform: scale(0.95);
-        opacity: 0;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-/* ریسپانسیو */
+/* استایل‌های موبایل و تبلت */
 @media (max-width: 768px) {
-    .gateway-card {
-        width: 100%;
-        max-width: 340px;
-        height: 180px;
+    .d-flex.flex-column.flex-md-row.align-items-center.gap-2.w-md-auto {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 991px) {
+    .glass-header {
+        padding: 0.5rem;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
     }
 
-    .search-box {
-        width: 100%;
-        margin-bottom: 1rem;
+    .glass-header .header-icon {
+        width: 20px;
+        height: 20px;
     }
 
     .glass-header h2 {
-        font-size: 1.5rem;
-    }
-
-    .status-switch {
-        width: 36px;
-        height: 36px;
-    }
-
-    .btn-custom,
-    .btn-danger,
-    .btn-success {
-        font-size: 0.85rem;
-        padding: 0.5rem 1rem;
-    }
-
-    .gateway-title {
         font-size: 1.1rem;
     }
 
-    .gateway-logo {
-        width: 48px;
-        height: 48px;
+    .search-box {
+        max-width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .search-box input {
+        padding: 0.4rem 0.6rem 0.4rem 1.8rem;
+        font-size: 0.8rem;
+        border-radius: 6px;
+    }
+
+    .search-box svg.search-icon {
+        width: 12px;
+        height: 12px;
+        right: 0.6rem;
+    }
+
+    .btn-success,
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.7rem;
+        border-radius: 6px;
+    }
+
+    .alert-custom {
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+    }
+
+    .alert-custom svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .gateway-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .card-body h6 {
+        font-size: 0.85rem;
+    }
+
+    .status-switch {
+        width: 20px;
+        height: 20px;
+    }
+
+    .status-switch svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .btn-custom,
+    .btn-danger {
+        padding: 0.3rem;
+    }
+
+    .btn-custom svg,
+    .btn-danger svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .pagination-container {
+        padding: 0.2rem;
+    }
+
+    .page-item .page-link {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.75rem;
+        min-width: 28px;
+        border-radius: 6px;
     }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-    .gateway-card {
-        width: 320px;
-        height: 190px;
-    }
+/* استایل‌های RTL */
+[dir="rtl"] .table thead th,
+[dir="rtl"] .table tbody td {
+    text-align: right;
+}
 
-    .search-box {
-        width: 300px;
-    }
+[dir="rtl"] .search-box input {
+    padding-right: 2rem;
+    padding-left: 0.7rem;
+}
+
+[dir="rtl"] .search-box svg.search-icon {
+    right: auto;
+    left: 0.7rem;
+}
+
+[dir="rtl"] .pagination {
+    padding-right: 0;
+}
+
+[dir="rtl"] .page-item:first-child .page-link {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+[dir="rtl"] .page-item:last-child .page-link {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
 }
