@@ -42,86 +42,95 @@
     </div>
 
     <!-- Gateway List -->
-    <div class="gateway-list d-flex flex-wrap gap-4 justify-content-center">
+    <div class="table-container">
       @if ($readyToLoad)
-        @forelse($gateways as $gateway)
-          <div
-            class="gateway-card card border-0 rounded-3 shadow-lg position-relative overflow-hidden animate__animated animate__zoomIn">
-            <div class="card-bg {{ $gateway->is_active ? 'bg-active' : 'bg-inactive' }}"></div>
-            <div class="card-body p-4 d-flex flex-column gap-3 position-relative">
-              <div class="d-flex align-items-center gap-4">
-                <div
-                  class="gateway-logo rounded-circle bg-white shadow-lg d-flex align-items-center justify-content-center"
-                  style="width: 50px; height: 50px; border: 3px solid #ffffff;">
-                  @if ($gateway->name === 'zarinpal')
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f59e0b"
-                      stroke-width="2">
-                      <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 4v6l5 5" />
-                    </svg>
-                  @elseif($gateway->name === 'parsian')
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#16a34a"
-                      stroke-width="2">
-                      <path d="M4 4h16v16H4zM8 8l8 8M8 16L16 8" />
-                    </svg>
-                  @elseif($gateway->name === 'saman')
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2563eb"
-                      stroke-width="2">
-                      <path d="M12 2L2 12l10 10 10-10L12 2zm0 4v12" />
-                    </svg>
-                  @elseif($gateway->name === 'mellat')
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#dc2626"
-                      stroke-width="2">
-                      <path d="M4 12a8 8 0 018-8 8 8 0 018 8H4z" />
-                    </svg>
-                  @else
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
-                      stroke-width="2">
-                      <path d="M12 2a10 10 0 110 20 10 10 0 010-20zM8 12h8M12 8v8" />
-                    </svg>
-                  @endif
-                </div>
-                <h5 class="mb-0 fw-bold text-dark gateway-title">{{ $gateway->title }}</h5>
-              </div>
-              <div class="d-flex align-items-center justify-content-between mt-2">
-                <span wire:click="toggleStatus({{ $gateway->id }})"
-                  class="status-switch {{ $gateway->is_active ? 'active' : 'inactive' }}">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" class="status-icon">
-                    @if ($gateway->is_active)
-                      <path d="M20 6L9 17l-5-5" />
+        <table class="table">
+          <thead>
+            <tr>
+              <th>درگاه</th>
+              <th>عنوان</th>
+              <th>وضعیت</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse($gateways as $gateway)
+              <tr>
+                <td>
+                  <div class="gateway-icon">
+                    @if ($gateway->name === 'zarinpal')
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f59e0b"
+                        stroke-width="2">
+                        <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 4v6l5 5" />
+                      </svg>
+                    @elseif($gateway->name === 'parsian')
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#16a34a"
+                        stroke-width="2">
+                        <path d="M4 4h16v16H4zM8 8l8 8M8 16L16 8" />
+                      </svg>
+                    @elseif($gateway->name === 'saman')
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2563eb"
+                        stroke-width="2">
+                        <path d="M12 2L2 12l10 10 10-10L12 2zm0 4v12" />
+                      </svg>
+                    @elseif($gateway->name === 'mellat')
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#dc2626"
+                        stroke-width="2">
+                        <path d="M4 12a8 8 0 018-8 8 8 0 018 8H4z" />
+                      </svg>
                     @else
-                      <path d="M18 6L6 18M6 6l12 12" />
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                        stroke-width="2">
+                        <path d="M12 2a10 10 0 110 20 10 10 0 010-20zM8 12h8M12 8v8" />
+                      </svg>
                     @endif
-                  </svg>
-                </span>
-                <div class="d-flex align-items-center gap-2">
-                  <a href="{{ route('admin.panel.tools.payment_gateways.edit', $gateway->name) }}"
-                    class="btn btn-custom rounded-pill px-3 py-1 d-flex align-items-center gap-2 text-white">
+                  </div>
+                </td>
+                <td>{{ $gateway->title }}</td>
+                <td>
+                  <span wire:click="toggleStatus({{ $gateway->id }})"
+                    class="status-switch {{ $gateway->is_active ? 'active' : 'inactive' }}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2">
-                      <path
-                        d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      stroke-width="2" class="status-icon">
+                      @if ($gateway->is_active)
+                        <path d="M20 6L9 17l-5-5" />
+                      @else
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      @endif
                     </svg>
-                    <span>ویرایش</span>
-                  </a>
-                  <button wire:click="confirmDelete('{{ $gateway->name }}')"
-                    class="btn btn-danger rounded-pill px-2 py-1 d-flex align-items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2">
-                      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        @empty
-          <div class="col-12 text-center text-muted">
-            هیچ درگاهی با این جستجو یافت نشد.
-          </div>
-        @endforelse
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <a href="{{ route('admin.panel.tools.payment_gateways.edit', $gateway->name) }}"
+                      class="btn btn-custom rounded-circle p-2 d-flex align-items-center justify-content-center">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path
+                          d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </a>
+                    <button wire:click="confirmDelete('{{ $gateway->name }}')"
+                      class="btn btn-danger rounded-circle p-2 d-flex align-items-center justify-content-center">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="4" class="text-center text-muted">
+                  هیچ درگاهی با این جستجو یافت نشد.
+                </td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
       @else
-        <div class="col-12 text-center text-muted">
+        <div class="text-center text-muted p-4">
           در حال بارگذاری درگاه‌ها...
         </div>
       @endif

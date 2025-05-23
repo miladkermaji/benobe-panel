@@ -1,334 +1,387 @@
-/* هدر شیشه‌ای */
-.glass-header {
-    background: linear-gradient(
-        135deg,
-        rgba(31, 41, 55, 0.95),
-        rgba(55, 65, 81, 0.85)
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
+    --primary-light: #84caf9; /* آبی روشن - در گرادیان‌ها */
+    --secondary: #1deb3c; /* سبز - برای دکمه‌های ثانویه */
+    --secondary-hover: #15802a; /* سبز تیره‌تر برای هاور */
+    --background-light: #f0f8ff; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
+    --background-footer: #d4ecfd; /* آبی روشن‌تر - فوتر */
+    --background-card: #ffffff; /* سفید - کارت‌ها */
+    --text-primary: #000000; /* مشکی - متن اصلی */
+    --text-secondary: #707070; /* خاکستری - متن ثانویه */
+    --text-discount: #008000; /* سبز - قیمت با تخفیف */
+    --text-original: #ff0000; /* قرمز - قیمت اولیه */
+    --border-neutral: #e5e7eb; /* خاکستری روشن - حاشیه‌ها */
+    --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
+    --gradient-instagram-from: #f92ca7; /* گرادیان اینستاگرام - شروع */
+    --gradient-instagram-to: #6b1a93; /* گرادیان اینستاگرام - پایان */
+    --button-mobile: #4f9acd; /* آبی متوسط - دکمه‌های موبایل */
+    --button-mobile-light: #a2cdeb; /* آبی روشن‌تر - دکمه‌های موبایل */
+    --support-section: #2e86c1; /* آبی - بخش پشتیبانی */
+    --support-text: #084d7c; /* آبی تیره - متن پشتیبانی */
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
     );
+}
+
+/* استایل‌های هدر */
+.glass-header {
+    background: var(--gradient-primary);
     backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-radius: 16px;
+    box-shadow: 0 8px 25px var(--shadow);
     transition: all 0.4s ease;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .glass-header:hover {
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 35px var(--shadow);
     transform: translateY(-3px);
 }
 
 .glass-header .header-icon {
-    transition: transform 0.3s ease;
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-.glass-header:hover .header-icon {
-    transform: scale(1.15) rotate(10deg);
-}
-
-/* اعلان */
+/* استایل‌های هشدار */
 .alert-custom {
-    background: #fff1f2;
-    border-left: 6px solid #f43f5e;
+    background: var(--background-light);
+    border: 1px solid var(--primary-light);
+    color: var(--support-text);
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     padding: 1rem 1.5rem;
-    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px var(--shadow);
 }
 
-.alert-custom:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+.alert-custom svg {
+    color: var(--primary);
+    margin-left: 0.75rem;
 }
 
-/* جستجو */
-.search-box {
-    width: 340px;
-    position: relative;
-}
-
-.search-box input {
-    background: #ffffff;
-    border: none;
-    border-radius: 9999px;
-    padding: 0.75rem 1rem 0.75rem 3rem;
-    font-size: 0.95rem;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
-
-.search-box input:focus {
-    box-shadow: 0 0 0 4px rgba(31, 41, 55, 0.15);
-    outline: none;
-}
-
-.search-box input::placeholder {
-    color: #9ca3af;
-    font-weight: 500;
-}
-
-/* کارت درگاه */
-.gateway-card {
-    width: 360px;
-    height: 200px;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    position: relative;
+/* استایل‌های جدول */
+.table-container {
+    background: var(--background-card);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--shadow);
     overflow: hidden;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-neutral);
 }
 
-.gateway-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+.table {
+    margin-bottom: 0;
 }
 
-.card-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.06;
-    transition: opacity 0.3s ease;
-    z-index: 0;
-}
-
-.bg-active {
-    background: linear-gradient(45deg, #6ee7b7, #34d399);
-}
-
-.bg-inactive {
-    background: linear-gradient(45deg, #f87171, #fb7185);
-}
-
-.gateway-card:hover .card-bg {
-    opacity: 0.12;
-}
-
-.gateway-logo {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    z-index: 1;
-}
-
-.gateway-card:hover .gateway-logo {
-    transform: scale(1.08);
-}
-
-.gateway-title {
-    font-size: 1.25rem;
+.table thead th {
+    background: var(--background-light);
+    color: var(--text-primary);
     font-weight: 600;
-    color: #1f2937;
-    transition: color 0.3s ease;
-    z-index: 1;
+    border: none;
+    padding: 1rem;
+    text-align: right;
+    font-size: 0.9rem;
+    border-bottom: 2px solid var(--border-neutral);
 }
 
-.gateway-card:hover .gateway-title {
-    color: #374151;
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-neutral);
+    color: var(--text-primary);
+    font-size: 0.9rem;
 }
 
-/* سوئیچ وضعیت */
-.status-switch {
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr:hover {
+    background-color: var(--background-light);
+}
+
+/* استایل‌های آیکون درگاه */
+.gateway-icon {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+/* استایل‌های دکمه‌ها */
+.btn-custom {
+    background: var(--primary);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.btn-custom:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    background: #bb2d3b;
+    transform: translateY(-1px);
+}
+
+/* استایل‌های وضعیت */
+.status-switch {
     cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
 .status-switch.active {
-    background: #10b981;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    background: var(--secondary);
     color: white;
 }
 
 .status-switch.inactive {
-    background: #f87171;
-    box-shadow: 0 0 10px rgba(248, 113, 113, 0.4);
+    background: #dc3545;
     color: white;
 }
 
 .status-switch:hover {
-    transform: scale(1.1);
+    transform: translateY(-1px);
 }
 
-.status-icon {
-    transition: transform 0.3s ease;
+/* استایل‌های جستجو */
+.search-box {
+    position: relative;
+    width: 300px;
 }
 
-.status-switch:hover .status-icon {
-    transform: rotate(15deg);
-}
-
-/* دکمه‌ها */
-.btn-custom {
-    background: linear-gradient(90deg, #374151, #4b5563);
+.search-box input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
     color: white;
-    border: none;
-    border-radius: 9999px;
-    padding: 0.5rem 1.25rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    box-shadow: 0 3px 10px rgba(55, 65, 81, 0.2);
-    transition: all 0.3s ease;
-}
-
-.btn-custom:hover {
-    background: linear-gradient(90deg, #1f2937, #374151);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(55, 65, 81, 0.3);
-}
-
-.btn-danger {
-    background: linear-gradient(90deg, #f43f5e, #fb7185);
-    border: none;
-    border-radius: 9999px;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    box-shadow: 0 3px 10px rgba(244, 63, 94, 0.2);
-    transition: all 0.3s ease;
-}
-
-.btn-danger:hover {
-    background: linear-gradient(90deg, #e11d48, #f43f5e);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3);
-}
-
-.btn-success {
-    background: linear-gradient(90deg, #10b981, #34d399);
-    border: none;
-    border-radius: 9999px;
-    padding: 0.5rem 1.5rem;
     font-size: 0.95rem;
-    font-weight: 500;
-    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
     transition: all 0.3s ease;
 }
 
-.btn-success:hover {
-    background: linear-gradient(90deg, #059669, #10b981);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+.search-box input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* صفحه‌بندی */
-.pagination-container {
-    padding: 1rem;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-box svg {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    width: 18px;
+    height: 18px;
+}
+
+/* استایل‌های پاگینیشن */
+.pagination {
     margin-top: 2rem;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-.pagination .page-item.active .page-link {
-    background: #374151;
-    border-color: #374151;
-    color: white;
-    border-radius: 8px;
-}
-
-.pagination .page-link {
-    color: #6b7280;
-    background: #ffffff;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
+.page-item .page-link {
+    color: var(--primary);
+    border: 1px solid var(--border-neutral);
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
     transition: all 0.3s ease;
+    font-size: 0.95rem;
+    background: white;
 }
 
-.pagination .page-link:hover {
-    background: #f3f4f6;
-    color: #374151;
-    border-color: #d1d5db;
+.page-item.active .page-link {
+    background: var(--gradient-primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(46, 134, 193, 0.3);
 }
 
-/* انیمیشن‌ها */
-.animate-pulse {
-    animation: pulse 1.5s infinite ease-in-out;
+.page-item .page-link:hover {
+    background: var(--background-light);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
 }
 
-@keyframes pulse {
-    0% {
-        opacity: 1;
+/* استایل‌های موبایل */
+@media (max-width: 767px) {
+    .glass-header {
+        flex-direction: column;
+        gap: 1rem;
     }
-    50% {
-        opacity: 0.6;
-    }
-    100% {
-        opacity: 1;
-    }
-}
 
-.animate__zoomIn {
-    animation: zoomIn 0.5s ease;
-}
-
-@keyframes zoomIn {
-    0% {
-        transform: scale(0.95);
-        opacity: 0;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-/* ریسپانسیو */
-@media (max-width: 768px) {
-    .gateway-card {
+    .glass-header > div {
         width: 100%;
-        max-width: 340px;
-        height: 180px;
     }
 
     .search-box {
         width: 100%;
+    }
+
+    .table-responsive {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .table thead {
+        display: none;
+    }
+
+    .table tbody tr {
+        display: block;
         margin-bottom: 1rem;
+        border: 1px solid var(--border-neutral);
+        border-radius: 12px;
+        background: white;
     }
 
-    .glass-header h2 {
-        font-size: 1.5rem;
+    .table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-neutral);
     }
 
-    .status-switch {
-        width: 36px;
-        height: 36px;
+    .table tbody td:last-child {
+        border-bottom: none;
     }
 
-    .btn-custom,
-    .btn-danger,
-    .btn-success {
-        font-size: 0.85rem;
-        padding: 0.5rem 1rem;
+    .table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-left: 1rem;
     }
 
-    .gateway-title {
-        font-size: 1.1rem;
-    }
-
-    .gateway-logo {
-        width: 48px;
-        height: 48px;
+    .btn-custom {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0.5rem;
     }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-    .gateway-card {
-        width: 320px;
-        height: 190px;
-    }
+/* استایل‌های RTL */
+[dir="rtl"] .table thead th,
+[dir="rtl"] .table tbody td {
+    text-align: right;
+}
 
-    .search-box {
-        width: 300px;
-    }
+[dir="rtl"] .search-box input {
+    padding-right: 2.5rem;
+    padding-left: 1rem;
+}
+
+[dir="rtl"] .search-box svg {
+    right: auto;
+    left: 1rem;
+}
+
+/* استایل‌های بج */
+.badge {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+/* استایل‌های سوئیچ */
+.form-switch {
+    padding-right: 2.5em;
+    margin: 0;
+}
+
+.form-switch .form-check-input {
+    width: 3em;
+    height: 1.5em;
+    margin-right: -2.5em;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+    background-position: right center;
+    border-radius: 2em;
+    transition: background-position 0.15s ease-in-out;
+    cursor: pointer;
+    border: 1px solid var(--border-neutral);
+    background-color: #e9ecef;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+    background-position: left center;
+}
+
+.form-switch .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(29, 235, 60, 0.25);
+    border-color: var(--secondary);
+}
+
+.form-switch .form-check-label {
+    cursor: pointer;
+}
+
+.form-switch .form-check-input:not(:checked) + .form-check-label .status-badge {
+    background: #dc3545;
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+}
+
+.form-switch .form-check-input:checked + .form-check-label .status-badge {
+    background: var(--secondary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(29, 235, 60, 0.2);
+}
+
+/* استایل‌های RTL برای سوئیچ */
+[dir="rtl"] .form-switch {
+    padding-right: 0;
+    padding-left: 2.5em;
+}
+
+[dir="rtl"] .form-switch .form-check-input {
+    margin-right: 0;
+    margin-left: -2.5em;
+    background-position: left center;
+}
+
+[dir="rtl"] .form-switch .form-check-input:checked {
+    background-position: right center;
 }
