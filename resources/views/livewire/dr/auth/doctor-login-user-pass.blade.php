@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
   style="background-color: #f8f9fa;">
-  <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4 mx-auto">
-    <div class="login-card custom-rounded custom-shadow p-4 p-md-7 bg-white">
+  <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4 mx-auto d-flex justify-content-center">
+    <div class="login-card custom-rounded custom-shadow p-4 p-md-7 bg-white w-100">
       <div class="logo-wrapper w-100 d-flex justify-content-center mb-4">
         <img class="cursor-pointer" onclick="location.href='/'" width="100px"
           src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
