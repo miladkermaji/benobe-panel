@@ -4,11 +4,24 @@ namespace App\Http\Services\LoginAttemptsService;
 
 use App\Models\LoginAttempt;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class LoginAttemptsService
 {
+    // تنظیمات پیش‌فرض برای محدودیت‌های تلاش
+    private const MAX_ATTEMPTS_BEFORE_LOCK = 3;
+    private const MAX_DAILY_ATTEMPTS = 20;
+    private const CACHE_PREFIX = 'login_attempts_';
+    private const CACHE_DURATION = 86400; // 24 hours
+
     public function incrementLoginAttempt($userId, $mobile, $doctorId = null, $secretaryId = null, $managerId = null)
     {
+        // بررسی محدودیت روزانه
+        if ($this->isDailyLimitExceeded($mobile)) {
+            Log::warning("Daily login attempts limit exceeded for mobile: $mobile");
+            return false;
+        }
+
         $attempt = LoginAttempt::firstOrCreate(
             ['mobile' => $mobile],
             [
@@ -21,8 +34,15 @@ class LoginAttemptsService
             ]
         );
 
+        // بررسی قفل فعلی
         if ($attempt->lockout_until && $attempt->lockout_until > now()) {
             return false;
+        }
+
+        // ریست تلاش‌ها بعد از اتمام قفل
+        if ($attempt->lockout_until && $attempt->lockout_until <= now()) {
+            $attempt->attempts = 2;
+            $attempt->lockout_until = null;
         }
 
         $attempt->doctor_id = $doctorId ?: null;
@@ -32,22 +52,24 @@ class LoginAttemptsService
         $attempt->attempts++;
         $attempt->last_attempt_at = now();
 
-        if ($attempt->attempts >= 3) {
-            $lockDuration = match ($attempt->attempts) {
-                3 => 5,
-                4 => 30,
-                5 => 60,
-                6 => 120,
-                7 => 240,
-                8 => 360,
-                9 => 480,
-                default => 240
-            };
+        // افزایش تعداد تلاش‌های روزانه
+        $this->incrementDailyAttempts($mobile);
+
+        if ($attempt->attempts >= self::MAX_ATTEMPTS_BEFORE_LOCK) {
+            $lockDuration = $this->calculateLockDuration($attempt->attempts);
             $attempt->lockout_until = now()->addMinutes($lockDuration);
+
+            // ثبت لاگ برای تلاش‌های مشکوک
+            if ($attempt->attempts >= 5) {
+                Log::warning("Suspicious login attempts detected", [
+                    'mobile' => $mobile,
+                    'attempts' => $attempt->attempts,
+                    'lock_duration' => $lockDuration
+                ]);
+            }
         }
 
         $attempt->save();
-
         return $attempt;
     }
 
@@ -60,24 +82,29 @@ class LoginAttemptsService
                 'last_attempt_at' => null,
                 'lockout_until' => null
             ]);
+
+            // ریست کردن تعداد تلاش‌های روزانه
+            $this->resetDailyAttempts($mobile);
+
+            Log::info("Login attempts reset for mobile: $mobile");
         }
     }
 
     public function isLocked($mobile)
     {
         $attempt = LoginAttempt::where('mobile', $mobile)->first();
-    
+
         if (!$attempt) {
-            return false; // هیچ تلاشی ثبت نشده، پس قفل نیست
+            return false;
         }
-    
+
         // بررسی منقضی شدن قفل
         if ($attempt->lockout_until && $attempt->lockout_until <= now()) {
             $this->resetLoginAttempts($mobile);
             Log::info("Lock expired and reset for mobile: $mobile");
-            return false; // قفل منقضی شده، حساب آزاد است
+            return false;
         }
-    
+
         $isLocked = $attempt->lockout_until && $attempt->lockout_until > now();
         Log::info("isLocked for mobile $mobile: ", [
             'attempt_exists' => !!$attempt,
@@ -85,7 +112,7 @@ class LoginAttemptsService
             'now' => now(),
             'is_locked' => $isLocked
         ]);
-    
+
         return $isLocked;
     }
 
@@ -98,7 +125,6 @@ class LoginAttemptsService
         return 0;
     }
 
-    // متد جدید برای فرمت کردن زمان باقی‌مانده
     public function getRemainingLockTimeFormatted($mobile)
     {
         $seconds = $this->getRemainingLockTime($mobile);
@@ -106,13 +132,47 @@ class LoginAttemptsService
             return "قفل باز شده است";
         }
 
-        $minutes = ceil($seconds / 60); // تبدیل ثانیه به دقیقه و رند به بالا
+        $minutes = ceil($seconds / 60);
 
         if ($minutes > 59) {
-            $hours = floor($minutes / 60); // تبدیل به ساعت
+            $hours = floor($minutes / 60);
             return "$hours ساعت";
         }
 
         return "$minutes دقیقه";
+    }
+
+    // متدهای جدید برای مدیریت تلاش‌های روزانه
+    private function isDailyLimitExceeded($mobile)
+    {
+        $dailyAttempts = Cache::get(self::CACHE_PREFIX . $mobile, 0);
+        return $dailyAttempts >= self::MAX_DAILY_ATTEMPTS;
+    }
+
+    private function incrementDailyAttempts($mobile)
+    {
+        $key = self::CACHE_PREFIX . $mobile;
+        $attempts = Cache::get($key, 0);
+        Cache::put($key, $attempts + 1, self::CACHE_DURATION);
+    }
+
+    private function resetDailyAttempts($mobile)
+    {
+        Cache::forget(self::CACHE_PREFIX . $mobile);
+    }
+
+    // محاسبه زمان قفل بر اساس تعداد تلاش‌ها
+    private function calculateLockDuration($attempts)
+    {
+        return match ($attempts) {
+            3 => 5,      // 5 minutes
+            4 => 15,     // 15 minutes
+            5 => 30,     // 30 minutes
+            6 => 60,     // 1 hour
+            7 => 120,    // 2 hours
+            8 => 240,    // 4 hours
+            9 => 480,    // 8 hours
+            default => 1440 // 24 hours
+        };
     }
 }
