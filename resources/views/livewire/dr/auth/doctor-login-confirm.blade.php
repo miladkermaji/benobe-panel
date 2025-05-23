@@ -8,7 +8,7 @@
       </div>
       <div class="text-center mb-4">
         <h2 class="text-primary fw-bold mb-2">پنل پزشکان به نوبه</h2>
-        <p class="text-muted">به پنل مدیریت پزشکان به نوبه خوش آمدید</p>
+        <p class="text-muted fw-bold">به پنل مدیریت پزشکان به نوبه خوش آمدید</p>
       </div>
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
@@ -23,7 +23,7 @@
         </a>
       </div>
       <form wire:submit.prevent="loginConfirm" class="login-confirm-form">
-        <div class="d-flex justify-content-center mb-3 gap-5" dir="rtl">
+        <div class="d-flex justify-content-center mb-3 gap-4" dir="rtl">
           @for ($i = 0; $i < 4; $i++)
             <input wire:model="otpCode.{{ $i }}" type="text" maxlength="1"
               class="form-control otp-input text-center custom-rounded border"
@@ -35,7 +35,7 @@
             {{ $message }}</div>
         @enderror
         <button type="submit" wire:loading.attr="disabled" wire:target="loginConfirm"
-          class="btn my-btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+          class="btn  w-100 custom-gradient custom-rounded h-50 d-flex justify-content-center">
           <span wire:loading.remove wire:target="loginConfirm">ادامه</span>
           <div wire:loading wire:target="loginConfirm" class="loader"></div>
         </button>

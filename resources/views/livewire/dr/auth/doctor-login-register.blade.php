@@ -8,7 +8,7 @@
       </div>
       <div class="text-center mb-4">
         <h2 class="text-primary fw-bold mb-2">پنل پزشکان به نوبه</h2>
-        <p class="text-muted">به پنل مدیریت پزشکان به نوبه خوش آمدید</p>
+        <p class="text-muted fw-bold">به پنل مدیریت پزشکان به نوبه خوش آمدید</p>
       </div>
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex align-items-center">
@@ -23,14 +23,14 @@
             <label class="text-custom-gray">شماره موبایل</label>
           </div>
           <input wire:model="mobile" dir="ltr"
-            class="form-control custom-rounded h-50 border-3 border-gray-300 @error('mobile') is-invalid @enderror"
+            class="form-control  h-50 border-3 border-gray-300 @error('mobile') is-invalid @enderror"
             type="text" placeholder="09123456789" maxlength="11">
           @error('mobile')
             <div class="invalid-feedback">{{ $message }}</div>
           @enderror
         </div>
         <button type="submit" wire:loading.attr="disabled"
-          class="btn my-btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+          class="btn w-100 custom-gradient custom-rounded h-50 d-flex justify-content-center border-x-0">
           <span wire:loading.remove wire:target="loginRegister">ادامه</span>
           <div wire:loading wire:target="loginRegister" class="loader"></div>
         </button>

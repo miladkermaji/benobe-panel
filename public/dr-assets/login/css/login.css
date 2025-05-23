@@ -41,7 +41,13 @@
     margin: 0;
     padding: 0;
 }
+.text-primary{
+    color: var(--primary) !important;
+}
+.bg-primary{
+    background-color: var(--primary) !important;
 
+}
 body {
     background: linear-gradient(135deg, var(--background-light) 0%, var(--background-footer) 100%);
     min-height: 100vh;

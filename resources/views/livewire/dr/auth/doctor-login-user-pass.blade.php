@@ -8,7 +8,7 @@
       </div>
       <div class="text-center mb-4">
         <h2 class="text-primary fw-bold mb-2" style="font-weight: 700 !important;">پنل پزشکان به نوبه</h2>
-        <p class="text-muted fw-semibold">به پنل مدیریت پزشکان به نوبه خوش آمدید</p>
+        <p class="text-muted fw-bold">به پنل مدیریت پزشکان به نوبه خوش آمدید</p>
       </div>
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
@@ -30,7 +30,7 @@
           </div>
           <div class="position-relative">
             <input wire:model="password"
-              class="form-control custom-rounded custom-shadow h-50 text-end @error('password') is-invalid @enderror"
+              class="form-control  custom-shadow h-50 text-end @error('password') is-invalid @enderror"
               type="password" placeholder="رمز عبور خود را وارد کنید" id="password-input">
             <img src="{{ asset('dr-assets/login/images/visible.svg') }}" alt="نمایش رمز" class="password-toggle"
               onclick="togglePasswordVisibility('password-input')">
@@ -40,7 +40,7 @@
           @enderror
         </div>
         <button type="submit" wire:loading.attr="disabled" wire:target="loginWithMobilePass"
-          class="btn my-btn-primary w-100 custom-gradient custom-rounded py-2 d-flex justify-content-center">
+          class="btn  w-100 custom-gradient custom-rounded h-50 d-flex justify-content-center">
           <span wire:loading.remove wire:target="loginWithMobilePass">ادامه</span>
           <div wire:loading wire:target="loginWithMobilePass" class="loader"></div>
         </button>
