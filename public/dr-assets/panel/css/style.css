@@ -673,6 +673,8 @@ svg {
     margin: 0;
     padding: 0;
     display: none;
+    background: rgba(49, 130, 206, 0.06);
+
 }
 
 .drop-toggle.is-active {
