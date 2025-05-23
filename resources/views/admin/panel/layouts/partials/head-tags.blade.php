@@ -7,6 +7,7 @@
 <script src="{{ asset('admin-assets/panel/js/home/bootstrap/bootstrap.popper.min.js') }}"></script>
 
 <script src="{{ asset('admin-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
+<link rel="stylesheet" href="{{ asset('dr-assets/panel/css/sweetalert2-custom.css') }}">
 
 {{-- persian calander --}}
 
@@ -33,11 +34,11 @@
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/custom-datepicker/custom-datepicker.css') }}">
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/flatpickr/dist/flatpickr.min.css') }}">
 @php
-    $excludedRoutes = ['admin-panel', 'admin.tools.page-builder.index'];
+  $excludedRoutes = ['admin-panel', 'admin.tools.page-builder.index'];
 @endphp
 
 @unless (Request::routeIs($excludedRoutes))
-    <link rel="stylesheet" href="{{ asset('admin-assets/css/my-form.css') }}">
+  <link rel="stylesheet" href="{{ asset('admin-assets/css/my-form.css') }}">
 @endunless
 {{-- tom select --}}
 @vite(['resources/js/app.js', 'resources/css/app.css'])

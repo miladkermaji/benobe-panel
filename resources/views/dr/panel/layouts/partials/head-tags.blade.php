@@ -6,6 +6,7 @@
 
 <link href="{{ asset('dr-assets/panel/css/bootstrap.min.css') }}" rel="stylesheet">
 <script src="{{ asset('dr-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
+<link rel="stylesheet" href="{{ asset('dr-assets/panel/css/sweetalert2-custom.css') }}">
 
 {{-- persian calander --}}
 
@@ -19,7 +20,7 @@
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/responsive_768.css') }}" media="(max-width:768px)">
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/font.css') }}">
 <link type="text/css" href="{{ asset('admin-assets/panel/jalali-datepicker/jalalidatepicker.min.css') }}"
-rel="stylesheet" />
+  rel="stylesheet" />
 <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/selesct2/select2.css') }}">
 
 {{-- tom select --}}
