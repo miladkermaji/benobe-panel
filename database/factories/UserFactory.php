@@ -30,7 +30,7 @@ class UserFactory extends Factory
 
         return [
             'email' => $faker->unique()->safeEmail,
-            'mobile' => $faker->unique()->numberBetween(9000000000, 9999999999),
+            'mobile' =>'0'. $faker->unique()->numberBetween(900000000, 999999999),
             'password' => Hash::make('password123'), // رمز عبور ثابت برای تست
             'national_code' => $faker->unique()->numerify('##########'),
             'first_name' => $faker->randomElement($firstNames),

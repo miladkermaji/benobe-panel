@@ -35,9 +35,9 @@ class DoctorFactory extends Factory
             'display_name' => $displayName,
             'date_of_birth' => $faker->dateTimeBetween('-60 years', '-25 years')->format('Y-m-d'),
             'sex' => $faker->randomElement(['male', 'female', 'other']),
-            'mobile' => $faker->unique()->numerify('09########'),
+            'mobile' => $faker->unique()->numerify('09#########'),
             'email' => $faker->unique()->safeEmail,
-            'alternative_mobile' => $faker->optional()->numerify('09########'),
+            'alternative_mobile' => $faker->optional()->numerify('09#########'),
             'national_code' => $faker->unique()->numerify('##########'),
             'password' => Hash::make('password123'), // رمز عبور ثابت برای تست
             'static_password_enabled' => $faker->boolean(20),
