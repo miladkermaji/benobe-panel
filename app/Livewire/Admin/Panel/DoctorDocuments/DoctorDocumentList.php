@@ -22,9 +22,11 @@ class DoctorDocumentList extends Component
     public $selectedDocuments = [];
     public $selectAll = [];
     public $expandedDoctors = [];
+    public $viewMode = 'table'; // 'table' or 'card'
 
     protected $queryString = [
         'search' => ['except' => ''],
+        'viewMode' => ['except' => 'table'],
     ];
 
     public function mount()
@@ -113,6 +115,11 @@ class DoctorDocumentList extends Component
         $this->selectedDocuments = [];
         $this->selectAll = [];
         $this->dispatch('show-alert', type: 'success', message: 'مدارک انتخاب‌شده حذف شدند!');
+    }
+
+    public function toggleViewMode()
+    {
+        $this->viewMode = $this->viewMode === 'table' ? 'card' : 'table';
     }
 
     private function getDoctors()
