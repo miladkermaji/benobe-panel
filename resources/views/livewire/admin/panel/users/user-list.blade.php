@@ -12,7 +12,7 @@
         <h2 class="mb-0 fw-bold fs-5">مدیریت کاربران</h2>
       </div>
       <!-- Search and Actions -->
-      <div class="d-flex flex-column flex-md-row align-items-center gap-3 w-100 w-md-auto">
+      <div class="d-flex flex-column flex-md-row align-items-center gap-3 w-100 w-md-auto ms-auto">
         <div class="search-box position-relative">
           <input type="text" wire:model.live="search"
             class="form-control border-0 shadow-none bg-white text-dark ps-5" placeholder="جستجو...">
@@ -238,7 +238,9 @@
       {{ $users ? $users->lastItem() : 0 }} از {{ $users ? $users->total() : 0 }} ردیف
     </div>
     @if ($users && $users->hasPages())
-      {{ $users->links('livewire::bootstrap') }}
+      <div class="pagination-container">
+        {{ $users->onEachSide(1)->links('livewire::bootstrap') }}
+      </div>
     @endif
   </div>
 
@@ -548,6 +550,60 @@
 
     img.loaded {
       opacity: 1 !important;
+    }
+
+    /* Pagination Styles */
+    .pagination-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .pagination-container .pagination {
+      margin: 0;
+      gap: 0.25rem;
+    }
+
+    .pagination-container .page-item {
+      margin: 0;
+    }
+
+    .pagination-container .page-link {
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.375rem;
+      border: 1px solid var(--border-neutral);
+      color: var(--text-primary);
+      background: var(--background-card);
+      transition: all 0.2s ease;
+    }
+
+    .pagination-container .page-item.active .page-link {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .pagination-container .page-link:hover {
+      background: var(--background-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .pagination-container .page-item.disabled .page-link {
+      background: var(--background-light);
+      border-color: var(--border-neutral);
+      color: var(--text-secondary);
+    }
+
+    /* Header Layout Adjustments */
+    .glass-header .ms-auto {
+      margin-right: auto !important;
+      margin-left: 0 !important;
+    }
+
+    @media (max-width: 768px) {
+      .glass-header .ms-auto {
+        margin-right: 0 !important;
+      }
     }
   </style>
 
