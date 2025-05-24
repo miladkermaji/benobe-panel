@@ -229,6 +229,17 @@
 
   <script>
     document.addEventListener('livewire:initialized', () => {
+      window.Livewire.on('show-alert', function(event) {
+          if (typeof toastr !== 'undefined') {
+            toastr.options = {
+              "positionClass": "toast-top-right",
+              "rtl": true
+            };
+            toastr[event.type](event.message);
+          } else {
+            alert(event.message);
+          }
+        });
       // Initialize doctor select2
       $('#doctor_id').select2({
         theme: 'bootstrap-5',
@@ -292,6 +303,9 @@
         allowClear: true
       });
     });
+  
   </script>
+
+
 
 </div>

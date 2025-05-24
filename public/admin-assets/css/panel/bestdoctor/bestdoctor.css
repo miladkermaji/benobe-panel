@@ -180,7 +180,7 @@
     background-size: contain;
     border: 1px solid var(--border-neutral);
     appearance: none;
-    color-adjust: exact;
+    
     print-color-adjust: exact;
 }
 
