@@ -54,7 +54,7 @@
               </div>
 
               @if (in_array($doctor->id, $expandedDoctors))
-                <div class="table-responsive text-nowrap p-3 bg-light">
+                <div class="table-responsive text-nowrap p-3 bg-light d-none d-md-block">
                   <table class="table table-bordered table-hover w-100 m-0">
                     <thead class="glass-header text-white">
                       <tr>
@@ -131,6 +131,67 @@
                     </tbody>
                   </table>
                 </div>
+
+                <!-- Mobile/Tablet Card View -->
+                <div class="d-md-none p-3 bg-light">
+                  <div class="row g-2">
+                    @forelse ($doctor->documents as $document)
+                      <div class="col-12">
+                        <div class="card compact-card">
+                          <div class="card-body p-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                              <div class="d-flex align-items-center gap-2">
+                                <input type="checkbox" wire:model.live="selectedDocuments"
+                                  value="{{ $document->id }}" class="form-check-input m-0">
+                                <h6 class="card-title mb-0">{{ $document->title ?? 'بدون عنوان' }}</h6>
+                              </div>
+                              <button wire:click="toggleVerified({{ $document->id }})"
+                                class="badge {{ $document->is_verified ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                                {{ $document->is_verified ? 'تأیید شده' : 'تأیید نشده' }}
+                              </button>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                              <small class="text-muted">{{ $document->file_type }}</small>
+                              <div class="d-flex gap-1">
+                                <button
+                                  wire:click="$dispatch('showPreview', { path: '{{ route('preview.document', basename($document->file_path)) }}', type: '{{ $document->file_type }}' })"
+                                  class="btn btn-sm btn-info text-white rounded-pill px-2">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                  </svg>
+                                </button>
+                                <a href="{{ route('admin.panel.doctor-documents.edit', $document->id) }}"
+                                  class="btn btn-sm btn-success text-white rounded-pill px-2">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                  </svg>
+                                </a>
+                                <button wire:click="confirmDelete({{ $document->id }})"
+                                  class="btn btn-sm btn-danger text-white rounded-pill px-2">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    @empty
+                      <div class="col-12">
+                        <div class="text-center py-3">
+                          <div class="text-muted">هیچ مدرکی یافت نشد.</div>
+                        </div>
+                      </div>
+                    @endforelse
+                  </div>
+                </div>
               @endif
             </div>
           @empty
@@ -171,66 +232,7 @@
     </div>
   </div>
 
-  <style>
-    .glass-header {
-      background: linear-gradient(90deg, rgba(107, 114, 128, 0.9), rgba(55, 65, 81, 0.9));
-      backdrop-filter: blur(10px);
-    }
 
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: white;
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      color: white;
-    }
-
-    .btn-gradient-info {
-      background: linear-gradient(90deg, #3b82f6, #2563eb);
-      color: white;
-    }
-
-    .btn-gradient-info:hover {
-      background: linear-gradient(90deg, #2563eb, #1d4ed8);
-    }
-
-    .doctor-toggle {
-      transition: all 0.3s ease;
-    }
-
-    .doctor-toggle:hover {
-      background: #f9fafb;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-
-    .transition-transform {
-      transition: transform 0.3s ease;
-    }
-
-    .rotate-180 {
-      transform: rotate(180deg);
-    }
-
-    .bg-label-primary {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .bg-label-success {
-      background: #d1fae5;
-      color: #059669;
-    }
-
-    .bg-label-danger {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {
