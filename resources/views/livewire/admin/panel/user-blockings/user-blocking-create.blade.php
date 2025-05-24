@@ -26,22 +26,24 @@
 
           <div class="col-md-6 mb-3">
             <label class="form-label">کاربر</label>
-            <select wire:model="user_id" class="form-select" id="user_id">
-              <option value="">انتخاب کنید</option>
-              @if ($type == 'user')
-                @foreach ($users as $user)
-                  <option value="{{ $user->id }}">
-                    {{ $user->first_name . ' ' . $user->last_name . ' (' . $user->mobile . ')' }}
-                  </option>
-                @endforeach
-              @elseif ($type == 'doctor')
-                @foreach ($doctors as $doctor)
-                  <option value="{{ $doctor->id }}">
-                    {{ $doctor->first_name . ' ' . $doctor->last_name . ' (' . $doctor->mobile . ')' }}
-                  </option>
-                @endforeach
-              @endif
-            </select>
+            <div wire:ignore>
+              <select wire:model.live="user_id" class="form-select select2" id="user_id">
+                <option value="">انتخاب کنید</option>
+                @if ($type == 'user')
+                  @foreach ($users as $user)
+                    <option value="{{ $user->id }}">
+                      {{ $user->first_name . ' ' . $user->last_name . ' (' . $user->mobile . ')' }}
+                    </option>
+                  @endforeach
+                @elseif ($type == 'doctor')
+                  @foreach ($doctors as $doctor)
+                    <option value="{{ $doctor->id }}">
+                      {{ $doctor->first_name . ' ' . $doctor->last_name . ' (' . $doctor->mobile . ')' }}
+                    </option>
+                  @endforeach
+                @endif
+              </select>
+            </div>
             @error('user_id')
               <div class="text-danger mt-1">{{ $message }}</div>
             @enderror
@@ -242,58 +244,64 @@
 
   <script>
     document.addEventListener('livewire:init', function() {
-      // مقداردهی اولیه Select2
       function initializeSelect2() {
         $('#user_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
-          allowClear: true,
           width: '100%',
-          dropdownParent: $('.card-body')
-        }).on('change', function() {
-          @this.set('user_id', this.value);
+          data: [{
+            id: '',
+            text: 'انتخاب کنید'
+          }]
         });
       }
-
-      // مقداردهی اولیه Datepicker
-      function initializeDatepicker() {
-        jalaliDatepicker.startWatch({
-          minDate: "attr",
-          maxDate: "attr",
-          showTodayBtn: true,
-          showEmptyBtn: true,
-          time: false,
-          zIndex: 1050,
-          dateFormatter: function(unix) {
-            return new Date(unix).toLocaleDateString('fa-IR', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
-            });
-          }
-        });
-
-        document.getElementById('blocked_at').addEventListener('change', function() {
-          @this.set('blocked_at', this.value);
-        });
-        document.getElementById('unblocked_at').addEventListener('change', function() {
-          @this.set('unblocked_at', this.value);
-        });
-      }
-
-      // اجرای اولیه
       initializeSelect2();
-      initializeDatepicker();
 
-      // به‌روزرسانی Select2 پس از تغییر نوع کاربر
-      Livewire.on('select2:refresh', () => {
+      Livewire.on('select2:refresh', (event) => {
+        const items = event.items || [];
         $('#user_id').select2('destroy');
-        setTimeout(() => {
-          initializeSelect2();
-        }, 100);
+        $('#user_id').empty().select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%',
+          data: [{
+              id: '',
+              text: 'انتخاب کنید'
+            },
+            ...items.map(item => ({
+              id: item.id,
+              text: item.first_name + ' ' + item.last_name + ' (' + item.mobile + ')'
+            }))
+          ]
+        });
       });
 
-      // نمایش اعلان‌ها
+      $('#user_id').on('change', function() {
+        @this.set('user_id', $(this).val());
+      });
+
+      jalaliDatepicker.startWatch({
+        minDate: "attr",
+        maxDate: "attr",
+        showTodayBtn: true,
+        showEmptyBtn: true,
+        time: false,
+        dateFormatter: function(unix) {
+          return new Date(unix).toLocaleDateString('fa-IR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          });
+        }
+      });
+
+      document.getElementById('blocked_at').addEventListener('change', function() {
+        @this.set('blocked_at', this.value);
+      });
+      document.getElementById('unblocked_at').addEventListener('change', function() {
+        @this.set('unblocked_at', this.value);
+      });
+
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });
