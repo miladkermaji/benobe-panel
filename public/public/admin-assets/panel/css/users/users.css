@@ -357,9 +357,7 @@
       }
     }
 /*     ------------------------------------------ */
-  .bg-gradient-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-    }
+
 
     .card {
       border-radius: 12px;
@@ -401,26 +399,13 @@
       pointer-events: none;
     }
 
-    .my-btn-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-
-    .my-btn-primary:hover {
-      background: linear-gradient(90deg, #4b5563, #1f2937);
-      transform: translateY(-2px);
-    }
+    
 
     .btn-outline-light {
       border-color: rgba(255, 255, 255, 0.8);
     }
 
-    .btn-outline-light:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-2px);
-    }
+   
 
     .form-check-input {
       margin-top: 0;

@@ -1,5 +1,9 @@
+@push('styles')
+  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/doctor/doctor.css') }}">
+@endpush
+
 <div class="container-fluid py-4" dir="rtl">
-  <div class="card shadow-lg border-0 rounded-3 overflow-hidden" style="background: #ffffff;">
+  <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
     <div
       class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
@@ -132,8 +136,6 @@
       </div>
     </div>
   </div>
-
-
 
   <script>
     document.addEventListener('livewire:init', function() {

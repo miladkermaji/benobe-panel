@@ -1,6 +1,10 @@
+@push('styles')
+  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/doctor/doctor.css') }}">
+@endpush
+
 <div class="container-fluid py-2" dir="rtl" wire:init="loaddoctors">
   <!-- Header -->
-  <header class="glass-header text-white p-3 rounded-3  shadow-lg">
+  <header class="glass-header text-white p-3 rounded-3 shadow-lg">
     <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
       <!-- Title Section -->
       <div class="d-flex align-items-center gap-2 flex-shrink-0">
@@ -265,8 +269,8 @@
 
       Livewire.on('confirm-delete', (event) => {
         Swal.fire({
-          title: 'حذف doctor',
-          text: 'آیا مطمئن هستید که می‌خواهید این doctor را حذف کنید؟',
+          title: 'حذف پزشک',
+          text: 'آیا مطمئن هستید که می‌خواهید این پزشک را حذف کنید؟',
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
