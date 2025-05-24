@@ -81,6 +81,20 @@ class UserBlockingCreate extends Component
             return;
         }
 
+        // Check for existing active blocking
+        $existingBlocking = UserBlocking::where(function ($query) {
+            if ($this->type == 'user') {
+                $query->where('user_id', $this->user_id);
+            } else {
+                $query->where('doctor_id', $this->user_id);
+            }
+        })->where('status', true)->first();
+
+        if ($existingBlocking) {
+            $this->dispatch('show-alert', type: 'error', message: 'این کاربر قبلاً مسدود شده است.');
+            return;
+        }
+
         $blockedAtMiladi = null;
         if ($this->blocked_at) {
             try {

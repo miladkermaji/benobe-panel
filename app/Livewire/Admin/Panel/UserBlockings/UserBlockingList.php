@@ -56,26 +56,8 @@ class UserBlockingList extends Component
         $item->update(['status' => !$item->status]);
 
         if ($item->status && !$oldStatus) {
-            if ($item->user_id) {
-                $user = $item->user;
-                $message = "کاربر گرامی، شما توسط مدیر سیستم مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-                SendSmsNotificationJob::dispatch($message, [$user->mobile])->delay(now()->addSeconds(5));
-            } elseif ($item->doctor_id) {
-                $doctor = $item->doctor;
-                $message = "دکتر گرامی، شما توسط مدیر سیستم مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-                SendSmsNotificationJob::dispatch($message, [$doctor->mobile])->delay(now()->addSeconds(5));
-            }
             $this->dispatch('show-alert', type: 'success', message: 'مسدودیت فعال شد!');
         } elseif (!$item->status && $oldStatus) {
-            if ($item->user_id) {
-                $user = $item->user;
-                $message = "کاربر گرامی، مسدودیت شما توسط مدیر سیستم رفع شد.";
-                SendSmsNotificationJob::dispatch($message, [$user->mobile])->delay(now()->addSeconds(5));
-            } elseif ($item->doctor_id) {
-                $doctor = $item->doctor;
-                $message = "دکتر گرامی، مسدودیت شما توسط مدیر سیستم رفع شد.";
-                SendSmsNotificationJob::dispatch($message, [$doctor->mobile])->delay(now()->addSeconds(5));
-            }
             $this->dispatch('show-alert', type: 'info', message: 'مسدودیت غیرفعال شد!');
         }
     }
@@ -126,7 +108,7 @@ class UserBlockingList extends Component
     {
         $managerId = Auth::guard('manager')->user()->id;
 
-        return UserBlocking::with(['user', 'doctor', 'manager', 'clinic'])
+        return UserBlocking::with(['user', 'doctor', 'manager'])
             ->where(function ($query) use ($managerId) {
                 $query->where('manager_id', $managerId)
                       ->orWhereNull('manager_id');

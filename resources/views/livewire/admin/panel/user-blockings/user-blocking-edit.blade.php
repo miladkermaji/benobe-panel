@@ -23,22 +23,27 @@
 
           <div class="col-md-6 mb-3">
             <label class="form-label">کاربر</label>
-            <select wire:model="user_id" class="form-select" disabled>
-              <option value="">انتخاب کنید</option>
-              @if ($userBlocking->user_id)
-                @foreach ($users as $user)
-                  <option value="{{ $user->id }}" {{ $userBlocking->user_id == $user->id ? 'selected' : '' }}>
-                    {{ $user->first_name . ' ' . $user->last_name . ' (' . $user->mobile . ')' }}
-                  </option>
-                @endforeach
-              @elseif ($userBlocking->doctor_id)
-                @foreach ($doctors as $doctor)
-                  <option value="{{ $doctor->id }}" {{ $userBlocking->doctor_id == $doctor->id ? 'selected' : '' }}>
-                    {{ $doctor->first_name . ' ' . $doctor->last_name . ' (' . $doctor->mobile . ')' }}
-                  </option>
-                @endforeach
-              @endif
-            </select>
+            <div wire:ignore>
+              <select wire:model.live="user_id" class="form-select select2" id="user_id">
+                <option value="">انتخاب کنید</option>
+                @if ($type == 'user')
+                  @foreach ($users as $user)
+                    <option value="{{ $user->id }}">
+                      {{ $user->first_name . ' ' . $user->last_name . ' (' . $user->mobile . ')' }}
+                    </option>
+                  @endforeach
+                @elseif ($type == 'doctor')
+                  @foreach ($doctors as $doctor)
+                    <option value="{{ $doctor->id }}">
+                      {{ $doctor->first_name . ' ' . $doctor->last_name . ' (' . $doctor->mobile . ')' }}
+                    </option>
+                  @endforeach
+                @endif
+              </select>
+            </div>
+            @error('user_id')
+              <div class="text-danger mt-1">{{ $message }}</div>
+            @enderror
           </div>
 
           <div class="col-md-6 mb-3">
@@ -93,27 +98,64 @@
 
   <script>
     document.addEventListener('livewire:init', function() {
-      // Initialize datepickers
-      const blockedAtInput = document.getElementById('blocked_at');
-      const unblockedAtInput = document.getElementById('unblocked_at');
-
-      if (blockedAtInput) {
-        new PDate(blockedAtInput, {
-          format: 'YYYY/MM/DD',
-          initialValue: false,
-          autoClose: true
+      function initializeSelect2() {
+        $('#user_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%',
+          data: [{
+            id: '',
+            text: 'انتخاب کنید'
+          }]
         });
       }
+      initializeSelect2();
 
-      if (unblockedAtInput) {
-        new PDate(unblockedAtInput, {
-          format: 'YYYY/MM/DD',
-          initialValue: false,
-          autoClose: true
+      Livewire.on('select2:refresh', (event) => {
+        const items = event.items || [];
+        $('#user_id').select2('destroy');
+        $('#user_id').empty().select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%',
+          data: [{
+              id: '',
+              text: 'انتخاب کنید'
+            },
+            ...items.map(item => ({
+              id: item.id,
+              text: item.first_name + ' ' + item.last_name + ' (' + item.mobile + ')'
+            }))
+          ]
         });
-      }
+      });
 
-      // Show alerts
+      $('#user_id').on('change', function() {
+        @this.set('user_id', $(this).val());
+      });
+
+      jalaliDatepicker.startWatch({
+        minDate: "attr",
+        maxDate: "attr",
+        showTodayBtn: true,
+        showEmptyBtn: true,
+        time: false,
+        dateFormatter: function(unix) {
+          return new Date(unix).toLocaleDateString('fa-IR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          });
+        }
+      });
+
+      document.getElementById('blocked_at').addEventListener('change', function() {
+        @this.set('blocked_at', this.value);
+      });
+      document.getElementById('unblocked_at').addEventListener('change', function() {
+        @this.set('unblocked_at', this.value);
+      });
+
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });
