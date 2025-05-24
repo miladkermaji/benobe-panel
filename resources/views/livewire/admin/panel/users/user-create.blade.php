@@ -142,7 +142,7 @@
                 <input class="form-check-input" type="checkbox" id="status" wire:model="status">
                 <label class="form-check-label fw-medium" for="status">
                   وضعیت: <span
-                    class="px-2 text-{{ $status ? 'success' : 'danger' }}">{{ $status ? 'فعال' : 'غیرفعال' }}</span>
+                    class="px-2 text-{{ $status ?? false ? 'success' : 'danger' }}">{{ $status ?? false ? 'فعال' : 'غیرفعال' }}</span>
                 </label>
               </div>
             </div>

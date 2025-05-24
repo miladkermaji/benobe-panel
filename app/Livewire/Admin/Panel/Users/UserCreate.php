@@ -28,6 +28,7 @@ class UserCreate extends Component
     public $photo;
     public $zone_province_id;
     public $zone_city_id;
+    public $status = false;
 
     public $provinces = [];
     public $cities    = [];
