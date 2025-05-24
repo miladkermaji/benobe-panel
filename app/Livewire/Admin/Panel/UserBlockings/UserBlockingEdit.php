@@ -41,7 +41,7 @@ class UserBlockingEdit extends Component
         $this->doctors = Doctor::select('id', 'first_name', 'last_name', 'mobile')->get();
         $this->clinics = Clinic::select('id', 'name')->get();
         $items = $this->type === 'user' ? $this->users : $this->doctors;
-        $this->dispatch('select2:refresh', items: $items->toArray());
+        $this->dispatch('select2:refresh', items: $items->toArray(), selected: $this->user_id);
     }
 
     public function updatedType($value)
@@ -76,6 +76,22 @@ class UserBlockingEdit extends Component
             'status.required' => 'لطفاً وضعیت را مشخص کنید.',
             'status.boolean' => 'وضعیت باید فعال یا غیرفعال باشد.',
         ]);
+
+        // Check for existing active blocking
+        $existingBlocking = UserBlocking::where(function ($query) {
+            if ($this->type == 'user') {
+                $query->where('user_id', $this->user_id);
+            } else {
+                $query->where('doctor_id', $this->user_id);
+            }
+        })->where('status', true)
+          ->where('id', '!=', $this->userBlocking->id)
+          ->first();
+
+        if ($existingBlocking) {
+            $this->dispatch('show-alert', type: 'error', message: 'این کاربر قبلاً مسدود شده است.');
+            return;
+        }
 
         $blockedAtMiladi = null;
         if ($this->blocked_at) {

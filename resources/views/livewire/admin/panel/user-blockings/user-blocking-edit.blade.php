@@ -97,41 +97,59 @@
   </div>
 
   <script>
-    document.addEventListener('livewire:init', function() {
-      function initializeSelect2() {
-        $('#user_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%',
-          data: [{
+    let select2Initialized = false;
+
+    function initializeSelect2() {
+      if (select2Initialized) return;
+
+      $('#user_id').select2({
+        dir: 'rtl',
+        placeholder: 'انتخاب کنید',
+        width: '100%',
+        data: [{
+          id: '',
+          text: 'انتخاب کنید'
+        }]
+      });
+      select2Initialized = true;
+    }
+
+    function refreshSelect2(items, selected) {
+      if (select2Initialized) {
+        $('#user_id').select2('destroy');
+        select2Initialized = false;
+      }
+
+      $('#user_id').empty().select2({
+        dir: 'rtl',
+        placeholder: 'انتخاب کنید',
+        width: '100%',
+        data: [{
             id: '',
             text: 'انتخاب کنید'
-          }]
-        });
+          },
+          ...items.map(item => ({
+            id: item.id,
+            text: item.first_name + ' ' + item.last_name + ' (' + item.mobile + ')'
+          }))
+        ]
+      });
+      select2Initialized = true;
+
+      if (selected) {
+        $('#user_id').val(selected).trigger('change');
       }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
       initializeSelect2();
 
-      Livewire.on('select2:refresh', (event) => {
-        const items = event.items || [];
-        $('#user_id').select2('destroy');
-        $('#user_id').empty().select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%',
-          data: [{
-              id: '',
-              text: 'انتخاب کنید'
-            },
-            ...items.map(item => ({
-              id: item.id,
-              text: item.first_name + ' ' + item.last_name + ' (' + item.mobile + ')'
-            }))
-          ]
-        });
-      });
-
       $('#user_id').on('change', function() {
-        @this.set('user_id', $(this).val());
+        let component = document.querySelector('[wire\\:id][wire\\:initial-data*="user-blocking-edit"]');
+        if (component) {
+          let id = component.getAttribute('wire:id');
+          Livewire.find(id).set('user_id', $(this).val());
+        }
       });
 
       jalaliDatepicker.startWatch({
@@ -150,10 +168,25 @@
       });
 
       document.getElementById('blocked_at').addEventListener('change', function() {
-        @this.set('blocked_at', this.value);
+        let component = document.querySelector('[wire\\:id][wire\\:initial-data*="user-blocking-edit"]');
+        if (component) {
+          let id = component.getAttribute('wire:id');
+          Livewire.find(id).set('blocked_at', this.value);
+        }
       });
+
       document.getElementById('unblocked_at').addEventListener('change', function() {
-        @this.set('unblocked_at', this.value);
+        let component = document.querySelector('[wire\\:id][wire\\:initial-data*="user-blocking-edit"]');
+        if (component) {
+          let id = component.getAttribute('wire:id');
+          Livewire.find(id).set('unblocked_at', this.value);
+        }
+      });
+    });
+
+    document.addEventListener('livewire:init', function() {
+      Livewire.on('select2:refresh', (event) => {
+        refreshSelect2(event.items || [], event.selected);
       });
 
       Livewire.on('show-alert', (event) => {
