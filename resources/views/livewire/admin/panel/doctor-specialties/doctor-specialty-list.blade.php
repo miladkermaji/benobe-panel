@@ -73,20 +73,23 @@
                     <tbody>
                       @forelse ($doctor->doctorSpecialties as $index => $specialty)
                         <tr>
-                          <td class="text-center align-middle">
+                          <td class="text-center align-middle" data-label="انتخاب">
                             <input type="checkbox" wire:model.live="selectedDoctorSpecialties"
                               value="{{ $specialty->id }}" class="form-check-input m-0">
                           </td>
-                          <td class="text-center align-middle">{{ $index + 1 }}</td>
-                          <td class="align-middle">{{ $specialty->specialty->name ?? 'نامشخص' }}</td>
-                          <td class="align-middle">{{ $specialty->specialty_title ?? 'بدون عنوان' }}</td>
-                          <td class="align-middle">{{ $specialty->academicDegree->title ?? 'بدون درجه' }}</td>
-                          <td class="text-center align-middle">
+                          <td class="text-center align-middle" data-label="ردیف">{{ $index + 1 }}</td>
+                          <td class="align-middle" data-label="نام تخصص">{{ $specialty->specialty->name ?? 'نامشخص' }}
+                          </td>
+                          <td class="align-middle" data-label="عنوان تخصص">
+                            {{ $specialty->specialty_title ?? 'بدون عنوان' }}</td>
+                          <td class="align-middle" data-label="درجه علمی">
+                            {{ $specialty->academicDegree->title ?? 'بدون درجه' }}</td>
+                          <td class="text-center align-middle" data-label="تخصص اصلی">
                             <span class="badge {{ $specialty->is_main ? 'bg-label-success' : 'bg-label-danger' }}">
                               {{ $specialty->is_main ? 'بله' : 'خیر' }}
                             </span>
                           </td>
-                          <td class="text-center align-middle">
+                          <td class="text-center align-middle" data-label="عملیات">
                             <div class="d-flex justify-content-center gap-2">
                               <a href="{{ route('admin.panel.doctor-specialties.edit', $specialty->id) }}"
                                 class="btn btn-gradient-success rounded-pill px-3">
@@ -143,57 +146,7 @@
     </div>
   </div>
 
-  <style>
-    .glass-header {
-      background: linear-gradient(90deg, rgba(107, 114, 128, 0.9), rgba(55, 65, 81, 0.9));
-      backdrop-filter: blur(10px);
-    }
 
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: white;
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      color: white;
-    }
-
-    .doctor-toggle {
-      transition: all 0.3s ease;
-    }
-
-    .doctor-toggle:hover {
-      background: #f9fafb;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-
-    .transition-transform {
-      transition: transform 0.3s ease;
-    }
-
-    .rotate-180 {
-      transform: rotate(180deg);
-    }
-
-    .bg-label-primary {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .bg-label-success {
-      background: #d1fae5;
-      color: #059669;
-    }
-
-    .bg-label-danger {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {
