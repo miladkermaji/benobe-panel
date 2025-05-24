@@ -30,6 +30,7 @@ class UserEdit extends Component
     public $photo;
     public $zone_province_id;
     public $zone_city_id;
+    public $activation = false;
 
     public $provinces = [];
     public $cities    = [];
@@ -49,6 +50,7 @@ class UserEdit extends Component
         $this->status           = $this->user->status;
         $this->zone_province_id = $this->user->zone_province_id;
         $this->zone_city_id     = $this->user->zone_city_id;
+        $this->activation       = $this->user->status;
 
         $this->provinces = Zone::where('level', 1)->get();
         $this->cities    = Zone::where('level', 2)->where('parent_id', $this->zone_province_id)->get();

@@ -104,7 +104,7 @@
                 <input class="form-check-input" type="checkbox" id="activation" wire:model="activation">
                 <label class="form-check-label fw-medium" for="activation">
                   وضعیت: <span
-                    class="px-2 text-{{ $activation ? 'success' : 'danger' }}">{{ $activation ? 'فعال' : 'غیرفعال' }}</span>
+                    class="px-2 text-{{ $activation ?? false ? 'success' : 'danger' }}">{{ $activation ?? false ? 'فعال' : 'غیرفعال' }}</span>
                 </label>
               </div>
             </div>
