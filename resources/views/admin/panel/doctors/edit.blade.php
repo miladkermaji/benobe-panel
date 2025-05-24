@@ -1,7 +1,7 @@
 @extends('admin.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('admin-assets/css/panel/doctor/doctor.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('public/admin-assets/panel/css/users/users.css') }}" rel="stylesheet" />
 @endsection
 
 @section('site-header')
@@ -9,6 +9,6 @@
 @endsection
 
 @section('content')
-@section('bread-crumb-title', 'ویرایش doctor')
+@section('bread-crumb-title', 'ویرایش پزشک')
 @livewire('admin.panel.doctors.doctor-edit', ['id' => $id])
 @endsection

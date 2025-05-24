@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Clinic;
@@ -19,7 +20,7 @@ class BestDoctor extends Model
         'star_rating'     => 'decimal:1',
     ];
 
-   public function doctor()
+    public function doctor()
     {
         return $this->belongsTo(Doctor::class, 'doctor_id');
     }
@@ -34,4 +35,3 @@ class BestDoctor extends Model
         return $this->hasManyThrough(Appointment::class, Doctor::class, 'id', 'doctor_id', 'doctor_id', 'id');
     }
 }
-
