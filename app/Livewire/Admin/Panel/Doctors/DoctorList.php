@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Panel\doctors;
 use App\Models\Doctor;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Log;
 
 class DoctorList extends Component
 {
@@ -37,8 +38,52 @@ class DoctorList extends Component
     public function toggleStatus($id)
     {
         $item = Doctor::findOrFail($id);
-        $item->update(['status' => ! $item->status]);
-        $this->dispatch('show-alert', type: $item->status ? 'success' : 'info', message: $item->status ? 'فعال شد!' : 'غیرفعال شد!');
+        $newStatus = !$item->status;
+
+        if ($newStatus) {
+            // اگر می‌خواهد فعال شود، تأیید بگیر
+            $doctorName = $item->first_name . ' ' . $item->last_name;
+            Log::info('Dispatching confirm-status-change event', [
+                'id' => $id,
+                'name' => $doctorName,
+                'newStatus' => $newStatus
+            ]);
+            $this->dispatch('confirm-status-change', [
+                'id' => $id,
+                'name' => $doctorName,
+                'newStatus' => $newStatus
+            ]);
+        } else {
+            // اگر می‌خواهد غیرفعال شود، مستقیماً انجام شود
+            $item->update(['status' => $newStatus]);
+            $this->dispatch('show-alert', type: 'info', message: 'پزشک غیرفعال شد!');
+        }
+    }
+
+    public function confirmStatusChange($data)
+    {
+        Log::info('confirmStatusChange called', $data);
+        $id = $data['id'];
+        $newStatus = $data['newStatus'];
+
+        $item = Doctor::findOrFail($id);
+        $item->update(['status' => $newStatus]);
+
+        // ارسال پیامک فعال‌سازی
+        $message = "دکتر گرامی، حساب کاربری شما در سیستم فعال شد. می‌توانید از طریق لینک زیر وارد پنل خود شوید: " . route('dr.auth.login-register-form', $item->id);
+
+        $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+        $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+        $templateId = ($gatewayName === 'pishgamrayan') ? 100254 : null;
+
+        \App\Jobs\SendSmsNotificationJob::dispatch(
+            $message,
+            [$item->mobile],
+            $templateId,
+            [$item->first_name . ' ' . $item->last_name]
+        )->delay(now()->addSeconds(5));
+
+        $this->dispatch('show-alert', type: 'success', message: 'پزشک فعال شد و پیامک فعال‌سازی ارسال شد!');
     }
 
     public function confirmDelete($id)

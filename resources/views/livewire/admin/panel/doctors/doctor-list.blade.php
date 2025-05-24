@@ -28,8 +28,8 @@
         <div class="d-flex gap-3 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
           <a href="{{ route('admin.panel.doctors.create') }}"
             class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
-            <svg  width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
               <path d="M12 5v14M5 12h14" />
             </svg>
             <span>افزودن پزشک</span>
@@ -37,8 +37,8 @@
           <button wire:click="deleteSelected"
             class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
             @if (empty($selecteddoctors)) disabled @endif>
-            <svg  width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
               <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
             </svg>
             <span>حذف انتخاب‌شده‌ها</span>
@@ -281,6 +281,27 @@
           if (result.isConfirmed) {
             Livewire.dispatch('deletedoctorConfirmed', {
               id: event.id
+            });
+          }
+        });
+      });
+
+      Livewire.on('confirm-status-change', (event) => {
+        const data = event[0];
+        Swal.fire({
+          title: 'فعال‌سازی پزشک',
+          html: `آیا مایل به فعال‌سازی پزشک <strong>${data.name}</strong> هستید؟<br>با فعال کردن این پزشک، پیامک فعال‌سازی ارسال خواهد شد.`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#22c55e',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، فعال کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('confirmStatusChange', {
+              id: data.id,
+              newStatus: data.newStatus
             });
           }
         });
