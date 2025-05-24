@@ -84,6 +84,7 @@ class DoctorList extends Component
         )->delay(now()->addSeconds(5));
 
         $this->dispatch('show-alert', type: 'success', message: 'پزشک فعال شد و پیامک فعال‌سازی ارسال شد!');
+        $this->resetPage();
     }
 
     public function confirmDelete($id)

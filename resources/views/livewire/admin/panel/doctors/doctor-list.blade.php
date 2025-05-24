@@ -299,7 +299,7 @@
           cancelButtonText: 'خیر'
         }).then((result) => {
           if (result.isConfirmed) {
-            Livewire.dispatch('confirmStatusChange', {
+            @this.confirmStatusChange({
               id: data.id,
               newStatus: data.newStatus
             });
