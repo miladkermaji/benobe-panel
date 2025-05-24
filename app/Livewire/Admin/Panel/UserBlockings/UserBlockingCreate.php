@@ -15,7 +15,6 @@ class UserBlockingCreate extends Component
 {
     public $type = '';
     public $user_id;
-    public $doctor_id;
     public $blocked_at;
     public $unblocked_at;
     public $reason;
@@ -27,15 +26,15 @@ class UserBlockingCreate extends Component
 
     public function mount()
     {
-        $this->users = User::all();
-        $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->users = User::select('id', 'first_name', 'last_name', 'mobile')->get();
+        $this->doctors = Doctor::select('id', 'first_name', 'last_name', 'mobile')->get();
+        $this->clinics = Clinic::select('id', 'name')->get();
     }
 
     public function updatedType($value)
     {
         $this->user_id = null;
-        $this->doctor_id = null;
+        $this->dispatch('select2:refresh');
     }
 
     public function save()
@@ -44,8 +43,8 @@ class UserBlockingCreate extends Component
 
         $this->validate([
             'type' => 'required|in:user,doctor',
-            'user_id' => 'required_if:type,user|exists:users,id',
-            'doctor_id' => 'required_if:type,doctor|exists:doctors,id',
+            'user_id' => 'required_if:type,user|exists:users,id|nullable',
+            'user_id' => 'required_if:type,doctor|exists:doctors,id|nullable',
             'blocked_at' => 'required',
             'unblocked_at' => 'nullable|after:blocked_at',
             'reason' => 'nullable|string|max:255',
@@ -54,10 +53,8 @@ class UserBlockingCreate extends Component
         ], [
             'type.required' => 'لطفاً نوع کاربر را انتخاب کنید.',
             'type.in' => 'نوع کاربر نامعتبر است.',
-            'user_id.required_if' => 'لطفاً کاربر را انتخاب کنید.',
-            'doctor_id.required_if' => 'لطفاً پزشک را انتخاب کنید.',
-            'user_id.exists' => 'کاربر انتخاب‌شده معتبر نیست.',
-            'doctor_id.exists' => 'دکتر انتخاب‌شده معتبر نیست.',
+            'user_id.required_if' => 'لطفاً کاربر یا پزشک را انتخاب کنید.',
+            'user_id.exists' => 'کاربر یا پزشک انتخاب‌شده معتبر نیست.',
             'blocked_at.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
             'unblocked_at.after' => 'تاریخ پایان باید بعد از تاریخ شروع باشد.',
             'reason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
@@ -69,7 +66,7 @@ class UserBlockingCreate extends Component
 
         $blocking = UserBlocking::create([
             'user_id' => $this->type === 'user' ? $this->user_id : null,
-            'doctor_id' => $this->type === 'doctor' ? $this->doctor_id : null,
+            'doctor_id' => $this->type === 'doctor' ? $this->user_id : null,
             'manager_id' => $managerId,
             'clinic_id' => $this->clinic_id,
             'blocked_at' => $blockedAtMiladi,
@@ -84,7 +81,7 @@ class UserBlockingCreate extends Component
                 $message = "کاربر گرامی، شما توسط مدیر سیستم مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
                 SendSmsNotificationJob::dispatch($message, [$user->mobile])->delay(now()->addSeconds(5));
             } else {
-                $doctor = Doctor::find($this->doctor_id);
+                $doctor = Doctor::find($this->user_id);
                 $message = "دکتر گرامی، شما توسط مدیر سیستم مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
                 SendSmsNotificationJob::dispatch($message, [$doctor->mobile])->delay(now()->addSeconds(5));
             }
