@@ -1,40 +1,3 @@
-:root {
-    /* پالت رنگی اصلی */
-    --primary: #2e86c1;
-    --primary-light: #84caf9;
-    --secondary: #1deb3c;
-    --secondary-hover: #15802a;
-    --background-light: #f0f8ff;
-    --background-footer: #d4ecfd;
-    --background-card: #ffffff;
-    --text-primary: #000000;
-    --text-secondary: #707070;
-    --text-discount: #008000;
-    --text-original: #ff0000;
-    --border-neutral: #e5e7eb;
-    --shadow: rgba(0, 0, 0, 0.35);
-    --gradient-instagram-from: #f92ca7;
-    --gradient-instagram-to: #6b1a93;
-    --button-mobile: #4f9acd;
-    --button-mobile-light: #a2cdeb;
-    --support-section: #2e86c1;
-    --support-text: #084d7c;
-    --gradient-primary: linear-gradient(
-        90deg,
-        var(--primary-light) 0%,
-        var(--primary) 100%
-    );
-
-    /* شعاع گوشه‌ها */
-    --radius-button: 0.5rem;
-    --radius-button-large: 1rem;
-    --radius-button-xl: 1.25rem;
-    --radius-card: 1.125rem;
-    --radius-footer: 1.875rem;
-    --radius-nav: 1.25rem;
-    --radius-circle: 9999px;
-}
-
 /* کلیات */
 body {
     background: var(--background-light);
@@ -240,34 +203,6 @@ body {
     border-color: var(--primary);
 }
 
-/* ناحیه sortable */
-.sortable {
-    border: 2px dashed var(--border-neutral);
-    border-radius: var(--radius-card);
-    padding: 1.5rem;
-    background: var(--background-light);
-    transition: all 0.3s ease;
-    min-height: 500px;
-}
-
-.sortable:hover {
-    border-color: var(--primary);
-    box-shadow: 0 0 15px var(--shadow);
-}
-
-/* پیش‌نمایش زنده */
-.bg-black.bg-opacity-75 {
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
-}
-
-iframe {
-    border-radius: var(--radius-card);
-    box-shadow: 0 6px 20px var(--shadow);
-    transition: all 0.3s ease;
-}
-
 /* وضعیت‌ها */
 .badge {
     padding: 0.35rem 0.75rem;
@@ -437,6 +372,90 @@ iframe {
         color: var(--text-secondary);
         font-size: 1rem;
     }
+
+    /* مخفی کردن جدول در تبلت و موبایل */
+    .table-responsive {
+        display: none;
+    }
+
+    /* استایل‌های کارت برای تبلت */
+    .card-view {
+        display: block;
+    }
+
+    .card-view .card {
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
+
+    .card-view .card-header {
+        background: var(--background-light);
+        border-bottom: 1px solid var(--border-neutral);
+        padding: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-view .card-body {
+        padding: 0.75rem;
+    }
+
+    .card-view .card-footer {
+        background: var(--background-light);
+        border-top: 1px solid var(--border-neutral);
+        padding: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-view .template-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .card-view .template-subject {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin: 0.5rem 0;
+    }
+
+    .card-view .template-status {
+        font-size: 0.85rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-circle);
+    }
+
+    .card-view .template-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .card-view .template-actions .btn {
+        padding: 0.35rem;
+        height: 36px;
+        width: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card-view .template-actions .btn i {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .card-view .template-preview {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        background: var(--background-light);
+        border-radius: var(--radius-button);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
 }
 
 @media (max-width: 480px) {
@@ -522,5 +541,57 @@ iframe {
     .search-input i {
         right: 0.5rem;
         font-size: 0.9rem;
+    }
+
+    /* استایل‌های کارت برای موبایل */
+    .card-view .card {
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .card-view .card-header {
+        padding: 0.5rem;
+    }
+
+    .card-view .card-body {
+        padding: 0.5rem;
+    }
+
+    .card-view .card-footer {
+        padding: 0.5rem;
+    }
+
+    .card-view .template-title {
+        font-size: 0.95rem;
+    }
+
+    .card-view .template-subject {
+        font-size: 0.85rem;
+        margin: 0.35rem 0;
+    }
+
+    .card-view .template-status {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .card-view .template-actions {
+        gap: 0.35rem;
+    }
+
+    .card-view .template-actions .btn {
+        padding: 0.25rem;
+        height: 32px;
+        width: 32px;
+    }
+
+    .card-view .template-actions .btn i {
+        font-size: 0.9rem;
+    }
+
+    .card-view .template-preview {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        font-size: 0.85rem;
     }
 }
