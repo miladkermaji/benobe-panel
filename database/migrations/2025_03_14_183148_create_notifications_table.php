@@ -4,12 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
-   public function up()
+    public function up()
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
@@ -20,7 +19,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true); // وضعیت فعال/غیرفعال
             $table->dateTime('start_at')->nullable(); // زمان شروع
             $table->dateTime('end_at')->nullable(); // زمان پایان
-            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null'); // کاربر ایجادکننده
+            $table->foreignId('created_by')->nullable()->constrained('managers')->onDelete('set null'); // کاربر ایجادکننده
             $table->timestamps();
         });
     }
