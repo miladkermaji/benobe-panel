@@ -244,6 +244,8 @@
     border-radius: 4px;
     box-shadow: 0 1px 4px var(--shadow);
     overflow: hidden;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-neutral);
 }
 
 .table {
@@ -251,17 +253,23 @@
 }
 
 .table thead th {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: white;
+    background: var(--background-light);
+    color: var(--text-primary);
     font-weight: 600;
-    padding: 0.75rem;
     border: none;
+    padding: 0.75rem;
+    text-align: right;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border-neutral);
 }
 
 .table tbody td {
     padding: 0.75rem;
     vertical-align: middle;
     border-bottom: 1px solid var(--border-neutral);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    text-align: right;
 }
 
 .table tbody tr:last-child td {
@@ -600,13 +608,16 @@ img.loaded {
 
 /* Button Styles */
 .btn-info {
-    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    background: #0ea5e9;
+    color: white;
     border: none;
+    transition: all 0.2s ease;
 }
 
 .btn-info:hover {
-    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    background: #0284c7;
     color: white;
+    transform: translateY(-1px);
 }
 
 .btn-success {
@@ -632,15 +643,22 @@ img.loaded {
 /* Table Header Styles */
 .glass-header {
     background: linear-gradient(135deg, #2e86c1, #84caf9);
-    border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    padding: 0.75rem;
+    border-radius: 6px;
 }
 
 .glass-header th {
-    font-weight: 600;
+    font-weight: 500;
     padding: 0.75rem;
     border: none;
-    color: white;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    text-align: right;
+    border-bottom: 1px solid var(--border-neutral);
 }
 
 /* Mobile Optimizations */

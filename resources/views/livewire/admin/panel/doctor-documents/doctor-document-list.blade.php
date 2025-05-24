@@ -55,8 +55,8 @@
 
               @if (in_array($doctor->id, $expandedDoctors))
                 <div class="table-responsive text-nowrap p-3 bg-light d-none d-md-block">
-                  <table class="table table-bordered table-hover w-100 m-0">
-                    <thead class="glass-header text-white">
+                  <table class="table">
+                    <thead>
                       <tr>
                         <th class="text-center align-middle" style="width: 50px;">
                           <input type="checkbox" wire:model.live="selectAll.{{ $doctor->id }}"
@@ -89,7 +89,7 @@
                             <div class="d-flex justify-content-center gap-2">
                               <button
                                 wire:click="$dispatch('showPreview', { path: '{{ route('preview.document', basename($document->file_path)) }}', type: '{{ $document->file_type }}' })"
-                                class="btn btn-gradient-info rounded-pill px-3">
+                                class="btn btn-info text-white rounded-pill px-3">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                   stroke="currentColor" stroke-width="2">
                                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
@@ -155,7 +155,7 @@
                               <div class="d-flex gap-1">
                                 <button
                                   wire:click="$dispatch('showPreview', { path: '{{ route('preview.document', basename($document->file_path)) }}', type: '{{ $document->file_type }}' })"
-                                  class="btn btn-sm btn-info text-white rounded-pill px-2">
+                                  class="btn btn-info text-white rounded-pill px-2">
                                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
@@ -217,11 +217,11 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content rounded-3 shadow-lg border-0" style="background: #ffffff;">
         <div class="modal-header bg-gradient-primary text-white p-3 rounded-top-3">
-          <h5 class="modal-title fw-bold text-shadow" id="previewModalLabel">پیش‌نمایش مدرک</h5>
+          <h5 class="modal-title fw-bold text-shadow text-dark" id="previewModalLabel">پیش‌نمایش مدرک</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
             aria-label="Close"></button>
         </div>
-        <div class="modal-body p-4 text-center" id="previewContent">
+        <div class="modal-body p-4 text-center text-dark" id="previewContent">
           <!-- محتوای پیش‌نمایش اینجا به صورت دینامیک پر می‌شه -->
         </div>
         <div class="modal-footer p-3">
