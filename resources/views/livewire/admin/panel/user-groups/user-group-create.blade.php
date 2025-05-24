@@ -1,5 +1,5 @@
 <div class="container-fluid py-4" dir="rtl">
-  <div class="card shadow-lg border-0 rounded-3 overflow-hidden" style="background: #ffffff;">
+  <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
     <div
       class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
@@ -33,8 +33,11 @@
             </div>
             <div class="col-12 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">
-                <input class="form-check-input" type="checkbox" id="is_active" wire:model="is_active">
-                <label class="form-check-label fw-medium" for="is_active">
+                <label class="status-toggle">
+                  <input type="checkbox" wire:model="is_active">
+                  <span class="slider"></span>
+                </label>
+                <label class="form-check-label fw-medium ms-3" for="is_active">
                   وضعیت: <span
                     class="px-2 text-{{ $is_active ? 'success' : 'danger' }}">{{ $is_active ? 'فعال' : 'غیرفعال' }}</span>
                 </label>
@@ -44,7 +47,7 @@
 
           <div class="text-end mt-4 w-100 d-flex justify-content-end">
             <button wire:click="store"
-              class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+              class="btn btn-gradient-success px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
@@ -59,50 +62,50 @@
 
   <style>
     .bg-gradient-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
+      background: var(--gradient-primary);
     }
 
     .card {
-      border-radius: 12px;
+      border-radius: var(--radius-card);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     .form-control {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
+      border: 1px solid var(--border-neutral);
+      border-radius: var(--radius-button);
       padding: 12px 15px;
       font-size: 14px;
       transition: all 0.3s ease;
-      background: #fafafa;
+      background: var(--background-light);
       width: 100%;
     }
 
     .form-control:focus {
-      border-color: #6b7280;
-      box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
-      background: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.2);
+      background: var(--background-card);
     }
 
     .form-label {
       position: absolute;
       top: -25px;
       right: 15px;
-      color: #374151;
+      color: var(--text-primary);
       font-size: 12px;
-      background: #ffffff;
+      background: var(--background-card);
       padding: 0 5px;
       pointer-events: none;
     }
 
-    .my-btn-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
+    .btn-gradient-success {
+      background: linear-gradient(90deg, var(--secondary), var(--secondary-hover));
       border: none;
-      color: white;
+      color: var(--background-card);
       font-weight: 600;
     }
 
-    .my-btn-primary:hover {
-      background: linear-gradient(90deg, #4b5563, #1f2937);
+    .btn-gradient-success:hover {
+      background: linear-gradient(90deg, var(--secondary-hover), var(--secondary));
       transform: translateY(-2px);
     }
 
@@ -115,22 +118,49 @@
       transform: translateY(-2px);
     }
 
-    .form-check-input {
-      margin-top: 0;
-      height: 20px;
-      width: 20px;
-      vertical-align: middle;
+    .status-toggle {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
     }
 
-    .form-check-label {
-      margin-right: 25px;
-      line-height: 1.5;
-      vertical-align: middle;
+    .status-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
     }
 
-    .form-check-input:checked {
-      background-color: #6b7280;
-      border-color: #6b7280;
+    .status-toggle .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .status-toggle .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    .status-toggle input:checked+.slider {
+      background-color: var(--secondary);
+    }
+
+    .status-toggle input:checked+.slider:before {
+      transform: translateX(26px);
     }
 
     .animate-bounce {
@@ -167,12 +197,22 @@
 
     @media (max-width: 575px) {
       .card-body {
-        padding: 2rem 1.5rem;
+        padding: 1.5rem;
       }
 
-      .my-btn-primary {
+      .btn-gradient-success {
         width: 100%;
         justify-content: center;
+      }
+
+      .form-control {
+        font-size: 13px;
+        padding: 10px 12px;
+      }
+
+      .form-label {
+        font-size: 11px;
+        top: -20px;
       }
     }
   </style>
