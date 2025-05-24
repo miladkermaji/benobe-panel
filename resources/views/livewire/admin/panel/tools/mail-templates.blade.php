@@ -47,7 +47,7 @@
       @endif
      </div>
      <button wire:click="{{ $editId ? 'updateTemplate' : 'addTemplate' }}"
-      class="btn btn-gradient-success w-100 py-3 rounded-xl shadow-sm">
+      class="btn btn-gradient-success w-100  rounded-xl shadow-sm d-flex align-items-center justify-content-center h-50">
       {{ $editId ? 'ویرایش' : 'ذخیره تغییرات' }}
      </button>
     </div>
@@ -118,7 +118,7 @@
          <td class="align-middle text-center">
           <div class="d-flex gap-3 justify-content-center flex-wrap">
            <button wire:click="startEdit({{ $template->id }})"
-            class="btn btn-gradient-warning rounded-xl px-3 py-2 d-flex align-items-center gap-2 shadow-sm">
+            class="btn btn-gradient-primary rounded-xl px-3 py-2 d-flex align-items-center gap-2 shadow-sm">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -169,7 +169,7 @@
  </div>
  <!-- نکته راهنما -->
  <div
-  class="help-block mt-5 p-4 rounded-xl shadow-sm d-flex align-items-center gap-3 animate__animated animate__fadeInUp">
+  class="alert alert-warning help-block mt-5 p-4 rounded-xl shadow-sm d-flex align-items-center gap-3 animate__animated animate__fadeInUp">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
    <circle cx="12" cy="12" r="10" />
    <path d="M12 16v-4" />

@@ -1,368 +1,410 @@
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1;
+    --primary-light: #84caf9;
+    --secondary: #1deb3c;
+    --secondary-hover: #15802a;
+    --background-light: #f0f8ff;
+    --background-footer: #d4ecfd;
+    --background-card: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --text-discount: #008000;
+    --text-original: #ff0000;
+    --border-neutral: #e5e7eb;
+    --shadow: rgba(0, 0, 0, 0.35);
+    --gradient-instagram-from: #f92ca7;
+    --gradient-instagram-to: #6b1a93;
+    --button-mobile: #4f9acd;
+    --button-mobile-light: #a2cdeb;
+    --support-section: #2e86c1;
+    --support-text: #084d7c;
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
+
+    /* شعاع گوشه‌ها */
+    --radius-button: 0.5rem;
+    --radius-button-large: 1rem;
+    --radius-button-xl: 1.25rem;
+    --radius-card: 1.125rem;
+    --radius-footer: 1.875rem;
+    --radius-nav: 1.25rem;
+    --radius-circle: 9999px;
+}
+
 /* کلیات */
-.container-fluid {
- padding: 2rem;
- background: #f4f6f9;
+body {
+    background: var(--background-light);
+    direction: rtl;
+    font-family: "Vazir", sans-serif;
 }
 
 /* هدر شیشه‌ای */
 .glass-header {
- background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.85));
- backdrop-filter: blur(15px);
- border: 1px solid rgba(255, 255, 255, 0.1);
- box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
- border-radius: 16px;
- padding: 1.5rem;
- transition: all 0.4s ease;
+    background: var(--gradient-primary);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 25px var(--shadow);
+    border-radius: 0 0 var(--radius-nav) var(--radius-nav);
+    padding: 1rem;
+    height: 74px;
+    transition: all 0.4s ease;
 }
 
 .glass-header:hover {
- box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
- transform: translateY(-3px);
+    box-shadow: 0 12px 35px var(--shadow);
+    transform: translateY(-2px);
 }
 
 .glass-header h4 {
- color: #ffffff;
- font-size: 1.5rem;
- font-weight: 600;
- margin: 0;
- letter-spacing: -0.025em;
- text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    color: var(--background-card);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 1px 3px var(--shadow);
+}
+
+/* دکمه‌های شیشه‌ای */
+.btn-glass {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--background-card);
+    border-radius: var(--radius-circle);
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+/* دکمه‌های گرادینت */
+.btn-gradient-primary {
+    background: var(--gradient-primary);
+    border: none;
+    color: var(--background-card);
+    border-radius: var(--radius-button-large);
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 3px 10px var(--shadow);
+    transition: all 0.3s ease;
+    height: 40px;
+}
+
+.btn-gradient-primary:hover {
+    background: linear-gradient(
+        90deg,
+        var(--primary) 0%,
+        var(--support-text) 100%
+    );
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 5px 15px var(--shadow);
+}
+
+.btn-gradient-success {
+    background: linear-gradient(
+        90deg,
+        var(--secondary),
+        var(--secondary-hover)
+    );
+    border: none;
+    color: var(--background-card);
+    border-radius: var(--radius-button-large);
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 3px 10px var(--shadow);
+    transition: all 0.3s ease;
+    height: 40px;
+}
+
+.btn-gradient-success:hover {
+    background: linear-gradient(
+        90deg,
+        var(--secondary-hover),
+        var(--secondary)
+    );
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 5px 15px var(--shadow);
+}
+
+.btn-gradient-danger {
+    background: linear-gradient(90deg, var(--text-original), #ff4d4d);
+    border: none;
+    color: var(--background-card);
+    border-radius: var(--radius-button-large);
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 3px 10px var(--shadow);
+    transition: all 0.3s ease;
+    height: 40px;
+}
+
+.btn-gradient-danger:hover:not(:disabled) {
+    background: linear-gradient(90deg, #ff4d4d, var(--text-original));
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 5px 15px var(--shadow);
+}
+
+.btn-gradient-danger:disabled {
+    background: var(--border-neutral);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 /* کارت‌ها */
 .card {
- background: #ffffff;
- border-radius: 16px;
- box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
- transition: all 0.3s ease;
- border: none;
+    background: var(--background-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 6px 20px var(--shadow);
+    transition: all 0.3s ease;
+    border: none;
 }
 
 .card:hover {
- box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
- transform: translateY(-2px);
-}
-
-.card-header {
- background: linear-gradient(135deg, #f9fafb, #eceff1);
- color: #1f2937;
- font-weight: 600;
- padding: 1.25rem 1.5rem;
- border-bottom: 1px solid #e5e7eb;
- border-radius: 16px 16px 0 0;
+    box-shadow: 0 12px 30px var(--shadow);
+    transform: translateY(-2px);
 }
 
 /* فیلدهای ورودی */
-.input-modern {
- background: #ffffff;
- border: 1px solid #d1d5db;
- border-radius: 12px;
- padding: 0.75rem 1rem;
- font-size: 0.95rem;
- box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
- transition: all 0.3s ease;
- height: 48px;
+.input-shiny,
+.form-control {
+    background: var(--background-card);
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    height: 44px;
 }
 
-.input-modern:focus {
- border-color: #374151;
- box-shadow: 0 0 0 4px rgba(55, 65, 81, 0.15);
- background: #f9fafb;
- outline: none;
-}
-
-textarea.input-modern {
- height: auto;
- min-height: 200px;
- padding: 1rem;
- resize: vertical;
-}
-
-/* گروه ورودی جستجو */
-.input-group-text {
- background: #ffffff;
- border: 1px solid #d1d5db;
- border-left: none;
- border-radius: 0 12px 12px 0;
- padding: 0.75rem;
- transition: all 0.3s ease;
-}
-
-.input-group .input-modern {
- border-right: none;
- border-radius: 12px 0 0 12px;
-}
-
-/* دکمه‌ها */
-.btn-gradient-success {
- background: linear-gradient(90deg, #10b981, #34d399);
- border: none;
- color: #ffffff;
- border-radius: 16px;
- padding: 0.75rem 1.5rem;
- font-size: 1rem;
- font-weight: 500;
- box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
- transition: all 0.3s ease;
-}
-
-.btn-gradient-success:hover {
- background: linear-gradient(90deg, #059669, #10b981);
- transform: translateY(-2px);
- box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-}
-
-.btn-gradient-danger {
- background: linear-gradient(90deg, #f43f5e, #fb7185);
- border: none;
- color: #ffffff;
- border-radius: 16px;
- padding: 0.75rem 1.5rem;
- font-size: 1rem;
- font-weight: 500;
- box-shadow: 0 3px 10px rgba(244, 63, 94, 0.2);
- transition: all 0.3s ease;
-}
-
-.btn-gradient-danger:hover:not(:disabled) {
- background: linear-gradient(90deg, #e11d48, #f43f5e);
- transform: translateY(-2px);
- box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3);
-}
-
-.btn-gradient-danger:disabled {
- background: #e5e7eb;
- color: #9ca3af;
- cursor: not-allowed;
- box-shadow: none;
-}
-
-.btn-gradient-warning {
- background: linear-gradient(90deg, #f59e0b, #fbbf24);
- border: none;
- color: #ffffff;
- border-radius: 16px;
- padding: 0.65rem 1.25rem;
- font-size: 0.9rem;
- font-weight: 500;
- box-shadow: 0 3px 10px rgba(245, 158, 11, 0.2);
- transition: all 0.3s ease;
-}
-
-.btn-gradient-warning:hover {
- background: linear-gradient(90deg, #d97706, #f59e0b);
- transform: translateY(-2px);
- box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
-}
-
-.btn-gradient-primary {
- background: linear-gradient(90deg, #374151, #4b5563);
- border: none;
- color: #ffffff;
- border-radius: 16px;
- padding: 0.65rem 1.25rem;
- font-size: 0.9rem;
- font-weight: 500;
- box-shadow: 0 3px 10px rgba(55, 65, 81, 0.2);
- transition: all 0.3s ease;
-}
-
-.btn-gradient-primary:hover {
- background: linear-gradient(90deg, #1f2937, #374151);
- transform: translateY(-2px);
- box-shadow: 0 5px 15px rgba(55, 65, 81, 0.3);
-}
-
-/* جدول */
-.table {
- border-collapse: separate;
- border-spacing: 0;
- margin: 0;
-}
-
-.table thead th {
- background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.85));
- color: #ffffff;
- font-weight: 600;
- padding: 1rem;
- border-bottom: none;
-}
-
-.table td {
- border-bottom: 1px solid #e5e7eb;
- padding: 1rem;
- vertical-align: middle;
-}
-
-.table-hover tbody tr:hover {
- background: #f9fafb;
- transition: background 0.2s ease;
+.input-shiny:focus,
+.form-control:focus {
+    border-color: var(--primary);
+    background: var(--background-light);
+    outline: none;
 }
 
 /* چک‌باکس */
-input[type="checkbox"] {
- width: 1.25rem;
- height: 1.25rem;
- border-radius: 4px;
- border: 1px solid #d1d5db;
- transition: all 0.3s ease;
- cursor: pointer;
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: var(--radius-button);
+    border: 1px solid var(--border-neutral);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    vertical-align: middle;
 }
 
-input[type="checkbox"]:checked {
- background-color: #374151;
- border-color: #374151;
+.form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* ناحیه sortable */
+.sortable {
+    border: 2px dashed var(--border-neutral);
+    border-radius: var(--radius-card);
+    padding: 1.5rem;
+    background: var(--background-light);
+    transition: all 0.3s ease;
+    min-height: 500px;
+}
+
+.sortable:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--shadow);
+}
+
+/* پیش‌نمایش زنده */
+.bg-black.bg-opacity-75 {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+iframe {
+    border-radius: var(--radius-card);
+    box-shadow: 0 6px 20px var(--shadow);
+    transition: all 0.3s ease;
 }
 
 /* وضعیت‌ها */
 .badge {
- padding: 0.5rem 1rem;
- border-radius: 9999px;
- font-weight: 500;
- transition: all 0.3s ease;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-circle);
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
-.bg-success {
- background: #d1fae5;
- color: #10b981;
+.bg-green-500 {
+    background: var(--background-light);
+    color: var(--text-discount);
 }
 
-.bg-success:hover {
- background: #a7f3d0;
+.bg-green-500:hover {
+    background: var(--background-footer);
 }
 
-.bg-danger {
- background: #fee2e2;
- color: #f43f5e;
+.bg-red-500 {
+    background: var(--background-light);
+    color: var(--text-original);
 }
 
-.bg-danger:hover {
- background: #fecaca;
-}
-
-/* بخش راهنما */
-.help-block {
- background: #fef3c7;
- border: 1px solid #fde68a;
- border-radius: 16px;
- padding: 1.5rem;
- color: #d97706;
- font-size: 0.9rem;
- transition: all 0.3s ease;
- box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-}
-
-.help-block:hover {
- box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
- transform: translateY(-2px);
-}
-
-/* انیمیشن‌ها */
-.animate__animated.animate__fadeIn {
- animation: fadeIn 0.5s ease-out;
-}
-
-.animate__animated.animate__fadeInUp {
- animation: fadeInUp 0.5s ease-out;
-}
-
-@keyframes fadeIn {
- 0% { opacity: 0; }
- 100% { opacity: 1; }
-}
-
-@keyframes fadeInUp {
- 0% { opacity: 0; transform: translateY(20px); }
- 100% { opacity: 1; transform: translateY(0); }
-}
-
-/* استایل‌های متفرقه */
-.text-sm {
- font-size: 0.875rem;
-}
-
-.text-lg {
- font-size: 1.125rem;
-}
-
-.tracking-tight {
- letter-spacing: -0.025em;
-}
-
-.cursor-pointer {
- cursor: pointer;
+.bg-red-500:hover {
+    background: var(--background-footer);
 }
 
 /* ریسپانسیو */
-@media (max-width: 992px) {
- .glass-header {
-  padding: 1.25rem;
- }
-
- .btn {
-  margin-top: 0.75rem;
- }
-
- .card-body {
-  padding: 1.25rem;
- }
-}
-
 @media (max-width: 768px) {
- .container-fluid {
-  padding: 1.5rem;
- }
+    .glass-header {
+        height: auto;
+        padding: 0.5rem;
+        border-radius: 0 0 0.75rem 0.75rem;
+    }
+    .row > *{
+      padding-left: .1rem !important;
+      padding-right: .1rem !important;
+    }
+    .btn-glass,
+    .btn-gradient-primary,
+    .btn-gradient-success,
+    .btn-gradient-danger {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.75rem;
+        width: 100%;
+        margin-bottom: 0.5rem;
+        background: var(--button-mobile);
+        border-radius: 0.5rem;
+    }
 
- .input-modern {
-  font-size: 0.9rem;
-  padding: 0.65rem 0.9rem;
-  height: 44px;
- }
+    .btn-glass:hover,
+    .btn-gradient-primary:hover,
+    .btn-gradient-success:hover,
+    .btn-gradient-danger:hover {
+        background: var(--button-mobile-light);
+    }
 
- .btn {
-  font-size: 0.9rem;
-  padding: 0.65rem 1.25rem;
- }
+    .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
 
- .card-header {
-  padding: 1rem 1.25rem;
- }
+    .w-80 {
+        width: 100%;
+    }
 
- .table td,
- .table th {
-  padding: 0.75rem;
- }
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
 
- .help-block {
-  padding: 1.25rem;
- }
+    .flex-1 {
+        width: 100%;
+    }
+
+    .card {
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .sortable {
+        padding: 0.75rem;
+        min-height: 300px;
+        border-radius: 0.75rem;
+    }
+
+    .input-shiny,
+    .form-control {
+        font-size: 0.9rem;
+        height: 38px;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+    }
+
+    .form-check-input {
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 0.35rem;
+    }
+
+    .badge {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
 }
 
-@media (max-width: 576px) {
- .glass-header {
-  padding: 1rem;
- }
+@media (max-width: 480px) {
+    .glass-header {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
 
- .glass-header h4 {
-  font-size: 1.25rem;
- }
+    .glass-header h4 {
+        font-size: 1.1rem;
+    }
 
- .input-modern {
-  font-size: 0.85rem;
-  padding: 0.5rem 0.75rem;
-  height: 40px;
- }
+    .btn-glass,
+    .btn-gradient-primary,
+    .btn-gradient-success,
+    .btn-gradient-danger {
+        width: 100%;
+        font-size: 0.8rem;
+        padding: 0.3rem 0.5rem;
+        border-radius: 0.4rem;
+    }
 
- .btn {
-  font-size: 0.85rem;
-  padding: 0.5rem 1rem;
- }
+    .sortable {
+        max-width: 100%;
+        padding: 0.5rem;
+        min-height: 250px;
+    }
 
- .card-body {
-  padding: 1rem;
- }
+    .card {
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.35rem;
+    }
 
- .table-responsive {
-  font-size: 0.9rem;
- }
+    .absolute.top-12 {
+        top: 2rem;
+    }
+
+    .input-shiny,
+    .form-control {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.85rem;
+        height: 35px;
+        border-radius: 0.4rem;
+    }
+
+    .form-check-input {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 0.3rem;
+        margin-left: 0.35rem;
+    }
+
+    .badge {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
+    }
+
+    iframe {
+        border-radius: 0.5rem;
+    }
 }
