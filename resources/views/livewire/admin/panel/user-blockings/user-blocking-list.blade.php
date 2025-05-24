@@ -34,7 +34,8 @@
   <div class="container-fluid px-0">
     <div class="card shadow-sm">
       <div class="card-body p-0">
-        <div class="table-responsive text-nowrap">
+        <!-- Desktop Table View -->
+        <div class="table-responsive text-nowrap d-none d-lg-block">
           <table class="table table-bordered table-hover w-100 m-0">
             <thead class="glass-header text-white">
               <tr>
@@ -80,10 +81,11 @@
                       {{ $item->manager ? $item->manager->first_name . ' ' . $item->manager->last_name : 'نامشخص' }}
                     </td>
                     <td class="text-center align-middle">
-                      <button wire:click="confirmToggleStatus({{ $item->id }})"
-                        class="badge {{ $item->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
-                        {{ $item->status ? 'مسدود' : 'آزاد' }}
-                      </button>
+                      <label class="status-toggle">
+                        <input type="checkbox" wire:click="confirmToggleStatus({{ $item->id }})"
+                          {{ $item->status ? 'checked' : '' }}>
+                        <span class="slider"></span>
+                      </label>
                     </td>
                     <td class="text-center align-middle">
                       <div class="d-flex justify-content-center gap-2">
@@ -126,6 +128,101 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Mobile/Tablet Card View -->
+        <div class="card-grid d-lg-none">
+          @if ($readyToLoad)
+            @forelse ($userBlockings as $index => $item)
+              <div class="user-blocking-card">
+                <div class="card-header">
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="checkbox" wire:model.live="selectedUserBlockings" value="{{ $item->id }}"
+                      class="form-check-input m-0">
+                    <h6 class="m-0">
+                      @if ($item->user)
+                        {{ $item->user->first_name . ' ' . $item->user->last_name }}
+                      @elseif ($item->doctor)
+                        {{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}
+                      @else
+                        نامشخص
+                      @endif
+                    </h6>
+                  </div>
+                  <label class="status-toggle">
+                    <input type="checkbox" wire:click="confirmToggleStatus({{ $item->id }})"
+                      {{ $item->status ? 'checked' : '' }}>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="card-body">
+                  <div class="mb-2">
+                    <small class="text-muted">شماره موبایل:</small>
+                    <p class="mb-0">
+                      @if ($item->user)
+                        {{ $item->user->mobile }}
+                      @elseif ($item->doctor)
+                        {{ $item->doctor->mobile }}
+                      @else
+                        -
+                      @endif
+                    </p>
+                  </div>
+                  <div class="mb-2">
+                    <small class="text-muted">تاریخ شروع:</small>
+                    <p class="mb-0">{{ \Morilog\Jalali\Jalalian::fromCarbon($item->blocked_at)->format('Y/m/d') }}
+                    </p>
+                  </div>
+                  <div class="mb-2">
+                    <small class="text-muted">تاریخ پایان:</small>
+                    <p class="mb-0">
+                      {{ $item->unblocked_at ? \Morilog\Jalali\Jalalian::fromCarbon($item->unblocked_at)->format('Y/m/d') : '-' }}
+                    </p>
+                  </div>
+                  <div class="mb-2">
+                    <small class="text-muted">دلیل:</small>
+                    <p class="mb-0">{{ $item->reason ?: '-' }}</p>
+                  </div>
+                  <div>
+                    <small class="text-muted">مسدود کننده:</small>
+                    <p class="mb-0">
+                      {{ $item->manager ? $item->manager->first_name . ' ' . $item->manager->last_name : 'نامشخص' }}
+                    </p>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <a href="{{ route('admin.panel.user-blockings.edit', $item->id) }}"
+                    class="btn btn-gradient-success rounded-pill px-3">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <path
+                        d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </a>
+                  <button wire:click="confirmDelete({{ $item->id }})"
+                    class="btn btn-gradient-danger rounded-pill px-3">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            @empty
+              <div class="text-center py-5 w-100">
+                <div class="d-flex justify-content-center align-items-center flex-column">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" class="text-muted mb-3">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                  <p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p>
+                </div>
+              </div>
+            @endforelse
+          @else
+            <div class="text-center py-5 w-100">در حال بارگذاری کاربران مسدود...</div>
+          @endif
+        </div>
+
         <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
           <div class="text-muted">نمایش {{ $userBlockings ? $userBlockings->firstItem() : 0 }} تا
             {{ $userBlockings ? $userBlockings->lastItem() : 0 }} از
@@ -147,8 +244,8 @@
 
       Livewire.on('confirm-delete', (event) => {
         Swal.fire({
-          title: 'حذف رکورد مسدودیت',
-          text: 'آیا مطمئن هستید که می‌خواهید این رکورد را حذف کنید؟',
+          title: 'حذف مسدودیت',
+          text: 'آیا مطمئن هستید که می‌خواهید این مسدودیت را حذف کنید؟',
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
@@ -166,13 +263,13 @@
 
       Livewire.on('confirm-toggle-status', (event) => {
         Swal.fire({
-          title: `تغییر وضعیت مسدودیت`,
-          text: `آیا مطمئن هستید که می‌خواهید ${event.action} "${event.name}" را انجام دهید؟`,
-          icon: 'question',
+          title: event.action + ' کاربر',
+          text: 'آیا مطمئن هستید که می‌خواهید ' + event.name + ' را ' + event.action + ' کنید؟',
+          icon: 'warning',
           showCancelButton: true,
-          confirmButtonColor: '#10b981',
+          confirmButtonColor: '#1deb3c',
           cancelButtonColor: '#6b7280',
-          confirmButtonText: 'بله، مطمئنم',
+          confirmButtonText: 'بله',
           cancelButtonText: 'خیر'
         }).then((result) => {
           if (result.isConfirmed) {
