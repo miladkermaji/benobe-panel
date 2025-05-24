@@ -1,7 +1,7 @@
 <div class="container-fluid py-4" dir="rtl">
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden" style="background: #ffffff;">
     <div
-      class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+      class="card-header bg-gradient-success text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           class="animate-bounce">
@@ -29,7 +29,7 @@
                 style="width: 100px; height: 100px; object-fit: cover;" alt="پروفایل" wire:loading.class="opacity-50"
                 wire:target="photo">
               <label for="photo"
-                class="btn my-btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 p-2 shadow"
+                class="btn btn-gradient-success btn-sm rounded-circle position-absolute bottom-0 end-0 p-2 shadow"
                 style="transform: translate(10%, 10%);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2">
@@ -43,68 +43,106 @@
           <!-- فرم -->
           <div class="row g-4">
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="first_name" class="form-control" id="first_name" placeholder=" "
-                required>
+              <input type="text" wire:model="first_name"
+                class="form-control @error('first_name') is-invalid @enderror" id="first_name" placeholder=" " required>
               <label for="first_name" class="form-label">نام</label>
+              @error('first_name')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="last_name" class="form-control" id="last_name" placeholder=" " required>
+              <input type="text" wire:model="last_name" class="form-control @error('last_name') is-invalid @enderror"
+                id="last_name" placeholder=" " required>
               <label for="last_name" class="form-label">نام خانوادگی</label>
+              @error('last_name')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="email" wire:model="email" class="form-control" id="email" placeholder=" " required>
+              <input type="email" wire:model="email" class="form-control @error('email') is-invalid @enderror"
+                id="email" placeholder=" " required>
               <label for="email" class="form-label">ایمیل</label>
+              @error('email')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="mobile" class="form-control" id="mobile" placeholder=" " required>
+              <input type="text" wire:model="mobile" class="form-control @error('mobile') is-invalid @enderror"
+                id="mobile" placeholder=" " required>
               <label for="mobile" class="form-label">موبایل</label>
+              @error('mobile')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="password" wire:model="password" class="form-control" id="password" placeholder=" " required>
+              <input type="password" wire:model="password" class="form-control @error('password') is-invalid @enderror"
+                id="password" placeholder=" " required>
               <label for="password" class="form-label">رمز عبور</label>
+              @error('password')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="national_code" class="form-control" id="national_code" placeholder=" ">
+              <input type="text" wire:model="national_code"
+                class="form-control @error('national_code') is-invalid @enderror" id="national_code" placeholder=" ">
               <label for="national_code" class="form-label">کد ملی (اختیاری)</label>
+              @error('national_code')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="date_of_birth" class="form-control jalali-datepicker text-end"
+              <input type="text" wire:model="date_of_birth"
+                class="form-control jalali-datepicker text-end @error('date_of_birth') is-invalid @enderror"
                 id="date_of_birth" placeholder="" data-jdp>
               <label for="date_of_birth" class="form-label">تاریخ تولد</label>
+              @error('date_of_birth')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <select wire:model="sex" class="form-select" id="sex">
+              <select wire:model="sex" class="form-select @error('sex') is-invalid @enderror" id="sex">
                 <option value="">انتخاب کنید</option>
                 <option value="male">مرد</option>
                 <option value="female">زن</option>
               </select>
               <label for="sex" class="form-label">جنسیت</label>
+              @error('sex')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="zone_province_id" class="form-select select2" id="zone_province_id">
+              <select wire:model.live="zone_province_id"
+                class="form-select select2 @error('zone_province_id') is-invalid @enderror" id="zone_province_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($provinces as $province)
                   <option value="{{ $province->id }}">{{ $province->name }}</option>
                 @endforeach
               </select>
               <label for="zone_province_id" class="form-label">استان</label>
+              @error('zone_province_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
 
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model="zone_city_id" class="form-select select2" id="zone_city_id">
+              <select wire:model="zone_city_id"
+                class="form-select select2 @error('zone_city_id') is-invalid @enderror" id="zone_city_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($cities as $city)
                   <option value="{{ $city->id }}">{{ $city->name }}</option>
                 @endforeach
               </select>
               <label for="zone_city_id" class="form-label">شهر</label>
+              @error('zone_city_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">
-                <input class="form-check-input" type="checkbox" id="activation" wire:model="activation">
-                <label class="form-check-label fw-medium" for="activation">
+                <input class="form-check-input" type="checkbox" id="status" wire:model="status">
+                <label class="form-check-label fw-medium" for="status">
                   وضعیت: <span
-                    class="px-2 text-{{ $activation ? 'success' : 'danger' }}">{{ $activation ? 'فعال' : 'غیرفعال' }}</span>
+                    class="px-2 text-{{ $status ? 'success' : 'danger' }}">{{ $status ? 'فعال' : 'غیرفعال' }}</span>
                 </label>
               </div>
             </div>
@@ -112,7 +150,7 @@
 
           <div class="text-end mt-4 w-100 d-flex justify-content-end">
             <button wire:click="store"
-              class="btn my-btn-primary  px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+              class="btn btn-gradient-success px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
@@ -126,8 +164,19 @@
   </div>
 
   <style>
-    .bg-gradient-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
+    .bg-gradient-success {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+    }
+
+    .btn-gradient-success {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      border: none;
+      color: white;
+    }
+
+    .btn-gradient-success:hover {
+      background: linear-gradient(135deg, #45a049, #3d8b40);
+      color: white;
     }
 
     .card {
@@ -153,8 +202,8 @@
 
     .form-control:focus,
     .form-select:focus {
-      border-color: #6b7280;
-      box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
+      border-color: #4CAF50;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
       background: #fff;
     }
 
@@ -170,18 +219,6 @@
       transition: none;
       /* حذف انیمیشن */
       pointer-events: none;
-    }
-
-    .my-btn-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-
-    .my-btn-primary:hover {
-      background: linear-gradient(90deg, #4b5563, #1f2937);
-      transform: translateY(-2px);
     }
 
     .btn-outline-light {
@@ -207,8 +244,8 @@
     }
 
     .form-check-input:checked {
-      background-color: #6b7280;
-      border-color: #6b7280;
+      background-color: #4CAF50;
+      border-color: #4CAF50;
     }
 
     .animate-bounce {
@@ -284,7 +321,7 @@
         padding: 2rem 1.5rem;
       }
 
-      .my-btn-primary {
+      .btn-gradient-success {
         width: 100%;
         justify-content: center;
       }
@@ -297,14 +334,12 @@
         $('#zone_province_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
-
           width: '100%'
         });
 
         $('#zone_city_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
-
           width: '100%',
           data: [{
             id: '',
@@ -323,7 +358,6 @@
         $('#zone_city_id').empty().select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
-
           width: '100%',
           data: [{
               id: '',

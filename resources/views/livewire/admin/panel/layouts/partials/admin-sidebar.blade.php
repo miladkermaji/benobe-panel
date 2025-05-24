@@ -66,11 +66,9 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            <li class="item-li"><a href="{{ route('admin.panel.users.index') }}">لیست کاربران</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.user-groups.index') }}">گروه‌های کاربری</a></li>
-            <li class="item-li"><a href="#">مدیریت نقش‌ها و دسترسی‌ها</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.user-blockings.index') }}">کاربران مسدود</a></li>
-           
-            <!-- جدید -->
+            <li class="item-li"><a href="{{ route('admin.panel.user-blockings.index') }}">مدیریت مسدودیت‌ها</a></li>
           </ul>
         </li>
         <!-- مدیریت پزشکان -->
@@ -150,7 +148,7 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.users.index') }}">لیست بیماران</a></li>
-             <li class="item-li"><a href="{{ route('admin.panel.sub-users.index') }}">کاربران زیرمجموعه</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.sub-users.index') }}">کاربران زیرمجموعه</a></li>
             <li class="item-li"><a href="{{ route('dr-patient-records') }}">پرونده پزشکی</a></li>
           </ul>
         </li>

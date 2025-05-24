@@ -35,12 +35,11 @@ class UserList extends Component
         $this->readyToLoad = true;
     }
 
-    public function toggleStatus($userId)
+    public function toggleStatus($id)
     {
-        $user = User::findOrFail($userId);
-        $user->update(['activation' => ! $user->activation]);
-
-        $this->dispatch('show-alert', type: $user->activation ? 'success' : 'info', message: $user->activation ? 'کاربر فعال شد!' : 'کاربر غیرفعال شد!');
+        $user = User::findOrFail($id);
+        $user->update(['status' => !$user->status]);
+        $this->dispatch('show-alert', type: $user->status ? 'success' : 'info', message: $user->status ? 'فعال شد!' : 'غیرفعال شد!');
         Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
     }
 
@@ -52,10 +51,9 @@ class UserList extends Component
     public function deleteUser($id)
     {
         $user = User::findOrFail($id);
-        $user->delete(); // حذف عکس در مدل User مدیریت می‌شود
-
+        $user->delete();
+        $this->dispatch('show-alert', type: 'success', message: 'کاربر با موفقیت حذف شد!');
         Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
-        $this->dispatch('show-alert', type: 'success', message: 'کاربر حذف شد!');
     }
 
     public function updatedSearch()
@@ -65,47 +63,47 @@ class UserList extends Component
 
     public function updatedSelectAll($value)
     {
-        $currentPageIds      = $this->getUsersQuery()->pluck('id')->toArray();
+        $currentPageIds = $this->getUsersQuery()->pluck('id')->toArray();
         $this->selectedUsers = $value ? $currentPageIds : [];
     }
 
     public function updatedSelectedUsers()
     {
-        $currentPageIds  = $this->getUsersQuery()->pluck('id')->toArray();
-        $this->selectAll = ! empty($this->selectedUsers) && count(array_diff($currentPageIds, $this->selectedUsers)) === 0;
+        $currentPageIds = $this->getUsersQuery()->pluck('id')->toArray();
+        $this->selectAll = !empty($this->selectedUsers) && count(array_diff($currentPageIds, $this->selectedUsers)) === 0;
     }
 
     public function deleteSelected()
     {
         if (empty($this->selectedUsers)) {
-            $this->dispatch('show-alert', type: 'warning', message: 'هیچ کاربری انتخاب نشده است.');
             return;
         }
 
         User::whereIn('id', $this->selectedUsers)->delete();
         $this->selectedUsers = [];
-        $this->selectAll     = false;
-        $this->dispatch('show-alert', type: 'success', message: 'کاربران انتخاب‌شده حذف شدند!');
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'کاربران انتخاب شده با موفقیت حذف شدند!');
+        Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
     }
 
-    private function getUsersQuery()
+    protected function getUsersQuery()
     {
-        return User::where('first_name', 'like', '%' . $this->search . '%')
-            ->orWhere('last_name', 'like', '%' . $this->search . '%')
-            ->orWhere('email', 'like', '%' . $this->search . '%')
-            ->orWhere('mobile', 'like', '%' . $this->search . '%')
-            ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])
-            ->with(['province', 'city'])
-            ->paginate($this->perPage);
-
+        return User::query()
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('first_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('last_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('mobile', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->orderBy('created_at', 'desc');
     }
 
     public function render()
     {
-        $users = $this->readyToLoad ? $this->getUsersQuery() : null;
-
         return view('livewire.admin.panel.users.user-list', [
-            'users' => $users,
+            'users' => $this->readyToLoad ? $this->getUsersQuery()->paginate($this->perPage) : [],
         ]);
     }
 }
