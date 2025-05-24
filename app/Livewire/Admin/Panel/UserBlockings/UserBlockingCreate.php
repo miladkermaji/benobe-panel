@@ -13,6 +13,7 @@ use Morilog\Jalali\Jalalian;
 
 class UserBlockingCreate extends Component
 {
+    public $type = '';
     public $user_id;
     public $doctor_id;
     public $blocked_at;
@@ -31,19 +32,30 @@ class UserBlockingCreate extends Component
         $this->clinics = Clinic::all();
     }
 
-    public function store()
+    public function updatedType($value)
+    {
+        $this->user_id = null;
+        $this->doctor_id = null;
+    }
+
+    public function save()
     {
         $managerId = Auth::guard('manager')->user()->id;
 
         $this->validate([
-            'user_id' => 'nullable|exists:users,id',
-            'doctor_id' => 'nullable|exists:doctors,id',
+            'type' => 'required|in:user,doctor',
+            'user_id' => 'required_if:type,user|exists:users,id',
+            'doctor_id' => 'required_if:type,doctor|exists:doctors,id',
             'blocked_at' => 'required',
             'unblocked_at' => 'nullable|after:blocked_at',
             'reason' => 'nullable|string|max:255',
             'clinic_id' => 'nullable|exists:clinics,id',
             'status' => 'required|boolean',
         ], [
+            'type.required' => 'لطفاً نوع کاربر را انتخاب کنید.',
+            'type.in' => 'نوع کاربر نامعتبر است.',
+            'user_id.required_if' => 'لطفاً کاربر را انتخاب کنید.',
+            'doctor_id.required_if' => 'لطفاً پزشک را انتخاب کنید.',
             'user_id.exists' => 'کاربر انتخاب‌شده معتبر نیست.',
             'doctor_id.exists' => 'دکتر انتخاب‌شده معتبر نیست.',
             'blocked_at.required' => 'لطفاً تاریخ شروع مسدودیت را وارد کنید.',
@@ -51,19 +63,13 @@ class UserBlockingCreate extends Component
             'reason.max' => 'دلیل مسدودیت نمی‌تواند بیشتر از 255 کاراکتر باشد.',
         ]);
 
-        if (!$this->user_id && !$this->doctor_id) {
-            $this->addError('user_id', 'لطفاً حداقل یک کاربر یا دکتر را انتخاب کنید.');
-            $this->addError('doctor_id', 'لطفاً حداقل یک کاربر یا دکتر را انتخاب کنید.');
-            return;
-        }
-
         // تبدیل تاریخ جلالی به میلادی
         $blockedAtMiladi = Jalalian::fromFormat('Y/m/d', $this->blocked_at)->toCarbon();
         $unblockedAtMiladi = $this->unblocked_at ? Jalalian::fromFormat('Y/m/d', $this->unblocked_at)->toCarbon() : null;
 
         $blocking = UserBlocking::create([
-            'user_id' => $this->user_id,
-            'doctor_id' => $this->doctor_id,
+            'user_id' => $this->type === 'user' ? $this->user_id : null,
+            'doctor_id' => $this->type === 'doctor' ? $this->doctor_id : null,
             'manager_id' => $managerId,
             'clinic_id' => $this->clinic_id,
             'blocked_at' => $blockedAtMiladi,
@@ -73,12 +79,11 @@ class UserBlockingCreate extends Component
         ]);
 
         if ($this->status) {
-            if ($this->user_id) {
+            if ($this->type === 'user') {
                 $user = User::find($this->user_id);
                 $message = "کاربر گرامی، شما توسط مدیر سیستم مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
                 SendSmsNotificationJob::dispatch($message, [$user->mobile])->delay(now()->addSeconds(5));
-            }
-            if ($this->doctor_id) {
+            } else {
                 $doctor = Doctor::find($this->doctor_id);
                 $message = "دکتر گرامی، شما توسط مدیر سیستم مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
                 SendSmsNotificationJob::dispatch($message, [$doctor->mobile])->delay(now()->addSeconds(5));

@@ -49,7 +49,7 @@
 
           <div class="col-md-6 mb-3">
             <label class="form-label">تاریخ شروع</label>
-            <input type="text" wire:model="blocked_at" class="form-control" id="blocked_at">
+            <input type="text" wire:model="blocked_at" class="form-control" data-jdp>
             @error('blocked_at')
               <div class="text-danger mt-1">{{ $message }}</div>
             @enderror
@@ -57,7 +57,7 @@
 
           <div class="col-md-6 mb-3">
             <label class="form-label">تاریخ پایان</label>
-            <input type="text" wire:model="unblocked_at" class="form-control" id="unblocked_at">
+            <input type="text" wire:model="unblocked_at" class="form-control" data-jdp>
             @error('unblocked_at')
               <div class="text-danger mt-1">{{ $message }}</div>
             @enderror
@@ -99,26 +99,6 @@
 
   <script>
     document.addEventListener('livewire:init', function() {
-      // Initialize datepickers
-      const blockedAtInput = document.getElementById('blocked_at');
-      const unblockedAtInput = document.getElementById('unblocked_at');
-
-      if (blockedAtInput) {
-        new PDate(blockedAtInput, {
-          format: 'YYYY/MM/DD',
-          initialValue: false,
-          autoClose: true
-        });
-      }
-
-      if (unblockedAtInput) {
-        new PDate(unblockedAtInput, {
-          format: 'YYYY/MM/DD',
-          initialValue: false,
-          autoClose: true
-        });
-      }
-
       // Show alerts
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
