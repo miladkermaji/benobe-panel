@@ -35,11 +35,10 @@ class BestDoctorEdit extends Component
 
     public function loadClinics()
     {
-        \Log::info('Loading clinics for doctor_id: ' . $this->doctor_id);
 
         if ($this->doctor_id) {
             $clinics = Clinic::where('doctor_id', $this->doctor_id)->get();
-            \Log::info('Found clinics:', ['count' => $clinics->count(), 'clinics' => $clinics->toArray()]);
+
             $this->clinics = $clinics;
 
             // ارسال داده‌ها با فرمت صحیح برای Select2
@@ -50,7 +49,6 @@ class BestDoctorEdit extends Component
                 ];
             })->toArray());
         } else {
-            \Log::info('No doctor_id provided, returning empty collection');
             $this->clinics = collect();
             $this->dispatch('clinics-updated', clinics: []);
         }
@@ -58,7 +56,6 @@ class BestDoctorEdit extends Component
 
     public function updatedDoctorId($value)
     {
-        \Log::info('Doctor ID updated:', ['old_value' => $this->doctor_id, 'new_value' => $value]);
         $this->doctor_id = $value;
         $this->clinic_id = null;
         $this->loadClinics();
@@ -93,7 +90,7 @@ class BestDoctorEdit extends Component
         if ($updated) {
             $this->dispatch('show-alert', type: 'success', message: 'بهترین پزشک با موفقیت ویرایش شد!');
             $this->dispatch('refresh-index');
-            return redirect()->route('admin.panel.best_doctors.index');
+            return redirect()->route('admin.panel.best-doctors.index');
         } else {
             $this->dispatch('show-alert', type: 'error', message: 'خطا در ذخیره‌سازی رخ داد!');
         }

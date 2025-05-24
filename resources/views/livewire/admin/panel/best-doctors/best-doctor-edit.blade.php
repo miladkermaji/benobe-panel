@@ -237,6 +237,7 @@
 
   <script>
     document.addEventListener('livewire:initialized', () => {
+      
       // Function to initialize or reinitialize Select2
       function initializeSelect2() {
         // Destroy existing Select2 instances if they exist
