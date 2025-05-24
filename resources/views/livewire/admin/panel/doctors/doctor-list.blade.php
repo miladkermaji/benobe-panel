@@ -28,7 +28,7 @@
         <div class="d-flex gap-3 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
           <a href="{{ route('admin.panel.doctors.create') }}"
             class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
-            <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            <svg  width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -37,7 +37,7 @@
           <button wire:click="deleteSelected"
             class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
             @if (empty($selecteddoctors)) disabled @endif>
-            <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            <svg  width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2">
               <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
             </svg>
