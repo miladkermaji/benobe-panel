@@ -28,7 +28,6 @@
       transition: all 0.3s ease;
       padding: 0.75rem;
       border-radius: 6px;
-      margin-bottom: 1rem;
     }
 
     .glass-header .header-icon {
@@ -155,7 +154,6 @@
       .glass-header {
         padding: 0.6rem;
         border-radius: 4px;
-        margin-bottom: 0.75rem;
       }
 
       .glass-header .header-icon {
@@ -520,4 +518,3 @@
         justify-content: center;
       }
     }
-    

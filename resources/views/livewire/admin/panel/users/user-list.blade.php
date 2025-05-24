@@ -1,6 +1,6 @@
 <div class="container-fluid py-2" dir="rtl" wire:init="loadUsers">
   <!-- Header -->
-  <header class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg">
+  <header class="glass-header text-white p-3 rounded-3  shadow-lg">
     <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
       <!-- Title Section -->
       <div class="d-flex align-items-center gap-2 flex-shrink-0">
