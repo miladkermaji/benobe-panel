@@ -14,7 +14,7 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label class="form-label">نوع کاربر</label>
-            <select wire:model="type" class="form-select" id="type">
+            <select wire:model.live="type" class="form-select" id="type">
               <option value="">انتخاب کنید</option>
               <option value="user">کاربر</option>
               <option value="doctor">پزشک</option>
@@ -26,7 +26,7 @@
 
           <div class="col-md-6 mb-3">
             <label class="form-label">کاربر</label>
-            <select wire:model="user_id" class="form-select select2-user" id="user_id">
+            <select wire:model="user_id" class="form-select" id="user_id">
               <option value="">انتخاب کنید</option>
               @if ($type == 'user')
                 @foreach ($users as $user)
@@ -288,9 +288,9 @@
       // به‌روزرسانی Select2 پس از تغییر نوع کاربر
       Livewire.on('select2:refresh', () => {
         $('#user_id').select2('destroy');
-        initializeSelect2();
-        // اطمینان از فعال شدن فیلد
-        $('#user_id').prop('disabled', @json(!$type));
+        setTimeout(() => {
+          initializeSelect2();
+        }, 100);
       });
 
       // نمایش اعلان‌ها

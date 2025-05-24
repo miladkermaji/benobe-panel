@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Clinic;
 use App\Models\UserBlocking;
-use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
 use Morilog\Jalali\Jalalian;
 
@@ -20,9 +19,9 @@ class UserBlockingCreate extends Component
     public $reason;
     public $clinic_id;
     public $status = true;
-    public $users;
-    public $doctors;
-    public $clinics;
+    public $users = [];
+    public $doctors = [];
+    public $clinics = [];
 
     public function mount()
     {
@@ -35,6 +34,11 @@ class UserBlockingCreate extends Component
     {
         $this->user_id = null;
         $this->dispatch('select2:refresh');
+    }
+
+    public function getUsersProperty()
+    {
+        return $this->type === 'user' ? $this->users : $this->doctors;
     }
 
     public function save()
@@ -64,7 +68,7 @@ class UserBlockingCreate extends Component
         $blockedAtMiladi = Jalalian::fromFormat('Y/m/d', $this->blocked_at)->toCarbon();
         $unblockedAtMiladi = $this->unblocked_at ? Jalalian::fromFormat('Y/m/d', $this->unblocked_at)->toCarbon() : null;
 
-        $blocking = UserBlocking::create([
+        UserBlocking::create([
             'user_id' => $this->type === 'user' ? $this->user_id : null,
             'doctor_id' => $this->type === 'doctor' ? $this->user_id : null,
             'manager_id' => $managerId,
@@ -74,18 +78,6 @@ class UserBlockingCreate extends Component
             'reason' => $this->reason,
             'status' => $this->status,
         ]);
-
-        if ($this->status) {
-            if ($this->type === 'user') {
-                $user = User::find($this->user_id);
-                $message = "کاربر گرامی، شما توسط مدیر سیستم مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-                SendSmsNotificationJob::dispatch($message, [$user->mobile])->delay(now()->addSeconds(5));
-            } else {
-                $doctor = Doctor::find($this->user_id);
-                $message = "دکتر گرامی، شما توسط مدیر سیستم مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-                SendSmsNotificationJob::dispatch($message, [$doctor->mobile])->delay(now()->addSeconds(5));
-            }
-        }
 
         $this->dispatch('show-alert', type: 'success', message: 'مسدودیت با موفقیت ثبت شد!');
         return redirect()->route('admin.panel.user-blockings.index');
