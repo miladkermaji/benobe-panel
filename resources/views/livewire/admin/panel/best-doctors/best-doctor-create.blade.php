@@ -1,7 +1,7 @@
 <div class="container-fluid py-4" dir="rtl">
-  <div class="card shadow-lg border-0 rounded-3 overflow-hidden" style="background: #ffffff;">
+  <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
     <div
-      class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+      class="card-header glass-header text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           class="animate-bounce">
@@ -88,7 +88,7 @@
           <!-- دکمه افزودن -->
           <div class="text-end mt-4 w-100 d-flex justify-content-end">
             <button wire:click="store"
-              class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+              class="btn btn-gradient-success px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
