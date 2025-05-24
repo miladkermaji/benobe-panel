@@ -36,14 +36,23 @@ class BestDoctorEdit extends Component
     public function loadClinics()
     {
         \Log::info('Loading clinics for doctor_id: ' . $this->doctor_id);
-        
+
         if ($this->doctor_id) {
             $clinics = Clinic::where('doctor_id', $this->doctor_id)->get();
             \Log::info('Found clinics:', ['count' => $clinics->count(), 'clinics' => $clinics->toArray()]);
             $this->clinics = $clinics;
+
+            // ارسال داده‌ها با فرمت صحیح برای Select2
+            $this->dispatch('clinics-updated', clinics: $clinics->map(function ($clinic) {
+                return [
+                    'id' => $clinic->id,
+                    'text' => $clinic->name
+                ];
+            })->toArray());
         } else {
             \Log::info('No doctor_id provided, returning empty collection');
             $this->clinics = collect();
+            $this->dispatch('clinics-updated', clinics: []);
         }
     }
 

@@ -296,7 +296,10 @@
         ];
 
         // Destroy and reinitialize clinic Select2 with new data
-        $('#clinic_id').select2('destroy');
+        if ($('#clinic_id').hasClass('select2-hidden-accessible')) {
+          $('#clinic_id').select2('destroy');
+        }
+
         $('#clinic_id').empty().select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
