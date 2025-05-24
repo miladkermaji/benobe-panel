@@ -1,41 +1,49 @@
 <div class="container-fluid py-2" dir="rtl" wire:init="loadUsers">
-  <div
-    class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت کاربران</h1>
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-      <div class="d-flex align-items-center gap-2">
-        <div class="input-group">
-          <span class="input-group-text">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  <!-- Header -->
+  <header class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg">
+    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+      <!-- Title Section -->
+      <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="header-icon">
+          <path
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <h2 class="mb-0 fw-bold fs-5">مدیریت کاربران</h2>
+      </div>
+      <!-- Search and Actions -->
+      <div class="d-flex flex-column flex-md-row align-items-center gap-3 w-100 w-md-auto">
+        <div class="search-box position-relative">
+          <input type="text" wire:model.live="search"
+            class="form-control border-0 shadow-none bg-white text-dark ps-5" placeholder="جستجو...">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"
+            class="search-icon">
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+        </div>
+        <div class="d-flex gap-3 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
+          <a href="{{ route('admin.panel.users.create') }}"
+            class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+            <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14" />
             </svg>
-          </span>
-          <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="جستجو...">
+            <span>افزودن کاربر</span>
+          </a>
+          <button wire:click="deleteSelected"
+            class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
+            @if (empty($selectedUsers)) disabled @endif>
+            <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+            </svg>
+            <span>حذف انتخاب‌شده‌ها</span>
+          </button>
         </div>
       </div>
-
-      <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
-        <a href="{{ route('admin.panel.users.create') }}"
-          class="btn btn-gradient-primary rounded-pill px-4 d-flex align-items-center gap-2">
-          <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          <span>افزودن کاربر</span>
-        </a>
-        <button wire:click="deleteSelected"
-          class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
-          @if (empty($selectedUsers)) disabled @endif>
-          <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2">
-            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-          </svg>
-          <span>حذف انتخاب‌شده‌ها</span>
-        </button>
-      </div>
     </div>
-  </div>
+  </header>
 
   <!-- Desktop View -->
   <div class="container-fluid px-0 d-none d-md-block">
@@ -69,8 +77,21 @@
                     </td>
                     <td class="text-center align-middle">{{ $users->firstItem() + $index }}</td>
                     <td class="text-center align-middle">
-                      <img src="{{ $user->profile_photo_url }}" class="rounded-circle"
-                        style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل">
+                      <div class="position-relative" style="width: 40px; height: 40px;">
+                        <img loading="lazy"
+                          src="{{ str_starts_with($user->profile_photo_url, 'http') ? $user->profile_photo_url : asset('admin-assets/images/default-avatar.png') }}"
+                          class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل"
+                          onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+                        <div
+                          class="position-absolute top-0 start-0 w-100 h-100 rounded-circle bg-light d-none align-items-center justify-content-center"
+                          style="background-color: #f8f9fa;">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6c757d"
+                            stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                          </svg>
+                        </div>
+                      </div>
                     </td>
                     <td class="align-middle">{{ $user->first_name }}</td>
                     <td class="align-middle">{{ $user->last_name }}</td>
@@ -87,16 +108,16 @@
                       <div class="d-flex justify-content-center gap-2">
                         <a href="{{ route('admin.panel.users.edit', $user->id) }}"
                           class="btn btn-gradient-primary rounded-pill px-3">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
                             <path
                               d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg>
                         </a>
                         <button wire:click="confirmDelete({{ $user->id }})"
                           class="btn btn-gradient-danger rounded-pill px-3">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                           </svg>
                         </button>
@@ -137,8 +158,21 @@
             <div class="d-flex align-items-center gap-3 mb-3">
               <input type="checkbox" wire:model.live="selectedUsers" value="{{ $user->id }}"
                 class="form-check-input m-0">
-              <img src="{{ $user->profile_photo_url }}" class="rounded-circle"
-                style="width: 50px; height: 50px; object-fit: cover;" alt="پروفایل">
+              <div class="position-relative" style="width: 50px; height: 50px;">
+                <img loading="lazy"
+                  src="{{ str_starts_with($user->profile_photo_url, 'http') ? $user->profile_photo_url : asset('admin-assets/images/default-avatar.png') }}"
+                  class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;" alt="پروفایل"
+                  onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+                <div
+                  class="position-absolute top-0 start-0 w-100 h-100 rounded-circle bg-light d-none align-items-center justify-content-center"
+                  style="background-color: #f8f9fa;">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6c757d"
+                    stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+              </div>
               <div>
                 <h6 class="mb-1">{{ $user->first_name }} {{ $user->last_name }}</h6>
                 <small class="text-muted">{{ $user->email }}</small>
@@ -232,28 +266,89 @@
     }
 
     .glass-header {
-      background: var(--gradient-primary);
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: all 0.3s ease;
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .glass-header .header-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .glass-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .search-box {
+      position: relative;
+      width: 100%;
+      max-width: 350px;
+    }
+
+    .search-box input {
+      padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+      font-size: 0.85rem;
+      border-radius: 4px;
+      background: var(--background-light);
+    }
+
+    .search-box svg.search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--text-secondary);
+    }
+
+    .buttons-container {
+      display: flex;
+      gap: 1rem;
     }
 
     .btn-gradient-primary {
-      background: var(--gradient-primary);
-      border: none;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
       color: white;
+      border: none;
+      transition: all 0.2s ease;
     }
 
     .btn-gradient-primary:hover {
-      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+      transform: translateY(-1px);
       color: white;
     }
 
     .btn-gradient-danger {
-      background: linear-gradient(90deg, #f44336, #e53935);
-      border: none;
+      background: linear-gradient(135deg, #dc3545, #bb2d3b);
       color: white;
+      border: none;
+      transition: all 0.2s ease;
     }
 
     .btn-gradient-danger:hover {
-      background: linear-gradient(90deg, #e53935, #d32f2f);
+      transform: translateY(-1px);
+      color: white;
+    }
+
+    .btn-gradient-success {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-gradient-success:hover {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      transform: translateY(-1px);
       color: white;
     }
 
@@ -301,14 +396,41 @@
       border-radius: var(--radius-button);
     }
 
-    @media (max-width: 767px) {
+    @media (max-width: 768px) {
       .glass-header {
-        flex-direction: column;
-        gap: 1rem;
+        padding: 0.6rem;
+        border-radius: 4px;
+        margin-bottom: 0.75rem;
+      }
+
+      .glass-header .header-icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .glass-header h2 {
+        font-size: 1.1rem;
+      }
+
+      .search-box {
+        max-width: 100%;
+        margin-bottom: 0.75rem;
+      }
+
+      .search-box input {
+        padding: 0.5rem 0.75rem 0.5rem 2rem;
+        font-size: 0.85rem;
+      }
+
+      .search-box svg.search-icon {
+        width: 14px;
+        height: 14px;
+        left: 0.65rem;
       }
 
       .buttons-container {
         width: 100%;
+        gap: 0.75rem;
       }
 
       .btn {
@@ -417,6 +539,16 @@
         height: 14px;
       }
     }
+
+    /* Lazy loading styles */
+    img[loading="lazy"] {
+      opacity: 1;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    img.loaded {
+      opacity: 1 !important;
+    }
   </style>
 
   <script>
@@ -442,6 +574,34 @@
             });
           }
         });
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Handle lazy loaded images
+      const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+
+            // Add loaded class when image is actually loaded
+            if (img.complete) {
+              img.classList.add('loaded');
+            } else {
+              img.addEventListener('load', function() {
+                img.classList.add('loaded');
+              });
+            }
+
+            observer.unobserve(img);
+          }
+        });
+      });
+
+      lazyImages.forEach(img => {
+        imageObserver.observe(img);
       });
     });
   </script>
