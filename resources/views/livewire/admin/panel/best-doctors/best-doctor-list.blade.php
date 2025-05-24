@@ -45,8 +45,8 @@
                     <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
                   </th>
                   <th class="text-center align-middle" style="width: 70px;">ردیف</th>
-                  <th class="align-middle">نام نمایشی پزشک</th>
-                  <th class="align-middle">بیمارستان</th>
+                  <th class="text-center">نام پزشک</th>
+                  <th class="text-center">کلینیک</th>
                   <th class="align-middle">بهترین پزشک</th>
                   <th class="align-middle">بهترین مشاور</th>
                   <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
@@ -62,9 +62,8 @@
                           class="form-check-input m-0">
                       </td>
                       <td class="text-center align-middle">{{ $bestdoctors->firstItem() + $index }}</td>
-                      <td class="align-middle">{{ $item->doctor->first_name . ' ' . $item->doctor->last_name ?? '' }}
-                      </td>
-                      <td class="align-middle">{{ $item->hospital->name ?? '-' }}</td>
+                      <td class="text-center">{{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}</td>
+                      <td class="text-center">{{ $item->clinic ? $item->clinic->name : '-' }}</td>
                       <td class="align-middle">{{ $item->best_doctor ? 'بله' : 'خیر' }}</td>
                       <td class="align-middle">{{ $item->best_consultant ? 'بله' : 'خیر' }}</td>
                       <td class="text-center align-middle">
@@ -140,8 +139,8 @@
                 <input type="checkbox" wire:model.live="selectedBestDoctors" value="{{ $item->id }}"
                   class="form-check-input m-0">
                 <div>
-                  <h6 class="mb-1">{{ $item->doctor->first_name . ' ' . $item->doctor->last_name ?? '' }}</h6>
-                  <small class="text-muted">{{ $item->hospital->name ?? '-' }}</small>
+                  <h6 class="mb-1">{{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}</h6>
+                  <small class="text-muted">{{ $item->clinic ? $item->clinic->name : '-' }}</small>
                 </div>
               </div>
               <div class="row g-3">

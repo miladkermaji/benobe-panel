@@ -33,7 +33,7 @@ class Clinic extends Model
         'consultation_fee',
         'payment_methods',
         'working_days',
-        'avatar', // JSON field, though we’ll use a separate table for galleries
+        'avatar', // JSON field, though we'll use a separate table for galleries
         'documents',
         'location_confirmed',
     ];
@@ -58,9 +58,9 @@ class Clinic extends Model
         return $this->belongsTo(Zone::class, 'province_id');
     }
 
-    public function doctor()
+    public function doctors()
     {
-        return $this->belongsTo(Doctor::class, 'doctor_id');
+        return $this->belongsToMany(Doctor::class, 'doctor_clinic');
     }
 
     public function galleries()

@@ -37,16 +37,16 @@
               @enderror
             </div>
 
-            <!-- بیمارستان -->
+            <!-- کلینیک -->
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="hospital_id" class="form-select select2" id="hospital_id">
+              <select wire:model.live="clinic_id" class="form-select select2" id="clinic_id">
                 <option value="">انتخاب کنید</option>
-                @foreach ($hospitals as $hospital)
-                  <option value="{{ $hospital->id }}">{{ $hospital->name }}</option>
+                @foreach ($clinics as $clinic)
+                  <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
                 @endforeach
               </select>
-              <label for="hospital_id" class="form-label">بیمارستان (اختیاری)</label>
-              @error('hospital_id')
+              <label for="clinic_id" class="form-label">کلینیک (اختیاری)</label>
+              @error('clinic_id')
                 <span class="text-danger small">{{ $message }}</span>
               @enderror
             </div>
@@ -228,40 +228,68 @@
   </style>
 
   <script>
-    document.addEventListener('livewire:init', function() {
-      // Show alerts
-      Livewire.on('show-alert', (event) => {
-        toastr[event.type](event.message);
+    document.addEventListener('livewire:initialized', () => {
+      // Initialize doctor select2
+      $('#doctor_id').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'انتخاب پزشک',
+        allowClear: true
       });
 
-      // Function to initialize Select2
-      function initializeSelect2() {
-        $('#doctor_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%'
-        });
-        $('#hospital_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%'
+      // Initialize clinic select2
+      $('#clinic_id').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'انتخاب کلینیک',
+        allowClear: true
+      });
+
+      // Handle doctor selection
+      $('#doctor_id').on('select2:select', function(e) {
+        @this.set('doctor_id', e.target.value);
+      });
+
+      // Handle doctor clearing
+      $('#doctor_id').on('select2:clear', function() {
+        @this.set('doctor_id', null);
+      });
+
+      // Handle clinic selection
+      $('#clinic_id').on('select2:select', function(e) {
+        @this.set('clinic_id', e.target.value);
+      });
+
+      // Handle clinic clearing
+      $('#clinic_id').on('select2:clear', function() {
+        @this.set('clinic_id', null);
+      });
+
+      // Listen for clinics update
+      Livewire.on('clinics-updated', (data) => {
+        const clinicSelect = $('#clinic_id');
+        clinicSelect.empty();
+
+        // Add placeholder option
+        clinicSelect.append(new Option('انتخاب کلینیک', '', true, true));
+
+        // Add clinic options
+        data.clinics.forEach(clinic => {
+          clinicSelect.append(new Option(clinic.text, clinic.id, false, false));
         });
 
-        // Sync with Livewire
-        $('#doctor_id').on('change', function() {
-          @this.set('doctor_id', $(this).val());
-        });
-        $('#hospital_id').on('change', function() {
-          @this.set('hospital_id', $(this).val());
-        });
-      }
+        // Trigger change to update Select2
+        clinicSelect.trigger('change');
+      });
+    });
 
-      // Initial load
-      initializeSelect2();
-
-      // Re-initialize Select2 after every Livewire update
-      Livewire.hook('component.updated', (component) => {
-        initializeSelect2();
+    // Re-initialize Select2 after Livewire updates
+    document.addEventListener('livewire:update', () => {
+      $('#doctor_id, #clinic_id').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'انتخاب پزشک',
+        allowClear: true
       });
     });
   </script>

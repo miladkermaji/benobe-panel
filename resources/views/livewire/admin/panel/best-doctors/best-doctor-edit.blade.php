@@ -9,8 +9,8 @@
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">
           ویرایش بهترین پزشک:
-          @if ($best - doctor->doctor)
-            {{ $best - doctor->doctor->first_name . ' ' . $best - doctor->doctor->last_name }}
+          @if ($bestdoctor->doctor)
+            {{ $bestdoctor->doctor->first_name . ' ' . $bestdoctor->doctor->last_name }}
           @else
             نامشخص (پزشک یافت نشد)
           @endif
@@ -32,12 +32,10 @@
           <div class="row g-4">
             <!-- پزشک -->
             <div class="col-6 position-relative mt-5" wire:ignore>
-              <select class="form-select select2" id="doctor_id" required>
+              <select wire:model.live="doctor_id" class="form-select select2" id="doctor_id" required>
                 <option value="">انتخاب کنید</option>
                 @foreach ($doctors as $doctor)
-                  <option value="{{ $doctor->id }}" {{ $doctor->id == $doctor_id ? 'selected' : '' }}>
-                    {{ $doctor->first_name . ' ' . $doctor->last_name }}
-                  </option>
+                  <option value="{{ $doctor->id }}">{{ $doctor->display_name ?? $doctor->full_name }}</option>
                 @endforeach
               </select>
               <label for="doctor_id" class="form-label">پزشک</label>
@@ -46,18 +44,16 @@
               @enderror
             </div>
 
-            <!-- بیمارستان -->
-            <div class="col-6 position-relative mt-5" wire:ignore>
-              <select class="form-select select2" id="hospital_id">
+            <!-- کلینیک -->
+            <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+              <select wire:model.live="clinic_id" class="form-select select2" id="clinic_id">
                 <option value="">انتخاب کنید</option>
-                @foreach ($hospitals as $hospital)
-                  <option value="{{ $hospital->id }}" {{ $hospital->id == $hospital_id ? 'selected' : '' }}>
-                    {{ $hospital->name }}
-                  </option>
+                @foreach ($clinics as $clinic)
+                  <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
                 @endforeach
               </select>
-              <label for="hospital_id" class="form-label">بیمارستان (اختیاری)</label>
-              @error('hospital_id')
+              <label for="clinic_id" class="form-label">کلینیک (اختیاری)</label>
+              @error('clinic_id')
                 <span class="text-danger small">{{ $message }}</span>
               @enderror
             </div>
@@ -240,35 +236,90 @@
   </style>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('livewire:initialized', () => {
+      // Function to initialize or reinitialize Select2
       function initializeSelect2() {
+        // Destroy existing Select2 instances if they exist
+        if ($('#doctor_id').hasClass('select2-hidden-accessible')) {
+          $('#doctor_id').select2('destroy');
+        }
+        if ($('#clinic_id').hasClass('select2-hidden-accessible')) {
+          $('#clinic_id').select2('destroy');
+        }
+
+        // Initialize Select2 for doctor
         $('#doctor_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
         }).val('{{ $doctor_id ?? '' }}').trigger('change');
 
-        $('#hospital_id').select2({
+        // Initialize Select2 for clinic
+        $('#clinic_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
-        }).val('{{ $hospital_id ?? '' }}').trigger('change');
+        }).val('{{ $clinic_id ?? '' }}').trigger('change');
       }
 
+      // Initial setup
       initializeSelect2();
 
-      $('#doctor_id').on('change', function() {
-        let value = $(this).val();
-        console.log('Doctor ID selected:', value);
+      // Handle doctor selection change
+      $('#doctor_id').on('select2:select', function(e) {
+        const value = e.target.value === '' ? null : e.target.value;
         @this.set('doctor_id', value);
       });
 
-      $('#hospital_id').on('change', function() {
-        let value = $(this).val();
-        console.log('Hospital ID selected:', value);
-        @this.set('hospital_id', value);
+      $('#doctor_id').on('select2:clear', function() {
+        @this.set('doctor_id', null);
       });
 
+      // Handle clinic selection change
+      $('#clinic_id').on('select2:select', function(e) {
+        const value = e.target.value === '' ? null : e.target.value;
+        @this.set('clinic_id', value);
+      });
+
+      $('#clinic_id').on('select2:clear', function() {
+        @this.set('clinic_id', null);
+      });
+
+      // Listen for clinics update event
+      Livewire.on('clinics-updated', (data) => {
+        // Prepare options including the default option
+        const options = [{
+            id: '',
+            text: 'انتخاب کنید'
+          },
+          ...(data.clinics || [])
+        ];
+
+        // Destroy and reinitialize clinic Select2 with new data
+        $('#clinic_id').select2('destroy');
+        $('#clinic_id').empty().select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%',
+          data: options
+        });
+
+        // Reset the selected value
+        $('#clinic_id').val('').trigger('change');
+      });
+
+      // Reinitialize Select2 after Livewire updates
+      document.addEventListener('livewire:update', () => {
+        initializeSelect2();
+
+        // Restore the current values after reinitialization
+        const doctorId = @json($doctor_id);
+        const clinicId = @json($clinic_id);
+        $('#doctor_id').val(doctorId || '').trigger('change');
+        $('#clinic_id').val(clinicId || '').trigger('change');
+      });
+
+      // Handle alerts
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });

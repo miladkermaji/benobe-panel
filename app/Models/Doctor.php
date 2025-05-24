@@ -139,7 +139,7 @@ class Doctor extends Authenticatable
 
     public function clinics()
     {
-        return $this->hasMany(Clinic::class);
+        return $this->belongsToMany(Clinic::class, 'doctor_clinic');
     }
     public function walletTransactions()
     {
@@ -298,5 +298,20 @@ class Doctor extends Authenticatable
     public function hospital()
     {
         return $this->belongsTo(Hospital::class);
+    }
+
+    public function attachClinic($clinicId)
+    {
+        return $this->clinics()->attach($clinicId);
+    }
+
+    public function detachClinic($clinicId)
+    {
+        return $this->clinics()->detach($clinicId);
+    }
+
+    public function syncClinics($clinicIds)
+    {
+        return $this->clinics()->sync($clinicIds);
     }
 }

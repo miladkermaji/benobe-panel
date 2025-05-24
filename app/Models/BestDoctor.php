@@ -4,14 +4,13 @@ namespace App\Models;
 
 use App\Models\Clinic;
 use App\Models\Doctor;
-use App\Models\Hospital;
 use App\Models\Appointment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BestDoctor extends Model
 {
-    protected $fillable = ['doctor_id', 'hospital_id', 'best_doctor', 'best_consultant', 'status', 'star_rating'];
+    protected $fillable = ['doctor_id', 'clinic_id', 'best_doctor', 'best_consultant', 'status', 'star_rating'];
 
     protected $casts = [
         'best_doctor'     => 'boolean',
@@ -25,9 +24,9 @@ class BestDoctor extends Model
         return $this->belongsTo(Doctor::class, 'doctor_id');
     }
 
-    public function hospital()
+    public function clinic()
     {
-        return $this->belongsTo(Clinic::class, 'hospital_id');
+        return $this->belongsTo(Clinic::class, 'clinic_id');
     }
 
     public function appointments()
