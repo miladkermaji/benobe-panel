@@ -116,12 +116,18 @@ class UserBlockingList extends Component
             ->where(function ($query) {
                 $query->whereHas('user', function ($q) {
                     $q->where('mobile', 'like', '%' . $this->search . '%')
-                      ->orWhere('first_name', 'like', '%' . $this->search . '%')
-                      ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                      ->orWhere(function ($q) {
+                          $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])
+                            ->orWhere('first_name', 'like', '%' . $this->search . '%')
+                            ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                      });
                 })->orWhereHas('doctor', function ($q) {
                     $q->where('mobile', 'like', '%' . $this->search . '%')
-                      ->orWhere('first_name', 'like', '%' . $this->search . '%')
-                      ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                      ->orWhere(function ($q) {
+                          $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])
+                            ->orWhere('first_name', 'like', '%' . $this->search . '%')
+                            ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                      });
                 })->orWhere('reason', 'like', '%' . $this->search . '%');
             })
             ->paginate($this->perPage);
