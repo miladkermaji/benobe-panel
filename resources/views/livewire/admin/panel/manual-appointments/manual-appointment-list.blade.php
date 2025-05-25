@@ -43,7 +43,7 @@
               </div>
 
               @if (in_array($data['doctor']->id, $expandedDoctors))
-                <div class="table-responsive text-nowrap p-3 bg-light">
+                <div class="table-responsive text-nowrap p-3 bg-light d-none d-md-block">
                   <table class="table table-bordered table-hover w-100 m-0">
                     <thead class="glass-header text-white">
                       <tr>
@@ -123,35 +123,88 @@
                       @endforelse
                     </tbody>
                   </table>
-
-                  @if ($data['totalAppointments'] > $appointmentsPerPage)
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                      <div>
-                        نمایش {{ ($data['currentPage'] - 1) * $appointmentsPerPage + 1 }} تا
-                        {{ min($data['currentPage'] * $appointmentsPerPage, $data['totalAppointments']) }} از
-                        {{ $data['totalAppointments'] }} نوبت
-                      </div>
-                      <nav>
-                        <ul class="pagination mb-0">
-                          <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
-                            <button class="page-link"
-                              wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $data['currentPage'] - 1 }})">قبلی</button>
-                          </li>
-                          @for ($i = 1; $i <= $data['lastPage']; $i++)
-                            <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
-                              <button class="page-link"
-                                wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $i }})">{{ $i }}</button>
-                            </li>
-                          @endfor
-                          <li class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
-                            <button class="page-link"
-                              wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $data['currentPage'] + 1 }})">بعدی</button>
-                          </li>
-                        </ul>
-                      </nav>
-                    </div>
-                  @endif
                 </div>
+
+                <div class="d-md-none">
+                  @forelse ($data['appointments'] as $index => $appointment)
+                    <div class="card mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title">
+                          {{ $appointment->user->first_name . ' ' . $appointment->user->last_name ?? 'نامشخص' }}</h5>
+                        <p class="card-text">کد ملی: {{ $appointment->user->national_code ?? 'نامشخص' }}</p>
+                        <p class="card-text">تاریخ نوبت:
+                          {{ \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
+                        </p>
+                        <p class="card-text">ساعت نوبت: {{ $appointment->appointment_time }}</p>
+                        <p class="card-text">وضعیت نوبت: <span
+                            class="badge {{ $appointment->status === 'scheduled' ? 'bg-label-success' : 'bg-label-danger' }}">{{ $appointment->status === 'scheduled' ? 'فعال' : 'لغو شده' }}</span>
+                        </p>
+                        <p class="card-text">وضعیت پرداخت: <span
+                            class="badge {{ $appointment->payment_status === 'paid' ? 'bg-label-success' : ($appointment->payment_status === 'unpaid' ? 'bg-label-danger' : 'bg-label-warning') }}">{{ $appointment->payment_status === 'paid' ? 'پرداخت شده' : ($appointment->payment_status === 'unpaid' ? 'پرداخت نشده' : 'در انتظار') }}</span>
+                        </p>
+                        <p class="card-text">هزینه: {{ number_format($appointment->fee) ?? 'نامشخص' }}</p>
+                        <p class="card-text">کد رهگیری: {{ $appointment->tracking_code ?? 'نامشخص' }}</p>
+                        <p class="card-text">یادداشت: {{ $appointment->description ?? '---' }}</p>
+                        <div class="d-flex justify-content-end gap-2">
+                          <a href="{{ route('admin.panel.manual-appointments.edit', $appointment->id) }}"
+                            class="btn btn-gradient-success rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </a>
+                          <button wire:click="confirmDelete({{ $appointment->id }})"
+                            class="btn btn-gradient-danger rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  @empty
+                    <div class="text-center py-5">
+                      <div class="d-flex flex-column align-items-center justify-content-center">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" class="text-muted mb-3">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                        <p class="text-muted fw-medium m-0">هیچ نوبت یافت نشد.</p>
+                      </div>
+                    </div>
+                  @endforelse
+                </div>
+
+                @if ($data['totalAppointments'] > $appointmentsPerPage)
+                  <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                      نمایش {{ ($data['currentPage'] - 1) * $appointmentsPerPage + 1 }} تا
+                      {{ min($data['currentPage'] * $appointmentsPerPage, $data['totalAppointments']) }} از
+                      {{ $data['totalAppointments'] }} نوبت
+                    </div>
+                    <nav>
+                      <ul class="pagination mb-0">
+                        <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
+                          <button class="page-link"
+                            wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $data['currentPage'] - 1 }})">قبلی</button>
+                        </li>
+                        @for ($i = 1; $i <= $data['lastPage']; $i++)
+                          <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
+                            <button class="page-link"
+                              wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $i }})">{{ $i }}</button>
+                          </li>
+                        @endfor
+                        <li class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
+                          <button class="page-link"
+                            wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $data['currentPage'] + 1 }})">بعدی</button>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                @endif
               @endif
             </div>
           @empty
@@ -171,63 +224,6 @@
       </div>
     </div>
   </div>
-
-  <style>
-    .glass-header {
-      background: linear-gradient(90deg, rgba(107, 114, 128, 0.9), rgba(55, 65, 81, 0.9));
-      backdrop-filter: blur(10px);
-    }
-
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: white;
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      color: white;
-    }
-
-    .doctor-toggle {
-      transition: all 0.3s ease;
-    }
-
-    .doctor-toggle:hover {
-      background: #f9fafb;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-
-    .transition-transform {
-      transition: transform 0.3s ease;
-    }
-
-    .rotate-180 {
-      transform: rotate(180deg);
-    }
-
-    .bg-label-primary {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .bg-label-success {
-      background: #d1fae5;
-      color: #059669;
-    }
-
-    .bg-label-danger {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-
-    .bg-label-warning {
-      background: #fef3c7;
-      color: #d97706;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {
