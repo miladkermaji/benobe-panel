@@ -108,7 +108,7 @@
 
         <!-- دکمه‌ها -->
         <div class="col-md-12 text-end mt-4">
-          <button type="submit" class="btn btn-gradient-primary px-4">
+          <button type="submit" class="btn btn-primary px-4">
             ثبت
           </button>
         </div>
