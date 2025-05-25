@@ -11,13 +11,13 @@
         </svg>
       </span>
     </div>
-    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
+    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2">
       <a href="{{ route('admin.panel.doctor-insurances.create') }}"
-        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2 w-100 w-md-auto justify-content-center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14" />
         </svg>
-        <span>افزودن بیمه جدید</span>
+        <span class="text-truncate">افزودن</span>
       </a>
     </div>
   </div>
@@ -48,72 +48,145 @@
               </div>
 
               @if (in_array($doctor->id, $expandedDoctors))
-                <div class="table-responsive text-nowrap p-3 bg-light">
-                  <table class="table table-bordered table-hover w-100 m-0">
-                    <thead class="glass-header text-white">
-                      <tr>
-                        <th class="text-center align-middle" style="width: 70px;">ردیف</th>
-                        <th class="align-middle">نام بیمه</th>
-                        <th class="align-middle">کلینیک</th>
-                        <th class="align-middle">روش محاسبه</th>
-                        <th class="align-middle">قیمت نوبت</th>
-                        <th class="align-middle">درصد بیمه</th>
-                        <th class="align-middle">قیمت نهایی</th>
-                        <th class="text-center align-middle" style="width: 150px;">عملیات</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @forelse ($doctor->insurances as $index => $insurance)
+                <!-- نمایش جدول در دسکتاپ -->
+                <div class="d-none d-md-block">
+                  <div class="table-responsive text-nowrap p-3 bg-light">
+                    <table class="table table-bordered table-hover w-100 m-0">
+                      <thead class="glass-header text-white">
                         <tr>
-                          <td class="text-center align-middle">{{ $index + 1 }}</td>
-                          <td class="align-middle">{{ $insurance->name }}</td>
-                          <td class="align-middle">{{ $insurance->clinic ? $insurance->clinic->name : 'ندارد' }}</td>
-                          <td class="align-middle">
-                            {{ $insurance->calculation_method == 0 ? 'مبلغ ثابت' : ($insurance->calculation_method == 1 ? 'درصد از مبلغ نوبت' : ($insurance->calculation_method == 2 ? 'مبلغ ثابت + درصد' : ($insurance->calculation_method == 3 ? 'فقط برای آمار' : 'پویا'))) }}
-                          </td>
-                          <td class="align-middle">
-                            {{ $insurance->appointment_price ? number_format($insurance->appointment_price) : '-' }}
-                          </td>
-                          <td class="align-middle">
-                            {{ $insurance->insurance_percent ? $insurance->insurance_percent . '%' : '-' }}</td>
-                          <td class="align-middle">
-                            {{ $insurance->final_price ? number_format($insurance->final_price) : '-' }}</td>
-                          <td class="text-center align-middle">
-                            <div class="d-flex justify-content-center gap-2">
-                              <a href="{{ route('admin.panel.doctor-insurances.edit', $insurance->id) }}"
-                                class="btn btn-gradient-success rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                </svg>
-                              </a>
-                              <button wire:click="confirmDelete({{ $insurance->id }})"
-                                class="btn btn-gradient-danger rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                </svg>
-                              </button>
-                            </div>
-                          </td>
+                          <th class="text-center align-middle" style="width: 70px;">ردیف</th>
+                          <th class="align-middle">نام بیمه</th>
+                          <th class="align-middle">کلینیک</th>
+                          <th class="align-middle">روش محاسبه</th>
+                          <th class="align-middle">قیمت نوبت</th>
+                          <th class="align-middle">درصد بیمه</th>
+                          <th class="align-middle">قیمت نهایی</th>
+                          <th class="text-center align-middle" style="width: 150px;">عملیات</th>
                         </tr>
-                      @empty
-                        <tr>
-                          <td colspan="8" class="text-center py-5">
-                            <div class="d-flex flex-column align-items-center justify-content-center">
-                              <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" class="text-muted mb-3">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
+                      </thead>
+                      <tbody>
+                        @forelse ($doctor->insurances as $index => $insurance)
+                          <tr>
+                            <td class="text-center align-middle">{{ $index + 1 }}</td>
+                            <td class="align-middle">{{ $insurance->name }}</td>
+                            <td class="align-middle">{{ $insurance->clinic ? $insurance->clinic->name : 'ندارد' }}</td>
+                            <td class="align-middle">
+                              {{ $insurance->calculation_method == 0 ? 'مبلغ ثابت' : ($insurance->calculation_method == 1 ? 'درصد از مبلغ نوبت' : ($insurance->calculation_method == 2 ? 'مبلغ ثابت + درصد' : ($insurance->calculation_method == 3 ? 'فقط برای آمار' : 'پویا'))) }}
+                            </td>
+                            <td class="align-middle">
+                              {{ $insurance->appointment_price ? number_format($insurance->appointment_price) : '-' }}
+                            </td>
+                            <td class="align-middle">
+                              {{ $insurance->insurance_percent ? $insurance->insurance_percent . '%' : '-' }}</td>
+                            <td class="align-middle">
+                              {{ $insurance->final_price ? number_format($insurance->final_price) : '-' }}</td>
+                            <td class="text-center align-middle">
+                              <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ route('admin.panel.doctor-insurances.edit', $insurance->id) }}"
+                                  class="btn btn-gradient-success rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                  </svg>
+                                </a>
+                                <button wire:click="confirmDelete({{ $insurance->id }})"
+                                  class="btn btn-gradient-danger rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        @empty
+                          <tr>
+                            <td colspan="8" class="text-center py-5">
+                              <div class="d-flex flex-column align-items-center justify-content-center">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                                  <path d="M5 12h14M12 5l7 7-7 7" />
+                                </svg>
+                                <p class="text-muted fw-medium m-0">هیچ بیمه‌ای یافت نشد.</p>
+                              </div>
+                            </td>
+                          </tr>
+                        @endforelse
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- نمایش کارت در موبایل و تبلت -->
+                <div class="d-md-none p-3 bg-light">
+                  @forelse ($doctor->insurances as $index => $insurance)
+                    <div class="card shadow-sm mb-3 border-0">
+                      <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <span class="badge bg-label-primary">#{{ $index + 1 }}</span>
+                          <div class="d-flex gap-2">
+                            <a href="{{ route('admin.panel.doctor-insurances.edit', $insurance->id) }}"
+                              class="btn btn-gradient-success rounded-pill px-3">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path
+                                  d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                               </svg>
-                              <p class="text-muted fw-medium m-0">هیچ بیمه‌ای یافت نشد.</p>
-                            </div>
-                          </td>
-                        </tr>
-                      @endforelse
-                    </tbody>
-                  </table>
+                            </a>
+                            <button wire:click="confirmDelete({{ $insurance->id }})"
+                              class="btn btn-gradient-danger rounded-pill px-3">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path
+                                  d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">نام بیمه:</small>
+                          <span class="fw-medium">{{ $insurance->name }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">کلینیک:</small>
+                          <span class="fw-medium">{{ $insurance->clinic ? $insurance->clinic->name : 'ندارد' }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">روش محاسبه:</small>
+                          <span class="fw-medium">
+                            {{ $insurance->calculation_method == 0 ? 'مبلغ ثابت' : ($insurance->calculation_method == 1 ? 'درصد از مبلغ نوبت' : ($insurance->calculation_method == 2 ? 'مبلغ ثابت + درصد' : ($insurance->calculation_method == 3 ? 'فقط برای آمار' : 'پویا'))) }}
+                          </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">قیمت نوبت:</small>
+                          <span
+                            class="fw-medium">{{ $insurance->appointment_price ? number_format($insurance->appointment_price) : '-' }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">درصد بیمه:</small>
+                          <span
+                            class="fw-medium">{{ $insurance->insurance_percent ? $insurance->insurance_percent . '%' : '-' }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">قیمت نهایی:</small>
+                          <span
+                            class="fw-medium">{{ $insurance->final_price ? number_format($insurance->final_price) : '-' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  @empty
+                    <div class="text-center py-5">
+                      <div class="d-flex flex-column align-items-center justify-content-center">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" class="text-muted mb-3">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                        <p class="text-muted fw-medium m-0">هیچ بیمه‌ای یافت نشد.</p>
+                      </div>
+                    </div>
+                  @endforelse
                 </div>
               @endif
             </div>
@@ -141,48 +214,6 @@
       </div>
     </div>
   </div>
-
-  <style>
-    .glass-header {
-      background: linear-gradient(90deg, rgba(107, 114, 128, 0.9), rgba(55, 65, 81, 0.9));
-      backdrop-filter: blur(10px);
-    }
-
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: white;
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      color: white;
-    }
-
-    .doctor-toggle {
-      transition: all 0.3s ease;
-    }
-
-    .doctor-toggle:hover {
-      background: #f9fafb;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-
-    .transition-transform {
-      transition: transform 0.3s ease;
-    }
-
-    .rotate-180 {
-      transform: rotate(180deg);
-    }
-
-    .bg-label-primary {
-      background: #e5e7eb;
-      color: #374151;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {

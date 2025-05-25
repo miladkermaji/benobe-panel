@@ -67,7 +67,7 @@ class DoctorInsuranceList extends Component
                 $query->where('first_name', 'like', '%' . $this->search . '%')
                       ->orWhere('last_name', 'like', '%' . $this->search . '%')
                       ->orWhere('mobile', 'like', '%' . $this->search . '%');
-            })->with('insurances')->paginate(10)
+            })->with('insurances')->paginate(100)
             : collect();
 
         return view('livewire.admin.panel.doctor-insurances.doctor-insurance-list', [
