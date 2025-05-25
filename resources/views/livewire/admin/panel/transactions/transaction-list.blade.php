@@ -28,7 +28,7 @@
         @if ($readyToLoad)
           <!-- کاربران -->
           <div class="mb-4">
-            <h5 class="p-3 bg-gradient-primary text-white">کاربران</h5>
+            <h5 class="p-3 glass-header text-white">کاربران</h5>
             @forelse ($users as $data)
               <div class="entity-toggle border-bottom">
                 <div class="d-flex justify-content-between align-items-center p-3 cursor-pointer"
@@ -213,7 +213,7 @@
 
           <!-- دکترها -->
           <div class="mb-4">
-            <h5 class="p-3 bg-gradient-primary text-white">دکترها</h5>
+            <h5 class="p-3 glass-header text-white">دکترها</h5>
             @forelse ($doctors as $data)
               <div class="entity-toggle border-bottom">
                 <div class="d-flex justify-content-between align-items-center p-3 cursor-pointer"
@@ -398,7 +398,7 @@
 
           <!-- منشی‌ها -->
           <div class="mb-4">
-            <h5 class="p-3 bg-gradient-primary text-white">منشی‌ها</h5>
+            <h5 class="p-3 glass-header text-white">منشی‌ها</h5>
             @forelse ($secretaries as $data)
               <div class="entity-toggle border-bottom">
                 <div class="d-flex justify-content-between align-items-center p-3 cursor-pointer"
