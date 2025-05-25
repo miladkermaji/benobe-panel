@@ -281,3 +281,26 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('livewire:initialized', () => {
+    Livewire.on('confirm-delete', (event) => {
+      Swal.fire({
+        title: 'آیا مطمئن هستید؟',
+        text: 'این نوبت حذف خواهد شد.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'بله، حذف کن',
+        cancelButtonText: 'انصراف'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Livewire.dispatch('deleteAppointmentConfirmed', {
+            id: event.id
+          });
+        }
+      });
+    });
+  });
+</script>
