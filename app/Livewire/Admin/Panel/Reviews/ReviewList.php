@@ -77,7 +77,7 @@ class ReviewList extends Component
         $reviews = Review::whereIn('id', $this->selectedReviews)->get();
         foreach ($reviews as $review) {
             if ($review->image_path) {
-                \Storage::disk('public')->delete($review->image_path);
+                Storage::disk('public')->delete($review->image_path);
             }
             $review->delete();
         }
