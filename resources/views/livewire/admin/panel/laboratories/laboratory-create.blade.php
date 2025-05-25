@@ -11,8 +11,7 @@
       </div>
       <a href="{{ route('admin.panel.laboratories.index') }}"
         class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">
-        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         بازگشت
@@ -63,11 +62,13 @@
               <label for="city_id" class="form-label">شهر</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="time" wire:model="start_time" class="form-control" id="start_time" placeholder=" ">
+              <input data-timepicker type="text" wire:model="start_time" class="form-control" id="start_time"
+                placeholder=" ">
               <label for="start_time" class="form-label">ساعت شروع</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="time" wire:model="end_time" class="form-control" id="end_time" placeholder=" ">
+              <input data-timepicker type="text" wire:model="end_time" class="form-control" id="end_time"
+                placeholder=" ">
               <label for="end_time" class="form-label">ساعت پایان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
@@ -110,7 +111,7 @@
                   stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
-                افزودن آزمایشگاه
+                افزودن
               </button>
             </div>
           </div>
@@ -119,99 +120,7 @@
     </div>
   </div>
 
-  <style>
-    .bg-gradient-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-    }
 
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-control,
-    .form-select {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 12px 15px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      height: 48px;
-      width: 100%;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-      border-color: #6b7280;
-      box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
-    }
-
-    .form-label {
-      position: absolute;
-      top: -25px;
-      right: 15px;
-      color: #374151;
-      font-size: 12px;
-      background: #ffffff;
-      padding: 0 5px;
-      pointer-events: none;
-    }
-
-    .my-btn-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-
-    .my-btn-primary:hover {
-      background: linear-gradient(90deg, #4b5563, #1f2937);
-      transform: translateY(-2px);
-    }
-
-    .form-check-input {
-      margin-top: 0;
-      height: 20px;
-      width: 20px;
-      vertical-align: middle;
-    }
-
-    .form-check-label {
-      margin-right: 25px;
-      line-height: 1.5;
-      vertical-align: middle;
-    }
-
-    .form-check-input:checked {
-      background-color: #6b7280;
-      border-color: #6b7280;
-    }
-
-    .select2-container {
-      width: 100% !important;
-    }
-
-    .select2-container--default .select2-selection--single {
-      height: 48px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-      line-height: 46px;
-      padding-right: 15px;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-      height: 46px;
-    }
-
-    .select2-dropdown {
-      z-index: 1050 !important;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {
