@@ -104,7 +104,7 @@
                   stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
-                افزودن بیمارستان
+                افزودن
               </button>
             </div>
           </div>
