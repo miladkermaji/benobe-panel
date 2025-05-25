@@ -15,8 +15,8 @@ class AppointmentList extends Component
 
     protected $listeners = ['deleteAppointmentConfirmed' => 'deleteAppointment'];
 
-    public $perPage = 10;
-    public $appointmentsPerPage = 5;
+    public $perPage = 100;
+    public $appointmentsPerPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $expandedDoctors = [];

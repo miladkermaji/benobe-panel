@@ -49,7 +49,7 @@
               <label for="appointment_date" class="form-label">تاریخ نوبت</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" dir="rtl">
-              <input type="text" wire:model="appointment_time" class="form-control flatpickr-time h-50"
+              <input type="text" data-timepicker wire:model="appointment_time" class="form-control h-50"
                 id="appointment_time" required>
               <label for="appointment_time" class="form-label">ساعت نوبت</label>
             </div>
@@ -104,33 +104,7 @@
   <script>
     document.addEventListener('livewire:init', function() {
       // مقداردهی اولیه flatpickr برای انتخاب زمان
-      flatpickr('#appointment_time', {
-        enableTime: true, // فعال کردن انتخاب زمان
-        noCalendar: true, // غیرفعال کردن تقویم (فقط زمان)
-        dateFormat: 'H:i', // فرمت 24 ساعته (مثل 14:30)
-        time_24hr: true, // استفاده از فرمت 24 ساعته
-        minuteIncrement: 5, // افزایش دقیقه‌ها با گام 5
-        defaultDate: '', // مقدار پیش‌فرض (خالی)
-        locale: { // پشتیبانی از RTL و فارسی
-          firstDayOfWeek: 6, // شروع هفته از شنبه
-          weekdays: {
-            shorthand: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
-            longhand: ['شنبه', 'یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'],
-          },
-          meridiem: {
-            am: 'ق.ظ',
-            pm: 'ب.ظ'
-          } // در صورت نیاز به 12 ساعته
-        },
-        onChange: function(selectedDates, dateStr) {
-          // ارسال مقدار به Livewire
-          if (dateStr) {
-            @this.set('appointment_time', dateStr);
-            console.log('Selected time:', dateStr); // برای دیباگ
-          }
-        }
-
-      });
+    
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });

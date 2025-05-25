@@ -41,4 +41,4 @@
   <link rel="stylesheet" href="{{ asset('admin-assets/css/my-form.css') }}">
 @endunless
 {{-- tom select --}}
-@vite(['resources/js/app.js', 'resources/css/app.css'])
+@vite(['resources/css/app.css', 'resources/css/timepicker.css', 'resources/js/app.js', 'resources/js/timepicker.js'])
