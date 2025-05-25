@@ -79,48 +79,7 @@
     </div>
   </div>
 
-  <style>
-    .bg-gradient-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-    }
 
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-control {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 12px 15px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      background: #fafafa;
-    }
-
-    .form-control:focus {
-      border-color: #6b7280;
-      box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
-      background: #fff;
-    }
-
-    .my-btn-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-
-    .my-btn-primary:hover {
-      background: linear-gradient(90deg, #4b5563, #1f2937);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline-success.active {
-      background-color: #28a745;
-      color: white;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {
