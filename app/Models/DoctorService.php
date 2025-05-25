@@ -35,6 +35,10 @@ class DoctorService extends Model
     {
         return $this->belongsTo(Clinic::class);
     }
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
 
     public function insurance()
     {
