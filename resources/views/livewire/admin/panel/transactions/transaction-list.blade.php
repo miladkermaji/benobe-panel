@@ -11,13 +11,13 @@
         </svg>
       </span>
     </div>
-    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
+    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2">
       <a href="{{ route('admin.panel.transactions.create') }}"
-        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2 w-100 w-md-auto justify-content-center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14" />
         </svg>
-        <span>افزودن تراکنش</span>
+        <span class="text-truncate">افزودن</span>
       </a>
     </div>
   </div>
@@ -49,87 +49,151 @@
                   </svg>
                 </div>
                 @if (in_array('user-' . $data['entity']->id, $expandedEntities))
-                  <div class="table-responsive text-nowrap p-3 bg-light">
-                    <table class="table table-bordered table-hover w-100 m-0">
-                      <thead class="glass-header text-white">
-                        <tr>
-                          <th class="text-center align-middle" style="width: 70px;">ردیف</th>
-                          <th class="align-middle">مبلغ (تومان)</th>
-                          <th class="align-middle">درگاه</th>
-                          <th class="align-middle">وضعیت</th>
-                          <th class="align-middle">تاریخ</th>
-                          <th class="text-center align-middle" style="width: 150px;">عملیات</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @forelse ($data['transactions'] as $index => $transaction)
+                  <!-- نمایش جدول در دسکتاپ -->
+                  <div class="d-none d-md-block">
+                    <div class="table-responsive text-nowrap p-3 bg-light">
+                      <table class="table table-bordered table-hover w-100 m-0">
+                        <thead class="glass-header text-white">
                           <tr>
-                            <td class="text-center align-middle">
-                              {{ ($data['currentPage'] - 1) * $transactionsPerPage + $index + 1 }}</td>
-                            <td class="align-middle">{{ number_format($transaction->amount) }}</td>
-                            <td class="align-middle">{{ $transaction->gateway }}</td>
-                            <td class="align-middle">
-                              <span
-                                class="badge {{ $transaction->status === 'paid' ? 'bg-label-success' : ($transaction->status === 'failed' ? 'bg-label-danger' : 'bg-label-warning') }}">
-                                {{ $transaction->status === 'paid' ? 'پرداخت‌شده' : ($transaction->status === 'failed' ? 'ناموفق' : 'در انتظار') }}
-                              </span>
-                            </td>
-                            <td class="align-middle">{{ $transaction->jalali_created_at }}</td>
-                            <td class="text-center align-middle">
-                              <div class="d-flex justify-content-center gap-2">
-                                <a href="{{ route('admin.panel.transactions.edit', $transaction->id) }}"
-                                  class="btn btn-gradient-success rounded-pill px-3">
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path
-                                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                  </svg>
-                                </a>
-                                <button wire:click="confirmDelete({{ $transaction->id }})"
-                                  class="btn btn-gradient-danger rounded-pill px-3">
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path
-                                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                  </svg>
-                                </button>
-                              </div>
-                            </td>
+                            <th class="text-center align-middle" style="width: 70px;">ردیف</th>
+                            <th class="align-middle">مبلغ (تومان)</th>
+                            <th class="align-middle">درگاه</th>
+                            <th class="align-middle">وضعیت</th>
+                            <th class="align-middle">تاریخ</th>
+                            <th class="text-center align-middle" style="width: 150px;">عملیات</th>
                           </tr>
-                        @empty
-                          <tr>
-                            <td colspan="6" class="text-center py-5">هیچ تراکنشی یافت نشد.</td>
-                          </tr>
-                        @endforelse
-                      </tbody>
-                    </table>
-                    @if ($data['totalTransactions'] > $transactionsPerPage)
-                      <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div>
-                          نمایش {{ ($data['currentPage'] - 1) * $transactionsPerPage + 1 }} تا
-                          {{ min($data['currentPage'] * $transactionsPerPage, $data['totalTransactions']) }} از
-                          {{ $data['totalTransactions'] }} تراکنش
-                        </div>
-                        <nav>
-                          <ul class="pagination mb-0">
-                            <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
-                              <button class="page-link"
-                                wire:click="setEntityPage('user-{{ $data['entity']->id }}', {{ $data['currentPage'] - 1 }})">قبلی</button>
-                            </li>
-                            @for ($i = 1; $i <= $data['lastPage']; $i++)
-                              <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
+                        </thead>
+                        <tbody>
+                          @forelse ($data['transactions'] as $index => $transaction)
+                            <tr>
+                              <td class="text-center align-middle">
+                                {{ ($data['currentPage'] - 1) * $transactionsPerPage + $index + 1 }}</td>
+                              <td class="align-middle">{{ number_format($transaction->amount) }}</td>
+                              <td class="align-middle">{{ $transaction->gateway }}</td>
+                              <td class="align-middle">
+                                <span
+                                  class="badge {{ $transaction->status === 'paid' ? 'bg-label-success' : ($transaction->status === 'failed' ? 'bg-label-danger' : 'bg-label-warning') }}">
+                                  {{ $transaction->status === 'paid' ? 'پرداخت‌شده' : ($transaction->status === 'failed' ? 'ناموفق' : 'در انتظار') }}
+                                </span>
+                              </td>
+                              <td class="align-middle">{{ $transaction->jalali_created_at }}</td>
+                              <td class="text-center align-middle">
+                                <div class="d-flex justify-content-center gap-2">
+                                  <a href="{{ route('admin.panel.transactions.edit', $transaction->id) }}"
+                                    class="btn btn-gradient-success rounded-pill px-3">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                      stroke="currentColor" stroke-width="2">
+                                      <path
+                                        d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                    </svg>
+                                  </a>
+                                  <button wire:click="confirmDelete({{ $transaction->id }})"
+                                    class="btn btn-gradient-danger rounded-pill px-3">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                      stroke="currentColor" stroke-width="2">
+                                      <path
+                                        d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          @empty
+                            <tr>
+                              <td colspan="6" class="text-center py-5">هیچ تراکنشی یافت نشد.</td>
+                            </tr>
+                          @endforelse
+                        </tbody>
+                      </table>
+                      @if ($data['totalTransactions'] > $transactionsPerPage)
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                          <div>
+                            نمایش {{ ($data['currentPage'] - 1) * $transactionsPerPage + 1 }} تا
+                            {{ min($data['currentPage'] * $transactionsPerPage, $data['totalTransactions']) }} از
+                            {{ $data['totalTransactions'] }} تراکنش
+                          </div>
+                          <nav>
+                            <ul class="pagination mb-0">
+                              <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
                                 <button class="page-link"
-                                  wire:click="setEntityPage('user-{{ $data['entity']->id }}', {{ $i }})">{{ $i }}</button>
+                                  wire:click="setEntityPage('user-{{ $data['entity']->id }}', {{ $data['currentPage'] - 1 }})">قبلی</button>
                               </li>
-                            @endfor
-                            <li class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
-                              <button class="page-link"
-                                wire:click="setEntityPage('user-{{ $data['entity']->id }}', {{ $data['currentPage'] + 1 }})">بعدی</button>
-                            </li>
-                          </ul>
-                        </nav>
+                              @for ($i = 1; $i <= $data['lastPage']; $i++)
+                                <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
+                                  <button class="page-link"
+                                    wire:click="setEntityPage('user-{{ $data['entity']->id }}', {{ $i }})">{{ $i }}</button>
+                                </li>
+                              @endfor
+                              <li class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
+                                <button class="page-link"
+                                  wire:click="setEntityPage('user-{{ $data['entity']->id }}', {{ $data['currentPage'] + 1 }})">بعدی</button>
+                              </li>
+                            </ul>
+                          </nav>
+                        </div>
+                      @endif
+                    </div>
+                  </div>
+
+                  <!-- نمایش کارت در موبایل و تبلت -->
+                  <div class="d-md-none p-3 bg-light">
+                    @forelse ($data['transactions'] as $index => $transaction)
+                      <div class="card shadow-sm mb-3 border-0">
+                        <div class="card-body p-3">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span
+                              class="badge bg-label-primary">#{{ ($data['currentPage'] - 1) * $transactionsPerPage + $index + 1 }}</span>
+                            <div class="d-flex gap-2">
+                              <a href="{{ route('admin.panel.transactions.edit', $transaction->id) }}"
+                                class="btn btn-gradient-success rounded-pill px-3">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2">
+                                  <path
+                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>
+                              </a>
+                              <button wire:click="confirmDelete({{ $transaction->id }})"
+                                class="btn btn-gradient-danger rounded-pill px-3">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2">
+                                  <path
+                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">مبلغ:</small>
+                            <span class="fw-medium">{{ number_format($transaction->amount) }} تومان</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">درگاه:</small>
+                            <span class="fw-medium">{{ $transaction->gateway }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">وضعیت:</small>
+                            <span
+                              class="badge {{ $transaction->status === 'paid' ? 'bg-label-success' : ($transaction->status === 'failed' ? 'bg-label-danger' : 'bg-label-warning') }}">
+                              {{ $transaction->status === 'paid' ? 'پرداخت‌شده' : ($transaction->status === 'failed' ? 'ناموفق' : 'در انتظار') }}
+                            </span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">تاریخ:</small>
+                            <span class="fw-medium">{{ $transaction->jalali_created_at }}</span>
+                          </div>
+                        </div>
                       </div>
-                    @endif
+                    @empty
+                      <div class="text-center py-5">
+                        <div class="d-flex flex-column align-items-center justify-content-center">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                          <p class="text-muted fw-medium m-0">هیچ تراکنشی یافت نشد.</p>
+                        </div>
+                      </div>
+                    @endforelse
                   </div>
                 @endif
               </div>
@@ -170,87 +234,151 @@
                   </svg>
                 </div>
                 @if (in_array('doctor-' . $data['entity']->id, $expandedEntities))
-                  <div class="table-responsive text-nowrap p-3 bg-light">
-                    <table class="table table-bordered table-hover w-100 m-0">
-                      <thead class="glass-header text-white">
-                        <tr>
-                          <th class="text-center align-middle" style="width: 70px;">ردیف</th>
-                          <th class="align-middle">مبلغ (تومان)</th>
-                          <th class="align-middle">درگاه</th>
-                          <th class="align-middle">وضعیت</th>
-                          <th class="align-middle">تاریخ</th>
-                          <th class="text-center align-middle" style="width: 150px;">عملیات</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @forelse ($data['transactions'] as $index => $transaction)
+                  <!-- نمایش جدول در دسکتاپ -->
+                  <div class="d-none d-md-block">
+                    <div class="table-responsive text-nowrap p-3 bg-light">
+                      <table class="table table-bordered table-hover w-100 m-0">
+                        <thead class="glass-header text-white">
                           <tr>
-                            <td class="text-center align-middle">
-                              {{ ($data['currentPage'] - 1) * $transactionsPerPage + $index + 1 }}</td>
-                            <td class="align-middle">{{ number_format($transaction->amount) }}</td>
-                            <td class="align-middle">{{ $transaction->gateway }}</td>
-                            <td class="align-middle">
-                              <span
-                                class="badge {{ $transaction->status === 'paid' ? 'bg-label-success' : ($transaction->status === 'failed' ? 'bg-label-danger' : 'bg-label-warning') }}">
-                                {{ $transaction->status === 'paid' ? 'پرداخت‌شده' : ($transaction->status === 'failed' ? 'ناموفق' : 'در انتظار') }}
-                              </span>
-                            </td>
-                            <td class="align-middle">{{ $transaction->jalali_created_at }}</td>
-                            <td class="text-center align-middle">
-                              <div class="d-flex justify-content-center gap-2">
-                                <a href="{{ route('admin.panel.transactions.edit', $transaction->id) }}"
-                                  class="btn btn-gradient-success rounded-pill px-3">
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path
-                                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                  </svg>
-                                </a>
-                                <button wire:click="confirmDelete({{ $transaction->id }})"
-                                  class="btn btn-gradient-danger rounded-pill px-3">
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path
-                                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                  </svg>
-                                </button>
-                              </div>
-                            </td>
+                            <th class="text-center align-middle" style="width: 70px;">ردیف</th>
+                            <th class="align-middle">مبلغ (تومان)</th>
+                            <th class="align-middle">درگاه</th>
+                            <th class="align-middle">وضعیت</th>
+                            <th class="align-middle">تاریخ</th>
+                            <th class="text-center align-middle" style="width: 150px;">عملیات</th>
                           </tr>
-                        @empty
-                          <tr>
-                            <td colspan="6" class="text-center py-5">هیچ تراکنشی یافت نشد.</td>
-                          </tr>
-                        @endforelse
-                      </tbody>
-                    </table>
-                    @if ($data['totalTransactions'] > $transactionsPerPage)
-                      <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div>
-                          نمایش {{ ($data['currentPage'] - 1) * $transactionsPerPage + 1 }} تا
-                          {{ min($data['currentPage'] * $transactionsPerPage, $data['totalTransactions']) }} از
-                          {{ $data['totalTransactions'] }} تراکنش
-                        </div>
-                        <nav>
-                          <ul class="pagination mb-0">
-                            <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
-                              <button class="page-link"
-                                wire:click="setEntityPage('doctor-{{ $data['entity']->id }}', {{ $data['currentPage'] - 1 }})">قبلی</button>
-                            </li>
-                            @for ($i = 1; $i <= $data['lastPage']; $i++)
-                              <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
+                        </thead>
+                        <tbody>
+                          @forelse ($data['transactions'] as $index => $transaction)
+                            <tr>
+                              <td class="text-center align-middle">
+                                {{ ($data['currentPage'] - 1) * $transactionsPerPage + $index + 1 }}</td>
+                              <td class="align-middle">{{ number_format($transaction->amount) }}</td>
+                              <td class="align-middle">{{ $transaction->gateway }}</td>
+                              <td class="align-middle">
+                                <span
+                                  class="badge {{ $transaction->status === 'paid' ? 'bg-label-success' : ($transaction->status === 'failed' ? 'bg-label-danger' : 'bg-label-warning') }}">
+                                  {{ $transaction->status === 'paid' ? 'پرداخت‌شده' : ($transaction->status === 'failed' ? 'ناموفق' : 'در انتظار') }}
+                                </span>
+                              </td>
+                              <td class="align-middle">{{ $transaction->jalali_created_at }}</td>
+                              <td class="text-center align-middle">
+                                <div class="d-flex justify-content-center gap-2">
+                                  <a href="{{ route('admin.panel.transactions.edit', $transaction->id) }}"
+                                    class="btn btn-gradient-success rounded-pill px-3">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                      stroke="currentColor" stroke-width="2">
+                                      <path
+                                        d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                    </svg>
+                                  </a>
+                                  <button wire:click="confirmDelete({{ $transaction->id }})"
+                                    class="btn btn-gradient-danger rounded-pill px-3">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                      stroke="currentColor" stroke-width="2">
+                                      <path
+                                        d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          @empty
+                            <tr>
+                              <td colspan="6" class="text-center py-5">هیچ تراکنشی یافت نشد.</td>
+                            </tr>
+                          @endforelse
+                        </tbody>
+                      </table>
+                      @if ($data['totalTransactions'] > $transactionsPerPage)
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                          <div>
+                            نمایش {{ ($data['currentPage'] - 1) * $transactionsPerPage + 1 }} تا
+                            {{ min($data['currentPage'] * $transactionsPerPage, $data['totalTransactions']) }} از
+                            {{ $data['totalTransactions'] }} تراکنش
+                          </div>
+                          <nav>
+                            <ul class="pagination mb-0">
+                              <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
                                 <button class="page-link"
-                                  wire:click="setEntityPage('doctor-{{ $data['entity']->id }}', {{ $i }})">{{ $i }}</button>
+                                  wire:click="setEntityPage('doctor-{{ $data['entity']->id }}', {{ $data['currentPage'] - 1 }})">قبلی</button>
                               </li>
-                            @endfor
-                            <li class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
-                              <button class="page-link"
-                                wire:click="setEntityPage('doctor-{{ $data['entity']->id }}', {{ $data['currentPage'] + 1 }})">بعدی</button>
-                            </li>
-                          </ul>
-                        </nav>
+                              @for ($i = 1; $i <= $data['lastPage']; $i++)
+                                <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
+                                  <button class="page-link"
+                                    wire:click="setEntityPage('doctor-{{ $data['entity']->id }}', {{ $i }})">{{ $i }}</button>
+                                </li>
+                              @endfor
+                              <li class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
+                                <button class="page-link"
+                                  wire:click="setEntityPage('doctor-{{ $data['entity']->id }}', {{ $data['currentPage'] + 1 }})">بعدی</button>
+                              </li>
+                            </ul>
+                          </nav>
+                        </div>
+                      @endif
+                    </div>
+                  </div>
+
+                  <!-- نمایش کارت در موبایل و تبلت -->
+                  <div class="d-md-none p-3 bg-light">
+                    @forelse ($data['transactions'] as $index => $transaction)
+                      <div class="card shadow-sm mb-3 border-0">
+                        <div class="card-body p-3">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span
+                              class="badge bg-label-primary">#{{ ($data['currentPage'] - 1) * $transactionsPerPage + $index + 1 }}</span>
+                            <div class="d-flex gap-2">
+                              <a href="{{ route('admin.panel.transactions.edit', $transaction->id) }}"
+                                class="btn btn-gradient-success rounded-pill px-3">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2">
+                                  <path
+                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>
+                              </a>
+                              <button wire:click="confirmDelete({{ $transaction->id }})"
+                                class="btn btn-gradient-danger rounded-pill px-3">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2">
+                                  <path
+                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">مبلغ:</small>
+                            <span class="fw-medium">{{ number_format($transaction->amount) }} تومان</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">درگاه:</small>
+                            <span class="fw-medium">{{ $transaction->gateway }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">وضعیت:</small>
+                            <span
+                              class="badge {{ $transaction->status === 'paid' ? 'bg-label-success' : ($transaction->status === 'failed' ? 'bg-label-danger' : 'bg-label-warning') }}">
+                              {{ $transaction->status === 'paid' ? 'پرداخت‌شده' : ($transaction->status === 'failed' ? 'ناموفق' : 'در انتظار') }}
+                            </span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">تاریخ:</small>
+                            <span class="fw-medium">{{ $transaction->jalali_created_at }}</span>
+                          </div>
+                        </div>
                       </div>
-                    @endif
+                    @empty
+                      <div class="text-center py-5">
+                        <div class="d-flex flex-column align-items-center justify-content-center">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                          <p class="text-muted fw-medium m-0">هیچ تراکنشی یافت نشد.</p>
+                        </div>
+                      </div>
+                    @endforelse
                   </div>
                 @endif
               </div>
@@ -293,87 +421,152 @@
                   </svg>
                 </div>
                 @if (in_array('secretary-' . $data['entity']->id, $expandedEntities))
-                  <div class="table-responsive text-nowrap p-3 bg-light">
-                    <table class="table table-bordered table-hover w-100 m-0">
-                      <thead class="glass-header text-white">
-                        <tr>
-                          <th class="text-center align-middle" style="width: 70px;">ردیف</th>
-                          <th class="align-middle">مبلغ (تومان)</th>
-                          <th class="align-middle">درگاه</th>
-                          <th class="align-middle">وضعیت</th>
-                          <th class="align-middle">تاریخ</th>
-                          <th class="text-center align-middle" style="width: 150px;">عملیات</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @forelse ($data['transactions'] as $index => $transaction)
+                  <!-- نمایش جدول در دسکتاپ -->
+                  <div class="d-none d-md-block">
+                    <div class="table-responsive text-nowrap p-3 bg-light">
+                      <table class="table table-bordered table-hover w-100 m-0">
+                        <thead class="glass-header text-white">
                           <tr>
-                            <td class="text-center align-middle">
-                              {{ ($data['currentPage'] - 1) * $transactionsPerPage + $index + 1 }}</td>
-                            <td class="align-middle">{{ number_format($transaction->amount) }}</td>
-                            <td class="align-middle">{{ $transaction->gateway }}</td>
-                            <td class="align-middle">
-                              <span
-                                class="badge {{ $transaction->status === 'paid' ? 'bg-label-success' : ($transaction->status === 'failed' ? 'bg-label-danger' : 'bg-label-warning') }}">
-                                {{ $transaction->status === 'paid' ? 'پرداخت‌شده' : ($transaction->status === 'failed' ? 'ناموفق' : 'در انتظار') }}
-                              </span>
-                            </td>
-                            <td class="align-middle">{{ $transaction->jalali_created_at }}</td>
-                            <td class="text-center align-middle">
-                              <div class="d-flex justify-content-center gap-2">
-                                <a href="{{ route('admin.panel.transactions.edit', $transaction->id) }}"
-                                  class="btn btn-gradient-success rounded-pill px-3">
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path
-                                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                  </svg>
-                                </a>
-                                <button wire:click="confirmDelete({{ $transaction->id }})"
-                                  class="btn btn-gradient-danger rounded-pill px-3">
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path
-                                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                  </svg>
-                                </button>
-                              </div>
-                            </td>
+                            <th class="text-center align-middle" style="width: 70px;">ردیف</th>
+                            <th class="align-middle">مبلغ (تومان)</th>
+                            <th class="align-middle">درگاه</th>
+                            <th class="align-middle">وضعیت</th>
+                            <th class="align-middle">تاریخ</th>
+                            <th class="text-center align-middle" style="width: 150px;">عملیات</th>
                           </tr>
-                        @empty
-                          <tr>
-                            <td colspan="6" class="text-center py-5">هیچ تراکنشی یافت نشد.</td>
-                          </tr>
-                        @endforelse
-                      </tbody>
-                    </table>
-                    @if ($data['totalTransactions'] > $transactionsPerPage)
-                      <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div>
-                          نمایش {{ ($data['currentPage'] - 1) * $transactionsPerPage + 1 }} تا
-                          {{ min($data['currentPage'] * $transactionsPerPage, $data['totalTransactions']) }} از
-                          {{ $data['totalTransactions'] }} تراکنش
-                        </div>
-                        <nav>
-                          <ul class="pagination mb-0">
-                            <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
-                              <button class="page-link"
-                                wire:click="setEntityPage('secretary-{{ $data['entity']->id }}', {{ $data['currentPage'] - 1 }})">قبلی</button>
-                            </li>
-                            @for ($i = 1; $i <= $data['lastPage']; $i++)
-                              <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
+                        </thead>
+                        <tbody>
+                          @forelse ($data['transactions'] as $index => $transaction)
+                            <tr>
+                              <td class="text-center align-middle">
+                                {{ ($data['currentPage'] - 1) * $transactionsPerPage + $index + 1 }}</td>
+                              <td class="align-middle">{{ number_format($transaction->amount) }}</td>
+                              <td class="align-middle">{{ $transaction->gateway }}</td>
+                              <td class="align-middle">
+                                <span
+                                  class="badge {{ $transaction->status === 'paid' ? 'bg-label-success' : ($transaction->status === 'failed' ? 'bg-label-danger' : 'bg-label-warning') }}">
+                                  {{ $transaction->status === 'paid' ? 'پرداخت‌شده' : ($transaction->status === 'failed' ? 'ناموفق' : 'در انتظار') }}
+                                </span>
+                              </td>
+                              <td class="align-middle">{{ $transaction->jalali_created_at }}</td>
+                              <td class="text-center align-middle">
+                                <div class="d-flex justify-content-center gap-2">
+                                  <a href="{{ route('admin.panel.transactions.edit', $transaction->id) }}"
+                                    class="btn btn-gradient-success rounded-pill px-3">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                      stroke="currentColor" stroke-width="2">
+                                      <path
+                                        d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                    </svg>
+                                  </a>
+                                  <button wire:click="confirmDelete({{ $transaction->id }})"
+                                    class="btn btn-gradient-danger rounded-pill px-3">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                      stroke="currentColor" stroke-width="2">
+                                      <path
+                                        d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          @empty
+                            <tr>
+                              <td colspan="6" class="text-center py-5">هیچ تراکنشی یافت نشد.</td>
+                            </tr>
+                          @endforelse
+                        </tbody>
+                      </table>
+                      @if ($data['totalTransactions'] > $transactionsPerPage)
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                          <div>
+                            نمایش {{ ($data['currentPage'] - 1) * $transactionsPerPage + 1 }} تا
+                            {{ min($data['currentPage'] * $transactionsPerPage, $data['totalTransactions']) }} از
+                            {{ $data['totalTransactions'] }} تراکنش
+                          </div>
+                          <nav>
+                            <ul class="pagination mb-0">
+                              <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
                                 <button class="page-link"
-                                  wire:click="setEntityPage('secretary-{{ $data['entity']->id }}', {{ $i }})">{{ $i }}</button>
+                                  wire:click="setEntityPage('secretary-{{ $data['entity']->id }}', {{ $data['currentPage'] - 1 }})">قبلی</button>
                               </li>
-                            @endfor
-                            <li class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
-                              <button class="page-link"
-                                wire:click="setEntityPage('secretary-{{ $data['entity']->id }}', {{ $data['currentPage'] + 1 }})">بعدی</button>
-                            </li>
-                          </ul>
-                        </nav>
+                              @for ($i = 1; $i <= $data['lastPage']; $i++)
+                                <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
+                                  <button class="page-link"
+                                    wire:click="setEntityPage('secretary-{{ $data['entity']->id }}', {{ $i }})">{{ $i }}</button>
+                                </li>
+                              @endfor
+                              <li
+                                class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
+                                <button class="page-link"
+                                  wire:click="setEntityPage('secretary-{{ $data['entity']->id }}', {{ $data['currentPage'] + 1 }})">بعدی</button>
+                              </li>
+                            </ul>
+                          </nav>
+                        </div>
+                      @endif
+                    </div>
+                  </div>
+
+                  <!-- نمایش کارت در موبایل و تبلت -->
+                  <div class="d-md-none p-3 bg-light">
+                    @forelse ($data['transactions'] as $index => $transaction)
+                      <div class="card shadow-sm mb-3 border-0">
+                        <div class="card-body p-3">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span
+                              class="badge bg-label-primary">#{{ ($data['currentPage'] - 1) * $transactionsPerPage + $index + 1 }}</span>
+                            <div class="d-flex gap-2">
+                              <a href="{{ route('admin.panel.transactions.edit', $transaction->id) }}"
+                                class="btn btn-gradient-success rounded-pill px-3">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2">
+                                  <path
+                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>
+                              </a>
+                              <button wire:click="confirmDelete({{ $transaction->id }})"
+                                class="btn btn-gradient-danger rounded-pill px-3">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2">
+                                  <path
+                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">مبلغ:</small>
+                            <span class="fw-medium">{{ number_format($transaction->amount) }} تومان</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">درگاه:</small>
+                            <span class="fw-medium">{{ $transaction->gateway }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">وضعیت:</small>
+                            <span
+                              class="badge {{ $transaction->status === 'paid' ? 'bg-label-success' : ($transaction->status === 'failed' ? 'bg-label-danger' : 'bg-label-warning') }}">
+                              {{ $transaction->status === 'paid' ? 'پرداخت‌شده' : ($transaction->status === 'failed' ? 'ناموفق' : 'در انتظار') }}
+                            </span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">تاریخ:</small>
+                            <span class="fw-medium">{{ $transaction->jalali_created_at }}</span>
+                          </div>
+                        </div>
                       </div>
-                    @endif
+                    @empty
+                      <div class="text-center py-5">
+                        <div class="d-flex flex-column align-items-center justify-content-center">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                          <p class="text-muted fw-medium m-0">هیچ تراکنشی یافت نشد.</p>
+                        </div>
+                      </div>
+                    @endforelse
                   </div>
                 @endif
               </div>
@@ -396,74 +589,6 @@
       </div>
     </div>
   </div>
-
-  <style>
-    .glass-header {
-      background: linear-gradient(90deg, #6b7280, #374151);
-    }
-
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #10b981, #059669);
-      border: none;
-      color: white;
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      border: none;
-      color: white;
-    }
-
-    .btn-gradient-success:hover,
-    .btn-gradient-danger:hover {
-      transform: translateY(-2px);
-    }
-
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .entity-toggle {
-      transition: all 0.3s ease;
-    }
-
-    .entity-toggle:hover {
-      background: #f9fafb;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-
-    .transition-transform {
-      transition: transform 0.3s ease;
-    }
-
-    .rotate-180 {
-      transform: rotate(180deg);
-    }
-
-    .bg-label-primary {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .bg-label-success {
-      background: #d1fae5;
-      color: #059669;
-    }
-
-    .bg-label-danger {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-
-    .bg-label-warning {
-      background: #fef3c7;
-      color: #d97706;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:initialized', function() {
