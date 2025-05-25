@@ -14,8 +14,7 @@
     <div class="d-flex gap-2 flex-shrink-0  justify-content-center mt-md-2">
       <a href="{{ route('admin.panel.laboratories.create') }}"
         class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
-        <svg  width="16" height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14" />
         </svg>
         <span class="text-truncate">افزودن</span>
@@ -23,8 +22,7 @@
       <button wire:click="deleteSelected"
         class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto"
         @if (empty($selectedLaboratories)) disabled @endif>
-        <svg  width="16" height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
         </svg>
         <span class="text-truncate">حذف انتخاب‌شده‌ها</span>
@@ -75,8 +73,18 @@
                       </td>
                       <td class="align-middle">{{ $item->province?->name ?? '-' }}</td>
                       <td class="align-middle">{{ $item->city?->name ?? '-' }}</td>
-                      <td class="align-middle">{{ $item->address ?? '-' }}</td>
-                      <td class="align-middle">{{ $item->description }}</td>
+                      <td class="align-middle">
+                        <div class="text-truncate" style="max-width: 150px;" data-bs-toggle="tooltip"
+                          data-bs-placement="top" title="{{ $item->address ?? '-' }}">
+                          {{ $item->address ?? '-' }}
+                        </div>
+                      </td>
+                      <td class="align-middle">
+                        <div class="text-truncate" style="max-width: 150px;" data-bs-toggle="tooltip"
+                          data-bs-placement="top" title="{{ $item->description ?? '-' }}">
+                          {{ $item->description ?? '-' }}
+                        </div>
+                      </td>
                       <td class="text-center align-middle">
                         <a href="{{ route('admin.panel.laboratories.gallery', $item->id) }}"
                           class="btn btn-gradient-info rounded-pill px-3">
@@ -96,8 +104,8 @@
                         <div class="d-flex justify-content-center gap-2">
                           <a href="{{ route('admin.panel.laboratories.edit', $item->id) }}"
                             class="btn btn-gradient-success rounded-pill px-3">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
                               <path
                                 d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
@@ -177,11 +185,17 @@
                   </div>
                   <div class="d-flex justify-content-between align-items-center mb-2">
                     <small class="text-muted">آدرس:</small>
-                    <span class="fw-medium">{{ $item->address ?? '-' }}</span>
+                    <div class="text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip"
+                      data-bs-placement="top" title="{{ $item->address ?? '-' }}">
+                      {{ $item->address ?? '-' }}
+                    </div>
                   </div>
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <small class="text-muted">توضیحات:</small>
-                    <span class="fw-medium">{{ $item->description ?? '-' }}</span>
+                    <div class="text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip"
+                      data-bs-placement="top" title="{{ $item->description ?? '-' }}">
+                      {{ $item->description ?? '-' }}
+                    </div>
                   </div>
                   <div class="d-flex justify-content-end gap-2">
                     <a href="{{ route('admin.panel.laboratories.gallery', $item->id) }}"
@@ -261,6 +275,10 @@
           }
         });
       });
+
+      // Initialize tooltips
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     });
   </script>
 </div>
