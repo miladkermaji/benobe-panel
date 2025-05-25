@@ -13,11 +13,11 @@
     </div>
     <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
       <a href="{{ route('admin.panel.doctor-holidays.create') }}"
-        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+        class="btn btn-gradient-success rounded-pill px-4 d-flex justify-content-center align-items-center gap-2">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14" />
         </svg>
-        <span>افزودن تعطیلات جدید</span>
+        <span>افزودن</span>
       </a>
     </div>
   </div>
@@ -50,70 +50,134 @@
 
               @if (in_array($doctor->id, $expandedDoctors))
                 <div class="table-responsive text-nowrap p-3 bg-light">
-                  <table class="table table-bordered table-hover w-100 m-0">
-                    <thead class="glass-header text-white">
-                      <tr>
-                        <th class="text-center align-middle" style="width: 70px;">ردیف</th>
-                        <th class="align-middle">تاریخ تعطیل</th>
-                        <th class="align-middle">کلینیک</th>
-                        <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
-                        <th class="text-center align-middle" style="width: 150px;">عملیات</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @php
-                        $paginatedHolidays = $this->getPaginatedHolidays(
-                            $doctor->id,
-                            request()->query('page_' . $doctor->id, 1),
-                        );
-                      @endphp
-                      @forelse ($paginatedHolidays as $index => $holiday)
+                  <!-- نمایش جدول در دسکتاپ -->
+                  <div class="d-none d-md-block">
+                    <table class="table table-bordered table-hover w-100 m-0">
+                      <thead class="glass-header text-white">
                         <tr>
-                          <td class="text-center align-middle">{{ $paginatedHolidays->firstItem() + $index }}</td>
-                          <td class="align-middle">{{ $holiday['date'] }}</td>
-                          <td class="align-middle">{{ $holiday['clinic'] ?? '---' }}</td>
-                          <td class="text-center align-middle">
+                          <th class="text-center align-middle" style="width: 70px;">ردیف</th>
+                          <th class="align-middle">تاریخ تعطیل</th>
+                          <th class="align-middle">کلینیک</th>
+                          <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
+                          <th class="text-center align-middle" style="width: 150px;">عملیات</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @php
+                          $paginatedHolidays = $this->getPaginatedHolidays(
+                              $doctor->id,
+                              request()->query('page_' . $doctor->id, 1),
+                          );
+                        @endphp
+                        @forelse ($paginatedHolidays as $index => $holiday)
+                          <tr>
+                            <td class="text-center align-middle">{{ $paginatedHolidays->firstItem() + $index }}</td>
+                            <td class="align-middle">{{ $holiday['date'] }}</td>
+                            <td class="align-middle">{{ $holiday['clinic'] ?? '---' }}</td>
+                            <td class="text-center align-middle">
+                              <button wire:click="toggleStatus({{ $holiday['id'] }})"
+                                class="badge {{ $holiday['status'] === 'active' ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                                {{ $holiday['status'] === 'active' ? 'فعال' : 'غیرفعال' }}
+                              </button>
+                            </td>
+                            <td class="text-center align-middle">
+                              <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ route('admin.panel.doctor-holidays.edit', [$holiday['id'], str_replace('/', '-', $holiday['date'])]) }}"
+                                  class="btn btn-gradient-success rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                  </svg>
+                                </a>
+                                <button wire:click="confirmDelete({{ $holiday['id'] }})"
+                                  class="btn btn-gradient-danger rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        @empty
+                          <tr>
+                            <td colspan="5" class="text-center py-5">
+                              <div class="d-flex flex-column align-items-center justify-content-center">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                                  <path d="M5 12h14M12 5l7 7-7 7" />
+                                </svg>
+                                <p class="text-muted fw-medium m-0">هیچ تعطیلاتی یافت نشد.</p>
+                              </div>
+                            </td>
+                          </tr>
+                        @endforelse
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- نمایش کارت در موبایل و تبلت -->
+                  <div class="d-md-none">
+                    @php
+                      $paginatedHolidays = $this->getPaginatedHolidays(
+                          $doctor->id,
+                          request()->query('page_' . $doctor->id, 1),
+                      );
+                    @endphp
+                    @forelse ($paginatedHolidays as $index => $holiday)
+                      <div class="card shadow-sm mb-3 border-0">
+                        <div class="card-body p-3">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span
+                              class="badge bg-label-primary">#{{ $paginatedHolidays->firstItem() + $index }}</span>
                             <button wire:click="toggleStatus({{ $holiday['id'] }})"
                               class="badge {{ $holiday['status'] === 'active' ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
                               {{ $holiday['status'] === 'active' ? 'فعال' : 'غیرفعال' }}
                             </button>
-                          </td>
-                          <td class="text-center align-middle">
-                            <div class="d-flex justify-content-center gap-2">
-                              <a href="{{ route('admin.panel.doctor-holidays.edit', [$holiday['id'], str_replace('/', '-', $holiday['date'])]) }}"
-                                class="btn btn-gradient-success rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                </svg>
-                              </a>
-                              <button wire:click="confirmDelete({{ $holiday['id'] }})"
-                                class="btn btn-gradient-danger rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                </svg>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      @empty
-                        <tr>
-                          <td colspan="5" class="text-center py-5">
-                            <div class="d-flex flex-column align-items-center justify-content-center">
-                              <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" class="text-muted mb-3">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
+                          </div>
+                          <div class="mb-2">
+                            <small class="text-muted d-block mb-1">تاریخ تعطیل:</small>
+                            <span class="fw-medium">{{ $holiday['date'] }}</span>
+                          </div>
+                          <div class="mb-3">
+                            <small class="text-muted d-block mb-1">کلینیک:</small>
+                            <span class="fw-medium">{{ $holiday['clinic'] ?? '---' }}</span>
+                          </div>
+                          <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ route('admin.panel.doctor-holidays.edit', [$holiday['id'], str_replace('/', '-', $holiday['date'])]) }}"
+                              class="btn btn-gradient-success rounded-pill px-3">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path
+                                  d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                               </svg>
-                              <p class="text-muted fw-medium m-0">هیچ تعطیلاتی یافت نشد.</p>
-                            </div>
-                          </td>
-                        </tr>
-                      @endforelse
-                    </tbody>
-                  </table>
+                            </a>
+                            <button wire:click="confirmDelete({{ $holiday['id'] }})"
+                              class="btn btn-gradient-danger rounded-pill px-3">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path
+                                  d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    @empty
+                      <div class="text-center py-5">
+                        <div class="d-flex flex-column align-items-center justify-content-center">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                          <p class="text-muted fw-medium m-0">هیچ تعطیلاتی یافت نشد.</p>
+                        </div>
+                      </div>
+                    @endforelse
+                  </div>
+
                   <div class="mt-3">
                     {{ $paginatedHolidays->appends(['doctor_id' => $doctor->id])->links('vendor.livewire.bootstrap') }}
                   </div>
@@ -138,57 +202,7 @@
     </div>
   </div>
 
-  <style>
-    .glass-header {
-      background: linear-gradient(90deg, rgba(107, 114, 128, 0.9), rgba(55, 65, 81, 0.9));
-      backdrop-filter: blur(10px);
-    }
 
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: white;
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      color: white;
-    }
-
-    .doctor-toggle {
-      transition: all 0.3s ease;
-    }
-
-    .doctor-toggle:hover {
-      background: #f9fafb;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-
-    .transition-transform {
-      transition: transform 0.3s ease;
-    }
-
-    .rotate-180 {
-      transform: rotate(180deg);
-    }
-
-    .bg-label-primary {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .bg-label-success {
-      background: #d1fae5;
-      color: #059669;
-    }
-
-    .bg-label-danger {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {
