@@ -14,7 +14,7 @@ class ZoneList extends Component
 
     protected $listeners = ['deleteZoneConfirmed' => 'deleteZone'];
 
-    public $perPage       = 10;
+    public $perPage       = 100;
     public $search        = '';
     public $readyToLoad   = false;
     public $selectedZones = [];
