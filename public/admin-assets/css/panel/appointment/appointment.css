@@ -491,11 +491,9 @@
 
 .form-label {
     position: absolute;
-    top: -25px;
-    right: 15px;
+    top: -18px;
     color: #374151;
     font-size: 12px;
-    background: #ffffff;
     padding: 0 5px;
     pointer-events: none;
 }
