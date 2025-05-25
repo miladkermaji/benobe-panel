@@ -34,7 +34,8 @@
   <div class="container-fluid px-0">
     <div class="card shadow-sm">
       <div class="card-body p-0">
-        <div class="table-responsive text-nowrap">
+        <!-- Desktop View -->
+        <div class="table-responsive text-nowrap d-none d-md-block">
           <table class="table table-bordered table-hover w-100 m-0">
             <thead class="glass-header text-white">
               <tr>
@@ -62,7 +63,8 @@
                     </td>
                     <td class="text-center align-middle">{{ $menus->firstItem() + $index }}</td>
                     <td>{{ $item->name }}</td>
-                    <td>{{ $item->url }}</td>
+                    <td class="text-truncate" style="max-width: 200px;" title="{{ $item->url }}">{{ $item->url }}
+                    </td>
                     <td>
                       @if ($item->icon)
                         <img src="{{ asset('storage/' . $item->icon) }}" alt="آیکون" class="img-thumbnail"
@@ -121,6 +123,99 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Mobile/Tablet View -->
+        <div class="d-md-none">
+          @if ($readyToLoad)
+            @forelse ($menus as $index => $item)
+              <div class="card m-3 border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                      <input type="checkbox" wire:model.live="selectedmenus" value="{{ $item->id }}"
+                        class="form-check-input m-0">
+                      <span class="text-muted">{{ $menus->firstItem() + $index }}</span>
+                    </div>
+                    <button wire:click="toggleStatus({{ $item->id }})"
+                      class="badge {{ $item->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                      {{ $item->status ? 'فعال' : 'غیرفعال' }}
+                    </button>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">نام:</span>
+                    <span class="fw-medium">{{ $item->name }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">لینک:</span>
+                    <span class="fw-medium text-truncate" style="max-width: 200px;" title="{{ $item->url }}">
+                      {{ $item->url }}
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">آیکون:</span>
+                    <span class="fw-medium">
+                      @if ($item->icon)
+                        <img src="{{ asset('storage/' . $item->icon) }}" alt="آیکون" class="img-thumbnail"
+                          style="width: 40px; height: 40px; border-radius: 8px;">
+                      @else
+                        <span class="text-muted">بدون آیکون</span>
+                      @endif
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">جایگاه:</span>
+                    <span class="fw-medium">{{ $item->position }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">زیرمجموعه:</span>
+                    <span class="fw-medium">{{ $item->parent ? $item->parent->name : 'دسته اصلی' }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">ترتیب:</span>
+                    <span class="fw-medium">{{ $item->order }}</span>
+                  </div>
+                  <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ route('admin.panel.menus.edit', $item->id) }}"
+                      class="btn btn-gradient-success rounded-pill px-3">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path
+                          d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </a>
+                    <button wire:click="confirmDelete({{ $item->id }})"
+                      class="btn btn-gradient-danger rounded-pill px-3">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            @empty
+              <div class="text-center py-5">
+                <div class="d-flex justify-content-center align-items-center flex-column">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" class="text-muted mb-3">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                  <p class="text-muted fw-medium">هیچ منویی یافت نشد.</p>
+                </div>
+              </div>
+            @endforelse
+          @else
+            <div class="text-center py-5">
+              <div class="d-flex justify-content-center align-items-center flex-column">
+                <div class="spinner-border text-primary mb-3" role="status">
+                  <span class="visually-hidden">در حال بارگذاری...</span>
+                </div>
+                <p class="text-muted fw-medium">در حال بارگذاری منوها...</p>
+              </div>
+            </div>
+          @endif
+        </div>
+
         <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
           <div class="text-muted">نمایش {{ $menus ? $menus->firstItem() : 0 }} تا
             {{ $menus ? $menus->lastItem() : 0 }} از {{ $menus ? $menus->total() : 0 }} ردیف

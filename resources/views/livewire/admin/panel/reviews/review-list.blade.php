@@ -1,37 +1,34 @@
 <div class="container-fluid py-2" dir="rtl" wire:init="loadReviews">
-  <div class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-      <h1 class="m-0 h3 font-thin">مدیریت نظرات</h1>
-      <div class="input-group position-relative" style="max-width: 400px; width: 100%;">
-        <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
-          wire:model.live.debounce.300ms="search" placeholder="جستجو در نظرات..." style="padding-right: 23px">
-        <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3"
-          style="z-index: 5;right: 5px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
-            <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
-          </svg>
-        </span>
-      </div>
-      <div class="d-flex gap-2 flex-wrap justify-content-center">
-        <a href="{{ route('admin.panel.reviews.create') }}"
-          class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2"
-          style="white-space: nowrap;">
-          <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          <span>افزودن نظر</span>
-        </a>
-        <button wire:click="deleteSelected" wire:loading.attr="disabled"
-          class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2" style="white-space: nowrap;"
-          @if (empty($selectedReviews)) disabled @endif>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-          </svg>
-          <span wire:loading.remove wire:target="deleteSelected">حذف انتخاب‌شده‌ها</span>
-          <span wire:loading wire:target="deleteSelected">در حال حذف...</span>
-        </button>
-      </div>
+  <div
+    class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت نظرات</h1>
+    <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
+      <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
+        wire:model.live.debounce.300ms="search" placeholder="جستجو در نظرات..." style="padding-right: 23px">
+      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5;right: 5px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+          <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+        </svg>
+      </span>
+    </div>
+    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
+      <a href="{{ route('admin.panel.reviews.create') }}"
+        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        <span>افزودن نظر</span>
+      </a>
+      <button wire:click="deleteSelected" wire:loading.attr="disabled"
+        class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
+        @if (empty($selectedReviews)) disabled @endif>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+        </svg>
+        <span wire:loading.remove wire:target="deleteSelected">حذف انتخاب‌شده‌ها</span>
+        <span wire:loading wire:target="deleteSelected">در حال حذف...</span>
+      </button>
     </div>
   </div>
 
@@ -65,7 +62,9 @@
                     </td>
                     <td class="text-center align-middle">{{ $reviews->firstItem() + $index }}</td>
                     <td class="align-middle">{{ $review->name ?? '-' }}</td>
-                    <td class="align-middle">{{ $review->comment ?? '-' }}</td>
+                    <td class="align-middle text-truncate" style="max-width: 200px;" title="{{ $review->comment }}">
+                      {{ $review->comment ?? '-' }}
+                    </td>
                     <td class="align-middle">
                       @if ($review->image_url)
                         <img src="{{ $review->image_url }}" alt="تصویر نظر" style="max-width: 50px; height: auto;">
@@ -156,18 +155,29 @@
                       </span>
                     </button>
                   </div>
-                  <h6 class="card-title mb-2">{{ $review->name ?? '-' }}</h6>
-                  <p class="card-text mb-3">{{ $review->comment ?? '-' }}</p>
-                  <div class="d-flex flex-wrap gap-3 mb-3">
-                    @if ($review->image_url)
-                      <div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">نام:</span>
+                    <span class="fw-medium">{{ $review->name ?? '-' }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">نظر:</span>
+                    <span class="fw-medium text-truncate" style="max-width: 200px;" title="{{ $review->comment }}">
+                      {{ $review->comment ?? '-' }}
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">تصویر:</span>
+                    <span class="fw-medium">
+                      @if ($review->image_url)
                         <img src="{{ $review->image_url }}" alt="تصویر نظر" style="max-width: 100px; height: auto;">
-                      </div>
-                    @endif
-                    <div class="text-muted">
-                      <small>امتیاز:</small>
-                      <span class="ms-1">{{ $review->rating }}/5</span>
-                    </div>
+                      @else
+                        -
+                      @endif
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">امتیاز:</span>
+                    <span class="fw-medium">{{ $review->rating }}/5</span>
                   </div>
                   <div class="d-flex justify-content-end gap-2">
                     <a href="{{ route('admin.panel.reviews.edit', $review->id) }}"

@@ -17,7 +17,7 @@ class MenuList extends Component
         'deleteSelectedConfirmed' => 'deleteSelectedConfirmed', // Listener جدید برای حذف انتخاب‌شده‌ها
     ];
 
-    public $perPage       = 10;
+    public $perPage       = 20;
     public $search        = '';
     public $readyToLoad   = false;
     public $selectedmenus = [];
