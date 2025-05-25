@@ -54,7 +54,7 @@
                 <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
                 <path d="M17 21v-8H7v8M7 3v5h8" />
               </svg>
-              <span wire:loading.remove>شارژ کیف‌پول</span>
+              <span wire:loading.remove>شارژ</span>
               <span wire:loading>در حال پردازش...</span>
             </button>
           </div>
@@ -63,113 +63,7 @@
     </div>
   </div>
 
-  <style>
-    .bg-gradient-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-    }
 
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-control,
-    .select2-container--default .select2-selection--single {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 12px 15px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      height: 48px;
-      background: #fafafa;
-      width: 100%;
-    }
-
-    .form-control:focus,
-    .select2-container--default .select2-selection--single:focus {
-      border-color: #6b7280;
-      box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
-      background: #fff;
-    }
-
-    .form-label {
-      position: absolute;
-      top: -25px;
-      right: 15px;
-      color: #374151;
-      font-size: 12px;
-      background: #ffffff;
-      padding: 0 5px;
-      pointer-events: none;
-    }
-
-    .my-btn-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-
-    .my-btn-primary:hover {
-      background: linear-gradient(90deg, #4b5563, #1f2937);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline-light {
-      border-color: rgba(255, 255, 255, 0.8);
-    }
-
-    .btn-outline-light:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-2px);
-    }
-
-    .animate-bounce {
-      animation: bounce 1s infinite;
-    }
-
-    @keyframes bounce {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-5px);
-      }
-    }
-
-    .text-shadow {
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-
-    .select2-container {
-      width: 100% !important;
-    }
-
-    .select2-container--default .select2-selection--single {
-      height: 48px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      background: #fafafa;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-      line-height: 46px;
-      padding-right: 15px;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-      height: 46px;
-    }
-
-    .select2-dropdown {
-      z-index: 1050 !important;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {

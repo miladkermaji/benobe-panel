@@ -131,3 +131,5 @@ Route::prefix('doctors')->group(function () {
 Route::prefix('hospital')->group(function () {
     Route::get('/{slug}', [HospitalController::class, 'getHospitalDetails'])->name('api.hospital.details');
 });
+
+Route::get('/appointments/payment/result', [AppointmentBookingController::class, 'paymentResult'])->name('appointment.payment.result');

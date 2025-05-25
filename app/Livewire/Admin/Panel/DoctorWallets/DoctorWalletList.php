@@ -17,8 +17,8 @@ class DoctorWalletList extends Component
     public $search = '';
     public $readyToLoad = false;
     public $expandedDoctors = []; // برای ذخیره پزشک‌هایی که باز شدن
-    public $perPageDoctors = 5; // تعداد پزشکان در هر صفحه
-    public $perPageTransactions = 5; // تعداد تراکنش‌ها در هر صفحه برای هر پزشک
+    public $perPageDoctors = 100; // تعداد پزشکان در هر صفحه
+    public $perPageTransactions = 20; // تعداد تراکنش‌ها در هر صفحه برای هر پزشک
 
     protected $queryString = [
         'search' => ['except' => ''],

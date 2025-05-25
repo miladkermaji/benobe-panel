@@ -11,13 +11,13 @@
         </svg>
       </span>
     </div>
-    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
+    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2">
       <a href="{{ route('admin.panel.doctor-wallets.create') }}"
-        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2 w-100 w-md-auto justify-content-center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14" />
         </svg>
-        <span>شارژ کیف‌پول</span>
+        <span class="text-truncate">شارژ کیف‌پول</span>
       </a>
     </div>
   </div>
@@ -49,66 +49,121 @@
 
               @if (in_array($doctor->id, $expandedDoctors))
                 <?php $transactions = $this->getTransactionsForDoctor($doctor->id); ?>
-                <div class="table-responsive text-nowrap p-3 bg-light">
-                  <table class="table table-bordered table-hover w-100 m-0">
-                    <thead class="glass-header text-white">
-                      <tr>
-                        <th class="text-center align-middle" style="width: 70px;">ردیف</th>
-                        <th class="align-middle">مبلغ (تومان)</th>
-                        <th class="align-middle">توضیحات</th>
-                        <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
-                        <th class="text-center align-middle" style="width: 150px;">تاریخ ثبت</th>
-                        <th class="text-center align-middle" style="width: 150px;">عملیات</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @forelse ($transactions as $index => $item)
+                <!-- نمایش جدول در دسکتاپ -->
+                <div class="d-none d-md-block">
+                  <div class="table-responsive text-nowrap p-3 bg-light">
+                    <table class="table table-bordered table-hover w-100 m-0">
+                      <thead class="glass-header text-white">
                         <tr>
-                          <td class="text-center align-middle">{{ $transactions->firstItem() + $index }}</td>
-                          <td class="align-middle">{{ number_format($item->amount) }}</td>
-                          <td class="align-middle">{{ $item->description }}</td>
-                          <td class="text-center align-middle">
-                            <span class="badge {{ $item->status === 'paid' ? 'bg-label-success' : 'bg-label-danger' }}">
-                              {{ $item->status === 'paid' ? 'پرداخت‌شده' : 'ناموفق' }}
-                            </span>
-                          </td>
-                          <td class="text-center align-middle">
+                          <th class="text-center align-middle" style="width: 70px;">ردیف</th>
+                          <th class="align-middle">مبلغ (تومان)</th>
+                          <th class="align-middle">توضیحات</th>
+                          <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
+                          <th class="text-center align-middle" style="width: 150px;">تاریخ ثبت</th>
+                          <th class="text-center align-middle" style="width: 150px;">عملیات</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @forelse ($transactions as $index => $item)
+                          <tr>
+                            <td class="text-center align-middle">{{ $transactions->firstItem() + $index }}</td>
+                            <td class="align-middle">{{ number_format($item->amount) }}</td>
+                            <td class="align-middle">{{ $item->description }}</td>
+                            <td class="text-center align-middle">
+                              <span
+                                class="badge {{ $item->status === 'paid' ? 'bg-label-success' : 'bg-label-danger' }}">
+                                {{ $item->status === 'paid' ? 'پرداخت‌شده' : 'ناموفق' }}
+                              </span>
+                            </td>
+                            <td class="text-center align-middle">
+                              {{ $item->registered_at ? \Morilog\Jalali\Jalalian::fromDateTime($item->registered_at)->format('Y/m/d H:i') : 'نامشخص' }}
+                            </td>
+                            <td class="text-center align-middle">
+                              <button wire:click="confirmDelete({{ $item->id }})"
+                                class="btn btn-gradient-danger rounded-pill px-3">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2">
+                                  <path
+                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                </svg>
+                              </button>
+                            </td>
+                          </tr>
+                        @empty
+                          <tr>
+                            <td colspan="6" class="text-center py-5">
+                              <div class="d-flex flex-column align-items-center justify-content-center">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                                  <path d="M5 12h14M12 5l7 7-7 7" />
+                                </svg>
+                                <p class="text-muted fw-medium m-0">هیچ تراکنشی یافت نشد.</p>
+                              </div>
+                            </td>
+                          </tr>
+                        @endforelse
+                      </tbody>
+                    </table>
+                    <!-- پیجینیشن داخلی برای تراکنش‌ها -->
+                    @if ($transactions->hasPages())
+                      <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
+                        <div class="text-muted">نمایش {{ $transactions->firstItem() }} تا
+                          {{ $transactions->lastItem() }} از {{ $transactions->total() }} تراکنش</div>
+                        {{ $transactions->links('livewire::bootstrap') }}
+                      </div>
+                    @endif
+                  </div>
+                </div>
+
+                <!-- نمایش کارت در موبایل و تبلت -->
+                <div class="d-md-none p-3 bg-light">
+                  @forelse ($transactions as $index => $item)
+                    <div class="card shadow-sm mb-3 border-0">
+                      <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <span class="badge bg-label-primary">#{{ $transactions->firstItem() + $index }}</span>
+                          <button wire:click="confirmDelete({{ $item->id }})"
+                            class="btn btn-gradient-danger rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">مبلغ:</small>
+                          <span class="fw-medium">{{ number_format($item->amount) }} تومان</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">توضیحات:</small>
+                          <span class="fw-medium">{{ $item->description }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">وضعیت:</small>
+                          <span class="badge {{ $item->status === 'paid' ? 'bg-label-success' : 'bg-label-danger' }}">
+                            {{ $item->status === 'paid' ? 'پرداخت‌شده' : 'ناموفق' }}
+                          </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <small class="text-muted">تاریخ ثبت:</small>
+                          <span class="fw-medium">
                             {{ $item->registered_at ? \Morilog\Jalali\Jalalian::fromDateTime($item->registered_at)->format('Y/m/d H:i') : 'نامشخص' }}
-                          </td>
-                          <td class="text-center align-middle">
-                            <button wire:click="confirmDelete({{ $item->id }})"
-                              class="btn btn-gradient-danger rounded-pill px-3">
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path
-                                  d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                              </svg>
-                            </button>
-                          </td>
-                        </tr>
-                      @empty
-                        <tr>
-                          <td colspan="6" class="text-center py-5">
-                            <div class="d-flex flex-column align-items-center justify-content-center">
-                              <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" class="text-muted mb-3">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                              </svg>
-                              <p class="text-muted fw-medium m-0">هیچ تراکنشی یافت نشد.</p>
-                            </div>
-                          </td>
-                        </tr>
-                      @endforelse
-                    </tbody>
-                  </table>
-                  <!-- پیجینیشن داخلی برای تراکنش‌ها -->
-                  @if ($transactions->hasPages())
-                    <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
-                      <div class="text-muted">نمایش {{ $transactions->firstItem() }} تا
-                        {{ $transactions->lastItem() }} از {{ $transactions->total() }} تراکنش</div>
-                      {{ $transactions->links('livewire::bootstrap') }}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  @endif
+                  @empty
+                    <div class="text-center py-5">
+                      <div class="d-flex flex-column align-items-center justify-content-center">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" class="text-muted mb-3">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                        <p class="text-muted fw-medium m-0">هیچ تراکنشی یافت نشد.</p>
+                      </div>
+                    </div>
+                  @endforelse
                 </div>
               @endif
             </div>
@@ -139,57 +194,6 @@
     </div>
   </div>
 
-  <style>
-    .glass-header {
-      background: linear-gradient(90deg, rgba(107, 114, 128, 0.9), rgba(55, 65, 81, 0.9));
-      backdrop-filter: blur(10px);
-    }
-
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: white;
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      color: white;
-    }
-
-    .doctor-toggle {
-      transition: all 0.3s ease;
-    }
-
-    .doctor-toggle:hover {
-      background: #f9fafb;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-
-    .transition-transform {
-      transition: transform 0.3s ease;
-    }
-
-    .rotate-180 {
-      transform: rotate(180deg);
-    }
-
-    .bg-label-primary {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .bg-label-success {
-      background: #d1fae5;
-      color: #059669;
-    }
-
-    .bg-label-danger {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {
