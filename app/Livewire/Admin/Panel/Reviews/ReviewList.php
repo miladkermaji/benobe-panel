@@ -15,7 +15,7 @@ class ReviewList extends Component
 
     protected $listeners = ['deleteReviewConfirmed' => 'deleteReview'];
 
-    public $perPage         = 10;
+    public $perPage         = 100;
     public $search          = '';
     public $selectedReviews = [];
     public $selectAll       = false;
