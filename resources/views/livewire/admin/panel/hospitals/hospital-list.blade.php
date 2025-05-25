@@ -69,7 +69,7 @@
                       <td class="text-center align-middle">
                         <a href="{{ route('admin.panel.hospitals.gallery', $item->id) }}"
                           class="btn btn-gradient-info rounded-pill px-3">
-                          <svg width="25px" height="25px" viewBox="0 -0.5 21 21" version="1.1"
+                          <svg width="18px" height="18px" viewBox="0 -0.5 21 21" version="1.1"
                             xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                             fill="#000000">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
