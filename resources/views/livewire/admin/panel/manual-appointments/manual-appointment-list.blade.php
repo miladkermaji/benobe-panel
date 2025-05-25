@@ -13,11 +13,11 @@
     </div>
     <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
       <a href="{{ route('admin.panel.manual-appointments.create') }}"
-        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2 justify-content-center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14" />
         </svg>
-        <span>افزودن نوبت دستی</span>
+        <span>افزودن</span>
       </a>
     </div>
   </div>
