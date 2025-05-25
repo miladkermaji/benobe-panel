@@ -25,7 +25,7 @@
           <div class="row g-4">
             <!-- پزشک -->
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model="doctor_id" class="form-select select2" id="doctor_id">
+              <select wire:model.live="doctor_id" class="form-select select2" id="doctor_id" required>
                 <option value="">انتخاب کنید</option>
                 @foreach ($doctors as $doctor)
                   <option value="{{ $doctor->id }}">{{ $doctor->first_name . ' ' . $doctor->last_name }}</option>
@@ -39,7 +39,7 @@
 
             <!-- کلینیک -->
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model="clinic_id" class="form-select select2" id="clinic_id">
+              <select wire:model.live="clinic_id" class="form-select select2" id="clinic_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($clinics as $clinic)
                   <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
@@ -51,9 +51,37 @@
               @enderror
             </div>
 
+            <!-- خدمت پایه -->
+            <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+              <select wire:model.live="service_id" class="form-select select2" id="service_id">
+                <option value="">انتخاب کنید</option>
+                @foreach ($services as $service)
+                  <option value="{{ $service->id }}">{{ $service->name }}</option>
+                @endforeach
+              </select>
+              <label for="service_id" class="form-label">خدمت پایه (اختیاری)</label>
+              @error('service_id')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <!-- بیمه -->
+            <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+              <select wire:model.live="insurance_id" class="form-select select2" id="insurance_id">
+                <option value="">انتخاب کنید</option>
+                @foreach ($insurances as $insurance)
+                  <option value="{{ $insurance->id }}">{{ $insurance->name }}</option>
+                @endforeach
+              </select>
+              <label for="insurance_id" class="form-label">بیمه (اختیاری)</label>
+              @error('insurance_id')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
+            </div>
+
             <!-- نام -->
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="name" class="form-control" id="name"
+              <input type="text" wire:model.live="name" class="form-control" id="name"
                 placeholder="نام خدمت را وارد کنید" required>
               <label for="name" class="form-label">نام خدمت</label>
               @error('name')
@@ -63,7 +91,7 @@
 
             <!-- مدت زمان -->
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="number" wire:model="duration" class="form-control" id="duration"
+              <input type="number" wire:model.live="duration" class="form-control" id="duration"
                 placeholder="مدت زمان خدمت">
               <label for="duration" class="form-label">مدت زمان (دقیقه)</label>
               @error('duration')
@@ -73,7 +101,7 @@
 
             <!-- قیمت -->
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="number" wire:model="price" class="form-control" id="price" placeholder="قیمت خدمت"
+              <input type="number" wire:model.live="price" class="form-control" id="price" placeholder="قیمت خدمت"
                 step="0.01">
               <label for="price" class="form-label">قیمت</label>
               @error('price')
@@ -83,8 +111,8 @@
 
             <!-- تخفیف -->
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="number" wire:model="discount" class="form-control" id="discount" placeholder="درصد تخفیف"
-                step="0.01">
+              <input type="number" wire:model.live="discount" class="form-control" id="discount"
+                placeholder="درصد تخفیف" step="0.01">
               <label for="discount" class="form-label">تخفیف (درصد، اختیاری)</label>
               @error('discount')
                 <span class="text-danger small">{{ $message }}</span>
@@ -93,7 +121,8 @@
 
             <!-- توضیحات -->
             <div class="col-12 position-relative mt-5">
-              <textarea wire:model="description" class="form-control" id="description" rows="3" placeholder="توضیحات خدمت"></textarea>
+              <textarea wire:model.live="description" class="form-control" id="description" rows="3"
+                placeholder="توضیحات خدمت"></textarea>
               <label for="description" class="form-label">توضیحات (اختیاری)</label>
               @error('description')
                 <span class="text-danger small">{{ $message }}</span>
@@ -103,7 +132,7 @@
             <!-- وضعیت -->
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">
-                <input class="form-check-input" type="checkbox" id="status" wire:model="status">
+                <input class="form-check-input" type="checkbox" id="status" wire:model.live="status">
                 <label class="form-check-label fw-medium" for="status">
                   وضعیت: <span
                     class="px-2 text-{{ $status ? 'success' : 'danger' }}">{{ $status ? 'فعال' : 'غیرفعال' }}</span>
@@ -116,7 +145,7 @@
 
             <!-- خدمت مادر -->
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model="parent_id" class="form-select select2" id="parent_id">
+              <select wire:model.live="parent_id" class="form-select select2" id="parent_id">
                 <option value="">بدون زیرگروه</option>
                 @foreach ($parentServices as $service)
                   <option value="{{ $service->id }}">{{ $service->name }}</option>
@@ -137,7 +166,7 @@
                 stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
               </svg>
-              ذخیره 
+              ذخیره
             </button>
           </div>
         </div>

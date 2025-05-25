@@ -80,10 +80,13 @@ class DoctorServiceList extends Component
 
     private function getDoctorServicesQuery()
     {
-        return DoctorService::with(['doctor', 'parent'])
+        return DoctorService::with(['doctor', 'service', 'insurance', 'parent'])
             ->where(function ($query) {
                 $query->whereHas('doctor', function ($q) {
                     $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%']);
+                })
+                ->orWhereHas('service', function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%');
                 })
                 ->orWhere('name', 'like', '%' . $this->search . '%')
                 ->orWhere('description', 'like', '%' . $this->search . '%');

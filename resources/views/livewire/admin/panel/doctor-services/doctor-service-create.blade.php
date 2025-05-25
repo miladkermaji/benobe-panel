@@ -24,7 +24,6 @@
         <div class="col-12 col-md-10 col-lg-8">
           <div class="row g-4">
             <!-- پزشک -->
-            <!-- پزشک -->
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
               <select wire:model.live="doctor_id" class="form-select select2" id="doctor_id" required>
                 <option value="">انتخاب کنید</option>
@@ -52,6 +51,34 @@
               @enderror
             </div>
 
+            <!-- خدمت پایه -->
+            <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+              <select wire:model.live="service_id" class="form-select select2" id="service_id">
+                <option value="">انتخاب کنید</option>
+                @foreach ($services as $service)
+                  <option value="{{ $service->id }}">{{ $service->name }}</option>
+                @endforeach
+              </select>
+              <label for="service_id" class="form-label">خدمت پایه (اختیاری)</label>
+              @error('service_id')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
+            </div>
+
+            <!-- بیمه -->
+            <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+              <select wire:model.live="insurance_id" class="form-select select2" id="insurance_id">
+                <option value="">انتخاب کنید</option>
+                @foreach ($insurances as $insurance)
+                  <option value="{{ $insurance->id }}">{{ $insurance->name }}</option>
+                @endforeach
+              </select>
+              <label for="insurance_id" class="form-label">بیمه (اختیاری)</label>
+              @error('insurance_id')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
+            </div>
+
             <!-- نام -->
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model.live="name" class="form-control" id="name"
@@ -66,7 +93,7 @@
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="number" wire:model.live="duration" class="form-control" id="duration"
                 placeholder="مدت زمان خدمت">
-              <label for="duration" class="form-label">مدت زمان (دقیقه،)</label>
+              <label for="duration" class="form-label">مدت زمان (دقیقه)</label>
               @error('duration')
                 <span class="text-danger small">{{ $message }}</span>
               @enderror
@@ -94,7 +121,8 @@
 
             <!-- توضیحات -->
             <div class="col-12 position-relative mt-5">
-              <textarea wire:model.live="description" class="form-control" id="description" rows="3" placeholder="توضیحات خدمت"></textarea>
+              <textarea wire:model.live="description" class="form-control" id="description" rows="3"
+                placeholder="توضیحات خدمت"></textarea>
               <label for="description" class="form-label">توضیحات (اختیاری)</label>
               @error('description')
                 <span class="text-danger small">{{ $message }}</span>
@@ -138,7 +166,7 @@
                 stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
               </svg>
-              افزودن  
+              افزودن
             </button>
           </div>
         </div>
@@ -170,6 +198,16 @@
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
+        $('#service_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
+        $('#insurance_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
         $('#parent_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
@@ -182,6 +220,12 @@
         $('#clinic_id').on('change', function() {
           @this.set('clinic_id', $(this).val());
         });
+        $('#service_id').on('change', function() {
+          @this.set('service_id', $(this).val());
+        });
+        $('#insurance_id').on('change', function() {
+          @this.set('insurance_id', $(this).val());
+        });
         $('#parent_id').on('change', function() {
           @this.set('parent_id', $(this).val());
         });
@@ -192,14 +236,20 @@
       Livewire.hook('morph.updated', () => {
         $('#doctor_id').select2('destroy');
         $('#clinic_id').select2('destroy');
+        $('#service_id').select2('destroy');
+        $('#insurance_id').select2('destroy');
         $('#parent_id').select2('destroy');
         initializeSelect2();
 
         const doctorValue = @json($this->doctor_id);
         const clinicValue = @json($this->clinic_id);
+        const serviceValue = @json($this->service_id);
+        const insuranceValue = @json($this->insurance_id);
         const parentValue = @json($this->parent_id);
         if (doctorValue) $('#doctor_id').val(doctorValue).trigger('change');
         if (clinicValue) $('#clinic_id').val(clinicValue).trigger('change');
+        if (serviceValue) $('#service_id').val(serviceValue).trigger('change');
+        if (insuranceValue) $('#insurance_id').val(insuranceValue).trigger('change');
         if (parentValue) $('#parent_id').val(parentValue).trigger('change');
       });
 

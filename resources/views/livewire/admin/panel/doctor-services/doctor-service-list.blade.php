@@ -45,73 +45,170 @@
 
               @if (in_array($data['doctor']->id, $expandedDoctors))
                 <div class="table-responsive text-nowrap p-3 bg-light">
-                  <table class="table table-bordered table-hover w-100 m-0">
-                    <thead class="glass-header text-white">
-                      <tr>
-                        <th class="text-center align-middle" style="width: 70px;">ردیف</th>
-                        <th class="align-middle">نام خدمت</th>
-                        <th class="align-middle">توضیحات</th>
-                        <th class="align-middle">مدت زمان</th>
-                        <th class="align-middle">قیمت</th>
-                        <th class="align-middle">تخفیف</th>
-                        <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
-                        <th class="align-middle">مادر</th>
-                        <th class="text-center align-middle" style="width: 150px;">عملیات</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @forelse ($data['services'] as $index => $item)
-                        <tr>
-                          <td class="text-center align-middle">
-                            {{ ($data['currentPage'] - 1) * $servicesPerPage + $index + 1 }}</td>
-                          <td class="align-middle">{{ $item->name }}</td>
-                          <td class="align-middle">{{ $item->description }}</td>
-                          <td class="align-middle">{{ $item->duration ? $item->duration . ' دقیقه' : '-' }}</td>
-                          <td class="align-middle">{{ $item->price ? number_format($item->price) : '-' }}</td>
-                          <td class="align-middle">{{ $item->discount ? $item->discount . '%' : '-' }}</td>
-                          <td class="text-center align-middle">
+                  <!-- نمایش جدول در دسکتاپ -->
+                  <div class="d-none d-md-block">
+                    <div class="table-responsive text-nowrap">
+                      <table class="table table-bordered table-hover w-100 m-0">
+                        <thead class="glass-header text-white">
+                          <tr>
+                            <th class="text-center align-middle" style="width: 70px;">ردیف</th>
+                            <th class="align-middle">نام خدمت</th>
+                            <th class="align-middle">خدمت پایه</th>
+                            <th class="align-middle">بیمه</th>
+                            <th class="align-middle">توضیحات</th>
+                            <th class="align-middle">مدت زمان</th>
+                            <th class="align-middle">قیمت</th>
+                            <th class="align-middle">تخفیف</th>
+                            <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
+                            <th class="align-middle">مادر</th>
+                            <th class="text-center align-middle" style="width: 150px;">عملیات</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @forelse ($data['services'] as $index => $item)
+                            <tr>
+                              <td class="text-center align-middle">
+                                {{ ($data['currentPage'] - 1) * $servicesPerPage + $index + 1 }}</td>
+                              <td class="align-middle">{{ $item->name }}</td>
+                              <td class="align-middle">{{ $item->service->name ?? '-' }}</td>
+                              <td class="align-middle">{{ $item->insurance->name ?? '-' }}</td>
+                              <td class="align-middle">
+                                <div class="text-truncate" style="max-width: 150px;" data-bs-toggle="tooltip"
+                                  data-bs-placement="top" title="{{ $item->description ?? '-' }}">
+                                  {{ $item->description ?? '-' }}
+                                </div>
+                              </td>
+                              <td class="align-middle">{{ $item->duration ? $item->duration . ' دقیقه' : '-' }}</td>
+                              <td class="align-middle">{{ $item->price ? number_format($item->price) : '-' }}</td>
+                              <td class="align-middle">{{ $item->discount ? $item->discount . '%' : '-' }}</td>
+                              <td class="text-center align-middle">
+                                <button wire:click="toggleStatus({{ $item->id }})"
+                                  class="badge {{ $item->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                                  {{ $item->status ? 'فعال' : 'غیرفعال' }}
+                                </button>
+                              </td>
+                              <td class="align-middle">{{ $item->parent->name ?? '-' }}</td>
+                              <td class="text-center align-middle">
+                                <div class="d-flex justify-content-center gap-2">
+                                  <a href="{{ route('admin.panel.doctor-services.edit', $item->id) }}"
+                                    class="btn btn-gradient-success rounded-pill px-3">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                      stroke="currentColor" stroke-width="2">
+                                      <path
+                                        d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                    </svg>
+                                  </a>
+                                  <button wire:click="confirmDelete({{ $item->id }})"
+                                    class="btn btn-gradient-danger rounded-pill px-3">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                      stroke="currentColor" stroke-width="2">
+                                      <path
+                                        d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          @empty
+                            <tr>
+                              <td colspan="11" class="text-center py-5">
+                                <div class="d-flex flex-column align-items-center justify-content-center">
+                                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                                    <path d="M5 12h14M12 5l7 7-7 7" />
+                                  </svg>
+                                  <p class="text-muted fw-medium m-0">هیچ خدمتی یافت نشد.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          @endforelse
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- نمایش کارت در موبایل و تبلت -->
+                  <div class="d-md-none">
+                    @forelse ($data['services'] as $index => $item)
+                      <div class="card shadow-sm mb-3 border-0">
+                        <div class="card-body p-3">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                              <span
+                                class="badge bg-label-primary">#{{ ($data['currentPage'] - 1) * $servicesPerPage + $index + 1 }}</span>
+                            </div>
                             <button wire:click="toggleStatus({{ $item->id }})"
                               class="badge {{ $item->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
                               {{ $item->status ? 'فعال' : 'غیرفعال' }}
                             </button>
-                          </td>
-                          <td class="align-middle">{{ $item->parent->name ?? '-' }}</td>
-                          <td class="text-center align-middle">
-                            <div class="d-flex justify-content-center gap-2">
-                              <a href="{{ route('admin.panel.doctor-services.edit', $item->id) }}"
-                                class="btn btn-gradient-success rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                </svg>
-                              </a>
-                              <button wire:click="confirmDelete({{ $item->id }})"
-                                class="btn btn-gradient-danger rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                </svg>
-                              </button>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">نام خدمت:</small>
+                            <span class="fw-medium">{{ $item->name }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">خدمت پایه:</small>
+                            <span class="fw-medium">{{ $item->service->name ?? '-' }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">بیمه:</small>
+                            <span class="fw-medium">{{ $item->insurance->name ?? '-' }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">توضیحات:</small>
+                            <div class="text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip"
+                              data-bs-placement="top" title="{{ $item->description ?? '-' }}">
+                              {{ $item->description ?? '-' }}
                             </div>
-                          </td>
-                        </tr>
-                      @empty
-                        <tr>
-                          <td colspan="9" class="text-center py-5">
-                            <div class="d-flex flex-column align-items-center justify-content-center">
-                              <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" class="text-muted mb-3">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">مدت زمان:</small>
+                            <span class="fw-medium">{{ $item->duration ? $item->duration . ' دقیقه' : '-' }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">قیمت:</small>
+                            <span class="fw-medium">{{ $item->price ? number_format($item->price) : '-' }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">تخفیف:</small>
+                            <span class="fw-medium">{{ $item->discount ? $item->discount . '%' : '-' }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between align-items-center mb-3">
+                            <small class="text-muted">مادر:</small>
+                            <span class="fw-medium">{{ $item->parent->name ?? '-' }}</span>
+                          </div>
+                          <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ route('admin.panel.doctor-services.edit', $item->id) }}"
+                              class="btn btn-gradient-success rounded-pill px-3">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path
+                                  d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                               </svg>
-                              <p class="text-muted fw-medium m-0">هیچ خدمتی یافت نشد.</p>
-                            </div>
-                          </td>
-                        </tr>
-                      @endforelse
-                    </tbody>
-                  </table>
+                            </a>
+                            <button wire:click="confirmDelete({{ $item->id }})"
+                              class="btn btn-gradient-danger rounded-pill px-3">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path
+                                  d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    @empty
+                      <div class="text-center py-5">
+                        <div class="d-flex flex-column align-items-center justify-content-center">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                          <p class="text-muted fw-medium m-0">هیچ خدمتی یافت نشد.</p>
+                        </div>
+                      </div>
+                    @endforelse
+                  </div>
 
                   <!-- پیجینیشن محلی برای خدمات -->
                   @if ($data['totalServices'] > $servicesPerPage)
@@ -161,8 +258,6 @@
       </div>
     </div>
   </div>
-
-
 
   <script>
     document.addEventListener('livewire:init', function() {
