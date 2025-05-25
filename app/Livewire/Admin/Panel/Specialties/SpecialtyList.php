@@ -14,7 +14,7 @@ class SpecialtyList extends Component
 
     protected $listeners = ['deleteSpecialtyConfirmed' => 'deleteSpecialty'];
 
-    public $perPage             = 10;
+    public $perPage             = 300;
     public $search              = '';
     public $readyToLoad         = false;
     public $selectedSpecialties = [];

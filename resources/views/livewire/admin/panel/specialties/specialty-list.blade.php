@@ -18,7 +18,7 @@
           stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14" />
         </svg>
-        <span>افزودن تخصص</span>
+        <span>افزودن </span>
       </a>
       <button wire:click="deleteSelected"
         class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
