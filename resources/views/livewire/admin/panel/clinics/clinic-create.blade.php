@@ -63,11 +63,11 @@
               <label for="city_id" class="form-label">شهر</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="time" wire:model="start_time" class="form-control" id="start_time" placeholder=" ">
+              <input data-timepicker type="text" wire:model="start_time" class="form-control" id="start_time" placeholder=" ">
               <label for="start_time" class="form-label">ساعت شروع</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="time" wire:model="end_time" class="form-control" id="end_time" placeholder=" ">
+              <input data-timepicker type="text" wire:model="end_time" class="form-control" id="end_time" placeholder=" ">
               <label for="end_time" class="form-label">ساعت پایان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
