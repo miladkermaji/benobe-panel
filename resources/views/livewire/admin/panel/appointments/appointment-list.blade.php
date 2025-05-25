@@ -1,17 +1,18 @@
-<div class="container-fluid py-2" dir="rtl" wire:init="loadAppointments">
+<div class="container-fluid py-4" dir="rtl" wire:init="loadAppointments">
   <div
-    class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت نوبت‌ها</h1>
-    <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
-      <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
-        wire:model.live="search" placeholder="جستجو بر اساس نام، نام خانوادگی یا کد ملی..." style="padding-right: 23px">
-      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5;right: 5px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+    class="glass-header p-4 rounded-xl mb-6 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-4">
+    <h1 class="m-0 h3 font-light flex-grow-1" style="min-width: 200px; color: var(--text-primary);">مدیریت نوبت‌ها</h1>
+    <div class="input-group flex-grow-1 position-relative" style="max-width: 450px;">
+      <input type="text"
+        class="form-control border-0 shadow-none bg-background-card text-text-primary ps-5 rounded-full h-12"
+        wire:model.live="search" placeholder="جستجو بر اساس نام، نام خانوادگی یا کد ملی...">
+      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-4 text-text-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
         </svg>
       </span>
     </div>
-    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
+    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2">
       <a href="{{ route('admin.panel.appointments.create') }}"
         class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -23,80 +24,89 @@
   </div>
 
   <div class="container-fluid px-0">
-    <div class="card shadow-sm">
+    <div class="card shadow-xl rounded-2xl overflow-hidden bg-background-card">
       <div class="card-body p-0">
         @if ($readyToLoad)
-          @forelse ($doctors as $data)
-            <div class="doctor-toggle border-bottom">
-              <div class="d-flex justify-content-between align-items-center p-3 cursor-pointer"
-                wire:click="toggleDoctor({{ $data['doctor']->id }})">
+          @forelse ($doctors as $doctor)
+            <div class="doctor-appointments border-bottom border-soft">
+              <div
+                class="d-flex justify-content-between align-items-center p-3 bg-background-light cursor-pointer hover:bg-background-hover transition-colors duration-200"
+                wire:click="toggleDoctor({{ $doctor['doctor']->id }})">
                 <div class="d-flex align-items-center gap-3">
-                  <img src="{{ $data['doctor']->profile_photo_url }}" class="rounded-circle"
-                    style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل پزشک">
-                  <span class="fw-bold">{{ $data['doctor']->full_name }}</span>
-                  <span class="badge bg-label-primary">{{ $data['totalAppointments'] }} نوبت</span>
+                  <h3 class="h6 m-0 text-text-primary fw-medium">{{ $doctor['doctor']->full_name }}</h3>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-label-primary">{{ $doctor['totalAppointments'] }} نوبت</span>
+                    <span
+                      class="text-text-secondary text-xs">({{ $doctor['currentPage'] }}/{{ $doctor['lastPage'] }})</span>
+                  </div>
                 </div>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"
-                  class="transition-transform {{ in_array($data['doctor']->id, $expandedDoctors) ? 'rotate-180' : '' }}">
-                  <path d="M6 9l6 6 6-6" />
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2"
+                  class="transition-transform {{ in_array($doctor['doctor']->id, $expandedDoctors) ? 'rotate-180' : '' }}">
+                  <path d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
 
-              @if (in_array($data['doctor']->id, $expandedDoctors))
-                <div class="table-responsive text-nowrap p-3 bg-light">
-                  <table class="table table-bordered table-hover w-100 m-0">
-                    <thead class="glass-header text-white">
+              @if (in_array($doctor['doctor']->id, $expandedDoctors))
+                <!-- Desktop Table View -->
+                <div class="table-responsive position-relative w-100 d-none d-md-block">
+                  <table class="table table-hover w-100 text-sm text-center">
+                    <thead class="bg-light">
                       <tr>
-                        <th class="text-center align-middle" style="width: 70px;">ردیف</th>
-                        <th class="align-middle">بیمار</th>
-                        <th class="align-middle">کد ملی بیمار</th>
-                        <th class="align-middle">تاریخ نوبت</th>
-                        <th class="align-middle">ساعت نوبت</th>
-                        <th class="align-middle">وضعیت نوبت</th>
-                        <th class="align-middle">وضعیت پرداخت</th>
-                        <th class="align-middle">هزینه</th>
-                        <th class="align-middle">کد رهگیری</th>
-                        <th class="align-middle">یادداشت</th>
-                        <th class="text-center align-middle" style="width: 150px;">عملیات</th>
+                        <th><input class="form-check-input" type="checkbox"
+                            wire:click="$set('selectedAppointments', [])"></th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">نام بیمار</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">شماره‌ موبایل</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">کد ملی</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">زمان نوبت</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">بیعانه</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">وضعیت پرداخت</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">بیمه</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">قیمت نهایی</th>
+                        <th scope="col" class="px-6 py-3 fw-bolder">عملیات</th>
                       </tr>
                     </thead>
                     <tbody>
-                      @forelse ($data['appointments'] as $index => $appointment)
-                        <tr>
+                      @forelse ($doctor['appointments'] as $appointment)
+                        <tr class="hover:bg-background-light transition-colors duration-200">
                           <td class="text-center align-middle">
-                            {{ ($data['currentPage'] - 1) * $appointmentsPerPage + $index + 1 }}</td>
-                          <td class="align-middle">{{ $appointment->patient->full_name ?? 'نامشخص' }}</td>
-                          <td class="align-middle">{{ $appointment->patient->national_code ?? 'نامشخص' }}</td>
-                          <td class="align-middle">{{ $appointment->jalali_appointment_date }}</td>
-                          <td class="align-middle">{{ $appointment->appointment_time->format('H:i') }}</td>
-                          <td class="text-center align-middle">
-                            <button wire:click="toggleStatus({{ $appointment->id }})"
-                              class="badge {{ $appointment->status === 'scheduled' ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
-                              {{ $appointment->status === 'scheduled' ? 'فعال' : 'لغو شده' }}
-                            </button>
+                            <input type="checkbox" wire:model.live="selectedAppointments" value="{{ $appointment->id }}"
+                              class="form-check-input m-0 shadow-sm">
                           </td>
-                          <td class="text-center align-middle">
+                          <td class="align-middle text-text-primary">{{ $appointment->patient->full_name }}</td>
+                          <td class="align-middle text-text-secondary">{{ $appointment->patient->phone }}</td>
+                          <td class="align-middle text-text-secondary">{{ $appointment->patient->national_code }}</td>
+                          <td class="align-middle text-text-primary">
+                            {{ \Morilog\Jalali\Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d') }}
+                            {{ $appointment->appointment_time }}
+                          </td>
+                          <td class="align-middle">
+                            <span class="badge bg-label-success">{{ number_format($appointment->deposit) }}
+                              تومان</span>
+                          </td>
+                          <td class="align-middle">
                             <span
-                              class="badge {{ $appointment->payment_status === 'paid' ? 'bg-label-success' : ($appointment->payment_status === 'unpaid' ? 'bg-label-danger' : 'bg-label-warning') }}">
-                              {{ $appointment->payment_status_label }}
+                              class="badge {{ $appointment->payment_status === 'paid' ? 'bg-label-success' : 'bg-label-danger' }}">
+                              {{ $appointment->payment_status === 'paid' ? 'پرداخت شده' : 'پرداخت نشده' }}
                             </span>
                           </td>
-                          <td class="align-middle">{{ number_format($appointment->fee) ?? 'نامشخص' }}</td>
-                          <td class="align-middle">{{ $appointment->tracking_code ?? 'نامشخص' }}</td>
-                          <td class="align-middle">{{ $appointment->notes ?? '---' }}</td>
-                          <td class="text-center align-middle">
+                          <td class="align-middle text-text-secondary">
+                            {{ $appointment->insurance_type ?? 'بدون بیمه' }}</td>
+                          <td class="align-middle text-text-primary">{{ number_format($appointment->fee) }}
+                            تومان</td>
+                          <td class="align-middle">
                             <div class="d-flex justify-content-center gap-2">
                               <a href="{{ route('admin.panel.appointments.edit', $appointment->id) }}"
-                                class="btn btn-gradient-success rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                class="btn btn-sm btn-outline-primary rounded-pill">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                                   stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                                 </svg>
                               </a>
                               <button wire:click="confirmDelete({{ $appointment->id }})"
-                                class="btn btn-gradient-danger rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                class="btn btn-sm btn-outline-danger rounded-pill">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                                   stroke="currentColor" stroke-width="2">
                                   <path
                                     d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
@@ -107,150 +117,171 @@
                         </tr>
                       @empty
                         <tr>
-                          <td colspan="11" class="text-center py-5">
+                          <td colspan="10" class="text-center py-6">
                             <div class="d-flex flex-column align-items-center justify-content-center">
                               <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                                stroke="var(--text-secondary)" stroke-width="2" class="mb-3 animate-bounce">
                                 <path d="M5 12h14M12 5l7 7-7 7" />
                               </svg>
-                              <p class="text-muted fw-medium m-0">هیچ نوبت یافت نشد.</p>
+                              <p class="text-text-secondary font-medium m-0">هیچ نوبتی یافت نشد</p>
                             </div>
                           </td>
                         </tr>
                       @endforelse
                     </tbody>
                   </table>
-
-                  <!-- پیجینیشن محلی برای نوبت‌ها -->
-                  @if ($data['totalAppointments'] > $appointmentsPerPage)
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                      <div>
-                        نمایش {{ ($data['currentPage'] - 1) * $appointmentsPerPage + 1 }} تا
-                        {{ min($data['currentPage'] * $appointmentsPerPage, $data['totalAppointments']) }} از
-                        {{ $data['totalAppointments'] }} نوبت
-                      </div>
-                      <nav>
-                        <ul class="pagination mb-0">
-                          <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
-                            <button class="page-link"
-                              wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $data['currentPage'] - 1 }})">قبلی</button>
-                          </li>
-                          @for ($i = 1; $i <= $data['lastPage']; $i++)
-                            <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
-                              <button class="page-link"
-                                wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $i }})">{{ $i }}</button>
-                            </li>
-                          @endfor
-                          <li class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
-                            <button class="page-link"
-                              wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $data['currentPage'] + 1 }})">بعدی</button>
-                          </li>
-                        </ul>
-                      </nav>
-                    </div>
-                  @endif
                 </div>
+
+                <!-- Mobile Cards View -->
+                <div class="d-md-none p-3">
+                  @forelse ($doctor['appointments'] as $appointment)
+                    <div class="card mb-3 rounded-xl shadow-sm bg-background-card">
+                      <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                          <div class="d-flex align-items-center gap-2">
+                            <input type="checkbox" wire:model.live="selectedAppointments"
+                              value="{{ $appointment->id }}" class="form-check-input m-0 shadow-sm">
+                            <span class="text-text-primary font-medium">{{ $appointment->patient->full_name }}</span>
+                          </div>
+                          <span
+                            class="badge {{ $appointment->payment_status === 'paid' ? 'bg-label-success' : 'bg-label-danger' }}">
+                            {{ $appointment->payment_status === 'paid' ? 'پرداخت شده' : 'پرداخت نشده' }}
+                          </span>
+                        </div>
+
+                        <div class="d-flex flex-column gap-2">
+                          <div class="d-flex justify-content-between">
+                            <span class="text-text-secondary">شماره موبایل:</span>
+                            <span class="text-text-primary">{{ $appointment->patient->phone }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between">
+                            <span class="text-text-secondary">کد ملی:</span>
+                            <span class="text-text-primary">{{ $appointment->patient->national_code }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between">
+                            <span class="text-text-secondary">زمان نوبت:</span>
+                            <span class="text-text-primary">
+                              {{ \Morilog\Jalali\Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d') }}
+                              {{ $appointment->appointment_time }}
+                            </span>
+                          </div>
+                          <div class="d-flex justify-content-between">
+                            <span class="text-text-secondary">بیعانه:</span>
+                            <span class="badge bg-label-success">{{ number_format($appointment->deposit) }}
+                              تومان</span>
+                          </div>
+                          <div class="d-flex justify-content-between">
+                            <span class="text-text-secondary">بیمه:</span>
+                            <span class="text-text-primary">{{ $appointment->insurance_type ?? 'بدون بیمه' }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between">
+                            <span class="text-text-secondary">قیمت نهایی:</span>
+                            <span class="text-text-primary">{{ number_format($appointment->fee) }} تومان</span>
+                          </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
+                          <a href="{{ route('admin.panel.appointments.edit', $appointment->id) }}"
+                            class="btn btn-sm btn-outline-primary rounded-pill">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </a>
+                          <button wire:click="confirmDelete({{ $appointment->id }})"
+                            class="btn btn-sm btn-outline-danger rounded-pill">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  @empty
+                    <div class="text-center py-6">
+                      <div class="d-flex flex-column align-items-center justify-content-center">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                          stroke="var(--text-secondary)" stroke-width="2" class="mb-3 animate-bounce">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                        <p class="text-text-secondary font-medium m-0">هیچ نوبتی یافت نشد</p>
+                      </div>
+                    </div>
+                  @endforelse
+                </div>
+
+                @if ($doctor['totalAppointments'] > $appointmentsPerPage)
+                  <div class="d-flex justify-content-center p-2 bg-background-light">
+                    <div class="btn-group">
+                      @if ($doctor['currentPage'] > 1)
+                        <button wire:click="setDoctorPage({{ $doctor['doctor']->id }}, 1)"
+                          class="btn btn-sm btn-outline-primary">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+                          </svg>
+                        </button>
+                        <button
+                          wire:click="setDoctorPage({{ $doctor['doctor']->id }}, {{ $doctor['currentPage'] - 1 }})"
+                          class="btn btn-sm btn-outline-primary">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6" />
+                          </svg>
+                        </button>
+                      @endif
+
+                      @for ($i = max(1, $doctor['currentPage'] - 1); $i <= min($doctor['lastPage'], $doctor['currentPage'] + 1); $i++)
+                        <button wire:click="setDoctorPage({{ $doctor['doctor']->id }}, {{ $i }})"
+                          class="btn btn-sm {{ $doctor['currentPage'] == $i ? 'btn-primary' : 'btn-outline-primary' }}">
+                          {{ $i }}
+                        </button>
+                      @endfor
+
+                      @if ($doctor['currentPage'] < $doctor['lastPage'])
+                        <button
+                          wire:click="setDoctorPage({{ $doctor['doctor']->id }}, {{ $doctor['currentPage'] + 1 }})"
+                          class="btn btn-sm btn-outline-primary">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6" />
+                          </svg>
+                        </button>
+                        <button wire:click="setDoctorPage({{ $doctor['doctor']->id }}, {{ $doctor['lastPage'] }})"
+                          class="btn btn-sm btn-outline-primary">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          </svg>
+                        </button>
+                      @endif
+                    </div>
+                  </div>
+                @endif
               @endif
             </div>
           @empty
-            <div class="text-center py-5">
+            <div class="text-center py-6">
               <div class="d-flex flex-column align-items-center justify-content-center">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2" class="text-muted mb-3">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                  stroke="var(--text-secondary)" stroke-width="2" class="mb-3 animate-bounce">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
-                <p class="text-muted fw-medium m-0">هیچ نوبت یافت نشد.</p>
+                <p class="text-text-secondary font-medium m-0">هیچ نوبتی یافت نشد</p>
               </div>
             </div>
           @endforelse
         @else
-          <div class="text-center py-5">در حال بارگذاری نوبت‌ها...</div>
+          <div class="text-center py-6">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">در حال بارگذاری...</span>
+            </div>
+          </div>
         @endif
       </div>
     </div>
   </div>
-
-  <style>
-    .glass-header {
-      background: linear-gradient(90deg, rgba(107, 114, 128, 0.9), rgba(55, 65, 81, 0.9));
-      backdrop-filter: blur(10px);
-    }
-
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: white;
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      color: white;
-    }
-
-    .doctor-toggle {
-      transition: all 0.3s ease;
-    }
-
-    .doctor-toggle:hover {
-      background: #f9fafb;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-
-    .transition-transform {
-      transition: transform 0.3s ease;
-    }
-
-    .rotate-180 {
-      transform: rotate(180deg);
-    }
-
-    .bg-label-primary {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .bg-label-success {
-      background: #d1fae5;
-      color: #059669;
-    }
-
-    .bg-label-danger {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-
-    .bg-label-warning {
-      background: #fef3c7;
-      color: #d97706;
-    }
-  </style>
-
-  <script>
-    document.addEventListener('livewire:init', function() {
-      Livewire.on('show-alert', (event) => {
-        toastr[event.type](event.message);
-      });
-
-      Livewire.on('confirm-delete', (event) => {
-        Swal.fire({
-          title: 'حذف نوبت',
-          text: 'آیا مطمئن هستید که می‌خواهید این نوبت را حذف کنید؟',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#ef4444',
-          cancelButtonColor: '#6b7280',
-          confirmButtonText: 'بله، حذف کن',
-          cancelButtonText: 'خیر'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Livewire.dispatch('deleteAppointmentConfirmed', {
-              id: event.id
-            });
-          }
-        });
-      });
-    });
-  </script>
 </div>

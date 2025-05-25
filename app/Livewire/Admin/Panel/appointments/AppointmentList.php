@@ -1,11 +1,11 @@
 <?php
 
-
 namespace App\Livewire\Admin\Panel\Appointments;
 
 use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\Appointment;
+use Livewire\WithPagination;
+use Illuminate\Support\Facades\DB;
 
 class AppointmentList extends Component
 {
@@ -15,12 +15,13 @@ class AppointmentList extends Component
 
     protected $listeners = ['deleteAppointmentConfirmed' => 'deleteAppointment'];
 
-    public $perPage = 10; // پیجینیشن اصلی صفحه
-    public $appointmentsPerPage = 5; // پیجینیشن محلی برای نوبت‌های هر پزشک
+    public $perPage = 10;
+    public $appointmentsPerPage = 5;
     public $search = '';
     public $readyToLoad = false;
     public $expandedDoctors = [];
-    public $doctorPages = []; // آرایه برای ذخیره صفحه فعلی نوبت‌ها برای هر پزشک
+    public $doctorPages = [];
+    public $selectedAppointments = [];
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -43,7 +44,6 @@ class AppointmentList extends Component
             $this->expandedDoctors = array_diff($this->expandedDoctors, [$doctorId]);
         } else {
             $this->expandedDoctors[] = $doctorId;
-            // مقدار پیش‌فرض صفحه برای پزشک جدید
             if (!isset($this->doctorPages[$doctorId])) {
                 $this->doctorPages[$doctorId] = 1;
             }
@@ -52,14 +52,7 @@ class AppointmentList extends Component
 
     public function setDoctorPage($doctorId, $page)
     {
-        $this->doctorPages[$doctorId] = max(1, $page); // مطمئن می‌شیم صفحه کمتر از 1 نشه
-    }
-
-    public function toggleStatus($id)
-    {
-        $appointment = Appointment::findOrFail($id);
-        $appointment->update(['status' => $appointment->status === 'scheduled' ? 'cancelled' : 'scheduled']);
-        $this->dispatch('show-alert', type: $appointment->status === 'scheduled' ? 'success' : 'info', message: $appointment->status === 'scheduled' ? 'نوبت فعال شد!' : 'نوبت لغو شد!');
+        $this->doctorPages[$doctorId] = max(1, $page);
     }
 
     public function confirmDelete($id)
@@ -71,13 +64,13 @@ class AppointmentList extends Component
     {
         $appointment = Appointment::findOrFail($id);
         $appointment->delete();
-        $this->dispatch('show-alert', type: 'success', message: 'نوبت حذف شد!');
+        $this->dispatch('show-alert', type: 'success', message: 'نوبت با موفقیت حذف شد.');
     }
 
     public function updatedSearch()
     {
         $this->resetPage();
-        $this->doctorPages = []; // ریست کردن پیجینیشن محلی هنگام جستجو
+        $this->doctorPages = [];
     }
 
     private function getAppointmentsQuery()
@@ -105,7 +98,7 @@ class AppointmentList extends Component
                 $paginatedAppointments = $appointments->forPage($currentPage, $this->appointmentsPerPage);
                 return [
                     'doctor' => $appointments->first()->doctor,
-                    'appointments' => $paginatedAppointments->values(), // تبدیل به آرایه معمولی
+                    'appointments' => $paginatedAppointments->values(),
                     'totalAppointments' => $appointments->count(),
                     'currentPage' => $currentPage,
                     'lastPage' => ceil($appointments->count() / $this->appointmentsPerPage),
