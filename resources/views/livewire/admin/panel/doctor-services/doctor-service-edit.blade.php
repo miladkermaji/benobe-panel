@@ -174,8 +174,6 @@
     </div>
   </div>
 
-
-
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
@@ -190,6 +188,16 @@
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
+        $('#service_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
+        $('#insurance_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
         $('#parent_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
@@ -199,10 +207,14 @@
         // تنظیم مقادیر اولیه هنگام لود صفحه
         const doctorId = @json($this->doctor_id);
         const clinicId = @json($this->clinic_id);
+        const serviceId = @json($this->service_id);
+        const insuranceId = @json($this->insurance_id);
         const parentId = @json($this->parent_id);
 
         $('#doctor_id').val(doctorId || '').trigger('change');
         $('#clinic_id').val(clinicId || '').trigger('change');
+        $('#service_id').val(serviceId || '').trigger('change');
+        $('#insurance_id').val(insuranceId || '').trigger('change');
         $('#parent_id').val(parentId || '').trigger('change');
       }
 
@@ -217,6 +229,14 @@
       $('#clinic_id').on('change', function() {
         const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
         @this.set('clinic_id', value);
+      });
+      $('#service_id').on('change', function() {
+        const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
+        @this.set('service_id', value);
+      });
+      $('#insurance_id').on('change', function() {
+        const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
+        @this.set('insurance_id', value);
       });
       $('#parent_id').on('change', function() {
         const value = $(this).val() === '' || $(this).val() === null ? null : $(this).val();
@@ -239,10 +259,14 @@
         if ($('#doctor_id').hasClass('select2-hidden-accessible')) {
           const doctorId = @json($this->doctor_id);
           const clinicId = @json($this->clinic_id);
+          const serviceId = @json($this->service_id);
+          const insuranceId = @json($this->insurance_id);
           const parentId = @json($this->parent_id);
 
           $('#doctor_id').val(doctorId || '').trigger('change');
           $('#clinic_id').val(clinicId || '').trigger('change');
+          $('#service_id').val(serviceId || '').trigger('change');
+          $('#insurance_id').val(insuranceId || '').trigger('change');
           $('#parent_id').val(parentId || '').trigger('change');
         }
       });

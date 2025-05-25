@@ -174,8 +174,6 @@
     </div>
   </div>
 
-
-
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof jQuery === 'undefined') {
