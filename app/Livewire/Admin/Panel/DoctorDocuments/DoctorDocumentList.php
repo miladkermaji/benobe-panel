@@ -16,7 +16,7 @@ class DoctorDocumentList extends Component
 
     protected $listeners = ['deleteDoctorDocumentConfirmed' => 'deleteDoctorDocument'];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $selectedDocuments = [];

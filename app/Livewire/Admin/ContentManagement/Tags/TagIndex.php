@@ -15,7 +15,7 @@ class TagIndex extends Component
     public $search = '';
     public $selectedTags = [];
     public $selectAll = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $tagStatuses = [];
 
     protected $paginationTheme = 'bootstrap';
@@ -81,7 +81,7 @@ class TagIndex extends Component
 
         try {
             $tags = Tag::whereIn('id', $this->selectedTags)->get();
-         
+
             Tag::whereIn('id', $this->selectedTags)->delete();
 
             $this->selectedTags = [];

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Livewire\Admin\Panel\Hospitals;
 
 use App\Models\Hospital;
@@ -14,7 +13,7 @@ class HospitalList extends Component
     protected $paginationTheme = 'bootstrap';
     protected $listeners = ['deleteHospitalConfirmed' => 'deleteHospital'];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $selectedHospitals = [];

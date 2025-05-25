@@ -18,7 +18,7 @@ class DoctorCommentList extends Component
         'replySubmitted' => 'saveReply'
     ];
 
-    public $perPage = 10; // برای پیجینیشن اصلی پزشکان
+    public $perPage = 100; // برای پیجینیشن اصلی پزشکان
     public $perPageComments = 5; // برای پیجینیشن نظرات هر پزشک
     public $search = '';
     public $readyToLoad = false;

@@ -16,7 +16,7 @@ class FrontPageList extends Component
     public $search = '';
     public $selectedPages = [];
     public $selectAll = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $pageStatuses = [];
 
     protected $paginationTheme = 'bootstrap';

@@ -15,7 +15,7 @@ class SlideList extends Component
     public $search = '';
     public $selectedSlides = [];
     public $selectAll = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $slideStatuses = [];
 
     protected $paginationTheme = 'bootstrap';

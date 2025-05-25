@@ -15,7 +15,7 @@ class DoctorSpecialtyList extends Component
 
     protected $listeners = ['deleteDoctorSpecialtyConfirmed' => 'deleteDoctorSpecialty'];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $selectedDoctorSpecialties = [];

@@ -15,7 +15,7 @@ class DoctorNoteList extends Component
 
     protected $listeners = ['deleteDoctorNoteConfirmed' => 'deleteDoctorNote'];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $selectedDoctorNotes = [];

@@ -14,7 +14,7 @@ class LinkList extends Component
     public $search = '';
     public $selectedLinks = [];
     public $selectAll = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $linkStatuses = [];
 
     protected $paginationTheme = 'bootstrap';

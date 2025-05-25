@@ -15,7 +15,7 @@ class BlogList extends Component
     public $search = '';
     public $selectedBlogs = [];
     public $selectAll = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $blogStatuses = [];
 
     protected $paginationTheme = 'bootstrap';

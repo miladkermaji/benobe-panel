@@ -14,7 +14,7 @@ class QuestionCatList extends Component
     public $search = '';
     public $selectedCategories = [];
     public $selectAll = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $categoryStatuses = [];
 
     protected $paginationTheme = 'bootstrap';

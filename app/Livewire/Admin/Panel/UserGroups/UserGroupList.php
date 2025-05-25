@@ -14,7 +14,7 @@ class UserGroupList extends Component
 
     protected $listeners = ['deleteUserGroupConfirmed' => 'deleteUserGroup'];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $selectedusergroups = [];

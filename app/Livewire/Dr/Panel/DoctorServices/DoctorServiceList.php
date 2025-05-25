@@ -24,7 +24,7 @@ class DoctorServiceList extends Component
         'refreshDoctorServiceList' => 'loadDoctorServices',
     ];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $selectedDoctorServices = [];

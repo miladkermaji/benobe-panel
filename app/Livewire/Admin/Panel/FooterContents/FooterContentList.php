@@ -15,7 +15,7 @@ class FooterContentList extends Component
 
     protected $listeners = ['deleteFooterContentConfirmed' => 'deleteFooterContent'];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $selectedFooterContents = [];
     public $selectAll = false;

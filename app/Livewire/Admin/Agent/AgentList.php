@@ -14,7 +14,7 @@ class AgentList extends Component
     public $search = ''; // رشته جستجو
     public $selectedAgents = []; // آرایه IDهای انتخاب‌شده برای حذف
     public $selectAll = false; // وضعیت چک‌باکس "انتخاب همه"
-    public $perPage = 10; // تعداد ردیف‌ها در هر صفحه
+    public $perPage = 100; // تعداد ردیف‌ها در هر صفحه
     public $agentStatuses = []; // برای ذخیره وضعیت‌ها
 
     protected $paginationTheme = 'bootstrap'; // تم صفحه‌بندی بوتسترپ

@@ -20,7 +20,7 @@ class UserBlockingList extends Component
         'toggleStatusConfirmed' => 'toggleStatusConfirmed',
     ];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $selectedUserBlockings = [];

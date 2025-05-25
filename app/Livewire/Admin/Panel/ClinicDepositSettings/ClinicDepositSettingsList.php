@@ -15,7 +15,7 @@ class ClinicDepositSettingsList extends Component
 
     public $search = '';
     public $readyToLoad = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $expandedDoctors = [];
 
     protected $queryString = [

@@ -32,7 +32,7 @@ class FinancialReport extends Component
     public $endDate;
     public $paymentMethod = '';
     public $insuranceId = '';
-    public $perPage = 10;
+    public $perPage = 100;
     public $readyToLoad = false;
     public $chartData = [];
     public $summary = [
@@ -604,50 +604,50 @@ class FinancialReport extends Component
         }
     }
 
-public function render()
-{
-    $doctorId = Auth::guard('doctor')->user()->id;
-    $transactions = $this->readyToLoad ? $this->getTransactions() : collect([]);
-    $totalAmount = $this->readyToLoad ? $this->getTotalAmount() : 0;
+    public function render()
+    {
+        $doctorId = Auth::guard('doctor')->user()->id;
+        $transactions = $this->readyToLoad ? $this->getTransactions() : collect([]);
+        $totalAmount = $this->readyToLoad ? $this->getTotalAmount() : 0;
 
-    // محاسبه جمع مبالغ امروز
-    $todayStart = Carbon::today()->startOfDay();
-    $todayEnd = Carbon::today()->endOfDay();
-    $todayAmount = $this->readyToLoad ? $this->getTotalAmount($todayStart, $todayEnd) : 0;
+        // محاسبه جمع مبالغ امروز
+        $todayStart = Carbon::today()->startOfDay();
+        $todayEnd = Carbon::today()->endOfDay();
+        $todayAmount = $this->readyToLoad ? $this->getTotalAmount($todayStart, $todayEnd) : 0;
 
-    $clinics = Clinic::where('doctor_id', $doctorId)->get();
+        $clinics = Clinic::where('doctor_id', $doctorId)->get();
 
-    // گرفتن بیمه‌هایی که در نوبت‌ها برای این دکتر استفاده شدن
-    $insurances = Insurance::whereIn('id', function ($query) use ($doctorId) {
-        $query->select('insurance_id')
-            ->from('appointments')
-            ->where('doctor_id', $doctorId)
-            ->whereNotNull('insurance_id')
-            ->union(
-                DB::table('counseling_appointments')
-                    ->select('insurance_id')
-                    ->where('doctor_id', $doctorId)
-                    ->whereNotNull('insurance_id')
-            );
-    })->get();
+        // گرفتن بیمه‌هایی که در نوبت‌ها برای این دکتر استفاده شدن
+        $insurances = Insurance::whereIn('id', function ($query) use ($doctorId) {
+            $query->select('insurance_id')
+                ->from('appointments')
+                ->where('doctor_id', $doctorId)
+                ->whereNotNull('insurance_id')
+                ->union(
+                    DB::table('counseling_appointments')
+                        ->select('insurance_id')
+                        ->where('doctor_id', $doctorId)
+                        ->whereNotNull('insurance_id')
+                );
+        })->get();
 
-    Log::info('Rendering FinancialReport view', [
-        'doctor_id' => $doctorId,
-        'transaction_count' => $this->readyToLoad ? $transactions->total() : 0,
-        'total_amount' => $totalAmount,
-        'today_amount' => $todayAmount,
-        'start_date' => $this->startDate,
-        'end_date' => $this->endDate,
-        'insurances_count' => $insurances->count(),
-    ]);
+        Log::info('Rendering FinancialReport view', [
+            'doctor_id' => $doctorId,
+            'transaction_count' => $this->readyToLoad ? $transactions->total() : 0,
+            'total_amount' => $totalAmount,
+            'today_amount' => $todayAmount,
+            'start_date' => $this->startDate,
+            'end_date' => $this->endDate,
+            'insurances_count' => $insurances->count(),
+        ]);
 
-    return view('livewire.dr.panel.financial.financial-report', [
-        'transactions' => $transactions,
-        'totalAmount' => $totalAmount,
-        'todayAmount' => $todayAmount, // مقدار جدید
-        'clinics' => $clinics,
-        'insurances' => $insurances,
-        'summary' => $this->summary,
-    ]);
-}
+        return view('livewire.dr.panel.financial.financial-report', [
+            'transactions' => $transactions,
+            'totalAmount' => $totalAmount,
+            'todayAmount' => $todayAmount, // مقدار جدید
+            'clinics' => $clinics,
+            'insurances' => $insurances,
+            'summary' => $this->summary,
+        ]);
+    }
 }

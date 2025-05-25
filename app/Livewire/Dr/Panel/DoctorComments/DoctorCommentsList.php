@@ -18,7 +18,7 @@ class DoctorCommentsList extends Component
         'replySubmitted' => 'saveReply'
     ];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $selectedDoctorComments = [];

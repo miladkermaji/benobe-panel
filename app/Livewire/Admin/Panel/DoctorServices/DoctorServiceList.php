@@ -14,7 +14,7 @@ class DoctorServiceList extends Component
 
     protected $listeners = ['deleteDoctorServiceConfirmed' => 'deleteDoctorService'];
 
-    public $perPage = 10; // پیجینیشن اصلی صفحه (در صورت نیاز)
+    public $perPage = 100; // پیجینیشن اصلی صفحه (در صورت نیاز)
     public $servicesPerPage = 5; // پیجینیشن محلی برای خدمات هر پزشک
     public $search = '';
     public $readyToLoad = false;

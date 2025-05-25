@@ -14,7 +14,7 @@ class CategoryBlogList extends Component
     public $search = '';
     public $selectedCategories = [];
     public $selectAll = false;
-    public $perPage = 10;
+    public $perPage = 100;
 
     protected $paginationTheme = 'bootstrap';
 

@@ -13,7 +13,7 @@ class InsuranceList extends Component
     protected $paginationTheme = 'bootstrap';
     protected $listeners = ['deleteInsuranceConfirmed' => 'deleteInsurance'];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $selectedInsurances = [];

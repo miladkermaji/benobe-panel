@@ -11,12 +11,13 @@ use App\Models\Admin\ContentManagement\HomeVideo\HomeVideo;
 
 class HomeVideoList extends Component
 {
-    use WithPagination, WithFileUploads;
+    use WithPagination;
+    use WithFileUploads;
 
     public $search = '';
     public $selectedVideos = [];
     public $selectAll = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $videoStatuses = [];
 
     protected $paginationTheme = 'bootstrap';

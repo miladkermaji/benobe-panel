@@ -15,7 +15,7 @@ class DoctorFaqsList extends Component
 
     public $search = '';
     public $readyToLoad = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $selectedFaqs = [];
     public $selectAll = false;
 

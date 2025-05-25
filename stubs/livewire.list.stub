@@ -15,7 +15,7 @@ class {{class}} extends Component
 
     public $search = '';
     public $readyToLoad = false;
-    public $perPage = 10;
+    public $perPage = 100;
 
     protected $queryString = [
         'search' => ['except' => ''],

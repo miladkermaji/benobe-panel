@@ -14,7 +14,7 @@ class WalletReportList extends Component
     public $search = '';
     public $selectedReports = [];
     public $selectAll = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $reportStatuses = [];
 
     protected $paginationTheme = 'bootstrap';

@@ -16,7 +16,7 @@ class QuestionList extends Component
     public $search = '';
     public $selectedQuestions = [];
     public $selectAll = false;
-    public $perPage = 10;
+    public $perPage = 100;
     public $questionStatuses = [];
     public $categoryFilter = 0;
 

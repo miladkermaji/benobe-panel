@@ -16,7 +16,7 @@ class DoctorHolidayList extends Component
     protected $paginationTheme = 'bootstrap';
     protected $listeners = ['deleteDoctorHolidayConfirmed' => 'deleteDoctorHoliday'];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $expandedDoctors = [];
