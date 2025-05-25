@@ -22,21 +22,21 @@
     <div class="card-body p-4">
       <div class="row g-4">
         <div class="col-md-6 col-sm-12 ">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="source_url" class="form-label fw-bold text-dark mb-2">URL مبدا</label>
             <input type="text" wire:model="source_url" class="form-control input-shiny" id="source_url"
               placeholder="https://example.com/old-path" required>
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="target_url" class="form-label fw-bold text-dark mb-2">URL مقصد</label>
             <input type="text" wire:model="target_url" class="form-control input-shiny" id="target_url"
               placeholder="https://example.com/new-path" required>
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="status_code" class="form-label fw-bold text-dark mb-2">کد وضعیت</label>
             <select wire:model="status_code" class="form-select input-shiny" id="status_code">
               <option value="301">301 - دائمی</option>
@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="isActive" wire:model="is_active">
               <label class="form-check-label fw-medium" for="isActive">
@@ -56,7 +56,7 @@
           </div>
         </div>
         <div class="col-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="description" class="form-label fw-bold text-dark mb-2">توضیحات (اختیاری)</label>
             <textarea wire:model="description" class="form-control input-shiny" id="description" rows="3"
               placeholder="توضیحات ریدایرکت"></textarea>

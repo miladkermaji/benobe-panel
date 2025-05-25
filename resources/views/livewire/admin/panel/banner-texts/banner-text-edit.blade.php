@@ -22,14 +22,14 @@
     <div class="card-body p-4">
       <div class="row g-4">
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="main_text" class="form-label fw-bold text-dark mb-2">متن اصلی</label>
             <input type="text" wire:model="main_text" class="form-control input-shiny" id="main_text"
               placeholder="متن اصلی بنر" required>
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label class="form-label fw-bold text-dark mb-2">کلمات متغیر (اختیاری)</label>
             @foreach ($switch_words as $index => $word)
               <div class="d-flex align-items-center gap-2 mb-2">
@@ -52,14 +52,14 @@
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="switch_interval" class="form-label fw-bold text-dark mb-2">فاصله تعویض (ثانیه)</label>
             <input type="number" wire:model="switch_interval" class="form-control input-shiny" id="switch_interval"
               placeholder="مثال: 3">
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="image" class="form-label fw-bold text-dark mb-2">تصویر بنر (اختیاری)</label>
             <input type="file" wire:model="image" class="form-control input-shiny" id="image" accept="image/*">
             @if ($image)
@@ -71,9 +71,9 @@
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <div class="col-md-6 col-sm-12">
-              <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+              <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
                 <div class="form-check form-switch d-flex align-items-center gap-2">
                   <input class="form-check-input" type="checkbox" id="isActive" wire:model="status">
                   <label class="form-check-label fw-medium mb-0 mx-3" for="isActive">

@@ -22,9 +22,11 @@
     <div class="card-body p-4">
       <div class="row g-4">
         <div class="col-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
+          <div
+            class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative position-relative">
             <label class="form-label fw-bold text-dark mb-2">آپلود تصاویر</label>
-            <input type="file" wire:model="images" multiple class="form-control input-shiny position-relative" accept="image/*">
+            <input type="file" wire:model="images" multiple class="form-control input-shiny position-relative"
+              accept="image/*">
             @foreach ($images as $index => $image)
               <div class="mt-2">
                 <input type="text" wire:model="captions.{{ $index }}" class="form-control input-shiny mt-1"

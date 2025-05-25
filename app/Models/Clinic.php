@@ -57,6 +57,10 @@ class Clinic extends Model
     {
         return $this->belongsTo(Zone::class, 'province_id');
     }
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class, 'id');
+    }
 
     public function doctors()
     {

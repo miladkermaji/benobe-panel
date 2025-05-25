@@ -22,14 +22,14 @@
     <div class="card-body p-4">
       <div class="row g-4">
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="name" class="form-label fw-bold text-dark mb-2">نام شهر</label>
             <input type="text" wire:model="name" class="form-control input-shiny" id="name"
               placeholder="نام شهر" required>
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="parent_id" class="form-label fw-bold text-dark mb-2">استان</label>
             <select wire:model="parent_id" class="form-control input-shiny" id="parent_id" required>
               <option value="">انتخاب کنید</option>
@@ -40,49 +40,49 @@
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="sort" class="form-label fw-bold text-dark mb-2">ترتیب</label>
             <input type="number" wire:model="sort" class="form-control input-shiny" id="sort" placeholder="ترتیب"
               required>
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="latitude" class="form-label fw-bold text-dark mb-2">عرض جغرافیایی (اختیاری)</label>
             <input type="number" step="any" wire:model="latitude" class="form-control input-shiny" id="latitude"
               placeholder="مثال: 35.6892">
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="longitude" class="form-label fw-bold text-dark mb-2">طول جغرافیایی (اختیاری)</label>
             <input type="number" step="any" wire:model="longitude" class="form-control input-shiny" id="longitude"
               placeholder="مثال: 51.3890">
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="population" class="form-label fw-bold text-dark mb-2">جمعیت (اختیاری)</label>
             <input type="number" wire:model="population" class="form-control input-shiny" id="population"
               placeholder="مثال: 1000000">
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="area" class="form-label fw-bold text-dark mb-2">مساحت (km²) (اختیاری)</label>
             <input type="number" step="any" wire:model="area" class="form-control input-shiny" id="area"
               placeholder="مثال: 183">
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="postal_code" class="form-label fw-bold text-dark mb-2">کد پستی (اختیاری)</label>
             <input type="text" wire:model="postal_code" class="form-control input-shiny" id="postal_code"
               placeholder="مثال: 12345">
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <label for="price_shipping" class="form-label fw-bold text-dark mb-2">هزینه ارسال (تومان)
               (اختیاری)</label>
             <input type="number" wire:model="price_shipping" class="form-control input-shiny" id="price_shipping"
@@ -90,9 +90,9 @@
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
-          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+          <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
             <div class="col-md-6 col-sm-12">
-              <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all">
+              <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
                 <div class="form-check form-switch d-flex align-items-center gap-2">
                   <input class="form-check-input" type="checkbox" id="isActive" wire:model="status">
                   <label class="form-check-label fw-medium mb-0 mx-3" for="isActive">
