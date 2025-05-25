@@ -14,7 +14,7 @@ class CityList extends Component
 
     protected $listeners = ['deleteCityConfirmed' => 'deleteCity'];
 
-    public $perPage        = 10;
+    public $perPage        = 40;
     public $search         = '';
     public $readyToLoad    = false;
     public $selectedCities = [];

@@ -193,7 +193,7 @@
                       </svg>
                     </button>
                     <a href="{{ route('admin.panel.cities.index', ['province_id' => $item->id]) }}"
-                      class="btn btn-light rounded-pill px-3" title="مشاهده شهرها">
+                      class="btn btn-info rounded-pill px-3" title="مشاهده شهرها">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
