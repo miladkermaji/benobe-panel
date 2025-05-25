@@ -75,7 +75,7 @@
                   stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
-                افزودن آیتم
+                افزودن 
               </button>
             </div>
           </div>
@@ -83,75 +83,6 @@
       </div>
     </div>
   </div>
-
-  <style>
-    .bg-gradient-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-    }
-
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .input-shiny {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 12px 15px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      height: 48px;
-      background: #fafafa;
-    }
-
-    .input-shiny:focus {
-      border-color: #6b7280;
-      box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
-      background: #fff;
-    }
-
-    .form-label {
-      position: absolute;
-      top: -25px;
-      right: 15px;
-      color: #374151;
-      font-size: 12px;
-      background: #ffffff;
-      padding: 0 5px;
-      pointer-events: none;
-    }
-
-    .my-btn-primary {
-      background: linear-gradient(90deg, #6b7280, #374151);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-
-    .my-btn-primary:hover {
-      background: linear-gradient(90deg, #4b5563, #1f2937);
-      transform: translateY(-2px);
-    }
-
-    .form-check-input {
-      margin-top: 0;
-      height: 20px;
-      width: 20px;
-      vertical-align: middle;
-    }
-
-    .form-check-label {
-      margin-right: 25px;
-      line-height: 1.5;
-      vertical-align: middle;
-    }
-
-    .form-check-input:checked {
-      background-color: #6b7280;
-      border-color: #6b7280;
-    }
-  </style>
-
   <script>
     document.addEventListener('livewire:init', function() {
       Livewire.on('show-alert', (event) => toastr[event.type](event.message));

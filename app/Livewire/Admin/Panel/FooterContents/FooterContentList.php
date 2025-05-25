@@ -19,8 +19,14 @@ class FooterContentList extends Component
     public $search = '';
     public $selectedFooterContents = [];
     public $selectAll = false;
+    public $readyToLoad = false;
 
     protected $queryString = ['search' => ['except' => '']];
+
+    public function loadFooterContents()
+    {
+        $this->readyToLoad = true;
+    }
 
     public function toggleStatus($id)
     {
