@@ -13,11 +13,11 @@
     </div>
     <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
       <a href="{{ route('admin.panel.manual-appointment-settings.create') }}"
-        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2 justify-content-center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14" />
         </svg>
-        <span>افزودن تنظیمات جدید</span>
+        <span>افزودن</span>
       </a>
     </div>
   </div>
@@ -154,57 +154,7 @@
     </div>
   </div>
 
-  <style>
-    .glass-header {
-      background: linear-gradient(90deg, rgba(107, 114, 128, 0.9), rgba(55, 65, 81, 0.9));
-      backdrop-filter: blur(10px);
-    }
 
-    .btn-gradient-success {
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: white;
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      color: white;
-    }
-
-    .doctor-toggle {
-      transition: all 0.3s ease;
-    }
-
-    .doctor-toggle:hover {
-      background: #f9fafb;
-    }
-
-    .cursor-pointer {
-      cursor: pointer;
-    }
-
-    .transition-transform {
-      transition: transform 0.3s ease;
-    }
-
-    .rotate-180 {
-      transform: rotate(180deg);
-    }
-
-    .bg-label-primary {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .bg-label-success {
-      background: #d1fae5;
-      color: #059669;
-    }
-
-    .bg-label-danger {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-  </style>
 
   <script>
     document.addEventListener('livewire:init', function() {
