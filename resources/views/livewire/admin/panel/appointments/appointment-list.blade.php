@@ -4,17 +4,17 @@
     <h1 class="m-0 h3 font-light flex-grow-1" style="min-width: 200px; color: var(--text-primary);">مدیریت نوبت‌ها</h1>
     <div class="input-group flex-grow-1 position-relative" style="max-width: 450px;">
       <input type="text"
-        class="form-control border-0 shadow-none bg-background-card text-text-primary ps-5 rounded-full h-12"
+        class="form-control border-0 shadow-none bg-background-card text-text-primary ps-5 rounded-3 h-12"
         wire:model.live="search" placeholder="جستجو بر اساس نام، نام خانوادگی یا کد ملی...">
       <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-4 text-text-secondary">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+          <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5-7-7-7 7" />
         </svg>
       </span>
     </div>
     <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center mt-md-2">
       <a href="{{ route('admin.panel.appointments.create') }}"
-        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+        class="btn btn-success rounded-pill px-4 d-flex align-items-center gap-2">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14" />
         </svg>
@@ -34,11 +34,7 @@
                 wire:click="toggleDoctor({{ $doctor['doctor']->id }})">
                 <div class="d-flex align-items-center gap-3">
                   <h3 class="h6 m-0 text-text-primary fw-medium">{{ $doctor['doctor']->full_name }}</h3>
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-label-primary">{{ $doctor['totalAppointments'] }} نوبت</span>
-                    <span
-                      class="text-text-secondary text-xs">({{ $doctor['currentPage'] }}/{{ $doctor['lastPage'] }})</span>
-                  </div>
+                  <span class="badge bg-label-primary">{{ $doctor['totalAppointments'] }} نوبت</span>
                 </div>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2"
@@ -78,7 +74,7 @@
                           <td class="align-middle text-text-secondary">{{ $appointment->patient->national_code }}</td>
                           <td class="align-middle text-text-primary">
                             {{ \Morilog\Jalali\Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d') }}
-                            {{ $appointment->appointment_time }}
+                            {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') }}
                           </td>
                           <td class="align-middle">
                             <span class="badge bg-label-success">{{ number_format($appointment->deposit) }}
@@ -162,7 +158,7 @@
                             <span class="text-text-secondary">زمان نوبت:</span>
                             <span class="text-text-primary">
                               {{ \Morilog\Jalali\Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d') }}
-                              {{ $appointment->appointment_time }}
+                              {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') }}
                             </span>
                           </div>
                           <div class="d-flex justify-content-between">
