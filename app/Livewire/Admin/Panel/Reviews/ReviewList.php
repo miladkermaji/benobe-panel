@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Panel\Reviews;
 use App\Models\Review;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Storage;
 
 class ReviewList extends Component
 {
@@ -18,8 +19,14 @@ class ReviewList extends Component
     public $search          = '';
     public $selectedReviews = [];
     public $selectAll       = false;
+    public $readyToLoad     = false;
 
     protected $queryString = ['search' => ['except' => '']];
+
+    public function loadReviews()
+    {
+        $this->readyToLoad = true;
+    }
 
     public function toggleStatus($id)
     {
@@ -37,7 +44,7 @@ class ReviewList extends Component
     {
         $review = Review::findOrFail($id);
         if ($review->image_path) {
-            \Storage::disk('public')->delete($review->image_path);
+            Storage::disk('public')->delete($review->image_path);
         }
         $review->delete();
         $this->dispatch('show-alert', type: 'success', message: 'نظر با موفقیت حذف شد!');
