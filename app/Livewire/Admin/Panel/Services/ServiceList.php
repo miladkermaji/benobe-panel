@@ -14,7 +14,7 @@ class ServiceList extends Component
 
     protected $listeners = ['deleteServiceConfirmed' => 'deleteService'];
 
-    public $perPage          = 10;
+    public $perPage          = 300;
     public $search           = '';
     public $readyToLoad      = false;
     public $selectedServices = [];
