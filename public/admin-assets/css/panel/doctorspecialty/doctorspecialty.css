@@ -280,8 +280,49 @@
     background-color: var(--background-light);
 }
 
-/* Mobile and Tablet Styles for Tables */
+/* Mobile and Tablet Styles */
 @media (max-width: 991px) {
+    .doctor-toggle {
+        margin: 0.5rem;
+        background: var(--background-card);
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border-neutral);
+        text-align: right !important;
+        font-family: Vazir !important;
+    }
+
+    .doctor-toggle * {
+        font-family: Vazir !important;
+        text-align: right !important;
+    }
+
+    .doctor-toggle .d-flex {
+        padding: 0.5rem;
+        cursor: pointer;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .doctor-toggle svg {
+        width: 16px;
+        height: 16px;
+        color: var(--text-secondary);
+    }
+
+    .doctor-toggle .fw-bold {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .doctor-toggle .badge {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.3rem;
+        background-color: var(--background-light);
+        color: var(--text-primary);
+    }
+
     .table-responsive {
         padding: 0;
         background: transparent;
@@ -297,21 +338,22 @@
 
     .table tbody tr {
         display: block;
-        margin-bottom: 0.75rem;
+        margin: 0.5rem;
         background: white;
         border-radius: 8px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         border: 1px solid var(--border-neutral);
-        transition: all 0.2s ease;
     }
 
     .table tbody td {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.6rem 0.75rem;
+        padding: 0.4rem 0.5rem;
         border-bottom: 1px solid var(--border-neutral);
-        font-size: 0.85rem;
+        font-size: 0.75rem;
+        font-family: Vazir;
+        text-align: right;
     }
 
     .table tbody td:last-child {
@@ -320,10 +362,12 @@
 
     .table tbody td::before {
         content: attr(data-label);
-        font-weight: 500;
+        font-family: Vazir;
+        font-weight: 400;
         color: var(--text-secondary);
-        font-size: 0.8rem;
-        margin-left: 0.75rem;
+        font-size: 0.7rem;
+        margin-left: 0.5rem;
+        opacity: 0.8;
     }
 
     .table tbody td .d-flex {
@@ -331,55 +375,58 @@
         gap: 0.5rem;
     }
 
-    .table tbody td .badge {
-        margin-right: auto;
-        font-size: 0.7rem;
-        padding: 0.25rem 0.5rem;
-    }
-
     .table tbody td .btn {
-        padding: 0.35rem 0.5rem;
-        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.25rem 0.35rem;
+        font-size: 0.7rem;
+        border-radius: 50px;
     }
 
     .table tbody td .btn svg {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
     }
 
-    .table tbody tr:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+    .form-check-input {
+        width: 0.9rem !important;
+        height: 0.9rem !important;
+        margin-top: 0.15rem !important;
     }
+}
 
-    /* Compact Card Styles */
+/* Extra Small Devices */
+@media (max-width: 575px) {
     .doctor-toggle {
-        margin-bottom: 0.5rem;
+        margin: 0.5rem;
     }
 
     .doctor-toggle .d-flex {
         padding: 0.75rem;
     }
 
-    .doctor-toggle .badge {
-        font-size: 0.7rem;
-        padding: 0.25rem 0.5rem;
-    }
-
     .doctor-toggle svg {
         width: 18px;
         height: 18px;
     }
-}
 
-/* Extra Small Devices */
-@media (max-width: 575px) {
+    .doctor-toggle .fw-bold {
+        font-size: 0.85rem;
+    }
+
+    .doctor-toggle .badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+
     .table tbody tr {
-        margin-bottom: 0.5rem;
+        margin: 0.4rem;
     }
 
     .table tbody td {
-        padding: 0.5rem 0.6rem;
+        padding: 0.6rem;
+        font-size: 0.8rem;
     }
 
     .table tbody td::before {
@@ -388,6 +435,7 @@
 
     .table tbody td .btn {
         padding: 0.3rem 0.4rem;
+        font-size: 0.75rem;
     }
 
     .table tbody td .btn svg {
@@ -395,13 +443,9 @@
         height: 12px;
     }
 
-    .doctor-toggle .d-flex {
-        padding: 0.6rem;
-    }
-
-    .doctor-toggle svg {
-        width: 16px;
-        height: 16px;
+    .table tbody td .badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
     }
 }
 
