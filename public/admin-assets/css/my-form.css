@@ -145,7 +145,6 @@ input:not([type="checkbox"]) {
 
 /* سوئیچ وضعیت */
 .form-check-input {
- 
     border-radius: var(--radius-circle);
     border: 1px solid var(--border-neutral);
     transition: all 0.3s ease;
@@ -331,27 +330,27 @@ input:not([type="checkbox"]) {
 /* ریسپانسیو برای تبلت */
 @media (max-width: 991px) {
     .container-fluid {
-        padding: 1.5rem;
+        padding: 1rem;
     }
 
     .card-header {
-        padding: 1.25rem;
+        padding: 1rem;
         flex-direction: row;
         align-items: center;
-        gap: 0.75rem;
+        gap: 0.5rem;
     }
 
     .card-body {
-        padding: 1.5rem;
+        padding: 1rem;
     }
 
     .my-btn-primary {
-        padding: 0.65rem 1.5rem;
+        padding: 0.5rem 1.25rem;
         font-size: 0.95rem;
     }
 
     .btn-outline-light {
-        padding: 0.4rem 1rem;
+        padding: 0.35rem 0.75rem;
         font-size: 0.85rem;
     }
 
@@ -359,11 +358,12 @@ input:not([type="checkbox"]) {
     .form-select,
     textarea {
         font-size: 0.9rem;
-        padding: 0.65rem 0.9rem;
+        padding: 0.5rem 0.75rem;
     }
 
     .form-label {
         font-size: 0.9rem;
+        margin-bottom: 0.5rem;
     }
 
     .gateway-logo {
@@ -376,32 +376,53 @@ input:not([type="checkbox"]) {
     }
 
     .pagination {
-        padding: 0.5rem;
-        gap: 0.3rem;
+        padding: 0.4rem;
+        gap: 0.2rem;
     }
 
     .pagination .page-link {
-        padding: 0.4rem 0.85rem;
-        min-width: 2.2rem;
-        height: 2.2rem;
+        padding: 0.35rem 0.7rem;
+        min-width: 2rem;
+        height: 2rem;
         font-size: 0.9rem;
     }
 
     .pagination-info {
         font-size: 0.85rem;
-        padding: 0.5rem 1rem;
+        padding: 0.4rem 0.75rem;
+    }
+
+    /* اضافه کردن استایل برای تبلت */
+    .col-md-6 {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .row.g-3 {
+        gap: 0.5rem !important;
     }
 }
 
 /* ریسپانسیو برای موبایل */
 @media (max-width: 767px) {
     .container-fluid {
-        padding: 1rem;
+        padding: 0.75rem;
     }
+    .row > * {
+        flex-shrink: 0;
+        width: 100%;
+        max-width: 100%;
+        padding-left: .1rem !important;
+        padding-right: .1rem !important;
+        margin-top: var(--bs-gutter-y);
+      }
+
     .card-body.p-4 {
-        padding-right: 0.1rem !important;
-        padding-left: 0.1rem !important;
+        padding: 0.75rem !important;
     }
+
     .card {
         margin: 0;
     }
@@ -409,37 +430,38 @@ input:not([type="checkbox"]) {
     .card-header {
         flex-direction: column;
         align-items: flex-start;
-        padding: 1rem;
-        gap: 0.75rem;
+        padding: 0.75rem;
+        gap: 0.5rem;
     }
 
     .card-body {
-        padding: 1.25rem;
+        padding: 0.75rem;
     }
 
     .form-group,
     .bg-light {
-        padding: 1rem;
-        margin-bottom: 1rem;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
     }
 
     .form-label {
         font-size: 0.85rem;
+        margin-bottom: 0.35rem;
     }
 
     .form-control,
     .form-select,
     textarea {
         font-size: 0.875rem;
-        padding: 0.6rem 0.75rem;
-        height: 45px !important; /* کاهش ارتفاع ورودی‌ها برای موبایل */
+        padding: 0.5rem 0.6rem;
+        height: 42px !important;
     }
 
     .my-btn-primary,
     .btn-outline-light {
         width: 100%;
         justify-content: center;
-        padding: 0.6rem 1.25rem;
+        padding: 0.5rem 1rem;
         font-size: 0.9rem;
     }
 
@@ -453,62 +475,75 @@ input:not([type="checkbox"]) {
     }
 
     .pagination {
-        padding: 0.5rem;
-        gap: 0.2rem;
-        flex-wrap: wrap;
+        padding: 0.4rem;
+        gap: 0.15rem;
     }
 
     .pagination .page-link {
-        padding: 0.35rem 0.7rem;
-        min-width: 2rem;
-        height: 2rem;
+        padding: 0.3rem 0.6rem;
+        min-width: 1.8rem;
+        height: 1.8rem;
         font-size: 0.85rem;
     }
 
     .pagination-info {
         font-size: 0.8rem;
-        padding: 0.5rem 0.75rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    /* اضافه کردن استایل برای موبایل */
+    .col-sm-6 {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .row.g-3 {
+        gap: 0.5rem !important;
     }
 }
 
 /* ریسپانسیو برای موبایل‌های خیلی کوچک (زیر 576px) */
 @media (max-width: 576px) {
     .container-fluid {
-        padding: 0.75rem;
+        padding: 0.5rem;
     }
 
     .card {
-        margin: 0 0.25rem;
+        margin: 0;
     }
 
     .card-header {
-        padding: 0.75rem;
+        padding: 0.6rem;
     }
 
     .card-body {
-        padding: 1rem;
+        padding: 0.6rem;
     }
 
     .form-group,
     .bg-light {
-        padding: 0.75rem;
+        padding: 0.6rem;
+        margin-bottom: 0.4rem;
     }
 
     .form-label {
         font-size: 0.8rem;
+        margin-bottom: 0.25rem;
     }
 
     .form-control,
     .form-select,
     textarea {
         font-size: 0.85rem;
-        padding: 0.5rem 0.65rem;
-        height: 40px !important;
+        padding: 0.4rem 0.5rem;
+        height: 38px !important;
     }
 
     .my-btn-primary,
     .btn-outline-light {
-        padding: 0.5rem 1rem;
+        padding: 0.4rem 0.75rem;
         font-size: 0.85rem;
     }
 
@@ -522,19 +557,23 @@ input:not([type="checkbox"]) {
     }
 
     .pagination {
-        padding: 0.4rem;
-        gap: 0.15rem;
+        padding: 0.3rem;
+        gap: 0.1rem;
     }
 
     .pagination .page-link {
-        padding: 0.3rem 0.6rem;
-        min-width: 1.8rem;
-        height: 1.8rem;
+        padding: 0.25rem 0.5rem;
+        min-width: 1.6rem;
+        height: 1.6rem;
         font-size: 0.8rem;
     }
 
     .pagination-info {
         font-size: 0.75rem;
-        padding: 0.4rem 0.6rem;
+        padding: 0.3rem 0.5rem;
+    }
+
+    .row.g-3 {
+        gap: 0.4rem !important;
     }
 }

@@ -43,7 +43,7 @@
               </div>
 
               @if (in_array($data['doctor']->id, $expandedDoctors))
-                <div class="table-responsive text-nowrap p-3 bg-light">
+                <div class="table-responsive text-nowrap p-3 bg-light d-none d-md-block">
                   <table class="table table-bordered table-hover w-100 m-0">
                     <thead class="glass-header text-white">
                       <tr>
@@ -105,35 +105,78 @@
                       @endforelse
                     </tbody>
                   </table>
-
-                  @if ($data['totalSettings'] > $settingsPerPage)
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                      <div>
-                        نمایش {{ ($data['currentPage'] - 1) * $settingsPerPage + 1 }} تا
-                        {{ min($data['currentPage'] * $settingsPerPage, $data['totalSettings']) }} از
-                        {{ $data['totalSettings'] }} تنظیم
-                      </div>
-                      <nav>
-                        <ul class="pagination mb-0">
-                          <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
-                            <button class="page-link"
-                              wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $data['currentPage'] - 1 }})">قبلی</button>
-                          </li>
-                          @for ($i = 1; $i <= $data['lastPage']; $i++)
-                            <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
-                              <button class="page-link"
-                                wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $i }})">{{ $i }}</button>
-                            </li>
-                          @endfor
-                          <li class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
-                            <button class="page-link"
-                              wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $data['currentPage'] + 1 }})">بعدی</button>
-                          </li>
-                        </ul>
-                      </nav>
-                    </div>
-                  @endif
                 </div>
+
+                <div class="d-md-none">
+                  @forelse ($data['settings'] as $index => $setting)
+                    <div class="card mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title">{{ $setting->clinic->name ?? 'نامشخص' }}</h5>
+                        <p class="card-text">تأیید دو مرحله‌ای: <span
+                            class="badge {{ $setting->is_active ? 'bg-label-success' : 'bg-label-danger' }}">{{ $setting->is_active ? 'فعال' : 'غیرفعال' }}</span>
+                        </p>
+                        <p class="card-text">زمان ارسال لینک: {{ $setting->duration_send_link }} ساعت</p>
+                        <p class="card-text">مدت اعتبار لینک: {{ $setting->duration_confirm_link }} ساعت</p>
+                        <div class="d-flex justify-content-end gap-2">
+                          <a href="{{ route('admin.panel.manual-appointment-settings.edit', $setting->id) }}"
+                            class="btn btn-gradient-success rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </a>
+                          <button wire:click="confirmDelete({{ $setting->id }})"
+                            class="btn btn-gradient-danger rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  @empty
+                    <div class="text-center py-5">
+                      <div class="d-flex flex-column align-items-center justify-content-center">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" class="text-muted mb-3">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                        <p class="text-muted fw-medium m-0">هیچ تنظیمی یافت نشد.</p>
+                      </div>
+                    </div>
+                  @endforelse
+                </div>
+
+                @if ($data['totalSettings'] > $settingsPerPage)
+                  <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                      نمایش {{ ($data['currentPage'] - 1) * $settingsPerPage + 1 }} تا
+                      {{ min($data['currentPage'] * $settingsPerPage, $data['totalSettings']) }} از
+                      {{ $data['totalSettings'] }} تنظیم
+                    </div>
+                    <nav>
+                      <ul class="pagination mb-0">
+                        <li class="page-item {{ $data['currentPage'] == 1 ? 'disabled' : '' }}">
+                          <button class="page-link"
+                            wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $data['currentPage'] - 1 }})">قبلی</button>
+                        </li>
+                        @for ($i = 1; $i <= $data['lastPage']; $i++)
+                          <li class="page-item {{ $data['currentPage'] == $i ? 'active' : '' }}">
+                            <button class="page-link"
+                              wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $i }})">{{ $i }}</button>
+                          </li>
+                        @endfor
+                        <li class="page-item {{ $data['currentPage'] == $data['lastPage'] ? 'disabled' : '' }}">
+                          <button class="page-link"
+                            wire:click="setDoctorPage({{ $data['doctor']->id }}, {{ $data['currentPage'] + 1 }})">بعدی</button>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                @endif
               @endif
             </div>
           @empty
@@ -153,8 +196,6 @@
       </div>
     </div>
   </div>
-
-
 
   <script>
     document.addEventListener('livewire:init', function() {
