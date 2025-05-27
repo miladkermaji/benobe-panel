@@ -44,10 +44,7 @@ class DoctorPermissions extends Component
             ]);
         }
 
-        $this->dispatch('show-alert', [
-            'type' => 'success',
-            'message' => 'دسترسی‌ها با موفقیت به‌روزرسانی شدند.'
-        ]);
+        $this->dispatch('show-alert', type: 'success', message: 'دسترسی‌ها با موفقیت به‌روزرسانی شدند.');
     }
 
     public function render()
