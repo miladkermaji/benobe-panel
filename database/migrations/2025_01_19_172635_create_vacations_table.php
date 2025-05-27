@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -21,6 +21,14 @@ return new class extends Migration {
             $table->timestamps();
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
             $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('cascade');
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('doctor_id');
+            $table->index('clinic_id');
+            $table->index('date');
+            $table->index(['doctor_id', 'date']);
+            $table->index(['clinic_id', 'date']);
+            $table->index('is_full_day');
         });
 
     }

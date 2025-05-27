@@ -14,6 +14,12 @@ class CreateQuestionCategoriesTable extends Migration
             $table->string('alt_name')->nullable(); // نام جایگزین (مثلاً sport)
             $table->boolean('approve')->default(true);
             $table->timestamps();
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('name');
+            $table->index('approve');
+            $table->index('alt_name');
+            $table->index(['name', 'approve']);
         });
     }
 

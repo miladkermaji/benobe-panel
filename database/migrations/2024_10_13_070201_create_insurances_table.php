@@ -6,8 +6,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     public function up(): void
     {
         // ایجاد جدول insurances
@@ -20,6 +19,11 @@ return new class extends Migration
             $table->unsignedInteger('insurance_percent')->nullable();
             $table->unsignedInteger('final_price')->nullable();
             $table->timestamps();
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('clinic_id');
+            $table->index('name');
+            $table->index('calculation_method');
         });
 
         // اجرای Seeder با مدیریت خطا

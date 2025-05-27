@@ -16,6 +16,11 @@ class CreateRedirectsTable extends Migration
             $table->boolean('is_active')->default(true)->comment('وضعیت فعال/غیرفعال');
             $table->text('description')->nullable()->comment('توضیحات اختیاری');
             $table->timestamps();
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('is_active');
+            $table->index('status_code');
+            $table->index(['source_url', 'is_active']);
         });
     }
 

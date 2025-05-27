@@ -31,6 +31,16 @@ return new class () extends Migration {
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
             $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('cascade');
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('appointment_date');
+            $table->index('status');
+            $table->index('payment_status');
+            $table->index('payment_method');
+            $table->index('tracking_code');
+            $table->index(['doctor_id', 'appointment_date']);
+            $table->index(['clinic_id', 'appointment_date']);
+            $table->index(['status', 'payment_status']);
         });
     }
 

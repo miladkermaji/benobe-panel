@@ -14,6 +14,10 @@ class CreateMailTemplatesTable extends Migration
             $table->text('template');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('is_active');
+            $table->index('subject');
         });
     }
 

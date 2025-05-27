@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -24,6 +23,14 @@ return new class extends Migration
             $table->tinyInteger('used')->default(0)->comment('0 => not used , 1 => used');
             $table->tinyInteger('status')->default(0);
             $table->timestamps();
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('type');
+            $table->index('used');
+            $table->index('status');
+            $table->index('otp_code');
+            $table->index(['login_id', 'type']);
+            $table->index(['type', 'status']);
         });
     }
 

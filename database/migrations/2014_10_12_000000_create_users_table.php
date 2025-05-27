@@ -41,6 +41,15 @@ return new class () extends Migration {
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('status');
+            $table->index('user_type');
+            $table->index('activation');
+            $table->index('mobile_verified_at');
+            $table->index('email_verified_at');
+            $table->index(['status', 'activation']);
+            $table->index(['user_type', 'status']);
         });
     }
 

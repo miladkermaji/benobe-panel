@@ -5,8 +5,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,6 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->tinyInteger('status')->default(0);
             $table->timestamps();
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('status');
+            $table->index('name');
         });
         Artisan::call('db:seed', [
             '--class' => 'MedicalSystemCodeTypeSeeder',

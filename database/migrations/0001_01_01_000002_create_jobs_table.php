@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -19,6 +18,12 @@ return new class extends Migration
             $table->unsignedInteger('reserved_at')->nullable();
             $table->unsignedInteger('available_at');
             $table->unsignedInteger('created_at');
+
+            $table->index('attempts');
+            $table->index('reserved_at');
+            $table->index('available_at');
+            $table->index('created_at');
+            $table->index(['queue', 'reserved_at']);
         });
 
         Schema::create('job_batches', function (Blueprint $table) {
@@ -32,6 +37,13 @@ return new class extends Migration
             $table->integer('cancelled_at')->nullable();
             $table->integer('created_at');
             $table->integer('finished_at')->nullable();
+
+            $table->index('name');
+            $table->index('pending_jobs');
+            $table->index('failed_jobs');
+            $table->index('cancelled_at');
+            $table->index('created_at');
+            $table->index('finished_at');
         });
 
         Schema::create('failed_jobs', function (Blueprint $table) {

@@ -48,9 +48,18 @@ return new class () extends Migration {
             $table->timestamps();
 
             // کلیدهای خارجی
-        
+
             $table->foreign('province_id')->references('id')->on('zone')->onDelete('set null');
             $table->foreign('city_id')->references('id')->on('zone')->onDelete('set null');
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('name');
+            $table->index('is_main_center');
+            $table->index('province_id');
+            $table->index('city_id');
+            $table->index(['province_id', 'city_id']);
+            $table->index(['latitude', 'longitude']);
+            $table->index('slug');
         });
     }
 

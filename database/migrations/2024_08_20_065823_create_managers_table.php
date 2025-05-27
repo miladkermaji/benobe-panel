@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class () extends Migration {
     public function up(): void
     {
         Schema::create('managers', function (Blueprint $table) {
@@ -41,6 +41,14 @@ return new class extends Migration {
             $table->timestamps();
             $table->index(['first_name', 'last_name'], 'name_index');
             $table->index('status', 'status_index');
+            $table->index('status');
+            $table->index('permission_level');
+            $table->index('is_active');
+            $table->index('is_verified');
+            $table->index('profile_completed');
+            $table->index('last_login_at');
+            $table->index(['status', 'is_active']);
+            $table->index(['permission_level', 'is_active']);
         });
 
         Artisan::call('db:seed', [

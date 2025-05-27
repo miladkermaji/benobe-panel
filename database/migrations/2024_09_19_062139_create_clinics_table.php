@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,7 +14,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('doctor_id');
 
-                                                   // اطلاعات مطب
+            // اطلاعات مطب
             $table->string('name')->nullable();    // نام مطب
             $table->string('address')->nullable(); // آدرس مطب
             $table->string('secretary_phone')->nullable();
@@ -24,21 +23,21 @@ return new class extends Migration
             $table->unsignedBigInteger('province_id')->nullable(); // کلید خارجی به جدول zone
             $table->unsignedBigInteger('city_id')->nullable();     // کلید خارجی به جدول zone
 
-                                                               // اطلاعات تکمیلی
+            // اطلاعات تکمیلی
             $table->boolean('is_main_clinic')->default(false); // آیا مطب اصلی است
             $table->time('start_time')->nullable();            // ساعت شروع کار
             $table->time('end_time')->nullable();              // ساعت پایان کار
             $table->text('description')->nullable();           // توضیحات مطب
 
-                                                             // مختصات جغرافیایی
+            // مختصات جغرافیایی
             $table->decimal('latitude', 10, 7)->nullable();  // عرض جغرافیایی
             $table->decimal('longitude', 10, 7)->nullable(); // طول جغرافیایی
 
-                                                                                     // اطلاعات مالی
+            // اطلاعات مالی
             $table->decimal('consultation_fee', 10, 2)->nullable();                  // هزینه ویزیت
             $table->enum('payment_methods', ['cash', 'card', 'online'])->nullable(); // روش‌های پرداخت
 
-                                                          // وضعیت و تنظیمات
+            // وضعیت و تنظیمات
             $table->boolean('is_active')->default(false); // وضعیت فعال‌سازی
             $table->json('working_days')->nullable();     // روزهای کاری
             $table->text('avatar')->nullable();                  // گالری تصاویر مطب
@@ -55,6 +54,13 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->foreign('province_id')->references('id')->on('zone')->onDelete('set null');
             $table->foreign('city_id')->references('id')->on('zone')->onDelete('set null');
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('doctor_id');
+            $table->index('is_main_clinic');
+            $table->index('name');
+            $table->index(['province_id', 'city_id']);
+            $table->index(['latitude', 'longitude']);
         });
     }
 

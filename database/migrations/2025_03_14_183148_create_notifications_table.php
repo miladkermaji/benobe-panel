@@ -21,6 +21,15 @@ return new class () extends Migration {
             $table->dateTime('end_at')->nullable(); // زمان پایان
             $table->foreignId('created_by')->nullable()->constrained('managers')->onDelete('set null'); // کاربر ایجادکننده
             $table->timestamps();
+
+            // اضافه کردن ایندکس‌ها
+            $table->index('type');
+            $table->index('target_group');
+            $table->index('is_active');
+            $table->index('start_at');
+            $table->index('end_at');
+            $table->index(['type', 'is_active']);
+            $table->index(['target_group', 'is_active']);
         });
     }
 
