@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use Carbon\Carbon;
@@ -74,24 +75,24 @@ class DoctorListingController extends Controller
                 $query = Doctor::query()
                     ->where('status', true)
                     ->with([
-                        'specialty'     => fn($q)     => $q->select('id', 'name'),
-                        'province'      => fn($q)      => $q->select('id', 'name'),
-                        'clinics'       => fn($q)       => $q->where('is_active', true)
-                            ->with(['city' => fn($q) => $q->select('id', 'name')])
-                            ->select('id', 'doctor_id', 'address', 'province_id', 'city_id', 'is_main_clinic', 'payment_methods'),
-                        'workSchedules' => fn($q) => $q->where('is_working', true)
+                        'specialty'     => fn ($q) => $q->select('id', 'name'),
+                        'province'      => fn ($q) => $q->select('id', 'name'),
+                        'clinics'       => fn ($q) => $q->where('is_active', true)
+                            ->with(['city' => fn ($q) => $q->select('id', 'name')])
+                            ->select('clinics.id', 'clinics.doctor_id', 'clinics.address', 'clinics.province_id', 'clinics.city_id', 'clinics.is_main_clinic', 'clinics.payment_methods'),
+                        'workSchedules' => fn ($q) => $q->where('is_working', true)
                             ->select('id', 'doctor_id', 'day', 'work_hours', 'appointment_settings'),
-                        'appointments'  => fn($q)  => $q->where('status', 'scheduled')
+                        'appointments'  => fn ($q) => $q->where('status', 'scheduled')
                             ->select('id', 'doctor_id', 'appointment_date', 'appointment_time', 'status'),
-                        'reviews'       => fn($q)       => $q->where('is_approved', true)
+                        'reviews'       => fn ($q) => $q->where('is_approved', true)
                             ->select('reviewable_id', 'reviewable_type', 'rating'),
-                        'doctorTags'    => fn($q)    => $q->select('id', 'doctor_id', 'name', 'color', 'text_color'),
+                        'doctorTags'    => fn ($q) => $q->select('id', 'doctor_id', 'name', 'color', 'text_color'),
                     ]);
 
                 // لود کردن رابطه appointmentConfig فقط برای نوبت‌های حضوری
                 if ($serviceType === 'in_person') {
                     $query->with([
-                        'appointmentConfig' => fn($q) => $q->select(
+                        'appointmentConfig' => fn ($q) => $q->select(
                             'id',
                             'doctor_id',
                             'calendar_days',
@@ -103,7 +104,7 @@ class DoctorListingController extends Controller
                 // لود کردن رابطه counselingConfig برای نوبت‌های مشاوره
                 if (in_array($serviceType, ['phone', 'text', 'video'])) {
                     $query->with([
-                        'counselingConfig' => fn($q) => $q->select(
+                        'counselingConfig' => fn ($q) => $q->select(
                             'id',
                             'doctor_id',
                             'online_consultation',
