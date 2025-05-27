@@ -6,7 +6,7 @@
     <div class="input-group flex-grow-1 position-relative" style="max-width: 450px;">
       <input type="text"
         class="form-control border-0 shadow-none bg-background-card text-text-primary ps-5 rounded-full h-12"
-        wire:model.live="search" placeholder="جستجو در پزشکان یا منشی‌ها...">
+        wire:model.live="search" placeholder="جستجو در پزشکان...">
       <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-4 text-text-secondary">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
@@ -28,8 +28,9 @@
                   <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
-                <span class="fw-bold text-text-primary text-lg">{{ $doctor->first_name . ' ' . $doctor->last_name }}
-                  ({{ $doctor->mobile }})</span>
+                <span class="fw-bold text-text-primary text-lg">{{ $doctor->full_name }}</span>
+                <span
+                  class="badge-comment bg-gradient-primary text-white font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">{{ $doctor->mobile }}</span>
               </div>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)"
                 stroke-width="2"
@@ -92,7 +93,7 @@
                 stroke-width="2" class="mb-3 animate-bounce">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              <p class="text-text-secondary font-medium m-0">پزشکی با منشی مطابق جستجو یافت نشد.</p>
+              <p class="text-text-secondary font-medium m-0">پزشکی مطابق جستجو یافت نشد.</p>
             </div>
           </div>
         @endforelse
@@ -100,11 +101,11 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener('livewire:init', function() {
-      Livewire.on('show-alert', (event) => {
-        toastr[event.type](event.message);
+    <script>
+      document.addEventListener('livewire:init', function() {
+          Livewire.on('show-alert', (event) => {
+              toastr[event.type](event.message);
+          });
       });
-    });
   </script>
 </div>
