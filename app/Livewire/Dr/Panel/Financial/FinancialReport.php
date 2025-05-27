@@ -67,7 +67,20 @@ class FinancialReport extends Component
         $this->updateDateRange();
         $this->updateChartData();
         $this->updateSummary();
-        Log::info('FinancialReport component mounted', ['doctor_id' => Auth::guard('doctor')->user()->id]);
+
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        Log::info('FinancialReport component mounted', ['doctor_id' => $doctor->id]);
     }
 
     public function loadReports()
@@ -75,7 +88,7 @@ class FinancialReport extends Component
         $this->readyToLoad = true;
         $this->updateChartData();
         $this->updateSummary();
-        Log::info('Reports loaded', ['doctor_id' => Auth::guard('doctor')->user()->id, 'filters' => $this->getFilters()]);
+        Log::info('Reports loaded', ['doctor_id' => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id, 'filters' => $this->getFilters()]);
     }
 
     public function updated($propertyName)
@@ -127,7 +140,19 @@ class FinancialReport extends Component
             return;
         }
 
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
 
         // تبدیل تاریخ‌های جلالی به میلادی
         try {
@@ -228,7 +253,19 @@ class FinancialReport extends Component
             return;
         }
 
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
 
         $this->summary = [
             'daily' => $this->getTotalAmount(Carbon::today(), Carbon::today()->endOfDay()),
@@ -243,7 +280,19 @@ class FinancialReport extends Component
 
     private function getTotalAmount($start = null, $end = null)
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
 
         $transactionsTotal = Transaction::whereJsonContains('meta->doctor_id', $doctorId);
         $walletTransactionsTotal = DoctorWalletTransaction::where('doctor_id', $doctorId);
@@ -409,13 +458,37 @@ class FinancialReport extends Component
 
     public function exportExcel()
     {
-        Log::info('Excel export initiated', ['doctor_id' => Auth::guard('doctor')->user()->id, 'filters' => $this->getFilters()]);
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        Log::info('Excel export initiated', ['doctor_id' => $doctor->id, 'filters' => $this->getFilters()]);
         return redirect()->route('dr.panel.financial-reports.export-excel', $this->getFilters());
     }
 
     public function exportPdf()
     {
-        Log::info('PDF export initiated', ['doctor_id' => Auth::guard('doctor')->user()->id, 'filters' => $this->getFilters()]);
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        Log::info('PDF export initiated', ['doctor_id' => $doctor->id, 'filters' => $this->getFilters()]);
 
         // گرفتن داده‌های تراکنش‌ها
         $transactions = $this->getTransactions()->items();
@@ -431,7 +504,19 @@ class FinancialReport extends Component
 
     private function getTransactions()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
 
         $transactionsQuery = Transaction::whereJsonContains('meta->doctor_id', $doctorId);
         $walletTransactionsQuery = DoctorWalletTransaction::where('doctor_id', $doctorId);
@@ -519,7 +604,7 @@ class FinancialReport extends Component
                 'status' => $item->payment_status,
                 'description' => $item->description ?? 'بدون توضیح',
                 'clinic_id' => $item->clinic_id,
-                'payment_method' => null, // CounselingAppointment ستون payment_method نداره
+                'payment_method' => null,
                 'insurance_id' => $item->insurance_id,
                 'transaction_type' => $item->appointment_type,
             ];
@@ -606,7 +691,19 @@ class FinancialReport extends Component
 
     public function render()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
         $transactions = $this->readyToLoad ? $this->getTransactions() : collect([]);
         $totalAmount = $this->readyToLoad ? $this->getTotalAmount() : 0;
 
@@ -644,7 +741,7 @@ class FinancialReport extends Component
         return view('livewire.dr.panel.financial.financial-report', [
             'transactions' => $transactions,
             'totalAmount' => $totalAmount,
-            'todayAmount' => $todayAmount, // مقدار جدید
+            'todayAmount' => $todayAmount,
             'clinics' => $clinics,
             'insurances' => $insurances,
             'summary' => $this->summary,

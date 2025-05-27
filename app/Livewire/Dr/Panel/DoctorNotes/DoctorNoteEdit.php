@@ -23,7 +23,7 @@ class DoctorNoteEdit extends Component
         $this->appointment_type = $this->doctorNote->appointment_type;
         $this->notes = $this->doctorNote->notes;
         // Fetch only the clinics associated with the authenticated doctor
-        $this->clinics = Auth::guard('doctor')->user()->clinics;
+        $this->clinics = Auth::guard('doctor')->user()->clinics ?? Auth::guard('secretary')->user()->clinics;
     }
 
     public function update()

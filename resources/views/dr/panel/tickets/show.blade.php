@@ -72,8 +72,15 @@
       <div class="response-list">
         <!-- نمایش پیام اصلی تیکت به‌عنوان اولین پاسخ -->
         <div class="response-card doctor p-3 mb-3">
-          <strong>دکتر: {{ Auth::guard('doctor')->user()->first_name ?? 'نامشخص' }}
-            {{ Auth::guard('doctor')->user()->last_name ?? '' }}</strong>
+          <strong>
+            @if (Auth::guard('doctor')->check())
+              دکتر: {{ Auth::guard('doctor')->user()->first_name ?? 'نامشخص' }}
+              {{ Auth::guard('doctor')->user()->last_name ?? '' }}
+            @elseif(Auth::guard('secretary')->check())
+              منشی: {{ Auth::guard('secretary')->user()->first_name ?? 'نامشخص' }}
+              {{ Auth::guard('secretary')->user()->last_name ?? '' }}
+            @endif
+          </strong>
           <p>{{ $ticket->description }}</p>
           <small class="text-muted">{{ \Morilog\Jalali\Jalalian::forge($ticket->created_at)->ago() }}</small>
         </div>
@@ -85,7 +92,11 @@
               @if ($response->manager_id)
                 {{ $response->manager ? 'مدیر: ' . $response->manager->first_name . ' ' . $response->manager->last_name : 'مدیر (نامشخص)' }}
               @else
-                {{ $response->doctor ? 'دکتر: ' . $response->doctor->first_name . ' ' . $response->doctor->last_name : 'دکتر (نامشخص)' }}
+                @if ($response->doctor_id)
+                  {{ $response->doctor ? 'دکتر: ' . $response->doctor->first_name . ' ' . $response->doctor->last_name : 'دکتر (نامشخص)' }}
+                @elseif($response->secretary_id)
+                  {{ $response->secretary ? 'منشی: ' . $response->secretary->first_name . ' ' . $response->secretary->last_name : 'منشی (نامشخص)' }}
+                @endif
               @endif
             </strong>
             <p>{{ $response->message }}</p>

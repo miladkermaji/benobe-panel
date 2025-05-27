@@ -18,7 +18,7 @@ class DoctorNoteCreate extends Component
     public function mount()
     {
         // Fetch only the clinics associated with the authenticated doctor
-        $this->clinics = Auth::guard('doctor')->user()->clinics;
+        $this->clinics = Auth::guard('doctor')->user()->clinics ?? Auth::guard('secretary')->user()->clinics;
     }
 
     public function store()
@@ -44,7 +44,7 @@ class DoctorNoteCreate extends Component
         }
 
         DoctorNote::create([
-            'doctor_id' => Auth::guard('doctor')->user()->id,
+            'doctor_id' => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id,
             'clinic_id' => $this->clinic_id,
             'appointment_type' => $this->appointment_type,
             'notes' => $this->notes,

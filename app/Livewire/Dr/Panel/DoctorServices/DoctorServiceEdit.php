@@ -165,7 +165,7 @@ class DoctorServiceEdit extends Component
         }
 
         // بررسی تکراری بودن خدمت
-        $exists = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id)
+        $exists = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->where('service_id', $this->service_id)
             ->where('insurance_id', $this->insurance_id)
             ->where('clinic_id', $this->clinic_id)
@@ -198,8 +198,8 @@ class DoctorServiceEdit extends Component
     {
         $services = Service::where('status', true)->get();
         $insurances = Insurance::all();
-        $clinics = Clinic::where('doctor_id', Auth::guard('doctor')->user()->id)->get();
-        $doctorServices = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id)
+        $clinics = Clinic::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->get();
+        $doctorServices = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->with(['service', 'insurance', 'clinic'])
             ->get();
 

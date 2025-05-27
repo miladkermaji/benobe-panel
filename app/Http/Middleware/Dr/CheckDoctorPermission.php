@@ -10,7 +10,7 @@ class CheckDoctorPermission
 {
     public function handle(Request $request, Closure $next, $permission = null)
     {
-        $user = Auth::guard('doctor')->user();
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (!$user) {
             return abort(403, 'پزشک احراز هویت نشده است.');
         }

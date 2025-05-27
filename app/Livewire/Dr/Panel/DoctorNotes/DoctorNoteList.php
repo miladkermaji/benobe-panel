@@ -79,7 +79,7 @@ class DoctorNoteList extends Component
 
     private function getDoctorNotesQuery()
     {
-        return DoctorNote::where('doctor_id', Auth::guard('doctor')->user()->id)
+        return DoctorNote::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->where(function ($query) {
                 $query->where('notes', 'like', '%' . $this->search . '%')
                     ->orWhere('appointment_type', 'like', '%' . $this->search . '%');

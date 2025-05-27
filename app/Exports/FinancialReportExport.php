@@ -19,7 +19,7 @@ class FinancialReportExport implements FromCollection, WithHeadings, WithMapping
 
     public function collection()
     {
-        $query = DoctorWalletTransaction::where('doctor_id', Auth::guard('doctor')->user()->id);
+        $query = DoctorWalletTransaction::where('doctor_id', Auth::guard('doctor')->user()->id  ?? Auth::guard('secretary')->user()->doctor_id);
 
         // Apply filters
         if (!empty($this->filters['search'])) {

@@ -22,7 +22,7 @@ class HeaderComponent extends Component
 
         if (Auth::guard('doctor')->check()) {
             // کاربر پزشک است
-            $doctorId = Auth::guard('doctor')->user()->id;
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $doctorMobile = Auth::guard('doctor')->user()->mobile; // شماره موبایل پزشک
 
             $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)

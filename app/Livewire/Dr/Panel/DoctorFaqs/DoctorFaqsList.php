@@ -32,7 +32,7 @@ class DoctorFaqsList extends Component
     public function mount()
     {
         // بررسی احراز هویت پزشک
-        if (!Auth::guard('doctor')->check()) {
+        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
             return redirect()->route('dr.auth.login-register-form');
         }
         $this->readyToLoad = true;
@@ -43,7 +43,7 @@ class DoctorFaqsList extends Component
      */
     public function updatedSelectAll($value)
     {
-        if (!Auth::guard('doctor')->check()) {
+        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
             return redirect()->route('dr.auth.login-register-form');
         }
 
@@ -59,7 +59,7 @@ class DoctorFaqsList extends Component
      */
     public function updatedSelectedFaqs()
     {
-        if (!Auth::guard('doctor')->check()) {
+        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
             return redirect()->route('dr.auth.login-register-form');
         }
 
@@ -75,7 +75,7 @@ class DoctorFaqsList extends Component
      */
     public function confirmDelete($id)
     {
-        if (!Auth::guard('doctor')->check()) {
+        if (!Auth::guard('doctor')->check()|| !Auth::guard('secretary')->check()) {
             return redirect()->route('dr.auth.login-register-form');
         }
         $this->dispatch('confirm-delete', id: $id);
@@ -86,11 +86,11 @@ class DoctorFaqsList extends Component
      */
     public function deleteFaq($id)
     {
-        if (!Auth::guard('doctor')->check()) {
+        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
             return redirect()->route('dr.auth.login-register-form');
         }
 
-        $faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id)->findOrFail($id);
+        $faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->findOrFail($id);
         $faq->delete();
         $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت حذف شد!');
     }
@@ -100,11 +100,11 @@ class DoctorFaqsList extends Component
      */
     public function deleteSelected()
     {
-        if (!Auth::guard('doctor')->check()) {
+        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
             return redirect()->route('dr.auth.login-register-form');
         }
 
-        DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id)
+        DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->whereIn('id', $this->selectedFaqs)
             ->delete();
         $this->selectedFaqs = [];
@@ -117,11 +117,11 @@ class DoctorFaqsList extends Component
      */
     public function toggleStatus($id)
     {
-        if (!Auth::guard('doctor')->check()) {
+        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
             return redirect()->route('dr.auth.login-register-form');
         }
 
-        $faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id)->findOrFail($id);
+        $faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->findOrFail($id);
         $faq->update(['is_active' => !$faq->is_active]);
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت سوال متداول تغییر کرد!');
     }
@@ -139,11 +139,11 @@ class DoctorFaqsList extends Component
      */
     private function getFaqsQuery()
     {
-        if (!Auth::guard('doctor')->check()) {
+        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
             return collect();
         }
 
-        return DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id)
+        return DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->where(function ($query) {
                 $query->where('question', 'like', '%' . $this->search . '%')
                     ->orWhere('answer', 'like', '%' . $this->search . '%');

@@ -38,7 +38,12 @@
           </div>
           <div class="mx-2 mt-3">
             <span class="d-block fw-bold font-size-15 profile-header-name text-dark">
-              {{ Auth::guard('doctor')->user()->first_name . ' ' . Auth::guard('doctor')->user()->last_name }}</span>
+              @if (Auth::guard('doctor')->check())
+                {{ Auth::guard('doctor')->user()->first_name . ' ' . Auth::guard('doctor')->user()->last_name }}
+              @elseif(Auth::guard('secretary')->check())
+                {{ Auth::guard('secretary')->user()->doctor->first_name . ' ' . Auth::guard('secretary')->user()->doctor->last_name }}
+              @endif
+            </span>
             <span class="badge badge-light p-2 border-radius-8 mt-3 mx-3 font-size-13 cursor-pointer">
               {{ $specialtyName }}
             </span>
@@ -46,9 +51,7 @@
         </div>
         <div class="show-profile-badge">
           <a href="" class="d-flex align-items-center">
-
             <img src="{{ asset('dr-assets/icons/eye.svg') }}" alt="" srcset="">
-
             <span class="mx-1">مشاهده پروفایل</span>
           </a>
         </div>
@@ -75,7 +78,8 @@
             <div class="mt-2">
               <label for="name" class="label-top-input">نام</label>
               <input type="text" class="my-form-control w-100 border-radius-6 mt-3"
-                value="{{ Auth::guard('doctor')->user()->first_name }}" name="first_name" readonly>
+                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->first_name }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->first_name }} @endif"
+                name="first_name" readonly>
               @error('first_name')
                 <span class="text-danger fw-bold mt-2">{{ $message }}</span>
               @enderror
@@ -83,16 +87,19 @@
             <div class="mt-2">
               <label for="name" class="label-top-input">نام خانوادگی</label>
               <input type="text" class="my-form-control w-100 border-radius-6 mt-3"
-                value="{{ Auth::guard('doctor')->user()->last_name }}" name="last_name" readonly>
+                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->last_name }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->last_name }} @endif"
+                name="last_name" readonly>
             </div>
             <div class="mt-2">
               <label for="name" class="label-top-input">کدملی</label>
-              <input type="text" value="{{ Auth::guard('doctor')->user()->national_code ?? '' }}"
+              <input type="text"
+                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->national_code ?? '' }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->national_code ?? '' }} @endif"
                 class="my-form-control-light h-50 w-100 border-radius-6 mt-3 text-right" name="national_code">
             </div>
             <div class="mt-2">
               <label for="name" class="label-top-input">شماره نظام پزشکی</label>
-              <input type="text" value="{{ Auth::guard('doctor')->user()->license_number ?? '' }}"
+              <input type="text"
+                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->license_number ?? '' }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->license_number ?? '' }} @endif"
                 class="my-form-control-light h-50 w-100 border-radius-6 mt-3 text-right" name="license_number">
             </div>
             <div class="d-flex justify-content-between mt-4 gap-4 position-relative">
@@ -115,7 +122,9 @@
                 <option value="">انتخاب استان</option>
                 @foreach (\App\Models\Zone::provinces()->get() as $province)
                   <option value="{{ $province->id }}"
-                    {{ Auth::guard('doctor')->user()->province_id == $province->id ? 'selected' : '' }}>
+                    @if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->province_id == $province->id ? 'selected' : '' }}
+                    @elseif(Auth::guard('secretary')->check())
+                      {{ Auth::guard('secretary')->user()->doctor->province_id == $province->id ? 'selected' : '' }} @endif>
                     {{ $province->name }}
                   </option>
                 @endforeach
@@ -137,8 +146,12 @@
             <div class="mt-4">
               <label for="name" class="fw-bold font-size-13"> بیوگرافی و توضیحات</label>
               <textarea class="ckeditor form-control" name="description" class="form-control" id="description">
-            {{ trim(Auth::guard('doctor')->user()->bio ?? '') }}
-        </textarea>
+                @if (Auth::guard('doctor')->check())
+{{ trim(Auth::guard('doctor')->user()->bio ?? '') }}
+@elseif(Auth::guard('secretary')->check())
+{{ trim(Auth::guard('secretary')->user()->doctor->bio ?? '') }}
+@endif
+              </textarea>
             </div>
             <div class="w-100">
               <button type="submit"
@@ -661,7 +674,6 @@
     });
     const cityTomSelect = initializeTomSelect('city_id', {
       placeholder: 'انتخاب شهر',
-      
     });
 
     if (!provinceTomSelect || !cityTomSelect) {
@@ -670,8 +682,10 @@
     }
 
     const provinceSelect = document.getElementById('province_id');
-    const doctorProvinceId = '{{ Auth::guard('doctor')->user()->province_id }}';
-    const doctorCityId = '{{ Auth::guard('doctor')->user()->city_id }}';
+    const doctorProvinceId =
+      '@if (Auth::guard('doctor')->check()){{ Auth::guard('doctor')->user()->province_id }}@elseif (Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->province_id }}@endif';
+    const doctorCityId =
+      '@if (Auth::guard('doctor')->check()){{ Auth::guard('doctor')->user()->city_id }}@elseif (Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->city_id }}@endif';
 
     // مدیریت تغییر در انتخاب استان
     provinceSelect.addEventListener('change', function() {

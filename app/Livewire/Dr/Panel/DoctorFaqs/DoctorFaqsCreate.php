@@ -49,27 +49,27 @@ class DoctorFaqsCreate extends Component
         }
 
         // ایجاد سوال متداول جدید با افزودن doctor_id
-        DoctorFaq::create(array_merge($this->form, ['doctor_id' => Auth::guard('doctor')->user()->id]));
+        DoctorFaq::create(array_merge($this->form, ['doctor_id' => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id]));
 
         // نمایش اعلان موفقیت و ریدایرکت
         $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت ایجاد شد!');
         return redirect()->route('dr.panel.doctor-faqs.index');
     }
-public function mount()
-{
-    
-if (!Auth::guard('doctor')->check()) {
-    return redirect()->route('dr.auth.login-register-form');
-}
+    public function mount()
+    {
 
-}
+        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
+            return redirect()->route('dr.auth.login-register-form');
+        }
+
+    }
     /**
      * رندر صفحه ایجاد
      */
     public function render()
     {
 
-      
+
 
         return view('livewire.dr.panel.doctor-faqs.doctor-faqs-create');
     }

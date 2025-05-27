@@ -48,7 +48,7 @@ class DoctorServiceList extends Component
         Log::info('setSelectedClinicId called with clinicId: ' . $this->selectedClinicId);
 
         // اعتبارسنجی clinic_id
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         if ($this->selectedClinicId !== 'default') {
             $clinic = Clinic::where('id', $this->selectedClinicId)
                 ->where('doctor_id', $doctorId)
@@ -67,7 +67,7 @@ class DoctorServiceList extends Component
 
     public function createDefaultVisitService()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
 
         // بررسی وجود هرگونه خدمت برای پزشک
@@ -125,7 +125,7 @@ class DoctorServiceList extends Component
         Log::info('clinicSelected called with clinicId: ' . $this->selectedClinicId);
 
         // اعتبارسنجی clinic_id
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         if ($this->selectedClinicId !== 'default') {
             $clinic = Clinic::where('id', $this->selectedClinicId)
                 ->where('doctor_id', $doctorId)
@@ -144,7 +144,7 @@ class DoctorServiceList extends Component
 
     private function getDoctorServicesQuery()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
         // کوئری اصلی برای دریافت بیمه‌ها و خدمات مرتبط
         $query = Insurance::with(['doctorServices' => function ($query) use ($doctorId) {
