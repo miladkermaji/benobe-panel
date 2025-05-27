@@ -56,7 +56,7 @@
                     <div class="permissions-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       @php
                         $permission = $secretary->permissions->firstWhere('clinic_id', $secretary->clinic_id);
-                        $savedPermissions = $permission ? json_decode($permission->permissions ?? '[]', true) : [];
+                        $savedPermissions = $permission ? $permission->permissions ?? [] : [];
                         $savedPermissions = is_array($savedPermissions) ? $savedPermissions : [];
                         $clinicId = $secretary->clinic_id;
                       @endphp

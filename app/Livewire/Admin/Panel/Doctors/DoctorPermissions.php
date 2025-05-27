@@ -33,6 +33,7 @@ class DoctorPermissions extends Component
     public function updatePermissions($doctorId, $permissions)
     {
         $doctor = Doctor::findOrFail($doctorId);
+        $permissions = is_array($permissions) ? $permissions : json_decode($permissions, true);
 
         // اگر دسترسی‌ها قبلاً وجود نداشته باشند، یک رکورد جدید ایجاد می‌کنیم
         if (!$doctor->permissions) {

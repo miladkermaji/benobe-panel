@@ -42,6 +42,9 @@ class SecretaryPermissions extends Component
         $secretary = Secretary::findOrFail($secretaryId);
         $doctorId = $secretary->doctor_id;
 
+        // Ensure permissions is an array
+        $permissions = is_array($permissions) ? $permissions : (is_string($permissions) ? json_decode($permissions, true) : []);
+
         $permission = SecretaryPermission::where('doctor_id', $doctorId)
             ->where('secretary_id', $secretaryId)
             ->where(function ($query) use ($clinicId) {
@@ -54,7 +57,7 @@ class SecretaryPermissions extends Component
 
         if ($permission) {
             $permission->update([
-                'permissions' => json_encode($permissions),
+                'permissions' => $permissions,
                 'has_access' => !empty($permissions),
             ]);
         } else {
@@ -62,7 +65,7 @@ class SecretaryPermissions extends Component
                 'doctor_id' => $doctorId,
                 'secretary_id' => $secretaryId,
                 'clinic_id' => $clinicId === 'null' ? null : $clinicId,
-                'permissions' => json_encode($permissions),
+                'permissions' => $permissions,
                 'has_access' => !empty($permissions),
             ]);
         }
