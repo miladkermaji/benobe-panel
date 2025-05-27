@@ -17,16 +17,17 @@ class DrPanelController extends Controller
 {
     public function index()
     {
-        // ID دکتر لاگین‌شده
-        $doctorId = Auth::guard('doctor')->id();
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if (!$doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        }
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
         // تعداد بیماران امروز
-
         $totalPatientsToday = Appointment::where('doctor_id', $doctorId)
                ->whereDate('appointment_date', Carbon::today())
                ->where('status', '!=', 'cancelled')
                ->count();
-
 
         // بیماران ویزیت‌شده
         $visitedPatients = Appointment::where('doctor_id', $doctorId)
@@ -71,5 +72,5 @@ class DrPanelController extends Controller
         ));
     }
 
-    
+
 }

@@ -5,36 +5,37 @@ namespace App\Http\Controllers\Dr\Panel\SecretaryPermission;
 use App\Http\Controllers\Dr\Controller;
 use App\Models\SecretaryPermission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SecretaryPermissionController extends Controller
 {
-  public function index(Request $request)
-{
-    $doctor   = auth()->guard('doctor')->user();
-    $clinicId = $request->input('selectedClinicId') === 'default' ? null : $request->input('selectedClinicId');
+    public function index(Request $request)
+    {
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $clinicId = $request->input('selectedClinicId') === 'default' ? null : $request->input('selectedClinicId');
 
-    if (! $doctor) {
-        return redirect()->route('dr.auth.login-register-form');
+        if (! $doctor) {
+            return redirect()->route('dr.auth.login-register-form');
+        }
+
+        $secretaries = $doctor->secretaries()
+            ->with('permissions')
+            ->when($clinicId !== null, function ($query) use ($clinicId) {
+                $query->where('clinic_id', $clinicId);
+            })
+            ->when($clinicId === null, function ($query) {
+                $query->whereNull('clinic_id');
+            })
+            ->get();
+
+        $permissions = config('permissions');
+
+        if ($request->ajax()) {
+            return response()->json(['secretaries' => $secretaries]);
+        }
+
+        return view('dr.panel.secretary_permissions.index', compact('secretaries', 'permissions'));
     }
-
-    $secretaries = $doctor->secretaries()
-        ->with('permissions')
-        ->when($clinicId !== null, function ($query) use ($clinicId) {
-            $query->where('clinic_id', $clinicId);
-        })
-        ->when($clinicId === null, function ($query) {
-            $query->whereNull('clinic_id');
-        })
-        ->get();
-
-    $permissions = config('permissions');
-
-    if ($request->ajax()) {
-        return response()->json(['secretaries' => $secretaries]);
-    }
-
-    return view('dr.panel.secretary_permissions.index', compact('secretaries', 'permissions'));
-}
 
     public function update(Request $request, $secretaryId)
     {

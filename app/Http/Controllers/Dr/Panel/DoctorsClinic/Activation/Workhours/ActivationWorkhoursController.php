@@ -14,9 +14,17 @@ class ActivationWorkhoursController extends Controller
 {
     public function index($clinicId)
     {
-        $doctorId  = Auth::guard('doctor')->user()->id;
-        $otherSite = DoctorAppointmentConfig::where('collaboration_with_other_sites', 1)->first();
-        return view('dr.panel.doctors-clinic.activation.workhours.index', compact(['clinicId', 'doctorId', 'otherSite']));
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if (!$doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        }
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+        $hasCollaboration = DoctorAppointmentConfig::where('doctor_id', $doctorId)
+            ->where('clinic_id', $clinicId)
+            ->where('collaboration_with_other_sites', true)
+            ->exists();
+
+        return view('dr.panel.doctors-clinic.activation.workhours.index', compact(['clinicId', 'doctorId', 'hasCollaboration']));
     }
     public function store(Request $request)
     {
@@ -112,30 +120,30 @@ class ActivationWorkhoursController extends Controller
 
         return response()->json($schedules);
     }
-public function startAppointment(Request $request)
-{
-    $request->validate([
-        'doctor_id' => 'required|exists:doctors,id',
-        'clinic_id' => 'required|exists:clinics,id',
-    ]);
+    public function startAppointment(Request $request)
+    {
+        $request->validate([
+            'doctor_id' => 'required|exists:doctors,id',
+            'clinic_id' => 'required|exists:clinics,id',
+        ]);
 
-    // بررسی اینکه آیا ساعت کاری تعریف شده است
-    $workSchedule = DoctorWorkSchedule::where('doctor_id', $request->doctor_id)
-        ->where('clinic_id', $request->clinic_id)
-        ->whereNotNull('work_hours')
-        ->first();
+        // بررسی اینکه آیا ساعت کاری تعریف شده است
+        $workSchedule = DoctorWorkSchedule::where('doctor_id', $request->doctor_id)
+            ->where('clinic_id', $request->clinic_id)
+            ->whereNotNull('work_hours')
+            ->first();
 
-    if (! $workSchedule || empty(json_decode($workSchedule->work_hours, true))) {
-        return response()->json(['message' => 'پزشک گرامی شما هیچ برنامه کاری تعریف نکرده اید  لطفا ابتدا برنامه کاری  را تعریف کنید تغیرات را ذخیره کنید سپس مجدد دکمه پایان را بزنید با تشکر از شما...'], 400);
+        if (! $workSchedule || empty(json_decode($workSchedule->work_hours, true))) {
+            return response()->json(['message' => 'پزشک گرامی شما هیچ برنامه کاری تعریف نکرده اید  لطفا ابتدا برنامه کاری  را تعریف کنید تغیرات را ذخیره کنید سپس مجدد دکمه پایان را بزنید با تشکر از شما...'], 400);
+        }
+
+        // تغییر فیلد is_active به 1
+        $clinic = Clinic::findOrFail($request->clinic_id);
+        $clinic->is_active = 1;
+        $clinic->save();
+
+        return response()->json(['message' => 'نوبت‌دهی شروع شد.', 'redirect_url' => route('dr-panel')]);
     }
-
-    // تغییر فیلد is_active به 1
-    $clinic = Clinic::findOrFail($request->clinic_id);
-    $clinic->is_active = 1;
-    $clinic->save();
-
-    return response()->json(['message' => 'نوبت‌دهی شروع شد.', 'redirect_url' => route('dr-panel')]);
-}
 
     public function deleteWorkHours(Request $request)
     {

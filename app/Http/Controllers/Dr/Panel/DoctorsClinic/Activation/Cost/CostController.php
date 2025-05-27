@@ -11,10 +11,14 @@ class CostController extends Controller
 {
     public function index($clinicId)
     {
-        $doctorId       = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if (!$doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        }
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $averageDeposit = ClinicDepositSetting::whereNotNull('deposit_amount')->avg('deposit_amount'); // میانگین بیعانه
 
-        return view('dr.panel.doctors-clinic.activation.cost.index', compact('clinicId', 'doctorId', 'averageDeposit'));
+        return view('dr.panel.doctors-clinic.activation.cost.index', compact(['clinicId', 'doctorId', 'averageDeposit']));
     }
 
     public function listDeposits($clinicId)

@@ -15,12 +15,9 @@ class DrScheduleController extends Controller
 {
     public function getAuthenticatedDoctor()
     {
-        $doctor = Auth::guard('doctor')->user();
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (! $doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
-            }
+            throw new \Exception('کاربر احراز هویت شده از نوع Doctor نیست یا وجود ندارد.');
         }
         return $doctor;
     }

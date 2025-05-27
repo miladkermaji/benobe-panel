@@ -18,26 +18,55 @@ class MoshavereSettingController extends Controller
  */
     public function index(Request $request)
     {
-        $doctorId         = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
-        $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
+        try {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
-        // بررسی یا ایجاد تنظیمات مشاوره آنلاین
-        $appointmentConfig = DoctorCounselingConfig::firstOrCreate(
-            ['doctor_id' => $doctorId, 'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
-            [
-                'auto_scheduling'      => true,
-                'calendar_days'        => 30,
-                'online_consultation'  => false,
-                'holiday_availability' => false,
-                'has_phone_counseling' => false, // مقدار پیش‌فرض برای مشاوره تلفنی
-                'has_text_counseling'  => false, // مقدار پیش‌فرض برای مشاوره متنی
-                'has_video_counseling' => false, // مقدار پیش‌فرض برای مشاوره ویدیویی
-            ]
-        );
+            // دریافت داده‌های ارسال‌شده از درخواست
+            $inputDay = $request->input('day');
+            $inputStartTime = $request->input('start_time');
+            $inputEndTime = $request->input('end_time');
+            $inputMaxAppointments = $request->input('max_appointments');
 
-        return view('dr.panel.turn.schedule.moshavere_setting.index', [
-            'appointmentConfig' => $appointmentConfig,
-        ]);
+            // فیلتر کردن بر اساس داده‌های ارسال‌شده
+            $workSchedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
+                ->when($inputDay, function ($query) use ($inputDay) {
+                    $query->where('day', $inputDay);
+                })
+                ->where(function ($query) use ($selectedClinicId) {
+                    if ($selectedClinicId !== 'default') {
+                        $query->where('clinic_id', $selectedClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->get();
+
+            // بررسی یا ایجاد تنظیمات مشاوره آنلاین
+            $appointmentConfig = DoctorCounselingConfig::firstOrCreate(
+                ['doctor_id' => $doctorId, 'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
+                [
+                    'auto_scheduling'      => true,
+                    'calendar_days'        => 30,
+                    'online_consultation'  => false,
+                    'holiday_availability' => false,
+                    'has_phone_counseling' => false, // مقدار پیش‌فرض برای مشاوره تلفنی
+                    'has_text_counseling'  => false, // مقدار پیش‌فرض برای مشاوره متنی
+                    'has_video_counseling' => false, // مقدار پیش‌فرض برای مشاوره ویدیویی
+                ]
+            );
+
+            return view('dr.panel.turn.schedule.moshavere_setting.index', [
+                'appointmentConfig' => $appointmentConfig,
+                'workSchedules'     => $workSchedules,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'خطا در دریافت تنظیمات',
+                'status'  => false,
+            ], 500);
+        }
     }
 
     /**

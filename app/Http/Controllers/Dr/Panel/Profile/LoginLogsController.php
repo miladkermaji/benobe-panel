@@ -11,15 +11,15 @@ class LoginLogsController extends Controller
 {
     public function security()
     {
-        $doctor = Auth::guard('doctor')->user();
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (!$doctor) {
             return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
 
-        
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
         // دریافت لاگ‌های دکتر و منشی برای بارگذاری اولیه صفحه
-        $doctorLogs = LoginLog::where('doctor_id', $doctor->id)->orderBy('login_at', 'desc')->paginate(5);
+        $doctorLogs = LoginLog::where('doctor_id', $doctorId)->orderBy('login_at', 'desc')->paginate(5);
         $secretaryIds = $doctor->secretaries ? $doctor->secretaries->pluck('id')->toArray() : [];
         $secretaryLogs = LoginLog::whereIn('secretary_id', $secretaryIds)->orderBy('login_at', 'desc')->paginate(5);
 

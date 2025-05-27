@@ -23,7 +23,11 @@ class BlockingUsersController extends Controller
 {
     public function index(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if (!$doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        }
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
         $search = $request->input('search');
 
@@ -325,7 +329,7 @@ class BlockingUsersController extends Controller
     {
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
-    
+
         // تعریف پیام‌های خطای فارسی
         $messages = [
             'title.required' => 'لطفاً عنوان پیام را وارد کنید.',
@@ -339,7 +343,7 @@ class BlockingUsersController extends Controller
             'specific_recipient.required_if' => 'لطفاً شماره موبایل گیرنده را وارد کنید.',
             'specific_recipient.exists' => 'شماره موبایل وارد‌شده در سیستم ثبت نشده یا نوبت فعالی با شما ندارد.',
         ];
-    
+
         try {
             // تعریف قوانین اعتبارسنجی
             $rules = [
@@ -347,7 +351,7 @@ class BlockingUsersController extends Controller
                 'content' => 'required|string|max:1000',
                 'recipient_type' => 'required|in:all,blocked,specific',
             ];
-    
+
             // اضافه کردن قانون برای specific_recipient در صورت انتخاب نوع گیرنده 'specific'
             if ($request->input('recipient_type') === 'specific') {
                 $rules['specific_recipient'] = [
@@ -357,14 +361,14 @@ class BlockingUsersController extends Controller
                     }),
                 ];
             }
-    
+
             // انجام اعتبارسنجی
             $validated = $request->validate($rules, $messages);
-    
+
             // ادامه منطق برنامه...
             $recipients = [];
             $userId = null;
-    
+
             if ($validated['recipient_type'] === 'all') {
                 $recipients = DB::table('appointments')
                     ->where('doctor_id', $doctorId)
@@ -396,7 +400,7 @@ class BlockingUsersController extends Controller
                 $recipients[] = $validated['specific_recipient'];
                 $userId = $user->id;
             }
-    
+
             // ذخیره پیام در SmsTemplate
             $smsTemplate = SmsTemplate::create([
                 'doctor_id' => $doctorId,
@@ -407,22 +411,22 @@ class BlockingUsersController extends Controller
                 'recipient_type' => $validated['recipient_type'],
                 'identifier' => uniqid(),
             ]);
-    
+
             // ارسال پیامک
             $doctor = Doctor::find($doctorId);
             $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-    
+
             $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
             $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
             $templateId = ($gatewayName === 'pishgamrayan') ? null : null;
-    
+
             SendSmsNotificationJob::dispatch(
                 $validated['content'],
                 $recipients,
                 $templateId,
                 [$doctorName]
             )->delay(now()->addSeconds(5));
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'پیام با موفقیت در صف ارسال قرار گرفت.',
@@ -432,7 +436,7 @@ class BlockingUsersController extends Controller
                 'errors' => $e->errors(),
                 'request_data' => $request->all(),
             ]);
-    
+
             return response()->json([
                 'success' => false,
                 'message' => 'خطا در اطلاعات ارسالی!',
@@ -443,7 +447,7 @@ class BlockingUsersController extends Controller
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-    
+
             return response()->json([
                 'success' => false,
                 'message' => 'خطایی در ارسال پیام رخ داد. لطفاً دوباره تلاش کنید.',
@@ -468,9 +472,9 @@ class BlockingUsersController extends Controller
                     'message' => 'هیچ پیامی برای حذف انتخاب نشده است.',
                 ], 422);
             }
-    
+
             SmsTemplate::whereIn('id', $messageIds)->delete();
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'پیام‌ها با موفقیت حذف شدند.',

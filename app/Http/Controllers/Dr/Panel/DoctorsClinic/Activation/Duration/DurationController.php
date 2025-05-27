@@ -11,7 +11,11 @@ class DurationController extends Controller
 {
     public function index($clinicId)
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if (!$doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        }
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         return view('dr.panel.doctors-clinic.activation.duration.index', compact(['clinicId', 'doctorId']));
     }
 

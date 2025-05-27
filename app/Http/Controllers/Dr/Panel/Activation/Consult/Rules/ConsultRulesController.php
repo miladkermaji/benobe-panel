@@ -13,7 +13,7 @@ class ConsultRulesController extends Controller
 {
     protected function getAuthenticatedDoctor(): Doctor
     {
-        $doctor = Auth::guard('doctor')->user();
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (! $doctor instanceof Doctor) {
             throw new \Exception('کاربر احراز هویت شده از نوع Doctor نیست یا وجود ندارد.');
         }
