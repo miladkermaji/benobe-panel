@@ -34,7 +34,7 @@ class DrSidebar extends Component
             return true;
         }
 
-        // If this is a parent permission, check if any of its children are enabled
+        // If this is a parent permission
         if (isset($permissionsConfig[$permission])) {
             // Check if any child route is enabled
             foreach ($permissionsConfig[$permission]['routes'] ?? [] as $routeKey => $routeTitle) {
@@ -42,16 +42,36 @@ class DrSidebar extends Component
                     return true;
                 }
             }
+            return false;
         }
 
-        // If this is a child permission, check if its parent is enabled
+        // If this is a child permission (route)
         foreach ($permissionsConfig as $parentKey => $parentData) {
-            if (isset($parentData['routes'][$permission]) && in_array($parentKey, $this->permissions)) {
-                return true;
+            if (isset($parentData['routes'][$permission])) {
+                // If parent is enabled, all children are enabled
+                if (in_array($parentKey, $this->permissions)) {
+                    return true;
+                }
+                // If parent is not enabled, only check this specific route
+                return in_array($permission, $this->permissions);
             }
         }
 
         return false;
+    }
+
+    public function shouldShowChildMenu($parentKey, $childKey)
+    {
+        // Get all permissions from config
+        $permissionsConfig = config('doctor-permissions');
+
+        // If parent is enabled, show all children
+        if (in_array($parentKey, $this->permissions)) {
+            return true;
+        }
+
+        // If parent is not enabled, only show enabled children
+        return in_array($childKey, $this->permissions);
     }
 
     public function render()

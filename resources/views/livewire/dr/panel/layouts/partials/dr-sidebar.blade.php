@@ -38,47 +38,47 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            @if ($this->hasPermission('appointments'))
+            @if ($this->hasPermission('dr-appointments'))
               <li class="item-li {{ Request::routeIs('dr-appointments') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-appointments') }}"> لیست نوبت ها</a>
               </li>
             @endif
-            @if ($this->hasPermission('appointments'))
+            @if ($this->hasPermission('dr-workhours'))
               <li class="item-li {{ Request::routeIs('dr-workhours') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-workhours') }}">ساعت کاری</a>
               </li>
             @endif
-            @if ($this->hasPermission('appointments'))
+            @if ($this->hasPermission('dr.panel.doctornotes.index'))
               <li class="item-li {{ Request::routeIs('dr.panel.doctornotes.index') ? 'is-active' : '' }}">
                 <a href="{{ route('dr.panel.doctornotes.index') }}"> توضیحات نوبت</a>
               </li>
             @endif
-            @if ($this->hasPermission('appointments'))
+            @if ($this->hasPermission('dr-mySpecialDays'))
               <li class="item-li {{ Request::routeIs('dr-mySpecialDays') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-mySpecialDays') }}">روزهای خاص</a>
               </li>
             @endif
-            @if ($this->hasPermission('appointments'))
+            @if ($this->hasPermission('dr-manual_nobat_setting'))
               <li class="item-li {{ Request::routeIs('dr-manual_nobat_setting') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-manual_nobat_setting') }}">تنظیمات نوبت دستی</a>
               </li>
             @endif
-            @if ($this->hasPermission('appointments'))
+            @if ($this->hasPermission('dr-manual_nobat'))
               <li class="item-li {{ Request::routeIs('dr-manual_nobat') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-manual_nobat') }}">ثبت نوبت دستی</a>
               </li>
             @endif
-            @if ($this->hasPermission('appointments'))
+            @if ($this->hasPermission('dr-scheduleSetting'))
               <li class="item-li {{ Request::routeIs('dr-scheduleSetting') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-scheduleSetting') }}">تنظیمات نوبت</a>
               </li>
             @endif
-            @if ($this->hasPermission('appointments'))
+            @if ($this->hasPermission('dr-vacation'))
               <li class="item-li {{ Request::routeIs('dr-vacation') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-vacation') }}">تعطیلات</a>
               </li>
             @endif
-            @if ($this->hasPermission('appointments'))
+            @if ($this->hasPermission('doctor-blocking-users.index'))
               <li class="item-li {{ Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
                 <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
               </li>
@@ -102,29 +102,29 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            @if ($this->hasPermission('consult'))
+            @if ($this->hasPermission('dr-moshavere_setting'))
               <li class="item-li i-courses {{ Request::routeIs('dr-moshavere_setting') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-moshavere_setting') }}">برنامه‌ریزی مشاوره</a>
               </li>
             @endif
-            @if ($this->hasPermission('consult'))
+            @if ($this->hasPermission('dr-moshavere_waiting'))
               <li
                 class="item-li i-user__inforamtion {{ Request::routeIs('dr-moshavere_waiting') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-moshavere_waiting') }}">گزارش مشاوره</a>
               </li>
             @endif
-            @if ($this->hasPermission('consult'))
+            @if ($this->hasPermission('dr.panel.doctornotes.index'))
               <li class="item-li {{ Request::routeIs('dr.panel.doctornotes.index') ? 'is-active' : '' }}">
                 <a href="{{ route('dr.panel.doctornotes.index') }}"> توضیحات نوبت</a>
               </li>
             @endif
-            @if ($this->hasPermission('consult'))
+            @if ($this->hasPermission('dr-mySpecialDays-counseling'))
               <li
                 class="item-li i-user__inforamtion {{ Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-mySpecialDays-counseling') }}">روزهای خاص</a>
               </li>
             @endif
-            @if ($this->hasPermission('consult'))
+            @if ($this->hasPermission('consult-term.index'))
               <li class="item-li i-user__inforamtion {{ Request::routeIs('consult-term.index') ? 'is-active' : '' }}">
                 <a href="{{ route('consult-term.index') }}">قوانین مشاوره</a>
               </li>
@@ -155,25 +155,25 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            @if ($this->hasPermission('patient_records'))
+            @if ($this->hasPermission('dr-patient-records'))
               <li class="item-li"><a href="{{ route('dr-patient-records') }}">پرونده پزشکی</a></li>
             @endif
-            @if ($this->hasPermission('prescription'))
+            @if ($this->hasPermission('prescription.index'))
               <li class="item-li i-courses {{ Request::routeIs('prescription.index') ? 'is-active' : '' }}">
                 <a href="{{ route('prescription.index') }}">نسخه‌های ثبت شده</a>
               </li>
             @endif
-            @if ($this->hasPermission('prescription'))
+            @if ($this->hasPermission('providers.index'))
               <li class="item-li i-courses {{ Request::routeIs('providers.index') ? 'is-active' : '' }}">
                 <a href="{{ route('providers.index') }}">بیمه‌های من</a>
               </li>
             @endif
-            @if ($this->hasPermission('prescription'))
+            @if ($this->hasPermission('favorite.templates.index'))
               <li class="item-li i-courses {{ Request::routeIs('favorite.templates.index') ? 'is-active' : '' }}">
                 <a href="{{ route('favorite.templates.index') }}">نسخه پراستفاده</a>
               </li>
             @endif
-            @if ($this->hasPermission('prescription'))
+            @if ($this->hasPermission('templates.favorite.service.index'))
               <li
                 class="item-li i-courses {{ Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}">
                 <a href="{{ route('templates.favorite.service.index') }}">اقلام پراستفاده</a>
@@ -199,18 +199,18 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            @if ($this->hasPermission('financial_reports'))
+            @if ($this->hasPermission('dr.panel.financial-reports.index'))
               <li
                 class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.financial-reports.index') ? 'is-active' : '' }}">
                 <a href="{{ route('dr.panel.financial-reports.index') }}">گزارش مالی</a>
               </li>
             @endif
-            @if ($this->hasPermission('financial_reports'))
+            @if ($this->hasPermission('dr-payment-setting'))
               <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-payment-setting') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-payment-setting') }}">پرداخت</a>
               </li>
             @endif
-            @if ($this->hasPermission('financial_reports'))
+            @if ($this->hasPermission('dr-wallet-charge'))
               <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-wallet-charge') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-wallet-charge') }}">شارژ کیف‌پول</a>
               </li>
@@ -233,7 +233,7 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            @if ($this->hasPermission('patient_communication'))
+            @if ($this->hasPermission('dr.panel.send-message'))
               <li class="item-li"><a href="{{ route('dr.panel.send-message') }}">ارسال پیام</a></li>
             @endif
           </ul>
