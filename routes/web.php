@@ -390,6 +390,10 @@ Route::prefix('admin')
             Route::get('/edit/{id}', [UserController::class, 'edit'])->name('admin.panel.users.edit');
             // عملیات‌های دیگر مثل toggle، update و destroy در Livewire انجام می‌شوند
         });
+
+        Route::get('/panel/doctors/permissions', function () {
+            return view('admin.panel.doctors.doctors-permissions');
+        })->name('admin.panel.doctors.permissions');
     });
 
 // end manager  routes

@@ -62,7 +62,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // اسم مستعار برای میدلورها (Middleware Aliases)
         $middleware->alias([
-            'custom-auth.jwt' => JwtMiddleware::class, // از کد اولیه شما
+            'custom-auth.jwt' => JwtMiddleware::class,
             'auth' => \App\Http\Middleware\Authenticate::class,
             'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
             'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
@@ -79,8 +79,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'doctor' => \App\Http\Middleware\doctor::class,
             'secretary' => \App\Http\Middleware\secretary::class,
             'secretary.permission' => \App\Http\Middleware\Dr\CheckSecretaryPermission::class,
-            'complete-profile' => \App\Http\Middleware\Dr\CheckCompleteProfile::class,
-            'jwt.auth' => \App\Http\Middleware\JwtMiddleware::class,
+            'doctor.permission' => \App\Http\Middleware\Dr\CheckDoctorPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

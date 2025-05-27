@@ -90,6 +90,7 @@
             <li class="item-li"><a href="{{ route('admin.panel.doctor-documents.index') }}">تأیید مدارک</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.doctor-specialties.index') }}">تخصص های پزشک</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.doctor-comments.index') }}">نظرات بیماران</a></li>
+            <li class="item-li"><a href="{{ route('admin.panel.doctors.permissions') }}">مدیریت دسترسی‌ها</a></li>
             <li class="item-li"><a href="#">ارتقا حساب پزشکان</a></li>
           </ul>
         </li>

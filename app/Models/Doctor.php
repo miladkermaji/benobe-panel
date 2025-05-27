@@ -314,4 +314,9 @@ class Doctor extends Authenticatable
     {
         return $this->clinics()->sync($clinicIds);
     }
+
+    public function permissions()
+    {
+        return $this->hasOne(DoctorPermission::class);
+    }
 }
