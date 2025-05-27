@@ -322,6 +322,14 @@ Route::prefix('admin')
             return redirect()->route('dr-panel');
         })->name('doctor.login');
 
+        Route::get('/secretary-login/{secretary}', function (\App\Models\Secretary $secretary) {
+            // لاگین کردن منشی با گارد secretary
+            Auth::guard('secretary')->login($secretary);
+
+            // ریدایرکت به پنل منشی
+            return redirect()->route('dr-panel');
+        })->name('secretary.login');
+
         Route::get('dashboard/', [AdminDashboardController::class, 'index'])->name('admin-panel');
         Route::post('/upload-profile-photo', [AdminProfileController::class, 'uploadPhoto'])->name('admin.upload-photo')->middleware('auth:manager');
         Route::prefix('tools/')->group(function () {

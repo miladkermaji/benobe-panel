@@ -16,11 +16,13 @@ class DrSidebar extends Component
             $doctor = Auth::guard('doctor')->user();
             $this->specialtyName = optional($doctor)->specialty?->name ?? 'نامشخص';
             // Get permissions from database
-            $this->permissions = $doctor->permissions ? $doctor->permissions->permissions : [];
+            $permissionRecord = $doctor->permissions()->first();
+            $this->permissions = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
         } elseif (Auth::guard('secretary')->check()) {
             $this->specialtyName = 'منشی';
             $secretary = Auth::guard('secretary')->user();
-            $this->permissions = $secretary->permissions ? $secretary->permissions->permissions : [];
+            $permissionRecord = $secretary->permissions()->first();
+            $this->permissions = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
         }
     }
 

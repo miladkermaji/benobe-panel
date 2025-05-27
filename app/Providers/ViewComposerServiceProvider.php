@@ -23,9 +23,12 @@ class ViewComposerServiceProvider extends ServiceProvider
     {
         // ارسال متغیر permissions به تمام ویوهایی که sidebar.blade.php را include کرده‌اند
         View::composer('dr.panel.layouts.partials.sidebar', function ($view) {
-            $permissions = Auth::guard('secretary')->check()
-             ? json_decode(Auth::guard('secretary')->user()->permissions->permissions ?? '[]', true)
-             : [];
+            $permissions = [];
+            if (Auth::guard('secretary')->check()) {
+                $secretary = Auth::guard('secretary')->user();
+                $permissionRecord = $secretary->permissions()->first();
+                $permissions = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
+            }
 
             $view->with('permissions', $permissions);
         });

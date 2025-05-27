@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware\Dr;
 
 use Closure;
@@ -21,7 +22,8 @@ class CheckSecretaryPermission
         }
 
         // دریافت لیست مجوزهای منشی
-        $permissionsArray = array_filter(json_decode($user->permissions->permissions ?? '[]', true));
+        $permissionRecord = $user->permissions()->first();
+        $permissionsArray = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
 
         // اگر منشی مجوز لازم را دارد، اجازه‌ی عبور داده شود
         if ($permission && in_array($permission, $permissionsArray, true)) {
