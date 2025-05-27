@@ -35,7 +35,9 @@ class CounselingSpecialDaysApoointment extends Component
     public $emergencyModalDay;
     public $emergencyModalIndex;
     public $isEmergencyModalOpen = false;
-    public $isFromSpecialDailySchedule = false; // متغیر جدید
+    public $isFromSpecialDailySchedule = false;
+    public $doctorId;
+    public $doctor;
     public $calculator = [
         'day' => null,
         'index' => null,
@@ -65,10 +67,17 @@ class CounselingSpecialDaysApoointment extends Component
         'set-calculator-values' => 'setCalculatorValues',
         'initialize-calculator' => 'initializeCalculator',
         'confirmDeleteSlot' => 'confirmDeleteSlot',
-        'confirm-add-slot' => 'openAddSlotModal', // تغییر به باز کردن مودال
+        'confirm-add-slot' => 'openAddSlotModal',
     ];
     public function mount()
     {
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if (!$doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        }
+        $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+        $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
+
         $this->calendarYear = is_numeric($this->calendarYear) ? (int) $this->calendarYear : (int) Jalalian::now()->getYear();
         $this->calendarMonth = is_numeric($this->calendarMonth) ? (int) $this->calendarMonth : (int) Jalalian::now()->getMonth();
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
@@ -77,7 +86,7 @@ class CounselingSpecialDaysApoointment extends Component
     public function selectDate($date)
     {
         $this->isLoading = true;
-        $this->dispatch('toggle-loading', ['isLoading' => true]); // ارسال لودینگ
+        $this->dispatch('toggle-loading', ['isLoading' => true]);
         $this->selectedDate = $date;
         $this->showModal = true;
         $this->workSchedule = $this->getWorkScheduleForDate($date);
@@ -227,7 +236,7 @@ class CounselingSpecialDaysApoointment extends Component
             $this->workSchedule = $this->getWorkScheduleForDate($gregorianDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
             $this->isLoading = false;
-            $this->dispatch('toggle-loading', ['isLoading' => false]); // اضافه کردن رویداد
+            $this->dispatch('toggle-loading', ['isLoading' => false]);
             $this->dispatch('updateSelectedDate', $gregorianDate, $this->workSchedule);
             $this->dispatch('open-modal', id: 'holiday-modal');
         } else {
@@ -378,7 +387,6 @@ class CounselingSpecialDaysApoointment extends Component
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $cacheKey = "work_schedule_{$doctorId}_{$date}_{$this->selectedClinicId}";
         return Cache::remember($cacheKey, now()->addHours(1), function () use ($doctorId, $date) {
-            // ابتدا بررسی SpecialDailySchedule
             $specialSchedule = CounselingDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $date)
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
@@ -393,13 +401,12 @@ class CounselingSpecialDaysApoointment extends Component
                     'status' => true,
                     'data' => [
                         'day' => strtolower(Carbon::parse($date)->englishDayOfWeek),
-                        'work_hours' => $consultationHours, // تغییر به work_hours برای سازگاری با UI
+                        'work_hours' => $consultationHours,
                         'appointment_settings' => $appointmentSettings,
                         'emergency_times' => $emergencyTimes,
                     ],
                 ];
             }
-            // اگر SpecialDailySchedule خالی بود، از DoctorWorkSchedule بخوان
             $dayOfWeek = strtolower(Carbon::parse($date)->englishDayOfWeek);
             $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $dayOfWeek)
@@ -431,12 +438,11 @@ class CounselingSpecialDaysApoointment extends Component
                     ],
                 ];
             }
-            // اگر هیچ داده‌ای وجود نداشت
             return [
                 'status' => false,
                 'data' => [
                     'day' => $dayOfWeek,
-                    'work_hours' => [[ // تغییر به work_hours برای سازگاری
+                    'work_hours' => [[
                         'start' => '',
                         'end' => '',
                         'max_appointments' => '',
@@ -458,7 +464,6 @@ class CounselingSpecialDaysApoointment extends Component
             $this->selectedDate = $parsedDate->toDateString();
             if ($workSchedule) {
                 $this->workSchedule = $workSchedule;
-                // بررسی منبع داده‌ها برای تنظیم isFromSpecialDailySchedule
                 $specialSchedule = CounselingDailySchedule::where('doctor_id', $this->getAuthenticatedDoctor()->id)
                     ->where('date', $this->selectedDate)
                     ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))

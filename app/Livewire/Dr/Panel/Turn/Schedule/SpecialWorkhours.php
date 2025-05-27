@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\SpecialDailySchedule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Doctor;
 
 class SpecialWorkhours extends Component
 {
@@ -22,6 +23,8 @@ class SpecialWorkhours extends Component
     public $emergencyModalDay;
     public $emergencyModalIndex;
     public $isEmergencyModalOpen = false;
+    public $doctorId;
+    public $doctor;
     public $calculator = [
         'day' => null,
         'index' => null,
@@ -50,6 +53,13 @@ class SpecialWorkhours extends Component
 
     public function mount($selectedDate, $workSchedule, $clinicId = 'default')
     {
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if (!$doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        }
+        $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+        $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
+
         $this->selectedDate = $selectedDate;
         $this->workSchedule = $workSchedule;
         $this->clinicId = $clinicId;
@@ -535,8 +545,6 @@ class SpecialWorkhours extends Component
             $this->isProcessing = false;
         }
     }
-
-
 
     public function saveSchedule($startTime, $endTime)
     {

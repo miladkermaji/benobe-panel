@@ -44,7 +44,19 @@ class WalletChargeComponent extends Component
 
     public function render()
     {
-        $doctorId     = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
         $transactions = DoctorWalletTransaction::where('doctor_id', $doctorId)
             ->latest()
             ->take(10)
@@ -82,7 +94,19 @@ class WalletChargeComponent extends Component
 
         $this->isLoading = true;
 
-        $doctorId    = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
         $callbackUrl = route('payment.callback');
         $successRedirect = route('dr-wallet-verify');
         $errorRedirect = route('dr-wallet-charge') . '?from_payment=error';
@@ -149,7 +173,19 @@ class WalletChargeComponent extends Component
                 return redirect()->route('dr-wallet-charge')->with('error', 'تراکنش تأیید نشده است.');
             }
 
-            $doctorId = Auth::guard('doctor')->user()->id;
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+
+            if (!$doctor) {
+                return redirect()->route('login');
+            }
+
+            $doctorId = $doctor->id;
             $meta = json_decode($transaction->meta, true);
 
             if (
@@ -164,7 +200,7 @@ class WalletChargeComponent extends Component
                     'doctor_id'    => $doctorId,
                     'amount'       => $transaction->amount,
                     'status'       => 'paid',
-                    'type'         => 'wallet_charge', // یا 'charge' اگه مایگریشن اجرا نشد
+                    'type'         => 'wallet_charge',
                     'description'  => 'شارژ کیف پول',
                     'registered_at' => now(),
                     'paid_at'      => now(),
@@ -185,7 +221,19 @@ class WalletChargeComponent extends Component
     public function deleteTransaction($transactionId)
     {
         try {
-            $doctorId = Auth::guard('doctor')->user()->id;
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+
+            if (!$doctor) {
+                return redirect()->route('login');
+            }
+
+            $doctorId = $doctor->id;
             $transaction = DoctorWalletTransaction::where('id', $transactionId)
                 ->where('doctor_id', $doctorId)
                 ->first();

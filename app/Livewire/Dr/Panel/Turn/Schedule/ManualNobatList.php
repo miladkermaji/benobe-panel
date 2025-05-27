@@ -133,9 +133,18 @@ class ManualNobatList extends Component
     public $availableTimes = [];
     public $isTimeSelectionModalOpen = false;
     public $selectedUserId = null;
+    public $doctorId;
+    public $doctor;
 
     public function mount()
     {
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if (!$doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        }
+        $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+        $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
+        $this->loadWorkSchedules();
 
         $this->isLoading = true;
 
@@ -182,11 +191,10 @@ class ManualNobatList extends Component
         $this->calendarYear = Jalalian::now()->getYear();
         $this->calendarMonth = Jalalian::now()->getMonth();
         // لود داده‌های اولیه
-        $doctor = $this->getAuthenticatedDoctor();
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
-        if ($doctor) {
+        if ($this->doctor) {
 
-            $cacheKeyPattern = "appointments_doctor_{$doctor->id}_*";
+            $cacheKeyPattern = "appointments_doctor_{$this->doctor->id}_*";
             Cache::forget($cacheKeyPattern);
 
             $this->loadClinics();
@@ -245,7 +253,7 @@ class ManualNobatList extends Component
     public function getAppointmentsCountData()
     {
         try {
-            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $doctorId = $this->doctor->id;
             $selectedClinicId = $this->selectedClinicId;
             $year = $this->calendarYear ?? Jalalian::now()->getYear();
             $month = $this->calendarMonth ?? Jalalian::now()->getMonth();

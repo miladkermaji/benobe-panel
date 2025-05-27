@@ -49,6 +49,8 @@ class SpecialDaysAppointment extends Component
     public $hasWorkHoursMessage = false;
     public $showAddSlotModal = false;
     public $savePreviousRows = true;
+    public $doctorId;
+    public $doctor;
     protected $listeners = [
         'openHolidayModal' => 'handleOpenHolidayModal',
         'openTransferModal' => 'handleOpenTransferModal',
@@ -66,6 +68,13 @@ class SpecialDaysAppointment extends Component
     ];
     public function mount()
     {
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if (!$doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        }
+        $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+        $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
+        $this->loadWorkSchedules();
         $this->calendarYear = is_numeric($this->calendarYear) ? (int) $this->calendarYear : (int) Jalalian::now()->getYear();
         $this->calendarMonth = is_numeric($this->calendarMonth) ? (int) $this->calendarMonth : (int) Jalalian::now()->getMonth();
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
@@ -826,7 +835,7 @@ class SpecialDaysAppointment extends Component
                 ->first();
             $isFromDoctorWorkSchedule = !$specialSchedule;
             if ($isFromDoctorWorkSchedule) {
-                
+
                 $this->workSchedule['data']['work_hours'][$index] = [
                     'start' => '',
                     'end' => '',
@@ -835,11 +844,11 @@ class SpecialDaysAppointment extends Component
                 $this->dispatch('show-toastr', type: 'success', message: 'بازه زمانی خالی شد. لطفاً مقادیر جدید را وارد کنید.');
                 $this->dispatch('refresh-timepicker');
             } else {
-                
+
                 $this->dispatch('confirm-delete-slot', index: $index); // ← فرمت واضح‌تر
             }
         } catch (\Exception $e) {
-            
+
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف بازه زمانی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;
@@ -848,10 +857,10 @@ class SpecialDaysAppointment extends Component
 
     public function confirmDeleteSlot($index)
     {
-       
+
 
         if ($this->isProcessing) {
-    
+
             return;
         }
         $this->isProcessing = true;
@@ -878,7 +887,7 @@ class SpecialDaysAppointment extends Component
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             $emergencyTimes = $specialSchedule->emergency_times ? json_decode($specialSchedule->emergency_times, true) : [[]];
 
-        
+
 
             if (!isset($workHours[$index])) {
                 $this->dispatch('show-toastr', type: 'error', message: 'بازه زمانی نامعتبر است.');
@@ -895,14 +904,14 @@ class SpecialDaysAppointment extends Component
             $appointmentSettings = array_values($appointmentSettings);
             $emergencyTimes = array_values(array_map(fn ($times) => is_array($times) ? array_values($times) : [], $emergencyTimes));
 
-           
+
 
             // ذخیره یا حذف
             if (empty($workHours)) {
-             
+
                 $specialSchedule->delete();
             } else {
-             
+
                 $specialSchedule->work_hours = json_encode($workHours);
                 $specialSchedule->appointment_settings = json_encode($appointmentSettings);
                 $specialSchedule->emergency_times = json_encode($emergencyTimes);
@@ -916,14 +925,14 @@ class SpecialDaysAppointment extends Component
             // به‌روزرسانی workSchedule
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
-           
+
 
             $this->dispatch('show-toastr', type: 'success', message: 'بازه زمانی حذف شد.');
             $this->dispatch('refresh-timepicker');
             $this->dispatch('refresh');
             $this->dispatch('refreshWorkhours');
         } catch (\Exception $e) {
-           
+
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف بازه زمانی: ' . $e->getMessage());
         } finally {
             $this->isProcessing = false;

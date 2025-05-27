@@ -20,7 +20,19 @@ class PaymentSettingComponent extends Component
 
     public function mount()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
         $settings = DoctorPaymentSetting::where('doctor_id', $doctorId)->first();
 
         if (!$settings) {
@@ -37,7 +49,19 @@ class PaymentSettingComponent extends Component
 
     public function render()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
         $totalIncome = $this->calculateTotalIncome($doctorId);
         $paid = DoctorSettlementRequest::where('doctor_id', $doctorId)
             ->where('status', 'paid')
@@ -55,19 +79,31 @@ class PaymentSettingComponent extends Component
 
     public function deleteRequest($requestId)
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
         $request = DoctorSettlementRequest::where('doctor_id', $doctorId)->where('id', $requestId)->first();
-    
+
         if (!$request) {
             $this->dispatch('toast', message: 'درخواست یافت نشد!', type: 'error');
             return;
         }
-    
+
         if ($request->status !== 'pending') {
             $this->dispatch('toast', message: 'فقط درخواست‌های در انتظار قابل حذف هستند.', type: 'error');
             return;
         }
-    
+
         // بازگشت settlement_status نوبت‌ها به pending
         Appointment::where('doctor_id', $doctorId)
             ->where('payment_status', 'paid')
@@ -75,38 +111,50 @@ class PaymentSettingComponent extends Component
             ->where('settlement_status', 'settled')
             ->where('updated_at', '>=', $request->created_at)
             ->update(['settlement_status' => 'pending']);
-    
+
         CounselingAppointment::where('doctor_id', $doctorId)
             ->where('payment_status', 'paid')
             ->whereIn('status', ['call_completed', 'video_completed', 'text_completed'])
             ->where('settlement_status', 'settled')
             ->where('updated_at', '>=', $request->created_at)
             ->update(['settlement_status' => 'pending']);
-    
+
         // بازگشت مبلغ به کیف پول
         $wallet = DoctorWallet::firstOrCreate(
             ['doctor_id' => $doctorId],
             ['balance' => 0]
         );
         $wallet->increment('balance', $request->amount);
-    
+
         // حذف یا غیرفعال کردن تراکنش تسویه
         DoctorWalletTransaction::where('doctor_id', $doctorId)
             ->where('type', 'settlement')
             ->where('amount', $request->amount)
             ->where('created_at', '>=', $request->created_at)
             ->delete();
-    
+
         // حذف درخواست تسویه
         $request->delete();
-    
+
         $this->dispatch('toast', message: 'درخواست با موفقیت حذف شد و مبلغ به موجودی بازگشت.', type: 'success');
         $this->loadData();
     }
 
     public function requestSettlement()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
         $settings = DoctorPaymentSetting::where('doctor_id', $doctorId)->first();
 
         if (empty($this->card_number)) {
@@ -178,7 +226,19 @@ class PaymentSettingComponent extends Component
 
     protected function loadData()
     {
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
+            }
+        }
+
+        if (!$doctor) {
+            return redirect()->route('login');
+        }
+
+        $doctorId = $doctor->id;
         $this->requests = DoctorSettlementRequest::where('doctor_id', $doctorId)
             ->latest()
             ->with('doctor')

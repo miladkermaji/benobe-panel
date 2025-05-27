@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\DoctorCounselingWorkSchedule;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use App\Models\Doctor;
 
 class CounselingWorkHours extends Component
 {
@@ -88,6 +89,8 @@ class CounselingWorkHours extends Component
     public $emergencyModalIndex;
     public $isEmergencyModalOpen = false;
     public $selectAllScheduleModal = false;
+    public $doctorId;
+    public $doctor;
 
     protected $rules = [
         'selectedDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
@@ -129,96 +132,15 @@ class CounselingWorkHours extends Component
         'selectedScheduleDays.min' => 'لطفاً حداقل یک روز را انتخاب کنید.',
     ];
 
-    public function mount($clinicId = null)
+    public function mount()
     {
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-        $this->clinicId = $clinicId;
-        $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
-        $this->activeClinicId = $this->clinicId ?? $this->selectedClinicId;
-        session(['selectedClinicId' => $this->selectedClinicId]);
-
-        // دریافت یا ایجاد تنظیمات مشاوره
-        $this->appointmentConfig = DoctorCounselingConfig::firstOrCreate(
-            [
-                'doctor_id' => $doctorId,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-            ],
-            [
-                'auto_scheduling' => true,
-                'online_consultation' => false,
-                'holiday_availability' => false,
-                'has_phone_counseling' => false,
-                'has_text_counseling' => false,
-                'has_video_counseling' => false,
-                'price_15min' => null,
-                'price_30min' => null,
-                'price_45min' => null,
-                'price_60min' => null,
-            ]
-        );
-
-        // تنظیم مقادیر پراپرتی‌ها
-        $this->autoScheduling = $this->appointmentConfig->auto_scheduling;
-        $this->calendarDays = $this->appointmentConfig->calendar_days ?? 30;
-        $this->onlineConsultation = $this->appointmentConfig->online_consultation;
-        $this->holidayAvailability = $this->appointmentConfig->holiday_availability;
-        $this->has_phone_counseling = $this->appointmentConfig->has_phone_counseling;
-        $this->has_text_counseling = $this->appointmentConfig->has_text_counseling;
-        $this->has_video_counseling = $this->appointmentConfig->has_video_counseling;
-        $this->price_15min = $this->appointmentConfig->price_15min;
-        $this->price_30min = $this->appointmentConfig->price_30min;
-        $this->price_45min = $this->appointmentConfig->price_45min;
-        $this->price_60min = $this->appointmentConfig->price_60min;
-
-        $this->refreshWorkSchedules();
-
-        $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-        foreach ($daysOfWeek as $day) {
-            if (!collect($this->workSchedules)->firstWhere('day', $day)) {
-                DoctorCounselingWorkSchedule::create([
-                    'doctor_id' => $doctorId,
-                    'day' => $day,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                    'is_working' => false,
-                    'work_hours' => json_encode([]),
-                    'appointment_settings' => json_encode([]),
-                    'emergency_times' => json_encode([]),
-                ]);
-            }
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if (!$doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
-
-        $this->refreshWorkSchedules();
-
-        $this->isWorking = array_fill_keys($daysOfWeek, false);
-        $this->slots = array_fill_keys($daysOfWeek, []);
-        foreach ($daysOfWeek as $day) {
-            $schedule = collect($this->workSchedules)->firstWhere('day', $day);
-            if ($schedule) {
-                $this->isWorking[$day] = (bool) $schedule['is_working'];
-                $workHours = !empty($schedule['work_hours']) ? $schedule['work_hours'] : [];
-                if (!empty($workHours)) {
-                    foreach ($workHours as $index => $slot) {
-                        $this->slots[$day][$index] = [
-                            'id' => $schedule['id'] . '-' . $index,
-                            'start_time' => $slot['start'] ?? null,
-                            'end_time' => $slot['end'] ?? null,
-                            'max_appointments' => $slot['max_appointments'] ?? null,
-                        ];
-                    }
-                }
-            }
-            if (empty($this->slots[$day])) {
-                $this->slots[$day][] = [
-                    'id' => null,
-                    'start_time' => null,
-                    'end_time' => null,
-                    'max_appointments' => null,
-                ];
-            }
-        }
-
-        $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
-        $this->dispatch('refresh-clinic-data');
+        $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+        $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
+        $this->loadWorkSchedules();
     }
 
     public function setSelectedClinicId($clinicId)
@@ -591,69 +513,69 @@ class CounselingWorkHours extends Component
             Log::info("Updated $propertyName:", [$propertyName => $this->$propertyName]);
         }
     }
- public function saveWorkSchedule()
-{
-    try {
-        $this->validate([
-            'calendarDays' => 'required|integer|min:1',
-            'holidayAvailability' => 'boolean',
-            'onlineConsultation' => 'boolean',
-            'has_phone_counseling' => 'boolean',
-            'has_text_counseling' => 'boolean',
-            'has_video_counseling' => 'boolean',
-            'price_15min' => 'nullable|numeric|min:0',
-            'price_30min' => 'nullable|numeric|min:0',
-            'price_45min' => 'nullable|numeric|min:0',
-            'price_60min' => 'nullable|numeric|min:0',
-        ]);
+    public function saveWorkSchedule()
+    {
+        try {
+            $this->validate([
+                'calendarDays' => 'required|integer|min:1',
+                'holidayAvailability' => 'boolean',
+                'onlineConsultation' => 'boolean',
+                'has_phone_counseling' => 'boolean',
+                'has_text_counseling' => 'boolean',
+                'has_video_counseling' => 'boolean',
+                'price_15min' => 'nullable|numeric|min:0',
+                'price_30min' => 'nullable|numeric|min:0',
+                'price_45min' => 'nullable|numeric|min:0',
+                'price_60min' => 'nullable|numeric|min:0',
+            ]);
 
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
 
-        Log::info('Saving Counseling Config:', [
-            'online_consultation' => $this->onlineConsultation,
-            'holiday_availability' => $this->holidayAvailability,
-            'has_phone_counseling' => $this->has_phone_counseling,
-            'has_text_counseling' => $this->has_text_counseling,
-            'has_video_counseling' => $this->has_video_counseling,
-        ]);
+            Log::info('Saving Counseling Config:', [
+                'online_consultation' => $this->onlineConsultation,
+                'holiday_availability' => $this->holidayAvailability,
+                'has_phone_counseling' => $this->has_phone_counseling,
+                'has_text_counseling' => $this->has_text_counseling,
+                'has_video_counseling' => $this->has_video_counseling,
+            ]);
 
-        DoctorCounselingConfig::updateOrCreate(
-            [
-                'doctor_id' => $doctor->id,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-            ],
-            [
-                'calendar_days' => $this->calendarDays,
-                'holiday_availability' => (bool) $this->holidayAvailability,
-                'auto_scheduling' => (bool) $this->autoScheduling,
-                'online_consultation' => (bool) $this->onlineConsultation,
-                'has_phone_counseling' => (bool) $this->has_phone_counseling,
-                'has_text_counseling' => (bool) $this->has_text_counseling,
-                'has_video_counseling' => (bool) $this->has_video_counseling,
-                'price_15min' => $this->price_15min,
-                'price_30min' => $this->price_30min,
-                'price_45min' => $this->price_45min,
-                'price_60min' => $this->price_60min,
-            ]
-        );
+            DoctorCounselingConfig::updateOrCreate(
+                [
+                    'doctor_id' => $doctor->id,
+                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                ],
+                [
+                    'calendar_days' => $this->calendarDays,
+                    'holiday_availability' => (bool) $this->holidayAvailability,
+                    'auto_scheduling' => (bool) $this->autoScheduling,
+                    'online_consultation' => (bool) $this->onlineConsultation,
+                    'has_phone_counseling' => (bool) $this->has_phone_counseling,
+                    'has_text_counseling' => (bool) $this->has_text_counseling,
+                    'has_video_counseling' => (bool) $this->has_video_counseling,
+                    'price_15min' => $this->price_15min,
+                    'price_30min' => $this->price_30min,
+                    'price_45min' => $this->price_45min,
+                    'price_60min' => $this->price_60min,
+                ]
+            );
 
-        $this->modalMessage = 'تنظیمات با موفقیت ذخیره شد';
-        $this->modalType = 'success';
-        $this->modalOpen = true;
-        $this->dispatch('show-toastr', [
-            'message' => $this->modalMessage,
-            'type' => 'success',
-        ]);
-    } catch (\Exception $e) {
-        $this->modalMessage = 'خطا در ذخیره تنظیمات: ' . $e->getMessage();
-        $this->modalType = 'error';
-        $this->modalOpen = true;
-        $this->dispatch('show-toastr', [
-            'message' => $this->modalMessage,
-            'type' => 'error',
-        ]);
+            $this->modalMessage = 'تنظیمات با موفقیت ذخیره شد';
+            $this->modalType = 'success';
+            $this->modalOpen = true;
+            $this->dispatch('show-toastr', [
+                'message' => $this->modalMessage,
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            $this->modalMessage = 'خطا در ذخیره تنظیمات: ' . $e->getMessage();
+            $this->modalType = 'error';
+            $this->modalOpen = true;
+            $this->dispatch('show-toastr', [
+                'message' => $this->modalMessage,
+                'type' => 'error',
+            ]);
+        }
     }
-}
 
     public $storedCopySource = [];
     public $storedSelectedDays = [];
