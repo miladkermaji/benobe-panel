@@ -29,7 +29,7 @@
     <x-global-loader />
     @yield('content')
     @livewireScripts
-    {{-- @networkStatus --}}
+    @networkStatus
 </body>
 @include('admin.panel.layouts.partials.scripts')
 @yield('scripts')

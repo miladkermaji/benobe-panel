@@ -47,7 +47,7 @@
 
   @include('dr.panel.layouts.partials.scripts')
   @yield('scripts')
-
+   @networkStatus
   <!-- سایر اسکریپت‌ها -->
   <script>
     Livewire.on('navigateTo', (event) => {
