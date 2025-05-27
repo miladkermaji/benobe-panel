@@ -110,4 +110,19 @@ return [
             'my-dr-appointments' => 'نوبت‌های من',
         ],
     ],
+    'statistics' => [
+        'title' => 'گزارش‌ها و آمار',
+        'icon' => 'i-transactions',
+        'routes' => [
+            'dr-my-performance-chart' => 'آمار و نمودار'
+        ],
+    ],
+    'messages' => [
+        'title' => 'پیام',
+        'icon' => 'i-comments',
+        'routes' => [
+            'dr-panel-tickets' => 'تیکت‌ها',
+            '#' => 'صفحه گفتگو',
+        ],
+    ],
 ];
