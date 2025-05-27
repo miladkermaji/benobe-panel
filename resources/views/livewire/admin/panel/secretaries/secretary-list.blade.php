@@ -61,7 +61,6 @@
                         <th class="align-middle">کلینیک</th>
                         <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
                         <th class="text-center align-middle" style="width: 150px;">عملیات</th>
-                        <th class="text-center align-middle" style="width: 100px;">ورود</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -99,12 +98,7 @@
                               </button>
                             </div>
                           </td>
-                          <td class="text-center align-middle">
-                            <a href="{{ route('secretary.login', $secretary->id) }}"
-                              class="btn btn-gradient-primary rounded-full px-3 py-1 shadow-sm hover:shadow-md transition-all duration-300">
-                              ورود
-                            </a>
-                          </td>
+                        
                         </tr>
                       @empty
                         <tr>
@@ -158,10 +152,7 @@
                                   d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                               </svg>
                             </button>
-                            <a href="{{ route('secretary.login', $secretary->id) }}"
-                              class="btn btn-gradient-primary rounded-full px-3 py-1 shadow-sm hover:shadow-md transition-all duration-300">
-                              ورود
-                            </a>
+                       
                           </div>
                         </div>
                       </div>
