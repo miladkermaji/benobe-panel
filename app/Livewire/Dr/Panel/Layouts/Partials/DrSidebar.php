@@ -58,15 +58,7 @@ class DrSidebar extends Component
 
     public function shouldShowChildMenu($parentKey, $childKey)
     {
-        // Get all permissions from config
-        $permissionsConfig = config('doctor-permissions');
-
-        // If parent is enabled, show all children
-        if (in_array($parentKey, $this->permissions)) {
-            return true;
-        }
-
-        // If parent is not enabled, only show enabled children
+        // Only show child menu if user has direct permission for it
         return in_array($childKey, $this->permissions);
     }
 

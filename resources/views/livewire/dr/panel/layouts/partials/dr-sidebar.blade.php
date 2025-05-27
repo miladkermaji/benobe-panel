@@ -290,19 +290,19 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            @if ($this->hasPermission('clinic_management'))
+            @if ($this->hasPermission('dr-clinic-management'))
               <li
                 class="item-li i-user__inforamtion {{ Request::routeIs('dr-clinic-management') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
               </li>
             @endif
-            @if ($this->hasPermission('clinic_management'))
+            @if ($this->hasPermission('dr.panel.clinics.medical-documents'))
               <li
                 class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.clinics.medical-documents') ? 'is-active' : '' }}">
                 <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
               </li>
             @endif
-            @if ($this->hasPermission('clinic_management'))
+            @if ($this->hasPermission('doctors.clinic.deposit'))
               <li
                 class="item-li i-checkout__request {{ Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }}">
                 <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
