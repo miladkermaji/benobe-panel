@@ -29,7 +29,6 @@ body {
 
 /* کانتینر اصلی */
 .container-fluid {
-    padding: 2rem;
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -329,9 +328,6 @@ input:not([type="checkbox"]) {
 
 /* ریسپانسیو برای تبلت */
 @media (max-width: 991px) {
-    .container-fluid {
-        padding: 1rem;
-    }
 
     .card-header {
         padding: 1rem;
@@ -407,9 +403,7 @@ input:not([type="checkbox"]) {
 
 /* ریسپانسیو برای موبایل */
 @media (max-width: 767px) {
-    .container-fluid {
-        padding: 0.75rem;
-    }
+
     .row > * {
         flex-shrink: 0;
         width: 100%;
@@ -506,9 +500,7 @@ input:not([type="checkbox"]) {
 
 /* ریسپانسیو برای موبایل‌های خیلی کوچک (زیر 576px) */
 @media (max-width: 576px) {
-    .container-fluid {
-        padding: 0.5rem;
-    }
+
 
     .card {
         margin: 0;
