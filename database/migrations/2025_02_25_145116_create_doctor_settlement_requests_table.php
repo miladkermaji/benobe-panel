@@ -1,9 +1,10 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     public function up(): void
     {
         Schema::create('doctor_settlement_requests', function (Blueprint $table) {
@@ -14,6 +15,7 @@ return new class extends Migration {
             $table->timestamp('requested_at')->useCurrent(); // تاریخ درخواست
             $table->timestamp('processed_at')->nullable(); // تاریخ پردازش (تأیید یا پرداخت)
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

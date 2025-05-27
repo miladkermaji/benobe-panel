@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,11 +14,17 @@ return new class extends Migration {
             $table->id(); // شناسه یکتا
             $table->unsignedBigInteger('user_id'); // شناسه کاربر از جدول users
             $table->unsignedBigInteger('doctor_id'); // شناسه پزشک
+            $table->unsignedBigInteger('insurance_id')->nullable(); // شناسه بیمه
             $table->unsignedBigInteger('clinic_id')->nullable(); // شناسه پزشک
             $table->date('appointment_date'); // تاریخ نوبت
             $table->time('appointment_time'); // ساعت نوبت
             $table->text('description')->nullable(); // توضیحات
             $table->string('status')->default('scheduled'); // وضعیت نوبت (scheduled, canceled, etc.)
+            $table->enum('payment_method', ['online', 'cash', 'card_to_card', 'pos'])->nullable();
+            $table->enum('payment_status', ['pending', 'paid', 'unpaid'])->default('pending')->nullable();
+            $table->decimal('fee', 8, 2)->nullable();
+            $table->decimal('final_price', 14, 2)->nullable();
+            $table->string('tracking_code')->nullable()->unique();
             $table->timestamps(); // زمان‌های ایجاد و به‌روزرسانی
 
             // تعریف کلیدهای خارجی

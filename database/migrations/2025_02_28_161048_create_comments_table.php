@@ -16,6 +16,7 @@ class CreateCommentsTable extends Migration
             $table->text('comment'); // متن نظر
             $table->text('reply')->nullable(); // پاسخ به نظر
             $table->boolean('approve')->default(false); // وضعیت (فعال/غیرفعال)
+            $table->boolean('status')->default(true); // وضعیت کلی نظر، پیش‌فرض فعال
             $table->timestamps();
         });
     }

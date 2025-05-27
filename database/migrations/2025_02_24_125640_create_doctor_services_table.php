@@ -15,6 +15,7 @@ return new class () extends Migration {
             $table->unsignedBigInteger('doctor_id')->comment('شناسه دکتر مربوط به سرویس');
             $table->unsignedBigInteger('clinic_id')->nullable()->comment('شناسه کلینیک مربوط به سرویس');
             $table->foreignId('insurance_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('set null');
             $table->string('name')->comment('نام سرویس');
             $table->text('description')->nullable()->comment('توضیحات سرویس');
             $table->integer('duration')->comment('مدت زمان خدمت (به دقیقه)');

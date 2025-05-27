@@ -18,7 +18,7 @@ return new class () extends Migration {
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
             $table->enum('payment_status', ['pending', 'paid', 'unpaid'])->default('pending');
 
-            $table->enum('appointment_type', ['in_person', 'online', 'phone']);
+            $table->enum('appointment_type', ['in_person', 'online', 'phone', 'manual']);
             $table->date('appointment_date');
             $table->time('appointment_time');
 
@@ -43,6 +43,8 @@ return new class () extends Migration {
             $table->enum('appointment_category', ['initial', 'follow_up'])->nullable();
             $table->string('location')->nullable();
             $table->boolean('notification_sent')->default(false);
+            $table->enum('payment_method', ['online', 'cash', 'card_to_card', 'pos'])->default('online')->nullable();
+            $table->enum('settlement_status', ['pending', 'settled'])->default('pending')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

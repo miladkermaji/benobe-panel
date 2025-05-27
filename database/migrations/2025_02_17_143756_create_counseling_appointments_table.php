@@ -20,6 +20,7 @@ return new class () extends Migration {
             $table->enum('consultation_type', ['general', 'specialized', 'emergency'])->nullable();
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
             $table->enum('payment_status', ['pending', 'paid', 'unpaid','failed'])->default('pending');
+            $table->enum('payment_method', ['online', 'cash', 'card_to_card', 'pos'])->default('online')->nullable();
             $table->enum('appointment_type', ['in_person', 'phone', 'video', 'text']); // به‌روزرسانی برای پشتیبانی از video و text
             $table->date('appointment_date');
             $table->time('appointment_time');
@@ -59,7 +60,7 @@ return new class () extends Migration {
             $table->decimal('fee', 8, 2)->nullable();
 
             $table->decimal('final_price', 14, 2)->nullable();
-
+            $table->enum('settlement_status', ['pending', 'settled'])->default('pending')->nullable();
             $table->decimal('doctor_rating', 3, 1)->nullable(); // میانگین امتیاز پزشک
             $table->enum('appointment_category', ['initial', 'follow_up'])->nullable();
             $table->string('location')->nullable();

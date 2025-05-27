@@ -12,6 +12,7 @@ class CreateQuestionCategoriesTable extends Migration
             $table->id();
             $table->string('name'); // نام دسته‌بندی
             $table->string('alt_name')->nullable(); // نام جایگزین (مثلاً sport)
+            $table->boolean('approve')->default(true);
             $table->timestamps();
         });
     }
