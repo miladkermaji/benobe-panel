@@ -26,8 +26,32 @@ class DrSidebar extends Component
 
     public function hasPermission($permission)
     {
+        // Get all permissions from config
+        $permissionsConfig = config('doctor-permissions');
+
         // Check if user has the specific permission
-        return in_array($permission, $this->permissions);
+        if (in_array($permission, $this->permissions)) {
+            return true;
+        }
+
+        // If this is a parent permission, check if any of its children are enabled
+        if (isset($permissionsConfig[$permission])) {
+            // Check if any child route is enabled
+            foreach ($permissionsConfig[$permission]['routes'] ?? [] as $routeKey => $routeTitle) {
+                if (in_array($routeKey, $this->permissions)) {
+                    return true;
+                }
+            }
+        }
+
+        // If this is a child permission, check if its parent is enabled
+        foreach ($permissionsConfig as $parentKey => $parentData) {
+            if (isset($parentData['routes'][$permission]) && in_array($parentKey, $this->permissions)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function render()
