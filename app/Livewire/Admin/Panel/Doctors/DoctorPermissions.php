@@ -17,6 +17,7 @@ class DoctorPermissions extends Component
     public function mount()
     {
         $this->permissionsConfig = config('doctor-permissions');
+        $this->expandedDoctors = session('expandedDoctors', []);
     }
 
     public function toggleDoctor($doctorId)
@@ -26,21 +27,22 @@ class DoctorPermissions extends Component
         } else {
             $this->expandedDoctors[] = $doctorId;
         }
+        session(['expandedDoctors' => $this->expandedDoctors]);
     }
 
-    public function updatePermissions($doctorId, $permissions, $clinicId = null)
+    public function updatePermissions($doctorId, $permissions)
     {
         $doctor = Doctor::findOrFail($doctorId);
 
         // اگر دسترسی‌ها قبلاً وجود نداشته باشند، یک رکورد جدید ایجاد می‌کنیم
         if (!$doctor->permissions) {
             $doctor->permissions()->create([
-                'permissions' => json_encode($permissions)
+                'permissions' => $permissions
             ]);
         } else {
             // در غیر این صورت، دسترسی‌های موجود را به‌روزرسانی می‌کنیم
             $doctor->permissions->update([
-                'permissions' => json_encode($permissions)
+                'permissions' => $permissions
             ]);
         }
 

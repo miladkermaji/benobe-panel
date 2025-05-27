@@ -33,7 +33,8 @@
                     </svg>
                     <span
                       class="fw-bold text-text-primary text-lg">{{ $secretary->first_name . ' ' . $secretary->last_name }}
-                      ({{ $secretary->mobile }})</span>
+                      ({{ $secretary->mobile }})
+                    </span>
                     @if ($secretary->clinic)
                       <span
                         class="badge-comment bg-gradient-primary text-white font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">{{ $secretary->clinic->name }}</span>

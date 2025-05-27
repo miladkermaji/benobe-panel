@@ -44,7 +44,7 @@
                 <div class="permissions-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   @php
                     $permission = $doctor->permissions;
-                    $savedPermissions = $permission ? json_decode($permission->permissions ?? '[]', true) : [];
+                    $savedPermissions = $permission ? $permission->permissions ?? [] : [];
                     $savedPermissions = is_array($savedPermissions) ? $savedPermissions : [];
                   @endphp
                   @foreach ($permissionsConfig as $permissionKey => $permissionData)
@@ -55,7 +55,7 @@
                           <input type="checkbox" class="custom-checkbox-input parent-checkbox"
                             data-doctor-id="{{ $doctor->id }}" data-permission-key="{{ $permissionKey }}"
                             id="parent-{{ $doctor->id }}-{{ $permissionKey }}"
-                            wire:change="updatePermissions({{ $doctor->id }}, $event.target.checked ? {{ json_encode(array_merge($savedPermissions, [$permissionKey])) }} : {{ json_encode(array_filter($savedPermissions, fn($p) => $p !== $permissionKey)) }})"
+                            wire:change="updatePermissions({{ $doctor->id }}, $event.target.checked ? {{ json_encode(array_merge($savedPermissions, [$permissionKey], array_keys($permissionData['routes'] ?? []))) }} : {{ json_encode(array_filter($savedPermissions, fn($p) => $p !== $permissionKey && !in_array($p, array_keys($permissionData['routes'] ?? [])))) }})"
                             {{ in_array($permissionKey, $savedPermissions) ? 'checked' : '' }}>
                           <span class="custom-checkbox-checkmark"></span>
                           <span class="custom-checkbox-label text-text-primary font-bold text-sm">
