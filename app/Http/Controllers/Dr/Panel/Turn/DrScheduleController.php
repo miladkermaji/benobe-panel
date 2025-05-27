@@ -15,24 +15,28 @@ class DrScheduleController extends Controller
 {
     public function getAuthenticatedDoctor()
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        if (! $doctor) {
-            throw new \Exception('کاربر احراز هویت شده از نوع Doctor نیست یا وجود ندارد.');
+        if (Auth::guard('doctor')->check()) {
+            return Auth::guard('doctor')->user();
+        } elseif (Auth::guard('secretary')->check()) {
+            $secretary = Auth::guard('secretary')->user();
+            if (!$secretary->doctor) {
+                throw new \Exception('منشی به هیچ دکتری متصل نیست.');
+            }
+            return $secretary->doctor;
         }
-        return $doctor;
+        throw new \Exception('کاربر احراز هویت نشده است.');
     }
 
     public function index(Request $request)
     {
         $doctor = $this->getAuthenticatedDoctor();
-        if (! $doctor) {
+        if (!$doctor) {
             abort(403, 'شما به این بخش دسترسی ندارید.');
         }
 
-        $clinics = $doctor->clinics()->where('is_active', 0)->get();
-        $now = Carbon::now()->format('Y-m-d');
         $selectedClinicId = $request->query('selectedClinicId');
         $filterType = $request->input('type');
+        $now = Carbon::now()->format('Y-m-d');
 
         $appointments = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
             ->where('doctor_id', $doctor->id)
@@ -58,14 +62,7 @@ class DrScheduleController extends Controller
 
         $appointments = $appointments->get();
 
-        if ($request->ajax()) {
-            return response()->json([
-                'appointments' => $appointments,
-                'clinics' => $clinics,
-            ]);
-        }
-
-        return view("dr.panel.turn.schedule.appointments", compact('appointments', 'clinics'));
+        return view('dr.panel.turn.schedule.appointments', compact('appointments'));
     }
 
     public function getAppointmentsByDate(Request $request)
