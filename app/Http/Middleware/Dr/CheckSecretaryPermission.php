@@ -23,7 +23,7 @@ class CheckSecretaryPermission
 
         // دریافت لیست مجوزهای منشی
         $permissionRecord = $user->permissions()->first();
-        $permissionsArray = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
+        $permissionsArray = $permissionRecord ? json_decode($permissionRecord->permissions ?? '[]', true) : [];
 
         // اگر منشی مجوز لازم را دارد، اجازه‌ی عبور داده شود
         if ($permission && in_array($permission, $permissionsArray, true)) {

@@ -22,7 +22,7 @@ class DrSidebar extends Component
             $this->specialtyName = 'منشی';
             $secretary = Auth::guard('secretary')->user();
             $permissionRecord = $secretary->permissions()->first();
-            $this->permissions = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
+            $this->permissions = $permissionRecord ? json_decode($permissionRecord->permissions ?? '[]', true) : [];
         }
     }
 
