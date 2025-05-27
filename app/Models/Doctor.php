@@ -84,6 +84,7 @@ class Doctor extends Authenticatable
         'mobile_verified_at' => 'datetime',
         'email_verified_at'  => 'datetime',
         'last_login_at'      => 'datetime',
+        'permissions'        => 'array'
     ];
 
     protected $dates = ['created_at', 'updated_at', 'date_of_birth', 'mobile_verified_at', 'email_verified_at', 'last_login_at'];
@@ -91,6 +92,68 @@ class Doctor extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($doctor) {
+            $defaultPermissions = [
+                "dashboard",
+                "dr-panel",
+                "appointments",
+                "dr-appointments",
+                "dr-workhours",
+                "dr.panel.doctornotes.index",
+                "dr-mySpecialDays",
+                "dr-manual_nobat_setting",
+                "dr-manual_nobat",
+                "dr-scheduleSetting",
+                "dr-vacation",
+                "doctor-blocking-users.index",
+                "consult",
+                "dr-moshavere_setting",
+                "dr-moshavere_waiting",
+                "dr.panel.doctornotes.index",
+                "dr-mySpecialDays-counseling",
+                "consult-term.index",
+                "insurance",
+                "dr.panel.doctor-services.index",
+                "financial_reports",
+                "dr.panel.financial-reports.index",
+                "dr-payment-setting",
+                "dr-wallet-charge",
+                "secretary_management",
+                "dr-secretary-management",
+                "clinic_management",
+                "dr-clinic-management",
+                "dr.panel.clinics.medical-documents",
+                "doctors.clinic.deposit",
+                "permissions",
+                "dr-secretary-permissions",
+                "profile",
+                "dr-edit-profile",
+                "dr-edit-profile-security",
+                "dr-edit-profile-upgrade",
+                "dr-my-performance",
+                "dr-subuser",
+                "my-dr-appointments",
+                "statistics",
+                "dr-my-performance-chart",
+                "messages",
+                "dr-panel-tickets",
+                "#"
+            ];
+
+            // اگر دسترسی‌ای وجود نداشت، ایجاد کن
+            if (!$doctor->permissions) {
+                DoctorPermission::create([
+                    'doctor_id' => $doctor->id,
+                    'permissions' => $defaultPermissions
+                ]);
+            }
+        });
+    }
 
     public function sluggable(): array
     {
@@ -318,5 +381,64 @@ class Doctor extends Authenticatable
     public function permissions()
     {
         return $this->hasOne(DoctorPermission::class);
+    }
+
+    public function getPermissionsAttribute()
+    {
+        if (!$this->permissions()->exists()) {
+            $defaultPermissions = [
+                "dashboard",
+                "dr-panel",
+                "appointments",
+                "dr-appointments",
+                "dr-workhours",
+                "dr.panel.doctornotes.index",
+                "dr-mySpecialDays",
+                "dr-manual_nobat_setting",
+                "dr-manual_nobat",
+                "dr-scheduleSetting",
+                "dr-vacation",
+                "doctor-blocking-users.index",
+                "consult",
+                "dr-moshavere_setting",
+                "dr-moshavere_waiting",
+                "dr.panel.doctornotes.index",
+                "dr-mySpecialDays-counseling",
+                "consult-term.index",
+                "insurance",
+                "dr.panel.doctor-services.index",
+                "financial_reports",
+                "dr.panel.financial-reports.index",
+                "dr-payment-setting",
+                "dr-wallet-charge",
+                "secretary_management",
+                "dr-secretary-management",
+                "clinic_management",
+                "dr-clinic-management",
+                "dr.panel.clinics.medical-documents",
+                "doctors.clinic.deposit",
+                "permissions",
+                "dr-secretary-permissions",
+                "profile",
+                "dr-edit-profile",
+                "dr-edit-profile-security",
+                "dr-edit-profile-upgrade",
+                "dr-my-performance",
+                "dr-subuser",
+                "my-dr-appointments",
+                "statistics",
+                "dr-my-performance-chart",
+                "messages",
+                "dr-panel-tickets",
+                "#"
+            ];
+
+            DoctorPermission::create([
+                'doctor_id' => $this->id,
+                'permissions' => $defaultPermissions
+            ]);
+        }
+
+        return $this->permissions()->first();
     }
 }

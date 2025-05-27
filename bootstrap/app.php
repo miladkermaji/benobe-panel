@@ -90,3 +90,19 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->job(new \App\Jobs\CheckUserBlockingsExpiration())->hourly();
     })
     ->create();
+
+$app->singleton(
+    Illuminate\Contracts\Console\Kernel::class,
+    App\Console\Kernel::class
+);
+
+$app->singleton(
+    Illuminate\Contracts\Debug\ExceptionHandler::class,
+    App\Exceptions\Handler::class
+);
+
+$app->commands([
+    \App\Console\Commands\AddDefaultDoctorPermissions::class,
+]);
+
+return $app;
