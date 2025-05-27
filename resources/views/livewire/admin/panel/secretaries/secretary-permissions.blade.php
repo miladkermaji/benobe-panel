@@ -68,7 +68,7 @@
                               <input type="checkbox" class="custom-checkbox-input parent-checkbox"
                                 data-parent-id="parent-{{ $secretary->id }}-{{ $permissionKey }}"
                                 id="parent-{{ $secretary->id }}-{{ $permissionKey }}"
-                                wire:change="updatePermissions({{ $secretary->id }}, $event.target.checked ? {{ json_encode(array_merge($savedPermissions, [$permissionKey])) }} : {{ json_encode(array_filter($savedPermissions, fn($p) => $p !== $permissionKey)) }}, {{ $clinicId ?? 'null' }})"
+                                wire:change="updatePermissions({{ $secretary->id }}, $event.target.checked ? {{ json_encode(array_merge($savedPermissions, [$permissionKey], array_keys($permissionData['routes'] ?? []))) }} : {{ json_encode(array_filter($savedPermissions, fn($p) => $p !== $permissionKey && !in_array($p, array_keys($permissionData['routes'] ?? [])))) }}, {{ $clinicId ?? 'null' }})"
                                 {{ in_array($permissionKey, $savedPermissions) ? 'checked' : '' }}>
                               <span class="custom-checkbox-checkmark"></span>
                               <span class="custom-checkbox-label text-text-primary font-bold text-sm">
@@ -131,13 +131,10 @@
         if (e.target.classList.contains('parent-checkbox')) {
           const parentId = e.target.id;
           const childCheckboxes = document.querySelectorAll(`.child-checkbox[data-parent-id="${parentId}"]`);
+
+          // Update UI
           childCheckboxes.forEach(checkbox => {
             checkbox.checked = e.target.checked;
-            // ایجاد یک event change برای هر checkbox فرزند
-            const event = new Event('change', {
-              bubbles: true
-            });
-            checkbox.dispatchEvent(event);
           });
         }
       });

@@ -114,13 +114,10 @@
         if (e.target.classList.contains('parent-checkbox')) {
           const parentId = e.target.id;
           const childCheckboxes = document.querySelectorAll(`.child-checkbox[data-parent-id="${parentId}"]`);
+
+          // Update UI
           childCheckboxes.forEach(checkbox => {
             checkbox.checked = e.target.checked;
-            // ایجاد یک event change برای هر checkbox فرزند
-            const event = new Event('change', {
-              bubbles: true
-            });
-            checkbox.dispatchEvent(event);
           });
         }
       });
