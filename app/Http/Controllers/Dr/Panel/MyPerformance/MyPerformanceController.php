@@ -224,14 +224,14 @@ class MyPerformanceController extends Controller
      */
     public function chart()
     {
-        $clinics = Clinic::where('doctor_id', Auth::guard('doctor')->user()->id)->get();
+        $clinics = Clinic::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->get();
         return view('dr.panel.my-performance.chart.index', compact('clinics'));
     }
 
     public function getChartData(Request $request)
     {
         $clinicId = $request->input('clinic_id', 'default');
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
 
         // اعتبارسنجی clinic_id
