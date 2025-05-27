@@ -52,7 +52,8 @@
                       class="permission-item p-3 rounded-xl shadow-md bg-background-card hover:bg-background-light transition-all duration-300">
                       <div class="d-flex align-items-center mb-2">
                         <label class="custom-checkbox flex items-center gap-2">
-                          <input type="checkbox" class="custom-checkbox-input"
+                          <input type="checkbox" class="custom-checkbox-input parent-checkbox"
+                            data-doctor-id="{{ $doctor->id }}" data-permission-key="{{ $permissionKey }}"
                             id="parent-{{ $doctor->id }}-{{ $permissionKey }}"
                             wire:change="updatePermissions({{ $doctor->id }}, $event.target.checked ? {{ json_encode(array_merge($savedPermissions, [$permissionKey])) }} : {{ json_encode(array_filter($savedPermissions, fn($p) => $p !== $permissionKey)) }})"
                             {{ in_array($permissionKey, $savedPermissions) ? 'checked' : '' }}>
@@ -67,7 +68,8 @@
                           @foreach ($permissionData['routes'] as $routeKey => $routeTitle)
                             <div class="d-flex align-items-center mb-2">
                               <label class="custom-checkbox flex items-center gap-2">
-                                <input type="checkbox" class="custom-checkbox-input"
+                                <input type="checkbox" class="custom-checkbox-input child-checkbox"
+                                  data-parent-id="parent-{{ $doctor->id }}-{{ $permissionKey }}"
                                   id="child-{{ $doctor->id }}-{{ $routeKey }}"
                                   wire:change="updatePermissions({{ $doctor->id }}, $event.target.checked ? {{ json_encode(array_merge($savedPermissions, [$routeKey])) }} : {{ json_encode(array_filter($savedPermissions, fn($p) => $p !== $routeKey)) }})"
                                   {{ in_array($routeKey, $savedPermissions) ? 'checked' : '' }}>
@@ -101,11 +103,27 @@
     </div>
   </div>
 
-    <script>
-      document.addEventListener('livewire:init', function() {
-          Livewire.on('show-alert', (event) => {
-              toastr[event.type](event.message);
-          });
+  <script>
+    document.addEventListener('livewire:init', function() {
+      Livewire.on('show-alert', (event) => {
+        toastr[event.type](event.message);
       });
+
+      // اضافه کردن event listener برای تیک‌های پدر
+      document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('parent-checkbox')) {
+          const parentId = e.target.id;
+          const childCheckboxes = document.querySelectorAll(`.child-checkbox[data-parent-id="${parentId}"]`);
+          childCheckboxes.forEach(checkbox => {
+            checkbox.checked = e.target.checked;
+            // ایجاد یک event change برای هر checkbox فرزند
+            const event = new Event('change', {
+              bubbles: true
+            });
+            checkbox.dispatchEvent(event);
+          });
+        }
+      });
+    });
   </script>
 </div>
