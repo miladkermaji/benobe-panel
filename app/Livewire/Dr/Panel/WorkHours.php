@@ -154,10 +154,23 @@ class Workhours extends Component
 
         $this->refreshWorkSchedules();
 
-        // Lazy load work schedules
+        // Get existing schedules for all days
+        $existingSchedules = DoctorWorkSchedule::withoutGlobalScopes()
+            ->where('doctor_id', $this->doctorId)
+            ->where(function ($query) {
+                if ($this->activeClinicId !== 'default') {
+                    $query->where('clinic_id', $this->activeClinicId);
+                } else {
+                    $query->whereNull('clinic_id');
+                }
+            })
+            ->get()
+            ->keyBy('day');
+
+        // Create missing schedules only
         $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
         foreach ($daysOfWeek as $day) {
-            if (!collect($this->workSchedules)->firstWhere('day', $day)) {
+            if (!isset($existingSchedules[$day])) {
                 DoctorWorkSchedule::withoutGlobalScopes()->create([
                     'doctor_id' => $this->doctorId,
                     'day' => $day,

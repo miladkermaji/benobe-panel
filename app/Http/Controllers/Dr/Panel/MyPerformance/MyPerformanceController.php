@@ -251,7 +251,7 @@ class MyPerformanceController extends Controller
         $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition);
 
-
+    
 
         $appointments = $appointmentsQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -268,7 +268,7 @@ class MyPerformanceController extends Controller
         $monthlyIncomeQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition);
 
-
+    
 
         $monthlyIncome = $monthlyIncomeQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -278,14 +278,14 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-
+      
 
         // 3. بیماران جدید
         $newPatientsQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->join('users', 'appointments.patient_id', '=', 'users.id');
 
-
+     
 
         $newPatients = $newPatientsQuery
             ->selectRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%m') as month,
@@ -294,13 +294,13 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%m')")
             ->get();
 
-
+       
 
         // 4. نوبت‌های مشاوره
         $counselingQuery = CounselingAppointment::where('doctor_id', $doctorId)
             ->where($clinicCondition);
 
-
+       
 
         $counselingAppointments = $counselingQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -312,14 +312,14 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-
+       
 
         // 5. نوبت‌های دستی
         $manualQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->where('appointment_type', 'manual');
 
-
+        
 
         $manualAppointments = $manualQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -329,7 +329,7 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-
+     
 
         // 6. درآمد کلی
         $totalIncomeQuery = Appointment::where('doctor_id', $doctorId)
@@ -337,7 +337,7 @@ class MyPerformanceController extends Controller
             ->where('payment_status', 'paid')
             ->where('status', 'attended');
 
-
+     
 
         $totalIncome = $totalIncomeQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -362,7 +362,7 @@ class MyPerformanceController extends Controller
             })
             ->values();
 
-
+     
 
         $response = [
             'appointments' => $appointments->map(function ($item) {
@@ -415,7 +415,7 @@ class MyPerformanceController extends Controller
             'totalIncome' => $totalIncome->toArray(),
         ];
 
-
+    
 
         return response()->json($response);
     }

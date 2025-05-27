@@ -151,7 +151,7 @@
 @elseif(Auth::guard('secretary')->check())
 {{ trim(Auth::guard('secretary')->user()->doctor->bio ?? '') }}
 @endif
-              </textarea>
+        </textarea>
             </div>
             <div class="w-100">
               <button type="submit"
