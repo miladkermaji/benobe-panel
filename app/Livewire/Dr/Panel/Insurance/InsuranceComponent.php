@@ -55,6 +55,18 @@ class InsuranceComponent extends Component
             $query->whereHas('doctors', function ($q) use ($doctorId) {
                 $q->where('doctor_id', $doctorId);
             });
+        } elseif (Auth::guard('secretary')->check()) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctorId = $secretary->doctor->id;
+                $query->whereHas('doctors', function ($q) use ($doctorId) {
+                    $q->where('doctor_id', $doctorId);
+                });
+            } else {
+                $this->dispatch('toast', message: 'شما به یک دکتر متصل نیستید.', type: 'error');
+                $this->insurances = collect();
+                return view('livewire.dr.panel.insurance.insurance-component');
+            }
         } elseif (Auth::guard('manager')->check()) {
             $segments = request()->segments();
             $doctorId = end($segments);
@@ -142,6 +154,14 @@ class InsuranceComponent extends Component
 
         if (Auth::guard('doctor')->check()) {
             $data['doctor_id'] = Auth::guard('doctor')->user()->id;
+        } elseif (Auth::guard('secretary')->check()) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $data['doctor_id'] = $secretary->doctor->id;
+            } else {
+                $this->dispatch('toast', message: 'شما به یک دکتر متصل نیستید.', type: 'error');
+                return;
+            }
         } elseif (Auth::guard('manager')->check()) {
             $segments = request()->segments();
             $doctorId = end($segments);
@@ -191,6 +211,17 @@ class InsuranceComponent extends Component
             $query->whereHas('doctors', function ($q) use ($doctorId) {
                 $q->where('doctor_id', $doctorId);
             });
+        } elseif (Auth::guard('secretary')->check()) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctorId = $secretary->doctor->id;
+                $query->whereHas('doctors', function ($q) use ($doctorId) {
+                    $q->where('doctor_id', $doctorId);
+                });
+            } else {
+                $this->dispatch('toast', message: 'شما به یک دکتر متصل نیستید.', type: 'error');
+                return;
+            }
         } elseif (Auth::guard('manager')->check()) {
             $segments = request()->segments();
             $doctorId = end($segments);

@@ -130,8 +130,19 @@ class Workhours extends Component
         if (!$doctor) {
             return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
-        $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+        // اگر کاربر منشی است، باید doctor_id را از جدول منشی‌ها بگیریم
+        if ($doctor instanceof \App\Models\Secretary) {
+            $this->doctorId = $doctor->doctor_id;
+        } else {
+            $this->doctorId = $doctor->id;
+        }
+
         $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
+        if (!$this->doctor) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'اطلاعات پزشک یافت نشد.');
+        }
+
         $this->clinicId = $clinicId;
 
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
@@ -334,7 +345,9 @@ class Workhours extends Component
             $newStartMinutes = $timeToMinutes($startTime);
             $newEndMinutes = $timeToMinutes($endTime);
 
-            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
             $dayTranslations = [
                 'saturday' => 'شنبه',
                 'sunday' => 'یکشنبه',
@@ -448,7 +461,9 @@ class Workhours extends Component
                 'scheduleModalDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
             ]);
 
-            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
             $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $day)
                 ->where(function ($query) {
@@ -503,7 +518,8 @@ class Workhours extends Component
 
     public function refreshWorkSchedules()
     {
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
         // Optimize query by selecting only needed fields
         $this->workSchedules = DoctorWorkSchedule::withoutGlobalScopes()
@@ -548,7 +564,9 @@ class Workhours extends Component
 
     public function saveEmergencyTimes()
     {
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
         $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
             ->where('day', $this->emergencyModalDay)
             ->where(function ($query) {
@@ -595,12 +613,13 @@ class Workhours extends Component
             ]);
 
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
             // Remove cache and use withoutGlobalScopes
             DoctorAppointmentConfig::withoutGlobalScopes()
                 ->updateOrCreate(
                     [
-                        'doctor_id' => $doctor->id,
+                        'doctor_id' => $doctorId,
                         'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     ],
                     [
@@ -654,7 +673,8 @@ class Workhours extends Component
             return;
         }
 
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $sourceDay = $copySource['day'];
         $sourceIndex = (int) $copySource['index'];
 
@@ -984,7 +1004,9 @@ class Workhours extends Component
             ];
 
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $day)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
@@ -997,7 +1019,7 @@ class Workhours extends Component
 
             if (!$workSchedule) {
                 $workSchedule = DoctorWorkSchedule::create([
-                    'doctor_id' => $doctor->id,
+                    'doctor_id' => $doctorId,
                     'day' => $day,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => true,
@@ -1055,7 +1077,7 @@ class Workhours extends Component
             ];
 
             foreach ($daysOfWeek as $weekDay) {
-                $schedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
+                $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                     ->where('day', $weekDay)
                     ->where(function ($query) {
                         if ($this->activeClinicId !== 'default') {
@@ -1068,7 +1090,7 @@ class Workhours extends Component
 
                 if (!$schedule) {
                     $schedule = DoctorWorkSchedule::create([
-                        'doctor_id' => $doctor->id,
+                        'doctor_id' => $doctorId,
                         'day' => $weekDay,
                         'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                         'is_working' => false,
@@ -1153,9 +1175,10 @@ class Workhours extends Component
         ]);
 
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
         try {
-            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
+            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $this->selectedDay)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
@@ -1168,7 +1191,7 @@ class Workhours extends Component
 
             if (!$workSchedule) {
                 $workSchedule = DoctorWorkSchedule::create([
-                    'doctor_id' => $doctor->id,
+                    'doctor_id' => $doctorId,
                     'day' => $this->selectedDay,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => true,
@@ -1262,9 +1285,10 @@ class Workhours extends Component
     public function deleteTimeSlot($day, $index)
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
         try {
-            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
+            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $day)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
@@ -1365,11 +1389,12 @@ class Workhours extends Component
 
         $englishDay = $dayMap[$day];
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $isWorking = isset($this->isWorking[$englishDay]) ? (bool) $this->isWorking[$englishDay] : false;
 
         try {
             $workSchedule = DoctorWorkSchedule::where([
-                'doctor_id' => $doctor->id,
+                'doctor_id' => $doctorId,
                 'day' => $englishDay,
                 'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
             ])->first();
@@ -1380,7 +1405,7 @@ class Workhours extends Component
                 ]);
             } else {
                 $workSchedule = DoctorWorkSchedule::create([
-                    'doctor_id' => $doctor->id,
+                    'doctor_id' => $doctorId,
                     'day' => $englishDay,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => $isWorking,
@@ -1459,6 +1484,7 @@ class Workhours extends Component
         $englishDay = $key;
         $persianDay = $dayMap[$englishDay] ?? null;
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
         if (!$persianDay) {
             $this->modalMessage = 'روز نامعتبر است';
@@ -1471,7 +1497,7 @@ class Workhours extends Component
 
         try {
             $workSchedule = DoctorWorkSchedule::where([
-                'doctor_id' => $doctor->id,
+                'doctor_id' => $doctorId,
                 'day' => $englishDay,
                 'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
             ])->first();
@@ -1482,7 +1508,7 @@ class Workhours extends Component
                 ]);
             } else {
                 $workSchedule = DoctorWorkSchedule::create([
-                    'doctor_id' => $doctor->id,
+                    'doctor_id' => $doctorId,
                     'day' => $englishDay,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => $isWorking,
@@ -1517,17 +1543,18 @@ class Workhours extends Component
     public function updateAutoScheduling()
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
         try {
             DoctorAppointmentConfig::withoutGlobalScopes()
                 ->updateOrCreate(
                     [
-                        'doctor_id' => $doctor->id,
+                        'doctor_id' => $doctorId,
                         'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     ],
                     [
                         'auto_scheduling' => $this->autoScheduling,
-                        'doctor_id' => $doctor->id,
+                        'doctor_id' => $doctorId,
                         'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     ]
                 );
