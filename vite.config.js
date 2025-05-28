@@ -11,6 +11,7 @@ export default defineConfig({
                 "resources/css/timepicker.css",
                 "resources/js/app.js",
                 "resources/js/timepicker.js",
+                "resources/js/persian-number-converter.js",
             ],
             refresh: ["resources/views/**/*"],
         }),
