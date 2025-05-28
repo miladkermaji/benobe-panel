@@ -98,7 +98,7 @@
                     {{ number_format($plan->price) }} تومان
                   </div>
                   <div
-                    class="discount-badge {{ $colors['badge'] }} text-white rounded-pill px-3 py-1 d-inline-block mb-2">
+                    class="discount-badge {{ $colors['badge'] }} text-white rounded-pill px-3 py-1 d-inline-block mb-3">
                     {{ $plan->discount }}% تخفیف
                   </div>
                 @endif
@@ -365,41 +365,22 @@
 
       .price-tag {
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      }
-
-      .text-shadow {
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      }
-
-      .discount-badge {
-        font-weight: 600;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        color: white;
-      }
-
-      .fw-medium {
-        font-weight: 500 !important;
-      }
-
-      .btn {
-        transition: all 0.2s ease;
-      }
-
-      .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
       .original-price {
         font-size: 1.1rem;
         opacity: 0.7;
+        margin-bottom: 0.5rem;
       }
 
       .discount-badge {
         font-weight: 600;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         color: white;
+        margin-bottom: 1rem;
       }
 
       .final-price {
