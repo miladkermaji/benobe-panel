@@ -22,6 +22,7 @@ use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\DoctorSpecialtyRequest;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use App\Models\Secretary;
 
 class DrProfileController extends Controller
 {
@@ -29,11 +30,17 @@ class DrProfileController extends Controller
 
     protected function getAuthenticatedDoctor(): Doctor
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        if (! $doctor instanceof Doctor) {
-            throw new \Exception('کاربر احراز هویت شده از نوع Doctor نیست یا وجود ندارد.');
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+
+        if ($user instanceof Doctor) {
+            return $user;
         }
-        return $doctor;
+
+        if ($user instanceof Secretary) {
+            return $user->doctor;
+        }
+
+        throw new \Exception('کاربر احراز هویت شده از نوع Doctor نیست یا وجود ندارد.');
     }
 
     public function uploadPhoto(Request $request)
@@ -89,12 +96,12 @@ class DrProfileController extends Controller
     public function edit()
     {
         $doctor                   = $this->getAuthenticatedDoctor();
-        $currentSpecialty         = DoctorSpecialty::where('doctor_id', $doctor->id)->first();
+        $currentSpecialty         = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id  )->first();
         $specialtyName            = $currentSpecialty->specialty_title ?? 'نامشخص';
-        $doctor_specialties       = DoctorSpecialty::where('doctor_id', $doctor->id)->get();
-        $doctorSpecialties        = DoctorSpecialty::where('doctor_id', $doctor->id)->get();
-        $existingSpecialtiesCount = DoctorSpecialty::where('doctor_id', $doctor->id)->count();
-        $doctorSpecialtyId        = DoctorSpecialty::where('doctor_id', $doctor->id)->first();
+        $doctor_specialties       = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)->get();
+        $doctorSpecialties        = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)->get();
+        $existingSpecialtiesCount = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)->count();
+        $doctorSpecialtyId        = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)->first();
         $academic_degrees         = AcademicDegree::active()
             ->orderBy('sort_order')
             ->get();
@@ -136,7 +143,7 @@ class DrProfileController extends Controller
         try {
             DB::beginTransaction();
             $mainSpecialty = DoctorSpecialty::updateOrCreate(
-                ['doctor_id' => $doctor->id, 'is_main' => true],
+                ['doctor_id' => $doctor->id ?? $doctor->doctor_id, 'is_main' => true],
                 [
                     'academic_degree_id' => $request->academic_degree_id,
                     'specialty_id'       => $request->specialty_id,
@@ -148,7 +155,7 @@ class DrProfileController extends Controller
                 $additionalSpecialtiesCount = 0;
                 foreach ($request->degrees as $index => $degreeId) {
                     if (! empty($degreeId) && ! empty($request->specialties[$index])) {
-                        $duplicateSpecialty = DoctorSpecialty::where('doctor_id', $doctor->id)
+                        $duplicateSpecialty = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)
                             ->where('specialty_id', $request->specialties[$index])
                             ->exists();
                         if ($duplicateSpecialty) {
@@ -159,7 +166,7 @@ class DrProfileController extends Controller
                             break;
                         }
                         DoctorSpecialty::create([
-                            'doctor_id'          => $doctor->id,
+                            'doctor_id'          => $doctor->id ?? $doctor->doctor_id,
                             'academic_degree_id' => $degreeId,
                             'specialty_id'       => $request->specialties[$index],
                             'specialty_title'    => $request->titles[$index] ?? null,
@@ -171,7 +178,7 @@ class DrProfileController extends Controller
 
             DB::commit();
             $this->updateProfileCompletion($doctor);
-            $updatedSpecialties = DoctorSpecialty::where('doctor_id', $doctor->id)->where('is_main', 0)->get();
+            $updatedSpecialties = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)->where('is_main', 0)->get();
 
             return response()->json([
                 'success'     => true,
@@ -201,11 +208,11 @@ class DrProfileController extends Controller
             'uuid' => [
                 'string',
                 'nullable',
-                'unique:doctors,uuid,' . $doctor->id,
+                'unique:doctors,uuid,' . $doctor->id ?? $doctor->doctor_id,
                 'regex:/^[a-zA-Z0-9_-]+$/',
                 function ($attribute, $value, $fail) use ($doctor) {
                     $existingDoctor = Doctor::where('uuid', $value)
-                        ->where('id', '!=', $doctor->id)
+                        ->where('id', '!=', $doctor->id ?? $doctor->doctor_id)
                         ->first();
                     if ($existingDoctor) {
                         $fail('این UUID قبلاً توسط پزشک دیگری ثبت شده است');
@@ -515,7 +522,7 @@ class DrProfileController extends Controller
         $token   = Str::random(60);
         Otp::create([
             'token'     => $token,
-            'doctor_id' => $doctor->id,
+            'doctor_id' => $doctor->id ?? $doctor->doctor_id,
             'otp_code'  => $otpCode,
             'login_id'  => $newMobile,
             'type'      => 0,

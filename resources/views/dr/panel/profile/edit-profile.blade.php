@@ -135,9 +135,9 @@
               <select name="city_id" id="city_id" class="form-control h-50 w-100 border-radius-6 mt-3 tom-select"
                 autocomplete="off">
                 <option value="">ابتدا یک استان انتخاب کنید</option>
-                @if (Auth::guard('doctor')->user()->city_id)
+                @if ($doctor->city_id)
                   @php
-                    $city = \App\Models\Zone::find(Auth::guard('doctor')->user()->city_id);
+                    $city = \App\Models\Zone::find($doctor->city_id);
                   @endphp
                   <option value="{{ $city->id }}" selected>{{ $city->name }}</option>
                 @endif
@@ -146,12 +146,8 @@
             <div class="mt-4">
               <label for="name" class="fw-bold font-size-13"> بیوگرافی و توضیحات</label>
               <textarea class="ckeditor form-control" name="description" class="form-control" id="description">
-                @if (Auth::guard('doctor')->check())
-{{ trim(Auth::guard('doctor')->user()->bio ?? '') }}
-@elseif(Auth::guard('secretary')->check())
-{{ trim(Auth::guard('secretary')->user()->doctor->bio ?? '') }}
-@endif
-        </textarea>
+                {{ trim($doctor->bio ?? '') }}
+              </textarea>
             </div>
             <div class="w-100">
               <button type="submit"
@@ -379,12 +375,12 @@
                 <div class="row">
                   <div class="col-12 position-relative">
                     <h4 class="text-left"><span class="color-999">benobe.ir/ </span><span class="color-nobat">
-                        {{ Auth::guard('doctor')->user()->uuid ?? '1997' }}
+                        {{ $doctor->uuid ?? '1997' }}
                       </span></h4>
                     <div class="mt-3 w-100">
                       <label class="label-top-input-special-takhasos"> آی دی خود را وارد نمایید : </label>
-                      <input class="form-control mt-2 h-50" type="text"
-                        value="{{ Auth::guard('doctor')->user()->uuid }}" name="uuid">
+                      <input class="form-control mt-2 h-50" type="text" value="{{ $doctor->uuid }}"
+                        name="uuid">
                     </div>
                   </div>
                 </div>
@@ -523,10 +519,10 @@
               <div class="d-flex align-items-center mt-2">
                 <div class="password_toggle__AXK9v d-flex align-items-center">
                   <input type="checkbox" id="static_password_enabled" name="static_password_enabled" value="1"
-                    {{ Auth::guard('doctor')->user()->static_password_enabled ? 'checked' : '' }}>
+                    {{ $doctor->static_password_enabled ? 'checked' : '' }}>
                   <label for="static_password_enabled">Toggle</label>
                   <span id="static_password_status" class="mx-1">
-                    {{ Auth::guard('doctor')->user()->static_password_enabled ? 'رمز عبور ثابت فعال است' : 'رمز عبور ثابت غیرفعال است' }}
+                    {{ $doctor->static_password_enabled ? 'رمز عبور ثابت فعال است' : 'رمز عبور ثابت غیرفعال است' }}
                   </span>
                 </div>
               </div>
@@ -537,8 +533,8 @@
                   <div class="input-group">
                     <input type="password" class="form-control h-50 w-100 border-radius-6 mt-3" id="password"
                       name="password" value=""
-                      placeholder="{{ Auth::guard('doctor')->user()->static_password_enabled ? 'رمز عبور تنظیم شده است' : 'رمز عبور' }}"
-                      {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
+                      placeholder="{{ $doctor->static_password_enabled ? 'رمز عبور تنظیم شده است' : 'رمز عبور' }}"
+                      {{ $doctor->static_password_enabled ? '' : 'disabled' }}>
                     <span
                       class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2 top-64">
                       <img onclick="togglePassword('password')" class="show-pass cursor-pointer"
@@ -554,8 +550,8 @@
                   <div class="input-group">
                     <input type="password" class="form-control h-50 w-100 border-radius-6 mt-3"
                       id="password_confirmation" name="password_confirmation" value=""
-                      placeholder="{{ Auth::guard('doctor')->user()->static_password_enabled ? 'رمز عبور تنظیم شده است' : 'تکرار رمز عبور' }}"
-                      {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
+                      placeholder="{{ $doctor->static_password_enabled ? 'رمز عبور تنظیم شده است' : 'تکرار رمز عبور' }}"
+                      {{ $doctor->static_password_enabled ? '' : 'disabled' }}>
                     <span
                       class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2 top-64">
                       <img onclick="togglePassword('password_confirmation')" class="show-pass cursor-pointer"
@@ -569,7 +565,7 @@
               <div class="w-100 mt-3">
                 <button type="submit"
                   class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-                  id="btn-save-pass" {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
+                  id="btn-save-pass" {{ $doctor->static_password_enabled ? '' : 'disabled' }}>
                   <span class="button_text">ذخیره تغییرات</span>
                   <div class="loader"></div>
                 </button>
@@ -597,11 +593,11 @@
               <div class="d-flex align-items-center mt-3">
                 <div class="password_toggle__AXK9v d-flex align-items-center">
                   <input type="checkbox" id="two_factor_secret_enabled" name="two_factor_secret_enabled"
-                    value="1" {{ Auth::guard('doctor')->user()->two_factor_secret_enabled ? 'checked' : '' }}>
+                    value="1" {{ $doctor->two_factor_secret_enabled ? 'checked' : '' }}>
                   <label for="two_factor_secret_enabled">Toggle</label>
                 </div>
                 <span id="two_factor_status" class="mx-1">
-                  {{ Auth::guard('doctor')->user()->two_factor_secret_enabled ? 'گذرواژه دو مرحله‌ای فعال است' : 'گذرواژه دو مرحله‌ای غیرفعال است' }}
+                  {{ $doctor->two_factor_secret_enabled ? 'گذرواژه دو مرحله‌ای فعال است' : 'گذرواژه دو مرحله‌ای غیرفعال است' }}
                 </span>
               </div>
             </div>

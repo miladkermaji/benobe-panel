@@ -792,7 +792,7 @@ Route::prefix('dr')
                 Route::post('sub-users/update/{id}', [SubUserController::class, 'update'])->name('dr-sub-users-update');
                 Route::delete('sub-users/delete/{id}', [SubUserController::class, 'destroy'])->name('dr-sub-users-delete');
 
-                Route::get('/dr/get-cities', [DrProfileController::class, 'getCities'])->name('dr-get-cities')->middleware('auth:doctor');
+                Route::get('/dr/get-cities', [DrProfileController::class, 'getCities'])->name('dr-get-cities')->middleware('auth:doctor,secretary');
 
             });
 

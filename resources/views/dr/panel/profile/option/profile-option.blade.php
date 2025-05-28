@@ -1,5 +1,6 @@
 {{-- resources/views/dr/panel/profile/option/profile-option.blade.php --}}
 <script>
+  
   function updateAlert() {
     fetch("{{ route('dr-check-profile-completeness') }}", {
         method: 'GET',
