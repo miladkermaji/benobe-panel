@@ -58,7 +58,7 @@ class MembershipPlanList extends Component
     public function delete($id)
     {
         $plan = UserMembershipPlan::findOrFail($id);
-        if ($plan->user_id !== Auth::guard('manager')->user()->id) {
+        if (!Auth::guard('manager')->user()->id) {
             $this->dispatch('show-alert', type: 'error', message: 'دسترسی غیرمجاز برای حذف طرح عضویت.');
             return;
         }
@@ -92,7 +92,6 @@ class MembershipPlanList extends Component
         }
 
         UserMembershipPlan::whereIn('id', $this->selectedPlans)
-            ->where('user_id', Auth::guard('manager')->user()->id)
             ->delete();
         $this->selectedPlans = [];
         $this->selectAll = false;
@@ -107,7 +106,6 @@ class MembershipPlanList extends Component
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('description', 'like', '%' . $this->search . '%');
             })
-            ->where('user_id', Auth::guard('manager')->user()->id)
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
     }

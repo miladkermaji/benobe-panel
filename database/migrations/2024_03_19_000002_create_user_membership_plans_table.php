@@ -12,10 +12,15 @@ return new class () extends Migration {
             $table->string('name');
             $table->decimal('price', 10, 2);
             $table->integer('duration_days');
+
+            $table->enum('duration_type', ['day', 'week', 'month','year'])->nullable();
+
             $table->integer('appointment_count');
             $table->json('features')->nullable();
             $table->boolean('status')->default(true);
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+
+            $table->text('description')->nullable();
+
             $table->timestamps();
         });
     }

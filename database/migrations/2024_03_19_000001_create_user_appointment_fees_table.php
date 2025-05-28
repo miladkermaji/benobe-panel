@@ -14,7 +14,6 @@ return new class () extends Migration {
             $table->integer('discount')->default(0);
             $table->text('description')->nullable();
             $table->boolean('status')->default(true);
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -14,15 +14,16 @@ class UserMembershipPlan extends Model
         'name',
         'description',
         'price',
-        'duration',
-        'duration_unit',
+        'duration_days',
+        'duration_type',
+        'appointment_count',
         'features',
         'status',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
-        'duration' => 'integer',
+        'duration_days' => 'integer',
         'features' => 'array',
     ];
 

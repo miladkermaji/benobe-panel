@@ -421,7 +421,7 @@ Route::prefix('admin')
             Route::get('/', [UserMembershipPlanController::class, 'index'])->name('admin.panel.user-membership-plans.index');
             Route::get('/create', [UserMembershipPlanController::class, 'create'])->name('admin.panel.user-membership-plans.create');
             Route::post('/', [UserMembershipPlanController::class, 'store'])->name('admin.panel.user-membership-plans.store');
-            Route::get('/{userMembershipPlan}/edit', [UserMembershipPlanController::class, 'admin.panel.user-membership-plans.edit'])->name('edit');
+            Route::get('/{userMembershipPlan}/edit', [UserMembershipPlanController::class, 'edit'])->name('admin.panel.user-membership-plans.edit');
             Route::put('/{userMembershipPlan}', [UserMembershipPlanController::class, 'update'])->name('admin.panel.user-membership-plans.update');
             Route::delete('/{userMembershipPlan}', [UserMembershipPlanController::class, 'destroy'])->name('admin.panel.user-membership-plans.destroy');
         });

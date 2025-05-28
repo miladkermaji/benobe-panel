@@ -44,8 +44,13 @@
               <label for="duration_type" class="form-label">نوع مدت‌زمان</label>
             </div>
             <div class="col-12 col-md-6 position-relative mt-5">
-              <input type="number" wire:model="duration" class="form-control text-end" id="duration" placeholder=" ">
-              <label for="duration" class="form-label">مدت‌زمان</label>
+              <input type="number" wire:model="duration_days" class="form-control text-end" id="duration_days" placeholder=" ">
+              <label for="duration_days" class="form-label">مدت‌زمان</label>
+            </div>
+             <div class="col-12 col-md-6 position-relative mt-5">
+              <input type="number" wire:model="appointment_count" class="form-control text-end" id="appointment_count"
+                placeholder=" ">
+              <label for="appointment_count" class="form-label">تعداد نوبت</label>
             </div>
             <div class="col-12 col-md-6 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">

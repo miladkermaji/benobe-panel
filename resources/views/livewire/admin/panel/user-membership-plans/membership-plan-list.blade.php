@@ -68,7 +68,7 @@
                   <th class="align-middle cursor-pointer" wire:click="sortBy('name')">نام</th>
                   <th class="align-middle cursor-pointer" wire:click="sortBy('price')">قیمت</th>
                   <th class="align-middle cursor-pointer" wire:click="sortBy('discount')">تخفیف</th>
-                  <th class="align-middle cursor-pointer" wire:click="sortBy('duration')">مدت‌زمان</th>
+                  <th class="align-middle cursor-pointer" wire:click="sortBy('duration_days')">مدت‌زمان</th>
                   <th class="text-center align-middle cursor-pointer" style="width: 100px;"
                     wire:click="sortBy('status')">وضعیت</th>
                   <th class="text-center align-middle" style="width: 150px;">عملیات</th>
@@ -86,7 +86,7 @@
                       <td class="align-middle">{{ $plan->name }}</td>
                       <td class="align-middle">{{ number_format($plan->price) }} تومان</td>
                       <td class="align-middle">{{ $plan->discount }}%</td>
-                      <td class="align-middle">{{ $plan->duration }} {{ $plan->duration_type }}</td>
+                      <td class="align-middle">{{ $plan->duration_days }} {{ $plan->duration_type }}</td>
                       <td class="text-center align-middle">
                         <span class="badge {{ $plan->status ? 'bg-label-success' : 'bg-label-danger' }} border-0">
                           {{ $plan->status ? 'فعال' : 'غیرفعال' }}
@@ -163,7 +163,7 @@
                 </div>
                 <div class="col-6">
                   <small class="text-muted d-block">مدت‌زمان</small>
-                  <span>{{ $plan->duration }} {{ $plan->duration_type }}</span>
+                  <span>{{ $plan->duration_days }} {{ $plan->duration_type }}</span>
                 </div>
                 <div class="col-6">
                   <small class="text-muted d-block">وضعیت</small>
