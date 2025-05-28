@@ -1,33 +1,39 @@
-@push('styles')
-  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/doctor/doctor.css') }}">
-@endpush
+
 
 <div class="container-fluid py-2" dir="rtl" wire:init="loadPlans">
   <header class="glass-header text-white p-3 rounded-3 shadow-lg">
     <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-      <div class="d-flex align-items-center gap-2 flex-shrink-0">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="header-icon">
+      <div class="d-flex align-items-center gap-2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="header-icon">
           <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
         <h2 class="mb-0 fw-bold fs-5">مدیریت طرح‌های عضویت</h2>
       </div>
-      <div class="d-flex flex-column flex-md-row align-items-center gap-3 w-100 w-md-auto ms-auto">
-        <div class="search-box position-relative">
-          <input type="text" wire:model.live="search" class="form-control border-0 shadow-none bg-white text-dark ps-5" placeholder="جستجو...">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" class="search-icon">
+      <div class="d-flex flex-column flex-md-row align-items-center gap-3 w-100 w-md-auto">
+        <div class="search-box position-relative w-100 w-md-auto" style="max-width: 300px;">
+          <input type="text" wire:model.live="search"
+            class="form-control border-0 shadow-none bg-white text-dark ps-4" placeholder="جستجو...">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"
+            class="search-icon position-absolute" style="right: .4rem; top: 50%; transform: translateY(-50%);">
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
         </div>
-        <div class="d-flex gap-3 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
-          <a href="{{ route('admin.panel.user-membership-plans.create') }}" class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="d-flex gap-3 flex-shrink-0 flex-wrap justify-content-center mt-md-0">
+          <a href="{{ route('admin.panel.user-membership-plans.create') }}" style="white-space: nowrap"
+            class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
               <path d="M12 5v14M5 12h14" />
             </svg>
             <span>افزودن طرح عضویت</span>
           </a>
-          <button wire:click="deleteSelected" class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2" @if (empty($selectedPlans)) disabled @endif>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button wire:click="deleteSelected" style="white-space: nowrap"
+            class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
+            @if (empty($selectedPlans)) disabled @endif>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
               <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
             </svg>
             <span>حذف انتخاب‌شده‌ها</span>
@@ -52,14 +58,19 @@
                   <th class="text-center align-middle cursor-pointer" style="width: 70px;" wire:click="sortBy('id')">
                     شناسه
                     @if ($sortField === 'id')
-                      @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                      @if ($sortDirection === 'asc')
+                        ↑
+                      @else
+                        ↓
+                      @endif
                     @endif
                   </th>
                   <th class="align-middle cursor-pointer" wire:click="sortBy('name')">نام</th>
                   <th class="align-middle cursor-pointer" wire:click="sortBy('price')">قیمت</th>
                   <th class="align-middle cursor-pointer" wire:click="sortBy('discount')">تخفیف</th>
                   <th class="align-middle cursor-pointer" wire:click="sortBy('duration')">مدت‌زمان</th>
-                  <th class="text-center align-middle cursor-pointer" style="width: 100px;" wire:click="sortBy('status')">وضعیت</th>
+                  <th class="text-center align-middle cursor-pointer" style="width: 100px;"
+                    wire:click="sortBy('status')">وضعیت</th>
                   <th class="text-center align-middle" style="width: 150px;">عملیات</th>
                 </tr>
               </thead>
@@ -68,7 +79,8 @@
                   @forelse ($plans as $index => $plan)
                     <tr>
                       <td class="text-center align-middle">
-                        <input type="checkbox" wire:model.live="selectedPlans" value="{{ $plan->id }}" class="form-check-input m-0">
+                        <input type="checkbox" wire:model.live="selectedPlans" value="{{ $plan->id }}"
+                          class="form-check-input m-0">
                       </td>
                       <td class="text-center align-middle">{{ $plans->firstItem() + $index }}</td>
                       <td class="align-middle">{{ $plan->name }}</td>
@@ -84,13 +96,18 @@
                         <div class="d-flex justify-content-center gap-2">
                           <a href="{{ route('admin.panel.user-membership-plans.edit', $plan->id) }}"
                             class="btn btn-gradient-primary rounded-pill px-3">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2">
+                              <path
+                                d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
                           </a>
-                          <button wire:click="confirmDelete({{ $plan->id }})" class="btn btn-gradient-danger rounded-pill px-3">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                          <button wire:click="confirmDelete({{ $plan->id }})"
+                            class="btn btn-gradient-danger rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                             </svg>
                           </button>
                         </div>
@@ -100,7 +117,8 @@
                     <tr>
                       <td colspan="8" class="text-center py-5">
                         <div class="d-flex justify-content-center align-items-center flex-column">
-                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-3">
                             <path d="M5 12h14M12 5l7 7-7 7" />
                           </svg>
                           <p class="text-muted fw-medium">هیچ طرح عضویتی یافت نشد.</p>
@@ -127,7 +145,8 @@
           <div class="card shadow-sm mb-3">
             <div class="card-body">
               <div class="d-flex align-items-center gap-3 mb-3">
-                <input type="checkbox" wire:model.live="selectedPlans" value="{{ $plan->id }}" class="form-check-input m-0">
+                <input type="checkbox" wire:model.live="selectedPlans" value="{{ $plan->id }}"
+                  class="form-check-input m-0">
                 <div>
                   <h6 class="mb-1">{{ $plan->name }}</h6>
                   <small class="text-muted">{{ number_format($plan->price) }} تومان</small>
@@ -157,12 +176,16 @@
                   <div class="d-flex gap-2">
                     <a href="{{ route('admin.panel.user-membership-plans.edit', $plan->id) }}"
                       class="btn btn-gradient-primary btn-sm rounded-pill px-3">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path
+                          d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                       </svg>
                     </a>
-                    <button wire:click="confirmDelete({{ $plan->id }})" class="btn btn-gradient-danger btn-sm rounded-pill px-3">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <button wire:click="confirmDelete({{ $plan->id }})"
+                      class="btn btn-gradient-danger btn-sm rounded-pill px-3">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                       </svg>
                     </button>
@@ -174,7 +197,8 @@
         @empty
           <div class="text-center py-5">
             <div class="d-flex justify-content-center align-items-center flex-column">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" class="text-muted mb-3">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
               <p class="text-muted fw-medium">هیچ طرح عضویتی یافت نشد.</p>

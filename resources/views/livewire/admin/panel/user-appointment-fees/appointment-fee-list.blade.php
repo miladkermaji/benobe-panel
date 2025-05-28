@@ -1,29 +1,27 @@
-@push('styles')
-  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/doctor.css') }}">
-@endpush
+
 
 <div class="container-fluid py-2" dir="rtl" wire:init="loadFees">
   <header class="glass-header text-white p-3 rounded-3 shadow-lg">
     <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-      <div class="d-flex align-items-center gap-2 flex-shrink-0">
+      <div class="d-flex align-items-center gap-2">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           class="header-icon">
           <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
         <h2 class="mb-0 fw-bold fs-5">مدیریت هزینه‌های نوبت</h2>
       </div>
-      <div class="d-flex flex-column flex-md-row align-items-center gap-3 w-100 w-md-auto ms-auto">
-        <div class="search-box position-relative">
+      <div class="d-flex flex-column flex-md-row align-items-center gap-3 w-100 w-md-auto">
+        <div class="search-box position-relative w-100 w-md-auto" style="max-width: 300px;">
           <input type="text" wire:model.live="search"
-            class="form-control border-0 shadow-none bg-white text-dark ps-5" placeholder="جستجو...">
+            class="form-control border-0 shadow-none bg-white text-dark ps-4" placeholder="جستجو...">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"
-            class="search-icon">
+            class="search-icon position-absolute" style="right: .4rem; top: 50%; transform: translateY(-50%);">
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
         </div>
-        <div class="d-flex gap-3 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
-          <a href="{{ route('admin.panel.user-appointment-fees.create') }}"
+        <div class="d-flex gap-3 flex-shrink-0 flex-wrap justify-content-center mt-md-0">
+          <a href="{{ route('admin.panel.user-appointment-fees.create') }}" style="white-space: nowrap"
             class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2">
@@ -31,7 +29,7 @@
             </svg>
             <span>افزودن حق نوبت</span>
           </a>
-          <button wire:click="deleteSelected"
+          <button wire:click="deleteSelected" style="white-space: nowrap"
             class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
             @if (empty($selectedFees)) disabled @endif>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -104,8 +102,8 @@
                           </a>
                           <button wire:click="confirmDelete({{ $fee->id }})"
                             class="btn btn-gradient-danger rounded-pill px-3">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
                               <path
                                 d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                             </svg>
@@ -182,8 +180,7 @@
                       class="btn btn-gradient-danger btn-sm rounded-pill px-3">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
-                        <path
-                          d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                       </svg>
                     </button>
                   </div>
@@ -221,7 +218,7 @@
   </div>
 
   <script>
-    document.addEventListener('livewire:init', function () {
+    document.addEventListener('livewire:init', function() {
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });
