@@ -56,7 +56,7 @@ class SubscriptionEdit extends Component
         ]);
 
         session()->flash('success', 'اشتراک با موفقیت ویرایش شد.');
-        return redirect()->route('admin.user-subscriptions.index');
+        return redirect()->route('admin.panel.user-subscriptions.index');
     }
 
     public function render()

@@ -67,7 +67,7 @@
     </div>
 
     <div class="flex justify-end space-x-3">
-      <a href="{{ route('admin.user-subscriptions.index') }}"
+      <a href="{{ route('admin.panel.user-subscriptions.index') }}"
         class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
         انصراف
       </a>

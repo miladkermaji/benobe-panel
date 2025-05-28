@@ -38,17 +38,17 @@ class SubscriptionCreate extends Component
             'status' => $this->status,
             'description' => $this->description,
             'admin_id' => Auth::guard('manager')->user()->id
-            
+
         ]);
 
         session()->flash('success', 'اشتراک با موفقیت ایجاد شد.');
-        return redirect()->route('admin.user-subscriptions.index');
+        return redirect()->route('admin.panel.user-subscriptions.index');
     }
 
     public function render()
     {
-        $users = User::where('user_id', Auth::guard('manager')->user()->id)->get();
-        $plans = UserMembershipPlan::where('user_id', Auth::guard('manager')->user()->id)->where('status', true)->get();
+        $users = User::all();
+        $plans = UserMembershipPlan::where('status', true)->get();
 
         return view('livewire.admin.panel.user-subscriptions.subscription-create', [
             'users' => $users,
