@@ -27,6 +27,14 @@
               <input type="text" wire:model="name" class="form-control text-end" id="name" placeholder=" ">
               <label for="name" class="form-label">نام طرح</label>
             </div>
+            <div class="col-12 col-md-6 position-relative mt-5" wire:ignore>
+              <select wire:model="type" class="form-select select2" id="type">
+                <option value="gold">طلایی</option>
+                <option value="silver">نقره‌ای</option>
+                <option value="bronze">برنزی</option>
+              </select>
+              <label for="type" class="form-label">نوع طرح</label>
+            </div>
             <div class="col-12 col-md-6 position-relative mt-5">
               <input type="number" wire:model="price" class="form-control text-end" id="price" placeholder=" ">
               <label for="price" class="form-label">قیمت (تومان)</label>
@@ -45,7 +53,8 @@
               <label for="duration_type" class="form-label">نوع مدت‌زمان</label>
             </div>
             <div class="col-12 col-md-6 position-relative mt-5">
-              <input type="number" wire:model="duration_days" class="form-control text-end" id="duration_days" placeholder=" ">
+              <input type="number" wire:model="duration_days" class="form-control text-end" id="duration_days"
+                placeholder=" ">
               <label for="duration_days" class="form-label">مدت‌زمان</label>
             </div>
             <div class="col-12 col-md-6 position-relative mt-5">
@@ -86,7 +95,7 @@
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
-        $('#duration_type').select2({
+        $('#duration_type, #type').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
@@ -94,8 +103,8 @@
       }
       initializeSelect2();
 
-      $('#duration_type').on('change', function() {
-        @this.set('duration_type', $(this).val());
+      $('#duration_type, #type').on('change', function() {
+        @this.set($(this).attr('id'), $(this).val());
       });
 
       Livewire.on('show-alert', (event) => {

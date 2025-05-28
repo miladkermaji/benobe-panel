@@ -1,17 +1,18 @@
-
-
 <div class="container-fluid py-4" dir="rtl">
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
-    <div class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div
+      class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-bounce">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">ویرایش طرح عضویت</h5>
       </div>
       <a href="{{ route('admin.panel.user-membership-plans.index') }}"
         class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">
-        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
           <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         بازگشت
@@ -25,6 +26,14 @@
             <div class="col-12 col-md-6 position-relative mt-5">
               <input type="text" wire:model="name" class="form-control text-end" id="name" placeholder=" ">
               <label for="name" class="form-label">نام طرح</label>
+            </div>
+            <div class="col-12 col-md-6 position-relative mt-5" wire:ignore>
+              <select wire:model="type" class="form-select select2" id="type">
+                <option value="gold">طلایی</option>
+                <option value="silver">نقره‌ای</option>
+                <option value="bronze">برنزی</option>
+              </select>
+              <label for="type" class="form-label">نوع طرح</label>
             </div>
             <div class="col-12 col-md-6 position-relative mt-5">
               <input type="number" wire:model="price" class="form-control text-end" id="price" placeholder=" ">
@@ -44,10 +53,11 @@
               <label for="duration_type" class="form-label">نوع مدت‌زمان</label>
             </div>
             <div class="col-12 col-md-6 position-relative mt-5">
-              <input type="number" wire:model="duration_days" class="form-control text-end" id="duration_days" placeholder=" ">
+              <input type="number" wire:model="duration_days" class="form-control text-end" id="duration_days"
+                placeholder=" ">
               <label for="duration_days" class="form-label">مدت‌زمان</label>
             </div>
-             <div class="col-12 col-md-6 position-relative mt-5">
+            <div class="col-12 col-md-6 position-relative mt-5">
               <input type="number" wire:model="appointment_count" class="form-control text-end" id="appointment_count"
                 placeholder=" ">
               <label for="appointment_count" class="form-label">تعداد نوبت</label>
@@ -56,7 +66,8 @@
               <div class="form-check form-switch w-100 d-flex align-items-center">
                 <input class="form-check-input" type="checkbox" id="status" wire:model="status">
                 <label class="form-check-label fw-medium" for="status">
-                  وضعیت: <span class="px-2 text-{{ $status ? 'success' : 'danger' }}">{{ $status ? 'فعال' : 'غیرفعال' }}</span>
+                  وضعیت: <span
+                    class="px-2 text-{{ $status ? 'success' : 'danger' }}">{{ $status ? 'فعال' : 'غیرفعال' }}</span>
                 </label>
               </div>
             </div>
@@ -67,8 +78,10 @@
           </div>
 
           <div class="text-end mt-4 w-100 d-flex justify-content-end">
-            <button wire:click="save" class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button wire:click="save"
+              class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
               </svg>
               به‌روزرسانی طرح عضویت
@@ -82,19 +95,21 @@
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
-        $('#duration_type').select2({
+        $('#duration_type, #type').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
 
         const durationType = @json($duration_type);
+        const type = @json($type);
         $('#duration_type').val(durationType || 'month').trigger('change');
+        $('#type').val(type || 'silver').trigger('change');
       }
       initializeSelect2();
 
-      $('#duration_type').on('change', function() {
-        @this.set('duration_type', $(this).val());
+      $('#duration_type, #type').on('change', function() {
+        @this.set($(this).attr('id'), $(this).val());
       });
 
       Livewire.on('show-alert', (event) => {

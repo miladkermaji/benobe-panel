@@ -18,11 +18,10 @@ class MembershipPlanCreate extends Component
     public $duration_days;
     public $duration_type = 'month';
     public $appointment_count;
+    public $type = 'silver';
 
     public function save()
     {
- 
-
         $validator = Validator::make([
             'name' => $this->name,
             'price' => $this->price,
@@ -32,6 +31,7 @@ class MembershipPlanCreate extends Component
             'duration_days' => $this->duration_days,
             'duration_type' => $this->duration_type,
             'appointment_count' => $this->appointment_count,
+            'type' => $this->type,
         ], [
             'name' => 'required|string|min:3|max:255',
             'price' => 'required|numeric|min:0',
@@ -41,6 +41,7 @@ class MembershipPlanCreate extends Component
             'duration_days' => 'required|integer|min:1',
             'appointment_count' => 'required|integer|min:1',
             'duration_type' => 'required|in:day,week,month,year',
+            'type' => 'required|in:gold,silver,bronze',
         ], [
             'name.required' => 'لطفاً نام طرح را وارد کنید.',
             'name.string' => 'نام طرح باید متن باشد.',
@@ -49,7 +50,6 @@ class MembershipPlanCreate extends Component
             'price.required' => 'لطفاً قیمت را وارد کنید.',
             'price.numeric' => 'قیمت باید عدد باشد.',
             'price.min' => 'قیمت نمی‌تواند منفی باشد.',
-            
             'discount.numeric' => 'تخفیف باید عدد باشد.',
             'discount.min' => 'تخفیف نمی‌تواند منفی باشد.',
             'discount.max' => 'تخفیف نمی‌تواند بیشتر از ۱۰۰ درصد باشد.',
@@ -64,6 +64,8 @@ class MembershipPlanCreate extends Component
             'appointment_count.min' => 'مدت‌زمان باید حداقل ۱ باشد.',
             'appointment_count.required' => 'لطفاً نوع مدت‌زمان را انتخاب کنید.',
             'duration_type.in' => 'نوع مدت‌زمان معتبر نیست.',
+            'type.required' => 'لطفاً نوع طرح را انتخاب کنید.',
+            'type.in' => 'نوع طرح معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -80,6 +82,7 @@ class MembershipPlanCreate extends Component
             'duration_days' => $this->duration_days,
             'duration_type' => $this->duration_type,
             'appointment_count' => $this->appointment_count,
+            'type' => $this->type,
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'طرح عضویت با موفقیت ایجاد شد!');

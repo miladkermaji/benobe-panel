@@ -13,7 +13,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 5v14M5 12h14" />
           </svg>
-          افزودن  
+          افزودن
         </a>
       </div>
     </div>
@@ -52,12 +52,7 @@
                   'gradient' => 'linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)',
               ],
           ];
-          $planType = $loop->index % 3;
-          $colors = match ($planType) {
-              0 => $planColors['gold'],
-              1 => $planColors['silver'],
-              default => $planColors['bronze'],
-          };
+          $colors = $planColors[$plan->type] ?? $planColors['silver'];
         @endphp
         <div class="col-md-4">
           <div class="plan-card rounded-5 p-4 h-100 position-relative"
@@ -98,18 +93,21 @@
             <!-- Price Section -->
             <div class="text-center my-4">
               <div class="price-tag {{ $colors['text'] }} mb-2">
-                <span
-                  class="display-4 fw-bold text-dark text-shadow">{{ number_format($plan->price * (1 - $plan->discount / 100)) }}</span>
-                <span class="fs-5 fw-bold text-dark text-shadow">تومان</span>
+                @if ($plan->discount > 0)
+                  <div class="original-price text-dark-50 text-decoration-line-through mb-2">
+                    {{ number_format($plan->price) }} تومان
+                  </div>
+                  <div
+                    class="discount-badge {{ $colors['badge'] }} text-white rounded-pill px-3 py-1 d-inline-block mb-2">
+                    {{ $plan->discount }}% تخفیف
+                  </div>
+                @endif
+                <div class="final-price">
+                  <span
+                    class="display-4 fw-bold text-dark text-shadow">{{ number_format($plan->price * (1 - $plan->discount / 100)) }}</span>
+                  <span class="fs-5 fw-bold text-dark text-shadow">تومان</span>
+                </div>
               </div>
-              @if ($plan->discount > 0)
-                <div class="discount-badge {{ $colors['badge'] }} text-white rounded-pill px-3 py-1 d-inline-block">
-                  {{ $plan->discount }}% تخفیف
-                </div>
-                <div class="original-price text-dark-50 text-decoration-line-through mt-2">
-                  {{ number_format($plan->price) }} تومان
-                </div>
-              @endif
             </div>
 
             <!-- Features Section -->
@@ -391,6 +389,31 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         color: white;
+      }
+
+      .original-price {
+        font-size: 1.1rem;
+        opacity: 0.7;
+      }
+
+      .discount-badge {
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        color: white;
+      }
+
+      .final-price {
+        margin-top: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        background: rgba(0, 0, 0, 0.03);
+        display: inline-block;
+      }
+
+      .plan-card:hover .final-price {
+        background: rgba(0, 0, 0, 0.05);
+        transform: scale(1.02);
+        transition: all 0.3s ease;
       }
     </style>
   </div>

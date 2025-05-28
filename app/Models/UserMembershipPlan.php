@@ -12,8 +12,11 @@ class UserMembershipPlan extends Model
 
     protected $fillable = [
         'name',
+        'type',
         'description',
         'price',
+        'discount',
+        'final_price',
         'duration_days',
         'duration_type',
         'appointment_count',
@@ -23,8 +26,11 @@ class UserMembershipPlan extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'final_price' => 'decimal:2',
         'duration_days' => 'integer',
         'features' => 'array',
+        'status' => 'boolean',
     ];
 
     public function subscriptions()
