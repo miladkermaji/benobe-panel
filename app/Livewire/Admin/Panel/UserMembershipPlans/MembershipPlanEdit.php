@@ -69,7 +69,7 @@ class MembershipPlanEdit extends Component
                    'price.required' => 'لطفاً قیمت را وارد کنید.',
                    'price.numeric' => 'قیمت باید عدد باشد.',
                    'price.min' => 'قیمت نمی‌تواند منفی باشد.',
-                   
+
                    'discount.numeric' => 'تخفیف باید عدد باشد.',
                    'discount.min' => 'تخفیف نمی‌تواند منفی باشد.',
                    'discount.max' => 'تخفیف نمی‌تواند بیشتر از ۱۰۰ درصد باشد.',
