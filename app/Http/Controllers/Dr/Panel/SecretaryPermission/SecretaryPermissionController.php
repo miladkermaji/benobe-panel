@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Dr\Panel\SecretaryPermission;
 
 use App\Http\Controllers\Dr\Controller;
 use App\Models\SecretaryPermission;
+use App\Models\Secretary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Doctor;
 
 class SecretaryPermissionController extends Controller
 {
@@ -14,11 +16,14 @@ class SecretaryPermissionController extends Controller
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $clinicId = $request->input('selectedClinicId') === 'default' ? null : $request->input('selectedClinicId');
 
-        if (! $doctor) {
+        if (!$doctor) {
             return redirect()->route('dr.auth.login-register-form');
         }
 
-        $secretaries = $doctor->secretaries()
+        // اگر کاربر منشی است، از doctor_id آن استفاده می‌کنیم
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+        $secretaries = Secretary::where('doctor_id', $doctorId)
             ->with('permissions')
             ->when($clinicId !== null, function ($query) use ($clinicId) {
                 $query->where('clinic_id', $clinicId);
