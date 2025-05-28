@@ -66,6 +66,9 @@ use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationW
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
+use App\Http\Controllers\Admin\Panel\Users\UserSubscriptionController;
+use App\Http\Controllers\Admin\Panel\Users\UserMembershipPlanController;
+use App\Http\Controllers\Admin\Panel\Users\UserAppointmentFeeController;
 
 //manager login routes
 /* login manager routes */
@@ -402,6 +405,36 @@ Route::prefix('admin')
         Route::get('/panel/doctors/permissions', function () {
             return view('admin.panel.doctors.doctors-permissions');
         })->name('admin.panel.doctors.permissions');
+
+        // User Subscriptions Routes
+        Route::prefix('user-subscriptions')->name('user-subscriptions.')->group(function () {
+            Route::get('/', [UserSubscriptionController::class, 'index'])->name('index');
+            Route::get('/create', [UserSubscriptionController::class, 'create'])->name('create');
+            Route::post('/', [UserSubscriptionController::class, 'store'])->name('store');
+            Route::get('/{userSubscription}/edit', [UserSubscriptionController::class, 'edit'])->name('edit');
+            Route::put('/{userSubscription}', [UserSubscriptionController::class, 'update'])->name('update');
+            Route::delete('/{userSubscription}', [UserSubscriptionController::class, 'destroy'])->name('destroy');
+        });
+
+        // User Membership Plans Routes
+        Route::prefix('user-membership-plans')->name('user-membership-plans.')->group(function () {
+            Route::get('/', [UserMembershipPlanController::class, 'index'])->name('index');
+            Route::get('/create', [UserMembershipPlanController::class, 'create'])->name('create');
+            Route::post('/', [UserMembershipPlanController::class, 'store'])->name('store');
+            Route::get('/{userMembershipPlan}/edit', [UserMembershipPlanController::class, 'edit'])->name('edit');
+            Route::put('/{userMembershipPlan}', [UserMembershipPlanController::class, 'update'])->name('update');
+            Route::delete('/{userMembershipPlan}', [UserMembershipPlanController::class, 'destroy'])->name('destroy');
+        });
+
+        // User Appointment Fees Routes
+        Route::prefix('user-appointment-fees')->name('user-appointment-fees.')->group(function () {
+            Route::get('/', [UserAppointmentFeeController::class, 'index'])->name('index');
+            Route::get('/create', [UserAppointmentFeeController::class, 'create'])->name('create');
+            Route::post('/', [UserAppointmentFeeController::class, 'store'])->name('store');
+            Route::get('/{userAppointmentFee}/edit', [UserAppointmentFeeController::class, 'edit'])->name('edit');
+            Route::put('/{userAppointmentFee}', [UserAppointmentFeeController::class, 'update'])->name('update');
+            Route::delete('/{userAppointmentFee}', [UserAppointmentFeeController::class, 'destroy'])->name('destroy');
+        });
     });
 
 // end manager  routes
