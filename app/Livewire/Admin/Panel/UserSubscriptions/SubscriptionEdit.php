@@ -15,7 +15,7 @@ class SubscriptionEdit extends Component
 {
     public UserSubscription $userSubscription;
     public $user_id;
-    public $membership_plan_id;
+    public $plan_id;
     public $start_date;
     public $end_date;
     public $status;
@@ -31,7 +31,7 @@ class SubscriptionEdit extends Component
 
         $this->userSubscription = $userSubscription;
         $this->user_id = $userSubscription->user_id;
-        $this->membership_plan_id = $userSubscription->membership_plan_id;
+        $this->plan_id = $userSubscription->plan_id;
         $this->start_date = $userSubscription->start_date
             ? Jalalian::fromCarbon(\Carbon\Carbon::parse($userSubscription->start_date))->format('Y/m/d')
             : null;
@@ -41,13 +41,20 @@ class SubscriptionEdit extends Component
         $this->status = $userSubscription->status;
         $this->description = $userSubscription->description;
 
-        $this->users = User::select('id', 'name')->get();
+        $this->users = User::select('id', 'first_name', 'last_name')
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->first_name . ' ' . $user->last_name
+                ];
+            });
         $this->plans = UserMembershipPlan::where('status', true)->select('id', 'name')->get();
 
         Log::info('Subscription Edit Loaded', [
             'id' => $userSubscription->id,
             'user_id' => $this->user_id,
-            'membership_plan_id' => $this->membership_plan_id,
+            'plan_id' => $this->plan_id,
         ]);
     }
 
@@ -55,21 +62,21 @@ class SubscriptionEdit extends Component
     {
         Log::info('Subscription Edit Input', [
             'user_id' => $this->user_id,
-            'membership_plan_id' => $this->membership_plan_id,
+            'plan_id' => $this->plan_id,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
         ]);
 
         $validator = Validator::make([
             'user_id' => $this->user_id,
-            'membership_plan_id' => $this->membership_plan_id,
+            'plan_id' => $this->plan_id,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'status' => $this->status,
             'description' => $this->description,
         ], [
             'user_id' => 'required|exists:users,id',
-            'membership_plan_id' => 'required|exists:user_membership_plans,id',
+            'plan_id' => 'required|exists:user_membership_plans,id',
             'start_date' => 'required|string|max:10',
             'end_date' => 'required|string|max:10|after:start_date',
             'status' => 'required|boolean',
@@ -77,8 +84,8 @@ class SubscriptionEdit extends Component
         ], [
             'user_id.required' => 'لطفاً کاربر را انتخاب کنید.',
             'user_id.exists' => 'کاربر انتخاب‌شده معتبر نیست.',
-            'membership_plan_id.required' => 'لطفاً طرح عضویت را انتخاب کنید.',
-            'membership_plan_id.exists' => 'طرح عضویت انتخاب‌شده معتبر نیست.',
+            'plan_id.required' => 'لطفاً طرح عضویت را انتخاب کنید.',
+            'plan_id.exists' => 'طرح عضویت انتخاب‌شده معتبر نیست.',
             'start_date.required' => 'لطفاً تاریخ شروع را وارد کنید.',
             'start_date.string' => 'تاریخ شروع باید به فرمت صحیح باشد.',
             'start_date.max' => 'تاریخ شروع نباید بیشتر از ۱۰ کاراکتر باشد.',
@@ -109,7 +116,7 @@ class SubscriptionEdit extends Component
 
         $this->userSubscription->update([
             'user_id' => $this->user_id,
-            'membership_plan_id' => $this->membership_plan_id,
+            'plan_id' => $this->plan_id,
             'start_date' => $startDateMiladi,
             'end_date' => $endDateMiladi,
             'status' => $this->status,

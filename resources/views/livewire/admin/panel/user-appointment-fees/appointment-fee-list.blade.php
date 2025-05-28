@@ -84,7 +84,7 @@
                       <td class="text-center align-middle">{{ $fees->firstItem() + $index }}</td>
                       <td class="align-middle">{{ $fee->name }}</td>
                       <td class="align-middle">{{ number_format($fee->price) }} تومان</td>
-                      <td class="align-middle">{{ $fee->discount }}%</td>
+                      <td class="align-middle">{{ $fee->discount .'%' ?? '---' }}</td>
                       <td class="text-center align-middle">
                         <span class="badge {{ $fee->status ? 'bg-label-success' : 'bg-label-danger' }} border-0">
                           {{ $fee->status ? 'فعال' : 'غیرفعال' }}

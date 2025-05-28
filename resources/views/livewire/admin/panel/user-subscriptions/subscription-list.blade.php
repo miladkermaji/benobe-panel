@@ -64,7 +64,7 @@
                     @endif
                   </th>
                   <th class="align-middle cursor-pointer" wire:click="sortBy('user_id')">کاربر</th>
-                  <th class="align-middle cursor-pointer" wire:click="sortBy('membership_plan_id')">طرح عضویت</th>
+                  <th class="align-middle cursor-pointer" wire:click="sortBy('plan_id')">طرح عضویت</th>
                   <th class="align-middle cursor-pointer" wire:click="sortBy('start_date')">تاریخ شروع</th>
                   <th class="align-middle cursor-pointer" wire:click="sortBy('end_date')">تاریخ پایان</th>
                   <th class="text-center align-middle cursor-pointer" style="width: 100px;"
@@ -81,8 +81,8 @@
                           class="form-check-input m-0">
                       </td>
                       <td class="text-center align-middle">{{ $subscriptions->firstItem() + $index }}</td>
-                      <td class="align-middle">{{ $subscription->user->name }}</td>
-                      <td class="align-middle">{{ $subscription->membershipPlan->name }}</td>
+                      <td class="align-middle">{{ $subscription->user->full_name ?? 'نامشخص' }}</td>
+                      <td class="align-middle">{{ $subscription->plan->name ?? 'نامشخص' }}</td>
                       <td class="align-middle">
                         {{ \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($subscription->start_date))->format('Y/m/d') }}
                       </td>
@@ -151,8 +151,8 @@
                 <input type="checkbox" wire:model.live="selectedSubscriptions" value="{{ $subscription->id }}"
                   class="form-check-input m-0">
                 <div>
-                  <h6 class="mb-1">{{ $subscription->user->name }}</h6>
-                  <small class="text-muted">{{ $subscription->membershipPlan->name }}</small>
+                  <h6 class="mb-1">{{ $subscription->user->full_name ?? 'نامشخص' }}</h6>
+                  <small class="text-muted">{{ $subscription->plan->name ?? 'نامشخص' }}</small>
                 </div>
               </div>
               <div class="row g-3">

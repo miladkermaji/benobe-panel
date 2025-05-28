@@ -65,7 +65,6 @@ class AppointmentFeeCreate extends Component
             'discount' => $this->discount,
             'description' => $this->description,
             'status' => $this->status,
-            'user_id' => Auth::guard('manager')->user()->id,
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'حق نوبت با موفقیت ایجاد شد!');

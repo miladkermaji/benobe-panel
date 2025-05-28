@@ -19,7 +19,7 @@ class AppointmentFeeEdit extends Component
 
     public function mount(UserAppointmentFee $userAppointmentFee)
     {
-        if ($userAppointmentFee->user_id !== Auth::guard('manager')->user()->id) {
+        if (!Auth::guard('manager')->user()->id) {
             abort(403, 'دسترسی غیرمجاز');
         }
 

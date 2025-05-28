@@ -1,17 +1,18 @@
-
-
 <div class="container-fluid py-4" dir="rtl">
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
-    <div class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div
+      class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-bounce">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">ویرایش اشتراک</h5>
       </div>
       <a href="{{ route('admin.panel.user-subscriptions.index') }}"
         class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">
-        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
           <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         بازگشت
@@ -26,26 +27,28 @@
               <select wire:model.live="user_id" class="form-select select2" id="user_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($users as $user)
-                  <option value="{{ $user->id }}">{{ $user->name }}</option>
+                  <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
                 @endforeach
               </select>
               <label for="user_id" class="form-label">کاربر</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model="membership_plan_id" class="form-select select2" id="membership_plan_id">
+              <select wire:model="plan_id" class="form-select select2" id="plan_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($plans as $plan)
                   <option value="{{ $plan->id }}">{{ $plan->name }}</option>
                 @endforeach
               </select>
-              <label for="membership_plan_id" class="form-label">طرح عضویت</label>
+              <label for="plan_id" class="form-label">طرح عضویت</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="start_date" class="form-control jalali-datepicker text-end" id="start_date" placeholder="" data-jdp>
+              <input type="text" wire:model="start_date" class="form-control jalali-datepicker text-end"
+                id="start_date" placeholder="" data-jdp>
               <label for="start_date" class="form-label">تاریخ شروع</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="end_date" class="form-control jalali-datepicker text-end" id="end_date" placeholder="" data-jdp>
+              <input type="text" wire:model="end_date" class="form-control jalali-datepicker text-end" id="end_date"
+                placeholder="" data-jdp>
               <label for="end_date" class="form-label">تاریخ پایان</label>
             </div>
             <div class="col-12 position-relative mt-5">
@@ -56,15 +59,18 @@
               <div class="form-check form-switch w-100 d-flex align-items-center">
                 <input class="form-check-input" type="checkbox" id="status" wire:model="status">
                 <label class="form-check-label fw-medium" for="status">
-                  وضعیت: <span class="px-2 text-{{ $status ? 'success' : 'danger' }}">{{ $status ? 'فعال' : 'غیرفعال' }}</span>
+                  وضعیت: <span
+                    class="px-2 text-{{ $status ? 'success' : 'danger' }}">{{ $status ? 'فعال' : 'غیرفعال' }}</span>
                 </label>
               </div>
             </div>
           </div>
 
           <div class="text-end mt-4 w-100 d-flex justify-content-end">
-            <button wire:click="save" class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button wire:click="save"
+              class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
               </svg>
               به‌روزرسانی اشتراک
@@ -83,24 +89,29 @@
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
-        $('#membership_plan_id').select2({
+        $('#plan_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
 
         const userId = @json($user_id);
-        const planId = @json($membership_plan_id);
-        $('#user_id').val(userId || '').trigger('change');
-        $('#membership_plan_id').val(planId || '').trigger('change');
+        const planId = @json($plan_id);
+
+        if (userId) {
+          $('#user_id').val(userId).trigger('change');
+        }
+        if (planId) {
+          $('#plan_id').val(planId).trigger('change');
+        }
       }
       initializeSelect2();
 
       $('#user_id').on('change', function() {
         @this.set('user_id', $(this).val());
       });
-      $('#membership_plan_id').on('change', function() {
-        @this.set('membership_plan_id', $(this).val());
+      $('#plan_id').on('change', function() {
+        @this.set('plan_id', $(this).val());
       });
 
       jalaliDatepicker.startWatch({

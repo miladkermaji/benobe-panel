@@ -24,7 +24,14 @@ class SubscriptionCreate extends Component
 
     public function mount()
     {
-        $this->users = User::select('id', 'first_name','last_name')->get();
+        $this->users = User::select('id', 'first_name', 'last_name')
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->first_name . ' ' . $user->last_name
+                ];
+            });
         $this->plans = UserMembershipPlan::where('status', true)->select('id', 'name')->get();
     }
 
@@ -84,18 +91,31 @@ class SubscriptionCreate extends Component
             return;
         }
 
-        UserSubscription::create([
-            'user_id' => $this->user_id,
-            'membership_plan_id' => $this->membership_plan_id,
-            'start_date' => $startDateMiladi,
-            'end_date' => $endDateMiladi,
-            'status' => $this->status,
-            'description' => $this->description,
-            'admin_id' => Auth::guard('manager')->user()->id,
-        ]);
+        $plan = UserMembershipPlan::find($this->membership_plan_id);
 
-        $this->dispatch('show-alert', type: 'success', message: 'اشتراک با موفقیت ایجاد شد!');
-        return redirect()->route('admin.panel.user-subscriptions.index');
+        if (!$plan) {
+            $this->dispatch('show-alert', type: 'error', message: 'طرح عضویت یافت نشد.');
+            return;
+        }
+
+        try {
+            UserSubscription::create([
+                'user_id' => $this->user_id,
+                'plan_id' => $this->membership_plan_id,
+                'start_date' => $startDateMiladi,
+                'end_date' => $endDateMiladi,
+                'status' => $this->status,
+                'description' => $this->description,
+                'admin_id' => Auth::guard('manager')->user()->id,
+                'remaining_appointments' => $plan->appointment_count ?? 0
+            ]);
+
+            $this->dispatch('show-alert', type: 'success', message: 'اشتراک با موفقیت ایجاد شد!');
+            return redirect()->route('admin.panel.user-subscriptions.index');
+        } catch (\Exception $e) {
+            Log::error('Error creating subscription: ' . $e->getMessage());
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در ایجاد اشتراک. لطفاً دوباره تلاش کنید.');
+        }
     }
 
     public function render()

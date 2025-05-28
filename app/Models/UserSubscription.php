@@ -16,6 +16,9 @@ class UserSubscription extends Model
         'start_date',
         'end_date',
         'status',
+        'description',
+        'admin_id',
+        'remaining_appointments'
     ];
 
     protected $casts = [
@@ -25,7 +28,7 @@ class UserSubscription extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function plan()

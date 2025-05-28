@@ -58,10 +58,6 @@ class AppointmentFeeList extends Component
     public function delete($id)
     {
         $fee = UserAppointmentFee::findOrFail($id);
-        if ($fee->user_id !== Auth::guard('manager')->user()->id) {
-            $this->dispatch('show-alert', type: 'error', message: 'دسترسی غیرمجاز برای حذف حق نوبت.');
-            return;
-        }
         $fee->delete();
         $this->dispatch('show-alert', type: 'success', message: 'حق نوبت با موفقیت حذف شد!');
         $this->resetPage();
@@ -91,9 +87,7 @@ class AppointmentFeeList extends Component
             return;
         }
 
-        UserAppointmentFee::whereIn('id', $this->selectedFees)
-            ->where('user_id', Auth::guard('manager')->user()->id)
-            ->delete();
+        UserAppointmentFee::whereIn('id', $this->selectedFees)->delete();
         $this->selectedFees = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'حق نوبت‌های انتخاب‌شده حذف شدند!');
@@ -107,7 +101,6 @@ class AppointmentFeeList extends Component
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('description', 'like', '%' . $this->search . '%');
             })
-            ->where('user_id', Auth::guard('manager')->user()->id)
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
     }

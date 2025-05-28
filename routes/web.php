@@ -431,7 +431,7 @@ Route::prefix('admin')
             Route::get('/', [UserAppointmentFeeController::class, 'index'])->name('admin.panel.user-appointment-fees.index');
             Route::get('/create', [UserAppointmentFeeController::class, 'create'])->name('admin.panel.user-appointment-fees.create');
             Route::post('/', [UserAppointmentFeeController::class, 'store'])->name('admin.panel.user-appointment-fees.store');
-            Route::get('/{userAppointmentFee}/edit', [UserAppointmentFeeController::class, 'admin.panel.user-appointment-fees.edit'])->name('edit');
+            Route::get('/{userAppointmentFee}/edit', [UserAppointmentFeeController::class, 'edit'])->name('admin.panel.user-appointment-fees.edit');
             Route::put('/{userAppointmentFee}', [UserAppointmentFeeController::class, 'update'])->name('admin.panel.user-appointment-fees.update');
             Route::delete('/{userAppointmentFee}', [UserAppointmentFeeController::class, 'destroy'])->name('admin.panel.user-appointment-fees.destroy');
         });

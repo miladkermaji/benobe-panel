@@ -15,6 +15,8 @@ return new class () extends Migration {
             $table->date('end_date');
             $table->integer('remaining_appointments');
             $table->boolean('status')->default(true);
+            $table->foreignId('admin_id')->nullable()->constrained('managers')->onDelete('set null');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

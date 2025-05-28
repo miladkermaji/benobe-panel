@@ -102,15 +102,15 @@ class SubscriptionList extends Component
     private function getSubscriptionsQuery()
     {
         return UserSubscription::query()
-            ->with(['user', 'membershipPlan'])
+            ->with(['user', 'plan'])
             ->when($this->search, function ($query) {
                 $query->whereHas('user', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('mobile', 'like', '%' . $this->search . '%')
+                    $q->where('mobile', 'like', '%' . $this->search . '%')
+                        ->orWhere('first_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('last_name', 'like', '%' . $this->search . '%')
                         ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%']);
                 });
             })
-            
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
     }
