@@ -104,6 +104,62 @@
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
 <script>
+$(document).ready(function() {
+   
 
+    // مدیریت تاگل‌ها
+    $('.toggle-header').on('click', function() {
+        const secretaryId = $(this).data('secretary-id');
+        const content = $(this).siblings('.permissions-content');
+        const icon = $(this).find('.toggle-icon');
+
+        content.toggleClass('d-none');
+        icon.toggleClass('rotate-180');
+    });
+
+    let updateTimer;
+
+    function updatePermissions(secretaryId) {
+        let permissions = [];
+        let selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
+
+        $('input[data-secretary-id="' + secretaryId + '"]:checked').each(function() {
+            permissions.push($(this).val());
+        });
+
+        $.ajax({
+            url: "{{ route('dr-secretary-permissions-update', ':id') }}".replace(':id', secretaryId),
+            method: "POST",
+            data: {
+                permissions: permissions,
+                selectedClinicId: selectedClinicId,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                }
+            },
+            error: function() {
+                toastr.error('مشکلی در ذخیره اطلاعات پیش آمد.');
+            }
+        });
+    }
+
+    $('.parent-permission').change(function() {
+        let isChecked = $(this).is(':checked');
+        let parentKey = $(this).val();
+        let secretaryId = $(this).data('secretary-id');
+        $(this).closest('.permission-item').find(`.child-permission[data-parent="${parentKey}"]`).prop('checked', isChecked);
+        clearTimeout(updateTimer);
+        updateTimer = setTimeout(() => updatePermissions(secretaryId), 500);
+    });
+
+    $('.update-permissions').change(function() {
+        let secretaryId = $(this).data('secretary-id');
+        clearTimeout(updateTimer);
+        updateTimer = setTimeout(() => updatePermissions(secretaryId), 500);
+    });
+});
 </script>
 @endsection

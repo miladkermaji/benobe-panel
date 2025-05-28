@@ -44,10 +44,10 @@ class SecretaryPermissionController extends Controller
 
     public function update(Request $request, $secretaryId)
     {
-        $doctor   = auth()->guard('doctor')->user();
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $clinicId = $request->input('selectedClinicId') === 'default' ? null : $request->input('selectedClinicId');
 
-        if (! $doctor) {
+        if (!$doctor) {
             return response()->json([
                 'success' => false,
                 'message' => 'شما اجازه‌ی این عملیات را ندارید.',
@@ -58,8 +58,11 @@ class SecretaryPermissionController extends Controller
             'permissions' => 'array',
         ]);
 
+        // اگر کاربر منشی است، از doctor_id آن استفاده می‌کنیم
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
         // یافتن دسترسی موجود بر اساس doctor_id, secretary_id و clinic_id
-        $permission = SecretaryPermission::where('doctor_id', $doctor->id)
+        $permission = SecretaryPermission::where('doctor_id', $doctorId)
             ->where('secretary_id', $secretaryId)
             ->where(function ($query) use ($clinicId) {
                 if ($clinicId) {
@@ -77,7 +80,7 @@ class SecretaryPermissionController extends Controller
         } else {
             // اگر نبود، ایجاد کن
             SecretaryPermission::create([
-                'doctor_id'    => $doctor->id,
+                'doctor_id'    => $doctorId,
                 'secretary_id' => $secretaryId,
                 'clinic_id'    => $clinicId,
                 'permissions'  => json_encode($request->permissions),
@@ -89,5 +92,4 @@ class SecretaryPermissionController extends Controller
             'message' => 'دسترسی‌های منشی با موفقیت ویرایش شد.',
         ]);
     }
-
 }
