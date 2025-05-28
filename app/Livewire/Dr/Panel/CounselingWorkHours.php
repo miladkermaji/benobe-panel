@@ -1111,7 +1111,7 @@ class CounselingWorkHours extends Component
             ];
 
             foreach ($daysOfWeek as $weekDay) {
-                $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                $schedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
                     ->where('day', $weekDay)
                     ->where(function ($query) {
                         if ($this->activeClinicId !== 'default') {
@@ -1123,7 +1123,7 @@ class CounselingWorkHours extends Component
                     ->first();
 
                 if (!$schedule) {
-                    $schedule = DoctorWorkSchedule::create([
+                    $schedule = DoctorCounselingWorkSchedule::create([
                         'doctor_id' => $doctorId,
                         'day' => $weekDay,
                         'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
