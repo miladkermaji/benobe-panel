@@ -6,16 +6,38 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\UserAppointmentFee;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AppointmentFeeList extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'pagination';
+    protected $listeners = ['deleteAppointmentFeeConfirmed' => 'delete', 'refreshList' => '$refresh'];
+
     public $search = '';
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
+    public $perPage = 10;
+    public $readyToLoad = false;
+    public $selectedFees = [];
+    public $selectAll = false;
 
-    protected $listeners = ['refreshList' => '$refresh'];
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'sortField' => ['except' => 'created_at'],
+        'sortDirection' => ['except' => 'desc'],
+    ];
+
+    public function mount()
+    {
+        $this->perPage = max($this->perPage, 1);
+    }
+
+    public function loadFees()
+    {
+        $this->readyToLoad = true;
+    }
 
     public function sortBy($field)
     {
@@ -25,27 +47,76 @@ class AppointmentFeeList extends Component
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
+        $this->resetPage();
     }
 
-    public function delete(UserAppointmentFee $fee)
+    public function confirmDelete($id)
     {
+        $this->dispatch('confirm-delete', id: $id);
+    }
+
+    public function delete($id)
+    {
+        $fee = UserAppointmentFee::findOrFail($id);
+        if ($fee->user_id !== Auth::guard('manager')->user()->id) {
+            $this->dispatch('show-alert', type: 'error', message: 'دسترسی غیرمجاز برای حذف حق نوبت.');
+            return;
+        }
         $fee->delete();
-        $this->dispatch('refreshList');
-        session()->flash('success', 'حق نوبت با موفقیت حذف شد.');
+        $this->dispatch('show-alert', type: 'success', message: 'حق نوبت با موفقیت حذف شد!');
+        $this->resetPage();
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSelectAll($value)
+    {
+        $currentPageIds = $this->getFeesQuery()->pluck('id')->toArray();
+        $this->selectedFees = $value ? $currentPageIds : [];
+    }
+
+    public function updatedSelectedFees()
+    {
+        $currentPageIds = $this->getFeesQuery()->pluck('id')->toArray();
+        $this->selectAll = !empty($this->selectedFees) && count(array_diff($currentPageIds, $this->selectedFees)) === 0;
+    }
+
+    public function deleteSelected()
+    {
+        if (empty($this->selectedFees)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ حق نوبتی انتخاب نشده است.');
+            return;
+        }
+
+        UserAppointmentFee::whereIn('id', $this->selectedFees)
+            ->where('user_id', Auth::guard('manager')->user()->id)
+            ->delete();
+        $this->selectedFees = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'حق نوبت‌های انتخاب‌شده حذف شدند!');
+        $this->resetPage();
+    }
+
+    private function getFeesQuery()
+    {
+        return UserAppointmentFee::query()
+            ->when($this->search, function ($query) {
+                $query->where('name', 'like', '%' . $this->search . '%')
+                      ->orWhere('description', 'like', '%' . $this->search . '%');
+            })
+            ->where('user_id', Auth::guard('manager')->user()->id)
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate($this->perPage);
     }
 
     public function render()
     {
-        $fees = UserAppointmentFee::query()
-            ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%');
-            })
-            ->where('user_id', Auth::guard('manager')->user()->id)
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(10);
-
+        $fees = $this->readyToLoad ? $this->getFeesQuery() : null;
         return view('livewire.admin.panel.user-appointment-fees.appointment-fee-list', [
-            'fees' => $fees
+            'fees' => $fees,
         ]);
     }
 }
