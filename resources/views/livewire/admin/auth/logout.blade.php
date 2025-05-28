@@ -19,7 +19,7 @@
                     <span wire:loading.remove wire:target="logout">خروج</span>
                     <div wire:loading wire:target="logout" class="spinner-border spinner-border-sm ms-2" role="status"></div>
                 </button>
-                <a href="{{ route('admin-panel') }}" class="btn btn-outline-primary rounded-pill py-2 px-5 btn-hover">بازگشت</a>
+                <a href="{{ route('admin-panel') }}" class="btn  btn-primary rounded-pill py-2 px-5 btn-hover">بازگشت</a>
             </div>
         </div>
     </div>
