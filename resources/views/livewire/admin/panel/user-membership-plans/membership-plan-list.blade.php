@@ -6,7 +6,7 @@
           <input wire:model.live="search" type="text" class="form-control" placeholder="جستجو...">
         </div>
         <div>
-          <a href="{{ route('admin.user-membership-plans.create') }}" class="btn btn-primary">
+          <a href="{{ route('admin.panel.user-membership-plans.create') }}" class="btn btn-primary">
             <i class="fa fa-plus"></i>
             افزودن طرح عضویت جدید
           </a>

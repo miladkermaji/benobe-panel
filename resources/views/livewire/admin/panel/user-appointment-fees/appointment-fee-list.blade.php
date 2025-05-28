@@ -6,7 +6,7 @@
           <input wire:model.live="search" type="text" class="form-control" placeholder="جستجو...">
         </div>
         <div>
-          <a href="{{ route('admin.user-appointment-fees.create') }}" class="btn btn-primary">
+          <a href="{{ route('admin.panel.user-appointment-fees.create') }}" class="btn btn-primary">
             <i class="fa fa-plus"></i>
             افزودن حق نوبت جدید
           </a>

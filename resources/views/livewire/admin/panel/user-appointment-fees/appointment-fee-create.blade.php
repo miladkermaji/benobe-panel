@@ -69,7 +69,7 @@
         <div class="row mt-4">
           <div class="col-12">
             <button type="submit" class="btn btn-primary">ذخیره</button>
-            <a href="{{ route('admin.user-appointment-fees.index') }}" class="btn btn-secondary">بازگشت</a>
+            <a href="{{ route('admin.panel.user-appointment-fees.index') }}" class="btn btn-secondary">بازگشت</a>
           </div>
         </div>
       </form>

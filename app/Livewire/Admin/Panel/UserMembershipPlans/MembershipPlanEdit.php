@@ -58,7 +58,7 @@ class MembershipPlanEdit extends Component
         ]);
 
         session()->flash('success', 'طرح عضویت با موفقیت ویرایش شد.');
-        return redirect()->route('admin.user-membership-plans.index');
+        return redirect()->route('admin.panel.user-membership-plans.index');
     }
 
     public function render()

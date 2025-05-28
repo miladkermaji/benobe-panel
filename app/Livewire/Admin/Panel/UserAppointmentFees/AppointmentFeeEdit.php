@@ -50,7 +50,7 @@ class AppointmentFeeEdit extends Component
         ]);
 
         session()->flash('success', 'حق نوبت با موفقیت ویرایش شد.');
-        return redirect()->route('admin.user-appointment-fees.index');
+        return redirect()->route('admin.panel.user-appointment-fees.index');
     }
 
     public function render()
