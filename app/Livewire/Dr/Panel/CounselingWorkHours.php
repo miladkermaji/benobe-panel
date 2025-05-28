@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\DoctorCounselingWorkSchedule;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
-use App\Models\Doctor;
 
 class CounselingWorkHours extends Component
 {
@@ -89,8 +88,6 @@ class CounselingWorkHours extends Component
     public $emergencyModalIndex;
     public $isEmergencyModalOpen = false;
     public $selectAllScheduleModal = false;
-    public $doctorId;
-    public $doctor;
 
     protected $rules = [
         'selectedDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
@@ -132,15 +129,98 @@ class CounselingWorkHours extends Component
         'selectedScheduleDays.min' => 'لطفاً حداقل یک روز را انتخاب کنید.',
     ];
 
-    public function mount()
+    public function mount($clinicId = null)
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
+
+        $this->clinicId = $clinicId;
+        $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
+        $this->activeClinicId = $this->clinicId ?? $this->selectedClinicId;
+        session(['selectedClinicId' => $this->selectedClinicId]);
+
+        // دریافت یا ایجاد تنظیمات مشاوره
+        $this->appointmentConfig = DoctorCounselingConfig::firstOrCreate(
+            [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+            ],
+            [
+                'auto_scheduling' => true,
+                'online_consultation' => false,
+                'holiday_availability' => false,
+                'has_phone_counseling' => false,
+                'has_text_counseling' => false,
+                'has_video_counseling' => false,
+                'price_15min' => null,
+                'price_30min' => null,
+                'price_45min' => null,
+                'price_60min' => null,
+            ]
+        );
+
+        // تنظیم مقادیر پراپرتی‌ها
+        $this->autoScheduling = $this->appointmentConfig->auto_scheduling;
+        $this->calendarDays = $this->appointmentConfig->calendar_days ?? 30;
+        $this->onlineConsultation = $this->appointmentConfig->online_consultation;
+        $this->holidayAvailability = $this->appointmentConfig->holiday_availability;
+        $this->has_phone_counseling = $this->appointmentConfig->has_phone_counseling;
+        $this->has_text_counseling = $this->appointmentConfig->has_text_counseling;
+        $this->has_video_counseling = $this->appointmentConfig->has_video_counseling;
+        $this->price_15min = $this->appointmentConfig->price_15min;
+        $this->price_30min = $this->appointmentConfig->price_30min;
+        $this->price_45min = $this->appointmentConfig->price_45min;
+        $this->price_60min = $this->appointmentConfig->price_60min;
+
+        $this->refreshWorkSchedules();
+
+        $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        foreach ($daysOfWeek as $day) {
+            if (!collect($this->workSchedules)->firstWhere('day', $day)) {
+                DoctorCounselingWorkSchedule::create([
+                    'doctor_id' => $doctorId,
+                    'day' => $day,
+                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'is_working' => false,
+                    'work_hours' => json_encode([]),
+                    'appointment_settings' => json_encode([]),
+                    'emergency_times' => json_encode([]),
+                ]);
+            }
         }
-        $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-        $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
-        $this->loadWorkSchedules();
+
+        $this->refreshWorkSchedules();
+
+        $this->isWorking = array_fill_keys($daysOfWeek, false);
+        $this->slots = array_fill_keys($daysOfWeek, []);
+        foreach ($daysOfWeek as $day) {
+            $schedule = collect($this->workSchedules)->firstWhere('day', $day);
+            if ($schedule) {
+                $this->isWorking[$day] = (bool) $schedule['is_working'];
+                $workHours = !empty($schedule['work_hours']) ? $schedule['work_hours'] : [];
+                if (!empty($workHours)) {
+                    foreach ($workHours as $index => $slot) {
+                        $this->slots[$day][$index] = [
+                            'id' => $schedule['id'] . '-' . $index,
+                            'start_time' => $slot['start'] ?? null,
+                            'end_time' => $slot['end'] ?? null,
+                            'max_appointments' => $slot['max_appointments'] ?? null,
+                        ];
+                    }
+                }
+            }
+            if (empty($this->slots[$day])) {
+                $this->slots[$day][] = [
+                    'id' => null,
+                    'start_time' => null,
+                    'end_time' => null,
+                    'max_appointments' => null,
+                ];
+            }
+        }
+
+        $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
+        $this->dispatch('refresh-clinic-data');
     }
 
     public function setSelectedClinicId($clinicId)
@@ -167,7 +247,9 @@ class CounselingWorkHours extends Component
             false
         );
 
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
+
         $schedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
             ->where('day', $day)
             ->where(function ($query) {
@@ -253,7 +335,9 @@ class CounselingWorkHours extends Component
             $newStartMinutes = $timeToMinutes($startTime);
             $newEndMinutes = $timeToMinutes($endTime);
 
-            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+            $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
+
             $dayTranslations = [
                 'saturday' => 'شنبه',
                 'sunday' => 'یکشنبه',
@@ -367,7 +451,9 @@ class CounselingWorkHours extends Component
                 'scheduleModalDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
             ]);
 
-            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+            $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
+
             $schedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $day)
                 ->where(function ($query) {
@@ -422,7 +508,9 @@ class CounselingWorkHours extends Component
 
     public function refreshWorkSchedules()
     {
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
+
         $this->workSchedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
             ->where(function ($query) {
                 if ($this->activeClinicId !== 'default') {
@@ -463,7 +551,9 @@ class CounselingWorkHours extends Component
 
     public function saveEmergencyTimes()
     {
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
+
         $schedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
             ->where('day', $this->emergencyModalDay)
             ->where(function ($query) {
@@ -529,9 +619,12 @@ class CounselingWorkHours extends Component
                 'price_60min' => 'nullable|numeric|min:0',
             ]);
 
-            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
 
             Log::info('Saving Counseling Config:', [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $this->activeClinicId,
                 'online_consultation' => $this->onlineConsultation,
                 'holiday_availability' => $this->holidayAvailability,
                 'has_phone_counseling' => $this->has_phone_counseling,
@@ -539,33 +632,46 @@ class CounselingWorkHours extends Component
                 'has_video_counseling' => $this->has_video_counseling,
             ]);
 
-            DoctorCounselingConfig::updateOrCreate(
-                [
-                    'doctor_id' => $doctor->id,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                ],
-                [
-                    'calendar_days' => $this->calendarDays,
-                    'holiday_availability' => (bool) $this->holidayAvailability,
-                    'auto_scheduling' => (bool) $this->autoScheduling,
-                    'online_consultation' => (bool) $this->onlineConsultation,
-                    'has_phone_counseling' => (bool) $this->has_phone_counseling,
-                    'has_text_counseling' => (bool) $this->has_text_counseling,
-                    'has_video_counseling' => (bool) $this->has_video_counseling,
-                    'price_15min' => $this->price_15min,
-                    'price_30min' => $this->price_30min,
-                    'price_45min' => $this->price_45min,
-                    'price_60min' => $this->price_60min,
-                ]
-            );
+            DB::beginTransaction();
+            try {
+                $config = DoctorCounselingConfig::updateOrCreate(
+                    [
+                        'doctor_id' => $doctorId,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    ],
+                    [
+                        'calendar_days' => $this->calendarDays,
+                        'holiday_availability' => (bool) $this->holidayAvailability,
+                        'auto_scheduling' => (bool) $this->autoScheduling,
+                        'online_consultation' => (bool) $this->onlineConsultation,
+                        'has_phone_counseling' => (bool) $this->has_phone_counseling,
+                        'has_text_counseling' => (bool) $this->has_text_counseling,
+                        'has_video_counseling' => (bool) $this->has_video_counseling,
+                        'price_15min' => $this->price_15min,
+                        'price_30min' => $this->price_30min,
+                        'price_45min' => $this->price_45min,
+                        'price_60min' => $this->price_60min,
+                    ]
+                );
 
-            $this->modalMessage = 'تنظیمات با موفقیت ذخیره شد';
-            $this->modalType = 'success';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => $this->modalMessage,
-                'type' => 'success',
-            ]);
+                DB::commit();
+
+                $this->modalMessage = 'تنظیمات با موفقیت ذخیره شد';
+                $this->modalType = 'success';
+                $this->modalOpen = true;
+                $this->dispatch('show-toastr', [
+                    'message' => $this->modalMessage,
+                    'type' => 'success',
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Error saving counseling config:', [
+                    'error' => $e->getMessage(),
+                    'doctor_id' => $doctorId,
+                    'clinic_id' => $this->activeClinicId
+                ]);
+                throw $e;
+            }
         } catch (\Exception $e) {
             $this->modalMessage = 'خطا در ذخیره تنظیمات: ' . $e->getMessage();
             $this->modalType = 'error';
@@ -602,7 +708,8 @@ class CounselingWorkHours extends Component
             return;
         }
 
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $sourceDay = $copySource['day'];
         $sourceIndex = (int) $copySource['index'];
 
@@ -895,7 +1002,6 @@ class CounselingWorkHours extends Component
         ];
         return $dayMap[$englishDay] ?? $englishDay;
     }
-
     public function saveCalculator()
     {
         try {
@@ -932,7 +1038,9 @@ class CounselingWorkHours extends Component
             ];
 
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-            $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+            $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $day)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
@@ -945,7 +1053,7 @@ class CounselingWorkHours extends Component
 
             if (!$workSchedule) {
                 $workSchedule = DoctorCounselingWorkSchedule::create([
-                    'doctor_id' => $doctor->id,
+                    'doctor_id' => $doctorId,
                     'day' => $day,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => true,
@@ -1003,7 +1111,7 @@ class CounselingWorkHours extends Component
             ];
 
             foreach ($daysOfWeek as $weekDay) {
-                $schedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
+                $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                     ->where('day', $weekDay)
                     ->where(function ($query) {
                         if ($this->activeClinicId !== 'default') {
@@ -1015,8 +1123,8 @@ class CounselingWorkHours extends Component
                     ->first();
 
                 if (!$schedule) {
-                    $schedule = DoctorCounselingWorkSchedule::create([
-                        'doctor_id' => $doctor->id,
+                    $schedule = DoctorWorkSchedule::create([
+                        'doctor_id' => $doctorId,
                         'day' => $weekDay,
                         'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                         'is_working' => false,
@@ -1093,111 +1201,117 @@ class CounselingWorkHours extends Component
 
     public function saveTimeSlot()
     {
-        $this->validate([
-            'selectedDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
-            'startTime' => 'required|date_format:H:i',
-            'endTime' => 'required|date_format:H:i|after:startTime',
-            'maxAppointments' => 'required|integer|min:1',
-        ]);
-
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-
         try {
-            $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
-                ->where('day', $this->selectedDay)
-                ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
-                    } else {
-                        $query->whereNull('clinic_id');
+            $this->validate([
+                'selectedDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
+                'startTime' => 'required|date_format:H:i',
+                'endTime' => 'required|date_format:H:i|after:startTime',
+                'maxAppointments' => 'required|integer|min:1',
+            ]);
+
+            $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
+
+            DB::beginTransaction();
+            try {
+                $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
+                    ->where('day', $this->selectedDay)
+                    ->where(function ($query) {
+                        if ($this->activeClinicId !== 'default') {
+                            $query->where('clinic_id', $this->activeClinicId);
+                        } else {
+                            $query->whereNull('clinic_id');
+                        }
+                    })
+                    ->first();
+
+                if (!$workSchedule) {
+                    $workSchedule = DoctorCounselingWorkSchedule::create([
+                        'doctor_id' => $doctorId,
+                        'day' => $this->selectedDay,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'is_working' => true,
+                        'work_hours' => json_encode([]),
+                    ]);
+                }
+
+                $existingWorkHours = json_decode($workSchedule->work_hours, true) ?? [];
+                $newSlot = [
+                    'start' => $this->startTime,
+                    'end' => $this->endTime,
+                    'max_appointments' => $this->maxAppointments,
+                ];
+
+                // Check for duplicate slots
+                $slotExists = array_filter($existingWorkHours, function ($slot) use ($newSlot) {
+                    return $slot['start'] === $newSlot['start'] && $slot['end'] === $newSlot['end'];
+                });
+
+                if (!empty($slotExists)) {
+                    throw new \Exception(sprintf(
+                        'بازه زمانی %s تا %s قبلاً برای روز %s ثبت شده است',
+                        $newSlot['start'],
+                        $newSlot['end'],
+                        $this->getPersianDay($this->selectedDay)
+                    ));
+                }
+
+                // Check for time conflicts
+                foreach ($existingWorkHours as $slot) {
+                    if ($this->isTimeConflict($newSlot['start'], $newSlot['end'], $slot['start'], $slot['end'])) {
+                        throw new \Exception(sprintf(
+                            'زمان %s تا %s با بازه زمانی موجود %s تا %s در روز %s تداخل دارد',
+                            $newSlot['start'],
+                            $newSlot['end'],
+                            $slot['start'],
+                            $slot['end'],
+                            $this->getPersianDay($this->selectedDay)
+                        ));
                     }
-                })
-                ->first();
+                }
 
-            if (!$workSchedule) {
-                $workSchedule = DoctorCounselingWorkSchedule::create([
-                    'doctor_id' => $doctor->id,
-                    'day' => $this->selectedDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                    'is_working' => true,
-                    'work_hours' => json_encode([]),
+                $existingWorkHours[] = $newSlot;
+                $workSchedule->update([
+                    'work_hours' => json_encode($existingWorkHours),
+                    'is_working' => true
                 ]);
-            }
 
-            $existingWorkHours = json_decode($workSchedule->work_hours, true) ?? [];
-            $newSlot = [
-                'start' => $this->startTime,
-                'end' => $this->endTime,
-                'max_appointments' => $this->maxAppointments,
-            ];
+                DB::commit();
 
-            $slotExists = array_filter($existingWorkHours, function ($slot) use ($newSlot) {
-                return $slot['start'] === $newSlot['start'] && $slot['end'] === $newSlot['end'];
-            });
+                $newSlotIndex = count($existingWorkHours) - 1;
+                $newSlotEntry = [
+                    'id' => $workSchedule->id . '-' . $newSlotIndex,
+                    'start_time' => $this->startTime,
+                    'end_time' => $this->endTime,
+                    'max_appointments' => $this->maxAppointments,
+                ];
 
-            if (!empty($slotExists)) {
-                $this->modalMessage = sprintf(
-                    'بازه زمانی %s تا %s قبلاً برای روز %s ثبت شده است',
-                    $newSlot['start'],
-                    $newSlot['end'],
-                    $this->getPersianDay($this->selectedDay)
-                );
-                $this->modalType = 'error';
+                if (!isset($this->slots[$this->selectedDay])) {
+                    $this->slots[$this->selectedDay] = [];
+                }
+                $this->slots[$this->selectedDay][] = $newSlotEntry;
+
+                $this->modalMessage = 'ساعت کاری با موفقیت ذخیره شد';
+                $this->modalType = 'success';
                 $this->modalOpen = true;
                 $this->dispatch('show-toastr', [
                     'message' => $this->modalMessage,
-                    'type' => 'error',
+                    'type' => 'success',
                 ]);
-                return;
+                $this->reset(['startTime', 'endTime', 'maxAppointments', 'selectedDay']);
+                $this->dispatch('refresh-work-hours');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Error saving time slot:', [
+                    'error' => $e->getMessage(),
+                    'doctor_id' => $doctorId,
+                    'day' => $this->selectedDay,
+                    'clinic_id' => $this->activeClinicId
+                ]);
+                throw $e;
             }
-
-            foreach ($existingWorkHours as $index => $slot) {
-                if ($this->isTimeConflict($newSlot['start'], $newSlot['end'], $slot['start'], $slot['end'])) {
-                    $this->modalMessage = sprintf(
-                        'زمان %s تا %s با بازه زمانی موجود %s تا %s در روز %s تداخل دارد',
-                        $newSlot['start'],
-                        $newSlot['end'],
-                        $slot['start'],
-                        $slot['end'],
-                        $this->getPersianDay($this->selectedDay)
-                    );
-                    $this->modalType = 'error';
-                    $this->modalOpen = true;
-                    $this->dispatch('show-toastr', [
-                        'message' => $this->modalMessage,
-                        'type' => 'error',
-                    ]);
-                    return;
-                }
-            }
-
-            $existingWorkHours[] = $newSlot;
-            $workSchedule->update(['work_hours' => json_encode($existingWorkHours), 'is_working' => true]);
-
-            $newSlotIndex = count($existingWorkHours) - 1;
-            $newSlotEntry = [
-                'id' => $workSchedule->id . '-' . $newSlotIndex,
-                'start_time' => $this->startTime,
-                'end_time' => $this->endTime,
-                'max_appointments' => $this->maxAppointments,
-            ];
-
-            if (!isset($this->slots[$this->selectedDay])) {
-                $this->slots[$this->selectedDay] = [];
-            }
-            $this->slots[$this->selectedDay][] = $newSlotEntry;
-
-            $this->modalMessage = 'ساعت کاری با موفقیت ذخیره شد';
-            $this->modalType = 'success';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => $this->modalMessage,
-                'type' => 'success',
-            ]);
-            $this->reset(['startTime', 'endTime', 'maxAppointments', 'selectedDay']);
-            $this->dispatch('refresh-work-hours');
         } catch (\Exception $e) {
-            $this->modalMessage = 'خطا در ذخیره‌سازی ساعت کاری';
+            $this->modalMessage = 'خطا در ذخیره‌سازی ساعت کاری: ' . $e->getMessage();
             $this->modalType = 'error';
             $this->modalOpen = true;
             $this->dispatch('show-toastr', [
@@ -1209,10 +1323,11 @@ class CounselingWorkHours extends Component
 
     public function deleteTimeSlot($day, $index)
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
 
         try {
-            $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
+            $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $day)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
@@ -1312,12 +1427,13 @@ class CounselingWorkHours extends Component
         }
 
         $englishDay = $dayMap[$day];
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
         $isWorking = isset($this->isWorking[$englishDay]) ? (bool) $this->isWorking[$englishDay] : false;
 
         try {
             $workSchedule = DoctorCounselingWorkSchedule::where([
-                'doctor_id' => $doctor->id,
+                'doctor_id' => $doctorId,
                 'day' => $englishDay,
                 'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
             ])->first();
@@ -1328,7 +1444,7 @@ class CounselingWorkHours extends Component
                 ]);
             } else {
                 $workSchedule = DoctorCounselingWorkSchedule::create([
-                    'doctor_id' => $doctor->id,
+                    'doctor_id' => $doctorId,
                     'day' => $englishDay,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => $isWorking,
@@ -1406,7 +1522,8 @@ class CounselingWorkHours extends Component
 
         $englishDay = $key;
         $persianDay = $dayMap[$englishDay] ?? null;
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
 
         if (!$persianDay) {
             $this->modalMessage = 'روز نامعتبر است';
@@ -1419,7 +1536,7 @@ class CounselingWorkHours extends Component
 
         try {
             $workSchedule = DoctorCounselingWorkSchedule::where([
-                'doctor_id' => $doctor->id,
+                'doctor_id' => $doctorId,
                 'day' => $englishDay,
                 'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
             ])->first();
@@ -1430,7 +1547,7 @@ class CounselingWorkHours extends Component
                 ]);
             } else {
                 $workSchedule = DoctorCounselingWorkSchedule::create([
-                    'doctor_id' => $doctor->id,
+                    'doctor_id' => $doctorId,
                     'day' => $englishDay,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => $isWorking,
@@ -1464,17 +1581,18 @@ class CounselingWorkHours extends Component
 
     public function updateAutoScheduling()
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
 
         try {
             DoctorCounselingConfig::updateOrCreate(
                 [
-                    'doctor_id' => $doctor->id,
+                    'doctor_id' => $doctorId,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                 ],
                 [
                     'auto_scheduling' => $this->autoScheduling,
-                    'doctor_id' => $doctor->id,
+                    'doctor_id' => $doctorId,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                 ]
             );

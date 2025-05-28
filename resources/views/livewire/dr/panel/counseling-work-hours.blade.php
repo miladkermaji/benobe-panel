@@ -1,6 +1,6 @@
 <div>
   <div>
-    <div class="w-100 d-flex justify-content-center mt-3" dir="ltr">
+    <div class="w-100 d-flex justify-content-center mt-5" dir="ltr">
       <div class="auto-scheule-content-top">
         <x-my-toggle-appointment :isChecked="$autoScheduling" id="appointment-toggle" day="مشاوره آنلاین" class="mt-3"
           wire:model="autoScheduling" wire:change="updateAutoScheduling" />
