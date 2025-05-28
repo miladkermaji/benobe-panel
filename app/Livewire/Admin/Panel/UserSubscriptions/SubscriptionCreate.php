@@ -3,9 +3,10 @@
 namespace App\Livewire\Admin\Panel\UserSubscriptions;
 
 use App\Models\User;
-use App\Models\UserMembershipPlan;
-use App\Models\UserSubscription;
 use Livewire\Component;
+use App\Models\UserSubscription;
+use App\Models\UserMembershipPlan;
+use Illuminate\Support\Facades\Auth;
 
 class SubscriptionCreate extends Component
 {
@@ -36,7 +37,8 @@ class SubscriptionCreate extends Component
             'end_date' => $this->end_date,
             'status' => $this->status,
             'description' => $this->description,
-            'admin_id' => auth('admin')->id()
+            'admin_id' => Auth::guard('manager')->user()->id
+            
         ]);
 
         session()->flash('success', 'اشتراک با موفقیت ایجاد شد.');
@@ -45,8 +47,8 @@ class SubscriptionCreate extends Component
 
     public function render()
     {
-        $users = User::where('user_id', auth('admin')->id())->get();
-        $plans = UserMembershipPlan::where('user_id', auth('admin')->id())->where('status', true)->get();
+        $users = User::where('user_id', Auth::guard('manager')->user()->id)->get();
+        $plans = UserMembershipPlan::where('user_id', Auth::guard('manager')->user()->id)->where('status', true)->get();
 
         return view('livewire.admin.panel.user-subscriptions.subscription-create', [
             'users' => $users,

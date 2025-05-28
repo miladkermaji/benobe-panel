@@ -24,6 +24,9 @@ use App\Http\Controllers\Dr\Panel\Turn\DrScheduleController;
 use App\Http\Controllers\Dr\Panel\Profile\DrProfileController;
 use App\Http\Controllers\Dr\Panel\Profile\LoginLogsController;
 use App\Http\Controllers\Admin\Panel\Setting\SettingController;
+use App\Http\Controllers\Admin\Panel\UserSubscriptionController;
+use App\Http\Controllers\Admin\Panel\UserAppointmentFeeController;
+use App\Http\Controllers\Admin\Panel\UserMembershipPlanController;
 use App\Http\Controllers\Dr\Panel\Tickets\TicketResponseController;
 use App\Http\Controllers\Admin\Panel\Profile\AdminProfileController;
 use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapController;
@@ -66,9 +69,6 @@ use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationW
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
-use App\Http\Controllers\Admin\Panel\Users\UserSubscriptionController;
-use App\Http\Controllers\Admin\Panel\Users\UserMembershipPlanController;
-use App\Http\Controllers\Admin\Panel\Users\UserAppointmentFeeController;
 
 //manager login routes
 /* login manager routes */
@@ -407,33 +407,33 @@ Route::prefix('admin')
         })->name('admin.panel.doctors.permissions');
 
         // User Subscriptions Routes
-        Route::prefix('user-subscriptions')->name('user-subscriptions.')->group(function () {
-            Route::get('/', [UserSubscriptionController::class, 'index'])->name('index');
-            Route::get('/create', [UserSubscriptionController::class, 'create'])->name('create');
-            Route::post('/', [UserSubscriptionController::class, 'store'])->name('store');
-            Route::get('/{userSubscription}/edit', [UserSubscriptionController::class, 'edit'])->name('edit');
-            Route::put('/{userSubscription}', [UserSubscriptionController::class, 'update'])->name('update');
-            Route::delete('/{userSubscription}', [UserSubscriptionController::class, 'destroy'])->name('destroy');
+        Route::prefix('user-subscriptions')->group(function () {
+            Route::get('/', [UserSubscriptionController::class, 'index'])->name('admin.panel.user-subscriptions.index');
+            Route::get('/create', [UserSubscriptionController::class, 'create'])->name('admin.panel.user-subscriptions.create');
+            Route::post('/', [UserSubscriptionController::class, 'store'])->name('admin.panel.user-subscriptions.store');
+            Route::get('/{userSubscription}/edit', [UserSubscriptionController::class, 'edit'])->name('admin.panel.user-subscriptions.edit');
+            Route::put('/{userSubscription}', [UserSubscriptionController::class, 'update'])->name('admin.panel.user-subscriptions.update');
+            Route::delete('/{userSubscription}', [UserSubscriptionController::class, 'destroy'])->name('admin.panel.user-subscriptions.destroy');
         });
 
         // User Membership Plans Routes
-        Route::prefix('user-membership-plans')->name('user-membership-plans.')->group(function () {
-            Route::get('/', [UserMembershipPlanController::class, 'index'])->name('index');
-            Route::get('/create', [UserMembershipPlanController::class, 'create'])->name('create');
-            Route::post('/', [UserMembershipPlanController::class, 'store'])->name('store');
-            Route::get('/{userMembershipPlan}/edit', [UserMembershipPlanController::class, 'edit'])->name('edit');
-            Route::put('/{userMembershipPlan}', [UserMembershipPlanController::class, 'update'])->name('update');
-            Route::delete('/{userMembershipPlan}', [UserMembershipPlanController::class, 'destroy'])->name('destroy');
+        Route::prefix('user-membership-plans')->group(function () {
+            Route::get('/', [UserMembershipPlanController::class, 'index'])->name('admin.panel.user-membership-plans.index');
+            Route::get('/create', [UserMembershipPlanController::class, 'create'])->name('admin.panel.user-membership-plans.create');
+            Route::post('/', [UserMembershipPlanController::class, 'store'])->name('admin.panel.user-membership-plans.store');
+            Route::get('/{userMembershipPlan}/edit', [UserMembershipPlanController::class, 'admin.panel.user-membership-plans.edit'])->name('edit');
+            Route::put('/{userMembershipPlan}', [UserMembershipPlanController::class, 'update'])->name('admin.panel.user-membership-plans.update');
+            Route::delete('/{userMembershipPlan}', [UserMembershipPlanController::class, 'destroy'])->name('admin.panel.user-membership-plans.destroy');
         });
 
         // User Appointment Fees Routes
-        Route::prefix('user-appointment-fees')->name('user-appointment-fees.')->group(function () {
-            Route::get('/', [UserAppointmentFeeController::class, 'index'])->name('index');
-            Route::get('/create', [UserAppointmentFeeController::class, 'create'])->name('create');
-            Route::post('/', [UserAppointmentFeeController::class, 'store'])->name('store');
-            Route::get('/{userAppointmentFee}/edit', [UserAppointmentFeeController::class, 'edit'])->name('edit');
-            Route::put('/{userAppointmentFee}', [UserAppointmentFeeController::class, 'update'])->name('update');
-            Route::delete('/{userAppointmentFee}', [UserAppointmentFeeController::class, 'destroy'])->name('destroy');
+        Route::prefix('user-appointment-fees')->group(function () {
+            Route::get('/', [UserAppointmentFeeController::class, 'index'])->name('admin.panel.user-appointment-fees.index');
+            Route::get('/create', [UserAppointmentFeeController::class, 'create'])->name('admin.panel.user-appointment-fees.create');
+            Route::post('/', [UserAppointmentFeeController::class, 'store'])->name('admin.panel.user-appointment-fees.store');
+            Route::get('/{userAppointmentFee}/edit', [UserAppointmentFeeController::class, 'admin.panel.user-appointment-fees.edit'])->name('edit');
+            Route::put('/{userAppointmentFee}', [UserAppointmentFeeController::class, 'update'])->name('admin.panel.user-appointment-fees.update');
+            Route::delete('/{userAppointmentFee}', [UserAppointmentFeeController::class, 'destroy'])->name('admin.panel.user-appointment-fees.destroy');
         });
     });
 

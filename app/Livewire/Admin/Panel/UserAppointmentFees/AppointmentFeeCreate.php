@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Panel\UserAppointmentFees;
 
-use App\Models\UserAppointmentFee;
 use Livewire\Component;
+use App\Models\UserAppointmentFee;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentFeeCreate extends Component
 {
@@ -31,7 +32,7 @@ class AppointmentFeeCreate extends Component
             'discount' => $this->discount,
             'description' => $this->description,
             'status' => $this->status,
-            'user_id' => auth('admin')->id()
+            'user_id' => Auth::guard('manager')->user()->id
         ]);
 
         session()->flash('success', 'حق نوبت با موفقیت ایجاد شد.');

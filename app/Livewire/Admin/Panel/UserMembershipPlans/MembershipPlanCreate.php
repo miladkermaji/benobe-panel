@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Panel\UserMembershipPlans;
 
-use App\Models\UserMembershipPlan;
 use Livewire\Component;
+use App\Models\UserMembershipPlan;
+use Illuminate\Support\Facades\Auth;
 
 class MembershipPlanCreate extends Component
 {
@@ -37,7 +38,7 @@ class MembershipPlanCreate extends Component
             'status' => $this->status,
             'duration' => $this->duration,
             'duration_type' => $this->duration_type,
-            'user_id' => auth('admin')->id()
+            'user_id' => Auth::guard('manager')->user()->id
         ]);
 
         session()->flash('success', 'طرح عضویت با موفقیت ایجاد شد.');

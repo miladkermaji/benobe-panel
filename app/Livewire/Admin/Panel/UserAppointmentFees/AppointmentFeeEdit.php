@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Panel\UserAppointmentFees;
 
-use App\Models\UserAppointmentFee;
 use Livewire\Component;
+use App\Models\UserAppointmentFee;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentFeeEdit extends Component
 {
@@ -24,7 +25,7 @@ class AppointmentFeeEdit extends Component
 
     public function mount(UserAppointmentFee $userAppointmentFee)
     {
-        if ($userAppointmentFee->user_id !== auth('admin')->id()) {
+        if ($userAppointmentFee->user_id !== Auth::guard('manager')->user()->id) {
             abort(403);
         }
 

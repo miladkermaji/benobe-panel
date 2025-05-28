@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Admin\Panel\UserSubscriptions;
 
-use App\Models\UserSubscription;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\UserSubscription;
+use Illuminate\Support\Facades\Auth;
 
 class SubscriptionList extends Component
 {
@@ -43,7 +44,7 @@ class SubscriptionList extends Component
                         ->orWhere('mobile', 'like', '%' . $this->search . '%');
                 });
             })
-            ->where('user_id', auth('admin')->id())
+            ->where('user_id', Auth::guard('manager')->user()->id)
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 

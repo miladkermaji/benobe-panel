@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Admin\Panel\UserMembershipPlans;
 
-use App\Models\UserMembershipPlan;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\UserMembershipPlan;
+use Illuminate\Support\Facades\Auth;
 
 class MembershipPlanList extends Component
 {
@@ -39,7 +40,7 @@ class MembershipPlanList extends Component
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%');
             })
-            ->where('user_id', auth('admin')->id())
+            ->where('user_id', Auth::guard('manager')->user()->id)
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(10);
 

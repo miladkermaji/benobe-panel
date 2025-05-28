@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Panel\UserMembershipPlans;
 
-use App\Models\UserMembershipPlan;
 use Livewire\Component;
+use App\Models\UserMembershipPlan;
+use Illuminate\Support\Facades\Auth;
 
 class MembershipPlanEdit extends Component
 {
@@ -28,7 +29,7 @@ class MembershipPlanEdit extends Component
 
     public function mount(UserMembershipPlan $userMembershipPlan)
     {
-        if ($userMembershipPlan->user_id !== auth('admin')->id()) {
+        if ($userMembershipPlan->user_id !== Auth::guard('manager')->user()->id) {
             abort(403);
         }
 

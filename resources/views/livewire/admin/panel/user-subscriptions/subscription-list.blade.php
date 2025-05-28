@@ -12,7 +12,7 @@
         </div>
       </div>
     </div>
-    <a href="{{ route('admin.user-subscriptions.create') }}"
+    <a href="{{ route('admin.panel.user-subscriptions.create') }}"
       class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
       افزودن اشتراک جدید
     </a>
