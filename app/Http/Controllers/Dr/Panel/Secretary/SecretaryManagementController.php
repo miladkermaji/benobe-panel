@@ -16,6 +16,7 @@ class SecretaryManagementController extends Controller
         $doctorId         = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
 
+
         $secretaries = Secretary::where('doctor_id', $doctorId)
             ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                 $query->where('clinic_id', $selectedClinicId);
@@ -23,7 +24,6 @@ class SecretaryManagementController extends Controller
                 $query->whereNull('clinic_id');
             })
             ->get();
-
         if ($request->ajax()) {
             return response()->json(['secretaries' => $secretaries]);
         }

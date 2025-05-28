@@ -4,7 +4,7 @@
   <link type="text/css" href="{{ asset('admin-assets/css/panel/clinic/clinic.css') }}" rel="stylesheet" />
   <style>
     .myPanelOption {
-      display: none;
+      display: none !important;
     }
   </style>
 @endsection
