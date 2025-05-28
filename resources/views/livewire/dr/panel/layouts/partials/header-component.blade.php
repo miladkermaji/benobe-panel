@@ -1,21 +1,22 @@
 <div>
-  <div
-    class="header d-flex item-center bg-white dark:bg-gray-800 width-100 custom-border-bottom transition-colors duration-300">
+  <div class="header d-flex item-center bg-white width-100 custom-border-bottom">
     <div class="w-100 d-flex align-items-center">
       <div class="header__right d-flex flex-grow-1 item-center">
         <span class="bars"></span>
         <div class="top-dr-panel d-flex justify-content-between w-100 align-items-start">
-          <div class="p-3 bg-white dark:bg-gray-800 stylish-breadcrumb" style="display: none">
+          <div class="p-3 bg-white stylish-breadcrumb" style="display: none">
             <nav aria-label="breadcrumb">
-              <ol class="breadcrumb bg-white dark:bg-gray-800 mb-0">
+              <ol class="breadcrumb bg-white mb-0">
                 <li class="breadcrumb-item"><a href="#">پنل دکتر</a></li>
                 <li class="breadcrumb-item active" aria-current="page">@yield('bread-crumb-title')</li>
               </ol>
             </nav>
           </div>
+
         </div>
       </div>
       <div class="header__left d-flex flex-end item-center margin-top-2">
+
         <div class="myPanelOption p-3 d-md-block d-none">
           <div class="d-flex align-items-center">
             <div class="my-tooltip mx-2">
@@ -35,10 +36,10 @@
             <div class="">
               <div class="dropdown">
                 <div
-                  class="dropdown-trigger btn h-40 w-300 bg-light-blue dark:bg-gray-700 text-left d-flex justify-content-between align-items-center"
+                  class="dropdown-trigger btn h-40 w-300 bg-light-blue text-left d-flex justify-content-between align-items-center"
                   aria-haspopup="true" aria-expanded="false">
                   <div class="">
-                    <span class="dropdown-label dark:text-gray-200">مشاوره آنلاین به نوبه</span>
+                    <span class="dropdown-label">مشاوره آنلاین به نوبه</span>
                   </div>
                   <div>
                     <svg width="7" height="11" viewBox="0 0 7 11" fill="none"
@@ -52,9 +53,7 @@
                 <div class="my-dropdown-menu d-none">
                   <div class="" aria-hidden="true">
                     <div class="{{ Request::routeIs('doctors.clinic.deposit') ? 'd-none' : '' }}" aria-hidden="true">
-                      <div
-                        class="d-flex align-items-center p-3 option-card card-active dark:bg-gray-700 dark:text-gray-200"
-                        data-id="default">
+                      <div class="d-flex align-items-center p-3 option-card card-active" data-id="default">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                           xmlns="http://www.w3.org/2000/svg">
                           <path
@@ -78,8 +77,9 @@
                     </div>
                     @foreach ($clinics as $clinic)
                       <div
-                        class="d-flex justify-content-between align-items-center option-card flex-wrap {{ !$clinic->is_active ? 'inactive-clinic' : '' }} dark:bg-gray-700 dark:text-gray-200"
-                        data-id="{{ $clinic->id }}" data-active="{{ $clinic->is_active ? '1' : '0' }}">
+                        class="d-flex justify-content-between align-items-center option-card {{ !$clinic->is_active ? 'inactive-clinic' : '' }}"
+                        aria-hidden="true" data-id="{{ $clinic->id }}"
+                        data-active="{{ $clinic->is_active ? '1' : '0' }}">
                         <div class="d-flex align-items-center p-3 position-relative">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -98,9 +98,9 @@
                             </div>
                           @endif
                         </div>
-                        <div class="mx-2 w-100">
+                        <div class="mx-2">
                           @if (!$clinic->is_active)
-                            <button class="btn my-btn-primary fs-13 btn-sm h-35 w-100" tabindex="0" type="button"
+                            <button class="btn my-btn-primary fs-13 btn-sm h-35" tabindex="0" type="button"
                               onclick="window.location.href='{{ route('activation-doctor-clinic', $clinic) }}'">فعال‌سازی
                             </button>
                           @endif
@@ -155,8 +155,7 @@
             </div>
             <div class="panel-content">
               <div class="{{ Request::routeIs('doctors.clinic.deposit') ? 'd-none' : '' }}">
-                <div class="d-flex align-items-center p-3 option-card card-active dark:bg-gray-700 dark:text-gray-200"
-                  data-id="default">
+                <div class="d-flex align-items-center p-3 option-card card-active" data-id="default">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -180,7 +179,7 @@
               </div>
               @foreach ($clinics as $clinic)
                 <div
-                  class="d-flex justify-content-between align-items-center option-card flex-wrap {{ !$clinic->is_active ? 'inactive-clinic' : '' }} dark:bg-gray-700 dark:text-gray-200"
+                  class="d-flex justify-content-between align-items-center option-card flex-wrap {{ !$clinic->is_active ? 'inactive-clinic' : '' }}"
                   data-id="{{ $clinic->id }}" data-active="{{ $clinic->is_active ? '1' : '0' }}">
                   <div class="d-flex align-items-center p-3 position-relative">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -213,6 +212,11 @@
           </div>
         </div>
 
+        <!-- اسکریپت برای مدیریت باز و بسته شدن پنل -->
+
+
+        <!-- اسکریپت برای مدیریت باز و بسته شدن پنل -->
+
         <div class="d-flex notif-option px-3">
           <div class="position-relative">
             <!-- آیکون زنگوله -->
@@ -231,10 +235,10 @@
 
             <!-- باکس اعلان‌ها -->
             <div x-ref="notificationBox"
-              class="notification-box d-none position-absolute bg-white dark:bg-gray-800 shadow-lg rounded-3 p-3"
+              class="notification-box d-none position-absolute bg-white shadow-lg rounded-3 p-3"
               style="width: 500px; top: 40px; left: 0; z-index: 1000;">
               <div class="d-flex justify-content-between align-items-center mb-4">
-                <h6 class="mb-0 fw-bold text-gray-800 dark:text-gray-200" style="font-size: 18px;">اعلان‌ها</h6>
+                <h6 class="mb-0 fw-bold text-gray-800" style="font-size: 18px;">اعلان‌ها</h6>
                 <span class="badge bg-primary text-white">{{ $unreadCount }} جدید</span>
               </div>
               <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
@@ -242,29 +246,91 @@
                   @if ($recipient->notification)
                     <div class="notification-item d-flex justify-content-between align-items-start border-bottom py-3">
                       <div class="notification-content">
-                        <p class="mb-1 fw-medium text-gray-800 dark:text-gray-200" style="font-size: 16px;">
+                        <p class="mb-1 fw-medium text-gray-800" style="font-size: 16px;">
                           {{ $recipient->notification->title }}</p>
+                        <p class="mb-0 text-gray-600" style="font-size: 14px;">
+                          {{ $recipient->notification->message }}
+                        </p>
                       </div>
+                      <button wire:click="markAsRead({{ $recipient->id }})" class="btn-read rounded-circle p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path d="M20 6L9 17l-5-5"></path>
+                        </svg>
+                      </button>
                     </div>
                   @endif
                 @empty
                   <div class="text-center py-4">
-                    <p class="text-gray-500 dark:text-gray-400">هیچ اعلانی وجود ندارد</p>
+                    <p class="text-gray-500 mb-0" style="font-size: 16px;">اعلانی برای نمایش وجود ندارد.</p>
                   </div>
                 @endforelse
               </div>
             </div>
           </div>
+          <div style="display: none !important" class="mx-3 cursor-pointer d-flex"
+            onclick="location.href='{{ route('dr-wallet-charge') }}'">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="24px" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="plasmic-default__svg plasmic_all__FLoMj PlasmicQuickAccessWallet_svg__4uUbY lucide lucide-wallet"
+              viewBox="0 0 24 24" role="img">
+              <path
+                d="M19 7V4a1 1 0 00-1-1H5a2 2 0 000 4h15a1 1 0 011 1v4h-3a2 2 0 000 4h3a1 1 0 001-1v-2a1 1 0 00-1-1">
+              </path>
+              <path d="M3 5v14a2 2 0 002 2h15a1 1 0 001-1v-4"></path>
+            </svg>
+            <span>{{ number_format($walletBalance) }} تومان</span>
+          </div>
         </div>
-
-  
-
-        <!-- دکمه خروج -->
+        <!-- تغییر لینک لاگ‌اوت به نویگیشن Livewire -->
         <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('dr.auth.logout') }}' })"
           class="logout" title="خروج"></a>
       </div>
     </div>
+
+
+    <script>
+      document.addEventListener('livewire:init', function() {
+        // بستن باکس اعلان‌ها با کلیک خارج از آن
+        document.addEventListener('click', function(event) {
+          const notificationBox = document.querySelector('.notification-box');
+          const bellIcon = document.querySelector('.bell-red-badge').parentElement.querySelector('svg');
+          if (!notificationBox || !bellIcon) return;
+
+          if (!notificationBox.contains(event.target) && !bellIcon.contains(event.target)) {
+            notificationBox.classList.add('d-none');
+          }
+        });
+      });
+      document.addEventListener('DOMContentLoaded', function() {
+        const floatingBtn = document.querySelector('.floating-btn');
+        const floatingPanel = document.querySelector('.floating-panel');
+        const closeBtn = document.querySelector('.panel-close-btn');
+
+        // باز کردن پنل با کلیک روی دکمه شناور
+        floatingBtn.addEventListener('click', function() {
+          floatingPanel.classList.toggle('d-none');
+          floatingPanel.classList.toggle('panel-open');
+        });
+
+        // بستن پنل با کلیک روی دکمه بستن
+        closeBtn.addEventListener('click', function() {
+          floatingPanel.classList.add('d-none');
+          floatingPanel.classList.remove('panel-open');
+        });
+
+        // بستن پنل با کلیک خارج از آن
+        document.addEventListener('click', function(event) {
+          if (!floatingPanel.contains(event.target) && !floatingBtn.contains(event.target)) {
+            floatingPanel.classList.add('d-none');
+            floatingPanel.classList.remove('panel-open');
+          }
+        });
+      });
+    </script>
+  </div>
+  <div class="quick-access">
+
   </div>
 </div>
-
-
