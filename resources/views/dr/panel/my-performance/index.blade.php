@@ -401,11 +401,31 @@
         // به‌روزرسانی امتیاز در UI
         $('#performance-score').text(performanceScore);
       },
-      error: function() {
+      error: function(xhr) {
+        const cardsContainer = $('#performance-cards');
+        cardsContainer.empty();
+
+        let errorMessage = 'خطایی در بارگذاری داده‌ها رخ داد. لطفاً دوباره تلاش کنید.';
+
+        if (xhr.status === 401) {
+          errorMessage = 'لطفاً ابتدا وارد حساب کاربری خود شوید.';
+        } else if (xhr.status === 404) {
+          errorMessage = 'اطلاعات پزشک یافت نشد.';
+        } else if (xhr.responseJSON && xhr.responseJSON.error) {
+          errorMessage = xhr.responseJSON.error;
+        }
+
         Swal.fire({
           icon: 'error',
           title: 'خطا',
-          text: 'خطایی در بارگذاری داده‌ها رخ داد. لطفاً دوباره تلاش کنید.',
+          text: errorMessage,
+          confirmButtonText: 'تلاش مجدد',
+          showCancelButton: true,
+          cancelButtonText: 'بستن'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            loadPerformanceData();
+          }
         });
       }
     });

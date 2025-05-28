@@ -44,110 +44,122 @@ class MyPerformanceController extends Controller
      */
     public function getPerformanceData(Request $request)
     {
-        $doctor = Doctor::with([
-            'clinics',
-            'messengers',
-            'reviews',
-            'appointments' => function ($query) {
-                $query->whereDate('appointment_date', now()->toDateString());
+        try {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            if (!$doctor) {
+                return response()->json(['error' => 'Unauthorized'], 401);
             }
-        ])->find(Auth::guard('doctor')->id());
 
-        // محاسبه امتیاز عملکرد (فرضی)
-        $performanceScore = $this->calculatePerformanceScore($doctor);
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
-        // بررسی شهر محل طبابت
-        $city = $doctor->city ?? 'نامشخص';
-        $cityStatus = !empty($doctor->city);
+            $doctor = Doctor::with([
+                'clinics',
+                'messengers',
+                'reviews',
+                'appointments' => function ($query) {
+                    $query->whereDate('appointment_date', now()->toDateString());
+                }
+            ])->findOrFail($doctorId);
 
-        // بررسی وضعیت ویزیت آنلاین
-        $onlineVisitEnabled = $doctor->appointmentConfig->auto_scheduling ?? false;
+            // محاسبه امتیاز عملکرد (فرضی)
+            $performanceScore = $this->calculatePerformanceScore($doctor);
 
-        // تعداد نظرات
-        $reviewsCount = $doctor->reviews->count();
-        $hasEnoughReviews = $reviewsCount >= 150;
+            // بررسی شهر محل طبابت
+            $city = $doctor->city ?? 'نامشخص';
+            $cityStatus = !empty($doctor->city);
 
-        // وضعیت آنلاین بودن
-        $isOnline = $doctor->appointmentConfig->auto_scheduling ?? false;
+            // بررسی وضعیت ویزیت آنلاین
+            $onlineVisitEnabled = $doctor->appointmentConfig->auto_scheduling ?? false;
 
-        // نوبت‌دهی حضوری برای امروز
-        $hasInPersonAppointmentsToday = $doctor->appointments->isNotEmpty();
+            // تعداد نظرات
+            $reviewsCount = $doctor->reviews->count();
+            $hasEnoughReviews = $reviewsCount >= 150;
 
-        // آدرس واضح
-        $hasClearAddress = !empty($doctor->address) && !preg_match('/\d{10,}/', $doctor->address);
+            // وضعیت آنلاین بودن
+            $isOnline = $doctor->appointmentConfig->auto_scheduling ?? false;
 
-        // شماره تلفن در آدرس
-        $hasPhoneInAddress = !empty($doctor->address) && preg_match('/\d{10,}/', $doctor->address);
+            // نوبت‌دهی حضوری برای امروز
+            $hasInPersonAppointmentsToday = $doctor->appointments->isNotEmpty();
 
-        // صحت تلفن مطب
-        $hasValidOfficePhone = !empty($doctor->office_phone) && preg_match('/^09\d{9}$/', $doctor->office_phone);
+            // آدرس واضح
+            $hasClearAddress = !empty($doctor->address) && !preg_match('/\d{10,}/', $doctor->address);
 
-        // موقعیت مطب
-        $hasClinicLocationSet = $doctor->clinics->every(function ($clinic) {
-            return !empty($clinic->latitude) && !empty($clinic->longitude);
-        });
+            // شماره تلفن در آدرس
+            $hasPhoneInAddress = !empty($doctor->address) && preg_match('/\d{10,}/', $doctor->address);
 
-        // تخصص‌ها و درجه علمی
-        $hasSpecialties = !empty($doctor->specialties);
+            // صحت تلفن مطب
+            $hasValidOfficePhone = !empty($doctor->office_phone) && preg_match('/^09\d{9}$/', $doctor->office_phone);
 
-        // عنوان بی‌ربط در تخصص
-        $hasIrrelevantSpecialty = $this->checkIrrelevantSpecialty($doctor->specialties);
+            // موقعیت مطب
+            $hasClinicLocationSet = $doctor->clinics->every(function ($clinic) {
+                return !empty($clinic->latitude) && !empty($clinic->longitude);
+            });
 
-        // سایر موارد
-        $hasLowerDegrees = !empty($doctor->lower_degrees);
-        $hasProperSpecialtyTitle = $this->checkProperSpecialtyTitle($doctor->specialties);
-        $hasRealisticTitles = !$this->checkUnrealisticTitles($doctor->specialties);
-        $satisfactionRate = $this->calculateSatisfactionRate($doctor);
-        $hasManipulatedReviews = $this->checkManipulatedReviews($doctor);
-        $hasProfilePicture = !empty($doctor->profile_picture);
-        $hasClinicGallery = $this->checkClinicGallery($doctor->clinics);
-        $hasFacilityImages = $this->checkFacilityImages($doctor->clinics);
-        $hasBiography = !empty($doctor->biography);
-        $hasKeywordsInBiography = $this->checkKeywordsInBiography($doctor->biography);
-        $hasMultipleMessengers = $doctor->messengers->count() >= 2;
-        $hasSecureCall = $doctor->secure_call_enabled ?? false;
-        $hasMissedReports = $this->checkMissedReports($doctor);
+            // تخصص‌ها و درجه علمی
+            $hasSpecialties = !empty($doctor->specialties);
 
-        // تولید URL برای کلینیک‌ها
-        $clinicsData = $doctor->clinics->map(function ($clinic) {
-            return [
-                'id' => $clinic->id,
-                'name' => $clinic->name,
-                'url' => route('activation-doctor-clinic', ['clinic' => $clinic->id]),
-            ];
-        });
+            // عنوان بی‌ربط در تخصص
+            $hasIrrelevantSpecialty = $this->checkIrrelevantSpecialty($doctor->specialties);
 
-        return response()->json([
-            'doctor_name' => $doctor->full_name,
-            'performance_score' => $performanceScore,
-            'city' => $city,
-            'city_status' => $cityStatus,
-            'online_visit_enabled' => $onlineVisitEnabled,
-            'reviews_count' => $reviewsCount,
-            'has_enough_reviews' => $hasEnoughReviews,
-            'is_online' => $isOnline,
-            'has_in_person_appointments_today' => $hasInPersonAppointmentsToday,
-            'has_clear_address' => $hasClearAddress,
-            'has_phone_in_address' => $hasPhoneInAddress,
-            'has_valid_office_phone' => $hasValidOfficePhone,
-            'has_clinic_location_set' => $hasClinicLocationSet,
-            'has_specialties' => $hasSpecialties,
-            'has_irrelevant_specialty' => $hasIrrelevantSpecialty,
-            'has_lower_degrees' => $hasLowerDegrees,
-            'has_proper_specialty_title' => $hasProperSpecialtyTitle,
-            'has_realistic_titles' => $hasRealisticTitles,
-            'satisfaction_rate' => $satisfactionRate,
-            'has_manipulated_reviews' => $hasManipulatedReviews,
-            'has_profile_picture' => $hasProfilePicture,
-            'has_clinic_gallery' => $hasClinicGallery,
-            'has_facility_images' => $hasFacilityImages,
-            'has_biography' => $hasBiography,
-            'has_keywords_in_biography' => $hasKeywordsInBiography,
-            'has_multiple_messengers' => $hasMultipleMessengers,
-            'has_secure_call' => $hasSecureCall,
-            'has_missed_reports' => $hasMissedReports,
-            'clinics' => $clinicsData,
-        ]);
+            // سایر موارد
+            $hasLowerDegrees = !empty($doctor->lower_degrees);
+            $hasProperSpecialtyTitle = $this->checkProperSpecialtyTitle($doctor->specialties);
+            $hasRealisticTitles = !$this->checkUnrealisticTitles($doctor->specialties);
+            $satisfactionRate = $this->calculateSatisfactionRate($doctor);
+            $hasManipulatedReviews = $this->checkManipulatedReviews($doctor);
+            $hasProfilePicture = !empty($doctor->profile_picture);
+            $hasClinicGallery = $this->checkClinicGallery($doctor->clinics);
+            $hasFacilityImages = $this->checkFacilityImages($doctor->clinics);
+            $hasBiography = !empty($doctor->biography);
+            $hasKeywordsInBiography = $this->checkKeywordsInBiography($doctor->biography);
+            $hasMultipleMessengers = $doctor->messengers->count() >= 2;
+            $hasSecureCall = $doctor->secure_call_enabled ?? false;
+            $hasMissedReports = $this->checkMissedReports($doctor);
+
+            // تولید URL برای کلینیک‌ها
+            $clinicsData = $doctor->clinics->map(function ($clinic) {
+                return [
+                    'id' => $clinic->id,
+                    'name' => $clinic->name,
+                    'url' => route('activation-doctor-clinic', ['clinic' => $clinic->id]),
+                ];
+            });
+
+            return response()->json([
+                'doctor_name' => $doctor->full_name,
+                'performance_score' => $performanceScore,
+                'city' => $city,
+                'city_status' => $cityStatus,
+                'online_visit_enabled' => $onlineVisitEnabled,
+                'reviews_count' => $reviewsCount,
+                'has_enough_reviews' => $hasEnoughReviews,
+                'is_online' => $isOnline,
+                'has_in_person_appointments_today' => $hasInPersonAppointmentsToday,
+                'has_clear_address' => $hasClearAddress,
+                'has_phone_in_address' => $hasPhoneInAddress,
+                'has_valid_office_phone' => $hasValidOfficePhone,
+                'has_clinic_location_set' => $hasClinicLocationSet,
+                'has_specialties' => $hasSpecialties,
+                'has_irrelevant_specialty' => $hasIrrelevantSpecialty,
+                'has_lower_degrees' => $hasLowerDegrees,
+                'has_proper_specialty_title' => $hasProperSpecialtyTitle,
+                'has_realistic_titles' => $hasRealisticTitles,
+                'satisfaction_rate' => $satisfactionRate,
+                'has_manipulated_reviews' => $hasManipulatedReviews,
+                'has_profile_picture' => $hasProfilePicture,
+                'has_clinic_gallery' => $hasClinicGallery,
+                'has_facility_images' => $hasFacilityImages,
+                'has_biography' => $hasBiography,
+                'has_keywords_in_biography' => $hasKeywordsInBiography,
+                'has_multiple_messengers' => $hasMultipleMessengers,
+                'has_secure_call' => $hasSecureCall,
+                'has_missed_reports' => $hasMissedReports,
+                'clinics' => $clinicsData,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in getPerformanceData: ' . $e->getMessage());
+            return response()->json(['error' => 'Internal server error'], 500);
+        }
     }
 
     /**
@@ -251,7 +263,7 @@ class MyPerformanceController extends Controller
         $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition);
 
-    
+
 
         $appointments = $appointmentsQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -268,7 +280,7 @@ class MyPerformanceController extends Controller
         $monthlyIncomeQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition);
 
-    
+
 
         $monthlyIncome = $monthlyIncomeQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -278,14 +290,14 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-      
+
 
         // 3. بیماران جدید
         $newPatientsQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->join('users', 'appointments.patient_id', '=', 'users.id');
 
-     
+
 
         $newPatients = $newPatientsQuery
             ->selectRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%m') as month,
@@ -294,13 +306,13 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%m')")
             ->get();
 
-       
+
 
         // 4. نوبت‌های مشاوره
         $counselingQuery = CounselingAppointment::where('doctor_id', $doctorId)
             ->where($clinicCondition);
 
-       
+
 
         $counselingAppointments = $counselingQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -312,14 +324,14 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-       
+
 
         // 5. نوبت‌های دستی
         $manualQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
             ->where('appointment_type', 'manual');
 
-        
+
 
         $manualAppointments = $manualQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -329,7 +341,7 @@ class MyPerformanceController extends Controller
             ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->get();
 
-     
+
 
         // 6. درآمد کلی
         $totalIncomeQuery = Appointment::where('doctor_id', $doctorId)
@@ -337,7 +349,7 @@ class MyPerformanceController extends Controller
             ->where('payment_status', 'paid')
             ->where('status', 'attended');
 
-     
+
 
         $totalIncome = $totalIncomeQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -362,7 +374,7 @@ class MyPerformanceController extends Controller
             })
             ->values();
 
-     
+
 
         $response = [
             'appointments' => $appointments->map(function ($item) {
@@ -415,7 +427,7 @@ class MyPerformanceController extends Controller
             'totalIncome' => $totalIncome->toArray(),
         ];
 
-    
+
 
         return response()->json($response);
     }
