@@ -176,195 +176,67 @@ select:focus[data-flux-control] {
 
 /* استایل‌های دارک مود */
 .dark {
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #2d2d2d;
-    --text-primary: #ffffff;
-    --text-secondary: #a0aec0;
-    --border-color: #4a5568;
+    --bg-primary: #1e1b4b; /* رنگ بنفش تیره شیک */
+    --bg-secondary: #312e81; /* رنگ بنفش تیره‌تر برای المان‌های ثانویه */
+    --text-primary: #f8fafc; /* رنگ سفید روشن‌تر برای متن اصلی */
+    --text-secondary: #cbd5e1; /* رنگ خاکستری روشن برای متن ثانویه */
+    --border-color: #4338ca; /* رنگ بنفش برای بوردرها */
+    --hover-color: #4338ca; /* رنگ بنفش برای هاور */
+    --card-bg: #312e81; /* رنگ بنفش برای کارت‌ها */
+    --input-bg: #312e81; /* رنگ بنفش برای ورودی‌ها */
+    --modal-bg: #312e81; /* رنگ بنفش برای مودال‌ها */
 }
 
+/* استایل‌های اصلی */
 .dark body {
     background-color: var(--bg-primary) !important;
     color: var(--text-primary) !important;
 }
 
+/* استایل‌های هدر */
 .dark .header {
     background-color: var(--bg-secondary) !important;
     border-color: var(--border-color) !important;
 }
 
-.dark .notification-box {
+/* استایل‌های سایدبار */
+.dark .sidebar {
     background-color: var(--bg-secondary) !important;
     border-color: var(--border-color) !important;
 }
 
-.dark .option-card {
+.dark .sidebar-menu {
     background-color: var(--bg-secondary) !important;
-    border-color: var(--border-color) !important;
 }
 
-.dark .option-card:hover {
-    background-color: #3d3d3d !important;
-}
-
-.dark .dropdown-trigger {
-    background-color: var(--bg-secondary) !important;
-    border-color: var(--border-color) !important;
-}
-
-.dark .dropdown-trigger:hover {
-    background-color: #3d3d3d !important;
-}
-
-.dark .my-dropdown-menu {
-    background-color: var(--bg-secondary) !important;
-    border-color: var(--border-color) !important;
-}
-
-.dark .my-dropdown-menu .option-card {
-    background-color: var(--bg-secondary) !important;
-    border-color: var(--border-color) !important;
-}
-
-.dark .my-dropdown-menu .option-card:hover {
-    background-color: #3d3d3d !important;
-}
-
-.dark .floating-panel {
-    background-color: var(--bg-secondary) !important;
-    border-color: var(--border-color) !important;
-}
-
-.dark .floating-panel .option-card {
-    background-color: var(--bg-secondary) !important;
-    border-color: var(--border-color) !important;
-}
-
-.dark .floating-panel .option-card:hover {
-    background-color: #3d3d3d !important;
-}
-
-.dark .breadcrumb {
-    background-color: var(--bg-secondary) !important;
-    border-color: var(--border-color) !important;
-}
-
-.dark .breadcrumb-item a {
-    color: var(--text-secondary) !important;
-}
-
-.dark .breadcrumb-item.active {
+.dark .sidebar-menu a {
     color: var(--text-primary) !important;
 }
 
-/* انیمیشن تغییر تم */
-.transition-colors {
-    transition-property: background-color, border-color, color, fill, stroke !important;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
-    transition-duration: 300ms !important;
+.dark .sidebar-menu a:hover {
+    background-color: var(--hover-color) !important;
 }
 
-/* استایل‌های دکمه دارک مود */
-#theme-toggle {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.dark .sidebar-menu .active {
+    background-color: var(--hover-color) !important;
 }
 
-#theme-toggle:hover {
-    background-color: rgba(0, 0, 0, 0.05) !important;
-}
-
-.dark #theme-toggle:hover {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-#theme-toggle:focus {
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
-}
-
-.dark #theme-toggle:focus {
-    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
-}
-
-#theme-toggle svg {
-    width: 1.25rem;
-    height: 1.25rem;
-    transition: all 0.3s ease;
-}
-
-/* استایل‌های اعلان‌ها در دارک مود */
-.dark .notification-item {
-    border-color: var(--border-color) !important;
-}
-
-.dark .notification-item:hover {
-    background-color: #3d3d3d !important;
-}
-
-.dark .notification-content p {
+/* استایل‌های محتوا */
+.dark .content {
+    background-color: var(--bg-primary) !important;
     color: var(--text-primary) !important;
 }
 
-.dark .notification-content .text-gray-600 {
-    color: var(--text-secondary) !important;
-}
-
-/* استایل‌های دکمه‌ها در دارک مود */
-.dark .btn {
-    background-color: var(--bg-secondary) !important;
-    border-color: var(--border-color) !important;
-    color: var(--text-primary) !important;
-}
-
-.dark .btn:hover {
-    background-color: #3d3d3d !important;
-}
-
-.dark .btn-primary {
-    background-color: #4a5568 !important;
-    border-color: #4a5568 !important;
-    color: white !important;
-}
-
-.dark .btn-primary:hover {
-    background-color: #2d3748 !important;
-    border-color: #2d3748 !important;
-}
-
-/* استایل‌های فرم‌ها در دارک مود */
-.dark input,
-.dark select,
-.dark textarea {
-    background-color: var(--bg-secondary) !important;
-    border-color: var(--border-color) !important;
-    color: var(--text-primary) !important;
-}
-
-.dark input:focus,
-.dark select:focus,
-.dark textarea:focus {
-    border-color: #4a5568 !important;
-    box-shadow: 0 0 0 2px rgba(74, 85, 104, 0.2) !important;
-}
-
-/* استایل‌های جداول در دارک مود */
+/* استایل‌های جداول */
 .dark table {
-    background-color: var(--bg-secondary) !important;
+    background-color: var(--card-bg) !important;
     border-color: var(--border-color) !important;
 }
 
 .dark th {
-    background-color: #2d3748 !important;
+    background-color: var(--bg-secondary) !important;
     color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
 }
 
 .dark td {
@@ -373,42 +245,99 @@ select:focus[data-flux-control] {
 }
 
 .dark tr:hover {
-    background-color: #3d3d3d !important;
+    background-color: var(--hover-color) !important;
 }
 
-/* استایل‌های کارت‌ها در دارک مود */
+/* استایل‌های نمودارها */
+.dark .chart-container {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .chart-title {
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+}
+
+.dark .chart-legend {
+    color: var(--text-secondary) !important;
+}
+
+.dark .chart-axis text {
+    fill: var(--text-secondary) !important;
+}
+
+.dark .chart-grid line {
+    stroke: var(--border-color) !important;
+}
+
+/* استایل‌های کارت‌ها */
 .dark .card {
-    background-color: var(--bg-secondary) !important;
+    background-color: var(--card-bg) !important;
     border-color: var(--border-color) !important;
 }
 
 .dark .card-header {
-    background-color: #2d3748 !important;
+    background-color: var(--bg-secondary) !important;
     border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark .card-body {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
 }
 
 .dark .card-footer {
-    background-color: #2d3748 !important;
-    border-color: var(--border-color) !important;
-}
-
-/* استایل‌های مودال در دارک مود */
-.dark .modal-content {
     background-color: var(--bg-secondary) !important;
     border-color: var(--border-color) !important;
 }
 
-.dark .modal-header {
+/* استایل‌های فرم‌ها */
+.dark input,
+.dark select,
+.dark textarea {
+    background-color: var(--input-bg) !important;
     border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
 }
 
-.dark .modal-footer {
-    border-color: var(--border-color) !important;
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+    border-color: var(--hover-color) !important;
+    box-shadow: 0 0 0 2px rgba(67, 56, 202, 0.2) !important;
 }
 
-/* استایل‌های منو در دارک مود */
+.dark label {
+    color: var(--text-primary) !important;
+}
+
+/* استایل‌های دکمه‌ها */
+.dark .btn {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark .btn:hover {
+    background-color: var(--hover-color) !important;
+}
+
+.dark .btn-primary {
+    background-color: var(--hover-color) !important;
+    border-color: var(--hover-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark .btn-primary:hover {
+    background-color: #3730a3 !important;
+    border-color: #3730a3 !important;
+}
+
+/* استایل‌های منوها */
 .dark .dropdown-menu {
-    background-color: var(--bg-secondary) !important;
+    background-color: var(--card-bg) !important;
     border-color: var(--border-color) !important;
 }
 
@@ -417,11 +346,78 @@ select:focus[data-flux-control] {
 }
 
 .dark .dropdown-item:hover {
-    background-color: #3d3d3d !important;
+    background-color: var(--hover-color) !important;
     color: var(--text-primary) !important;
 }
 
-/* استایل‌های اسکرول‌بار در دارک مود */
+/* استایل‌های اعلان‌ها */
+.dark .notification-box {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .notification-item {
+    border-color: var(--border-color) !important;
+}
+
+.dark .notification-item:hover {
+    background-color: var(--hover-color) !important;
+}
+
+.dark .notification-content p {
+    color: var(--text-primary) !important;
+}
+
+/* استایل‌های مودال */
+.dark .modal-content {
+    background-color: var(--modal-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .modal-header {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark .modal-body {
+    background-color: var(--modal-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark .modal-footer {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* استایل‌های بج‌ها */
+.dark .badge {
+    background-color: var(--hover-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* استایل‌های آیکون‌ها */
+.dark svg {
+    color: var(--text-primary) !important;
+    fill: var(--text-primary) !important;
+    stroke: var(--text-primary) !important;
+}
+
+.dark svg path {
+    fill: var(--text-primary) !important;
+    stroke: var(--text-primary) !important;
+}
+
+/* استایل‌های لینک‌ها */
+.dark a {
+    color: #818cf8 !important;
+}
+
+.dark a:hover {
+    color: #a5b4fc !important;
+}
+
+/* استایل‌های اسکرول‌بار */
 .dark ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -432,99 +428,24 @@ select:focus[data-flux-control] {
 }
 
 .dark ::-webkit-scrollbar-thumb {
-    background: #4a5568;
+    background: var(--hover-color);
     border-radius: 4px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-    background: #2d3748;
+    background: #3730a3;
 }
 
-/* استایل‌های لینک‌ها در دارک مود */
-.dark a {
-    color: #63b3ed !important;
-}
-
-.dark a:hover {
-    color: #90cdf4 !important;
-}
-
-/* استایل‌های کد در دارک مود */
-.dark code {
-    background-color: #2d3748 !important;
-    color: #90cdf4 !important;
-}
-
-.dark pre {
-    background-color: #2d3748 !important;
-    border-color: var(--border-color) !important;
-}
-
-/* استایل‌های بج‌ها در دارک مود */
-.dark .badge {
-    background-color: #4a5568 !important;
-    color: var(--text-primary) !important;
-}
-
-.dark .badge-primary {
-    background-color: #2b6cb0 !important;
-}
-
-.dark .badge-secondary {
-    background-color: #4a5568 !important;
-}
-
-.dark .badge-success {
-    background-color: #2f855a !important;
-}
-
-.dark .badge-danger {
-    background-color: #c53030 !important;
-}
-
-.dark .badge-warning {
-    background-color: #975a16 !important;
-}
-
-.dark .badge-info {
-    background-color: #2c5282 !important;
-}
-
-/* استایل‌های آیکون‌ها در دارک مود */
-.dark svg {
-    color: var(--text-primary) !important;
-}
-
-.dark .text-muted {
-    color: var(--text-secondary) !important;
-}
-
-/* استایل‌های گرادیان‌ها در دارک مود */
+/* استایل‌های گرادیان‌ها */
 .dark .bg-gradient-primary {
-    background: linear-gradient(45deg, #2b6cb0, #4299e1) !important;
+    background: linear-gradient(45deg, #4338ca, #6366f1) !important;
 }
 
 .dark .bg-gradient-secondary {
-    background: linear-gradient(45deg, #4a5568, #718096) !important;
+    background: linear-gradient(45deg, #312e81, #4338ca) !important;
 }
 
-.dark .bg-gradient-success {
-    background: linear-gradient(45deg, #2f855a, #48bb78) !important;
-}
-
-.dark .bg-gradient-danger {
-    background: linear-gradient(45deg, #c53030, #f56565) !important;
-}
-
-.dark .bg-gradient-warning {
-    background: linear-gradient(45deg, #975a16, #ed8936) !important;
-}
-
-.dark .bg-gradient-info {
-    background: linear-gradient(45deg, #2c5282, #4299e1) !important;
-}
-
-/* استایل‌های سایه‌ها در دارک مود */
+/* استایل‌های سایه‌ها */
 .dark .shadow {
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3) !important;
 }
@@ -534,65 +455,29 @@ select:focus[data-flux-control] {
         0 2px 4px -1px rgba(0, 0, 0, 0.3) !important;
 }
 
-.dark .shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4),
-        0 4px 6px -2px rgba(0, 0, 0, 0.3) !important;
+/* استایل‌های انیمیشن */
+.transition-colors {
+    transition-property: background-color, border-color, color, fill, stroke !important;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition-duration: 300ms !important;
 }
 
-.dark .shadow-xl {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
-        0 10px 10px -5px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* استایل‌های انیمیشن‌ها در دارک مود */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-.dark .fade-in {
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateY(-10px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.dark .slide-in {
-    animation: slideIn 0.3s ease-in-out;
-}
-
-/* استایل‌های ریسپانسیو در دارک مود */
+/* استایل‌های ریسپانسیو */
 @media (max-width: 640px) {
     .dark .header {
         padding: 0.5rem;
     }
 
-    .dark .notification-box {
-        width: 100%;
-        max-width: 100%;
-        left: 0;
-        right: 0;
+    .dark .sidebar {
+        background-color: var(--bg-secondary) !important;
     }
 
-    .dark .floating-panel {
-        width: 100%;
-        max-width: 100%;
+    .dark .content {
+        background-color: var(--bg-primary) !important;
     }
 }
 
-/* استایل‌های پرینت در دارک مود */
+/* استایل‌های پرینت */
 @media print {
     .dark {
         --bg-primary: white;
@@ -608,12 +493,8 @@ select:focus[data-flux-control] {
     }
 
     .dark .header,
-    .dark .notification-box,
-    .dark .option-card,
-    .dark .dropdown-trigger,
-    .dark .my-dropdown-menu,
-    .dark .floating-panel,
-    .dark .breadcrumb,
+    .dark .sidebar,
+    .dark .content,
     .dark .card,
     .dark .modal-content {
         background-color: white !important;
@@ -621,17 +502,7 @@ select:focus[data-flux-control] {
     }
 
     .dark .text-primary,
-    .dark .text-secondary,
-    .dark .text-muted {
-        color: black !important;
-    }
-
-    .dark a {
-        color: #2b6cb0 !important;
-    }
-
-    .dark .badge {
-        background-color: #e2e8f0 !important;
+    .dark .text-secondary {
         color: black !important;
     }
 }
