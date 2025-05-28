@@ -173,3 +173,465 @@ select:focus[data-flux-control] {
     position: relative;
     min-height: 400px;
 }
+
+/* استایل‌های دارک مود */
+.dark {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #a0aec0;
+    --border-color: #4a5568;
+}
+
+.dark body {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark .header {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .notification-box {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .option-card {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .option-card:hover {
+    background-color: #3d3d3d !important;
+}
+
+.dark .dropdown-trigger {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .dropdown-trigger:hover {
+    background-color: #3d3d3d !important;
+}
+
+.dark .my-dropdown-menu {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .my-dropdown-menu .option-card {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .my-dropdown-menu .option-card:hover {
+    background-color: #3d3d3d !important;
+}
+
+.dark .floating-panel {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .floating-panel .option-card {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .floating-panel .option-card:hover {
+    background-color: #3d3d3d !important;
+}
+
+.dark .breadcrumb {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .breadcrumb-item a {
+    color: var(--text-secondary) !important;
+}
+
+.dark .breadcrumb-item.active {
+    color: var(--text-primary) !important;
+}
+
+/* انیمیشن تغییر تم */
+.transition-colors {
+    transition-property: background-color, border-color, color, fill, stroke !important;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition-duration: 300ms !important;
+}
+
+/* استایل‌های دکمه دارک مود */
+#theme-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#theme-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark #theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#theme-toggle:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark #theme-toggle:focus {
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
+#theme-toggle svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+/* استایل‌های اعلان‌ها در دارک مود */
+.dark .notification-item {
+    border-color: var(--border-color) !important;
+}
+
+.dark .notification-item:hover {
+    background-color: #3d3d3d !important;
+}
+
+.dark .notification-content p {
+    color: var(--text-primary) !important;
+}
+
+.dark .notification-content .text-gray-600 {
+    color: var(--text-secondary) !important;
+}
+
+/* استایل‌های دکمه‌ها در دارک مود */
+.dark .btn {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark .btn:hover {
+    background-color: #3d3d3d !important;
+}
+
+.dark .btn-primary {
+    background-color: #4a5568 !important;
+    border-color: #4a5568 !important;
+    color: white !important;
+}
+
+.dark .btn-primary:hover {
+    background-color: #2d3748 !important;
+    border-color: #2d3748 !important;
+}
+
+/* استایل‌های فرم‌ها در دارک مود */
+.dark input,
+.dark select,
+.dark textarea {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+    border-color: #4a5568 !important;
+    box-shadow: 0 0 0 2px rgba(74, 85, 104, 0.2) !important;
+}
+
+/* استایل‌های جداول در دارک مود */
+.dark table {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark th {
+    background-color: #2d3748 !important;
+    color: var(--text-primary) !important;
+}
+
+.dark td {
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark tr:hover {
+    background-color: #3d3d3d !important;
+}
+
+/* استایل‌های کارت‌ها در دارک مود */
+.dark .card {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .card-header {
+    background-color: #2d3748 !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .card-footer {
+    background-color: #2d3748 !important;
+    border-color: var(--border-color) !important;
+}
+
+/* استایل‌های مودال در دارک مود */
+.dark .modal-content {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .modal-header {
+    border-color: var(--border-color) !important;
+}
+
+.dark .modal-footer {
+    border-color: var(--border-color) !important;
+}
+
+/* استایل‌های منو در دارک مود */
+.dark .dropdown-menu {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark .dropdown-item {
+    color: var(--text-primary) !important;
+}
+
+.dark .dropdown-item:hover {
+    background-color: #3d3d3d !important;
+    color: var(--text-primary) !important;
+}
+
+/* استایل‌های اسکرول‌بار در دارک مود */
+.dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #4a5568;
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #2d3748;
+}
+
+/* استایل‌های لینک‌ها در دارک مود */
+.dark a {
+    color: #63b3ed !important;
+}
+
+.dark a:hover {
+    color: #90cdf4 !important;
+}
+
+/* استایل‌های کد در دارک مود */
+.dark code {
+    background-color: #2d3748 !important;
+    color: #90cdf4 !important;
+}
+
+.dark pre {
+    background-color: #2d3748 !important;
+    border-color: var(--border-color) !important;
+}
+
+/* استایل‌های بج‌ها در دارک مود */
+.dark .badge {
+    background-color: #4a5568 !important;
+    color: var(--text-primary) !important;
+}
+
+.dark .badge-primary {
+    background-color: #2b6cb0 !important;
+}
+
+.dark .badge-secondary {
+    background-color: #4a5568 !important;
+}
+
+.dark .badge-success {
+    background-color: #2f855a !important;
+}
+
+.dark .badge-danger {
+    background-color: #c53030 !important;
+}
+
+.dark .badge-warning {
+    background-color: #975a16 !important;
+}
+
+.dark .badge-info {
+    background-color: #2c5282 !important;
+}
+
+/* استایل‌های آیکون‌ها در دارک مود */
+.dark svg {
+    color: var(--text-primary) !important;
+}
+
+.dark .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+/* استایل‌های گرادیان‌ها در دارک مود */
+.dark .bg-gradient-primary {
+    background: linear-gradient(45deg, #2b6cb0, #4299e1) !important;
+}
+
+.dark .bg-gradient-secondary {
+    background: linear-gradient(45deg, #4a5568, #718096) !important;
+}
+
+.dark .bg-gradient-success {
+    background: linear-gradient(45deg, #2f855a, #48bb78) !important;
+}
+
+.dark .bg-gradient-danger {
+    background: linear-gradient(45deg, #c53030, #f56565) !important;
+}
+
+.dark .bg-gradient-warning {
+    background: linear-gradient(45deg, #975a16, #ed8936) !important;
+}
+
+.dark .bg-gradient-info {
+    background: linear-gradient(45deg, #2c5282, #4299e1) !important;
+}
+
+/* استایل‌های سایه‌ها در دارک مود */
+.dark .shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4),
+        0 2px 4px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4),
+        0 4px 6px -2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .shadow-xl {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
+        0 10px 10px -5px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* استایل‌های انیمیشن‌ها در دارک مود */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.dark .fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.dark .slide-in {
+    animation: slideIn 0.3s ease-in-out;
+}
+
+/* استایل‌های ریسپانسیو در دارک مود */
+@media (max-width: 640px) {
+    .dark .header {
+        padding: 0.5rem;
+    }
+
+    .dark .notification-box {
+        width: 100%;
+        max-width: 100%;
+        left: 0;
+        right: 0;
+    }
+
+    .dark .floating-panel {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* استایل‌های پرینت در دارک مود */
+@media print {
+    .dark {
+        --bg-primary: white;
+        --bg-secondary: #f7fafc;
+        --text-primary: black;
+        --text-secondary: #4a5568;
+        --border-color: #e2e8f0;
+    }
+
+    .dark body {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    .dark .header,
+    .dark .notification-box,
+    .dark .option-card,
+    .dark .dropdown-trigger,
+    .dark .my-dropdown-menu,
+    .dark .floating-panel,
+    .dark .breadcrumb,
+    .dark .card,
+    .dark .modal-content {
+        background-color: white !important;
+        border-color: #e2e8f0 !important;
+    }
+
+    .dark .text-primary,
+    .dark .text-secondary,
+    .dark .text-muted {
+        color: black !important;
+    }
+
+    .dark a {
+        color: #2b6cb0 !important;
+    }
+
+    .dark .badge {
+        background-color: #e2e8f0 !important;
+        color: black !important;
+    }
+}
