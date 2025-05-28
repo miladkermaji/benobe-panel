@@ -49,8 +49,6 @@ class SpecialDaysAppointment extends Component
     public $hasWorkHoursMessage = false;
     public $showAddSlotModal = false;
     public $savePreviousRows = true;
-    public $doctorId;
-    public $doctor;
     protected $listeners = [
         'openHolidayModal' => 'handleOpenHolidayModal',
         'openTransferModal' => 'handleOpenTransferModal',
@@ -68,13 +66,6 @@ class SpecialDaysAppointment extends Component
     ];
     public function mount()
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
-        }
-        $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-        $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
-        $this->loadWorkSchedules();
         $this->calendarYear = is_numeric($this->calendarYear) ? (int) $this->calendarYear : (int) Jalalian::now()->getYear();
         $this->calendarMonth = is_numeric($this->calendarMonth) ? (int) $this->calendarMonth : (int) Jalalian::now()->getMonth();
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));

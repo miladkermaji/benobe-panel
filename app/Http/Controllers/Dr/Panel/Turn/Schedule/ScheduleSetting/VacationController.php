@@ -16,6 +16,9 @@ class VacationController extends Controller
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $selectedClinicId = $request->input('selectedClinicId');
 
+        // Get doctor's clinics
+        $clinics = \App\Models\Clinic::where('doctor_id', $doctorId)->get();
+
         try {
             $year = $request->input('year', Jalalian::now()->getYear());
             $month = str_pad($request->input('month', Jalalian::now()->getMonth()), 2, '0', STR_PAD_LEFT);
@@ -38,7 +41,7 @@ class VacationController extends Controller
                 return response()->json(['success' => true, 'vacations' => $vacations, 'year' => $year, 'month' => $month]);
             }
 
-            return view("dr.panel.turn.schedule.scheduleSetting.vacation", compact('vacations'));
+            return view("dr.panel.turn.schedule.scheduleSetting.vacation", compact('vacations', 'clinics'));
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'خطا در پردازش تاریخ‌ها: ' . $e->getMessage()], 500);
         }
@@ -104,7 +107,7 @@ class VacationController extends Controller
 
         Vacation::create([
             'doctor_id' => $doctorId,
-            'clinic_id' => $request->selectedClinicId !== 'default' ? $request->selectedClinicId : null,
+            'clinic_id' => $request->selectedClinicId && $request->selectedClinicId !== 'default' ? $request->selectedClinicId : null,
             'date' => $validatedData['date'],
             'start_time' => $validatedData['start_time'] ?? null,
             'end_time' => $validatedData['end_time'] ?? null,
