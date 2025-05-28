@@ -20,19 +20,18 @@
         <div class="myPanelOption p-3 d-md-block d-none">
           <div class="d-flex align-items-center">
             <div class="my-tooltip mx-2">
-              <x-custom-tooltip title="از این قسمت، مرکزی که در آن مشغول تجویز و طبابت هستید را انتخاب کنید" placement="bottom">
-              <svg
-                 width="16"
-                height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg"
-                class="lg:block svg-help" color="#3f4079" data-tip="true" data-for="centerSelect" currentItem="false">
-                <path
-                  d="M8.00006 9.9198V9.70984C8.00006 9.02984 8.42009 8.66982 8.84009 8.37982C9.25009 8.09982 9.66003 7.73983 9.66003 7.07983C9.66003 6.15983 8.92006 5.4198 8.00006 5.4198C7.08006 5.4198 6.34009 6.15983 6.34009 7.07983"
-                  stroke="#3f4079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                <path d="M7.9955 12.0692H8.0045" stroke="#3f4079" stroke-width="1.5" stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-                <circle cx="8" cy="8.99445" r="7.25" stroke="#3f4079" stroke-width="1.5"></circle>
-              </svg>
-            </x-custom-tooltip>
+              <x-custom-tooltip title="از این قسمت، مرکزی که در آن مشغول تجویز و طبابت هستید را انتخاب کنید"
+                placement="bottom">
+                <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg"
+                  class="lg:block svg-help" color="#3f4079" data-tip="true" data-for="centerSelect" currentItem="false">
+                  <path
+                    d="M8.00006 9.9198V9.70984C8.00006 9.02984 8.42009 8.66982 8.84009 8.37982C9.25009 8.09982 9.66003 7.73983 9.66003 7.07983C9.66003 6.15983 8.92006 5.4198 8.00006 5.4198C7.08006 5.4198 6.34009 6.15983 6.34009 7.07983"
+                    stroke="#3f4079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M7.9955 12.0692H8.0045" stroke="#3f4079" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                  <circle cx="8" cy="8.99445" r="7.25" stroke="#3f4079" stroke-width="1.5"></circle>
+                </svg>
+              </x-custom-tooltip>
             </div>
             <div class="">
               <div class="dropdown">
@@ -118,11 +117,31 @@
         <!-- دکمه شناور و پنل بازشونده برای موبایل -->
         <div class="floating-panel-btn d-md-none">
           <x-custom-tooltip title="انتخاب مرکز" placement="top">
-                <button class="floating-btn" aria-label="باز کردن پنل انتخاب مرکز">
-           <svg fill="#fff" width="64px" height="64px" viewBox="-0.26 0 33.549 33.549" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g transform="translate(-607.873 -577.167)"> <path d="M638.546,610.716a1,1,0,0,1-.942-1.334c1.785-5.044,1.745-8.637-.12-10.679-3.26-3.568-11.186-1.6-11.266-1.574l-1.247.318V586l.016-.087a3.188,3.188,0,0,0-.274-2.085.7.7,0,0,0-.609-.226.774.774,0,0,0-.657.247,3.155,3.155,0,0,0-.346,2.033l.011.144v15.115l-1.155-.18c-1.766-.279-2.336.02-2.408.158-.459.9,2.05,4.66,5.264,7.888a1,1,0,0,1-1.418,1.412c-1.681-1.689-7.053-7.412-5.627-10.208.645-1.265,2.182-1.425,3.344-1.359V586.094a4.926,4.926,0,0,1,.822-3.55,2.768,2.768,0,0,1,2.17-.939,2.678,2.678,0,0,1,2.144.944,4.94,4.94,0,0,1,.723,3.624v8.757c2.643-.466,8.781-1.085,11.987,2.42,2.406,2.629,2.585,6.9.532,12.7A1,1,0,0,1,638.546,610.716Z"></path> <path d="M612.733,586.792a2.2,2.2,0,0,1-1.562-.646l-3.005-3.005a1,1,0,0,1,1.414-1.414l3.006,3.005a.211.211,0,0,0,.3,0l6.522-6.521a1,1,0,0,1,1.414,1.414l-6.523,6.522A2.2,2.2,0,0,1,612.733,586.792Z"></path> <path d="M639.392,587.543a1,1,0,0,1-.707-.293l-8.376-8.376a1,1,0,0,1,1.414-1.414l8.376,8.376a1,1,0,0,1-.707,1.707Z"></path> <path d="M631.016,587.543a1,1,0,0,1-.707-1.707l8.376-8.376a1,1,0,0,1,1.414,1.414l-8.376,8.376A1,1,0,0,1,631.016,587.543Z"></path> </g> </g></svg>
-          </button>
+            <button class="floating-btn" aria-label="باز کردن پنل انتخاب مرکز">
+              <svg fill="#fff" width="64px" height="64px" viewBox="-0.26 0 33.549 33.549"
+                xmlns="http://www.w3.org/2000/svg">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <g transform="translate(-607.873 -577.167)">
+                    <path
+                      d="M638.546,610.716a1,1,0,0,1-.942-1.334c1.785-5.044,1.745-8.637-.12-10.679-3.26-3.568-11.186-1.6-11.266-1.574l-1.247.318V586l.016-.087a3.188,3.188,0,0,0-.274-2.085.7.7,0,0,0-.609-.226.774.774,0,0,0-.657.247,3.155,3.155,0,0,0-.346,2.033l.011.144v15.115l-1.155-.18c-1.766-.279-2.336.02-2.408.158-.459.9,2.05,4.66,5.264,7.888a1,1,0,0,1-1.418,1.412c-1.681-1.689-7.053-7.412-5.627-10.208.645-1.265,2.182-1.425,3.344-1.359V586.094a4.926,4.926,0,0,1,.822-3.55,2.768,2.768,0,0,1,2.17-.939,2.678,2.678,0,0,1,2.144.944,4.94,4.94,0,0,1,.723,3.624v8.757c2.643-.466,8.781-1.085,11.987,2.42,2.406,2.629,2.585,6.9.532,12.7A1,1,0,0,1,638.546,610.716Z">
+                    </path>
+                    <path
+                      d="M612.733,586.792a2.2,2.2,0,0,1-1.562-.646l-3.005-3.005a1,1,0,0,1,1.414-1.414l3.006,3.005a.211.211,0,0,0,.3,0l6.522-6.521a1,1,0,0,1,1.414,1.414l-6.523,6.522A2.2,2.2,0,0,1,612.733,586.792Z">
+                    </path>
+                    <path
+                      d="M639.392,587.543a1,1,0,0,1-.707-.293l-8.376-8.376a1,1,0,0,1,1.414-1.414l8.376,8.376a1,1,0,0,1-.707,1.707Z">
+                    </path>
+                    <path
+                      d="M631.016,587.543a1,1,0,0,1-.707-1.707l8.376-8.376a1,1,0,0,1,1.414,1.414l-8.376,8.376A1,1,0,0,1,631.016,587.543Z">
+                    </path>
+                  </g>
+                </g>
+              </svg>
+            </button>
           </x-custom-tooltip>
-      
+
           <div class="floating-panel d-none">
             <div class="panel-header">
               <h6 class="fw-bold fs-15 mb-0">انتخاب مرکز</h6>

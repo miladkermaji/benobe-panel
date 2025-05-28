@@ -2,11 +2,12 @@
 
 namespace App\Livewire\Dr\Panel\DoctorNotes;
 
-use Livewire\Component;
-use Illuminate\Support\Facades\Validator;
-use App\Models\DoctorNote;
 use App\Models\Clinic;
+use Livewire\Component;
+use App\Models\DoctorNote;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class DoctorNoteCreate extends Component
 {
@@ -17,8 +18,28 @@ class DoctorNoteCreate extends Component
 
     public function mount()
     {
-        // Fetch only the clinics associated with the authenticated doctor
-        $this->clinics = Auth::guard('doctor')->user()->clinics ?? Auth::guard('secretary')->user()->clinics;
+        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        if ($user instanceof \App\Models\Doctor) {
+            $this->clinics = $user->clinics()->get();
+            Log::info('Loading clinics for doctor', [
+                'user_type' => 'doctor',
+                'doctor_id' => $user->id
+            ]);
+        } else {
+            $this->clinics = $user->doctor->clinics()->get();
+            Log::info('Loading clinics for secretary', [
+                'user_type' => 'secretary',
+                'secretary_id' => $user->id,
+                'doctor_id' => $user->doctor_id
+            ]);
+        }
+
+        if ($this->clinics->isEmpty()) {
+            Log::info('No clinics found', [
+                'user_type' => $user instanceof \App\Models\Doctor ? 'doctor' : 'secretary',
+                'user_id' => $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id
+            ]);
+        }
     }
 
     public function store()
