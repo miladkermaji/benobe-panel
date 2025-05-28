@@ -99,6 +99,13 @@ class MembershipPlanList extends Component
         $this->resetPage();
     }
 
+    public function toggleStatus($id)
+    {
+        $plan = UserMembershipPlan::findOrFail($id);
+        $plan->update(['status' => !$plan->status]);
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت طرح عضویت با موفقیت تغییر کرد!');
+    }
+
     private function getPlansQuery()
     {
         return UserMembershipPlan::query()

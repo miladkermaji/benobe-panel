@@ -1,251 +1,396 @@
+<div class="container-fluid py-4" dir="rtl" wire:init="loadPlans">
+  <!-- Header Section -->
+  <div class="glass-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-3">
 
-
-<div class="container-fluid py-2" dir="rtl" wire:init="loadPlans">
-  <header class="glass-header text-white p-3 rounded-3 shadow-lg">
-    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-      <div class="d-flex align-items-center gap-2">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          class="header-icon">
-          <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-        <h2 class="mb-0 fw-bold fs-5">مدیریت طرح‌های عضویت</h2>
+        <h4 class="mb-0 fw-bold text-white">طرح‌های عضویت</h4>
       </div>
-      <div class="d-flex flex-column flex-md-row align-items-center gap-3 w-100 w-md-auto">
-        <div class="search-box position-relative w-100 w-md-auto" style="max-width: 300px;">
-          <input type="text" wire:model.live="search"
-            class="form-control border-0 shadow-none bg-white text-dark ps-4" placeholder="جستجو...">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"
-            class="search-icon position-absolute" style="right: .4rem; top: 50%; transform: translateY(-50%);">
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
+      <div class="d-flex gap-3">
+
+        <a href="{{ route('admin.panel.user-membership-plans.create') }}"
+          class="btn btn-success btn-sm rounded-pill px-4 py-2 d-flex align-items-center text-white gap-2 shadow-sm hover-shadow-lg transition-all">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14" />
           </svg>
-        </div>
-        <div class="d-flex gap-3 flex-shrink-0 flex-wrap justify-content-center mt-md-0">
-          <a href="{{ route('admin.panel.user-membership-plans.create') }}" style="white-space: nowrap"
-            class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            <span>افزودن طرح عضویت</span>
-          </a>
-          <button wire:click="deleteSelected" style="white-space: nowrap"
-            class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
-            @if (empty($selectedPlans)) disabled @endif>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-            </svg>
-            <span>حذف انتخاب‌شده‌ها</span>
-          </button>
-        </div>
+          افزودن طرح جدید
+        </a>
       </div>
-    </div>
-  </header>
-
-  <div class="container-fluid px-0">
-    <!-- Desktop View -->
-    <div class="container-fluid px-0 d-none d-md-block">
-      <div class="card shadow-sm">
-        <div class="card-body p-0">
-          <div class="table-responsive text-nowrap">
-            <table class="table table-hover w-100 m-0">
-              <thead>
-                <tr>
-                  <th class="text-center align-middle" style="width: 50px;">
-                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
-                  </th>
-                  <th class="text-center align-middle cursor-pointer" style="width: 70px;" wire:click="sortBy('id')">
-                    شناسه
-                    @if ($sortField === 'id')
-                      @if ($sortDirection === 'asc')
-                        ↑
-                      @else
-                        ↓
-                      @endif
-                    @endif
-                  </th>
-                  <th class="align-middle cursor-pointer" wire:click="sortBy('name')">نام</th>
-                  <th class="align-middle cursor-pointer" wire:click="sortBy('price')">قیمت</th>
-                  <th class="align-middle cursor-pointer" wire:click="sortBy('discount')">تخفیف</th>
-                  <th class="align-middle cursor-pointer" wire:click="sortBy('duration_days')">مدت‌زمان</th>
-                  <th class="text-center align-middle cursor-pointer" style="width: 100px;"
-                    wire:click="sortBy('status')">وضعیت</th>
-                  <th class="text-center align-middle" style="width: 150px;">عملیات</th>
-                </tr>
-              </thead>
-              <tbody>
-                @if ($readyToLoad)
-                  @forelse ($plans as $index => $plan)
-                    <tr>
-                      <td class="text-center align-middle">
-                        <input type="checkbox" wire:model.live="selectedPlans" value="{{ $plan->id }}"
-                          class="form-check-input m-0">
-                      </td>
-                      <td class="text-center align-middle">{{ $plans->firstItem() + $index }}</td>
-                      <td class="align-middle">{{ $plan->name }}</td>
-                      <td class="align-middle">{{ number_format($plan->price) }} تومان</td>
-                      <td class="align-middle">{{ $plan->discount }}%</td>
-                      <td class="align-middle">{{ $plan->duration_days }} {{ $plan->duration_type }}</td>
-                      <td class="text-center align-middle">
-                        <span class="badge {{ $plan->status ? 'bg-label-success' : 'bg-label-danger' }} border-0">
-                          {{ $plan->status ? 'فعال' : 'غیرفعال' }}
-                        </span>
-                      </td>
-                      <td class="text-center align-middle">
-                        <div class="d-flex justify-content-center gap-2">
-                          <a href="{{ route('admin.panel.user-membership-plans.edit', $plan->id) }}"
-                            class="btn btn-gradient-primary rounded-pill px-3">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
-                              <path
-                                d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                            </svg>
-                          </a>
-                          <button wire:click="confirmDelete({{ $plan->id }})"
-                            class="btn btn-gradient-danger rounded-pill px-3">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                              stroke="currentColor" stroke-width="2">
-                              <path
-                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  @empty
-                    <tr>
-                      <td colspan="8" class="text-center py-5">
-                        <div class="d-flex justify-content-center align-items-center flex-column">
-                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" class="text-muted mb-3">
-                            <path d="M5 12h14M12 5l7 7-7 7" />
-                          </svg>
-                          <p class="text-muted fw-medium">هیچ طرح عضویتی یافت نشد.</p>
-                        </div>
-                      </td>
-                    </tr>
-                  @endforelse
-                @else
-                  <tr>
-                    <td colspan="8" class="text-center py-5">در حال بارگذاری طرح‌های عضویت...</td>
-                  </tr>
-                @endif
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mobile/Tablet View -->
-    <div class="container-fluid px-0 d-md-none">
-      @if ($readyToLoad)
-        @forelse ($plans as $index => $plan)
-          <div class="card shadow-sm mb-3">
-            <div class="card-body">
-              <div class="d-flex align-items-center gap-3 mb-3">
-                <input type="checkbox" wire:model.live="selectedPlans" value="{{ $plan->id }}"
-                  class="form-check-input m-0">
-                <div>
-                  <h6 class="mb-1">{{ $plan->name }}</h6>
-                  <small class="text-muted">{{ number_format($plan->price) }} تومان</small>
-                </div>
-              </div>
-              <div class="row g-3">
-                <div class="col-6">
-                  <small class="text-muted d-block">شناسه</small>
-                  <span>{{ $plans->firstItem() + $index }}</span>
-                </div>
-                <div class="col-6">
-                  <small class="text-muted d-block">تخفیف</small>
-                  <span>{{ $plan->discount }}%</span>
-                </div>
-                <div class="col-6">
-                  <small class="text-muted d-block">مدت‌زمان</small>
-                  <span>{{ $plan->duration_days }} {{ $plan->duration_type }}</span>
-                </div>
-                <div class="col-6">
-                  <small class="text-muted d-block">وضعیت</small>
-                  <span class="badge {{ $plan->status ? 'bg-label-success' : 'bg-label-danger' }} border-0">
-                    {{ $plan->status ? 'فعال' : 'غیرفعال' }}
-                  </span>
-                </div>
-                <div class="col-12">
-                  <small class="text-muted d-block">عملیات</small>
-                  <div class="d-flex gap-2">
-                    <a href="{{ route('admin.panel.user-membership-plans.edit', $plan->id) }}"
-                      class="btn btn-gradient-primary btn-sm rounded-pill px-3">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path
-                          d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                      </svg>
-                    </a>
-                    <button wire:click="confirmDelete({{ $plan->id }})"
-                      class="btn btn-gradient-danger btn-sm rounded-pill px-3">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        @empty
-          <div class="text-center py-5">
-            <div class="d-flex justify-content-center align-items-center flex-column">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" class="text-muted mb-3">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-              <p class="text-muted fw-medium">هیچ طرح عضویتی یافت نشد.</p>
-            </div>
-          </div>
-        @endforelse
-      @else
-        <div class="text-center py-5">در حال بارگذاری طرح‌های عضویت...</div>
-      @endif
-    </div>
-
-    <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
-      <div class="text-muted">نمایش {{ $plans ? $plans->firstItem() : 0 }} تا
-        {{ $plans ? $plans->lastItem() : 0 }} از {{ $plans ? $plans->total() : 0 }} ردیف
-      </div>
-      @if ($plans && $plans->hasPages())
-        <div class="pagination-container">
-          {{ $plans->onEachSide(1)->links('livewire::bootstrap') }}
-        </div>
-      @endif
     </div>
   </div>
 
-  <script>
-    document.addEventListener('livewire:init', function() {
-      Livewire.on('show-alert', (event) => {
-        toastr[event.type](event.message);
-      });
+  @if ($readyToLoad)
+    <div class="row g-4">
+      @forelse($plans as $plan)
+        @php
+          $planColors = [
+              'gold' => [
+                  'bg' => 'bg-opacity-5',
+                  'text' => 'text-warning',
+                  'border' => 'border-warning',
+                  'badge' => 'bg-warning',
+                  'icon' => '⭐',
+                  'color' => '#FFD700',
+                  'gradient' => 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+              ],
+              'silver' => [
+                  'bg' => 'bg-opacity-5',
+                  'text' => 'text-secondary',
+                  'border' => 'border-secondary',
+                  'badge' => 'bg-secondary',
+                  'icon' => '🥈',
+                  'color' => '#C0C0C0',
+                  'gradient' => 'linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%)',
+              ],
+              'bronze' => [
+                  'bg' => 'bg-opacity-5',
+                  'text' => 'text-danger',
+                  'border' => 'border-danger',
+                  'badge' => 'bg-danger',
+                  'icon' => '🥉',
+                  'color' => '#CD7F32',
+                  'gradient' => 'linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)',
+              ],
+          ];
+          $planType = $loop->index % 3;
+          $colors = match ($planType) {
+              0 => $planColors['gold'],
+              1 => $planColors['silver'],
+              default => $planColors['bronze'],
+          };
+        @endphp
+        <div class="col-md-4">
+          <div class="plan-card rounded-5 p-4 h-100 position-relative"
+            style="background: white; border: 1px solid {{ $colors['color'] }}30;">
+            <!-- Gradient Corner -->
+            <div class="gradient-corner" style="background: {{ $colors['gradient'] }}; z-index: 0;"></div>
 
-      Livewire.on('confirm-delete', (event) => {
-        Swal.fire({
-          title: 'حذف طرح عضویت',
-          text: 'آیا مطمئن هستید که می‌خواهید این طرح عضویت را حذف کنید؟',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#ef4444',
-          cancelButtonColor: '#6b7280',
-          confirmButtonText: 'بله، حذف کن',
-          cancelButtonText: 'خیر'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Livewire.dispatch('deletePlanConfirmed', {
-              id: event.id
+            <!-- Duration Type Badge -->
+            <div class="duration-badge rounded-pill px-3 py-1 position-absolute top-0 start-0 m-3"
+              style="background: {{ $colors['color'] }}50; backdrop-filter: blur(5px); z-index: 1;">
+              <span class="fw-bold text-white">
+                @switch($plan->duration_type)
+                  @case('day')
+                    روزانه
+                  @break
+
+                  @case('week')
+                    هفتگی
+                  @break
+
+                  @case('month')
+                    ماهانه
+                  @break
+
+                  @case('year')
+                    سالانه
+                  @break
+                @endswitch
+              </span>
+            </div>
+
+            <!-- Plan Type Badge -->
+            <div class="plan-type-badge rounded-pill px-3 py-1 position-absolute"
+              style="background: {{ $colors['color'] }}; backdrop-filter: blur(5px); box-shadow: 0 2px 8px {{ $colors['color'] }}50; z-index: 999; left: 50%; top: -15px; transform: translateX(-50%);">
+              <span class="badge-text">{{ $colors['icon'] }} {{ $plan->name }}</span>
+            </div>
+
+            <!-- Price Section -->
+            <div class="text-center my-4">
+              <div class="price-tag {{ $colors['text'] }} mb-2">
+                <span
+                  class="display-4 fw-bold text-dark text-shadow">{{ number_format($plan->price * (1 - $plan->discount / 100)) }}</span>
+                <span class="fs-5 fw-bold text-dark text-shadow">تومان</span>
+              </div>
+              @if ($plan->discount > 0)
+                <div class="discount-badge {{ $colors['badge'] }} text-white rounded-pill px-3 py-1 d-inline-block">
+                  {{ $plan->discount }}% تخفیف
+                </div>
+                <div class="original-price text-dark-50 text-decoration-line-through mt-2">
+                  {{ number_format($plan->price) }} تومان
+                </div>
+              @endif
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-list">
+              <div class="feature-item d-flex align-items-center gap-2 mb-3">
+                <div class="feature-icon {{ $colors['text'] }}">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div class="feature-text">
+                  <span class="text-dark-75 fw-medium">مدت زمان:</span>
+                  <span class="fw-bold text-dark">{{ $plan->duration_days }} روز</span>
+                </div>
+              </div>
+
+              <div class="feature-item d-flex align-items-center gap-2 mb-3">
+                <div class="feature-icon {{ $colors['text'] }}">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div class="feature-text">
+                  <span class="text-dark-75 fw-medium">تعداد نوبت:</span>
+                  <span class="fw-bold text-dark">{{ $plan->appointment_count }} نوبت</span>
+                </div>
+              </div>
+
+              @if ($plan->description)
+                <div class="feature-item d-flex align-items-center gap-2">
+                  <div class="feature-icon {{ $colors['text'] }}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <path
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div class="feature-text">
+                    <span class="text-dark-75 fw-medium">توضیحات:</span>
+                    <p class="mb-0 small text-dark fw-medium">{{ Str::limit($plan->description, 100) }}</p>
+                  </div>
+                </div>
+              @endif
+            </div>
+
+            <!-- Actions Section -->
+            <div class="actions mt-4 pt-3 border-top border-dark-25">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex gap-2">
+                  <a href="{{ route('admin.panel.user-membership-plans.edit', $plan) }}"
+                    class="btn btn-sm rounded-pill px-3" style="background: {{ $colors['color'] }}; color: white;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    ویرایش
+                  </a>
+                  <button wire:click="confirmDelete({{ $plan->id }})" class="btn btn-sm rounded-pill px-3"
+                    style="background: #dc3545; color: white;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                    </svg>
+                    حذف
+                  </button>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" wire:click="toggleStatus({{ $plan->id }})"
+                    {{ $plan->status ? 'checked' : '' }}>
+                  <label class="form-check-label small text-dark fw-bold">
+                    {{ $plan->status ? 'فعال' : 'غیرفعال' }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        @empty
+          <div class="col-12">
+            <div class="empty-state text-center py-5">
+              <div class="empty-state-icon mb-3">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" class="text-muted">
+                  <path
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h5 class="text-muted mb-0">هیچ طرح عضویتی یافت نشد!</h5>
+            </div>
+          </div>
+        @endforelse
+      </div>
+
+      <div class="d-flex justify-content-center mt-4">
+        {{ $plans->links() }}
+      </div>
+    @else
+      <div class="loading-state text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">در حال بارگذاری...</span>
+        </div>
+        <h5 class="text-muted mt-3 mb-0">در حال بارگذاری...</h5>
+      </div>
+    @endif
+
+    @push('scripts')
+      <script>
+        document.addEventListener('livewire:init', function() {
+          Livewire.on('show-alert', (event) => {
+            toastr[event.type](event.message);
+          });
+
+          Livewire.on('confirm-delete', (event) => {
+            Swal.fire({
+              title: 'آیا مطمئن هستید؟',
+              text: "این عملیات غیرقابل بازگشت است!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'بله، حذف شود!',
+              cancelButtonText: 'انصراف'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                Livewire.dispatch('deletePlanConfirmed', {
+                  id: event.id
+                });
+              }
             });
-          }
+          });
         });
-      });
-    });
-  </script>
-</div>
+      </script>
+    @endpush
+    <style>
+      .glass-header {
+        background: var(--gradient-primary);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 15px var(--shadow);
+        border-radius: var(--radius-card);
+        transition: all 0.3s ease;
+        padding: 0.75rem;
+      }
+
+      .glass-input {
+        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+
+      .glass-input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .glass-input:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+        box-shadow: none;
+      }
+
+      .plan-card {
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border-radius: 1.5rem !important;
+        background: white !important;
+        overflow: visible;
+        position: relative;
+      }
+
+      .plan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.3);
+      }
+
+      .gradient-corner {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 150px;
+        height: 150px;
+        opacity: 0.1;
+        clip-path: polygon(100% 0, 0 0, 100% 100%);
+        transition: all 0.3s ease;
+      }
+
+      .plan-card:hover .gradient-corner {
+        opacity: 0.15;
+        transform: scale(1.1);
+      }
+
+      .duration-badge {
+        font-size: 0.9rem;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .plan-type-badge {
+        font-size: 0.9rem;
+        font-weight: 600;
+        white-space: nowrap;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        background: var(--gradient-primary);
+      }
+
+      .plan-card:hover .plan-type-badge {
+        transform: translateX(-50%) scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .badge-text {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        letter-spacing: 0.5px;
+      }
+
+      .feature-item {
+        padding: 0.75rem;
+        border-radius: 1rem;
+        transition: all 0.2s ease;
+        background: rgba(0, 0, 0, 0.03);
+      }
+
+      .feature-item:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+
+      .feature-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.05);
+      }
+
+      .text-dark-75 {
+        color: rgba(0, 0, 0, 0.75) !important;
+      }
+
+      .text-dark-50 {
+        color: rgba(0, 0, 0, 0.5) !important;
+      }
+
+      .border-dark-25 {
+        border-color: rgba(0, 0, 0, 0.25) !important;
+      }
+
+      .price-tag {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .text-shadow {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .discount-badge {
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        color: white;
+      }
+
+      .fw-medium {
+        font-weight: 500 !important;
+      }
+
+      .btn {
+        transition: all 0.2s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: white;
+      }
+    </style>
+  </div>
