@@ -202,7 +202,7 @@ class Doctor extends Authenticatable
 
     public function clinics()
     {
-        return $this->belongsToMany(Clinic::class, 'doctor_clinic');
+        return $this->hasMany(Clinic::class, 'doctor_id');
     }
     public function walletTransactions()
     {

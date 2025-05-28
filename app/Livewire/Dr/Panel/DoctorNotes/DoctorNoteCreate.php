@@ -23,21 +23,28 @@ class DoctorNoteCreate extends Component
             $this->clinics = $user->clinics()->get();
             Log::info('Loading clinics for doctor', [
                 'user_type' => 'doctor',
-                'doctor_id' => $user->id
+                'doctor_id' => $user->id,
+                'clinics_count' => $this->clinics->count()
             ]);
         } else {
-            $this->clinics = $user->doctor->clinics()->get();
+            $doctor = $user->doctor;
+            
+            $this->clinics = $doctor->clinics()->get();
             Log::info('Loading clinics for secretary', [
                 'user_type' => 'secretary',
                 'secretary_id' => $user->id,
-                'doctor_id' => $user->doctor_id
+                'doctor_id' => $doctor->id,
+                'doctor_exists' => $doctor ? 'yes' : 'no',
+                'clinics_count' => $this->clinics->count(),
+                'raw_clinics' => $doctor->clinics()->toSql()
             ]);
         }
 
         if ($this->clinics->isEmpty()) {
             Log::info('No clinics found', [
                 'user_type' => $user instanceof \App\Models\Doctor ? 'doctor' : 'secretary',
-                'user_id' => $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id
+                'user_id' => $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id,
+                'doctor_exists' => $user instanceof \App\Models\Doctor ? 'yes' : ($user->doctor ? 'yes' : 'no')
             ]);
         }
     }
