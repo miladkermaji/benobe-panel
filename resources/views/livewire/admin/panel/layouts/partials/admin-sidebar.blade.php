@@ -94,7 +94,7 @@
             <li class="item-li"><a href="#">ارتقا حساب پزشکان</a></li>
           </ul>
         </li>
-         <!-- حق عضویت -->
+        <!-- حق عضویت -->
         <li class="item-li i-courses">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             حق عضویت
@@ -278,7 +278,7 @@
             <li class="item-li"><a href="{{ route('admin.panel.doctor-services.index') }}">خدمات پزشکان</a></li>
           </ul>
         </li>
-       
+
         <!-- مدیریت مالی -->
         <li class="item-li i-courses">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">

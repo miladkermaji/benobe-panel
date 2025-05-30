@@ -100,6 +100,8 @@
 }
 
 canvas {
+    width: 100% !important;
+    height: 250px !important;
     font-family: IRANSans, sans-serif !important;
 }
 
@@ -107,7 +109,8 @@ canvas {
     border-radius: 16px;
     margin: 20px 0;
     background: var(--background-card);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 
+0, 0.08);
 }
 
 .top-details-sicks-cards {
