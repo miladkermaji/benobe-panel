@@ -69,11 +69,6 @@
     transition: none !important;
 }
 
-.chart-container:hover {
-    transform: none !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
 .chart-container::before {
     content: "";
     position: absolute;
@@ -84,10 +79,6 @@
     background: linear-gradient(90deg, var(--primary), var(--primary-light));
     opacity: 0.9;
     transition: none !important;
-}
-
-.chart-container:hover::before {
-    opacity: 0.9;
 }
 
 .section-title {
@@ -103,12 +94,9 @@
     gap: 8px;
     background: linear-gradient(90deg, var(--primary), #7fbfff);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
-    transition: transform 0.3s ease;
-}
-
-.section-title:hover {
-    transform: scale(1.03);
+    transition: none !important;
 }
 
 canvas {
