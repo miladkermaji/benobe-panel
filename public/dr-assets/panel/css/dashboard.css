@@ -65,11 +65,13 @@
     margin-bottom: 0;
     display: flex;
     flex-direction: column;
+    transform: none !important;
+    transition: none !important;
 }
 
 .chart-container:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: none !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .chart-container::before {
@@ -81,11 +83,11 @@
     height: 4px;
     background: linear-gradient(90deg, var(--primary), var(--primary-light));
     opacity: 0.9;
-    transition: opacity 0.3s ease;
+    transition: none !important;
 }
 
 .chart-container:hover::before {
-    opacity: 1;
+    opacity: 0.9;
 }
 
 .section-title {
@@ -110,8 +112,6 @@
 }
 
 canvas {
-    width: 100% !important;
-    height: 100% !important;
     font-family: IRANSans, sans-serif !important;
 }
 

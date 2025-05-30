@@ -171,19 +171,41 @@
               size: 12
             },
             padding: 10,
-            cornerRadius: 8
+            cornerRadius: 8,
+            animation: false
           }
         },
-        animation: {
-          duration: 1200,
-          easing: 'easeOutQuart'
+        animation: false,
+        elements: {
+          line: {
+            tension: 0,
+            borderWidth: 2,
+            fill: false
+          },
+          point: {
+            radius: 0,
+            hitRadius: 10,
+            hoverRadius: 4
+          }
+        },
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        layout: {
+          padding: {
+            top: 10,
+            right: 10,
+            bottom: 10,
+            left: 10
+          }
         }
       };
 
       // Appointments by Month Chart
       const appointmentsByMonthCtx = document.getElementById('appointmentsByMonthChart').getContext('2d');
       new Chart(appointmentsByMonthCtx, {
-        type: 'bar',
+        type: 'line',
         data: {
           labels: persianMonths,
           datasets: [{
@@ -191,9 +213,9 @@
             data: @json(array_values($appointmentsByMonth)),
             backgroundColor: '#60a5fa',
             borderColor: '#3b82f6',
-            borderWidth: 1,
-            borderRadius: 12,
-            barThickness: 20
+            borderWidth: 2,
+            tension: 0,
+            fill: false
           }]
         },
         options: {
@@ -203,6 +225,10 @@
               beginAtZero: true,
               grid: {
                 color: 'rgba(0, 0, 0, 0.05)'
+              },
+              ticks: {
+                precision: 0,
+                stepSize: 1
               }
             },
             x: {
