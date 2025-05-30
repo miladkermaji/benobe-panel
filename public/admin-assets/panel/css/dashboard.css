@@ -105,7 +105,6 @@
 
 .top-panel-bg {
     border-radius: 16px;
-    margin: 20px 0;
     background: var(--background-card);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
