@@ -220,9 +220,13 @@
         <div class="d-flex notif-option px-3">
           <div class="position-relative">
             <!-- آیکون زنگوله -->
-            <span class="bell-red-badge" x-show="{{ $unreadCount }} > 0" x-text="{{ $unreadCount }}"></span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="cursor-pointer" fill="none" viewBox="0 0 24 24"
-              height="24px" role="img" x-on:click="$refs.notificationBox.classList.toggle('d-none')">
+            <span
+              class="absolute -top-3 -right-3 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-white shadow-lg"
+              x-show="{{ $unreadCount }} > 0" x-text="{{ $unreadCount }}"></span>
+            <svg xmlns="http://www.w3.org/2000/svg"
+              class="cursor-pointer hover:text-gray-600 transition-colors duration-200" fill="none"
+              viewBox="0 0 24 24" height="24px" role="img"
+              x-on:click="$refs.notificationBox.classList.toggle('d-none')">
               <path
                 d="M12.02 2.91c-3.31 0-6 2.69-6 6v2.89c0 .61-.26 1.54-.57 2.06L4.3 15.77c-.71 1.18-.22 2.49 1.08 2.93 4.31 1.44 8.96 1.44 13.27 0 1.21-.4 1.74-1.83 1.08-2.93l-1.15-1.91c-.3-.52-.56-1.45-.56-2.06V8.91c0-3.3-2.7-6-6-6z"
                 stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"></path>
