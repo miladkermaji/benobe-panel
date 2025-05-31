@@ -2,32 +2,64 @@
 @section('styles')
   <link type="text/css" href="{{ asset('admin-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('admin-assets/panel/css/dashboard.css') }}" rel="stylesheet" />
+
   <style>
-    .chart-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
+    .chart-content {
       padding: 1.5rem;
     }
 
-    .chart-container {
+    .chart-card {
       background: white;
       border-radius: 1rem;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      padding: 1.5rem;
+      margin-bottom: 1.5rem;
       height: 400px;
     }
 
-    .chart-title {
+    .chart-card .card-body {
+      height: 100%;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-card .card-title {
       font-size: 1.1rem;
       font-weight: 600;
       color: #2d3748;
       margin-bottom: 1rem;
       text-align: right;
+      font-family: 'Vazir', sans-serif;
     }
 
-    .chart-wrapper {
-      height: calc(100% - 3rem);
+    .chart-container {
+      flex: 1;
+      position: relative;
+      min-height: 300px;
+    }
+
+    @media (max-width: 768px) {
+      .chart-content {
+        padding: 0.5rem;
+      }
+
+      .chart-card {
+        margin-bottom: 1rem;
+        height: 350px;
+      }
+
+      .chart-card .card-body {
+        padding: 1rem;
+      }
+
+      .chart-card .card-title {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .chart-container {
+        min-height: 250px;
+      }
     }
   </style>
 @endsection
@@ -99,76 +131,172 @@
 </div>
 
 <div class="chart-content">
-  <div class="chart-grid">
-    <!-- نمودار ۱: نوبت‌ها در هر ماه -->
-    <div class="chart-container">
-      <div class="chart-title">📊 نوبت‌ها در هر ماه</div>
-      <div class="chart-wrapper">
-        <canvas id="appointmentsByMonthChart"></canvas>
+  <div class="row">
+    <!-- نمودار نوبت‌ها در هر ماه -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">نوبت‌ها در هر ماه</h5>
+          <div class="chart-container">
+            <canvas id="appointmentsByMonthChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- نمودار ۲: وضعیت نوبت‌ها -->
-    <div class="chart-container">
-      <div class="chart-title">📈 وضعیت نوبت‌ها</div>
-      <div class="chart-wrapper">
-        <canvas id="appointmentStatusesChart"></canvas>
+    <!-- نمودار وضعیت نوبت‌ها -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">وضعیت نوبت‌ها</h5>
+          <div class="chart-container">
+            <canvas id="appointmentStatusesChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- نمودار ۳: نوبت‌ها در روزهای هفته -->
-    <div class="chart-container">
-      <div class="chart-title">📅 نوبت‌ها در روزهای هفته</div>
-      <div class="chart-wrapper">
-        <canvas id="appointmentsByDayOfWeekChart"></canvas>
+    <!-- نمودار نوبت‌ها در روزهای هفته -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">نوبت‌ها در روزهای هفته</h5>
+          <div class="chart-container">
+            <canvas id="appointmentsByDayOfWeekChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- نمودار ۴: فعالیت کلینیک‌ها -->
-    <div class="chart-container">
-      <div class="chart-title">🏥 فعالیت کلینیک‌ها</div>
-      <div class="chart-wrapper">
-        <canvas id="clinicActivityChart"></canvas>
+    <!-- نمودار توزیع تخصص‌های پزشکان -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">توزیع تخصص‌های پزشکان</h5>
+          <div class="chart-container">
+            <canvas id="doctorSpecialtiesChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- نمودار ۵: توزیع تخصص‌های پزشکان -->
-    <div class="chart-container">
-      <div class="chart-title">👨‍⚕️ توزیع تخصص‌های پزشکان</div>
-      <div class="chart-wrapper">
-        <canvas id="doctorSpecialtiesChart"></canvas>
+    <!-- نمودار روند نوبت‌ها -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">روند نوبت‌ها</h5>
+          <div class="chart-container">
+            <canvas id="appointmentsTrendChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- نمودار ۶: روند نوبت‌ها -->
-    <div class="chart-container">
-      <div class="chart-title">📈 روند نوبت‌ها</div>
-      <div class="chart-wrapper">
-        <canvas id="appointmentsTrendChart"></canvas>
+    <!-- نمودار مقایسه کلینیک‌ها -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">مقایسه کلینیک‌ها</h5>
+          <div class="chart-container">
+            <canvas id="clinicComparisonChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- نمودار ۷: مقایسه کلینیک‌ها -->
-    <div class="chart-container">
-      <div class="chart-title">⚖️ مقایسه کلینیک‌ها</div>
-      <div class="chart-wrapper">
-        <canvas id="clinicComparisonChart"></canvas>
+    <!-- نمودار وضعیت پرداخت‌ها -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">وضعیت پرداخت‌ها</h5>
+          <div class="chart-container">
+            <canvas id="paymentStatusChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- نمودار ۸: وضعیت پرداخت‌ها -->
-    <div class="chart-container">
-      <div class="chart-title">💰 وضعیت پرداخت‌ها</div>
-      <div class="chart-wrapper">
-        <canvas id="paymentStatusChart"></canvas>
+    <!-- نمودار آمار بازدید -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">آمار بازدید</h5>
+          <div class="chart-container">
+            <canvas id="visitorStatsChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- نمودار ۹: آمار بازدید -->
-    <div class="chart-container">
-      <div class="chart-title">👥 آمار بازدید</div>
-      <div class="chart-wrapper">
-        <canvas id="visitorStatsChart"></canvas>
+    <!-- نمودار درآمد ماهانه -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">درآمد ماهانه</h5>
+          <div class="chart-container">
+            <canvas id="monthlyRevenueChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- نمودار توزیع بیمه‌ها -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">توزیع بیمه‌ها</h5>
+          <div class="chart-container">
+            <canvas id="insuranceDistributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- نمودار روند رشد کاربران -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">روند رشد کاربران</h5>
+          <div class="chart-container">
+            <canvas id="userGrowthChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- نمودار توزیع جنسیت بیماران -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">توزیع جنسیت بیماران</h5>
+          <div class="chart-container">
+            <canvas id="patientGenderDistributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- نمودار توزیع سنی بیماران -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">توزیع سنی بیماران</h5>
+          <div class="chart-container">
+            <canvas id="patientAgeDistributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- نمودار توزیع جغرافیایی بیماران -->
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">توزیع جغرافیایی بیماران</h5>
+          <div class="chart-container">
+            <canvas id="patientGeographicDistributionChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -178,7 +306,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const persianMonths = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+    const persianMonths = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی',
+      'بهمن', 'اسفند'
+    ];
     const persianDays = ['دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه', 'یک‌شنبه'];
 
     const commonOptions = {
@@ -186,338 +316,443 @@
       maintainAspectRatio: false,
       plugins: {
         legend: {
+          display: true,
           position: 'bottom',
+          align: 'center',
           labels: {
             font: {
-              family: 'IRANSans',
-              size: 14,
-              weight: '500'
+              family: 'Vazir',
+              size: 14
             },
             padding: 20,
-            color: '#2d3748'
+            usePointStyle: true,
+            pointStyle: 'circle'
           }
-        },
-        tooltip: {
-          enabled: true,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleFont: {
-            family: 'IRANSans',
-            size: 14
-          },
-          bodyFont: {
-            family: 'IRANSans',
-            size: 12
-          },
-          padding: 10,
-          cornerRadius: 8
         }
-      },
-      animation: {
-        duration: 1200,
-        easing: 'easeOutQuart'
       }
     };
 
-    // نمودار ۱: نوبت‌ها در هر ماه (Bar Chart)
-    const appointmentsByMonthCtx = document.getElementById('appointmentsByMonthChart').getContext('2d');
-    new Chart(appointmentsByMonthCtx, {
+    const pieChartOptions = {
+      ...commonOptions,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          align: 'center',
+          labels: {
+            font: {
+              family: 'Vazir',
+              size: 14
+            },
+            padding: 20,
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.raw;
+            }
+          }
+        }
+      },
+      layout: {
+        padding: {
+          bottom: 40
+        }
+      },
+      cutout: '50%'
+    };
+
+    // نمودار نوبت‌ها در هر ماه
+    const appointmentsByMonthData = @json($appointmentsByMonth);
+    const monthLabels = [];
+    const monthData = [];
+    for (let i = 1; i <= 12; i++) {
+      if (appointmentsByMonthData[i] !== undefined) {
+        monthLabels.push(persianMonths[i - 1]);
+        monthData.push(appointmentsByMonthData[i]);
+      }
+    }
+    new Chart(document.getElementById('appointmentsByMonthChart'), {
       type: 'bar',
       data: {
-        labels: persianMonths,
+        labels: monthLabels,
         datasets: [{
           label: 'تعداد نوبت‌ها',
-          data: @json(array_values($appointmentsByMonth)),
-          backgroundColor: '#60a5fa',
-          borderColor: '#3b82f6',
-          borderWidth: 1,
-          borderRadius: 12,
-          barThickness: 20
+          data: monthData,
+          backgroundColor: 'rgb(75, 192, 192)',
+          borderWidth: 0
         }]
       },
       options: {
         ...commonOptions,
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            }
-          },
-          x: {
-            grid: {
-              display: false
+        plugins: {
+          ...commonOptions.plugins,
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return 'تعداد نوبت‌ها: ' + context.raw;
+              }
             }
           }
         },
-        plugins: {
-          legend: {
-            display: false
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
           }
         }
       }
     });
 
-    // نمودار ۲: وضعیت نوبت‌ها (Doughnut Chart)
-    const appointmentStatusesCtx = document.getElementById('appointmentStatusesChart').getContext('2d');
-    new Chart(appointmentStatusesCtx, {
-      type: 'doughnut',
+    // نمودار وضعیت نوبت‌ها
+    const appointmentStatusesData = @json($appointmentStatuses);
+    new Chart(document.getElementById('appointmentStatusesChart'), {
+      type: 'pie',
       data: {
-        labels: @json(array_keys($appointmentStatuses)),
+        labels: Object.keys(appointmentStatusesData),
         datasets: [{
-          data: @json(array_values($appointmentStatuses)),
-          backgroundColor: ['#60a5fa', '#f87171', '#34d399', '#fbbf24', '#a78bfa'],
-          borderWidth: 2,
-          borderColor: '#fff'
+          data: Object.values(appointmentStatusesData),
+          backgroundColor: [
+            'rgb(75, 192, 192)',
+            'rgb(255, 99, 132)',
+            'rgb(255, 205, 86)',
+            'rgb(54, 162, 235)'
+          ]
         }]
       },
-      options: {
-        ...commonOptions,
-        cutout: '60%'
-      }
+      options: pieChartOptions
     });
 
-    // نمودار ۳: نوبت‌ها در روزهای هفته (Line Chart)
-    const appointmentsByDayOfWeekCtx = document.getElementById('appointmentsByDayOfWeekChart').getContext('2d');
-    new Chart(appointmentsByDayOfWeekCtx, {
-      type: 'line',
+    // نمودار نوبت‌ها در روزهای هفته
+    const appointmentsByDayOfWeekData = @json($appointmentsByDayOfWeek);
+    new Chart(document.getElementById('appointmentsByDayOfWeekChart'), {
+      type: 'bar',
       data: {
         labels: persianDays,
         datasets: [{
           label: 'تعداد نوبت‌ها',
-          data: @json(array_values($appointmentsByDayOfWeek)),
-          borderColor: '#34d399',
-          backgroundColor: 'rgba(52, 211, 153, 0.1)',
-          tension: 0.4,
-          fill: true
+          data: Object.values(appointmentsByDayOfWeekData),
+          backgroundColor: 'rgb(153, 102, 255)'
         }]
       },
-      options: {
-        ...commonOptions,
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
-        }
-      }
+      options: commonOptions
     });
 
-    // نمودار ۴: فعالیت کلینیک‌ها (Horizontal Bar Chart)
-    const clinicActivityCtx = document.getElementById('clinicActivityChart').getContext('2d');
-    new Chart(clinicActivityCtx, {
-      type: 'bar',
+    // نمودار توزیع تخصص‌های پزشکان
+    const doctorSpecialtiesData = @json($doctorSpecialties);
+    const topSpecialties = Object.entries(doctorSpecialtiesData)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .reduce((r, [k, v]) => ({
+        ...r,
+        [k]: v
+      }), {});
+
+    new Chart(document.getElementById('doctorSpecialtiesChart'), {
+      type: 'doughnut',
       data: {
-        labels: @json(array_keys($clinicActivity)),
+        labels: Object.keys(topSpecialties),
         datasets: [{
-          label: 'تعداد نوبت‌ها',
-          data: @json(array_values($clinicActivity)),
-          backgroundColor: ['#60a5fa', '#f87171', '#34d399', '#fbbf24', '#a78bfa', '#f59e0b'],
-          borderColor: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#d97706'],
-          borderWidth: 1,
-          borderRadius: 12
+          data: Object.values(topSpecialties),
+          backgroundColor: [
+            'rgb(255, 99, 132)',
+            'rgb(54, 162, 235)',
+            'rgb(255, 205, 86)',
+            'rgb(75, 192, 192)',
+            'rgb(153, 102, 255)'
+          ]
         }]
       },
-      options: {
-        ...commonOptions,
-        indexAxis: 'y',
-        scales: {
-          x: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            }
-          },
-          y: {
-            grid: {
-              display: false
-            }
-          }
-        }
-      }
+      options: pieChartOptions
     });
 
-    // نمودار ۵: توزیع تخصص‌های پزشکان (Pie Chart)
-    const doctorSpecialtiesCtx = document.getElementById('doctorSpecialtiesChart').getContext('2d');
-    new Chart(doctorSpecialtiesCtx, {
-      type: 'pie',
-      data: {
-        labels: @json(array_keys($doctorSpecialties)),
-        datasets: [{
-          data: @json(array_values($doctorSpecialties)),
-          backgroundColor: ['#60a5fa', '#f87171', '#34d399', '#fbbf24', '#a78bfa', '#f59e0b'],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        ...commonOptions,
-        plugins: {
-          legend: {
-            position: 'right'
-          }
-        }
-      }
-    });
+    // نمودار روند نوبت‌ها
+    const appointmentsTrendData = @json($appointmentsTrend);
+    const jalaliAppointmentsTrend = convertWeeksToJalali(appointmentsTrendData);
 
-    // نمودار ۶: روند نوبت‌ها (Area Chart)
-    const appointmentsTrendCtx = document.getElementById('appointmentsTrendChart').getContext('2d');
-    new Chart(appointmentsTrendCtx, {
+    new Chart(document.getElementById('appointmentsTrendChart'), {
       type: 'line',
       data: {
-        labels: @json(array_keys($appointmentsTrend)),
+        labels: Object.keys(jalaliAppointmentsTrend),
         datasets: [{
-          label: 'نوبت‌های جدید',
-          data: @json(array_values($appointmentsTrend)),
-          borderColor: '#8b5cf6',
-          backgroundColor: 'rgba(139, 92, 246, 0.1)',
-          tension: 0.4,
-          fill: true
+          label: 'تعداد نوبت‌ها',
+          data: Object.values(jalaliAppointmentsTrend),
+          borderColor: 'rgb(153, 102, 255)',
+          tension: 0.1
         }]
       },
-      options: {
-        ...commonOptions,
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
-        }
-      }
+      options: commonOptions
     });
 
-    // نمودار ۷: مقایسه کلینیک‌ها (Stacked Bar Chart)
-    const clinicComparisonCtx = document.getElementById('clinicComparisonChart').getContext('2d');
+    // نمودار مقایسه کلینیک‌ها
     const clinicComparisonData = @json($clinicComparison);
-    new Chart(clinicComparisonCtx, {
+    new Chart(document.getElementById('clinicComparisonChart'), {
       type: 'bar',
       data: {
         labels: Object.keys(clinicComparisonData),
-        datasets: [
-          {
+        datasets: [{
             label: 'حاضر شده',
             data: Object.values(clinicComparisonData).map(item => item['حاضر شده']),
-            backgroundColor: '#34d399',
-            borderColor: '#10b981',
-            borderWidth: 1
+            backgroundColor: 'rgb(75, 192, 192)'
           },
           {
             label: 'لغو شده',
             data: Object.values(clinicComparisonData).map(item => item['لغو شده']),
-            backgroundColor: '#f87171',
-            borderColor: '#ef4444',
-            borderWidth: 1
+            backgroundColor: 'rgb(255, 99, 132)'
           },
           {
             label: 'غایب',
             data: Object.values(clinicComparisonData).map(item => item['غایب']),
-            backgroundColor: '#fbbf24',
-            borderColor: '#f59e0b',
-            borderWidth: 1
+            backgroundColor: 'rgb(255, 205, 86)'
           }
         ]
       },
-      options: {
-        ...commonOptions,
-        scales: {
-          x: {
-            stacked: true,
-            grid: {
-              display: false
-            }
-          },
-          y: {
-            stacked: true,
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            }
-          }
-        }
-      }
+      options: commonOptions
     });
 
-    // نمودار ۸: وضعیت پرداخت‌ها (Polar Area Chart)
-    const paymentStatusCtx = document.getElementById('paymentStatusChart').getContext('2d');
-    new Chart(paymentStatusCtx, {
-      type: 'polarArea',
+    // نمودار وضعیت پرداخت‌ها
+    const paymentStatusData = @json($paymentStatus);
+    new Chart(document.getElementById('paymentStatusChart'), {
+      type: 'pie',
       data: {
-        labels: @json(array_keys($paymentStatus)),
+        labels: Object.keys(paymentStatusData),
         datasets: [{
-          data: @json(array_values($paymentStatus)),
-          backgroundColor: ['#34d399', '#fbbf24', '#f87171'],
-          borderWidth: 2,
-          borderColor: '#fff'
+          data: Object.values(paymentStatusData),
+          backgroundColor: [
+            'rgb(75, 192, 192)',
+            'rgb(255, 99, 132)',
+            'rgb(255, 205, 86)'
+          ]
         }]
       },
-      options: {
-        ...commonOptions,
-        scales: {
-          r: {
-            ticks: {
-              display: false
-            }
-          }
-        }
-      }
+      options: pieChartOptions
     });
 
-    // نمودار ۹: آمار بازدید (Bar Chart)
-    const visitorStatsCtx = document.getElementById('visitorStatsChart').getContext('2d');
-    new Chart(visitorStatsCtx, {
+    // نمودار آمار بازدید
+    const visitorStatsData = @json($visitorStats);
+    const persianVisitorLabels = {
+      'today': 'امروز',
+      'yesterday': 'دیروز',
+      'this_week': 'این هفته',
+      'last_week': 'هفته گذشته',
+      'this_month': 'این ماه'
+    };
+
+    const persianVisitorData = {};
+    Object.keys(visitorStatsData).forEach(key => {
+      persianVisitorData[persianVisitorLabels[key]] = visitorStatsData[key];
+    });
+
+    new Chart(document.getElementById('visitorStatsChart'), {
       type: 'bar',
       data: {
-        labels: ['امروز', 'دیروز', 'این هفته', 'هفته گذشته', 'این ماه'],
+        labels: Object.keys(persianVisitorData),
         datasets: [{
           label: 'تعداد بازدید',
-          data: [
-            @json($visitorStats['today']),
-            @json($visitorStats['yesterday']),
-            @json($visitorStats['this_week']),
-            @json($visitorStats['last_week']),
-            @json($visitorStats['this_month'])
-          ],
-          backgroundColor: '#60a5fa',
-          borderColor: '#3b82f6',
-          borderWidth: 1,
-          borderRadius: 12
+          data: Object.values(persianVisitorData),
+          backgroundColor: 'rgb(54, 162, 235)'
+        }]
+      },
+      options: commonOptions
+    });
+
+    // نمودار درآمد ماهانه
+    const monthlyRevenueData = @json($monthlyRevenue);
+    const jalaliMonthlyRevenue = convertMonthsToJalali(monthlyRevenueData);
+
+    new Chart(document.getElementById('monthlyRevenueChart'), {
+      type: 'line',
+      data: {
+        labels: Object.keys(jalaliMonthlyRevenue),
+        datasets: [{
+          label: 'درآمد ماهانه',
+          data: Object.values(jalaliMonthlyRevenue),
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
         }]
       },
       options: {
         ...commonOptions,
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
-        },
         plugins: {
-          legend: {
-            display: false
+          ...commonOptions.plugins,
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return 'درآمد: ' + context.raw + ' تومان';
+              }
+            }
           }
         }
       }
     });
+
+    // نمودار توزیع بیمه‌ها
+    const insuranceDistributionData = @json($insuranceDistribution);
+    const topInsurances = Object.entries(insuranceDistributionData)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .reduce((r, [k, v]) => ({
+        ...r,
+        [k]: v
+      }), {});
+
+    new Chart(document.getElementById('insuranceDistributionChart'), {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(topInsurances),
+        datasets: [{
+          data: Object.values(topInsurances),
+          backgroundColor: [
+            'rgb(255, 99, 132)',
+            'rgb(54, 162, 235)',
+            'rgb(255, 205, 86)',
+            'rgb(75, 192, 192)',
+            'rgb(153, 102, 255)'
+          ]
+        }]
+      },
+      options: pieChartOptions
+    });
+
+    // نمودار روند رشد کاربران
+    const userGrowthData = @json($userGrowth);
+    const jalaliUserGrowth = convertMonthsToJalali(userGrowthData);
+
+    new Chart(document.getElementById('userGrowthChart'), {
+      type: 'line',
+      data: {
+        labels: Object.keys(jalaliUserGrowth),
+        datasets: [{
+          label: 'تعداد کاربران جدید',
+          data: Object.values(jalaliUserGrowth),
+          borderColor: 'rgb(255, 99, 132)',
+          tension: 0.1
+        }]
+      },
+      options: {
+        ...commonOptions,
+        plugins: {
+          ...commonOptions.plugins,
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return 'تعداد کاربران: ' + context.raw;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // نمودار توزیع جنسیت بیماران
+    const patientGenderData = @json($patientGenderDistribution);
+    new Chart(document.getElementById('patientGenderDistributionChart'), {
+      type: 'pie',
+      data: {
+        labels: Object.keys(patientGenderData),
+        datasets: [{
+          data: Object.values(patientGenderData),
+          backgroundColor: [
+            'rgb(54, 162, 235)',
+            'rgb(255, 99, 132)'
+          ]
+        }]
+      },
+      options: pieChartOptions
+    });
+
+    // نمودار توزیع سنی بیماران
+    const patientAgeData = @json($patientAgeDistribution);
+    new Chart(document.getElementById('patientAgeDistributionChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(patientAgeData),
+        datasets: [{
+          label: 'تعداد بیماران',
+          data: Object.values(patientAgeData),
+          backgroundColor: 'rgb(75, 192, 192)'
+        }]
+      },
+      options: commonOptions
+    });
+
+    // نمودار توزیع جغرافیایی بیماران
+    const geographicData = @json($patientGeographicDistribution);
+    const topGeographic = Object.entries(geographicData)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
+      .reduce((r, [k, v]) => ({
+        ...r,
+        [k]: v
+      }), {});
+    new Chart(document.getElementById('patientGeographicDistributionChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(topGeographic),
+        datasets: [{
+          label: 'تعداد بیماران',
+          data: Object.values(topGeographic),
+          backgroundColor: 'rgb(75, 192, 192)'
+        }]
+      },
+      options: commonOptions
+    });
+
+    // تبدیل ماه‌های میلادی به شمسی برای نمودارها
+    function convertMonthsToJalali(data) {
+      const jalaliMonths = {
+        '01': 'فروردین',
+        '02': 'اردیبهشت',
+        '03': 'خرداد',
+        '04': 'تیر',
+        '05': 'مرداد',
+        '06': 'شهریور',
+        '07': 'مهر',
+        '08': 'آبان',
+        '09': 'آذر',
+        '10': 'دی',
+        '11': 'بهمن',
+        '12': 'اسفند'
+      };
+
+      const result = {};
+      Object.keys(data).forEach(key => {
+        if (key && data[key] !== undefined) {
+          const [year, month] = key.split('-');
+          if (month && jalaliMonths[month]) {
+            const jalaliMonth = jalaliMonths[month];
+            result[jalaliMonth] = data[key];
+          }
+        }
+      });
+      return result;
+    }
+
+    // تبدیل هفته‌های میلادی به شمسی برای نمودارها
+    function convertWeeksToJalali(data) {
+      const result = {};
+      Object.keys(data).forEach(key => {
+        const [year, week] = key.split('-');
+        const date = moment().year(year).week(week);
+        result[toJalaliWeek(date)] = data[key];
+      });
+      return result;
+    }
+
+    // تبدیل تاریخ میلادی به شمسی
+    function toJalali(date) {
+      return moment(date).format('jYYYY/jMM/jDD');
+    }
+
+    // تبدیل هفته میلادی به شمسی
+    function toJalaliWeek(date) {
+      return moment(date).format('jYYYY/jMM/jDD');
+    }
   });
 </script>
 @endsection

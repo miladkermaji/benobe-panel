@@ -48,6 +48,34 @@ class AdminDashboardController extends Controller
             'pos' => 'پرداخت با کارت'
         ];
 
+        // آمار هفتگی
+        $weeklyStats = [
+            'appointments' => Appointment::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'users' => User::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'operations' => Appointment::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+                ->where('status', 'attended')
+                ->count(),
+            'revenue' => Appointment::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+                ->where('payment_status', 'paid')
+                ->sum('final_price'),
+            'new_doctors' => Doctor::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'new_clinics' => Clinic::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count()
+        ];
+
+        // آمار ماهانه
+        $monthlyStats = [
+            'appointments' => Appointment::whereMonth('created_at', now()->month)->count(),
+            'users' => User::whereMonth('created_at', now()->month)->count(),
+            'operations' => Appointment::whereMonth('created_at', now()->month)
+                ->where('status', 'attended')
+                ->count(),
+            'revenue' => Appointment::whereMonth('created_at', now()->month)
+                ->where('payment_status', 'paid')
+                ->sum('final_price'),
+            'new_doctors' => Doctor::whereMonth('created_at', now()->month)->count(),
+            'new_clinics' => Clinic::whereMonth('created_at', now()->month)->count()
+        ];
+
         return view('admin.panel.dashboard.index', [
             'totalDoctors' => Doctor::whereNull('deleted_at')->count(),
             'totalPatients' => User::where('user_type', 0)->whereNull('deleted_at')->count(),
@@ -55,6 +83,8 @@ class AdminDashboardController extends Controller
             'totalManagers' => Manager::whereNull('deleted_at')->count(),
             'totalClinics' => Clinic::count(),
             'totalAppointments' => Appointment::whereNull('deleted_at')->count(),
+            'weeklyStats' => $weeklyStats,
+            'monthlyStats' => $monthlyStats,
 
             // نمودار ۱: نوبت‌ها در هر ماه
             'appointmentsByMonth' => Appointment::selectRaw('MONTH(appointment_date) as month, COUNT(*) as count')
@@ -80,28 +110,26 @@ class AdminDashboardController extends Controller
                 ->pluck('count', 'day')
                 ->toArray(),
 
-            // نمودار ۴: فعالیت کلینیک‌ها
-            'clinicActivity' => Appointment::selectRaw('clinics.name as clinic_name, COUNT(appointments.id) as count')
-                ->join('clinics', 'appointments.clinic_id', '=', 'clinics.id')
-                ->whereNull('appointments.deleted_at')
-                ->groupBy('clinics.id', 'clinics.name')
-                ->pluck('count', 'clinic_name')
-                ->toArray(),
-
             // نمودار ۵: توزیع تخصص‌های پزشکان
             'doctorSpecialties' => Doctor::selectRaw('specialties.name as specialty_name, COUNT(doctors.id) as count')
                 ->join('specialties', 'doctors.specialty_id', '=', 'specialties.id')
                 ->whereNull('doctors.deleted_at')
                 ->groupBy('specialties.id', 'specialties.name')
+                ->orderBy('count', 'desc')
+                ->limit(6)
                 ->pluck('count', 'specialty_name')
                 ->toArray(),
 
-            // نمودار ۶: روند نوبت‌ها
-            'appointmentsTrend' => Appointment::selectRaw('DATE(appointment_date) as date, COUNT(*) as count')
+            // نمودار ۶: روند نوبت‌ها (به صورت هفتگی)
+            'appointmentsTrend' => Appointment::selectRaw('
+                    DATE_FORMAT(appointment_date, "%Y-%u") as week,
+                    COUNT(*) as count
+                ')
                 ->whereNull('appointments.deleted_at')
-                ->where('appointment_date', '>=', now()->subDays(30))
-                ->groupBy('date')
-                ->pluck('count', 'date')
+                ->where('appointment_date', '>=', now()->subWeeks(12))
+                ->groupBy('week')
+                ->orderBy('week')
+                ->pluck('count', 'week')
                 ->toArray(),
 
             // نمودار ۷: مقایسه کلینیک‌ها
@@ -114,6 +142,8 @@ class AdminDashboardController extends Controller
                 ->join('clinics', 'appointments.clinic_id', '=', 'clinics.id')
                 ->whereNull('appointments.deleted_at')
                 ->groupBy('clinics.id', 'clinics.name')
+                ->orderBy(DB::raw('COUNT(appointments.id)'), 'desc')
+                ->limit(5)
                 ->get()
                 ->mapWithKeys(function ($item) {
                     return [$item->clinic_name => [
@@ -142,6 +172,119 @@ class AdminDashboardController extends Controller
                 'last_week' => Appointment::whereBetween('created_at', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->count(),
                 'this_month' => Appointment::whereMonth('created_at', now()->month)->count(),
             ],
+
+            // نمودار ۱۰: درآمد ماهانه
+            'monthlyRevenue' => Appointment::selectRaw('
+                    DATE_FORMAT(created_at, "%Y-%m") as month,
+                    SUM(CASE WHEN payment_status = "paid" THEN final_price ELSE 0 END) as revenue
+                ')
+                ->whereNull('deleted_at')
+                ->where('created_at', '>=', now()->subMonths(12))
+                ->groupBy('month')
+                ->orderBy('month')
+                ->pluck('revenue', 'month')
+                ->toArray(),
+
+            // نمودار ۱۱: توزیع بیمه‌ها
+            'insuranceDistribution' => Appointment::selectRaw('
+                    insurances.name as insurance_name,
+                    COUNT(appointments.id) as count
+                ')
+                ->join('insurances', 'appointments.insurance_id', '=', 'insurances.id')
+                ->whereNull('appointments.deleted_at')
+                ->groupBy('insurances.id', 'insurances.name')
+                ->orderBy('count', 'desc')
+                ->limit(5)
+                ->pluck('count', 'insurance_name')
+                ->toArray(),
+
+            // نمودار ۱۲: روند رشد کاربران
+            'userGrowth' => User::selectRaw('
+                    DATE_FORMAT(created_at, "%Y-%m") as month,
+                    COUNT(*) as count
+                ')
+                ->where('created_at', '>=', now()->subMonths(12))
+                ->groupBy('month')
+                ->orderBy('month')
+                ->pluck('count', 'month')
+                ->toArray(),
+
+            // نمودار ۱۳: توزیع جنسیت بیماران
+            'patientGenderDistribution' => User::where('user_type', 0)
+                ->selectRaw('sex, COUNT(*) as count')
+                ->groupBy('sex')
+                ->pluck('count', 'sex')
+                ->mapWithKeys(function ($count, $sex) {
+                    return [$sex === 'male' ? 'مرد' : 'زن' => $count];
+                })
+                ->toArray(),
+
+            // نمودار ۱۴: توزیع سنی بیماران
+            'patientAgeDistribution' => User::where('user_type', 0)
+                ->whereNotNull('date_of_birth')
+                ->selectRaw('
+                    CASE 
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 18 THEN "کمتر از 18 سال"
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 18 AND 30 THEN "18-30 سال"
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 31 AND 45 THEN "31-45 سال"
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 46 AND 60 THEN "46-60 سال"
+                        ELSE "بیشتر از 60 سال"
+                    END as age_group,
+                    COUNT(*) as count
+                ')
+                ->groupBy('age_group')
+                ->pluck('count', 'age_group')
+                ->toArray(),
+
+            // نمودار ۱۵: توزیع جغرافیایی بیماران (بهبود یافته)
+            'patientGeographicDistribution' => User::where('user_type', 0)
+                ->selectRaw('
+                    zone.name as province,
+                    COUNT(*) as count
+                ')
+                ->join('zone', 'users.zone_province_id', '=', 'zone.id')
+                ->groupBy('zone.id', 'zone.name')
+                ->orderBy('count', 'desc')
+                ->limit(10)
+                ->pluck('count', 'province')
+                ->toArray(),
+
+            // نمودار جدید: توزیع نوع نوبت‌ها
+            'appointmentTypeDistribution' => Appointment::selectRaw('
+                    appointment_type,
+                    COUNT(*) as count
+                ')
+                ->whereNull('deleted_at')
+                ->groupBy('appointment_type')
+                ->pluck('count', 'appointment_type')
+                ->mapWithKeys(function ($count, $type) use ($appointmentTypeTranslations) {
+                    return [$appointmentTypeTranslations[$type] ?? $type => $count];
+                })
+                ->toArray(),
+
+            // نمودار جدید: توزیع روش‌های پرداخت
+            'paymentMethodDistribution' => Appointment::selectRaw('
+                    payment_method,
+                    COUNT(*) as count
+                ')
+                ->whereNull('deleted_at')
+                ->groupBy('payment_method')
+                ->pluck('count', 'payment_method')
+                ->mapWithKeys(function ($count, $method) use ($paymentMethodTranslations) {
+                    return [$paymentMethodTranslations[$method] ?? $method => $count];
+                })
+                ->toArray(),
+
+            // نمودار جدید: روند رشد پزشکان
+            'doctorGrowth' => Doctor::selectRaw('
+                    DATE_FORMAT(created_at, "%Y-%m") as month,
+                    COUNT(*) as count
+                ')
+                ->where('created_at', '>=', now()->subMonths(12))
+                ->groupBy('month')
+                ->orderBy('month')
+                ->pluck('count', 'month')
+                ->toArray(),
 
             // برچسب‌های کلینیک
             'clinicActivityLabels' => Clinic::pluck('name')->toArray()

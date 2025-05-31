@@ -109,8 +109,7 @@ canvas {
     border-radius: 16px;
     margin: 20px 0;
     background: var(--background-card);
-    box-shadow: 0 4px 12px rgba(0, 0, 
-0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .top-details-sicks-cards {
@@ -187,6 +186,39 @@ canvas {
     text-overflow: ellipsis;
     transition: color 0.3s ease;
     color: white;
+}
+
+/* Weekly and Monthly Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.stat-box {
+    background: var(--primary);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-box .stat-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-box .stat-value {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
 /* Appointment Cards */
