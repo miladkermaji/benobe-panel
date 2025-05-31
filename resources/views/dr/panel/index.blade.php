@@ -100,7 +100,7 @@
 
     <!-- نمودار ۴: وضعیت نوبت‌ها -->
     <div class="chart-container">
-      <div class="chart-title">📈 وضعیت نوبت‌ها</div>
+      <div class="chart-title">📈 انواع نوبت‌ها</div>
       <div class="chart-wrapper">
         <canvas id="doctor-status-chart"></canvas>
       </div>

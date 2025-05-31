@@ -1,6 +1,4 @@
 <script>
-
-
   // متغیر جهانی برای clinic_id
   let selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
 
@@ -19,15 +17,16 @@
         console.log('AJAX response:', response);
         $('#chart-container .loader').remove();
 
-        // تبدیل ماه‌ها به فارسی
-        const persianMonths = response.appointments?.map(item => {
-          const [year, month] = item.month.split('-');
-          return moment(`${year}-${month}-01`).locale('fa').format('jYYYY/jMM');
+        // تبدیل هفته‌ها به فارسی
+        const persianWeeks = response.appointments?.map(item => {
+          const [year, week] = item.month.split('-');
+          const date = moment().year(year).week(week).startOf('week');
+          return date.locale('fa').format('jYYYY/jMM/jDD');
         }) || [];
 
         // داده‌های پیش‌فرض
         const defaultData = [{
-          month: persianMonths[0] || 'ماه قبل',
+          month: persianWeeks[0] || 'هفته قبل',
           scheduled: 0,
           attended: 0,
           missed: 0,
@@ -40,7 +39,8 @@
 
         // تبدیل داده‌ها به فرمت مناسب
         const appointments = response.appointments?.map(item => ({
-          month: moment(item.month + '-01').locale('fa').format('jYYYY/jMM'),
+          month: moment().year(item.month.split('-')[0]).week(item.month.split('-')[1]).startOf('week')
+            .locale('fa').format('jYYYY/jMM/jDD'),
           scheduled: item.scheduled || 0,
           attended: item.attended || 0,
           missed: item.missed || 0,
@@ -54,12 +54,24 @@
         })) || defaultData;
 
         const newPatients = response.newPatients?.map(item => ({
-          month: moment(item.month + '-01').locale('fa').format('jYYYY/jMM'),
+          month: moment().year(item.month.split('-')[0]).week(item.month.split('-')[1]).startOf('week')
+            .locale('fa').format('jYYYY/jMM/jDD'),
           count: item.count || 0
         })) || defaultData;
 
+        const appointmentTypes = response.appointmentTypes?.map(item => ({
+          month: moment().year(item.month.split('-')[0]).week(item.month.split('-')[1]).startOf('week')
+            .locale('fa').format('jYYYY/jMM/jDD'),
+          in_person: item.in_person || 0,
+          online: item.online || 0,
+          phone: item.phone || 0,
+          video: item.video || 0,
+          text: item.text || 0
+        })) || defaultData;
+
         const counselingAppointments = response.counselingAppointments?.map(item => ({
-          month: moment(item.month + '-01').locale('fa').format('jYYYY/jMM'),
+          month: moment().year(item.month.split('-')[0]).week(item.month.split('-')[1]).startOf('week')
+            .locale('fa').format('jYYYY/jMM/jDD'),
           scheduled: item.scheduled || 0,
           attended: item.attended || 0,
           missed: item.missed || 0,
@@ -67,7 +79,8 @@
         })) || defaultData;
 
         const manualAppointments = response.manualAppointments?.map(item => ({
-          month: moment(item.month + '-01').locale('fa').format('jYYYY/jMM'),
+          month: moment().year(item.month.split('-')[0]).week(item.month.split('-')[1]).startOf('week')
+            .locale('fa').format('jYYYY/jMM/jDD'),
           scheduled: item.scheduled || 0,
           confirmed: item.confirmed || 0
         })) || defaultData;
@@ -81,7 +94,7 @@
         renderPerformanceChart(appointments);
         renderIncomeChart(monthlyIncome);
         renderPatientChart(newPatients);
-        renderStatusChart(appointments);
+        renderAppointmentTypesChart(appointmentTypes);
         renderStatusPieChart(appointments);
         renderPatientTrendChart(newPatients);
         renderCounselingChart(counselingAppointments);
@@ -297,8 +310,8 @@
     });
   }
 
-  // 📈 نمودار وضعیت نوبت‌ها - نمودار میله‌ای گروهی
-  function renderStatusChart(data) {
+  // 📈 نمودار انواع نوبت‌ها - نمودار میله‌ای گروهی
+  function renderAppointmentTypesChart(data) {
     let ctx = document.getElementById('doctor-status-chart').getContext('2d');
     if (window.statusChart) {
       window.statusChart.destroy();
@@ -313,29 +326,36 @@
       data: {
         labels: labels,
         datasets: [{
-            label: 'ویزیت شده',
-            data: data.map(item => item.scheduled || 0),
+            label: 'حضوری',
+            data: data.map(item => item.in_person || 0),
             backgroundColor: '#2e86c1',
             borderColor: '#2e86c1',
             borderWidth: 1
           },
           {
-            label: 'انجام‌شده',
-            data: data.map(item => item.attended || 0),
+            label: 'آنلاین',
+            data: data.map(item => item.online || 0),
             backgroundColor: '#34d399',
             borderColor: '#34d399',
             borderWidth: 1
           },
           {
-            label: 'غیبت',
-            data: data.map(item => item.missed || 0),
+            label: 'تلفنی',
+            data: data.map(item => item.phone || 0),
             backgroundColor: '#f87171',
             borderColor: '#f87171',
             borderWidth: 1
           },
           {
-            label: 'لغو‌شده',
-            data: data.map(item => item.cancelled || 0),
+            label: 'ویدیویی',
+            data: data.map(item => item.video || 0),
+            backgroundColor: '#8b5cf6',
+            borderColor: '#8b5cf6',
+            borderWidth: 1
+          },
+          {
+            label: 'متنی',
+            data: data.map(item => item.text || 0),
             backgroundColor: '#fbbf24',
             borderColor: '#fbbf24',
             borderWidth: 1
