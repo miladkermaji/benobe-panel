@@ -118,74 +118,71 @@ canvas {
 
 .top-s-a-wrapper {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1rem;
-    margin: 0 -0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    width: 100%;
 }
 
 .stat-card {
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    min-width: 0;
-    position: relative;
+    gap: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    min-height: 80px;
+    width: 100%;
     overflow: hidden;
-    background: var(--primary);
-    height: 80px;
 }
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .stat-icon {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    background: #f8fafc;
+    border-radius: 10px;
     flex-shrink: 0;
-    position: relative;
-    z-index: 2;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.2);
 }
 
-.stat-card:hover .stat-icon {
-    background: rgba(255, 255, 255, 0.3);
+.stat-icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
 }
 
 .stat-info {
     flex: 1;
     min-width: 0;
-    position: relative;
-    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .stat-label {
-    font-size: 0.75rem;
-    margin-bottom: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: color 0.3s ease;
-    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.4;
 }
 
 .stat-value {
-    font-size: 1.125rem;
+    font-size: 16px;
+    color: #ffffff;
     font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: color 0.3s ease;
-    color: white;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.4;
 }
 
 /* Weekly and Monthly Stats */
@@ -323,7 +320,7 @@ canvas {
     }
 
     .stat-card {
-        flex: 0 0 180px;
+        flex: 0 0 220px;
         scroll-snap-align: start;
     }
 
@@ -337,8 +334,37 @@ canvas {
 }
 
 @media only screen and (max-width: 768px) {
+    .top-s-a-wrapper {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding: 0.5rem 0;
+        gap: 1rem;
+    }
+
     .stat-card {
-        flex: 0 0 160px;
+        flex: 0 0 200px;
+        scroll-snap-align: start;
+        padding: 12px;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .stat-icon img {
+        width: 20px;
+        height: 20px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+    }
+
+    .stat-value {
+        font-size: 15px;
     }
 
     .chart-grid {
@@ -357,6 +383,6 @@ canvas {
 
 @media only screen and (max-width: 480px) {
     .stat-card {
-        flex: 0 0 140px;
+        flex: 0 0 180px;
     }
 }
