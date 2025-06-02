@@ -360,7 +360,7 @@
         --animate-spin: spin 1s linear infinite;
         --animate-ping: ping 1s cubic-bezier(0, 0, .2, 1)infinite;
         --animate-pulse: pulse 2s cubic-bezier(.4, 0, .6, 1)infinite;
-        --animate-bounce: bounce 1s infinite;
+        --custom-animate-bounce: bounce 1s infinite;
         --blur-xs: 4px;
         --blur-sm: 8px;
         --blur-md: 12px;

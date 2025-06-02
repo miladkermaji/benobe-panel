@@ -4,7 +4,7 @@
       class="card-header glass-header text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          class="animate-bounce">
+          class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">افزودن بهترین پزشک جدید</h5>
@@ -180,7 +180,7 @@
       border-color: #6b7280;
     }
 
-    .animate-bounce {
+    .custom-animate-bounce {
       animation: bounce 1s infinite;
     }
 
@@ -230,16 +230,16 @@
   <script>
     document.addEventListener('livewire:initialized', () => {
       window.Livewire.on('show-alert', function(event) {
-          if (typeof toastr !== 'undefined') {
-            toastr.options = {
-              "positionClass": "toast-top-right",
-              "rtl": true
-            };
-            toastr[event.type](event.message);
-          } else {
-            alert(event.message);
-          }
-        });
+        if (typeof toastr !== 'undefined') {
+          toastr.options = {
+            "positionClass": "toast-top-right",
+            "rtl": true
+          };
+          toastr[event.type](event.message);
+        } else {
+          alert(event.message);
+        }
+      });
       // Initialize doctor select2
       $('#doctor_id').select2({
         theme: 'bootstrap-5',
@@ -303,7 +303,6 @@
         allowClear: true
       });
     });
-  
   </script>
 
 

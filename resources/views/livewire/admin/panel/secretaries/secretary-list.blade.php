@@ -38,7 +38,8 @@
                     <circle cx="12" cy="7" r="4" />
                   </svg>
                   <span class="fw-bold text-text-primary text-lg">{{ $doctor->first_name . ' ' . $doctor->last_name }}
-                    ({{ $doctor->mobile }})</span>
+                    ({{ $doctor->mobile }})
+                  </span>
                   <span
                     class="badge-comment bg-gradient-primary text-white font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">{{ $doctor->secretaries->count() }}
                     منشی</span>
@@ -98,14 +99,14 @@
                               </button>
                             </div>
                           </td>
-                        
+
                         </tr>
                       @empty
                         <tr>
                           <td colspan="6" class="text-center py-6">
                             <div class="d-flex flex-column align-items-center justify-content-center">
                               <svg width="56" height="56" viewBox="0 0 24 24" fill="none"
-                                stroke="var(--text-secondary)" stroke-width="2" class="mb-3 animate-bounce">
+                                stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
                                 <path d="M5 12h14M12 5l7 7-7 7" />
                               </svg>
                               <p class="text-text-secondary font-medium m-0">هیچ منشی‌ای یافت نشد.</p>
@@ -152,7 +153,7 @@
                                   d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                               </svg>
                             </button>
-                       
+
                           </div>
                         </div>
                       </div>
@@ -160,7 +161,7 @@
                       <div class="text-center py-6">
                         <div class="d-flex flex-column align-items-center justify-content-center">
                           <svg width="56" height="56" viewBox="0 0 24 24" fill="none"
-                            stroke="var(--text-secondary)" stroke-width="2" class="mb-3 animate-bounce">
+                            stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
                             <path d="M5 12h14M12 5l7 7-7 7" />
                           </svg>
                           <p class="text-text-secondary font-medium m-0">هیچ منشی‌ای یافت نشد.</p>
@@ -175,7 +176,7 @@
             <div class="text-center py-6">
               <div class="d-flex flex-column align-items-center justify-content-center">
                 <svg width="56" height="56" viewBox="0 0 24 24" fill="none"
-                  stroke="var(--text-secondary)" stroke-width="2" class="mb-3 animate-bounce">
+                  stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
                 <p class="text-text-secondary font-medium m-0">هیچ پزشکی یافت نشد.</p>

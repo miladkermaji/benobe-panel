@@ -4,7 +4,7 @@
       class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          class="animate-bounce">
+          class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">ویرایش اعلان</h5>

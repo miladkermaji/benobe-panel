@@ -670,7 +670,7 @@ img.loaded {
     border-color: var(--primary);
 }
 
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 
@@ -1002,7 +1002,7 @@ img.loaded {
     transform: translateY(-2px);
 }
 
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 

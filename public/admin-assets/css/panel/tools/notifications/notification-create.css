@@ -113,7 +113,7 @@
     border-color: #6b7280;
 }
 
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 

@@ -324,7 +324,7 @@
     color: var(--text-primary);
 }
 
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 
@@ -523,7 +523,7 @@
     transform: translateY(-2px);
 }
 
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 

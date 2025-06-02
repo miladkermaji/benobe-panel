@@ -4,7 +4,7 @@
       class="card-header glass-header text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          class="animate-bounce">
+          class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">
@@ -188,7 +188,7 @@
       border-color: #6b7280;
     }
 
-    .animate-bounce {
+    .custom-animate-bounce {
       animation: bounce 1s infinite;
     }
 
@@ -237,7 +237,7 @@
 
   <script>
     document.addEventListener('livewire:initialized', () => {
-      
+
       // Function to initialize or reinitialize Select2
       function initializeSelect2() {
         // Destroy existing Select2 instances if they exist

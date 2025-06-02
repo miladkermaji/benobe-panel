@@ -283,7 +283,7 @@ body {
 }
 
 /* انیمیشن */
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1.2s infinite;
 }
 

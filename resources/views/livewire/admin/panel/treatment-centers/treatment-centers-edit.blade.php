@@ -4,7 +4,7 @@
       class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          class="animate-bounce">
+          class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">ویرایش درمانگاه: {{ $name }}</h5>
@@ -63,11 +63,13 @@
               <label for="city_id" class="form-label">شهر</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input data-timepicker type="text" wire:model="start_time" class="form-control" id="start_time" placeholder=" ">
+              <input data-timepicker type="text" wire:model="start_time" class="form-control" id="start_time"
+                placeholder=" ">
               <label for="start_time" class="form-label">ساعت شروع</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input data-timepicker type="text" wire:model="end_time" class="form-control" id="end_time" placeholder=" ">
+              <input data-timepicker type="text" wire:model="end_time" class="form-control" id="end_time"
+                placeholder=" ">
               <label for="end_time" class="form-label">ساعت پایان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
@@ -111,7 +113,7 @@
                   <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
                   <path d="M17 21v-8H7v8M7 3v5h8" />
                 </svg>
-                ذخیره 
+                ذخیره
               </button>
             </div>
           </div>

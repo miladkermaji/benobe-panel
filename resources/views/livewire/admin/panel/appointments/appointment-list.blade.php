@@ -116,7 +116,7 @@
                           <td colspan="10" class="text-center py-6">
                             <div class="d-flex flex-column align-items-center justify-content-center">
                               <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                                stroke="var(--text-secondary)" stroke-width="2" class="mb-3 animate-bounce">
+                                stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
                                 <path d="M5 12h14M12 5l7 7-7 7" />
                               </svg>
                               <p class="text-text-secondary font-medium m-0">هیچ نوبتی یافت نشد</p>
@@ -200,7 +200,7 @@
                     <div class="text-center py-6">
                       <div class="d-flex flex-column align-items-center justify-content-center">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                          stroke="var(--text-secondary)" stroke-width="2" class="mb-3 animate-bounce">
+                          stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
                           <path d="M5 12h14M12 5l7 7-7 7" />
                         </svg>
                         <p class="text-text-secondary font-medium m-0">هیچ نوبتی یافت نشد</p>
@@ -263,7 +263,7 @@
             <div class="text-center py-6">
               <div class="d-flex flex-column align-items-center justify-content-center">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                  stroke="var(--text-secondary)" stroke-width="2" class="mb-3 animate-bounce">
+                  stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
                 <p class="text-text-secondary font-medium m-0">هیچ نوبتی یافت نشد</p>

@@ -1,15 +1,18 @@
 <div class="container-fluid py-2" dir="rtl">
   <div class="card shadow-lg border-0 rounded-2 overflow-hidden" style="background: #ffffff;">
-    <div class="card-header bg-gradient-primary text-white p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div
+      class="card-header bg-gradient-primary text-white p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
       <div class="d-flex align-items-center gap-2">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-bounce">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">افزودن یادداشت جدید</h5>
       </div>
       <a href="{{ route('dr.panel.doctornotes.index') }}"
         class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 d-flex align-items-center gap-1 hover:shadow-lg transition-all">
-        <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
           <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         بازگشت
@@ -45,7 +48,8 @@
             <div class="col-12 text-end mt-3 w-100 d-flex justify-content-end">
               <button wire:click="store"
                 class="btn my-btn-primary py-2 px-3 d-flex align-items-center gap-1 shadow-lg hover:shadow-xl transition-all">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
                 افزودن یادداشت

@@ -447,7 +447,7 @@ img.loaded {
     border-color: var(--primary);
 }
 
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 

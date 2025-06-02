@@ -1,24 +1,28 @@
 :root {
-    --primary: #2E86C1;
-    --primary-light: #84CAF9;
-    --secondary: #1DEB3C;
-    --secondary-hover: #15802A;
-    --background-light: #F0F8FF;
-    --background-footer: #D4ECFD;
-    --background-card: #FFFFFF;
+    --primary: #2e86c1;
+    --primary-light: #84caf9;
+    --secondary: #1deb3c;
+    --secondary-hover: #15802a;
+    --background-light: #f0f8ff;
+    --background-footer: #d4ecfd;
+    --background-card: #ffffff;
     --text-primary: #000000;
     --text-secondary: #707070;
     --text-discount: #008000;
-    --text-original: #FF0000;
-    --border-neutral: #E5E7EB;
+    --text-original: #ff0000;
+    --border-neutral: #e5e7eb;
     --shadow: rgba(0, 0, 0, 0.35);
-    --gradient-instagram-from: #F92CA7;
-    --gradient-instagram-to: #6B1A93;
-    --button-mobile: #4F9ACD;
-    --button-mobile-light: #A2CDEB;
-    --support-section: #2E86C1;
-    --support-text: #084D7C;
-    --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%) !important;
+    --gradient-instagram-from: #f92ca7;
+    --gradient-instagram-to: #6b1a93;
+    --button-mobile: #4f9acd;
+    --button-mobile-light: #a2cdeb;
+    --support-section: #2e86c1;
+    --support-text: #084d7c;
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    ) !important;
     --radius-button: 0.3rem; /* کاهش ردیوس دکمه */
     --radius-button-large: 0.6rem; /* کاهش ردیوس دکمه بزرگ */
     --radius-button-xl: 0.8rem; /* کاهش ردیوس دکمه خیلی بزرگ */
@@ -85,7 +89,11 @@
 }
 
 .btn-gradient-success {
-    background: linear-gradient(135deg, var(--secondary), var(--secondary-hover));
+    background: linear-gradient(
+        135deg,
+        var(--secondary),
+        var(--secondary-hover)
+    );
     border: none;
     color: white;
     box-shadow: 0 2px 5px var(--shadow); /* کاهش سایه */
@@ -96,7 +104,11 @@
 }
 
 .btn-gradient-success:hover {
-    background: linear-gradient(135deg, var(--secondary-hover), var(--secondary));
+    background: linear-gradient(
+        135deg,
+        var(--secondary-hover),
+        var(--secondary)
+    );
     transform: translateY(-2px);
     box-shadow: 0 4px 10px var(--shadow); /* کاهش سایه در هاور */
 }
@@ -257,7 +269,11 @@
 }
 
 .toggle-input:checked + .toggle-slider {
-    background: linear-gradient(135deg, var(--secondary), var(--secondary-hover));
+    background: linear-gradient(
+        135deg,
+        var(--secondary),
+        var(--secondary-hover)
+    );
     justify-content: flex-start;
 }
 
@@ -308,12 +324,13 @@
     color: var(--text-primary);
 }
 
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 
 @keyframes bounce {
-    0%, 100% {
+    0%,
+    100% {
         transform: translateY(0);
     }
     50% {
@@ -485,7 +502,6 @@
 .form-control:focus,
 .form-select:focus {
     border-color: var(--primary-light);
-    ;
     background: #fff;
 }
 
@@ -507,7 +523,7 @@
     transform: translateY(-2px);
 }
 
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 

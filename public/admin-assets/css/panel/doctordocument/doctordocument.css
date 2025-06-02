@@ -501,7 +501,7 @@ img.loaded {
     border-color: var(--primary);
 }
 
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 
@@ -824,8 +824,6 @@ img.loaded {
     pointer-events: none;
 }
 
-
-
 .btn-outline-light {
     border-color: rgba(255, 255, 255, 0.8);
 }
@@ -835,7 +833,7 @@ img.loaded {
     transform: translateY(-2px);
 }
 
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 

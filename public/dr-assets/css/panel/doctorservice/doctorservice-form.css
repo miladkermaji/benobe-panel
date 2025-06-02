@@ -213,7 +213,7 @@ textarea.form-control {
 }
 
 /* انیمیشن‌ها */
-.animate-bounce {
+.custom-animate-bounce {
     animation: bounce 1s infinite;
 }
 
@@ -327,12 +327,12 @@ textarea.form-control {
         padding: 0.75rem;
     }
 }
-@media (max-width: 425px){
-    .card-body{
+@media (max-width: 425px) {
+    .card-body {
         padding: 4px 0 !important;
         margin-bottom: 15px !important;
     }
-    .select2-container{
+    .select2-container {
         font-size: 11px !important;
         font-weight: bold !important;
     }

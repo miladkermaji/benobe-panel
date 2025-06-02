@@ -1,7 +1,7 @@
 @extends('dr.panel.layouts.master')
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
- <link type="text/css" href="{{ asset('dr-assets/panel/css/doctor-clinics/creaete.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('dr-assets/panel/css/doctor-clinics/creaete.css') }}" rel="stylesheet" />
 @endsection
 
 @section('site-header')
@@ -16,7 +16,7 @@
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          class="animate-bounce">
+          class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
         <h5 class="mb-0 fw-bold">ویرایش مطب: {{ $clinic->name }}</h5>
@@ -132,7 +132,7 @@
 <script>
   const cities = @json($cities);
   $(document).ready(function() {
-   
+
 
     // تنظیمات تغییر استان
     $('#clinic-province').on('change', function() {

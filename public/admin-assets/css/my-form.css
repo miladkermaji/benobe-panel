@@ -240,20 +240,7 @@ input:not([type="checkbox"]) {
     margin-top: 0.25rem;
 }
 
-/* انیمیشن‌ها */
-.animate-bounce {
-    animation: bounce 1.2s infinite ease-in-out;
-}
 
-@keyframes bounce {
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-6px);
-    }
-}
 
 /* پیجینیشن */
 .pagination-container {
