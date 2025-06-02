@@ -34,7 +34,7 @@
                   فیلتر
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                   <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'all')">همه  نوبت ها</a>
+                  <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'all')">همه نوبت ها</a>
                   </li>
                   <li><a class="dropdown-item" href="#" wire:click="$set('filterStatus', 'scheduled')">در
                       انتظار</a></li>
@@ -47,7 +47,7 @@
                   <li>
                     <hr class="dropdown-divider">
                   </li>
-                
+
                   <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_year')">سال
                       جاری</a></li>
                   <li><a class="dropdown-item" href="#" wire:click="$set('dateFilter', 'current_month')">ماه
@@ -744,6 +744,19 @@
         </x-slot:body>
       </x-modal>
     </div>
+    <div class="alert alert-warning" role="alert" wire:ignore.self id="noResultsAlert" style="display: none;">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <div>
+          <span x-text="message"></span>
+        </div>
+      </div>
+      <div class="mt-2">
+        <button class="btn btn-sm btn-primary" wire:click="searchAllDates">
+          جستجو در همه تاریخ‌ها
+        </button>
+      </div>
+    </div>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         // استفاده از Event Delegation برای مدیریت کلیک و لمس
@@ -1309,37 +1322,37 @@
         });
         // Handle available times loaded event
         /*
-                                                                                                            Livewire.on('available-times-loaded', (event) => {
-                                                                                                              console.log('Available times loaded:', event);
-                                                                                                              const times = event.times || [];
-                                                                                                              const $container = $('#available-times');
-                                                                                                              $container.empty();
-                                                                                                              if (times.length === 0) {
-                                                                                                                $container.html(
-                                                                                                                  '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
-                                                                                                                return;
-                                                                                                              }
-                                                                                                              times.forEach(time => {
-                                                                                                                const $button = $(
-                                                                                                                  `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
+                                                                                                                Livewire.on('available-times-loaded', (event) => {
+                                                                                                                  console.log('Available times loaded:', event);
+                                                                                                                  const times = event.times || [];
+                                                                                                                  const $container = $('#available-times');
+                                                                                                                  $container.empty();
+                                                                                                                  if (times.length === 0) {
+                                                                                                                    $container.html(
+                                                                                                                      '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
+                                                                                                                    return;
+                                                                                                                  }
+                                                                                                                  times.forEach(time => {
+                                                                                                                    const $button = $(
+                                                                                                                      `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
         ${time}
       </button>`
-                                                                                                                );
-                                                                                                                $container.append($button);
-                                                                                                              });
-                                                                                                              // Handle time selection
-                                                                                                              $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
-                                                                                                                const $btn = $(this);
-                                                                                                                const time = $btn.data('time');
-                                                                                                                // Remove selection from other buttons
-                                                                                                                $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
-                                                                                                                // Select this button
-                                                                                                                $btn.removeClass('btn-outline-primary').addClass('btn-primary');
-                                                                                                                // Update Livewire component
-                                                                                                                @this.set('appointmentTime', time);
-                                                                                                              });
-                                                                                                            });
-                                                                                                            */
+                                                                                                                    );
+                                                                                                                    $container.append($button);
+                                                                                                                  });
+                                                                                                                  // Handle time selection
+                                                                                                                  $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+                                                                                                                    const $btn = $(this);
+                                                                                                                    const time = $btn.data('time');
+                                                                                                                    // Remove selection from other buttons
+                                                                                                                    $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+                                                                                                                    // Select this button
+                                                                                                                    $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+                                                                                                                    // Update Livewire component
+                                                                                                                    @this.set('appointmentTime', time);
+                                                                                                                  });
+                                                                                                                });
+                                                                                                                */
         // Handle modal close
         Livewire.on('close-modal', (event) => {
           const modalId = event?.name || (event && event[0]?.name) || null;

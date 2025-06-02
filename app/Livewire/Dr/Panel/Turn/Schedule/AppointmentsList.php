@@ -462,7 +462,10 @@ class AppointmentsList extends Component
                 $this->dispatch('no-results-found', ['date' => $jalaliDate->format('Y/m/d'), 'searchAll' => true]);
             } else {
                 $this->showNoResultsAlert = true;
-                $this->dispatch('show-no-results-alert', ['date' => $jalaliDate->format('Y/m/d')]);
+                $this->dispatch('show-no-results-alert', [
+                    'date' => $jalaliDate->format('Y/m/d'),
+                    'message' => "نتیجه‌ای برای جستجوی شما در تاریخ {$jalaliDate->format('Y/m/d')} یافت نشد. آیا می‌خواهید در همه سوابق و نوبت‌ها جستجو کنید؟"
+                ]);
             }
         } else {
             $this->showNoResultsAlert = false;
@@ -517,8 +520,10 @@ class AppointmentsList extends Component
     {
         if (strlen($this->searchQuery) < 2) {
             $this->searchResults = [];
+            $this->loadAppointments();
             return;
         }
+
         $this->isSearching = true;
         $this->searchResults = User::where(function ($query) {
             $query->where('first_name', 'like', '%' . $this->searchQuery . '%')
@@ -526,6 +531,9 @@ class AppointmentsList extends Component
                   ->orWhere('mobile', 'like', '%' . $this->searchQuery . '%')
                   ->orWhere('national_code', 'like', '%' . $this->searchQuery . '%');
         })->limit(10)->get();
+
+        // اعمال جستجو روی لیست اصلی نوبت‌ها
+        $this->loadAppointments();
         $this->isSearching = false;
     }
     public function updatedFilterStatus()
