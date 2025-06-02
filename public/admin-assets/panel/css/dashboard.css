@@ -1,46 +1,3 @@
-:root {
-    --primary: #2e86c1;
-    --primary-light: #84caf9;
-    --secondary: #1deb3c;
-    --secondary-hover: #15802a;
-    --background-light: #f0f8ff;
-    --background-footer: #d4ecfd;
-    --background-card: #ffffff;
-    --text-primary: #000000;
-    --text-secondary: #707070;
-    --text-discount: #008000;
-    --text-original: #ff0000;
-    --border-neutral: #e5e7eb;
-    --shadow: rgba(0, 0, 0, 0.35);
-    --gradient-instagram-from: #f92ca7;
-    --gradient-instagram-to: #6b1a93;
-    --button-mobile: #4f9acd;
-    --button-mobile-light: #a2cdeb;
-    --support-section: #2e86c1;
-    --support-text: #084d7c;
-    --glass-border: 1px solid rgba(255, 255, 255, 0.3);
-    --radius-button: 0.5rem;
-    --radius-button-large: 1rem;
-    --radius-button-xl: 1.25rem;
-    --radius-card: 1.125rem;
-    --radius-footer: 1.875rem;
-    --radius-nav: 1.25rem;
-    --radius-circle: 9999px;
-    --gradient-primary: linear-gradient(
-        90deg,
-        var(--primary-light) 0%,
-        var(--primary) 100%
-    );
-    --gradient-bg: linear-gradient(145deg, #ffffff, #f0f6ff);
-    --text-color: #1e293b;
-    --hover-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-    --glass-bg: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.9),
-        rgba(255, 255, 255, 0.7)
-    );
-}
-
 .chart-content {
     padding: 15px;
     width: 100%;
@@ -48,14 +5,12 @@
     background: linear-gradient(135deg, #f9fafb 0%, #ebedf0 100%);
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
 }
-
 .chart-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     width: 100%;
 }
-
 .chart-container {
     background: white;
     border-radius: 12px;
@@ -68,12 +23,10 @@
     position: relative;
     overflow: hidden;
 }
-
 .chart-container:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
-
 .chart-container::before {
     content: "";
     position: absolute;
@@ -85,11 +38,9 @@
     opacity: 0.9;
     transition: opacity 0.3s ease;
 }
-
 .chart-container:hover::before {
     opacity: 1;
 }
-
 .chart-title {
     text-align: center;
     margin-bottom: 1rem;
@@ -97,29 +48,24 @@
     font-size: 1rem;
     font-weight: 500;
 }
-
 .chart-wrapper {
     flex: 1;
     min-height: 180px;
 }
-
 .top-panel-bg {
     border-radius: 16px;
     background: var(--background-card);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
-
 .top-details-sicks-cards {
     padding: 1rem;
 }
-
 .top-s-a-wrapper {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 16px;
     width: 100%;
 }
-
 .stat-card {
     background: #ffffff;
     border-radius: 12px;
@@ -133,12 +79,10 @@
     width: 100%;
     overflow: hidden;
 }
-
 .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 .stat-icon {
     width: 48px;
     height: 48px;
@@ -149,13 +93,11 @@
     border-radius: 10px;
     flex-shrink: 0;
 }
-
 .stat-icon img {
     width: 24px;
     height: 24px;
     object-fit: contain;
 }
-
 .stat-info {
     flex: 1;
     min-width: 0;
@@ -163,7 +105,6 @@
     flex-direction: column;
     gap: 4px;
 }
-
 .stat-label {
     font-size: 14px;
     color: rgba(255, 255, 255, 0.95);
@@ -172,7 +113,6 @@
     word-wrap: break-word;
     line-height: 1.4;
 }
-
 .stat-value {
     font-size: 16px;
     color: #ffffff;
@@ -181,32 +121,74 @@
     word-wrap: break-word;
     line-height: 1.4;
 }
-
 /* Stat Card Colors */
 .stat-card:nth-child(1) {
     background: var(--primary);
 }
-
 .stat-card:nth-child(2) {
     background: #2ecc71;
 }
-
 .stat-card:nth-child(3) {
     background: var(--support-section);
 }
-
 .stat-card:nth-child(4) {
     background: var(--gradient-instagram-from);
 }
-
 .stat-card:nth-child(5) {
     background: var(--primary);
 }
-
 .stat-card:nth-child(6) {
     background: #f59e0b;
 }
-
+.chart-content {
+    padding: 1.5rem;
+}
+.chart-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    margin-bottom: 1.5rem;
+    height: 400px;
+}
+.chart-card .card-body {
+    height: 100%;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+.chart-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    text-align: right;
+    font-family: "Vazir", sans-serif;
+}
+.chart-container {
+    flex: 1;
+    position: relative;
+    min-height: 300px;
+}
+@media (max-width: 768px) {
+    .chart-content {
+        padding: 0.5rem;
+    }
+    .chart-card {
+        margin-bottom: 1rem;
+        height: 350px;
+    }
+    .chart-card .card-body {
+        padding: 1rem;
+    }
+    .chart-card .card-title {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    .chart-container {
+        min-height: 250px;
+    }
+}
 @media only screen and (max-width: 1400px) {
     .top-s-a-wrapper {
         display: flex;
@@ -218,57 +200,46 @@
         padding: 0.5rem 0;
         gap: 1rem;
     }
-
     .top-s-a-wrapper::-webkit-scrollbar {
         height: 6px;
     }
-
     .top-s-a-wrapper::-webkit-scrollbar-thumb {
         background: var(--primary-light);
         border-radius: 3px;
     }
-
     .top-s-a-wrapper::-webkit-scrollbar-track {
         background: var(--background-light);
     }
-
     .stat-card {
         flex: 0 0 220px;
         scroll-snap-align: start;
     }
-
     .chart-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-
     .chart-wrapper {
         min-height: 160px;
     }
 }
-
 @media only screen and (max-width: 768px) {
-  .stat-card {
+    .stat-card {
         flex: 0 0 200px;
         scroll-snap-align: start;
         padding: 12px;
     }
-
     .chart-grid {
         grid-template-columns: 1fr;
     }
-
     .chart-content {
         padding: 10px;
         margin: 10px 0;
     }
-
     .chart-wrapper {
         min-height: 140px;
     }
 }
-
 @media only screen and (max-width: 480px) {
-     .stat-card {
+    .stat-card {
         flex: 0 0 180px;
     }
 }
