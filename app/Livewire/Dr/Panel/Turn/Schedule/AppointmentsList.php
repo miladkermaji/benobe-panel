@@ -2013,25 +2013,29 @@ class AppointmentsList extends Component
     }
     public function storeWithUser()
     {
+        $this->validate([
+            'firstName' => 'required',
+            'lastName' => 'required',
+            'mobile' => 'required',
+            'nationalCode' => 'required',
+            'appointmentDate' => 'required',
+            'appointmentTime' => 'required',
+        ]);
+
+        // Check if user already has an appointment on this date
+        $existingAppointment = \App\Models\Appointment::whereHas('patient', function ($query) {
+            $query->where('national_code', $this->nationalCode);
+        })
+        ->whereDate('appointment_date', Carbon::parse($this->appointmentDate))
+        ->first();
+
+        if ($existingAppointment) {
+            $this->addError('appointmentDate', 'این بیمار قبلاً برای این تاریخ نوبت ثبت کرده است.');
+            return;
+        }
+
+        // Continue with the rest of the appointment creation logic
         try {
-            // Validate required fields
-            $this->validate([
-                'firstName' => 'required|string|max:255',
-                'lastName' => 'required|string|max:255',
-                'mobile' => 'required|digits:11',
-                'nationalCode' => 'required|digits:10',
-                'appointmentDate' => 'required',
-                'appointmentTime' => 'required',
-            ], [
-                'firstName.required' => 'نام الزامی است',
-                'lastName.required' => 'نام خانوادگی الزامی است',
-                'mobile.required' => 'شماره موبایل الزامی است',
-                'mobile.digits' => 'شماره موبایل باید 11 رقم باشد',
-                'nationalCode.required' => 'کد ملی الزامی است',
-                'nationalCode.digits' => 'کد ملی باید 10 رقم باشد',
-                'appointmentDate.required' => 'تاریخ نوبت الزامی است',
-                'appointmentTime.required' => 'ساعت نوبت الزامی است',
-            ]);
             // Convert Jalali date to Gregorian
             $gregorianDate = null;
             if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $this->appointmentDate)) {
