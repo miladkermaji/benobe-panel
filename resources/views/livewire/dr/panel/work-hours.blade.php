@@ -82,7 +82,18 @@
                                       data-bs-toggle="modal" data-bs-target="#CalculatorModal"
                                       data-day="{{ $englishDay }}" data-index="{{ $index }}" readonly />
                                   </div>
-                                  <!-- دکمه جدید برای نوبت‌های اورژانسی -->
+                                  <!-- دکمه باز شدن نوبت‌ها -->
+                                  <div class="form-group position-relative">
+                                    <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
+                                      <button type="button" class="btn text-black btn-sm schedule-btn"
+                                        data-bs-toggle="modal" data-bs-target="#scheduleModal"
+                                        data-day="{{ $englishDay }}" data-index="{{ $index }}"
+                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                        <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                      </button>
+                                    </x-custom-tooltip>
+                                  </div>
+                                  <!-- دکمه نوبت‌های اورژانسی -->
                                   <div class="form-group position-relative">
                                     <x-custom-tooltip
                                       title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
@@ -116,17 +127,6 @@
                                     </x-custom-tooltip>
                                   </div>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                  <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
-                                    <button type="button"
-                                      class="btn text-black btn-sm  schedule-btn"
-                                      data-bs-toggle="modal" data-bs-target="#scheduleModal"
-                                      data-day="{{ $englishDay }}" data-index="{{ $index }}"
-                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                      <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
-                                    </button>
-                                  </x-custom-tooltip>
-                                </div>
                               </div>
                             @endforeach
                           @else
@@ -159,7 +159,18 @@
                                     data-bs-toggle="modal" data-bs-target="#CalculatorModal"
                                     data-day="{{ $englishDay }}" data-index="{{ $index }}" readonly />
                                 </div>
-                                <!-- دکمه جدید برای نوبت‌های اورژانسی -->
+                                <!-- دکمه باز شدن نوبت‌ها -->
+                                <div class="form-group position-relative">
+                                  <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
+                                    <button type="button" class="btn text-black btn-sm schedule-btn"
+                                      data-bs-toggle="modal" data-bs-target="#scheduleModal"
+                                      data-day="{{ $englishDay }}" data-index="{{ $index }}"
+                                      {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                      <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                    </button>
+                                  </x-custom-tooltip>
+                                </div>
+                                <!-- دکمه نوبت‌های اورژانسی -->
                                 <div class="form-group position-relative">
                                   <x-custom-tooltip
                                     title="زمان های مخصوص منشی که میتواند برای شرایط خاص نگهدارد توجه داشته باشید این زمان ها غیر فعال میشود و تا زمانی که منشی یا پزشک آن را مجدد فعال نکند در دسترس بیماران نخواهد بود"
@@ -192,17 +203,6 @@
                                     </button>
                                   </x-custom-tooltip>
                                 </div>
-                              </div>
-                              <div class="d-flex align-items-center">
-                                <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
-                                  <button type="button"
-                                    class="btn text-black btn-sm  schedule-btn"
-                                    data-bs-toggle="modal" data-bs-target="#scheduleModal"
-                                    data-day="{{ $englishDay }}" data-index="{{ $index }}"
-                                    {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                    <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
-                                  </button>
-                                </x-custom-tooltip>
                               </div>
                             </div>
                           @endif
