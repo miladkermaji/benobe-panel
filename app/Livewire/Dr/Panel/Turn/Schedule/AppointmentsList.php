@@ -2022,20 +2022,6 @@ class AppointmentsList extends Component
             'appointmentTime' => 'required',
         ]);
 
-        // Check if user already has an appointment on this date
-        $existingAppointment = \App\Models\Appointment::whereHas('patient', function ($query) {
-            $query->where('national_code', $this->nationalCode);
-        })
-        ->whereDate('appointment_date', Carbon::parse($this->appointmentDate))
-        ->whereNotIn('status', ['cancelled', 'missed', 'attended'])  // Exclude all inactive appointments
-        ->first();
-
-        if ($existingAppointment) {
-            $this->addError('appointmentDate', 'این بیمار قبلاً برای این تاریخ نوبت ثبت کرده است.');
-            return;
-        }
-
-        // Continue with the rest of the appointment creation logic
         try {
             // Convert Jalali date to Gregorian
             $gregorianDate = null;
@@ -2050,10 +2036,12 @@ class AppointmentsList extends Component
             } else {
                 $gregorianDate = $this->appointmentDate;
             }
+
             // Check if user exists
             $user = User::where('mobile', $this->mobile)
                        ->orWhere('national_code', $this->nationalCode)
                        ->first();
+
             if (!$user) {
                 $user = User::create([
                     'first_name' => $this->firstName,
@@ -2062,11 +2050,25 @@ class AppointmentsList extends Component
                     'national_code' => $this->nationalCode,
                 ]);
             }
+
             $doctor = $this->getAuthenticatedDoctor();
             if (!$doctor) {
                 throw new \Exception('دکتر معتبر یافت نشد.');
             }
+
+            // Check for existing appointment
+            $existingAppointment = Appointment::where('patient_id', $user->id)
+                ->where('doctor_id', $doctor->id)
+                ->whereDate('appointment_date', $gregorianDate)
+                ->first();
+
+            if ($existingAppointment) {
+                $this->dispatch('show-toastr', ['message' => 'این بیمار قبلاً برای این تاریخ نوبت ثبت کرده است.', 'type' => 'error']);
+                return;
+            }
+
             $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+
             // Create the appointment
             $appointment = Appointment::create([
                 'patient_id' => $user->id,
@@ -2078,9 +2080,11 @@ class AppointmentsList extends Component
                 'payment_status' => 'unpaid',
                 'appointment_type' => 'manual'
             ]);
+
             // Clear cache
             $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$clinicId}_date_{$gregorianDate}";
             Cache::forget($cacheKey);
+
             // Reset form fields
             $this->reset([
                 'firstName',
@@ -2094,12 +2098,15 @@ class AppointmentsList extends Component
                 'searchQuery',
                 'searchResults'
             ]);
+
             // Close modal and show success message
             $this->dispatch('close-modal', ['name' => 'add-sick-modal']);
             $this->dispatch('show-toastr', ['message' => 'نوبت با موفقیت ثبت شد', 'type' => 'success']);
             $this->dispatch('appointment-registered', ['message' => 'نوبت با موفقیت ثبت شد']);
+
             // Reload appointments list
             $this->loadAppointments();
+
         } catch (\Exception $e) {
             $this->dispatch('show-toastr', ['message' => 'خطا در ثبت نوبت: ' . $e->getMessage(), 'type' => 'error']);
         }
