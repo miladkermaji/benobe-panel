@@ -545,6 +545,9 @@ class AppointmentsList extends Component
     {
         $now = Carbon::now();
 
+        // ریست کردن فیلتر نوبت‌های دستی
+        $this->filterStatus = '';
+
         switch ($this->dateFilter) {
             case 'all':
                 $this->selectedDate = null;
