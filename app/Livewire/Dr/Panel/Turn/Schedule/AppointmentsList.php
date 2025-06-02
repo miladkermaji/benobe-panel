@@ -46,6 +46,7 @@ class AppointmentsList extends Component
     public $selectedDate;
     public $selectedClinicId = 'default';
     public $searchQuery = '';
+    public $manualSearchQuery = '';
     public $filterStatus = '';
     public $attendanceStatus = '';
     public $dateFilter = '';
@@ -542,6 +543,7 @@ class AppointmentsList extends Component
         $this->dateFilter = '';
         $this->resetPage();
         $this->appointments = [];
+        $this->searchQuery = '';
         $this->loadAppointments();
     }
     public function updatedAttendanceStatus()
@@ -552,37 +554,32 @@ class AppointmentsList extends Component
     public function updatedDateFilter()
     {
         $now = Carbon::now();
-
         // ریست کردن فیلتر نوبت‌های دستی
         $this->filterStatus = '';
-
+        $this->searchQuery = '';
         switch ($this->dateFilter) {
             case 'all':
                 $this->selectedDate = null;
                 $this->isSearchingAllDates = true;
                 break;
-
             case 'current_year':
                 $this->selectedDate = null;
                 $this->isSearchingAllDates = true;
                 $this->startDate = $now->startOfYear()->format('Y-m-d');
                 $this->endDate = $now->endOfYear()->format('Y-m-d');
                 break;
-
             case 'current_month':
                 $this->selectedDate = null;
                 $this->isSearchingAllDates = true;
                 $this->startDate = $now->startOfMonth()->format('Y-m-d');
                 $this->endDate = $now->endOfMonth()->format('Y-m-d');
                 break;
-
             case 'current_week':
                 $this->selectedDate = null;
                 $this->isSearchingAllDates = true;
                 $this->startDate = $now->startOfWeek()->format('Y-m-d');
                 $this->endDate = $now->endOfWeek()->format('Y-m-d');
                 break;
-
             default:
                 $this->selectedDate = $now->format('Y-m-d');
                 $this->isSearchingAllDates = false;
@@ -590,7 +587,6 @@ class AppointmentsList extends Component
                 $this->endDate = null;
                 break;
         }
-
         $this->loadAppointments();
     }
     public function gotoPage($page)
@@ -1992,7 +1988,7 @@ class AppointmentsList extends Component
             $this->lastName = $user->last_name;
             $this->mobile = $user->mobile;
             $this->nationalCode = $user->national_code;
-            $this->searchQuery = '';
+            $this->manualSearchQuery = '';
             $this->searchResults = [];
             $this->selectedUserId = $userId;
         }
@@ -2504,5 +2500,20 @@ class AppointmentsList extends Component
         } catch (\Exception $e) {
             return [];
         }
+    }
+    public function updatedManualSearchQuery()
+    {
+        if (strlen($this->manualSearchQuery) < 2) {
+            $this->searchResults = [];
+            return;
+        }
+        $this->isSearching = true;
+        $this->searchResults = User::where(function ($query) {
+            $query->where('first_name', 'like', '%' . $this->manualSearchQuery . '%')
+                  ->orWhere('last_name', 'like', '%' . $this->manualSearchQuery . '%')
+                  ->orWhere('mobile', 'like', '%' . $this->manualSearchQuery . '%')
+                  ->orWhere('national_code', 'like', '%' . $this->manualSearchQuery . '%');
+        })->limit(10)->get();
+        $this->isSearching = false;
     }
 }
