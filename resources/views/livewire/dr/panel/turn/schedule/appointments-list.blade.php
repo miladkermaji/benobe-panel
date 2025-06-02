@@ -413,8 +413,8 @@
                 @enderror
               </div>
             @endif
-            <div class="col-12">
-              <button type="submit" class="btn btn-primary w-100"
+            <div class="col-12 mt-5">
+              <button type="submit" class="btn btn-primary w-100 mt-3"
                 @if (!$selectedUserId) disabled @endif>ثبت نوبت</button>
             </div>
           </div>

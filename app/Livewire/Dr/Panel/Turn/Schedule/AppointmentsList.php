@@ -2027,6 +2027,7 @@ class AppointmentsList extends Component
             $query->where('national_code', $this->nationalCode);
         })
         ->whereDate('appointment_date', Carbon::parse($this->appointmentDate))
+        ->whereNotIn('status', ['cancelled', 'missed', 'attended'])  // Exclude all inactive appointments
         ->first();
 
         if ($existingAppointment) {
