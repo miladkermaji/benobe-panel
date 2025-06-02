@@ -396,32 +396,43 @@ class AppointmentsList extends Component
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
                 return $query->where('clinic_id', $this->selectedClinicId);
             });
+
         if ($this->filterStatus === 'manual') {
             $query->where('appointment_type', 'manual');
         } else {
-            $query->when($this->selectedDate, function ($query) {
-                return $query->whereDate('appointment_date', $this->selectedDate);
-            });
+            if ($this->dateFilter) {
+                $today = Carbon::today();
+                switch ($this->dateFilter) {
+                    case 'all':
+                        // Don't apply any date filter
+                        break;
+                    case 'current_week':
+                        $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
+                        $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
+                        $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
+                        break;
+                    case 'current_month':
+                        $startOfMonth = $today->copy()->startOfMonth();
+                        $endOfMonth = $today->copy()->endOfMonth();
+                        $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
+                        break;
+                    case 'current_year':
+                        $startOfYear = $today->copy()->startOfYear();
+                        $endOfYear = $today->copy()->endOfYear();
+                        $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
+                        break;
+                }
+            } elseif (!$this->isSearchingAllDates && $this->filterStatus !== 'all') {
+                $query->when($this->selectedDate, function ($query) {
+                    return $query->whereDate('appointment_date', $this->selectedDate);
+                });
+            }
         }
-        $query->when($this->filterStatus && $this->filterStatus !== 'manual', function ($query) {
+
+        $query->when($this->filterStatus && $this->filterStatus !== 'manual' && $this->filterStatus !== 'all', function ($query) {
             return $query->where('status', $this->filterStatus);
         });
-        $query->when($this->dateFilter, function ($query) {
-            $today = Carbon::today();
-            if ($this->dateFilter === 'current_week') {
-                $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
-                $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
-                $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
-            } elseif ($this->dateFilter === 'current_month') {
-                $startOfMonth = $today->copy()->startOfMonth();
-                $endOfMonth = $today->copy()->endOfMonth();
-                $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
-            } elseif ($this->dateFilter === 'current_year') {
-                $startOfYear = $today->copy()->startOfYear();
-                $endOfYear = $today->copy()->endOfYear();
-                $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
-            }
-        });
+
         $query->when($this->searchQuery, function ($query) {
             $query->whereHas('patient', function ($q) {
                 $q->where('first_name', 'like', "%{$this->searchQuery}%")
@@ -431,6 +442,7 @@ class AppointmentsList extends Component
                     ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
             });
         });
+
         try {
             $this->appointments = [];
             foreach ($query->orderBy('appointment_date', 'desc')
@@ -441,7 +453,9 @@ class AppointmentsList extends Component
         } catch (\Exception $e) {
             $this->appointments = [];
         }
+
         $this->dispatch('setAppointments', ['appointments' => $this->appointments]);
+
         if (empty($this->appointments) && $this->searchQuery) {
             $jalaliDate = Jalalian::fromCarbon(Carbon::parse($this->selectedDate));
             if ($this->isSearchingAllDates) {
@@ -454,6 +468,7 @@ class AppointmentsList extends Component
             $this->showNoResultsAlert = false;
             $this->dispatch('hide-no-results-alert');
         }
+
         return $this->appointments;
     }
     private function convertToGregorian($date)
