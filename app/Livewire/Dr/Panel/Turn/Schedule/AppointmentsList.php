@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Livewire\Dr\Panel\Turn\Schedule;
+
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Doctor;
@@ -25,6 +27,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
 use Exception;
+
 class AppointmentsList extends Component
 {
     use WithPagination;
@@ -130,6 +133,8 @@ class AppointmentsList extends Component
     public $availableTimes = [];
     public $isTimeSelectionModalOpen = false;
     public $selectedUserId = null;
+    public $startDate;
+    public $endDate;
     public function mount()
     {
         $this->isLoading = true;
@@ -523,10 +528,43 @@ class AppointmentsList extends Component
     }
     public function updatedDateFilter()
     {
-        $this->isSearchingAllDates = false;
-        $this->filterStatus = '';
-        $this->resetPage();
-        $this->appointments = [];
+        $now = Carbon::now();
+
+        switch ($this->dateFilter) {
+            case 'all':
+                $this->selectedDate = null;
+                $this->isSearchingAllDates = true;
+                break;
+
+            case 'current_year':
+                $this->selectedDate = null;
+                $this->isSearchingAllDates = true;
+                $this->startDate = $now->startOfYear()->format('Y-m-d');
+                $this->endDate = $now->endOfYear()->format('Y-m-d');
+                break;
+
+            case 'current_month':
+                $this->selectedDate = null;
+                $this->isSearchingAllDates = true;
+                $this->startDate = $now->startOfMonth()->format('Y-m-d');
+                $this->endDate = $now->endOfMonth()->format('Y-m-d');
+                break;
+
+            case 'current_week':
+                $this->selectedDate = null;
+                $this->isSearchingAllDates = true;
+                $this->startDate = $now->startOfWeek()->format('Y-m-d');
+                $this->endDate = $now->endOfWeek()->format('Y-m-d');
+                break;
+
+            default:
+                $this->selectedDate = $now->format('Y-m-d');
+                $this->isSearchingAllDates = false;
+                $this->startDate = null;
+                $this->endDate = null;
+                break;
+        }
+
         $this->loadAppointments();
     }
     public function gotoPage($page)
