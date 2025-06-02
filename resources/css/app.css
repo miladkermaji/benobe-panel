@@ -17,6 +17,9 @@
     --background-card: #ffffff; /* سفید - کارت‌ها */
     --text-primary: #000000; /* مشکی - متن اصلی */
     --text-secondary: #707070; /* خاکستری - متن ثانویه */
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
     --text-discount: #008000; /* سبز - قیمت با تخفیف */
     --text-original: #ff0000; /* قرمز - قیمت اولیه */
     --border-neutral: #e5e7eb; /* خاکستری روشن - حاشیه‌ها */

@@ -3,7 +3,6 @@
     use Morilog\Jalali\Jalalian;
     use Carbon\Carbon;
   @endphp
-
   <div class="d-flex justify-content-center top-s-wrapper flex-wrap">
     <div class="calendar-and-add-sick-section p-3 w-100">
       <div class="c-a-wrapper">
@@ -21,11 +20,9 @@
         </button>
       </div>
     </div>
-
     <div wire:ignore class="w-100">
       <x-jalali-calendar-row />
     </div>
-
     <div class="sicks-content h-100 w-100 position-relative border">
       <div class="d-flex justify-content-start gap-10 nobat-option w-100" wire:ignore>
         <div class="d-flex align-items-center m-2 gap-4 justify-content-between w-100">
@@ -75,7 +72,6 @@
                 <span class="d-none d-md-block">هفته جاری</span>
               </button>
             </div>
-
           </div>
           <div class="d-flex">
             <button id="block-users-btn" x-data @click="$dispatch('open-modal', { name: 'block-user-modal' })"
@@ -135,7 +131,6 @@
                         {{ $appointment->appointment_time->format('H:i') ?? '-' }}
                       </span>
                     </td>
-
                     <td>
                       @if ($appointment->fee)
                         {{ number_format($appointment->fee) . ' تومان' }}
@@ -233,7 +228,6 @@
             </tbody>
           </table>
         </div>
-
         <!-- نمایش کارت‌ها در موبایل -->
         <div class="appointments-cards d-md-none">
           @if (count($appointments) > 0)
@@ -331,10 +325,7 @@
           @endif
         </div>
       </div>
-
-
     </div>
-
     <div wire:ignore>
       <x-modal name="mini-calendar-modal" title="انتخاب تاریخ" size="sm">
         <x-slot:body>
@@ -342,7 +333,6 @@
         </x-slot:body>
       </x-modal>
     </div>
-
     <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="md">
       <x-slot:body>
         <form wire:submit.prevent="storeWithUser">
@@ -377,7 +367,6 @@
                 @endif
               </div>
             </div>
-
             @if ($selectedUserId)
               <div class="col-md-6 position-relative">
                 <label class="label-top-input-special-takhasos">نام</label>
@@ -422,7 +411,6 @@
                 @enderror
               </div>
             @endif
-
             <div class="col-12">
               <button type="submit" class="btn btn-primary w-100"
                 @if (!$selectedUserId) disabled @endif>ثبت نوبت</button>
@@ -431,7 +419,6 @@
         </form>
       </x-slot:body>
     </x-modal>
-
     <x-modal name="add-new-patient-modal" title="افزودن بیمار جدید" size="lg">
       <x-slot:body>
         <form wire:submit.prevent="storeNewUser">
@@ -443,7 +430,6 @@
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
-
             <div class="col-md-6 position-relative">
               <label class="label-top-input-special-takhasos">نام خانوادگی</label>
               <input type="text" class="form-control h-50" wire:model="newUser.lastName" required>
@@ -451,7 +437,6 @@
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
-
             <div class="col-md-6 position-relative">
               <label class="label-top-input-special-takhasos">شماره موبایل</label>
               <input type="text" class="form-control h-50" wire:model="newUser.mobile" required>
@@ -459,7 +444,6 @@
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
-
             <div class="col-md-6 position-relative">
               <label class="label-top-input-special-takhasos">کد ملی</label>
               <input type="text" class="form-control h-50" wire:model="newUser.nationalCode" required>
@@ -467,7 +451,6 @@
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
-
             <div class="col-12">
               <button type="submit" class="btn btn-primary w-100">ثبت بیمار</button>
             </div>
@@ -475,10 +458,8 @@
         </form>
       </x-slot:body>
     </x-modal>
-
     <x-modal name="paziresh-modal" title="ارجاع" size="sm">
       <x-slot:body>
-
         <form action="" method="post">
           <input type="text" class="my-form-control-light w-100" placeholder="کدملی/کداتباع بیمار">
           <input type="text" class="my-form-control-light w-100 mt-3" placeholder="کد پیگیری">
@@ -487,23 +468,17 @@
           </div>
         </form>
       </x-slot:body>
-
     </x-modal>
-
     <div wire:ignore>
       <x-modal name="reschedule-modal" title="جابجایی نوبت" size="lg">
         <x-slot:body>
-
           <x-reschedule-calendar :appointmentId="$rescheduleAppointmentIds ? $rescheduleAppointmentIds : [$rescheduleAppointmentId]" />
         </x-slot:body>
       </x-modal>
     </div>
-
     <div wire:ignore>
-
       <x-modal name="block-user-modal" title="مسدود کردن کاربر" size="md">
         <x-slot:body>
-
           <form wire:submit.prevent="blockMultipleUsers">
             <div class="mb-4 position-relative">
               <label for="blockedAt" class="label-top-input-special-takhasos">تاریخ شروع مسدودیت</label>
@@ -531,10 +506,8 @@
             <button type="submit" class="btn my-btn-primary w-100 h-50">مسدود کردن</button>
           </form>
         </x-slot:body>
-
       </x-modal>
     </div>
-
     <div>
       <x-modal name="end-visit-modal" title="پایان ویزیت" size="lg">
         <x-slot:body>
@@ -561,7 +534,6 @@
                   @enderror
                 </div>
               </div>
-
               <div class="col-12">
                 <div class="border rounded p-2 bg-light services-checkbox-container position-relative">
                   <div class="loading-overlay-custom {{ $isLoadingServices ? 'show-custom' : '' }}">
@@ -589,7 +561,6 @@
                   @enderror
                 </div>
               </div>
-
               <!-- ویزیت رایگان و تخفیف در یک ردیف -->
               <div class="col-12">
                 <div class="border rounded p-2 bg-light mb-2">
@@ -599,7 +570,6 @@
                   </div>
                 </div>
               </div>
-
               <div class="col-12">
                 <div class="row g-2">
                   <div class="col-md-6">
@@ -631,17 +601,14 @@
                   </div>
                 </div>
               </div>
-
               <div class="col-12">
                 <div class="border rounded p-4 bg-white shadow-sm">
                   <h6 class="fw-bold mb-4 text-primary">جزئیات فاکتور</h6>
-
                   <!-- قیمت پایه -->
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="text-muted">قیمت پایه:</span>
                     <span>{{ number_format($this->getBasePrice(), 0, '.', ',') }} تومان</span>
                   </div>
-
                   <!-- نمایش مبلغ تخفیف -->
                   @if ($discountPercentage > 0)
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -649,7 +616,6 @@
                       <span class="text-danger">-{{ number_format($discountAmount, 0, '.', ',') }} تومان</span>
                     </div>
                   @endif
-
                   <!-- نمایش بیعانه -->
                   @php
                     $appointment = \App\Models\Appointment::find($endVisitAppointmentId);
@@ -661,7 +627,6 @@
                       <span class="text-success">-{{ number_format($fee, 0, '.', ',') }} تومان</span>
                     </div>
                   @endif
-
                   <!-- قیمت نهایی -->
                   <div class="border-top border-bottom border-success py-3 mt-3">
                     <div class="d-flex justify-content-between align-items-center">
@@ -673,7 +638,6 @@
                   </div>
                 </div>
               </div>
-
               <div class="col-12">
                 <div class="border rounded p-2 bg-light">
                   <label class="form-label fw-bold mb-1">توضیحات درمان</label>
@@ -690,7 +654,6 @@
         </x-slot:body>
       </x-modal>
     </div>
-
     <div wire:ignore>
       <x-modal name="discount-modal" title="اعمال تخفیف" size="md">
         <x-slot:body>
@@ -729,7 +692,6 @@
         </x-slot:body>
       </x-modal>
     </div>
-
     <div>
       <x-modal name="time-selection-modal" title="انتخاب ساعت نوبت" size="md">
         <x-slot:body>
@@ -757,7 +719,6 @@
         </x-slot:body>
       </x-modal>
     </div>
-
     <!-- Add new modal for reschedule time selection -->
     <div wire:ignore>
       <x-modal name="reschedule-time-modal" title="انتخاب ساعت نوبت جدید" size="md">
@@ -781,7 +742,6 @@
         </x-slot:body>
       </x-modal>
     </div>
-
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         // استفاده از Event Delegation برای مدیریت کلیک و لمس
@@ -789,34 +749,26 @@
         document.body.addEventListener('touchstart', handleToggle, {
           passive: false
         });
-
         // به‌روزرسانی پس از رندر Livewire
         Livewire.on('refresh', () => {
           console.log('Livewire refreshed, re-checking toggle buttons');
         });
       });
-
       function handleToggle(event) {
         const button = event.target.closest('.appointment-card .toggle-details');
         if (!button) return; // اگر کلیک روی دکمه toggle-details نبود، خارج شو
-
         event.preventDefault(); // جلوگیری از رفتار پیش‌فرض
-
-
         const card = button.closest('.appointment-card');
         if (!card) {
           return;
         }
-
         const details = card.querySelectorAll('.card-item.details');
         const isExpanded = card.classList.contains('expanded');
         const toggleIcon = button.querySelector('svg');
-
         if (!toggleIcon) {
           console.warn('Toggle icon (svg) not found in button');
           return;
         }
-
         if (isExpanded) {
           details.forEach(item => item.classList.add('d-none'));
           card.classList.remove('expanded');
@@ -829,10 +781,8 @@
       }
       window.holidaysData = @json($holidaysData);
       window.appointmentsData = @json($appointmentsData);
-
       document.addEventListener('livewire:initialized', () => {
         let updateTimeout;
-
         Livewire.on('calendarDataUpdated', () => {
           clearTimeout(updateTimeout);
           updateTimeout = setTimeout(() => {
@@ -840,7 +790,6 @@
             window.appointmentsData = @json($appointmentsData);
           }, 100);
         });
-
         Livewire.on('toggle-loading', (event) => {
           const isLoading = event.isLoading !== undefined ? event.isLoading : false;
           setTimeout(() => {
@@ -888,14 +837,10 @@
         if (clinicId && clinicId !== 'default') {
           localStorage.setItem('selectedClinicId', clinicId);
         }
-
         window.addEventListener('open-modal', event => {
-
           const modalId = event.detail.name;
           const appointmentId = event.detail.appointmentId || null;
-
           // Alpine خودش این ایونت رو هندل می‌کنه با x-on:open-modal.window
-
           // حالا Livewire
           if (appointmentId && modalId === 'reschedule-modal') {
             @this.set('rescheduleAppointmentId', appointmentId);
@@ -911,8 +856,6 @@
             @this.set('blockAppointmentId', appointmentId);
           }
         });
-
-
         Livewire.on('refresh', () => {
           initializeDropdowns();
         });
@@ -934,7 +877,6 @@
             }
           }
         });
-
         Livewire.on('show-partial-reschedule-confirm', (event) => {
           const data = event[0] || {};
           const {
@@ -944,7 +886,6 @@
             nextDate,
             availableSlots
           } = data;
-
           if (!message || !appointmentIds || !newDate || !nextDate || !availableSlots) {
             console.error('Invalid data received in show-partial-reschedule-confirm', data);
             Swal.fire({
@@ -955,7 +896,6 @@
             });
             return;
           }
-
           Swal.fire({
             title: 'تأیید جابجایی ناقص',
             text: message,
@@ -979,7 +919,6 @@
             }
           });
         });
-
         Livewire.on('show-first-available-confirm', (event) => {
           const data = event[0] || {};
           const {
@@ -990,7 +929,6 @@
             isFullCapacity,
             nextDate
           } = data;
-
           if (!message || !appointmentIds || !newDate || !availableSlots) {
             console.error('Invalid data in show-first-available-confirm', data);
             Swal.fire({
@@ -1001,7 +939,6 @@
             });
             return;
           }
-
           const swalOptions = {
             title: 'تأیید جابجایی به اولین نوبت خالی',
             text: message,
@@ -1011,12 +948,10 @@
             cancelButtonText: 'لغو',
             reverseButtons: true,
           };
-
           if (!isFullCapacity) {
             swalOptions.showDenyButton = true;
             swalOptions.denyButtonText = 'انتقال کامل به تاریخ با ظرفیت کافی';
           }
-
           Swal.fire(swalOptions).then((result) => {
             if (result.isConfirmed) {
               if (isFullCapacity) {
@@ -1051,11 +986,9 @@
             }
           });
         });
-
         Livewire.on('services-updated', () => {
           Livewire.dispatch('get-services', {});
         });
-
         Livewire.on('services-received', (services) => {
           const container = document.querySelector('.services-checkbox-container .checkbox-area');
           if (container) {
@@ -1065,7 +998,6 @@
               container.innerHTML = '<p class="text-danger">هیچ خدمتی یافت نشد.</p>';
               return;
             }
-
             flatServices.forEach(service => {
               const div = document.createElement('div');
               div.className = 'form-check';
@@ -1084,9 +1016,6 @@
             console.warn('Services container not found');
           }
         });
-
-
-
         Livewire.on('close-modal', (event) => {
           const modalId = event?.name || (event && event[0]?.name) || null;
           if (modalId) {
@@ -1095,7 +1024,6 @@
                 name: modalId
               }
             }));
-
           } else {
             document.querySelectorAll('.modal.show').forEach(modal => {
               if (modal.name) {
@@ -1104,7 +1032,6 @@
                     name: modalId
                   }
                 }));
-
               }
             });
           }
@@ -1116,7 +1043,6 @@
           const isFree = @this.get('isFree');
           const finalPrice = @this.get('finalPrice');
           const discountPercentage = @this.get('discountPercentage');
-
           if (priceInput) {
             priceInput.value = isFree ? '0 تومان' : `${new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان`;
             priceInput.disabled = isFree;
@@ -1127,18 +1053,14 @@
             discountInput.disabled = isFree;
           }
         });
-
         Livewire.on('discount-applied', (event) => {
           const percentage = parseFloat(event[0]?.percentage) || parseFloat(@this.get('discountPercentage')) || 0;
           const finalPrice = parseFloat(@this.get('finalPrice'));
           const isFree = @this.get('isFree');
-
           @this.set('discountPercentage', percentage);
           @this.set('finalPrice', finalPrice);
-
           const discountInput = document.querySelector('input[wire\\:model\\.live="discountPercentage"]');
           const priceInput = document.querySelector('input[wire\\:model\\.live="finalPrice"]');
-
           if (discountInput) {
             discountInput.value = isFree ? '' : (percentage ? `${percentage.toFixed(2)}%` : '0.00%');
             discountInput.disabled = isFree;
@@ -1148,41 +1070,33 @@
             priceInput.value = isFree ? '0 تومان' : `${new Intl.NumberFormat('fa-IR').format(finalPrice)} تومان`;
             priceInput.disabled = isFree;
           }
-
           window.dispatchEvent(new CustomEvent('close-modal', {
             detail: {
               name: 'discount-modal'
             }
           }));
         });
-
         function initializeDropdowns() {
           const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
           dropdownElementList.map(function(dropdownToggleEl) {
             return new bootstrap.Dropdown(dropdownToggleEl);
           });
         }
-
         document.addEventListener('DOMContentLoaded', initializeDropdowns);
-
         const selectAllCheckbox = document.getElementById('select-all-row');
         const cancelAppointmentsBtn = document.getElementById('cancel-appointments-btn');
         const moveAppointmentsBtn = document.getElementById('move-appointments-btn');
         const blockUsersBtn = document.getElementById('block-users-btn');
-
         function updateButtonStates() {
           const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
           const anySelected = selectedCheckboxes.length > 0;
-
           if (!cancelAppointmentsBtn || !moveAppointmentsBtn || !blockUsersBtn) {
             console.warn('یکی از دکمه‌ها یافت نشد');
             return;
           }
-
           cancelAppointmentsBtn.disabled = !anySelected;
           moveAppointmentsBtn.disabled = !anySelected;
           blockUsersBtn.disabled = !anySelected;
-
           if (anySelected) {
             let hasInvalidStatus = false;
             selectedCheckboxes.forEach(checkbox => {
@@ -1191,20 +1105,17 @@
                 hasInvalidStatus = true;
               }
             });
-
             cancelAppointmentsBtn.disabled = hasInvalidStatus;
             moveAppointmentsBtn.disabled = hasInvalidStatus;
             blockUsersBtn.disabled = false;
           }
         }
-
         function checkCheckboxes() {
           const checkboxes = document.querySelectorAll('.appointment-checkbox');
           const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
           selectAllCheckbox.checked = checkboxes.length > 0 && selectedCheckboxes.length === checkboxes.length;
           updateButtonStates();
         }
-
         if (selectAllCheckbox) {
           selectAllCheckbox.addEventListener('change', function() {
             const checkboxes = document.querySelectorAll('.appointment-checkbox');
@@ -1219,16 +1130,13 @@
         } else {
           console.warn('چک‌باکس انتخاب همه پیدا نشد');
         }
-
         document.addEventListener('change', function(e) {
           if (e.target.classList.contains('appointment-checkbox')) {
             checkCheckboxes();
           }
         });
-
         Livewire.on('confirm-cancel-single', (event) => {
           const appointmentId = event.id || (event[0] && event[0].id) || null;
-
           if (!appointmentId) {
             console.error('شناسه نوبت در confirm-cancel-single پیدا نشد', event);
             Swal.fire({
@@ -1239,7 +1147,6 @@
             });
             return;
           }
-
           Swal.fire({
             title: 'تأیید لغو نوبت',
             text: 'آیا مطمئن هستید که می‌خواهید این نوبت را لغو کنید؟',
@@ -1256,7 +1163,6 @@
             }
           });
         });
-
         Livewire.on('appointments-cancelled', (event) => {
           Swal.fire({
             toast: true,
@@ -1272,13 +1178,11 @@
             }
           });
         });
-
         if (cancelAppointmentsBtn) {
           cancelAppointmentsBtn.addEventListener('click', function(e) {
             e.preventDefault();
             const selected = Array.from(document.querySelectorAll('.appointment-checkbox:checked')).map(cb =>
               parseInt(cb.value));
-
             if (selected.length === 0) {
               console.warn('هیچ نوبت برای لغو گروهی انتخاب نشده');
               Swal.fire({
@@ -1289,7 +1193,6 @@
               });
               return;
             }
-
             Swal.fire({
               title: 'تأیید لغو نوبت',
               text: `آیا مطمئن هستید که می‌خواهید ${selected.length} نوبت را لغو کنید؟`,
@@ -1308,13 +1211,11 @@
         } else {
           console.warn('دکمه لغو نوبت‌ها پیدا نشد');
         }
-
         if (moveAppointmentsBtn) {
           moveAppointmentsBtn.addEventListener('click', function(e) {
             e.preventDefault();
             const selectedCheckboxes = document.querySelectorAll('.appointment-checkbox:checked');
             const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
-
             if (selectedIds.length === 0) {
               Swal.fire({
                 title: 'خطا',
@@ -1324,9 +1225,7 @@
               });
               return;
             }
-
             @this.set('rescheduleAppointmentIds', selectedIds);
-
             window.dispatchEvent(new CustomEvent('open-modal', {
               detail: {
                 name: 'reschedule-modal'
@@ -1336,7 +1235,6 @@
         } else {
           console.warn('دکمه جابجایی نوبت‌ها پیدا نشد');
         }
-
         if (blockUsersBtn) {
           blockUsersBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1344,7 +1242,6 @@
             const mobiles = Array.from(selectedCheckboxes)
               .map(cb => cb.dataset.mobile)
               .filter(mobile => mobile);
-
             if (mobiles.length === 0) {
               Swal.fire({
                 title: 'خطا',
@@ -1354,20 +1251,17 @@
               });
               return;
             }
-
             @this.set('selectedMobiles', mobiles);
             window.open - modal('block-user-modal');
           });
         } else {
           console.warn('دکمه مسدود کردن کاربران پیدا نشد');
         }
-
         document.addEventListener('DOMContentLoaded', () => {
           const loadMoreTrigger = document.createElement('div');
           loadMoreTrigger.id = 'load-more-trigger';
           loadMoreTrigger.style.height = '1px';
           document.querySelector('.appointments-container').appendChild(loadMoreTrigger);
-
           const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && @this.pagination.current_page < @this.pagination.last_page) {
               @this.nextPage();
@@ -1375,14 +1269,10 @@
           }, {
             threshold: 0.1
           });
-
           observer.observe(loadMoreTrigger);
-
           // به‌روزرسانی چک‌باکس‌ها
           checkCheckboxes();
-
         });
-
         Livewire.on('show-no-results-alert', (event) => {
           Swal.fire({
             title: 'نتیجه‌ای یافت نشد',
@@ -1398,7 +1288,6 @@
             }
           });
         });
-
         // Add event listener for time input click
         $(document).on('click', 'input[type="text"]', function(e) {
           e.preventDefault();
@@ -1412,47 +1301,39 @@
             @this.call('openTimeSelectionModal');
           }
         });
-
         // Handle available times loaded event
         /*
-                                                                                                Livewire.on('available-times-loaded', (event) => {
-                                                                                                  console.log('Available times loaded:', event);
-                                                                                                  const times = event.times || [];
-                                                                                                  const $container = $('#available-times');
-                                                                                                  $container.empty();
-
-                                                                                                  if (times.length === 0) {
-                                                                                                    $container.html(
-                                                                                                      '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
-                                                                                                    return;
-                                                                                                  }
-
-                                                                                                  times.forEach(time => {
-                                                                                                    const $button = $(
-                                                                                                      `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
+                                                                                                    Livewire.on('available-times-loaded', (event) => {
+                                                                                                      console.log('Available times loaded:', event);
+                                                                                                      const times = event.times || [];
+                                                                                                      const $container = $('#available-times');
+                                                                                                      $container.empty();
+                                                                                                      if (times.length === 0) {
+                                                                                                        $container.html(
+                                                                                                          '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
+                                                                                                        return;
+                                                                                                      }
+                                                                                                      times.forEach(time => {
+                                                                                                        const $button = $(
+                                                                                                          `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
         ${time}
       </button>`
-                                                                                                    );
-                                                                                                    $container.append($button);
-                                                                                                  });
-
-                                                                                                  // Handle time selection
-                                                                                                  $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
-                                                                                                    const $btn = $(this);
-                                                                                                    const time = $btn.data('time');
-
-                                                                                                    // Remove selection from other buttons
-                                                                                                    $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
-
-                                                                                                    // Select this button
-                                                                                                    $btn.removeClass('btn-outline-primary').addClass('btn-primary');
-
-                                                                                                    // Update Livewire component
-                                                                                                    @this.set('appointmentTime', time);
-                                                                                                  });
-                                                                                                });
-                                                                                                */
-
+                                                                                                        );
+                                                                                                        $container.append($button);
+                                                                                                      });
+                                                                                                      // Handle time selection
+                                                                                                      $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+                                                                                                        const $btn = $(this);
+                                                                                                        const time = $btn.data('time');
+                                                                                                        // Remove selection from other buttons
+                                                                                                        $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+                                                                                                        // Select this button
+                                                                                                        $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+                                                                                                        // Update Livewire component
+                                                                                                        @this.set('appointmentTime', time);
+                                                                                                      });
+                                                                                                    });
+                                                                                                    */
         // Handle modal close
         Livewire.on('close-modal', (event) => {
           const modalId = event?.name || (event && event[0]?.name) || null;
@@ -1461,7 +1342,6 @@
             @this.set('isTimeSelectionModalOpen', false);
           }
         });
-
       });
       // Lazy Loading با IntersectionObserver
     </script>
