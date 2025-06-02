@@ -14,7 +14,6 @@
         <canvas id="doctor-performance-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۲: درآمد ماهانه -->
     <div class="chart-container">
       <div class="chart-title">💰 درآمد ماهانه</div>
@@ -22,7 +21,6 @@
         <canvas id="doctor-income-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۳: تعداد بیماران جدید -->
     <div class="chart-container">
       <div class="chart-title">👨‍⚕️ بیماران جدید</div>
@@ -30,7 +28,6 @@
         <canvas id="doctor-patient-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۴: وضعیت نوبت‌ها -->
     <div class="chart-container">
       <div class="chart-title">📈 انواع نوبت‌ها</div>
@@ -38,7 +35,6 @@
         <canvas id="doctor-status-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۵: درصد نوبت‌ها -->
     <div class="chart-container">
       <div class="chart-title">🥧 درصد نوبت‌ها</div>
@@ -46,7 +42,6 @@
         <canvas id="doctor-status-pie-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۶: روند بیماران -->
     <div class="chart-container">
       <div class="chart-title">📉 روند بیماران</div>
@@ -54,7 +49,6 @@
         <canvas id="doctor-patient-trend-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۷: نوبت‌های مشاوره -->
     <div class="chart-container">
       <div class="chart-title">🗣️ نوبت‌های مشاوره</div>
@@ -62,7 +56,6 @@
         <canvas id="doctor-counseling-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۸: نوبت‌های دستی -->
     <div class="chart-container">
       <div class="chart-title">✍️ نوبت‌های دستی</div>
@@ -70,7 +63,6 @@
         <canvas id="doctor-manual-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۹: درآمد کلی -->
     <div class="chart-container">
       <div class="chart-title">💸 درآمد کلی</div>
@@ -82,9 +74,9 @@
 </div>
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
+<script>
+  var chartUrl = "{{ route('dr-my-performance-chart-data') }}";
+</script>
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-@include('dr.panel.my-tools.dashboardTools')
-
+<script src="{{ asset('dr-assets/panel/js/dashboard/dashboard.js') }}"></script>
 @endsection

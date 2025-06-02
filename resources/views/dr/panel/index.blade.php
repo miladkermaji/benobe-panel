@@ -1,14 +1,11 @@
 @extends('dr.panel.layouts.master')
-
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('dr-assets/panel/css/dashboard.css') }}" rel="stylesheet" />
 @endsection
-
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
 @endsection
-
 @section('content')
 @section('bread-crumb-title', 'لیست بیماران')
 <div class="d-flex flex-column justify-content-center p-3 top-panel-bg">
@@ -71,7 +68,6 @@
     </div>
   </div>
 </div>
-
 <div class="chart-content">
   <div class="chart-grid">
     <!-- نمودار ۱: تعداد ویزیت‌ها -->
@@ -81,7 +77,6 @@
         <canvas id="doctor-performance-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۲: درآمد ماهانه -->
     <div class="chart-container">
       <div class="chart-title">💰 درآمد ماهانه</div>
@@ -89,7 +84,6 @@
         <canvas id="doctor-income-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۳: تعداد بیماران جدید -->
     <div class="chart-container">
       <div class="chart-title">👨‍⚕️ بیماران جدید</div>
@@ -97,7 +91,6 @@
         <canvas id="doctor-patient-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۴: وضعیت نوبت‌ها -->
     <div class="chart-container">
       <div class="chart-title">📈 انواع نوبت‌ها</div>
@@ -105,7 +98,6 @@
         <canvas id="doctor-status-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۵: درصد نوبت‌ها -->
     <div class="chart-container">
       <div class="chart-title">🥧 درصد نوبت‌ها</div>
@@ -113,7 +105,6 @@
         <canvas id="doctor-status-pie-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۶: روند بیماران -->
     <div class="chart-container">
       <div class="chart-title">📉 روند بیماران</div>
@@ -121,7 +112,6 @@
         <canvas id="doctor-patient-trend-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۷: نوبت‌های مشاوره -->
     <div class="chart-container">
       <div class="chart-title">🗣️ نوبت‌های مشاوره</div>
@@ -129,7 +119,6 @@
         <canvas id="doctor-counseling-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۸: نوبت‌های دستی -->
     <div class="chart-container">
       <div class="chart-title">✍️ نوبت‌های دستی</div>
@@ -137,7 +126,6 @@
         <canvas id="doctor-manual-chart"></canvas>
       </div>
     </div>
-
     <!-- نمودار ۹: درآمد کلی -->
     <div class="chart-container">
       <div class="chart-title">💸 درآمد کلی</div>
@@ -148,21 +136,12 @@
   </div>
 </div>
 @endsection
-
 @section('scripts')
-@include('dr.panel.my-tools.dashboardTools')
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-
+<script src="{{ asset('dr-assets/panel/js/dashboard/dashboard.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
+  var chartUrl = "{{ route('dr-my-performance-chart-data') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
-</script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('showModal')) {
-      $('#activation-modal').modal('show');
-    }
-  });
 </script>
 @endsection

@@ -1,45 +1,4 @@
-:root {
-    --primary: #2e86c1;
-    --primary-light: #84caf9;
-    --secondary: #1deb3c;
-    --secondary-hover: #15802a;
-    --background-light: #f0f8ff;
-    --background-footer: #d4ecfd;
-    --background-card: #ffffff;
-    --text-primary: #000000;
-    --text-secondary: #707070;
-    --text-discount: #008000;
-    --text-original: #ff0000;
-    --border-neutral: #e5e7eb;
-    --shadow: rgba(0, 0, 0, 0.35);
-    --gradient-instagram-from: #f92ca7;
-    --gradient-instagram-to: #6b1a93;
-    --button-mobile: #4f9acd;
-    --button-mobile-light: #a2cdeb;
-    --support-section: #2e86c1;
-    --support-text: #084d7c;
-    --glass-border: 1px solid rgba(255, 255, 255, 0.3);
-    --radius-button: 0.5rem;
-    --radius-button-large: 1rem;
-    --radius-button-xl: 1.25rem;
-    --radius-card: 1.125rem;
-    --radius-footer: 1.875rem;
-    --radius-nav: 1.25rem;
-    --radius-circle: 9999px;
-    --gradient-primary: linear-gradient(
-        90deg,
-        var(--primary-light) 0%,
-        var(--primary) 100%
-    );
-    --gradient-bg: linear-gradient(145deg, #ffffff, #f0f6ff);
-    --text-color: #1e293b;
-    --hover-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-    --glass-bg: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.9),
-        rgba(255, 255, 255, 0.7)
-    );
-}
+
 
 .chart-content {
     padding: 15px;
