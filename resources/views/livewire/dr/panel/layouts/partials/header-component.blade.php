@@ -299,7 +299,7 @@
         // بستن باکس اعلان‌ها با کلیک خارج از آن
         document.addEventListener('click', function(event) {
           const notificationBox = document.querySelector('.notification-box');
-          const bellIcon = document.querySelector('.bell-red-badge').parentElement.querySelector('svg');
+          const bellIcon = document.querySelector('.notif-option svg');
           if (!notificationBox || !bellIcon) return;
 
           if (!notificationBox.contains(event.target) && !bellIcon.contains(event.target)) {
