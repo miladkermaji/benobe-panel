@@ -398,6 +398,93 @@ body {
     .table th {
         font-size: 12px;
     }
+
+    .notes-cards {
+        display: block;
+    }
+
+    .table-responsive {
+        display: none;
+    }
+
+    .note-card {
+        background: var(--background-card);
+        border-radius: var(--radius-card);
+        box-shadow: 0 2px 8px var(--shadow);
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .note-card .card-header {
+        background: var(--gradient-primary);
+        color: #ffffff;
+        padding: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .note-card .card-body {
+        padding: 1rem;
+    }
+
+    .note-card .card-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-neutral);
+    }
+
+    .note-card .card-item:last-child {
+        border-bottom: none;
+    }
+
+    .note-card .card-item .label {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .note-card .card-item .value {
+        font-weight: 500;
+    }
+
+    .note-card .card-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-neutral);
+    }
+
+    .note-card .card-actions button {
+        flex: 1;
+        padding: 0.5rem;
+        border: none;
+        border-radius: var(--radius-button);
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .note-card .card-actions .edit-btn {
+        background: var(--primary-light);
+        color: #ffffff;
+    }
+
+    .note-card .card-actions .delete-btn {
+        background: var(--text-original);
+        color: #ffffff;
+    }
+
+    .note-card .card-actions button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px var(--shadow);
+    }
 }
 
 @media (max-width: 767px) {
@@ -508,6 +595,32 @@ body {
     .container-fluid .row.g-3 > div {
         padding: 0.25rem;
     }
+
+    .note-card .card-header {
+        padding: 0.5rem;
+    }
+
+    .note-card .card-body {
+        padding: 0.75rem;
+    }
+
+    .note-card .card-item {
+        padding: 0.375rem 0;
+    }
+
+    .note-card .card-item .label {
+        font-size: 0.8125rem;
+    }
+
+    .note-card .card-actions {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+    }
+
+    .note-card .card-actions button {
+        padding: 0.375rem;
+        font-size: 0.8125rem;
+    }
 }
 
 @media (max-width: 575px) {
@@ -587,9 +700,293 @@ body {
         padding: 0.3rem;
         font-size: 9px;
     }
+
+    .note-card {
+        border-radius: 0.5rem;
+    }
+
+    .note-card .card-header {
+        padding: 0.375rem;
+    }
+
+    .note-card .card-body {
+        padding: 0.5rem;
+    }
+
+    .note-card .card-item {
+        padding: 0.25rem 0;
+    }
+
+    .note-card .card-item .label {
+        font-size: 0.75rem;
+    }
+
+    .note-card .card-actions {
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+    }
+
+    .note-card .card-actions button {
+        padding: 0.25rem;
+        font-size: 0.75rem;
+    }
 }
 
 /* مخفی کردن گزینه‌های پنل */
 .myPanelOption {
     display: none !important;
+}
+
+/* استایل کارت‌های موبایل برای یادداشت‌ها */
+.notes-cards {
+    display: none;
+}
+
+@media (max-width: 991px) {
+    .notes-cards {
+        display: block;
+    }
+
+    .table-responsive {
+        display: none;
+    }
+
+    .note-card {
+        background: var(--background-card);
+        border-radius: var(--radius-card);
+        box-shadow: 0 2px 8px var(--shadow);
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .note-card .card-header {
+        background: var(--gradient-primary);
+        color: #ffffff;
+        padding: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .note-card .card-body {
+        padding: 1rem;
+    }
+
+    .note-card .card-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-neutral);
+    }
+
+    .note-card .card-item:last-child {
+        border-bottom: none;
+    }
+
+    .note-card .card-item .label {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .note-card .card-item .value {
+        font-weight: 500;
+    }
+
+    .note-card .card-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-neutral);
+    }
+
+    .note-card .card-actions button {
+        flex: 1;
+        padding: 0.5rem;
+        border: none;
+        border-radius: var(--radius-button);
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .note-card .card-actions .edit-btn {
+        background: var(--primary-light);
+        color: #ffffff;
+    }
+
+    .note-card .card-actions .delete-btn {
+        background: var(--text-original);
+        color: #ffffff;
+    }
+
+    .note-card .card-actions button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px var(--shadow);
+    }
+}
+
+@media (max-width: 767px) {
+    .note-card .card-header {
+        padding: 0.5rem;
+    }
+
+    .note-card .card-body {
+        padding: 0.75rem;
+    }
+
+    .note-card .card-item {
+        padding: 0.375rem 0;
+    }
+
+    .note-card .card-item .label {
+        font-size: 0.8125rem;
+    }
+
+    .note-card .card-actions {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+    }
+
+    .note-card .card-actions button {
+        padding: 0.375rem;
+        font-size: 0.8125rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .note-card {
+        border-radius: 0.5rem;
+    }
+
+    .note-card .card-header {
+        padding: 0.375rem;
+    }
+
+    .note-card .card-body {
+        padding: 0.5rem;
+    }
+
+    .note-card .card-item {
+        padding: 0.25rem 0;
+    }
+
+    .note-card .card-item .label {
+        font-size: 0.75rem;
+    }
+
+    .note-card .card-actions {
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+    }
+
+    .note-card .card-actions button {
+        padding: 0.25rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Mobile Card Styles */
+@media (max-width: 991px) {
+    .table-responsive {
+        display: none;
+    }
+
+    .notes-cards {
+        display: block !important;
+        padding: 1rem;
+    }
+
+    .note-card {
+        background: #fff;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .note-card-header {
+        padding: 1rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .note-card-body {
+        padding: 1rem;
+    }
+
+    .note-card-item {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-neutral);
+    }
+
+    .note-card-item:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+    }
+
+    .note-card-label {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        min-width: 80px;
+    }
+
+    .note-card-value {
+        color: var(--text-primary);
+        font-size: 0.9375rem;
+        text-align: left;
+        flex: 1;
+    }
+}
+
+@media (max-width: 767px) {
+    .notes-cards {
+        padding: 0.75rem;
+    }
+
+    .note-card {
+        margin-bottom: 0.75rem;
+    }
+
+    .note-card-header,
+    .note-card-body {
+        padding: 0.75rem;
+    }
+
+    .note-card-item {
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .notes-cards {
+        padding: 0.5rem;
+    }
+
+    .note-card {
+        margin-bottom: 0.5rem;
+    }
+
+    .note-card-header,
+    .note-card-body {
+        padding: 0.5rem;
+    }
+
+    .note-card-label {
+        font-size: 0.8125rem;
+    }
+
+    .note-card-value {
+        font-size: 0.875rem;
+    }
 }
