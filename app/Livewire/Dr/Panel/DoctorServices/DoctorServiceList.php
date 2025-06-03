@@ -15,6 +15,7 @@ class DoctorServiceList extends Component
 {
     use WithPagination;
     public $openServices = [];
+    public $openInsurances = [];
     protected $paginationTheme = 'bootstrap';
 
     protected $listeners = [
@@ -249,6 +250,15 @@ class DoctorServiceList extends Component
         $this->selectedDoctorServices = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'سرویس‌های انتخاب‌شده با موفقیت حذف شدند!');
+    }
+
+    public function toggleInsurance($insuranceId)
+    {
+        if (in_array($insuranceId, $this->openInsurances)) {
+            $this->openInsurances = array_diff($this->openInsurances, [$insuranceId]);
+        } else {
+            $this->openInsurances[] = $insuranceId;
+        }
     }
 
     public function render()

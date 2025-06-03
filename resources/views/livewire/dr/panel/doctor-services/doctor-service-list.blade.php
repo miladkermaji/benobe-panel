@@ -42,10 +42,16 @@
       @forelse ($insurances as $insurance)
         <!-- نوار بیمه -->
         <div class="insurance-section">
-          <div class="insurance-header">
+          <div class="insurance-header" wire:click="toggleInsurance('{{ $insurance->id }}')">
             <h2 class="insurance-title">{{ $insurance->name }}</h2>
+            <div class="insurance-toggle {{ in_array($insurance->id, $openInsurances) ? 'rotate-180' : '' }}">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
           </div>
-          <div class="services-table">
+          <div class="services-table {{ in_array($insurance->id, $openInsurances) ? 'show' : '' }}">
             <div class="table-header">
               <span>نام خدمت</span>
               <span>توضیحات</span>
