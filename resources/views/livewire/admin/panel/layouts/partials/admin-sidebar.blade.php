@@ -174,10 +174,11 @@
             <li class="item-li"><a href="{{ route('dr-patient-records') }}">پرونده پزشکی</a></li>
           </ul>
         </li>
-        <!-- مدیریت fdlhvsjhk -->
-        <li class="item-li i-courses">
+        <!-- مدیریت مراکز درمانی -->
+        <li
+          class="item-li i-courses {{ Request::routeIs('admin.panel.hospitals.index') || Request::routeIs('admin.panel.laboratories.index') || Request::routeIs('admin.panel.clinics.index') || Request::routeIs('admin.panel.treatment-centers.index') || Request::routeIs('admin.panel.imaging-centers.index') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-            مدیریت بیمارستان
+            مراکز درمانی
             <div class="d-flex justify-content-end w-100 align-items-center">
               <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
                 xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
@@ -188,76 +189,21 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('admin.panel.hospitals.index') }}"> مدیریت بیمارستان</a></li>
-          </ul>
-        </li>
-        <!-- مدیریت آزمایشگاه -->
-        <li class="item-li i-courses">
-          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-            مدیریت آزمایشگاه
-            <div class="d-flex justify-content-end w-100 align-items-center">
-              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                  fill="currentColor"></path>
-              </svg>
-            </div>
-          </a>
-          <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('admin.panel.laboratories.index') }}"> مدیریت آزمایشگاه</a></li>
-          </ul>
-        </li>
-        <!-- مدیریت کلینیک‌ها -->
-        <li class="item-li i-courses">
-          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-            مدیریت کلینیک‌ها
-            <div class="d-flex justify-content-end w-100 align-items-center">
-              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                  fill="currentColor"></path>
-              </svg>
-            </div>
-          </a>
-          <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('admin.panel.clinics.index') }}"> مدیریت کلینیک</a></li>
-            <li class="item-li"><a href="{{ route('admin.panel.clinic-deposit-settings.index') }}"> بیعانه</a></li>
-          </ul>
-        </li>
-        <!-- مدیریت کلینیک‌ها -->
-        <li class="item-li i-courses">
-          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-            مدیریت درمانگاه
-            <div class="d-flex justify-content-end w-100 align-items-center">
-              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                  fill="currentColor"></path>
-              </svg>
-            </div>
-          </a>
-          <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('admin.panel.treatment-centers.index') }}"> مدیریت درمانگاه</a>
+            <li class="item-li {{ Request::routeIs('admin.panel.hospitals.index') ? 'is-active' : '' }}">
+              <a href="{{ route('admin.panel.hospitals.index') }}">مدیریت بیمارستان</a>
             </li>
-          </ul>
-        </li>
-        <li class="item-li i-courses">
-          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-            مراکزتصویربرداری
-            <div class="d-flex justify-content-end w-100 align-items-center">
-              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                  fill="currentColor"></path>
-              </svg>
-            </div>
-          </a>
-          <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('admin.panel.imaging-centers.index') }}"> مراکزتصویربرداری</a></li>
+            <li class="item-li {{ Request::routeIs('admin.panel.laboratories.index') ? 'is-active' : '' }}">
+              <a href="{{ route('admin.panel.laboratories.index') }}">مدیریت آزمایشگاه</a>
+            </li>
+            <li class="item-li {{ Request::routeIs('admin.panel.clinics.index') ? 'is-active' : '' }}">
+              <a href="{{ route('admin.panel.clinics.index') }}">مدیریت کلینیک</a>
+            </li>
+            <li class="item-li {{ Request::routeIs('admin.panel.treatment-centers.index') ? 'is-active' : '' }}">
+              <a href="{{ route('admin.panel.treatment-centers.index') }}">مدیریت درمانگاه</a>
+            </li>
+            <li class="item-li {{ Request::routeIs('admin.panel.imaging-centers.index') ? 'is-active' : '' }}">
+              <a href="{{ route('admin.panel.imaging-centers.index') }}">مراکز تصویربرداری</a>
+            </li>
           </ul>
         </li>
         <!-- مدیریت خدمات -->
