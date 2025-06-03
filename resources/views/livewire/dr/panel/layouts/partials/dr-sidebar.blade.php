@@ -25,7 +25,8 @@
       @endif
 
       @if ($this->hasPermission('appointments'))
-        <li class="item-li i-courses">
+        <li
+          class="item-li i-courses {{ Request::routeIs('dr-appointments') || Request::routeIs('dr-workhours') || Request::routeIs('dr.panel.doctornotes.index') || Request::routeIs('dr-mySpecialDays') || Request::routeIs('dr-manual_nobat_setting') || Request::routeIs('dr-scheduleSetting') || Request::routeIs('dr-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             نوبت اینترنتی
             <div class="d-flex justify-content-end w-100 align-items-center">
@@ -63,7 +64,7 @@
                 <a href="{{ route('dr-manual_nobat_setting') }}">تنظیمات نوبت دستی</a>
               </li>
             @endif
-         {{--    @if ($this->hasPermission('dr-manual_nobat'))
+            {{--    @if ($this->hasPermission('dr-manual_nobat'))
               <li class="item-li {{ Request::routeIs('dr-manual_nobat') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-manual_nobat') }}">ثبت نوبت دستی</a>
               </li>
@@ -89,7 +90,7 @@
 
       @if ($this->hasPermission('consult'))
         <li
-          class="item-li i-moshavere {{ Request::routeIs('dr-moshavere_setting') || Request::routeIs('dr-moshavere_waiting') || Request::routeIs('consult-term.index') ? 'is-active' : '' }}">
+          class="item-li i-moshavere {{ Request::routeIs('dr-moshavere_setting') || Request::routeIs('dr-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             مشاوره
             <div class="d-flex justify-content-end w-100 align-items-center">
@@ -142,7 +143,7 @@
 
       @if ($this->hasPermission('prescription'))
         <li
-          class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}">
+          class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('dr-patient-records') ? 'is-active' : '' }}">
           <a href="#">
             نسخه الکترونیک
             <div class="d-flex justify-content-end w-100 align-items-center">
@@ -185,7 +186,7 @@
 
       @if ($this->hasPermission('financial_reports'))
         <li
-          class="item-li i-my__peyments {{ Request::routeIs('dr-wallet') || Request::routeIs('dr-payment-setting') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          class="item-li i-my__peyments {{ Request::routeIs('dr-wallet') || Request::routeIs('dr-payment-setting') || Request::routeIs('dr.panel.financial-reports.index') || Request::routeIs('dr-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
           id="gozaresh-mali">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             گزارش مالی
@@ -220,7 +221,7 @@
       @endif
 
       @if ($this->hasPermission('patient_communication'))
-        <li class="item-li i-users">
+        <li class="item-li i-users {{ Request::routeIs('dr.panel.send-message') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             ارتباط با بیماران
             <div class="d-flex justify-content-end w-100 align-items-center">
@@ -276,7 +277,7 @@
 
       @if ($this->hasPermission('clinic_management'))
         <li
-          class="item-li i-clinic {{ Request::routeIs('dr-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          class="item-li i-clinic {{ Request::routeIs('dr-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('dr.panel.clinics.medical-documents') || Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
           id="gozaresh-mali">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             مطب
