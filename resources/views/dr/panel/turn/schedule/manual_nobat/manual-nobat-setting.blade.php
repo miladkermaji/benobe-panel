@@ -22,7 +22,7 @@
 <div class="manual-nobat-content w-100 d-flex justify-content-center mt-3">
   <div class="manual-nobat-content-wrapper">
     <div class="main-content">
-      <div class="row g-0 font-size-13 mb-2">
+      <div class="row g-0 font-size-13">
         <div class="user-panel-content w-100">
           <div class="p-3 w-100 d-flex justify-content-center">
             <div class="w-100" style="max-width: 850px;">
@@ -146,9 +146,7 @@
               });
               errorMessage += '</ul>';
             }
-            toastr.error(errorMessage, 'خطا', {
-              timeOut: 5000
-            });
+            toastr.error(errorMessage);
           }
         },
         error: function(xhr) {
@@ -162,9 +160,7 @@
           } else if (xhr.responseJSON && xhr.responseJSON.message) {
             errorMessage = `${xhr.responseJSON.message}<br>جزئیات: ${xhr.responseJSON.error.details}`;
           }
-          toastr.error(errorMessage, 'خطا', {
-            timeOut: 5000
-          });
+          toastr.error(errorMessage);
         },
         complete: function() {
           // بازگرداندن حالت اولیه دکمه
