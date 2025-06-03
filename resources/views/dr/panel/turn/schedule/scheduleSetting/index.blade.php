@@ -44,7 +44,7 @@
         </div>
       </li>
       <li class="d-flex align-items-center cursor-pointer" tabindex="0" role="button"
-        onclick="location.href='{{ route('dr-manual_nobat') }}'">
+        onclick="location.href='{{ route('dr-manual_nobat_setting') }}'">
         <div class="my-svg-setting-nobat">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path

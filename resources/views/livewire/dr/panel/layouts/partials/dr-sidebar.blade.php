@@ -63,11 +63,11 @@
                 <a href="{{ route('dr-manual_nobat_setting') }}">تنظیمات نوبت دستی</a>
               </li>
             @endif
-            @if ($this->hasPermission('dr-manual_nobat'))
+         {{--    @if ($this->hasPermission('dr-manual_nobat'))
               <li class="item-li {{ Request::routeIs('dr-manual_nobat') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-manual_nobat') }}">ثبت نوبت دستی</a>
               </li>
-            @endif
+            @endif --}}
             @if ($this->hasPermission('dr-scheduleSetting'))
               <li class="item-li {{ Request::routeIs('dr-scheduleSetting') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-scheduleSetting') }}">تنظیمات نوبت</a>
