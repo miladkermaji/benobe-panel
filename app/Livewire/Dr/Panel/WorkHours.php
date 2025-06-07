@@ -131,25 +131,19 @@ class Workhours extends Component
             return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
 
-        // اگر کاربر منشی است، باید doctor_id را از جدول منشی‌ها بگیریم
-        if ($doctor instanceof \App\Models\Secretary) {
-            $this->doctorId = $doctor->doctor_id;
-        } else {
-            $this->doctorId = $doctor->id;
-        }
-
+        $this->doctorId = $doctor instanceof \App\Models\Secretary ? $doctor->doctor_id : $doctor->id;
         $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
+
         if (!$this->doctor) {
             return redirect()->route('dr.auth.login-register-form')->with('error', 'اطلاعات پزشک یافت نشد.');
         }
 
         $this->clinicId = $clinicId;
-
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
         $this->activeClinicId = $this->clinicId ?? $this->selectedClinicId;
         session(['selectedClinicId' => $this->selectedClinicId]);
 
-        // Lazy load appointment config
+        // یک درخواست برای دریافت همه تنظیمات
         $this->appointmentConfig = DoctorAppointmentConfig::withoutGlobalScopes()
             ->firstOrCreate(
                 [
@@ -163,9 +157,8 @@ class Workhours extends Component
                 ]
             );
 
-        $this->refreshWorkSchedules();
-
-        // Get existing schedules for all days
+        // یک درخواست برای ایجاد/به‌روزرسانی همه روزها
+        $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
         $existingSchedules = DoctorWorkSchedule::withoutGlobalScopes()
             ->where('doctor_id', $this->doctorId)
             ->where(function ($query) {
@@ -178,11 +171,11 @@ class Workhours extends Component
             ->get()
             ->keyBy('day');
 
-        // Create missing schedules only
-        $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-        foreach ($daysOfWeek as $day) {
-            if (!isset($existingSchedules[$day])) {
-                DoctorWorkSchedule::withoutGlobalScopes()->create([
+        $missingDays = array_diff($daysOfWeek, $existingSchedules->keys()->toArray());
+
+        if (!empty($missingDays)) {
+            $newSchedules = collect($missingDays)->map(function ($day) {
+                return [
                     'doctor_id' => $this->doctorId,
                     'day' => $day,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
@@ -190,8 +183,10 @@ class Workhours extends Component
                     'work_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
                     'emergency_times' => json_encode([]),
-                ]);
-            }
+                ];
+            })->toArray();
+
+            DoctorWorkSchedule::insert($newSchedules);
         }
 
         $this->refreshWorkSchedules();
