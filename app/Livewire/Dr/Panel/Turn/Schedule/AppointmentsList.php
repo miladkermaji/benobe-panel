@@ -537,90 +537,177 @@ class AppointmentsList extends Component
     }
     public function updatedSearchQuery()
     {
-        if (strlen($this->searchQuery) < 2) {
-            $this->searchResults = [];
-            $this->loadAppointments();
+        if ($this->isSearching) {
             return;
         }
 
         $this->isSearching = true;
-        $this->searchResults = User::where(function ($query) {
-            $query->where('first_name', 'like', '%' . $this->searchQuery . '%')
-                  ->orWhere('last_name', 'like', '%' . $this->searchQuery . '%')
-                  ->orWhere('mobile', 'like', '%' . $this->searchQuery . '%')
-                  ->orWhere('national_code', 'like', '%' . $this->searchQuery . '%');
-        })->limit(10)->get();
 
-        // اعمال جستجو روی لیست اصلی نوبت‌ها
-        $this->loadAppointments();
-        $this->isSearching = false;
+        try {
+            if (strlen($this->searchQuery) < 2) {
+                $this->searchResults = [];
+                $this->loadAppointments();
+                return;
+            }
+
+            // بهینه‌سازی جستجوی کاربران
+            $searchQuery = '%' . $this->searchQuery . '%';
+            $this->searchResults = User::select(['id', 'first_name', 'last_name', 'mobile', 'national_code'])
+                ->where(function ($query) use ($searchQuery) {
+                    $query->where('first_name', 'like', $searchQuery)
+                          ->orWhere('last_name', 'like', $searchQuery)
+                          ->orWhere('mobile', 'like', $searchQuery)
+                          ->orWhere('national_code', 'like', $searchQuery)
+                          ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$searchQuery]);
+                })
+                ->limit(10)
+                ->get();
+
+            // اعمال جستجو روی لیست اصلی نوبت‌ها
+            $this->loadAppointments();
+        } finally {
+            $this->isSearching = false;
+        }
     }
+
     public function updatedFilterStatus()
     {
-        $this->isSearchingAllDates = false;
-        $this->dateFilter = '';
-        $this->resetPage();
-        $this->appointments = [];
-        $this->searchQuery = '';
-        $this->loadAppointments();
+        if ($this->isLoading) {
+            return;
+        }
+
+        $this->isLoading = true;
+
+        try {
+            $this->isSearchingAllDates = false;
+            $this->dateFilter = '';
+            $this->resetPage();
+            $this->appointments = [];
+            $this->searchQuery = '';
+            $this->loadAppointments();
+        } finally {
+            $this->isLoading = false;
+        }
     }
+
     public function updatedAttendanceStatus()
     {
-        $this->isSearchingAllDates = false;
-        $this->loadAppointments();
+        if ($this->isLoading) {
+            return;
+        }
+
+        $this->isLoading = true;
+
+        try {
+            $this->isSearchingAllDates = false;
+            $this->loadAppointments();
+        } finally {
+            $this->isLoading = false;
+        }
     }
+
     public function updatedDateFilter()
     {
-        $now = Carbon::now();
-        // ریست کردن فیلتر نوبت‌های دستی
-        $this->filterStatus = '';
-        $this->searchQuery = '';
-        switch ($this->dateFilter) {
-            case 'all':
-                $this->selectedDate = null;
-                $this->isSearchingAllDates = true;
-                break;
-            case 'current_year':
-                $this->selectedDate = null;
-                $this->isSearchingAllDates = true;
-                $this->startDate = $now->startOfYear()->format('Y-m-d');
-                $this->endDate = $now->endOfYear()->format('Y-m-d');
-                break;
-            case 'current_month':
-                $this->selectedDate = null;
-                $this->isSearchingAllDates = true;
-                $this->startDate = $now->startOfMonth()->format('Y-m-d');
-                $this->endDate = $now->endOfMonth()->format('Y-m-d');
-                break;
-            case 'current_week':
-                $this->selectedDate = null;
-                $this->isSearchingAllDates = true;
-                $this->startDate = $now->startOfWeek()->format('Y-m-d');
-                $this->endDate = $now->endOfWeek()->format('Y-m-d');
-                break;
-            default:
-                $this->selectedDate = $now->format('Y-m-d');
-                $this->isSearchingAllDates = false;
-                $this->startDate = null;
-                $this->endDate = null;
-                break;
+        if ($this->isLoading) {
+            return;
         }
-        $this->loadAppointments();
+
+        $this->isLoading = true;
+
+        try {
+            $now = Carbon::now();
+
+            // ریست کردن فیلتر نوبت‌های دستی
+            $this->filterStatus = '';
+            $this->searchQuery = '';
+
+            switch ($this->dateFilter) {
+                case 'all':
+                    $this->selectedDate = null;
+                    $this->isSearchingAllDates = true;
+                    break;
+
+                case 'current_year':
+                    $this->selectedDate = null;
+                    $this->isSearchingAllDates = true;
+                    $this->startDate = $now->copy()->startOfYear()->format('Y-m-d');
+                    $this->endDate = $now->copy()->endOfYear()->format('Y-m-d');
+                    break;
+
+                case 'current_month':
+                    $this->selectedDate = null;
+                    $this->isSearchingAllDates = true;
+                    $this->startDate = $now->copy()->startOfMonth()->format('Y-m-d');
+                    $this->endDate = $now->copy()->endOfMonth()->format('Y-m-d');
+                    break;
+
+                case 'current_week':
+                    $this->selectedDate = null;
+                    $this->isSearchingAllDates = true;
+                    $this->startDate = $now->copy()->startOfWeek()->format('Y-m-d');
+                    $this->endDate = $now->copy()->endOfWeek()->format('Y-m-d');
+                    break;
+
+                default:
+                    $this->selectedDate = $now->format('Y-m-d');
+                    $this->isSearchingAllDates = false;
+                    $this->startDate = null;
+                    $this->endDate = null;
+                    break;
+            }
+
+            $this->loadAppointments();
+        } finally {
+            $this->isLoading = false;
+        }
     }
+
     public function gotoPage($page)
     {
-        $this->setPage($page);
-        $this->loadAppointments();
+        if ($this->isLoading) {
+            return;
+        }
+
+        $this->isLoading = true;
+
+        try {
+            $this->setPage($page);
+            $this->loadAppointments();
+        } finally {
+            $this->isLoading = false;
+        }
     }
+
     public function previousPage()
     {
-        $this->setPage($this->pagination['current_page'] - 1);
-        $this->loadAppointments();
+        if ($this->isLoading) {
+            return;
+        }
+
+        $this->isLoading = true;
+
+        try {
+            $this->setPage($this->pagination['current_page'] - 1);
+            $this->loadAppointments();
+        } finally {
+            $this->isLoading = false;
+        }
     }
+
     public function nextPage()
     {
-        $this->setPage($this->pagination['current_page'] + 1);
-        $this->loadAppointments();
+        if ($this->isLoading) {
+            return;
+        }
+
+        $this->isLoading = true;
+
+        try {
+            $this->setPage($this->pagination['current_page'] + 1);
+            $this->loadAppointments();
+        } finally {
+            $this->isLoading = false;
+        }
     }
     public function handleRescheduleAppointment($appointmentIds, $newDate)
     {
