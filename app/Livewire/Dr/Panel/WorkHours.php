@@ -690,214 +690,198 @@ class Workhours extends Component
 
     public function copySchedule($replace = false)
     {
-        if (!$replace && !empty($this->copySource['day'])) {
-            $this->storedCopySource = $this->copySource;
-            $this->storedSelectedDays = $this->selectedDays;
-        }
-
-        $copySource = $replace || empty($this->copySource['day']) ? $this->storedCopySource : $this->copySource;
-        $selectedDays = $replace || empty(array_filter($this->selectedDays)) ? $this->storedSelectedDays : $this->selectedDays;
-
-        if (!isset($copySource['day']) || !in_array($copySource['day'], ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']) || !isset($copySource['index']) || !is_numeric($copySource['index']) || $copySource['index'] < 0) {
-            $this->modalMessage = 'داده‌های منبع کپی نامعتبر است';
-            $this->modalType = 'error';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => 'داده‌های منبع کپی نامعتبر است',
-                'type' => 'error',
-            ]);
-            $this->dispatch('close-checkbox-modal');
-            return;
-        }
-
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-        $sourceDay = $copySource['day'];
-        $sourceIndex = (int) $copySource['index'];
-
-        if (empty(array_filter($selectedDays))) {
-            $this->modalMessage = 'هیچ روزی برای کپی انتخاب نشده است';
-            $this->modalType = 'error';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => 'هیچ روزی برای کپی انتخاب نشده است',
-                'type' => 'error',
-            ]);
-            $this->dispatch('close-checkbox-modal');
-            return;
-        }
-
-        $sourceSchedule = collect($this->workSchedules)->firstWhere('day', $sourceDay);
-        if (!$sourceSchedule) {
-            $this->modalMessage = 'برنامه کاری برای روز مبدا یافت نشد';
-            $this->modalType = 'error';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => 'برنامه کاری برای روز مبدا یافت نشد',
-                'type' => 'error',
-            ]);
-            $this->dispatch('close-checkbox-modal');
-            return;
-        }
-
-        $sourceWorkHours = !empty($sourceSchedule['work_hours']) ? $sourceSchedule['work_hours'] : [];
-        $sourceAppointmentSettings = !empty($sourceSchedule['appointment_settings']) ? $sourceSchedule['appointment_settings'] : [];
-        $sourceEmergencyTimes = !empty($sourceSchedule['emergency_times']) ? $sourceSchedule['emergency_times'] : [];
-
-        if (empty($sourceWorkHours[$sourceIndex])) {
-            $this->modalMessage = 'اسلات انتخاب‌شده برای کپی یافت نشد';
-            $this->modalType = 'error';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => 'اسلات انتخاب‌شده برای کپی یافت نشد',
-                'type' => 'error',
-            ]);
-            $this->dispatch('close-checkbox-modal');
-            return;
-        }
-
-        $sourceSlot = $sourceWorkHours[$sourceIndex];
-        $conflicts = [];
-        $selectedTargetDays = array_keys(array_filter($selectedDays));
-
-        foreach ($selectedTargetDays as $targetDay) {
-            if ($targetDay === $sourceDay) {
-                continue;
+        try {
+            if (!$replace && !empty($this->copySource['day'])) {
+                $this->storedCopySource = $this->copySource;
+                $this->storedSelectedDays = $this->selectedDays;
             }
 
-            $targetSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-                ->where('day', $targetDay)
-                ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
-                    } else {
-                        $query->whereNull('clinic_id');
+            $copySource = $replace || empty($this->copySource['day']) ? $this->storedCopySource : $this->copySource;
+            $selectedDays = $replace || empty(array_filter($this->selectedDays)) ? $this->storedSelectedDays : $this->selectedDays;
+
+            if (!isset($copySource['day']) || !in_array($copySource['day'], ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']) || !isset($copySource['index']) || !is_numeric($copySource['index']) || $copySource['index'] < 0) {
+                throw new \Exception('داده‌های منبع کپی نامعتبر است');
+            }
+
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+            $sourceDay = $copySource['day'];
+            $sourceIndex = (int) $copySource['index'];
+
+            if (empty(array_filter($selectedDays))) {
+                throw new \Exception('هیچ روزی برای کپی انتخاب نشده است');
+            }
+
+            $sourceSchedule = collect($this->workSchedules)->firstWhere('day', $sourceDay);
+            if (!$sourceSchedule) {
+                throw new \Exception('برنامه کاری برای روز مبدا یافت نشد');
+            }
+
+            $sourceWorkHours = !empty($sourceSchedule['work_hours']) ? $sourceSchedule['work_hours'] : [];
+            $sourceAppointmentSettings = !empty($sourceSchedule['appointment_settings']) ? $sourceSchedule['appointment_settings'] : [];
+            $sourceEmergencyTimes = !empty($sourceSchedule['emergency_times']) ? $sourceSchedule['emergency_times'] : [];
+
+            if (empty($sourceWorkHours[$sourceIndex])) {
+                throw new \Exception('اسلات انتخاب‌شده برای کپی یافت نشد');
+            }
+
+            $sourceSlot = $sourceWorkHours[$sourceIndex];
+            $conflicts = [];
+            $selectedTargetDays = array_keys(array_filter($selectedDays));
+
+            DB::beginTransaction();
+            try {
+                foreach ($selectedTargetDays as $targetDay) {
+                    if ($targetDay === $sourceDay) {
+                        continue;
                     }
-                })
-                ->first();
 
-            if ($targetSchedule) {
-                $targetWorkHours = $targetSchedule->work_hours ? json_decode($targetSchedule->work_hours, true) : [];
-                $targetEmergencyTimes = $targetSchedule->emergency_times ? json_decode($targetSchedule->emergency_times, true) : [];
+                    $targetSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                        ->where('day', $targetDay)
+                        ->where(function ($query) {
+                            if ($this->activeClinicId !== 'default') {
+                                $query->where('clinic_id', $this->activeClinicId);
+                            } else {
+                                $query->whereNull('clinic_id');
+                            }
+                        })
+                        ->first();
 
-                if (!$replace && (!empty($targetWorkHours) || !empty($targetEmergencyTimes))) {
-                    $conflictDetails = [];
-                    foreach ($targetWorkHours as $slot) {
-                        if ($this->isTimeConflict($sourceSlot['start'], $sourceSlot['end'], $slot['start'], $slot['end'])) {
-                            $conflictDetails['work_hours'][] = [
-                                'start' => $slot['start'],
-                                'end' => $slot['end'],
-                                'max_appointments' => $slot['max_appointments'] ?? null,
-                            ];
+                    if ($targetSchedule) {
+                        $targetWorkHours = $targetSchedule->work_hours ? json_decode($targetSchedule->work_hours, true) : [];
+                        $targetEmergencyTimes = $targetSchedule->emergency_times ? json_decode($targetSchedule->emergency_times, true) : [];
+
+                        if (!$replace && (!empty($targetWorkHours) || !empty($targetEmergencyTimes))) {
+                            $conflictDetails = [];
+                            foreach ($targetWorkHours as $slot) {
+                                if ($this->isTimeConflict($sourceSlot['start'], $sourceSlot['end'], $slot['start'], $slot['end'])) {
+                                    $conflictDetails['work_hours'][] = [
+                                        'start' => $slot['start'],
+                                        'end' => $slot['end'],
+                                        'max_appointments' => $slot['max_appointments'] ?? null,
+                                    ];
+                                }
+                            }
+                            if (!empty($targetEmergencyTimes)) {
+                                $conflictDetails['emergency_times'] = $targetEmergencyTimes;
+                            }
+                            if (!empty($conflictDetails)) {
+                                $conflicts[$targetDay] = $conflictDetails;
+                            }
                         }
                     }
-                    if (!empty($targetEmergencyTimes)) {
-                        $conflictDetails['emergency_times'] = $targetEmergencyTimes;
-                    }
-                    if (!empty($conflictDetails)) {
-                        $conflicts[$targetDay] = $conflictDetails;
-                    }
                 }
-            }
-        }
 
-        if (!empty($conflicts) && !$replace) {
-            $this->dispatch('show-conflict-alert', ['conflicts' => $conflicts]);
-            $this->dispatch('close-checkbox-modal');
-            return;
-        }
+                if (!empty($conflicts) && !$replace) {
+                    $this->dispatch('show-conflict-alert', ['conflicts' => $conflicts]);
+                    $this->dispatch('close-checkbox-modal');
+                    return;
+                }
 
-        $daysToCopy = $replace ? array_diff($selectedTargetDays, [$sourceDay]) : array_diff($selectedTargetDays, array_keys($conflicts), [$sourceDay]);
+                $daysToCopy = $replace ? array_diff($selectedTargetDays, [$sourceDay]) : array_diff($selectedTargetDays, array_keys($conflicts), [$sourceDay]);
 
-        if (empty($daysToCopy)) {
-            $this->modalMessage = 'هیچ روزی برای کپی بدون تداخل یافت نشد';
-            $this->modalType = 'error';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => 'هیچ روزی برای کپی بدون تداخل یافت نشد',
-                'type' => 'error',
-            ]);
-            $this->dispatch('close-checkbox-modal');
-            return;
-        }
+                if (empty($daysToCopy)) {
+                    throw new \Exception('هیچ روزی برای کپی بدون تداخل یافت نشد');
+                }
 
-        foreach ($daysToCopy as $targetDay) {
-            $targetSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-                ->where('day', $targetDay)
-                ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                foreach ($daysToCopy as $targetDay) {
+                    $targetSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                        ->where('day', $targetDay)
+                        ->where(function ($query) {
+                            if ($this->activeClinicId !== 'default') {
+                                $query->where('clinic_id', $this->activeClinicId);
+                            } else {
+                                $query->whereNull('clinic_id');
+                            }
+                        })
+                        ->first();
+
+                    if (!$targetSchedule) {
+                        $targetSchedule = DoctorWorkSchedule::create([
+                            'doctor_id' => $doctorId,
+                            'day' => $targetDay,
+                            'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                            'is_working' => true,
+                            'work_hours' => json_encode([$sourceSlot]),
+                            'appointment_settings' => json_encode($sourceAppointmentSettings),
+                            'emergency_times' => json_encode($sourceEmergencyTimes),
+                        ]);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $targetWorkHours = json_decode($targetSchedule->work_hours, true) ?? [];
+                        if ($replace) {
+                            $targetWorkHours = array_filter($targetWorkHours, fn ($slot) => !$this->isTimeConflict($sourceSlot['start'], $sourceSlot['end'], $slot['start'], $slot['end']));
+                        }
+                        $targetWorkHours[] = $sourceSlot;
+                        $targetSchedule->update([
+                            'work_hours' => json_encode($targetWorkHours),
+                            'appointment_settings' => json_encode($sourceAppointmentSettings),
+                            'emergency_times' => json_encode($sourceEmergencyTimes),
+                            'is_working' => true,
+                        ]);
                     }
-                })
-                ->first();
-
-            if (!$targetSchedule) {
-                $targetSchedule = DoctorWorkSchedule::create([
-                    'doctor_id' => $doctorId,
-                    'day' => $targetDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                    'is_working' => true,
-                    'work_hours' => json_encode([$sourceSlot]),
-                    'appointment_settings' => json_encode($sourceAppointmentSettings),
-                    'emergency_times' => json_encode($sourceEmergencyTimes),
-                ]);
-            } else {
-                $targetWorkHours = json_decode($targetSchedule->work_hours, true) ?? [];
-                if ($replace) {
-                    $targetWorkHours = array_filter($targetWorkHours, fn ($slot) => !$this->isTimeConflict($sourceSlot['start'], $sourceSlot['end'], $slot['start'], $slot['end']));
                 }
-                $targetWorkHours[] = $sourceSlot;
-                $targetSchedule->update([
-                    'work_hours' => json_encode($targetWorkHours),
-                    'appointment_settings' => json_encode($sourceAppointmentSettings),
-                    'emergency_times' => json_encode($sourceEmergencyTimes),
-                    'is_working' => true,
-                ]);
-            }
-        }
 
-        $this->refreshWorkSchedules();
+                $this->refreshWorkSchedules();
 
-        $this->slots = [];
-        $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-        foreach ($daysOfWeek as $day) {
-            $schedule = collect($this->workSchedules)->firstWhere('day', $day);
-            if ($schedule) {
-                $this->isWorking[$day] = (bool) $schedule['is_working'];
-                $workHours = !empty($schedule['work_hours']) ? $schedule['work_hours'] : [];
-                if (!empty($workHours)) {
-                    foreach ($workHours as $index => $slot) {
-                        $this->slots[$day][$index] = [
-                            'id' => $schedule['id'] . '-' . $index,
-                            'start_time' => $slot['start'] ?? null,
-                            'end_time' => $slot['end'] ?? null,
-                            'max_appointments' => $slot['max_appointments'] ?? null,
+                $this->slots = [];
+                $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+                foreach ($daysOfWeek as $day) {
+                    $schedule = collect($this->workSchedules)->firstWhere('day', $day);
+                    if ($schedule) {
+                        $this->isWorking[$day] = (bool) $schedule['is_working'];
+                        $workHours = !empty($schedule['work_hours']) ? $schedule['work_hours'] : [];
+                        if (!empty($workHours)) {
+                            foreach ($workHours as $index => $slot) {
+                                $this->slots[$day][$index] = [
+                                    'id' => $schedule['id'] . '-' . $index,
+                                    'start_time' => $slot['start'] ?? null,
+                                    'end_time' => $slot['end'] ?? null,
+                                    'max_appointments' => $slot['max_appointments'] ?? null,
+                                ];
+                            }
+                        }
+                    }
+                    if (empty($this->slots[$day])) {
+                        $this->slots[$day][] = [
+                            'id' => null,
+                            'start_time' => null,
+                            'end_time' => null,
+                            'max_appointments' => null,
                         ];
                     }
                 }
-            }
-            if (empty($this->slots[$day])) {
-                $this->slots[$day][] = [
-                    'id' => null,
-                    'start_time' => null,
-                    'end_time' => null,
-                    'max_appointments' => null,
-                ];
-            }
-        }
 
-        $this->selectedDays = [];
-        $this->selectAllCopyModal = false;
-        $this->modalMessage = $replace ? 'برنامه کاری با موفقیت جایگزین شد' : 'برنامه کاری با موفقیت کپی شد';
-        $this->modalType = 'success';
-        $this->modalOpen = true;
-        $this->dispatch('show-toastr', [
-            'message' => $this->modalMessage,
-            'type' => 'success',
-        ]);
-        $this->dispatch('close-checkbox-modal');
+                DB::commit();
+
+                $this->selectedDays = [];
+                $this->selectAllCopyModal = false;
+                $this->modalMessage = $replace ? 'برنامه کاری با موفقیت جایگزین شد' : 'برنامه کاری با موفقیت کپی شد';
+                $this->modalType = 'success';
+                $this->modalOpen = true;
+                $this->dispatch('show-toastr', [
+                    'message' => $this->modalMessage,
+                    'type' => 'success',
+                ]);
+                $this->dispatch('close-checkbox-modal');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            Log::error('Error in copySchedule: ' . $e->getMessage(), [
+                'copy_source' => $copySource ?? null,
+                'selected_days' => $selectedDays ?? null,
+                'doctor_id' => $doctorId ?? null
+            ]);
+
+            $this->modalMessage = $e->getMessage() ?: 'خطا در کپی برنامه کاری';
+            $this->modalType = 'error';
+            $this->modalOpen = true;
+            $this->dispatch('show-toastr', [
+                'message' => $this->modalMessage,
+                'type' => 'error',
+            ]);
+        }
     }
 
     private function isTimeConflict($newStart, $newEnd, $existingStart, $existingEnd)
