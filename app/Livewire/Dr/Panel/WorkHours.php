@@ -1558,28 +1558,45 @@ class Workhours extends Component
 
     public function updateAutoScheduling()
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-
         try {
-            DoctorAppointmentConfig::withoutGlobalScopes()
-                ->updateOrCreate(
-                    [
-                        'doctor_id' => $doctorId,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                    ],
-                    [
-                        'auto_scheduling' => $this->autoScheduling,
-                        'doctor_id' => $doctorId,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                    ]
-                );
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
-            $this->dispatch('show-toastr', [
-                'message' => $this->autoScheduling ? 'نوبت‌دهی خودکار فعال شد' : 'نوبت‌دهی خودکار غیرفعال شد',
-                'type' => $this->autoScheduling ? 'success' : 'error',
-            ]);
+            DB::beginTransaction();
+            try {
+                DoctorAppointmentConfig::withoutGlobalScopes()
+                    ->updateOrCreate(
+                        [
+                            'doctor_id' => $doctorId,
+                            'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        ],
+                        [
+                            'auto_scheduling' => (bool) $this->autoScheduling,
+                            'doctor_id' => $doctorId,
+                            'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        ]
+                    );
+
+                DB::commit();
+
+                $this->dispatch('show-toastr', [
+                    'message' => $this->autoScheduling ? 'نوبت‌دهی خودکار فعال شد' : 'نوبت‌دهی خودکار غیرفعال شد',
+                    'type' => 'success',
+                ]);
+
+                // به‌روزرسانی تنظیمات در حافظه
+                $this->appointmentConfig->auto_scheduling = (bool) $this->autoScheduling;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
         } catch (\Exception $e) {
+            Log::error('Error in updateAutoScheduling: ' . $e->getMessage(), [
+                'doctor_id' => $doctorId ?? null,
+                'auto_scheduling' => $this->autoScheduling ?? null,
+                'clinic_id' => $this->activeClinicId ?? null
+            ]);
+
             $this->dispatch('show-toastr', [
                 'message' => 'خطا در به‌روزرسانی تنظیمات',
                 'type' => 'error',
