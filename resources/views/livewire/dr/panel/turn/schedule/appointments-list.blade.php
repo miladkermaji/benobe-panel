@@ -446,7 +446,7 @@
         </form>
       </x-slot:body>
     </x-modal>
-    <x-modal name="add-new-patient-modal" title="افزودن بیمار جدید" size="lg">
+    <x-modal name="add-new-patient-modal" title="افزودن بیمار جدید" size="md">
       <x-slot:body>
         <form wire:submit.prevent="storeNewUser">
           <div class="row g-3">
