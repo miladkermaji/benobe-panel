@@ -1375,65 +1375,76 @@ class Workhours extends Component
 
     public function updateWorkDayStatus($day)
     {
-        $dayMap = [
-            'شنبه' => 'saturday',
-            'یکشنبه' => 'sunday',
-            'دوشنبه' => 'monday',
-            'سه‌شنبه' => 'tuesday',
-            'چهارشنبه' => 'wednesday',
-            'پنج‌شنبه' => 'thursday',
-            'جمعه' => 'friday',
-        ];
-
-        if (!isset($dayMap[$day])) {
-            $this->modalMessage = 'روز نامعتبر است';
-            $this->modalType = 'error';
-            $this->modalOpen = true;
-            return;
-        }
-
-        $englishDay = $dayMap[$day];
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-        $isWorking = isset($this->isWorking[$englishDay]) ? (bool) $this->isWorking[$englishDay] : false;
-
         try {
-            $workSchedule = DoctorWorkSchedule::where([
-                'doctor_id' => $doctorId,
-                'day' => $englishDay,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-            ])->first();
+            $dayMap = [
+                'شنبه' => 'saturday',
+                'یکشنبه' => 'sunday',
+                'دوشنبه' => 'monday',
+                'سه‌شنبه' => 'tuesday',
+                'چهارشنبه' => 'wednesday',
+                'پنج‌شنبه' => 'thursday',
+                'جمعه' => 'friday',
+            ];
 
-            if ($workSchedule) {
-                $workSchedule->update([
-                    'is_working' => $isWorking,
-                ]);
-            } else {
-                $workSchedule = DoctorWorkSchedule::create([
-                    'doctor_id' => $doctorId,
-                    'day' => $englishDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                    'is_working' => $isWorking,
-                    'work_hours' => json_encode([]),
-                ]);
+            if (!isset($dayMap[$day])) {
+                throw new \Exception('روز نامعتبر است');
             }
 
-            $this->isWorking[$englishDay] = $isWorking;
-            $this->refreshWorkSchedules();
+            $englishDay = $dayMap[$day];
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+            $isWorking = isset($this->isWorking[$englishDay]) ? (bool) $this->isWorking[$englishDay] : false;
 
-            $this->modalMessage = $isWorking
-                ? "روز {$day} با موفقیت فعال شد"
-                : "روز {$day} با موفقیت غیرفعال شد";
-            $this->modalType = 'success';
-            $this->modalOpen = true;
+            DB::beginTransaction();
+            try {
+                $workSchedule = DoctorWorkSchedule::withoutGlobalScopes()
+                    ->where([
+                        'doctor_id' => $doctorId,
+                        'day' => $englishDay,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    ])
+                    ->first();
 
-            $this->dispatch('show-toastr', [
-                'message' => $this->modalMessage,
-                'type' => 'success',
-            ]);
-            $this->dispatch('refresh-work-hours');
+                if ($workSchedule) {
+                    $workSchedule->update(['is_working' => $isWorking]);
+                } else {
+                    DoctorWorkSchedule::create([
+                        'doctor_id' => $doctorId,
+                        'day' => $englishDay,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'is_working' => $isWorking,
+                        'work_hours' => json_encode([]),
+                    ]);
+                }
+
+                $this->isWorking[$englishDay] = $isWorking;
+                $this->refreshWorkSchedules();
+
+                DB::commit();
+
+                $this->modalMessage = $isWorking
+                    ? "روز {$day} با موفقیت فعال شد"
+                    : "روز {$day} با موفقیت غیرفعال شد";
+                $this->modalType = 'success';
+                $this->modalOpen = true;
+
+                $this->dispatch('show-toastr', [
+                    'message' => $this->modalMessage,
+                    'type' => 'success',
+                ]);
+                $this->dispatch('refresh-work-hours');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
         } catch (\Exception $e) {
-            $this->modalMessage = 'خطا در بروزرسانی وضعیت روز کاری';
+            Log::error('Error in updateWorkDayStatus: ' . $e->getMessage(), [
+                'day' => $day,
+                'doctor_id' => $doctorId ?? null,
+                'is_working' => $isWorking ?? null
+            ]);
+
+            $this->modalMessage = $e->getMessage() ?: 'خطا در بروزرسانی وضعیت روز کاری';
             $this->modalType = 'error';
             $this->modalOpen = true;
             $this->dispatch('show-toastr', [
