@@ -605,35 +605,77 @@ class Workhours extends Component
             $this->validate([
                 'calendarDays' => 'required|integer|min:1',
                 'holidayAvailability' => 'boolean',
+                'autoScheduling' => 'boolean',
+                'onlineConsultation' => 'boolean',
+            ], [
+                'calendarDays.required' => 'تعداد روزهای تقویم الزامی است',
+                'calendarDays.integer' => 'تعداد روزهای تقویم باید عدد باشد',
+                'calendarDays.min' => 'تعداد روزهای تقویم باید حداقل ۱ باشد',
+                'holidayAvailability.boolean' => 'مقدار در دسترس بودن در تعطیلات نامعتبر است',
+                'autoScheduling.boolean' => 'مقدار نوبت‌دهی خودکار نامعتبر است',
+                'onlineConsultation.boolean' => 'مقدار مشاوره آنلاین نامعتبر است',
             ]);
 
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
-            // Remove cache and use withoutGlobalScopes
-            DoctorAppointmentConfig::withoutGlobalScopes()
-                ->updateOrCreate(
-                    [
-                        'doctor_id' => $doctorId,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                    ],
-                    [
-                        'calendar_days' => $this->calendarDays,
-                        'holiday_availability' => $this->holidayAvailability,
-                        'auto_scheduling' => $this->autoScheduling,
-                        'online_consultation' => $this->onlineConsultation,
-                    ]
-                );
+            DB::beginTransaction();
+            try {
+                $config = DoctorAppointmentConfig::withoutGlobalScopes()
+                    ->updateOrCreate(
+                        [
+                            'doctor_id' => $doctorId,
+                            'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        ],
+                        [
+                            'calendar_days' => (int) $this->calendarDays,
+                            'holiday_availability' => (bool) $this->holidayAvailability,
+                            'auto_scheduling' => (bool) $this->autoScheduling,
+                            'online_consultation' => (bool) $this->onlineConsultation,
+                        ]
+                    );
 
-            $this->modalMessage = 'تنظیمات با موفقیت ذخیره شد';
-            $this->modalType = 'success';
+                // به‌روزرسانی تنظیمات در حافظه
+                $this->appointmentConfig = $config;
+                $this->calendarDays = (int) $this->calendarDays;
+                $this->holidayAvailability = (bool) $this->holidayAvailability;
+                $this->autoScheduling = (bool) $this->autoScheduling;
+                $this->onlineConsultation = (bool) $this->onlineConsultation;
+
+                DB::commit();
+
+                $this->modalMessage = 'تنظیمات با موفقیت ذخیره شد';
+                $this->modalType = 'success';
+                $this->modalOpen = true;
+                $this->dispatch('show-toastr', [
+                    'message' => $this->modalMessage,
+                    'type' => 'success',
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errorMessages = $e->validator->errors()->all();
+            $errorMessage = implode('، ', $errorMessages);
+            $this->modalMessage = $errorMessage ?: 'لطفاً تمام فیلدهای مورد نیاز را پر کنید';
+            $this->modalType = 'error';
             $this->modalOpen = true;
+            Log::error('Validation error in saveWorkSchedule: ' . $errorMessage);
             $this->dispatch('show-toastr', [
                 'message' => $this->modalMessage,
-                'type' => 'success',
+                'type' => 'error',
             ]);
         } catch (\Exception $e) {
-            $this->modalMessage = 'خطا در ذخیره تنظیمات';
+            Log::error('Error in saveWorkSchedule: ' . $e->getMessage(), [
+                'doctor_id' => $doctorId ?? null,
+                'calendar_days' => $this->calendarDays ?? null,
+                'holiday_availability' => $this->holidayAvailability ?? null,
+                'auto_scheduling' => $this->autoScheduling ?? null,
+                'online_consultation' => $this->onlineConsultation ?? null
+            ]);
+
+            $this->modalMessage = $e->getMessage() ?: 'خطا در ذخیره تنظیمات';
             $this->modalType = 'error';
             $this->modalOpen = true;
             $this->dispatch('show-toastr', [
