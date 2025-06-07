@@ -1175,112 +1175,105 @@ class Workhours extends Component
 
     public function saveTimeSlot()
     {
-        $this->validate([
-            'selectedDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
-            'startTime' => 'required|date_format:H:i',
-            'endTime' => 'required|date_format:H:i|after:startTime',
-            'maxAppointments' => 'required|integer|min:1',
-        ]);
-
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-
         try {
-            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-                ->where('day', $this->selectedDay)
-                ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
-                    } else {
-                        $query->whereNull('clinic_id');
+            $this->validate([
+                'selectedDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
+                'startTime' => 'required|date_format:H:i',
+                'endTime' => 'required|date_format:H:i|after:startTime',
+                'maxAppointments' => 'required|integer|min:1',
+            ]);
+
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+            DB::beginTransaction();
+            try {
+                $workSchedule = DoctorWorkSchedule::withoutGlobalScopes()
+                    ->where('doctor_id', $doctorId)
+                    ->where('day', $this->selectedDay)
+                    ->where(function ($query) {
+                        if ($this->activeClinicId !== 'default') {
+                            $query->where('clinic_id', $this->activeClinicId);
+                        } else {
+                            $query->whereNull('clinic_id');
+                        }
+                    })
+                    ->first();
+
+                if (!$workSchedule) {
+                    $workSchedule = DoctorWorkSchedule::create([
+                        'doctor_id' => $doctorId,
+                        'day' => $this->selectedDay,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'is_working' => true,
+                        'work_hours' => json_encode([]),
+                    ]);
+                }
+
+                $existingWorkHours = is_array($workSchedule->work_hours) ? $workSchedule->work_hours : json_decode($workSchedule->work_hours, true) ?? [];
+                $newSlot = [
+                    'start' => $this->startTime,
+                    'end' => $this->endTime,
+                    'max_appointments' => (int) $this->maxAppointments,
+                ];
+
+                // بررسی تداخل زمانی با یک حلقه
+                foreach ($existingWorkHours as $slot) {
+                    if ($this->isTimeConflict($newSlot['start'], $newSlot['end'], $slot['start'], $slot['end'])) {
+                        throw new \Exception(sprintf(
+                            'زمان %s تا %s با بازه زمانی موجود %s تا %s در روز %s تداخل دارد',
+                            $newSlot['start'],
+                            $newSlot['end'],
+                            $slot['start'],
+                            $slot['end'],
+                            $this->getPersianDay($this->selectedDay)
+                        ));
                     }
-                })
-                ->first();
+                }
 
-            if (!$workSchedule) {
-                $workSchedule = DoctorWorkSchedule::create([
-                    'doctor_id' => $doctorId,
-                    'day' => $this->selectedDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                    'is_working' => true,
-                    'work_hours' => json_encode([]),
+                $existingWorkHours[] = $newSlot;
+                $workSchedule->update([
+                    'work_hours' => json_encode($existingWorkHours),
+                    'is_working' => true
                 ]);
-            }
 
-            $existingWorkHours = json_decode($workSchedule->work_hours, true) ?? [];
-            $newSlot = [
-                'start' => $this->startTime,
-                'end' => $this->endTime,
-                'max_appointments' => $this->maxAppointments,
-            ];
+                $newSlotIndex = count($existingWorkHours) - 1;
+                $this->slots[$this->selectedDay][] = [
+                    'id' => $workSchedule->id . '-' . $newSlotIndex,
+                    'start_time' => $this->startTime,
+                    'end_time' => $this->endTime,
+                    'max_appointments' => (int) $this->maxAppointments,
+                ];
 
-            $slotExists = array_filter($existingWorkHours, function ($slot) use ($newSlot) {
-                return $slot['start'] === $newSlot['start'] && $slot['end'] === $newSlot['end'];
-            });
+                DB::commit();
 
-            if (!empty($slotExists)) {
-                $this->modalMessage = sprintf(
-                    'بازه زمانی %s تا %s قبلاً برای روز %s ثبت شده است',
-                    $newSlot['start'],
-                    $newSlot['end'],
-                    $this->getPersianDay($this->selectedDay)
-                );
-                $this->modalType = 'error';
+                $this->modalMessage = 'ساعت کاری با موفقیت ذخیره شد';
+                $this->modalType = 'success';
                 $this->modalOpen = true;
                 $this->dispatch('show-toastr', [
                     'message' => $this->modalMessage,
-                    'type' => 'error',
+                    'type' => 'success',
                 ]);
-                return;
+                $this->reset(['startTime', 'endTime', 'maxAppointments', 'selectedDay']);
+                $this->dispatch('refresh-work-hours');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
             }
-
-            foreach ($existingWorkHours as $index => $slot) {
-                if ($this->isTimeConflict($newSlot['start'], $newSlot['end'], $slot['start'], $slot['end'])) {
-                    $this->modalMessage = sprintf(
-                        'زمان %s تا %s با بازه زمانی موجود %s تا %s در روز %s تداخل دارد',
-                        $newSlot['start'],
-                        $newSlot['end'],
-                        $slot['start'],
-                        $slot['end'],
-                        $this->getPersianDay($this->selectedDay)
-                    );
-                    $this->modalType = 'error';
-                    $this->modalOpen = true;
-                    $this->dispatch('show-toastr', [
-                        'message' => $this->modalMessage,
-                        'type' => 'error',
-                    ]);
-                    return;
-                }
-            }
-
-            $existingWorkHours[] = $newSlot;
-            $workSchedule->update(['work_hours' => json_encode($existingWorkHours), 'is_working' => true]);
-
-            $newSlotIndex = count($existingWorkHours) - 1;
-            $newSlotEntry = [
-                'id' => $workSchedule->id . '-' . $newSlotIndex,
-                'start_time' => $this->startTime,
-                'end_time' => $this->endTime,
-                'max_appointments' => $this->maxAppointments,
-            ];
-
-            if (!isset($this->slots[$this->selectedDay])) {
-                $this->slots[$this->selectedDay] = [];
-            }
-            $this->slots[$this->selectedDay][] = $newSlotEntry;
-
-            $this->modalMessage = 'ساعت کاری با موفقیت ذخیره شد';
-            $this->modalType = 'success';
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errorMessages = $e->validator->errors()->all();
+            $errorMessage = implode('، ', $errorMessages);
+            $this->modalMessage = $errorMessage ?: 'لطفاً تمام فیلدهای مورد نیاز را پر کنید';
+            $this->modalType = 'error';
             $this->modalOpen = true;
+            Log::error('Validation error in saveTimeSlot: ' . $errorMessage);
             $this->dispatch('show-toastr', [
                 'message' => $this->modalMessage,
-                'type' => 'success',
+                'type' => 'error',
             ]);
-            $this->reset(['startTime', 'endTime', 'maxAppointments', 'selectedDay']);
-            $this->dispatch('refresh-work-hours');
         } catch (\Exception $e) {
-            $this->modalMessage = 'خطا در ذخیره‌سازی ساعت کاری';
+            Log::error('Error in saveTimeSlot: ' . $e->getMessage());
+            $this->modalMessage = $e->getMessage() ?: 'خطا در ذخیره‌سازی ساعت کاری';
             $this->modalType = 'error';
             $this->modalOpen = true;
             $this->dispatch('show-toastr', [
