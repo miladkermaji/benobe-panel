@@ -973,31 +973,57 @@ class Workhours extends Component
 
     public function updatedCalculatorAppointmentCount($value)
     {
-        if ($value && !is_nan($value) && $value > 0) {
+        try {
+            if (!$value || !is_numeric($value) || $value <= 0) {
+                $this->calculator['time_per_appointment'] = null;
+                return;
+            }
+
             $startTime = $this->calculator['start_time'] ?? null;
             $endTime = $this->calculator['end_time'] ?? null;
-            if ($startTime && $endTime) {
-                $totalMinutes = $this->timeToMinutes($endTime) - $this->timeToMinutes($startTime);
-                if ($totalMinutes > 0) {
-                    $this->calculator['time_per_appointment'] = round($totalMinutes / $value);
-                    $this->calculationMode = 'count';
-                } else {
-                    $this->calculator['time_per_appointment'] = null;
-                    $this->modalMessage = 'زمان پایان باید بعد از زمان شروع باشد';
-                    $this->modalType = 'error';
-                    $this->modalOpen = true;
-                    $this->dispatch('show-toastr', ['message' => 'زمان پایان باید بعد از زمان شروع باشد', 'type' => 'error']);
-                }
-            } else {
+
+            if (!$startTime || !$endTime) {
                 $this->calculator['time_per_appointment'] = null;
-                $this->modalMessage = 'زمان شروع یا پایان وارد نشده است';
-                $this->modalType = 'error';
-                $this->modalOpen = true;
-                $this->dispatch('show-toastr', ['message' => 'زمان شروع یا پایان وارد نشده است', 'type' => 'error']);
+                $this->showError('زمان شروع یا پایان وارد نشده است');
+                return;
             }
-        } else {
+
+            $totalMinutes = $this->timeToMinutes($endTime) - $this->timeToMinutes($startTime);
+
+            if ($totalMinutes <= 0) {
+                $this->calculator['time_per_appointment'] = null;
+                $this->showError('زمان پایان باید بعد از زمان شروع باشد');
+                return;
+            }
+
+            if ($totalMinutes < $value) {
+                $this->calculator['time_per_appointment'] = null;
+                $this->showError('تعداد نوبت‌ها نمی‌تواند بیشتر از کل زمان باشد');
+                return;
+            }
+
+            $this->calculator['time_per_appointment'] = round($totalMinutes / $value);
+            $this->calculationMode = 'count';
+        } catch (\Exception $e) {
+            Log::error('Error in updatedCalculatorAppointmentCount: ' . $e->getMessage(), [
+                'value' => $value,
+                'calculator' => $this->calculator
+            ]);
+
             $this->calculator['time_per_appointment'] = null;
+            $this->showError('خطا در محاسبه زمان هر نوبت');
         }
+    }
+
+    private function showError($message)
+    {
+        $this->modalMessage = $message;
+        $this->modalType = 'error';
+        $this->modalOpen = true;
+        $this->dispatch('show-toastr', [
+            'message' => $message,
+            'type' => 'error'
+        ]);
     }
 
     public function updatedCalculatorTimePerAppointment($value)
