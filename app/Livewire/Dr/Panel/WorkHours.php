@@ -887,15 +887,30 @@ class Workhours extends Component
     private function isTimeConflict($newStart, $newEnd, $existingStart, $existingEnd)
     {
         try {
+            if (empty($newStart) || empty($newEnd) || empty($existingStart) || empty($existingEnd)) {
+                return false;
+            }
+
             $newStartTime = Carbon::createFromFormat('H:i', $newStart);
             $newEndTime = Carbon::createFromFormat('H:i', $newEnd);
             $existingStartTime = Carbon::createFromFormat('H:i', $existingStart);
             $existingEndTime = Carbon::createFromFormat('H:i', $existingEnd);
+
+            if (!$newStartTime || !$newEndTime || !$existingStartTime || !$existingEndTime) {
+                return false;
+            }
+
             return (
                 ($newStartTime < $existingEndTime && $newEndTime > $existingStartTime) ||
                 ($newStartTime == $existingStartTime && $newEndTime == $existingEndTime)
             );
         } catch (\Exception $e) {
+            Log::error('Error in isTimeConflict: ' . $e->getMessage(), [
+                'new_start' => $newStart,
+                'new_end' => $newEnd,
+                'existing_start' => $existingStart,
+                'existing_end' => $existingEnd
+            ]);
             return false;
         }
     }
