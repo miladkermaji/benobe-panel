@@ -392,71 +392,89 @@ class AppointmentsList extends Component
         if (!$doctor) {
             return;
         }
+
         $query = Appointment::query()
-            ->where('doctor_id', $doctor->id)
+            ->select([
+                'appointments.*',
+                'users.first_name',
+                'users.last_name',
+                'users.mobile',
+                'users.national_code'
+            ])
+            ->join('users', 'appointments.patient_id', '=', 'users.id')
+            ->where('appointments.doctor_id', $doctor->id)
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
-                return $query->where('clinic_id', $this->selectedClinicId);
+                return $query->where('appointments.clinic_id', $this->selectedClinicId);
             });
 
+        // بهینه‌سازی فیلتر تاریخ
         if ($this->filterStatus === 'manual') {
-            $query->where('appointment_type', 'manual');
+            $query->where('appointments.appointment_type', 'manual');
         } else {
             if ($this->dateFilter) {
                 $today = Carbon::today();
                 switch ($this->dateFilter) {
-                    case 'all':
-                        // Don't apply any date filter
-                        break;
                     case 'current_week':
-                        $startOfWeek = $today->copy()->startOfWeek(Carbon::SATURDAY);
-                        $endOfWeek = $today->copy()->endOfWeek(Carbon::FRIDAY);
-                        $query->whereBetween('appointment_date', [$startOfWeek, $endOfWeek]);
+                        $query->whereBetween('appointments.appointment_date', [
+                            $today->copy()->startOfWeek(Carbon::SATURDAY),
+                            $today->copy()->endOfWeek(Carbon::FRIDAY)
+                        ]);
                         break;
                     case 'current_month':
-                        $startOfMonth = $today->copy()->startOfMonth();
-                        $endOfMonth = $today->copy()->endOfMonth();
-                        $query->whereBetween('appointment_date', [$startOfMonth, $endOfMonth]);
+                        $query->whereBetween('appointments.appointment_date', [
+                            $today->copy()->startOfMonth(),
+                            $today->copy()->endOfMonth()
+                        ]);
                         break;
                     case 'current_year':
-                        $startOfYear = $today->copy()->startOfYear();
-                        $endOfYear = $today->copy()->endOfYear();
-                        $query->whereBetween('appointment_date', [$startOfYear, $endOfYear]);
+                        $query->whereBetween('appointments.appointment_date', [
+                            $today->copy()->startOfYear(),
+                            $today->copy()->endOfYear()
+                        ]);
                         break;
                 }
             } elseif (!$this->isSearchingAllDates && $this->filterStatus !== 'all') {
                 $query->when($this->selectedDate, function ($query) {
-                    return $query->whereDate('appointment_date', $this->selectedDate);
+                    return $query->whereDate('appointments.appointment_date', $this->selectedDate);
                 });
             }
         }
 
-        $query->when($this->filterStatus && $this->filterStatus !== 'manual' && $this->filterStatus !== 'all', function ($query) {
-            return $query->where('status', $this->filterStatus);
-        });
+        // بهینه‌سازی فیلتر وضعیت
+        if ($this->filterStatus && $this->filterStatus !== 'manual' && $this->filterStatus !== 'all') {
+            $query->where('appointments.status', $this->filterStatus);
+        }
 
-        $query->when($this->searchQuery, function ($query) {
-            $query->whereHas('patient', function ($q) {
-                $q->where('first_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
-                    ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
+        // بهینه‌سازی جستجو
+        if ($this->searchQuery) {
+            $searchQuery = '%' . $this->searchQuery . '%';
+            $query->where(function ($q) use ($searchQuery) {
+                $q->where('users.first_name', 'like', $searchQuery)
+                  ->orWhere('users.last_name', 'like', $searchQuery)
+                  ->orWhere('users.mobile', 'like', $searchQuery)
+                  ->orWhere('users.national_code', 'like', $searchQuery)
+                  ->orWhereRaw("CONCAT(users.first_name, ' ', users.last_name) LIKE ?", [$searchQuery]);
             });
-        });
+        }
 
         try {
+            // استفاده از chunk به جای cursor برای مدیریت بهتر حافظه
             $this->appointments = [];
-            foreach ($query->orderBy('appointment_date', 'desc')
-                          ->orderBy('appointment_time', 'desc')
-                          ->cursor() as $appointment) {
-                $this->appointments[] = $appointment;
-            }
+            $query->orderBy('appointments.appointment_date', 'desc')
+                  ->orderBy('appointments.appointment_time', 'desc')
+                  ->chunk(100, function ($appointments) {
+                      foreach ($appointments as $appointment) {
+                          $this->appointments[] = $appointment;
+                      }
+                  });
         } catch (\Exception $e) {
             $this->appointments = [];
+            Log::error('Error loading appointments: ' . $e->getMessage());
         }
 
         $this->dispatch('setAppointments', ['appointments' => $this->appointments]);
 
+        // مدیریت پیام‌های عدم وجود نتیجه
         if (empty($this->appointments) && $this->searchQuery) {
             $jalaliDate = Jalalian::fromCarbon(Carbon::parse($this->selectedDate));
             if ($this->isSearchingAllDates) {
@@ -1198,72 +1216,108 @@ class AppointmentsList extends Component
     }
     public function calculateFinalPrice()
     {
-        $this->isLoadingFinalPrice = true; // فعال کردن لودینگ قیمت نهایی
-        if ($this->isFree) {
-            $this->finalPrice = 0;
-            $this->discountPercentage = 0;
-            $this->discountAmount = 0;
-        } else {
-            $basePrice = $this->getBasePrice();
-            if (empty($this->selectedServiceIds)) {
+        if ($this->isLoadingFinalPrice) {
+            return;
+        }
+
+        $this->isLoadingFinalPrice = true;
+
+        try {
+            if ($this->isFree) {
                 $this->finalPrice = 0;
                 $this->discountPercentage = 0;
                 $this->discountAmount = 0;
             } else {
-                $discountPercentage = is_numeric($this->discountPercentage) ? floatval($this->discountPercentage) : floatval(str_replace('%', '', $this->discountPercentage));
-                if ($discountPercentage > 0) {
-                    $this->discountAmount = round(($basePrice * $discountPercentage) / 100, 2);
-                    $this->discountPercentage = round($discountPercentage, 2);
-                } elseif ($this->discountAmount > 0 && $basePrice > 0) {
-                    $this->discountPercentage = round(($this->discountAmount / $basePrice) * 100, 2);
-                    $this->discountAmount = round($this->discountAmount, 2);
-                } else {
+                $basePrice = $this->getBasePrice();
+                if (empty($this->selectedServiceIds)) {
+                    $this->finalPrice = 0;
                     $this->discountPercentage = 0;
                     $this->discountAmount = 0;
+                } else {
+                    $discountPercentage = is_numeric($this->discountPercentage) ? floatval($this->discountPercentage) : floatval(str_replace('%', '', $this->discountPercentage));
+
+                    if ($discountPercentage > 0) {
+                        $this->discountAmount = round(($basePrice * $discountPercentage) / 100, 2);
+                        $this->discountPercentage = round($discountPercentage, 2);
+                    } elseif ($this->discountAmount > 0 && $basePrice > 0) {
+                        $this->discountPercentage = round(($this->discountAmount / $basePrice) * 100, 2);
+                        $this->discountAmount = round($this->discountAmount, 2);
+                    } else {
+                        $this->discountPercentage = 0;
+                        $this->discountAmount = 0;
+                    }
+
+                    $this->finalPrice = round(max(0, $basePrice - $this->discountAmount), 0);
                 }
-                $this->finalPrice = round(max(0, $basePrice - $this->discountAmount), 0);
             }
+        } finally {
+            $this->isLoadingFinalPrice = false;
+            $this->dispatch('final-price-updated');
         }
-        $this->isLoadingFinalPrice = false; // غیرفعال کردن لودینگ قیمت نهایی
-        $this->dispatch('final-price-updated');
     }
     public function updatedDiscountInputPercentage()
     {
-        // تبدیل ورودی به عدد، اگه خالی یا غیرعددی بود 0 می‌ذاریم
-        $percentage = is_numeric($this->discountInputPercentage) ? floatval($this->discountInputPercentage) : 0;
-        // مطمئن می‌شیم درصد بین 0 تا 100 باشه
-        if ($percentage > 100) {
-            $percentage = 100;
-            $this->discountInputPercentage = 100;
-        } elseif ($percentage < 0) {
-            $percentage = 0;
-            $this->discountInputPercentage = 0;
+        if ($this->isLoadingDiscount) {
+            return;
         }
-        $basePrice = $this->getBasePrice();
-        $this->discountInputAmount = ($basePrice * $percentage) / 100;
-        $this->discountPercentage = $percentage;
-        $this->discountAmount = $this->discountInputAmount;
-        $this->calculateFinalPrice();
-        $this->dispatch('discount-updated');
+
+        $this->isLoadingDiscount = true;
+
+        try {
+            $percentage = is_numeric($this->discountInputPercentage) ? floatval($this->discountInputPercentage) : 0;
+
+            if ($percentage > 100) {
+                $percentage = 100;
+                $this->discountInputPercentage = 100;
+            } elseif ($percentage < 0) {
+                $percentage = 0;
+                $this->discountInputPercentage = 0;
+            }
+
+            $basePrice = $this->getBasePrice();
+            $this->discountInputAmount = round(($basePrice * $percentage) / 100, 2);
+            $this->discountPercentage = $percentage;
+            $this->discountAmount = $this->discountInputAmount;
+
+            $this->calculateFinalPrice();
+        } finally {
+            $this->isLoadingDiscount = false;
+            $this->dispatch('discount-updated');
+        }
     }
     public function updatedDiscountInputAmount()
     {
-        $basePrice = $this->getBasePrice();
-        if ($this->discountInputAmount > $basePrice) {
-            $this->discountInputAmount = $basePrice;
+        if ($this->isLoadingDiscount) {
+            return;
         }
-        $this->discountInputPercentage = $basePrice > 0 ? ($this->discountInputAmount / $basePrice) * 100 : 0;
-        $this->discountPercentage = $this->discountInputPercentage;
-        $this->discountAmount = $this->discountInputAmount;
-        $this->calculateFinalPrice();
-        $this->dispatch('discount-updated');
+
+        $this->isLoadingDiscount = true;
+
+        try {
+            $basePrice = $this->getBasePrice();
+
+            if ($this->discountInputAmount > $basePrice) {
+                $this->discountInputAmount = $basePrice;
+            }
+
+            $this->discountInputPercentage = $basePrice > 0 ? round(($this->discountInputAmount / $basePrice) * 100, 2) : 0;
+            $this->discountPercentage = $this->discountInputPercentage;
+            $this->discountAmount = round($this->discountInputAmount, 2);
+
+            $this->calculateFinalPrice();
+        } finally {
+            $this->isLoadingDiscount = false;
+            $this->dispatch('discount-updated');
+        }
     }
     public function getBasePrice()
     {
         if (empty($this->selectedServiceIds)) {
             return 0;
         }
+
         $cacheKey = 'base_price_' . md5(json_encode($this->selectedServiceIds));
+
         return Cache::remember($cacheKey, now()->addMinutes(5), function () {
             return collect($this->services)
                 ->whereIn('id', $this->selectedServiceIds)
@@ -1289,14 +1343,20 @@ class AppointmentsList extends Component
     }
     public function endVisit($appointmentId = null)
     {
-        $this->isSaving = true; // فعال کردن لودینگ ذخیره
-        $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
-        if (!$appointmentId) {
-            $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'شناسه نوبت نامعتبر است.']);
-            $this->isSaving = false;
+        if ($this->isSaving) {
             return;
         }
+
+        $this->isSaving = true;
+
         try {
+            $appointmentId = $appointmentId ?? $this->endVisitAppointmentId;
+
+            if (!$appointmentId) {
+                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'شناسه نوبت نامعتبر است.']);
+                return;
+            }
+
             $this->validate([
                 'selectedInsuranceId' => 'required|exists:insurances,id',
                 'selectedServiceIds' => 'required|array|min:1',
@@ -1310,47 +1370,62 @@ class AppointmentsList extends Component
                 'paymentMethod.required' => 'لطفاً نوع پرداخت را انتخاب کنید.',
                 'paymentMethod.in' => 'نوع پرداخت انتخاب‌شده معتبر نیست.',
             ]);
+
+            DB::beginTransaction();
+
+            try {
+                $appointment = Appointment::findOrFail($appointmentId);
+                $appointment->update([
+                    'insurance_id' => $this->selectedInsuranceId,
+                    'service_ids' => json_encode($this->selectedServiceIds),
+                    'final_price' => $this->finalPrice,
+                    'discount_percentage' => $this->discountPercentage,
+                    'discount_amount' => $this->discountAmount,
+                    'status' => 'attended',
+                    'description' => $this->endVisitDescription,
+                    'payment_status' => 'paid',
+                    'payment_method' => $this->paymentMethod,
+                ]);
+
+                $doctor = $this->getAuthenticatedDoctor();
+                $cacheKeyPattern = "appointments_doctor_{$doctor->id}_*";
+                Cache::forget($cacheKeyPattern);
+
+                DB::commit();
+
+                $this->dispatch('close-modal', ['name' => 'end-visit-modal']);
+                $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'ویزیت با موفقیت ثبت شد.']);
+                $this->dispatch('visited', ['type' => 'success', 'message' => 'ویزیت با موفقیت ثبت شد.']);
+
+                $this->reset([
+                    'selectedInsuranceId',
+                    'selectedServiceIds',
+                    'isFree',
+                    'discountPercentage',
+                    'discountAmount',
+                    'finalPrice',
+                    'endVisitDescription',
+                    'endVisitAppointmentId',
+                    'paymentMethod',
+                ]);
+
+                $this->loadAppointments();
+                $this->dispatch('refresh-appointments-list');
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             $firstError = collect($e->errors())->flatten()->first();
             $this->dispatch('show-toastr', ['type' => 'error', 'message' => $firstError]);
+        } catch (\Exception $e) {
+            $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'خطا در ثبت ویزیت. لطفاً دوباره تلاش کنید.']);
+            Log::error('Error in endVisit: ' . $e->getMessage());
+        } finally {
             $this->isSaving = false;
-            return;
         }
-        $appointment = Appointment::findOrFail($appointmentId);
-        $appointment->update([
-            'insurance_id' => $this->selectedInsuranceId,
-            'service_ids' => json_encode($this->selectedServiceIds),
-            'final_price' => $this->finalPrice,
-            'discount_percentage' => $this->discountPercentage,
-            'discount_amount' => $this->discountAmount,
-            'status' => 'attended',
-            'description' => $this->endVisitDescription,
-            'payment_status' => 'paid',
-            'payment_method' => $this->paymentMethod,
-        ]);
-        $doctor = $this->getAuthenticatedDoctor();
-        $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$this->selectedClinicId}_datefilter_{$this->dateFilter}_status_{$this->filterStatus}_search_{$this->searchQuery}_page_{$this->pagination['current_page']}";
-        Cache::forget($cacheKey);
-        $cacheKeyPattern = "appointments_doctor_{$doctor->id}_*"; // حذف تمام کش‌های مرتبط با پزشک
-        Cache::forget($cacheKeyPattern);
-        $this->dispatch('close-modal', ['name' => 'end-visit-modal']);
-        $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'ویزیت با موفقیت ثبت شد.']);
-        $this->dispatch('visited', ['type' => 'success', 'message' => 'ویزیت با موفقیت ثبت شد.']);
-        $this->loadAppointments();
-        $this->reset([
-            'selectedInsuranceId',
-            'selectedServiceIds',
-            'isFree',
-            'discountPercentage',
-            'discountAmount',
-            'finalPrice',
-            'endVisitDescription',
-            'endVisitAppointmentId',
-            'paymentMethod',
-        ]);
-        $this->isSaving = false; // غیرفعال کردن لودینگ ذخیره
-        Cache::forget($cacheKey);
-        $this->dispatch('refresh-appointments-list');
     }
     public function updatedDiscountPercentage($value)
     {
