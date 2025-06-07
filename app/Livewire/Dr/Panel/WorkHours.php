@@ -1285,76 +1285,80 @@ class Workhours extends Component
 
     public function deleteTimeSlot($day, $index)
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-
         try {
-            $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-                ->where('day', $day)
-                ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
-                    } else {
-                        $query->whereNull('clinic_id');
-                    }
-                })
-                ->first();
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
-            if (!$workSchedule) {
-                $this->modalMessage = 'ساعات کاری برای این روز یافت نشد';
-                $this->modalType = 'error';
+            DB::beginTransaction();
+            try {
+                $workSchedule = DoctorWorkSchedule::withoutGlobalScopes()
+                    ->where('doctor_id', $doctorId)
+                    ->where('day', $day)
+                    ->where(function ($query) {
+                        if ($this->activeClinicId !== 'default') {
+                            $query->where('clinic_id', $this->activeClinicId);
+                        } else {
+                            $query->whereNull('clinic_id');
+                        }
+                    })
+                    ->first();
+
+                if (!$workSchedule) {
+                    throw new \Exception('ساعات کاری برای این روز یافت نشد');
+                }
+
+                $existingWorkHours = is_array($workSchedule->work_hours) ? $workSchedule->work_hours : json_decode($workSchedule->work_hours, true) ?? [];
+
+                if (!isset($existingWorkHours[$index])) {
+                    throw new \Exception('اسلات انتخاب‌شده یافت نشد');
+                }
+
+                // حذف اسلات و بازسازی آرایه
+                unset($existingWorkHours[$index]);
+                $updatedWorkHours = array_values($existingWorkHours);
+
+                // به‌روزرسانی رکورد
+                $workSchedule->update([
+                    'work_hours' => json_encode($updatedWorkHours),
+                    'is_working' => !empty($updatedWorkHours)
+                ]);
+
+                // به‌روزرسانی آرایه slots
+                unset($this->slots[$day][$index]);
+                $this->slots[$day] = array_values($this->slots[$day]);
+
+                // اگر هیچ اسلاتی باقی نمانده، یک اسلات خالی اضافه کن
+                if (empty($this->slots[$day])) {
+                    $this->slots[$day][] = [
+                        'id' => null,
+                        'start_time' => null,
+                        'end_time' => null,
+                        'max_appointments' => null,
+                    ];
+                }
+
+                DB::commit();
+
+                $this->modalMessage = 'اسلات با موفقیت حذف شد';
+                $this->modalType = 'success';
                 $this->modalOpen = true;
                 $this->dispatch('show-toastr', [
                     'message' => $this->modalMessage,
-                    'type' => 'error',
+                    'type' => 'success',
                 ]);
-                return;
+                $this->dispatch('refresh-work-hours');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
             }
-
-            $existingWorkHours = json_decode($workSchedule->work_hours, true) ?? [];
-
-            if (!isset($existingWorkHours[$index])) {
-                $this->modalMessage = 'اسلات انتخاب‌شده یافت نشد';
-                $this->modalType = 'error';
-                $this->modalOpen = true;
-                $this->dispatch('show-toastr', [
-                    'message' => $this->modalMessage,
-                    'type' => 'error',
-                ]);
-                return;
-            }
-
-            unset($existingWorkHours[$index]);
-            $updatedWorkHours = array_values($existingWorkHours);
-
-            $workSchedule->update([
-                'work_hours' => json_encode($updatedWorkHours),
-                'is_working' => !empty($updatedWorkHours),
-            ]);
-
-            unset($this->slots[$day][$index]);
-            $this->slots[$day] = array_values($this->slots[$day]);
-
-            if (empty($this->slots[$day])) {
-                $this->slots[$day][] = [
-                    'id' => null,
-                    'start_time' => null,
-                    'end_time' => null,
-                    'max_appointments' => null,
-                ];
-            }
-
-            $this->modalMessage = 'اسلات با موفقیت حذف شد';
-            $this->modalType = 'success';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => $this->modalMessage,
-                'type' => 'success',
-            ]);
-
-            $this->dispatch('refresh-work-hours');
         } catch (\Exception $e) {
-            $this->modalMessage = 'خطا در حذف اسلات';
+            Log::error('Error in deleteTimeSlot: ' . $e->getMessage(), [
+                'day' => $day,
+                'index' => $index,
+                'doctor_id' => $doctorId ?? null
+            ]);
+
+            $this->modalMessage = $e->getMessage() ?: 'خطا در حذف اسلات';
             $this->modalType = 'error';
             $this->modalOpen = true;
             $this->dispatch('show-toastr', [
