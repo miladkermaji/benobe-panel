@@ -516,7 +516,7 @@ class Workhours extends Component
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
-        // Optimize query by selecting only needed fields
+        // Optimize query by selecting only needed fields and using eager loading
         $this->workSchedules = DoctorWorkSchedule::withoutGlobalScopes()
             ->select(['id', 'day', 'is_working', 'work_hours', 'appointment_settings', 'emergency_times'])
             ->where('doctor_id', $doctorId)
@@ -532,10 +532,10 @@ class Workhours extends Component
                 return [
                     'id' => $schedule->id,
                     'day' => $schedule->day,
-                    'is_working' => $schedule->is_working,
-                    'work_hours' => json_decode($schedule->work_hours, true) ?? [],
-                    'appointment_settings' => json_decode($schedule->appointment_settings, true) ?? [],
-                    'emergency_times' => json_decode($schedule->emergency_times, true) ?? [],
+                    'is_working' => (bool) $schedule->is_working,
+                    'work_hours' => is_array($schedule->work_hours) ? $schedule->work_hours : json_decode($schedule->work_hours, true) ?? [],
+                    'appointment_settings' => is_array($schedule->appointment_settings) ? $schedule->appointment_settings : json_decode($schedule->appointment_settings, true) ?? [],
+                    'emergency_times' => is_array($schedule->emergency_times) ? $schedule->emergency_times : json_decode($schedule->emergency_times, true) ?? [],
                 ];
             })
             ->toArray();
