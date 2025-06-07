@@ -140,58 +140,74 @@ class AppointmentsList extends Component
     {
         $this->isLoading = true;
         $this->dispatch('toggle-loading', isLoading: true);
-        // مقداردهی اولیه pagination با مقادیر پیش‌فرض
-        $this->pagination = [
-            'current_page' => 1,
-            'per_page' => 100, // مقدار پیش‌فرض مناسب برای تعداد آیتم‌ها در هر صفحه
-            'last_page' => 1,
-            'total' => 0,
-        ];
-        // مقدار پیش‌فرض تاریخ امروز
-        $this->selectedDate = Carbon::now()->setTimezone('Asia/Tehran')->format('Y-m-d');
-        // خواندن selected_date از URL و دی‌کد کردن آن
-        $selectedDateFromUrl = request()->query('selected_date');
-        if ($selectedDateFromUrl) {
-            $decodedDate = urldecode($selectedDateFromUrl); // دی‌کد کردن 1404%2F02%2F05 به 1404/02/05 یا 1404-02-05
-            try {
-                // بررسی فرمت جلالی با خط تیره (مثل 1404-02-05)
-                if (preg_match('/^14\d{2}-\d{2}-\d{2}$/', $decodedDate)) {
-                    $this->selectedDate = Jalalian::fromFormat('Y-m-d', $decodedDate)->toCarbon()->format('Y-m-d');
+
+        try {
+            // مقداردهی اولیه pagination با مقادیر پیش‌فرض
+            $this->pagination = [
+                'current_page' => 1,
+                'per_page' => 100,
+                'last_page' => 1,
+                'total' => 0,
+            ];
+
+            // مقدار پیش‌فرض تاریخ امروز
+            $this->selectedDate = Carbon::now()->setTimezone('Asia/Tehran')->format('Y-m-d');
+
+            // خواندن selected_date از URL و دی‌کد کردن آن
+            $selectedDateFromUrl = request()->query('selected_date');
+            if ($selectedDateFromUrl) {
+                $decodedDate = urldecode($selectedDateFromUrl);
+                try {
+                    // بررسی فرمت جلالی با خط تیره (مثل 1404-02-05)
+                    if (preg_match('/^14\d{2}-\d{2}-\d{2}$/', $decodedDate)) {
+                        $this->selectedDate = Jalalian::fromFormat('Y-m-d', $decodedDate)->toCarbon()->format('Y-m-d');
+                    }
+                    // بررسی فرمت جلالی با اسلش (مثل 1404/02/05)
+                    elseif (preg_match('/^14\d{2}\/\d{2}\/\d{2}$/', $decodedDate)) {
+                        $this->selectedDate = Jalalian::fromFormat('Y/m/d', $decodedDate)->toCarbon()->format('Y-m-d');
+                    }
+                    // بررسی فرمت میلادی (مثل 2025-05-13)
+                    elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $decodedDate)) {
+                        $this->selectedDate = Carbon::parse($decodedDate)->format('Y-m-d');
+                    }
+                } catch (\Exception $e) {
+                    $this->dispatch('show-toastr', type: 'error', message: 'فرمت تاریخ انتخاب‌شده نامعتبر است.');
                 }
-                // بررسی فرمت جلالی با اسلش (مثل 1404/02/05)
-                elseif (preg_match('/^14\d{2}\/\d{2}\/\d{2}$/', $decodedDate)) {
-                    $this->selectedDate = Jalalian::fromFormat('Y/m/d', $decodedDate)->toCarbon()->format('Y-m-d');
-                }
-                // بررسی فرمت میلادی (مثل 2025-05-13)
-                elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $decodedDate)) {
-                    $this->selectedDate = Carbon::parse($decodedDate)->format('Y-m-d');
-                }
-            } catch (\Exception $e) {
-                // در صورت خطا، تاریخ امروز استفاده می‌شود
-                $this->dispatch('show-toastr', type: 'error', message: 'فرمت تاریخ انتخاب‌شده نامعتبر است.');
             }
+
+            // ذخیره URL بازگشت
+            $this->redirectBack = urldecode(request()->query('redirect_back', url()->previous()));
+
+            // تنظیم تاریخ‌های پیش‌فرض برای مسدودیت
+            $now = Jalalian::now();
+            $this->blockedAt = $now->format('Y-m-d');
+            $this->calendarYear = $now->getYear();
+            $this->calendarMonth = $now->getMonth();
+
+            // لود داده‌های اولیه
+            $doctor = $this->getAuthenticatedDoctor();
+            if ($doctor) {
+                $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+
+                // پاک کردن کش‌های قبلی
+                Cache::forget("appointments_doctor_{$doctor->id}_*");
+
+                // لود همزمان داده‌ها
+                $this->loadClinics();
+                $this->loadBlockedUsers();
+                $this->loadMessages();
+                $this->loadInsurances();
+
+                // لود داده‌های اصلی
+                $this->loadAppointments();
+                $this->loadCalendarData();
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در بارگذاری داده‌ها');
+        } finally {
+            $this->isLoading = false;
+            $this->dispatch('toggle-loading', isLoading: false);
         }
-        // ذخیره URL بازگشت
-        $this->redirectBack = urldecode(request()->query('redirect_back', url()->previous()));
-        // تنظیم تاریخ‌های پیش‌فرض برای مسدودیت
-        $this->blockedAt = Jalalian::now()->format('Y-m-d');
-        $this->calendarYear = Jalalian::now()->getYear();
-        $this->calendarMonth = Jalalian::now()->getMonth();
-        // لود داده‌های اولیه
-        $doctor = $this->getAuthenticatedDoctor();
-        $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
-        if ($doctor) {
-            $cacheKeyPattern = "appointments_doctor_{$doctor->id}_*";
-            Cache::forget($cacheKeyPattern);
-            $this->loadClinics();
-            $this->loadAppointments();
-            $this->loadBlockedUsers();
-            $this->loadMessages();
-            $this->loadCalendarData();
-            $this->loadInsurances();
-        }
-        $this->isLoading = false;
-        $this->dispatch('toggle-loading', isLoading: false);
     }
     /**
      * اعتبارسنجی فرمت تاریخ
@@ -380,9 +396,7 @@ class AppointmentsList extends Component
             $this->clinics = $doctor->clinics()->where('is_active', 0)->get()->toArray();
         }
     }
-    /**
-     * لود نوبت‌ها با Lazy Loading
-     */
+
     /**
      * لود نوبت‌ها با Lazy Loading
      */
@@ -611,43 +625,36 @@ class AppointmentsList extends Component
         if ($this->isLoading) {
             return;
         }
-
         $this->isLoading = true;
-
         try {
             $now = Carbon::now();
-
-            // ریست کردن فیلتر نوبت‌های دستی
             $this->filterStatus = '';
             $this->searchQuery = '';
-
             switch ($this->dateFilter) {
                 case 'all':
                     $this->selectedDate = null;
                     $this->isSearchingAllDates = true;
+                    $this->startDate = null;
+                    $this->endDate = null;
                     break;
-
                 case 'current_year':
                     $this->selectedDate = null;
                     $this->isSearchingAllDates = true;
                     $this->startDate = $now->copy()->startOfYear()->format('Y-m-d');
                     $this->endDate = $now->copy()->endOfYear()->format('Y-m-d');
                     break;
-
                 case 'current_month':
                     $this->selectedDate = null;
                     $this->isSearchingAllDates = true;
                     $this->startDate = $now->copy()->startOfMonth()->format('Y-m-d');
                     $this->endDate = $now->copy()->endOfMonth()->format('Y-m-d');
                     break;
-
                 case 'current_week':
                     $this->selectedDate = null;
                     $this->isSearchingAllDates = true;
-                    $this->startDate = $now->copy()->startOfWeek()->format('Y-m-d');
-                    $this->endDate = $now->copy()->endOfWeek()->format('Y-m-d');
+                    $this->startDate = $now->copy()->startOfWeek(Carbon::SATURDAY)->format('Y-m-d');
+                    $this->endDate = $now->copy()->endOfWeek(Carbon::FRIDAY)->format('Y-m-d');
                     break;
-
                 default:
                     $this->selectedDate = $now->format('Y-m-d');
                     $this->isSearchingAllDates = false;
@@ -655,7 +662,6 @@ class AppointmentsList extends Component
                     $this->endDate = null;
                     break;
             }
-
             $this->loadAppointments();
         } finally {
             $this->isLoading = false;
