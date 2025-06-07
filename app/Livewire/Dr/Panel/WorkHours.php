@@ -946,11 +946,29 @@ class Workhours extends Component
 
     protected function timeToMinutes($time)
     {
-        if (!$time) {
+        try {
+            if (empty($time)) {
+                return 0;
+            }
+
+            if (!preg_match('/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/', $time)) {
+                throw new \Exception('فرمت زمان نامعتبر است');
+            }
+
+            [$hours, $minutes] = explode(':', $time);
+            $totalMinutes = ((int)$hours * 60) + (int)$minutes;
+
+            if ($totalMinutes < 0 || $totalMinutes > 1440) { // 24 * 60 = 1440 minutes in a day
+                throw new \Exception('زمان خارج از محدوده مجاز است');
+            }
+
+            return $totalMinutes;
+        } catch (\Exception $e) {
+            Log::error('Error in timeToMinutes: ' . $e->getMessage(), [
+                'time' => $time
+            ]);
             return 0;
         }
-        [$hours, $minutes] = explode(':', $time);
-        return ($hours * 60) + $minutes;
     }
 
     public function updatedCalculatorAppointmentCount($value)
