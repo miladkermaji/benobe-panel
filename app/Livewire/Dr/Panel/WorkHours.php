@@ -917,10 +917,31 @@ class Workhours extends Component
 
     public function openCopyModal($day)
     {
-        $this->sourceDay = $day;
-        $this->selectAllCopyModal = false;
-        $this->selectedDays = [];
-        $this->dispatchBrowserEvent('open-checkbox-modal');
+        try {
+            if (!in_array($day, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])) {
+                throw new \Exception('روز نامعتبر است');
+            }
+
+            $this->sourceDay = $day;
+            $this->selectAllCopyModal = false;
+            $this->selectedDays = array_fill_keys(
+                ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                false
+            );
+            $this->dispatchBrowserEvent('open-checkbox-modal');
+        } catch (\Exception $e) {
+            Log::error('Error in openCopyModal: ' . $e->getMessage(), [
+                'day' => $day
+            ]);
+
+            $this->modalMessage = $e->getMessage() ?: 'خطا در باز کردن مودال کپی';
+            $this->modalType = 'error';
+            $this->modalOpen = true;
+            $this->dispatch('show-toastr', [
+                'message' => $this->modalMessage,
+                'type' => 'error',
+            ]);
+        }
     }
 
     protected function timeToMinutes($time)
