@@ -20,6 +20,7 @@ class DoctorNoteList extends Component
     public $readyToLoad = false;
     public $selectedDoctorNotes = [];
     public $selectAll = false;
+    public $groupAction = '';
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -62,6 +63,43 @@ class DoctorNoteList extends Component
     {
         $currentPageIds = $this->getDoctorNotesQuery()->pluck('id')->toArray();
         $this->selectAll = !empty($this->selectedDoctorNotes) && count(array_diff($currentPageIds, $this->selectedDoctorNotes)) === 0;
+    }
+
+    public function executeGroupAction()
+    {
+        if (empty($this->selectedDoctorNotes)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ یادداشتی انتخاب نشده است.');
+            return;
+        }
+
+        if (empty($this->groupAction)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        switch ($this->groupAction) {
+            case 'delete':
+                $this->deleteSelected();
+                break;
+            case 'status_active':
+                $this->updateStatus(true);
+                break;
+            case 'status_inactive':
+                $this->updateStatus(false);
+                break;
+        }
+
+        $this->groupAction = '';
+    }
+
+    private function updateStatus($status)
+    {
+        DoctorNote::whereIn('id', $this->selectedDoctorNotes)
+            ->update(['status' => $status]);
+
+        $this->selectedDoctorNotes = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت یادداشت‌های انتخاب‌شده با موفقیت تغییر کرد.');
     }
 
     public function deleteSelected()

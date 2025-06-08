@@ -14,6 +14,7 @@
 @section('scripts')
 
 
+
   <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 @endsection
 @endsection

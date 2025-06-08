@@ -407,6 +407,7 @@ body {
         display: none;
     }
 
+    
     .note-card {
         background: var(--background-card);
         border-radius: var(--radius-card);
