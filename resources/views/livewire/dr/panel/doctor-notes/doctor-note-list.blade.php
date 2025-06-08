@@ -40,7 +40,7 @@
           <!-- Group Actions -->
           <div class="group-actions p-2 border-bottom" x-data="{ show: false }"
             x-show="$wire.selectedDoctorNotes.length > 0">
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 justify-content-end">
               <select class="form-select form-select-sm" style="max-width: 200px;" wire:model="groupAction">
                 <option value="">عملیات گروهی</option>
                 <option value="delete">حذف انتخاب شده‌ها</option>
