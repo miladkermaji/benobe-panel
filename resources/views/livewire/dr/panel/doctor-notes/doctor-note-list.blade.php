@@ -3,19 +3,10 @@
     <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
-          <h1 class="m-0 h4 font-thin text-nowrap">یادداشت‌های من</h1>
           <div class="d-flex align-items-center gap-3">
-            <div class="search-container position-relative" style="max-width: 300px; width: 100%;">
-              <input type="text"
-                class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2"
-                wire:model.live="search" placeholder="جستجو در یادداشت‌ها..." style="padding-right: 20px;">
-              <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
-                style="z-index: 5; top: 50%; right: 8px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
-                  <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
-                </svg>
-              </span>
-            </div>
+            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0">یادداشت‌های من</h1>
+          </div>
+          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
             <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
               <a href="{{ route('dr.panel.doctornotes.create') }}"
                 class="btn btn-gradient-success rounded-1 px-3 py-1 d-flex align-items-center gap-1">
@@ -25,6 +16,19 @@
                 </svg>
                 <span>افزودن</span>
               </a>
+              <div class="search-container position-relative" style="max-width: 100%;">
+                <input type="text"
+                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-end"
+                  wire:model.live="search" placeholder="جستجو در یادداشت‌ها..."
+                  style="padding-right: 20px; text-align: right; direction: rtl;">
+                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                  style="z-index: 5; top: 50%; right: 8px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                    stroke-width="2">
+                    <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                  </svg>
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -376,6 +380,20 @@
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
+        @media (min-width: 768px) {
+          .glass-header .search-container {
+            max-width: 300px;
+          }
+
+          .glass-header .btn-gradient-success {
+            width: auto;
+          }
+
+          .glass-header .d-flex {
+            justify-content: space-between !important;
+          }
+        }
+
         @media (max-width: 768px) {
           .glass-header {
             padding: 1rem;
@@ -386,23 +404,24 @@
           }
 
           .search-container {
-            max-width: 100% !important;
+            width: 100%;
           }
 
           .search-input {
-            height: 34px;
-            font-size: 0.8125rem;
+            height: 38px;
+            font-size: 0.875rem;
           }
 
           .btn-gradient-success {
-            width: auto;
+            width: 100%;
+            height: 38px;
             justify-content: center;
           }
 
           .glass-header h1 {
             font-size: 1.1rem;
             text-align: right;
-            margin-bottom: 0.5rem;
+            width: 100%;
           }
         }
 
@@ -417,8 +436,12 @@
           }
 
           .search-input {
-            height: 32px;
-            font-size: 0.75rem;
+            height: 36px;
+            font-size: 0.8125rem;
+          }
+
+          .btn-gradient-success {
+            height: 36px;
           }
         }
       </style>
