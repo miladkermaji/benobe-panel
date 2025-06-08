@@ -171,22 +171,6 @@
 .turning_filterWrapper__2cOOi .dropdown {
     position: static;
 }
-.turning_filterWrapper__2cOOi .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    min-width: 200px;
-    margin-top: 0.5rem;
-    padding: 0.5rem;
-    background: var(--background-card);
-    border: 1px solid var(--border-neutral);
-    border-radius: var(--radius-button);
-    box-shadow: 0 4px 12px var(--shadow);
-    animation: slideDown 0.3s ease-out;
-    z-index: 1000;
-    max-height: 400px;
-    overflow-y: auto;
-}
 .turning_filterWrapper__2cOOi .dropdown-toggle {
     background: var(--background-card);
     border: 1px solid var(--border-neutral);
@@ -200,11 +184,31 @@
     align-items: center;
     gap: 0.5rem;
     white-space: nowrap;
+    width: 100%;
+    justify-content: space-between;
 }
 .turning_filterWrapper__2cOOi .dropdown-toggle:hover {
     background: var(--primary);
     color: var(--background-card);
     border-color: var(--primary);
+}
+.turning_filterWrapper__2cOOi .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    min-width: 250px;
+    margin-top: 5px;
+    padding: 0.5rem;
+    background: var(--background-card);
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
+    box-shadow: 0 4px 12px var(--shadow);
+    animation: slideDown 0.3s ease-out;
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+    transform: none !important;
 }
 .dropdown-menu {
     background: var(--background-card);
@@ -727,13 +731,16 @@ textarea.form-control {
         padding: 0.5rem 0.75rem;
     }
     .turning_filterWrapper__2cOOi .dropdown-menu {
-        position: fixed;
-        top: auto;
-        right: 50%;
-        transform: translateX(50%);
-        width: 90%;
-        max-width: 300px;
-        margin-top: 0.5rem;
+        position: fixed !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border-radius: var(--radius-card) var(--radius-card) 0 0;
+        transform: none !important;
         max-height: 350px;
     }
     .table-responsive {
