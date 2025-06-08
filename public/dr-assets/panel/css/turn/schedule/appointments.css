@@ -164,6 +164,29 @@
     position: relative;
     z-index: 10;
 }
+.turning_filterWrapper__2cOOi {
+    position: relative;
+    z-index: 1000;
+}
+.turning_filterWrapper__2cOOi .dropdown {
+    position: static;
+}
+.turning_filterWrapper__2cOOi .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 200px;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--background-card);
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
+    box-shadow: 0 4px 12px var(--shadow);
+    animation: slideDown 0.3s ease-out;
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+}
 .turning_filterWrapper__2cOOi .dropdown-toggle {
     background: var(--background-card);
     border: 1px solid var(--border-neutral);
@@ -176,6 +199,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    white-space: nowrap;
 }
 .turning_filterWrapper__2cOOi .dropdown-toggle:hover {
     background: var(--primary);
@@ -189,6 +213,7 @@
     box-shadow: 0 4px 12px var(--shadow);
     padding: 0.5rem;
     animation: slideDown 0.3s ease-out;
+    text-align: right;
 }
 .dropdown-item {
     font-size: 0.875rem;
@@ -196,6 +221,8 @@
     border-radius: var(--radius-button);
     color: var(--text-primary);
     transition: all 0.2s ease;
+    text-align: right;
+    white-space: nowrap;
 }
 .dropdown-item:hover {
     background: var(--primary-light);
@@ -238,10 +265,12 @@
 }
 /* Table styling */
 .table-responsive {
-    max-height: 600px;
+    min-height: 600px;
+    max-height: 800px;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--primary-light) var(--background-light);
+    position: relative;
 }
 .table-responsive::-webkit-scrollbar {
     width: 8px;
@@ -696,6 +725,19 @@ textarea.form-control {
     .end-visit-btn {
         font-size: 0.75rem;
         padding: 0.5rem 0.75rem;
+    }
+    .turning_filterWrapper__2cOOi .dropdown-menu {
+        position: fixed;
+        top: auto;
+        right: 50%;
+        transform: translateX(50%);
+        width: 90%;
+        max-width: 300px;
+        margin-top: 0.5rem;
+        max-height: 350px;
+    }
+    .table-responsive {
+        min-height: 500px;
     }
 }
 @media (max-width: 425px) {
