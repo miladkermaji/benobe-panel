@@ -753,20 +753,19 @@ function renderTotalIncomeChart(data) {
 // تنظیمات مشترک برای نمودارها
 const commonOptions = {
     responsive: true,
-    maintainAspectRatio: true,
-    aspectRatio: 2.5, // افزایش نسبت عرض به ارتفاع برای نمودارهای کوتاه‌تر
+    maintainAspectRatio: false,
     plugins: {
         legend: {
             position: "bottom",
             labels: {
                 font: {
                     family: "IRANSans",
-                    size: 12,
+                    size: 11,
                     weight: "500",
                 },
-                padding: 12,
+                padding: 8,
                 color: "#1e293b",
-                boxWidth: 12,
+                boxWidth: 10,
                 usePointStyle: true,
             },
         },
@@ -775,34 +774,33 @@ const commonOptions = {
             backgroundColor: "rgba(30, 41, 59, 0.9)",
             titleFont: {
                 family: "IRANSans",
-                size: 13,
+                size: 12,
             },
             bodyFont: {
                 family: "IRANSans",
                 size: 11,
             },
-            padding: 10,
-            cornerRadius: 8,
+            padding: 8,
+            cornerRadius: 6,
             borderColor: "rgba(255, 255, 255, 0.2)",
             borderWidth: 1,
         },
     },
     animation: {
-        duration: 1200,
+        duration: 800,
         easing: "easeOutQuart",
-        delay: 200,
     },
     hover: {
         mode: "nearest",
         intersect: true,
-        animationDuration: 400,
+        animationDuration: 200,
     },
     layout: {
         padding: {
-            top: 20,
-            right: 20,
-            bottom: 20,
-            left: 20,
+            top: 10,
+            right: 10,
+            bottom: 10,
+            left: 10,
         },
     },
 };

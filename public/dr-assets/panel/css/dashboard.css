@@ -12,9 +12,12 @@
     width: 100%;
 }
 .chart-container {
+    flex: 1;
+    position: relative;
+    min-height: 300px;
     background: white;
     border-radius: 12px;
-    padding: 0.5rem 0.25rem 0.15rem 0.25rem;
+    padding: 0.35rem 0.25rem 0.15rem 0.25rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     border: 1px solid #e5e7eb;
     margin-bottom: 0;
@@ -63,7 +66,6 @@
     left: 0;
     width: 100% !important;
     height: 100% !important;
-    object-fit: fill;
 }
 .top-panel-bg {
     border-radius: 16px;
@@ -183,22 +185,41 @@
 }
 .chart-card .card-body {
     height: 100%;
-    padding: 1.5rem;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
 }
 .chart-card .card-title {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: #2d3748;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     text-align: right;
     font-family: "Vazir", sans-serif;
 }
-.chart-container {
-    flex: 1;
-    position: relative;
-    min-height: 300px;
+.chartjs-legend {
+    font-size: 0.75rem !important;
+    font-family: "Vazir", sans-serif;
+}
+.chartjs-tooltip {
+    font-size: 0.75rem !important;
+    font-family: "Vazir", sans-serif;
+    background: rgba(0, 0, 0, 0.8) !important;
+    border-radius: 4px !important;
+    padding: 4px 8px !important;
+}
+.chartjs-axis-label {
+    font-size: 0.7rem !important;
+    font-family: "Vazir", sans-serif;
+    color: #4a5568 !important;
+}
+.chartjs-legend-item {
+    margin-right: 8px !important;
+    margin-bottom: 4px !important;
+}
+.chartjs-legend-item-text {
+    font-size: 0.75rem !important;
+    color: #4a5568 !important;
 }
 @media (max-width: 768px) {
     .chart-content {

@@ -69,68 +69,104 @@
   </div>
 </div>
 <div class="chart-content">
-  <div class="chart-grid">
+  <div class="row">
     <!-- نمودار ۱: تعداد ویزیت‌ها -->
-    <div class="chart-container">
-      <div class="chart-title">📊 تعداد ویزیت‌ها</div>
-      <div class="chart-wrapper">
-        <canvas id="doctor-performance-chart"></canvas>
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">📊 تعداد ویزیت‌ها</h5>
+          <div class="chart-container">
+            <canvas id="doctor-performance-chart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <!-- نمودار ۲: درآمد ماهانه -->
-    <div class="chart-container">
-      <div class="chart-title">💰 درآمد ماهانه</div>
-      <div class="chart-wrapper">
-        <canvas id="doctor-income-chart"></canvas>
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">💰 درآمد ماهانه</h5>
+          <div class="chart-container">
+            <canvas id="doctor-income-chart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <!-- نمودار ۳: تعداد بیماران جدید -->
-    <div class="chart-container">
-      <div class="chart-title">👨‍⚕️ بیماران جدید</div>
-      <div class="chart-wrapper">
-        <canvas id="doctor-patient-chart"></canvas>
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">👨‍⚕️ بیماران جدید</h5>
+          <div class="chart-container">
+            <canvas id="doctor-patient-chart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <!-- نمودار ۴: وضعیت نوبت‌ها -->
-    <div class="chart-container">
-      <div class="chart-title">📈 انواع نوبت‌ها</div>
-      <div class="chart-wrapper">
-        <canvas id="doctor-status-chart"></canvas>
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">📈 انواع نوبت‌ها</h5>
+          <div class="chart-container">
+            <canvas id="doctor-status-chart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <!-- نمودار ۵: درصد نوبت‌ها -->
-    <div class="chart-container">
-      <div class="chart-title">🥧 درصد نوبت‌ها</div>
-      <div class="chart-wrapper">
-        <canvas id="doctor-status-pie-chart"></canvas>
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">🥧 درصد نوبت‌ها</h5>
+          <div class="chart-container">
+            <canvas id="doctor-status-pie-chart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <!-- نمودار ۶: روند بیماران -->
-    <div class="chart-container">
-      <div class="chart-title">📉 روند بیماران</div>
-      <div class="chart-wrapper">
-        <canvas id="doctor-patient-trend-chart"></canvas>
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">📉 روند بیماران</h5>
+          <div class="chart-container">
+            <canvas id="doctor-patient-trend-chart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <!-- نمودار ۷: نوبت‌های مشاوره -->
-    <div class="chart-container">
-      <div class="chart-title">🗣️ نوبت‌های مشاوره</div>
-      <div class="chart-wrapper">
-        <canvas id="doctor-counseling-chart"></canvas>
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">🗣️ نوبت‌های مشاوره</h5>
+          <div class="chart-container">
+            <canvas id="doctor-counseling-chart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <!-- نمودار ۸: نوبت‌های دستی -->
-    <div class="chart-container">
-      <div class="chart-title">✍️ نوبت‌های دستی</div>
-      <div class="chart-wrapper">
-        <canvas id="doctor-manual-chart"></canvas>
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">✍️ نوبت‌های دستی</h5>
+          <div class="chart-container">
+            <canvas id="doctor-manual-chart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <!-- نمودار ۹: درآمد کلی -->
-    <div class="chart-container">
-      <div class="chart-title">💸 درآمد کلی</div>
-      <div class="chart-wrapper">
-        <canvas id="doctor-total-income-chart"></canvas>
+    <div class="col-md-4">
+      <div class="chart-card">
+        <div class="card-body">
+          <h5 class="card-title">💸 درآمد کلی</h5>
+          <div class="chart-container">
+            <canvas id="doctor-total-income-chart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
   </div>
