@@ -127,7 +127,7 @@
   .xai-modal-body {
     padding: 1rem;
     z-index: 1001;
-    min-height: 200px
+    min-height: 400px
     /* هم‌سطح با کانتینر مودال */
   }
 

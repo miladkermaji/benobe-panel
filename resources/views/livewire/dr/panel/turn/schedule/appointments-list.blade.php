@@ -360,92 +360,91 @@
         </x-slot:body>
       </x-modal>
     </div>
-    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="md">
-      <x-slot:body>
-        <form wire:submit.prevent="storeWithUser">
-          <div class="row g-3">
-            <div class="col-12">
-              <div class="position-relative">
-                <input type="text" class="form-control h-50" wire:model.live.debounce.500ms="manualSearchQuery"
-                  placeholder="جستجو با نام، نام خانوادگی، کد ملی یا شماره موبایل...">
-                @if ($manualSearchQuery && !$isSearching)
-                  <div class="search-results position-absolute w-100 bg-white border rounded shadow-sm mt-1"
-                    style="z-index: 1000; max-height: 400px; overflow-y: auto;">
-                    @if (count($searchResults) > 0)
-                      @foreach ($searchResults as $user)
-                        <div class="p-2 hover-bg-light cursor-pointer" wire:click="selectUser({{ $user->id }})">
-                          <div class="d-flex justify-content-between">
-                            <span>{{ $user->first_name }} {{ $user->last_name }}</span>
-                            <span class="text-muted">{{ $user->mobile }}</span>
-                          </div>
-                          <small class="text-muted">{{ $user->national_code }}</small>
-                        </div>
-                      @endforeach
-                    @else
-                      <div class="p-3 text-center">
-                        <p class="mb-2">نتیجه‌ای یافت نشد</p>
-                        <button type="button" class="btn btn-primary btn-sm"
-                          wire:click="$dispatch('open-modal', { name: 'add-new-patient-modal' })">
-                          افزودن بیمار جدید
-                        </button>
+<x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="md" class="modal-lg">
+  <x-slot:body>
+    <form wire:submit.prevent="storeWithUser">
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="position-relative">
+            <input type="text" class="form-control h-50" wire:model.live.debounce.500ms="manualSearchQuery"
+              placeholder="جستجو با نام، نام خانوادگی، کد ملی یا شماره موبایل...">
+            @if ($manualSearchQuery && !$isSearching)
+              <div class="search-results position-absolute w-100 bg-white border rounded shadow-sm mt-1"
+                style="z-index: 1000; max-height: 400px; overflow-y: auto;">
+                @if (count($searchResults) > 0)
+                  @foreach ($searchResults as $user)
+                    <div class="p-2 hover-bg-light cursor-pointer" wire:click="selectUser({{ $user->id }})">
+                      <div class="d-flex justify-content-between">
+                        <span>{{ $user->first_name }} {{ $user->last_name }}</span>
+                        <span class="text-muted">{{ $user->mobile }}</span>
                       </div>
-                    @endif
+                      <small class="text-muted">{{ $user->national_code }}</small>
+                    </div>
+                  @endforeach
+                @else
+                  <div class="p-3 text-center">
+                    <p class="mb-2">نتیجه‌ای یافت نشد</p>
+                    <button type="button" class="btn btn-primary btn-sm"
+                      wire:click="$dispatch('open-modal', { name: 'add-new-patient-modal' })">
+                      افزودن بیمار جدید
+                    </button>
                   </div>
                 @endif
               </div>
-            </div>
-            @if ($selectedUserId)
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">نام</label>
-                <input type="text" class="form-control h-50" wire:model="firstName" required disabled>
-                @error('firstName')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">نام خانوادگی</label>
-                <input type="text" class="form-control h-50" wire:model="lastName" required disabled>
-                @error('lastName')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">شماره موبایل</label>
-                <input type="text" class="form-control h-50" wire:model="mobile" required disabled>
-                @error('mobile')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">کد ملی</label>
-                <input type="text" class="form-control h-50" wire:model="nationalCode" required disabled>
-                @error('nationalCode')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">تاریخ نوبت</label>
-                <input type="text" class="form-control h-50" data-jdp wire:model="appointmentDate" required>
-                @error('appointmentDate')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">ساعت نوبت</label>
-                <input type="text" class="form-control h-50" wire:model="appointmentTime" required readonly>
-                @error('appointmentTime')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
             @endif
-            <div class="col-12 mt-5">
-              <button type="submit" class="btn btn-primary w-100 mt-3"
-                @if (!$selectedUserId) disabled @endif>ثبت نوبت</button>
-            </div>
           </div>
-        </form>
-      </x-slot:body>
-    </x-modal>
+        </div>
+        @if ($selectedUserId)
+          <div class="col-md-6 position-relative">
+            <label class="label-top-input-special-takhasos">نام</label>
+            <input type="text" class="form-control h-50" wire:model="firstName" required disabled>
+            @error('firstName')
+              <span class="text-danger">{{ $message }}</span>
+            @enderror
+          </div>
+          <div class="col-md-6 position-relative">
+            <label class="label-top-input-special-takhasos">نام خانوادگی</label>
+            <input type="text" class="form-control h-50" wire:model="lastName" required disabled>
+            @error('lastName')
+              <span class="text-danger">{{ $message }}</span>
+            @enderror
+          </div>
+          <div class="col-md-6 position-relative">
+            <label class="label-top-input-special-takhasos">شماره موبایل</label>
+            <input type="text" class="form-control h-50" wire:model="mobile" required disabled>
+            @error('mobile')
+              <span class="text-danger">{{ $message }}</span>
+            @enderror
+          </div>
+          <div class="col-md-6 position-relative">
+            <label class="label-top-input-special-takhasos">کد ملی</label>
+            <input type="text" class="form-control h-50" wire:model="nationalCode" required disabled>
+            @error('nationalCode')
+              <span class="text-danger">{{ $message }}</span>
+            @enderror
+          </div>
+          <div class="col-md-6 position-relative">
+            <label class="label-top-input-special-takhasos">تاریخ نوبت</label>
+            <input type="text" class="form-control h-50" data-jdp wire:model="appointmentDate" required>
+            @error('appointmentDate')
+              <span class="text-danger">{{ $message }}</span>
+            @enderror
+          </div>
+          <div class="col-md-6 position-relative">
+            <label class="label-top-input-special-takhasos">ساعت نوبت</label>
+            <input type="text" class="form-control h-50" wire:model="appointmentTime" required readonly>
+            @error('appointmentTime')
+              <span class="text-danger">{{ $message }}</span>
+            @enderror
+          </div>
+          <div class="col-12 mt-5">
+            <button type="submit" class="btn btn-primary w-100 mt-3">ثبت نوبت</button>
+          </div>
+        @endif
+      </div>
+    </form>
+  </x-slot:body>
+</x-modal>
     <x-modal name="add-new-patient-modal" title="افزودن بیمار جدید" size="md">
       <x-slot:body>
         <form wire:submit.prevent="storeNewUser">
@@ -1350,37 +1349,37 @@
         });
         // Handle available times loaded event
         /*
-                                                                                                                                                                                Livewire.on('available-times-loaded', (event) => {
-                                                                                                                                                                                  console.log('Available times loaded:', event);
-                                                                                                                                                                                  const times = event.times || [];
-                                                                                                                                                                                  const $container = $('#available-times');
-                                                                                                                                                                                  $container.empty();
-                                                                                                                                                                                  if (times.length === 0) {
-                                                                                                                                                                                    $container.html(
-                                                                                                                                                                                      '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
-                                                                                                                                                                                    return;
-                                                                                                                                                                                  }
-                                                                                                                                                                                  times.forEach(time => {
-                                                                                                                                                                                    const $button = $(
-                                                                                                                                                                                      `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
+                                                                                                                                                                                                    Livewire.on('available-times-loaded', (event) => {
+                                                                                                                                                                                                      console.log('Available times loaded:', event);
+                                                                                                                                                                                                      const times = event.times || [];
+                                                                                                                                                                                                      const $container = $('#available-times');
+                                                                                                                                                                                                      $container.empty();
+                                                                                                                                                                                                      if (times.length === 0) {
+                                                                                                                                                                                                        $container.html(
+                                                                                                                                                                                                          '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
+                                                                                                                                                                                                        return;
+                                                                                                                                                                                                      }
+                                                                                                                                                                                                      times.forEach(time => {
+                                                                                                                                                                                                        const $button = $(
+                                                                                                                                                                                                          `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
         ${time}
       </button>`
-                                                                                                                                                                                    );
-                                                                                                                                                                                    $container.append($button);
-                                                                                                                                                                                  });
-                                                                                                                                                                                  // Handle time selection
-                                                                                                                                                                                  $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
-                                                                                                                                                                                    const $btn = $(this);
-                                                                                                                                                                                    const time = $btn.data('time');
-                                                                                                                                                                                    // Remove selection from other buttons
-                                                                                                                                                                                    $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
-                                                                                                                                                                                    // Select this button
-                                                                                                                                                                                    $btn.removeClass('btn-outline-primary').addClass('btn-primary');
-                                                                                                                                                                                    // Update Livewire component
-                                                                                                                                                                                    @this.set('appointmentTime', time);
-                                                                                                                                                                                  });
-                                                                                                                                                                                });
-                                                                                                                                                                                */
+                                                                                                                                                                                                        );
+                                                                                                                                                                                                        $container.append($button);
+                                                                                                                                                                                                      });
+                                                                                                                                                                                                      // Handle time selection
+                                                                                                                                                                                                      $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+                                                                                                                                                                                                        const $btn = $(this);
+                                                                                                                                                                                                        const time = $btn.data('time');
+                                                                                                                                                                                                        // Remove selection from other buttons
+                                                                                                                                                                                                        $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+                                                                                                                                                                                                        // Select this button
+                                                                                                                                                                                                        $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+                                                                                                                                                                                                        // Update Livewire component
+                                                                                                                                                                                                        @this.set('appointmentTime', time);
+                                                                                                                                                                                                      });
+                                                                                                                                                                                                    });
+                                                                                                                                                                                                    */
         // Handle modal close
         Livewire.on('close-modal', (event) => {
           const modalId = event?.name || (event && event[0]?.name) || null;
