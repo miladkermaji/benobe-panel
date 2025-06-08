@@ -115,6 +115,15 @@ class DoctorNoteList extends Component
         $this->dispatch('show-alert', type: 'success', message: 'یادداشت‌های انتخاب‌شده حذف شدند!');
     }
 
+    public function toggleStatus($id)
+    {
+        $note = DoctorNote::findOrFail($id);
+        $note->status = $note->status === 'active' ? 'inactive' : 'active';
+        $note->save();
+
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت یادداشت با موفقیت تغییر کرد.');
+    }
+
     private function getDoctorNotesQuery()
     {
         return DoctorNote::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)

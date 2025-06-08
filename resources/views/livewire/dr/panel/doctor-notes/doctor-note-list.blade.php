@@ -67,6 +67,7 @@
                   <th class="align-middle">نوع نوبت</th>
                   <th class="align-middle">کلینیک</th>
                   <th class="align-middle">یادداشت</th>
+                  <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
                   <th class="text-center align-middle" style="width: 120px;">عملیات</th>
                 </tr>
               </thead>
@@ -110,6 +111,14 @@
                         </div>
                       </td>
                       <td class="text-center">
+                        <div class="form-check form-switch d-flex justify-content-center">
+                          <input class="form-check-input" type="checkbox" role="switch"
+                            wire:click="toggleStatus({{ $item->id }})"
+                            {{ $item->status === 'active' ? 'checked' : '' }}
+                            style="width: 3em; height: 1.5em; margin-top: 0;">
+                        </div>
+                      </td>
+                      <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
                           <a href="{{ route('dr.panel.doctornotes.edit', $item->id) }}"
                             class="btn btn-sm btn-gradient-success px-2 py-1">
@@ -121,8 +130,8 @@
                           </a>
                           <button wire:click="confirmDelete({{ $item->id }})"
                             class="btn btn-sm btn-gradient-danger px-2 py-1">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
                               <path
                                 d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                             </svg>
@@ -210,6 +219,15 @@
                       <div class="note-card-item">
                         <span class="note-card-label">یادداشت:</span>
                         <span class="note-card-value">{{ e($item->notes) ?? 'بدون یادداشت' }}</span>
+                      </div>
+                      <div class="note-card-item">
+                        <span class="note-card-label">وضعیت:</span>
+                        <div class="form-check form-switch d-inline-block">
+                          <input class="form-check-input" type="checkbox" role="switch"
+                            wire:click="toggleStatus({{ $item->id }})"
+                            {{ $item->status === 'active' ? 'checked' : '' }}
+                            style="width: 3em; height: 1.5em; margin-top: 0;">
+                        </div>
                       </div>
                     </div>
                   </div>
