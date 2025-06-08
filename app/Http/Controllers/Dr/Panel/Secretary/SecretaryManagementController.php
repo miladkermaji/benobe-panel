@@ -36,6 +36,15 @@ class SecretaryManagementController extends Controller
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $clinicId = $request->selectedClinicId === 'default' ? null : $request->selectedClinicId;
 
+        // تبدیل اعداد فارسی به انگلیسی
+        $request->merge([
+            'mobile' => \App\Helpers\PersianNumber::convertToEnglish($request->mobile),
+            'national_code' => \App\Helpers\PersianNumber::convertToEnglish($request->national_code)
+        ]);
+
+        // اضافه کردن لاگ برای بررسی مقادیر ورودی
+ 
+
         // اعتبارسنجی داده‌های ورودی
         $request->validate([
             'first_name'    => 'required|string|max:255',
@@ -113,6 +122,8 @@ class SecretaryManagementController extends Controller
                 'password'      => $request->password ? Hash::make($request->password) : null,
             ]);
 
+          
+
             \App\Models\SecretaryPermission::create([
                 'doctor_id'    => $doctorId,
                 'secretary_id' => $secretary->id,
@@ -166,6 +177,7 @@ class SecretaryManagementController extends Controller
                 'secretaries' => $secretaries,
             ]);
         } catch (\Exception $e) {
+          
             return response()->json([
                 'message' => 'خطا در ثبت منشی یا دسترسی‌ها!',
                 'error'   => $e->getMessage(),
@@ -190,6 +202,12 @@ class SecretaryManagementController extends Controller
     public function update(Request $request, $id)
     {
         $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
+
+        // تبدیل اعداد فارسی به انگلیسی
+        $request->merge([
+            'mobile' => \App\Helpers\PersianNumber::convertToEnglish($request->mobile),
+            'national_code' => \App\Helpers\PersianNumber::convertToEnglish($request->national_code)
+        ]);
 
         $request->validate([
             'first_name'    => 'required|string|max:255',
@@ -302,5 +320,5 @@ class SecretaryManagementController extends Controller
 
         return response()->json(['message' => 'منشی با موفقیت حذف شد', 'secretaries' => $secretaries]);
     }
-   
+
 }

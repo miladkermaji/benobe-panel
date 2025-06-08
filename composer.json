@@ -57,7 +57,8 @@
         },
         "files": [
             "app/Helpers/Helpers.php",
-            "app/Helpers/JalaliHelper.php"
+            "app/Helpers/JalaliHelper.php",
+            "app/Helpers/PersianNumber.php"
         ]
     },
     "scripts": {
