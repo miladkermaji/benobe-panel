@@ -15,9 +15,9 @@
 
 @section('content')
   @include('dr.panel.my-tools.loader-btn')
-  <div class="blocking_users_content" dir="rtl">
+  <div class="blocking_users_container" dir="rtl">
     <div class="container px-0">
-      <!-- هدر مشابه کد اول -->
+      <!-- هدر -->
       <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
           <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
@@ -57,11 +57,32 @@
       <!-- کارت اصلی -->
       <div class="card shadow-sm rounded-2">
         <div class="card-body p-0">
+          <!-- عملیات گروهی -->
+          <div class="group-actions p-2 border-bottom" id="groupActions" style="display: none;">
+            <div class="d-flex align-items-center gap-2 justify-content-end">
+              <select id="groupActionSelect" class="form-select form-select-sm" style="max-width: 200px;">
+                <option value="">عملیات گروهی</option>
+                <option value="delete">حذف انتخاب شده‌ها</option>
+                <option value="status_active">فعال کردن</option>
+                <option value="status_inactive">غیرفعال کردن</option>
+              </select>
+              <button id="executeGroupAction" class="btn btn-sm btn-primary" disabled>
+                <span>اجرا</span>
+                <span class="loader" style="display: none;">در حال اجرا...</span>
+              </button>
+            </div>
+          </div>
+
           <!-- نمای جدول برای دسکتاپ -->
           <div class="table-responsive text-nowrap d-none d-md-block">
             <table id="blockedUsersTable" class="table table-hover w-100 m-0">
               <thead>
                 <tr>
+                  <th class="text-center align-middle" style="width: 40px;">
+                    <div class="d-flex justify-content-center align-items-center">
+                      <input type="checkbox" id="selectAll" class="form-check-input m-0">
+                    </div>
+                  </th>
                   <th class="text-center align-middle" style="width: 60px;">ردیف</th>
                   <th class="align-middle">نام کاربر</th>
                   <th class="align-middle">شماره موبایل</th>
@@ -75,6 +96,11 @@
               <tbody>
                 @forelse ($blockedUsers as $index => $blockedUser)
                   <tr class="align-middle" data-id="{{ $blockedUser->id }}">
+                    <td class="text-center">
+                      <div class="d-flex justify-content-center align-items-center">
+                        <input type="checkbox" class="form-check-input m-0 select-user" value="{{ $blockedUser->id }}">
+                      </div>
+                    </td>
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>{{ $blockedUser->user->first_name }} {{ $blockedUser->user->last_name }}</td>
                     <td>{{ $blockedUser->user->mobile }}</td>
@@ -91,14 +117,15 @@
                     <td class="text-center">
                       <div class="form-check form-switch d-flex justify-content-center">
                         <input class="form-check-input" type="checkbox" role="switch" data-id="{{ $blockedUser->id }}"
-                          data-status="{{ $blockedUser->status }}" {{ $blockedUser->status == 1 ? 'checked' : '' }}
-                          onchange="toggleStatus(this)" style="width: 3em; height: 1.5em; margin-top: 0;">
+                          data-status="{{ (int) $blockedUser->status }}"
+                          {{ $blockedUser->status == 1 ? 'checked' : '' }} onchange="toggleStatus(this)"
+                          style="width: 3em; height: 1.5em; margin-top: 0;">
                       </div>
                     </td>
                     <td class="text-center">
                       <div class="d-flex justify-content-center gap-1">
                         <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                           </svg>
@@ -108,7 +135,7 @@
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="8" class="text-center py-4">
+                    <td colspan="9" class="text-center py-4">
                       <div class="d-flex justify-content-center align-items-center flex-column">
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2" class="text-muted mb-2">
@@ -129,6 +156,7 @@
               <div class="note-card mb-3" data-id="{{ $blockedUser->id }}">
                 <div class="note-card-header d-flex justify-content-between align-items-center">
                   <div class="d-flex align-items-center gap-2">
+                    <input type="checkbox" class="form-check-input m-0 select-user" value="{{ $blockedUser->id }}">
                     <span class="badge bg-primary-subtle text-primary">
                       {{ $blockedUser->user->first_name }} {{ $blockedUser->user->last_name }}
                     </span>
@@ -166,7 +194,7 @@
                     <span class="note-card-label">وضعیت:</span>
                     <div class="form-check form-switch d-inline-block">
                       <input class="form-check-input" type="checkbox" role="switch" data-id="{{ $blockedUser->id }}"
-                        data-status="{{ $blockedUser->status }}" {{ $blockedUser->status == 1 ? 'checked' : '' }}
+                        data-status="{{ (int) $blockedUser->status }}" {{ $blockedUser->status == 1 ? 'checked' : '' }}
                         onchange="toggleStatus(this)" style="width: 3em; height: 1.5em; margin-top: 0;">
                     </div>
                   </div>
@@ -240,6 +268,103 @@
   <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
   <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/vacation/vacation.js') }}"></script>
   <script>
+    // مدیریت انتخاب‌ها
+    let selectedUsers = [];
+
+    // انتخاب همه
+    $('#selectAll').on('change', function() {
+      const isChecked = $(this).is(':checked');
+      $('.select-user').prop('checked', isChecked);
+      selectedUsers = isChecked ? $('.select-user').map((i, el) => $(el).val()).get() : [];
+      toggleGroupActions();
+    });
+
+    // انتخاب تکی
+    $(document).on('change', '.select-user', function() {
+      selectedUsers = $('.select-user:checked').map((i, el) => $(el).val()).get();
+      $('#selectAll').prop('checked', selectedUsers.length === $('.select-user').length);
+      toggleGroupActions();
+    });
+
+    // نمایش/مخفی کردن بخش عملیات گروهی
+    function toggleGroupActions() {
+      $('#groupActions').toggle(selectedUsers.length > 0);
+      $('#executeGroupAction').prop('disabled', selectedUsers.length === 0 || !$('#groupActionSelect').val());
+    }
+
+    // تغییر در منوی کشویی
+    $('#groupActionSelect').on('change', function() {
+      $('#executeGroupAction').prop('disabled', !$(this).val() || selectedUsers.length === 0);
+    });
+
+    // اجرای عملیات گروهی
+    $('#executeGroupAction').on('click', function() {
+      if (selectedUsers.length === 0) {
+        toastr.warning('هیچ کاربری انتخاب نشده است.');
+        return;
+      }
+
+      const action = $('#groupActionSelect').val();
+      if (!action) {
+        toastr.warning('لطفاً یک عملیات را انتخاب کنید.');
+        return;
+      }
+
+      const button = $(this);
+      const loader = button.find('.loader');
+      const buttonText = button.find('span').first();
+      button.prop('disabled', true);
+      buttonText.hide();
+      loader.show();
+
+      Swal.fire({
+        title: 'آیا مطمئن هستید؟',
+        text: `آیا می‌خواهید عملیات "${$('#groupActionSelect option:selected').text()}" را روی ${selectedUsers.length} کاربر اجرا کنید؟`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'بله، اجرا کن',
+        cancelButtonText: 'لغو',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: "{{ route('doctor-blocking-users.group-action') }}",
+            method: 'POST',
+            data: {
+              _token: '{{ csrf_token() }}',
+              user_ids: selectedUsers,
+              action: action,
+              selectedClinicId: localStorage.getItem('selectedClinicId') || 'default'
+            },
+            success: function(response) {
+              if (response.success) {
+                toastr.success(response.message);
+                loadBlockedUsers();
+                selectedUsers = [];
+                $('#selectAll').prop('checked', false);
+                toggleGroupActions();
+              } else {
+                toastr.error(response.message);
+              }
+            },
+            error: function(xhr) {
+              toastr.error(xhr.responseJSON?.message || 'خطا در اجرای عملیات گروهی!');
+            },
+            complete: function() {
+              button.prop('disabled', false);
+              buttonText.show();
+              loader.hide();
+            }
+          });
+        } else {
+          button.prop('disabled', false);
+          buttonText.show();
+          loader.hide();
+        }
+      });
+    });
+
     // جستجو
     $('#searchInput').on('input', function() {
       const search = $(this).val();
@@ -256,9 +381,12 @@
           const cardsContainer = $('.notes-cards');
           tableBody.empty();
           cardsContainer.empty();
+          selectedUsers = [];
+          $('#selectAll').prop('checked', false);
+          toggleGroupActions();
           if (response.blockedUsers.length === 0) {
             tableBody.append(
-              '<tr><td colspan="8" class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></td></tr>'
+              '<tr><td colspan="9" class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></td></tr>'
             );
             cardsContainer.append(
               '<div class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></div>'
@@ -337,6 +465,11 @@
 
       const newRow = `
                 <tr class="align-middle" data-id="${user.id}">
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <input type="checkbox" class="form-check-input m-0 select-user" value="${user.id}">
+                        </div>
+                    </td>
                     <td class="text-center">${index}</td>
                     <td>${user.user.first_name} ${user.user.last_name}</td>
                     <td>${user.user.mobile}</td>
@@ -351,19 +484,18 @@
                                 ${user.status == 1 ? 'checked' : ''}
                                 onchange="toggleStatus(this)"
                                 style="width: 3em; height: 1.5em; margin-top: 0;">
-                            </div>
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-1">
-                                <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
-                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                          </svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>`;
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+                            <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
       tableBody.append(newRow);
     }
 
@@ -377,6 +509,7 @@
                 <div class="note-card mb-3" data-id="${user.id}">
                     <div class="note-card-header d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center gap-2">
+                            <input type="checkbox" class="form-check-input m-0 select-user" value="${user.id}">
                             <span class="badge bg-primary-subtle text-primary">
                                 ${user.user.first_name} ${user.user.last_name}
                             </span>
@@ -436,9 +569,12 @@
           const cardsContainer = $('.notes-cards');
           tableBody.empty();
           cardsContainer.empty();
+          selectedUsers = [];
+          $('#selectAll').prop('checked', false);
+          toggleGroupActions();
           if (response.blockedUsers.length === 0) {
             tableBody.append(
-              '<tr><td colspan="8" class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></td></tr>'
+              '<tr><td colspan="9" class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></td></tr>'
             );
             cardsContainer.append(
               '<div class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></div>'
@@ -500,6 +636,8 @@
                 toastr.success(response.message);
                 row.remove();
                 card.remove();
+                selectedUsers = selectedUsers.filter(id => id != userId);
+                toggleGroupActions();
               } else {
                 toastr.error(response.message);
               }
@@ -515,47 +653,59 @@
     // تغییر وضعیت کاربر
     function toggleStatus(element) {
       const userId = $(element).data('id');
-      const currentStatus = $(element).data('status');
+      const currentStatus = parseInt($(element).data('status'));
       const newStatus = currentStatus === 1 ? 0 : 1;
       const statusText = newStatus === 1 ? 'مسدود' : 'آزاد';
+
+      // اضافه کردن console.log برای دیباگ
+      console.log('Toggle Status Debug:', {
+        userId,
+        currentStatus,
+        newStatus,
+        element: $(element).data()
+      });
 
       Swal.fire({
         title: 'تغییر وضعیت',
         text: `آیا می‌خواهید وضعیت این کاربر را به "${statusText}" تغییر دهید؟`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButton: true,
         confirmButtonText: 'بله، تغییر بده',
         cancelButtonText: 'لغو',
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
       }).then((result) => {
         if (result.isConfirmed) {
+          const requestData = {
+            _token: '{{ csrf_token() }}',
+            selectedClinicId: localStorage.getItem('selectedClinicId'),
+            id: userId,
+            status: newStatus,
+          };
+
+          // اضافه کردن console.log برای دیباگ
+          console.log('Request Data:', requestData);
+
           $.ajax({
             url: "{{ route('doctor-blocking-users.update-status') }}",
-            method: "POST",
-            data: {
-              _token: '{{ csrf_token() }}',
-              selectedClinicId: localStorage.getItem('selectedClinicId'),
-              id: userId,
-              status: newStatus,
-            },
+            method: "PATCH",
+            data: requestData,
             success: function(response) {
+              console.log('Success Response:', response);
               if (response.success) {
                 $(element)
                   .prop('checked', newStatus === 1)
                   .data('status', newStatus);
-                const row = $(element).closest('tr');
-                const card = $(element).closest('.note-card');
-                row.find('.form-check-label').text(statusText);
-                card.find('.form-check-label span').text(statusText);
-                toastr.success(response.message, 'وضعیت با موفقیت تغییر کرد.');
+                toastr.success(response.message);
               } else {
-                toastr.error(response.message);
+                toastr.error(response.message || 'خطا در تغییر وضعیت');
+                $(element).prop('checked', currentStatus === 1);
               }
             },
             error: function(xhr) {
+              console.error('Error Response:', xhr.responseJSON);
               toastr.error(xhr.responseJSON?.message || 'خطا در تغییر وضعیت!');
+              $(element).prop('checked', currentStatus === 1);
             }
           });
         } else {

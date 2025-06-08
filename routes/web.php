@@ -209,6 +209,9 @@ Route::prefix('admin')
             Route::get('/', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'index'])->name('admin.panel.user-blockings.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'create'])->name('admin.panel.user-blockings.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'edit'])->name('admin.panel.user-blockings.edit');
+
+            Route::post('/doctor-blocking-users/group-action', [BlockingUsersController::class, 'groupAction'])->name('doctor-blocking-users.group-action');
+
         });
 
         Route::prefix('user-groups')->group(function () {
@@ -581,6 +584,8 @@ Route::prefix('dr')
                         Route::patch('/update-status', [BlockingUsersController::class, 'updateStatus'])
                             ->middleware('secretary.permission:appointments')
                             ->name('doctor-blocking-users.update-status');
+
+
 
                         Route::post('/messages/delete', [BlockingUsersController::class, 'deleteMessage'])
                         ->middleware('secretary.permission:appointments')
