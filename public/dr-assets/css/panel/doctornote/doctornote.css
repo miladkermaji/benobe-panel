@@ -135,7 +135,9 @@ body {
     );
     transform: translateY(-2px);
 }
-
+/* .doctor-notes-container{
+    max-width: 1400px;
+} */
 .btn-gradient-danger {
     background: linear-gradient(90deg, var(--text-original) 0%, #f87171 100%);
     color: #ffffff;
@@ -407,7 +409,6 @@ body {
         display: none;
     }
 
-    
     .note-card {
         background: var(--background-card);
         border-radius: var(--radius-card);
@@ -989,5 +990,214 @@ body {
 
     .note-card-value {
         font-size: 0.875rem;
+    }
+}
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    background-color: var(--background-light);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.group-actions {
+    background-color: var(--background-light);
+    border-bottom: 1px solid var(--border-neutral);
+}
+
+.form-select-sm {
+    height: 32px;
+    font-size: 0.875rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Mobile Card Styles */
+.note-card {
+    background: var(--background-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 2px 8px var(--shadow);
+    overflow: hidden;
+}
+
+.note-card-header {
+    background: var(--gradient-primary);
+    color: #ffffff;
+    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.note-card-body {
+    padding: 1rem;
+}
+
+.note-card-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-neutral);
+}
+
+.note-card-item:last-child {
+    border-bottom: none;
+}
+
+.note-card-label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    min-width: 80px;
+}
+
+.note-card-value {
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    text-align: left;
+    flex: 1;
+}
+
+.search-container {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.search-input {
+    height: 36px;
+    font-size: 0.875rem;
+    padding: 0.5rem 2rem 0.5rem 1rem;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.95);
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+    background-color: #ffffff;
+}
+
+.search-icon {
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.search-input:focus + .search-icon {
+    opacity: 1;
+}
+
+.btn-gradient-success {
+    border-radius: 6px !important;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+    .glass-header .search-container {
+        max-width: 300px;
+    }
+
+    .glass-header .btn-gradient-success {
+        width: auto;
+    }
+
+    .glass-header .d-flex {
+        justify-content: space-between !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .glass-header {
+        padding: 1rem;
+    }
+
+    .glass-header .d-flex {
+        gap: 1rem;
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    .search-input {
+        height: 38px;
+        font-size: 0.875rem;
+    }
+
+    .btn-gradient-success {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .glass-header h1 {
+        font-size: 1.1rem;
+        text-align: right;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .glass-header .d-flex.flex-column {
+        width: 100%;
+    }
+
+    .glass-header .d-flex.flex-column > div {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .glass-header {
+        padding: 0.75rem;
+    }
+
+    .btn-gradient-success-576 {
+        height: 36px;
+    }
+
+    .glass-header h1 {
+        font-size: 1rem;
+        text-align: right;
+        margin-bottom: 0.75rem;
+    }
+
+    .search-input {
+        height: 36px;
+        font-size: 0.8125rem;
+    }
+
+    .glass-header .d-flex.gap-2 {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .glass-header .d-flex.gap-2 > * {
+        width: 100%;
     }
 }

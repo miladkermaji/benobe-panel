@@ -1,5 +1,5 @@
 <div class="doctor-notes-container">
-  <div class="container-fluid py-2" dir="rtl" wire:init="loadDoctorNotes">
+  <div class="container py-2" dir="rtl" wire:init="loadDoctorNotes">
     <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
@@ -8,7 +8,6 @@
           </div>
           <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
             <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
-             
               <div class="search-container position-relative" style="max-width: 100%;">
                 <input type="text"
                   class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
@@ -22,8 +21,8 @@
                   </svg>
                 </span>
               </div>
-               <a href="{{ route('dr.panel.doctornotes.create') }}"
-                class="btn btn-gradient-success rounded-1 px-3 py-1 d-flex align-items-center gap-1">
+              <a href="{{ route('dr.panel.doctornotes.create') }}"
+                class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1">
                 <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
@@ -35,7 +34,6 @@
         </div>
       </div>
     </div>
-
     <div class="container-fluid px-0">
       <div class="card shadow-sm rounded-2">
         <div class="card-body p-0">
@@ -55,7 +53,6 @@
               </button>
             </div>
           </div>
-
           <!-- Desktop Table View -->
           <div class="table-responsive text-nowrap d-none d-md-block">
             <table class="table table-hover w-100 m-0">
@@ -158,7 +155,6 @@
                 </tbody>
               </table>
             </div>
-
             <!-- Mobile Card View -->
             <div class="notes-cards d-md-none">
               @if ($readyToLoad)
@@ -190,7 +186,7 @@
                       </div>
                       <div class="d-flex gap-1">
                         <a href="{{ route('dr.panel.doctornotes.edit', $item->id) }}"
-                          class="btn btn-sm btn-gradient-success rounded-pill px-2 py-1">
+                          class="btn btn-sm btn-gradient-success  px-2 py-1">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path
@@ -198,7 +194,7 @@
                           </svg>
                         </a>
                         <button wire:click="confirmDelete({{ $item->id }})"
-                          class="btn btn-sm btn-gradient-danger rounded-pill px-2 py-1">
+                          class="btn btn-sm btn-gradient-danger  px-2 py-1">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
@@ -236,7 +232,6 @@
                   </div>
                 @endif
               </div>
-
               <div class="d-flex justify-content-between align-items-center mt-3 px-3 flex-wrap gap-2">
                 @if ($readyToLoad)
                   <div class="text-muted">
@@ -252,226 +247,11 @@
           </div>
         </div>
       </div>
-
-      <style>
-        .table {
-          margin-bottom: 0;
-        }
-
-        .table th {
-          background-color: var(--background-light);
-          font-weight: 600;
-          white-space: nowrap;
-        }
-
-        .table td {
-          vertical-align: middle;
-        }
-
-        .badge {
-          font-weight: 500;
-          padding: 0.35em 0.65em;
-        }
-
-        .bg-primary-subtle {
-          background-color: rgba(37, 99, 235, 0.1);
-        }
-
-        .text-primary {
-          color: var(--primary) !important;
-        }
-
-        .group-actions {
-          background-color: var(--background-light);
-          border-bottom: 1px solid var(--border-neutral);
-        }
-
-        .form-select-sm {
-          height: 32px;
-          font-size: 0.875rem;
-        }
-
-        .btn-sm {
-          padding: 0.25rem 0.5rem;
-          font-size: 0.875rem;
-        }
-
-        /* Mobile Card Styles */
-        .note-card {
-          background: var(--background-card);
-          border-radius: var(--radius-card);
-          box-shadow: 0 2px 8px var(--shadow);
-          overflow: hidden;
-        }
-
-        .note-card-header {
-          background: var(--gradient-primary);
-          color: #ffffff;
-          padding: 0.75rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .note-card-body {
-          padding: 1rem;
-        }
-
-        .note-card-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          padding: 0.5rem 0;
-          border-bottom: 1px solid var(--border-neutral);
-        }
-
-        .note-card-item:last-child {
-          border-bottom: none;
-        }
-
-        .note-card-label {
-          color: var(--text-secondary);
-          font-size: 0.875rem;
-          min-width: 80px;
-        }
-
-        .note-card-value {
-          color: var(--text-primary);
-          font-size: 0.9375rem;
-          text-align: left;
-          flex: 1;
-        }
-
-        .search-container {
-          position: relative;
-          transition: all 0.3s ease;
-        }
-
-        .search-input {
-          height: 36px;
-          font-size: 0.875rem;
-          padding: 0.5rem 2rem 0.5rem 1rem;
-          border-radius: 20px;
-          background-color: rgba(255, 255, 255, 0.95);
-          transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-          box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
-          background-color: #ffffff;
-        }
-
-        .search-icon {
-          opacity: 0.6;
-          transition: opacity 0.3s ease;
-        }
-
-        .search-input:focus+.search-icon {
-          opacity: 1;
-        }
-
-        .btn-gradient-success {
-          border-radius: 6px !important;
-          transition: all 0.3s ease;
-        }
-
-        .btn-gradient-success:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        @media (min-width: 768px) {
-          .glass-header .search-container {
-            max-width: 300px;
-          }
-
-          .glass-header .btn-gradient-success {
-            width: auto;
-          }
-
-          .glass-header .d-flex {
-            justify-content: space-between !important;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .glass-header {
-            padding: 1rem;
-          }
-
-          .glass-header .d-flex {
-            gap: 1rem;
-          }
-
-          .search-container {
-            width: 100%;
-          }
-
-          .search-input {
-            height: 38px;
-            font-size: 0.875rem;
-          }
-
-          .btn-gradient-success {
-            width: 100%;
-            height: 38px;
-            justify-content: center;
-          }
-
-          .glass-header h1 {
-            font-size: 1.1rem;
-            text-align: right;
-            width: 100%;
-            margin-bottom: 0.5rem;
-          }
-
-          .glass-header .d-flex.flex-column {
-            width: 100%;
-          }
-
-          .glass-header .d-flex.flex-column>div {
-            width: 100%;
-          }
-        }
-
-        @media (max-width: 576px) {
-          .glass-header {
-            padding: 0.75rem;
-          }
-
-          .glass-header h1 {
-            font-size: 1rem;
-            text-align: right;
-            margin-bottom: 0.75rem;
-          }
-
-          .search-input {
-            height: 36px;
-            font-size: 0.8125rem;
-          }
-
-          .btn-gradient-success {
-            height: 36px;
-          }
-
-          .glass-header .d-flex.gap-2 {
-            flex-direction: column;
-            width: 100%;
-          }
-
-          .glass-header .d-flex.gap-2>* {
-            width: 100%;
-          }
-        }
-      </style>
-
       <script>
         document.addEventListener('livewire:init', function() {
           Livewire.on('show-alert', (event) => {
             toastr[event.type](event.message);
           });
-
           Livewire.on('confirm-delete', (event) => {
             Swal.fire({
               title: 'حذف یادداشت',
