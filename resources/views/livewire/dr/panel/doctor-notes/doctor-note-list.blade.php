@@ -8,17 +8,10 @@
           </div>
           <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
             <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
-              <a href="{{ route('dr.panel.doctornotes.create') }}"
-                class="btn btn-gradient-success rounded-1 px-3 py-1 d-flex align-items-center gap-1">
-                <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                <span>افزودن</span>
-              </a>
+             
               <div class="search-container position-relative" style="max-width: 100%;">
                 <input type="text"
-                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-end"
+                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
                   wire:model.live="search" placeholder="جستجو در یادداشت‌ها..."
                   style="padding-right: 20px; text-align: right; direction: rtl;">
                 <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
@@ -29,6 +22,14 @@
                   </svg>
                 </span>
               </div>
+               <a href="{{ route('dr.panel.doctornotes.create') }}"
+                class="btn btn-gradient-success rounded-1 px-3 py-1 d-flex align-items-center gap-1">
+                <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span>افزودن</span>
+              </a>
             </div>
           </div>
         </div>
@@ -114,7 +115,7 @@
                       <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
                           <a href="{{ route('dr.panel.doctornotes.edit', $item->id) }}"
-                            class="btn btn-sm btn-gradient-success rounded-pill px-2 py-1">
+                            class="btn btn-sm btn-gradient-success px-2 py-1">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                               stroke-width="2">
                               <path
@@ -122,7 +123,7 @@
                             </svg>
                           </a>
                           <button wire:click="confirmDelete({{ $item->id }})"
-                            class="btn btn-sm btn-gradient-danger rounded-pill px-2 py-1">
+                            class="btn btn-sm btn-gradient-danger px-2 py-1">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                               stroke-width="2">
                               <path
@@ -422,6 +423,15 @@
             font-size: 1.1rem;
             text-align: right;
             width: 100%;
+            margin-bottom: 0.5rem;
+          }
+
+          .glass-header .d-flex.flex-column {
+            width: 100%;
+          }
+
+          .glass-header .d-flex.flex-column>div {
+            width: 100%;
           }
         }
 
@@ -433,6 +443,7 @@
           .glass-header h1 {
             font-size: 1rem;
             text-align: right;
+            margin-bottom: 0.75rem;
           }
 
           .search-input {
@@ -442,6 +453,15 @@
 
           .btn-gradient-success {
             height: 36px;
+          }
+
+          .glass-header .d-flex.gap-2 {
+            flex-direction: column;
+            width: 100%;
+          }
+
+          .glass-header .d-flex.gap-2>* {
+            width: 100%;
           }
         }
       </style>
