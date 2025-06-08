@@ -1,20 +1,20 @@
 .chart-content {
-    padding: 15px;
+    padding: 10px;
     width: 100%;
-    margin: 15px 0;
+    margin: 10px 0;
     background: linear-gradient(135deg, #f9fafb 0%, #ebedf0 100%);
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .chart-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     width: 100%;
 }
 .chart-container {
     background: white;
     border-radius: 12px;
-    padding: 1rem;
+    padding: 0.5rem 0.25rem 0.15rem 0.25rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     border: 1px solid #e5e7eb;
     margin-bottom: 0;
@@ -43,14 +43,27 @@
 }
 .chart-title {
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.15rem;
     color: #374151;
     font-size: 1rem;
     font-weight: 500;
 }
 .chart-wrapper {
     flex: 1;
-    min-height: 180px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    position: relative;
+}
+.chart-wrapper canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill;
 }
 .top-panel-bg {
     border-radius: 16px;
@@ -61,12 +74,31 @@
     padding: 1rem;
 }
 .top-s-a-wrapper {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex;
     gap: 16px;
     width: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-light) var(--background-light);
+    padding: 0.5rem 0;
+}
+.top-s-a-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+.top-s-a-wrapper::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: 3px;
+}
+.top-s-a-wrapper::-webkit-scrollbar-track {
+    background: var(--background-light);
 }
 .stat-card {
+    flex: 1;
+    min-width: 240px;
+    max-width: 320px;
+    scroll-snap-align: start;
     background: #ffffff;
     border-radius: 12px;
     padding: 16px;
@@ -76,7 +108,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     min-height: 80px;
-    width: 100%;
     overflow: hidden;
 }
 .stat-card:hover {
@@ -109,17 +140,19 @@
     font-size: 14px;
     color: rgba(255, 255, 255, 0.95);
     font-weight: 500;
-    white-space: normal;
-    word-wrap: break-word;
     line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .stat-value {
     font-size: 16px;
     color: #ffffff;
     font-weight: 600;
-    white-space: normal;
-    word-wrap: break-word;
     line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 /* Stat Card Colors */
 .stat-card:nth-child(1) {
@@ -139,9 +172,6 @@
 }
 .stat-card:nth-child(6) {
     background: #f59e0b;
-}
-.chart-content {
-    padding: 1.5rem;
 }
 .chart-card {
     background: white;
@@ -172,7 +202,7 @@
 }
 @media (max-width: 768px) {
     .chart-content {
-        padding: 0.5rem;
+        padding: 5px;
     }
     .chart-card {
         margin-bottom: 1rem;
@@ -186,45 +216,45 @@
         margin-bottom: 0.5rem;
     }
     .chart-container {
-        min-height: 250px;
+        padding: 0.35rem 0.15rem 0.15rem 0.15rem;
+    }
+    .chart-title {
+        margin-bottom: 0.15rem;
+    }
+    .chart-wrapper {
+        min-height: 140px;
     }
 }
 @media only screen and (max-width: 1400px) {
     .top-s-a-wrapper {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-        scrollbar-color: var(--primary-light) var(--background-light);
-        padding: 0.5rem 0;
-        gap: 1rem;
-    }
-    .top-s-a-wrapper::-webkit-scrollbar {
-        height: 6px;
-    }
-    .top-s-a-wrapper::-webkit-scrollbar-thumb {
-        background: var(--primary-light);
-        border-radius: 3px;
-    }
-    .top-s-a-wrapper::-webkit-scrollbar-track {
-        background: var(--background-light);
+        gap: 12px;
     }
     .stat-card {
-        flex: 0 0 220px;
-        scroll-snap-align: start;
+        min-width: 220px;
+        max-width: 280px;
     }
     .chart-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
     .chart-wrapper {
         min-height: 160px;
     }
 }
+@media only screen and (max-width: 1200px) {
+    .top-s-a-wrapper {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .chart-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 @media only screen and (max-width: 768px) {
+    .top-s-a-wrapper {
+        grid-template-columns: 1fr;
+    }
     .stat-card {
-        flex: 0 0 200px;
-        scroll-snap-align: start;
+        min-width: 200px;
+        max-width: 260px;
         padding: 12px;
     }
     .chart-grid {
