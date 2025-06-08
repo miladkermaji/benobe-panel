@@ -30,13 +30,14 @@
     background-color: #ffffff;
     border-radius: 1rem;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    overflow-y: auto;
+    overflow: hidden;
     max-height: calc(100vh - 3rem);
     transition: transform 0.2s ease-out, opacity 0.2s ease-out;
     transform: scale(0.95);
     opacity: 0;
     z-index: 1001;
-    /* بالاتر از بک‌دراپ و سایر المان‌ها */
+    display: flex;
+    flex-direction: column;
   }
 
   [x-show="show"] .xai-modal-container {
@@ -71,7 +72,11 @@
     justify-content: space-between;
     border-bottom: 1px solid #e5e7eb;
     z-index: 1002;
-    /* بالاتر از محتوای مودال */
+    position: sticky;
+    top: 0;
+    background-color: #ffffff;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
   }
 
   .xai-modal-title {
@@ -127,8 +132,9 @@
   .xai-modal-body {
     padding: 1rem;
     z-index: 1001;
-    min-height: 400px
-    /* هم‌سطح با کانتینر مودال */
+    min-height: 200px;
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
   }
 
   [x-cloak] {
