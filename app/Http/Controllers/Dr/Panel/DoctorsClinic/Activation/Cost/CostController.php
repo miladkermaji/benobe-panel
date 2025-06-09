@@ -45,10 +45,13 @@ class CostController extends Controller
         $request->validate([
             'clinic_id'       => 'required|exists:clinics,id',
             'doctor_id'       => 'required|exists:doctors,id',
-            'deposit_amount'  => 'nullable|numeric|min:0', // تغییر به nullable و حداقل 0
+            'deposit_amount'  => 'nullable|numeric|min:0',
             'is_custom_price' => 'required|boolean',
-            'no_deposit'      => 'nullable|boolean', // اضافه کردن فیلد جدید
+            'no_deposit'      => 'nullable|boolean',
         ]);
+
+        // اگر کاربر بدون بیعانه را انتخاب کرده باشد یا مقدار صفر باشد
+        $depositAmount = $request->no_deposit || !$request->deposit_amount ? 0 : $request->deposit_amount;
 
         // بررسی وجود بیعانه برای کلینیک و دکتر
         $existingDeposit = ClinicDepositSetting::where('clinic_id', $request->clinic_id)
@@ -56,20 +59,22 @@ class CostController extends Controller
             ->first();
 
         if ($existingDeposit) {
-            return response()->json(['success' => false, 'message' => 'شما قبلاً یک بیعانه برای این کلینیک ثبت کرده‌اید. لطفاً ابتدا آن را حذف کنید.']);
+            // آپدیت بیعانه موجود
+            $existingDeposit->update([
+                'deposit_amount'  => $depositAmount,
+                'is_custom_price' => $request->is_custom_price && $depositAmount > 0,
+            ]);
+        } else {
+            // ایجاد بیعانه جدید
+            ClinicDepositSetting::create([
+                'clinic_id'       => $request->clinic_id,
+                'doctor_id'       => $request->doctor_id,
+                'deposit_amount'  => $depositAmount,
+                'is_custom_price' => $request->is_custom_price && $depositAmount > 0,
+            ]);
         }
 
-        // اگه "بدون بیعانه" انتخاب شده باشه یا مقدار صفر باشه
-        $depositAmount = $request->no_deposit || !$request->deposit_amount ? 0 : $request->deposit_amount;
-
-        $setting = ClinicDepositSetting::create([
-            'clinic_id'       => $request->clinic_id,
-            'doctor_id'       => $request->doctor_id,
-            'deposit_amount'  => $depositAmount,
-            'is_custom_price' => $request->is_custom_price && $depositAmount > 0, // فقط اگه مبلغ باشه
-        ]);
-
-        return response()->json(['success' => true, 'message' => 'تنظیمات بیعانه با موفقیت ذخیره شد.']);
+        return response()->json(['success' => true, 'message' => 'تنظیمات با موفقیت ذخیره شد.']);
     }
 
 }

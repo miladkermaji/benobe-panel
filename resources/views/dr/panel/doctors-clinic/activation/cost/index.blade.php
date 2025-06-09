@@ -133,8 +133,7 @@
                 </div>
               </div>
               <div class="d-flex justify-content-between w-100 gap-4">
-                <button type="button" class="btn my-btn-primary h-50 w-50" data-bs-toggle="modal"
-                  data-bs-target="#confirmationModal">ادامه</button>
+                <button type="button" class="btn my-btn-primary h-50 w-50" onclick="saveAndContinue()">ادامه</button>
                 <button type="button" class="btn btn-outline-secondary h-50 w-50">انصراف</button>
               </div>
               <div id="depositList" class="mt-4">
@@ -157,15 +156,14 @@
     document.getElementById('noDeposit').addEventListener('change', function() {
       const depositSelect = document.getElementById('depositAmount');
       const customPriceInput = document.getElementById('customPrice');
+      const depositContainer = document.querySelector('.mb-3.mt-4');
 
       if (this.checked) {
-        depositSelect.disabled = true;
-        customPriceInput.disabled = true;
+        depositContainer.style.display = 'none';
         depositSelect.value = ""; // خالی کردن مقدار
         customPriceInput.classList.add('d-none');
       } else {
-        depositSelect.disabled = false;
-        customPriceInput.disabled = false;
+        depositContainer.style.display = 'block';
       }
     });
 
@@ -275,11 +273,13 @@
     document.getElementById('depositAmount').addEventListener('change', function() {
       const customPrice = document.getElementById('customPrice');
       const isCustomPrice = document.getElementById('isCustomPrice');
+      const noDepositCheckbox = document.getElementById('noDeposit');
 
       if (this.value === 'custom') {
         customPrice.classList.remove('d-none');
         customPrice.setAttribute('name', 'deposit_amount');
         isCustomPrice.value = 1;
+        noDepositCheckbox.checked = false;
       } else {
         customPrice.classList.add('d-none');
         customPrice.removeAttribute('name');
@@ -287,13 +287,7 @@
       }
     });
 
-
-
-    document.getElementById('saveButton').addEventListener('click', function() {
-      if (!validateDepositAmount()) {
-        return; // اگر مقدار معتبر نبود، ادامه ندهد
-      }
-
+    function saveAndContinue() {
       const form = document.getElementById('depositForm');
       const formData = new FormData(form);
       const data = {};
@@ -303,19 +297,16 @@
         data[key] = value;
       });
 
-      // اگه "بدون بیعانه" انتخاب شده، مقدار deposit_amount رو صفر بفرست
+      // اگر "بدون بیعانه" انتخاب شده باشد، مقدار deposit_amount را صفر بفرست
       if (document.getElementById('noDeposit').checked) {
         data.deposit_amount = 0;
         data.is_custom_price = 0;
       }
 
-      // If custom price is selected, use its value
+      // اگر قیمت دلخواه انتخاب شده باشد، از مقدار آن استفاده کن
       if (data.deposit_amount === 'custom') {
         data.deposit_amount = document.getElementById('customPrice').value;
       }
-
-      // Log the data being sent
-      console.log('Sending data:', data);
 
       fetch("{{ route('cost.store') }}", {
           method: "POST",
@@ -369,6 +360,6 @@
             text: errorMessage,
           });
         });
-    });
+    }
   </script>
 @endsection
