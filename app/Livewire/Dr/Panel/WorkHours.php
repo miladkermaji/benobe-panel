@@ -1222,7 +1222,9 @@ class Workhours extends Component
 
                 // به‌روزرسانی تنظیمات نوبت‌دهی برای تمام روزها
                 foreach ($schedules as $schedule) {
-                    $appointmentSettings = json_decode($schedule->appointment_settings, true) ?? [];
+                    $appointmentSettings = is_array($schedule->appointment_settings) 
+                        ? $schedule->appointment_settings 
+                        : json_decode($schedule->appointment_settings, true) ?? [];
                     $existingIndex = array_search(
                         (int)$index,
                         array_column($appointmentSettings, 'work_hour_key')

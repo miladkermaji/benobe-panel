@@ -711,6 +711,10 @@ Route::prefix('dr')
                 Route::get('/edit/{id}', [SecretaryManagementController::class, 'edit'])->middleware('secretary.permission:secretary_management')->name('dr-secretary-edit');
                 Route::post('/update/{id}', [SecretaryManagementController::class, 'update'])->middleware('secretary.permission:secretary_management')->name('dr-secretary-update');
                 Route::delete('/delete/{id}', [SecretaryManagementController::class, 'destroy'])->middleware('secretary.permission:secretary_management')->name('dr-secretary-delete');
+
+                Route::post('group-action', [SecretaryManagementController::class, 'groupAction'])->name('dr-secretary-group-action');
+                Route::patch('update-status', [SecretaryManagementController::class, 'updateStatus'])->name('dr-secretary-update-status');
+
             });
 
             Route::group(['prefix' => 'doctors-clinic'], function () {
