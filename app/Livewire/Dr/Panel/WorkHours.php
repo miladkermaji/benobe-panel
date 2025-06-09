@@ -1141,11 +1141,18 @@ class Workhours extends Component
                         'day' => $day,
                         'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                         'is_working' => true,
-                        'work_hours' => json_encode([]),
+                        'work_hours' => '[]',
                     ]);
                 }
 
-                $workHours = json_decode($workSchedule->work_hours, true) ?? [];
+                $workHours = [];
+                if (is_string($workSchedule->work_hours)) {
+                    $decodedHours = json_decode($workSchedule->work_hours, true);
+                    $workHours = is_array($decodedHours) ? $decodedHours : [];
+                } elseif (is_array($workSchedule->work_hours)) {
+                    $workHours = $workSchedule->work_hours;
+                }
+
                 $slotExists = array_filter($workHours, function ($slot, $i) use ($newSlot, $index) {
                     return $i !== $index && $slot['start'] === $newSlot['start'] && $slot['end'] === $newSlot['end'];
                 }, ARRAY_FILTER_USE_BOTH);
@@ -1222,9 +1229,18 @@ class Workhours extends Component
 
                 // به‌روزرسانی تنظیمات نوبت‌دهی برای تمام روزها
                 foreach ($schedules as $schedule) {
-                    $appointmentSettings = is_array($schedule->appointment_settings) 
-                        ? $schedule->appointment_settings 
-                        : json_decode($schedule->appointment_settings, true) ?? [];
+                    $appointmentSettings = [];
+
+                    // بررسی نوع داده appointment_settings
+                    if (is_string($schedule->appointment_settings)) {
+                        $decodedSettings = json_decode($schedule->appointment_settings, true);
+                        $appointmentSettings = is_array($decodedSettings) ? $decodedSettings : [];
+                    } elseif (is_array($schedule->appointment_settings)) {
+                        $appointmentSettings = $schedule->appointment_settings;
+                    } else {
+                        $appointmentSettings = [];
+                    }
+
                     $existingIndex = array_search(
                         (int)$index,
                         array_column($appointmentSettings, 'work_hour_key')
