@@ -126,21 +126,34 @@ class Workhours extends Component
 
     public function mount($clinicId = null)
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
-        }
-
-        $this->doctorId = $doctor instanceof \App\Models\Secretary ? $doctor->doctor_id : $doctor->id;
-        $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
-
-        if (!$this->doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'اطلاعات پزشک یافت نشد.');
-        }
-
         $this->clinicId = $clinicId;
+        $this->activeClinicId = $clinicId ?? 'default';
+
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+        // Check if clinic exists if clinicId is provided
+        if ($this->activeClinicId !== 'default') {
+            $clinicExists = \App\Models\Clinic::where('id', $this->activeClinicId)->exists();
+            if (!$clinicExists) {
+                $this->activeClinicId = 'default';
+                session()->flash('error', 'The selected clinic does not exist. Using default settings instead.');
+            }
+        }
+
+        $this->appointmentConfig = DoctorAppointmentConfig::firstOrCreate(
+            [
+                'doctor_id' => $this->doctorId,
+                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+            ],
+            [
+                'auto_scheduling' => true,
+                'online_consultation' => false,
+                'holiday_availability' => false,
+            ]
+        );
+
         $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
-        $this->activeClinicId = $this->clinicId ?? $this->selectedClinicId;
         session(['selectedClinicId' => $this->selectedClinicId]);
 
         // یک درخواست برای دریافت همه تنظیمات
