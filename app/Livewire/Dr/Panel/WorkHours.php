@@ -748,8 +748,8 @@ class Workhours extends Component
                         ->first();
 
                     if ($targetSchedule) {
-                        $targetWorkHours = $targetSchedule->work_hours ? json_decode($targetSchedule->work_hours, true) : [];
-                        $targetEmergencyTimes = $targetSchedule->emergency_times ? json_decode($targetSchedule->emergency_times, true) : [];
+                        $targetWorkHours = is_string($targetSchedule->work_hours) ? json_decode($targetSchedule->work_hours, true) : ($targetSchedule->work_hours ?? []);
+                        $targetEmergencyTimes = is_string($targetSchedule->emergency_times) ? json_decode($targetSchedule->emergency_times, true) : ($targetSchedule->emergency_times ?? []);
 
                         if (!$replace && (!empty($targetWorkHours) || !empty($targetEmergencyTimes))) {
                             $conflictDetails = [];
