@@ -96,7 +96,7 @@ class DrProfileController extends Controller
     public function edit()
     {
         $doctor                   = $this->getAuthenticatedDoctor();
-        $currentSpecialty         = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id  )->first();
+        $currentSpecialty         = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)->first();
         $specialtyName            = $currentSpecialty->specialty_title ?? 'نامشخص';
         $doctor_specialties       = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)->get();
         $doctorSpecialties        = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)->get();
@@ -529,7 +529,7 @@ class DrProfileController extends Controller
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100253, $newMobile, [$otpCode])
+            SmsService::create(100279, $newMobile, [$otpCode])
         );
         $messagesService->send();
 
