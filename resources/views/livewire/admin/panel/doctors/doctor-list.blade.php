@@ -103,7 +103,8 @@
                       <td class="align-middle">{{ $item->jalali_created_at }}</td>
                       <td class="align-middle">رایگان</td>
                       <td class="align-middle">رایگان</td>
-                      <td class="align-middle">{{ $item->province->name . '/' . $item->city->name }}</td>
+                      <td class="align-middle">{{ $item->province?->name ?? '---' }} /
+                        {{ $item->city?->name ?? '---' }}</td>
                       <td class="text-center align-middle">
                         <button wire:click="toggleStatus({{ $item->id }})"
                           class="badge {{ $item->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
@@ -197,7 +198,7 @@
                 </div>
                 <div class="col-6">
                   <small class="text-muted d-block">شهر</small>
-                  <span>{{ $item->province->name . '/' . $item->city->name }}</span>
+                  <span>{{ $item->province?->name ?? '---' }} / {{ $item->city?->name ?? '---' }}</span>
                 </div>
                 <div class="col-6">
                   <small class="text-muted d-block">وضعیت</small>
