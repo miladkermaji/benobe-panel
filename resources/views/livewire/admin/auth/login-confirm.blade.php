@@ -25,7 +25,7 @@
       <form wire:submit.prevent="loginConfirm" class="login-confirm-form">
         <div class="d-flex justify-content-center mb-3 gap-4" dir="rtl">
           @for ($i = 0; $i < 4; $i++)
-            <input wire:model="otpCode.{{ $i }}" type="text" maxlength="1"
+            <input wire:model="otpCode.{{ $i }}" inputmode="numeric"  maxlength="1"
               class="form-control otp-input text-center custom-rounded border"
               style="width: 60px; height: 60px; font-size: 1.5rem;">
           @endfor
