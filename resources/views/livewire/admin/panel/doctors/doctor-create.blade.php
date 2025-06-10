@@ -85,22 +85,22 @@
               <label for="sex" class="form-label">جنسیت</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="zone_province_id" class="form-select select2" id="zone_province_id">
+              <select wire:model.live="province_id" class="form-select select2" id="province_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($provinces as $province)
                   <option value="{{ $province->id }}">{{ $province->name }}</option>
                 @endforeach
               </select>
-              <label for="zone_province_id" class="form-label">استان</label>
+              <label for="province_id" class="form-label">استان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model="zone_city_id" class="form-select select2" id="zone_city_id">
+              <select wire:model="city_id" class="form-select select2" id="city_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($cities as $city)
                   <option value="{{ $city->id }}">{{ $city->name }}</option>
                 @endforeach
               </select>
-              <label for="zone_city_id" class="form-label">شهر</label>
+              <label for="city_id" class="form-label">شهر</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="number" wire:model="appointment_fee" class="form-control" id="appointment_fee"
@@ -140,12 +140,12 @@
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
-        $('#zone_province_id').select2({
+        $('#province_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
-        $('#zone_city_id').select2({
+        $('#city_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%',
@@ -159,8 +159,8 @@
 
       Livewire.on('refresh-select2', (event) => {
         const cities = event.cities || [];
-        $('#zone_city_id').select2('destroy');
-        $('#zone_city_id').empty().select2({
+        $('#city_id').select2('destroy');
+        $('#city_id').empty().select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%',
@@ -176,11 +176,11 @@
         });
       });
 
-      $('#zone_province_id').on('change', function() {
-        @this.set('zone_province_id', $(this).val());
+      $('#province_id').on('change', function() {
+        @this.set('province_id', $(this).val());
       });
-      $('#zone_city_id').on('change', function() {
-        @this.set('zone_city_id', $(this).val());
+      $('#city_id').on('change', function() {
+        @this.set('city_id', $(this).val());
       });
 
       jalaliDatepicker.startWatch({
