@@ -529,13 +529,27 @@ class Workhours extends Component
             })
             ->get()
             ->map(function ($schedule) {
+                $workHours = $schedule->work_hours;
+                $appointmentSettings = $schedule->appointment_settings;
+                $emergencyTimes = $schedule->emergency_times;
+
+                if (is_string($workHours)) {
+                    $workHours = json_decode($workHours, true) ?? [];
+                }
+                if (is_string($appointmentSettings)) {
+                    $appointmentSettings = json_decode($appointmentSettings, true) ?? [];
+                }
+                if (is_string($emergencyTimes)) {
+                    $emergencyTimes = json_decode($emergencyTimes, true) ?? [];
+                }
+
                 return [
                     'id' => $schedule->id,
                     'day' => $schedule->day,
                     'is_working' => (bool) $schedule->is_working,
-                    'work_hours' => is_array($schedule->work_hours) ? $schedule->work_hours : json_decode($schedule->work_hours, true) ?? [],
-                    'appointment_settings' => is_array($schedule->appointment_settings) ? $schedule->appointment_settings : json_decode($schedule->appointment_settings, true) ?? [],
-                    'emergency_times' => is_array($schedule->emergency_times) ? $schedule->emergency_times : json_decode($schedule->emergency_times, true) ?? [],
+                    'work_hours' => $workHours,
+                    'appointment_settings' => $appointmentSettings,
+                    'emergency_times' => $emergencyTimes,
                 ];
             })
             ->toArray();
@@ -717,9 +731,9 @@ class Workhours extends Component
                 throw new \Exception('برنامه کاری برای روز مبدا یافت نشد');
             }
 
-            $sourceWorkHours = !empty($sourceSchedule['work_hours']) ? $sourceSchedule['work_hours'] : [];
-            $sourceAppointmentSettings = !empty($sourceSchedule['appointment_settings']) ? $sourceSchedule['appointment_settings'] : [];
-            $sourceEmergencyTimes = !empty($sourceSchedule['emergency_times']) ? $sourceSchedule['emergency_times'] : [];
+            $sourceWorkHours = $sourceSchedule['work_hours'] ?? [];
+            $sourceAppointmentSettings = $sourceSchedule['appointment_settings'] ?? [];
+            $sourceEmergencyTimes = $sourceSchedule['emergency_times'] ?? [];
 
             if (empty($sourceWorkHours[$sourceIndex])) {
                 throw new \Exception('اسلات انتخاب‌شده برای کپی یافت نشد');
@@ -748,8 +762,15 @@ class Workhours extends Component
                         ->first();
 
                     if ($targetSchedule) {
-                        $targetWorkHours = is_string($targetSchedule->work_hours) ? json_decode($targetSchedule->work_hours, true) : ($targetSchedule->work_hours ?? []);
-                        $targetEmergencyTimes = is_string($targetSchedule->emergency_times) ? json_decode($targetSchedule->emergency_times, true) : ($targetSchedule->emergency_times ?? []);
+                        $targetWorkHours = $targetSchedule->work_hours;
+                        $targetEmergencyTimes = $targetSchedule->emergency_times;
+
+                        if (is_string($targetWorkHours)) {
+                            $targetWorkHours = json_decode($targetWorkHours, true) ?? [];
+                        }
+                        if (is_string($targetEmergencyTimes)) {
+                            $targetEmergencyTimes = json_decode($targetEmergencyTimes, true) ?? [];
+                        }
 
                         if (!$replace && (!empty($targetWorkHours) || !empty($targetEmergencyTimes))) {
                             $conflictDetails = [];
