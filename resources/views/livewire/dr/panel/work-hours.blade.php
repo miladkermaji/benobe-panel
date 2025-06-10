@@ -11,7 +11,7 @@
         <div>
           <div>
             <div>
-              
+
               <div class="row border border-radius-11 p-3 align-items-center">
                 <!-- تعداد روزهای باز تقویم -->
                 <div class="col-8">
@@ -20,9 +20,9 @@
                       style="position: absolute; top: -10px; right: -4px; font-size: 0.85rem; color: #6c757d; z-index: 10; transition: all 0.2s ease;">
                       تعداد روز‌های باز تقویم
                     </label>
-                    <input type="number" class="form-control text-center" name="calendar_days"
-                      placeholder="تعداد روز مورد نظر خود را وارد کنید" wire:model.live="calendarDays"
-                      style="height: 50px; z-index: 1;">
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" class="form-control text-center"
+                      name="calendar_days" placeholder="تعداد روز مورد نظر خود را وارد کنید"
+                      wire:model.live="calendarDays" style="height: 50px; z-index: 1;">
                     <span class="input-group-text" style="height: 50px; z-index: 1;">روز</span>
                   </div>
                 </div>
