@@ -834,9 +834,9 @@ class Workhours extends Component
                         }
                         $targetWorkHours[] = $sourceSlot;
                         $targetSchedule->update([
-                            'work_hours' => json_encode($targetWorkHours),
-                            'appointment_settings' => json_encode($sourceAppointmentSettings),
-                            'emergency_times' => json_encode($sourceEmergencyTimes),
+                            'work_hours' => is_array($targetWorkHours) ? json_encode($targetWorkHours) : $targetWorkHours,
+                            'appointment_settings' => is_array($sourceAppointmentSettings) ? json_encode($sourceAppointmentSettings) : $sourceAppointmentSettings,
+                            'emergency_times' => is_array($sourceEmergencyTimes) ? json_encode($sourceEmergencyTimes) : $sourceEmergencyTimes,
                             'is_working' => true,
                         ]);
                     }
