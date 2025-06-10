@@ -27,8 +27,8 @@ class DoctorEdit extends Component
     public $sex;
     public $status;
     public $photo;
-    public $zone_province_id;
-    public $zone_city_id;
+    public $province_id;
+    public $city_id;
     public $appointment_fee;
     public $visit_fee;
 
@@ -48,30 +48,30 @@ class DoctorEdit extends Component
             : null;
         $this->sex = $this->doctor->sex;
         $this->status = $this->doctor->status;
-        $this->zone_province_id = $this->doctor->province?->id;
-        $this->zone_city_id = $this->doctor->city?->id;
+        $this->province_id = $this->doctor->province?->id;
+        $this->city_id = $this->doctor->city?->id;
         $this->appointment_fee = $this->doctor->appointment_fee;
         $this->visit_fee = $this->doctor->visit_fee;
 
         // دیباگ
         Log::info('Doctor Data Loaded', [
             'id' => $id,
-            'zone_province_id' => $this->doctor->zone_province_id,
-            'zone_city_id' => $this->doctor->zone_city_id,
+            'province_id' => $this->doctor->province_id,
+            'city_id' => $this->doctor->city_id,
         ]);
 
         $this->provinces = Zone::where('level', 1)->get();
-        if ($this->zone_province_id) {
-            $this->cities = Zone::where('level', 2)->where('parent_id', $this->zone_province_id)->get();
+        if ($this->province_id) {
+            $this->cities = Zone::where('level', 2)->where('parent_id', $this->province_id)->get();
         } else {
             $this->cities = collect();
         }
     }
 
-    public function updatedZoneProvinceId($value)
+    public function updatedProvinceId($value)
     {
-        $this->cities       = Zone::where('level', 2)->where('parent_id', $value)->get();
-        $this->zone_city_id = null;
+        $this->cities = Zone::where('level', 2)->where('parent_id', $value)->get();
+        $this->city_id = null;
         $this->dispatch('refresh-select2', cities: $this->cities->toArray());
     }
 
@@ -100,8 +100,8 @@ class DoctorEdit extends Component
             'sex'              => $this->sex,
             'status'           => $this->status,
             'photo'            => $this->photo,
-            'zone_province_id' => $this->zone_province_id,
-            'zone_city_id'     => $this->zone_city_id,
+            'province_id'      => $this->province_id,
+            'city_id'          => $this->city_id,
             'appointment_fee'  => $this->appointment_fee,
             'visit_fee'        => $this->visit_fee,
         ], [
@@ -115,8 +115,8 @@ class DoctorEdit extends Component
             'sex'              => 'required|in:male,female',
             'status'           => 'required|boolean',
             'photo'            => 'nullable|image|max:2048',
-            'zone_province_id' => 'required|exists:zone,id',
-            'zone_city_id'     => 'required|exists:zone,id',
+            'province_id'      => 'required|exists:zone,id',
+            'city_id'          => 'required|exists:zone,id',
             'appointment_fee'  => 'nullable|numeric|min:0|max:10000000',
             'visit_fee'        => 'nullable|numeric|min:0|max:10000000',
         ], [
@@ -152,10 +152,10 @@ class DoctorEdit extends Component
             'photo.image'               => 'فایل باید عکس باشد.',
             'photo.max'                 => 'حجم عکس نباید بیشتر از ۲ مگابایت باشد.',
             'photo.nullable'            => 'عکس باید خالی یا یک فایل معتبر باشد.',
-            'zone_province_id.required' => 'لطفاً استان را انتخاب کنید.',
-            'zone_province_id.exists'   => 'استان انتخاب‌شده معتبر نیست.',
-            'zone_city_id.required'     => 'لطفاً شهر را انتخاب کنید.',
-            'zone_city_id.exists'       => 'شهر انتخاب‌شده معتبر نیست.',
+            'province_id.required'      => 'لطفاً استان را انتخاب کنید.',
+            'province_id.exists'        => 'استان انتخاب‌شده معتبر نیست.',
+            'city_id.required'          => 'لطفاً شهر را انتخاب کنید.',
+            'city_id.exists'            => 'شهر انتخاب‌شده معتبر نیست.',
             'appointment_fee.numeric'   => 'تعرفه نوبت باید عدد باشد.',
             'appointment_fee.min'       => 'تعرفه نوبت نمی‌تواند منفی باشد.',
             'appointment_fee.max'       => 'تعرفه نوبت نباید بیشتر از ۱۰ میلیون تومان باشد.',
@@ -190,8 +190,8 @@ class DoctorEdit extends Component
             'date_of_birth'    => $dateOfBirthMiladi,
             'sex'              => $this->sex,
             'status'           => $this->status,
-            'zone_province_id' => $this->zone_province_id,
-            'zone_city_id'     => $this->zone_city_id,
+            'province_id'      => $this->province_id,
+            'city_id'          => $this->city_id,
             'appointment_fee'  => $this->appointment_fee,
             'visit_fee'        => $this->visit_fee,
         ];
