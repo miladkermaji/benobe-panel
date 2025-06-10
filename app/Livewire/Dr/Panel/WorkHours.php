@@ -533,14 +533,23 @@ class Workhours extends Component
                 $appointmentSettings = $schedule->appointment_settings;
                 $emergencyTimes = $schedule->emergency_times;
 
+                // Ensure we only decode if the value is a string
                 if (is_string($workHours)) {
                     $workHours = json_decode($workHours, true) ?? [];
+                } elseif (!is_array($workHours)) {
+                    $workHours = [];
                 }
+
                 if (is_string($appointmentSettings)) {
                     $appointmentSettings = json_decode($appointmentSettings, true) ?? [];
+                } elseif (!is_array($appointmentSettings)) {
+                    $appointmentSettings = [];
                 }
+
                 if (is_string($emergencyTimes)) {
                     $emergencyTimes = json_decode($emergencyTimes, true) ?? [];
+                } elseif (!is_array($emergencyTimes)) {
+                    $emergencyTimes = [];
                 }
 
                 return [
