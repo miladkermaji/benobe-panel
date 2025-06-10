@@ -137,8 +137,8 @@ class DoctorList extends Component
             ->orWhere('mobile', 'like', '%' . $this->search . '%')
             ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])
             ->with(['province', 'city'])
+            ->orderBy('created_at', 'desc')
             ->paginate($this->perPage);
-
     }
 
     public function render()
