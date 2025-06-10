@@ -771,12 +771,9 @@ class Workhours extends Component
                         ->first();
 
                     if ($targetSchedule) {
-                        $targetWorkHours = $targetSchedule->work_hours;
+                        $targetWorkHours = is_string($targetSchedule->work_hours) ? json_decode($targetSchedule->work_hours, true) : $targetSchedule->work_hours;
                         $targetEmergencyTimes = $targetSchedule->emergency_times;
 
-                        if (is_string($targetWorkHours)) {
-                            $targetWorkHours = json_decode($targetWorkHours, true) ?? [];
-                        }
                         if (is_string($targetEmergencyTimes)) {
                             $targetEmergencyTimes = json_decode($targetEmergencyTimes, true) ?? [];
                         }
@@ -837,13 +834,13 @@ class Workhours extends Component
                             'emergency_times' => json_encode($sourceEmergencyTimes),
                         ]);
                     } else {
-                        $targetWorkHours = json_decode($targetSchedule->work_hours, true) ?? [];
+                        $targetWorkHours = is_string($targetSchedule->work_hours) ? json_decode($targetSchedule->work_hours, true) : $targetSchedule->work_hours;
                         if ($replace) {
                             $targetWorkHours = array_filter($targetWorkHours, fn ($slot) => !$this->isTimeConflict($sourceSlot['start'], $sourceSlot['end'], $slot['start'], $slot['end']));
                         }
                         $targetWorkHours[] = $sourceSlot;
                         $targetSchedule->update([
-                            'work_hours' => is_array($targetWorkHours) ? json_encode($targetWorkHours) : $targetWorkHours,
+                            'work_hours' => json_encode($targetWorkHours),
                             'appointment_settings' => is_array($sourceAppointmentSettings) ? json_encode($sourceAppointmentSettings) : $sourceAppointmentSettings,
                             'emergency_times' => is_array($sourceEmergencyTimes) ? json_encode($sourceEmergencyTimes) : $sourceEmergencyTimes,
                             'is_working' => true,
