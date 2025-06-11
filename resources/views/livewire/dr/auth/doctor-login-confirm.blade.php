@@ -245,36 +245,32 @@
         const ac = new AbortController();
 
         // درخواست مجوز اعلان‌ها
-        async function requestNotificationPermission() {
-          try {
-            // ثبت Service Worker
-            if ('serviceWorker' in navigator) {
-              const registration = await navigator.serviceWorker.register('/sw.js');
-              console.log('Service Worker registered:', registration);
-            }
-
-            // درخواست مجوز اعلان‌ها
-            if ('Notification' in window) {
-              const permission = await Notification.requestPermission();
-              console.log('Notification permission:', permission);
-
-              if (permission === 'granted') {
-                // نمایش یک اعلان تست
-                new Notification('اعلان‌های به نوبه', {
-                  body: 'اعلان‌های به نوبه فعال شد',
-                  icon: '/dr-assets/images/logo.png'
-                });
-              }
-            }
-          } catch (error) {
-            console.error('Error requesting notification permission:', error);
+        function requestNotificationPermission() {
+          if (!('Notification' in window)) {
+            console.log('This browser does not support notifications');
+            return;
           }
+
+          // اگر مجوز قبلاً داده شده
+          if (Notification.permission === 'granted') {
+            console.log('Notification permission already granted');
+            return;
+          }
+
+          // اگر مجوز قبلاً رد شده
+          if (Notification.permission === 'denied') {
+            console.log('Notification permission denied');
+            return;
+          }
+
+          // درخواست مجوز
+          Notification.requestPermission().then(function(permission) {
+            console.log('Notification permission:', permission);
+          });
         }
 
         // درخواست مجوز در زمان مناسب
-        setTimeout(() => {
-          requestNotificationPermission();
-        }, 2000);
+        setTimeout(requestNotificationPermission, 1000);
 
         navigator.credentials.get({
           otp: {
@@ -282,22 +278,20 @@
           },
           signal: ac.signal
         }).then(otp => {
-          // نمایش اعلان با استفاده از Service Worker
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.ready.then(registration => {
-              registration.showNotification('کد تایید جدید', {
-                body: `کد تایید شما: ${otp.code}`,
-                icon: '/dr-assets/images/logo.png',
-                badge: '/dr-assets/images/logo.png',
-                tag: 'otp-code',
-                requireInteraction: true,
-                actions: [{
-                  action: 'copy',
-                  title: 'کپی کد'
-                }],
-                vibrate: [200, 100, 200]
-              });
+          // نمایش اعلان
+          if (Notification.permission === 'granted') {
+            const notification = new Notification('کد تایید جدید', {
+              body: `کد تایید شما: ${otp.code}`,
+              icon: '/dr-assets/images/logo.png',
+              badge: '/dr-assets/images/logo.png',
+              tag: 'otp-code',
+              requireInteraction: true
             });
+
+            notification.onclick = function() {
+              window.focus();
+              this.close();
+            };
           }
 
           // نمایش دیالوگ تایید
