@@ -20,9 +20,13 @@ class LoginRegister extends Component
     public $mobile;
     protected $notificationService;
 
-    public function mount()
+    public function booted()
     {
         $this->notificationService = new NotificationService();
+    }
+
+    public function mount()
+    {
         if (Auth::guard('manager')->check()) {
             $this->redirect(route('admin-panel'));
         } elseif (session('current_step') === 2) {

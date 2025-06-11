@@ -20,9 +20,13 @@ class DoctorLoginRegister extends Component
     public $mobile;
     protected $notificationService;
 
-    public function mount()
+    public function booted()
     {
         $this->notificationService = new NotificationService();
+    }
+
+    public function mount()
+    {
         if (Auth::guard('doctor')->check()) {
             $this->redirect(route('dr-panel'));
         } elseif (Auth::guard('secretary')->check()) {
