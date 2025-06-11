@@ -247,12 +247,21 @@
         // درخواست مجوز اعلان‌ها
         async function requestNotificationPermission() {
           try {
-            if ('Notification' in window) {
+            if ('serviceWorker' in navigator && 'PushManager' in window) {
+              const registration = await navigator.serviceWorker.register('/sw.js');
               const permission = await Notification.requestPermission();
-              console.log('Notification permission:', permission);
+              console.log('Push notification permission:', permission);
+
+              if (permission === 'granted') {
+                const subscription = await registration.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: 'YOUR_PUBLIC_VAPID_KEY'
+                });
+                console.log('Push notification subscription:', subscription);
+              }
             }
           } catch (error) {
-            console.error('Error requesting notification permission:', error);
+            console.error('Error requesting push notification permission:', error);
           }
         }
 
@@ -265,33 +274,22 @@
           },
           signal: ac.signal
         }).then(otp => {
-          // نمایش اعلان سیستم
-          if ('Notification' in window && Notification.permission === 'granted') {
-            const notification = new Notification('کد تایید جدید', {
-              body: `کد تایید شما: ${otp.code}`,
-              icon: '/dr-assets/images/logo.png',
-              badge: '/dr-assets/images/logo.png',
-              tag: 'otp-code',
-              requireInteraction: true,
-              actions: [{
-                action: 'copy',
-                title: 'کپی کد'
-              }]
+          // نمایش اعلان با استفاده از Service Worker
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(registration => {
+              registration.showNotification('کد تایید جدید', {
+                body: `کد تایید شما: ${otp.code}`,
+                icon: '/dr-assets/images/logo.png',
+                badge: '/dr-assets/images/logo.png',
+                tag: 'otp-code',
+                requireInteraction: true,
+                actions: [{
+                  action: 'copy',
+                  title: 'کپی کد'
+                }],
+                vibrate: [200, 100, 200]
+              });
             });
-
-            notification.onclick = function() {
-              window.focus();
-              this.close();
-            };
-
-            notification.onaction = function(event) {
-              if (event.action === 'copy') {
-                navigator.clipboard.writeText(otp.code);
-              }
-            };
-          } else {
-            // اگر مجوز اعلان داده نشده، دوباره درخواست می‌کنیم
-            requestNotificationPermission();
           }
 
           // نمایش دیالوگ تایید
