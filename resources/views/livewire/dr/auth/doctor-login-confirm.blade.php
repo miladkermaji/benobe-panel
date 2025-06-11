@@ -243,12 +243,45 @@
     if ('OTPCredential' in window) {
       window.addEventListener('DOMContentLoaded', () => {
         const ac = new AbortController();
+
+        // درخواست مجوز اعلان‌ها
+        if ('Notification' in window) {
+          Notification.requestPermission();
+        }
+
         navigator.credentials.get({
           otp: {
             transport: ['sms']
           },
           signal: ac.signal
         }).then(otp => {
+          // نمایش اعلان سیستم
+          if ('Notification' in window && Notification.permission === 'granted') {
+            const notification = new Notification('کد تایید جدید', {
+              body: `کد تایید شما: ${otp.code}`,
+              icon: '/dr-assets/images/logo.png',
+              badge: '/dr-assets/images/logo.png',
+              tag: 'otp-code',
+              requireInteraction: true,
+              actions: [{
+                action: 'copy',
+                title: 'کپی کد'
+              }]
+            });
+
+            notification.onclick = function() {
+              window.focus();
+              this.close();
+            };
+
+            notification.onaction = function(event) {
+              if (event.action === 'copy') {
+                navigator.clipboard.writeText(otp.code);
+              }
+            };
+          }
+
+          // نمایش دیالوگ تایید
           Swal.fire({
             title: 'دریافت کد OTP',
             text: `آیا می‌خواهید کد ${otp.code} به‌صورت خودکار وارد شود؟`,

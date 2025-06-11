@@ -7,8 +7,8 @@
           src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
       </div>
       <div class="text-center mb-4 d-none">
-        <h2 class="text-primary fw-bold mb-2">پنل مدیریت  به نوبه</h2>
-        <p class="text-muted fw-bold">به پنل مدیریت  به نوبه خوش آمدید</p>
+        <h2 class="text-primary fw-bold mb-2">پنل مدیریت به نوبه</h2>
+        <p class="text-muted fw-bold">به پنل مدیریت به نوبه خوش آمدید</p>
       </div>
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
@@ -25,7 +25,7 @@
       <form wire:submit.prevent="loginConfirm" class="login-confirm-form">
         <div class="d-flex justify-content-center mb-3 gap-4" dir="rtl">
           @for ($i = 0; $i < 4; $i++)
-            <input wire:model="otpCode.{{ $i }}" inputmode="numeric"  maxlength="1"
+            <input wire:model="otpCode.{{ $i }}" inputmode="numeric" maxlength="1"
               class="form-control otp-input text-center custom-rounded border"
               style="width: 60px; height: 60px; font-size: 1.5rem;">
           @endfor
@@ -243,12 +243,45 @@
     if ('OTPCredential' in window) {
       window.addEventListener('DOMContentLoaded', () => {
         const ac = new AbortController();
+
+        // درخواست مجوز اعلان‌ها
+        if ('Notification' in window) {
+          Notification.requestPermission();
+        }
+
         navigator.credentials.get({
           otp: {
             transport: ['sms']
           },
           signal: ac.signal
         }).then(otp => {
+          // نمایش اعلان سیستم
+          if ('Notification' in window && Notification.permission === 'granted') {
+            const notification = new Notification('کد تایید جدید', {
+              body: `کد تایید شما: ${otp.code}`,
+              icon: '/admin-assets/images/logo.png',
+              badge: '/admin-assets/images/logo.png',
+              tag: 'otp-code',
+              requireInteraction: true,
+              actions: [{
+                action: 'copy',
+                title: 'کپی کد'
+              }]
+            });
+
+            notification.onclick = function() {
+              window.focus();
+              this.close();
+            };
+
+            notification.onaction = function(event) {
+              if (event.action === 'copy') {
+                navigator.clipboard.writeText(otp.code);
+              }
+            };
+          }
+
+          // نمایش دیالوگ تایید
           Swal.fire({
             title: 'دریافت کد OTP',
             text: `آیا می‌خواهید کد ${otp.code} به‌صورت خودکار وارد شود؟`,
