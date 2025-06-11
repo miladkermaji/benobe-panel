@@ -1,5 +1,12 @@
 <script>
   document.addEventListener('livewire:initialized', () => {
+    // درخواست اجازه نوتیفیکیشن
+    if ('Notification' in window) {
+      if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        Notification.requestPermission();
+      }
+    }
+
     Livewire.on('otpSent', (data) => {
       const otpInput = document.querySelector('input[name="otp"]');
       if (otpInput) {
