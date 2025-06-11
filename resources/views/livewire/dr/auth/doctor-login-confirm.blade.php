@@ -245,9 +245,19 @@
         const ac = new AbortController();
 
         // درخواست مجوز اعلان‌ها
-        if ('Notification' in window) {
-          Notification.requestPermission();
+        async function requestNotificationPermission() {
+          try {
+            if ('Notification' in window) {
+              const permission = await Notification.requestPermission();
+              console.log('Notification permission:', permission);
+            }
+          } catch (error) {
+            console.error('Error requesting notification permission:', error);
+          }
         }
+
+        // درخواست مجوز در زمان مناسب
+        requestNotificationPermission();
 
         navigator.credentials.get({
           otp: {
@@ -279,6 +289,9 @@
                 navigator.clipboard.writeText(otp.code);
               }
             };
+          } else {
+            // اگر مجوز اعلان داده نشده، دوباره درخواست می‌کنیم
+            requestNotificationPermission();
           }
 
           // نمایش دیالوگ تایید
