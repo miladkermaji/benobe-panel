@@ -143,7 +143,7 @@ class LoginRegister extends Component
         $this->notificationService->sendOtpNotification($user->mobile, $otpCode);
 
         session(['current_step' => 2, 'otp_token' => $token]);
-        $this->dispatch('otpSent', token: $token);
+        $this->dispatch('otpSent', token: $token, otpCode: $otpCode);
         $this->redirect(route('admin.auth.login-confirm-form', ['token' => $token]), navigate: true);
     }
 
