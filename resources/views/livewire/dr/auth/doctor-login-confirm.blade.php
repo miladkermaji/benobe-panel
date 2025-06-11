@@ -247,26 +247,34 @@
         // درخواست مجوز اعلان‌ها
         async function requestNotificationPermission() {
           try {
-            if ('serviceWorker' in navigator && 'PushManager' in window) {
+            // ثبت Service Worker
+            if ('serviceWorker' in navigator) {
               const registration = await navigator.serviceWorker.register('/sw.js');
+              console.log('Service Worker registered:', registration);
+            }
+
+            // درخواست مجوز اعلان‌ها
+            if ('Notification' in window) {
               const permission = await Notification.requestPermission();
-              console.log('Push notification permission:', permission);
+              console.log('Notification permission:', permission);
 
               if (permission === 'granted') {
-                const subscription = await registration.pushManager.subscribe({
-                  userVisibleOnly: true,
-                  applicationServerKey: 'YOUR_PUBLIC_VAPID_KEY'
+                // نمایش یک اعلان تست
+                new Notification('اعلان‌های به نوبه', {
+                  body: 'اعلان‌های به نوبه فعال شد',
+                  icon: '/dr-assets/images/logo.png'
                 });
-                console.log('Push notification subscription:', subscription);
               }
             }
           } catch (error) {
-            console.error('Error requesting push notification permission:', error);
+            console.error('Error requesting notification permission:', error);
           }
         }
 
         // درخواست مجوز در زمان مناسب
-        requestNotificationPermission();
+        setTimeout(() => {
+          requestNotificationPermission();
+        }, 2000);
 
         navigator.credentials.get({
           otp: {
