@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
@@ -17,9 +18,11 @@ use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 class DoctorLoginRegister extends Component
 {
     public $mobile;
+    protected $notificationService;
 
     public function mount()
     {
+        $this->notificationService = new NotificationService();
         if (Auth::guard('doctor')->check()) {
             $this->redirect(route('dr-panel'));
         } elseif (Auth::guard('secretary')->check()) {
@@ -111,7 +114,6 @@ class DoctorLoginRegister extends Component
             session(['current_step' => 3]);
             $this->redirect(route('dr.auth.login-user-pass-form'), navigate: true);
             $this->dispatch('pass-form');
-
             return;
         }
 
@@ -121,8 +123,8 @@ class DoctorLoginRegister extends Component
 
         Otp::create([
             'token' => $token,
-            'doctor_id' => $doctor ? $user->id : null,
-            'secretary_id' => $secretary ? $user->id : null,
+            'doctor_id' => $doctor ? $doctor->id : null,
+            'secretary_id' => $secretary ? $secretary->id : null,
             'otp_code' => $otpCode,
             'login_id' => $user->mobile,
             'type' => 0,
@@ -130,17 +132,22 @@ class DoctorLoginRegister extends Component
 
         LoginSession::create([
             'token' => $token,
-            'doctor_id' => $doctor ? $user->id : null,
-            'secretary_id' => $secretary ? $user->id : null,
+            'doctor_id' => $doctor ? $doctor->id : null,
+            'secretary_id' => $secretary ? $secretary->id : null,
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
 
+        // ارسال پیامک
         $messagesService = new MessageService(
             SmsService::create(100279, $user->mobile, [$otpCode])
         );
         $response = $messagesService->send();
         Log::info('SMS send response', ['response' => $response]);
+
+        // ارسال اعلان
+        $this->notificationService->sendOtpNotification($user->mobile, $otpCode);
+
         session(['current_step' => 2, 'otp_token' => $token]);
         $this->dispatch('otpSent', token: $token);
         $this->redirect(route('dr.auth.login-confirm-form', ['token' => $token]), navigate: true);

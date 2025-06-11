@@ -10,6 +10,7 @@ use App\Models\LoginSession;
 use App\Models\Admin\Manager;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
@@ -17,9 +18,11 @@ use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 class LoginRegister extends Component
 {
     public $mobile;
+    protected $notificationService;
 
     public function mount()
     {
+        $this->notificationService = new NotificationService();
         if (Auth::guard('manager')->check()) {
             $this->redirect(route('admin-panel'));
         } elseif (session('current_step') === 2) {
@@ -88,7 +91,6 @@ class LoginRegister extends Component
         }
 
         // افزایش تعداد تلاش‌ها
-
         $loginAttempts->incrementLoginAttempt(
             $user->id,
             $formattedMobile,
@@ -97,7 +99,6 @@ class LoginRegister extends Component
             $manager ? $manager->id : null
         );
 
-
         session(['step1_completed' => true, 'login_mobile' => $formattedMobile]);
 
         // بررسی فعال بودن رمز عبور ثابت
@@ -105,7 +106,6 @@ class LoginRegister extends Component
             session(['current_step' => 3]);
             $this->redirect(route('admin.auth.login-user-pass-form'), navigate: true);
             $this->dispatch('pass-form');
-
             return;
         }
 
@@ -128,11 +128,16 @@ class LoginRegister extends Component
             'expires_at' => now()->addMinutes(10),
         ]);
 
+        // ارسال پیامک
         $messagesService = new MessageService(
             SmsService::create(100279, $user->mobile, [$otpCode])
         );
         $response = $messagesService->send();
         Log::info('SMS send response', ['response' => $response]);
+
+        // ارسال اعلان
+        $this->notificationService->sendOtpNotification($user->mobile, $otpCode);
+
         session(['current_step' => 2, 'otp_token' => $token]);
         $this->dispatch('otpSent', token: $token);
         $this->redirect(route('admin.auth.login-confirm-form', ['token' => $token]), navigate: true);
