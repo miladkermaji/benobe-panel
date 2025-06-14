@@ -375,7 +375,7 @@
                     <span class="fw-bold text-end">
                       {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
                       @if ($appointment->patient && $appointment->patient->national_code)
-                        <span class="text-muted">({{ $appointment->patient->national_code }})</span>
+                        <span class="text-muted">کدملی : {{ $appointment->patient->national_code }}</span>
                       @endif
                     </span>
                   </div>

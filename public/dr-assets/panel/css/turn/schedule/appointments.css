@@ -487,7 +487,7 @@
 }
 .reschedule-btn img,
 .cancel-btn img,
-.block-btn img {
+.block-btn img ,.manual-appointment-btn img {
     width: 16px;
     height: 16px;
 }
@@ -728,13 +728,13 @@ textarea.form-control {
     }
     .reschedule-btn,
     .cancel-btn,
-    .block-btn {
+    .block-btn,.manual-appointment-btn {
         width: 28px;
         height: 28px;
     }
     .reschedule-btn img,
     .cancel-btn img,
-    .block-btn img {
+    .block-btn img,.manual-appointment-btn img {
         width: 14px;
         height: 14px;
     }
@@ -796,7 +796,7 @@ textarea.form-control {
     }
     .reschedule-btn img,
     .cancel-btn img,
-    .block-btn img {
+    .block-btn img,.manual-appointment-btn img {
         width: 14px;
         height: 14px;
     }
