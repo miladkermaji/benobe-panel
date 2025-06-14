@@ -15,7 +15,7 @@
           <input type="text" class="my-form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ..."
             wire:model.live.debounce.500ms="searchQuery">
         </div>
-        <button class="btn-primary" x-data @click="$dispatch('open-modal', { name: 'add-sick-modal' })">
+        <button class="btn-primary" x-data @click="$dispatch('openAddSickModal'); $dispatch('open-modal', { name: 'add-sick-modal' })">
           ثبت نوبت دستی
         </button>
       </div>

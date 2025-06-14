@@ -31,6 +31,7 @@ use Exception;
 class AppointmentsList extends Component
 {
     use WithPagination;
+    
     public $isLoadingServices = false;
     public $isLoadingFinalPrice = false;
     public $showPatientForm = false;
@@ -114,6 +115,7 @@ class AppointmentsList extends Component
         'applyDiscount' => 'applyDiscount',
         'get-services' => 'getServices',
         'getAvailableTimesForDate' => 'getAvailableTimesForDate',
+        'openAddSickModal' => 'handleOpenAddSickModal',
         'getAppointmentDetails' => 'getAppointmentDetails',
     ];
     public $showNoResultsAlert = false;
@@ -2163,11 +2165,24 @@ class AppointmentsList extends Component
             $this->showPatientForm = true;
         }
     }
+    public function handleOpenAddSickModal()
+    {
+        $this->resetAddSickModal();
+    }
+    
     public function resetAddSickModal(){
-        $this->selectedUserId = null;
-        $this->showPatientForm = false;
-        $this->manualSearchQuery = '';
-        $this->searchResults = [];
+        $this->reset([
+            'selectedUserId',
+            'firstName',
+            'lastName',
+            'mobile',
+            'nationalCode',
+            'appointmentDate',
+            'appointmentTime',
+            'manualSearchQuery',
+            'searchResults',
+            'showPatientForm'
+        ]);
     }
     public function storeNewUser()
     {
