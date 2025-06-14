@@ -80,6 +80,30 @@
               </button>
             </div>
           </div>
+          <!-- گزارش مالی -->
+          @php
+            $isFutureDate = \Carbon\Carbon::parse($selectedDate)->isFuture();
+            $isToday = \Carbon\Carbon::parse($selectedDate)->isToday();
+            $showReport = !$isFutureDate;
+            
+            // Calculate visited appointments and total income
+            $visitedCount = collect($appointments)->where('status', 'attended')->count();
+            $totalIncome = collect($appointments)->where('status', 'attended')->sum('final_price');
+          @endphp
+          
+          @if($showReport)
+          <div class="financial-report d-flex align-items-center mx-3 px-3 py-1 rounded-3" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
+            <div class="d-none d-md-flex align-items-center me-3">
+              <span class="text-muted ms-2">تعداد ویزیت‌ها:</span>
+              <span class="fw-bold">{{ number_format($visitedCount) }}</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <span class="text-muted ms-2">جمع درآمد:</span>
+              <span class="fw-bold text-success">{{ number_format($totalIncome) }} تومان</span>
+            </div>
+          </div>
+          @endif
+          
           <div class="d-flex">
             <button id="block-users-btn" x-data @click="$dispatch('open-modal', { name: 'block-user-modal' })"
               class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
@@ -99,6 +123,24 @@
           </div>
         </div>
       </div>
+      
+      <!-- گزارش مالی موبایل -->
+      @if($showReport)
+      <div class="d-md-none my-3 p-2 bg-light rounded-3 text-center">
+        <div class="d-flex justify-content-around">
+          <div>
+            <div class="text-muted small">ویزیت‌ها</div>
+            <div class="fw-bold">{{ number_format($visitedCount) }}</div>
+          </div>
+          <div class="vr"></div>
+          <div>
+            <div class="text-muted small">جمع درآمد</div>
+            <div class="fw-bold text-success">{{ number_format($totalIncome) }} تومان</div>
+          </div>
+        </div>
+      </div>
+      @endif
+      
       <div class="appointments-container">
         <div wire:loading wire:target="loadAppointments" class="loading-overlay-custom">
           <div class="spinner-custom"></div>
