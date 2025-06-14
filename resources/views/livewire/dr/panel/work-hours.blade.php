@@ -1012,7 +1012,7 @@
             cleanupModal();
           });
 
-          $(document).on('change', '#select-all-days', function() => {
+          $(document).on('change', '#select-all-days', function() {
             const isChecked = $(this).is(':checked');
             $('#day-checkboxes .form-check:visible input[type="checkbox"]').prop('checked', isChecked);
           });

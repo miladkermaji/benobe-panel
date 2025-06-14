@@ -1,15 +1,47 @@
 <div class="segmented-toggle {{ $attributes->get('class') }}" dir="ltr">
   <div class="toggle-wrapper">
-    <input
+      <input
       {{ $isChecked ? 'checked' : '' }}
       class="toggle-input"
       id="{{ $id }}"
       type="checkbox"
       wire:model.live="autoScheduling"
-      wire:change="updateAutoScheduling"
+      x-data="{ isChecked: {{ $isChecked ? 'true' : 'false' }} }"
+      x-init="
+        isChecked = {{ $isChecked ? 'true' : 'false' }};
+        $watch('isChecked', value => {
+          if (value !== {{ $isChecked ? 'true' : 'false' }}) {
+            $wire.set('autoScheduling', value);
+          }
+        })
+      "
+      x-on:click.prevent="
+        if (isChecked) {
+          Swal.fire({
+            title: 'تغییر به حالت دستی',
+            text: 'آیا مایلید نوبت‌دهی را به حالت دستی تغییر دهید؟ با این تغییر، نوبت‌دهی آنلاین شما غیرفعال شده و تمامی نوبت‌ها بر اساس ساعت کاری تعریف شده و به صورت دستی توسط منشی یا پزشک ثبت خواهد شد.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'بله، تغییر به دستی',
+            cancelButtonText: 'انصراف',
+            reverseButtons: true,
+            customClass: {
+              confirmButton: 'btn btn-danger',
+              cancelButton: 'btn btn-secondary'
+            }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              isChecked = false;
+            } else {
+              isChecked = true;
+            }
+          });
+        } else {
+          isChecked = true;
+        }
+      "
       aria-label="تغییر حالت نوبت‌دهی بین آنلاین + دستی و دستی"
-      {{ $attributes->only(['wire:model', 'wire:change']) }}
-    >
+      {{ $attributes->except('class') }}>
     <div class="toggle-segments">
       <label class="toggle-segment toggle-segment-off {{ !$isChecked ? 'active' : '' }}" for="{{ $id }}" data-value="false">
         دستی
@@ -20,6 +52,10 @@
     </div>
   </div>
 </div>
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@endpush
+
 <style>
   :root {
   /* پالت رنگی اصلی */
@@ -111,6 +147,7 @@
   white-space: nowrap;
   position: relative;
   z-index: 1;
+  user-select: none;
 }
 
 .segmented-toggle .toggle-segment.active {
