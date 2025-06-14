@@ -97,7 +97,7 @@
           
           @if($showReport)
           <!-- گزارش مالی دسکتاپ -->
-          <div class="d-none d-md-flex align-items-center mx-3 px-3 py-1 rounded-3 bg-white border shadow-sm" 
+          <div class="d-none d-md-flex align-items-center mx-3 px-3 py-1 rounded-3 bg-white border shadow-sm " 
                wire:key="financial-report-desktop-{{ $selectedDate }}">
             <div class="d-flex align-items-center">
               <div class="d-flex align-items-center">
