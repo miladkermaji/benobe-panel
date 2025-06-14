@@ -3,6 +3,7 @@
 namespace App\Livewire\Dr\Panel;
 
 use Carbon\Carbon;
+
 use App\Models\User;
 use App\Models\Clinic;
 use Livewire\Component;
@@ -638,48 +639,62 @@ class Workhours extends Component
     public function saveWorkSchedule()
     {
         try {
-            $this->validate([
-                'calendarDays' => 'required|integer|min:1',
-                'holidayAvailability' => 'boolean',
-                'autoScheduling' => 'boolean',
-                'onlineConsultation' => 'boolean',
-            ], [
-                'calendarDays.required' => 'تعداد روزهای تقویم الزامی است',
-                'calendarDays.integer' => 'تعداد روزهای تقویم باید عدد باشد',
-                'calendarDays.min' => 'تعداد روزهای تقویم باید حداقل ۱ باشد',
-                'holidayAvailability.boolean' => 'مقدار در دسترس بودن در تعطیلات نامعتبر است',
-                'autoScheduling.boolean' => 'مقدار نوبت‌دهی خودکار نامعتبر است',
-                'onlineConsultation.boolean' => 'مقدار مشاوره آنلاین نامعتبر است',
-            ]);
-
+            $rules = [];
+            $messages = [];
+    
+            // فقط در حالت نوبت‌دهی آنلاین + دستی، این موارد رو اعتبارسنجی کن
+            if ($this->autoScheduling) {
+                $rules['calendarDays'] = 'required|integer|min:1';
+                $rules['holidayAvailability'] = 'boolean';
+                $messages = [
+                    'calendarDays.required' => 'تعداد روزهای تقویم الزامی است',
+                    'calendarDays.integer' => 'تعداد روزهای تقویم باید عدد باشد',
+                    'calendarDays.min' => 'تعداد روزهای تقویم باید حداقل ۱ باشد',
+                    'holidayAvailability.boolean' => 'مقدار در دسترس بودن در تعطیلات نامعتبر است',
+                ];
+            }
+    
+            $rules['autoScheduling'] = 'boolean';
+            $rules['onlineConsultation'] = 'boolean';
+            $messages['autoScheduling.boolean'] = 'مقدار نوبت‌دهی آنلاین + دستی نامعتبر است';
+            $messages['onlineConsultation.boolean'] = 'مقدار مشاوره آنلاین نامعتبر است';
+    
+            $this->validate($rules, $messages);
+    
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-
+    
             DB::beginTransaction();
             try {
-                $config = DoctorAppointmentConfig::withoutGlobalScopes()
-                    ->updateOrCreate(
-                        [
-                            'doctor_id' => $doctorId,
-                            'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                        ],
-                        [
-                            'calendar_days' => (int) $this->calendarDays,
-                            'holiday_availability' => (bool) $this->holidayAvailability,
-                            'auto_scheduling' => (bool) $this->autoScheduling,
-                            'online_consultation' => (bool) $this->onlineConsultation,
-                        ]
-                    );
-
+                $data = [
+                    'auto_scheduling' => (bool) $this->autoScheduling,
+                    'online_consultation' => (bool) $this->onlineConsultation,
+                ];
+    
+                if ($this->autoScheduling) {
+                    $data['calendar_days'] = (int) $this->calendarDays;
+                    $data['holiday_availability'] = (bool) $this->holidayAvailability;
+                }
+    
+                $config = DoctorAppointmentConfig::withoutGlobalScopes()->updateOrCreate(
+                    [
+                        'doctor_id' => $doctorId,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    ],
+                    $data
+                );
+    
                 // به‌روزرسانی تنظیمات در حافظه
                 $this->appointmentConfig = $config;
-                $this->calendarDays = (int) $this->calendarDays;
-                $this->holidayAvailability = (bool) $this->holidayAvailability;
+                if ($this->autoScheduling) {
+                    $this->calendarDays = (int) $this->calendarDays;
+                    $this->holidayAvailability = (bool) $this->holidayAvailability;
+                }
                 $this->autoScheduling = (bool) $this->autoScheduling;
                 $this->onlineConsultation = (bool) $this->onlineConsultation;
-
+    
                 DB::commit();
-
+    
                 $this->modalMessage = 'تنظیمات با موفقیت ذخیره شد';
                 $this->modalType = 'success';
                 $this->modalOpen = true;
@@ -710,7 +725,7 @@ class Workhours extends Component
                 'auto_scheduling' => $this->autoScheduling ?? null,
                 'online_consultation' => $this->onlineConsultation ?? null
             ]);
-
+    
             $this->modalMessage = $e->getMessage() ?: 'خطا در ذخیره تنظیمات';
             $this->modalType = 'error';
             $this->modalOpen = true;
@@ -1740,31 +1755,51 @@ class Workhours extends Component
         try {
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-
+    
             DB::beginTransaction();
             try {
-                DoctorAppointmentConfig::withoutGlobalScopes()
-                    ->updateOrCreate(
-                        [
-                            'doctor_id' => $doctorId,
-                            'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                        ],
-                        [
-                            'auto_scheduling' => (bool) $this->autoScheduling,
-                            'doctor_id' => $doctorId,
-                            'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                        ]
-                    );
-
+                $data = [
+                    'auto_scheduling' => (bool) $this->autoScheduling,
+                    'doctor_id' => $doctorId,
+                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                ];
+    
+                // فقط در حالت نوبت‌دهی آنلاین + دستی، calendar_days و holiday_availability رو ذخیره کن
+                if ($this->autoScheduling) {
+                    $this->validate([
+                        'calendarDays' => 'required|integer|min:1',
+                        'holidayAvailability' => 'boolean',
+                    ], [
+                        'calendarDays.required' => 'تعداد روزهای تقویم الزامی است',
+                        'calendarDays.integer' => 'تعداد روزهای تقویم باید عدد باشد',
+                        'calendarDays.min' => 'تعداد روزهای تقویم باید حداقل ۱ باشد',
+                    ]);
+    
+                    $data['calendar_days'] = (int) $this->calendarDays;
+                    $data['holiday_availability'] = (bool) $this->holidayAvailability;
+                }
+    
+                DoctorAppointmentConfig::withoutGlobalScopes()->updateOrCreate(
+                    [
+                        'doctor_id' => $doctorId,
+                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    ],
+                    $data
+                );
+    
                 DB::commit();
-
+    
                 $this->dispatch('show-toastr', [
-                    'message' => $this->autoScheduling ? 'نوبت‌دهی خودکار فعال شد' : 'نوبت‌دهی خودکار غیرفعال شد',
+                    'message' => $this->autoScheduling ? 'نوبت‌دهی آنلاین + دستی فعال شد' : 'نوبت‌دهی دستی فعال شد',
                     'type' => 'success',
                 ]);
-
+    
                 // به‌روزرسانی تنظیمات در حافظه
                 $this->appointmentConfig->auto_scheduling = (bool) $this->autoScheduling;
+                if ($this->autoScheduling) {
+                    $this->appointmentConfig->calendar_days = (int) $this->calendarDays;
+                    $this->appointmentConfig->holiday_availability = (bool) $this->holidayAvailability;
+                }
             } catch (\Exception $e) {
                 DB::rollBack();
                 throw $e;
@@ -1775,7 +1810,7 @@ class Workhours extends Component
                 'auto_scheduling' => $this->autoScheduling ?? null,
                 'clinic_id' => $this->activeClinicId ?? null
             ]);
-
+    
             $this->dispatch('show-toastr', [
                 'message' => 'خطا در به‌روزرسانی تنظیمات',
                 'type' => 'error',
