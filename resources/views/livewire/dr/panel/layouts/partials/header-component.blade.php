@@ -200,28 +200,7 @@
           }
         });
       });
-      document.addEventListener('DOMContentLoaded', function() {
-        const floatingBtn = document.querySelector('.floating-btn');
-        const floatingPanel = document.querySelector('.floating-panel');
-        const closeBtn = document.querySelector('.panel-close-btn');
-        // باز کردن پنل با کلیک روی دکمه شناور
-        floatingBtn.addEventListener('click', function() {
-          floatingPanel.classList.toggle('d-none');
-          floatingPanel.classList.toggle('panel-open');
-        });
-        // بستن پنل با کلیک روی دکمه بستن
-        closeBtn.addEventListener('click', function() {
-          floatingPanel.classList.add('d-none');
-          floatingPanel.classList.remove('panel-open');
-        });
-        // بستن پنل با کلیک خارج از آن
-        document.addEventListener('click', function(event) {
-          if (!floatingPanel.contains(event.target) && !floatingBtn.contains(event.target)) {
-            floatingPanel.classList.add('d-none');
-            floatingPanel.classList.remove('panel-open');
-          }
-        });
-      });
+    
     </script>
   </div>
   <div class="quick-access">

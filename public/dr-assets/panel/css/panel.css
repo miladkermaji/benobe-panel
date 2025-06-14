@@ -393,7 +393,6 @@ body {
         border-radius: 5px;
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
         position: absolute;
-        right: 8px;
         top: 42px;
         z-index: 45;
     }
@@ -458,10 +457,12 @@ body {
         display: flex;
         justify-content: center;
     }
+  .px-3{
+    padding-left: .3rem !important;
+    padding-right: .3rem !important;
 
-    .myPanelOption .dropdown {
-        width: 300px !important;
-    }
+  }
+  
 }
 
 @media screen and (max-width: 488px) {
@@ -498,7 +499,7 @@ body {
         border-radius: 5px;
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
         position: absolute;
-        right: -35px;
+        right: -112px;
         top: 42px;
         z-index: 45;
     }
@@ -523,7 +524,7 @@ body {
         border-radius: 5px;
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
         position: absolute;
-        right: -10px;
+        right: -60px;
         top: 42px;
         z-index: 45;
     }
@@ -547,7 +548,7 @@ body {
         border-radius: 5px;
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
         position: absolute;
-        right: 0px;
+        right: -60px;
         top: 42px;
         z-index: 45;
     }
