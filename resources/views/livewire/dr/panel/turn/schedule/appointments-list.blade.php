@@ -91,7 +91,29 @@
                 $totalCount = collect($appointments)->count();
                 $totalIncome = collect($appointments)->where('status', 'attended')->sum('final_price');
                 $jDate = \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate));
-                $formattedDate = $jDate->format('d F Y');
+                
+                // تعیین متن نمایشی بر اساس فیلتر فعال
+                $dateDisplay = $jDate->format('d F Y');
+                
+                // متن فیلترهای تاریخ و وضعیت
+                $filters = [
+                    // فیلترهای تاریخ
+                    'all' => 'همه نوبت ها',
+                    'current_year' => 'سال جاری',
+                    'current_month' => 'ماه جاری',
+                    'current_week' => 'هفته جاری',
+                    // فیلترهای وضعیت
+                    'scheduled' => 'در انتظار',
+                    'cancelled' => 'لغو شده',
+                    'attended' => 'ویزیت شده',
+                    'manual' => 'نوبت‌های دستی'
+                ];
+                
+                if (isset($filters[$dateFilter])) {
+                    $dateDisplay = $filters[$dateFilter];
+                } elseif (isset($filters[$filterStatus])) {
+                    $dateDisplay = $filters[$filterStatus];
+                }
             }
           @endphp
           
@@ -102,7 +124,7 @@
             <div class="d-flex align-items-center">
               <div class="d-flex align-items-center">
                 <span class="text-sm text-muted ms-1">تاریخ:</span>
-                <span class="fw-bold me-1">{{ $formattedDate }}</span>
+                <span class="fw-bold me-1">{{ $dateDisplay ?? $dateFilter ?? $jDate->format('d F Y') }}</span>
               </div>
               <div class="vr mx-2"></div>
               <div class="d-flex align-items-center">
@@ -151,7 +173,30 @@
         <div class="flex items-center justify-between text-xs">
           <div class="flex items-center">
             <span class="text-gray-500 ml-1">تاریخ:</span>
-            <span class="font-medium">{{ $jDate->format('d F') }}</span>
+            <span class="font-medium">
+              @php
+                $filters = [
+                    // فیلترهای تاریخ
+                    'all' => 'همه نوبت ها',
+                    'current_year' => 'سال جاری',
+                    'current_month' => 'ماه جاری',
+                    'current_week' => 'هفته جاری',
+                    // فیلترهای وضعیت
+                    'scheduled' => 'در انتظار',
+                    'cancelled' => 'لغو شده',
+                    'attended' => 'ویزیت شده',
+                    'manual' => 'نوبت‌های دستی'
+                ];
+                
+                if (isset($filters[$dateFilter])) {
+                    echo $filters[$dateFilter];
+                } elseif (isset($filters[$filterStatus])) {
+                    echo $filters[$filterStatus];
+                } else {
+                    echo $jDate->format('d F');
+                }
+              @endphp
+            </span>
           </div>
           <div class="flex items-center">
             <span class="text-gray-500 ml-1">کل:</span>
