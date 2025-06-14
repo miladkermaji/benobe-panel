@@ -110,9 +110,9 @@
                 ];
                 
                 if (isset($filters[$dateFilter])) {
-                    $dateDisplay = $filters[$dateFilter];
+                    $dateDisplay = 'فیلتر: ' . $filters[$dateFilter];
                 } elseif (isset($filters[$filterStatus])) {
-                    $dateDisplay = $filters[$filterStatus];
+                    $dateDisplay = 'فیلتر: ' . $filters[$filterStatus];
                 }
             }
           @endphp
@@ -189,9 +189,9 @@
                 ];
                 
                 if (isset($filters[$dateFilter])) {
-                    echo $filters[$dateFilter];
+                    echo 'فیلتر: ' . $filters[$dateFilter];
                 } elseif (isset($filters[$filterStatus])) {
-                    echo $filters[$filterStatus];
+                    echo 'فیلتر: ' . $filters[$filterStatus];
                 } else {
                     echo $jDate->format('d F');
                 }
