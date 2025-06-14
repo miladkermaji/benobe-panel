@@ -195,7 +195,7 @@ class AppointmentsList extends Component
                 // پاک کردن کش‌های قبلی
                 Cache::forget("appointments_doctor_{$doctor->id}_*");
 
-                // لود همزمان داده‌ها
+               // لود همزمان داده‌ها
                 $this->loadClinics();
                 $this->loadBlockedUsers();
                 $this->loadMessages();

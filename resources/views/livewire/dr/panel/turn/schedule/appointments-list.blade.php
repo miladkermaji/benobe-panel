@@ -86,20 +86,40 @@
             $isToday = \Carbon\Carbon::parse($selectedDate)->isToday();
             $showReport = !$isFutureDate;
             
-            // Calculate visited appointments and total income
-            $visitedCount = collect($appointments)->where('status', 'attended')->count();
-            $totalIncome = collect($appointments)->where('status', 'attended')->sum('final_price');
+            if ($showReport) {
+                $visitedCount = collect($appointments)->where('status', 'attended')->count();
+                $totalCount = collect($appointments)->count();
+                $totalIncome = collect($appointments)->where('status', 'attended')->sum('final_price');
+                $jDate = \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate));
+                $formattedDate = $jDate->format('d F Y');
+            }
           @endphp
           
           @if($showReport)
-          <div class="financial-report d-flex align-items-center mx-3 px-3 py-1 rounded-3" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
-            <div class="d-none d-md-flex align-items-center me-3">
-              <span class="text-muted ms-2">تعداد ویزیت‌ها:</span>
-              <span class="fw-bold">{{ number_format($visitedCount) }}</span>
-            </div>
-            <div class="d-flex align-items-center">
-              <span class="text-muted ms-2">جمع درآمد:</span>
-              <span class="fw-bold text-success">{{ number_format($totalIncome) }} تومان</span>
+          <!-- گزارش مالی دسکتاپ -->
+          <div class="hidden md:flex items-center mx-3 px-4 py-2 rounded-lg bg-white border border-gray-200 shadow-sm" 
+               wire:key="financial-report-{{ $selectedDate }}">
+            <div class="flex items-center space-x-3 space-x-reverse">
+              <div class="flex items-center">
+                <span class="text-sm text-gray-500 ml-1">تاریخ:</span>
+                <span class="font-bold text-gray-800">{{ $formattedDate }}</span>
+              </div>
+              <div class="w-px h-5 bg-gray-200"></div>
+              <div class="flex items-center">
+                <span class="text-sm text-gray-500 ml-1">کل:</span>
+                <span class="font-bold text-blue-600 mr-1">{{ number_format($totalCount) }}</span>
+              </div>
+              <div class="w-px h-5 bg-gray-200"></div>
+              <div class="flex items-center">
+                <span class="text-sm text-gray-500 ml-1">ویزیت:</span>
+                <span class="font-bold text-green-600 mr-1">{{ number_format($visitedCount) }}</span>
+              </div>
+              <div class="w-px h-5 bg-gray-200"></div>
+              <div class="flex items-center">
+                <span class="text-sm text-gray-500 ml-1">درآمد:</span>
+                <span class="font-bold text-green-700 mr-1">{{ number_format($totalIncome) }}</span>
+                <span class="text-xs text-gray-500">تومان</span>
+              </div>
             </div>
           </div>
           @endif
@@ -124,18 +144,27 @@
         </div>
       </div>
       
-      <!-- گزارش مالی موبایل -->
+      <!-- گزارش مالی موبایل و تبلت -->
       @if($showReport)
-      <div class="d-md-none my-3 p-2 bg-light rounded-3 text-center">
-        <div class="d-flex justify-content-around">
-          <div>
-            <div class="text-muted small">ویزیت‌ها</div>
-            <div class="fw-bold">{{ number_format($visitedCount) }}</div>
+      <div class="md:hidden my-2 mx-2 p-2 bg-white rounded-lg border border-gray-100 shadow-sm" 
+           wire:key="mobile-financial-report-{{ $selectedDate }}">
+        <div class="flex items-center justify-between text-xs">
+          <div class="flex items-center">
+            <span class="text-gray-500 ml-1">تاریخ:</span>
+            <span class="font-medium">{{ $jDate->format('d F') }}</span>
           </div>
-          <div class="vr"></div>
-          <div>
-            <div class="text-muted small">جمع درآمد</div>
-            <div class="fw-bold text-success">{{ number_format($totalIncome) }} تومان</div>
+          <div class="flex items-center">
+            <span class="text-gray-500 ml-1">کل:</span>
+            <span class="font-bold text-blue-600 mr-1">{{ $totalCount }}</span>
+          </div>
+          <div class="flex items-center">
+            <span class="text-gray-500 ml-1">ویزیت:</span>
+            <span class="font-bold text-green-600 mr-1">{{ $visitedCount }}</span>
+          </div>
+          <div class="flex items-center">
+            <span class="text-gray-500 ml-1">درآمد:</span>
+            <span class="font-bold text-green-700 mr-1">{{ number_format($totalIncome) }}</span>
+            <span class="text-2xs text-gray-500">تومان</span>
           </div>
         </div>
       </div>
