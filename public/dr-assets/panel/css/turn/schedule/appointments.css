@@ -946,3 +946,43 @@ textarea.form-control {
         margin: 1.75rem auto;
     }
 }
+/* گزارش مالی دسکتاپ */
+.d-none.d-md-block.my-2.mx-3.p-2.bg-white.rounded-lg {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.d-none.d-md-block.my-2.mx-3.p-2.bg-white.rounded-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.d-none.d-md-block.my-2.mx-3.p-2.bg-white.rounded-lg .d-flex.align-items-center {
+    gap: 1rem;
+}
+
+.d-none.d-md-block.my-2.mx-3.p-2.bg-white.rounded-lg .text-sm {
+    font-size: 14px;
+}
+
+.d-none.d-md-block.my-2.mx-3.p-2.bg-white.rounded-lg .font-medium,
+.d-none.d-md-block.my-2.mx-3.p-2.bg-white.rounded-lg .font-bold {
+    font-weight: 600;
+}
+
+.d-none.d-md-block.my-2.mx-3.p-2.bg-white.rounded-lg .text-gray-500 {
+    color: #6b7280;
+}
+
+.d-none.d-md-block.my-2.mx-3.p-2.bg-white.rounded-lg .text-blue-600,
+.d-none.d-md-block.my-2.mx-3.p-2.bg-white.rounded-lg .text-green-600,
+.d-none.d-md-block.my-2.mx-3.p-2.bg-white.rounded-lg .text-green-700 {
+    font-weight: 700;
+}
