@@ -24,7 +24,7 @@
       <x-jalali-calendar-row />
     </div>
     <div class="sicks-content h-100 w-100 position-relative border">
-      <div class="d-flex justify-content-start gap-10 nobat-option w-100" wire:ignore>
+      <div class="d-flex justify-content-start gap-10 nobat-option w-100">
         <div class="d-flex align-items-center m-2 gap-4 justify-content-between w-100">
           <div class="d-flex">
             <div class="turning_filterWrapper__2cOOi">
@@ -98,7 +98,7 @@
           @if($showReport)
           <!-- گزارش مالی دسکتاپ -->
           <div class="d-none d-md-flex align-items-center mx-3 px-3 py-1 rounded-3 bg-white border shadow-sm" 
-               wire:key="financial-report-{{ $selectedDate }}">
+               wire:key="financial-report-desktop-{{ $selectedDate }}">
             <div class="d-flex align-items-center">
               <div class="d-flex align-items-center">
                 <span class="text-sm text-muted ms-1">تاریخ:</span>
@@ -1421,7 +1421,6 @@
               return;
             }
             @this.set('selectedMobiles', mobiles);
-            window.open - modal('block-user-modal');
           });
         } else {
           console.warn('دکمه مسدود کردن کاربران پیدا نشد');

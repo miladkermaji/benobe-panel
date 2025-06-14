@@ -78,6 +78,7 @@ class AppointmentsList extends Component
     public $redirectBack;
     public $discountInputType = 'percentage';
     public $discountInputValue;
+    public $showReport = false;
     #[Validate('required', message: 'لطفاً تاریخ شروع مسدودیت را وارد کنید.')]
     #[Validate('regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', message: 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.')]
     public $blockedAt;
@@ -545,6 +546,9 @@ class AppointmentsList extends Component
         $this->resetPage();
         $this->appointments = [];
         $this->loadAppointments();
+        
+        // Force Livewire to re-render the component
+        $this->dispatch('$refresh');
     }
     public function updatedSelectedClinicId()
     {
