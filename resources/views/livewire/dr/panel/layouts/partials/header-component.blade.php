@@ -12,11 +12,9 @@
               </ol>
             </nav>
           </div>
-
         </div>
       </div>
       <div class="header__left d-flex flex-end item-center margin-top-2">
-
         <div class="myPanelOption p-3 d-md-block d-none">
           <div class="d-flex align-items-center">
             <div class="my-tooltip mx-2">
@@ -113,7 +111,6 @@
             </div>
           </div>
         </div>
-
         <!-- دکمه شناور و پنل بازشونده برای موبایل -->
         <div class="floating-panel-btn d-md-none">
           <x-custom-tooltip title="انتخاب مرکز" placement="top">
@@ -141,7 +138,6 @@
               </svg>
             </button>
           </x-custom-tooltip>
-
           <div class="floating-panel d-none">
             <div class="panel-header">
               <h6 class="fw-bold fs-15 mb-0">انتخاب مرکز</h6>
@@ -211,12 +207,8 @@
             </div>
           </div>
         </div>
-
         <!-- اسکریپت برای مدیریت باز و بسته شدن پنل -->
-
-
         <!-- اسکریپت برای مدیریت باز و بسته شدن پنل -->
-
         <div class="d-flex notif-option px-3">
           <div class="position-relative">
             <!-- آیکون زنگوله -->
@@ -236,7 +228,6 @@
               <path d="M15.02 19.06c0 1.65-1.35 3-3 3-.82 0-1.58-.34-2.12-.88a3.01 3.01 0 01-.88-2.12"
                 stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></path>
             </svg>
-
             <!-- باکس اعلان‌ها -->
             <div x-ref="notificationBox"
               class="notification-box d-none position-absolute bg-white shadow-lg rounded-3 p-3"
@@ -292,8 +283,6 @@
           class="logout" title="خروج"></a>
       </div>
     </div>
-
-
     <script>
       document.addEventListener('livewire:init', function() {
         // بستن باکس اعلان‌ها با کلیک خارج از آن
@@ -301,7 +290,6 @@
           const notificationBox = document.querySelector('.notification-box');
           const bellIcon = document.querySelector('.notif-option svg');
           if (!notificationBox || !bellIcon) return;
-
           if (!notificationBox.contains(event.target) && !bellIcon.contains(event.target)) {
             notificationBox.classList.add('d-none');
           }
@@ -311,19 +299,16 @@
         const floatingBtn = document.querySelector('.floating-btn');
         const floatingPanel = document.querySelector('.floating-panel');
         const closeBtn = document.querySelector('.panel-close-btn');
-
         // باز کردن پنل با کلیک روی دکمه شناور
         floatingBtn.addEventListener('click', function() {
           floatingPanel.classList.toggle('d-none');
           floatingPanel.classList.toggle('panel-open');
         });
-
         // بستن پنل با کلیک روی دکمه بستن
         closeBtn.addEventListener('click', function() {
           floatingPanel.classList.add('d-none');
           floatingPanel.classList.remove('panel-open');
         });
-
         // بستن پنل با کلیک خارج از آن
         document.addEventListener('click', function(event) {
           if (!floatingPanel.contains(event.target) && !floatingBtn.contains(event.target)) {
@@ -335,6 +320,5 @@
     </script>
   </div>
   <div class="quick-access">
-
   </div>
 </div>
