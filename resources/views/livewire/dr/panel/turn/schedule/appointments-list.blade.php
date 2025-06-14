@@ -379,10 +379,11 @@
         </x-slot:body>
       </x-modal>
     </div>
-    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="md" class="modal-lg">
+    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="md" class="modal-lg" x-init="$watch('show', value => { if (value) { $wire.resetAddSickModal(); } })">
       <x-slot:body>
         <form wire:submit.prevent="storeWithUser">
           <div class="row g-3">
+            <!-- بخش جستجو -->
             <div class="col-12">
               <div class="position-relative">
                 <input type="text" class="form-control h-50" wire:model.live.debounce.500ms="manualSearchQuery"
@@ -413,51 +414,78 @@
                 @endif
               </div>
             </div>
-            @if ($selectedUserId)
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">نام</label>
-                <input type="text" class="form-control h-50" wire:model="firstName" required disabled>
-                @error('firstName')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
+
+            <!-- فرم اطلاعات بیمار (فقط وقتی که بیمار انتخاب شده باشد نمایش داده می‌شود) -->
+            @if($showPatientForm && $selectedUserId)
+              <div class="col-12">
+                <div class="border p-3 rounded">
+                  <h6 class="fw-bold mb-3">اطلاعات بیمار</h6>
+                  <div class="row g-3">
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">نام</label>
+                      <input type="text" class="form-control h-50" wire:model="firstName" required disabled>
+                      @error('firstName')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">نام خانوادگی</label>
+                      <input type="text" class="form-control h-50" wire:model="lastName" required disabled>
+                      @error('lastName')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">شماره موبایل</label>
+                      <input type="text" class="form-control h-50" wire:model="mobile" required disabled>
+                      @error('mobile')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">کد ملی</label>
+                      <input type="text" class="form-control h-50" wire:model="nationalCode" required disabled>
+                      @error('nationalCode')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">نام خانوادگی</label>
-                <input type="text" class="form-control h-50" wire:model="lastName" required disabled>
-                @error('lastName')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
+
+              <!-- فرم نوبت‌دهی -->
+              <div class="col-12">
+                <div class="border p-3 rounded">
+                  <h6 class="fw-bold mb-3">زمان نوبت</h6>
+                  <div class="row g-3">
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">تاریخ نوبت</label>
+                      <input type="text" class="form-control h-50" data-jdp wire:model="appointmentDate" required>
+                      @error('appointmentDate')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">ساعت نوبت</label>
+                      <input type="text" class="form-control h-50" wire:model="appointmentTime" required readonly>
+                      @error('appointmentTime')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">شماره موبایل</label>
-                <input type="text" class="form-control h-50" wire:model="mobile" required disabled>
-                @error('mobile')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">کد ملی</label>
-                <input type="text" class="form-control h-50" wire:model="nationalCode" required disabled>
-                @error('nationalCode')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">تاریخ نوبت</label>
-                <input type="text" class="form-control h-50" data-jdp wire:model="appointmentDate" required>
-                @error('appointmentDate')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">ساعت نوبت</label>
-                <input type="text" class="form-control h-50" wire:model="appointmentTime" required readonly>
-                @error('appointmentTime')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-12 mt-5">
-                <button type="submit" class="btn btn-primary w-100 mt-3">ثبت نوبت</button>
+
+              <div class="col-12">
+                <div class="d-flex justify-content-between">
+                  <button type="button" class="btn btn-outline-secondary" wire:click="resetAddSickModal">
+                    تغییر بیمار
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    <span wire:loading.remove>ثبت نوبت</span>
+                    <span wire:loading>در حال ثبت...</span>
+                  </button>
+                </div>
               </div>
             @endif
           </div>

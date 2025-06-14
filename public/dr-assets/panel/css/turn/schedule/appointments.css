@@ -460,7 +460,7 @@
 /* Action buttons */
 .reschedule-btn,
 .cancel-btn,
-.block-btn {
+.block-btn,.manual-appointment-btn {
     width: 32px;
     height: 32px;
     padding: 0;

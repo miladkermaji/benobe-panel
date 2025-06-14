@@ -33,6 +33,7 @@ class AppointmentsList extends Component
     use WithPagination;
     public $isLoadingServices = false;
     public $isLoadingFinalPrice = false;
+    public $showPatientForm = false;
     public $isLoadingDiscount = false;
     public $isSaving = false;
     public $isLoading = false;
@@ -2159,7 +2160,14 @@ class AppointmentsList extends Component
             $this->manualSearchQuery = '';
             $this->searchResults = [];
             $this->selectedUserId = $userId;
+            $this->showPatientForm = true;
         }
+    }
+    public function resetAddSickModal(){
+        $this->selectedUserId = null;
+        $this->showPatientForm = false;
+        $this->manualSearchQuery = '';
+        $this->searchResults = [];
     }
     public function storeNewUser()
     {
