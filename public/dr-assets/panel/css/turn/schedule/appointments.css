@@ -460,7 +460,8 @@
 /* Action buttons */
 .reschedule-btn,
 .cancel-btn,
-.block-btn,.manual-appointment-btn {
+.block-btn,
+.manual-appointment-btn {
     width: 32px;
     height: 32px;
     padding: 0;
@@ -665,7 +666,7 @@ textarea.form-control {
     .top-s-wrapper {
         padding: 0.75rem;
     }
-    .p-3{
+    .p-3 {
         padding: 0.1rem !important;
     }
     .c-a-wrapper {
@@ -709,7 +710,12 @@ textarea.form-control {
         padding: 0.5rem 0.75rem;
     }
     .appointment-card .card-body {
-        padding: 0.5rem;
+        padding: 0.4rem;
+    }
+    .appointment-card .card-body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
     }
     .appointment-card .card-item {
         font-size: 0.75rem;
