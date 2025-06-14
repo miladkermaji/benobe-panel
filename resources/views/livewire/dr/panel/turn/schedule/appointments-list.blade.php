@@ -97,28 +97,28 @@
           
           @if($showReport)
           <!-- گزارش مالی دسکتاپ -->
-          <div class="hidden md:flex items-center mx-3 px-4 py-2 rounded-lg bg-white border border-gray-200 shadow-sm" 
+          <div class="d-none d-md-flex align-items-center mx-3 px-3 py-1 rounded-3 bg-white border shadow-sm" 
                wire:key="financial-report-{{ $selectedDate }}">
-            <div class="flex items-center space-x-3 space-x-reverse">
-              <div class="flex items-center">
-                <span class="text-sm text-gray-500 ml-1">تاریخ:</span>
-                <span class="font-bold text-gray-800">{{ $formattedDate }}</span>
+            <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center">
+                <span class="text-sm text-muted ms-1">تاریخ:</span>
+                <span class="fw-bold me-1">{{ $formattedDate }}</span>
               </div>
-              <div class="w-px h-5 bg-gray-200"></div>
-              <div class="flex items-center">
-                <span class="text-sm text-gray-500 ml-1">کل:</span>
-                <span class="font-bold text-blue-600 mr-1">{{ number_format($totalCount) }}</span>
+              <div class="vr mx-2"></div>
+              <div class="d-flex align-items-center">
+                <span class="text-sm text-muted ms-1">کل:</span>
+                <span class="fw-bold text-primary ms-1">{{ number_format($totalCount) }}</span>
               </div>
-              <div class="w-px h-5 bg-gray-200"></div>
-              <div class="flex items-center">
-                <span class="text-sm text-gray-500 ml-1">ویزیت:</span>
-                <span class="font-bold text-green-600 mr-1">{{ number_format($visitedCount) }}</span>
+              <div class="vr mx-2"></div>
+              <div class="d-flex align-items-center">
+                <span class="text-sm text-muted ms-1">ویزیت:</span>
+                <span class="fw-bold text-success ms-1">{{ number_format($visitedCount) }}</span>
               </div>
-              <div class="w-px h-5 bg-gray-200"></div>
-              <div class="flex items-center">
-                <span class="text-sm text-gray-500 ml-1">درآمد:</span>
-                <span class="font-bold text-green-700 mr-1">{{ number_format($totalIncome) }}</span>
-                <span class="text-xs text-gray-500">تومان</span>
+              <div class="vr mx-2"></div>
+              <div class="d-flex align-items-center">
+                <span class="text-sm text-muted ms-1">درآمد:</span>
+                <span class="fw-bold text-success ms-1">{{ number_format($totalIncome) }}</span>
+                <span class="text-xs text-muted me-1">تومان</span>
               </div>
             </div>
           </div>
