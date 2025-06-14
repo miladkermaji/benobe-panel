@@ -249,18 +249,21 @@
           @if (count($appointments) > 0)
             @foreach ($appointments as $appointment)
               <div class="appointment-card" data-id="{{ $appointment->id }}">
-                <div class="card-header">
-                  <input type="checkbox" class="appointment-checkbox form-check-input"
-                    value="{{ $appointment->id }}" data-status="{{ $appointment->status }}"
-                    data-mobile="{{ $appointment->patient->mobile ?? '' }}"
-                    wire:model="cancelIds.{{ $appointment->id }}">
-                  <span class="fw-bold text-end d-block">
-                    {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
-                    @if ($appointment->patient && $appointment->patient->national_code)
-                      <span class="text-muted">({{ $appointment->patient->national_code }})</span>
-                    @endif
-                  </span>
-                  <button class="toggle-details" type="button">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="checkbox" class="appointment-checkbox form-check-input"
+                      value="{{ $appointment->id }}" 
+                      data-status="{{ $appointment->status }}"
+                      data-mobile="{{ $appointment->patient->mobile ?? '' }}"
+                      wire:model="cancelIds.{{ $appointment->id }}">
+                    <span class="fw-bold text-end">
+                      {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
+                      @if ($appointment->patient && $appointment->patient->national_code)
+                        <span class="text-muted">({{ $appointment->patient->national_code }})</span>
+                      @endif
+                    </span>
+                  </div>
+                  <button class="toggle-details border-0 bg-transparent p-0" type="button">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                       xmlns="http://www.w3.org/2000/svg">
                       <path d="M6 9l6 6 6-6" stroke="#4a5568" stroke-width="2" stroke-linecap="round"

@@ -706,6 +706,9 @@ textarea.form-control {
         border-radius: 0;
         height: 100%;
     }
+    .appointment-card,.sicks-content{
+        border-radius: 0 !important;
+    }
     .appointment-card .card-header {
         padding: 0.5rem 0.75rem;
     }
