@@ -57,7 +57,7 @@
                 </ul>
               </div>
             </div>
-            <div class="d-flex d-none d-md-flex">
+            <div class="d-flex d-none d-md-flex ms-3">
               <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
                 wire:click="$set('dateFilter', 'current_year')">
                 <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
@@ -72,6 +72,11 @@
                 wire:click="$set('dateFilter', 'current_week')">
                 <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
                 <span class="d-none d-md-block">هفته جاری</span>
+              </button>
+              <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm ms-2"
+                wire:click="$set('filterStatus', 'manual')">
+                <img src="{{ asset('dr-assets/icons/add-appointment.svg') }}" alt="" class="me-1">
+                <span class="d-none d-md-block">نوبت‌های دستی</span>
               </button>
             </div>
           </div>
