@@ -311,6 +311,9 @@ body {
         right: inherit !important;
         left: -50px !important;
     }
+    .header{
+        padding: 5px !important;
+    }
     .top-details-sicks-cards .rounded-lg span {
         font-size: 13px;
     }
@@ -457,7 +460,7 @@ body {
     }
 
     .myPanelOption .dropdown {
-        width: 100% !important;
+        width: 300px !important;
     }
 }
 
@@ -467,6 +470,10 @@ body {
         left: 2px !important;
         top: 327px !important;
     }
+   /* .myPanelOption .dropdown-trigger{
+        width: 200px;
+    }
+        */
 }
 
 @media screen and (min-width: 992px) {
@@ -1804,14 +1811,23 @@ img {
 }
 
 /* پاسخ‌گویی به سایزهای مختلف */
-@media (min-width: 768px) {
-    .floating-panel-btn {
-        display: none;
-    }
-}
-
 @media (max-width: 767px) {
     .myPanelOption {
-        display: none !important;
+        padding: 8px !important;
+        display: flex;
+        justify-content: end;
+    }
+    
+    .myPanelOption .dropdown-trigger {
+        max-width: 200px;
+    }
+    .myPanelOption .dropdown{
+        display: flex;
+  justify-content: end;
+    }
+    
+    .myPanelOption .dropdown-menu {
+        width: 100%;
+        max-width: 100%;
     }
 }
