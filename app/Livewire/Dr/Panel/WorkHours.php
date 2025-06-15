@@ -21,7 +21,7 @@ use App\Models\Doctor;
 class Workhours extends Component
 {
     public $calculationMode = 'count'; // حالت پیش‌فرض: تعداد نوبت‌ها
-    public $selectedClinicId; // برای صفحه قبلی (مثل schedule/setting)
+    public $selectedClinicId = 'default';
     public $clinicId; // برای صفحه جدید (مثل activation/workhours/{clinic})
     public $activeClinicId; // پراپرتی مشترک برای کوئری‌ها
     public $appointmentConfig;
@@ -118,9 +118,13 @@ class Workhours extends Component
         'selectedScheduleDays.required' => 'لطفاً حداقل یک روز را انتخاب کنید.',
         'selectedScheduleDays.min' => 'لطفاً حداقل یک روز را انتخاب کنید.',
     ];
-    public function mount($clinicId = null)
+    protected $listeners = [
+        'setSelectedClinicId' => 'setSelectedClinicId',
+    ];
+    public function mount()
     {
-        $this->clinicId = $clinicId;
+        $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+        
         $this->activeClinicId = $clinicId ?? 'default';
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
@@ -231,6 +235,7 @@ class Workhours extends Component
         $this->mount($this->clinicId);
         $this->dispatch('refresh-clinic-data');
     }
+ 
     public function forceRefreshSettings()
     {
         $this->dispatch('refresh-schedule-settings');
