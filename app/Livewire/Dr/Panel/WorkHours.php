@@ -256,78 +256,75 @@ class Workhours extends Component
     public $editingSettingIndex = null; // ایندکس تنظیم در حال ویرایش
     public $editingSetting = null; // داده‌های تنظیم در حال ویرایش
 
-    // اصلاح متد openScheduleModal برای پشتیبانی از حالت ویرایش
-    public function openScheduleModal($day, $index)
-    {
-        $this->scheduleModalDay = $day;
-        $this->scheduleModalIndex = $index;
-        $this->isEditingSchedule = false; // ریست حالت ویرایش
-        $this->editingSettingIndex = null;
-        $this->editingSetting = null;
-        $this->selectedScheduleDays = array_fill_keys(
-            ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-            false
-        );
+public function openScheduleModal($day, $index)
+{
+    $this->scheduleModalDay = $day;
+    $this->scheduleModalIndex = $index;
+    $this->isEditingSchedule = false; // Reset editing state
+    $this->editingSettingIndex = null;
+    $this->editingSetting = null;
+    $this->selectedScheduleDays = array_fill_keys(['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'], false);
 
-        $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
-            ->where('day', $day)
-            ->where(function ($query) {
-                if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
-                } else {
-                    $query->whereNull('clinic_id');
-                }
-            })
-            ->first();
+    $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
+        ->where('day', $day)
+        ->where(function ($query) {
+            if ($this->activeClinicId !== 'default') {
+                $query->where('clinic_id', $this->activeClinicId);
+            } else {
+                $query->whereNull('clinic_id');
+            }
+        })->first();
 
-        if ($schedule && $schedule->appointment_settings) {
-            $settings = is_array($schedule->appointment_settings)
-                ? $schedule->appointment_settings
-                : json_decode($schedule->appointment_settings, true) ?? [];
-            foreach ($settings as $setting) {
-                if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index) {
+    if ($schedule && $schedule->appointment_settings) {
+        $settings = is_array($schedule->appointment_settings)
+            ? $schedule->appointment_settings
+            : json_decode($schedule->appointment_settings, true) ?? [];
+
+        foreach ($settings as $setting) {
+            if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index) {
+                // Check if 'days' key exists before iterating
+                if (isset($setting['days']) && is_array($setting['days'])) {
                     foreach ($setting['days'] as $d) {
                         $this->selectedScheduleDays[$d] = true;
                     }
                 }
             }
         }
-
-        $this->refreshWorkSchedules();
-        $this->dispatch('refresh-schedule-settings');
     }
 
-    // اضافه کردن متد برای شروع ویرایش یک تنظیم
-    public function editScheduleSetting($day, $index)
-    {
-        $this->isEditingSchedule = true;
-        $this->editingSettingIndex = $index;
-        $schedule = collect($this->workSchedules)->firstWhere('day', $day);
-        $settings = $schedule && isset($schedule['appointment_settings'])
-            ? (is_array($schedule['appointment_settings'])
-                ? $schedule['appointment_settings']
-                : json_decode($schedule['appointment_settings'], true) ?? [])
-            : [];
-        $filteredSettings = array_values(array_filter(
-            $settings,
-            fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
-        ));
+    $this->refreshWorkSchedules();
+    $this->dispatch('refresh-schedule-settings');
+}
 
-        if (isset($filteredSettings[$index])) {
-            $this->editingSetting = $filteredSettings[$index];
-            $this->selectedScheduleDays = array_fill_keys(
-                ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-                false
-            );
+  public function editScheduleSetting($day, $index)
+{
+    $this->isEditingSchedule = true;
+    $this->editingSettingIndex = $index;
+    $schedule = collect($this->workSchedules)->firstWhere('day', $day);
+    $settings = $schedule && isset($schedule['appointment_settings'])
+        ? (is_array($schedule['appointment_settings'])
+            ? $schedule['appointment_settings']
+            : json_decode($schedule['appointment_settings'], true) ?? [])
+        : [];
+    $filteredSettings = array_values(array_filter($settings, fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex));
+
+    if (isset($filteredSettings[$index])) {
+        $this->editingSetting = $filteredSettings[$index];
+        $this->selectedScheduleDays = array_fill_keys(['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'], false);
+        
+        // Check if 'days' key exists and is an array before iterating
+        if (isset($this->editingSetting['days']) && is_array($this->editingSetting['days'])) {
             foreach ($this->editingSetting['days'] as $day) {
                 $this->selectedScheduleDays[$day] = true;
             }
-            $this->dispatch('set-schedule-times', [
-                'startTime' => $this->editingSetting['start_time'],
-                'endTime' => $this->editingSetting['end_time']
-            ]);
         }
+        
+        $this->dispatch('set-schedule-times', [
+            'startTime' => $this->editingSetting['start_time'],
+            'endTime' => $this->editingSetting['end_time']
+        ]);
     }
+}
 
     // اصلاح متد saveSchedule برای پشتیبانی از ویرایش
     public function saveSchedule($startTime, $endTime)
