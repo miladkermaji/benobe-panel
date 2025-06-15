@@ -286,7 +286,7 @@
     </div>
 
     <!-- مودال برای انتخاب زمان‌های اورژانسی -->
-    <div>
+    <div wire:ignore>
       <x-modal name="emergency-modal" title="انتخاب زمان‌های اورژانسی" size="medium">
         <x-slot:body>
           <div class="emergency-times-container">
@@ -501,67 +501,8 @@
 
     <script>
       document.addEventListener('livewire:initialized', () => {
-        $(document).ready(function() {
-          function toggleButtonLoading($button, isLoading) {
-            const $loader = $button.find('.loader');
-            const $text = $button.find('.button_text');
-            if (isLoading) {
-              $loader.show();
-              $text.hide();
-              $button.prop('disabled', true);
-            } else {
-              $loader.hide();
-              $text.show();
-              $button.prop('disabled', false);
-            }
-          }
-
-          const excludedButtons = [
-            '.copy-single-slot-btn',
-            '.delete-schedule-setting',
-            '.emergency-slot-btn'
-          ];
-
-          $(document).on('click', '.btn:not(' + excludedButtons.join(',') + ')', function(e) {
-            const $button = $(this);
-            if ($button.find('.loader').length && $button.find('.button_text').length) {
-              toggleButtonLoading($button, true);
-            }
-          });
-
-          Livewire.on('show-toastr', () => {
-            $('.btn').each(function() {
-              const $button = $(this);
-              if ($button.find('.loader').length && $button.find('.button_text').length) {
-                toggleButtonLoading($button, false);
-              }
-            });
-          });
-
-          $(document).on('click', '.remove-row-btn', function(e) {
-            e.preventDefault();
-            const day = $(this).closest('[data-slot-id]').find('.schedule-btn').data('day');
-            const index = $(this).closest('[data-slot-id]').find('.schedule-btn').data('index');
-            if ($(this).is(':disabled')) return;
-            Swal.fire({
-              title: 'آیا مطمئن هستید؟',
-              text: 'این اسلات حذف خواهد شد و قابل بازگشت نیست!',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'بله، حذف کن!',
-              cancelButtonText: 'خیر',
-              reverseButtons: true
-            }).then((result) => {
-              if (result.isConfirmed) {
-                toggleButtonLoading($(this), true);
-                @this.call('removeSlot', day, index);
-              }
-            });
-          });
-
-          Livewire.on('open-modal', (event) => {
+           window.addEventListener('open-modal', event => {
+            
             const modalName = event.detail.name;
             const day = event.detail.day;
             const index = event.detail.index;
@@ -874,6 +815,67 @@
               $('.form-check-input').prop('disabled', false);
             }
           });
+        $(document).ready(function() {
+          function toggleButtonLoading($button, isLoading) {
+            const $loader = $button.find('.loader');
+            const $text = $button.find('.button_text');
+            if (isLoading) {
+              $loader.show();
+              $text.hide();
+              $button.prop('disabled', true);
+            } else {
+              $loader.hide();
+              $text.show();
+              $button.prop('disabled', false);
+            }
+          }
+
+          const excludedButtons = [
+            '.copy-single-slot-btn',
+            '.delete-schedule-setting',
+            '.emergency-slot-btn'
+          ];
+
+          $(document).on('click', '.btn:not(' + excludedButtons.join(',') + ')', function(e) {
+            const $button = $(this);
+            if ($button.find('.loader').length && $button.find('.button_text').length) {
+              toggleButtonLoading($button, true);
+            }
+          });
+
+          Livewire.on('show-toastr', () => {
+            $('.btn').each(function() {
+              const $button = $(this);
+              if ($button.find('.loader').length && $button.find('.button_text').length) {
+                toggleButtonLoading($button, false);
+              }
+            });
+          });
+
+          $(document).on('click', '.remove-row-btn', function(e) {
+            e.preventDefault();
+            const day = $(this).closest('[data-slot-id]').find('.schedule-btn').data('day');
+            const index = $(this).closest('[data-slot-id]').find('.schedule-btn').data('index');
+            if ($(this).is(':disabled')) return;
+            Swal.fire({
+              title: 'آیا مطمئن هستید؟',
+              text: 'این اسلات حذف خواهد شد و قابل بازگشت نیست!',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'بله، حذف کن!',
+              cancelButtonText: 'خیر',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                toggleButtonLoading($(this), true);
+                @this.call('removeSlot', day, index);
+              }
+            });
+          });
+
+        
 
           $(document).on('click', '#saveSchedule', function() {
             const $button = $(this);
