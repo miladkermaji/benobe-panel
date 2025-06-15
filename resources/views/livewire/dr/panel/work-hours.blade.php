@@ -323,7 +323,7 @@
               <!-- بخش انتخاب روزها -->
               <div class="schedule-days-section border-section mb-2">
                 <h6 class="section-title mb-2">انتخاب روزها</h6>
-                <div class="d-flex justify-content-start gap-3 bg-light p-2 border-radius-11 align-items-center">
+                <div class="d-flex justify-content-start gap-3 bg-light p-2 border-radius-11 align-items-center" style="overflow-x: scroll;overflow-y: hidden">
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                     <div class="d-flex align-items-center">
                       <input type="checkbox" class="form-check-input me-1" id="schedule-day-{{ $day }}"
@@ -336,12 +336,12 @@
               </div>
               <!-- بخش تنظیمات زمان‌بندی برای هر روز -->
               <div class="schedule-settings-section border-section">
-                <h6 class="section-title mb-2">تنظیمات زمان‌بندی</h6>
+                <h6 class="section-title mb-2"> باز شدن نوبت ها</h6>
                 @foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day)
                   @if ($selectedScheduleDays[$day])
                     <div class="work-hours-{{ $day }} mb-2 border-333 p-2 border-radius-11">
                       <h6 class="mb-1 font-size-13">
-                        {{ ['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'][$day] }}
+                        {{ ['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'][$day] . " " . "ها" }}
                       </h6>
                       @php
                         $schedule = collect($this->workSchedules)->firstWhere('day', $day);
