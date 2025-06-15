@@ -308,7 +308,7 @@
 
     <!-- مودال تنظیم زمان‌بندی -->
     <div>
-      <x-modal id="scheduleModal" name="schedule-modal" title="تنظیم زمان‌بندی" size="md-medium">
+      <x-modal id="scheduleModal" name="schedule-modal" title="تنظیم زمان‌بندی بازشدن نوبت ها" size="lg">
         <x-slot:body>
           <div class="position-relative">
             <!-- لودینگ -->
@@ -323,104 +323,127 @@
               <!-- بخش انتخاب روزها -->
               <div class="schedule-days-section border-section">
                 <h6 class="section-title">انتخاب روزها</h6>
-                <div class="day-schedule-grid mt-2">
-                  <div class="day-checkbox form-check select-all-checkbox">
-                    <input type="checkbox" class="form-check-input" id="select-all-schedule-days"
-                      wire:model.live="selectAllScheduleModal">
-                    <label class="form-check-label" for="select-all-schedule-days">انتخاب همه</label>
-                  </div>
+                <div class="d-flex justify-content-start mt-2 gap-40 bg-light p-2 border-radius-11 align-items-center">
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
-                    <div class="day-checkbox form-check">
-                      <input type="checkbox" class="form-check-input schedule-day-checkbox"
-                        id="schedule-day-{{ $day }}"
+                    <div class="d-flex align-items-center">
+                      <input type="checkbox" class="form-check-input me-2" id="schedule-day-{{ $day }}"
                         wire:model.live="selectedScheduleDays.{{ $day }}" data-day="{{ $day }}">
-                      <label class="form-check-label"
+                      <label class="mb-0 fw-bold px-0"
                         for="schedule-day-{{ $day }}">{{ $label }}</label>
                     </div>
                   @endforeach
                 </div>
               </div>
-              <!-- بخش تنظیم بازه زمانی -->
-              <div class="timepicker-save-section border-section {{ $isEditingSchedule ? '' : 'd-none' }}"
-                id="timepicker-save-section">
-                <h6 class="section-title">تنظیم بازه زمانی</h6>
-                <div class="timepicker-grid mt-3">
-                  <div class="form-group position-relative timepicker-ui">
-                    <label class="label-top-input-special-takhasos">شروع</label>
-                    <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
-                      id="schedule-start" value="00:00">
-                  </div>
-                  <div class="form-group position-relative timepicker-ui">
-                    <label class="label-top-input-special-takhasos">پایان</label>
-                    <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
-                      id="schedule-end" value="23:59">
-                  </div>
-                  <button type="button"
-                    class="btn my-btn-primary d-flex justify-content-center align-items-center save-schedule-btn"
-                    id="saveSchedule">
-                    <span class="button_text">ذخیره تغییرات</span>
-                    <div class="loader"></div>
-                  </button>
-                </div>
-              </div>
-              <!-- بخش لیست تنظیمات ذخیره‌شده -->
+              <!-- بخش تنظیمات زمان‌بندی برای هر روز -->
               <div class="schedule-settings-section border-section">
-                <h6 class="section-title">تنظیمات ذخیره شده باز شدن نوبت ها</h6>
-                <div class="schedule-settings-list mt-3">
-                  @if ($scheduleModalDay && $scheduleModalIndex !== null)
-                    @php
-                      $schedule = collect($this->workSchedules)->firstWhere('day', $scheduleModalDay);
-                      $settings =
-                          $schedule && isset($schedule['appointment_settings'])
-                              ? (is_array($schedule['appointment_settings'])
-                                  ? $schedule['appointment_settings']
-                                  : json_decode($schedule['appointment_settings'], true) ?? [])
-                              : [];
-                      $filteredSettings = array_values(
-                          array_filter(
-                              $settings,
-                              fn($setting) => isset($setting['work_hour_key']) &&
-                                  (int) $setting['work_hour_key'] === (int) $this->scheduleModalIndex,
-                          ),
-                      );
-                      $dayTranslations = [
-                          'saturday' => 'شنبه',
-                          'sunday' => 'یکشنبه',
-                          'monday' => 'دوشنبه',
-                          'tuesday' => 'سه‌شنبه',
-                          'wednesday' => 'چهارشنبه',
-                          'thursday' => 'پنج‌شنبه',
-                          'friday' => 'جمعه',
-                      ];
-                    @endphp
-                    @if (!empty($filteredSettings))
-                      @foreach ($filteredSettings as $index => $setting)
-                        <div
-                          class="schedule-setting-item d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded"
-                          wire:key="setting-{{ $scheduleModalDay }}-{{ $index }}">
-                          <span class="setting-text flex-grow-1">
-                            از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }}
-                            (روزها:
-                            {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
-                          </span>
-                          <button class="btn btn-outline-primary btn-sm edit-schedule-setting"
-                            wire:click="editScheduleSetting('{{ $scheduleModalDay }}', {{ $index }})">
-                            <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش"
-                              style="width: 16px; height: 16px;">
-                          </button>
+                <h6 class="section-title">تنظیمات زمان‌بندی</h6>
+                @foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day)
+                  @if ($selectedScheduleDays[$day])
+                    <div class="work-hours-{{ $day }} mt-3 border-333 p-3 border-radius-11">
+                      <h6>
+                        {{ ['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'][$day] }}
+                      </h6>
+                      @php
+                        $schedule = collect($this->workSchedules)->firstWhere('day', $day);
+                        $settings =
+                            $schedule && isset($schedule['appointment_settings'])
+                                ? (is_array($schedule['appointment_settings'])
+                                    ? $schedule['appointment_settings']
+                                    : json_decode($schedule['appointment_settings'], true) ?? [])
+                                : [];
+                        $filteredSettings = array_values(
+                            array_filter(
+                                $settings,
+                                fn($setting) => isset($setting['work_hour_key']) &&
+                                    (int) $setting['work_hour_key'] === (int) $this->scheduleModalIndex,
+                            ),
+                        );
+                      @endphp
+                      @if (!empty($filteredSettings))
+                        @foreach ($filteredSettings as $index => $setting)
+                          <div class="mt-3 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11"
+                            wire:key="setting-{{ $day }}-{{ $index }}-{{ $scheduleModalIndex }}">
+                            <div class="d-flex justify-content-start align-items-center gap-4">
+                              <div class="form-group position-relative timepicker-ui">
+                                <label class="label-top-input-special-takhasos">از</label>
+                                <input type="text"
+                                  class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                                  data-timepicker
+                                  wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.{{ $index }}.start_time"
+                                  wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
+                                  value="{{ $setting['start_time'] }}">
+                              </div>
+                              <div class="form-group position-relative timepicker-ui">
+                                <label class="label-top-input-special-takhasos">تا</label>
+                                <input type="text"
+                                  class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                                  data-timepicker
+                                  wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.{{ $index }}.end_time"
+                                  wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
+                                  value="{{ $setting['end_time'] }}">
+                              </div>
+
+                              <div class="form-group position-relative">
+                                <x-custom-tooltip title="حذف تنظیمات" placement="top">
+                                  <button class="btn btn-outline-danger btn-sm delete-schedule-setting"
+                                    wire:click="deleteScheduleSetting('{{ $day }}', {{ $index }})">
+                                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
+                                      style="width: 16px; height: 16px;">
+                                  </button>
+                                </x-custom-tooltip>
+                              </div>
+                            </div>
+                          </div>
+                        @endforeach
+                      @else
+                        <div class="mt-3 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11">
+                          <div class="d-flex justify-content-start align-items-center gap-4">
+                            <div class="form-group position-relative timepicker-ui">
+                              <label class="label-top-input-special-takhasos">از</label>
+                              <input type="text"
+                                class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                                data-timepicker
+                                wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.start_time"
+                                wire:change="autoSaveSchedule('{{ $day }}', 0)">
+                            </div>
+                            <div class="form-group position-relative timepicker-ui">
+                              <label class="label-top-input-special-takhasos">تا</label>
+                              <input type="text"
+                                class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                                data-timepicker
+                                wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.end_time"
+                                wire:change="autoSaveSchedule('{{ $day }}', 0)">
+                            </div>
+                            <div class="form-group position-relative">
+                              <x-custom-tooltip title="ویرایش تنظیمات" placement="top">
+                                <button class="btn btn-outline-primary btn-sm edit-schedule-setting" disabled>
+                                  <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش"
+                                    style="width: 16px; height: 16px;">
+                                </button>
+                              </x-custom-tooltip>
+                            </div>
+                            <div class="form-group position-relative">
+                              <x-custom-tooltip title="حذف تنظیمات" placement="top">
+                                <button class="btn btn-outline-danger btn-sm delete-schedule-setting" disabled>
+                                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
+                                    style="width: 16px; height: 16px;">
+                                </button>
+                              </x-custom-tooltip>
+                            </div>
+                          </div>
                         </div>
-                      @endforeach
-                    @else
-                      <div class="alert alert-info text-center">
-                        هیچ تنظیم زمان‌بندی برای این بازه زمانی ذخیره نشده است.
+                      @endif
+                      <div class="add-new-row mt-3">
+                        <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true" data-placement="bottom"
+                          data-original-title="اضافه کردن تنظیم جدید"
+                          wire:click="addScheduleSetting('{{ $day }}')">
+                          <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="">
+                          <span>افزودن ردیف جدید</span>
+                        </button>
                       </div>
-                    @endif
-                  @else
-                    <div class="alert alert-info text-center">
-                      روز یا بازه زمانی انتخاب نشده است.
                     </div>
                   @endif
-                </div>
+                @endforeach
               </div>
             </div>
           </div>
@@ -748,36 +771,9 @@
               $('#scheduleLoading').removeClass('d-none');
               $('.modal-content-inner').hide();
 
-              const startTimeInput = $(`#morning-start-${day}-${index}`);
-              const endTimeInput = $(`#morning-end-${day}-${index}`);
-              const startTime = startTimeInput.length ? startTimeInput.val() : '00:00';
-              const endTime = endTimeInput.length ? endTimeInput.val() : '23:59';
-
-              if (!startTime || !endTime) {
-                throw new Error('Start or end time is missing');
-              }
-
-              $('#schedule-start').val(startTime);
-              $('#schedule-end').val(endTime);
-
               setTimeout(() => {
                 $('#scheduleLoading').addClass('d-none');
                 $('.modal-content-inner').show();
-
-                const selectAllCheckbox = $('#select-all-schedule-days');
-                const dayCheckboxes = $('.schedule-day-checkbox');
-
-                selectAllCheckbox.prop('checked', false);
-                selectAllCheckbox.off('change').on('change', function() {
-                  const isChecked = $(this).is(':checked');
-                  dayCheckboxes.prop('checked', isChecked);
-                  dayCheckboxes.each(function() {
-                    @this.set(`selectedScheduleDays.${$(this).data('day')}`, isChecked);
-                  });
-                });
-
-                const allChecked = dayCheckboxes.length === dayCheckboxes.filter(':checked').length;
-                selectAllCheckbox.prop('checked', allChecked);
               }, 300);
             } catch (error) {
               console.error('Error in scheduleModal:', error);
@@ -791,7 +787,7 @@
           }
         });
 
-   
+
         $(document).ready(function() {
           function toggleButtonLoading($button, isLoading) {
             const $loader = $button.find('.loader');
@@ -854,82 +850,86 @@
 
 
 
-       Livewire.on('set-schedule-times', (event) => {
-        const startTime = event.startTime || '00:00';
-        const endTime = event.endTime || '23:59';
-        $('#schedule-start').val(startTime);
-        $('#schedule-end').val(endTime);
-        $('#timepicker-save-section').removeClass('d-none');
-    });
+          Livewire.on('set-schedule-times', (event) => {
+            const startTime = event.startTime || '00:00';
+            const endTime = event.endTime || '23:59';
+            $('#schedule-start').val(startTime);
+            $('#schedule-end').val(endTime);
+            $('#timepicker-save-section').removeClass('d-none');
+          });
 
-    $(document).on('click', '#saveSchedule', function() {
-        const $button = $(this);
-        const startTime = $('#schedule-start').val();
-        const endTime = $('#schedule-end').val();
-        const selectedDays = $('.schedule-day-checkbox:checked')
-            .map(function() {
+          $(document).on('click', '#saveSchedule', function() {
+            const $button = $(this);
+            const startTime = $('#schedule-start').val();
+            const endTime = $('#schedule-end').val();
+            const selectedDays = $('.schedule-day-checkbox:checked')
+              .map(function() {
                 return $(this).data('day');
-            })
-            .get();
+              })
+              .get();
 
-        try {
-            if (!selectedDays.length) {
+            try {
+              if (!selectedDays.length) {
                 toastr.error('لطفاً حداقل یک روز انتخاب کنید');
                 return;
-            }
-            if (!startTime) {
+              }
+              if (!startTime) {
                 toastr.error('لطفاً زمان شروع را وارد کنید');
                 return;
-            }
-            if (!endTime) {
+              }
+              if (!endTime) {
                 toastr.error('لطفاً زمان پایان را وارد کنید');
                 return;
-            }
+              }
 
-            const timeToMinutes = (time) => {
+              const timeToMinutes = (time) => {
                 const [hours, minutes] = time.split(':').map(Number);
                 return hours * 60 + minutes;
-            };
+              };
 
-            if (timeToMinutes(endTime) <= timeToMinutes(startTime)) {
+              if (timeToMinutes(endTime) <= timeToMinutes(startTime)) {
                 toastr.error('زمان پایان باید بعد از زمان شروع باشد');
                 return;
-            }
+              }
 
-            selectedDays.forEach(day => {
+              selectedDays.forEach(day => {
                 @this.set(`selectedScheduleDays.${day}`, true);
-            });
+              });
 
-            toggleButtonLoading($button, true);
-            @this.call('saveSchedule', startTime, endTime).then(() => {
+              toggleButtonLoading($button, true);
+              @this.call('saveSchedule', startTime, endTime).then(() => {
                 $('#timepicker-save-section').addClass('d-none');
-            }).catch((error) => {
+              }).catch((error) => {
                 toggleButtonLoading($button, false);
                 console.error('Error saving schedule:', error);
                 toastr.error('خطا در ذخیره زمان‌بندی: ' + (error.message || 'خطای ناشناخته'));
-            });
-        } catch (error) {
-            toggleButtonLoading($button, false);
-            console.error('Error in saveSchedule click:', error);
-            toastr.error('خطا در ذخیره زمان‌بندی: ' + error.message);
-        }
-    });
+              });
+            } catch (error) {
+              toggleButtonLoading($button, false);
+              console.error('Error in saveSchedule click:', error);
+              toastr.error('خطا در ذخیره زمان‌بندی: ' + error.message);
+            }
+          });
 
-    Livewire.on('close-modal', (event) => {
-        const modalName = event?.name || (event && event[0]?.name) || null;
-        if (modalName === 'schedule-modal') {
-            @this.set('scheduleModalDay', null);
-            @this.set('scheduleModalIndex', null);
-            @this.set('selectedScheduleDays', []);
-            @this.set('selectAllScheduleModal', false);
-            @this.set('isEditingSchedule', false);
-            @this.set('editingSettingIndex', null);
-            @this.set('editingSetting', null);
-            $('#schedule-settings-list').empty();
-            $('.form-check-input').prop('disabled', false);
-            $('#timepicker-save-section').addClass('d-none');
-        }
-    });
+          Livewire.on('close-modal', (event) => {
+            const modalName = event?.name || (event && event[0]?.name) || null;
+            if (modalName === 'schedule-modal') {
+              @this.set('scheduleModalDay', null);
+              @this.set('scheduleModalIndex', null);
+              @this.set('selectedScheduleDays', []);
+              @this.set('scheduleSettings', []);
+              @this.set('isEditingSchedule', false);
+              @this.set('editingSettingIndex', null);
+              @this.set('editingSetting', null);
+            }
+          });
+
+          Livewire.on('set-schedule-times', (event) => {
+            const startTime = event.startTime || '00:00';
+            const endTime = event.endTime || '23:59';
+            $(`input[wire\\:model="scheduleSettings.${event.day}.${event.index}.start_time"]`).val(startTime);
+            $(`input[wire\\:model="scheduleSettings.${event.day}.${event.index}.end_time"]`).val(endTime);
+          });
 
           $(document).on('change', '#select-all-days', function() {
             const isChecked = $(this).is(':checked');
