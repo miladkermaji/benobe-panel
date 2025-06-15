@@ -2,7 +2,7 @@
   <div>
 
 
-    <div class="w-100 d-flex justify-content-center mt-5" dir="ltr">
+    <div class="w-100 d-flex justify-content-center mt-3" dir="ltr">
       <div class="auto-scheule-content-top">
         <x-my-toggle-appointment :isChecked="$autoScheduling" id="appointment-toggle"
           day="{{ $autoScheduling ? 'نوبت‌دهی آنلاین + دستی' : 'نوبت‌دهی دستی' }}" class="mt-3 custom-toggle"
@@ -25,9 +25,10 @@
                       style="position: absolute; top: -10px; right: -4px; font-size: 0.85rem; color: var(--text-secondary); z-index: 10; transition: all 0.2s ease;">
                       تعداد روز‌های باز تقویم
                     </label>
-                    <input type="text" inputmode="numeric" pattern="[0-9]*" class="form-control text-center calendar-days-input"
-                      name="calendar_days" placeholder="تعداد روز مورد نظر خود را وارد کنید"
-                      wire:model.live="calendarDays" style="height: 50px; z-index: 1;">
+                    <input type="text" inputmode="numeric" pattern="[0-9]*"
+                      class="form-control text-center calendar-days-input" name="calendar_days"
+                      placeholder="تعداد روز مورد نظر خود را وارد کنید" wire:model.live="calendarDays"
+                      style="height: 50px; z-index: 1;">
                     <span class="input-group-text" style="height: 50px; z-index: 1;">روز</span>
                   </div>
                 </div>
@@ -48,8 +49,11 @@
                   class="d-flex justify-content-start mt-3 gap-40 bg-light p-3 border-radius-11 day-contents align-items-center h-55"
                   id="day-contents-outside">
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $englishDay => $persianDay)
-                    <x-my-check :isChecked="$isWorking[$englishDay]" id="{{ $englishDay }}" day="{{ $persianDay }}"
-                      wire:model.live="isWorking.{{ $englishDay }}" />
+                    <div class="d-flex align-items-center">
+                      <input type="checkbox" class="form-check-input me-2" id="{{ $englishDay }}"
+                        wire:model.live="isWorking.{{ $englishDay }}">
+                      <label class="mb-0 fw-bold px-0" for="{{ $englishDay }}">{{ $persianDay }}</label>
+                    </div>
                   @endforeach
                 </div>
                 <div id="work-hours" class="mt-4">
@@ -505,16 +509,18 @@
           </div>
           <div class="modal-body">
             <p>روزهایی که می‌خواهید برنامه کاری به آن‌ها کپی شود را انتخاب کنید:</p>
-            <div class="form-check mb-3">
-              <x-my-check-box :is-checked="$selectAllCopyModal" id="select-all-days" day="انتخاب همه"
-                wire:model.live="selectAllCopyModal" />
+            <div class="mb-3">
+              <input type="checkbox" class="form-check-input me-2" id="select-all-days"
+                wire:model.live="selectAllCopyModal">
+              <label class="fw-bold mb-0" for="select-all-days">انتخاب همه</label>
             </div>
             <div class="d-flex flex-column gap-2" id="day-checkboxes">
               @foreach (['saturday' => 'شنبه', 'sunday' => 'یک‌شنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                 @if ($day !== $sourceDay)
                   <div class="form-check d-flex align-items-center" data-day="{{ $day }}">
-                    <x-my-check-box :is-checked="isset($selectedDays[$day]) && $selectedDays[$day]" id="day-{{ $day }}" day="{{ $label }}"
-                      wire:model.live="selectedDays.{{ $day }}" data-day="{{ $day }}" />
+                    <input type="checkbox" class="form-check-input me-2" id="day-{{ $day }}"
+                      wire:model.live="selectedDays.{{ $day }}" data-day="{{ $day }}">
+                    <label class="fw-bold mb-0" for="day-{{ $day }}">{{ $label }}</label>
                   </div>
                 @endif
               @endforeach
