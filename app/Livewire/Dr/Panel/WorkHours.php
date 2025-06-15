@@ -977,7 +977,7 @@ class Workhours extends Component
             $sourceAppointmentSettings = $sourceSchedule['appointment_settings'] ?? [];
             $sourceEmergencyTimes = $sourceSchedule['emergency_times'] ?? [];
             if (empty($sourceWorkHours[$sourceIndex])) {
-                throw new \Exception('اسلات انتخاب‌شده برای کپی یافت نشد');
+                throw new \Exception('زمان انتخاب‌شده برای کپی یافت نشد');
             }
             $sourceSlot = $sourceWorkHours[$sourceIndex];
             $conflicts = [];
@@ -1621,9 +1621,9 @@ class Workhours extends Component
                 }
                 $existingWorkHours = is_array($workSchedule->work_hours) ? $workSchedule->work_hours : json_decode($workSchedule->work_hours, true) ?? [];
                 if (!isset($existingWorkHours[$index])) {
-                    throw new \Exception('اسلات انتخاب‌شده یافت نشد');
+                    throw new \Exception('زمان انتخاب‌شده یافت نشد');
                 }
-                // حذف اسلات و بازسازی آرایه
+                // حذف زمان و بازسازی آرایه
                 unset($existingWorkHours[$index]);
                 $updatedWorkHours = array_values($existingWorkHours);
                 // به‌روزرسانی رکورد
@@ -1634,7 +1634,7 @@ class Workhours extends Component
                 // به‌روزرسانی آرایه slots
                 unset($this->slots[$day][$index]);
                 $this->slots[$day] = array_values($this->slots[$day]);
-                // اگر هیچ اسلاتی باقی نمانده، یک اسلات خالی اضافه کن
+                // اگر هیچ زمانی باقی نمانده، یک زمان خالی اضافه کن
                 if (empty($this->slots[$day])) {
                     $this->slots[$day][] = [
                         'id' => null,
@@ -1644,7 +1644,7 @@ class Workhours extends Component
                     ];
                 }
                 DB::commit();
-                $this->modalMessage = 'اسلات با موفقیت حذف شد';
+                $this->modalMessage = 'زمان با موفقیت حذف شد';
                 $this->modalType = 'success';
                 $this->modalOpen = true;
                 $this->dispatch('show-toastr', [
@@ -1662,7 +1662,7 @@ class Workhours extends Component
                 'index' => $index,
                 'doctor_id' => $doctorId ?? null
             ]);
-            $this->modalMessage = $e->getMessage() ?: 'خطا در حذف اسلات';
+            $this->modalMessage = $e->getMessage() ?: 'خطا در حذف زمان';
             $this->modalType = 'error';
             $this->modalOpen = true;
             $this->dispatch('show-toastr', [
