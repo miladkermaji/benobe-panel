@@ -286,11 +286,11 @@
     </div>
 
     <!-- مودال برای انتخاب زمان‌های اورژانسی -->
-    <div wire:ignore>
+    <div>
       <x-modal name="emergency-modal" title="انتخاب زمان‌های اورژانسی" size="medium">
         <x-slot:body>
           <div class="emergency-times-container">
-            <div class="d-flex flex-wrap gap-2 justify-content-center" id="emergency-times" wire:ignore>
+            <div class="d-flex flex-wrap gap-2 justify-content-center" id="emergency-times">
               <!-- زمان‌ها به‌صورت داینامیک با جاوااسکریپت اضافه می‌شن -->
             </div>
           </div>
@@ -307,8 +307,8 @@
     </div>
 
     <!-- مودال تنظیم زمان‌بندی -->
-    <div wire:ignore>
-      <x-modal name="schedule-modal" title="تنظیم زمان‌بندی" size="md-medium">
+    <div>
+      <x-modal id="schedule-modal" name="schedule-modal" title="تنظیم زمان‌بندی" size="md-medium">
         <x-slot:body>
           <div class="position-relative">
             <!-- لودینگ -->
@@ -472,7 +472,7 @@
     </div>
 
     <!-- مودال کپی برنامه کاری -->
-    <div wire:ignore>
+    <div>
       <x-modal name="checkbox-modal" title="کپی برنامه کاری" size="sm">
         <x-slot:body>
           <p>روزهایی که می‌خواهید برنامه کاری به آن‌ها کپی شود را انتخاب کنید:</p>
