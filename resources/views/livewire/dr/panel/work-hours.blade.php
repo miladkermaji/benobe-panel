@@ -340,8 +340,9 @@
                   @endforeach
                 </div>
               </div>
-              <!-- بخش تنظیم بازه زمانی و دکمه ذخیره -->
-              <div class="timepicker-save-section border-section">
+              <!-- بخش تنظیم بازه زمانی -->
+              <div class="timepicker-save-section border-section {{ $isEditingSchedule ? '' : 'd-none' }}"
+                id="timepicker-save-section">
                 <h6 class="section-title">تنظیم بازه زمانی</h6>
                 <div class="timepicker-grid mt-3">
                   <div class="form-group position-relative timepicker-ui">
@@ -394,15 +395,18 @@
                     @endphp
                     @if (!empty($filteredSettings))
                       @foreach ($filteredSettings as $index => $setting)
-                        <div class="schedule-setting-item"
+                        <div
+                          class="schedule-setting-item d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded"
                           wire:key="setting-{{ $scheduleModalDay }}-{{ $index }}">
-                          <span class="setting-text">
-                            از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }} (روزها:
+                          <span class="setting-text flex-grow-1">
+                            از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }}
+                            (روزها:
                             {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
                           </span>
-                          <button class="btn btn-light delete-schedule-setting" data-day="{{ $scheduleModalDay }}"
-                            data-index="{{ $index }}">
-                            <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                          <button class="btn btn-outline-primary btn-sm edit-schedule-setting"
+                            wire:click="editScheduleSetting('{{ $scheduleModalDay }}', {{ $index }})">
+                            <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش"
+                              style="width: 16px; height: 16px;">
                           </button>
                         </div>
                       @endforeach
@@ -423,7 +427,6 @@
         </x-slot:body>
       </x-modal>
     </div>
-
     <!-- مودال ماشین‌حساب -->
     <div>
       <x-modal name="calculator-modal" title="انتخاب تعداد نوبت یا زمان ویزیت" size="sm">
@@ -501,320 +504,294 @@
 
     <script>
       document.addEventListener('livewire:initialized', () => {
-           window.addEventListener('open-modal', event => {
-            
-            const modalName = event.detail.name;
-            const day = event.detail.day;
-            const index = event.detail.index;
+        window.addEventListener('open-modal', event => {
 
-            if (modalName === 'calculator-modal') {
-              try {
-                @this.set('calculator.day', day);
-                @this.set('calculator.index', index);
-                const startTime = $(`#morning-start-${day}-${index}`).val();
-                const endTime = $(`#morning-end-${day}-${index}`).val();
-                if (!startTime || !endTime) {
-                  @this.set('modalMessage', 'لطفاً ابتدا زمان شروع و پایان را وارد کنید');
-                  @this.set('modalType', 'error');
-                  @this.set('modalOpen', true);
-                  return;
+          const modalName = event.detail.name;
+          const day = event.detail.day;
+          const index = event.detail.index;
+
+          if (modalName === 'calculator-modal') {
+            try {
+              @this.set('calculator.day', day);
+              @this.set('calculator.index', index);
+              const startTime = $(`#morning-start-${day}-${index}`).val();
+              const endTime = $(`#morning-end-${day}-${index}`).val();
+              if (!startTime || !endTime) {
+                @this.set('modalMessage', 'لطفاً ابتدا زمان شروع و پایان را وارد کنید');
+                @this.set('modalType', 'error');
+                @this.set('modalOpen', true);
+                return;
+              }
+              @this.set('calculator.start_time', startTime);
+              @this.set('calculator.end_time', endTime);
+              const $appointmentCount = $('#appointment-count');
+              const $timeCount = $('#time-count');
+              const $countRadio = $('#count-radio');
+              const $timeRadio = $('#time-radio');
+              const timeToMinutes = (time) => {
+                const [hours, minutes] = time.split(':').map(Number);
+                return hours * 60 + minutes;
+              };
+              const totalMinutes = timeToMinutes(endTime) - timeToMinutes(startTime);
+              if (totalMinutes <= 0) {
+                @this.set('modalMessage', 'زمان پایان باید بعد از زمان شروع باشد');
+                @this.set('modalType', 'error');
+                @this.set('modalOpen', true);
+                return;
+              }
+              const currentCount = @this.get('calculator.appointment_count');
+              const currentTime = @this.get('calculator.time_per_appointment');
+              if (currentCount) {
+                $appointmentCount.val(currentCount);
+                $timeCount.val(Math.round(totalMinutes / currentCount));
+              } else if (currentTime) {
+                $timeCount.val(currentTime);
+                $appointmentCount.val(Math.round(totalMinutes / currentTime));
+              } else {
+                $appointmentCount.val('');
+                $timeCount.val('');
+              }
+              $appointmentCount.on('focus', function() {
+                $countRadio.prop('checked', true).trigger('change');
+                $timeRadio.prop('checked', false);
+                $appointmentCount.prop('disabled', false);
+                $timeCount.prop('disabled', true);
+                @this.set('calculationMode', 'count');
+              });
+              $timeCount.on('focus', function() {
+                $timeRadio.prop('checked', true).trigger('change');
+                $countRadio.prop('checked', false);
+                $timeCount.prop('disabled', false);
+                $appointmentCount.prop('disabled', true);
+                @this.set('calculationMode', 'time');
+              });
+              $appointmentCount.on('input', function() {
+                const count = parseInt($(this).val());
+                if (count && !isNaN(count) && count > 0) {
+                  const timePerAppointment = Math.round(totalMinutes / count);
+                  $timeCount.val(timePerAppointment);
+                  @this.set('calculator.appointment_count', count);
+                  @this.set('calculator.time_per_appointment', timePerAppointment);
+                } else {
+                  $timeCount.val('');
+                  @this.set('calculator.appointment_count', null);
+                  @this.set('calculator.time_per_appointment', null);
                 }
-                @this.set('calculator.start_time', startTime);
-                @this.set('calculator.end_time', endTime);
-                const $appointmentCount = $('#appointment-count');
-                const $timeCount = $('#time-count');
-                const $countRadio = $('#count-radio');
-                const $timeRadio = $('#time-radio');
-                const timeToMinutes = (time) => {
-                  const [hours, minutes] = time.split(':').map(Number);
-                  return hours * 60 + minutes;
-                };
-                const totalMinutes = timeToMinutes(endTime) - timeToMinutes(startTime);
-                if (totalMinutes <= 0) {
-                  @this.set('modalMessage', 'زمان پایان باید بعد از زمان شروع باشد');
-                  @this.set('modalType', 'error');
-                  @this.set('modalOpen', true);
-                  return;
-                }
-                const currentCount = @this.get('calculator.appointment_count');
-                const currentTime = @this.get('calculator.time_per_appointment');
-                if (currentCount) {
-                  $appointmentCount.val(currentCount);
-                  $timeCount.val(Math.round(totalMinutes / currentCount));
-                } else if (currentTime) {
-                  $timeCount.val(currentTime);
-                  $appointmentCount.val(Math.round(totalMinutes / currentTime));
+              });
+              $timeCount.on('input', function() {
+                const time = parseInt($(this).val());
+                if (time && !isNaN(time) && time > 0) {
+                  const appointmentCount = Math.round(totalMinutes / time);
+                  $appointmentCount.val(appointmentCount);
+                  @this.set('calculator.time_per_appointment', time);
+                  @this.set('calculator.appointment_count', appointmentCount);
                 } else {
                   $appointmentCount.val('');
-                  $timeCount.val('');
+                  @this.set('calculator.appointment_count', null);
+                  @this.set('calculator.time_per_appointment', null);
                 }
-                $appointmentCount.on('focus', function() {
-                  $countRadio.prop('checked', true).trigger('change');
-                  $timeRadio.prop('checked', false);
+              });
+              $countRadio.on('change', function() {
+                if ($(this).is(':checked')) {
                   $appointmentCount.prop('disabled', false);
                   $timeCount.prop('disabled', true);
                   @this.set('calculationMode', 'count');
-                });
-                $timeCount.on('focus', function() {
-                  $timeRadio.prop('checked', true).trigger('change');
-                  $countRadio.prop('checked', false);
+                }
+              });
+              $timeRadio.on('change', function() {
+                if ($(this).is(':checked')) {
                   $timeCount.prop('disabled', false);
                   $appointmentCount.prop('disabled', true);
                   @this.set('calculationMode', 'time');
-                });
-                $appointmentCount.on('input', function() {
-                  const count = parseInt($(this).val());
-                  if (count && !isNaN(count) && count > 0) {
-                    const timePerAppointment = Math.round(totalMinutes / count);
-                    $timeCount.val(timePerAppointment);
-                    @this.set('calculator.appointment_count', count);
-                    @this.set('calculator.time_per_appointment', timePerAppointment);
-                  } else {
-                    $timeCount.val('');
-                    @this.set('calculator.appointment_count', null);
-                    @this.set('calculator.time_per_appointment', null);
-                  }
-                });
-                $timeCount.on('input', function() {
-                  const time = parseInt($(this).val());
-                  if (time && !isNaN(time) && time > 0) {
-                    const appointmentCount = Math.round(totalMinutes / time);
-                    $appointmentCount.val(appointmentCount);
-                    @this.set('calculator.time_per_appointment', time);
-                    @this.set('calculator.appointment_count', appointmentCount);
-                  } else {
-                    $appointmentCount.val('');
-                    @this.set('calculator.appointment_count', null);
-                    @this.set('calculator.time_per_appointment', null);
-                  }
-                });
-                $countRadio.on('change', function() {
-                  if ($(this).is(':checked')) {
-                    $appointmentCount.prop('disabled', false);
-                    $timeCount.prop('disabled', true);
-                    @this.set('calculationMode', 'count');
-                  }
-                });
-                $timeRadio.on('change', function() {
-                  if ($(this).is(':checked')) {
-                    $timeCount.prop('disabled', false);
-                    $appointmentCount.prop('disabled', true);
-                    @this.set('calculationMode', 'time');
-                  }
-                });
-                const calculationMode = @this.get('calculationMode');
-                if (calculationMode === 'count') {
-                  $countRadio.prop('checked', true);
-                  $appointmentCount.prop('disabled', false);
-                  $timeCount.prop('disabled', true);
-                } else {
-                  $timeRadio.prop('checked', true);
-                  $timeCount.prop('disabled', false);
-                  $appointmentCount.prop('disabled', true);
                 }
-              } catch (error) {
-                console.error('Error in CalculatorModal:', error);
-                window.dispatchEvent(new CustomEvent('close-modal', {
-                  detail: {
-                    name: 'calculator-modal'
-                  }
-                }));
+              });
+              const calculationMode = @this.get('calculationMode');
+              if (calculationMode === 'count') {
+                $countRadio.prop('checked', true);
+                $appointmentCount.prop('disabled', false);
+                $timeCount.prop('disabled', true);
+              } else {
+                $timeRadio.prop('checked', true);
+                $timeCount.prop('disabled', false);
+                $appointmentCount.prop('disabled', true);
               }
+            } catch (error) {
+              console.error('Error in CalculatorModal:', error);
+              window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: {
+                  name: 'calculator-modal'
+                }
+              }));
             }
+          }
 
-            if (modalName === 'checkbox-modal') {
-              try {
-                @this.set('copySource.day', day);
-                @this.set('copySource.index', index);
-                @this.set('selectedDays', []);
-                @this.set('selectAllCopyModal', false);
-                setTimeout(() => {
-                  const selector = `#day-checkboxes .form-check[data-day="${day}"]`;
-                  const $element = $(selector);
-                  if ($element.length > 0) {
-                    $element.hide();
-                  }
-                }, 100);
-              } catch (error) {
-                console.error('Error setting copySource:', error);
-                window.dispatchEvent(new CustomEvent('close-modal', {
-                  detail: {
-                    name: 'checkbox-modal'
-                  }
-                }));
-              }
+          if (modalName === 'checkbox-modal') {
+            try {
+              @this.set('copySource.day', day);
+              @this.set('copySource.index', index);
+              @this.set('selectedDays', []);
+              @this.set('selectAllCopyModal', false);
+              setTimeout(() => {
+                const selector = `#day-checkboxes .form-check[data-day="${day}"]`;
+                const $element = $(selector);
+                if ($element.length > 0) {
+                  $element.hide();
+                }
+              }, 100);
+            } catch (error) {
+              console.error('Error setting copySource:', error);
+              window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: {
+                  name: 'checkbox-modal'
+                }
+              }));
             }
+          }
 
-            if (modalName === 'emergency-modal') {
-              try {
-                @this.set('isEmergencyModalOpen', true);
-                @this.set('emergencyModalDay', day);
-                @this.set('emergencyModalIndex', index);
-                const $startTimeInput = $(`#morning-start-${day}-${index}`);
-                const $endTimeInput = $(`#morning-end-${day}-${index}`);
-                const $maxAppointmentsInput = $(`#morning-patients-${day}-${index}`);
-                if (!$startTimeInput.length || !$endTimeInput.length || !$maxAppointmentsInput.length) {
-                  @this.set('modalMessage', 'خطا: ورودی‌های زمان یا تعداد نوبت یافت نشدند');
-                  @this.set('modalType', 'error');
-                  @this.set('modalOpen', true);
-                  window.dispatchEvent(new CustomEvent('close-modal', {
-                    detail: {
-                      name: 'emergency-modal'
-                    }
-                  }));
-                  return;
-                }
-                const startTime = $startTimeInput.val();
-                const endTime = $endTimeInput.val();
-                const maxAppointments = $maxAppointmentsInput.val();
-                if (!startTime || !endTime || !maxAppointments) {
-                  @this.set('modalMessage', 'لطفاً ابتدا زمان شروع، پایان و تعداد نوبت را وارد کنید');
-                  @this.set('modalType', 'error');
-                  @this.set('modalOpen', true);
-                  window.dispatchEvent(new CustomEvent('close-modal', {
-                    detail: {
-                      name: 'emergency-modal'
-                    }
-                  }));
-                  return;
-                }
-                const timeToMinutes = (time) => {
-                  const [hours, minutes] = time.split(':').map(Number);
-                  return hours * 60 + minutes;
-                };
-                const minutesToTime = (minutes) => {
-                  const hours = Math.floor(minutes / 60).toString().padStart(2, '0');
-                  const mins = (minutes % 60).toString().padStart(2, '0');
-                  return `${hours}:${mins}`;
-                };
-                const totalMinutes = timeToMinutes(endTime) - timeToMinutes(startTime);
-                const slotDuration = Math.floor(totalMinutes / maxAppointments);
-                const times = [];
-                for (let i = 0; i < maxAppointments; i++) {
-                  const start = timeToMinutes(startTime) + (i * slotDuration);
-                  times.push(minutesToTime(start));
-                }
-                let currentEmergencyTimes = [];
-                try {
-                  const workSchedule = @this.workSchedules.find(s => s.day === day);
-                  currentEmergencyTimes = workSchedule && workSchedule.emergency_times ? workSchedule
-                    .emergency_times : [];
-                } catch (error) {
-                  console.error('Error accessing emergency_times:', error);
-                  currentEmergencyTimes = [];
-                }
-                @this.set('emergencyTimes', currentEmergencyTimes);
-                const $timesContainer = $('#emergency-times');
-                $timesContainer.empty();
-                times.forEach(time => {
-                  const isSaved = currentEmergencyTimes.includes(time);
-                  const $button = $(`
-                <button type="button" class="btn btn-sm time-slot-btn ${isSaved ? 'btn-primary' : 'btn-outline-primary'}" data-time="${time}">
-                  ${time}
-                </button>
-              `);
-                  $timesContainer.append($button);
-                });
-                $timesContainer.show();
-                $timesContainer.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
-                  const $btn = $(this);
-                  const time = $btn.data('time');
-                  const isSelected = $btn.hasClass('btn-primary');
-                  if (isSelected) {
-                    $btn.removeClass('btn-primary').addClass('btn-outline-primary');
-                    @this.emergencyTimes = @this.emergencyTimes.filter(t => t !== time);
-                  } else {
-                    $btn.removeClass('btn-outline-primary').addClass('btn-primary');
-                    @this.emergencyTimes = [...@this.emergencyTimes, time];
-                  }
-                });
-                setTimeout(() => {}, 100);
-              } catch (error) {
-                console.error('Error in emergencyModal:', error);
+          if (modalName === 'emergency-modal') {
+            try {
+              @this.set('isEmergencyModalOpen', true);
+              @this.set('emergencyModalDay', day);
+              @this.set('emergencyModalIndex', index);
+              const $startTimeInput = $(`#morning-start-${day}-${index}`);
+              const $endTimeInput = $(`#morning-end-${day}-${index}`);
+              const $maxAppointmentsInput = $(`#morning-patients-${day}-${index}`);
+              if (!$startTimeInput.length || !$endTimeInput.length || !$maxAppointmentsInput.length) {
+                @this.set('modalMessage', 'خطا: ورودی‌های زمان یا تعداد نوبت یافت نشدند');
+                @this.set('modalType', 'error');
+                @this.set('modalOpen', true);
                 window.dispatchEvent(new CustomEvent('close-modal', {
                   detail: {
                     name: 'emergency-modal'
                   }
                 }));
+                return;
               }
-            }
-
-            if (modalName === 'schedule-modal') {
-              try {
-                @this.call('openScheduleModal', day, index);
-                $('#scheduleLoading').removeClass('d-none');
-                $('.modal-content-inner').hide();
-                const startTimeInput = $(`#morning-start-${day}-${index}`);
-                const endTimeInput = $(`#morning-end-${day}-${index}`);
-                const startTime = startTimeInput.length ? startTimeInput.val() : '00:00';
-                const endTime = endTimeInput.length ? endTimeInput.val() : '23:59';
-                if (!startTime || !endTime) {
-                  throw new Error('Start or end time is missing');
-                }
-                $('#schedule-start').val(startTime);
-                $('#schedule-end').val(endTime);
-                setTimeout(() => {
-                  $('#scheduleLoading').addClass('d-none');
-                  $('.modal-content-inner').show();
-                  const selectAllCheckbox = $('#select-all-schedule-days');
-                  const dayCheckboxes = $('.schedule-day-checkbox');
-                  selectAllCheckbox.prop('checked', false);
-                  selectAllCheckbox.off('change').on('change', function() {
-                    const isChecked = $(this).is(':checked');
-                    dayCheckboxes.prop('checked', isChecked);
-                    dayCheckboxes.each(function() {
-                      @this.set(`selectedScheduleDays.${$(this).data('day')}`, isChecked);
-                    });
-                  });
-                  const allChecked = dayCheckboxes.length === dayCheckboxes.filter(':checked').length;
-                  selectAllCheckbox.prop('checked', allChecked);
-                }, 300);
-              } catch (error) {
-                console.error('Error in scheduleModal:', error);
-                toastr.error('خطا در بارگذاری مودال: ' + error.message);
+              const startTime = $startTimeInput.val();
+              const endTime = $endTimeInput.val();
+              const maxAppointments = $maxAppointmentsInput.val();
+              if (!startTime || !endTime || !maxAppointments) {
+                @this.set('modalMessage', 'لطفاً ابتدا زمان شروع، پایان و تعداد نوبت را وارد کنید');
+                @this.set('modalType', 'error');
+                @this.set('modalOpen', true);
                 window.dispatchEvent(new CustomEvent('close-modal', {
                   detail: {
-                    name: 'schedule-modal'
+                    name: 'emergency-modal'
                   }
                 }));
+                return;
               }
-            }
-          });
-
-          Livewire.on('close-modal', (event) => {
-            const modalName = event?.name || (event && event[0]?.name) || null;
-            if (modalName === 'calculator-modal') {
-              const $button = $('#saveSelectionCalculator');
-              if ($button.find('.loader').length && $button.find('.button_text').length) {
-                toggleButtonLoading($button, false);
+              const timeToMinutes = (time) => {
+                const [hours, minutes] = time.split(':').map(Number);
+                return hours * 60 + minutes;
+              };
+              const minutesToTime = (minutes) => {
+                const hours = Math.floor(minutes / 60).toString().padStart(2, '0');
+                const mins = (minutes % 60).toString().padStart(2, '0');
+                return `${hours}:${mins}`;
+              };
+              const totalMinutes = timeToMinutes(endTime) - timeToMinutes(startTime);
+              const slotDuration = Math.floor(totalMinutes / maxAppointments);
+              const times = [];
+              for (let i = 0; i < maxAppointments; i++) {
+                const start = timeToMinutes(startTime) + (i * slotDuration);
+                times.push(minutesToTime(start));
               }
-              $('#appointment-count').off('input focus');
-              $('#time-count').off('input focus');
-              $('#count-radio').off('change');
-              $('#time-radio').off('change');
-            }
-            if (modalName === 'checkbox-modal') {
-              $('#day-checkboxes .form-check').show();
-              @this.set('selectedDays', []);
-              @this.set('copySource', {
-                day: null,
-                index: null
+              let currentEmergencyTimes = [];
+              try {
+                const workSchedule = @this.workSchedules.find(s => s.day === day);
+                currentEmergencyTimes = workSchedule && workSchedule.emergency_times ? workSchedule
+                  .emergency_times : [];
+              } catch (error) {
+                console.error('Error accessing emergency_times:', error);
+                currentEmergencyTimes = [];
+              }
+              @this.set('emergencyTimes', currentEmergencyTimes);
+              const $timesContainer = $('#emergency-times');
+              $timesContainer.empty();
+              times.forEach(time => {
+                const isSaved = currentEmergencyTimes.includes(time);
+                const $button = $(`
+                <button type="button" class="btn btn-sm time-slot-btn ${isSaved ? 'btn-primary' : 'btn-outline-primary'}" data-time="${time}">
+                  ${time}
+                </button>
+              `);
+                $timesContainer.append($button);
               });
-              @this.set('selectAllCopyModal', false);
+              $timesContainer.show();
+              $timesContainer.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+                const $btn = $(this);
+                const time = $btn.data('time');
+                const isSelected = $btn.hasClass('btn-primary');
+                if (isSelected) {
+                  $btn.removeClass('btn-primary').addClass('btn-outline-primary');
+                  @this.emergencyTimes = @this.emergencyTimes.filter(t => t !== time);
+                } else {
+                  $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+                  @this.emergencyTimes = [...@this.emergencyTimes, time];
+                }
+              });
+              setTimeout(() => {}, 100);
+            } catch (error) {
+              console.error('Error in emergencyModal:', error);
+              window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: {
+                  name: 'emergency-modal'
+                }
+              }));
             }
-            if (modalName === 'emergency-modal') {
-              @this.set('isEmergencyModalOpen', false);
-              $('#emergency-times').empty();
+          }
+
+          if (modalName === 'schedule-modal') {
+            try {
+              @this.call('openScheduleModal', day, index);
+              $('#scheduleLoading').removeClass('d-none');
+              $('.modal-content-inner').hide();
+
+              const startTimeInput = $(`#morning-start-${day}-${index}`);
+              const endTimeInput = $(`#morning-end-${day}-${index}`);
+              const startTime = startTimeInput.length ? startTimeInput.val() : '00:00';
+              const endTime = endTimeInput.length ? endTimeInput.val() : '23:59';
+
+              if (!startTime || !endTime) {
+                throw new Error('Start or end time is missing');
+              }
+
+              $('#schedule-start').val(startTime);
+              $('#schedule-end').val(endTime);
+
+              setTimeout(() => {
+                $('#scheduleLoading').addClass('d-none');
+                $('.modal-content-inner').show();
+
+                const selectAllCheckbox = $('#select-all-schedule-days');
+                const dayCheckboxes = $('.schedule-day-checkbox');
+
+                selectAllCheckbox.prop('checked', false);
+                selectAllCheckbox.off('change').on('change', function() {
+                  const isChecked = $(this).is(':checked');
+                  dayCheckboxes.prop('checked', isChecked);
+                  dayCheckboxes.each(function() {
+                    @this.set(`selectedScheduleDays.${$(this).data('day')}`, isChecked);
+                  });
+                });
+
+                const allChecked = dayCheckboxes.length === dayCheckboxes.filter(':checked').length;
+                selectAllCheckbox.prop('checked', allChecked);
+              }, 300);
+            } catch (error) {
+              console.error('Error in scheduleModal:', error);
+              toastr.error('خطا در بارگذاری مودال: ' + error.message);
+              window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: {
+                  name: 'schedule-modal'
+                }
+              }));
             }
-            if (modalName === 'schedule-modal') {
-              @this.set('scheduleModalDay', null);
-              @this.set('scheduleModalIndex', null);
-              @this.set('selectedScheduleDays', []);
-              @this.set('selectAllScheduleModal', false);
-              $('#schedule-settings-list').empty();
-              $('.form-check-input').prop('disabled', false);
-            }
-          });
+          }
+        });
+
+   
         $(document).ready(function() {
           function toggleButtonLoading($button, isLoading) {
             const $loader = $button.find('.loader');
@@ -875,76 +852,84 @@
             });
           });
 
-        
 
-          $(document).on('click', '#saveSchedule', function() {
-            const $button = $(this);
-            const startTime = $('#schedule-start').val();
-            const endTime = $('#schedule-end').val();
-            const selectedDays = $('.schedule-day-checkbox:checked')
-              .map(function() {
+
+       Livewire.on('set-schedule-times', (event) => {
+        const startTime = event.startTime || '00:00';
+        const endTime = event.endTime || '23:59';
+        $('#schedule-start').val(startTime);
+        $('#schedule-end').val(endTime);
+        $('#timepicker-save-section').removeClass('d-none');
+    });
+
+    $(document).on('click', '#saveSchedule', function() {
+        const $button = $(this);
+        const startTime = $('#schedule-start').val();
+        const endTime = $('#schedule-end').val();
+        const selectedDays = $('.schedule-day-checkbox:checked')
+            .map(function() {
                 return $(this).data('day');
-              })
-              .get();
-            try {
-              if (!selectedDays.length) {
+            })
+            .get();
+
+        try {
+            if (!selectedDays.length) {
                 toastr.error('لطفاً حداقل یک روز انتخاب کنید');
                 return;
-              }
-              if (!startTime) {
+            }
+            if (!startTime) {
                 toastr.error('لطفاً زمان شروع را وارد کنید');
                 return;
-              }
-              if (!endTime) {
+            }
+            if (!endTime) {
                 toastr.error('لطفاً زمان پایان را وارد کنید');
                 return;
-              }
-              const timeToMinutes = (time) => {
+            }
+
+            const timeToMinutes = (time) => {
                 const [hours, minutes] = time.split(':').map(Number);
                 return hours * 60 + minutes;
-              };
-              if (timeToMinutes(endTime) <= timeToMinutes(startTime)) {
+            };
+
+            if (timeToMinutes(endTime) <= timeToMinutes(startTime)) {
                 toastr.error('زمان پایان باید بعد از زمان شروع باشد');
                 return;
-              }
-              selectedDays.forEach(day => {
+            }
+
+            selectedDays.forEach(day => {
                 @this.set(`selectedScheduleDays.${day}`, true);
-              });
-              toggleButtonLoading($button, true);
-              @this.call('saveSchedule', startTime, endTime).catch((error) => {
+            });
+
+            toggleButtonLoading($button, true);
+            @this.call('saveSchedule', startTime, endTime).then(() => {
+                $('#timepicker-save-section').addClass('d-none');
+            }).catch((error) => {
                 toggleButtonLoading($button, false);
                 console.error('Error saving schedule:', error);
                 toastr.error('خطا در ذخیره زمان‌بندی: ' + (error.message || 'خطای ناشناخته'));
-              });
-            } catch (error) {
-              toggleButtonLoading($button, false);
-              console.error('Error in saveSchedule click:', error);
-              toastr.error('خطا در ذخیره زمان‌بندی: ' + error.message);
-            }
-          });
-
-          $(document).on('click', '.delete-schedule-setting', function() {
-            const day = $(this).data('day');
-            const index = $(this).data('index');
-            Swal.fire({
-              title: 'آیا مطمئن هستید؟',
-              text: 'این تنظیم زمان‌بندی حذف خواهد شد و قابل بازگشت نیست!',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'بله، حذف کن!',
-              cancelButtonText: 'خیر',
-              reverseButtons: true,
-            }).then((result) => {
-              if (result.isConfirmed) {
-                @this.call('deleteScheduleSetting', day, index);
-                setTimeout(() => {
-                  @this.dispatch('refresh-schedule-settings');
-                }, 300);
-              }
             });
-          });
+        } catch (error) {
+            toggleButtonLoading($button, false);
+            console.error('Error in saveSchedule click:', error);
+            toastr.error('خطا در ذخیره زمان‌بندی: ' + error.message);
+        }
+    });
+
+    Livewire.on('close-modal', (event) => {
+        const modalName = event?.name || (event && event[0]?.name) || null;
+        if (modalName === 'schedule-modal') {
+            @this.set('scheduleModalDay', null);
+            @this.set('scheduleModalIndex', null);
+            @this.set('selectedScheduleDays', []);
+            @this.set('selectAllScheduleModal', false);
+            @this.set('isEditingSchedule', false);
+            @this.set('editingSettingIndex', null);
+            @this.set('editingSetting', null);
+            $('#schedule-settings-list').empty();
+            $('.form-check-input').prop('disabled', false);
+            $('#timepicker-save-section').addClass('d-none');
+        }
+    });
 
           $(document).on('change', '#select-all-days', function() {
             const isChecked = $(this).is(':checked');
