@@ -31,7 +31,7 @@
   .toggle-wrapper {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
   }
 
   .toggle-input {
@@ -42,28 +42,28 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 16px;
+    padding: 6px 12px;
     background: var(--background-card);
     border-radius: var(--radius-button);
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 120px;
+    min-width: 100px;
     border: 1px solid var(--border-neutral);
-    box-shadow: 0 2px 4px var(--shadow);
+    box-shadow: 0 1px 2px var(--shadow);
   }
 
   .toggle-text {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-primary);
-    margin-left: 8px;
+    margin-left: 6px;
     white-space: nowrap;
   }
 
   .toggle-switch {
     position: relative;
-    width: 80px;
-    height: 24px;
+    width: 70px;
+    height: 22px;
     background: var(--background-light);
     border-radius: var(--radius-button);
     transition: all 0.3s ease;
@@ -73,21 +73,21 @@
     position: absolute;
     top: 2px;
     right: 2px;
-    width: 36px;
-    height: 20px;
+    width: 32px;
+    height: 18px;
     background: var(--text-original);
     border-radius: var(--radius-button);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px var(--shadow);
+    box-shadow: 0 1px 2px var(--shadow);
   }
 
   .toggle-text-yes,
   .toggle-text-no {
     position: absolute;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     transition: all 0.3s ease;
     color: white;
@@ -107,7 +107,7 @@
   }
 
   .toggle-input:checked+.toggle-label .toggle-slider {
-    right: 42px;
+    right: 36px;
     background: var(--text-discount);
   }
 
@@ -128,7 +128,7 @@
   }
 
   .toggle-label:hover {
-    box-shadow: 0 4px 8px var(--shadow);
+    box-shadow: 0 2px 4px var(--shadow);
   }
 
   .toggle-label:active .toggle-slider {
