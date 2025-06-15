@@ -365,7 +365,7 @@
               </div>
               <!-- بخش لیست تنظیمات ذخیره‌شده -->
               <div class="schedule-settings-section border-section">
-                <h6 class="section-title">تنظیمات ذخیره‌شده</h6>
+                <h6 class="section-title">تنظیمات ذخیره شده باز شدن نوبت ها</h6>
                 <div class="schedule-settings-list mt-3">
                   @if ($scheduleModalDay && $scheduleModalIndex !== null)
                     @php
