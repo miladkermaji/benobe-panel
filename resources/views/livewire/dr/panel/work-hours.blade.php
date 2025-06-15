@@ -308,7 +308,7 @@
 
     <!-- مودال تنظیم زمان‌بندی -->
     <div>
-      <x-modal id="schedule-modal" name="schedule-modal" title="تنظیم زمان‌بندی" size="md-medium">
+      <x-modal id="scheduleModal" name="schedule-modal" title="تنظیم زمان‌بندی" size="md-medium">
         <x-slot:body>
           <div class="position-relative">
             <!-- لودینگ -->
