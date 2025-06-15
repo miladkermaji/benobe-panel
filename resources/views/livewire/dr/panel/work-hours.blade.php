@@ -20,12 +20,12 @@
                 class="row border border-radius-11 p-3 align-items-center conditional-section {{ !$autoScheduling ? 'hidden' : '' }}">
                 <!-- تعداد روزهای باز تقویم -->
                 <div class="col-8">
-                  <div class="input-group position-relative p-1 rounded bg-white" style="min-width: 250px;">
+                  <div class="input-group position-relative p-1 rounded bg-white">
                     <label class="floating-label bg-white px-2 fw-bold"
                       style="position: absolute; top: -10px; right: -4px; font-size: 0.85rem; color: var(--text-secondary); z-index: 10; transition: all 0.2s ease;">
                       تعداد روز‌های باز تقویم
                     </label>
-                    <input type="text" inputmode="numeric" pattern="[0-9]*" class="form-control text-center"
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" class="form-control text-center calendar-days-input"
                       name="calendar_days" placeholder="تعداد روز مورد نظر خود را وارد کنید"
                       wire:model.live="calendarDays" style="height: 50px; z-index: 1;">
                     <span class="input-group-text" style="height: 50px; z-index: 1;">روز</span>
