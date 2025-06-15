@@ -308,7 +308,7 @@
 
     <!-- مودال تنظیم زمان‌بندی -->
     <div>
-      <x-modal id="scheduleModal" name="schedule-modal" title="تنظیم زمان‌بندی بازشدن نوبت ها" size="lg">
+      <x-modal id="scheduleModal" name="schedule-modal" title="تنظیم زمان‌بندی" size="lg">
         <x-slot:body>
           <div class="position-relative">
             <!-- لودینگ -->
@@ -323,7 +323,7 @@
               <!-- بخش انتخاب روزها -->
               <div class="schedule-days-section border-section">
                 <h6 class="section-title">انتخاب روزها</h6>
-                <div class="d-flex justify-content-start mt-2 gap-40 bg-light p-2 border-radius-11 align-items-center">
+                <div class="d-flex justify-content-start mt-3 gap-40 bg-light p-3 border-radius-11 align-items-center">
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                     <div class="d-flex align-items-center">
                       <input type="checkbox" class="form-check-input me-2" id="schedule-day-{{ $day }}"
@@ -335,7 +335,7 @@
                 </div>
               </div>
               <!-- بخش تنظیمات زمان‌بندی برای هر روز -->
-              <div class="schedule-settings-section border-section">
+              <div class="schedule-settings-section border-section mt-3">
                 <h6 class="section-title">تنظیمات زمان‌بندی</h6>
                 @foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day)
                   @if ($selectedScheduleDays[$day])
@@ -382,11 +382,35 @@
                                   wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
                                   value="{{ $setting['end_time'] }}">
                               </div>
-
+                              <div class="form-group position-relative">
+                                <x-custom-tooltip title="کپی تنظیمات" placement="top">
+                                  <button class="btn btn-outline-primary btn-sm copy-schedule-setting"
+                                    x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
+                                    @click="$dispatch('open-modal', { name: 'copy-schedule-modal', day: day, index: index })">
+                                    <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
+                                      style="width: 16px; height: 16px;">
+                                  </button>
+                                </x-custom-tooltip>
+                              </div>
                               <div class="form-group position-relative">
                                 <x-custom-tooltip title="حذف تنظیمات" placement="top">
                                   <button class="btn btn-outline-danger btn-sm delete-schedule-setting"
-                                    wire:click="deleteScheduleSetting('{{ $day }}', {{ $index }})">
+                                    x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
+                                    @click="Swal.fire({
+                                                                title: 'آیا مطمئن هستید؟',
+                                                                text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!',
+                                                                icon: 'warning',
+                                                                showCancelButton: true,
+                                                                confirmButtonColor: '#3085d6',
+                                                                cancelButtonColor: '#d33',
+                                                                confirmButtonText: 'بله، حذف کن!',
+                                                                cancelButtonText: 'خیر',
+                                                                reverseButtons: true
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    @this.call('deleteScheduleSetting', day, index);
+                                                                }
+                                                            })">
                                     <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
                                       style="width: 16px; height: 16px;">
                                   </button>
@@ -415,9 +439,9 @@
                                 wire:change="autoSaveSchedule('{{ $day }}', 0)">
                             </div>
                             <div class="form-group position-relative">
-                              <x-custom-tooltip title="ویرایش تنظیمات" placement="top">
-                                <button class="btn btn-outline-primary btn-sm edit-schedule-setting" disabled>
-                                  <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش"
+                              <x-custom-tooltip title="کپی تنظیمات" placement="top">
+                                <button class="btn btn-outline-primary btn-sm copy-schedule-setting" disabled>
+                                  <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
                                     style="width: 16px; height: 16px;">
                                 </button>
                               </x-custom-tooltip>
@@ -446,6 +470,35 @@
                 @endforeach
               </div>
             </div>
+          </div>
+        </x-slot:body>
+      </x-modal>
+
+      <!-- مودال کپی تنظیمات زمان‌بندی -->
+      <x-modal name="copy-schedule-modal" title="کپی تنظیم زمان‌بندی" size="sm">
+        <x-slot:body>
+          <p>روزهایی که می‌خواهید تنظیمات زمان‌بندی به آن‌ها کپی شود را انتخاب کنید:</p>
+          <div class="mb-3">
+            <input type="checkbox" class="form-check-input me-2" id="select-all-copy-schedule-days"
+              wire:model.live="selectAllCopyModal">
+            <label class="fw-bold mb-0" for="select-all-copy-schedule-days">انتخاب همه</label>
+          </div>
+          <div class="d-flex flex-column gap-2" id="copy-schedule-day-checkboxes">
+            @foreach (['saturday' => 'شنبه', 'sunday' => 'یک‌شنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+              @if ($day !== $copySourceDay)
+                <div class="form-check d-flex align-items-center" data-day="{{ $day }}">
+                  <input type="checkbox" class="form-check-input me-2" id="copy-schedule-day-{{ $day }}"
+                    wire:model.live="selectedCopyScheduleDays.{{ $day }}" data-day="{{ $day }}">
+                  <label class="fw-bold mb-0"
+                    for="copy-schedule-day-{{ $day }}">{{ $label }}</label>
+                </div>
+              @endif
+            @endforeach
+          </div>
+          <div class="mt-3">
+            <button type="button" class="btn my-btn-primary h-50 w-100" wire:click="copyScheduleSetting">
+              ذخیره
+            </button>
           </div>
         </x-slot:body>
       </x-modal>
@@ -785,6 +838,29 @@
               }));
             }
           }
+
+          if (modalName === 'copy-schedule-modal') {
+            try {
+              @this.set('copySourceDay', day);
+              @this.set('copySourceIndex', index);
+              @this.set('selectedCopyScheduleDays', []);
+              @this.set('selectAllCopyScheduleModal', false);
+              setTimeout(() => {
+                const selector = `#copy-schedule-day-checkboxes .form-check[data-day="${day}"]`;
+                const $element = $(selector);
+                if ($element.length > 0) {
+                  $element.hide();
+                }
+              }, 100);
+            } catch (error) {
+              console.error('Error setting copyScheduleSource:', error);
+              window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: {
+                  name: 'copy-schedule-modal'
+                }
+              }));
+            }
+          }
         });
 
 
@@ -918,10 +994,82 @@
               @this.set('scheduleModalIndex', null);
               @this.set('selectedScheduleDays', []);
               @this.set('scheduleSettings', []);
-              @this.set('isEditingSchedule', false);
-              @this.set('editingSettingIndex', null);
-              @this.set('editingSetting', null);
             }
+            if (modalName === 'copy-schedule-modal') {
+              @this.set('copySourceDay', null);
+              @this.set('copySourceIndex', null);
+              @this.set('selectedCopyScheduleDays', []);
+              @this.set('selectAllCopyScheduleModal', false);
+            }
+          });
+
+          Livewire.on('show-conflict-alert', (event) => {
+            let conflictsObj = Array.isArray(event) && event[0] && event[0].conflicts ? event[0].conflicts :
+              event.conflicts || event;
+            if (!conflictsObj || typeof conflictsObj !== 'object' || Object.keys(conflictsObj).length === 0) {
+              console.warn('No valid conflicts data, proceeding with copyScheduleSetting');
+              @this.call('copyScheduleSetting');
+              return;
+            }
+
+            const persianDayMap = {
+              saturday: 'شنبه',
+              sunday: 'یک‌شنبه',
+              monday: 'دوشنبه',
+              tuesday: 'سه‌شنبه',
+              wednesday: 'چهارشنبه',
+              thursday: 'پنج‌شنبه',
+              friday: 'جمعه'
+            };
+
+            let conflictMessage = '<p>تداخل در روزهای زیر یافت شد:</p><ul>';
+            let hasConflicts = false;
+            Object.keys(conflictsObj).forEach(day => {
+              if (!persianDayMap[day]) {
+                console.warn(`Day ${day} not found in persianDayMap`);
+                return;
+              }
+              const conflictDetails = conflictsObj[day];
+              if (!conflictDetails || !Array.isArray(conflictDetails)) {
+                console.warn(`No conflict details for day ${day}`);
+                return;
+              }
+              hasConflicts = true;
+              conflictMessage += `<li>${persianDayMap[day]}:</li><ul>`;
+              conflictDetails.forEach(slot => {
+                const start = slot.start_time || 'نامشخص';
+                const end = slot.end_time || 'نامشخص';
+                conflictMessage += `<li>از ${start} تا ${end}</li>`;
+              });
+              conflictMessage += '</ul></li>';
+            });
+
+            if (!hasConflicts) {
+              console.warn('No valid conflicts found, proceeding with copyScheduleSetting');
+              @this.call('copyScheduleSetting');
+              return;
+            }
+
+            conflictMessage += '<p>آیا می‌خواهید داده‌های موجود را جایگزین کنید؟</p>';
+            Swal.fire({
+              title: 'تداخل در کپی تنظیمات زمان‌بندی',
+              html: conflictMessage,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'جایگزین کن',
+              cancelButtonText: 'لغو',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                @this.call('copyScheduleSetting', true);
+              } else {
+                @this.set('modalMessage', 'عملیات کپی لغو شد');
+                @this.set('modalType', 'error');
+                @this.set('modalOpen', true);
+              }
+            });
           });
 
           Livewire.on('set-schedule-times', (event) => {

@@ -259,9 +259,6 @@ class Workhours extends Component
     {
         $this->scheduleModalDay = $day;
         $this->scheduleModalIndex = $index;
-        $this->isEditingSchedule = false;
-        $this->editingSettingIndex = null;
-        $this->editingSetting = null;
         $this->selectedScheduleDays = array_fill_keys(['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'], false);
         $this->scheduleSettings = [];
 
@@ -412,7 +409,20 @@ class Workhours extends Component
             'start_time' => null,
             'end_time' => null,
         ];
+        $this->dispatch('refresh-timepicker');
     }
+    public $copySourceDay;
+    public $copySourceIndex;
+    public $selectedCopyScheduleDays = [
+        'saturday' => false,
+        'sunday' => false,
+        'monday' => false,
+        'tuesday' => false,
+        'wednesday' => false,
+        'thursday' => false,
+        'friday' => false,
+    ];
+    public $selectAllCopyScheduleModal = false;
 
 
     public function deleteScheduleSetting($day, $index)
@@ -452,6 +462,143 @@ class Workhours extends Component
             $this->modalType = 'error';
             $this->modalOpen = true;
             $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'error']);
+        }
+    }
+    public function copyScheduleSetting()
+    {
+        try {
+            if (empty(array_filter($this->selectedCopyScheduleDays))) {
+                throw new \Exception('هیچ روزی برای کپی انتخاب نشده است');
+            }
+
+            $sourceSchedule = collect($this->workSchedules)->firstWhere('day', $this->copySourceDay);
+            if (!$sourceSchedule) {
+                throw new \Exception('تنظیمات برای روز مبدا یافت نشد');
+            }
+
+            $sourceSettings = is_array($sourceSchedule['appointment_settings'])
+                ? $sourceSchedule['appointment_settings']
+                : json_decode($sourceSchedule['appointment_settings'], true) ?? [];
+            $filteredSettings = array_values(array_filter($sourceSettings, fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex));
+            if (!isset($filteredSettings[$this->copySourceIndex])) {
+                throw new \Exception('تنظیم انتخاب‌شده برای کپی یافت نشد');
+            }
+
+            $sourceSetting = $filteredSettings[$this->copySourceIndex];
+            $selectedTargetDays = array_keys(array_filter($this->selectedCopyScheduleDays));
+            $conflicts = [];
+
+            DB::beginTransaction();
+            try {
+                foreach ($selectedTargetDays as $targetDay) {
+                    if ($targetDay === $this->copySourceDay) {
+                        continue;
+                    }
+
+                    $targetSchedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
+                        ->where('day', $targetDay)
+                        ->where(function ($query) {
+                            if ($this->activeClinicId !== 'default') {
+                                $query->where('clinic_id', $this->activeClinicId);
+                            } else {
+                                $query->whereNull('clinic_id');
+                            }
+                        })->first();
+
+                    if ($targetSchedule) {
+                        $targetSettings = is_array($targetSchedule->appointment_settings)
+                            ? $targetSchedule->appointment_settings
+                            : json_decode($targetSchedule->appointment_settings, true) ?? [];
+                        foreach ($targetSettings as $setting) {
+                            if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex) {
+                                if ($this->isTimeConflict($sourceSetting['start_time'], $sourceSetting['end_time'], $setting['start_time'], $setting['end_time'])) {
+                                    $conflicts[$targetDay][] = [
+                                        'start_time' => $setting['start_time'],
+                                        'end_time' => $setting['end_time'],
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!empty($conflicts)) {
+                    $this->dispatch('show-conflict-alert', ['conflicts' => $conflicts]);
+                    return;
+                }
+
+                foreach ($selectedTargetDays as $targetDay) {
+                    if ($targetDay === $this->copySourceDay) {
+                        continue;
+                    }
+
+                    $targetSchedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
+                        ->where('day', $targetDay)
+                        ->where(function ($query) {
+                            if ($this->activeClinicId !== 'default') {
+                                $query->where('clinic_id', $this->activeClinicId);
+                            } else {
+                                $query->whereNull('clinic_id');
+                            }
+                        })->first();
+
+                    if (!$targetSchedule) {
+                        $targetSchedule = DoctorWorkSchedule::create([
+                            'doctor_id' => $this->doctorId,
+                            'day' => $targetDay,
+                            'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                            'is_working' => true,
+                            'work_hours' => json_encode([]),
+                            'appointment_settings' => json_encode([]),
+                        ]);
+                    }
+
+                    $targetSettings = is_array($targetSchedule->appointment_settings)
+                        ? $targetSchedule->appointment_settings
+                        : json_decode($targetSchedule->appointment_settings, true) ?? [];
+                    $targetSettings[] = [
+                        'start_time' => $sourceSetting['start_time'],
+                        'end_time' => $sourceSetting['end_time'],
+                        'days' => [$targetDay],
+                        'work_hour_key' => (int)$this->scheduleModalIndex,
+                    ];
+
+                    $targetSchedule->update(['appointment_settings' => json_encode(array_values($targetSettings))]);
+                    $this->scheduleSettings[$targetDay][] = [
+                        'start_time' => $sourceSetting['start_time'],
+                        'end_time' => $sourceSetting['end_time'],
+                    ];
+                    $this->selectedScheduleDays[$targetDay] = true;
+                }
+
+                $this->refreshWorkSchedules();
+                $this->selectedCopyScheduleDays = array_fill_keys(['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'], false);
+                $this->selectAllCopyScheduleModal = false;
+                $this->modalMessage = 'تنظیمات با موفقیت کپی شد';
+                $this->modalType = 'success';
+                $this->modalOpen = true;
+                $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'success']);
+                $this->dispatch('close-modal', ['name' => 'copy-schedule-modal']);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            $this->modalMessage = $e->getMessage() ?: 'خطا در کپی تنظیمات';
+            $this->modalType = 'error';
+            $this->modalOpen = true;
+            $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'error']);
+        }
+    }
+    public function updatedSelectAllCopyScheduleModal($value)
+    {
+        $days = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        foreach ($days as $day) {
+            if ($day !== $this->copySourceDay) {
+                $this->selectedCopyScheduleDays[$day] = $value;
+            }
         }
     }
     // اصلاح متد saveSchedule برای پشتیبانی از ویرایش
