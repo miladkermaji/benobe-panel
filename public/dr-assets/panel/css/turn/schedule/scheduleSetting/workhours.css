@@ -239,7 +239,23 @@ body {
     border-color: var(--primary);
     transform: translateY(-1px);
 }
-
+#scheduleModal .copy-schedule-setting {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 0.375rem;
+  background: var(--background-card, #fff);
+  border: 1px solid var(--border-neutral, #dee2e6);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#scheduleModal .copy-schedule-setting:hover{
+     background: var(--background-light);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
 .copy-single-slot-btn,
 .remove-row-btn,
 .emergency-slot-btn,

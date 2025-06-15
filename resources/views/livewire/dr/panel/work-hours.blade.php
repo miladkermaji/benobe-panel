@@ -308,7 +308,7 @@
 
     <!-- مودال تنظیم زمان‌بندی -->
     <div>
-      <x-modal id="scheduleModal" name="schedule-modal" title="تنظیم زمان‌بندی" size="lg">
+     <x-modal id="scheduleModal" name="schedule-modal" :title="'برنامه باز شدن نوبت‌های ' . (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'][$scheduleModalDay] ?? 'نامشخص')" size="md-medium">
         <x-slot:body>
           <div class="position-relative">
             <!-- لودینگ -->
@@ -321,26 +321,26 @@
             <!-- محتوای اصلی -->
             <div class="modal-content-inner">
               <!-- بخش انتخاب روزها -->
-              <div class="schedule-days-section border-section">
-                <h6 class="section-title">انتخاب روزها</h6>
-                <div class="d-flex justify-content-start mt-3 gap-40 bg-light p-3 border-radius-11 align-items-center">
+              <div class="schedule-days-section border-section mb-2">
+                <h6 class="section-title mb-2">انتخاب روزها</h6>
+                <div class="d-flex justify-content-start gap-3 bg-light p-2 border-radius-11 align-items-center">
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                     <div class="d-flex align-items-center">
-                      <input type="checkbox" class="form-check-input me-2" id="schedule-day-{{ $day }}"
+                      <input type="checkbox" class="form-check-input me-1" id="schedule-day-{{ $day }}"
                         wire:model.live="selectedScheduleDays.{{ $day }}" data-day="{{ $day }}">
-                      <label class="mb-0 fw-bold px-0"
+                      <label class="mb-0 fw-bold px-0 font-size-12"
                         for="schedule-day-{{ $day }}">{{ $label }}</label>
                     </div>
                   @endforeach
                 </div>
               </div>
               <!-- بخش تنظیمات زمان‌بندی برای هر روز -->
-              <div class="schedule-settings-section border-section mt-3">
-                <h6 class="section-title">تنظیمات زمان‌بندی</h6>
+              <div class="schedule-settings-section border-section">
+                <h6 class="section-title mb-2">تنظیمات زمان‌بندی</h6>
                 @foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day)
                   @if ($selectedScheduleDays[$day])
-                    <div class="work-hours-{{ $day }} mt-3 border-333 p-3 border-radius-11">
-                      <h6>
+                    <div class="work-hours-{{ $day }} mb-2 border-333 p-2 border-radius-11">
+                      <h6 class="mb-1 font-size-13">
                         {{ ['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'][$day] }}
                       </h6>
                       @php
@@ -361,22 +361,23 @@
                       @endphp
                       @if (!empty($filteredSettings))
                         @foreach ($filteredSettings as $index => $setting)
-                          <div class="mt-3 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11"
+                          <div
+                            class="form-row d-flex w-100 align-items-center gap-2 mb-1 bg-active-slot border-radius-11 p-3"
                             wire:key="setting-{{ $day }}-{{ $index }}-{{ $scheduleModalIndex }}">
-                            <div class="d-flex justify-content-start align-items-center gap-4">
-                              <div class="form-group position-relative timepicker-ui">
-                                <label class="label-top-input-special-takhasos">از</label>
+                            <div class="d-flex justify-content-start align-items-center gap-2">
+                              <div class="form-group position-relative timepicker-ui flex-grow-1">
+                                <label class="label-top-input-special-takhasos font-size-11">از</label>
                                 <input type="text"
-                                  class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                                  class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
                                   data-timepicker
                                   wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.{{ $index }}.start_time"
                                   wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
                                   value="{{ $setting['start_time'] }}">
                               </div>
-                              <div class="form-group position-relative timepicker-ui">
-                                <label class="label-top-input-special-takhasos">تا</label>
+                              <div class="form-group position-relative timepicker-ui flex-grow-1">
+                                <label class="label-top-input-special-takhasos font-size-11">تا</label>
                                 <input type="text"
-                                  class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                                  class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
                                   data-timepicker
                                   wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.{{ $index }}.end_time"
                                   wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
@@ -384,17 +385,17 @@
                               </div>
                               <div class="form-group position-relative">
                                 <x-custom-tooltip title="کپی تنظیمات" placement="top">
-                                  <button class="btn btn-outline-primary btn-sm copy-schedule-setting"
+                                  <button class="btn btn-outline-primary btn-sm copy-schedule-setting p-1"
                                     x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
                                     @click="$dispatch('open-modal', { name: 'copy-schedule-modal', day: day, index: index })">
                                     <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
-                                      style="width: 16px; height: 16px;">
+                                      style="width: 14px; height: 14px;">
                                   </button>
                                 </x-custom-tooltip>
                               </div>
                               <div class="form-group position-relative">
                                 <x-custom-tooltip title="حذف تنظیمات" placement="top">
-                                  <button class="btn btn-outline-danger btn-sm delete-schedule-setting"
+                                  <button class="btn btn-outline-danger btn-sm delete-schedule-setting p-1"
                                     x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
                                     @click="Swal.fire({
                                                                 title: 'آیا مطمئن هستید؟',
@@ -412,7 +413,7 @@
                                                                 }
                                                             })">
                                     <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
-                                      style="width: 16px; height: 16px;">
+                                      style="width: 14px; height: 14px;">
                                   </button>
                                 </x-custom-tooltip>
                               </div>
@@ -420,49 +421,51 @@
                           </div>
                         @endforeach
                       @else
-                        <div class="mt-3 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11">
-                          <div class="d-flex justify-content-start align-items-center gap-4">
-                            <div class="form-group position-relative timepicker-ui">
-                              <label class="label-top-input-special-takhasos">از</label>
+                        <div
+                          class="form-row d-flex w-100 align-items-center gap-2 mb-1 bg-active-slot border-radius-11 p-2">
+                          <div class="d-flex justify-content-start align-items-center gap-2 w-100">
+                            <div class="form-group position-relative timepicker-ui flex-grow-1">
+                              <label class="label-top-input-special-takhasos font-size-11">از</label>
                               <input type="text"
-                                class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                                class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
                                 data-timepicker
                                 wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.start_time"
                                 wire:change="autoSaveSchedule('{{ $day }}', 0)">
                             </div>
-                            <div class="form-group position-relative timepicker-ui">
-                              <label class="label-top-input-special-takhasos">تا</label>
+                            <div class="form-group position-relative timepicker-ui flex-grow-1">
+                              <label class="label-top-input-special-takhasos font-size-11">تا</label>
                               <input type="text"
-                                class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                                class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
                                 data-timepicker
                                 wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.end_time"
                                 wire:change="autoSaveSchedule('{{ $day }}', 0)">
                             </div>
                             <div class="form-group position-relative">
                               <x-custom-tooltip title="کپی تنظیمات" placement="top">
-                                <button class="btn btn-outline-primary btn-sm copy-schedule-setting" disabled>
+                                <button class="btn btn-outline-primary btn-sm copy-schedule-setting p-1" disabled>
                                   <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
-                                    style="width: 16px; height: 16px;">
+                                    style="width: 14px; height: 14px;">
                                 </button>
                               </x-custom-tooltip>
                             </div>
                             <div class="form-group position-relative">
                               <x-custom-tooltip title="حذف تنظیمات" placement="top">
-                                <button class="btn btn-outline-danger btn-sm delete-schedule-setting" disabled>
+                                <button class="btn btn-outline-danger btn-sm delete-schedule-setting p-1" disabled>
                                   <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
-                                    style="width: 16px; height: 16px;">
+                                    style="width: 14px; height: 14px;">
                                 </button>
                               </x-custom-tooltip>
                             </div>
                           </div>
                         </div>
                       @endif
-                      <div class="add-new-row mt-3">
-                        <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true" data-placement="bottom"
-                          data-original-title="اضافه کردن تنظیم جدید"
+                      <div class="add-new-row mt-1">
+                        <button class="add-row-btn btn btn-sm btn-light p-1 font-size-12" data-tooltip="true"
+                          data-placement="bottom" data-original-title="اضافه کردن تنظیم جدید"
                           wire:click="addScheduleSetting('{{ $day }}')">
-                          <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="">
-                          <span>افزودن ردیف جدید</span>
+                          <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt=""
+                            style="width: 14px; height: 14px;">
+                          <span>افزودن</span>
                         </button>
                       </div>
                     </div>
@@ -477,26 +480,27 @@
       <!-- مودال کپی تنظیمات زمان‌بندی -->
       <x-modal name="copy-schedule-modal" title="کپی تنظیم زمان‌بندی" size="sm">
         <x-slot:body>
-          <p>روزهایی که می‌خواهید تنظیمات زمان‌بندی به آن‌ها کپی شود را انتخاب کنید:</p>
-          <div class="mb-3">
-            <input type="checkbox" class="form-check-input me-2" id="select-all-copy-schedule-days"
-              wire:model.live="selectAllCopyModal">
-            <label class="fw-bold mb-0" for="select-all-copy-schedule-days">انتخاب همه</label>
+          <p class="font-size-12 mb-2">روزهایی که می‌خواهید تنظیمات به آن‌ها کپی شود:</p>
+          <div class="mb-2">
+            <input type="checkbox" class="form-check-input me-1" id="select-all-copy-schedule-days"
+              wire:model.live="selectAllCopyScheduleModal">
+            <label class="fw-bold mb-0 font-size-12" for="select-all-copy-schedule-days">انتخاب همه</label>
           </div>
-          <div class="d-flex flex-column gap-2" id="copy-schedule-day-checkboxes">
+          <div class="d-flex flex-column gap-1" id="copy-schedule-day-checkboxes">
             @foreach (['saturday' => 'شنبه', 'sunday' => 'یک‌شنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
               @if ($day !== $copySourceDay)
                 <div class="form-check d-flex align-items-center" data-day="{{ $day }}">
-                  <input type="checkbox" class="form-check-input me-2" id="copy-schedule-day-{{ $day }}"
+                  <input type="checkbox" class="form-check-input me-1" id="copy-schedule-day-{{ $day }}"
                     wire:model.live="selectedCopyScheduleDays.{{ $day }}" data-day="{{ $day }}">
-                  <label class="fw-bold mb-0"
+                  <label class="fw-bold mb-0 font-size-12"
                     for="copy-schedule-day-{{ $day }}">{{ $label }}</label>
                 </div>
               @endif
             @endforeach
           </div>
-          <div class="mt-3">
-            <button type="button" class="btn my-btn-primary h-50 w-100" wire:click="copyScheduleSetting">
+          <div class="mt-2">
+            <button type="button" class="btn my-btn-primary h-40 w-100 font-size-12"
+              wire:click="copyScheduleSetting">
               ذخیره
             </button>
           </div>
@@ -1003,6 +1007,8 @@
             }
           });
 
+        
+
           Livewire.on('show-conflict-alert', (event) => {
             let conflictsObj = Array.isArray(event) && event[0] && event[0].conflicts ? event[0].conflicts :
               event.conflicts || event;
@@ -1071,6 +1077,8 @@
               }
             });
           });
+
+
 
           Livewire.on('set-schedule-times', (event) => {
             const startTime = event.startTime || '00:00';
