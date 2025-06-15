@@ -1,5 +1,4 @@
 @props(['isChecked' => false, 'id' => ''])
-
 <div class="segmented-toggle {{ $attributes->get('class') }}" dir="ltr" x-data="{
     isChecked: {{ $isChecked ? 'true' : 'false' }},
     tempChecked: {{ $isChecked ? 'true' : 'false' }}
@@ -63,9 +62,6 @@
     </div>
   </div>
 </div>
-
-
-
 <style>
   :root {
     /* پالت رنگی اصلی */
@@ -126,7 +122,6 @@
     --radius-circle: 9999px;
     /* دایره کامل - برای آیکون‌ها */
   }
-
   .segmented-toggle {
     --bs-toggle-width: 240px;
     /* عرض بزرگ‌تر برای حس پریمیوم */
@@ -151,7 +146,6 @@
     --bs-toggle-transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     /* انیمیشن فنری و پویا */
   }
-
   .segmented-toggle .toggle-wrapper {
     position: relative;
     width: var(--bs-toggle-width);
@@ -164,11 +158,9 @@
     /* افکت بلور */
     box-shadow: var(--bs-toggle-shadow);
   }
-
   .segmented-toggle .toggle-input {
     display: none;
   }
-
   .segmented-toggle .toggle-segments {
     display: flex;
     width: 100%;
@@ -180,7 +172,6 @@
     /* حاشیه ظریف */
     transition: var(--bs-toggle-transition);
   }
-
   .segmented-toggle .toggle-segment {
     flex: 1;
     display: flex;
@@ -199,7 +190,6 @@
     z-index: 1;
     user-select: none;
   }
-
   .segmented-toggle .toggle-segment.active {
     background: var(--bs-toggle-active-bg);
     color: var(--bs-toggle-active-color);
@@ -208,7 +198,6 @@
     transform: translateY(-2px) scale(1.03);
     /* حس بالا آمدن و بزرگ‌نمایی */
   }
-
   .segmented-toggle .toggle-segment:hover {
     background: rgba(241, 245, 249, 0.8);
     /* هاور شیشه‌ای ملایم */
@@ -216,20 +205,17 @@
     transform: scale(1.01);
     /* میکرواینتراکشن هاور */
   }
-
   .segmented-toggle .toggle-segment.active:hover {
     background: var(--bs-toggle-active-bg);
     filter: brightness(1.15);
     /* روشن‌تر شدن در هاور */
   }
-
   .segmented-toggle .toggle-input:focus+.toggle-segments .toggle-segment.active {
     outline: 2px solid #a855f7;
     /* فکوس بنفش برای دسترسی‌پذیری */
     outline-offset: 2px;
     border-radius: var(--bs-toggle-border-radius);
   }
-
   /* جداکننده بین بخش‌ها */
   .segmented-toggle .toggle-segment-on::before {
     content: '';
@@ -242,7 +228,6 @@
     /* جداکننده ظریف */
     transition: var(--bs-toggle-transition);
   }
-
   /* افکت نئونی برای حالت فعال */
   .segmented-toggle .toggle-segment.active::after {
     content: '';
@@ -255,25 +240,21 @@
     opacity: 0.6;
     transition: var(--bs-toggle-transition);
   }
-
   /* انیمیشن برای تغییر حالت */
   .segmented-toggle .toggle-segment {
     transition: background 0.4s ease, color 0.4s ease, transform 0.3s ease, box-shadow 0.4s ease;
   }
-
   /* استایل برای بخش‌های مشروط */
   .conditional-section {
     transition: opacity 0.5s ease, max-height 0.5s ease;
     overflow: hidden;
   }
-
   .conditional-section.hidden {
     opacity: 0;
     max-height: 0;
     margin: 0;
     padding: 0;
   }
-
   /* پاسخ‌گویی برای موبایل */
   @media (max-width: 640px) {
     .segmented-toggle {
@@ -281,7 +262,6 @@
       --bs-toggle-height: 40px;
       --bs-toggle-font-size: 0.9rem;
     }
-
     .segmented-toggle .toggle-wrapper {
       padding: 3px;
     }

@@ -4,14 +4,9 @@
 
     <div class="w-100 d-flex justify-content-center mt-5" dir="ltr">
       <div class="auto-scheule-content-top">
-        <x-my-toggle-appointment
-          :isChecked="$autoScheduling"
-          id="appointment-toggle"
-          day="{{ $autoScheduling ? 'نوبت‌دهی آنلاین + دستی' : 'نوبت‌دهی دستی' }}"
-          class="mt-3 custom-toggle"
-          wire:model.live="autoScheduling"
-          wire:change="updateAutoScheduling"
-        />
+        <x-my-toggle-appointment :isChecked="$autoScheduling" id="appointment-toggle"
+          day="{{ $autoScheduling ? 'نوبت‌دهی آنلاین + دستی' : 'نوبت‌دهی دستی' }}" class="mt-3 custom-toggle"
+          wire:model.live="autoScheduling" wire:change="updateAutoScheduling" />
       </div>
     </div>
 
@@ -21,7 +16,8 @@
           <div>
             <div>
               <!-- بخش تعداد روزهای باز تقویم و باز بودن مطب در تعطیلات -->
-              <div class="row border border-radius-11 p-3 align-items-center conditional-section {{ !$autoScheduling ? 'hidden' : '' }}">
+              <div
+                class="row border border-radius-11 p-3 align-items-center conditional-section {{ !$autoScheduling ? 'hidden' : '' }}">
                 <!-- تعداد روزهای باز تقویم -->
                 <div class="col-8">
                   <div class="input-group position-relative p-1 rounded bg-white" style="min-width: 250px;">
@@ -39,8 +35,8 @@
                 <div class="col-4">
                   <div class="p-1 rounded bg-white"
                     style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
-                    <x-my-check :isChecked="$holidayAvailability" id="possible-appointments-inholiday" day="باز بودن مطب در تعطیلات رسمی"
-                      model="holidayAvailability" />
+                    <x-my-toggle-yes-no :isChecked="$holidayAvailability" id="holiday-availability" model="holidayAvailability"
+                      day="باز بودن مطب در تعطیلات رسمی" />
                   </div>
                 </div>
               </div>
@@ -177,8 +173,7 @@
                                   <x-custom-tooltip title="زمانبندی باز شدن نوبت‌ها" placement="top">
                                     <button type="button" class="btn text-black btn-sm schedule-btn"
                                       data-bs-toggle="modal" data-bs-target="#scheduleModal"
-                                      data-day="{{ $englishDay }}" data-index="0"
-                                      disabled>
+                                      data-day="{{ $englishDay }}" data-index="0" disabled>
                                       <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
                                     </button>
                                   </x-custom-tooltip>
@@ -189,8 +184,8 @@
                                     title="زمان‌های مخصوص منشی که می‌تواند برای شرایط خاص نگهدارد. این زمان‌ها غیرفعال می‌شوند تا زمانی که منشی یا پزشک آن‌ها را مجدداً فعال کند."
                                     placement="top">
                                     <button class="btn btn-light btn-sm emergency-slot-btn" data-bs-toggle="modal"
-                                      data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
-                                      data-index="0" disabled>
+                                      data-bs-target="#emergencyModal" data-day="{{ $englishDay }}" data-index="0"
+                                      disabled>
                                       <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
                                     </button>
                                   </x-custom-tooltip>
@@ -199,8 +194,8 @@
                                 <div class="form-group position-relative">
                                   <x-custom-tooltip title="کپی ساعات کاری" placement="top">
                                     <button class="btn btn-light btn-sm copy-single-slot-btn" data-bs-toggle="modal"
-                                      data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
-                                      data-index="0" disabled>
+                                      data-bs-target="#checkboxModal" data-day="{{ $englishDay }}" data-index="0"
+                                      disabled>
                                       <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
                                     </button>
                                   </x-custom-tooltip>
@@ -353,7 +348,8 @@
                       <input type="checkbox" class="form-check-input schedule-day-checkbox"
                         id="schedule-day-{{ $day }}"
                         wire:model.live="selectedScheduleDays.{{ $day }}" data-day="{{ $day }}">
-                      <label class="form-check-label" for="schedule-day-{{ $day }}">{{ $label }}</label>
+                      <label class="form-check-label"
+                        for="schedule-day-{{ $day }}">{{ $label }}</label>
                     </div>
                   @endforeach
                 </div>
@@ -387,11 +383,12 @@
                   @if ($scheduleModalDay && $scheduleModalIndex !== null)
                     @php
                       $schedule = collect($this->workSchedules)->firstWhere('day', $scheduleModalDay);
-                      $settings = $schedule && isset($schedule['appointment_settings'])
-                          ? (is_array($schedule['appointment_settings'])
-                              ? $schedule['appointment_settings']
-                              : json_decode($schedule['appointment_settings'], true) ?? [])
-                          : [];
+                      $settings =
+                          $schedule && isset($schedule['appointment_settings'])
+                              ? (is_array($schedule['appointment_settings'])
+                                  ? $schedule['appointment_settings']
+                                  : json_decode($schedule['appointment_settings'], true) ?? [])
+                              : [];
                       $filteredSettings = array_values(
                           array_filter(
                               $settings,
@@ -496,8 +493,8 @@
     </div>
 
     <!-- مودال کپی برنامه کاری -->
-    <div class="modal fade" id="checkboxModal" tabindex="-1" aria-labelledby="checkboxModalLabel" aria-hidden="true"
-      wire:ignore.self>
+    <div class="modal fade" id="checkboxModal" tabindex="-1" aria-labelledby="checkboxModalLabel"
+      aria-hidden="true" wire:ignore.self>
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-radius-6">
           <div class="modal-header border-radius-6">
@@ -772,7 +769,10 @@
             $('body').removeClass('modal-open').css('padding-right', '');
             $('#day-checkboxes .form-check').show();
             @this.set('selectedDays', []);
-            @this.set('copySource', { day: null, index: null });
+            @this.set('copySource', {
+              day: null,
+              index: null
+            });
             @this.set('selectAllCopyModal', false);
           });
 
@@ -824,7 +824,8 @@
               let currentEmergencyTimes = [];
               try {
                 const workSchedule = @this.workSchedules.find(s => s.day === day);
-                currentEmergencyTimes = workSchedule && workSchedule.emergency_times ? workSchedule.emergency_times : [];
+                currentEmergencyTimes = workSchedule && workSchedule.emergency_times ? workSchedule
+                  .emergency_times : [];
               } catch (error) {
                 console.error('Error accessing emergency_times:', error);
                 currentEmergencyTimes = [];
@@ -1023,11 +1024,12 @@
           });
 
           Livewire.on('show-conflict-alert', (event) => {
-            let conflictsObj = Array.isArray(event) && event[0] && event[0].conflicts ? event[0].conflicts : event.conflicts || event;
+            let conflictsObj = Array.isArray(event) && event[0] && event[0].conflicts ? event[0].conflicts :
+              event.conflicts || event;
             if (!conflictsObj || typeof conflictsObj !== 'object' || Object.keys(conflictsObj).length === 0) {
-                console.warn('No valid conflicts data, proceeding with copySchedule');
-                @this.call('copySchedule', false);
-                return;
+              console.warn('No valid conflicts data, proceeding with copySchedule');
+              @this.call('copySchedule', false);
+              return;
             }
             const persianDayMap = {
               saturday: 'شنبه',
@@ -1052,15 +1054,18 @@
               }
               hasConflicts = true;
               conflictMessage += `<li>${persianDayMap[day]}:</li><ul>`;
-              if (conflictDetails.work_hours && Array.isArray(conflictDetails.work_hours) && conflictDetails.work_hours.length > 0) {
+              if (conflictDetails.work_hours && Array.isArray(conflictDetails.work_hours) && conflictDetails
+                .work_hours.length > 0) {
                 conflictDetails.work_hours.forEach(slot => {
                   const start = slot.start || 'نامشخص';
                   const end = slot.end || 'نامشخص';
                   conflictMessage += `<li>ساعت کاری: از ${start} تا ${end}</li>`;
                 });
               }
-              if (conflictDetails.emergency_times && Array.isArray(conflictDetails.emergency_times) && conflictDetails.emergency_times.length > 0) {
-                conflictMessage += `<li>زمان‌های اورژانسی: ${conflictDetails.emergency_times.join(', ')}</li>`;
+              if (conflictDetails.emergency_times && Array.isArray(conflictDetails.emergency_times) &&
+                conflictDetails.emergency_times.length > 0) {
+                conflictMessage +=
+                  `<li>زمان‌های اورژانسی: ${conflictDetails.emergency_times.join(', ')}</li>`;
               }
               conflictMessage += '</ul></li>';
             });
