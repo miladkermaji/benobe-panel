@@ -63,84 +63,85 @@
                       <div class="border-333 p-3 mt-3 border-radius-11">
                         <h6>{{ $persianDay }}</h6>
                         <div id="morning-{{ $englishDay }}-details" class="mt-4">
-                         @if (!empty($slots[$englishDay]))
-    @foreach ($slots[$englishDay] as $index => $slot)
-        <div class="mt-3 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11" data-slot-id="{{ $slot['id'] ?? '' }}">
-            <div class="d-flex justify-content-start align-items-center gap-4">
-                <div class="form-group position-relative timepicker-ui">
-                    <label class="label-top-input-special-takhasos" for="morning-start-{{ $englishDay }}-{{ $index }}">از</label>
-                    <input type="text"
-                           class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
-                           data-timepicker
-                           id="morning-start-{{ $englishDay }}-{{ $index }}"
-                           wire:model.live="slots.{{ $englishDay }}.{{ $index }}.start_time"
-                           wire:change="autoSaveTimeSlot('{{ $englishDay }}', {{ $index }})"
-                           value="{{ $slot['start_time'] ?? '' }}" />
-                </div>
-                <div class="form-group position-relative timepicker-ui">
-                    <label class="label-top-input-special-takhasos" for="morning-end-{{ $englishDay }}-{{ $index }}">تا</label>
-                    <input type="text"
-                           class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
-                           data-timepicker
-                           id="morning-end-{{ $englishDay }}-{{ $index }}"
-                           wire:model.live="slots.{{ $englishDay }}.{{ $index }}.end_time"
-                           wire:change="autoSaveTimeSlot('{{ $englishDay }}', {{ $index }})"
-                           value="{{ $slot['end_time'] ?? '' }}" />
-                </div>
-                <div class="form-group position-relative">
-                    <label class="label-top-input-special-takhasos" for="morning-patients-{{ $englishDay }}-{{ $index }}">تعداد نوبت</label>
-                    <input type="text"
-                           class="form-control h-50 text-center max-appointments bg-white"
-                           id="morning-patients-{{ $englishDay }}-{{ $index }}"
-                           wire:model.live="slots.{{ $englishDay }}.{{ $index }}.max_appointments"
-                           wire:change="autoSaveTimeSlot('{{ $englishDay }}', {{ $index }})"
-                           x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
-                           @click="$dispatch('open-modal', { name: 'calculator-modal', day: day, index: index })"
-                           readonly
-                           value="{{ $slot['max_appointments'] ?? '' }}" />
-                </div>
-                <!-- دکمه باز شدن نوبت‌ها -->
-                <div class="form-group position-relative">
-                    <x-custom-tooltip title="زمانبندی باز شدن نوبت‌ها" placement="top">
-                        <button type="button" class="btn text-black btn-sm schedule-btn"
-                                x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
-                                @click="$dispatch('open-modal', { name: 'schedule-modal', day: day, index: index })"
-                                {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                            <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
-                        </button>
-                    </x-custom-tooltip>
-                </div>
-                <!-- دکمه نوبت‌های اورژانسی -->
-                <div class="form-group position-relative">
-                    <x-custom-tooltip
-                        title="زمان‌های مخصوص منشی که می‌تواند برای شرایط خاص نگهدارد. این زمان‌ها غیرفعال می‌شوند تا زمانی که منشی یا پزشک آن‌ها را مجدداً فعال کند."
-                        placement="top">
-                        <button class="btn btn-light btn-sm emergency-slot-btn"
-                                x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
-                                @click="$dispatch('open-modal', { name: 'emergency-modal', day: day, index: index })"
-                                {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                            <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
-                        </button>
-                    </x-custom-tooltip>
-                </div>
-                <!-- دکمه کپی -->
-                <div class="form-group position-relative">
-                    <x-custom-tooltip title="کپی ساعات کاری" placement="top">
-                        <button class="btn btn-light btn-sm copy-single-slot-btn"
-                                x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
-                                @click="$dispatch('open-modal', { name: 'checkbox-modal', day: day, index: index })"
-                                {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                            <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
-                        </button>
-                    </x-custom-tooltip>
-                </div>
-                <!-- دکمه حذف -->
-                <div class="form-group position-relative">
-                    <x-custom-tooltip title="حذف برنامه کاری" placement="top">
-                        <button class="btn btn-light btn-sm remove-row-btn"
-                                {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}
-                                x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
-                                @click="Swal.fire({
+                          @if (!empty($slots[$englishDay]))
+                            @foreach ($slots[$englishDay] as $index => $slot)
+                              <div class="mt-3 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11"
+                                data-slot-id="{{ $slot['id'] ?? '' }}">
+                                <div class="d-flex justify-content-start align-items-center gap-4">
+                                  <div class="form-group position-relative timepicker-ui">
+                                    <label class="label-top-input-special-takhasos"
+                                      for="morning-start-{{ $englishDay }}-{{ $index }}">از</label>
+                                    <input type="text"
+                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                                      data-timepicker id="morning-start-{{ $englishDay }}-{{ $index }}"
+                                      wire:model.live="slots.{{ $englishDay }}.{{ $index }}.start_time"
+                                      wire:change="autoSaveTimeSlot('{{ $englishDay }}', {{ $index }})"
+                                      value="{{ $slot['start_time'] ?? '' }}" />
+                                  </div>
+                                  <div class="form-group position-relative timepicker-ui">
+                                    <label class="label-top-input-special-takhasos"
+                                      for="morning-end-{{ $englishDay }}-{{ $index }}">تا</label>
+                                    <input type="text"
+                                      class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                                      data-timepicker id="morning-end-{{ $englishDay }}-{{ $index }}"
+                                      wire:model.live="slots.{{ $englishDay }}.{{ $index }}.end_time"
+                                      wire:change="autoSaveTimeSlot('{{ $englishDay }}', {{ $index }})"
+                                      value="{{ $slot['end_time'] ?? '' }}" />
+                                  </div>
+                                  <div class="form-group position-relative">
+                                    <label class="label-top-input-special-takhasos"
+                                      for="morning-patients-{{ $englishDay }}-{{ $index }}">تعداد
+                                      نوبت</label>
+                                    <input type="text"
+                                      class="form-control h-50 text-center max-appointments bg-white"
+                                      id="morning-patients-{{ $englishDay }}-{{ $index }}"
+                                      wire:model.live="slots.{{ $englishDay }}.{{ $index }}.max_appointments"
+                                      wire:change="autoSaveTimeSlot('{{ $englishDay }}', {{ $index }})"
+                                      x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
+                                      @click="$dispatch('open-modal', { name: 'calculator-modal', day: day, index: index })"
+                                      readonly value="{{ $slot['max_appointments'] ?? '' }}" />
+                                  </div>
+                                  <!-- دکمه باز شدن نوبت‌ها -->
+                                  <div class="form-group position-relative">
+                                    <x-custom-tooltip title="زمانبندی باز شدن نوبت‌ها" placement="top">
+                                      <button type="button" class="btn text-black btn-sm schedule-btn"
+                                        x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
+                                        @click="$dispatch('open-modal', { name: 'schedule-modal', day: day, index: index })"
+                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                        <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                      </button>
+                                    </x-custom-tooltip>
+                                  </div>
+                                  <!-- دکمه نوبت‌های اورژانسی -->
+                                  <div class="form-group position-relative">
+                                    <x-custom-tooltip
+                                      title="زمان‌های مخصوص منشی که می‌تواند برای شرایط خاص نگهدارد. این زمان‌ها غیرفعال می‌شوند تا زمانی که منشی یا پزشک آن‌ها را مجدداً فعال کند."
+                                      placement="top">
+                                      <button class="btn btn-light btn-sm emergency-slot-btn" x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
+                                        @click="$dispatch('open-modal', { name: 'emergency-modal', day: day, index: index })"
+                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                        <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                                      </button>
+                                    </x-custom-tooltip>
+                                  </div>
+                                  <!-- دکمه کپی -->
+                                  <div class="form-group position-relative">
+                                    <x-custom-tooltip title="کپی ساعات کاری" placement="top">
+                                      <button class="btn btn-light btn-sm copy-single-slot-btn"
+                                        x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
+                                        @click="$dispatch('open-modal', { name: 'checkbox-modal', day: day, index: index })"
+                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
+                                        <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
+                                      </button>
+                                    </x-custom-tooltip>
+                                  </div>
+                                  <!-- دکمه حذف -->
+                                  <div class="form-group position-relative">
+                                    <x-custom-tooltip title="حذف برنامه کاری" placement="top">
+                                      <button class="btn btn-light btn-sm remove-row-btn"
+                                        {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}
+                                        x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
+                                        @click="Swal.fire({
                                     title: 'آیا مطمئن هستید؟',
                                     text: 'این اسلات حذف خواهد شد و قابل بازگشت نیست!',
                                     icon: 'warning',
@@ -155,87 +156,88 @@
                                         @this.call('removeSlot', day, index);
                                     }
                                 })">
-                            <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                        </button>
-                    </x-custom-tooltip>
-                </div>
-            </div>
-        </div>
-    @endforeach
-@else
-    <div class="mt-3 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11" data-slot-id="">
-        <div class="d-flex justify-content-start align-items-center gap-4">
-            <div class="form-group position-relative timepicker-ui">
-                <label class="label-top-input-special-takhasos" for="morning-start-{{ $englishDay }}-0">از</label>
-                <input type="text"
-                       class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
-                       data-timepicker
-                       id="morning-start-{{ $englishDay }}-0"
-                       wire:model.live.debounce.500ms="slots.{{ $englishDay }}.0.start_time"
-                       wire:change="autoSaveTimeSlot('{{ $englishDay }}', 0)" />
-            </div>
-            <div class="form-group position-relative timepicker-ui">
-                <label class="label-top-input-special-takhasos" for="morning-end-{{ $englishDay }}-0">تا</label>
-                <input type="text"
-                       class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
-                       data-timepicker
-                       id="morning-end-{{ $englishDay }}-0"
-                       wire:model.live.debounce.500ms="slots.{{ $englishDay }}.0.end_time"
-                       wire:change="autoSaveTimeSlot('{{ $englishDay }}', 0)" />
-            </div>
-            <div class="form-group position-relative">
-                <label class="label-top-input-special-takhasos" for="morning-patients-{{ $englishDay }}-0">تعداد نوبت</label>
-                <input type="text"
-                       class="form-control h-50 text-center max-appointments bg-white"
-                       id="morning-patients-{{ $englishDay }}-0"
-                       wire:model.live.debounce.500ms="slots.{{ $englishDay }}.0.max_appointments"
-                       wire:change="autoSaveTimeSlot('{{ $englishDay }}', 0)"
-                       x-data="{ day: '{{ $englishDay }}', index: '0' }"
-                       @click="$dispatch('open-modal', { name: 'calculator-modal', day: day, index: index })"
-                       readonly />
-            </div>
-            <!-- دکمه‌های غیرفعال برای ردیف خالی -->
-            <div class="form-group position-relative">
-                <x-custom-tooltip title="زمانبندی باز شدن نوبت‌ها" placement="top">
-                    <button type="button" class="btn text-black btn-sm schedule-btn" disabled>
-                        <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
-                    </button>
-                </x-custom-tooltip>
-            </div>
-            <div class="form-group position-relative">
-                <x-custom-tooltip
-                    title="زمان‌های مخصوص منشی که می‌تواند برای شرایط خاص نگهدارد. این زمان‌ها غیرفعال می‌شوند تا زمانی که منشی یا پزشک آن‌ها را مجدداً فعال کند."
-                    placement="top">
-                    <button class="btn btn-light btn-sm emergency-slot-btn" disabled>
-                        <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
-                    </button>
-                </x-custom-tooltip>
-            </div>
-            <div class="form-group position-relative">
-                <x-custom-tooltip title="کپی ساعات کاری" placement="top">
-                    <button class="btn btn-light btn-sm copy-single-slot-btn" disabled>
-                        <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
-                    </button>
-                </x-custom-tooltip>
-            </div>
-            <div class="form-group position-relative">
-                <x-custom-tooltip title="حذف برنامه کاری" placement="top">
-                    <button class="btn btn-light btn-sm remove-row-btn" disabled>
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                    </button>
-                </x-custom-tooltip>
-            </div>
-        </div>
-    </div>
-@endif
-<div class="add-new-row mt-3">
-    <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true"
-            data-placement="bottom" data-original-title="اضافه کردن ساعت کاری جدید"
-            wire:click="addSlot('{{ $englishDay }}')">
-        <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" srcset="">
-        <span>افزودن ردیف جدید</span>
-    </button>
-</div>
+                                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                      </button>
+                                    </x-custom-tooltip>
+                                  </div>
+                                </div>
+                              </div>
+                            @endforeach
+                          @else
+                            <div class="mt-3 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11"
+                              data-slot-id="">
+                              <div class="d-flex justify-content-start align-items-center gap-4">
+                                <div class="form-group position-relative timepicker-ui">
+                                  <label class="label-top-input-special-takhasos"
+                                    for="morning-start-{{ $englishDay }}-0">از</label>
+                                  <input type="text"
+                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
+                                    data-timepicker id="morning-start-{{ $englishDay }}-0"
+                                    wire:model.live.debounce.500ms="slots.{{ $englishDay }}.0.start_time"
+                                    wire:change="autoSaveTimeSlot('{{ $englishDay }}', 0)" />
+                                </div>
+                                <div class="form-group position-relative timepicker-ui">
+                                  <label class="label-top-input-special-takhasos"
+                                    for="morning-end-{{ $englishDay }}-0">تا</label>
+                                  <input type="text"
+                                    class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
+                                    data-timepicker id="morning-end-{{ $englishDay }}-0"
+                                    wire:model.live.debounce.500ms="slots.{{ $englishDay }}.0.end_time"
+                                    wire:change="autoSaveTimeSlot('{{ $englishDay }}', 0)" />
+                                </div>
+                                <div class="form-group position-relative">
+                                  <label class="label-top-input-special-takhasos"
+                                    for="morning-patients-{{ $englishDay }}-0">تعداد نوبت</label>
+                                  <input type="text"
+                                    class="form-control h-50 text-center max-appointments bg-white"
+                                    id="morning-patients-{{ $englishDay }}-0"
+                                    wire:model.live.debounce.500ms="slots.{{ $englishDay }}.0.max_appointments"
+                                    wire:change="autoSaveTimeSlot('{{ $englishDay }}', 0)" x-data="{ day: '{{ $englishDay }}', index: '0' }"
+                                    @click="$dispatch('open-modal', { name: 'calculator-modal', day: day, index: index })"
+                                    readonly />
+                                </div>
+                                <!-- دکمه‌های غیرفعال برای ردیف خالی -->
+                                <div class="form-group position-relative">
+                                  <x-custom-tooltip title="زمانبندی باز شدن نوبت‌ها" placement="top">
+                                    <button type="button" class="btn text-black btn-sm schedule-btn" disabled>
+                                      <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                    </button>
+                                  </x-custom-tooltip>
+                                </div>
+                                <div class="form-group position-relative">
+                                  <x-custom-tooltip
+                                    title="زمان‌های مخصوص منشی که می‌تواند برای شرایط خاص نگهدارد. این زمان‌ها غیرفعال می‌شوند تا زمانی که منشی یا پزشک آن‌ها را مجدداً فعال کند."
+                                    placement="top">
+                                    <button class="btn btn-light btn-sm emergency-slot-btn" disabled>
+                                      <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                                    </button>
+                                  </x-custom-tooltip>
+                                </div>
+                                <div class="form-group position-relative">
+                                  <x-custom-tooltip title="کپی ساعات کاری" placement="top">
+                                    <button class="btn btn-light btn-sm copy-single-slot-btn" disabled>
+                                      <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
+                                    </button>
+                                  </x-custom-tooltip>
+                                </div>
+                                <div class="form-group position-relative">
+                                  <x-custom-tooltip title="حذف برنامه کاری" placement="top">
+                                    <button class="btn btn-light btn-sm remove-row-btn" disabled>
+                                      <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                    </button>
+                                  </x-custom-tooltip>
+                                </div>
+                              </div>
+                            </div>
+                          @endif
+                          <div class="add-new-row mt-3">
+                            <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true"
+                              data-placement="bottom" data-original-title="اضافه کردن ساعت کاری جدید"
+                              wire:click="addSlot('{{ $englishDay }}')">
+                              <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" srcset="">
+                              <span>افزودن ردیف جدید</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -322,7 +324,17 @@
 
     <!-- مودال تنظیم زمان‌بندی -->
     <div>
-     <x-modal id="scheduleModal" name="schedule-modal" :title="'برنامه باز شدن نوبت‌های ' . (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'][$scheduleModalDay] ?? 'نامشخص')" size="md-medium">
+      <x-modal id="scheduleModal" name="schedule-modal" :title="'برنامه باز شدن نوبت‌های ' .
+          ([
+              'saturday' => 'شنبه',
+              'sunday' => 'یکشنبه',
+              'monday' => 'دوشنبه',
+              'tuesday' => 'سه‌شنبه',
+              'wednesday' => 'چهارشنبه',
+              'thursday' => 'پنج‌شنبه',
+              'friday' => 'جمعه',
+          ][$scheduleModalDay] ??
+              'نامشخص')" size="md-medium">
         <x-slot:body>
           <div class="position-relative">
             <!-- لودینگ -->
@@ -337,7 +349,8 @@
               <!-- بخش انتخاب روزها -->
               <div class="schedule-days-section border-section mb-2">
                 <h6 class="section-title mb-2">انتخاب روزها</h6>
-                <div class="d-flex justify-content-start gap-3 bg-light p-2 border-radius-11 align-items-center" style="overflow-x: scroll;overflow-y: hidden">
+                <div class="d-flex justify-content-start gap-3 bg-light p-2 border-radius-11 align-items-center"
+                  style="overflow-x: scroll;overflow-y: hidden">
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                     <div class="d-flex align-items-center">
                       <input type="checkbox" class="form-check-input me-1" id="schedule-day-{{ $day }}"
@@ -351,115 +364,129 @@
               <!-- بخش تنظیمات زمان‌بندی برای هر روز -->
               <div class="schedule-settings-section border-section">
                 <h6 class="section-title mb-2"> باز شدن نوبت ها</h6>
-            @foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day)
-    @if ($selectedScheduleDays[$day])
-        <div class="work-hours-{{ $day }} mb-2 border-333 p-2 border-radius-11">
-            <h6 class="mb-1 font-size-13">{{ ['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'][$day] . " " . "ها" }}</h6>
-            @php
-                $schedule = collect($this->workSchedules)->firstWhere('day', $day);
-                $settings = $schedule && isset($schedule['appointment_settings'])
-                    ? (is_array($schedule['appointment_settings'])
-                        ? $schedule['appointment_settings']
-                        : json_decode($schedule['appointment_settings'], true) ?? [])
-                    : [];
-                $filteredSettings = array_values(array_filter($settings,
-                    fn($setting) => isset($setting['work_hour_key']) &&
-                    (int) $setting['work_hour_key'] === (int) $this->scheduleModalIndex,
-                ));
-                // ترکیب تنظیمات ذخیره‌شده و تنظیمات جدید
-                $combinedSettings = !empty($this->scheduleSettings[$day]) ? $this->scheduleSettings[$day] : $filteredSettings;
-            @endphp
-            @if (!empty($combinedSettings))
-                @foreach ($combinedSettings as $index => $setting)
-                    <div class="form-row d-flex align-items-center  mb-1 bg-active-slot border-radius-11 p-3"
-                         wire:key="setting-{{ $day }}-{{ $index }}-{{ $scheduleModalIndex }}">
-                        <div class="form-group position-relative timepicker-ui ">
+                @foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day)
+                  @if ($selectedScheduleDays[$day])
+                    <div class="work-hours-{{ $day }} mb-2 border-333 p-2 border-radius-11">
+                      <h6 class="mb-1 font-size-13">
+                        {{ ['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'][$day] . ' ' . 'ها' }}
+                      </h6>
+                      @php
+                        $schedule = collect($this->workSchedules)->firstWhere('day', $day);
+                        $settings =
+                            $schedule && isset($schedule['appointment_settings'])
+                                ? (is_array($schedule['appointment_settings'])
+                                    ? $schedule['appointment_settings']
+                                    : json_decode($schedule['appointment_settings'], true) ?? [])
+                                : [];
+                        $filteredSettings = array_values(
+                            array_filter(
+                                $settings,
+                                fn($setting) => isset($setting['work_hour_key']) &&
+                                    (int) $setting['work_hour_key'] === (int) $this->scheduleModalIndex,
+                            ),
+                        );
+                        // ترکیب تنظیمات ذخیره‌شده و تنظیمات جدید
+                        $combinedSettings = !empty($this->scheduleSettings[$day])
+                            ? $this->scheduleSettings[$day]
+                            : $filteredSettings;
+                      @endphp
+                      @if (!empty($combinedSettings))
+                        @foreach ($combinedSettings as $index => $setting)
+                          <div class="form-row d-flex align-items-center  mb-1 bg-active-slot border-radius-11 p-3"
+                            wire:key="setting-{{ $day }}-{{ $index }}-{{ $scheduleModalIndex }}">
+                            <div class="form-group position-relative timepicker-ui ">
+                              <label class="label-top-input-special-takhasos font-size-11">از</label>
+                              <input type="text"
+                                class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
+                                data-timepicker
+                                wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.{{ $index }}.start_time"
+                                wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
+                                value="{{ $setting['start_time'] ?? '' }}">
+                            </div>
+                            <div class="form-group position-relative timepicker-ui ">
+                              <label class="label-top-input-special-takhasos font-size-11">تا</label>
+                              <input type="text"
+                                class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
+                                data-timepicker
+                                wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.{{ $index }}.end_time"
+                                wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
+                                value="{{ $setting['end_time'] ?? '' }}">
+                            </div>
+                            <!-- دکمه‌های کپی و حذف -->
+                            <div class="form-group position-relative">
+                              <x-custom-tooltip title="کپی تنظیمات" placement="top">
+                                <button class="btn btn-outline-primary btn-sm copy-schedule-setting p-1"
+                                  x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
+                                  @click="$dispatch('open-modal', { name: 'copy-schedule-modal', day: day, index: index })"
+                                  {{ empty($setting['start_time']) || empty($setting['end_time']) ? 'disabled' : '' }}>
+                                  <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
+                                    style="width: 14px; height: 14px;">
+                                </button>
+                              </x-custom-tooltip>
+                            </div>
+                            <div class="form-group position-relative">
+                              <x-custom-tooltip title="حذف تنظیمات" placement="top">
+                                <button class="btn btn-outline-danger btn-sm delete-schedule-setting p-1"
+                                  x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
+                                  @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', day, index);}})"
+                                  {{ empty($setting['start_time']) || empty($setting['end_time']) ? 'disabled' : '' }}>
+                                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
+                                    style="width: 14px; height: 14px;">
+                                </button>
+                              </x-custom-tooltip>
+                            </div>
+                          </div>
+                        @endforeach
+                      @else
+                        <div
+                          class="form-row d-flex w-100 align-items-center gap-2 mb-1 bg-active-slot border-radius-11 p-2">
+                          <div class="form-group position-relative timepicker-ui flex-grow-1">
                             <label class="label-top-input-special-takhasos font-size-11">از</label>
                             <input type="text"
-                                   class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
-                                   data-timepicker
-                                   wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.{{ $index }}.start_time"
-                                   wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
-                                   value="{{ $setting['start_time'] ?? '' }}">
-                        </div>
-                        <div class="form-group position-relative timepicker-ui ">
+                              class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
+                              data-timepicker
+                              wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.start_time"
+                              wire:change="autoSaveSchedule('{{ $day }}', 0)">
+                          </div>
+                          <div class="form-group position-relative timepicker-ui flex-grow-1">
                             <label class="label-top-input-special-takhasos font-size-11">تا</label>
                             <input type="text"
-                                   class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
-                                   data-timepicker
-                                   wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.{{ $index }}.end_time"
-                                   wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
-                                   value="{{ $setting['end_time'] ?? '' }}">
-                        </div>
-                        <!-- دکمه‌های کپی و حذف -->
-                        <div class="form-group position-relative">
+                              class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
+                              data-timepicker
+                              wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.end_time"
+                              wire:change="autoSaveSchedule('{{ $day }}', 0)">
+                          </div>
+                          <!-- دکمه‌های غیرفعال برای ردیف خالی -->
+                          <div class="form-group position-relative">
                             <x-custom-tooltip title="کپی تنظیمات" placement="top">
-                                <button class="btn btn-outline-primary btn-sm copy-schedule-setting p-1"
-                                        x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
-                                        @click="$dispatch('open-modal', { name: 'copy-schedule-modal', day: day, index: index })"
-                                        {{ empty($setting['start_time']) || empty($setting['end_time']) ? 'disabled' : '' }}>
-                                    <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی" style="width: 14px; height: 14px;">
-                                </button>
+                              <button class="btn btn-outline-primary btn-sm copy-schedule-setting p-1" disabled>
+                                <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
+                                  style="width: 14px; height: 14px;">
+                              </button>
                             </x-custom-tooltip>
-                        </div>
-                        <div class="form-group position-relative">
+                          </div>
+                          <div class="form-group position-relative">
                             <x-custom-tooltip title="حذف تنظیمات" placement="top">
-                                <button class="btn btn-outline-danger btn-sm delete-schedule-setting p-1"
-                                        x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
-                                        @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', day, index);}})"
-                                        {{ empty($setting['start_time']) || empty($setting['end_time']) ? 'disabled' : '' }}>
-                                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 14px; height: 14px;">
-                                </button>
+                              <button class="btn btn-outline-danger btn-sm delete-schedule-setting p-1" disabled>
+                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
+                                  style="width: 14px; height: 14px;">
+                              </button>
                             </x-custom-tooltip>
+                          </div>
                         </div>
+                      @endif
+                      <div class="add-new-row mt-1">
+                        <button class="add-row-btn btn btn-sm btn-light p-1 font-size-12" data-tooltip="true"
+                          data-placement="bottom" data-original-title="اضافه کردن تنظیم جدید"
+                          wire:click="addScheduleSetting('{{ $day }}')">
+                          <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt=""
+                            style="width: 14px; height: 14px;">
+                          <span>افزودن</span>
+                        </button>
+                      </div>
                     </div>
+                  @endif
                 @endforeach
-            @else
-                <div class="form-row d-flex w-100 align-items-center gap-2 mb-1 bg-active-slot border-radius-11 p-2">
-                    <div class="form-group position-relative timepicker-ui flex-grow-1">
-                        <label class="label-top-input-special-takhasos font-size-11">از</label>
-                        <input type="text"
-                               class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
-                               data-timepicker
-                               wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.start_time"
-                               wire:change="autoSaveSchedule('{{ $day }}', 0)">
-                    </div>
-                    <div class="form-group position-relative timepicker-ui flex-grow-1">
-                        <label class="label-top-input-special-takhasos font-size-11">تا</label>
-                        <input type="text"
-                               class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
-                               data-timepicker
-                               wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.end_time"
-                               wire:change="autoSaveSchedule('{{ $day }}', 0)">
-                    </div>
-                    <!-- دکمه‌های غیرفعال برای ردیف خالی -->
-                    <div class="form-group position-relative">
-                        <x-custom-tooltip title="کپی تنظیمات" placement="top">
-                            <button class="btn btn-outline-primary btn-sm copy-schedule-setting p-1" disabled>
-                                <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی" style="width: 14px; height: 14px;">
-                            </button>
-                        </x-custom-tooltip>
-                    </div>
-                    <div class="form-group position-relative">
-                        <x-custom-tooltip title="حذف تنظیمات" placement="top">
-                            <button class="btn btn-outline-danger btn-sm delete-schedule-setting p-1" disabled>
-                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 14px; height: 14px;">
-                            </button>
-                        </x-custom-tooltip>
-                    </div>
-                </div>
-            @endif
-            <div class="add-new-row mt-1">
-                <button class="add-row-btn btn btn-sm btn-light p-1 font-size-12" data-tooltip="true"
-                        data-placement="bottom" data-original-title="اضافه کردن تنظیم جدید"
-                        wire:click="addScheduleSetting('{{ $day }}')">
-                    <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" style="width: 14px; height: 14px;">
-                    <span>افزودن</span>
-                </button>
-            </div>
-        </div>
-    @endif
-@endforeach
               </div>
             </div>
           </div>
@@ -585,22 +612,28 @@
               @this.set('calculator.index', index);
               const startTime = $(`#morning-start-${day}-${index}`).val();
               const endTime = $(`#morning-end-${day}-${index}`).val();
+              const maxAppointments = $(`#morning-patients-${day}-${index}`).val();
+
               if (!startTime || !endTime) {
                 @this.set('modalMessage', 'لطفاً ابتدا زمان شروع و پایان را وارد کنید');
                 @this.set('modalType', 'error');
                 @this.set('modalOpen', true);
                 return;
               }
+
               @this.set('calculator.start_time', startTime);
               @this.set('calculator.end_time', endTime);
+
               const $appointmentCount = $('#appointment-count');
               const $timeCount = $('#time-count');
               const $countRadio = $('#count-radio');
               const $timeRadio = $('#time-radio');
+
               const timeToMinutes = (time) => {
                 const [hours, minutes] = time.split(':').map(Number);
                 return hours * 60 + minutes;
               };
+
               const totalMinutes = timeToMinutes(endTime) - timeToMinutes(startTime);
               if (totalMinutes <= 0) {
                 @this.set('modalMessage', 'زمان پایان باید بعد از زمان شروع باشد');
@@ -608,18 +641,41 @@
                 @this.set('modalOpen', true);
                 return;
               }
-              const currentCount = @this.get('calculator.appointment_count');
-              const currentTime = @this.get('calculator.time_per_appointment');
-              if (currentCount) {
+
+              // بازیابی مقادیر قبلی از slots
+              const currentCount = maxAppointments ? parseInt(maxAppointments) : @this.get(
+                'calculator.appointment_count');
+              const currentMode = @this.get('calculationMode');
+
+              if (currentCount && currentMode === 'count') {
                 $appointmentCount.val(currentCount);
-                $timeCount.val(Math.round(totalMinutes / currentCount));
-              } else if (currentTime) {
-                $timeCount.val(currentTime);
-                $appointmentCount.val(Math.round(totalMinutes / currentTime));
+                const timePerAppointment = Math.round(totalMinutes / currentCount);
+                $timeCount.val(timePerAppointment);
+                @this.set('calculator.appointment_count', currentCount);
+                @this.set('calculator.time_per_appointment', timePerAppointment);
+                $countRadio.prop('checked', true);
+                $appointmentCount.prop('disabled', false);
+                $timeCount.prop('disabled', true);
+              } else if (currentMode === 'time' && @this.get('calculator.time_per_appointment')) {
+                const timePerAppointment = @this.get('calculator.time_per_appointment');
+                $timeCount.val(timePerAppointment);
+                const appointmentCount = Math.round(totalMinutes / timePerAppointment);
+                $appointmentCount.val(appointmentCount);
+                @this.set('calculator.time_per_appointment', timePerAppointment);
+                @this.set('calculator.appointment_count', appointmentCount);
+                $timeRadio.prop('checked', true);
+                $timeCount.prop('disabled', false);
+                $appointmentCount.prop('disabled', true);
               } else {
                 $appointmentCount.val('');
                 $timeCount.val('');
+                @this.set('calculator.appointment_count', null);
+                @this.set('calculator.time_per_appointment', null);
+                $countRadio.prop('checked', true);
+                $appointmentCount.prop('disabled', false);
+                $timeCount.prop('disabled', true);
               }
+
               $appointmentCount.on('focus', function() {
                 $countRadio.prop('checked', true).trigger('change');
                 $timeRadio.prop('checked', false);
@@ -627,6 +683,7 @@
                 $timeCount.prop('disabled', true);
                 @this.set('calculationMode', 'count');
               });
+
               $timeCount.on('focus', function() {
                 $timeRadio.prop('checked', true).trigger('change');
                 $countRadio.prop('checked', false);
@@ -634,6 +691,7 @@
                 $appointmentCount.prop('disabled', true);
                 @this.set('calculationMode', 'time');
               });
+
               $appointmentCount.on('input', function() {
                 const count = parseInt($(this).val());
                 if (count && !isNaN(count) && count > 0) {
@@ -647,6 +705,7 @@
                   @this.set('calculator.time_per_appointment', null);
                 }
               });
+
               $timeCount.on('input', function() {
                 const time = parseInt($(this).val());
                 if (time && !isNaN(time) && time > 0) {
@@ -660,6 +719,7 @@
                   @this.set('calculator.time_per_appointment', null);
                 }
               });
+
               $countRadio.on('change', function() {
                 if ($(this).is(':checked')) {
                   $appointmentCount.prop('disabled', false);
@@ -667,6 +727,7 @@
                   @this.set('calculationMode', 'count');
                 }
               });
+
               $timeRadio.on('change', function() {
                 if ($(this).is(':checked')) {
                   $timeCount.prop('disabled', false);
@@ -674,16 +735,7 @@
                   @this.set('calculationMode', 'time');
                 }
               });
-              const calculationMode = @this.get('calculationMode');
-              if (calculationMode === 'count') {
-                $countRadio.prop('checked', true);
-                $appointmentCount.prop('disabled', false);
-                $timeCount.prop('disabled', true);
-              } else {
-                $timeRadio.prop('checked', true);
-                $timeCount.prop('disabled', false);
-                $appointmentCount.prop('disabled', true);
-              }
+
             } catch (error) {
               console.error('Error in CalculatorModal:', error);
               window.dispatchEvent(new CustomEvent('close-modal', {
@@ -996,7 +1048,7 @@
             }
           });
 
-        
+
 
           Livewire.on('show-conflict-alert', (event) => {
             let conflictsObj = Array.isArray(event) && event[0] && event[0].conflicts ? event[0].conflicts :
