@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // بستن دراپ‌داون با کلیک خارج
     document.addEventListener("click", function (event) {
         if (dropdownOpen) {
+            
             const dropdowns = document.querySelectorAll(".dropdown");
             dropdowns.forEach((dropdown) => {
                 if (!dropdown.contains(event.target)) {
@@ -35,6 +36,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // جلوگیری از بسته شدن دراپ‌داون با کلیک داخل آن
     document.querySelectorAll(".my-dropdown-menu").forEach((menu) => {
         menu.addEventListener("click", function (event) {
+            location.reload();
+
             event.stopPropagation();
         });
     });

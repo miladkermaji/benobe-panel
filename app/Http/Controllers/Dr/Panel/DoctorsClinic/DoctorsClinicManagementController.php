@@ -9,15 +9,20 @@ use App\Models\ClinicDepositSetting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Dr\Controller;
+use App\Traits\HasSelectedClinic;
 
 class DoctorsClinicManagementController extends Controller
 {
+    use HasSelectedClinic;
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $clinic = $this->getSelectedClinic();
+        $clinicId = $this->getSelectedClinicId();
 
         // بازیابی مطب‌ها با اطلاعات شهر و استان
         $clinics = Clinic::where('doctor_id', $doctorId)
@@ -44,7 +49,7 @@ class DoctorsClinicManagementController extends Controller
         }
 
         // ارسال داده‌ها به ویو
-        return view('dr.panel.doctors-clinic.index', compact('clinics', 'provinces', 'cities'));
+        return view('dr.panel.doctors-clinic.index', compact('clinics', 'provinces', 'cities', 'clinic', 'clinicId'));
     }
 
     public function getProvincesAndCities()
