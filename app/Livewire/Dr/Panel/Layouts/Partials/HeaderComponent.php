@@ -14,70 +14,120 @@ class HeaderComponent extends Component
     public $walletBalance = 0;
     public $notifications;
     public $unreadCount = 0;
+    public $selectedClinicId = null;
+    public $selectedClinicName = 'مشاوره آنلاین به نوبه';
+    public $clinics = [];
 
     public function mount()
     {
-        // مقداردهی اولیه به‌عنوان کالکشن خالی
         $this->notifications = new Collection();
 
         if (Auth::guard('doctor')->check()) {
-            // کاربر پزشک است
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $doctorMobile = Auth::guard('doctor')->user()->mobile; // شماره موبایل پزشک
+            $doctor = Auth::guard('doctor')->user();
+            $doctorId = $doctor->id;
+            $doctorMobile = $doctor->mobile;
+
+            // بارگذاری کلینیک‌ها
+            $this->loadClinics($doctor);
+
+            // تنظیم کلینیک انتخاب‌شده
+            $this->setSelectedClinicFromDatabase($doctor);
 
             $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
                 ->sum('balance');
 
-            // لود اعلان‌ها برای پزشک (بر اساس recipient_type و recipient_id)
+            // لود اعلان‌ها برای پزشک
             $doctorNotifications = NotificationRecipient::where('recipient_type', 'App\\Models\\Doctor')
                 ->where('recipient_id', $doctorId)
-                ->where('is_read', false) // فقط اعلان‌های خوانده‌نشده
+                ->where('is_read', false)
                 ->with('notification')
                 ->get();
 
-            // لود اعلان‌های تکی که شماره موبایلشون با شماره موبایل پزشک برابر است
             $singleNotifications = NotificationRecipient::where('recipient_type', 'phone')
                 ->where('phone_number', $doctorMobile)
-                ->where('is_read', false) // فقط اعلان‌های خوانده‌نشده
+                ->where('is_read', false)
                 ->with('notification')
                 ->get();
 
-            // ادغام اعلان‌ها
             $this->notifications = $doctorNotifications->merge($singleNotifications);
         } elseif (Auth::guard('secretary')->check()) {
-            // کاربر منشی است
             $secretary = Auth::guard('secretary')->user();
-            $doctorId = $secretary->doctor_id; // آیدی پزشک مرتبط با منشی
-            $secretaryMobile = $secretary->mobile; // شماره موبایل منشی
+            $doctorId = $secretary->doctor_id;
+            $secretaryMobile = $secretary->mobile;
+
+            // بارگذاری کلینیک‌ها
+            $this->loadClinics($secretary->doctor);
+
+            // تنظیم کلینیک انتخاب‌شده
+            $this->setSelectedClinicFromDatabase($secretary->doctor);
 
             if ($doctorId) {
                 $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
                     ->sum('balance');
             }
 
-            // لود اعلان‌ها برای منشی (بر اساس recipient_type و recipient_id)
             $secretaryNotifications = NotificationRecipient::where('recipient_type', 'App\\Models\\Secretary')
                 ->where('recipient_id', $secretary->id)
-                ->where('is_read', false) // فقط اعلان‌های خوانده‌نشده
+                ->where('is_read', false)
                 ->with('notification')
                 ->get();
 
-            // لود اعلان‌های تکی که شماره موبایلشون با شماره موبایل منشی برابر است
             $singleNotifications = NotificationRecipient::where('recipient_type', 'phone')
                 ->where('phone_number', $secretaryMobile)
-                ->where('is_read', false) // فقط اعلان‌های خوانده‌نشده
+                ->where('is_read', false)
                 ->with('notification')
                 ->get();
 
-            // ادغام اعلان‌ها
             $this->notifications = $secretaryNotifications->merge($singleNotifications);
         }
 
-        // محاسبه تعداد اعلان‌های خوانده‌نشده
         $this->unreadCount = $this->notifications->count();
     }
 
-    // متد برای علامت‌گذاری اعلان به‌عنوان خوانده‌شده
+    protected function loadClinics($doctor)
+    {
+        if ($doctor) {
+            $this->clinics = $doctor->clinics()->select('id', 'name', 'is_active', 'province_id', 'city_id')->with(['province', 'city'])->get();
+        }
+    }
+
+    protected function setSelectedClinicFromDatabase($doctor)
+    {
+        if ($doctor && $doctor->selectedClinic) {
+            $this->selectedClinicId = $doctor->selectedClinic->clinic_id;
+            $this->selectedClinicName = $this->selectedClinicId
+                ? $doctor->selectedClinic->clinic->name
+                : 'مشاوره آنلاین به نوبه';
+        }
+    }
+
+    public function selectClinic($clinicId = null)
+    {
+        $doctor = Auth::guard('doctor')->check()
+            ? Auth::guard('doctor')->user()
+            : Auth::guard('secretary')->user()->doctor;
+
+        if ($doctor) {
+            // اعتبارسنجی کلینیک
+            if ($clinicId && !$doctor->clinics()->where('id', $clinicId)->exists()) {
+                $this->addError('clinic', 'کلینیک انتخاب‌شده معتبر نیست.');
+                return;
+            }
+
+            // ذخیره کلینیک انتخاب‌شده
+            $doctor->setSelectedClinic($clinicId);
+
+            // به‌روزرسانی مقادیر
+            $this->selectedClinicId = $clinicId;
+            $this->selectedClinicName = $clinicId
+                ? $doctor->clinics()->find($clinicId)->name
+                : 'مشاوره آنلاین به نوبه';
+
+            // اطلاع‌رسانی به سایر کامپوننت‌ها
+            $this->dispatch('clinicSelected', ['clinicId' => $clinicId]);
+        }
+    }
+
     public function markAsRead($recipientId)
     {
         $recipient = NotificationRecipient::find($recipientId);
@@ -87,7 +137,6 @@ class HeaderComponent extends Component
                 'read_at' => now(),
             ]);
 
-            // به‌روزرسانی لیست اعلان‌ها
             $this->notifications = $this->notifications->filter(fn ($item) => $item->id != $recipientId);
             $this->unreadCount = $this->notifications->count();
         }

@@ -1,67 +1,65 @@
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function () {
     let dropdownOpen = false;
-    let selectedClinic = localStorage.getItem("selectedClinic");
-    let selectedClinicId = localStorage.getItem("selectedClinicId");
-    if (selectedClinic && selectedClinicId) {
-        $(".dropdown-label").text(selectedClinic);
-        $(".option-card").each(function () {
-            if ($(this).attr("data-id") === selectedClinicId) {
-                $(".option-card").removeClass("card-active");
-                $(this).addClass("card-active");
-            }
-        });
-    } else {
-        localStorage.setItem("selectedClinic", "مشاوره آنلاین به نوبه");
-        localStorage.setItem("selectedClinicId", "default");
-    }
 
-    function checkInactiveClinics() {
-        var hasInactiveClinics = $('.option-card[data-active="0"]').length > 0;
-        if (hasInactiveClinics) {
-            $(".dropdown-trigger").addClass("warning");
-        } else {
-            $(".dropdown-trigger").removeClass("warning");
+    // باز و بسته کردن دراپ‌داون
+    document.querySelectorAll(".dropdown-trigger").forEach((trigger) => {
+        trigger.addEventListener("click", function (event) {
+            event.stopPropagation();
+            dropdownOpen = !dropdownOpen;
+            this.classList.toggle("border");
+            this.classList.toggle("border-primary");
+            const dropdownMenu =
+                this.closest(".dropdown").querySelector(".my-dropdown-menu");
+            dropdownMenu.classList.toggle("d-none");
+        });
+    });
+
+    // بستن دراپ‌داون با کلیک خارج
+    document.addEventListener("click", function (event) {
+        if (dropdownOpen) {
+            const dropdowns = document.querySelectorAll(".dropdown");
+            dropdowns.forEach((dropdown) => {
+                if (!dropdown.contains(event.target)) {
+                    dropdown
+                        .querySelector(".dropdown-trigger")
+                        .classList.remove("border", "border-primary");
+                    dropdown
+                        .querySelector(".my-dropdown-menu")
+                        .classList.add("d-none");
+                    dropdownOpen = false;
+                }
+            });
         }
+    });
+
+    // جلوگیری از بسته شدن دراپ‌داون با کلیک داخل آن
+    document.querySelectorAll(".my-dropdown-menu").forEach((menu) => {
+        menu.addEventListener("click", function (event) {
+            event.stopPropagation();
+        });
+    });
+
+    // بررسی کلینیک‌های غیرفعال برای نمایش هشدار
+    function checkInactiveClinics() {
+        const hasInactiveClinics =
+            document.querySelectorAll('.option-card[data-active="0"]').length >
+            0;
+        document.querySelectorAll(".dropdown-trigger").forEach((trigger) => {
+            trigger.classList.toggle("warning", hasInactiveClinics);
+        });
     }
     checkInactiveClinics();
 
-    $(".dropdown-trigger").on("click", function (event) {
-        event.stopPropagation();
-        dropdownOpen = !dropdownOpen;
-        $(this).toggleClass("border border-primary");
-        $(".my-dropdown-menu").toggleClass("d-none");
-        setTimeout(() => {
-            dropdownOpen = $(".my-dropdown-menu").is(":visible");
-        }, 100);
-    });
-
-    $(document).on("click", function () {
-        if (dropdownOpen) {
-            $(".dropdown-trigger").removeClass("border border-primary");
-            $(".my-dropdown-menu").addClass("d-none");
-            dropdownOpen = false;
-        }
-    });
-
-    $(".my-dropdown-menu").on("click", function (event) {
-        event.stopPropagation();
-    });
-
-    $(".option-card").on("click", function () {
-        var selectedText = $(this).find(".fw-bold.d-block.fs-15").text().trim();
-        var selectedId = $(this).attr("data-id");
-        $(".option-card").removeClass("card-active");
-        $(this).addClass("card-active");
-        $(".dropdown-label").text(selectedText);
-
-        localStorage.setItem("selectedClinic", selectedText);
-        localStorage.setItem("selectedClinicId", selectedId);
+    // گوش دادن به رویداد تغییر کلینیک از Livewire
+    window.addEventListener("clinicSelected", function (event) {
+        const clinicId = event.detail.clinicId;
+        const optionCards = document.querySelectorAll(".option-card");
+        optionCards.forEach((card) => {
+            card.classList.toggle(
+                "card-active",
+                card.dataset.id == (clinicId || "default")
+            );
+        });
         checkInactiveClinics();
-        $(".dropdown-trigger").removeClass("border border-primary");
-        $(".my-dropdown-menu").addClass("d-none");
-        dropdownOpen = false;
-
-        window.location.href =
-            window.location.pathname + "?selectedClinicId=" + selectedId;
     });
 });

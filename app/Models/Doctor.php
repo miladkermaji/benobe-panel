@@ -186,7 +186,29 @@ class Doctor extends Authenticatable
     {
         return $this->morphMany(Transaction::class, 'transactable');
     }
+public function selectedClinic()
+    {
+        return $this->hasOne(DoctorSelectedClinic::class, 'doctor_id');
+    }
 
+    /**
+     * دریافت کلینیک انتخاب‌شده یا مقدار پیش‌فرض (مشاوره آنلاین)
+     */
+    public function getCurrentClinicAttribute()
+    {
+        return $this->selectedClinic?->clinic ?? null;
+    }
+
+    /**
+     * تنظیم کلینیک انتخاب‌شده
+     */
+    public function setSelectedClinic($clinicId = null)
+    {
+        $this->selectedClinic()->updateOrCreate(
+            ['doctor_id' => $this->id],
+            ['clinic_id' => $clinicId]
+        );
+    }
     public function getJalaliCreatedAtAttribute()
     {
         if (! $this->created_at) {
