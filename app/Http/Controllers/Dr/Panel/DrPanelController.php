@@ -61,14 +61,15 @@ class DrPanelController extends Controller
             ->where('payment_status', 'paid')
             ->where('status', 'attended')
             ->sum('final_price');
-
+         $selctedClinicId = $this->getSelectedClinicId();
         return view('dr.panel.index', compact(
             'totalPatientsToday',
             'visitedPatients',
             'remainingPatients',
             'weeklyIncome',
             'monthlyIncome',
-            'totalIncome'
+            'totalIncome',
+            'selctedClinicId',
         ));
     }
 

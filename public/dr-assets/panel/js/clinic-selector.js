@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // جلوگیری از بسته شدن دراپ‌داون با کلیک داخل آن
     document.querySelectorAll(".my-dropdown-menu").forEach((menu) => {
         menu.addEventListener("click", function (event) {
-            location.reload();
+            /* location.reload(); */
 
             event.stopPropagation();
         });

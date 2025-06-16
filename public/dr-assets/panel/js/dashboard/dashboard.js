@@ -3,9 +3,17 @@ document.addEventListener("DOMContentLoaded", function () {
     if (urlParams.has("showModal")) {
         $("#activation-modal").modal("show");
     }
+
 });
+let selectedClinicId = window.selectedClinicId || "default";
+console.log(selectedClinicId);
+// گوش دادن به رویداد تغییر کلینیک از Livewire
+window.addEventListener("clinicSelected", function (event) {
+    selectedClinicId = event.detail.clinicId || "default";
+    loadCharts(); // به‌روزرسانی نمودارها پس از تغییر کلینیک
+});
+
 // متغیر جهانی برای clinic_id
-let selectedClinicId = localStorage.getItem("selectedClinicId") || "default";
 // تابع بارگذاری نمودارها
 function loadCharts() {
     $("#chart-container").html('<div class="loader">در حال بارگذاری...</div>');
@@ -138,8 +146,7 @@ function loadCharts() {
 }
 // 📊 نمودار تعداد ویزیت‌ها - نمودار میله‌ای برای مقایسه بهتر
 function renderPerformanceChart(data) {
-    let ctx = document
-        .getElementById("doctor-performance-chart")
+    let ctx = document.getElementById("doctor-performance-chart")
         .getContext("2d");
     if (window.performanceChart) {
         window.performanceChart.destroy();

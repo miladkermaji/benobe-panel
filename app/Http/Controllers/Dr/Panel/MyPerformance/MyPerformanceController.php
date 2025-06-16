@@ -251,7 +251,7 @@ class MyPerformanceController extends Controller
 
     public function getChartData(Request $request)
     {
-        $clinicId = $request->input('clinic_id', 'default');
+        $clinicId = $this->getSelectedClinicId();
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
         // اعتبارسنجی clinic_id
