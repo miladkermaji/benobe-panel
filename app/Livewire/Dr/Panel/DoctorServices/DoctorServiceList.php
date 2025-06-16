@@ -8,12 +8,13 @@ use Livewire\Component;
 use App\Models\Insurance;
 use Livewire\WithPagination;
 use App\Models\DoctorService;
+use App\Traits\HasSelectedClinic;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class DoctorServiceList extends Component
 {
-    use WithPagination;
+    use WithPagination,HasSelectedClinic;
     public $openServices = [];
     public $openInsurances = [];
     protected $paginationTheme = 'bootstrap';
