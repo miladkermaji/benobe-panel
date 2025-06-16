@@ -262,7 +262,7 @@
               <button type="button"id="startAppointmentBtn" data-tooltip="true" data-placement="right"
                 data-original-title="پایان ثبت ساعات کاری و شروع نوبت‌دهی! حالا می‌توانید از امکانات سایت استفاده کنید."
                 class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center">
-                <span class="button_text">ذخیره تغییرات</span>
+                <span class="button_text"> پایان فعالسازی کلینیک</span>
                 <div class="loader"></div>
               </button>
             </div>
