@@ -14,7 +14,7 @@ class VacationController extends Controller
     public function index(Request $request)
     {
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $selectedClinicId = $request->input('selectedClinicId');
+        $selectedClinicId = $this->getSelectedClinicId();
 
         // Get doctor's clinics
         $clinics = \App\Models\Clinic::where('doctor_id', $doctorId)->get();
@@ -88,8 +88,8 @@ class VacationController extends Controller
         $exists = Vacation::where('doctor_id', $doctorId)
             ->where('date', $validatedData['date'])
             ->when(
-                $request->selectedClinicId && $request->selectedClinicId !== 'default',
-                fn ($query) => $query->where('clinic_id', $request->selectedClinicId)
+                $this->getSelectedClinicId() && $this->getSelectedClinicId() !== 'default',
+                fn ($query) => $query->where('clinic_id', $this->getSelectedClinicId())
             )
             ->where(function ($query) use ($validatedData) {
                 $query->whereBetween('start_time', [$validatedData['start_time'], $validatedData['end_time']])
@@ -107,7 +107,7 @@ class VacationController extends Controller
 
         Vacation::create([
             'doctor_id' => $doctorId,
-            'clinic_id' => $request->selectedClinicId && $request->selectedClinicId !== 'default' ? $request->selectedClinicId : null,
+            'clinic_id' => $this->getSelectedClinicId() && $this->getSelectedClinicId() !== 'default' ? $this->getSelectedClinicId() : null,
             'date' => $validatedData['date'],
             'start_time' => $validatedData['start_time'] ?? null,
             'end_time' => $validatedData['end_time'] ?? null,
@@ -140,8 +140,8 @@ class VacationController extends Controller
         $vacation = Vacation::where('id', $id)
             ->where('doctor_id', $doctorId)
             ->when(
-                $request->selectedClinicId && $request->selectedClinicId !== 'default',
-                fn ($query) => $query->where('clinic_id', $request->selectedClinicId)
+                $this->getSelectedClinicId() && $this->getSelectedClinicId() !== 'default',
+                fn ($query) => $query->where('clinic_id', $this->getSelectedClinicId())
             )
             ->firstOrFail();
 
@@ -155,7 +155,7 @@ class VacationController extends Controller
 
         // بررسی تداخل زمانی
         $exists = Vacation::where('doctor_id', $doctorId)
-            ->where('clinic_id', $request->selectedClinicId !== 'default' ? $request->selectedClinicId : null)
+            ->where('clinic_id', $this->getSelectedClinicId() !== 'default' ? $this->getSelectedClinicId() : null)
             ->where('date', $validatedData['date'])
             ->where('id', '!=', $vacation->id)
             ->where(function ($query) use ($validatedData) {
@@ -185,7 +185,7 @@ class VacationController extends Controller
     public function destroy(Request $request, $id)
     {
         $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
-        $selectedClinicId = $request->input('selectedClinicId');
+        $selectedClinicId = $this->getSelectedClinicId();
 
         $vacation = Vacation::where('id', $id)
             ->where('doctor_id', $doctorId)

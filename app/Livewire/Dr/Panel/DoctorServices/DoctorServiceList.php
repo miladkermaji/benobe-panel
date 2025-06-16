@@ -30,7 +30,7 @@ class DoctorServiceList extends Component
     public $readyToLoad = false;
     public $selectedDoctorServices = [];
     public $selectAll = false;
-    public $selectedClinicId = 'default';
+    public $selectedClinicId =  'default';
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -39,14 +39,17 @@ class DoctorServiceList extends Component
     public function mount()
     {
         $this->perPage = max($this->perPage, 1);
-        Log::info('Mount called, waiting for selectedClinicId');
+
+        $this->selectedClinicId = $this->getSelectedClinicId();
+
         // لود خدمات به setSelectedClinicId موکول می‌شود
     }
 
     public function setSelectedClinicId($clinicId)
     {
-        $this->selectedClinicId = $clinicId ?? 'default';
-        Log::info('setSelectedClinicId called with clinicId: ' . $this->selectedClinicId);
+        $this->selectedClinicId =
+$this->getSelectedClinicId()
+ ?? 'default';
 
         // اعتبارسنجی clinic_id
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;

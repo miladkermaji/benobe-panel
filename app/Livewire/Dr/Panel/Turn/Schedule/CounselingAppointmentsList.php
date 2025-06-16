@@ -16,6 +16,7 @@ use Livewire\WithPagination;
 use Morilog\Jalali\Jalalian;
 use App\Models\DoctorHoliday;
 use App\Models\DoctorService;
+use App\Traits\HasSelectedClinic;
 use Livewire\Attributes\Validate;
 use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,7 @@ use App\Models\DoctorCounselingWorkSchedule;
 
 class CounselingAppointmentsList extends Component
 {
+
     use WithPagination;
     public $selectedServiceIds = [];
     public $calendarYear;
@@ -147,7 +149,9 @@ class CounselingAppointmentsList extends Component
         $this->calendarYear = Jalalian::now()->getYear();
         $this->calendarMonth = Jalalian::now()->getMonth();
         $doctor = $this->getAuthenticatedDoctor();
-        $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+        $this->selectedClinicId = 
+$this->getSelectedClinicId();
+
         if ($doctor) {
             $this->loadClinics();
             $this->loadAppointments();
