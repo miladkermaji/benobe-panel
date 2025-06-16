@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // متغیر جهانی برای clinic_id، مقدار اولیه از Livewire
     let selectedClinicId = window.selectedClinicId || "default";
-
+    console.log(selectedClinicId)
     // گوش دادن به رویداد تغییر کلینیک از Livewire
     window.addEventListener("clinicSelected", function (event) {
         selectedClinicId = event.detail.clinicId || "default";
