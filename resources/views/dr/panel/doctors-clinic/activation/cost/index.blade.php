@@ -333,7 +333,7 @@
               text: data.message,
             }).then(() => {
               loadDeposits();
-              location.href = "{{ route('duration.index', $clinicId) }}";
+              location.href = "{{ route('activation.workhours.index', $clinicId) }}";
             });
           } else {
             Swal.fire({
