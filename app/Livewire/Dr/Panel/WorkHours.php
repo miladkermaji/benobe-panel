@@ -202,6 +202,82 @@ class Workhours extends Component
         $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
         $this->dispatch('refresh-clinic-data');
     }
+    public function autoSaveCalendarDays()
+{
+    try {
+        // تنظیم activeClinicId
+        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            $currentClinicId = explode(' ', explode('/', request())[6])[0];
+            $this->activeClinicId = $currentClinicId;
+        } else {
+            $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+            $this->activeClinicId = $clinicId ?? 'default';
+        }
+
+        // اعتبارسنجی
+        $this->validate([
+            'calendarDays' => 'required|integer|min:1',
+        ], [
+            'calendarDays.required' => 'تعداد روزهای تقویم الزامی است',
+            'calendarDays.integer' => 'تعداد روزهای تقویم باید عدد باشد',
+            'calendarDays.min' => 'تعداد روزهای تقویم باید حداقل ۱ باشد',
+        ]);
+
+        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+        DB::beginTransaction();
+
+        // به‌روزرسانی یا ایجاد تنظیمات
+        $config = DoctorAppointmentConfig::updateOrCreate(
+            [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+            ],
+            [
+                'calendar_days' => (int) $this->calendarDays,
+            ]
+        );
+
+        // به‌روزرسانی پراپرتی‌های محلی
+        $this->appointmentConfig->calendar_days = (int) $this->calendarDays;
+        $this->calendarDays = (int) $this->calendarDays;
+
+        DB::commit();
+
+        $this->modalMessage = 'تعداد روزهای باز تقویم با موفقیت ذخیره شد';
+        $this->modalType = 'success';
+        $this->modalOpen = true;
+        $this->dispatch('show-toastr', [
+            'message' => $this->modalMessage,
+            'type' => 'success',
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        $errorMessages = $e->validator->errors()->all();
+        $errorMessage = implode('، ', $errorMessages);
+        Log::error('Validation error in autoSaveCalendarDays: ' . $errorMessage);
+        $this->modalMessage = $errorMessage ?: 'لطفاً یک عدد معتبر وارد کنید';
+        $this->modalType = 'error';
+        $this->modalOpen = true;
+        $this->dispatch('show-toastr', [
+            'message' => $this->modalMessage,
+            'type' => 'error',
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error in autoSaveCalendarDays: ' . $e->getMessage(), [
+            'doctor_id' => $doctorId ?? null,
+            'calendar_days' => $this->calendarDays ?? null,
+        ]);
+        $this->modalMessage = $e->getMessage() ?: 'خطا در ذخیره تعداد روزهای تقویم';
+        $this->modalType = 'error';
+        $this->modalOpen = true;
+        $this->dispatch('show-toastr', [
+            'message' => $this->modalMessage,
+            'type' => 'error',
+        ]);
+    }
+}
     public function setSelectedClinicId($clinicId)
     {
         $this->selectedClinicId = $clinicId;
