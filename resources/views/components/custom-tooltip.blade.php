@@ -273,7 +273,7 @@
     --tooltip-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --tooltip-arrow-size: 8px;
     --tooltip-arrow-color: #2e3b4e;
-    --tooltip-z-index: 800;
+    --tooltip-z-index: 900;
     /* کاهش z-index پیش‌فرض */
   }
 
