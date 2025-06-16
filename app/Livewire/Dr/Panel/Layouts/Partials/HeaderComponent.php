@@ -27,6 +27,7 @@ class HeaderComponent extends Component
             $doctorId = $doctor->id;
             $doctorMobile = $doctor->mobile;
 
+            
             // بارگذاری کلینیک‌ها
             $this->loadClinics($doctor);
 

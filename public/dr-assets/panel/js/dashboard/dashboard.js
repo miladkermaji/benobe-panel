@@ -6,11 +6,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // متغیر جهانی برای clinic_id، مقدار اولیه از Livewire
     let selectedClinicId = window.selectedClinicId || "default";
-    console.log(selectedClinicId)
+    // Ensure the value is always a string
+    if (selectedClinicId === null || selectedClinicId === undefined) {
+        selectedClinicId = "default";
+    } else {
+        selectedClinicId = String(selectedClinicId);
+    }
+    console.log("Initial selectedClinicId:", selectedClinicId);
+    
     // گوش دادن به رویداد تغییر کلینیک از Livewire
     window.addEventListener("clinicSelected", function (event) {
-        selectedClinicId = event.detail.clinicId || "default";
-        loadCharts(); // به‌روزرسانی نمودارها پس از تغییر کلینیک
+        // Handle case where event.detail might be undefined
+        const detail = event.detail || {};
+        let newClinicId = detail.clinicId;
+        
+        // Set default value if clinicId is undefined or null
+        if (newClinicId === undefined || newClinicId === null) {
+            newClinicId = "default";
+        }
+        
+        // Ensure the value is always a string
+        selectedClinicId = String(newClinicId);
+        
+        console.log("Clinic selected, new clinicId:", selectedClinicId);
+        
+        // Only load charts if the clinic ID has actually changed
+        if (selectedClinicId !== (window.previousClinicId || null)) {
+            window.previousClinicId = selectedClinicId;
+            loadCharts(); // به‌روزرسانی نمودارها پس از تغییر کلینیک
+        }
     });
 
     // تابع بارگذاری نمودارها
@@ -22,8 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
             url: chartUrl,
             method: "GET",
             data: {
-                clinic_id:
-                    selectedClinicId === "default" ? null : selectedClinicId,
+                clinic_id: selectedClinicId,  // Always send the value as is
                 _t: new Date().getTime(),
             },
             success: function (response) {
@@ -152,14 +175,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 📊 نمودار تعداد ویزیت‌ها - نمودار میله‌ای برای مقایسه بهتر
     function renderPerformanceChart(data) {
-        let ctx = document
-            .getElementById("doctor-performance-chart")
-            .getContext("2d");
+        const chartElement = document.getElementById("doctor-performance-chart");
+        if (!chartElement) {
+            console.log("Performance chart container not found, skipping rendering");
+            return;
+        }
+        
+        let ctx = chartElement.getContext("2d");
         if (window.performanceChart) {
             window.performanceChart.destroy();
         }
         if (!data || data.length === 0) {
-            ctx.canvas.parentNode.innerHTML =
+            chartElement.parentNode.innerHTML =
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
@@ -232,14 +259,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 💰 نمودار درآمد ماهانه - نمودار خطی برای نمایش روند
     function renderIncomeChart(data) {
-        let ctx = document
-            .getElementById("doctor-income-chart")
-            .getContext("2d");
+        const chartElement = document.getElementById("doctor-income-chart");
+        if (!chartElement) {
+            console.log("Income chart container not found, skipping rendering");
+            return;
+        }
+        
+        let ctx = chartElement.getContext("2d");
         if (window.incomeChart) {
             window.incomeChart.destroy();
         }
         if (!data || data.length === 0) {
-            ctx.canvas.parentNode.innerHTML =
+            chartElement.parentNode.innerHTML =
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
@@ -303,14 +334,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 👨‍⚕️ نمودار تعداد بیماران جدید - نمودار خطی برای نمایش روند
     function renderPatientChart(data) {
-        let ctx = document
-            .getElementById("doctor-patient-chart")
-            .getContext("2d");
+        const chartElement = document.getElementById("doctor-patient-chart");
+        if (!chartElement) {
+            console.log("Patient chart container not found, skipping rendering");
+            return;
+        }
+        
+        let ctx = chartElement.getContext("2d");
         if (window.patientChart) {
             window.patientChart.destroy();
         }
         if (!data || data.length === 0) {
-            ctx.canvas.parentNode.innerHTML =
+            chartElement.parentNode.innerHTML =
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
@@ -363,14 +398,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 📈 نمودار انواع نوبت‌ها - نمودار میله‌ای گروهی
     function renderAppointmentTypesChart(data) {
-        let ctx = document
-            .getElementById("doctor-status-chart")
-            .getContext("2d");
+        const chartElement = document.getElementById("doctor-status-chart");
+        if (!chartElement) {
+            console.log("Appointment types chart container not found, skipping rendering");
+            return;
+        }
+        
+        let ctx = chartElement.getContext("2d");
         if (window.statusChart) {
             window.statusChart.destroy();
         }
         if (!data || data.length === 0) {
-            ctx.canvas.parentNode.innerHTML =
+            chartElement.parentNode.innerHTML =
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
@@ -450,14 +489,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 🥧 نمودار درصد نوبت‌ها - نمودار دایره‌ای
     function renderStatusPieChart(data) {
-        let ctx = document
-            .getElementById("doctor-status-pie-chart")
-            .getContext("2d");
+        const chartElement = document.getElementById("doctor-status-pie-chart");
+        if (!chartElement) {
+            console.log("Status pie chart container not found, skipping rendering");
+            return;
+        }
+        
+        let ctx = chartElement.getContext("2d");
         if (window.statusPieChart) {
             window.statusPieChart.destroy();
         }
         if (!data || data.length === 0) {
-            ctx.canvas.parentNode.innerHTML =
+            chartElement.parentNode.innerHTML =
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
@@ -514,14 +557,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 📉 نمودار روند بیماران - نمودار خطی با ناحیه
     function renderPatientTrendChart(data) {
-        let ctx = document
-            .getElementById("doctor-patient-trend-chart")
-            .getContext("2d");
+        const chartElement = document.getElementById("doctor-patient-trend-chart");
+        if (!chartElement) {
+            console.log("Patient trend chart container not found, skipping rendering");
+            return;
+        }
+        
+        let ctx = chartElement.getContext("2d");
         if (window.patientTrendChart) {
             window.patientTrendChart.destroy();
         }
         if (!data || data.length === 0) {
-            ctx.canvas.parentNode.innerHTML =
+            chartElement.parentNode.innerHTML =
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
@@ -574,14 +621,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 🗣️ نمودار نوبت‌های مشاوره - نمودار میله‌ای گروهی
     function renderCounselingChart(data) {
-        let ctx = document
-            .getElementById("doctor-counseling-chart")
-            .getContext("2d");
+        const chartElement = document.getElementById("doctor-counseling-chart");
+        if (!chartElement) {
+            console.log("Counseling chart container not found, skipping rendering");
+            return;
+        }
+        
+        let ctx = chartElement.getContext("2d");
         if (window.counselingChart) {
             window.counselingChart.destroy();
         }
         if (!data || data.length === 0) {
-            ctx.canvas.parentNode.innerHTML =
+            chartElement.parentNode.innerHTML =
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
@@ -654,14 +705,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✍️ نمودار نوبت‌های دستی - نمودار میله‌ای گروهی
     function renderManualChart(data) {
-        let ctx = document
-            .getElementById("doctor-manual-chart")
-            .getContext("2d");
+        const chartElement = document.getElementById("doctor-manual-chart");
+        if (!chartElement) {
+            console.log("Manual chart container not found, skipping rendering");
+            return;
+        }
+        
+        let ctx = chartElement.getContext("2d");
         if (window.manualChart) {
             window.manualChart.destroy();
         }
         if (!data || data.length === 0) {
-            ctx.canvas.parentNode.innerHTML =
+            chartElement.parentNode.innerHTML =
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
@@ -720,14 +775,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 💸 نمودار درآمد کلی - نمودار خطی با ناحیه
     function renderTotalIncomeChart(data) {
-        let ctx = document
-            .getElementById("doctor-total-income-chart")
-            .getContext("2d");
+        const chartElement = document.getElementById("doctor-total-income-chart");
+        if (!chartElement) {
+            console.log("Total income chart container not found, skipping rendering");
+            return;
+        }
+        
+        let ctx = chartElement.getContext("2d");
         if (window.totalIncomeChart) {
             window.totalIncomeChart.destroy();
         }
         if (!data || data.length === 0) {
-            ctx.canvas.parentNode.innerHTML =
+            chartElement.parentNode.innerHTML =
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }

@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
             dropdownMenu.classList.toggle("d-none");
         });
     });
+    
 
     // بستن دراپ‌داون با کلیک خارج
     document.addEventListener("click", function (event) {
@@ -55,14 +56,56 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // گوش دادن به رویداد تغییر کلینیک از Livewire
     window.addEventListener("clinicSelected", function (event) {
-        const clinicId = event.detail.clinicId;
+        // Handle case where event.detail might be undefined
+        const detail = event.detail || {};
+        let clinicId = detail.clinicId;
+        console.log('Clinic selected in clinic-selector:', clinicId);
+        
+        // If clinicId is undefined, use 'default'
+        const selectedId = (clinicId === undefined || clinicId === null) ? 'default' : clinicId.toString();
+        
         const optionCards = document.querySelectorAll(".option-card");
+        let foundSelected = false;
+        
         optionCards.forEach((card) => {
-            card.classList.toggle(
-                "card-active",
-                card.dataset.id == (clinicId || "default")
-            );
+            const cardId = card.dataset.id || '';
+            const isSelected = cardId === selectedId;
+            
+            card.classList.toggle("card-active", isSelected);
+            
+            // Update the selected clinic name in the dropdown trigger
+            if (isSelected) {
+                foundSelected = true;
+                const clinicName = card.querySelector('.fw-bold.fs-15')?.textContent || 
+                                 'مشاوره آنلاین به نوبه';
+                const dropdownLabel = document.querySelector('.dropdown-label');
+                if (dropdownLabel) {
+                    dropdownLabel.textContent = clinicName;
+                }
+            }
         });
+        
+        // If no card was selected, try to select the default one
+        if (!foundSelected) {
+            const defaultCard = document.querySelector('.option-card[data-id="default"]');
+            if (defaultCard) {
+                defaultCard.classList.add('card-active');
+                const dropdownLabel = document.querySelector('.dropdown-label');
+                if (dropdownLabel) {
+                    dropdownLabel.textContent = 'مشاوره آنلاین به نوبه';
+                }
+            }
+        }
+        
         checkInactiveClinics();
+        
+        // Close the dropdown after selection
+        const dropdownMenu = document.querySelector('.my-dropdown-menu');
+        const dropdownTrigger = document.querySelector('.dropdown-trigger');
+        if (dropdownMenu && dropdownTrigger) {
+            dropdownMenu.classList.add('d-none');
+            dropdownTrigger.classList.remove('border', 'border-primary');
+            dropdownOpen = false;
+        }
     });
 });
