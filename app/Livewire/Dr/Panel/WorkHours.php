@@ -5,10 +5,12 @@ namespace App\Livewire\Dr\Panel;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Clinic;
+use App\Models\Doctor;
 use Livewire\Component;
 use App\Models\Appointment;
 use Morilog\Jalali\Jalalian;
 use App\Models\DoctorHoliday;
+use App\Traits\HasSelectedClinic;
 use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,10 +21,10 @@ use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
-use App\Models\Doctor;
 
 class Workhours extends Component
 {
+    use HasSelectedClinic;
     public $calculationMode = 'count'; // حالت پیش‌فرض: تعداد نوبت‌ها
     public $selectedClinicId = 'default';
     public $clinicId; // برای صفحه جدید (مثل activation/workhours/{clinic})
@@ -130,7 +132,8 @@ class Workhours extends Component
             $currentClinicId = explode(' ', explode('/', request())[6])[0];
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+            $clinicId =
+            $this->getSelectedClinicId();
             $this->activeClinicId = $clinicId ?? 'default';
         }
 
@@ -159,8 +162,10 @@ class Workhours extends Component
             ]
         );
 
-        $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
-        session(['selectedClinicId' => $this->selectedClinicId]);
+        $this->selectedClinicId =
+$this->getSelectedClinicId();
+
+
 
         // بارگذاری برنامه‌های کاری
         $this->refreshWorkSchedules();
@@ -203,81 +208,81 @@ class Workhours extends Component
         $this->dispatch('refresh-clinic-data');
     }
     public function autoSaveCalendarDays()
-{
-    try {
-        // تنظیم activeClinicId
-        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = explode(' ', explode('/', request())[6])[0];
-            $this->activeClinicId = $currentClinicId;
-        } else {
-            $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
-            $this->activeClinicId = $clinicId ?? 'default';
+    {
+        try {
+            // تنظیم activeClinicId
+            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $this->activeClinicId = $currentClinicId;
+            } else {
+                $clinicId = $this->getSelectedClinicId();
+                $this->activeClinicId = $clinicId ?? 'default';
+            }
+
+            // اعتبارسنجی
+            $this->validate([
+                'calendarDays' => 'required|integer|min:1',
+            ], [
+                'calendarDays.required' => 'تعداد روزهای تقویم الزامی است',
+                'calendarDays.integer' => 'تعداد روزهای تقویم باید عدد باشد',
+                'calendarDays.min' => 'تعداد روزهای تقویم باید حداقل ۱ باشد',
+            ]);
+
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+            DB::beginTransaction();
+
+            // به‌روزرسانی یا ایجاد تنظیمات
+            $config = DoctorAppointmentConfig::updateOrCreate(
+                [
+                    'doctor_id' => $doctorId,
+                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                ],
+                [
+                    'calendar_days' => (int) $this->calendarDays,
+                ]
+            );
+
+            // به‌روزرسانی پراپرتی‌های محلی
+            $this->appointmentConfig->calendar_days = (int) $this->calendarDays;
+            $this->calendarDays = (int) $this->calendarDays;
+
+            DB::commit();
+
+            $this->modalMessage = 'تعداد روزهای باز تقویم با موفقیت ذخیره شد';
+            $this->modalType = 'success';
+            $this->modalOpen = true;
+            $this->dispatch('show-toastr', [
+                'message' => $this->modalMessage,
+                'type' => 'success',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errorMessages = $e->validator->errors()->all();
+            $errorMessage = implode('، ', $errorMessages);
+            Log::error('Validation error in autoSaveCalendarDays: ' . $errorMessage);
+            $this->modalMessage = $errorMessage ?: 'لطفاً یک عدد معتبر وارد کنید';
+            $this->modalType = 'error';
+            $this->modalOpen = true;
+            $this->dispatch('show-toastr', [
+                'message' => $this->modalMessage,
+                'type' => 'error',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in autoSaveCalendarDays: ' . $e->getMessage(), [
+                'doctor_id' => $doctorId ?? null,
+                'calendar_days' => $this->calendarDays ?? null,
+            ]);
+            $this->modalMessage = $e->getMessage() ?: 'خطا در ذخیره تعداد روزهای تقویم';
+            $this->modalType = 'error';
+            $this->modalOpen = true;
+            $this->dispatch('show-toastr', [
+                'message' => $this->modalMessage,
+                'type' => 'error',
+            ]);
         }
-
-        // اعتبارسنجی
-        $this->validate([
-            'calendarDays' => 'required|integer|min:1',
-        ], [
-            'calendarDays.required' => 'تعداد روزهای تقویم الزامی است',
-            'calendarDays.integer' => 'تعداد روزهای تقویم باید عدد باشد',
-            'calendarDays.min' => 'تعداد روزهای تقویم باید حداقل ۱ باشد',
-        ]);
-
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-
-        DB::beginTransaction();
-
-        // به‌روزرسانی یا ایجاد تنظیمات
-        $config = DoctorAppointmentConfig::updateOrCreate(
-            [
-                'doctor_id' => $doctorId,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-            ],
-            [
-                'calendar_days' => (int) $this->calendarDays,
-            ]
-        );
-
-        // به‌روزرسانی پراپرتی‌های محلی
-        $this->appointmentConfig->calendar_days = (int) $this->calendarDays;
-        $this->calendarDays = (int) $this->calendarDays;
-
-        DB::commit();
-
-        $this->modalMessage = 'تعداد روزهای باز تقویم با موفقیت ذخیره شد';
-        $this->modalType = 'success';
-        $this->modalOpen = true;
-        $this->dispatch('show-toastr', [
-            'message' => $this->modalMessage,
-            'type' => 'success',
-        ]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        $errorMessages = $e->validator->errors()->all();
-        $errorMessage = implode('، ', $errorMessages);
-        Log::error('Validation error in autoSaveCalendarDays: ' . $errorMessage);
-        $this->modalMessage = $errorMessage ?: 'لطفاً یک عدد معتبر وارد کنید';
-        $this->modalType = 'error';
-        $this->modalOpen = true;
-        $this->dispatch('show-toastr', [
-            'message' => $this->modalMessage,
-            'type' => 'error',
-        ]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error in autoSaveCalendarDays: ' . $e->getMessage(), [
-            'doctor_id' => $doctorId ?? null,
-            'calendar_days' => $this->calendarDays ?? null,
-        ]);
-        $this->modalMessage = $e->getMessage() ?: 'خطا در ذخیره تعداد روزهای تقویم';
-        $this->modalType = 'error';
-        $this->modalOpen = true;
-        $this->dispatch('show-toastr', [
-            'message' => $this->modalMessage,
-            'type' => 'error',
-        ]);
     }
-}
     public function setSelectedClinicId($clinicId)
     {
         $this->selectedClinicId = $clinicId;
@@ -311,7 +316,7 @@ class Workhours extends Component
             $currentClinicId = explode(' ', explode('/', request())[6])[0];
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+            $clinicId = $this->getSelectedClinicId();
             $this->activeClinicId = $clinicId ?? 'default';
         }
 
@@ -360,7 +365,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -476,7 +481,7 @@ class Workhours extends Component
             $currentClinicId = explode(' ', explode('/', request())[6])[0];
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+            $clinicId = $this->getSelectedClinicId();
             $this->activeClinicId = $clinicId ?? 'default';
         }
 
@@ -513,7 +518,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -570,7 +575,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -716,7 +721,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -872,7 +877,7 @@ class Workhours extends Component
             $this->activeClinicId = $currentClinicId;
 
         } else {
-            $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+            $clinicId = $this->getSelectedClinicId();
             $this->activeClinicId = $clinicId ?? 'default';
         }
 
@@ -942,7 +947,7 @@ class Workhours extends Component
             $currentClinicId = explode(' ', explode('/', request())[6])[0];
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+            $clinicId = $this->getSelectedClinicId();
             $this->activeClinicId = $clinicId ?? 'default';
         }
 
@@ -989,7 +994,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -1112,7 +1117,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -1362,7 +1367,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -1752,7 +1757,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -1946,7 +1951,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -2055,7 +2060,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -2141,7 +2146,7 @@ class Workhours extends Component
                 $currentClinicId = explode(' ', explode('/', request())[6])[0];
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $clinicId = $this->getSelectedClinicId();
                 $this->activeClinicId = $clinicId ?? 'default';
             }
 
@@ -2220,7 +2225,7 @@ class Workhours extends Component
             $currentClinicId = explode(' ', explode('/', request())[6])[0];
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+            $clinicId = $this->getSelectedClinicId();
             $this->activeClinicId = $clinicId ?? 'default';
         }
 
@@ -2257,7 +2262,7 @@ class Workhours extends Component
             $currentClinicId = explode(' ', explode('/', request())[6])[0];
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+            $clinicId = $this->getSelectedClinicId();
             $this->activeClinicId = $clinicId ?? 'default';
         }
 
@@ -2328,7 +2333,7 @@ class Workhours extends Component
             $currentClinicId = explode(' ', explode('/', request())[6])[0];
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+            $clinicId = $this->getSelectedClinicId();
             $this->activeClinicId = $clinicId ?? 'default';
         }
 

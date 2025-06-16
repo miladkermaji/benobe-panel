@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Dr\Panel\Turn\Schedule;
 
+use Exception;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Doctor;
@@ -16,6 +17,7 @@ use Livewire\WithPagination;
 use Morilog\Jalali\Jalalian;
 use App\Models\DoctorHoliday;
 use App\Models\DoctorService;
+use App\Traits\HasSelectedClinic;
 use Livewire\Attributes\Validate;
 use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\DB;
@@ -26,11 +28,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
-use Exception;
 
 class AppointmentsList extends Component
 {
-    use WithPagination;
+    use WithPagination,HasSelectedClinic;
     
     public $isLoadingServices = false;
     public $isLoadingFinalPrice = false;
@@ -191,7 +192,9 @@ class AppointmentsList extends Component
             // لود داده‌های اولیه
             $doctor = $this->getAuthenticatedDoctor();
             if ($doctor) {
-                $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', '1'));
+                $this->selectedClinicId = 
+               $this->getSelectedClinicId();
+
 
                 // پاک کردن کش‌های قبلی
                 Cache::forget("appointments_doctor_{$doctor->id}_*");
