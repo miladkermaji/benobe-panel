@@ -68,7 +68,7 @@
     </div>
   </div>
 </div>
-<div id="chart-container" class="chart-content">
+<div class="chart-content">
   <div class="row">
     <!-- نمودار ۱: تعداد ویزیت‌ها -->
     <div class="col-md-4">
@@ -179,6 +179,6 @@
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var chartUrl = "{{ route('dr-my-performance-chart-data') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
-    window.selectedClinicId = @json($selectedClinicId ?? 'default');
+   window.selectedClinicId = @json($selectedClinicId ?? 'default');
 </script>
 @endsection
