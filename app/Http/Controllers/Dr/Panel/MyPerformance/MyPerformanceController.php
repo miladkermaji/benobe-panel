@@ -251,13 +251,16 @@ class MyPerformanceController extends Controller
 
     public function getChartData(Request $request)
     {
-        $clinicId = $request->input('clinic_id', 'default');
-        
+        $clinicId =
+$this->getSelectedClinicId()
+ ?? 'default';
+
+
         // Convert empty string, null, or 'null' to 'default'
         if (empty($clinicId) || $clinicId === 'null') {
             $clinicId = 'default';
         }
-        
+
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
         // Validate clinic_id
