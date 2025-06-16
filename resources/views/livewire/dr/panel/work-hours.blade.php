@@ -440,7 +440,7 @@
                       @else
                         <div
                           class="form-row d-flex w-100 align-items-center gap-2 mb-1 bg-active-slot border-radius-11 p-2">
-                          <div class="form-group position-relative timepicker-ui flex-grow-1">
+                          <div class="form-group position-relative timepicker-ui">
                             <label class="label-top-input-special-takhasos font-size-11">از</label>
                             <input type="text"
                               class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
@@ -448,7 +448,7 @@
                               wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.start_time"
                               wire:change="autoSaveSchedule('{{ $day }}', 0)">
                           </div>
-                          <div class="form-group position-relative timepicker-ui flex-grow-1">
+                          <div class="form-group position-relative timepicker-ui">
                             <label class="label-top-input-special-takhasos font-size-11">تا</label>
                             <input type="text"
                               class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
