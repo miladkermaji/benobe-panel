@@ -14,7 +14,7 @@ class SecretaryManagementController extends Controller
     public function index(Request $request)
     {
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
+        $selectedClinicId = $this->getSelectedClinicId();
 
         $secretaries = Secretary::where('doctor_id', $doctorId)
             ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
@@ -23,6 +23,7 @@ class SecretaryManagementController extends Controller
                 $query->whereNull('clinic_id');
             })
             ->get();
+
 
         if ($request->ajax()) {
             return response()->json(['secretaries' => $secretaries]);
@@ -34,7 +35,7 @@ class SecretaryManagementController extends Controller
     public function store(Request $request)
     {
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $clinicId = $request->selectedClinicId === 'default' ? null : $request->selectedClinicId;
+        $clinicId = $this->getSelectedClinicId() === 'default' ? null : $this->getSelectedClinicId();
 
         $request->merge([
             'mobile' => \App\Helpers\PersianNumber::convertToEnglish($request->mobile),
@@ -178,7 +179,7 @@ class SecretaryManagementController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
+        $selectedClinicId = $this->getSelectedClinicId();
 
         $secretary = Secretary::where('id', $id)
             ->where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
@@ -192,7 +193,7 @@ class SecretaryManagementController extends Controller
 
     public function update(Request $request, $id)
     {
-        $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
+        $selectedClinicId = $this->getSelectedClinicId();
 
         $request->merge([
             'mobile' => \App\Helpers\PersianNumber::convertToEnglish($request->mobile),
@@ -291,7 +292,7 @@ class SecretaryManagementController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $selectedClinicId = $request->input('selectedClinicId') ?? 'default';
+        $selectedClinicId = $this->getSelectedClinicId();
 
         $secretary = Secretary::where('id', $id)
             ->where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
@@ -324,7 +325,7 @@ class SecretaryManagementController extends Controller
             ]);
 
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $clinicId = $request->selectedClinicId === 'default' ? null : $request->selectedClinicId;
+            $clinicId = $this->getSelectedClinicId() === 'default' ? null : $this->getSelectedClinicId();
 
             $secretary = Secretary::where('id', $request->id)
                 ->where('doctor_id', $doctorId)

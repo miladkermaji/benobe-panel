@@ -100,14 +100,7 @@
 
   <!-- اسکریپت‌ها -->
   <script>
-    document.addEventListener('livewire:initialized', function() {
-      const selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
-      setTimeout(() => {
-        Livewire.dispatch('setSelectedClinicId', {
-          clinicId: selectedClinicId
-        });
-      }, 100);
-    });
+
 
     $(document).ready(function() {
       Livewire.on('show-alert', (event) => {

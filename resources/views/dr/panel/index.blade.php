@@ -179,5 +179,6 @@
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var chartUrl = "{{ route('dr-my-performance-chart-data') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
+   window.selectedClinicId = @json($selectedClinicId ?? 'default');
 </script>
 @endsection

@@ -15,7 +15,7 @@
           <input type="text" class="my-form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ..."
             wire:model.live.debounce.500ms="searchQuery">
         </div>
-        <button class="btn-primary" x-data @click="$dispatch('open-modal', { name: 'add-sick-modal' })">
+        <button class="btn-primary" x-data @click="$dispatch('openAddSickModal'); $dispatch('open-modal', { name: 'add-sick-modal' })">
           ثبت نوبت دستی
         </button>
       </div>
@@ -24,7 +24,7 @@
       <x-jalali-calendar-row />
     </div>
     <div class="sicks-content h-100 w-100 position-relative border">
-      <div class="d-flex justify-content-start gap-10 nobat-option w-100" wire:ignore>
+      <div class="d-flex justify-content-start gap-10 nobat-option w-100">
         <div class="d-flex align-items-center m-2 gap-4 justify-content-between w-100">
           <div class="d-flex">
             <div class="turning_filterWrapper__2cOOi">
@@ -57,7 +57,7 @@
                 </ul>
               </div>
             </div>
-            <div class="d-flex d-none d-md-flex">
+            <div class="d-flex d-none d-md-flex ms-3">
               <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
                 wire:click="$set('dateFilter', 'current_year')">
                 <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
@@ -73,8 +73,79 @@
                 <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
                 <span class="d-none d-md-block">هفته جاری</span>
               </button>
+              <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm ms-2"
+                wire:click="$set('filterStatus', 'manual')">
+                <img src="{{ asset('dr-assets/icons/add-appointment.svg') }}" alt="" class="me-1">
+                <span class="d-none d-md-block">نوبت‌های دستی</span>
+              </button>
             </div>
           </div>
+          <!-- گزارش مالی -->
+          @php
+            $isFutureDate = \Carbon\Carbon::parse($selectedDate)->isFuture();
+            $isToday = \Carbon\Carbon::parse($selectedDate)->isToday();
+            $showReport = !$isFutureDate;
+            
+            if ($showReport) {
+                $visitedCount = collect($appointments)->where('status', 'attended')->count();
+                $totalCount = collect($appointments)->count();
+                $totalIncome = collect($appointments)->where('status', 'attended')->sum('final_price');
+                $jDate = \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate));
+                
+                // تعیین متن نمایشی بر اساس فیلتر فعال
+                $dateDisplay = $jDate->format('d F Y');
+                
+                // متن فیلترهای تاریخ و وضعیت
+                $filters = [
+                    // فیلترهای تاریخ
+                    'all' => 'همه نوبت ها',
+                    'current_year' => 'سال جاری',
+                    'current_month' => 'ماه جاری',
+                    'current_week' => 'هفته جاری',
+                    // فیلترهای وضعیت
+                    'scheduled' => 'در انتظار',
+                    'cancelled' => 'لغو شده',
+                    'attended' => 'ویزیت شده',
+                    'manual' => 'نوبت‌های دستی'
+                ];
+                
+                if (isset($filters[$dateFilter])) {
+                    $dateDisplay = 'فیلتر: ' . $filters[$dateFilter];
+                } elseif (isset($filters[$filterStatus])) {
+                    $dateDisplay = 'فیلتر: ' . $filters[$filterStatus];
+                }
+            }
+          @endphp
+          
+          @if($showReport)
+          <!-- گزارش مالی دسکتاپ -->
+          <div class="d-none d-md-flex align-items-center mx-3 px-3 py-1 rounded-3 bg-white border shadow-sm " 
+               wire:key="financial-report-desktop-{{ $selectedDate }}">
+            <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center">
+                <span class="text-sm text-muted ms-1">تاریخ:</span>
+                <span class="fw-bold me-1">{{ $dateDisplay ?? $dateFilter ?? $jDate->format('d F Y') }}</span>
+              </div>
+              <div class="vr mx-2"></div>
+              <div class="d-flex align-items-center">
+                <span class="text-sm text-muted ms-1">کل:</span>
+                <span class="fw-bold text-primary ms-1">{{ number_format($totalCount) }}</span>
+              </div>
+              <div class="vr mx-2"></div>
+              <div class="d-flex align-items-center">
+                <span class="text-sm text-muted ms-1">ویزیت:</span>
+                <span class="fw-bold text-success ms-1">{{ number_format($visitedCount) }}</span>
+              </div>
+              <div class="vr mx-2"></div>
+              <div class="d-flex align-items-center">
+                <span class="text-sm text-muted ms-1">درآمد:</span>
+                <span class="fw-bold text-success ms-1">{{ number_format($totalIncome) }}</span>
+                <span class="text-xs text-muted me-1">تومان</span>
+              </div>
+            </div>
+          </div>
+          @endif
+          
           <div class="d-flex">
             <button id="block-users-btn" x-data @click="$dispatch('open-modal', { name: 'block-user-modal' })"
               class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
@@ -94,6 +165,56 @@
           </div>
         </div>
       </div>
+      
+      <!-- گزارش مالی موبایل و تبلت -->
+      @if($showReport)
+      <div class="md:hidden my-2 mx-2 p-2 bg-white rounded-lg border border-gray-100 shadow-sm" 
+           wire:key="mobile-financial-report-{{ $selectedDate }}">
+        <div class="flex items-center justify-between text-xs">
+          <div class="flex items-center">
+            <span class="text-gray-500 ml-1">تاریخ:</span>
+            <span class="font-medium">
+              @php
+                $filters = [
+                    // فیلترهای تاریخ
+                    'all' => 'همه نوبت ها',
+                    'current_year' => 'سال جاری',
+                    'current_month' => 'ماه جاری',
+                    'current_week' => 'هفته جاری',
+                    // فیلترهای وضعیت
+                    'scheduled' => 'در انتظار',
+                    'cancelled' => 'لغو شده',
+                    'attended' => 'ویزیت شده',
+                    'manual' => 'نوبت‌های دستی'
+                ];
+                
+                if (isset($filters[$dateFilter])) {
+                    echo 'فیلتر: ' . $filters[$dateFilter];
+                } elseif (isset($filters[$filterStatus])) {
+                    echo 'فیلتر: ' . $filters[$filterStatus];
+                } else {
+                    echo $jDate->format('d F');
+                }
+              @endphp
+            </span>
+          </div>
+          <div class="flex items-center">
+            <span class="text-gray-500 ml-1">کل:</span>
+            <span class="font-bold text-blue-600 mr-1">{{ $totalCount }}</span>
+          </div>
+          <div class="flex items-center">
+            <span class="text-gray-500 ml-1">ویزیت:</span>
+            <span class="font-bold text-green-600 mr-1">{{ $visitedCount }}</span>
+          </div>
+          <div class="flex items-center">
+            <span class="text-gray-500 ml-1">درآمد:</span>
+            <span class="font-bold text-green-700 mr-1">{{ number_format($totalIncome) }}</span>
+            <span class="text-2xs text-gray-500">تومان</span>
+          </div>
+        </div>
+      </div>
+      @endif
+      
       <div class="appointments-container">
         <div wire:loading wire:target="loadAppointments" class="loading-overlay-custom">
           <div class="spinner-custom"></div>
@@ -244,18 +365,21 @@
           @if (count($appointments) > 0)
             @foreach ($appointments as $appointment)
               <div class="appointment-card" data-id="{{ $appointment->id }}">
-                <div class="card-header">
-                  <input type="checkbox" class="appointment-checkbox form-check-input"
-                    value="{{ $appointment->id }}" data-status="{{ $appointment->status }}"
-                    data-mobile="{{ $appointment->patient->mobile ?? '' }}"
-                    wire:model="cancelIds.{{ $appointment->id }}">
-                  <span class="fw-bold text-end d-block">
-                    {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
-                    @if ($appointment->patient && $appointment->patient->national_code)
-                      <span class="text-muted">({{ $appointment->patient->national_code }})</span>
-                    @endif
-                  </span>
-                  <button class="toggle-details" type="button">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="checkbox" class="appointment-checkbox form-check-input"
+                      value="{{ $appointment->id }}" 
+                      data-status="{{ $appointment->status }}"
+                      data-mobile="{{ $appointment->patient->mobile ?? '' }}"
+                      wire:model="cancelIds.{{ $appointment->id }}">
+                    <span class="fw-bold text-end">
+                      {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
+                      @if ($appointment->patient && $appointment->patient->national_code)
+                        <span class="text-muted">کدملی : {{ $appointment->patient->national_code }}</span>
+                      @endif
+                    </span>
+                  </div>
+                  <button class="toggle-details border-0 bg-transparent p-0" type="button">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                       xmlns="http://www.w3.org/2000/svg">
                       <path d="M6 9l6 6 6-6" stroke="#4a5568" stroke-width="2" stroke-linecap="round"
@@ -379,10 +503,11 @@
         </x-slot:body>
       </x-modal>
     </div>
-    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="md" class="modal-lg">
+    <x-modal name="add-sick-modal" title="ثبت نوبت دستی" size="md" class="modal-lg" x-init="$watch('show', value => { if (value) { $wire.resetAddSickModal(); } })">
       <x-slot:body>
         <form wire:submit.prevent="storeWithUser">
           <div class="row g-3">
+            <!-- بخش جستجو -->
             <div class="col-12">
               <div class="position-relative">
                 <input type="text" class="form-control h-50" wire:model.live.debounce.500ms="manualSearchQuery"
@@ -413,51 +538,78 @@
                 @endif
               </div>
             </div>
-            @if ($selectedUserId)
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">نام</label>
-                <input type="text" class="form-control h-50" wire:model="firstName" required disabled>
-                @error('firstName')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
+
+            <!-- فرم اطلاعات بیمار (فقط وقتی که بیمار انتخاب شده باشد نمایش داده می‌شود) -->
+            @if($showPatientForm && $selectedUserId)
+              <div class="col-12">
+                <div class="border p-3 rounded">
+                  <h6 class="fw-bold mb-3">اطلاعات بیمار</h6>
+                  <div class="row g-3">
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">نام</label>
+                      <input type="text" class="form-control h-50" wire:model="firstName" required disabled>
+                      @error('firstName')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">نام خانوادگی</label>
+                      <input type="text" class="form-control h-50" wire:model="lastName" required disabled>
+                      @error('lastName')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">شماره موبایل</label>
+                      <input type="text" class="form-control h-50" wire:model="mobile" required disabled>
+                      @error('mobile')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">کد ملی</label>
+                      <input type="text" class="form-control h-50" wire:model="nationalCode" required disabled>
+                      @error('nationalCode')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">نام خانوادگی</label>
-                <input type="text" class="form-control h-50" wire:model="lastName" required disabled>
-                @error('lastName')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
+
+              <!-- فرم نوبت‌دهی -->
+              <div class="col-12">
+                <div class="border p-3 rounded">
+                  <h6 class="fw-bold mb-3">زمان نوبت</h6>
+                  <div class="row g-3">
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">تاریخ نوبت</label>
+                      <input type="text" class="form-control h-50" data-jdp wire:model="appointmentDate" required>
+                      @error('appointmentDate')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                    <div class="col-md-6 position-relative">
+                      <label class="label-top-input-special-takhasos">ساعت نوبت</label>
+                      <input type="text" class="form-control h-50" wire:model="appointmentTime" required readonly>
+                      @error('appointmentTime')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">شماره موبایل</label>
-                <input type="text" class="form-control h-50" wire:model="mobile" required disabled>
-                @error('mobile')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">کد ملی</label>
-                <input type="text" class="form-control h-50" wire:model="nationalCode" required disabled>
-                @error('nationalCode')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">تاریخ نوبت</label>
-                <input type="text" class="form-control h-50" data-jdp wire:model="appointmentDate" required>
-                @error('appointmentDate')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-md-6 position-relative">
-                <label class="label-top-input-special-takhasos">ساعت نوبت</label>
-                <input type="text" class="form-control h-50" wire:model="appointmentTime" required readonly>
-                @error('appointmentTime')
-                  <span class="text-danger">{{ $message }}</span>
-                @enderror
-              </div>
-              <div class="col-12 mt-5">
-                <button type="submit" class="btn btn-primary w-100 mt-3">ثبت نوبت</button>
+
+              <div class="col-12">
+                <div class="d-flex justify-content-between">
+                  <button type="button" class="btn btn-outline-secondary" wire:click="resetAddSickModal">
+                    تغییر بیمار
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    <span wire:loading.remove>ثبت نوبت</span>
+                    <span wire:loading>در حال ثبت...</span>
+                  </button>
+                </div>
               </div>
             @endif
           </div>
@@ -1314,7 +1466,6 @@
               return;
             }
             @this.set('selectedMobiles', mobiles);
-            window.open - modal('block-user-modal');
           });
         } else {
           console.warn('دکمه مسدود کردن کاربران پیدا نشد');

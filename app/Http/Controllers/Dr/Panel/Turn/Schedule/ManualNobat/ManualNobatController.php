@@ -17,13 +17,16 @@ use Illuminate\Support\Facades\Validator;
 
 class ManualNobatController extends Controller
 {
+    
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
+
         try {
-            $selectedClinicId = $request->input('selectedClinicId');
+            $selectedClinicId = $this->getSelectedClinicId();;
 
             $appointments = ManualAppointment::with('user')
                 ->when($selectedClinicId === 'default', function ($query) {
@@ -62,7 +65,7 @@ class ManualNobatController extends Controller
     public function showSettings(Request $request)
     {
         $doctorId         = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $selectedClinicId = $request->input('selectedClinicId', 'default');
+        $selectedClinicId = $this->getSelectedClinicId();
 
         // جستجوی تنظیمات با در نظر گرفتن کلینیک
         $settings = ManualAppointmentSetting::where('doctor_id', $doctorId)
@@ -109,7 +112,7 @@ class ManualNobatController extends Controller
         try {
             // گرفتن آیدی پزشک یا منشی
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $request->input('selectedClinicId', 'default');
+            $selectedClinicId = $this->getSelectedClinicId();
 
             // ذخیره یا به‌روزرسانی تنظیمات نوبت‌دهی دستی
             $settings = ManualAppointmentSetting::updateOrCreate(
@@ -209,7 +212,7 @@ class ManualNobatController extends Controller
         try {
             $data = $validator->validated();
             $data['appointment_date'] = CalendarUtils::createDatetimeFromFormat('Y/m/d', $request->appointment_date)->format('Y-m-d');
-            $data['clinic_id'] = $request->selectedClinicId === 'default' ? null : $request->selectedClinicId;
+            $data['clinic_id'] = $this->getSelectedClinicId() === 'default' ? null : $this->getSelectedClinicId();
 
             if (ManualAppointment::where('user_id', $data['user_id'])
                 ->where('appointment_date', $data['appointment_date'])
@@ -308,7 +311,7 @@ class ManualNobatController extends Controller
     public function edit($id, Request $request)
     {
         try {
-            $selectedClinicId = $request->input('selectedClinicId');
+            $selectedClinicId = $this->getSelectedClinicId();;
 
             $appointment = ManualAppointment::with('user')
                 ->when($selectedClinicId === 'default', function ($query) {
@@ -395,7 +398,7 @@ class ManualNobatController extends Controller
     public function destroy($id, Request $request)
     {
         try {
-            $selectedClinicId = $request->input('selectedClinicId');
+            $selectedClinicId = $this->getSelectedClinicId();;
 
             // جستجوی نوبت بر اساس کلینیک
             $appointment = ManualAppointment::when(
@@ -417,7 +420,7 @@ class ManualNobatController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $request->input('selectedClinicId', 'default');
+            $selectedClinicId = $this->getSelectedClinicId();
     
             $insurances = DoctorService::where('doctor_services.doctor_id', $doctorId)
                 ->where('doctor_services.status', true)
@@ -451,7 +454,7 @@ class ManualNobatController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $request->input('selectedClinicId', 'default');
+            $selectedClinicId = $this->getSelectedClinicId();
 
             $services = DoctorService::where('doctor_id', $doctorId)
                 ->where('insurance_id', $insuranceId)
@@ -623,7 +626,7 @@ class ManualNobatController extends Controller
     
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $request->input('selectedClinicId', 'default');
+            $selectedClinicId = $this->getSelectedClinicId();
     
             Log::info('Attempting to find appointment', [
                 'appointment_id' => $id,

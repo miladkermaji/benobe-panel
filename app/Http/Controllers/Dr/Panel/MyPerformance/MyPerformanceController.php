@@ -12,9 +12,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\CounselingAppointment;
 use App\Http\Controllers\Dr\Controller;
 use App\Models\Doctor;
+use App\Traits\HasSelectedClinic;
 
 class MyPerformanceController extends Controller
 {
+    use HasSelectedClinic;
+
     /**
      * نمایش صفحه اصلی عملکرد من
      */
@@ -26,17 +29,23 @@ class MyPerformanceController extends Controller
         }
 
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+        $clinic = $this->getSelectedClinic();
+        $clinicId = $this->getSelectedClinicId();
+
         $doctor = Doctor::with([
             'clinics',
             'messengers',
             'reviews',
-            'appointments' => function ($query) {
-                $query->whereDate('appointment_date', now()->toDateString());
+            'appointments' => function ($query) use ($clinicId) {
+                $query->when($clinicId, function ($q) use ($clinicId) {
+                    $q->where('clinic_id', $clinicId);
+                })
+                ->whereDate('appointment_date', now()->toDateString());
             }
         ])->find($doctorId);
 
         $clinics = Clinic::where('doctor_id', $doctorId)->get();
-        return view('dr.panel.my-performance.index', compact('clinics'));
+        return view('dr.panel.my-performance.index', compact('clinics', 'clinic', 'clinicId'));
     }
 
     /**
@@ -242,10 +251,19 @@ class MyPerformanceController extends Controller
 
     public function getChartData(Request $request)
     {
-        $clinicId = $request->input('clinic_id', 'default');
+        $clinicId =
+$this->getSelectedClinicId()
+ ?? 'default';
+
+
+        // Convert empty string, null, or 'null' to 'default'
+        if (empty($clinicId) || $clinicId === 'null') {
+            $clinicId = 'default';
+        }
+
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
-        // اعتبارسنجی clinic_id
+        // Validate clinic_id
         if ($clinicId !== 'default' && !is_numeric($clinicId)) {
             return response()->json(['error' => 'مقدار clinic_id نامعتبر است'], 400);
         }

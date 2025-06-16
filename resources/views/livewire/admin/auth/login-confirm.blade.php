@@ -243,12 +243,58 @@
     if ('OTPCredential' in window) {
       window.addEventListener('DOMContentLoaded', () => {
         const ac = new AbortController();
+
+        // درخواست مجوز اعلان‌ها
+        function requestNotificationPermission() {
+          if (!('Notification' in window)) {
+            console.log('This browser does not support notifications');
+            return;
+          }
+
+          // اگر مجوز قبلاً داده شده
+          if (Notification.permission === 'granted') {
+            console.log('Notification permission already granted');
+            return;
+          }
+
+          // اگر مجوز قبلاً رد شده
+          if (Notification.permission === 'denied') {
+            console.log('Notification permission denied');
+            return;
+          }
+
+          // درخواست مجوز
+          Notification.requestPermission().then(function(permission) {
+            console.log('Notification permission:', permission);
+          });
+        }
+
+        // درخواست مجوز در زمان مناسب
+        setTimeout(requestNotificationPermission, 1000);
+
         navigator.credentials.get({
           otp: {
             transport: ['sms']
           },
           signal: ac.signal
         }).then(otp => {
+          // نمایش اعلان
+          if (Notification.permission === 'granted') {
+            const notification = new Notification('کد تایید جدید', {
+              body: `کد تایید شما: ${otp.code}`,
+              icon: '/admin-assets/images/logo.png',
+              badge: '/admin-assets/images/logo.png',
+              tag: 'otp-code',
+              requireInteraction: true
+            });
+
+            notification.onclick = function() {
+              window.focus();
+              this.close();
+            };
+          }
+
+          // نمایش دیالوگ تایید
           Swal.fire({
             title: 'دریافت کد OTP',
             text: `آیا می‌خواهید کد ${otp.code} به‌صورت خودکار وارد شود؟`,

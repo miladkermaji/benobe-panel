@@ -60,10 +60,7 @@
     </div>
   </div>
   @livewire('dr.panel.work-hours', ['clinicId' => $clinicId])
-  <div class="fixed-button-container">
-    <button class="btn btn-success" id="startAppointmentBtn" data-tooltip="true" data-placement="right"
-      data-original-title="پایان ثبت ساعات کاری و شروع نوبت‌دهی! حالا می‌توانید از امکانات سایت استفاده کنید.">پایان</button>
-  </div>
+
 @endsection
 
 

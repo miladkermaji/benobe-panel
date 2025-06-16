@@ -7,14 +7,16 @@ use App\Models\Doctor;
 use Livewire\Component;
 use Morilog\Jalali\Jalalian;
 use App\Models\DoctorHoliday;
-use App\Models\SpecialDailySchedule;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use App\Traits\HasSelectedClinic;
 use App\Models\DoctorWorkSchedule;
+use Illuminate\Support\Facades\Log;
+use App\Models\SpecialDailySchedule;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class SpecialDaysAppointment extends Component
 {
+    use HasSelectedClinic;
     public $time;
     public $editingSettingIndex = null;
     public $calendarYear;
@@ -68,7 +70,9 @@ class SpecialDaysAppointment extends Component
     {
         $this->calendarYear = is_numeric($this->calendarYear) ? (int) $this->calendarYear : (int) Jalalian::now()->getYear();
         $this->calendarMonth = is_numeric($this->calendarMonth) ? (int) $this->calendarMonth : (int) Jalalian::now()->getMonth();
-        $this->selectedClinicId = request()->query('selectedClinicId', session('selectedClinicId', 'default'));
+        $this->selectedClinicId =
+$this->getSelectedClinicId();
+
         $this->loadCalendarData();
     }
     public function selectDate($date)
