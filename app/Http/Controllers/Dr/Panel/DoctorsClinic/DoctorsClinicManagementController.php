@@ -212,7 +212,7 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $request->input('selectedClinicId', 'default');
+            $selectedClinicId = $this->getSelectedClinicId();
 
             $clinics = Clinic::where('doctor_id', $doctorId)->get();
             $deposits = ClinicDepositSetting::where('doctor_id', $doctorId)
@@ -233,7 +233,7 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $request->input('selectedClinicId', 'default');
+            $selectedClinicId = $this->getSelectedClinicId();
 
             // قوانین اعتبارسنجی پویا
             $rules = [
@@ -328,7 +328,7 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $request->input('selectedClinicId', 'default');
+            $selectedClinicId = $this->getSelectedClinicId();
 
             // قوانین اعتبارسنجی پویا
             $rules = [
@@ -409,7 +409,7 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $request->input('selectedClinicId', 'default');
+            $selectedClinicId = $this->getSelectedClinicId();
 
             $deposit = ClinicDepositSetting::where('id', $id)
                 ->where('doctor_id', $doctorId)
