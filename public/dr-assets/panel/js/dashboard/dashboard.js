@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+function initializeDashboard() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("showModal")) {
         $("#activation-modal").modal("show");
@@ -16,24 +16,28 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // گوش دادن به رویداد تغییر کلینیک از Livewire
     window.addEventListener("clinicSelected", function (event) {
-        // Handle case where event.detail might be undefined
+        // Ensure we have a valid detail object
         const detail = event.detail || {};
         let newClinicId = detail.clinicId;
         
-        // Set default value if clinicId is undefined or null
-        if (newClinicId === undefined || newClinicId === null) {
-            newClinicId = "default";
-        }
+        // Log the raw clinicId for debugging
+        console.log('Dashboard received clinicId:', newClinicId);
         
-        // Ensure the value is always a string
-        selectedClinicId = String(newClinicId);
+        // Normalize the clinicId - treat null/undefined as 'default'
+        newClinicId = (newClinicId === null || newClinicId === undefined) ? 'default' : newClinicId.toString();
         
-        console.log("Clinic selected, new clinicId:", selectedClinicId);
-        
-        // Only load charts if the clinic ID has actually changed
-        if (selectedClinicId !== (window.previousClinicId || null)) {
+        // Only proceed if the clinic ID has actually changed
+        if (newClinicId !== selectedClinicId) {
+            selectedClinicId = newClinicId;
+            console.log("Clinic changed to:", selectedClinicId);
+            
+            // Store the previous clinic ID to prevent unnecessary reloads
             window.previousClinicId = selectedClinicId;
+            
+            // Load charts with the new clinic ID
             loadCharts(); // به‌روزرسانی نمودارها پس از تغییر کلینیک
+        } else {
+            console.log('Clinic selection unchanged, skipping chart reload');
         }
     });
 
@@ -152,17 +156,20 @@ document.addEventListener("DOMContentLoaded", function () {
                             .format("jYYYY/jMM"),
                         total: item.total || 0,
                     })) || defaultData;
-                // رندر نمودارها
-                renderPerformanceChart(appointments);
-                renderIncomeChart(monthlyIncome);
-                renderPatientChart(newPatients);
-                renderAppointmentTypesChart(appointmentTypes);
-                renderStatusPieChart(appointments);
-                renderPatientTrendChart(newPatients);
-                renderCounselingChart(counselingAppointments);
-                renderManualChart(manualAppointments);
-                renderTotalIncomeChart(totalIncome);
-                $("#chart-container").hide().show();
+                // Wait for the next tick to ensure DOM is ready
+                setTimeout(() => {
+                    // رندر نمودارها
+                    renderPerformanceChart(appointments);
+                    renderIncomeChart(monthlyIncome);
+                    renderPatientChart(newPatients);
+                    renderAppointmentTypesChart(appointmentTypes);
+                    renderStatusPieChart(appointments);
+                    renderPatientTrendChart(newPatients);
+                    renderCounselingChart(counselingAppointments);
+                    renderManualChart(manualAppointments);
+                    renderTotalIncomeChart(totalIncome);
+                    $("#chart-container").hide().show();
+                }, 100);
             },
             error: function (xhr, status, error) {
                 console.error("AJAX error:", status, error);
@@ -897,4 +904,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // بارگذاری اولیه نمودارها
     loadCharts();
-});
+}
+
+// Initialize when DOM is fully loaded
+document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+// Also initialize when Livewire finishes loading
+document.addEventListener('livewire:load', initializeDashboard);
