@@ -12,7 +12,7 @@
                 @endif
             </div>
             <div class="d-flex gap-2">
-                <button wire:click="saveAndRedirect" class="btn btn-primary btn-sm rounded-pill px-4 d-flex align-items-center hover:shadow-lg transition-all">
+                <button wire:click="saveAndRedirect" class="btn btn-success btn-sm rounded-pill px-4 d-flex align-items-center hover:shadow-lg transition-all">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
                         <path d="M17 21v-8H7v8M7 3v5h8" />
@@ -92,11 +92,11 @@
                                 </div>
                                 <!-- تخفیف -->
                                 <div class="col-lg-3 col-md-6 position-relative mt-5">
-                                    <input type="number" wire:model="pricing.{{ $index}}.discount" wire:click="openDiscountModal($index)" class="mt-1 form-control cursor-pointer" readonly="required">
-                                    <label for="pricing.{{ $index }}.discount" class="form-label">تخفیف (درصد)</label>
+                                    <input type="number" wire:model="pricing.{{ $index }}.discount" wire:click="openDiscountModal({{ $index }})" class="form-control cursor-pointer" id="discount_{{ $index }}" placeholder=" " readonly>
+                                    <label for="discount_{{ $index }}" class="form-label">تخفیف (درصد)</label>
                                 </div>
                                 <!-- قیمت نهایی -->
-                                <div class="col-md-6 col-lg-2 position-relative mt-5">
+                                <div class="col-lg-2 col-md-6 position-relative mt-5">
                                     <input type="number" wire:model="pricing.{{ $index }}.final_price" class="form-control" id="final_price_{{ $index }}" placeholder=" " readonly>
                                     <label for="final_price_{{ $index }}" class="form-label">قیمت نهایی (تومان)</label>
                                 </div>
@@ -157,11 +157,14 @@
     <script>
         document.addEventListener('livewire:init', function() {
             function initializeSelect2() {
+                // تخریب Select2های قبلی برای جلوگیری از تداخل
                 $('#selected_service, #clinic_id, [id^="insurance_id_"]').each(function() {
                     if ($(this).hasClass('select2-hidden-accessible')) {
                         $(this).select2('destroy');
                     }
                 });
+
+                // مقداردهی اولیه برای خدمت
                 $('#selected_service').select2({
                     dir: 'rtl',
                     placeholder: 'انتخاب خدمت',
@@ -169,7 +172,9 @@
                     width: '100%',
                     dropdownAutoWidth: true,
                     minimumResultsForSearch: 5
-                });
+                }).val(@json($selected_service) || '').trigger('change');
+
+                // مقداردهی اولیه برای کلینیک
                 $('#clinic_id').select2({
                     dir: 'rtl',
                     placeholder: 'انتخاب کلینیک',
@@ -177,8 +182,12 @@
                     width: '100%',
                     dropdownAutoWidth: true,
                     minimumResultsForSearch: 5
-                });
+                }).val(@json($clinic_id) || '').trigger('change');
+
+                // مقداردهی اولیه برای بیمه‌ها
                 $('[id^="insurance_id_"]').each(function() {
+                    const index = $(this).attr('id').replace('insurance_id_', '');
+                    const insuranceId = @json($pricing) && @json($pricing)[index] ? @json($pricing)[index].insurance_id : '';
                     $(this).select2({
                         dir: 'rtl',
                         placeholder: 'انتخاب بیمه',
@@ -186,40 +195,58 @@
                         width: '100%',
                         dropdownAutoWidth: true,
                         minimumResultsForSearch: 5
-                    });
+                    }).val(insuranceId || '').trigger('change');
                 });
-                const selectedService = @json($selected_service);
-                const clinicId = @json($clinic_id);
-                $('#selected_service').val(selectedService || '').trigger('change');
-                $('#clinic_id').val(clinicId || '').trigger('change');
-                @foreach ($pricing as $index => $price)
-                    $('#insurance_id_{{ $index }}').val(@json($price['insurance_id']) || '').trigger('change');
-                @endforeach
             }
+
+            // اولیه‌سازی Select2 در بارگذاری اولیه
             initializeSelect2();
-            $('#selected_service').on('change', function() {
-                const value = $(this).val() === '' ? null : $(this).val();
+
+            // رویداد تغییر خدمت
+            $('#selected_service').on('select2:select', function(e) {
+                const value = e.target.value === '' ? null : e.target.value;
                 @this.set('selected_service', value);
             });
-            $('#clinic_id').on('change', function() {
-                const value = $(this).val() === '' ? null : $(this).val();
+
+            $('#selected_service').on('select2:clear', function() {
+                @this.set('selected_service', null);
+            });
+
+            // رویداد تغییر کلینیک
+            $('#clinic_id').on('select2:select', function(e) {
+                const value = e.target.value === '' ? null : e.target.value;
                 @this.set('clinic_id', value);
             });
+
+            $('#clinic_id').on('select2:clear', function() {
+                @this.set('clinic_id', null);
+            });
+
+            // رویداد تغییر بیمه
             $(document).on('select2:select', '[id^="insurance_id_"]', function(e) {
                 const index = $(this).attr('id').replace('insurance_id_', '');
                 const value = e.target.value === '' ? null : e.target.value;
                 @this.set(`pricing.${index}.insurance_id`, value);
             });
+
             $(document).on('select2:clear', '[id^="insurance_id_"]', function() {
                 const index = $(this).attr('id').replace('insurance_id_', '');
                 @this.set(`pricing.${index}.insurance_id`, null);
             });
-            Livewire.on('updateSelect2', () => {
-                initializeSelect2();
+
+            // به‌روزرسانی Select2 هنگام تغییر کلینیک
+            Livewire.on('update-select2', ({ clinicId }) => {
+                if (clinicId) {
+                    $('#clinic_id').val(clinicId).trigger('change');
+                }
             });
+
+            // نمایش پیام‌های toastr
             Livewire.on('show-alert', (event) => {
                 toastr[event.type](event.message);
             });
+
+            // بازسازی Select2 بعد از به‌روزرسانی Livewire
             document.addEventListener('livewire:updated', function() {
                 initializeSelect2();
             });
