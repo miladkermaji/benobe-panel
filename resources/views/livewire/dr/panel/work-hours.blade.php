@@ -17,7 +17,9 @@
             <div>
               <!-- بخش تعداد روزهای باز تقویم و باز بودن مطب در تعطیلات -->
               <div
-                class="row border border-radius-11 p-3 align-items-center conditional-section {{ !$autoScheduling ? 'hidden' : '' }}">
+                x-data="{ auto: @entangle('autoScheduling') }"
+                class="row border border-radius-11 p-3 align-items-center conditional-section"
+                x-show="auto" style="display: none;">
                 <!-- تعداد روزهای باز تقویم -->
                 <div class="col-8">
                   <div class="input-group position-relative p-1 rounded bg-white">
