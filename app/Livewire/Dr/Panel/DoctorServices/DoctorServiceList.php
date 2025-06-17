@@ -17,7 +17,6 @@ class DoctorServiceList extends Component
     use WithPagination, HasSelectedClinic;
 
     public $openServices = [];
-    public $openInsurances = [];
     protected $paginationTheme = 'bootstrap';
     protected $listeners = [
         'deleteDoctorServiceConfirmed' => 'deleteDoctorService',
@@ -123,19 +122,32 @@ class DoctorServiceList extends Component
     private function getDoctorServicesQuery()
     {
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $query = DoctorService::with(['insurance', 'children'])
-            ->where('doctor_id', $doctorId)
-            ->whereNull('parent_id')
-            ->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%');
-            });
-
-        if ($this->selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
-        } else {
-            $query->where('clinic_id', $this->selectedClinicId);
-        }
+        $query = Service::with(['doctorServices' => function ($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId)
+                  ->where(function ($q) {
+                      $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%');
+                  })
+                  ->with('insurance');
+            if ($this->selectedClinicId === 'default') {
+                $query->whereNull('clinic_id');
+            } else {
+                $query->where('clinic_id', $this->selectedClinicId);
+            }
+        }])
+        ->whereHas('doctorServices', function ($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId)
+                  ->where(function ($q) {
+                      $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%');
+                  });
+            if ($this->selectedClinicId === 'default') {
+                $query->whereNull('clinic_id');
+            } else {
+                $query->where('clinic_id', $this->selectedClinicId);
+            }
+        })
+        ->where('status', true);
 
         $paginated = $query->paginate($this->perPage);
         Log::info('Selected Clinic ID: ' . $this->selectedClinicId);
@@ -144,7 +156,9 @@ class DoctorServiceList extends Component
 
         $paginated->getCollection()->each(function ($service) {
             $service->isOpen = in_array($service->id, $this->openServices);
-            $service->insurance->isOpen = in_array($service->insurance_id, $this->openInsurances);
+            $service->doctorServices->each(function ($doctorService) {
+                $doctorService->isOpen = in_array($doctorService->id, $this->openServices);
+            });
         });
 
         return $paginated;
@@ -176,13 +190,13 @@ class DoctorServiceList extends Component
 
     public function updatedSelectAll($value)
     {
-        $currentPageIds = $this->getDoctorServicesQuery()->pluck('id')->toArray();
+        $currentPageIds = $this->getDoctorServicesQuery()->pluck('doctorServices')->flatten()->pluck('id')->toArray();
         $this->selectedDoctorServices = $value ? $currentPageIds : [];
     }
 
     public function updatedSelectedDoctorServices()
     {
-        $currentPageIds = $this->getDoctorServicesQuery()->pluck('id')->toArray();
+        $currentPageIds = $this->getDoctorServicesQuery()->pluck('doctorServices')->flatten()->pluck('id')->toArray();
         $this->selectAll = !empty($this->selectedDoctorServices) && count(array_diff($currentPageIds, $this->selectedDoctorServices)) === 0;
     }
 
@@ -192,15 +206,6 @@ class DoctorServiceList extends Component
             $this->openServices = array_diff($this->openServices, [$id]);
         } else {
             $this->openServices[] = $id;
-        }
-    }
-
-    public function toggleInsurance($insuranceId)
-    {
-        if (in_array($insuranceId, $this->openInsurances)) {
-            $this->openInsurances = array_diff($this->openInsurances, [$insuranceId]);
-        } else {
-            $this->openInsurances[] = $insuranceId;
         }
     }
 

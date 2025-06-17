@@ -55,13 +55,45 @@
                             <span>وضعیت</span>
                             <span>عملیات</span>
                         </div>
-                        @if ($service->insurance)
-                            @include('livewire.dr.panel.doctor-services.doctor-service-tree', ['service' => $service, 'level' => 0, 'index' => $services->firstItem() + $loop->index])
-                        @endif
-                        @foreach ($service->children as $child)
-                            @if (in_array($service->id, $openServices))
-                                @include('livewire.dr.panel.doctor-services.doctor-service-tree', ['service' => $child, 'level' => 1, 'index' => ($services->firstItem() + $loop->parent->index) . '.' . ($loop->index + 1)])
-                            @endif
+                        @foreach ($service->doctorServices as $doctorService)
+                            <div class="service-row">
+                                <div class="service-name">
+                                    <input type="checkbox" wire:model.live="selectedDoctorServices" value="{{ $doctorService->id }}" class="form-check-input">
+                                    <span>{{ $doctorService->insurance->name ?? 'بیمه نامشخص' }}</span>
+                                </div>
+                                <div class="service-description">{{ $doctorService->description ?? 'بدون توضیحات' }}</div>
+                                <div class="service-duration">{{ $doctorService->duration ? $doctorService->duration . ' دقیقه' : '---' }}</div>
+                                <div class="service-price">
+                                    <span class="price-badge {{ $doctorService->price ? 'price-active' : '' }}">{{ $doctorService->price ? number_format($doctorService->price) . ' تومان' : '---' }}</span>
+                                </div>
+                                <div class="service-discount">
+                                    <span class="price-badge {{ $doctorService->discount > 0 ? 'discount-active' : '' }}">
+                                        @if ($doctorService->discount > 0 && $doctorService->price)
+                                            {{ number_format(($doctorService->price * $doctorService->discount) / 100) . ' تومان' }}
+                                        @else
+                                            ---
+                                        @endif
+                                    </span>
+                                </div>
+                                <div class="service-final-price">
+                                    <span class="price-badge {{ $doctorService->price ? 'final-price-active' : '' }}">{{ $doctorService->price ? number_format($doctorService->price - ($doctorService->price * $doctorService->discount) / 100) . ' تومان' : '---' }}</span>
+                                </div>
+                                <div class="service-status">
+                                    <button wire:click="toggleStatus({{ $doctorService->id }})" class="status-badge {{ $doctorService->status ? 'status-active' : 'status-inactive' }}">{{ $doctorService->status ? 'فعال' : 'غیرفعال' }}</button>
+                                </div>
+                                <div class="service-actions">
+                                    <a href="{{ route('dr.panel.doctor-services.edit', $doctorService->id) }}" class="btn btn-outline-primary btn-sm">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                        </svg>
+                                    </a>
+                                    <button wire:click="confirmDelete({{ $doctorService->id }})" class="btn btn-outline-danger btn-sm">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 </div>
