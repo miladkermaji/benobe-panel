@@ -15,14 +15,12 @@
             <span class="tree-placeholder"></span>
         @endif
         <input type="checkbox" wire:model.live="selectedDoctorServices" value="{{ $service->id }}" class="form-check-input">
-        <span>{{ $service->name }}</span>
+        <span>{{ $service->insurance->name ?? 'بیمه نامشخص' }}</span>
     </div>
     <div class="service-description">{{ $service->description ?? 'بدون توضیحات' }}</div>
     <div class="service-duration">{{ $service->duration ? $service->duration . ' دقیقه' : '---' }}</div>
     <div class="service-price">
-        <span class="price-badge {{ $service->price ? 'price-active' : '' }}">
-            {{ $service->price ? number_format($service->price) . ' تومان' : '---' }}
-        </span>
+        <span class="price-badge {{ $service->price ? 'price-active' : '' }}">{{ $service->price ? number_format($service->price) . ' تومان' : '---' }}</span>
     </div>
     <div class="service-discount">
         <span class="price-badge {{ $service->discount > 0 ? 'discount-active' : '' }}">
@@ -34,14 +32,10 @@
         </span>
     </div>
     <div class="service-final-price">
-        <span class="price-badge {{ $service->price ? 'final-price-active' : '' }}">
-            {{ $service->price ? number_format($service->price - ($service->price * $service->discount) / 100) . ' تومان' : '---' }}
-        </span>
+        <span class="price-badge {{ $service->price ? 'final-price-active' : '' }}">{{ $service->price ? number_format($service->price - ($service->price * $service->discount) / 100) . ' تومان' : '---' }}</span>
     </div>
     <div class="service-status">
-        <button wire:click="toggleStatus({{ $service->id }})" class="status-badge {{ $service->status ? 'status-active' : 'status-inactive' }}">
-            {{ $service->status ? 'فعال' : 'غیرفعال' }}
-        </button>
+        <button wire:click="toggleStatus({{ $service->id }})" class="status-badge {{ $service->status ? 'status-active' : 'status-inactive' }}">{{ $service->status ? 'فعال' : 'غیرفعال' }}</button>
     </div>
     <div class="service-actions">
         <a href="{{ route('dr.panel.doctor-services.edit', $service->id) }}" class="btn btn-outline-primary btn-sm">
@@ -56,15 +50,10 @@
         </button>
     </div>
 </div>
-
 @foreach ($service->children as $child)
     @if ($service->isOpen ?? true)
         <div class="service-child {{ $service->isOpen ? 'child-open' : '' }}">
-            @include('livewire.dr.panel.doctor-services.doctor-service-tree', [
-                'service' => $child,
-                'level' => $level + 1,
-                'index' => $index . '.' . ($loop->index + 1),
-            ])
+            @include('livewire.dr.panel.doctor-services.doctor-service-tree', ['service' => $child, 'level' => $level + 1, 'index' => $index . '.' . ($loop->index + 1)])
         </div>
     @endif
 @endforeach

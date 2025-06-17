@@ -3,10 +3,10 @@
 namespace App\Livewire\Dr\Panel\DoctorServices;
 
 use App\Models\Clinic;
-use App\Models\Insurance;
-use App\Models\DoctorService;
 use App\Models\Service;
 use Livewire\Component;
+use App\Models\Insurance;
+use App\Models\DoctorService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -18,13 +18,11 @@ class DoctorServiceEdit extends Component
     public $clinic_id;
     public $duration;
     public $description;
-    public $insurance_id;
-    public $price;
-    public $discount = 0;
-    public $final_price = 0;
+    public $pricing = [];
     public $showDiscountModal = false;
     public $discountPercent = 0;
     public $discountAmount = 0;
+    public $currentPricingIndex = null;
 
     public function mount($id)
     {
@@ -34,66 +32,97 @@ class DoctorServiceEdit extends Component
         $this->clinic_id = $this->doctorService->clinic_id;
         $this->duration = $this->doctorService->duration;
         $this->description = $this->doctorService->description;
-        $this->insurance_id = $this->doctorService->insurance_id;
-        $this->price = $this->doctorService->price;
-        $this->discount = $this->doctorService->discount;
-        $this->final_price = $this->price - ($this->price * $this->discount / 100);
+        $this->pricing = [[
+            'insurance_id' => $this->doctorService->insurance_id,
+            'price' => $this->doctorService->price,
+            'discount' => $this->doctorService->discount,
+            'final_price' => $this->doctorService->price - ($this->doctorService->price * $this->doctorService->discount / 100),
+        ]];
     }
 
-    public function openDiscountModal()
+    public function openDiscountModal($index = null)
     {
+        $this->currentPricingIndex = $index;
         $this->showDiscountModal = true;
-        $this->discountPercent = $this->discount ?? 0;
-        $this->discountAmount = $this->price && $this->discount ? ($this->price * $this->discount / 100) : 0;
+        if ($index !== null && isset($this->pricing[$index])) {
+            $this->discountPercent = $this->pricing[$index]['discount'] ?? 0;
+            $this->discountAmount = $this->pricing[$index]['price'] && $this->discountPercent
+                ? ($this->pricing[$index]['price'] * $this->discountPercent / 100)
+                : 0;
+        }
     }
 
     public function closeDiscountModal()
     {
         $this->showDiscountModal = false;
+        $this->currentPricingIndex = null;
     }
 
     public function updatedDiscountPercent($value)
     {
-        if ($this->price && $value) {
-            $this->discountAmount = $this->price * $value / 100;
-            $this->final_price = $this->price - $this->discountAmount;
-        } else {
-            $this->discountAmount = 0;
-            $this->final_price = $this->price;
+        if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
+            if ($this->pricing[$this->currentPricingIndex]['price'] && $value) {
+                $this->discountAmount = $this->pricing[$this->currentPricingIndex]['price'] * $value / 100;
+                $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'] - $this->discountAmount;
+            } else {
+                $this->discountAmount = 0;
+                $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'];
+            }
         }
     }
 
     public function updatedDiscountAmount($value)
     {
-        if ($this->price && $value) {
-            $this->discountPercent = ($value / $this->price) * 100;
-            $this->final_price = $this->price - $value;
-        } else {
-            $this->discountPercent = 0;
-            $this->final_price = $this->price;
+        if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
+            if ($this->pricing[$this->currentPricingIndex]['price'] && $value) {
+                $this->discountPercent = ($value / $this->pricing[$this->currentPricingIndex]['price']) * 100;
+                $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'] - $value;
+            } else {
+                $this->discountPercent = 0;
+                $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'];
+            }
         }
     }
 
-    public function updatedPrice($value)
+    public function updatedPricing($value, $name)
     {
-        $this->final_price = $value - ($value * $this->discount / 100);
+        $index = explode('.', $name)[0];
+        if (isset($this->pricing[$index])) {
+            $this->pricing[$index]['final_price'] = $this->pricing[$index]['price'] - ($this->pricing[$index]['price'] * ($this->pricing[$index]['discount'] ?? 0) / 100);
+        }
     }
 
     public function applyDiscount()
     {
-        $this->discount = $this->discountPercent;
-        $this->final_price = $this->price - ($this->price * $this->discount / 100);
+        if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
+            $this->pricing[$this->currentPricingIndex]['discount'] = $this->discountPercent;
+            $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'] - ($this->pricing[$this->currentPricingIndex]['price'] * $this->discountPercent / 100);
+        }
         $this->showDiscountModal = false;
+        $this->currentPricingIndex = null;
     }
 
-    // لود اطلاعات خدمت انتخاب‌شده
+    public function addPricingRow()
+    {
+        $this->pricing[] = [
+            'insurance_id' => null,
+            'price' => 0,
+            'discount' => 0,
+            'final_price' => 0,
+        ];
+    }
+
+    public function removePricingRow($index)
+    {
+        unset($this->pricing[$index]);
+        $this->pricing = array_values($this->pricing);
+    }
+
     public function updatedSelectedService($value)
     {
-        $this->reset(['service_id', 'clinic_id', 'duration', 'description', 'price', 'discount', 'final_price', 'insurance_id']);
-
+        $this->reset(['service_id', 'clinic_id', 'duration', 'description', 'pricing']);
         if ($value) {
             if (str_starts_with($value, 'doctor_service_')) {
-                // خدمت از DoctorService
                 $doctorServiceId = str_replace('doctor_service_', '', $value);
                 $doctorService = DoctorService::find($doctorServiceId);
                 if ($doctorService) {
@@ -101,22 +130,25 @@ class DoctorServiceEdit extends Component
                     $this->clinic_id = $doctorService->clinic_id;
                     $this->duration = $doctorService->duration;
                     $this->description = $doctorService->description;
-                    $this->price = $doctorService->price;
-                    $this->discount = $doctorService->discount;
-                    $this->final_price = $this->price - ($this->price * $this->discount / 100);
-                    $this->insurance_id = null; // بیمه را خالی می‌کنیم
+                    $this->pricing = [[
+                        'insurance_id' => $doctorService->insurance_id,
+                        'price' => $doctorService->price,
+                        'discount' => $doctorService->discount,
+                        'final_price' => $doctorService->price - ($doctorService->price * $doctorService->discount / 100),
+                    ]];
                 }
             } else {
-                // خدمت از Service
                 $service = Service::find($value);
                 if ($service) {
                     $this->service_id = $service->id;
                     $this->description = $service->description;
-                    $this->duration = 15; // مقدار پیش‌فرض
-                    $this->price = 0;
-                    $this->discount = 0;
-                    $this->final_price = 0;
-                    $this->insurance_id = null;
+                    $this->duration = 15;
+                    $this->pricing = [[
+                        'insurance_id' => null,
+                        'price' => 0,
+                        'discount' => 0,
+                        'final_price' => 0,
+                    ]];
                 }
             }
         }
@@ -124,22 +156,22 @@ class DoctorServiceEdit extends Component
 
     public function update()
     {
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $validator = Validator::make([
             'service_id' => $this->service_id,
             'clinic_id' => $this->clinic_id,
             'duration' => $this->duration,
             'description' => $this->description,
-            'insurance_id' => $this->insurance_id,
-            'price' => $this->price,
-            'discount' => $this->discount,
+            'pricing' => $this->pricing,
         ], [
             'service_id' => 'required|exists:services,id',
             'clinic_id' => 'required|exists:clinics,id',
             'duration' => 'required|integer|min:1',
             'description' => 'nullable|string|max:500',
-            'insurance_id' => 'required|exists:insurances,id',
-            'price' => 'required|numeric|min:0',
-            'discount' => 'nullable|numeric|min:0|max:100',
+            'pricing' => 'required|array|min:1',
+            'pricing.*.insurance_id' => 'required|exists:insurances,id',
+            'pricing.*.price' => 'required|numeric|min:0',
+            'pricing.*.discount' => 'nullable|numeric|min:0|max:100',
         ], [
             'service_id.required' => 'انتخاب خدمت الزامی است.',
             'service_id.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
@@ -149,14 +181,15 @@ class DoctorServiceEdit extends Component
             'duration.integer' => 'مدت زمان باید عدد صحیح باشد.',
             'duration.min' => 'مدت زمان باید حداقل ۱ دقیقه باشد.',
             'description.max' => 'توضیحات نمی‌تواند بیشتر از ۵۰۰ کاراکتر باشد.',
-            'insurance_id.required' => 'انتخاب بیمه الزامی است.',
-            'insurance_id.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
-            'price.required' => 'قیمت الزامی است.',
-            'price.numeric' => 'قیمت باید عدد باشد.',
-            'price.min' => 'قیمت نمی‌تواند منفی باشد.',
-            'discount.numeric' => 'تخفیف باید عدد باشد.',
-            'discount.min' => 'تخفیف نمی‌تواند منفی باشد.',
-            'discount.max' => 'تخفیف نمی‌تواند بیشتر از ۱۰۰ درصد باشد.',
+            'pricing.required' => 'حداقل یک ردیف قیمت‌گذاری الزامی است.',
+            'pricing.*.insurance_id.required' => 'انتخاب بیمه الزامی است.',
+            'pricing.*.insurance_id.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+            'pricing.*.price.required' => 'قیمت الزامی است.',
+            'pricing.*.price.numeric' => 'قیمت باید عدد باشد.',
+            'pricing.*.price.min' => 'قیمت نمی‌تواند منفی باشد.',
+            'pricing.*.discount.numeric' => 'تخفیف باید عدد باشد.',
+            'pricing.*.discount.min' => 'تخفیف نمی‌تواند منفی باشد.',
+            'pricing.*.discount.max' => 'تخفیف نمی‌تواند بیشتر از ۱۰۰ درصد باشد.',
         ]);
 
         if ($validator->fails()) {
@@ -164,31 +197,34 @@ class DoctorServiceEdit extends Component
             return;
         }
 
-        // بررسی تکراری بودن خدمت
-        $exists = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
-            ->where('service_id', $this->service_id)
-            ->where('insurance_id', $this->insurance_id)
-            ->where('clinic_id', $this->clinic_id)
-            ->where('id', '!=', $this->doctorService->id)
-            ->exists();
+        // حذف خدمت فعلی
+        $this->doctorService->delete();
 
-        if ($exists) {
-            $this->dispatch('show-alert', type: 'error', message: 'این خدمت با این بیمه و کلینیک قبلاً تعریف شده است.');
-            return;
-        }
-
+        // ایجاد خدمات جدید بر اساس قیمت‌گذاری‌ها
         $service = Service::find($this->service_id);
-
-        $this->doctorService->update([
-            'service_id' => $this->service_id,
-            'clinic_id' => $this->clinic_id,
-            'insurance_id' => $this->insurance_id,
-            'name' => $service->name,
-            'description' => $this->description,
-            'duration' => $this->duration,
-            'price' => $this->price,
-            'discount' => $this->discount,
-        ]);
+        foreach ($this->pricing as $pricing) {
+            $exists = DoctorService::where('doctor_id', $doctorId)
+                ->where('service_id', $this->service_id)
+                ->where('insurance_id', $pricing['insurance_id'])
+                ->where('clinic_id', $this->clinic_id)
+                ->exists();
+            if ($exists) {
+                $this->dispatch('show-alert', type: 'error', message: 'این خدمت با بیمه ' . Insurance::find($pricing['insurance_id'])->name . ' و کلینیک انتخاب‌شده قبلاً تعریف شده است.');
+                return;
+            }
+            DoctorService::create([
+                'doctor_id' => $doctorId,
+                'service_id' => $this->service_id,
+                'clinic_id' => $this->clinic_id,
+                'insurance_id' => $pricing['insurance_id'],
+                'name' => $service->name,
+                'description' => $this->description,
+                'duration' => $this->duration,
+                'price' => $pricing['price'],
+                'discount' => $pricing['discount'] ?? 0,
+                'status' => true,
+            ]);
+        }
 
         $this->dispatch('show-alert', type: 'success', message: 'خدمت با موفقیت به‌روزرسانی شد!');
         return redirect()->route('dr.panel.doctor-services.index');
@@ -202,7 +238,6 @@ class DoctorServiceEdit extends Component
         $doctorServices = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->with(['service', 'insurance', 'clinic'])
             ->get();
-
         return view('livewire.dr.panel.doctor-services.doctor-service-edit', compact('services', 'insurances', 'clinics', 'doctorServices'));
     }
 }
