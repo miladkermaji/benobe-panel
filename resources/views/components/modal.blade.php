@@ -22,7 +22,7 @@
     /* opacity کمی افزایش یافت */
     z-index: 1000;
     /* اطمینان از پوشش کل صفحه */
-    transition: opacity 0.2s ease-out;
+    transition: opacity 0.08s ease-out;
   }
 
   .xai-modal-container {
@@ -32,8 +32,7 @@
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     overflow: hidden;
     max-height: calc(100vh - 3rem);
-    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
-    transform: scale(0.95);
+    transition: opacity 0.08s ease-out;
     opacity: 0;
     z-index: 1001;
     display: flex;
@@ -41,7 +40,6 @@
   }
 
   [x-show="show"] .xai-modal-container {
-    transform: scale(1);
     opacity: 1;
   }
 
@@ -164,9 +162,9 @@
   x-on:open-modal.window="if ($event.detail.name === name) show = true"
   x-on:close-modal.window="if ($event.detail.name === name) show = false"
   x-on:keydown.escape.window="if (show) $dispatch('close-modal', { name: name })"
-  class="fixed z-[1000] inset-0 flex items-center justify-center" x-transition:enter="transition ease-out duration-200"
+  class="fixed z-[1000] inset-0 flex items-center justify-center" x-transition:enter="transition ease-out duration-80"
   x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-  x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
+  x-transition:leave="transition ease-in duration-80" x-transition:leave-start="opacity-100"
   x-transition:leave-end="opacity-0">
   <div x-on:click="$dispatch('close-modal', { name: name })" class="xai-modal-overlay"></div>
   <div class="xai-modal-container {{ $sizeClass }}">
