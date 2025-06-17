@@ -352,11 +352,10 @@
         <x-slot:body>
           <div class="position-relative">
             <!-- لودینگ -->
-            <div class="loading-overlay d-none" id="scheduleLoading">
-              <div class="spinner-border text-primary" role="status">
+            <div class="loading-overlay d-none" id="scheduleLoading" style="position: absolute;top:70px;right:50%;">
+              <div class="spinner-border text-primary" style="border-radius: 50% !important" role="status">
                 <span class="sr-only">در حال بارگذاری...</span>
               </div>
-              <p class="mt-2">در حال بارگذاری...</p>
             </div>
             <!-- محتوای اصلی -->
             <div class="modal-content-inner">

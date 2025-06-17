@@ -35,11 +35,9 @@
     --radius-circle: 9999px;
 
     /* سایزهای فونت */
-    --font-size-base: 0.875rem;
-    --font-size-small: 0.75rem;
-    --font-size-label: 0.8125rem;
-}
 
+
+}
 /* استایل‌های عمومی */
 *,
 ::after,
@@ -567,36 +565,9 @@ body {
     transform: scale(1.05);
 }
 
-/* لودینگ مودال */
-.loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.95);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
 
-.loading-overlay .spinner-border {
-    display: inline-block;
-    width: 3rem;
-    height: 3rem;
-    vertical-align: text-bottom;
-    border: 0.25em solid currentColor;
-    border-right-color: transparent;
-    border-radius: 50%;
-    animation: spinner-border 0.75s linear infinite;
-}
-@keyframes spinner-border {
-    to {
-        transform: rotate(360deg);
-    }
-}
+
+
 
 /* سایر استایل‌ها */
 h6 {
@@ -1008,30 +979,7 @@ h6 {
     position: relative;
 }
 
-/* لودینگ */
-#scheduleModal .loading-overlay {
-    background: rgba(255, 255, 255, 0.95);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
 
-#scheduleModal .spinner-border {
-    width: 1.75rem;
-    height: 1.75rem;
-    border-width: 3px;
-    border-color: var(--primary, #2e86c1);
-    border-right-color: transparent;
-}
-
-#scheduleModal .loading-overlay p {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--text-primary, #212529);
-    font-weight: 500;
-}
 
 /* محتوای مودال */
 #scheduleModal .modal-content-inner {
@@ -1492,17 +1440,4 @@ h6 {
     opacity: 1;
 }
 
-/* لودینگ */
-.loading-overlay {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
-    z-index: 10;
-}
+
