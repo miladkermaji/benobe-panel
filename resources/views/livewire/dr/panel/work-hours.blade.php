@@ -415,7 +415,7 @@
                               <input type="text"
                                 class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
                                 data-timepicker
-                                wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.{{ $index }}.start_time"
+                                wire:model.live="scheduleSettings.{{ $day }}.{{ $index }}.start_time"
                                 wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
                                 value="{{ $setting['start_time'] ?? '' }}">
                             </div>
@@ -424,7 +424,7 @@
                               <input type="text"
                                 class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
                                 data-timepicker
-                                wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.{{ $index }}.end_time"
+                                wire:model.live="scheduleSettings.{{ $day }}.{{ $index }}.end_time"
                                 wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
                                 value="{{ $setting['end_time'] ?? '' }}">
                             </div>
