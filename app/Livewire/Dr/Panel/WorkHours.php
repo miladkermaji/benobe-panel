@@ -335,90 +335,90 @@ class Workhours extends Component
     public $isEditingSchedule = false; // نشان‌دهنده حالت ویرایش
     public $editingSettingIndex = null; // ایندکس تنظیم در حال ویرایش
     public $editingSetting = null; // داده‌های تنظیم در حال ویرایش
-   public function openScheduleModal($day, $index)
-{
-    try {
-        // نرمال‌سازی و اعتبارسنجی ورودی‌ها
-        $day = is_string($day) ? strtolower(trim($day)) : null;
-        $index = is_numeric($index) ? (int)$index : null;
+    public function openScheduleModal($day, $index)
+    {
+        try {
+            // نرمال‌سازی و اعتبارسنجی ورودی‌ها
+            $day = is_string($day) ? strtolower(trim($day)) : null;
+            $index = is_numeric($index) ? (int)$index : null;
 
-        if (!in_array($day, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']) || $index === null || $index < 0) {
-            Log::warning('Invalid inputs for openScheduleModal', [
+            if (!in_array($day, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']) || $index === null || $index < 0) {
+                Log::warning('Invalid inputs for openScheduleModal', [
+                    'day' => $day,
+                    'index' => $index,
+                ]);
+                throw new \Exception('روز یا ایندکس نامعتبر است');
+            }
+
+            // تنظیم activeClinicId
+            $this->activeClinicId = $this->resolveClinicId();
+
+            // تنظیم متغیرهای مودال
+            $this->scheduleModalDay = $day;
+            $this->scheduleModalIndex = $index;
+            $this->selectedScheduleDays = array_fill_keys(['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'], false);
+            $this->scheduleSettings = [];
+
+            // بارگذاری تنظیمات زمان‌بندی با یک کوئری
+            $schedules = DoctorWorkSchedule::select('day', 'appointment_settings')
+                ->where('doctor_id', $this->doctorId)
+                ->whereIn('day', ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])
+                ->where(function ($query) {
+                    if ($this->activeClinicId !== 'default') {
+                        $query->where('clinic_id', $this->activeClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->get();
+
+            // پردازش تنظیمات زمان‌بندی
+            foreach ($schedules as $schedule) {
+                $settings = is_string($schedule->appointment_settings)
+                    ? json_decode($schedule->appointment_settings, true) ?? []
+                    : $schedule->appointment_settings;
+
+                if (!is_array($settings)) {
+                    continue;
+                }
+
+                $filteredSettings = array_values(array_filter(
+                    $settings,
+                    fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === $this->scheduleModalIndex
+                ));
+
+                if ($filteredSettings) {
+                    $this->scheduleSettings[$schedule->day] = array_map(
+                        fn ($setting) => [
+                            'start_time' => $setting['start_time'],
+                            'end_time' => $setting['end_time'],
+                        ],
+                        $filteredSettings
+                    );
+                    $this->selectedScheduleDays[$schedule->day] = true;
+                }
+            }
+
+            // رفرش برنامه‌های کاری
+            $this->refreshWorkSchedules();
+            $this->dispatch('refresh-schedule-settings');
+
+            Log::info('Schedule modal opened successfully', [
                 'day' => $day,
                 'index' => $index,
+                'doctor_id' => $this->doctorId,
+                'clinic_id' => $this->activeClinicId,
             ]);
-            throw new \Exception('روز یا ایندکس نامعتبر است');
+        } catch (\Exception $e) {
+            Log::error('Error in openScheduleModal: ' . $e->getMessage(), [
+                'day' => $day,
+                'index' => $index,
+                'doctor_id' => $this->doctorId,
+                'clinic_id' => $this->activeClinicId,
+            ]);
+            $this->showErrorMessage('خطا در باز کردن مودال زمان‌بندی: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
         }
-
-        // تنظیم activeClinicId
-        $this->activeClinicId = $this->resolveClinicId();
-
-        // تنظیم متغیرهای مودال
-        $this->scheduleModalDay = $day;
-        $this->scheduleModalIndex = $index;
-        $this->selectedScheduleDays = array_fill_keys(['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'], false);
-        $this->scheduleSettings = [];
-
-        // بارگذاری تنظیمات زمان‌بندی با یک کوئری
-        $schedules = DoctorWorkSchedule::select('day', 'appointment_settings')
-            ->where('doctor_id', $this->doctorId)
-            ->whereIn('day', ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])
-            ->where(function ($query) {
-                if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
-                } else {
-                    $query->whereNull('clinic_id');
-                }
-            })
-            ->get();
-
-        // پردازش تنظیمات زمان‌بندی
-        foreach ($schedules as $schedule) {
-            $settings = is_string($schedule->appointment_settings)
-                ? json_decode($schedule->appointment_settings, true) ?? []
-                : $schedule->appointment_settings;
-
-            if (!is_array($settings)) {
-                continue;
-            }
-
-            $filteredSettings = array_values(array_filter(
-                $settings,
-                fn($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === $this->scheduleModalIndex
-            ));
-
-            if ($filteredSettings) {
-                $this->scheduleSettings[$schedule->day] = array_map(
-                    fn($setting) => [
-                        'start_time' => $setting['start_time'],
-                        'end_time' => $setting['end_time'],
-                    ],
-                    $filteredSettings
-                );
-                $this->selectedScheduleDays[$schedule->day] = true;
-            }
-        }
-
-        // رفرش برنامه‌های کاری
-        $this->refreshWorkSchedules();
-        $this->dispatch('refresh-schedule-settings');
-
-        Log::info('Schedule modal opened successfully', [
-            'day' => $day,
-            'index' => $index,
-            'doctor_id' => $this->doctorId,
-            'clinic_id' => $this->activeClinicId,
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Error in openScheduleModal: ' . $e->getMessage(), [
-            'day' => $day,
-            'index' => $index,
-            'doctor_id' => $this->doctorId,
-            'clinic_id' => $this->activeClinicId,
-        ]);
-        $this->showErrorMessage('خطا در باز کردن مودال زمان‌بندی: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
     }
-}
     public function autoSaveSchedule()
     {
         try {
@@ -516,46 +516,46 @@ class Workhours extends Component
         }
     }
 
-  public function addScheduleSetting($day)
-{
-    try {
-        // اعتبارسنجی ورودی
-        if (!in_array($day, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])) {
-            throw new \Exception('روز انتخاب‌شده نامعتبر است');
+    public function addScheduleSetting($day)
+    {
+        try {
+            // اعتبارسنجی ورودی
+            if (!in_array($day, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])) {
+                throw new \Exception('روز انتخاب‌شده نامعتبر است');
+            }
+
+            // تنظیم activeClinicId
+            $this->activeClinicId = $this->resolveClinicId();
+
+            // اطمینان از وجود آرایه scheduleSettings برای روز
+            $this->scheduleSettings[$day] = $this->scheduleSettings[$day] ?? [];
+
+            // افزودن تنظیم جدید
+            $this->scheduleSettings[$day][] = [
+                'start_time' => null,
+                'end_time' => null,
+            ];
+
+            // علامت‌گذاری روز به عنوان انتخاب‌شده
+            $this->selectedScheduleDays[$day] = true;
+
+            // ارسال رویداد برای رفرش رابط کاربری
+            $this->dispatch('refresh-timepicker');
+
+            Log::info('New schedule setting added', [
+                'day' => $day,
+                'doctor_id' => $this->doctorId,
+                'clinic_id' => $this->activeClinicId,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in addScheduleSetting: ' . $e->getMessage(), [
+                'day' => $day,
+                'doctor_id' => $this->doctorId,
+                'clinic_id' => $this->activeClinicId,
+            ]);
+            $this->showErrorMessage('خطا در افزودن تنظیم زمان‌بندی: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
         }
-
-        // تنظیم activeClinicId
-        $this->activeClinicId = $this->resolveClinicId();
-
-        // اطمینان از وجود آرایه scheduleSettings برای روز
-        $this->scheduleSettings[$day] = $this->scheduleSettings[$day] ?? [];
-
-        // افزودن تنظیم جدید
-        $this->scheduleSettings[$day][] = [
-            'start_time' => null,
-            'end_time' => null,
-        ];
-
-        // علامت‌گذاری روز به عنوان انتخاب‌شده
-        $this->selectedScheduleDays[$day] = true;
-
-        // ارسال رویداد برای رفرش رابط کاربری
-        $this->dispatch('refresh-timepicker');
-
-        Log::info('New schedule setting added', [
-            'day' => $day,
-            'doctor_id' => $this->doctorId,
-            'clinic_id' => $this->activeClinicId,
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Error in addScheduleSetting: ' . $e->getMessage(), [
-            'day' => $day,
-            'doctor_id' => $this->doctorId,
-            'clinic_id' => $this->activeClinicId,
-        ]);
-        $this->showErrorMessage('خطا در افزودن تنظیم زمان‌بندی: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
     }
-}
     public $copySourceDay;
     public $copySourceIndex;
     public $selectedCopyScheduleDays = [
@@ -568,272 +568,296 @@ class Workhours extends Component
         'friday' => false,
     ];
     public $selectAllCopyScheduleModal = false;
-public function deleteScheduleSetting($day, $index)
-{
-    try {
-        // اعتبارسنجی ورودی‌ها
-        if (!in_array($day, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])) {
-            throw new \Exception('روز انتخاب‌شده نامعتبر است');
-        }
-        if (!is_numeric($index) || (int)$index < 0) {
-            throw new \Exception('ایندکس نامعتبر است');
-        }
-        $index = (int)$index;
-
-        // تنظیم activeClinicId
-        $this->activeClinicId = $this->resolveClinicId();
-
-        // یافتن برنامه کاری
-        $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
-            ->where('day', $day)
-            ->where(function ($query) {
-                if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
-                } else {
-                    $query->whereNull('clinic_id');
-                }
-            })
-            ->first();
-
-        if (!$schedule) {
-            throw new \Exception('تنظیمات برای این روز یافت نشد');
-        }
-
-        // پردازش تنظیمات نوبت‌دهی
-        $appointmentSettings = is_string($schedule->appointment_settings)
-            ? json_decode($schedule->appointment_settings, true) ?? []
-            : $schedule->appointment_settings;
-
-        if (!is_array($appointmentSettings)) {
-            throw new \Exception('تنظیمات نوبت‌دهی نامعتبر است');
-        }
-
-        // فیلتر تنظیماتی که با work_hour_key مطابقت دارند
-        $filteredSettings = array_filter(
-            $appointmentSettings,
-            fn($setting, $key) => isset($setting['work_hour_key'])
-                && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
-                && $key === $index,
-            ARRAY_FILTER_USE_BOTH
-        );
-
-        if (empty($filteredSettings)) {
-            throw new \Exception('تنظیم انتخاب‌شده برای حذف یافت نشد');
-        }
-
-        // حذف تنظیم
-        foreach (array_keys($filteredSettings) as $key) {
-            unset($appointmentSettings[$key]);
-        }
-        $appointmentSettings = array_values($appointmentSettings);
-
-        // به‌روزرسانی دیتابیس
-        $schedule->update(['appointment_settings' => $appointmentSettings]);
-
-        // به‌روزرسانی آرایه محلی
-        if (isset($this->scheduleSettings[$day][$index])) {
-            unset($this->scheduleSettings[$day][$index]);
-            $this->scheduleSettings[$day] = array_values($this->scheduleSettings[$day]);
-        }
-
-        // بررسی تنظیمات باقی‌مانده برای این work_hour_key
-        $remainingSettings = array_filter(
-            $appointmentSettings,
-            fn($setting) => isset($setting['work_hour_key'])
-                && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
-        );
-
-        if (empty($remainingSettings)) {
-            $this->selectedScheduleDays[$day] = false;
-            unset($this->scheduleSettings[$day]);
-        }
-
-        // رفرش داده‌ها
-        $this->refreshWorkSchedules();
-        $this->dispatch('show-toastr', [
-            'message' => 'تنظیم زمان‌بندی با موفقیت حذف شد',
-            'type' => 'success',
-        ]);
-
-        Log::info('Schedule setting deleted successfully', [
-            'day' => $day,
-            'index' => $index,
-            'doctor_id' => $this->doctorId,
-            'clinic_id' => $this->activeClinicId,
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Error in deleteScheduleSetting: ' . $e->getMessage(), [
-            'day' => $day,
-            'index' => $index,
-            'doctor_id' => $this->doctorId,
-            'clinic_id' => $this->activeClinicId,
-        ]);
-        $this->showErrorMessage('خطا در حذف تنظیم زمان‌بندی: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
-    }
-}
-  public function copyScheduleSetting()
-{
-    try {
-        // اعتبارسنجی ورودی‌ها
-        if (!in_array($this->copySourceDay, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])) {
-            throw new \Exception('روز مبدا نامعتبر است');
-        }
-        if (!is_numeric($this->copySourceIndex) || (int)$this->copySourceIndex < 0) {
-            throw new \Exception('ایندکس مبدا نامعتبر است');
-        }
-        $selectedTargetDays = array_keys(array_filter($this->selectedCopyScheduleDays));
-        if (empty($selectedTargetDays)) {
-            throw new \Exception('هیچ روزی برای کپی انتخاب نشده است');
-        }
-
-        // تنظیم activeClinicId
-        $this->activeClinicId = $this->resolveClinicId();
-
-        // یافتن برنامه کاری روز مبدا
-        $sourceSchedule = collect($this->workSchedules)->firstWhere('day', $this->copySourceDay);
-        if (!$sourceSchedule) {
-            throw new \Exception('برنامه کاری برای روز مبدا یافت نشد');
-        }
-
-        // استخراج تنظیم مبدا
-        $sourceSettings = is_string($sourceSchedule['appointment_settings'])
-            ? json_decode($sourceSchedule['appointment_settings'], true) ?? []
-            : $sourceSchedule['appointment_settings'];
-        
-        $sourceSetting = array_values(array_filter(
-            $sourceSettings,
-            fn($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
-        ))[$this->copySourceIndex] ?? null;
-
-        if (!$sourceSetting) {
-            throw new \Exception('تنظیم انتخاب‌شده برای کپی یافت نشد');
-        }
-
-        // بارگذاری برنامه‌های کاری روزهای مقصد
-        $targetSchedules = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
-            ->whereIn('day', $selectedTargetDays)
-            ->where(function ($query) {
-                if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
-                } else {
-                    $query->whereNull('clinic_id');
-                }
-            })
-            ->get()
-            ->keyBy('day');
-
-        // بررسی تداخل زمانی
-        $conflicts = [];
-        foreach ($selectedTargetDays as $targetDay) {
-            if ($targetDay === $this->copySourceDay) {
-                continue;
+    public function deleteScheduleSetting($day, $index)
+    {
+        try {
+            // اعتبارسنجی ورودی‌ها
+            if (!in_array($day, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])) {
+                throw new \Exception('روز انتخاب‌شده نامعتبر است');
             }
-            $targetSchedule = $targetSchedules[$targetDay] ?? null;
-            if ($targetSchedule) {
-                $targetSettings = is_string($targetSchedule->appointment_settings)
-                    ? json_decode($targetSchedule->appointment_settings, true) ?? []
-                    : $targetSchedule->appointment_settings;
+            if (!is_numeric($index) || (int)$index < 0) {
+                throw new \Exception('ایندکس نامعتبر است');
+            }
+            $index = (int)$index;
 
-                foreach ($targetSettings as $setting) {
-                    if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex) {
-                        if ($this->isTimeConflict(
-                            $sourceSetting['start_time'],
-                            $sourceSetting['end_time'],
-                            $setting['start_time'],
-                            $setting['end_time']
-                        )) {
-                            $conflicts[$targetDay][] = [
-                                'start_time' => $setting['start_time'],
-                                'end_time' => $setting['end_time'],
-                            ];
+            // تنظیم activeClinicId
+            $this->activeClinicId = $this->resolveClinicId();
+
+            // یافتن برنامه کاری
+            $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
+                ->where('day', $day)
+                ->where(function ($query) {
+                    if ($this->activeClinicId !== 'default') {
+                        $query->where('clinic_id', $this->activeClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->first();
+
+            if (!$schedule) {
+                throw new \Exception('تنظیمات برای این روز یافت نشد');
+            }
+
+            // پردازش تنظیمات نوبت‌دهی
+            $appointmentSettings = is_string($schedule->appointment_settings)
+                ? json_decode($schedule->appointment_settings, true) ?? []
+                : $schedule->appointment_settings;
+
+            if (!is_array($appointmentSettings)) {
+                throw new \Exception('تنظیمات نوبت‌دهی نامعتبر است');
+            }
+
+            // فیلتر تنظیماتی که با work_hour_key مطابقت دارند
+            $filteredSettings = array_filter(
+                $appointmentSettings,
+                fn ($setting, $key) => isset($setting['work_hour_key'])
+                    && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
+                    && $key === $index,
+                ARRAY_FILTER_USE_BOTH
+            );
+
+            if (empty($filteredSettings)) {
+                throw new \Exception('تنظیم انتخاب‌شده برای حذف یافت نشد');
+            }
+
+            // حذف تنظیم
+            foreach (array_keys($filteredSettings) as $key) {
+                unset($appointmentSettings[$key]);
+            }
+            $appointmentSettings = array_values($appointmentSettings);
+
+            // به‌روزرسانی دیتابیس
+            $schedule->update(['appointment_settings' => $appointmentSettings]);
+
+            // به‌روزرسانی آرایه محلی
+            if (isset($this->scheduleSettings[$day][$index])) {
+                unset($this->scheduleSettings[$day][$index]);
+                $this->scheduleSettings[$day] = array_values($this->scheduleSettings[$day]);
+            }
+
+            // بررسی تنظیمات باقی‌مانده برای این work_hour_key
+            $remainingSettings = array_filter(
+                $appointmentSettings,
+                fn ($setting) => isset($setting['work_hour_key'])
+                    && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
+            );
+
+            if (empty($remainingSettings)) {
+                $this->selectedScheduleDays[$day] = false;
+                unset($this->scheduleSettings[$day]);
+            }
+
+            // رفرش داده‌ها
+            $this->refreshWorkSchedules();
+            $this->dispatch('show-toastr', [
+                'message' => 'تنظیم زمان‌بندی با موفقیت حذف شد',
+                'type' => 'success',
+            ]);
+
+            Log::info('Schedule setting deleted successfully', [
+                'day' => $day,
+                'index' => $index,
+                'doctor_id' => $this->doctorId,
+                'clinic_id' => $this->activeClinicId,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in deleteScheduleSetting: ' . $e->getMessage(), [
+                'day' => $day,
+                'index' => $index,
+                'doctor_id' => $this->doctorId,
+                'clinic_id' => $this->activeClinicId,
+            ]);
+            $this->showErrorMessage('خطا در حذف تنظیم زمان‌بندی: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
+        }
+    }
+    public function copyScheduleSetting()
+    {
+        try {
+            // اعتبارسنجی ورودی‌ها
+            if (!in_array($this->copySourceDay, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])) {
+                throw new \Exception('روز مبدا نامعتبر است');
+            }
+            if (!is_numeric($this->copySourceIndex) || (int)$this->copySourceIndex < 0) {
+                throw new \Exception('ایندکس مبدا نامعتبر است');
+            }
+            $selectedTargetDays = array_keys(array_filter($this->selectedCopyScheduleDays));
+            if (empty($selectedTargetDays)) {
+                throw new \Exception('هیچ روزی برای کپی انتخاب نشده است');
+            }
+
+            // تنظیم activeClinicId
+            $this->activeClinicId = $this->resolveClinicId();
+
+            // یافتن برنامه کاری روز مبدا
+            $sourceSchedule = collect($this->workSchedules)->firstWhere('day', $this->copySourceDay);
+            if (!$sourceSchedule) {
+                throw new \Exception('برنامه کاری برای روز مبدا یافت نشد');
+            }
+
+            // استخراج تنظیم مبدا
+            $sourceSettings = is_string($sourceSchedule['appointment_settings'])
+                ? json_decode($sourceSchedule['appointment_settings'], true) ?? []
+                : $sourceSchedule['appointment_settings'];
+
+            $sourceSetting = array_values(array_filter(
+                $sourceSettings,
+                fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
+            ))[$this->copySourceIndex] ?? null;
+
+            if (!$sourceSetting) {
+                throw new \Exception('تنظیم انتخاب‌شده برای کپی یافت نشد');
+            }
+
+            // بارگذاری برنامه‌های کاری روزهای مقصد
+            $targetSchedules = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
+                ->whereIn('day', $selectedTargetDays)
+                ->where(function ($query) {
+                    if ($this->activeClinicId !== 'default') {
+                        $query->where('clinic_id', $this->activeClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })
+                ->get()
+                ->keyBy('day');
+
+            // بررسی تداخل زمانی
+            $conflicts = [];
+            foreach ($selectedTargetDays as $targetDay) {
+                if ($targetDay === $this->copySourceDay) {
+                    continue;
+                }
+                $targetSchedule = $targetSchedules[$targetDay] ?? null;
+                if ($targetSchedule) {
+                    $targetSettings = is_string($targetSchedule->appointment_settings)
+                        ? json_decode($targetSchedule->appointment_settings, true) ?? []
+                        : $targetSchedule->appointment_settings;
+
+                    foreach ($targetSettings as $setting) {
+                        if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex) {
+                            if ($this->isTimeConflict(
+                                $sourceSetting['start_time'],
+                                $sourceSetting['end_time'],
+                                $setting['start_time'],
+                                $setting['end_time']
+                            )) {
+                                $conflicts[$targetDay][] = [
+                                    'start_time' => $setting['start_time'],
+                                    'end_time' => $setting['end_time'],
+                                ];
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if (!empty($conflicts)) {
-            $this->dispatch('show-conflict-alert', ['conflicts' => $conflicts]);
-            return;
-        }
-
-        DB::beginTransaction();
-
-        // کپی تنظیمات به روزهای مقصد
-        foreach ($selectedTargetDays as $targetDay) {
-            if ($targetDay === $this->copySourceDay) {
-                continue;
+            if (!empty($conflicts)) {
+                $this->dispatch('show-conflict-alert', ['conflicts' => $conflicts]);
+                return;
             }
 
-            $targetSchedule = $targetSchedules[$targetDay] ?? DoctorWorkSchedule::create([
+            DB::beginTransaction();
+
+            // کپی تنظیمات به روزهای مقصد
+            foreach ($selectedTargetDays as $targetDay) {
+                if ($targetDay === $this->copySourceDay) {
+                    continue;
+                }
+
+                $targetSchedule = $targetSchedules[$targetDay] ?? DoctorWorkSchedule::create([
+                    'doctor_id' => $this->doctorId,
+                    'day' => $targetDay,
+                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'is_working' => true,
+                    'work_hours' => json_encode([]),
+                    'appointment_settings' => json_encode([]),
+                ]);
+
+                $targetSettings = is_string($targetSchedule->appointment_settings)
+                    ? json_decode($targetSchedule->appointment_settings, true) ?? []
+                    : $targetSchedule->appointment_settings;
+
+                $targetSettings[] = [
+                    'start_time' => $sourceSetting['start_time'],
+                    'end_time' => $sourceSetting['end_time'],
+                    'days' => [$targetDay],
+                    'work_hour_key' => (int)$this->scheduleModalIndex,
+                ];
+
+                $targetSchedule->update(['appointment_settings' => $targetSettings]);
+
+                // به‌روزرسانی آرایه محلی
+                $this->scheduleSettings[$targetDay][] = [
+                    'start_time' => $sourceSetting['start_time'],
+                    'end_time' => $sourceSetting['end_time'],
+                ];
+                $this->selectedScheduleDays[$targetDay] = true;
+            }
+
+            DB::commit();
+
+            // رفرش داده‌ها و بازنشانی متغیرها
+            $this->refreshWorkSchedules();
+            $this->selectedCopyScheduleDays = array_fill_keys(
+                ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                false
+            );
+            $this->selectAllCopyScheduleModal = false;
+
+            $this->dispatch('show-toastr', ['message' => 'تنظیمات با موفقیت کپی شد', 'type' => 'success']);
+            $this->dispatch('close-modal', ['name' => 'copy-schedule-modal']);
+
+            Log::info('Schedule settings copied successfully', [
+                'source_day' => $this->copySourceDay,
+                'source_index' => $this->copySourceIndex,
+                'target_days' => $selectedTargetDays,
                 'doctor_id' => $this->doctorId,
-                'day' => $targetDay,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                'is_working' => true,
-                'work_hours' => json_encode([]),
-                'appointment_settings' => json_encode([]),
+                'clinic_id' => $this->activeClinicId,
             ]);
-
-            $targetSettings = is_string($targetSchedule->appointment_settings)
-                ? json_decode($targetSchedule->appointment_settings, true) ?? []
-                : $targetSchedule->appointment_settings;
-
-            $targetSettings[] = [
-                'start_time' => $sourceSetting['start_time'],
-                'end_time' => $sourceSetting['end_time'],
-                'days' => [$targetDay],
-                'work_hour_key' => (int)$this->scheduleModalIndex,
-            ];
-
-            $targetSchedule->update(['appointment_settings' => $targetSettings]);
-
-            // به‌روزرسانی آرایه محلی
-            $this->scheduleSettings[$targetDay][] = [
-                'start_time' => $sourceSetting['start_time'],
-                'end_time' => $sourceSetting['end_time'],
-            ];
-            $this->selectedScheduleDays[$targetDay] = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in copyScheduleSetting: ' . $e->getMessage(), [
+                'source_day' => $this->copySourceDay,
+                'source_index' => $this->copySourceIndex,
+                'target_days' => $selectedTargetDays ?? [],
+                'doctor_id' => $this->doctorId,
+                'clinic_id' => $this->activeClinicId,
+            ]);
+            $this->showErrorMessage('خطا در کپی تنظیمات: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
         }
-
-        DB::commit();
-
-        // رفرش داده‌ها و بازنشانی متغیرها
-        $this->refreshWorkSchedules();
-        $this->selectedCopyScheduleDays = array_fill_keys(
-            ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-            false
-        );
-        $this->selectAllCopyScheduleModal = false;
-
-        $this->dispatch('show-toastr', ['message' => 'تنظیمات با موفقیت کپی شد', 'type' => 'success']);
-        $this->dispatch('close-modal', ['name' => 'copy-schedule-modal']);
-
-        Log::info('Schedule settings copied successfully', [
-            'source_day' => $this->copySourceDay,
-            'source_index' => $this->copySourceIndex,
-            'target_days' => $selectedTargetDays,
-            'doctor_id' => $this->doctorId,
-            'clinic_id' => $this->activeClinicId,
-        ]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error in copyScheduleSetting: ' . $e->getMessage(), [
-            'source_day' => $this->copySourceDay,
-            'source_index' => $this->copySourceIndex,
-            'target_days' => $selectedTargetDays ?? [],
-            'doctor_id' => $this->doctorId,
-            'clinic_id' => $this->activeClinicId,
-        ]);
-        $this->showErrorMessage('خطا در کپی تنظیمات: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
     }
-}
-    public function updatedSelectAllCopyScheduleModal($value)
+    public function updatedSelectAllCopyScheduleModal()
     {
-        $days = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-        foreach ($days as $day) {
-            if ($day !== $this->copySourceDay) {
-                $this->selectedCopyScheduleDays[$day] = $value;
+        try {
+            // اعتبارسنجی ورودی
+            if (!in_array($this->copySourceDay, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])) {
+                throw new \Exception('روز مبدا نامعتبر است');
             }
+
+            // تنظیم مقادیر آرایه انتخاب روزهای مقصد
+            $days = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+            $this->selectedCopyScheduleDays = array_fill_keys(
+                $days,
+                $this->selectAllCopyScheduleModal && $this->copySourceDay !== null
+            );
+
+            // غیرفعال کردن روز مبدا
+            $this->selectedCopyScheduleDays[$this->copySourceDay] = false;
+
+            Log::info('selectAllCopyScheduleModal updated', [
+                'select_all' => $this->selectAllCopyScheduleModal,
+                'source_day' => $this->copySourceDay,
+                'selected_days' => array_keys(array_filter($this->selectedCopyScheduleDays)),
+                'doctor_id' => $this->doctorId,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in updatedSelectAllCopyScheduleModal: ' . $e->getMessage(), [
+                'select_all' => $this->selectAllCopyScheduleModal,
+                'source_day' => $this->copySourceDay,
+                'doctor_id' => $this->doctorId,
+            ]);
+            $this->showErrorMessage('خطا در به‌روزرسانی انتخاب روزها: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
         }
     }
     public function saveSchedule($startTime, $endTime)
