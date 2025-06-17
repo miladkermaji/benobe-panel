@@ -258,7 +258,7 @@
                 <div class="loader"></div>
               </button>
             </div>
-          @elseif (Request::is('dr/panel/doctors-clinic/activation/workhours/*'))
+          @elseif ($isActivationPage)
             <div class="d-flex w-100 justify-content-end mt-3">
               <button type="button" id="startAppointmentBtn" data-tooltip="true" data-placement="right"
                 data-original-title="پایان ثبت ساعات کاری و شروع نوبت‌دهی! حالا می‌توانید از امکانات سایت استفاده کنید."

@@ -127,9 +127,14 @@ class Workhours extends Component
     protected $listeners = [
         'setSelectedClinicId' => 'setSelectedClinicId',
     ];
+    public $isActivationPage = false;
     public function mount()
     {
         $this->showSaveButton = request()->routeIs('dr-workhours');
+        
+$this->isActivationPage = request()->is('dr/panel/doctors-clinic/activation/workhours/*');
+$this->showSaveButton = !$this->isActivationPage;
+
         // تنظیم activeClinicId
         $this->activeClinicId = $this->resolveClinicId();
         // دریافت اطلاعات دکتر
