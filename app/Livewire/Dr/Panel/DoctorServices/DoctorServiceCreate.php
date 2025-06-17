@@ -18,11 +18,23 @@ class DoctorServiceCreate extends Component
     public $clinic_id;
     public $duration;
     public $description;
-    public $pricing = []; // آرایه برای مدیریت چندین ردیف قیمت‌گذاری
+    public $pricing = [];
     public $showDiscountModal = false;
     public $discountPercent = 0;
     public $discountAmount = 0;
     public $currentPricingIndex = null;
+    public $isSaving = false;
+    protected $previousState = [];
+
+    public function mount()
+    {
+        $this->pricing[] = [
+            'insurance_id' => null,
+            'price' => 0,
+            'discount' => 0,
+            'final_price' => 0,
+        ];
+    }
 
     public function openDiscountModal($index = null)
     {
@@ -73,6 +85,7 @@ class DoctorServiceCreate extends Component
         $index = explode('.', $name)[0];
         if (isset($this->pricing[$index])) {
             $this->pricing[$index]['final_price'] = $this->pricing[$index]['price'] - ($this->pricing[$index]['price'] * ($this->pricing[$index]['discount'] ?? 0) / 100);
+            $this->save();
         }
     }
 
@@ -81,6 +94,7 @@ class DoctorServiceCreate extends Component
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
             $this->pricing[$this->currentPricingIndex]['discount'] = $this->discountPercent;
             $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'] - ($this->pricing[$this->currentPricingIndex]['price'] * $this->discountPercent / 100);
+            $this->save();
         }
         $this->showDiscountModal = false;
         $this->currentPricingIndex = null;
@@ -94,12 +108,14 @@ class DoctorServiceCreate extends Component
             'discount' => 0,
             'final_price' => 0,
         ];
+        $this->save();
     }
 
     public function removePricingRow($index)
     {
         unset($this->pricing[$index]);
         $this->pricing = array_values($this->pricing);
+        $this->save();
     }
 
     public function updatedSelectedService($value)
@@ -137,23 +153,44 @@ class DoctorServiceCreate extends Component
                 }
             }
         }
+        $this->save();
     }
 
     public function updatedClinicId($value)
     {
         Log::info('Clinic ID updated: ' . ($value ?? 'null'));
+        $this->save();
     }
 
-    public function store()
+    public function updatedDuration($value)
     {
+        $this->save();
+    }
+
+    public function updatedDescription($value)
+    {
+        $this->save();
+    }
+
+    private function save()
+    {
+        $this->isSaving = true;
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $validator = Validator::make([
+        $currentState = [
             'service_id' => $this->service_id,
             'clinic_id' => $this->clinic_id,
             'duration' => $this->duration,
             'description' => $this->description,
             'pricing' => $this->pricing,
-        ], [
+        ];
+
+        // بررسی تغییرات
+        if ($this->previousState && $this->previousState == $currentState) {
+            $this->isSaving = false;
+            return;
+        }
+
+        $validator = Validator::make($currentState, [
             'service_id' => 'required|exists:services,id',
             'clinic_id' => 'required|exists:clinics,id',
             'duration' => 'required|integer|min:1',
@@ -184,9 +221,11 @@ class DoctorServiceCreate extends Component
 
         if ($validator->fails()) {
             $this->dispatch('show-alert', type: 'error', message: $validator->errors()->first());
+            $this->isSaving = false;
             return;
         }
 
+        // بررسی وجود رکورد تکراری
         foreach ($this->pricing as $pricing) {
             $exists = DoctorService::where('doctor_id', $doctorId)
                 ->where('service_id', $this->service_id)
@@ -195,10 +234,12 @@ class DoctorServiceCreate extends Component
                 ->exists();
             if ($exists) {
                 $this->dispatch('show-alert', type: 'error', message: 'این خدمت با بیمه ' . Insurance::find($pricing['insurance_id'])->name . ' و کلینیک انتخاب‌شده قبلاً تعریف شده است.');
+                $this->isSaving = false;
                 return;
             }
         }
 
+        // ذخیره‌سازی
         $service = Service::find($this->service_id);
         foreach ($this->pricing as $pricing) {
             DoctorService::create([
@@ -215,8 +256,18 @@ class DoctorServiceCreate extends Component
             ]);
         }
 
-        $this->dispatch('show-alert', type: 'success', message: 'خدمت با موفقیت ایجاد شد!');
-        return redirect()->route('dr.panel.doctor-services.index');
+        $this->previousState = $currentState;
+        $this->dispatch('show-alert', type: 'success', message: 'تغییرات با موفقیت ذخیره شد!');
+        $this->isSaving = false;
+    }
+
+    public function saveAndRedirect()
+    {
+        $this->save();
+        if (!$this->isSaving) {
+            $this->dispatch('show-alert', type: 'success', message: 'تغییرات ذخیره شد!');
+            return redirect()->route('dr.panel.doctor-services.index');
+        }
     }
 
     public function render()

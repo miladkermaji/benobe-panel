@@ -6,13 +6,26 @@
                     <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
                 <h5 class="mb-0 fw-bold text-shadow">ویرایش خدمت</h5>
+                @if ($isSaving)
+                    <span class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></span>
+                    <span class="text-light ms-2">در حال ذخیره...</span>
+                @endif
             </div>
-            <a href="{{ route('dr.panel.doctor-services.index') }}" class="btn btn-outline-light btn-sm rounded-pill d-flex align-items-center hover:shadow-lg transition-all">
-                <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                بازگشت
-            </a>
+            <div class="d-flex gap-2">
+                <button wire:click="saveAndRedirect" class="btn btn-primary btn-sm rounded-pill px-4 d-flex align-items-center hover:shadow-lg transition-all">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                        <path d="M17 21v-8H7v8M7 3v5h8" />
+                    </svg>
+                    ذخیره تغییرات
+                </button>
+                <a href="{{ route('dr.panel.doctor-services.index') }}" class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center hover:shadow-lg transition-all">
+                    <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    بازگشت
+                </a>
+            </div>
         </div>
         <div class="card-body p-4">
             <div class="row justify-content-center">
@@ -20,7 +33,7 @@
                     <div class="row g-4">
                         <!-- خدمت -->
                         <div class="col-lg-4 col-md-6 position-relative mt-5" wire:ignore>
-                            <select wire:model.live="selected_service" class="form-select select2" id="selected_service">
+                            <select wire:model.debounce.500ms="selected_service" class="form-select select2" id="selected_service">
                                 <option value="" selected>انتخاب خدمت</option>
                                 <optgroup label="خدمات قبلی شما">
                                     @foreach ($doctorServices as $doctorService)
@@ -37,7 +50,7 @@
                         </div>
                         <!-- کلینیک -->
                         <div class="col-lg-4 col-md-6 position-relative mt-5" wire:ignore>
-                            <select wire:model.live="clinic_id" class="form-select select2" id="clinic_id">
+                            <select wire:model.debounce.500ms="clinic_id" class="form-select select2" id="clinic_id">
                                 <option value="" selected>انتخاب کلینیک</option>
                                 @foreach ($clinics as $clinic)
                                     <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
@@ -47,12 +60,12 @@
                         </div>
                         <!-- مدت زمان -->
                         <div class="col-lg-4 col-md-6 position-relative mt-5">
-                            <input type="number" wire:model="duration" class="form-control" id="duration" placeholder=" " required>
+                            <input type="number" wire:model.debounce.500ms="duration" class="form-control" id="duration" placeholder=" " required>
                             <label for="duration" class="form-label">مدت زمان (دقیقه)</label>
                         </div>
                         <!-- توضیحات -->
                         <div class="position-relative mt-5">
-                            <textarea wire:model="description" class="form-control" id="description" rows="3" placeholder=" "></textarea>
+                            <textarea wire:model.debounce.500ms="description" class="form-control" id="description" rows="3" placeholder=" "></textarea>
                             <label for="description" class="form-label">توضیحات (اختیاری)</label>
                         </div>
                         <!-- بخش قیمت‌گذاری -->
@@ -64,7 +77,7 @@
                             <div class="row g-4 align-items-end">
                                 <!-- بیمه -->
                                 <div class="col-lg-3 col-md-6 position-relative mt-5" wire:ignore>
-                                    <select wire:model.live="pricing.{{ $index }}.insurance_id" class="form-select select2" id="insurance_id_{{ $index }}">
+                                    <select wire:model.debounce.500ms="pricing.{{ $index }}.insurance_id" class="form-select select2" id="insurance_id_{{ $index }}">
                                         <option value="" selected>انتخاب بیمه</option>
                                         @foreach ($insurances as $insurance)
                                             <option value="{{ $insurance->id }}">{{ $insurance->name }}</option>
@@ -74,16 +87,16 @@
                                 </div>
                                 <!-- قیمت -->
                                 <div class="col-lg-3 col-md-6 position-relative mt-5">
-                                    <input type="number" wire:model="pricing.{{ $index }}.price" class="form-control" id="price_{{ $index }}" placeholder=" " required>
+                                    <input type="number" wire:model.debounce.500ms="pricing.{{ $index }}.price" class="form-control" id="price_{{ $index }}" placeholder=" " required>
                                     <label for="price_{{ $index }}" class="form-label">قیمت (تومان)</label>
                                 </div>
                                 <!-- تخفیف -->
                                 <div class="col-lg-3 col-md-6 position-relative mt-5">
-                                    <input type="number" wire:model="pricing.{{ $index }}.discount" wire:click="openDiscountModal({{ $index }})" class="form-control cursor-pointer" id="discount_{{ $index }}" placeholder=" " readonly>
-                                    <label for="discount_{{ $index }}" class="form-label">تخفیف (درصد)</label>
+                                    <input type="number" wire:model="pricing.{{ $index}}.discount" wire:click="openDiscountModal($index)" class="mt-1 form-control cursor-pointer" readonly="required">
+                                    <label for="pricing.{{ $index }}.discount" class="form-label">تخفیف (درصد)</label>
                                 </div>
                                 <!-- قیمت نهایی -->
-                                <div class="col-lg-2 col-md-6 position-relative mt-5">
+                                <div class="col-md-6 col-lg-2 position-relative mt-5">
                                     <input type="number" wire:model="pricing.{{ $index }}.final_price" class="form-control" id="final_price_{{ $index }}" placeholder=" " readonly>
                                     <label for="final_price_{{ $index }}" class="form-label">قیمت نهایی (تومان)</label>
                                 </div>
@@ -104,16 +117,6 @@
                                     <path d="M12 5v14M5 12h14" />
                                 </svg>
                                 افزودن ردیف قیمت‌گذاری
-                            </button>
-                        </div>
-                        <!-- دکمه ذخیره -->
-                        <div class="text-end mt-4 d-flex justify-content-end">
-                            <button wire:click="update" class="btn btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
-                                    <path d="M17 21v-8H7v8M7 3v5h8" />
-                                </svg>
-                                ذخیره تغییرات
                             </button>
                         </div>
                     </div>
@@ -197,10 +200,6 @@
             $('#selected_service').on('change', function() {
                 const value = $(this).val() === '' ? null : $(this).val();
                 @this.set('selected_service', value);
-            });
-            $('#insurance_id').on('change', function() {
-                const value = $(this).val() === '' ? null : $(this).val();
-                @this.set('insurance_id', value);
             });
             $('#clinic_id').on('change', function() {
                 const value = $(this).val() === '' ? null : $(this).val();

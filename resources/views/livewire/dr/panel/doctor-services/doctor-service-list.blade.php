@@ -37,7 +37,7 @@
                 <!-- نوار خدمت -->
                 <div class="service-section">
                     <div class="service-header" wire:click="toggleChildren('{{ $service->id }}')">
-                        <h2 class="service-title">{{ $service->name }}</h2>
+                        <h5 class="service-title fw-bold">{{ $service->name }}</h2>
                         <div class="service-toggle {{ in_array($service->id, $openServices) ? 'rotate-180' : '' }}">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M6 9l6 6 6-6" />
