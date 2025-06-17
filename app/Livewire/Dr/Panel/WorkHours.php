@@ -196,7 +196,7 @@ class Workhours extends Component
     private function resolveClinicId(): string
     {
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            return explode(' ', explode('/', request()->path())[6])[0];
+            return request()->route('clinic') ?? 'default';
         }
         return $this->getSelectedClinicId() ?? 'default';
     }
@@ -339,7 +339,7 @@ class Workhours extends Component
     {
         // اضافه کردن شرط برای تنظیم activeClinicId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = explode(' ', explode('/', request())[6])[0];
+            $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
             $clinicId = $this->getSelectedClinicId();
@@ -384,7 +384,7 @@ class Workhours extends Component
         try {
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -487,7 +487,7 @@ class Workhours extends Component
     {
         // اضافه کردن شرط برای تنظیم activeClinicId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = explode(' ', explode('/', request())[6])[0];
+            $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
             $clinicId = $this->getSelectedClinicId();
@@ -521,7 +521,7 @@ class Workhours extends Component
         try {
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -573,7 +573,7 @@ class Workhours extends Component
         try {
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -704,7 +704,7 @@ class Workhours extends Component
         try {
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -847,7 +847,7 @@ class Workhours extends Component
     public function refreshWorkSchedules()
     {
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = explode(' ', explode('/', request())[6])[0];
+            $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
             $clinicId = $this->getSelectedClinicId();
@@ -916,7 +916,7 @@ class Workhours extends Component
     {
         // اضافه کردن شرط برای تنظیم activeClinicId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = explode(' ', explode('/', request())[6])[0];
+            $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
             $clinicId = $this->getSelectedClinicId();
@@ -962,7 +962,7 @@ class Workhours extends Component
         try {
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -1080,7 +1080,7 @@ class Workhours extends Component
         try {
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -1304,7 +1304,7 @@ class Workhours extends Component
         try {
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -1690,7 +1690,7 @@ class Workhours extends Component
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -1867,7 +1867,7 @@ class Workhours extends Component
         try {
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -1975,7 +1975,7 @@ class Workhours extends Component
         try {
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -2060,7 +2060,7 @@ class Workhours extends Component
         try {
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
+                $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
                 $clinicId = $this->getSelectedClinicId();
@@ -2138,7 +2138,7 @@ class Workhours extends Component
     {
         // اضافه کردن شرط برای تنظیم activeClinicId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = explode(' ', explode('/', request())[6])[0];
+            $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
             $clinicId = $this->getSelectedClinicId();
@@ -2174,7 +2174,7 @@ class Workhours extends Component
     {
         // اضافه کردن شرط برای تنظیم activeClinicId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = explode(' ', explode('/', request())[6])[0];
+            $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
             $clinicId = $this->getSelectedClinicId();
@@ -2244,7 +2244,7 @@ class Workhours extends Component
     {
         // اضافه کردن شرط برای تنظیم activeClinicId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = explode(' ', explode('/', request())[6])[0];
+            $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
             $clinicId = $this->getSelectedClinicId();
