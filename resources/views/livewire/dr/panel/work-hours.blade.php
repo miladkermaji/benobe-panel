@@ -883,10 +883,7 @@
               $('#scheduleLoading').removeClass('d-none');
               $('.modal-content-inner').hide();
 
-              setTimeout(() => {
-                $('#scheduleLoading').addClass('d-none');
-                $('.modal-content-inner').show();
-              }, 300);
+             
             } catch (error) {
               console.error('Error in scheduleModal:', error);
               toastr.error('خطا در بارگذاری مودال: ' + error.message);
