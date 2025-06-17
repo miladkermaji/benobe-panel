@@ -1836,7 +1836,7 @@ $this->getSelectedClinicId();
                 // بهینه‌سازی: ذخیره تنظیمات نوبت‌دهی برای تمام روزهای هفته در یک تراکنش
                 $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
                 $newSetting = [
-                    'start_time' => '002',
+                    'start_time' => '00:00',
                     'end_time' => '23:59',
                     'days' => $daysOfWeek,
                     'work_hour_key' => (int)$index,
