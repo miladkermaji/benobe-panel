@@ -24,6 +24,7 @@ use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
 class Workhours extends Component
 {
+    public $showSaveButton = false;
     use HasSelectedClinic;
     public $calculationMode = 'count'; // حالت پیش‌فرض: تعداد نوبت‌ها
     public $selectedClinicId = 'default';
@@ -128,6 +129,7 @@ class Workhours extends Component
     ];
     public function mount()
     {
+        $this->showSaveButton = request()->routeIs('dr-workhours');
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
             $currentClinicId = explode(' ', explode('/', request())[6])[0];
             $this->activeClinicId = $currentClinicId;

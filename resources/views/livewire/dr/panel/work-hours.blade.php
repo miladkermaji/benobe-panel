@@ -248,7 +248,7 @@
           </div>
 
           <!-- دکمه ذخیره تغییرات (همیشه نمایش داده می‌شود) -->
-          @if (Request::routeIs('dr-workhours'))
+          @if ($showSaveButton)
             <div class="d-flex w-100 justify-content-end mt-3">
               <button type="button"
                 class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
@@ -257,16 +257,16 @@
                 <div class="loader"></div>
               </button>
             </div>
-          @else
+@elseif (Request::is('dr/panel/doctors-clinic/activation/workhours/*'))
             <div class="d-flex w-100 justify-content-end mt-3">
-              <button type="button"id="startAppointmentBtn" data-tooltip="true" data-placement="right"
+              <button type="button" id="startAppointmentBtn" data-tooltip="true" data-placement="right"
                 data-original-title="پایان ثبت ساعات کاری و شروع نوبت‌دهی! حالا می‌توانید از امکانات سایت استفاده کنید."
                 class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center">
                 <span class="button_text"> پایان فعالسازی کلینیک</span>
                 <div class="loader"></div>
               </button>
             </div>
-          @endif
+@endif
 
 
 
