@@ -204,13 +204,8 @@ class Workhours extends Component
     {
         try {
             // تنظیم activeClinicId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = explode(' ', explode('/', request())[6])[0];
-                $this->activeClinicId = $currentClinicId;
-            } else {
-                $clinicId = $this->getSelectedClinicId();
-                $this->activeClinicId = $clinicId ?? 'default';
-            }
+            $this->activeClinicId = $this->resolveClinicId();
+
             // اعتبارسنجی
             $this->validate([
                 'calendarDays' => 'required|integer|min:1',
@@ -219,11 +214,15 @@ class Workhours extends Component
                 'calendarDays.integer' => 'تعداد روزهای تقویم باید عدد باشد',
                 'calendarDays.min' => 'تعداد روزهای تقویم باید حداقل ۱ باشد',
             ]);
+
+            // دریافت اطلاعات دکتر
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+            $doctorId = $doctor instanceof Doctor ? $doctor->id : $doctor->doctor_id;
+
             DB::beginTransaction();
+
             // به‌روزرسانی یا ایجاد تنظیمات
-            $config = DoctorAppointmentConfig::updateOrCreate(
+            $this->appointmentConfig = DoctorAppointmentConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctorId,
                     'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
@@ -232,42 +231,50 @@ class Workhours extends Component
                     'calendar_days' => (int) $this->calendarDays,
                 ]
             );
-            // به‌روزرسانی پراپرتی‌های محلی
-            $this->appointmentConfig->calendar_days = (int) $this->calendarDays;
+
+            // به‌روزرسانی پراپرتی محلی
             $this->calendarDays = (int) $this->calendarDays;
+
             DB::commit();
-            $this->modalMessage = 'تعداد روزهای باز تقویم با موفقیت ذخیره شد';
-            $this->modalType = 'success';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => $this->modalMessage,
-                'type' => 'success',
-            ]);
+
+            $this->showSuccessMessage('تعداد روزهای باز تقویم با موفقیت ذخیره شد');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $errorMessages = $e->validator->errors()->all();
-            $errorMessage = implode('، ', $errorMessages);
-            Log::error('Validation error in autoSaveCalendarDays: ' . $errorMessage);
-            $this->modalMessage = $errorMessage ?: 'لطفاً یک عدد معتبر وارد کنید';
-            $this->modalType = 'error';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => $this->modalMessage,
-                'type' => 'error',
+            $errorMessage = implode('، ', $e->validator->errors()->all());
+            Log::error('Validation error in autoSaveCalendarDays: ' . $errorMessage, [
+                'doctor_id' => $doctorId ?? null,
+                'calendar_days' => $this->calendarDays,
             ]);
+            $this->showErrorMessage($errorMessage ?: 'لطفاً یک عدد معتبر وارد کنید');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error in autoSaveCalendarDays: ' . $e->getMessage(), [
                 'doctor_id' => $doctorId ?? null,
-                'calendar_days' => $this->calendarDays ?? null,
+                'calendar_days' => $this->calendarDays,
             ]);
-            $this->modalMessage = $e->getMessage() ?: 'خطا در ذخیره تعداد روزهای تقویم';
-            $this->modalType = 'error';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', [
-                'message' => $this->modalMessage,
-                'type' => 'error',
-            ]);
+            $this->showErrorMessage($e->getMessage() ?: 'خطا در ذخیره تعداد روزهای تقویم');
         }
+    }
+
+    /**
+     * Show success message and dispatch toastr event.
+     */
+    private function showSuccessMessage(string $message): void
+    {
+        $this->modalMessage = $message;
+        $this->modalType = 'success';
+        $this->modalOpen = true;
+        $this->dispatch('show-toastr', ['message' => $message, 'type' => 'success']);
+    }
+
+    /**
+     * Show error message and dispatch toastr event.
+     */
+    private function showErrorMessage(string $message): void
+    {
+        $this->modalMessage = $message;
+        $this->modalType = 'error';
+        $this->modalOpen = true;
+        $this->dispatch('show-toastr', ['message' => $message, 'type' => 'error']);
     }
     public function setSelectedClinicId($clinicId)
     {
