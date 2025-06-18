@@ -35,8 +35,7 @@
     left: 0;
     width: 100%;
     height: 4px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    opacity: 0.9;
+  
     transition: none !important;
 }
 
