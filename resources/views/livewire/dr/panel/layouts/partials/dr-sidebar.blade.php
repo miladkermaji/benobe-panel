@@ -23,10 +23,14 @@
           <a href="{{ route('dr-panel') }}">داشبورد</a>
         </li>
       @endif
-
+       @if ($this->hasPermission('dr-workhours'))
+              <li class="item-li i-checkout__request {{ Request::routeIs('dr-workhours') ? 'is-active' : '' }}">
+                <a href="{{ route('dr-workhours') }}">ساعت کاری</a>
+              </li>
+            @endif
       @if ($this->hasPermission('appointments'))
         <li
-          class="item-li i-courses {{ Request::routeIs('dr-appointments') || Request::routeIs('dr-workhours') || Request::routeIs('dr.panel.doctornotes.index') || Request::routeIs('dr-mySpecialDays') || Request::routeIs('dr-manual_nobat_setting') || Request::routeIs('dr-scheduleSetting') || Request::routeIs('dr-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
+          class="item-li i-courses {{ Request::routeIs('dr-appointments') || Request::routeIs('dr.panel.doctornotes.index') || Request::routeIs('dr-mySpecialDays') || Request::routeIs('dr-manual_nobat_setting') || Request::routeIs('dr-scheduleSetting') || Request::routeIs('dr-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             نوبت اینترنتی
             <div class="d-flex justify-content-end w-100 align-items-center">
@@ -44,11 +48,7 @@
                 <a href="{{ route('dr-appointments') }}"> لیست نوبت ها</a>
               </li>
             @endif
-            @if ($this->hasPermission('dr-workhours'))
-              <li class="item-li {{ Request::routeIs('dr-workhours') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-workhours') }}">ساعت کاری</a>
-              </li>
-            @endif
+           
             @if ($this->hasPermission('dr.panel.doctornotes.index'))
               <li class="item-li {{ Request::routeIs('dr.panel.doctornotes.index') ? 'is-active' : '' }}">
                 <a href="{{ route('dr.panel.doctornotes.index') }}"> توضیحات نوبت</a>
