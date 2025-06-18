@@ -112,7 +112,6 @@ select {
     transform: translateY(-2px);
 }
 .top-panel-bg {
-    box-shadow: var(--shadow);
     border-radius: 8px;
 }
 .btn-end-visit {
