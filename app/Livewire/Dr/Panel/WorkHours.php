@@ -132,8 +132,8 @@ class Workhours extends Component
     {
         $this->showSaveButton = request()->routeIs('dr-workhours');
         
-$this->isActivationPage = request()->is('dr/panel/doctors-clinic/activation/workhours/*');
-$this->showSaveButton = !$this->isActivationPage;
+        $this->isActivationPage = request()->is('dr/panel/doctors-clinic/activation/workhours/*');
+        $this->showSaveButton = !$this->isActivationPage;
 
         // تنظیم activeClinicId
         $this->activeClinicId = $this->resolveClinicId();
@@ -154,10 +154,10 @@ $this->showSaveButton = !$this->isActivationPage;
             [
                 'auto_scheduling' => true,
                 'online_consultation' => false,
-                'holiday_availability' => false,
+                'holiday_availability' => true,
             ]
         );
-        $this->selectedClinicId = $this->getSelectedClinicId();
+        $this->selectedClinicId = $this->activeClinicId;
         $this->refreshWorkSchedules();
         // آماده‌سازی آرایه‌های روزهای کاری
         $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
@@ -209,7 +209,6 @@ $this->showSaveButton = !$this->isActivationPage;
     {
         try {
             // تنظیم activeClinicId
-            $this->activeClinicId = $this->resolveClinicId();
 
             // اعتبارسنجی
             $this->validate([
@@ -347,7 +346,7 @@ $this->showSaveButton = !$this->isActivationPage;
             $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = $this->getSelectedClinicId();
+            $clinicId = $this->activeClinicId;
             $this->activeClinicId = $clinicId ?? 'default';
         }
         $this->scheduleModalDay = $day;
@@ -392,7 +391,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             $validator = Validator::make(
@@ -495,7 +494,7 @@ $this->showSaveButton = !$this->isActivationPage;
             $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = $this->getSelectedClinicId();
+            $clinicId = $this->activeClinicId;
             $this->activeClinicId = $clinicId ?? 'default';
         }
         if (!isset($this->scheduleSettings[$day])) {
@@ -529,7 +528,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
@@ -581,7 +580,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             if (empty(array_filter($this->selectedCopyScheduleDays))) {
@@ -712,7 +711,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             $validator = Validator::make([
@@ -855,7 +854,7 @@ $this->showSaveButton = !$this->isActivationPage;
             $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = $this->getSelectedClinicId();
+            $clinicId = $this->activeClinicId;
             $this->activeClinicId = $clinicId ?? 'default';
         }
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
@@ -924,7 +923,7 @@ $this->showSaveButton = !$this->isActivationPage;
             $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = $this->getSelectedClinicId();
+            $clinicId = $this->activeClinicId;
             $this->activeClinicId = $clinicId ?? 'default';
         }
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
@@ -970,7 +969,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             $rules = [];
@@ -1088,7 +1087,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             Log::info('Attempting to auto-save time slot', [
@@ -1312,7 +1311,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             if (!$replace && !empty($this->copySource['day'])) {
@@ -1698,7 +1697,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             DB::beginTransaction();
@@ -1875,7 +1874,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             $this->validate([
@@ -1983,7 +1982,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
@@ -2068,7 +2067,7 @@ $this->showSaveButton = !$this->isActivationPage;
                 $currentClinicId = request()->route('clinic') ?? 'default';
                 $this->activeClinicId = $currentClinicId;
             } else {
-                $clinicId = $this->getSelectedClinicId();
+                $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
             $dayMap = [
@@ -2146,7 +2145,7 @@ $this->showSaveButton = !$this->isActivationPage;
             $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = $this->getSelectedClinicId();
+            $clinicId = $this->activeClinicId;
             $this->activeClinicId = $clinicId ?? 'default';
         }
         if (!empty($this->slots[$day])) {
@@ -2182,7 +2181,7 @@ $this->showSaveButton = !$this->isActivationPage;
             $currentClinicId = request()->route('clinic') ?? 'default';
             $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = $this->getSelectedClinicId();
+            $clinicId = $this->activeClinicId;
             $this->activeClinicId = $clinicId ?? 'default';
         }
         $dayMap = [
@@ -2250,9 +2249,9 @@ $this->showSaveButton = !$this->isActivationPage;
         // اضافه کردن شرط برای تنظیم activeClinicId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
             $currentClinicId = request()->route('clinic') ?? 'default';
-            $this->activeClinicId = $currentClinicId;
+           $this->activeClinicId = $currentClinicId;
         } else {
-            $clinicId = $this->getSelectedClinicId();
+            $clinicId = $this->activeClinicId;
             $this->activeClinicId = $clinicId ?? 'default';
         }
         try {
