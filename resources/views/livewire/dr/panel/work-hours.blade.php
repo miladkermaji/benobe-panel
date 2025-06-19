@@ -315,9 +315,9 @@
       </div>
     </div>
 
-    <!-- مودال برای انتخاب زمان‌های اورژانسی -->
+    <!-- مودال برای زمان های مخصوص منشی -->
     <div wire:ignore>
-      <x-modal name="emergency-modal" title="انتخاب زمان‌های اورژانسی" size="medium">
+      <x-modal name="emergency-modal" title="زمان های مخصوص منشی" size="medium">
         <x-slot:body>
           <div class="emergency-times-container">
             <div class="d-flex flex-wrap gap-2 justify-content-center" id="emergency-times">
@@ -327,7 +327,7 @@
           <div class="w-100 d-flex justify-content-end mt-3">
             <button type="button"
               class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-              wire:click="saveEmergencyTimes">
+              wire:click="saveEmergencyTimes" {{ !$autoScheduling ? "disabled" : "" }}>
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -529,8 +529,9 @@
           </div>
           <div class="mt-2">
             <button type="button" class="btn my-btn-primary h-40 w-100 font-size-12"
-              wire:click="copyScheduleSetting">
+              wire:click="copyScheduleSetting" id="copy-btn">
               ذخیره
+              <div class="loader"></div>
             </button>
           </div>
         </x-slot:body>
@@ -605,7 +606,10 @@
             @endforeach
           </div>
           <div class="mt-3">
-            <button type="button" class="btn my-btn-primary h-50 w-100" wire:click="copySchedule">ذخیره</button>
+            <button type="button" class="btn my-btn-primary h-50 w-100" wire:click="copySchedule">
+              <span class="button_text">ذخیره تغییرات</span>
+              <div class="loader"></div>
+            </button>
           </div>
         </x-slot:body>
       </x-modal>
@@ -834,6 +838,9 @@
               let currentEmergencyTimes = [];
               try {
                 const workSchedule = @this.workSchedules.find(s => s.day === day);
+                const autoScheduling = @this.autoScheduling;
+                
+                
                 currentEmergencyTimes = workSchedule && workSchedule.emergency_times ? workSchedule
                   .emergency_times : [];
               } catch (error) {
@@ -846,7 +853,7 @@
               times.forEach(time => {
                 const isSaved = currentEmergencyTimes.includes(time);
                 const $button = $(`
-                <button type="button" class="btn btn-sm time-slot-btn ${isSaved ? 'btn-primary' : 'btn-outline-primary'}" data-time="${time}">
+                <button type="button" class="btn btn-sm time-slot-btn ${@this.autoScheduling ? (isSaved  ? 'btn-primary' : 'btn-outline-primary' ) :'btn-primary'}" data-time="${time}" {{ !$autoScheduling ? 'disabled': '' }}>
                   ${time}
                 </button>
               `);
@@ -882,7 +889,7 @@
               $('#scheduleLoading').removeClass('d-none');
               $('.modal-content-inner').hide();
 
-             
+
             } catch (error) {
               console.error('Error in scheduleModal:', error);
               toastr.error('خطا در بارگذاری مودال: ' + error.message);
