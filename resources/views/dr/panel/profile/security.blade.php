@@ -47,7 +47,6 @@
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 
 <script>
-
   $(document).ready(function() {
     function loadLogs(page = 1) {
       $.ajax({
@@ -90,7 +89,7 @@
             success: function() {
               row.remove();
               loadLogs();
-              toastr.success('تارخچه مورد نظر با موفقیت حذف شد.');
+              toastr.success('تاریخچه مورد نظر با موفقیت حذف شد.');
             }
           });
         }

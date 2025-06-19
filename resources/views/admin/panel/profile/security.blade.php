@@ -89,7 +89,7 @@
             success: function() {
               row.remove();
               loadLogs();
-              toastr.success('تارخچه مورد نظر با موفقیت حذف شد.');
+              toastr.success('تاریخچه مورد نظر با موفقیت حذف شد.');
             }
           });
         }
