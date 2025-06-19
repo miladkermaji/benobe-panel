@@ -144,7 +144,7 @@
                                         x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
                                         @click="Swal.fire({
                                     title: 'آیا مطمئن هستید؟',
-                                    text: 'این اسلات حذف خواهد شد و قابل بازگشت نیست!',
+                                    text: 'این ساعت کاری حذف خواهد شد و قابل بازگشت نیست!',
                                     icon: 'warning',
                                     showCancelButton: true,
                                     confirmButtonColor: '#3085d6',
@@ -970,7 +970,7 @@
             if ($(this).is(':disabled')) return;
             Swal.fire({
               title: 'آیا مطمئن هستید؟',
-              text: 'این اسلات حذف خواهد شد و قابل بازگشت نیست!',
+              text: 'این ساعت کاری حذف خواهد شد و قابل بازگشت نیست!',
               icon: 'warning',
               showCancelButton: true,
               confirmButtonColor: '#3085d6',

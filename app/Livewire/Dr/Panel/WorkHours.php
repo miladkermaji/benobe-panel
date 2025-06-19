@@ -163,7 +163,7 @@ class Workhours extends Component
         $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
         $this->isWorking = array_fill_keys($daysOfWeek, false);
         $this->slots = array_fill_keys($daysOfWeek, []);
-        // پر کردن اسلات‌ها به صورت بهینه
+        // پر کردن ساعت کاری‌ها به صورت بهینه
         foreach ($this->workSchedules as $schedule) {
             $day = $schedule['day'];
             $this->isWorking[$day] = (bool) $schedule['is_working'];
@@ -1178,7 +1178,7 @@ class Workhours extends Component
                 // بررسی تداخل زمانی
                 foreach ($existingWorkHours as $i => $slot) {
                     if ($i === $index) {
-                        continue; // نادیده گرفتن اسلات فعلی
+                        continue; // نادیده گرفتن ساعت کاری فعلی
                     }
                     if ($this->isTimeConflict($newSlot['start'], $newSlot['end'], $slot['start'], $slot['end'])) {
                         throw new \Exception(sprintf(
@@ -1191,7 +1191,7 @@ class Workhours extends Component
                         ));
                     }
                 }
-                // به‌روزرسانی یا اضافه کردن اسلات
+                // به‌روزرسانی یا اضافه کردن ساعت کاری
                 $existingWorkHours[$index] = $newSlot;
                 // به‌روزرسانی دیتابیس
                 $workSchedule->update([
