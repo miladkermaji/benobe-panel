@@ -39,6 +39,7 @@ return new class () extends Migration {
             // اطلاعات مالی
             $table->decimal('consultation_fee', 10, 2)->nullable();                  // هزینه خدمات
             $table->enum('payment_methods', ['cash', 'card', 'online'])->nullable(); // روش‌های پرداخت
+            $table->enum('payment_methods', ['hospital', 'treatment_centers', 'clinic','imaging_center','laboratory','pharmacy'])->nullable(); // نوع مراکز درمانی
 
             // وضعیت و تنظیمات
             $table->boolean('is_active')->default(false); // وضعیت فعال‌سازی
