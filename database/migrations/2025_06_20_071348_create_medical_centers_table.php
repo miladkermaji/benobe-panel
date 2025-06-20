@@ -44,6 +44,8 @@ return new class () extends Migration {
             // وضعیت و تنظیمات
             $table->boolean('is_active')->default(false); // وضعیت فعال‌سازی
             $table->json('working_days')->nullable();     // روزهای کاری
+            $table->json('specialty_ids')->nullable();     // روزهای کاری
+            $table->json('insurance_ids')->nullable();     // روزهای کاری
 
             // فیلدهای جدید
             $table->text('avatar')->nullable();                   // گالری تصاویر درمانگاه
