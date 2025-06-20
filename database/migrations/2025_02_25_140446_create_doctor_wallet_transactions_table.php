@@ -24,7 +24,6 @@ return new class () extends Migration {
             $table->index(['type', 'status']);
             $table->index('clinic_id');
             $table->index('amount');
-
         });
     }
 

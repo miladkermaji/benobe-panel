@@ -13,6 +13,9 @@ return new class () extends Migration {
             $table->unsignedBigInteger('clinic_id')->nullable(); // برای نوبت حضوری
             $table->enum('appointment_type', ['in_person','online_phone','online_text','online_video'])->default('in_person');
             $table->text('notes')->nullable()->comment('توضیحات و ملاحظات پزشک برای این نوع نوبت');
+
+            $table->enum('status', ['active', 'inactive'])->default('active');
+
             $table->timestamps();
 
             $table->foreign('doctor_id')

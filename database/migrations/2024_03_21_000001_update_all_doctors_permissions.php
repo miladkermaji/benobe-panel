@@ -51,7 +51,8 @@ return new class () extends Migration {
             "dr-my-performance-chart",
             "messages",
             "dr-panel-tickets",
-            "#"
+            "#",
+            "dr.panel.doctor-faqs.index"
         ];
 
         // اول همه دسترسی‌های موجود را پاک می‌کنیم

@@ -55,6 +55,11 @@ return new class () extends Migration {
                 ->references('id')
                 ->on('clinics')
                 ->onDelete('set null');
+
+            $table->index(['doctor_id', 'appointment_date'], 'idx_doctor_date');
+            $table->index(['doctor_id', 'clinic_id'], 'idx_doctor_clinic');
+            $table->index(['doctor_id', 'status'], 'idx_doctor_status');
+
         });
     }
 

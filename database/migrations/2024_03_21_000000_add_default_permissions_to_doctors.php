@@ -51,7 +51,8 @@ return new class () extends Migration {
             "dr-my-performance-chart",
             "messages",
             "dr-panel-tickets",
-            "#"
+            "#",
+            "dr.panel.doctor-faqs.index"
         ];
 
         // Get all doctors who don't have permissions
