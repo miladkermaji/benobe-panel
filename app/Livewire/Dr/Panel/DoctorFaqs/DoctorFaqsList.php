@@ -31,10 +31,7 @@ class DoctorFaqsList extends Component
      */
     public function mount()
     {
-        // بررسی احراز هویت پزشک
-        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
-            return redirect()->route('dr.auth.login-register-form');
-        }
+       
         $this->readyToLoad = true;
     }
 
@@ -43,9 +40,7 @@ class DoctorFaqsList extends Component
      */
     public function updatedSelectAll($value)
     {
-        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
-            return redirect()->route('dr.auth.login-register-form');
-        }
+       
 
         if ($value) {
             $this->selectedFaqs = $this->getFaqsQuery()->pluck('id')->toArray();
@@ -59,9 +54,7 @@ class DoctorFaqsList extends Component
      */
     public function updatedSelectedFaqs()
     {
-        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
-            return redirect()->route('dr.auth.login-register-form');
-        }
+       
 
         if (count($this->selectedFaqs) === $this->getFaqsQuery()->count()) {
             $this->selectAll = true;
@@ -75,9 +68,7 @@ class DoctorFaqsList extends Component
      */
     public function confirmDelete($id)
     {
-        if (!Auth::guard('doctor')->check()|| !Auth::guard('secretary')->check()) {
-            return redirect()->route('dr.auth.login-register-form');
-        }
+      
         $this->dispatch('confirm-delete', id: $id);
     }
 
@@ -86,9 +77,7 @@ class DoctorFaqsList extends Component
      */
     public function deleteFaq($id)
     {
-        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
-            return redirect()->route('dr.auth.login-register-form');
-        }
+     
 
         $faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->findOrFail($id);
         $faq->delete();
@@ -100,9 +89,7 @@ class DoctorFaqsList extends Component
      */
     public function deleteSelected()
     {
-        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
-            return redirect()->route('dr.auth.login-register-form');
-        }
+      
 
         DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->whereIn('id', $this->selectedFaqs)
@@ -117,9 +104,7 @@ class DoctorFaqsList extends Component
      */
     public function toggleStatus($id)
     {
-        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
-            return redirect()->route('dr.auth.login-register-form');
-        }
+     
 
         $faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->findOrFail($id);
         $faq->update(['is_active' => !$faq->is_active]);
@@ -139,9 +124,7 @@ class DoctorFaqsList extends Component
      */
     private function getFaqsQuery()
     {
-        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
-            return collect();
-        }
+       
 
         return DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->where(function ($query) {

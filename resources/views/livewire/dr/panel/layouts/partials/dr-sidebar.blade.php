@@ -23,11 +23,11 @@
           <a href="{{ route('dr-panel') }}">داشبورد</a>
         </li>
       @endif
-       @if ($this->hasPermission('dr-workhours'))
-              <li class="item-li i-checkout__request {{ Request::routeIs('dr-workhours') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-workhours') }}">ساعت کاری</a>
-              </li>
-            @endif
+      @if ($this->hasPermission('dr-workhours'))
+        <li class="item-li i-checkout__request {{ Request::routeIs('dr-workhours') ? 'is-active' : '' }}">
+          <a href="{{ route('dr-workhours') }}">ساعت کاری</a>
+        </li>
+      @endif
       @if ($this->hasPermission('appointments'))
         <li
           class="item-li i-courses {{ Request::routeIs('dr-appointments') || Request::routeIs('dr.panel.doctornotes.index') || Request::routeIs('dr-mySpecialDays') || Request::routeIs('dr-manual_nobat_setting') || Request::routeIs('dr-scheduleSetting') || Request::routeIs('dr-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
@@ -48,7 +48,7 @@
                 <a href="{{ route('dr-appointments') }}"> لیست نوبت ها</a>
               </li>
             @endif
-           
+
             @if ($this->hasPermission('dr.panel.doctornotes.index'))
               <li class="item-li {{ Request::routeIs('dr.panel.doctornotes.index') ? 'is-active' : '' }}">
                 <a href="{{ route('dr.panel.doctornotes.index') }}"> توضیحات نوبت</a>
@@ -366,7 +366,13 @@
               <li class="item-li i-user__inforamtion {{ Request::routeIs('my-dr-appointments') ? 'is-active' : '' }}">
                 <a href="{{ route('my-dr-appointments') }}">نوبت‌های من</a>
               </li>
-            @endif
+              @endif 
+              @if ($this->hasPermission('dr.panel.doctor-faqs.index'))
+                <li
+                  class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.doctor-faqs.index') ? 'is-active' : '' }}">
+                  <a href="{{ route('dr.panel.doctor-faqs.index') }}"> سوالات متداول</a>
+                </li>
+              @endif
           </ul>
         </li>
       @endif

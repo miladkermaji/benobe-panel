@@ -108,6 +108,7 @@ return [
             'dr-my-performance' => 'عملکرد من',
             'dr-subuser' => 'کاربران زیرمجموعه',
             'my-dr-appointments' => 'نوبت‌های من',
+            'dr.panel.doctor-faqs.index' => ' سوالات متداول',
         ],
     ],
     'statistics' => [

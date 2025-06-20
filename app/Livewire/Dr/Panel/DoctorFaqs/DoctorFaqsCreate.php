@@ -58,9 +58,7 @@ class DoctorFaqsCreate extends Component
     public function mount()
     {
 
-        if (!Auth::guard('doctor')->check() || !Auth::guard('secretary')->check()) {
-            return redirect()->route('dr.auth.login-register-form');
-        }
+       
 
     }
     /**
