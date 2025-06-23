@@ -109,8 +109,8 @@
                             <input type="number" wire:model="consultation_fee" class="form-control" id="consultation_fee" placeholder=" " step="0.01">
                             <label for="consultation_fee" class="form-label">هزینه خدمات</label>
                         </div>
-                        <div class="col-6 col-md-6 position-relative mt-5">
-                            <select wire:model="payment_methods" class="form-select" id="payment_methods">
+                        <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+                            <select wire:model="payment_methods" class="form-select select2" id="payment_methods">
                                 <option value="">انتخاب کنید</option>
                                 <option value="cash">نقدی</option>
                                 <option value="card">کارت</option>
@@ -234,29 +234,35 @@
                     width: '100%'
                 });
             }
-            initializeSelect2();
+
+            // اطمینان از لود کامل DOM قبل از مقداردهی Select2
+            setTimeout(() => {
+                initializeSelect2();
+            }, 100);
 
             // تنظیم مقادیر اولیه Select2
             Livewire.on('set-select2-initial', (event) => {
-                const data = event || {};
-                if (data.doctor_id) {
-                    $('#doctor_id').val(data.doctor_id).trigger('change');
-                }
-                if (data.specialty_ids) {
-                    $('#specialty_ids').val(data.specialty_ids).trigger('change');
-                }
-                if (data.insurance_ids) {
-                    $('#insurance_ids').val(data.insurance_ids).trigger('change');
-                }
-                if (data.province_id) {
-                    $('#province_id').val(data.province_id).trigger('change');
-                }
-                if (data.city_id) {
-                    $('#city_id').val(data.city_id).trigger('change');
-                }
-                if (data.payment_methods) {
-                    $('#payment_methods').val(data.payment_methods).trigger('change');
-                }
+                setTimeout(() => {
+                    const data = event || {};
+                    if (data.doctor_id) {
+                        $('#doctor_id').val(data.doctor_id).trigger('change');
+                    }
+                    if (data.specialty_ids && Array.isArray(data.specialty_ids)) {
+                        $('#specialty_ids').val(data.specialty_ids).trigger('change');
+                    }
+                    if (data.insurance_ids && Array.isArray(data.insurance_ids)) {
+                        $('#insurance_ids').val(data.insurance_ids).trigger('change');
+                    }
+                    if (data.province_id) {
+                        $('#province_id').val(data.province_id).trigger('change');
+                    }
+                    if (data.city_id) {
+                        $('#city_id').val(data.city_id).trigger('change');
+                    }
+                    if (data.payment_methods) {
+                        $('#payment_methods').val(data.payment_methods).trigger('change');
+                    }
+                }, 200); // تأخیر برای اطمینان از آماده بودن Select2
             });
 
             // به‌روزرسانی شهرها
@@ -270,8 +276,9 @@
                     data: [{ id: '', text: 'انتخاب کنید' }, ...cities.map(city => ({ id: city.id, text: city.name }))]
                 });
                 // تنظیم مقدار اولیه شهر
-                if (@this.city_id) {
-                    $('#city_id').val(@this.city_id).trigger('change');
+                const cityId = @json($this->city_id);
+                if (cityId) {
+                    $('#city_id').val(cityId).trigger('change');
                 }
             });
 

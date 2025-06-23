@@ -55,8 +55,8 @@ class ClinicEdit extends Component
         $this->clinic = MedicalCenter::findOrFail($id);
         $this->fill($this->clinic->toArray());
         $this->phone_numbers = $this->clinic->phone_numbers ?: [''];
-        $this->specialty_ids = $this->clinic->specialty_ids ?: [];
-        $this->insurance_ids = $this->clinic->insurance_ids ?: [];
+        $this->specialty_ids = $this->clinic->specialty_ids ? array_map('strval', $this->clinic->specialty_ids) : [];
+        $this->insurance_ids = $this->clinic->insurance_ids ? array_map('strval', $this->clinic->insurance_ids) : [];
         $this->doctors = Doctor::all();
         $this->specialties = Specialty::all();
         $this->insurances = Insurance::all();
@@ -65,11 +65,11 @@ class ClinicEdit extends Component
 
         // ارسال مقادیر اولیه به Select2
         $this->dispatch('set-select2-initial', [
-            'doctor_id' => $this->doctor_id,
+            'doctor_id' => $this->doctor_id ? strval($this->doctor_id) : null,
             'specialty_ids' => $this->specialty_ids,
             'insurance_ids' => $this->insurance_ids,
-            'province_id' => $this->province_id,
-            'city_id' => $this->city_id,
+            'province_id' => $this->province_id ? strval($this->province_id) : null,
+            'city_id' => $this->city_id ? strval($this->city_id) : null,
             'payment_methods' => $this->payment_methods,
         ]);
     }
