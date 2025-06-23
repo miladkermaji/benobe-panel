@@ -2,81 +2,142 @@
 
 namespace App\Livewire\Admin\Panel\Clinics;
 
-use App\Models\Clinic;
-use App\Models\Doctor;
 use App\Models\Zone;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Doctor;
 use Livewire\Component;
+use App\Models\Insurance;
+use App\Models\Specialty;
+use App\Models\MedicalCenter;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ClinicCreate extends Component
 {
+    use WithFileUploads;
+
     public $doctor_id;
+    public $specialty_ids;
+    public $insurance_ids;
     public $name;
+    public $title;
     public $address;
     public $phone_number;
+    public $secretary_phone;
+    public $postal_code;
     public $province_id;
     public $city_id;
-    public $is_main_clinic = false;
+    public $is_main_center = false;
     public $start_time;
     public $end_time;
     public $description;
+    public $latitude;
+    public $longitude;
     public $consultation_fee;
     public $payment_methods;
     public $is_active = true;
+    public $working_days = [];
+    public $avatar;
+    public $documents = [];
+    public $phone_numbers = [''];
+    public $location_confirmed = false;
+    public $type = 'clinic';
 
     public $doctors = [];
+    public $specialties = [];
     public $provinces = [];
+    public $insurances = [];
     public $cities = [];
 
     public function mount()
     {
-        $this->doctors   = Doctor::all();
+        $this->doctors = Doctor::all();
+        $this->specialties = Specialty::all();
+        $this->insurances = Insurance::all();
         $this->provinces = Zone::where('level', 1)->get();
-        $this->cities    = [];
+        $this->cities = [];
     }
 
     public function updatedProvinceId($value)
     {
-        $this->cities  = Zone::where('level', 2)->where('parent_id', $value)->get();
+        $this->cities = Zone::where('level', 2)->where('parent_id', $value)->get();
         $this->city_id = null;
         $this->dispatch('refresh-select2', cities: $this->cities->toArray());
+    }
+
+    public function addPhoneNumber()
+    {
+        $this->phone_numbers[] = '';
+    }
+
+    public function removePhoneNumber($index)
+    {
+        unset($this->phone_numbers[$index]);
+        $this->phone_numbers = array_values($this->phone_numbers);
     }
 
     public function store()
     {
         $validator = Validator::make($this->all(), [
-            'doctor_id'        => 'required|exists:doctors,id',
-            'name'             => 'required|string|max:255',
-            'address'          => 'nullable|string|max:500',
-            'phone_number'     => 'nullable|string|regex:/^09[0-9]{9}$/',
-            'province_id'      => 'required|exists:zone,id',
-            'city_id'          => 'required|exists:zone,id',
-            'is_main_clinic'   => 'boolean',
-            'start_time'       => 'nullable|date_format:H:i',
-            'end_time'         => 'nullable|date_format:H:i',
-            'description'      => 'nullable|string|max:1000',
+            'doctor_id' => 'required|exists:doctors,id',
+            'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:500',
+            'phone_number' => 'nullable|string|regex:/^09[0-9]{9}$/',
+            'secretary_phone' => 'nullable|string|regex:/^09[0-9]{9}$/',
+            'postal_code' => 'nullable|string|size:10',
+            'province_id' => 'required|exists:zone,id',
+            'city_id' => 'required|exists:zone,id',
+            'is_main_center' => 'boolean',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
+            'description' => 'nullable|string|max:1000',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'consultation_fee' => 'nullable|numeric|min:0',
-            'payment_methods'  => 'nullable|in:cash,card,online',
-            'is_active'        => 'boolean',
+            'payment_methods' => 'nullable|in:cash,card,online',
+            'is_active' => 'boolean',
+            'working_days' => 'nullable|array',
+            'working_days.*' => 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+            'avatar' => 'nullable|image|max:2048',
+            'documents' => 'nullable|array',
+            'documents.*' => 'file|mimes:pdf,doc,docx|max:10240',
+            'phone_numbers' => 'nullable|array',
+            'phone_numbers.*' => 'string|regex:/^09[0-9]{9}$/',
+            'location_confirmed' => 'boolean',
+            'type' => 'required|in:hospital,treatment_centers,clinic,imaging_center,laboratory,pharmacy',
+            'specialty_ids' => 'nullable|array',
+            'specialty_ids.*' => 'exists:specialties,id',
+            'insurance_ids' => 'nullable|array',
+            'insurance_ids.*' => 'exists:insurances,id',
         ], [
-            'doctor_id.required'       => 'لطفاً پزشک را انتخاب کنید.',
-            'doctor_id.exists'         => 'پزشک انتخاب‌شده معتبر نیست.',
-            'name.required'            => 'لطفاً نام کلینیک را وارد کنید.',
-            'name.string'              => 'نام کلینیک باید متن باشد.',
-            'name.max'                 => 'نام کلینیک نباید بیشتر از ۲۵۵ حرف باشد.',
-            'address.string'           => 'آدرس باید متن باشد.',
-            'address.max'              => 'آدرس نباید بیشتر از ۵۰۰ حرف باشد.',
-            'phone_number.regex'       => 'شماره تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.',
-            'province_id.required'     => 'لطفاً استان را انتخاب کنید.',
-            'province_id.exists'       => 'استان انتخاب‌شده معتبر نیست.',
-            'city_id.required'         => 'لطفاً شهر را انتخاب کنید.',
-            'city_id.exists'           => 'شهر انتخاب‌شده معتبر نیست.',
-            'start_time.date_format'   => 'ساعت شروع باید به فرمت HH:MM باشد.',
-            'end_time.date_format'     => 'ساعت پایان باید به فرمت HH:MM باشد.',
-            'description.max'          => 'توضیحات نباید بیشتر از ۱۰۰۰ حرف باشد.',
+            'doctor_id.required' => 'لطفاً پزشک را انتخاب کنید.',
+            'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
+            'name.required' => 'لطفاً نام کلینیک را وارد کنید.',
+            'name.max' => 'نام کلینیک نباید بیشتر از ۲۵۵ حرف باشد.',
+            'title.max' => 'عنوان نباید بیشتر از ۲۵۵ حرف باشد.',
+            'address.max' => 'آدرس نباید بیشتر از ۵۰۰ حرف باشد.',
+            'phone_number.regex' => 'شماره تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.',
+            'secretary_phone.regex' => 'شماره منشی باید با ۰۹ شروع شود و ۱۱ رقم باشد.',
+            'postal_code.size' => 'کد پستی باید ۱۰ رقم باشد.',
+            'province_id.required' => 'لطفاً استان را انتخاب کنید.',
+            'city_id.required' => 'لطفاً شهر را انتخاب کنید.',
+            'start_time.date_format' => 'ساعت شروع باید به فرمت HH:MM باشد.',
+            'end_time.date_format' => 'ساعت پایان باید به فرمت HH:MM باشد.',
+            'description.max' => 'توضیحات نباید بیشتر از ۱۰۰۰ حرف باشد.',
+            'latitude.between' => 'عرض جغرافیایی باید بین -۹۰ و ۹۰ باشد.',
+            'longitude.between' => 'طول جغرافیایی باید بین -۱۸۰ و ۱۸۰ باشد.',
             'consultation_fee.numeric' => 'هزینه خدمات باید عدد باشد.',
-            'consultation_fee.min'     => 'هزینه خدمات نمی‌تواند منفی باشد.',
-            'payment_methods.in'       => 'روش پرداخت باید یکی از گزینه‌های نقدی، کارت یا آنلاین باشد.',
+            'consultation_fee.min' => 'هزینه خدمات نمی‌تواند منفی باشد.',
+            'payment_methods.in' => 'روش پرداخت باید یکی از گزینه‌های نقدی، کارت یا آنلاین باشد.',
+            'working_days.*.in' => 'روزهای کاری باید از بین روزهای هفته باشد.',
+            'avatar.image' => 'تصویر اصلی باید یک فایل تصویری باشد.',
+            'avatar.max' => 'تصویر اصلی نباید بزرگ‌تر از ۲ مگابایت باشد.',
+            'documents.*.mimes' => 'مدارک باید از نوع PDF، DOC یا DOCX باشند.',
+            'documents.*.max' => 'هر مدرک نباید بزرگ‌تر از ۱۰ مگابایت باشد.',
+            'phone_numbers.*.regex' => 'شماره‌های تماس باید با ۰۹ شروع شوند و ۱۱ رقم باشند.',
+            'specialty_ids.*.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
+            'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -84,7 +145,26 @@ class ClinicCreate extends Component
             return;
         }
 
-        Clinic::create($validator->validated());
+        $data = $validator->validated();
+
+        // آپلود تصویر اصلی
+        if ($this->avatar) {
+            $data['avatar'] = $this->avatar->store('avatars', 'public');
+        }
+
+        // آپلود مدارک
+        if ($this->documents) {
+            $documentPaths = [];
+            foreach ($this->documents as $document) {
+                $documentPaths[] = $document->store('documents', 'public');
+            }
+            $data['documents'] = $documentPaths;
+        }
+
+        // فیلتر کردن شماره‌های تماس خالی
+        $data['phone_numbers'] = array_filter($this->phone_numbers, fn ($phone) => !empty($phone));
+
+        MedicalCenter::create($data);
 
         $this->dispatch('show-alert', type: 'success', message: 'کلینیک با موفقیت ایجاد شد!');
         return redirect()->route('admin.panel.clinics.index');

@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Admin\Panel\Clinics;
 
-use App\Models\Clinic;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\MedicalCenter;
+use Illuminate\Support\Facades\Storage;
 
 class ClinicList extends Component
 {
@@ -14,11 +15,11 @@ class ClinicList extends Component
 
     protected $listeners = ['deleteClinicConfirmed' => 'deleteClinic'];
 
-    public $perPage         = 10;
-    public $search          = '';
-    public $readyToLoad     = false;
+    public $perPage = 10;
+    public $search = '';
+    public $readyToLoad = false;
     public $selectedClinics = [];
-    public $selectAll       = false;
+    public $selectAll = false;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -36,8 +37,8 @@ class ClinicList extends Component
 
     public function toggleStatus($id)
     {
-        $item = Clinic::findOrFail($id);
-        $item->update(['is_active' => ! $item->is_active]);
+        $item = MedicalCenter::findOrFail($id);
+        $item->update(['is_active' => !$item->is_active]);
         $this->dispatch('show-alert', type: $item->is_active ? 'success' : 'info', message: $item->is_active ? 'فعال شد!' : 'غیرفعال شد!');
     }
 
@@ -48,7 +49,21 @@ class ClinicList extends Component
 
     public function deleteClinic($id)
     {
-        $item = Clinic::findOrFail($id);
+        $item = MedicalCenter::findOrFail($id);
+        // حذف فایل‌های مرتبط
+        if ($item->avatar) {
+            Storage::disk('public')->delete($item->avatar);
+        }
+        if ($item->documents) {
+            foreach ($item->documents as $document) {
+                Storage::disk('public')->delete($document);
+            }
+        }
+        if ($item->galleries) {
+            foreach ($item->galleries as $gallery) {
+                Storage::disk('public')->delete($gallery['image_path']);
+            }
+        }
         $item->delete();
         $this->dispatch('show-alert', type: 'success', message: 'کلینیک حذف شد!');
     }
@@ -60,14 +75,14 @@ class ClinicList extends Component
 
     public function updatedSelectAll($value)
     {
-        $currentPageIds        = $this->getClinicsQuery()->pluck('id')->toArray();
+        $currentPageIds = $this->getClinicsQuery()->pluck('id')->toArray();
         $this->selectedClinics = $value ? $currentPageIds : [];
     }
 
     public function updatedSelectedClinics()
     {
-        $currentPageIds  = $this->getClinicsQuery()->pluck('id')->toArray();
-        $this->selectAll = ! empty($this->selectedClinics) && count(array_diff($currentPageIds, $this->selectedClinics)) === 0;
+        $currentPageIds = $this->getClinicsQuery()->pluck('id')->toArray();
+        $this->selectAll = !empty($this->selectedClinics) && count(array_diff($currentPageIds, $this->selectedClinics)) === 0;
     }
 
     public function deleteSelected()
@@ -77,16 +92,36 @@ class ClinicList extends Component
             return;
         }
 
-        Clinic::whereIn('id', $this->selectedClinics)->delete();
+        $clinics = MedicalCenter::whereIn('id', $this->selectedClinics)->get();
+        foreach ($clinics as $clinic) {
+            if ($clinic->avatar) {
+                Storage::disk('public')->delete($clinic->avatar);
+            }
+            if ($clinic->documents) {
+                foreach ($clinic->documents as $document) {
+                    Storage::disk('public')->delete($document);
+                }
+            }
+            if ($clinic->galleries) {
+                foreach ($clinic->galleries as $gallery) {
+                    Storage::disk('public')->delete($gallery['image_path']);
+                }
+            }
+            $clinic->delete();
+        }
         $this->selectedClinics = [];
-        $this->selectAll       = false;
+        $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'کلینیک‌های انتخاب‌شده حذف شدند!');
     }
 
     private function getClinicsQuery()
     {
-        return Clinic::where('name', 'like', '%' . $this->search . '%')
-            ->orWhere('description', 'like', '%' . $this->search . '%')
+        return MedicalCenter::where('type', 'clinic')
+            ->where(function ($query) {
+                $query->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('description', 'like', '%' . $this->search . '%')
+                    ->orWhere('title', 'like', '%' . $this->search . '%');
+            })
             ->with(['doctor', 'province', 'city'])
             ->paginate($this->perPage);
     }
