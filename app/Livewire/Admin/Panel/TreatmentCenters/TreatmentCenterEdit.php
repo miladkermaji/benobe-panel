@@ -2,84 +2,167 @@
 
 namespace App\Livewire\Admin\Panel\TreatmentCenters;
 
-use App\Models\Doctor;
-use App\Models\TreatmentCenter;
 use App\Models\Zone;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Doctor;
 use Livewire\Component;
+use App\Models\Insurance;
+use App\Models\Specialty;
+use App\Models\MedicalCenter;
+use Livewire\WithFileUploads;
+use App\Models\TreatmentCenter;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class TreatmentCenterEdit extends Component
 {
-    public $center;
-    public $doctor_id;
+      use WithFileUploads;
+
+    public $treatmentCenter;
+    public $doctor_ids = [];
+    public $specialty_ids = [];
+    public $insurance_ids = [];
     public $name;
+    public $title;
     public $address;
     public $phone_number;
+    public $secretary_phone;
+    public $postal_code;
     public $province_id;
     public $city_id;
     public $is_main_center;
     public $start_time;
     public $end_time;
     public $description;
+    public $latitude;
+    public $longitude;
     public $consultation_fee;
     public $payment_methods;
     public $is_active;
+    public $working_days = [];
+    public $avatar;
+    public $documents = [];
+    public $phone_numbers = [''];
+    public $location_confirmed;
+    public $type = 'treatmentCenter';
 
     public $doctors = [];
+    public $specialties = [];
     public $provinces = [];
+    public $insurances = [];
     public $cities = [];
 
     public function mount($id)
     {
-        $this->center = TreatmentCenter::findOrFail($id);
-        $this->fill($this->center->toArray());
-        $this->doctors   = Doctor::all();
+        $this->treatmentCenter = MedicalCenter::findOrFail($id);
+        $this->fill($this->treatmentCenter->toArray());
+        $this->doctor_ids = $this->treatmentCenter->doctors->pluck('id')->map('strval')->toArray();
+        $this->phone_numbers = $this->treatmentCenter->phone_numbers ?: [''];
+        $this->specialty_ids = $this->treatmentCenter->specialty_ids ? array_map('strval', $this->treatmentCenter->specialty_ids) : [];
+        $this->insurance_ids = $this->treatmentCenter->insurance_ids ? array_map('strval', $this->treatmentCenter->insurance_ids) : [];
+
+        // تنظیم روزهای کاری
+        $workingDays = $this->treatmentCenter->working_days ?? [];
+        $this->working_days = array_fill_keys(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'], false);
+        foreach ($workingDays as $day) {
+            $this->working_days[$day] = true;
+        }
+
+        $this->doctors = Doctor::all();
+        $this->specialties = Specialty::all();
+        $this->insurances = Insurance::all();
         $this->provinces = Zone::where('level', 1)->get();
-        $this->cities    = $this->province_id ? Zone::where('level', 2)->where('parent_id', $this->province_id)->get() : [];
+        $this->cities = $this->province_id ? Zone::where('level', 2)->where('parent_id', $this->province_id)->get() : [];
+
+        $this->dispatch('set-select2-initial', [
+            'doctor_ids' => $this->doctor_ids,
+            'specialty_ids' => $this->specialty_ids,
+            'insurance_ids' => $this->insurance_ids,
+            'province_id' => $this->province_id ? strval($this->province_id) : null,
+            'city_id' => $this->city_id ? strval($this->city_id) : null,
+            'payment_methods' => $this->payment_methods,
+        ]);
     }
 
     public function updatedProvinceId($value)
     {
-        $this->cities  = Zone::where('level', 2)->where('parent_id', $value)->get();
+        $this->cities = Zone::where('level', 2)->where('parent_id', $value)->get();
         $this->city_id = null;
         $this->dispatch('refresh-select2', cities: $this->cities->toArray());
+    }
+
+    public function addPhoneNumber()
+    {
+        $this->phone_numbers[] = '';
+    }
+
+    public function removePhoneNumber($index)
+    {
+        unset($this->phone_numbers[$index]);
+        $this->phone_numbers = array_values($this->phone_numbers);
     }
 
     public function update()
     {
         $validator = Validator::make($this->all(), [
-            'doctor_id'        => 'required|exists:doctors,id',
-            'name'             => 'required|string|max:255',
-            'address'          => 'nullable|string|max:500',
-            'phone_number'     => 'nullable|string|regex:/^09[0-9]{9}$/',
-            'province_id'      => 'required|exists:zone,id',
-            'city_id'          => 'required|exists:zone,id',
-            'is_main_center'   => 'boolean',
-            'start_time'       => 'nullable|date_format:H:i',
-            'end_time'         => 'nullable|date_format:H:i',
-            'description'      => 'nullable|string|max:1000',
+            'doctor_ids' => 'required|array',
+            'doctor_ids.*' => 'exists:doctors,id',
+            'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:500',
+            'phone_number' => 'nullable|string|regex:/^09[0-9]{9}$/',
+            'secretary_phone' => 'nullable|string|regex:/^09[0-9]{9}$/',
+            'postal_code' => 'nullable|string|size:10',
+            'province_id' => 'required|exists:zone,id',
+            'city_id' => 'required|exists:zone,id',
+            'is_main_center' => 'boolean',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
+            'description' => 'nullable|string|max:1000',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'consultation_fee' => 'nullable|numeric|min:0',
-            'payment_methods'  => 'nullable|in:cash,card,online',
-            'is_active'        => 'boolean',
+            'payment_methods' => 'nullable|in:cash,card,online',
+            'is_active' => 'boolean',
+            'working_days' => 'nullable|array',
+            'avatar' => 'nullable|image',
+            'documents' => 'nullable|array',
+            'documents.*' => 'file|mimes:pdf,doc,docx|max:10240',
+            'phone_numbers' => 'nullable|array',
+            'phone_numbers.*' => 'string|regex:/^09[0-9]{9}$/',
+            'location_confirmed' => 'boolean',
+            'type' => 'required|in:treatmentCenter,treatment_centers,clinic,imaging_center,treatmentCenter,pharmacy',
+            'specialty_ids' => 'nullable|array',
+            'specialty_ids.*' => 'exists:specialties,id',
+            'insurance_ids' => 'nullable|array',
+            'insurance_ids.*' => 'exists:insurances,id',
         ], [
-            'doctor_id.required'       => 'لطفاً پزشک را انتخاب کنید.',
-            'doctor_id.exists'         => 'پزشک انتخاب‌شده معتبر نیست.',
-            'name.required'            => 'لطفاً نام درمانگاه را وارد کنید.',
-            'name.string'              => 'نام درمانگاه باید متن باشد.',
-            'name.max'                 => 'نام درمانگاه نباید بیشتر از ۲۵۵ حرف باشد.',
-            'address.string'           => 'آدرس باید متن باشد.',
-            'address.max'              => 'آدرس نباید بیشتر از ۵۰۰ حرف باشد.',
-            'phone_number.regex'       => 'شماره تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.',
-            'province_id.required'     => 'لطفاً استان را انتخاب کنید.',
-            'province_id.exists'       => 'استان انتخاب‌شده معتبر نیست.',
-            'city_id.required'         => 'لطفاً شهر را انتخاب کنید.',
-            'city_id.exists'           => 'شهر انتخاب‌شده معتبر نیست.',
-            'start_time.date_format'   => 'ساعت شروع باید به فرمت HH:MM باشد.',
-            'end_time.date_format'     => 'ساعت پایان باید به فرمت HH:MM باشد.',
-            'description.max'          => 'توضیحات نباید بیشتر از ۱۰۰۰ حرف باشد.',
+            'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
+            'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
+            'name.required' => 'لطفاً نام درمانگاه  را وارد کنید.',
+            'name.max' => 'نام درمانگاه  نباید بیشتر از ۲۵۵ حرف باشد.',
+            'title.max' => 'عنوان نباید بیشتر از ۲۵۵ حرف باشد.',
+            'address.max' => 'آدرس نباید بیشتر از ۵۰۰ حرف باشد.',
+            'phone_number.regex' => 'شماره تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.',
+            'secretary_phone.regex' => 'شماره منشی باید با ۰۹ شروع شود و ۱۱ رقم باشد.',
+            'postal_code.size' => 'کد پستی باید ۱۰ رقم باشد.',
+            'province_id.required' => 'لطفاً استان را انتخاب کنید.',
+            'city_id.required' => 'لطفاً شهر را انتخاب کنید.',
+            'start_time.date_format' => 'ساعت شروع باید به فرمت HH:MM باشد.',
+            'end_time.date_format' => 'ساعت پایان باید به فرمت HH:MM باشد.',
+            'description.max' => 'توضیحات نباید بیشتر از ۱۰۰۰ حرف باشد.',
+            'latitude.between' => 'عرض جغرافیایی باید بین -۹۰ و ۹۰ باشد.',
+            'longitude.between' => 'طول جغرافیایی باید بین -۱۸۰ و ۱۸۰ باشد.',
             'consultation_fee.numeric' => 'هزینه خدمات باید عدد باشد.',
-            'consultation_fee.min'     => 'هزینه خدمات نمی‌تواند منفی باشد.',
-            'payment_methods.in'       => 'روش پرداخت باید یکی از گزینه‌های نقدی، کارت یا آنلاین باشد.',
+            'consultation_fee.min' => 'هزینه خدمات نمی‌تواند منفی باشد.',
+            'payment_methods.in' => 'روش پرداخت باید یکی از گزینه‌های نقدی، کارت یا آنلاین باشد.',
+            'working_days.*.in' => 'روزهای کاری باید از بین روزهای هفته باشد.',
+            'avatar.image' => 'تصویر اصلی باید یک فایل تصویری باشد.',
+            'avatar.max' => 'تصویر اصلی نباید بزرگ‌تر از ۲ مگابایت باشد.',
+            'documents.*.mimes' => 'مدارک باید از نوع PDF، DOC یا DOCX باشند.',
+            'documents.*.max' => 'هر مدرک نباید بزرگ‌تر از ۱۰ مگابایت باشد.',
+            'phone_numbers.*.regex' => 'شماره‌های تماس باید با ۰۹ شروع شوند و ۱۱ رقم باشند.',
+            'specialty_ids.*.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
+            'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -87,14 +170,43 @@ class TreatmentCenterEdit extends Component
             return;
         }
 
-        $this->center->update($validator->validated());
+        $data = $validator->validated();
 
-        $this->dispatch('show-alert', type: 'success', message: 'درمانگاه با موفقیت به‌روزرسانی شد!');
+        if ($this->avatar) {
+            if ($this->treatmentCenter->avatar) {
+                Storage::disk('public')->delete($this->treatmentCenter->avatar);
+            }
+            $data['avatar'] = $this->avatar->store('avatars', 'public');
+        }
+
+        if ($this->documents) {
+            if ($this->treatmentCenter->documents) {
+                foreach ($this->treatmentCenter->documents as $document) {
+                    Storage::disk('public')->delete($document);
+                }
+            }
+            $documentPaths = [];
+            foreach ($this->documents as $document) {
+                $documentPaths[] = $document->store('documents', 'public');
+            }
+            $data['documents'] = $documentPaths;
+        }
+
+        $data['phone_numbers'] = array_filter($this->phone_numbers, fn ($phone) => !empty($phone));
+        $data['working_days'] = array_keys(array_filter($this->working_days, fn ($value) => $value));
+
+        // حذف doctor_ids از $data چون در جدول medical_centers ذخیره نمی‌شود
+        unset($data['doctor_ids']);
+
+        $this->treatmentCenter->update($data);
+        $this->treatmentCenter->doctors()->sync($this->doctor_ids); // به‌روزرسانی رابطه چند به چند
+
+        $this->dispatch('show-alert', type: 'success', message: 'درمانگاه  با موفقیت به‌روزرسانی شد!');
         return redirect()->route('admin.panel.treatment-centers.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.panel.treatment-centers.treatment-centers-edit');
+        return view('livewire.admin.panel.treatment-centers.treatment-center-edit');
     }
 }
