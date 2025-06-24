@@ -7,7 +7,7 @@ use App\Models\Doctor;
 use Livewire\Component;
 use App\Models\Insurance;
 use App\Models\Specialty;
-use App\Models\treatmentCenter;
+use App\Models\laboratory;
 use App\Models\MedicalCenter;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Validator;
@@ -41,7 +41,7 @@ class LaboratoryCreate extends Component
     public $documents = [];
     public $phone_numbers = [''];
     public $location_confirmed = false;
-    public $type = 'treatmentCenter';
+    public $type = 'laboratory';
 
     public $doctors = [];
     public $specialties = [];
@@ -105,7 +105,7 @@ class LaboratoryCreate extends Component
             'phone_numbers' => 'nullable|array',
             'phone_numbers.*' => 'string|regex:/^09[0-9]{9}$/',
             'location_confirmed' => 'boolean',
-            'type' => 'required|in:treatmentCenter,treatment_centers,clinic,imaging_center,treatmentCenter,pharmacy',
+            'type' => 'required|in:laboratory,treatment_centers,clinic,imaging_center,pharmacy',
             'specialty_ids' => 'nullable|array',
             'specialty_ids.*' => 'exists:specialties,id',
             'insurance_ids' => 'nullable|array',
@@ -173,6 +173,6 @@ class LaboratoryCreate extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.treatment-centers.treatment-centers-create');
+        return view('livewire.admin.panel.laboratories.laboratory-create');
     }
 }

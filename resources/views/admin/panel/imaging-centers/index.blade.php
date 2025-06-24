@@ -9,6 +9,6 @@
 @endsection
 
 @section('content')
-@section('bread-crumb-title', 'مدیریت مراکز تصویربرداری')
+@section('bread-crumb-title', ' مراکز تصویربرداری')
 @livewire('admin.panel.imaging-centers.imaging-center-list')
 @endsection

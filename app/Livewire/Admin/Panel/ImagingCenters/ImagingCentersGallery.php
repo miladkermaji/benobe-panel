@@ -2,70 +2,78 @@
 
 namespace App\Livewire\Admin\Panel\ImagingCenters;
 
+use Livewire\Component;
 use App\Models\ImagingCenter;
+use App\Models\MedicalCenter;
+use Livewire\WithFileUploads;
 use App\Models\ImagingCenterGallery;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Component;
-use Livewire\WithFileUploads;
 
 class ImagingCentersGallery extends Component
 {
-    use WithFileUploads;
+     use WithFileUploads;
 
-    public $imaging_center;
-    public $images   = [];
+    public $imagingCenter;
+    public $images = [];
     public $captions = [];
 
     public function mount($id)
     {
-        $this->imaging_center = ImagingCenter::with('galleries')->findOrFail($id);
+        $this->imagingCenter = MedicalCenter::findOrFail($id);
     }
 
     public function uploadImages()
     {
         $this->validate([
-            'images.*'   => 'image|max:2048',
+            'images.*' => 'image|max:2048',
             'captions.*' => 'nullable|string|max:255',
-        ], [
-            'images.*.image'    => 'فایل باید یک تصویر باشد.',
-            'images.*.max'      => 'حجم تصویر نباید بیشتر از ۲ مگابایت باشد.',
-            'captions.*.string' => 'توضیحات باید متن باشد.',
-            'captions.*.max'    => 'توضیحات نباید بیشتر از ۲۵۵ حرف باشد.',
         ]);
 
+        $galleries = $this->imagingCenter->galleries ?? [];
         foreach ($this->images as $index => $image) {
-            $path = $image->store('imaging_center_galleries', 'public');
-            ImagingCenterGallery::create([
-                'imaging_center_id' => $this->imaging_center->id,
-                'image_path'        => $path,
-                'caption'           => $this->captions[$index] ?? null,
-            ]);
+            $path = $image->store('hospital_galleries', 'public');
+            $galleries[] = [
+                'image_path' => $path,
+                'caption' => $this->captions[$index] ?? null,
+                'is_primary' => count($galleries) === 0, // اولین تصویر به‌طور پیش‌فرض اصلی باشد
+            ];
         }
 
-        $this->images   = [];
-        $this->captions = [];
-        $this->dispatch('show-alert', type: 'success', message: 'تصاویر با موفقیت آپلود شدند!');
+        $this->imagingCenter->update(['galleries' => $galleries]);
+        $this->reset(['images', 'captions']); // پاک‌سازی متغیرها
+        $this->dispatch('refresh-gallery'); // ارسال رویداد برای رفرش گالری
+        $this->dispatch('show-alert', type: 'success', message: 'تصاویر با موفقیت اضافه شدند!');
     }
 
-    public function deleteImage($id)
+    public function deleteImage($index)
     {
-        $gallery = ImagingCenterGallery::findOrFail($id);
-        Storage::disk('public')->delete($gallery->image_path);
-        $gallery->delete();
-        $this->dispatch('show-alert', type: 'success', message: 'تصویر حذف شد!');
+        $galleries = $this->imagingCenter->galleries ?? [];
+        if (isset($galleries[$index])) {
+            Storage::disk('public')->delete($galleries[$index]['image_path']);
+            unset($galleries[$index]);
+            $this->imagingCenter->update(['galleries' => array_values($galleries)]);
+            $this->dispatch('refresh-gallery');
+            $this->dispatch('show-alert', type: 'success', message: 'تصویر حذف شد!');
+        }
     }
 
-    public function setPrimary($id)
+    public function setPrimary($index)
     {
-        $this->imaging_center->galleries()->update(['is_primary' => false]);
-        $gallery = ImagingCenterGallery::findOrFail($id);
-        $gallery->update(['is_primary' => true]);
-        $this->dispatch('show-alert', type: 'success', message: 'تصویر اصلی تنظیم شد!');
+        $galleries = $this->imagingCenter->galleries ?? [];
+        foreach ($galleries as &$gallery) {
+            $gallery['is_primary'] = false;
+        }
+        if (isset($galleries[$index])) {
+            $galleries[$index]['is_primary'] = true;
+            $this->imagingCenter->update(['galleries' => $galleries]);
+            $this->dispatch('refresh-gallery');
+            $this->dispatch('show-alert', type: 'success', message: 'تصویر اصلی تنظیم شد!');
+        }
     }
 
     public function render()
     {
-        $galleries = $this->imaging_center->galleries ?? collect();
+        $galleries = collect($this->imagingCenter->galleries ?? []);
         return view('livewire.admin.panel.imaging-centers.imaging-centers-gallery', compact('galleries'));
     }
 }

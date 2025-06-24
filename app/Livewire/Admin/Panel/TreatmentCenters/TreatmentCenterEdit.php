@@ -207,6 +207,6 @@ class TreatmentCenterEdit extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.treatment-centers.treatment-center-edit');
+        return view('livewire.admin.panel.treatment-centers.treatment-centers-edit');
     }
 }

@@ -1,135 +1,182 @@
-<div class="container-fluid py-2" dir="rtl" wire:init="loadImagingCenters">
-  <div
-    class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت مراکز تصویربرداری</h1>
-    <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
-      <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
-        wire:model.live="search" placeholder="جستجو در مراکز تصویربرداری..." style="padding-right: 23px">
-      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5;right: 5px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
-          <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
-        </svg>
-      </span>
+<div class="clinics-container">
+  <div class="container py-2" dir="rtl" wire:init="loadimagingCenters">
+    <div class="glass-header text-white p-2 rounded-2 mb-4 mt-3 shadow-lg bg-gradient-primary">
+      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
+        <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0"> مراکز تصویربرداری  </h1>
+          </div>
+          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+            <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
+              <div class="search-container position-relative" style="max-width: 100%;">
+                <input type="text"
+                  class="form-control search-input border-0 shadow-none bg-white text-dar k ps-4 rounded-2 text-start"
+                  wire:model.live="search" placeholder="جستجو در مراکز   ..."
+                  style="padding-right: 20px; text-align: right; direction: rtl;">
+                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                  style="z-index: 5; top: 50%; right: 8px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                    stroke-width="2">
+                    <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                  </svg>
+                </span>
+              </div>
+              <a href="{{ route('admin.panel.imaging-centers.create') }}"
+                class="btn btn-gradient-success rounded-1 px-3 py-1 d-flex align-items-center gap-1">
+                <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span>افزودن</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="d-flex gap-2 flex-shrink-0 justify-content-center mt-md-2">
-      <a href="{{ route('admin.panel.imaging-centers.create') }}"
-        class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-        <span class="text-truncate">افزودن</span>
-      </a>
-      <button wire:click="deleteSelected"
-        class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto"
-        @if (empty($selectedImagingCenters)) disabled @endif>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-        </svg>
-        <span class="text-truncate">حذف انتخاب‌شده‌ها</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="container-fluid px-0">
-    <div class="card shadow-sm">
-      <div class="card-body p-0">
-        <!-- نمایش جدول در دسکتاپ -->
-        <div class="d-none d-md-block">
-          <div class="table-responsive text-nowrap">
-            <table class="table table-bordered table-hover w-100 m-0">
-              <thead class="glass-header text-white">
+    <div class="container-fluid px-0">
+      <div class="card shadow-sm rounded-2">
+        <div class="card-body p-0">
+          <!-- Group Actions -->
+          <div class="group-actions p-2 border-bottom" x-data="{ show: false }"
+            x-show="$wire.selectedHospitals.length > 0">
+            <div class="d-flex align-items-center gap-2 justify-content-end">
+              <select class="form-select form-select-sm" style="max-width: 200px;" wire:model="groupAction">
+                <option value="">عملیات گروهی</option>
+                <option value="delete">حذف انتخاب شده‌ها</option>
+                <option value="status_active">فعال کردن</option>
+                <option value="status_inactive">غیرفعال کردن</option>
+              </select>
+              <button class="btn btn-sm btn-primary" wire:click="executeGroupAction" wire:loading.attr="disabled">
+                <span wire:loading.remove>اجرا</span>
+                <span wire:loading>در حال اجرا...</span>
+              </button>
+            </div>
+          </div>
+          <!-- Desktop Table View -->
+          <div class="table-responsive text-nowrap d-none d-md-block">
+            <table class="table  w-100 m-0">
+              <thead>
                 <tr>
-                  <th class="text-center align-middle" style="width: 50px;">
+                  <th class="text-center align-middle" style="width: 40px;">
                     <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                   </th>
-                  <th class="text-center align-middle" style="width: 70px;">ردیف</th>
+                  <th class="text-center align-middle" style="width: 60px;">ردیف</th>
                   <th class="align-middle">نام</th>
-                  <th class="align-middle">پزشک</th>
+                  <th class="align-middle">پزشکان</th>
+                  <th class="align-middle">تخصص‌ها</th>
+                  <th class="align-middle">بیمه‌ها</th>
                   <th class="align-middle">استان</th>
                   <th class="align-middle">شهر</th>
                   <th class="align-middle">آدرس</th>
                   <th class="align-middle">توضیحات</th>
-                  <th class="align-middle">گالری</th>
+                  <th class="text-center align-middle" style="width: 80px;">گالری</th>
                   <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
-                  <th class="text-center align-middle" style="width: 200px;">عملیات</th>
+                  <th class="text-center align-middle" style="width: 120px;">عملیات</th>
                 </tr>
               </thead>
               <tbody>
                 @if ($readyToLoad)
-                  @forelse ($imaging_centers as $index => $item)
-                    <tr>
-                      <td class="text-center align-middle">
-                        <input type="checkbox" wire:model.live="selectedImagingCenters" value="{{ $item->id }}"
+                  @forelse ($imagingCenters as $index => $item)
+                    <tr class="align-middle" x-data="{ showDoctors: false, showSpecialties: false, showInsurances: false }">
+                      <td class="text-center">
+                        <input type="checkbox" wire:model.live="selectedHospitals" value="{{ $item->id }}"
                           class="form-check-input m-0 align-middle">
                       </td>
-                      <td class="text-center align-middle">{{ $imaging_centers->firstItem() + $index }}</td>
-                      <td class="align-middle">{{ $item->name }}</td>
-                      <td class="align-middle">
-                        @if ($item->doctor)
-                          {{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}
-                        @else
-                          نامشخص
-                        @endif
-                      </td>
-                      <td class="align-middle">{{ $item->province?->name ?? '-' }}</td>
-                      <td class="align-middle">{{ $item->city?->name ?? '-' }}</td>
-                      <td class="align-middle">
-                        <div class="text-truncate" style="max-width: 150px;" data-bs-toggle="tooltip"
-                          data-bs-placement="top" title="{{ $item->address ?? '-' }}">
-                          {{ $item->address ?? '-' }}
+                      <td class="text-center">{{ $imagingCenters->firstItem() + $index }}</td>
+                      <td>{{ $item->name }}</td>
+                      <td>
+                        <button class="btn btn-link text-primary p-0" @click="showDoctors = !showDoctors">
+                          <span class="badge bg-primary-subtle text-primary">{{ $item->doctors->count() }} پزشک</span>
+                        </button>
+                        <div x-show="showDoctors" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if ($item->doctors->isEmpty())
+                            <span class="text-muted">بدون پزشک</span>
+                          @else
+                            @foreach ($item->doctors as $doctor)
+                              <div class="py-1 border-bottom">
+                                {{ $doctor->first_name . ' ' . $doctor->last_name }}
+                              </div>
+                            @endforeach
+                          @endif
                         </div>
                       </td>
-                      <td class="align-middle">
-                        <div class="text-truncate" style="max-width: 150px;" data-bs-toggle="tooltip"
-                          data-bs-placement="top" title="{{ $item->description ?? '-' }}">
-                          {{ $item->description ?? '-' }}
+                      <td>
+                        <button class="btn btn-link text-primary p-0" @click="showSpecialties = !showSpecialties">
+                          <span class="badge bg-info-subtle text-info">{{ count($item->specialty_ids ?? []) }}
+                            تخصص</span>
+                        </button>
+                        <div x-show="showSpecialties" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if (empty($item->specialty_ids))
+                            <span class="text-muted">بدون تخصص</span>
+                          @else
+                            @foreach ($item->specialty_ids as $specialtyId)
+                              <div class="py-1 border-bottom">
+                                {{ $specialties[$specialtyId] ?? 'نامشخص' }}
+                              </div>
+                            @endforeach
+                          @endif
                         </div>
                       </td>
-                      <td class="text-center align-middle">
+                      <td>
+                        <button class="btn btn-link text-primary p-0" @click="showInsurances = !showInsurances">
+                          <span class="badge bg-success-subtle text-success">{{ count($item->insurance_ids ?? []) }}
+                            بیمه</span>
+                        </button>
+                        <div x-show="showInsurances" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if (empty($item->insurance_ids))
+                            <span class="text-muted">بدون بیمه</span>
+                          @else
+                            @foreach ($item->insurance_ids as $insuranceId)
+                              <div class="py-1 border-bottom">
+                                {{ $insurances[$insuranceId] ?? 'نامشخص' }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </td>
+                      <td>{{ $item->province?->name ?? '-' }}</td>
+                      <td>{{ $item->city?->name ?? '-' }}</td>
+                      <td>
+                        <div class="text-truncate" style="max-width: 150px;" title="{{ e($item->address) ?? '-' }}">
+                          {{ e($item->address) ?? '-' }}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="text-truncate" style="max-width: 150px;"
+                          title="{{ e($item->description) ?? '-' }}">
+                          {{ e($item->description) ?? '-' }}
+                        </div>
+                      </td>
+                      <td class="text-center">
                         <a href="{{ route('admin.panel.imaging-centers.gallery', $item->id) }}"
-                          class="btn btn-gradient-info rounded-pill px-3">
-                          <svg width="18px" height="18px" viewBox="0 -0.5 21 21" version="1.1"
-                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                            fill="#000000">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                            <g id="SVGRepo_iconCarrier">
-                              <title>gallery_grid_view [#1405]</title>
-                              <desc>Created with Sketch.</desc>
-                              <defs> </defs>
-                              <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                <g id="Dribbble-Light-Preview" transform="translate(-259.000000, -680.000000)"
-                                  fill="#000000">
-                                  <g id="icons" transform="translate(56.000000, 160.000000)">
-                                    <path
-                                      d="M209.3,538 L206.15,538 C205.5704,538 205.1,537.552 205.1,537 C205.1,536.448 205.5704,536 206.15,536 L209.3,536 C209.8796,536 210.35,536.448 210.35,537 C210.35,537.552 209.8796,538 209.3,538 L209.3,538 Z M210.35,534 L205.1,534 C203.93975,534 203,534.895 203,536 L203,538 C203,539.105 203.93975,540 205.1,540 L210.35,540 C211.51025,540 212.45,539.105 212.45,538 L212.45,536 C212.45,534.895 211.51025,534 210.35,534 L210.35,534 Z M220.85,524 L217.7,524 C217.1204,524 216.65,523.552 216.65,523 C216.65,522.448 217.1204,522 217.7,522 L220.85,522 C221.4296,522 221.9,522.448 221.9,523 C221.9,523.552 221.4296,524 220.85,524 L220.85,524 Z M221.9,520 L216.65,520 C215.48975,520 214.55,520.895 214.55,522 L214.55,524 C214.55,525.105 215.48975,526 216.65,526 L221.9,526 C223.06025,526 224,525.105 224,524 L224,522 C224,520.895 223.06025,520 221.9,520 L221.9,520 Z M221.9,537 C221.9,537.552 221.4296,538 220.85,538 L217.7,538 C217.1204,538 216.65,537.552 216.65,537 L216.65,531 C216.65,530.448 217.1204,530 217.7,530 L220.85,530 C221.4296,530 221.9,530.448 221.9,531 L221.9,537 Z M221.9,528 L216.65,528 C215.48975,528 214.55,528.895 214.55,530 L214.55,538 C214.55,539.105 215.48975,540 216.65,540 L221.9,540 C223.06025,540 224,539.105 224,538 L224,530 C224,528.895 223.06025,528 221.9,528 L221.9,528 Z M210.35,529 C210.35,529.552 209.8796,530 209.3,530 L206.15,530 C205.5704,530 205.1,529.552 205.1,529 L205.1,523 C205.1,522.448 205.5704,522 206.15,522 L209.3,522 C209.8796,522 210.35,522.448 210.35,523 L210.35,529 Z M210.35,520 L205.1,520 C203.93975,520 203,520.895 203,522 L203,530 C203,531.105 203.93975,532 205.1,532 L210.35,532 C211.51025,532 212.45,531.105 212.45,530 L212.45,522 C212.45,520.895 211.51025,520 210.35,520 L210.35,520 Z"
-                                      id="gallery_grid_view-[#1405]"> </path>
-                                  </g>
-                                </g>
-                              </g>
-                            </g>
-                          </svg>
+                          class="btn btn-sm btn-primary">
+                          <img src="{{ asset('admin-assets/icons/gallery.svg') }}" alt="گالری" width="16">
                         </a>
                       </td>
-                      <td class="text-center align-middle">
-                        <button wire:click="toggleStatus({{ $item->id }})"
-                          class="badge {{ $item->is_active ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
-                          {{ $item->is_active ? 'فعال' : 'غیرفعال' }}
-                        </button>
+                      <td class="text-center">
+                        <div class="form-check form-switch d-flex justify-content-center">
+                          <input class="form-check-input" type="checkbox" role="switch"
+                            wire:click="toggleStatus({{ $item->id }})" {{ $item->is_active ? 'checked' : '' }}
+                            style="width: 3em; height: 1.5em; margin-top: 0;">
+                        </div>
                       </td>
-                      <td class="text-center align-middle">
-                        <div class="d-flex justify-content-center gap-2">
+                      <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
                           <a href="{{ route('admin.panel.imaging-centers.edit', $item->id) }}"
-                            class="btn btn-gradient-success rounded-pill px-3">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            class="btn btn-sm btn-gradient-success px-2 py-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                               stroke="currentColor" stroke-width="2">
                               <path
                                 d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
                           </a>
                           <button wire:click="confirmDelete({{ $item->id }})"
-                            class="btn btn-gradient-danger rounded-pill px-3">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            class="btn btn-sm btn-gradient-danger px-2 py-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                               stroke="currentColor" stroke-width="2">
                               <path
                                 d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
@@ -140,144 +187,216 @@
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="11" class="text-center py-5">
+                      <td colspan="13" class="text-center py-4">
                         <div class="d-flex justify-content-center align-items-center flex-column">
-                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" class="text-muted mb-3">
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-2">
                             <path d="M5 12h14M12 5l7 7-7 7" />
                           </svg>
-                          <p class="text-muted fw-medium">هیچ مرکز تصویربرداری یافت نشد.</p>
+                          <p class="text-muted fw-medium">هیچ مراکز تصویربرداری   یافت نشد.</p>
                         </div>
                       </td>
                     </tr>
                   @endforelse
                 @else
                   <tr>
-                    <td colspan="11" class="text-center py-5">در حال بارگذاری مراکز تصویربرداری...</td>
+                    <td colspan="13" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
+                      </div>
+                    </td>
                   </tr>
                 @endif
               </tbody>
             </table>
           </div>
-        </div>
-
-        <!-- نمایش کارت در موبایل و تبلت -->
-        <div class="d-md-none">
-          @if ($readyToLoad)
-            @forelse ($imaging_centers as $index => $item)
-              <div class="card shadow-sm mb-3 border-0">
-                <div class="card-body p-3">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
+          <!-- Mobile Card View -->
+          <div class="clinics-cards d-md-none">
+            @if ($readyToLoad)
+              @forelse ($imagingCenters as $index => $item)
+                <div class="clinic-card mb-3 p-3 border rounded-2 shadow-sm" x-data="{ open: false, showDoctors: false, showSpecialties: false, showInsurances: false }">
+                  <div class="clinic-card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                      <input type="checkbox" wire:model.live="selectedImagingCenters" value="{{ $item->id }}"
+                      <input type="checkbox" wire:model.live="selectedHospitals" value="{{ $item->id }}"
                         class="form-check-input m-0 align-middle">
-                      <span class="badge bg-label-primary">#{{ $imaging_centers->firstItem() + $index }}</span>
+                      <h6 class="m-0 fw-bold">{{ $item->name }}</h6>
                     </div>
-                    <button wire:click="toggleStatus({{ $item->id }})"
-                      class="badge {{ $item->is_active ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
-                      {{ $item->is_active ? 'فعال' : 'غیرفعال' }}
-                    </button>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <small class="text-muted">نام:</small>
-                    <span class="fw-medium">{{ $item->name }}</span>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <small class="text-muted">پزشک:</small>
-                    <span class="fw-medium">
-                      @if ($item->doctor)
-                        {{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}
-                      @else
-                        نامشخص
-                      @endif
-                    </span>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <small class="text-muted">استان:</small>
-                    <span class="fw-medium">{{ $item->province?->name ?? '-' }}</span>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <small class="text-muted">شهر:</small>
-                    <span class="fw-medium">{{ $item->city?->name ?? '-' }}</span>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <small class="text-muted">آدرس:</small>
-                    <div class="text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip"
-                      data-bs-placement="top" title="{{ $item->address ?? '-' }}">
-                      {{ $item->address ?? '-' }}
+                    <div class="d-flex align-items-center gap-2">
+                      <button @click="open = !open" class="btn btn-sm btn-outline-primary p-1">
+                        <svg :class="{ 'rotate-180': open }" width="14" height="14" viewBox="0 0 24 24"
+                          fill="none" stroke="currentColor" stroke-width="2"
+                          class="transition-transform duration-200">
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </button>
+                      <a href="{{ route('admin.panel.imaging-centers.gallery', $item->id) }}"
+                        class="btn btn-sm btn-primary px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M4 16v4h4M4 20l4-4M20 8v-4h-4M20 4l-4 4M4 4v4M4 4h4M20 20v-4h-4M20 20l-4-4" />
+                        </svg>
+                      </a>
+                      <a href="{{ route('admin.panel.imaging-centers.edit', $item->id) }}"
+                        class="btn btn-sm btn-gradient-success px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path
+                            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      </a>
+                      <button wire:click="confirmDelete({{ $item->id }})"
+                        class="btn btn-sm btn-gradient-danger px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        </svg>
+                      </button>
                     </div>
                   </div>
-                  <div class="d-flex justify-content-between align-items-center mb-3">
-                    <small class="text-muted">توضیحات:</small>
-                    <div class="text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip"
-                      data-bs-placement="top" title="{{ $item->description ?? '-' }}">
-                      {{ $item->description ?? '-' }}
+                  <div class="clinic-card-body mt-2" x-show="open" x-transition>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">ردیف:</span>
+                      <span class="clinic-card-value">{{ $imagingCenters->firstItem() + $index }}</span>
                     </div>
-                  </div>
-                  <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('admin.panel.imaging-centers.gallery', $item->id) }}"
-                      class="btn btn-gradient-info rounded-pill px-3">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M4 16v4h4M4 20l4-4M20 8v-4h-4M20 4l-4 4M4 4v4M4 4h4M20 20v-4h-4M20 20l-4-4" />
-                      </svg>
-                    </a>
-                    <a href="{{ route('admin.panel.imaging-centers.edit', $item->id) }}"
-                      class="btn btn-gradient-success rounded-pill px-3">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path
-                          d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                      </svg>
-                    </a>
-                    <button wire:click="confirmDelete({{ $item->id }})"
-                      class="btn btn-gradient-danger rounded-pill px-3">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                      </svg>
-                    </button>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">پزشکان:</span>
+                      <span class="clinic-card-value">
+                        <button class="btn btn-link text-primary p-0" @click="showDoctors = !showDoctors">
+                          <span class="badge bg-primary-subtle text-primary">{{ $item->doctors->count() }} پزشک</span>
+                        </button>
+                        <div x-show="showDoctors" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if ($item->doctors->isEmpty())
+                            <span class="text-muted">بدون پزشک</span>
+                          @else
+                            @foreach ($item->doctors as $doctor)
+                              <div class="py-1 border-bottom">
+                                {{ $doctor->first_name . ' ' . $doctor->last_name }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">تخصص‌ها:</span>
+                      <span class="clinic-card-value">
+                        <button class="btn btn-link text-primary p-0" @click="showSpecialties = !showSpecialties">
+                          <span class="badge bg-info-subtle text-info">{{ count($item->specialty_ids ?? []) }}
+                            تخصص</span>
+                        </button>
+                        <div x-show="showSpecialties" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if (empty($item->specialty_ids))
+                            <span class="text-muted">بدون تخصص</span>
+                          @else
+                            @foreach ($item->specialty_ids as $specialtyId)
+                              <div class="py-1 border-bottom">
+                                {{ $specialties[$specialtyId] ?? 'نامشخص' }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">بیمه‌ها:</span>
+                      <span class="clinic-card-value">
+                        <button class="btn btn-link text-primary p-0" @click="showInsurances = !showInsurances">
+                          <span class="badge bg-success-subtle text-success">{{ count($item->insurance_ids ?? []) }}
+                            بیمه</span>
+                        </button>
+                        <div x-show="showInsurances" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if (empty($item->insurance_ids))
+                            <span class="text-muted">بدون بیمه</span>
+                          @else
+                            @foreach ($item->insurance_ids as $insuranceId)
+                              <div class="py-1 border-bottom">
+                                {{ $insurances[$insuranceId] ?? 'نامشخص' }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">استان:</span>
+                      <span class="clinic-card-value">{{ $item->province?->name ?? '-' }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">شهر:</span>
+                      <span class="clinic-card-value">{{ $item->city?->name ?? '-' }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">آدرس:</span>
+                      <span class="clinic-card-value">{{ e($item->address) ?? '-' }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">توضیحات:</span>
+                      <span class="clinic-card-value">{{ e($item->description) ?? '-' }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">وضعیت:</span>
+                      <div class="form-check form-switch d-inline-block">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                          wire:click="toggleStatus({{ $item->id }})" {{ $item->is_active ? 'checked' : '' }}
+                          style="width: 3em; height: 1.5em; margin-top: 0;">
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            @empty
-              <div class="text-center py-5">
-                <div class="d-flex flex-column align-items-center justify-content-center">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" class="text-muted mb-3">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                  <p class="text-muted fw-medium m-0">هیچ مرکز تصویربرداری یافت نشد.</p>
+              @empty
+                <div class="text-center py-4">
+                  <div class="d-flex justify-content-center align-items-center flex-column">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2" class="text-muted mb-2">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                    <p class="text-muted fw-medium">هیچ مراکز تصویربرداری  یافت نشد.</p>
+                  </div>
+                </div>
+              @endforelse
+            @else
+              <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">در حال بارگذاری...</span>
                 </div>
               </div>
-            @endforelse
-          @else
-            <div class="text-center py-5">در حال بارگذاری مراکز تصویربرداری...</div>
-          @endif
-        </div>
-        <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
-          <div class="text-muted">نمایش {{ $imaging_centers ? $imaging_centers->firstItem() : 0 }} تا
-            {{ $imaging_centers ? $imaging_centers->lastItem() : 0 }} از
-            {{ $imaging_centers ? $imaging_centers->total() : 0 }} ردیف
+            @endif
           </div>
-          @if ($imaging_centers && $imaging_centers->hasPages())
-            {{ $imaging_centers->links('livewire::bootstrap') }}
-          @endif
+          <!-- Pagination -->
+          <div class="d-flex justify-content-between align-items-center mt-3 px-3 flex-wrap gap-2">
+            @if ($readyToLoad)
+              <div class="text-muted">
+                نمایش {{ $imagingCenters->firstItem() }} تا {{ $imagingCenters->lastItem() }}
+                از {{ $imagingCenters->total() }} ردیف
+              </div>
+              @if ($imagingCenters->hasPages())
+                {{ $imagingCenters->links('livewire::bootstrap') }}
+              @endif
+            @endif
+          </div>
         </div>
       </div>
     </div>
   </div>
-
+  <!-- Scripts -->
   <script>
     document.addEventListener('livewire:init', function() {
+      // Re-initialize Alpine.js after Livewire updates
+      Livewire.hook('morph.updated', () => {
+        if (window.Alpine) {
+          window.Alpine.initTree(document.querySelector('.clinics-container'));
+        }
+      });
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });
-
       Livewire.on('confirm-delete', (event) => {
         Swal.fire({
-          title: 'حذف مرکز تصویربرداری',
-          text: 'آیا مطمئن هستید که می‌خواهید این مرکز تصویربرداری را حذف کنید؟',
+          title: 'حذف کلینیک',
+          text: 'آیا مطمئن هستید که می‌خواهید این کلینیک را حذف کنید؟',
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
@@ -292,10 +411,6 @@
           }
         });
       });
-
-      // Initialize tooltips
-      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-      [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     });
   </script>
 </div>
