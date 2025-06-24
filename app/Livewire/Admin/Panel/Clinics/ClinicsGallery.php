@@ -33,14 +33,14 @@ class ClinicsGallery extends Component
             $galleries[] = [
                 'image_path' => $path,
                 'caption' => $this->captions[$index] ?? null,
-                'is_primary' => false,
+                'is_primary' => count($galleries) === 0, // اولین تصویر به‌طور پیش‌فرض اصلی باشد
             ];
         }
 
         $this->clinic->update(['galleries' => $galleries]);
-        $this->images = [];
-        $this->captions = [];
-        $this->dispatch('show-alert', type: 'success', message: 'تصاویر با موفقیت آپلود شدند!');
+        $this->reset(['images', 'captions']); // پاک‌سازی متغیرها
+        $this->dispatch('refresh-gallery'); // ارسال رویداد برای رفرش گالری
+        $this->dispatch('show-alert', type: 'success', message: 'تصاویر با موفقیت اضافه شدند!');
     }
 
     public function deleteImage($index)
@@ -50,6 +50,7 @@ class ClinicsGallery extends Component
             Storage::disk('public')->delete($galleries[$index]['image_path']);
             unset($galleries[$index]);
             $this->clinic->update(['galleries' => array_values($galleries)]);
+            $this->dispatch('refresh-gallery');
             $this->dispatch('show-alert', type: 'success', message: 'تصویر حذف شد!');
         }
     }
@@ -63,6 +64,7 @@ class ClinicsGallery extends Component
         if (isset($galleries[$index])) {
             $galleries[$index]['is_primary'] = true;
             $this->clinic->update(['galleries' => $galleries]);
+            $this->dispatch('refresh-gallery');
             $this->dispatch('show-alert', type: 'success', message: 'تصویر اصلی تنظیم شد!');
         }
     }

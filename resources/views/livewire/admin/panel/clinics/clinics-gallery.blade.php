@@ -19,12 +19,13 @@
         <div class="card-body p-4">
             <div class="row g-4">
                 <div class="col-12">
-                    <div class="bg-light rounded-3 p-3 shadow-sm hover:shadow-md transition-all position-relative">
+                    <div class="bg-light rounded-3 p-4 shadow-sm hover:shadow-md transition-all">
                         <label class="form-label fw-bold text-dark mb-2">آپلود تصاویر</label>
                         <input type="file" wire:model="images" multiple class="form-control input-shiny" accept="image/*">
+                        @error('images.*') <span class="text-danger">{{ $message }}</span> @enderror
                         @foreach ($images as $index => $image)
                             <div class="mt-2">
-                                <input type="text" wire:model="captions.{{ $index }}" class="form-control input-shiny mt-1" placeholder="توضیح تصویر {{ $index + 1 }}">
+                                <input type="text" wire:model="captions.{{ $index }}" class="form-control mt-1" placeholder="توضیح تصویر {{ $index + 1 }}">
                             </div>
                         @endforeach
                         <button wire:click="uploadImages" class="btn my-btn-primary rounded-pill mt-3 px-4 d-flex align-items-center gap-2">
@@ -36,9 +37,9 @@
                     </div>
                 </div>
 
-                <div class="col-12 mt-3">
+                <div class="col-12 mt-3" wire:ignore.self>
                     <h6 class="fw-bold mb-3">تصاویر گالری</h6>
-                    <div class="row g-3">
+                    <div class="row g-3" id="gallery">
                         @forelse ($galleries as $index => $gallery)
                             <div class="col-md-3 col-sm-6">
                                 <div class="card shadow-sm position-relative">
@@ -72,6 +73,10 @@
     <script>
         document.addEventListener('livewire:init', function () {
             Livewire.on('show-alert', (event) => toastr[event.type](event.message));
+            Livewire.on('refresh-gallery', () => {
+                // رفرش گالری بدون نیاز به ریلود صفحه
+                @this.call('render');
+            });
         });
     </script>
 </div>

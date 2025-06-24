@@ -57,13 +57,20 @@ class ClinicEdit extends Component
         $this->phone_numbers = $this->clinic->phone_numbers ?: [''];
         $this->specialty_ids = $this->clinic->specialty_ids ? array_map('strval', $this->clinic->specialty_ids) : [];
         $this->insurance_ids = $this->clinic->insurance_ids ? array_map('strval', $this->clinic->insurance_ids) : [];
+
+        // تنظیم روزهای کاری
+        $workingDays = $this->clinic->working_days ?? [];
+        $this->working_days = array_fill_keys(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'], false);
+        foreach ($workingDays as $day) {
+            $this->working_days[$day] = true;
+        }
+
         $this->doctors = Doctor::all();
         $this->specialties = Specialty::all();
         $this->insurances = Insurance::all();
         $this->provinces = Zone::where('level', 1)->get();
         $this->cities = $this->province_id ? Zone::where('level', 2)->where('parent_id', $this->province_id)->get() : [];
 
-        // ارسال مقادیر اولیه به Select2
         $this->dispatch('set-select2-initial', [
             'doctor_id' => $this->doctor_id ? strval($this->doctor_id) : null,
             'specialty_ids' => $this->specialty_ids,
@@ -163,7 +170,6 @@ class ClinicEdit extends Component
 
         $data = $validator->validated();
 
-        // آپلود تصویر اصلی
         if ($this->avatar) {
             if ($this->clinic->avatar) {
                 Storage::disk('public')->delete($this->clinic->avatar);
@@ -171,7 +177,6 @@ class ClinicEdit extends Component
             $data['avatar'] = $this->avatar->store('avatars', 'public');
         }
 
-        // آپلود مدارک
         if ($this->documents) {
             if ($this->clinic->documents) {
                 foreach ($this->clinic->documents as $document) {
@@ -185,8 +190,8 @@ class ClinicEdit extends Component
             $data['documents'] = $documentPaths;
         }
 
-        // فیلتر کردن شماره‌های تماس خالی
         $data['phone_numbers'] = array_filter($this->phone_numbers, fn ($phone) => !empty($phone));
+        $data['working_days'] = array_keys(array_filter($this->working_days, fn ($value) => $value));
 
         $this->clinic->update($data);
 

@@ -17,8 +17,8 @@ class ClinicCreate extends Component
     use WithFileUploads;
 
     public $doctor_id;
-    public $specialty_ids;
-    public $insurance_ids;
+    public $specialty_ids = [];
+    public $insurance_ids = [];
     public $name;
     public $title;
     public $address;
@@ -98,7 +98,6 @@ class ClinicCreate extends Component
             'payment_methods' => 'nullable|in:cash,card,online',
             'is_active' => 'boolean',
             'working_days' => 'nullable|array',
-            'working_days.*' => 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
             'avatar' => 'nullable|image|max:2048',
             'documents' => 'nullable|array',
             'documents.*' => 'file|mimes:pdf,doc,docx|max:10240',
@@ -130,7 +129,6 @@ class ClinicCreate extends Component
             'consultation_fee.numeric' => 'هزینه خدمات باید عدد باشد.',
             'consultation_fee.min' => 'هزینه خدمات نمی‌تواند منفی باشد.',
             'payment_methods.in' => 'روش پرداخت باید یکی از گزینه‌های نقدی، کارت یا آنلاین باشد.',
-            'working_days.*.in' => 'روزهای کاری باید از بین روزهای هفته باشد.',
             'avatar.image' => 'تصویر اصلی باید یک فایل تصویری باشد.',
             'avatar.max' => 'تصویر اصلی نباید بزرگ‌تر از ۲ مگابایت باشد.',
             'documents.*.mimes' => 'مدارک باید از نوع PDF، DOC یا DOCX باشند.',
@@ -147,12 +145,10 @@ class ClinicCreate extends Component
 
         $data = $validator->validated();
 
-        // آپلود تصویر اصلی
         if ($this->avatar) {
             $data['avatar'] = $this->avatar->store('avatars', 'public');
         }
 
-        // آپلود مدارک
         if ($this->documents) {
             $documentPaths = [];
             foreach ($this->documents as $document) {
@@ -161,8 +157,8 @@ class ClinicCreate extends Component
             $data['documents'] = $documentPaths;
         }
 
-        // فیلتر کردن شماره‌های تماس خالی
         $data['phone_numbers'] = array_filter($this->phone_numbers, fn ($phone) => !empty($phone));
+        $data['working_days'] = array_keys(array_filter($this->working_days, fn ($value) => $value));
 
         MedicalCenter::create($data);
 
