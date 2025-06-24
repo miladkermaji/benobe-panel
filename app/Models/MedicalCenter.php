@@ -33,6 +33,8 @@ class MedicalCenter extends Model
         'galleries',
         'specialty_ids',
         'insurance_ids',
+        'Center_tariff_type',
+        'Daycare_centers',
     ];
 
     protected $casts = [

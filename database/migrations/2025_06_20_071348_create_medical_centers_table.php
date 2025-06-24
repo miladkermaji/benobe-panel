@@ -35,7 +35,9 @@ return new class () extends Migration {
             // اطلاعات مالی
             $table->decimal('consultation_fee', 10, 2)->nullable();                  // هزینه خدمات
             $table->enum('payment_methods', ['cash', 'card', 'online'])->nullable(); // روش‌های پرداخت
-            $table->enum('type', ['hospital', 'treatment_centers', 'clinic', 'imaging_center', 'laboratory', 'pharmacy'])->nullable(); // نوع مراکز درمانی
+            $table->enum('Center_tariff_type', ['governmental', 'special', 'else'])->nullable(); // نوع تعرفه مرکز 
+            $table->enum('Daycare_centers', ['yes', 'no'])->nullable(); //مراکز شبانه روزی
+            $table->enum('type', ['hospital', 'treatment_centers', 'clinic', 'imaging_center', 'laboratory', 'pharmacy','policlinic'])->nullable(); // نوع مراکز درمانی
 
             // وضعیت و تنظیمات
             $table->boolean('is_active')->default(false); // وضعیت فعال‌سازی
