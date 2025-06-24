@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Livewire\Admin\Panel\Hospitals;
 
 use App\Models\Zone;
@@ -15,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 
 class HospitalCreate extends Component
 {
-   use WithFileUploads;
+    use WithFileUploads;
 
     public $doctor_ids = [];
     public $specialty_ids = [];
@@ -49,6 +48,8 @@ class HospitalCreate extends Component
     public $provinces = [];
     public $insurances = [];
     public $cities = [];
+    public $Center_tariff_type;
+    public $Daycare_centers;
 
     public function mount()
     {
@@ -111,6 +112,8 @@ class HospitalCreate extends Component
             'specialty_ids.*' => 'exists:specialties,id',
             'insurance_ids' => 'nullable|array',
             'insurance_ids.*' => 'exists:insurances,id',
+            'Center_tariff_type' => 'nullable|in:governmental,special,else',
+            'Daycare_centers' => 'nullable|in:yes,no',
         ], [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
             'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
@@ -138,6 +141,9 @@ class HospitalCreate extends Component
             'phone_numbers.*.regex' => 'شماره‌های تماس باید با ۰۹ شروع شوند و ۱۱ رقم باشند.',
             'specialty_ids.*.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+            'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
+             'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
+
         ]);
 
         if ($validator->fails()) {
@@ -177,4 +183,3 @@ class HospitalCreate extends Component
         return view('livewire.admin.panel.hospitals.hospital-create');
     }
 }
-

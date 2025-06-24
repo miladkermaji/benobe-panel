@@ -50,7 +50,8 @@ class TreatmentCenterEdit extends Component
     public $provinces = [];
     public $insurances = [];
     public $cities = [];
-
+public $Center_tariff_type;
+public $Daycare_centers;
     public function mount($id)
     {
         $this->treatmentCenter = MedicalCenter::findOrFail($id);
@@ -59,6 +60,9 @@ class TreatmentCenterEdit extends Component
         $this->phone_numbers = $this->treatmentCenter->phone_numbers ?: [''];
         $this->specialty_ids = $this->treatmentCenter->specialty_ids ? array_map('strval', $this->treatmentCenter->specialty_ids) : [];
         $this->insurance_ids = $this->treatmentCenter->insurance_ids ? array_map('strval', $this->treatmentCenter->insurance_ids) : [];
+
+$this->Center_tariff_type = $this->hospital->Center_tariff_type;
+$this->Daycare_centers = $this->hospital->Daycare_centers;
 
         // تنظیم روزهای کاری
         $workingDays = $this->treatmentCenter->working_days ?? [];
@@ -80,6 +84,8 @@ class TreatmentCenterEdit extends Component
             'province_id' => $this->province_id ? strval($this->province_id) : null,
             'city_id' => $this->city_id ? strval($this->city_id) : null,
             'payment_methods' => $this->payment_methods,
+            'Center_tariff_type' => $this->Center_tariff_type,
+'Daycare_centers' => $this->Daycare_centers,
         ]);
     }
 
@@ -135,6 +141,8 @@ class TreatmentCenterEdit extends Component
             'specialty_ids.*' => 'exists:specialties,id',
             'insurance_ids' => 'nullable|array',
             'insurance_ids.*' => 'exists:insurances,id',
+            'Center_tariff_type' => 'nullable|in:governmental,special,else',
+'Daycare_centers' => 'nullable|in:yes,no',
         ], [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
             'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
@@ -163,6 +171,8 @@ class TreatmentCenterEdit extends Component
             'phone_numbers.*.regex' => 'شماره‌های تماس باید با ۰۹ شروع شوند و ۱۱ رقم باشند.',
             'specialty_ids.*.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+            'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
+'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
         ]);
 
         if ($validator->fails()) {

@@ -49,7 +49,8 @@ use WithFileUploads;
     public $provinces = [];
     public $insurances = [];
     public $cities = [];
-
+public $Center_tariff_type;
+public $Daycare_centers;
     public function mount()
     {
         $this->doctors = Doctor::all();
@@ -111,6 +112,8 @@ use WithFileUploads;
             'specialty_ids.*' => 'exists:specialties,id',
             'insurance_ids' => 'nullable|array',
             'insurance_ids.*' => 'exists:insurances,id',
+            'Center_tariff_type' => 'nullable|in:governmental,special,else',
+'Daycare_centers' => 'nullable|in:yes,no',
         ], [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
             'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
@@ -138,6 +141,8 @@ use WithFileUploads;
             'phone_numbers.*.regex' => 'شماره‌های تماس باید با ۰۹ شروع شوند و ۱۱ رقم باشند.',
             'specialty_ids.*.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+            'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
+'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
         ]);
 
         if ($validator->fails()) {

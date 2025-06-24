@@ -149,10 +149,27 @@
                 <label class="form-check-label fw-medium" for="location_confirmed">مکان تأیید شده</label>
               </div>
             </div>
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <select wire:model="Center_tariff_type" class="form-select select2" id="Center_tariff_type">
+                <option value="">انتخاب کنید</option>
+                <option value="governmental">دولتی</option>
+                <option value="special">ویژه</option>
+                <option value="else">سایر</option>
+              </select>
+              <label for="Center_tariff_type" class="form-label">نوع تعرفه مرکز</label>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <select wire:model="Daycare_centers" class="form-select select2" id="Daycare_centers">
+                <option value="">انتخاب کنید</option>
+                <option value="yes">بله</option>
+                <option value="no">خیر</option>
+              </select>
+              <label for="Daycare_centers" class="form-label">مرکز شبانه‌روزی</label>
+            </div>
             <div class="col-12 position-relative mt-5">
               <label class="form-label fw-bold text-dark mb-3">انتخاب روزهای کاری</label>
               <div class="d-flex flex-wrap gap-3 mt-4 border rounded-lg px-2">
-                @foreach (['saturday' => 'شنبه','sunday' => 'یک‌شنبه','monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+                @foreach (['saturday' => 'شنبه', 'sunday' => 'یک‌شنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                   <div class="form-check d-flex align-items-center">
                     <input class="form-check-input" type="checkbox"
                       wire:model.live="working_days.{{ $day }}" id="working_days_{{ $day }}"
@@ -239,6 +256,7 @@
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
+        
       }
       initializeSelect2();
 

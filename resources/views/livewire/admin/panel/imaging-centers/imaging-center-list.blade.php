@@ -4,7 +4,7 @@
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-3">
-            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0"> مراکز تصویربرداری  </h1>
+            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0"> مراکز تصویربرداری </h1>
           </div>
           <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
             <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
@@ -69,6 +69,8 @@
                   <th class="align-middle">استان</th>
                   <th class="align-middle">شهر</th>
                   <th class="align-middle">آدرس</th>
+                  <th class="align-middle">نوع تعرفه</th>
+                  <th class="align-middle">شبانه‌روزی</th>
                   <th class="align-middle">توضیحات</th>
                   <th class="text-center align-middle" style="width: 80px;">گالری</th>
                   <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
@@ -146,6 +148,11 @@
                         </div>
                       </td>
                       <td>
+                        {{ $item->Center_tariff_type ? ['governmental' => 'دولتی', 'special' => 'ویژه', 'else' => 'سایر'][$item->Center_tariff_type] : '-' }}
+                      </td>
+                      <td>{{ $item->Daycare_centers ? ['yes' => 'بله', 'no' => 'خیر'][$item->Daycare_centers] : '-' }}
+                      </td>
+                      <td>
                         <div class="text-truncate" style="max-width: 150px;"
                           title="{{ e($item->description) ?? '-' }}">
                           {{ e($item->description) ?? '-' }}
@@ -187,20 +194,20 @@
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="13" class="text-center py-4">
+                      <td colspan="15" class="text-center py-4">
                         <div class="d-flex justify-content-center align-items-center flex-column">
                           <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" class="text-muted mb-2">
                             <path d="M5 12h14M12 5l7 7-7 7" />
                           </svg>
-                          <p class="text-muted fw-medium">هیچ مراکز تصویربرداری   یافت نشد.</p>
+                          <p class="text-muted fw-medium">هیچ مراکز تصویربرداری یافت نشد.</p>
                         </div>
                       </td>
                     </tr>
                   @endforelse
                 @else
                   <tr>
-                    <td colspan="13" class="text-center py-4">
+                    <td colspan="15" class="text-center py-4">
                       <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">در حال بارگذاری...</span>
                       </div>
@@ -333,6 +340,16 @@
                       <span class="clinic-card-value">{{ e($item->address) ?? '-' }}</span>
                     </div>
                     <div class="clinic-card-item">
+                      <span class="clinic-card-label">نوع تعرفه:</span>
+                      <span
+                        class="clinic-card-value">{{ $item->Center_tariff_type ? ['governmental' => 'دولتی', 'special' => 'ویژه', 'else' => 'سایر'][$item->Center_tariff_type] : '-' }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">شبانه‌روزی:</span>
+                      <span
+                        class="clinic-card-value">{{ $item->Daycare_centers ? ['yes' => 'بله', 'no' => 'خیر'][$item->Daycare_centers] : '-' }}</span>
+                    </div>
+                    <div class="clinic-card-item">
                       <span class="clinic-card-label">توضیحات:</span>
                       <span class="clinic-card-value">{{ e($item->description) ?? '-' }}</span>
                     </div>
@@ -353,7 +370,7 @@
                       stroke-width="2" class="text-muted mb-2">
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
-                    <p class="text-muted fw-medium">هیچ مراکز تصویربرداری  یافت نشد.</p>
+                    <p class="text-muted fw-medium">هیچ مراکز تصویربرداری یافت نشد.</p>
                   </div>
                 </div>
               @endforelse

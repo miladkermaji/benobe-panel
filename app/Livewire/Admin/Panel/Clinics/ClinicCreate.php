@@ -48,7 +48,8 @@ class ClinicCreate extends Component
     public $provinces = [];
     public $insurances = [];
     public $cities = [];
-
+public $Center_tariff_type;
+public $Daycare_centers;
     public function mount()
     {
         $this->doctors = Doctor::all();
