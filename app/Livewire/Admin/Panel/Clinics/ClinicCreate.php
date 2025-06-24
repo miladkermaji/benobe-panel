@@ -99,7 +99,7 @@ class ClinicCreate extends Component
             'payment_methods' => 'nullable|in:cash,card,online',
             'is_active' => 'boolean',
             'working_days' => 'nullable|array',
-            'avatar' => 'nullable|image|max:2048',
+            'avatar' => 'nullable|image',
             'documents' => 'nullable|array',
             'documents.*' => 'file|mimes:pdf,doc,docx|max:10240',
             'phone_numbers' => 'nullable|array',

@@ -1,3 +1,4 @@
+
 <div class="clinics-container">
     <div class="container py-2" dir="rtl" wire:init="loadClinics">
         <div class="glass-header text-white p-2 rounded-2 mb-4 mt-3 shadow-lg bg-gradient-primary">
@@ -10,7 +11,7 @@
                         <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
                             <div class="search-container position-relative" style="max-width: 100%;">
                                 <input type="text"
-                                    class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                                    class="form-control search-input border-0 shadow-none bg-white text-dar k ps-4 rounded-2 text-start"
                                     wire:model.live="search" placeholder="جستجو در کلینیک‌ها..."
                                     style="padding-right: 20px; text-align: right; direction: rtl;">
                                 <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
@@ -55,7 +56,7 @@
                     </div>
                     <!-- Desktop Table View -->
                     <div class="table-responsive text-nowrap d-none d-md-block">
-                        <table class="table table-hover w-100 m-0">
+                        <table class="table  w-100 m-0">
                             <thead>
                                 <tr>
                                     <th class="text-center align-middle" style="width: 40px;">
@@ -78,7 +79,7 @@
                             <tbody>
                                 @if ($readyToLoad)
                                     @forelse ($clinics as $index => $item)
-                                        <tr class="align-middle">
+                                        <tr class="align-middle" x-data="{ showDoctors: false, showSpecialties: false, showInsurances: false }">
                                             <td class="text-center">
                                                 <input type="checkbox" wire:model.live="selectedClinics" value="{{ $item->id }}"
                                                     class="form-check-input m-0">
@@ -86,66 +87,51 @@
                                             <td class="text-center">{{ $clinics->firstItem() + $index }}</td>
                                             <td>{{ $item->name }}</td>
                                             <td>
-                                                <div x-data="{ open: false }" class="dropdown">
-                                                    <button class="btn btn-link text-primary p-0" @click="open = !open">
-                                                        {{ $item->doctors->count() }} پزشک
-                                                        <svg class="ms-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M6 9l6 6 6-6" />
-                                                        </svg>
-                                                    </button>
-                                                    <div x-show="open" @click.away="open = false" class="dropdown-menu shadow-sm mt-2" style="min-width: 200px;">
-                                                        @if ($item->doctors->isEmpty())
-                                                            <div class="dropdown-item text-muted">بدون پزشک</div>
-                                                        @else
-                                                            @foreach ($item->doctors as $doctor)
-                                                                <div class="dropdown-item">
-                                                                    {{ $doctor->first_name . ' ' . $doctor->last_name }}
-                                                                </div>
-                                                            @endforeach
-                                                        @endif
-                                                    </div>
+                                                <button class="btn btn-link text-primary p-0" @click="showDoctors = !showDoctors">
+                                                    <span class="badge bg-primary-subtle text-primary">{{ $item->doctors->count() }} پزشک</span>
+                                                </button>
+                                                <div x-show="showDoctors" x-transition class="mt-2 p-2 border rounded shadow-sm" style="max-height: 150px; overflow-y: auto;">
+                                                    @if ($item->doctors->isEmpty())
+                                                        <span class="text-muted">بدون پزشک</span>
+                                                    @else
+                                                        @foreach ($item->doctors as $doctor)
+                                                            <div class="py-1 border-bottom">
+                                                                {{ $doctor->first_name . ' ' . $doctor->last_name }}
+                                                            </div>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </td>
                                             <td>
-                                                <div x-data="{ open: false }" class="dropdown">
-                                                    <button class="btn btn-link text-primary p-0" @click="open = !open">
-                                                        {{ count($item->specialty_ids ?? []) }} تخصص
-                                                        <svg class="ms-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M6 9l6 6 6-6" />
-                                                        </svg>
-                                                    </button>
-                                                    <div x-show="open" @click.away="open = false" class="dropdown-menu shadow-sm mt-2" style="min-width: 200px;">
-                                                        @if (empty($item->specialty_ids))
-                                                            <div class="dropdown-item text-muted">بدون تخصص</div>
-                                                        @else
-                                                            @foreach ($item->specialty_ids as $specialtyId)
-                                                                <div class="dropdown-item">
-                                                                    {{ $specialties[$specialtyId] ?? 'نامشخص' }}
-                                                                </div>
-                                                            @endforeach
-                                                        @endif
-                                                    </div>
+                                                <button class="btn btn-link text-primary p-0" @click="showSpecialties = !showSpecialties">
+                                                    <span class="badge bg-info-subtle text-info">{{ count($item->specialty_ids ?? []) }} تخصص</span>
+                                                </button>
+                                                <div x-show="showSpecialties" x-transition class="mt-2 p-2 border rounded shadow-sm" style="max-height: 150px; overflow-y: auto;">
+                                                    @if (empty($item->specialty_ids))
+                                                        <span class="text-muted">بدون تخصص</span>
+                                                    @else
+                                                        @foreach ($item->specialty_ids as $specialtyId)
+                                                            <div class="py-1 border-bottom">
+                                                                {{ $specialties[$specialtyId] ?? 'نامشخص' }}
+                                                            </div>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </td>
                                             <td>
-                                                <div x-data="{ open: false }" class="dropdown">
-                                                    <button class="btn btn-link text-primary p-0" @click="open = !open">
-                                                        {{ count($item->insurance_ids ?? []) }} بیمه
-                                                        <svg class="ms-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M6 9l6 6 6-6" />
-                                                        </svg>
-                                                    </button>
-                                                    <div x-show="open" @click.away="open = false" class="dropdown-menu shadow-sm mt-2" style="min-width: 200px;">
-                                                        @if (empty($item->insurance_ids))
-                                                            <div class="dropdown-item text-muted">بدون بیمه</div>
-                                                        @else
-                                                            @foreach ($item->insurance_ids as $insuranceId)
-                                                                <div class="dropdown-item">
-                                                                    {{ $insurances[$insuranceId] ?? 'نامشخص' }}
-                                                                </div>
-                                                            @endforeach
-                                                        @endif
-                                                    </div>
+                                                <button class="btn btn-link text-primary p-0" @click="showInsurances = !showInsurances">
+                                                    <span class="badge bg-success-subtle text-success">{{ count($item->insurance_ids ?? []) }} بیمه</span>
+                                                </button>
+                                                <div x-show="showInsurances" x-transition class="mt-2 p-2 border rounded shadow-sm" style="max-height: 150px; overflow-y: auto;">
+                                                    @if (empty($item->insurance_ids))
+                                                        <span class="text-muted">بدون بیمه</span>
+                                                    @else
+                                                        @foreach ($item->insurance_ids as $insuranceId)
+                                                            <div class="py-1 border-bottom">
+                                                                {{ $insurances[$insuranceId] ?? 'نامشخص' }}
+                                                            </div>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </td>
                                             <td>{{ $item->province?->name ?? '-' }}</td>
@@ -224,7 +210,7 @@
                     <div class="clinics-cards d-md-none">
                         @if ($readyToLoad)
                             @forelse ($clinics as $index => $item)
-                                <div class="clinic-card mb-3 p-3 border rounded-2 shadow-sm" x-data="{ open: false }">
+                                <div class="clinic-card mb-3 p-3 border rounded-2 shadow-sm" x-data="{ open: false, showDoctors: false, showSpecialties: false, showInsurances: false }">
                                     <div class="clinic-card-header d-flex justify-content-between align-items-center">
                                         <div class="d-flex align-items-center gap-2">
                                             <input type="checkbox" wire:model.live="selectedClinics" value="{{ $item->id }}"
@@ -266,72 +252,57 @@
                                         <div class="clinic-card-item">
                                             <span class="clinic-card-label">پزشکان:</span>
                                             <span class="clinic-card-value">
-                                                <div x-data="{ open: false }" class="dropdown">
-                                                    <button class="btn btn-link text-primary p-0" @click="open = !open">
-                                                        {{ $item->doctors->count() }} پزشک
-                                                        <svg class="ms-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M6 9l6 6 6-6" />
-                                                        </svg>
-                                                    </button>
-                                                    <div x-show="open" @click.away="open = false" class="dropdown-menu shadow-sm mt-2" style="min-width: 200px;">
-                                                        @if ($item->doctors->isEmpty())
-                                                            <div class="dropdown-item text-muted">بدون پزشک</div>
-                                                        @else
-                                                            @foreach ($item->doctors as $doctor)
-                                                                <div class="dropdown-item">
-                                                                    {{ $doctor->first_name . ' ' . $doctor->last_name }}
-                                                                </div>
-                                                            @endforeach
-                                                        @endif
-                                                    </div>
+                                                <button class="btn btn-link text-primary p-0" @click="showDoctors = !showDoctors">
+                                                    <span class="badge bg-primary-subtle text-primary">{{ $item->doctors->count() }} پزشک</span>
+                                                </button>
+                                                <div x-show="showDoctors" x-transition class="mt-2 p-2 border rounded shadow-sm" style="max-height: 150px; overflow-y: auto;">
+                                                    @if ($item->doctors->isEmpty())
+                                                        <span class="text-muted">بدون پزشک</span>
+                                                    @else
+                                                        @foreach ($item->doctors as $doctor)
+                                                            <div class="py-1 border-bottom">
+                                                                {{ $doctor->first_name . ' ' . $doctor->last_name }}
+                                                            </div>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </span>
                                         </div>
                                         <div class="clinic-card-item">
                                             <span class="clinic-card-label">تخصص‌ها:</span>
                                             <span class="clinic-card-value">
-                                                <div x-data="{ open: false }" class="dropdown">
-                                                    <button class="btn btn-link text-primary p-0" @click="open = !open">
-                                                        {{ count($item->specialty_ids ?? []) }} تخصص
-                                                        <svg class="ms-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M6 9l6 6 6-6" />
-                                                        </svg>
-                                                    </button>
-                                                    <div x-show="open" @click.away="open = false" class="dropdown-menu shadow-sm mt-2" style="min-width: 200px;">
-                                                        @if (empty($item->specialty_ids))
-                                                            <div class="dropdown-item text-muted">بدون تخصص</div>
-                                                        @else
-                                                            @foreach ($item->specialty_ids as $specialtyId)
-                                                                <div class="dropdown-item">
-                                                                    {{ $specialties[$specialtyId] ?? 'نامشخص' }}
-                                                                </div>
-                                                            @endforeach
-                                                        @endif
-                                                    </div>
+                                                <button class="btn btn-link text-primary p-0" @click="showSpecialties = !showSpecialties">
+                                                    <span class="badge bg-info-subtle text-info">{{ count($item->specialty_ids ?? []) }} تخصص</span>
+                                                </button>
+                                                <div x-show="showSpecialties" x-transition class="mt-2 p-2 border rounded shadow-sm" style="max-height: 150px; overflow-y: auto;">
+                                                    @if (empty($item->specialty_ids))
+                                                        <span class="text-muted">بدون تخصص</span>
+                                                    @else
+                                                        @foreach ($item->specialty_ids as $specialtyId)
+                                                            <div class="py-1 border-bottom">
+                                                                {{ $specialties[$specialtyId] ?? 'نامشخص' }}
+                                                            </div>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </span>
                                         </div>
                                         <div class="clinic-card-item">
                                             <span class="clinic-card-label">بیمه‌ها:</span>
                                             <span class="clinic-card-value">
-                                                <div x-data="{ open: false }" class="dropdown">
-                                                    <button class="btn btn-link text-primary p-0" @click="open = !open">
-                                                        {{ count($item->insurance_ids ?? []) }} بیمه
-                                                        <svg class="ms-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M6 9l6 6 6-6" />
-                                                        </svg>
-                                                    </button>
-                                                    <div x-show="open" @click.away="open = false" class="dropdown-menu shadow-sm mt-2" style="min-width: 200px;">
-                                                        @if (empty($item->insurance_ids))
-                                                            <div class="dropdown-item text-muted">بدون بیمه</div>
-                                                        @else
-                                                            @foreach ($item->insurance_ids as $insuranceId)
-                                                                <div class="dropdown-item">
-                                                                    {{ $insurances[$insuranceId] ?? 'نامشخص' }}
-                                                                </div>
-                                                            @endforeach
-                                                        @endif
-                                                    </div>
+                                                <button class="btn btn-link text-primary p-0" @click="showInsurances = !showInsurances">
+                                                    <span class="badge bg-success-subtle text-success">{{ count($item->insurance_ids ?? []) }} بیمه</span>
+                                                </button>
+                                                <div x-show="showInsurances" x-transition class="mt-2 p-2 border rounded shadow-sm" style="max-height: 150px; overflow-y: auto;">
+                                                    @if (empty($item->insurance_ids))
+                                                        <span class="text-muted">بدون بیمه</span>
+                                                    @else
+                                                        @foreach ($item->insurance_ids as $insuranceId)
+                                                            <div class="py-1 border-bottom">
+                                                                {{ $insurances[$insuranceId] ?? 'نامشخص' }}
+                                                            </div>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </span>
                                         </div>
@@ -396,12 +367,15 @@
             </div>
         </div>
     </div>
-
-
-
-    <!-- اسکریپت‌ها -->
+    <!-- Scripts -->
     <script>
         document.addEventListener('livewire:init', function () {
+            // Re-initialize Alpine.js after Livewire updates
+            Livewire.hook('morph.updated', () => {
+                if (window.Alpine) {
+                    window.Alpine.initTree(document.querySelector('.clinics-container'));
+                }
+            });
             Livewire.on('show-alert', (event) => {
                 toastr[event.type](event.message);
             });
