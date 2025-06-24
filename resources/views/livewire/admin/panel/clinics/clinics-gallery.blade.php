@@ -70,13 +70,4 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('livewire:init', function () {
-            Livewire.on('show-alert', (event) => toastr[event.type](event.message));
-            Livewire.on('refresh-gallery', () => {
-                // رفرش گالری بدون نیاز به ریلود صفحه
-                @this.call('render');
-            });
-        });
-    </script>
 </div>
