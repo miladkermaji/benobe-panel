@@ -20,7 +20,6 @@
             <div class="row g-4">
                 <div class="col-12">
                     <div class="bg-light rounded-3 p-4 shadow-sm hover:shadow-md transition-all">
-                        <label class="form-label fw-bold text-dark mb-2">آپلود تصاویر</label>
                         <input type="file" wire:model="images" multiple class="form-control input-shiny" accept="image/*">
                         @error('images.*') <span class="text-danger">{{ $message }}</span> @enderror
                         @foreach ($images as $index => $image)
