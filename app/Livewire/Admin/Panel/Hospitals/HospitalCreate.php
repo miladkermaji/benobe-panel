@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Validator;
 
 class HospitalCreate extends Component
 {
-    use WithFileUploads;
+   use WithFileUploads;
 
-    public $doctor_id;
+    public $doctor_ids = [];
     public $specialty_ids = [];
     public $insurance_ids = [];
     public $name;
@@ -80,7 +80,8 @@ class HospitalCreate extends Component
     public function store()
     {
         $validator = Validator::make($this->all(), [
-            'doctor_id' => 'required|exists:doctors,id',
+            'doctor_ids' => 'required|array',
+            'doctor_ids.*' => 'exists:doctors,id',
             'name' => 'required|string|max:255',
             'title' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:500',
@@ -99,7 +100,7 @@ class HospitalCreate extends Component
             'payment_methods' => 'nullable|in:cash,card,online',
             'is_active' => 'boolean',
             'working_days' => 'nullable|array',
-            'avatar' => 'nullable|image|max:2048',
+            'avatar' => 'nullable|image',
             'documents' => 'nullable|array',
             'documents.*' => 'file|mimes:pdf,doc,docx|max:10240',
             'phone_numbers' => 'nullable|array',
@@ -111,8 +112,8 @@ class HospitalCreate extends Component
             'insurance_ids' => 'nullable|array',
             'insurance_ids.*' => 'exists:insurances,id',
         ], [
-            'doctor_id.required' => 'لطفاً پزشک را انتخاب کنید.',
-            'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
+            'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
+            'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
             'name.required' => 'لطفاً نام کلینیک را وارد کنید.',
             'name.max' => 'نام کلینیک نباید بیشتر از ۲۵۵ حرف باشد.',
             'title.max' => 'عنوان نباید بیشتر از ۲۵۵ حرف باشد.',
@@ -161,7 +162,11 @@ class HospitalCreate extends Component
         $data['phone_numbers'] = array_filter($this->phone_numbers, fn ($phone) => !empty($phone));
         $data['working_days'] = array_keys(array_filter($this->working_days, fn ($value) => $value));
 
-        MedicalCenter::create($data);
+        // حذف doctor_ids از $data چون در جدول medical_centers ذخیره نمی‌شود
+        unset($data['doctor_ids']);
+
+        $medicalCenter = MedicalCenter::create($data);
+        $medicalCenter->doctors()->sync($this->doctor_ids); // ذخیره رابطه چند به چند
 
         $this->dispatch('show-alert', type: 'success', message: 'کلینیک با موفقیت ایجاد شد!');
         return redirect()->route('admin.panel.hospitals.index');

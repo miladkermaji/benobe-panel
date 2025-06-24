@@ -7,7 +7,7 @@
           class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
-        <h5 class="mb-0 fw-bold text-shadow">افزودن بیمارستان جدید</h5>
+        <h5 class="mb-0 fw-bold text-shadow">افزودن کلینیک جدید</h5>
       </div>
       <a href="{{ route('admin.panel.hospitals.index') }}"
         class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">
@@ -24,21 +24,21 @@
         <div class="col-12 col-md-10 col-lg-8">
           <div class="row g-4">
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="doctor_id" class="form-select select2" id="doctor_id">
+              <select wire:model.live="doctor_ids" class="form-select select2" id="doctor_ids" multiple>
                 <option value="">انتخاب کنید</option>
                 @foreach ($doctors as $doctor)
                   <option value="{{ $doctor->id }}">{{ $doctor->first_name . ' ' . $doctor->last_name }}</option>
                 @endforeach
               </select>
-              <label for="doctor_id" class="form-label">پزشک</label>
+              <label for="doctor_ids" class="form-label">پزشکان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="name" class="form-control" id="name" placeholder=" " required>
-              <label for="name" class="form-label">نام بیمارستان</label>
+              <label for="name" class="form-label">نام کلینیک</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="title" class="form-control" id="title" placeholder=" ">
-              <label for="title" class="form-label">عنوان بیمارستان</label>
+              <label for="title" class="form-label">عنوان کلینیک</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
               <select wire:model.live="specialty_ids" class="form-select select2" id="specialty_ids" multiple>
@@ -47,7 +47,7 @@
                   <option value="{{ $specialty->id }}">{{ $specialty->name }}</option>
                 @endforeach
               </select>
-              <label for="specialty_ids" class="form-label">تخصص‌های بیمارستان</label>
+              <label for="specialty_ids" class="form-label">تخصص‌های کلینیک</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
               <select wire:model.live="insurance_ids" class="form-select select2" id="insurance_ids" multiple>
@@ -56,7 +56,7 @@
                   <option value="{{ $insurance->id }}">{{ $insurance->name }}</option>
                 @endforeach
               </select>
-              <label for="insurance_ids" class="form-label">بیمه‌های بیمارستان</label>
+              <label for="insurance_ids" class="form-label">بیمه‌های کلینیک</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="address" class="form-control" id="address" placeholder=" ">
@@ -139,7 +139,7 @@
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">
                 <input class="form-check-input" type="checkbox" id="is_main_center" wire:model="is_main_center">
-                <label class="form-check-label fw-medium" for="is_main_center">بیمارستان اصلی</label>
+                <label class="form-check-label fw-medium" for="is_main_center">کلینیک اصلی</label>
               </div>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
@@ -209,7 +209,7 @@
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
-        $('#doctor_id').select2({
+        $('#doctor_ids').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
@@ -259,8 +259,8 @@
         });
       });
 
-      $('#doctor_id').on('change', function() {
-        @this.set('doctor_id', $(this).val());
+      $('#doctor_ids').on('change', function() {
+        @this.set('doctor_ids', $(this).val());
       });
       $('#specialty_ids').on('change', function() {
         @this.set('specialty_ids', $(this).val());

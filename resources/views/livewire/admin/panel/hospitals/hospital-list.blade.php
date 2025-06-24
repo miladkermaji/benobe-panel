@@ -1,6 +1,6 @@
 <div class="clinics-container">
   <div class="container py-2" dir="rtl" wire:init="loadHospitals">
-    <div class="glass-header text-white p-2 rounded-2 mb-4 mt-3 shadow-lg">
+    <div class="glass-header text-white p-2 rounded-2 mb-4 mt-3 shadow-lg bg-gradient-primary">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-3">
@@ -10,7 +10,7 @@
             <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
               <div class="search-container position-relative" style="max-width: 100%;">
                 <input type="text"
-                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                  class="form-control search-input border-0 shadow-none bg-white text-dar k ps-4 rounded-2 text-start"
                   wire:model.live="search" placeholder="جستجو در بیمارستانها..."
                   style="padding-right: 20px; text-align: right; direction: rtl;">
                 <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
@@ -22,7 +22,7 @@
                 </span>
               </div>
               <a href="{{ route('admin.panel.hospitals.create') }}"
-                class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1">
+                class="btn btn-gradient-success rounded-1 px-3 py-1 d-flex align-items-center gap-1">
                 <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
@@ -39,7 +39,7 @@
         <div class="card-body p-0">
           <!-- Group Actions -->
           <div class="group-actions p-2 border-bottom" x-data="{ show: false }"
-            x-show="$wire.selectedHositals.length > 0">
+            x-show="$wire.selectedHospitals.length > 0">
             <div class="d-flex align-items-center gap-2 justify-content-end">
               <select class="form-select form-select-sm" style="max-width: 200px;" wire:model="groupAction">
                 <option value="">عملیات گروهی</option>
@@ -55,22 +55,22 @@
           </div>
           <!-- Desktop Table View -->
           <div class="table-responsive text-nowrap d-none d-md-block">
-            <table class="table table-hover w-100 m-0">
+            <table class="table  w-100 m-0">
               <thead>
                 <tr>
                   <th class="text-center align-middle" style="width: 40px;">
-                    <div class="d-flex justify-content-center align-items-center">
-                      <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
-                    </div>
+                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                   </th>
                   <th class="text-center align-middle" style="width: 60px;">ردیف</th>
                   <th class="align-middle">نام</th>
-                  <th class="align-middle">پزشک</th>
+                  <th class="align-middle">پزشکان</th>
+                  <th class="align-middle">تخصص‌ها</th>
+                  <th class="align-middle">بیمه‌ها</th>
                   <th class="align-middle">استان</th>
                   <th class="align-middle">شهر</th>
                   <th class="align-middle">آدرس</th>
                   <th class="align-middle">توضیحات</th>
-                  <th class="align-middle">گالری</th>
+                  <th class="text-center align-middle" style="width: 80px;">گالری</th>
                   <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
                   <th class="text-center align-middle" style="width: 120px;">عملیات</th>
                 </tr>
@@ -78,21 +78,65 @@
               <tbody>
                 @if ($readyToLoad)
                   @forelse ($hospitals as $index => $item)
-                    <tr class="align-middle">
+                    <tr class="align-middle" x-data="{ showDoctors: false, showSpecialties: false, showInsurances: false }">
                       <td class="text-center">
-                        <div class="d-flex justify-content-center align-items-center">
-                          <input type="checkbox" wire:model.live="selectedHositals" value="{{ $item->id }}"
-                            class="form-check-input m-0 align-middle">
-                        </div>
+                        <input type="checkbox" wire:model.live="selectedHospitals" value="{{ $item->id }}"
+                          class="form-check-input m-0 align-middle">
                       </td>
                       <td class="text-center">{{ $hospitals->firstItem() + $index }}</td>
                       <td>{{ $item->name }}</td>
                       <td>
-                        @if ($item->doctor)
-                          {{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}
-                        @else
-                          نامشخص
-                        @endif
+                        <button class="btn btn-link text-primary p-0" @click="showDoctors = !showDoctors">
+                          <span class="badge bg-primary-subtle text-primary">{{ $item->doctors->count() }} پزشک</span>
+                        </button>
+                        <div x-show="showDoctors" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if ($item->doctors->isEmpty())
+                            <span class="text-muted">بدون پزشک</span>
+                          @else
+                            @foreach ($item->doctors as $doctor)
+                              <div class="py-1 border-bottom">
+                                {{ $doctor->first_name . ' ' . $doctor->last_name }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </td>
+                      <td>
+                        <button class="btn btn-link text-primary p-0" @click="showSpecialties = !showSpecialties">
+                          <span class="badge bg-info-subtle text-info">{{ count($item->specialty_ids ?? []) }}
+                            تخصص</span>
+                        </button>
+                        <div x-show="showSpecialties" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if (empty($item->specialty_ids))
+                            <span class="text-muted">بدون تخصص</span>
+                          @else
+                            @foreach ($item->specialty_ids as $specialtyId)
+                              <div class="py-1 border-bottom">
+                                {{ $specialties[$specialtyId] ?? 'نامشخص' }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </td>
+                      <td>
+                        <button class="btn btn-link text-primary p-0" @click="showInsurances = !showInsurances">
+                          <span class="badge bg-success-subtle text-success">{{ count($item->insurance_ids ?? []) }}
+                            بیمه</span>
+                        </button>
+                        <div x-show="showInsurances" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if (empty($item->insurance_ids))
+                            <span class="text-muted">بدون بیمه</span>
+                          @else
+                            @foreach ($item->insurance_ids as $insuranceId)
+                              <div class="py-1 border-bottom">
+                                {{ $insurances[$insuranceId] ?? 'نامشخص' }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
                       </td>
                       <td>{{ $item->province?->name ?? '-' }}</td>
                       <td>{{ $item->city?->name ?? '-' }}</td>
@@ -102,14 +146,15 @@
                         </div>
                       </td>
                       <td>
-                        <div class="text-truncate" style="max-width: 150px;" title="{{ e($item->description) ?? '-' }}">
+                        <div class="text-truncate" style="max-width: 150px;"
+                          title="{{ e($item->description) ?? '-' }}">
                           {{ e($item->description) ?? '-' }}
                         </div>
                       </td>
                       <td class="text-center">
                         <a href="{{ route('admin.panel.hospitals.gallery', $item->id) }}"
                           class="btn btn-sm btn-primary">
-                          <img src="{{ asset('admin-assets/icons/gallery.svg') }}" alt="">
+                          <img src="{{ asset('admin-assets/icons/gallery.svg') }}" alt="گالری" width="16">
                         </a>
                       </td>
                       <td class="text-center">
@@ -142,7 +187,7 @@
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="11" class="text-center py-4">
+                      <td colspan="13" class="text-center py-4">
                         <div class="d-flex justify-content-center align-items-center flex-column">
                           <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" class="text-muted mb-2">
@@ -155,7 +200,7 @@
                   @endforelse
                 @else
                   <tr>
-                    <td colspan="11" class="text-center py-4">
+                    <td colspan="13" class="text-center py-4">
                       <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">در حال بارگذاری...</span>
                       </div>
@@ -166,23 +211,15 @@
             </table>
           </div>
           <!-- Mobile Card View -->
-          <!-- Mobile Card View -->
           <div class="clinics-cards d-md-none">
             @if ($readyToLoad)
               @forelse ($hospitals as $index => $item)
-                <div class="clinic-card mb-3 p-3 border rounded-2 shadow-sm" x-data="{ open: false }">
+                <div class="clinic-card mb-3 p-3 border rounded-2 shadow-sm" x-data="{ open: false, showDoctors: false, showSpecialties: false, showInsurances: false }">
                   <div class="clinic-card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                      <input type="checkbox" wire:model.live="selectedHositals" value="{{ $item->id }}"
+                      <input type="checkbox" wire:model.live="selectedHospitals" value="{{ $item->id }}"
                         class="form-check-input m-0 align-middle">
-                      <h6 class="m-0 fw-bold">
-                        {{ $item->name }}
-                        @if ($item->doctor)
-                          ({{ $item->doctor->first_name . ' ' . $item->doctor->last_name }})
-                        @else
-                          (نامشخص)
-                        @endif
-                      </h6>
+                      <h6 class="m-0 fw-bold">{{ $item->name }}</h6>
                     </div>
                     <div class="d-flex align-items-center gap-2">
                       <button @click="open = !open" class="btn btn-sm btn-outline-primary p-1">
@@ -220,6 +257,68 @@
                     <div class="clinic-card-item">
                       <span class="clinic-card-label">ردیف:</span>
                       <span class="clinic-card-value">{{ $hospitals->firstItem() + $index }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">پزشکان:</span>
+                      <span class="clinic-card-value">
+                        <button class="btn btn-link text-primary p-0" @click="showDoctors = !showDoctors">
+                          <span class="badge bg-primary-subtle text-primary">{{ $item->doctors->count() }} پزشک</span>
+                        </button>
+                        <div x-show="showDoctors" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if ($item->doctors->isEmpty())
+                            <span class="text-muted">بدون پزشک</span>
+                          @else
+                            @foreach ($item->doctors as $doctor)
+                              <div class="py-1 border-bottom">
+                                {{ $doctor->first_name . ' ' . $doctor->last_name }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">تخصص‌ها:</span>
+                      <span class="clinic-card-value">
+                        <button class="btn btn-link text-primary p-0" @click="showSpecialties = !showSpecialties">
+                          <span class="badge bg-info-subtle text-info">{{ count($item->specialty_ids ?? []) }}
+                            تخصص</span>
+                        </button>
+                        <div x-show="showSpecialties" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if (empty($item->specialty_ids))
+                            <span class="text-muted">بدون تخصص</span>
+                          @else
+                            @foreach ($item->specialty_ids as $specialtyId)
+                              <div class="py-1 border-bottom">
+                                {{ $specialties[$specialtyId] ?? 'نامشخص' }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </span>
+                    </div>
+                    <div class="clinic-card-item">
+                      <span class="clinic-card-label">بیمه‌ها:</span>
+                      <span class="clinic-card-value">
+                        <button class="btn btn-link text-primary p-0" @click="showInsurances = !showInsurances">
+                          <span class="badge bg-success-subtle text-success">{{ count($item->insurance_ids ?? []) }}
+                            بیمه</span>
+                        </button>
+                        <div x-show="showInsurances" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if (empty($item->insurance_ids))
+                            <span class="text-muted">بدون بیمه</span>
+                          @else
+                            @foreach ($item->insurance_ids as $insuranceId)
+                              <div class="py-1 border-bottom">
+                                {{ $insurances[$insuranceId] ?? 'نامشخص' }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </span>
                     </div>
                     <div class="clinic-card-item">
                       <span class="clinic-card-label">استان:</span>
@@ -266,6 +365,7 @@
               </div>
             @endif
           </div>
+          <!-- Pagination -->
           <div class="d-flex justify-content-between align-items-center mt-3 px-3 flex-wrap gap-2">
             @if ($readyToLoad)
               <div class="text-muted">
@@ -280,30 +380,37 @@
         </div>
       </div>
     </div>
-    <script>
-      document.addEventListener('livewire:init', function() {
-        Livewire.on('show-alert', (event) => {
-          toastr[event.type](event.message);
-        });
-        Livewire.on('confirm-delete', (event) => {
-          Swal.fire({
-            title: 'حذف کلینیک',
-            text: 'آیا مطمئن هستید که می‌خواهید این کلینیک را حذف کنید؟',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'بله، حذف کن',
-            cancelButtonText: 'خیر'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              Livewire.dispatch('deleteHospitalConfirmed', {
-                id: event.id
-              });
-            }
-          });
+  </div>
+  <!-- Scripts -->
+  <script>
+    document.addEventListener('livewire:init', function() {
+      // Re-initialize Alpine.js after Livewire updates
+      Livewire.hook('morph.updated', () => {
+        if (window.Alpine) {
+          window.Alpine.initTree(document.querySelector('.clinics-container'));
+        }
+      });
+      Livewire.on('show-alert', (event) => {
+        toastr[event.type](event.message);
+      });
+      Livewire.on('confirm-delete', (event) => {
+        Swal.fire({
+          title: 'حذف کلینیک',
+          text: 'آیا مطمئن هستید که می‌خواهید این کلینیک را حذف کنید؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('deleteHospitalConfirmed', {
+              id: event.id
+            });
+          }
         });
       });
-    </script>
-  </div>
+    });
+  </script>
 </div>
