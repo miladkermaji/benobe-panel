@@ -80,7 +80,7 @@
                 <tr>
                   <th class="text-center align-middle" style="width: 40px;">
                     <div class="d-flex justify-content-center align-items-center">
-                      <input type="checkbox" id="selectAll" class="form-check-input m-0">
+                      <input type="checkbox" id="selectAll" class="form-check-input m-0 align-middle">
                     </div>
                   </th>
                   <th class="text-center align-middle" style="width: 60px;">ردیف</th>
@@ -98,7 +98,8 @@
                   <tr class="align-middle" data-id="{{ $blockedUser->id }}">
                     <td class="text-center">
                       <div class="d-flex justify-content-center align-items-center">
-                        <input type="checkbox" class="form-check-input m-0 select-user" value="{{ $blockedUser->id }}">
+                        <input type="checkbox" class="form-check-input m-0 align-middle select-user"
+                          value="{{ $blockedUser->id }}">
                       </div>
                     </td>
                     <td class="text-center">{{ $index + 1 }}</td>
@@ -156,7 +157,8 @@
               <div class="note-card mb-3" data-id="{{ $blockedUser->id }}">
                 <div class="note-card-header d-flex justify-content-between align-items-center">
                   <div class="d-flex align-items-center gap-2">
-                    <input type="checkbox" class="form-check-input m-0 select-user" value="{{ $blockedUser->id }}">
+                    <input type="checkbox" class="form-check-input m-0 align-middle select-user"
+                      value="{{ $blockedUser->id }}">
                     <span class="badge bg-primary-subtle text-primary">
                       {{ $blockedUser->user->first_name }} {{ $blockedUser->user->last_name }}
                     </span>
@@ -467,7 +469,7 @@
                 <tr class="align-middle" data-id="${user.id}">
                     <td class="text-center">
                         <div class="d-flex justify-content-center align-items-center">
-                            <input type="checkbox" class="form-check-input m-0 select-user" value="${user.id}">
+                            <input type="checkbox" class="form-check-input m-0 align-middle select-user" value="${user.id}">
                         </div>
                     </td>
                     <td class="text-center">${index}</td>
@@ -509,7 +511,7 @@
                 <div class="note-card mb-3" data-id="${user.id}">
                     <div class="note-card-header d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center gap-2">
-                            <input type="checkbox" class="form-check-input m-0 select-user" value="${user.id}">
+                            <input type="checkbox" class="form-check-input m-0 align-middle select-user" value="${user.id}">
                             <span class="badge bg-primary-subtle text-primary">
                                 ${user.user.first_name} ${user.user.last_name}
                             </span>

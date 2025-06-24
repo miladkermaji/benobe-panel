@@ -60,7 +60,7 @@
                 <tr>
                   <th class="text-center align-middle" style="width: 40px;">
                     <div class="d-flex justify-content-center align-items-center">
-                      <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
+                      <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                     </div>
                   </th>
                   <th class="text-center align-middle" style="width: 60px;">ردیف</th>
@@ -78,7 +78,7 @@
                       <td class="text-center">
                         <div class="d-flex justify-content-center align-items-center">
                           <input type="checkbox" wire:model.live="selectedDoctorNotes" value="{{ $item->id }}"
-                            class="form-check-input m-0">
+                            class="form-check-input m-0 align-middle">
                         </div>
                       </td>
                       <td class="text-center">{{ $doctorNotes->firstItem() + $index }}</td>
@@ -172,7 +172,7 @@
                     <div class="note-card-header d-flex justify-content-between align-items-center">
                       <div class="d-flex align-items-center gap-2">
                         <input type="checkbox" wire:model.live="selectedDoctorNotes" value="{{ $item->id }}"
-                          class="form-check-input m-0">
+                          class="form-check-input m-0 align-middle">
                         <span class="badge bg-primary-subtle text-primary">
                           @switch($item->appointment_type)
                             @case('in_person')

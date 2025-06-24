@@ -40,7 +40,7 @@
             <thead class="glass-header text-white">
               <tr>
                 <th class="text-center align-middle" style="width: 50px;">
-                  <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
+                  <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                 </th>
                 <th>ردیف</th>
                 <th>نام</th>
@@ -59,7 +59,7 @@
                   <tr>
                     <td class="text-center align-middle">
                       <input type="checkbox" wire:model.live="selectedmenus" value="{{ $item->id }}"
-                        class="form-check-input m-0">
+                        class="form-check-input m-0 align-middle">
                     </td>
                     <td class="text-center align-middle">{{ $menus->firstItem() + $index }}</td>
                     <td>{{ $item->name }}</td>
@@ -133,7 +133,7 @@
                   <div class="d-flex justify-content-between align-items-start mb-3">
                     <div class="d-flex align-items-center gap-2">
                       <input type="checkbox" wire:model.live="selectedmenus" value="{{ $item->id }}"
-                        class="form-check-input m-0">
+                        class="form-check-input m-0 align-middle">
                       <span class="text-muted">{{ $menus->firstItem() + $index }}</span>
                     </div>
                     <button wire:click="toggleStatus({{ $item->id }})"

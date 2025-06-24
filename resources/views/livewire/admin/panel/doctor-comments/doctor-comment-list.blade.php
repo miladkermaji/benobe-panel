@@ -75,7 +75,7 @@
                       <tr>
                         <th class="text-center align-middle" style="width: 50px;">
                           <input type="checkbox" wire:model.live="selectAll.{{ $doctor->id }}"
-                            class="form-check-input m-0 shadow-sm">
+                            class="form-check-input m-0 align-middle shadow-sm">
                         </th>
                         <th class="text-center align-middle" style="width: 70px;">#</th>
                         <th class="align-middle">نام کاربر</th>
@@ -90,7 +90,7 @@
                         <tr class="hover:bg-background-light transition-colors duration-200">
                           <td class="text-center align-middle">
                             <input type="checkbox" wire:model.live="selectedDoctorComments" value="{{ $comment->id }}"
-                              class="form-check-input m-0 shadow-sm">
+                              class="form-check-input m-0 align-middle shadow-sm">
                           </td>
                           <td class="text-center align-middle font-medium text-text-secondary">
                             {{ $doctor->comments->firstItem() + $index }}</td>
@@ -175,7 +175,7 @@
                           <div class="d-flex justify-content-between align-items-center mb-2">
                             <div class="d-flex align-items-center gap-2">
                               <input type="checkbox" wire:model.live="selectedDoctorComments"
-                                value="{{ $comment->id }}" class="form-check-input m-0 shadow-sm">
+                                value="{{ $comment->id }}" class="form-check-input m-0 align-middle shadow-sm">
                               <span
                                 class="text-text-secondary font-medium text-sm">#{{ $doctor->comments->firstItem() + $index }}</span>
                             </div>

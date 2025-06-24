@@ -41,7 +41,7 @@
               <thead class="glass-header text-white">
                 <tr>
                   <th class="text-center align-middle" style="width: 50px;">
-                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
+                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                   </th>
                   <th class="text-center align-middle" style="width: 70px;">ردیف</th>
                   <th class="align-middle">آدرس مبدا</th>
@@ -57,7 +57,7 @@
                     <tr>
                       <td class="text-center align-middle">
                         <input type="checkbox" wire:model.live="selectedRedirects" value="{{ $redirect->id }}"
-                          class="form-check-input m-0">
+                          class="form-check-input m-0 align-middle">
                       </td>
                       <td class="text-center align-middle">{{ $redirects->firstItem() + $index }}</td>
                       <td class="align-middle">{{ $redirect->source_url }}</td>

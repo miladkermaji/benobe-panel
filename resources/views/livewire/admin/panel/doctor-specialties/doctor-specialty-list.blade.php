@@ -60,7 +60,7 @@
                       <tr>
                         <th class="text-center align-middle" style="width: 50px;">
                           <input type="checkbox" wire:model.live="selectAll.{{ $doctor->id }}"
-                            class="form-check-input m-0">
+                            class="form-check-input m-0 align-middle">
                         </th>
                         <th class="text-center align-middle" style="width: 70px;">ردیف</th>
                         <th class="align-middle">نام تخصص</th>
@@ -75,7 +75,7 @@
                         <tr>
                           <td class="text-center align-middle" data-label="انتخاب">
                             <input type="checkbox" wire:model.live="selectedDoctorSpecialties"
-                              value="{{ $specialty->id }}" class="form-check-input m-0">
+                              value="{{ $specialty->id }}" class="form-check-input m-0 align-middle">
                           </td>
                           <td class="text-center align-middle" data-label="ردیف">{{ $index + 1 }}</td>
                           <td class="align-middle" data-label="نام تخصص">{{ $specialty->specialty->name ?? 'نامشخص' }}

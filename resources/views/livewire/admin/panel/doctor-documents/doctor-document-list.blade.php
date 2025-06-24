@@ -60,7 +60,7 @@
                       <tr>
                         <th class="text-center align-middle" style="width: 50px;">
                           <input type="checkbox" wire:model.live="selectAll.{{ $doctor->id }}"
-                            class="form-check-input m-0">
+                            class="form-check-input m-0 align-middle">
                         </th>
                         <th class="text-center align-middle" style="width: 70px;">ردیف</th>
                         <th class="align-middle">عنوان مدرک</th>
@@ -74,7 +74,7 @@
                         <tr>
                           <td class="text-center align-middle">
                             <input type="checkbox" wire:model.live="selectedDocuments" value="{{ $document->id }}"
-                              class="form-check-input m-0">
+                              class="form-check-input m-0 align-middle">
                           </td>
                           <td class="text-center align-middle">{{ $index + 1 }}</td>
                           <td class="align-middle">{{ $document->title ?? 'بدون عنوان' }}</td>
@@ -142,7 +142,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-2">
                               <div class="d-flex align-items-center gap-2">
                                 <input type="checkbox" wire:model.live="selectedDocuments"
-                                  value="{{ $document->id }}" class="form-check-input m-0">
+                                  value="{{ $document->id }}" class="form-check-input m-0 align-middle">
                                 <h6 class="card-title mb-0">{{ $document->title ?? 'بدون عنوان' }}</h6>
                               </div>
                               <button wire:click="toggleVerified({{ $document->id }})"

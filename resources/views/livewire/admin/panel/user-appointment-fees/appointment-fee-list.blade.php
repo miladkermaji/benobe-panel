@@ -1,5 +1,3 @@
-
-
 <div class="container-fluid py-2" dir="rtl" wire:init="loadFees">
   <header class="glass-header text-white p-3 rounded-3 shadow-lg">
     <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
@@ -53,7 +51,7 @@
               <thead>
                 <tr>
                   <th class="text-center align-middle" style="width: 50px;">
-                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
+                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                   </th>
                   <th class="text-center align-middle cursor-pointer" style="width: 70px;" wire:click="sortBy('id')">
                     شناسه
@@ -79,12 +77,12 @@
                     <tr>
                       <td class="text-center align-middle">
                         <input type="checkbox" wire:model.live="selectedFees" value="{{ $fee->id }}"
-                          class="form-check-input m-0">
+                          class="form-check-input m-0 align-middle">
                       </td>
                       <td class="text-center align-middle">{{ $fees->firstItem() + $index }}</td>
                       <td class="align-middle">{{ $fee->name }}</td>
                       <td class="align-middle">{{ number_format($fee->price) }} تومان</td>
-                      <td class="align-middle">{{ $fee->discount .'%' ?? '---' }}</td>
+                      <td class="align-middle">{{ $fee->discount . '%' ?? '---' }}</td>
                       <td class="text-center align-middle">
                         <span class="badge {{ $fee->status ? 'bg-label-success' : 'bg-label-danger' }} border-0">
                           {{ $fee->status ? 'فعال' : 'غیرفعال' }}
@@ -144,7 +142,7 @@
             <div class="card-body">
               <div class="d-flex align-items-center gap-3 mb-3">
                 <input type="checkbox" wire:model.live="selectedFees" value="{{ $fee->id }}"
-                  class="form-check-input m-0">
+                  class="form-check-input m-0 align-middle">
                 <div>
                   <h6 class="mb-1">{{ $fee->name }}</h6>
                   <small class="text-muted">{{ number_format($fee->price) }} تومان</small>

@@ -25,8 +25,8 @@
         <div class="d-flex gap-3 flex-shrink-0 flex-wrap justify-content-center mt-md-2 buttons-container">
           <a href="{{ route('admin.panel.users.create') }}"
             class="btn btn-gradient-success rounded-pill px-4 d-flex align-items-center gap-2">
-            <svg  width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
               <path d="M12 5v14M5 12h14" />
             </svg>
             <span>افزودن کاربر</span>
@@ -34,8 +34,8 @@
           <button wire:click="deleteSelected"
             class="btn btn-gradient-danger rounded-pill px-4 d-flex align-items-center gap-2"
             @if (empty($selectedUsers)) disabled @endif>
-            <svg  width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
               <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
             </svg>
             <span>حذف انتخاب‌شده‌ها</span>
@@ -54,7 +54,7 @@
             <thead>
               <tr>
                 <th class="text-center align-middle" style="width: 50px;">
-                  <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
+                  <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                 </th>
                 <th class="text-center align-middle" style="width: 70px;">ردیف</th>
                 <th class="text-center align-middle" style="width: 80px;">عکس</th>
@@ -73,7 +73,7 @@
                   <tr>
                     <td class="text-center align-middle">
                       <input type="checkbox" wire:model.live="selectedUsers" value="{{ $user->id }}"
-                        class="form-check-input m-0">
+                        class="form-check-input m-0 align-middle">
                     </td>
                     <td class="text-center align-middle">{{ $users->firstItem() + $index }}</td>
                     <td class="text-center align-middle">
@@ -157,7 +157,7 @@
           <div class="card-body">
             <div class="d-flex align-items-center gap-3 mb-3">
               <input type="checkbox" wire:model.live="selectedUsers" value="{{ $user->id }}"
-                class="form-check-input m-0">
+                class="form-check-input m-0 align-middle">
               <div class="position-relative" style="width: 50px; height: 50px;">
                 <img loading="lazy"
                   src="{{ str_starts_with($user->profile_photo_url, 'http') ? $user->profile_photo_url : asset('admin-assets/images/default-avatar.png') }}"

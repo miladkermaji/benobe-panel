@@ -179,7 +179,7 @@
             <tr>
               <th style="width: 40px;">
                 <div class="d-flex justify-content-center align-items-center">
-                  <input type="checkbox" id="selectAll" class="form-check-input m-0">
+                  <input type="checkbox" id="selectAll" class="form-check-input m-0 align-middle">
                 </div>
               </th>
               <th>ردیف</th>
@@ -196,7 +196,8 @@
               <tr data-id="{{ $secretary->id }}">
                 <td class="text-center">
                   <div class="d-flex justify-content-center align-items-center">
-                    <input type="checkbox" class="form-check-input m-0 select-secretary" value="{{ $secretary->id }}">
+                    <input type="checkbox" class="form-check-input m-0 align-middle select-secretary"
+                      value="{{ $secretary->id }}">
                   </div>
                 </td>
                 <td>{{ $index + 1 }}</td>
@@ -356,7 +357,7 @@
                         <tr data-id="${secretary.id}">
                             <td class="text-center">
                                 <div class="d-flex justify-content-center align-items-center">
-                                    <input type="checkbox" class="form-check-input m-0 select-secretary" value="${secretary.id}">
+                                    <input type="checkbox" class="form-check-input m-0 align-middle select-secretary" value="${secretary.id}">
                                 </div>
                             </td>
                             <td>${index + 1}</td>

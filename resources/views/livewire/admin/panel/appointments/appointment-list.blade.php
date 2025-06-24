@@ -67,7 +67,7 @@
                         <tr class="hover:bg-background-light transition-colors duration-200">
                           <td class="text-center align-middle">
                             <input type="checkbox" wire:model.live="selectedAppointments" value="{{ $appointment->id }}"
-                              class="form-check-input m-0 shadow-sm">
+                              class="form-check-input m-0 align-middle shadow-sm">
                           </td>
                           <td class="align-middle text-text-primary">{{ $appointment->patient->full_name }}</td>
                           <td class="align-middle text-text-secondary">{{ $appointment->patient->phone }}</td>
@@ -136,7 +136,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-3">
                           <div class="d-flex align-items-center gap-2">
                             <input type="checkbox" wire:model.live="selectedAppointments"
-                              value="{{ $appointment->id }}" class="form-check-input m-0 shadow-sm">
+                              value="{{ $appointment->id }}" class="form-check-input m-0 align-middle shadow-sm">
                             <span class="text-text-primary font-medium">{{ $appointment->patient->full_name }}</span>
                           </div>
                           <span

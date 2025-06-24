@@ -214,7 +214,7 @@
                 <tr>
                   <th class="text-center align-middle" style="width: 50px;">
                     <div class="d-flex justify-content-center">
-                      <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
+                      <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                     </div>
                   </th>
                   <th class="text-center align-middle">آدرس</th>
@@ -232,7 +232,7 @@
                       <td class="text-center align-middle">
                         <div class="d-flex justify-content-center">
                           <input type="checkbox" wire:model.live="selectedRows" value="{{ $url['id'] }}"
-                            class="form-check-input m-0">
+                            class="form-check-input m-0 align-middle">
                         </div>
                       </td>
                       <td class="text-center align-middle">{{ $url['url'] }}</td>

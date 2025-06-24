@@ -1,7 +1,7 @@
 <tr>
   <td class="text-center align-middle">
     <input type="checkbox" wire:model.live="selectedDoctorServices" value="{{ $service->id }}"
-      class="form-check-input m-0">
+      class="form-check-input m-0 align-middle">
   </td>
   <td class="text-center align-middle">{{ $index }}</td>
   <td class="align-middle">

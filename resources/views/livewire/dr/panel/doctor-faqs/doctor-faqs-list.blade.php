@@ -39,7 +39,7 @@
             <thead class="">
               <tr>
                 <th class="text-center align-middle" style="width: 50px;">
-                  <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
+                  <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                 </th>
                 <th class="text-center align-middle" style="width: 70px;">ردیف</th>
                 <th class="align-middle">سوال</th>
@@ -54,7 +54,7 @@
                   <tr>
                     <td class="text-center align-middle">
                       <input type="checkbox" wire:model.live="selectedFaqs" value="{{ $faq->id }}"
-                        class="form-check-input m-0">
+                        class="form-check-input m-0 align-middle">
                     </td>
                     <td class="text-center align-middle">{{ $faqs->firstItem() + $index }}</td>
                     <td class="align-middle">{{ Str::limit($faq->question, 50) }}</td>

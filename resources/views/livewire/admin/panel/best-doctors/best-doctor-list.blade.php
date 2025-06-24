@@ -41,7 +41,7 @@
               <thead class="glass-header text-white">
                 <tr>
                   <th class="text-center align-middle" style="width: 50px;">
-                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
+                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                   </th>
                   <th class="text-center align-middle" style="width: 70px;">ردیف</th>
                   <th class="text-center">نام پزشک</th>
@@ -58,7 +58,7 @@
                     <tr>
                       <td class="text-center align-middle">
                         <input type="checkbox" wire:model.live="selectedBestDoctors" value="{{ $item->id }}"
-                          class="form-check-input m-0">
+                          class="form-check-input m-0 align-middle">
                       </td>
                       <td class="text-center align-middle">{{ $bestdoctors->firstItem() + $index }}</td>
                       <td class="text-center">{{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}</td>
@@ -136,7 +136,7 @@
             <div class="card-body">
               <div class="d-flex align-items-center gap-3 mb-3">
                 <input type="checkbox" wire:model.live="selectedBestDoctors" value="{{ $item->id }}"
-                  class="form-check-input m-0">
+                  class="form-check-input m-0 align-middle">
                 <div>
                   <h6 class="mb-1">{{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}</h6>
                   <small class="text-muted">{{ $item->clinic ? $item->clinic->name : '-' }}</small>
