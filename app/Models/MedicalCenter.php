@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class MedicalCenter extends Model
 {
     protected $fillable = [
-        'doctor_id',
         'name',
         'title',
         'address',
@@ -51,10 +50,10 @@ class MedicalCenter extends Model
         'longitude'          => 'decimal:7',
     ];
 
-    public function doctor()
-    {
-        return $this->belongsTo(Doctor::class);
-    }
+public function doctors()
+{
+    return $this->belongsToMany(Doctor::class, 'doctor_medical_center');
+}
 
     public function province()
     {

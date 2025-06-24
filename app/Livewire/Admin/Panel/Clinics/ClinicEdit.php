@@ -17,7 +17,7 @@ class ClinicEdit extends Component
     use WithFileUploads;
 
     public $clinic;
-    public $doctor_id;
+    public $doctor_ids = [];
     public $specialty_ids = [];
     public $insurance_ids = [];
     public $name;
@@ -54,6 +54,7 @@ class ClinicEdit extends Component
     {
         $this->clinic = MedicalCenter::findOrFail($id);
         $this->fill($this->clinic->toArray());
+        $this->doctor_ids = $this->clinic->doctors->pluck('id')->map('strval')->toArray();
         $this->phone_numbers = $this->clinic->phone_numbers ?: [''];
         $this->specialty_ids = $this->clinic->specialty_ids ? array_map('strval', $this->clinic->specialty_ids) : [];
         $this->insurance_ids = $this->clinic->insurance_ids ? array_map('strval', $this->clinic->insurance_ids) : [];
@@ -72,7 +73,7 @@ class ClinicEdit extends Component
         $this->cities = $this->province_id ? Zone::where('level', 2)->where('parent_id', $this->province_id)->get() : [];
 
         $this->dispatch('set-select2-initial', [
-            'doctor_id' => $this->doctor_id ? strval($this->doctor_id) : null,
+            'doctor_ids' => $this->doctor_ids,
             'specialty_ids' => $this->specialty_ids,
             'insurance_ids' => $this->insurance_ids,
             'province_id' => $this->province_id ? strval($this->province_id) : null,
@@ -102,7 +103,8 @@ class ClinicEdit extends Component
     public function update()
     {
         $validator = Validator::make($this->all(), [
-            'doctor_id' => 'required|exists:doctors,id',
+            'doctor_ids' => 'required|array',
+            'doctor_ids.*' => 'exists:doctors,id',
             'name' => 'required|string|max:255',
             'title' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:500',
@@ -134,8 +136,8 @@ class ClinicEdit extends Component
             'insurance_ids' => 'nullable|array',
             'insurance_ids.*' => 'exists:insurances,id',
         ], [
-            'doctor_id.required' => 'لطفاً پزشک را انتخاب کنید.',
-            'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
+            'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
+            'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
             'name.required' => 'لطفاً نام کلینیک را وارد کنید.',
             'name.max' => 'نام کلینیک نباید بیشتر از ۲۵۵ حرف باشد.',
             'title.max' => 'عنوان نباید بیشتر از ۲۵۵ حرف باشد.',
@@ -193,7 +195,11 @@ class ClinicEdit extends Component
         $data['phone_numbers'] = array_filter($this->phone_numbers, fn ($phone) => !empty($phone));
         $data['working_days'] = array_keys(array_filter($this->working_days, fn ($value) => $value));
 
+        // حذف doctor_ids از $data چون در جدول medical_centers ذخیره نمی‌شود
+        unset($data['doctor_ids']);
+
         $this->clinic->update($data);
+        $this->clinic->doctors()->sync($this->doctor_ids); // به‌روزرسانی رابطه چند به چند
 
         $this->dispatch('show-alert', type: 'success', message: 'کلینیک با موفقیت به‌روزرسانی شد!');
         return redirect()->route('admin.panel.clinics.index');

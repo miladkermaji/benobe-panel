@@ -24,13 +24,13 @@
         <div class="col-12 col-md-10 col-lg-8">
           <div class="row g-4">
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="doctor_id" class="form-select select2" id="doctor_id">
+              <select wire:model.live="doctor_ids" class="form-select select2" id="doctor_ids" multiple>
                 <option value="">انتخاب کنید</option>
                 @foreach ($doctors as $doctor)
                   <option value="{{ $doctor->id }}">{{ $doctor->first_name . ' ' . $doctor->last_name }}</option>
                 @endforeach
               </select>
-              <label for="doctor_id" class="form-label">پزشک</label>
+              <label for="doctor_ids" class="form-label">پزشکان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="name" class="form-control" id="name" placeholder=" " required>
@@ -209,7 +209,7 @@
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
-        $('#doctor_id').select2({
+        $('#doctor_ids').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
@@ -259,8 +259,8 @@
         });
       });
 
-      $('#doctor_id').on('change', function() {
-        @this.set('doctor_id', $(this).val());
+      $('#doctor_ids').on('change', function() {
+        @this.set('doctor_ids', $(this).val());
       });
       $('#specialty_ids').on('change', function() {
         @this.set('specialty_ids', $(this).val());

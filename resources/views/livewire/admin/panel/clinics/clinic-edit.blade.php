@@ -24,13 +24,13 @@
         <div class="col-12 col-md-10 col-lg-8">
           <div class="row g-4">
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="doctor_id" class="form-select select2" id="doctor_id">
+              <select wire:model.live="doctor_ids" class="form-select select2" id="doctor_ids" multiple>
                 <option value="">انتخاب کنید</option>
                 @foreach ($doctors as $doctor)
                   <option value="{{ $doctor->id }}">{{ $doctor->first_name . ' ' . $doctor->last_name }}</option>
                 @endforeach
               </select>
-              <label for="doctor_id" class="form-label">پزشک</label>
+              <label for="doctor_ids" class="form-label">پزشکان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="name" class="form-control" id="name" placeholder=" " required>
@@ -149,7 +149,7 @@
                 <label class="form-check-label fw-medium" for="location_confirmed">مکان تأیید شده</label>
               </div>
             </div>
-          <div class="col-12 position-relative mt-5">
+            <div class="col-12 position-relative mt-5">
               <label class="form-label fw-bold text-dark mb-3">انتخاب روزهای کاری</label>
               <div class="d-flex flex-wrap gap-3 mt-4 border rounded-lg px-2">
                 @foreach (['saturday' => 'شنبه','sunday' => 'یک‌شنبه','monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
@@ -222,7 +222,7 @@
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
-        $('#doctor_id').select2({
+        $('#doctor_ids').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
@@ -261,11 +261,9 @@
       Livewire.on('set-select2-initial', (event) => {
         setTimeout(() => {
           const data = event || {};
-          if (data.doctor_id) $('#doctor_id').val(data.doctor_id).trigger('change');
-          if (data.specialty_ids && Array.isArray(data.specialty_ids)) $('#specialty_ids').val(data
-            .specialty_ids).trigger('change');
-          if (data.insurance_ids && Array.isArray(data.insurance_ids)) $('#insurance_ids').val(data
-            .insurance_ids).trigger('change');
+          if (data.doctor_ids && Array.isArray(data.doctor_ids)) $('#doctor_ids').val(data.doctor_ids).trigger('change');
+          if (data.specialty_ids && Array.isArray(data.specialty_ids)) $('#specialty_ids').val(data.specialty_ids).trigger('change');
+          if (data.insurance_ids && Array.isArray(data.insurance_ids)) $('#insurance_ids').val(data.insurance_ids).trigger('change');
           if (data.province_id) $('#province_id').val(data.province_id).trigger('change');
           if (data.city_id) $('#city_id').val(data.city_id).trigger('change');
           if (data.payment_methods) $('#payment_methods').val(data.payment_methods).trigger('change');
@@ -291,8 +289,8 @@
         if (cityId) $('#city_id').val(cityId).trigger('change');
       });
 
-      $('#doctor_id').on('change', function() {
-        @this.set('doctor_id', $(this).val());
+      $('#doctor_ids').on('change', function() {
+        @this.set('doctor_ids', $(this).val());
       });
       $('#specialty_ids').on('change', function() {
         @this.set('specialty_ids', $(this).val());

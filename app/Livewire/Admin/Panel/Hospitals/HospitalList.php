@@ -2,24 +2,30 @@
 
 namespace App\Livewire\Admin\Panel\Hospitals;
 
-use App\Models\Hospital;
 use Livewire\Component;
+use App\Models\Hospital;
 use Livewire\WithPagination;
+use App\Models\MedicalCenter;
+use Illuminate\Support\Facades\Storage;
 
 class HospitalList extends Component
 {
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
+
     protected $listeners = ['deleteHospitalConfirmed' => 'deleteHospital'];
 
     public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
-    public $selectedHospitals = [];
+    public $selectedHositals = [];
     public $selectAll = false;
+    public $groupAction = '';
 
-    protected $queryString = ['search' => ['except' => '']];
+    protected $queryString = [
+        'search' => ['except' => ''],
+    ];
 
     public function mount()
     {
@@ -31,13 +37,6 @@ class HospitalList extends Component
         $this->readyToLoad = true;
     }
 
-    public function toggleStatus($id)
-    {
-        $hospital = Hospital::findOrFail($id);
-        $hospital->update(['is_active' => !$hospital->is_active]);
-        $this->dispatch('show-alert', type: $hospital->is_active ? 'success' : 'info', message: $hospital->is_active ? 'فعال شد!' : 'غیرفعال شد!');
-    }
-
     public function confirmDelete($id)
     {
         $this->dispatch('confirm-delete', id: $id);
@@ -45,9 +44,23 @@ class HospitalList extends Component
 
     public function deleteHospital($id)
     {
-        $hospital = Hospital::findOrFail($id);
-        $hospital->delete();
-        $this->dispatch('show-alert', type: 'success', message: 'بیمارستان حذف شد!');
+        $item = MedicalCenter::findOrFail($id);
+        // حذف فایل‌های مرتبط
+        if ($item->avatar) {
+            Storage::disk('public')->delete($item->avatar);
+        }
+        if ($item->documents) {
+            foreach ($item->documents as $document) {
+                Storage::disk('public')->delete($document);
+            }
+        }
+        if ($item->galleries) {
+            foreach ($item->galleries as $gallery) {
+                Storage::disk('public')->delete($gallery['image_path']);
+            }
+        }
+        $item->delete();
+        $this->dispatch('show-alert', type: 'success', message: 'کلینیک حذف شد!');
     }
 
     public function updatedSearch()
@@ -58,39 +71,106 @@ class HospitalList extends Component
     public function updatedSelectAll($value)
     {
         $currentPageIds = $this->getHospitalsQuery()->pluck('id')->toArray();
-        $this->selectedHospitals = $value ? $currentPageIds : [];
+        $this->selectedHositals = $value ? $currentPageIds : [];
     }
 
-    public function updatedSelectedHospitals()
+    public function updatedselectedHositals()
     {
         $currentPageIds = $this->getHospitalsQuery()->pluck('id')->toArray();
-        $this->selectAll = !empty($this->selectedHospitals) && count(array_diff($currentPageIds, $this->selectedHospitals)) === 0;
+        $this->selectAll = !empty($this->selectedHositals) && count(array_diff($currentPageIds, $this->selectedHositals)) === 0;
+    }
+
+    public function executeGroupAction()
+    {
+        if (empty($this->selectedHositals)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ کلینیکی انتخاب نشده است.');
+            return;
+        }
+
+        if (empty($this->groupAction)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        switch ($this->groupAction) {
+            case 'delete':
+                $this->deleteSelected();
+                break;
+            case 'status_active':
+                $this->updateStatus(true);
+                break;
+            case 'status_inactive':
+                $this->updateStatus(false);
+                break;
+        }
+
+        $this->groupAction = '';
+    }
+
+    private function updateStatus($status)
+    {
+        MedicalCenter::whereIn('id', $this->selectedHositals)
+            ->update(['is_active' => $status]);
+
+        $this->selectedHositals = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت بیمارستانهای انتخاب‌شده با موفقیت تغییر کرد.');
     }
 
     public function deleteSelected()
     {
-        if (empty($this->selectedHospitals)) {
-            $this->dispatch('show-alert', type: 'warning', message: 'هیچ بیمارستانی انتخاب نشده است.');
+        if (empty($this->selectedHositals)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ کلینیکی انتخاب نشده است.');
             return;
         }
 
-        Hospital::whereIn('id', $this->selectedHospitals)->delete();
-        $this->selectedHospitals = [];
+        $hospitals = MedicalCenter::whereIn('id', $this->selectedHositals)->get();
+        foreach ($hospitals as $hospitals) {
+            if ($hospitals->avatar) {
+                Storage::disk('public')->delete($hospitals->avatar);
+            }
+            if ($hospitals->documents) {
+                foreach ($hospitals->documents as $document) {
+                    Storage::disk('public')->delete($document);
+                }
+            }
+            if ($hospitals->galleries) {
+                foreach ($hospitals->galleries as $gallery) {
+                    Storage::disk('public')->delete($gallery['image_path']);
+                }
+            }
+            $hospitals->delete();
+        }
+        $this->selectedHositals = [];
         $this->selectAll = false;
-        $this->dispatch('show-alert', type: 'success', message: 'بیمارستان‌های انتخاب‌شده حذف شدند!');
+        $this->dispatch('show-alert', type: 'success', message: 'بیمارستانهای انتخاب‌شده حذف شدند!');
+    }
+
+    public function toggleStatus($id)
+    {
+        $item = MedicalCenter::findOrFail($id);
+        $item->is_active = !$item->is_active;
+        $item->save();
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت کلینیک با موفقیت تغییر کرد.');
     }
 
     private function getHospitalsQuery()
     {
-        return Hospital::where('name', 'like', '%' . $this->search . '%')
-            ->orWhere('description', 'like', '%' . $this->search . '%')
-            ->with(['province', 'city', 'doctors']) // رابطه معکوس
+        return MedicalCenter::where('type', 'hospital')
+            ->where(function ($query) {
+                $query->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('description', 'like', '%' . $this->search . '%')
+                    ->orWhere('title', 'like', '%' . $this->search . '%');
+            })
+            ->with(['doctor', 'province', 'city'])
             ->paginate($this->perPage);
     }
 
     public function render()
     {
-        $hospitals = $this->readyToLoad ? $this->getHospitalsQuery() : null;
-        return view('livewire.admin.panel.hospitals.hospital-list', ['hospitals' => $hospitals]);
+        $items = $this->readyToLoad ? $this->getHospitalsQuery() : null;
+        return view('livewire.admin.panel.hospitals.hospital-list', [
+            'hospitals' => $items,
+        ]);
     }
 }

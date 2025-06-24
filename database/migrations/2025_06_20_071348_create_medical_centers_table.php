@@ -12,8 +12,6 @@ return new class () extends Migration {
     {
         Schema::create('medical_centers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('doctor_id');
-
             // اطلاعات درمانگاه
             $table->string('name')->nullable();                    // نام درمانگاه
             $table->string('title')->nullable();                   // عنوان درمانگاه
@@ -54,11 +52,7 @@ return new class () extends Migration {
 
             $table->timestamps();
 
-            // کلیدهای خارجی
-            $table->foreign('doctor_id')
-                ->references('id')
-                ->on('doctors')
-                ->onDelete('cascade');
+          
             $table->foreign('province_id')->references('id')->on('zone')->onDelete('set null');
             $table->foreign('city_id')->references('id')->on('zone')->onDelete('set null');
         });

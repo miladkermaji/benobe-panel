@@ -23,9 +23,40 @@
       <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
           <div class="row g-4">
+            <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+              <select wire:model.live="doctor_id" class="form-select select2" id="doctor_id">
+                <option value="">انتخاب کنید</option>
+                @foreach ($doctors as $doctor)
+                  <option value="{{ $doctor->id }}">{{ $doctor->first_name . ' ' . $doctor->last_name }}</option>
+                @endforeach
+              </select>
+              <label for="doctor_id" class="form-label">پزشک</label>
+            </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="name" class="form-control" id="name" placeholder=" " required>
               <label for="name" class="form-label">نام بیمارستان</label>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <input type="text" wire:model="title" class="form-control" id="title" placeholder=" ">
+              <label for="title" class="form-label">عنوان بیمارستان</label>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+              <select wire:model.live="specialty_ids" class="form-select select2" id="specialty_ids" multiple>
+                <option value="">انتخاب کنید</option>
+                @foreach ($specialties as $specialty)
+                  <option value="{{ $specialty->id }}">{{ $specialty->name }}</option>
+                @endforeach
+              </select>
+              <label for="specialty_ids" class="form-label">تخصص‌های بیمارستان</label>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+              <select wire:model.live="insurance_ids" class="form-select select2" id="insurance_ids" multiple>
+                <option value="">انتخاب کنید</option>
+                @foreach ($insurances as $insurance)
+                  <option value="{{ $insurance->id }}">{{ $insurance->name }}</option>
+                @endforeach
+              </select>
+              <label for="insurance_ids" class="form-label">بیمه‌های بیمارستان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="address" class="form-control" id="address" placeholder=" ">
@@ -33,7 +64,16 @@
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="phone_number" class="form-control" id="phone_number" placeholder=" ">
-              <label for="phone_number" class="form-label">شماره تماس</label>
+              <label for="phone_number" class="form-label">شماره تماس اصلی</label>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <input type="text" wire:model="secretary_phone" class="form-control" id="secretary_phone"
+                placeholder=" ">
+              <label for="secretary_phone" class="form-label">شماره منشی</label>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <input type="text" wire:model="postal_code" class="form-control" id="postal_code" placeholder=" ">
+              <label for="postal_code" class="form-label">کد پستی</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
               <select wire:model.live="province_id" class="form-select select2" id="province_id">
@@ -53,21 +93,30 @@
               </select>
               <label for="city_id" class="form-label">شهر</label>
             </div>
-            <!-- جایگزینی input time با Flatpickr -->
-            <div class="col-6 col-md-6 position-relative mt-5" dir="rtl">
-              <input type="text" wire:model="start_time" class="form-control flatpickr-time" id="start_time"
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <input type="number" wire:model="latitude" class="form-control" id="latitude" placeholder=" "
+                step="0.0000001">
+              <label for="latitude" class="form-label">عرض جغرافیایی</label>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <input type="number" wire:model="longitude" class="form-control" id="longitude" placeholder=" "
+                step="0.0000001">
+              <label for="longitude" class="form-label">طول جغرافیایی</label>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <input data-timepicker type="text" wire:model="start_time" class="form-control" id="start_time"
                 placeholder=" ">
               <label for="start_time" class="form-label">ساعت شروع</label>
             </div>
-            <div class="col-6 col-md-6 position-relative mt-5" dir="rtl">
-              <input type="text" wire:model="end_time" class="form-control flatpickr-time" id="end_time"
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <input data-timepicker type="text" wire:model="end_time" class="form-control" id="end_time"
                 placeholder=" ">
               <label for="end_time" class="form-label">ساعت پایان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="number" wire:model="consultation_fee" class="form-control" id="consultation_fee"
                 placeholder=" " step="0.01">
-              <label for="consultation_fee" class="form-label">هزینه مشاوره</label>
+              <label for="consultation_fee" class="form-label">هزینه خدمات</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <select wire:model="payment_methods" class="form-select" id="payment_methods">
@@ -90,12 +139,56 @@
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">
                 <input class="form-check-input" type="checkbox" id="is_main_center" wire:model="is_main_center">
-                <label class="form-check-label fw-medium" for="is_main_center">مرکز اصلی</label>
+                <label class="form-check-label fw-medium" for="is_main_center">بیمارستان اصلی</label>
+              </div>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
+              <div class="form-check form-switch w-100 d-flex align-items-center">
+                <input class="form-check-input" type="checkbox" id="location_confirmed"
+                  wire:model="location_confirmed">
+                <label class="form-check-label fw-medium" for="location_confirmed">مکان تأیید شده</label>
               </div>
             </div>
             <div class="col-12 position-relative mt-5">
+              <label class="form-label fw-bold text-dark mb-3">انتخاب روزهای کاری</label>
+              <div class="d-flex flex-wrap gap-3 mt-4 border rounded-lg px-2">
+                @foreach (['saturday' => 'شنبه','sunday' => 'یک‌شنبه','monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+                  <div class="form-check d-flex align-items-center">
+                    <input class="form-check-input" type="checkbox"
+                      wire:model.live="working_days.{{ $day }}" id="working_days_{{ $day }}"
+                      value="1">
+                    <label class="text-black px-2"
+                      for="working_days_{{ $day }}">{{ $label }}</label>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+            <div class="col-12 position-relative mt-5">
+              <label class="form-label">تصویر اصلی</label>
+              <input type="file" wire:model="avatar" class="form-control" accept="image/*">
+            </div>
+            <div class="col-12 position-relative mt-5">
+              <label class="form-label">مدارک</label>
+              <input type="file" wire:model="documents" class="form-control" multiple accept=".pdf,.doc,.docx">
+            </div>
+            <div class="col-12 position-relative mt-5">
+              <label class="form-label fw-bold text-dark mb-3">شماره‌های تماس اضافی</label>
+              <div class="phone-numbers">
+                @foreach ($phone_numbers as $index => $phone)
+                  <div class="input-group mb-2" wire:ignore.self>
+                    <input type="text" wire:model="phone_numbers.{{ $index }}" class="form-control"
+                      placeholder="شماره تماس {{ $index + 1 }}">
+                    <button class="btn btn-outline-danger" type="button"
+                      wire:click="removePhoneNumber({{ $index }})">حذف</button>
+                  </div>
+                @endforeach
+                <button type="button" wire:click="addPhoneNumber" class="btn btn-outline-primary mt-2">افزودن شماره
+                  تماس</button>
+              </div>
+            </div>
+            <div class="col-12 position-relative mt-5">
+              <label class="form-label">توضیحات</label>
               <textarea wire:model="description" class="form-control" id="description" rows="3" placeholder=" "></textarea>
-              <label for="description" class="form-label">توضیحات (اختیاری)</label>
             </div>
             <div class="text-end mt-4 w-100 d-flex justify-content-end">
               <button wire:click="store"
@@ -113,17 +206,35 @@
     </div>
   </div>
 
-
-
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
+        $('#doctor_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
+        $('#specialty_ids').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
+        $('#insurance_ids').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
         $('#province_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
         $('#city_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
+        $('#payment_methods').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
@@ -148,54 +259,23 @@
         });
       });
 
+      $('#doctor_id').on('change', function() {
+        @this.set('doctor_id', $(this).val());
+      });
+      $('#specialty_ids').on('change', function() {
+        @this.set('specialty_ids', $(this).val());
+      });
+      $('#insurance_ids').on('change', function() {
+        @this.set('insurance_ids', $(this).val());
+      });
       $('#province_id').on('change', function() {
         @this.set('province_id', $(this).val());
       });
       $('#city_id').on('change', function() {
         @this.set('city_id', $(this).val());
       });
-
-      // مقداردهی اولیه Flatpickr برای انتخاب زمان
-      flatpickr('#start_time', {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: 'H:i',
-        time_24hr: true,
-        minuteIncrement: 5,
-        defaultDate: @json($start_time) || '',
-        locale: {
-          firstDayOfWeek: 6,
-          weekdays: {
-            shorthand: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
-            longhand: ['شنبه', 'یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'],
-          }
-        },
-        onChange: function(selectedDates, dateStr) {
-          if (dateStr) {
-            @this.set('start_time', dateStr);
-          }
-        }
-      });
-
-      flatpickr('#end_time', {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: 'H:i',
-        time_24hr: true,
-        minuteIncrement: 5,
-        defaultDate: @json($end_time) || '',
-        locale: {
-          firstDayOfWeek: 6,
-          weekdays: {
-            shorthand: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
-            longhand: ['شنبه', 'یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'],
-          }
-        },
-        onChange: function(selectedDates, dateStr) {
-          if (dateStr) {
-            @this.set('end_time', dateStr);
-          }
-        }
+      $('#payment_methods').on('change', function() {
+        @this.set('payment_methods', $(this).val());
       });
 
       Livewire.on('show-alert', (event) => toastr[event.type](event.message));

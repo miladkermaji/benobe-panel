@@ -5,6 +5,8 @@ namespace App\Livewire\Admin\Panel\Clinics;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\MedicalCenter;
+use App\Models\Specialty;
+use App\Models\Insurance;
 use Illuminate\Support\Facades\Storage;
 
 class ClinicList extends Component
@@ -161,15 +163,21 @@ class ClinicList extends Component
                     ->orWhere('description', 'like', '%' . $this->search . '%')
                     ->orWhere('title', 'like', '%' . $this->search . '%');
             })
-            ->with(['doctor', 'province', 'city'])
+            ->with(['doctors', 'province', 'city'])
             ->paginate($this->perPage);
     }
 
     public function render()
     {
         $items = $this->readyToLoad ? $this->getClinicsQuery() : null;
+        // بارگذاری تخصص‌ها و بیمه‌ها برای استفاده در قالب
+        $specialties = Specialty::pluck('name', 'id');
+        $insurances = Insurance::pluck('name', 'id');
+
         return view('livewire.admin.panel.clinics.clinic-list', [
             'clinics' => $items,
+            'specialties' => $specialties,
+            'insurances' => $insurances,
         ]);
     }
 }

@@ -9,6 +9,7 @@ use App\Models\DoctorTag;
 use App\Models\Secretary;
 use App\Models\Specialty;
 use Morilog\Jalali\Jalalian;
+use App\Models\MedicalCenter;
 use App\Models\DoctorDocument;
 use App\Models\UserDoctorLike;
 use Laravel\Sanctum\HasApiTokens;
@@ -186,7 +187,7 @@ class Doctor extends Authenticatable
     {
         return $this->morphMany(Transaction::class, 'transactable');
     }
-public function selectedClinic()
+    public function selectedClinic()
     {
         return $this->hasOne(DoctorSelectedClinic::class, 'doctor_id');
     }
@@ -399,7 +400,10 @@ public function selectedClinic()
     {
         return $this->clinics()->sync($clinicIds);
     }
-
+    public function medicalCenters()
+    {
+        return $this->belongsToMany(MedicalCenter::class, 'doctor_medical_center');
+    }
     public function permissions()
     {
         return $this->hasOne(DoctorPermission::class);
