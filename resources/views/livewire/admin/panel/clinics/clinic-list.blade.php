@@ -1,6 +1,6 @@
 <div class="container-fluid py-2" dir="rtl" wire:init="loadClinics">
   <div
-    class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
+    class="glass-header text-white p-3 rounded-3 mb-2 mt-2 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
     <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت کلینیک ها</h1>
     <div class="input-group flex-grow-1 position-relative" style="max-width: 400px;">
       <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 rounded-3"
