@@ -60,7 +60,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-center align-middle" style="width: 40px;">
-                                        <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0">
+                                        <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                                     </th>
                                     <th class="text-center align-middle" style="width: 60px;">ردیف</th>
                                     <th class="align-middle">نام</th>
@@ -82,7 +82,7 @@
                                         <tr class="align-middle" x-data="{ showDoctors: false, showSpecialties: false, showInsurances: false }">
                                             <td class="text-center">
                                                 <input type="checkbox" wire:model.live="selectedClinics" value="{{ $item->id }}"
-                                                    class="form-check-input m-0">
+                                                    class="form-check-input m-0 align-middle">
                                             </td>
                                             <td class="text-center">{{ $clinics->firstItem() + $index }}</td>
                                             <td>{{ $item->name }}</td>
