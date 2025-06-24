@@ -15,11 +15,12 @@ class ClinicList extends Component
 
     protected $listeners = ['deleteClinicConfirmed' => 'deleteClinic'];
 
-    public $perPage = 10;
+    public $perPage = 100;
     public $search = '';
     public $readyToLoad = false;
     public $selectedClinics = [];
     public $selectAll = false;
+    public $groupAction = '';
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -33,13 +34,6 @@ class ClinicList extends Component
     public function loadClinics()
     {
         $this->readyToLoad = true;
-    }
-
-    public function toggleStatus($id)
-    {
-        $item = MedicalCenter::findOrFail($id);
-        $item->update(['is_active' => !$item->is_active]);
-        $this->dispatch('show-alert', type: $item->is_active ? 'success' : 'info', message: $item->is_active ? 'فعال شد!' : 'غیرفعال شد!');
     }
 
     public function confirmDelete($id)
@@ -85,6 +79,43 @@ class ClinicList extends Component
         $this->selectAll = !empty($this->selectedClinics) && count(array_diff($currentPageIds, $this->selectedClinics)) === 0;
     }
 
+    public function executeGroupAction()
+    {
+        if (empty($this->selectedClinics)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ کلینیکی انتخاب نشده است.');
+            return;
+        }
+
+        if (empty($this->groupAction)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        switch ($this->groupAction) {
+            case 'delete':
+                $this->deleteSelected();
+                break;
+            case 'status_active':
+                $this->updateStatus(true);
+                break;
+            case 'status_inactive':
+                $this->updateStatus(false);
+                break;
+        }
+
+        $this->groupAction = '';
+    }
+
+    private function updateStatus($status)
+    {
+        MedicalCenter::whereIn('id', $this->selectedClinics)
+            ->update(['is_active' => $status]);
+
+        $this->selectedClinics = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت کلینیک‌های انتخاب‌شده با موفقیت تغییر کرد.');
+    }
+
     public function deleteSelected()
     {
         if (empty($this->selectedClinics)) {
@@ -112,6 +143,14 @@ class ClinicList extends Component
         $this->selectedClinics = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'کلینیک‌های انتخاب‌شده حذف شدند!');
+    }
+
+    public function toggleStatus($id)
+    {
+        $item = MedicalCenter::findOrFail($id);
+        $item->is_active = !$item->is_active;
+        $item->save();
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت کلینیک با موفقیت تغییر کرد.');
     }
 
     private function getClinicsQuery()
