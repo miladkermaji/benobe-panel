@@ -133,3 +133,9 @@ Route::prefix('hospital')->group(function () {
 });
 
 Route::get('/appointments/payment/result', [AppointmentBookingController::class, 'paymentResult'])->name('appointment.payment.result');
+
+// مسیرهای عمومی
+Route::prefix('medical-centers')->group(function () {
+    Route::get('/list', [MedicalCentersController::class, 'list'])->name('api.medical-centers.list');
+    Route::get('/{slug}/profile', [MedicalCentersController::class, 'getProfile'])->name('api.medical-centers.profile');
+});

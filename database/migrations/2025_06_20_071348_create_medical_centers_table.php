@@ -4,65 +4,60 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('medical_centers', function (Blueprint $table) {
             $table->id();
-            // اطلاعات درمانگاه
-            $table->string('name')->nullable();                    // نام درمانگاه
-            $table->string('title')->nullable();                   // عنوان درمانگاه
-            $table->string('address')->nullable();                 // آدرس درمانگاه
-            $table->string('secretary_phone')->nullable();         // شماره منشی
-            $table->string('phone_number')->nullable();            // شماره تماس درمانگاه
-            $table->string('postal_code')->nullable();             // کد پستی
-            $table->unsignedBigInteger('province_id')->nullable(); // کلید خارجی به جدول zone
-            $table->unsignedBigInteger('city_id')->nullable();     // کلید خارجی به جدول zone
-
-            // اطلاعات تکمیلی
-            $table->boolean('is_main_center')->default(false); // آیا درمانگاه اصلی است
-            $table->time('start_time')->nullable();            // ساعت شروع کار
-            $table->time('end_time')->nullable();              // ساعت پایان کار
-            $table->text('description')->nullable();           // توضیحات درمانگاه
-
-            // مختصات جغرافیایی
-            $table->decimal('latitude', 10, 7)->nullable();  // عرض جغرافیایی
-            $table->decimal('longitude', 10, 7)->nullable(); // طول جغرافیایی
-
-            // اطلاعات مالی
-            $table->decimal('consultation_fee', 10, 2)->nullable();                  // هزینه خدمات
-            $table->enum('payment_methods', ['cash', 'card', 'online'])->nullable(); // روش‌های پرداخت
-            $table->enum('Center_tariff_type', ['governmental', 'special', 'else'])->nullable(); // نوع تعرفه مرکز 
-            $table->enum('Daycare_centers', ['yes', 'no'])->nullable(); //مراکز شبانه روزی
-            $table->enum('type', ['hospital', 'treatment_centers', 'clinic', 'imaging_center', 'laboratory', 'pharmacy','policlinic'])->nullable(); // نوع مراکز درمانی
-
-            // وضعیت و تنظیمات
-            $table->boolean('is_active')->default(false); // وضعیت فعال‌سازی
-            $table->json('working_days')->nullable();     // روزهای کاری
-            $table->json('specialty_ids')->nullable();    // تخصص‌ها
-            $table->json('insurance_ids')->nullable();    // بیمه‌ها
-
-            // فیلدهای جدید
-            $table->text('avatar')->nullable();                   // تصویر اصلی درمانگاه
-            $table->json('documents')->nullable();                // مدارک درمانگاه
-            $table->json('galleries')->nullable();                // گالری درمانگاه
-            $table->json('phone_numbers')->nullable();            // شماره‌های تماس درمانگاه
-            $table->boolean('location_confirmed')->default(false); // تایید مکان روی نقشه
-
+            $table->string('name')->nullable();
+            $table->string('title')->nullable();
+            $table->string('address')->nullable();
+            $table->string('secretary_phone')->nullable();
+            $table->string('phone_number')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->unsignedBigInteger('province_id')->nullable();
+            $table->unsignedBigInteger('city_id')->nullable();
+            $table->boolean('is_main_center')->default(false);
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
+            $table->text('description')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
+            $table->decimal('consultation_fee', 10, 2)->nullable();
+            $table->enum('payment_methods', ['cash', 'card', 'online'])->nullable();
+            $table->enum('Center_tariff_type', ['governmental', 'special', 'else'])->nullable();
+            $table->enum('Daycare_centers', ['yes', 'no'])->nullable();
+            $table->enum('type', ['hospital', 'treatment_centers', 'clinic', 'imaging_center', 'laboratory', 'pharmacy', 'policlinic'])->nullable();
+            $table->boolean('is_active')->default(false);
+            $table->json('working_days')->nullable();
+            $table->json('specialty_ids')->nullable();
+            $table->json('insurance_ids')->nullable();
+            $table->text('avatar')->nullable();
+            $table->json('documents')->nullable();
+            $table->json('galleries')->nullable();
+            $table->json('phone_numbers')->nullable();
+            $table->boolean('location_confirmed')->default(false);
+            $table->string('slug')->unique()->nullable();
+            $table->decimal('average_rating', 2, 1)->default(0.0);
+            $table->unsignedInteger('reviews_count')->default(0);
+            $table->unsignedInteger('recommendation_percentage')->default(0);
             $table->timestamps();
+                        $table->softDeletes();
 
-          
+
             $table->foreign('province_id')->references('id')->on('zone')->onDelete('set null');
             $table->foreign('city_id')->references('id')->on('zone')->onDelete('set null');
+
+            // افزودن ایندکس برای بهینه‌سازی
+            $table->index('province_id');
+            $table->index('city_id');
+            $table->index('type');
+            $table->index('is_active');
+            $table->index('Center_tariff_type');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('medical_centers');
