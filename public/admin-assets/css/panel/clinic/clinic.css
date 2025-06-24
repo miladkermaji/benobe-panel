@@ -1205,3 +1205,8 @@ th{
     color: #333 !important;
     font-weight: bold;
 }
+.clinic-card-item{
+display: flex;
+  align-items: center;
+  gap: 10px;
+}
