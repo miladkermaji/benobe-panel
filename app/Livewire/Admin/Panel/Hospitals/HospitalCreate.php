@@ -114,8 +114,8 @@ class HospitalCreate extends Component
         ], [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
             'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
-            'name.required' => 'لطفاً نام کلینیک را وارد کنید.',
-            'name.max' => 'نام کلینیک نباید بیشتر از ۲۵۵ حرف باشد.',
+            'name.required' => 'لطفاً نام بیمارستان را وارد کنید.',
+            'name.max' => 'نام بیمارستان نباید بیشتر از ۲۵۵ حرف باشد.',
             'title.max' => 'عنوان نباید بیشتر از ۲۵۵ حرف باشد.',
             'address.max' => 'آدرس نباید بیشتر از ۵۰۰ حرف باشد.',
             'phone_number.regex' => 'شماره تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.',
@@ -168,7 +168,7 @@ class HospitalCreate extends Component
         $medicalCenter = MedicalCenter::create($data);
         $medicalCenter->doctors()->sync($this->doctor_ids); // ذخیره رابطه چند به چند
 
-        $this->dispatch('show-alert', type: 'success', message: 'کلینیک با موفقیت ایجاد شد!');
+        $this->dispatch('show-alert', type: 'success', message: 'بیمارستان با موفقیت ایجاد شد!');
         return redirect()->route('admin.panel.hospitals.index');
     }
 
