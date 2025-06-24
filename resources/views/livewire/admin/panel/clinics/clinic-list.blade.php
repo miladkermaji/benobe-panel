@@ -1,6 +1,6 @@
 <div class="clinics-container">
     <div class="container py-2" dir="rtl" wire:init="loadClinics">
-        <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
+        <div class="glass-header text-white p-2 rounded-2 mb-4 mt-3 shadow-lg">
             <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
                 <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-3">
@@ -169,104 +169,100 @@
                         </table>
                     </div>
                     <!-- Mobile Card View -->
-                    <div class="clinics-cards d-md-none">
-                        @if ($readyToLoad)
-                            @forelse ($clinics as $index => $item)
-                                <div class="clinic-card mb-3 p-3">
-                                    <div class="clinic-card-header d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <input type="checkbox" wire:model.live="selectedClinics" value="{{ $item->id }}"
-                                                class="form-check-input m-0">
-                                            <span class="badge bg-primary-subtle text-primary">#{{ $clinics->firstItem() + $index }}</span>
-                                        </div>
-                                        <div class="d-flex gap-1">
-                                            <a href="{{ route('admin.panel.clinics.gallery', $item->id) }}"
-                                                class="btn btn-sm btn-primary px-2 py-1">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                                    stroke="currentColor" stroke-width="2">
-                                                    <path
-                                                        d="M4 16v4h4M4 20l4-4M20 8v-4h-4M20 4l-4 4M4 4v4M4 4h4M20 20v-4h-4M20 20l-4-4" />
-                                                </svg>
-                                            </a>
-                                            <a href="{{ route('admin.panel.clinics.edit', $item->id) }}"
-                                                class="btn btn-sm btn-gradient-success px-2 py-1">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                                    stroke="currentColor" stroke-width="2">
-                                                    <path
-                                                        d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                                </svg>
-                                            </a>
-                                            <button wire:click="confirmDelete({{ $item->id }})"
-                                                class="btn btn-sm btn-gradient-danger px-2 py-1">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                                    stroke="currentColor" stroke-width="2">
-                                                    <path
-                                                        d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="clinic-card-body">
-                                        <div class="clinic-card-item">
-                                            <span class="clinic-card-label">نام:</span>
-                                            <span class="clinic-card-value">{{ $item->name }}</span>
-                                        </div>
-                                        <div class="clinic-card-item">
-                                            <span class="clinic-card-label">پزشک:</span>
-                                            <span class="clinic-card-value">
-                                                @if ($item->doctor)
-                                                    {{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}
-                                                @else
-                                                    نامشخص
-                                                @endif
-                                            </span>
-                                        </div>
-                                        <div class="clinic-card-item">
-                                            <span class="clinic-card-label">استان:</span>
-                                            <span class="clinic-card-value">{{ $item->province?->name ?? '-' }}</span>
-                                        </div>
-                                        <div class="clinic-card-item">
-                                            <span class="clinic-card-label">شهر:</span>
-                                            <span class="clinic-card-value">{{ $item->city?->name ?? '-' }}</span>
-                                        </div>
-                                        <div class="clinic-card-item">
-                                            <span class="clinic-card-label">آدرس:</span>
-                                            <span class="clinic-card-value">{{ e($item->address) ?? '-' }}</span>
-                                        </div>
-                                        <div class="clinic-card-item">
-                                            <span class="clinic-card-label">توضیحات:</span>
-                                            <span class="clinic-card-value">{{ e($item->description) ?? '-' }}</span>
-                                        </div>
-                                        <div class="clinic-card-item">
-                                            <span class="clinic-card-label">وضعیت:</span>
-                                            <div class="form-check form-switch d-inline-block">
-                                                <input class="form-check-input" type="checkbox" role="switch"
-                                                    wire:click="toggleStatus({{ $item->id }})"
-                                                    {{ $item->is_active ? 'checked' : '' }}
-                                                    style="width: 3em; height: 1.5em; margin-top: 0;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="text-center py-4">
-                                    <div class="d-flex justify-content-center align-items-center flex-column">
-                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" class="text-muted mb-2">
-                                            <path d="M5 12h14M12 5l7 7-7 7" />
-                                        </svg>
-                                        <p class="text-muted fw-medium">هیچ کلینیکی یافت نشد.</p>
-                                    </div>
-                                </div>
-                            @endforelse
-                        @else
-                            <div class="text-center py-4">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">در حال بارگذاری...</span>
-                                </div>
-                            </div>
-                        @endif
+                 <!-- Mobile Card View -->
+<div class="clinics-cards d-md-none">
+    @if ($readyToLoad)
+        @forelse ($clinics as $index => $item)
+            <div class="clinic-card mb-3 p-3 border rounded-2 shadow-sm" x-data="{ open: false }">
+                <div class="clinic-card-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="checkbox" wire:model.live="selectedClinics" value="{{ $item->id }}"
+                            class="form-check-input m-0">
+                        <h6 class="m-0 fw-bold">
+                            {{ $item->name }}
+                            @if ($item->doctor)
+                                ({{ $item->doctor->first_name . ' ' . $item->doctor->last_name }})
+                            @else
+                                (نامشخص)
+                            @endif
+                        </h6>
                     </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button @click="open = !open" class="btn btn-sm btn-outline-primary p-1">
+                            <svg :class="{ 'rotate-180': open }" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform duration-200">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </button>
+                        <a href="{{ route('admin.panel.clinics.gallery', $item->id) }}"
+                            class="btn btn-sm btn-primary px-2 py-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 16v4h4M4 20l4-4M20 8v-4h-4M20 4l-4 4M4 4v4M4 4h4M20 20v-4h-4M20 20l-4-4" />
+                            </svg>
+                        </a>
+                        <a href="{{ route('admin.panel.clinics.edit', $item->id) }}"
+                            class="btn btn-sm btn-gradient-success px-2 py-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                        </a>
+                        <button wire:click="confirmDelete({{ $item->id }})"
+                            class="btn btn-sm btn-gradient-danger px-2 py-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="clinic-card-body mt-2" x-show="open" x-transition>
+                    <div class="clinic-card-item">
+                        <span class="clinic-card-label">ردیف:</span>
+                        <span class="clinic-card-value">{{ $clinics->firstItem() + $index }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                        <span class="clinic-card-label">استان:</span>
+                        <span class="clinic-card-value">{{ $item->province?->name ?? '-' }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                        <span class="clinic-card-label">شهر:</span>
+                        <span class="clinic-card-value">{{ $item->city?->name ?? '-' }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                        <span class="clinic-card-label">آدرس:</span>
+                        <span class="clinic-card-value">{{ e($item->address) ?? '-' }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                        <span class="clinic-card-label">توضیحات:</span>
+                        <span class="clinic-card-value">{{ e($item->description) ?? '-' }}</span>
+                    </div>
+                    <div class="clinic-card-item">
+                        <span class="clinic-card-label">وضعیت:</span>
+                        <div class="form-check form-switch d-inline-block">
+                            <input class="form-check-input" type="checkbox" role="switch"
+                                wire:click="toggleStatus({{ $item->id }})"
+                                {{ $item->is_active ? 'checked' : '' }}
+                                style="width: 3em; height: 1.5em; margin-top: 0;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="text-center py-4">
+                <div class="d-flex justify-content-center align-items-center flex-column">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                    <p class="text-muted fw-medium">هیچ کلینیکی یافت نشد.</p>
+                </div>
+            </div>
+        @endforelse
+    @else
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">در حال بارگذاری...</span>
+            </div>
+        </div>
+    @endif
+</div>
                     <div class="d-flex justify-content-between align-items-center mt-3 px-3 flex-wrap gap-2">
                         @if ($readyToLoad)
                             <div class="text-muted">
