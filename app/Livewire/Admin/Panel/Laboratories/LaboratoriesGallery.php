@@ -2,67 +2,78 @@
 
 namespace App\Livewire\Admin\Panel\Laboratories;
 
+use Livewire\Component;
 use App\Models\Laboratory;
+use App\Models\MedicalCenter;
+use Livewire\WithFileUploads;
 use App\Models\LaboratoryGallery;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Component;
-use Livewire\WithFileUploads;
 
 class LaboratoriesGallery extends Component
 {
     use WithFileUploads;
 
     public $laboratory;
-    public $images   = [];
+    public $images = [];
     public $captions = [];
 
     public function mount($id)
     {
-        // Eager-load the galleries relationship
-        $this->laboratory = Laboratory::with('galleries')->findOrFail($id);
+        $this->laboratory = MedicalCenter::findOrFail($id);
     }
 
     public function uploadImages()
     {
         $this->validate([
-            'images.*'   => 'image|max:2048',
+            'images.*' => 'image|max:2048',
             'captions.*' => 'nullable|string|max:255',
         ]);
 
+        $galleries = $this->laboratory->galleries ?? [];
         foreach ($this->images as $index => $image) {
-            $path = $image->store('laboratory_galleries', 'public');
-            LaboratoryGallery::create([
-                'laboratory_id' => $this->laboratory->id,
-                'image_path'    => $path,
-                'caption'       => $this->captions[$index] ?? null,
-            ]);
+            $path = $image->store('hospital_galleries', 'public');
+            $galleries[] = [
+                'image_path' => $path,
+                'caption' => $this->captions[$index] ?? null,
+                'is_primary' => count($galleries) === 0, // اولین تصویر به‌طور پیش‌فرض اصلی باشد
+            ];
         }
 
-        $this->images   = [];
-        $this->captions = [];
-        $this->dispatch('show-alert', type: 'success', message: 'تصاویر با موفقیت آپلود شدند!');
+        $this->laboratory->update(['galleries' => $galleries]);
+        $this->reset(['images', 'captions']); // پاک‌سازی متغیرها
+        $this->dispatch('refresh-gallery'); // ارسال رویداد برای رفرش گالری
+        $this->dispatch('show-alert', type: 'success', message: 'تصاویر با موفقیت اضافه شدند!');
     }
 
-    public function deleteImage($id)
+    public function deleteImage($index)
     {
-        $gallery = LaboratoryGallery::findOrFail($id);
-        Storage::disk('public')->delete($gallery->image_path);
-        $gallery->delete();
-        $this->dispatch('show-alert', type: 'success', message: 'تصویر حذف شد!');
+        $galleries = $this->laboratory->galleries ?? [];
+        if (isset($galleries[$index])) {
+            Storage::disk('public')->delete($galleries[$index]['image_path']);
+            unset($galleries[$index]);
+            $this->laboratory->update(['galleries' => array_values($galleries)]);
+            $this->dispatch('refresh-gallery');
+            $this->dispatch('show-alert', type: 'success', message: 'تصویر حذف شد!');
+        }
     }
 
-    public function setPrimary($id)
+    public function setPrimary($index)
     {
-        $this->laboratory->galleries()->update(['is_primary' => false]);
-        $gallery = LaboratoryGallery::findOrFail($id);
-        $gallery->update(['is_primary' => true]);
-        $this->dispatch('show-alert', type: 'success', message: 'تصویر اصلی تنظیم شد!');
+        $galleries = $this->laboratory->galleries ?? [];
+        foreach ($galleries as &$gallery) {
+            $gallery['is_primary'] = false;
+        }
+        if (isset($galleries[$index])) {
+            $galleries[$index]['is_primary'] = true;
+            $this->laboratory->update(['galleries' => $galleries]);
+            $this->dispatch('refresh-gallery');
+            $this->dispatch('show-alert', type: 'success', message: 'تصویر اصلی تنظیم شد!');
+        }
     }
 
     public function render()
     {
-        // Ensure $galleries is always an array or collection
-        $galleries = $this->laboratory->galleries ?? collect();
+        $galleries = collect($this->laboratory->galleries ?? []);
         return view('livewire.admin.panel.laboratories.laboratories-gallery', compact('galleries'));
     }
 }
