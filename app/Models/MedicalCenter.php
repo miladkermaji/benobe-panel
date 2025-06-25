@@ -3,11 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MedicalCenter extends Model
 {
     use SoftDeletes;
+    use Sluggable;
+
+
 
     protected $fillable = [
         'name', 'title', 'address', 'secretary_phone', 'phone_number', 'postal_code',
@@ -41,7 +45,14 @@ class MedicalCenter extends Model
     {
         return $this->belongsToMany(Doctor::class, 'doctor_medical_center');
     }
-
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => ['name'],
+            ],
+        ];
+    }
     public function province()
     {
         return $this->belongsTo(Zone::class, 'province_id');

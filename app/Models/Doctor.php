@@ -237,11 +237,7 @@ class Doctor extends Authenticatable
         return $this->belongsTo(Zone::class, 'province_id');
     }
 
-    public function tariff()
-    {
-
-        return $this->hasOne(DoctorTariff::class, 'doctor_id');
-    }
+   
 
     public function city()
     {
