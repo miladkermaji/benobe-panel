@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Appointment;
@@ -39,9 +40,13 @@ class Insurance extends Model
         return $this->belongsToMany(Doctor::class, 'doctor_insurance', 'insurance_id', 'doctor_id')
                     ->withTimestamps();
     }
-     public function doctorServices()
+    public function doctorServices()
     {
         return $this->hasMany(DoctorService::class);
+    }
+    public function medicalCenters()
+    {
+        return $this->belongsToMany(MedicalCenter::class, 'medical_center_insurance', 'insurance_id', 'medical_center_id');
     }
 
 }

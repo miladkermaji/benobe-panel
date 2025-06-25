@@ -1,14 +1,15 @@
 <?php
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\DoctorCounselingConfig;
-use App\Models\Insurance;
-use App\Models\Service;
-use App\Models\Specialty;
 use App\Models\Zone;
+use App\Models\Service;
+use App\Models\Insurance;
+use App\Models\Specialty;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
+use App\Models\DoctorCounselingConfig;
 
 class DoctorFilterController extends Controller
 {
@@ -96,7 +97,7 @@ class DoctorFilterController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            \Log::error('GetFilterOptions - Error: ' . $e->getMessage());
+            Log::error('GetFilterOptions - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -54,6 +55,9 @@ class Specialty extends Model
         );
     }
 
-  
+    public function medicalCenters()
+    {
+        return $this->belongsToMany(MedicalCenter::class, 'medical_center_specialty', 'specialty_id', 'medical_center_id');
+    }
 
 }

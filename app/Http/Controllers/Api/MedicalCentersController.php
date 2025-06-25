@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Zone;
 use App\Models\Clinic;
+use App\Models\Service;
 use App\Models\Hospital;
+use App\Models\Insurance;
+use App\Models\Specialty;
 use App\Models\Laboratory;
 use Illuminate\Http\Request;
 use App\Models\ImagingCenter;
@@ -13,6 +16,10 @@ use App\Models\TreatmentCenter;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ZoneResource;
+use Illuminate\Support\Facades\Cache;
+use App\Http\Resources\ServiceResource;
+use App\Http\Resources\InsuranceResource;
+use App\Http\Resources\SpecialtyResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\MedicalCenterResource;
 
@@ -548,112 +555,186 @@ class MedicalCentersController extends Controller
 
 
 
+public function list(Request $request)
+{
+    try {
+        // لاگ درخواست
+        Log::info('درخواست لیست مراکز درمانی', ['params' => $request->all()]);
 
-  public function list(Request $request)
-    {
-        try {
-            // اعتبارسنجی ورودی‌ها
-            $validator = Validator::make($request->all(), [
-                'province_id' => 'nullable|exists:zone,id',
-                'city_id' => 'nullable|exists:zone,id',
-                'center_type' => 'nullable|in:hospital,treatment_centers,clinic,imaging_center,laboratory,pharmacy,policlinic',
-                'specialty_ids' => 'nullable|array',
-                'specialty_ids.*' => 'exists:specialties,id',
-                'insurance_ids' => 'nullable|array',
-                'insurance_ids.*' => 'exists:insurances,id',
-                'tariff_type' => 'nullable|in:governmental,special,else',
-                'sort_by' => 'nullable|in:average_rating,reviews_count',
-                'sort_direction' => 'nullable|in:asc,desc',
-                'per_page' => 'nullable|integer|min:1|max:100',
-            ], [
-                'province_id.exists' => 'استان انتخاب‌شده معتبر نیست.',
-                'city_id.exists' => 'شهر انتخاب‌شده معتبر نیست.',
-                'center_type.in' => 'نوع مرکز معتبر نیست.',
-                'specialty_ids.*.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
-                'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
-                'tariff_type.in' => 'نوع تعرفه معتبر نیست.',
-                'sort_by.in' => 'معیار مرتب‌سازی معتبر نیست.',
-                'sort_direction.in' => 'جهت مرتب‌سازی معتبر نیست.',
-                'per_page.integer' => 'تعداد در هر صفحه باید عدد باشد.',
-            ]);
+        // اعتبارسنجی ورودی‌ها
+        $validator = Validator::make($request->all(), [
+            'province_id' => 'nullable|exists:zone,id',
+            'city_id' => 'nullable|exists:zone,id',
+            'center_type' => 'nullable|in:hospital,treatment_centers,clinic,imaging_center,laboratory,pharmacy,policlinic',
+            'specialty_ids' => 'sometimes|nullable|string|exists:specialties,id',
+            'insurance_ids' => 'sometimes|nullable|string|exists:insurances,id',
+            'service_ids' => 'sometimes|nullable|string|exists:services,id',
+            'tariff_type' => 'nullable|in:governmental,special,else',
+            'sort_by' => 'nullable|in:average_rating,reviews_count',
+            'sort_direction' => 'nullable|in:asc,desc',
+            'per_page' => 'nullable|integer|min:1|max:100',
+        ], [
+            'province_id.exists' => 'استان انتخاب‌شده معتبر نیست.',
+            'city_id.exists' => 'شهر انتخاب‌شده معتبر نیست.',
+            'center_type.in' => 'نوع مرکز معتبر نیست.',
+            'specialty_ids.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
+            'insurance_ids.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+            'service_ids.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
+            'tariff_type.in' => 'نوع تعرفه معتبر نیست.',
+            'sort_by.in' => 'معیار مرتب‌سازی معتبر نیست.',
+            'sort_direction.in' => 'جهت مرتب‌سازی معتبر نیست.',
+            'per_page.integer' => 'تعداد در هر صفحه باید عدد باشد.',
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'خطا در اعتبارسنجی',
-                    'errors' => $validator->errors(),
-                ], 422);
-            }
-
-            // فیلترها
-            $filters = [
-                'province_id' => $request->input('province_id'),
-                'city_id' => $request->input('city_id'),
-                'center_type' => $request->input('center_type'),
-                'specialty_ids' => $request->input('specialty_ids'),
-                'insurance_ids' => $request->input('insurance_ids'),
-                'tariff_type' => $request->input('tariff_type'),
-            ];
-
-            // مرتب‌سازی
-            $sortBy = $request->input('sort_by', 'average_rating');
-            $sortDirection = $request->input('sort_direction', 'desc');
-            $perPage = $request->input('per_page', 10);
-
-            // کوئری برای مراکز درمانی
-            $query = MedicalCenter::query()
-                ->active()
-                ->with(['province', 'city', 'specialties', 'insurances', 'doctors'])
-                ->filter($filters)
-                ->sort($sortBy, $sortDirection);
-
-            // صفحه‌بندی
-            $medicalCenters = $query->paginate($perPage);
-
-            // دریافت لیست استان‌ها و شهرها
-            $provinces = Zone::provinces()
-                ->with(['children' => function ($query) {
-                    $query->cities()->whereHas('medicalCenters', function ($q) {
-                        $q->active();
-                    });
-                }])
-                ->whereHas('children.medicalCenters', function ($q) {
-                    $q->active();
-                })
-                ->get();
-
-            // پاسخ
-            return response()->json([
-                'status' => 'success',
-                'message' => 'لیست مراکز درمانی و مناطق با موفقیت دریافت شد.',
-                'data' => [
-                    'medical_centers' => MedicalCenterResource::collection($medicalCenters),
-                    'zones' => [
-                        'provinces' => ZoneResource::collection($provinces),
-                    ],
-                ],
-                'pagination' => [
-                    'current_page' => $medicalCenters->currentPage(),
-                    'last_page' => $medicalCenters->lastPage(),
-                    'per_page' => $medicalCenters->perPage(),
-                    'total' => $medicalCenters->total(),
-                ],
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error('خطا در دریافت لیست مراکز درمانی و مناطق: ' . $e->getMessage());
+        if ($validator->fails()) {
+            Log::warning('خطا در اعتبارسنجی ورودی‌ها', ['errors' => $validator->errors()]);
             return response()->json([
                 'status' => 'error',
-                'message' => 'خطایی در سرور رخ داد. لطفاً دوباره تلاش کنید.',
-            ], 500);
+                'message' => 'خطا در اعتبارسنجی',
+                'errors' => $validator->errors(),
+            ], 422);
         }
+
+        // فیلترها
+        $filters = [
+            'province_id' => $request->input('province_id'),
+            'city_id' => $request->input('city_id'),
+            'center_type' => $request->input('center_type'),
+            'specialty_ids' => $request->has('specialty_ids') ? (is_array($request->input('specialty_ids')) ? $request->input('specialty_ids') : [$request->input('specialty_ids')]) : null,
+            'insurance_ids' => $request->has('insurance_ids') ? (is_array($request->input('insurance_ids')) ? $request->input('insurance_ids') : [$request->input('insurance_ids')]) : null,
+            'service_ids' => $request->has('service_ids') ? (is_array($request->input('service_ids')) ? $request->input('service_ids') : [$request->input('service_ids')]) : null,
+            'tariff_type' => $request->input('tariff_type'),
+        ];
+
+        // لاگ فیلترها
+        Log::info('فیلترهای اعمال‌شده', ['filters' => $filters]);
+
+        // مرتب‌سازی
+        $sortBy = $request->input('sort_by', 'average_rating');
+        $sortDirection = $request->input('sort_direction', 'desc');
+        $perPage = $request->input('per_page', 10);
+
+        // کوئری برای مراکز درمانی
+        $query = MedicalCenter::query()
+            ->active()
+            ->with(['province', 'city', 'doctors'])
+            ->filter($filters)
+            ->orderBy($sortBy, $sortDirection);
+
+        // لاگ تعداد مراکز
+        Log::info('تعداد مراکز درمانی قبل از صفحه‌بندی', ['count' => $query->count()]);
+
+        // صفحه‌بندی
+        $medicalCenters = $query->paginate($perPage);
+
+        // دریافت لیست استان‌ها (با کش)
+        $provinces = Cache::remember('medical_centers_provinces', 1440, function () {
+            $provinces = Zone::where('level', 1)
+                ->where('status', 1)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+            Log::info('تعداد استان‌ها', ['count' => $provinces->count()]);
+            return $provinces;
+        });
+
+        // دریافت لیست شهرها (با کش)
+        $cities = Cache::remember('medical_centers_cities', 1440, function () {
+            $cities = Zone::where('level', 2)
+                ->where('status', 1)
+                ->select('id', 'name', 'parent_id as province_id')
+                ->orderBy('name')
+                ->get();
+            Log::info('تعداد شهرها', ['count' => $cities->count()]);
+            return $cities;
+        });
+
+        // دریافت لیست تخصص‌ها (با کش)
+        $specialties = Cache::remember('medical_centers_specialties', 1440, function () {
+            $specialties = Specialty::where('status', 1)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+            Log::info('تعداد تخصص‌ها', ['count' => $specialties->count()]);
+            return $specialties;
+        });
+
+        // دریافت لیست بیمه‌ها (با کش)
+        $insurances = Cache::remember('medical_centers_insurances', 1440, function () {
+            $insurances = Insurance::where('status', 1)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+            Log::info('تعداد بیمه‌ها', ['count' => $insurances->count()]);
+            return $insurances;
+        });
+
+        // دریافت لیست خدمات (با کش)
+        $services = Cache::remember('medical_centers_services', 1440, function () {
+            $services = Service::where('status', true)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+            Log::info('تعداد خدمات', ['count' => $services->count()]);
+            return $services;
+        });
+
+        // لیست انواع مراکز
+        $centerTypes = [
+            'hospital' => 'بیمارستان',
+            'treatment_centers' => 'مراکز درمانی',
+            'clinic' => 'کلینیک',
+            'imaging_center' => 'مرکز تصویربرداری',
+            'laboratory' => 'آزمایشگاه',
+            'pharmacy' => 'داروخانه',
+            'policlinic' => 'پلی‌کلینیک',
+        ];
+
+        // لیست انواع تعرفه‌ها
+        $tariffTypes = [
+            'governmental' => 'دولتی',
+            'special' => 'ویژه',
+            'else' => 'سایر',
+        ];
+
+        // پاسخ
+        return response()->json([
+            'status' => 'success',
+            'message' => 'لیست مراکز درمانی و اطلاعات فیلترها با موفقیت دریافت شد.',
+            'data' => [
+                'medical_centers' => MedicalCenterResource::collection($medicalCenters),
+                'zones' => [
+                    'provinces' => ZoneResource::collection($provinces),
+                    'cities' => ZoneResource::collection($cities),
+                ],
+                'specialties' => SpecialtyResource::collection($specialties),
+                'insurances' => InsuranceResource::collection($insurances),
+                'services' => ServiceResource::collection($services),
+                'center_types' => $centerTypes,
+                'tariff_types' => $tariffTypes,
+            ],
+            'pagination' => [
+                'current_page' => $medicalCenters->currentPage(),
+                'last_page' => $medicalCenters->lastPage(),
+                'per_page' => $medicalCenters->perPage(),
+                'total' => $medicalCenters->total(),
+            ],
+        ], 200);
+    } catch (\Exception $e) {
+        Log::error('خطا در دریافت لیست مراکز درمانی و اطلاعات فیلترها: ' . $e->getMessage());
+        return response()->json([
+            'status' => 'error',
+            'message' => 'خطایی در سرور رخ داد. لطفاً دوباره تلاش کنید.',
+        ], 500);
     }
+}
 
     public function getProfile($slug)
     {
         try {
             $medicalCenter = MedicalCenter::where('slug', $slug)
                 ->active()
-                ->with(['province', 'city', 'specialties', 'insurances', 'doctors'])
+                ->with(['province', 'city', 'doctors'])
                 ->firstOrFail();
 
             return response()->json([

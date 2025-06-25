@@ -10,38 +10,13 @@ class MedicalCenter extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name',
-        'title',
-        'address',
-        'secretary_phone',
-        'phone_number',
-        'postal_code',
-        'province_id',
-        'city_id',
-        'is_main_center',
-        'start_time',
-        'end_time',
-        'description',
-        'latitude',
-        'longitude',
-        'consultation_fee',
-        'payment_methods',
-        'is_active',
-        'working_days',
-        'avatar',
-        'documents',
-        'phone_numbers',
-        'location_confirmed',
-        'type',
-        'galleries',
-        'specialty_ids',
-        'insurance_ids',
-        'Center_tariff_type',
-        'Daycare_centers',
-        'slug',
-        'average_rating',
-        'reviews_count',
-        'recommendation_percentage',
+        'name', 'title', 'address', 'secretary_phone', 'phone_number', 'postal_code',
+        'province_id', 'city_id', 'is_main_center', 'start_time', 'end_time',
+        'description', 'latitude', 'longitude', 'consultation_fee', 'payment_methods',
+        'is_active', 'working_days', 'avatar', 'documents', 'phone_numbers',
+        'location_confirmed', 'type', 'galleries', 'specialty_ids', 'insurance_ids',
+        'service_ids', 'Center_tariff_type', 'Daycare_centers', 'slug', 'average_rating',
+        'reviews_count', 'recommendation_percentage',
     ];
 
     protected $casts = [
@@ -54,6 +29,7 @@ class MedicalCenter extends Model
         'phone_numbers' => 'array',
         'specialty_ids' => 'array',
         'insurance_ids' => 'array',
+        'service_ids' => 'array',
         'consultation_fee' => 'decimal:2',
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
@@ -78,12 +54,17 @@ class MedicalCenter extends Model
 
     public function specialties()
     {
-        return $this->belongsToMany(Specialty::class, 'medical_center_specialty', 'medical_center_id', 'specialty_id');
+        return Specialty::whereIn('id', $this->specialty_ids ?? [])->get();
     }
 
     public function insurances()
     {
-        return $this->belongsToMany(Insurance::class, 'medical_center_insurance', 'medical_center_id', 'insurance insurance_id');
+        return Insurance::whereIn('id', $this->insurance_ids ?? [])->get();
+    }
+
+    public function services()
+    {
+        return Service::whereIn('id', $this->service_ids ?? [])->where('status', true)->get();
     }
 
     public function scopeActive($query)
@@ -100,15 +81,13 @@ class MedicalCenter extends Model
         })->when($filters['center_type'] ?? null, function ($query, $type) {
             $query->where('type', $type);
         })->when($filters['specialty_ids'] ?? null, function ($query, $specialtyIds) {
-            $query->whereHas('specialties', function ($q) use ($specialtyIds) {
-                $q->whereIn('specialties.id', $specialtyIds);
-            });
+            $query->whereJsonContains('specialty_ids', array_map('intval', $specialtyIds));
         })->when($filters['insurance_ids'] ?? null, function ($query, $insuranceIds) {
-            $query->whereHas('insurances', function ($q) use ($insuranceIds) {
-                $q->whereIn('insurances.id', $insuranceIds);
-            });
+            $query->whereJsonContains('insurance_ids', array_map('intval', $insuranceIds));
         })->when($filters['tariff_type'] ?? null, function ($query, $tariffType) {
             $query->where('Center_tariff_type', $tariffType);
+        })->when($filters['service_ids'] ?? null, function ($query, $serviceIds) {
+            $query->whereJsonContains('service_ids', array_map('intval', $serviceIds));
         });
     }
 
