@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Zone extends Model
 {
-    protected $table ="zone";
+    protected $table = "zone";
     protected $fillable = [
         'name',
         'parent_id',
@@ -42,7 +42,8 @@ class Zone extends Model
 
     public function medicalCenters()
     {
-        return $this->hasMany(MedicalCenter::class, 'city_id');
+        return $this->hasMany(MedicalCenter::class, 'province_id')
+                    ->orWhere('city_id', $this->id);
     }
 
     public function scopeActive($query)
