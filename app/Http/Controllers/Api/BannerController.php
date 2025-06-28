@@ -92,8 +92,8 @@ public function getStats(Request $request)
     try {
         $doctorsCount = \App\Models\Doctor::count();
         $usersCount = \App\Models\User::count();
-        $hospitalsCount = \App\Models\Hospital::where('is_active', 1)->count();
-        $laboratoriesCount = \App\Models\Laboratory::where('is_active', 1)->count();
+        $hospitalsCount = \App\Models\MedicalCenter::where('is_active', 1)->where('type','hospital')->count();
+        $laboratoriesCount = \App\Models\Laboratory::where('is_active', 1)->where('type','laboratory')->count();
 
 
         return response()->json([
