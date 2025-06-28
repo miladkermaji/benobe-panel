@@ -81,7 +81,7 @@ class DoctorProfileController extends Controller
    $socialMedia = $this->getSocialMedia($doctor);
 
    // درباره پزشک
-   $about = $doctor->bio ?? 'دارای بورد تخصصی بیماری‌های نوزادان و کودکان، درمان اختلالات گوارشی و آلرژیک نوزادان و کودکان، اختلالات رشد و نمو، اختلال رشد و بلوغ نوجوانان. در مطب سونوگرافی شکم، تست حساسیت به کازئین شیر، تست حساسیت به لاکتوز شیر، تست تنفسی (اسپیرومتری)، حضور دستیار کارشناس ارشد مشاور کودکان و نوجوانان جهت راهنمایی‌های تکمیلی و پاسخ‌دهی به پرسش‌های مراجعین انجام می‌شود. سابقه فعالیت بیش از ۲۰ سال در بخش‌های مراقبت‌های ویژه نوزادان، همکاری با بیمارستان پیامبران، ابن سینا و ۱۰ سال فعالیت در بیمارستان شهدای یافت‌آباد.';
+   $about = $doctor->bio ?? '';
 
    // نوبت‌های حضوری و آنلاین
    $appointments = $this->getAppointments($doctor);
@@ -89,7 +89,7 @@ class DoctorProfileController extends Controller
    // آدرس و تلفن تماس
    $mainClinic = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
    $addressData = [
-    'address'      => $mainClinic ? $mainClinic->address : 'تهران، میدان تجریش، نرسیده به ترمینال مترو قلهک، کوچه نمونه، پلاک ۱۲۰',
+    'address'      => $mainClinic ? $mainClinic->address : 'آدرس ی ثبت نشده',
     'phone_number' => $mainClinic ? $mainClinic->phone_number : 'نامشخص',
    ];
 
@@ -137,9 +137,9 @@ class DoctorProfileController extends Controller
   // اگر شبکه اجتماعی ثبت نشده، مقادیر پیش‌فرض
   if (empty($socialMedia)) {
    $socialMedia = [
-    ['type' => 'website', 'link' => 'https://www.drbehrouzmeghdadi.com'],
-    ['type' => 'whatsapp', 'link' => 'https://wa.me/09123456789'],
-    ['type' => 'instagram', 'link' => 'https://instagram.com/dr.behrouzmegdadi'],
+    ['type' => 'website', 'link' => 'https://benobe.ir'],
+    ['type' => 'whatsapp', 'link' => ''],
+    ['type' => 'instagram', 'link' => ''],
    ];
   }
 
@@ -176,10 +176,10 @@ class DoctorProfileController extends Controller
 
   $inPersonData = $inPersonSlot ? [
    'date_time' => $this->formatJalaliDateTime($inPersonSlot->date, $inPersonSlot->time),
-   'address' => $mainClinic ? $mainClinic->address : 'تهران، میدان تجریش، نرسیده به ترمینال مترو قلهک، کوچه نمونه، پلاک ۱۲۰',
+   'address' => $mainClinic ? $mainClinic->address : '',
   ] : [
-   'date_time' => '۵ آذر ۱۴۰۳ ساعت ۱۷:۳۰',
-   'address' => $mainClinic ? $mainClinic->address : 'تهران، میدان تجریش، نرسیده به ترمینال مترو قلهک، کوچه نمونه، پلاک ۱۲۰',
+   'date_time' => '',
+   'address' => $mainClinic ? $mainClinic->address : '',
   ];
 
   // نوبت آنلاین
@@ -216,7 +216,7 @@ class DoctorProfileController extends Controller
     'text' => $onlineSlot->consultation_types['text'] ?? ($doctor->counselingConfig && $doctor->counselingConfig->has_text_counseling),
    ],
   ] : [
-   'date_time' => 'چهارشنبه ۱۴۰۳/۰۵/۱۸ ساعت ۱۵:۰۰',
+   'date_time' => '',
    'fee' => 300000,
    'consultation_types' => [
     'phone' => true,
@@ -290,22 +290,22 @@ class DoctorProfileController extends Controller
   $reviews = $doctor->reviews->map(function ($review) {
    $user = $review->reviewable;
    return [
-    'user_name' => $user ? $user->full_name : 'مرتضی بهمنی',
-    'date'      => $review->created_at ? Jalalian::fromCarbon($review->created_at)->ago() : '۳ هفته پیش',
-    'type'      => 'وقت حضوری', // می‌تونید منطق پیچیده‌تر برای نوع نوبت اضافه کنید
+    'user_name' => $user ? $user->full_name : '',
+    'date'      => $review->created_at ? Jalalian::fromCarbon($review->created_at)->ago() : '',
+    'type'      => '', // می‌تونید منطق پیچیده‌تر برای نوع نوبت اضافه کنید
     'rating'    => $review->rating ?? 4,
-    'comment'   => $review->comment ?? 'من این در کل مدت یک هفته برنامه‌ریزی و پیگیری داشتم و تجربه‌ام بسیار رضایت‌بخش بود. پیگیری‌ها و پاسخ‌ها سریع بود و شرایط به‌طور شفاف توضیح داده می‌شد. به‌نظرم خیلی خوبه و به بقیه هم توصیه می‌کنم.',
+    'comment'   => $review->comment ?? '',
    ];
   })->values()->all();
 
   if (empty($reviews)) {
    $reviews = [
     [
-     'user_name' => 'مرتضی بهمنی',
-     'date'      => '۳ هفته پیش',
-     'type'      => 'وقت حضوری',
-     'rating'    => 4,
-     'comment'   => 'من این در کل مدت یک هفته برنامه‌ریزی و پیگیری داشتم و تجربه‌ام بسیار رضایت‌بخش بود. پیگیری‌ها و پاسخ‌ها سریع بود و شرایط به‌طور شفاف توضیح داده می‌شد. به‌نظرم خیلی خوبه و به بقیه هم توصیه می‌کنم.',
+     'user_name' => '',
+     'date'      => '',
+     'type'      => '',
+     'rating'    => '',
+     'comment'   => '',
     ],
    ];
   }
