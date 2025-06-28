@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Api\Auth;
 use Carbon\Carbon;
 use App\Models\Otp;
 use App\Models\User;
+use App\Models\Doctor;
 use App\Models\LoginLog;
+use App\Models\Secretary;
 use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use Illuminate\Http\Request;
+use App\Models\Admin\Manager;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -55,7 +58,7 @@ class AuthController extends Controller
      *   }
      * }
      */
-    public function loginRegister(Request $request)
+public function loginRegister(Request $request)
     {
         $request->validate([
             'mobile' => [
@@ -65,70 +68,78 @@ class AuthController extends Controller
             ],
         ], [
             'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
-            'mobile.regex'    => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
+            'mobile.regex' => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
         ]);
 
-        $mobile          = preg_replace('/^(\+98|98|0)/', '', $request->mobile);
+        $mobile = preg_replace('/^(\+98|98|0)/', '', $request->mobile);
         $formattedMobile = '0' . $mobile;
 
-        $user          = User::where('mobile', $formattedMobile)->first();
+        // بررسی وجود شماره موبایل در جداول مختلف
+        $user = User::where('mobile', $formattedMobile)->first();
+        $doctor = Doctor::where('mobile', $formattedMobile)->first();
+        $secretary = Secretary::where('mobile', $formattedMobile)->first();
+        $manager = Manager::where('mobile', $formattedMobile)->first();
+
         $loginAttempts = new LoginAttemptsService();
 
-        // اگر کاربر وجود ندارد یا وضعیتش صفر است، کاربر جدید ثبت‌نام می‌شود
-        if (! $user || $user->status === 0) {
-            if (! $user) {
-                // ثبت‌نام کاربر جدید
-                $user = User::create([
-                    'mobile' => $formattedMobile,
-                    'status' => 1, // کاربر به صورت پیش‌فرض فعال می‌شود
-                ]);
-            } else {
-                // اگر کاربر وجود دارد ولی غیرفعال است، وضعیتش به فعال تغییر کند
-                $user->update(['status' => 1]);
+        // اگر شماره موبایل در یکی از جداول وجود داشت
+        if ($user || $doctor || $secretary || $manager) {
+            // انتخاب کاربر از اولین جدول که شماره موبایل در آن پیدا شده
+            $existingUser = $user ?? $doctor ?? $secretary ?? $manager;
+
+            // اطمینان از اینکه کاربر فعال است (اگر جدول status دارد)
+            if (isset($existingUser->status) && $existingUser->status === 0) {
+                $existingUser->update(['status' => 1]);
             }
+        } else {
+            // اگر شماره موبایل در هیچ جدولی نبود، کاربر جدید در جدول users ایجاد می‌شود
+            $existingUser = User::create([
+                'mobile' => $formattedMobile,
+                'status' => 1,
+            ]);
         }
 
         if ($loginAttempts->isLocked($formattedMobile)) {
             $remainingTime = $loginAttempts->getRemainingLockTime($formattedMobile);
             $formattedTime = $this->formatTime($remainingTime);
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => "شما بیش از حد تلاش کرده‌اید. لطفاً $formattedTime صبر کنید.",
-                'data'    => [
+                'data' => [
                     'remaining_time' => $remainingTime,
                     'formatted_time' => $formattedTime,
                 ],
             ], 429);
         }
 
-        $loginAttempts->incrementLoginAttempt($user->id, $formattedMobile, '', '', '');
+        $loginAttempts->incrementLoginAttempt($existingUser->id, $formattedMobile, '', '', '');
         $otpCode = rand(1000, 9999);
-        $token   = Str::random(60);
+        $token = Str::random(60);
 
         Otp::create([
-            'token'    => $token,
-            'user_id'  => $user->id,
+            'token' => $token,
+            'user_id' => $existingUser->id,
             'otp_code' => $otpCode,
-            'login_id' => $user->mobile,
-            'type'     => 0,
+            'login_id' => $existingUser->mobile,
+            'type' => 0,
         ]);
 
         LoginSession::create([
-            'token'      => $token,
-            'user_id'    => $user->id,
-            'step'       => 2,
+            'token' => $token,
+            'user_id' => $existingUser->id,
+            'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100285, $user->mobile, [$otpCode])
+            SmsService::create(100285, $existingUser->mobile, [$otpCode])
         );
         $messagesService->send();
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'کد تایید ارسال شد',
-            'data'    => [
+            'data' => [
                 'token' => $token,
             ],
         ], 200);
@@ -462,7 +473,7 @@ class AuthController extends Controller
        *   "data": null
        * }
        */
-    public function updateProfile(Request $request)
+public function updateProfile(Request $request)
     {
         Log::info('UpdateProfile - Headers: ' . json_encode($request->headers->all()));
         Log::info('UpdateProfile - Cookies: ' . json_encode($request->cookies->all()));
@@ -471,85 +482,162 @@ class AuthController extends Controller
         $token = $request->cookie('auth_token') ?: $request->bearerToken();
         Log::info('UpdateProfile - Token retrieved: ' . ($token ?: 'None'));
 
-        if (! $token) {
+        if (!$token) {
             Log::warning('UpdateProfile - No token provided');
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'توکن یافت نشد',
-                'data'    => null,
+                'data' => null,
             ], 401);
         }
 
         try {
-            // دیکد کردن توکن برای دیباگ
+            // اعتبارسنجی توکن و گرفتن کاربر
             $payload = JWTAuth::setToken($token)->getPayload();
             Log::info('UpdateProfile - Token payload: ' . json_encode($payload->toArray()));
 
-            // اعتبارسنجی توکن و گرفتن کاربر
             $user = JWTAuth::setToken($token)->authenticate();
-            if (! $user) {
+            if (!$user) {
                 Log::warning('UpdateProfile - User not found for token: ' . $token);
                 return response()->json([
-                    'status'  => 'error',
+                    'status' => 'error',
                     'message' => 'کاربر یافت نشد',
-                    'data'    => null,
+                    'data' => null,
                 ], 401);
             }
 
             Log::info('UpdateProfile - User authenticated: ' . $user->id);
 
-            // اعتبارسنجی درخواست
-            $request->validate([
-                'first_name'    => 'nullable|string|max:255',
-                'last_name'     => 'nullable|string|max:255',
-                'national_code' => 'nullable|string|size:10|unique:users,national_code,' . $user->id,
-                'date_of_birth' => 'nullable|date|before:today',
-                'sex'           => 'nullable|in:male,female',
-                'zone_city_id'  => 'nullable|exists:zone,id,level,2',
-                'zone_province_id'  => 'nullable|exists:zone,id,level,1',
-                'email'         => 'nullable|email|unique:users,email,' . $user->id,
-                'address'       => 'nullable|string|max:1000',
-            ]);
+            // تشخیص نوع کاربر با بررسی شماره موبایل در جداول دیگر
+            $mobile = $user->mobile;
+            $doctor = Doctor::where('mobile', $mobile)->first();
+            $secretary = Secretary::where('mobile', $mobile)->first();
+            $manager = Manager::where('mobile', $mobile)->first();
 
-            // به‌روزرسانی اطلاعات کاربر
-            $user->update([
-                'first_name'    => $request->input('first_name', $user->first_name),
-                'last_name'     => $request->input('last_name', $user->last_name),
-                'national_code' => $request->input('national_code', $user->national_code),
-                'date_of_birth' => $request->input('date_of_birth', $user->date_of_birth),
-                'sex'           => $request->input('sex', $user->sex),
-                'zone_city_id'  => $request->input('zone_city_id', $user->zone_city_id),
-                'zone_province_id'  => $request->input('zone_province_id', $user->zone_province_id),
-                'email'         => $request->input('email', $user->email),
-                'address'       => $request->input('address', $user->address),
-            ]);
+            // تعریف فیلدهای مجاز برای به‌روزرسانی در هر جدول
+            $commonFields = [
+                'first_name' => 'nullable|string|max:255',
+                'last_name' => 'nullable|string|max:255',
+                'national_code' => 'nullable|string|size:10',
+                'date_of_birth' => 'nullable|date|before:today',
+                'sex' => 'nullable|in:male,female',
+                'zone_city_id' => 'nullable|exists:zone,id,level,2',
+                'zone_province_id' => 'nullable|exists:zone,id,level,1',
+                'email' => 'nullable|email',
+                'address' => 'nullable|string|max:1000',
+            ];
+
+            // تنظیم اعتبارسنجی بر اساس نوع کاربر
+            if ($doctor) {
+                $model = $doctor;
+                $table = 'doctors';
+                $validationRules = array_merge($commonFields, [
+                    'national_code' => 'nullable|string|size:10|unique:doctors,national_code,' . $doctor->id,
+                    'email' => 'nullable|email|unique:doctors,email,' . $doctor->id,
+                ]);
+            } elseif ($secretary) {
+                $model = $secretary;
+                $table = 'secretaries';
+                $validationRules = array_merge($commonFields, [
+                    'national_code' => 'nullable|string|size:10|unique:secretaries,national_code,' . $secretary->id . ',id,doctor_id,' . ($secretary->doctor_id ?? 'NULL') . ',clinic_id,' . ($secretary->clinic_id ?? 'NULL'),
+                    'email' => 'nullable|email|unique:secretaries,email,' . $secretary->id,
+                ]);
+            } elseif ($manager) {
+                $model = $manager;
+                $table = 'managers';
+                $validationRules = array_merge($commonFields, [
+                    'national_code' => 'nullable|string|size:10|unique:managers,national_code,' . $manager->id,
+                    'email' => 'nullable|email|unique:managers,email,' . $manager->id,
+                ]);
+            } else {
+                $model = $user;
+                $table = 'users';
+                $validationRules = array_merge($commonFields, [
+                    'national_code' => 'nullable|string|size:10|unique:users,national_code,' . $user->id,
+                    'email' => 'nullable|email|unique:users,email,' . $user->id,
+                ]);
+            }
+
+            // اعتبارسنجی درخواست
+            $request->validate($validationRules);
+
+            // به‌روزرسانی اطلاعات در جدول مربوطه
+            $updateData = [
+                'first_name' => $request->input('first_name', $model->first_name),
+                'last_name' => $request->input('last_name', $model->last_name),
+                'national_code' => $request->input('national_code', $model->national_code),
+                'date_of_birth' => $request->input('date_of_birth', $model->date_of_birth),
+                'sex' => $request->input('sex', $model->sex ?? null),
+                'zone_city_id' => $request->input('zone_city_id', $model->zone_city_id ?? null),
+                'zone_province_id' => $request->input('zone_province_id', $model->zone_province_id ?? null),
+                'email' => $request->input('email', $model->email),
+                'address' => $request->input('address', $model->address),
+            ];
+
+            // حذف فیلدهای null یا غیرمجاز برای جداول خاص
+            $updateData = array_filter($updateData, function ($value, $key) use ($table) {
+                // برای جدول users، فیلد sex به صورت male/female است
+                if ($table === 'users' && $key === 'sex' && !in_array($value, ['male', 'female'])) {
+                    return false;
+                }
+                // برای جدول doctors، فیلد sex می‌تواند other هم باشد
+                if ($table === 'doctors' && $key === 'sex' && !in_array($value, ['male', 'female', 'other'])) {
+                    return false;
+                }
+                // برای جدول managers، فیلد sex می‌تواند other هم باشد
+                if ($table === 'managers' && $key === 'sex' && !in_array($value, ['male', 'female', 'other'])) {
+                    return false;
+                }
+                // برای جدول secretaries، فیلد sex فقط male/female است
+                if ($table === 'secretaries' && $key === 'sex' && !in_array($value, ['male', 'female'])) {
+                    return false;
+                }
+                return $value !== null;
+            }, ARRAY_FILTER_USE_BOTH);
+
+            $model->update($updateData);
+
+            // اگر کاربر در جدول دیگری بود، اطلاعات پایه را در جدول users هم به‌روزرسانی کنیم
+            if ($table !== 'users') {
+                $user->update([
+                    'first_name' => $request->input('first_name', $user->first_name),
+                    'last_name' => $request->input('last_name', $user->last_name),
+                    'national_code' => $request->input('national_code', $user->national_code),
+                    'date_of_birth' => $request->input('date_of_birth', $user->date_of_birth),
+                    'sex' => in_array($request->input('sex'), ['male', 'female']) ? $request->input('sex') : $user->sex,
+                    'zone_city_id' => $request->input('zone_city_id', $user->zone_city_id),
+                    'zone_province_id' => $request->input('zone_province_id', $user->zone_province_id),
+                    'email' => $request->input('email', $user->email),
+                    'address' => $request->input('address', $user->address),
+                ]);
+            }
 
             return response()->json([
-                'status'  => 'success',
+                'status' => 'success',
                 'message' => 'اطلاعات با موفقیت به‌روزرسانی شد',
-                'data'    => ['user' => $user->fresh()],
+                'data' => ['user' => $model->fresh()],
             ], 200);
 
         } catch (TokenExpiredException $e) {
             Log::error('UpdateProfile - Token expired: ' . $e->getMessage());
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'توکن منقضی شده است. لطفاً دوباره وارد شوید.',
-                'data'    => null,
+                'data' => null,
             ], 401);
         } catch (TokenInvalidException $e) {
             Log::error('UpdateProfile - Token invalid: ' . $e->getMessage());
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'توکن نامعتبر است.',
-                'data'    => null,
+                'data' => null,
             ], 401);
         } catch (JWTException $e) {
             Log::error('UpdateProfile - JWT error: ' . $e->getMessage());
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'خطا در پردازش توکن: ' . $e->getMessage(),
-                'data'    => null,
+                'data' => null,
             ], 401);
         }
     }
