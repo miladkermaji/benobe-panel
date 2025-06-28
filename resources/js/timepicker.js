@@ -2,26 +2,44 @@ class TimePicker {
     constructor() {
         this.activePicker = null;
         this.backdrop = null;
-        this.showPickerBound = this.showPicker.bind(this);
-        this.observer = null;
+        this.container = null; // اضافه کردن container ثابت
+        this.debounceBindInputs = this.debounce(
+            this.bindInputs.bind(this),
+            100
+        ); // Debounce برای بهینه‌سازی
         this.init();
     }
+
+    // تابع Debounce برای کاهش اجرای مکرر
+    debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
     init() {
+        // ایجاد container ثابت
+        this.container = document.createElement("div");
+        document.body.appendChild(this.container);
+
         this.bindInputs();
+
         // مدیریت کلیک خارج
-        document.addEventListener("click", (e) => this.handleOutsideClick(e), {
-            capture: true,
-        });
+        document.addEventListener("click", (e) => this.handleOutsideClick(e));
+
         // گوش دادن به آپدیت‌های Livewire
         document.addEventListener("livewire:initialized", () => {
-            Livewire.on("refresh-timepicker", () => this.bindInputs());
-            Livewire.on("component.updated", () => this.bindInputs());
+            Livewire.on("refresh-timepicker", () => this.debounceBindInputs());
+            Livewire.on("component.updated", () => this.debounceBindInputs());
             Livewire.on("open-modal", ({ id }) => {
                 if (id === "holiday-modal" || id === "scheduleModal") {
-                    setTimeout(() => this.bindInputs(), 100);
+                    this.debounceBindInputs();
                 }
             });
         });
+
         // مشاهده تغییرات DOM با بهینه‌سازی
         this.observer = new MutationObserver((mutations) => {
             if (
@@ -29,7 +47,7 @@ class TimePicker {
                     (m) => m.addedNodes.length || m.removedNodes.length
                 )
             ) {
-                this.bindInputs();
+                this.debounceBindInputs();
             }
         });
         this.observer.observe(document.body, {
@@ -37,23 +55,31 @@ class TimePicker {
             subtree: true,
         });
     }
+
     bindInputs() {
-        // حذف listenerهای قبلی
+        // استفاده از event delegation برای بهینه‌سازی
+        document.body.removeEventListener("click", this.handleInputClick, true);
+        document.body.addEventListener(
+            "click",
+            this.handleInputClick.bind(this),
+            true
+        );
+
+        // اطمینان از حذف listenerهای قدیمی
         document.querySelectorAll("input[data-timepicker]").forEach((input) => {
-            if (input._timePickerListener) {
-                input.removeEventListener("click", input._timePickerListener);
-            }
-        });
-        // اضافه کردن listenerهای جدید
-        document.querySelectorAll("input[data-timepicker]").forEach((input) => {
-            const listener = (e) => {
-                e.stopPropagation();
-                this.showPickerBound(input);
-            };
-            input._timePickerListener = listener;
-            input.addEventListener("click", listener, { capture: true });
+            input.removeEventListener("click", input._timePickerListener);
+            input._timePickerListener = null;
         });
     }
+
+    handleInputClick(e) {
+        const input = e.target.closest("input[data-timepicker]");
+        if (input) {
+            e.stopPropagation();
+            this.showPicker(input);
+        }
+    }
+
     showPicker(input) {
         if (
             !(input instanceof HTMLElement) ||
@@ -62,25 +88,31 @@ class TimePicker {
             console.warn("Invalid input element for TimePicker:", input);
             return;
         }
+
         if (this.activePicker) {
             this.closePicker();
         }
+
         // ایجاد بک‌دراپ
         this.backdrop = document.createElement("div");
         this.backdrop.classList.add("timepicker-backdrop");
-        document.body.appendChild(this.backdrop);
+        this.container.appendChild(this.backdrop);
+        setTimeout(() => (this.backdrop.style.opacity = "1"), 0); // برای transition
+
         // ایجاد تایم‌پیکر
         const picker = document.createElement("div");
         picker.classList.add("timepicker");
         picker.innerHTML = this.getPickerHTML();
-        document.body.appendChild(picker);
+        this.container.appendChild(picker);
         this.activePicker = picker;
+
         // تنظیم موقعیت مرکزی
         picker.style.position = "fixed";
         picker.style.top = "50%";
         picker.style.left = "50%";
         picker.style.transform = "translate(-50%, -50%)";
         picker.style.zIndex = "10000";
+
         // خواندن مقدار اولیه یا تنظیم پیش‌فرض
         const value = input.value ? input.value.split(":") : ["07", "00"];
         const hours = value[0] || "07";
@@ -89,8 +121,10 @@ class TimePicker {
         const minutesInput = picker.querySelector(".timepicker-minutes");
         hoursInput.value = hours;
         minutesInput.value = minutes;
+
         this.bindArrowButtons(picker);
         this.bindInputEvents(picker, input);
+
         // مدیریت دکمه تأیید
         picker
             .querySelector(".timepicker-confirm")
@@ -102,11 +136,22 @@ class TimePicker {
                 input.dispatchEvent(new Event("change"));
                 this.closePicker();
             });
+
         // مدیریت دکمه لغو
         picker
             .querySelector(".timepicker-cancel")
             .addEventListener("click", () => this.closePicker());
+
+        // فعال‌سازی انیمیشن
+        setTimeout(
+            () =>
+                picker
+                    .querySelector(".timepicker-content")
+                    .classList.add("show"),
+            0
+        );
     }
+
     getPickerHTML() {
         return `
             <div class="timepicker-content">
@@ -146,6 +191,7 @@ class TimePicker {
             </div>
         `;
     }
+
     bindArrowButtons(picker) {
         picker.querySelectorAll(".timepicker-arrow").forEach((button) => {
             button.addEventListener("click", () => {
@@ -165,37 +211,37 @@ class TimePicker {
             });
         });
     }
+
     bindInputEvents(picker, inputElement) {
         const hoursInput = picker.querySelector(".timepicker-hours");
         const minutesInput = picker.querySelector(".timepicker-minutes");
         [hoursInput, minutesInput].forEach((input) => {
-            // پاک کردن مقدار قبلی هنگام فوکوس
             input.addEventListener("focus", () => {
                 input.value = "";
             });
-            // مدیریت تایپ
+
             input.addEventListener("input", (e) => {
                 let value = e.target.value.replace(/[^0-9]/g, "");
                 if (value.length > 2) {
                     value = value.slice(-2);
                 }
                 e.target.value = value;
-                // اعتبارسنجی هنگام خروج از فوکوس
-                input.addEventListener(
-                    "blur",
-                    () => {
-                        let num = parseInt(input.value) || 0;
-                        if (input.classList.contains("timepicker-hours")) {
-                            num = Math.min(Math.max(num, 0), 23);
-                        } else {
-                            num = Math.min(Math.max(num, 0), 59);
-                        }
-                        input.value = num.toString().padStart(2, "0");
-                    },
-                    { once: true }
-                );
             });
-            // مدیریت کلیدهای فلش بالا و پایین
+
+            input.addEventListener(
+                "blur",
+                () => {
+                    let num = parseInt(input.value) || 0;
+                    if (input.classList.contains("timepicker-hours")) {
+                        num = Math.min(Math.max(num, 0), 23);
+                    } else {
+                        num = Math.min(Math.max(num, 0), 59);
+                    }
+                    input.value = num.toString().padStart(2, "0");
+                },
+                { once: true }
+            );
+
             input.addEventListener("keydown", (e) => {
                 if (e.key === "ArrowUp" || e.key === "ArrowDown") {
                     e.preventDefault();
@@ -221,16 +267,18 @@ class TimePicker {
             });
         });
     }
+
     handleOutsideClick(e) {
         if (
             this.activePicker &&
             !this.activePicker.contains(e.target) &&
-            !e.target.hasAttribute("data-timepicker") &&
+            !e.target.closest("input[data-timepicker]") &&
             !e.target.closest(".x-modal__content")
         ) {
             this.closePicker();
         }
     }
+
     closePicker() {
         if (this.activePicker) {
             this.activePicker.remove();
@@ -240,10 +288,22 @@ class TimePicker {
             this.backdrop.remove();
             this.backdrop = null;
         }
+        // تمیز کردن container
+        this.container.innerHTML = "";
+    }
+
+    destroy() {
+        // تمیز کردن کامل هنگام تخریب
+        this.observer.disconnect();
+        document.removeEventListener("click", this.handleOutsideClick);
+        document.body.removeEventListener("click", this.handleInputClick, true);
+        this.closePicker();
+        this.container.remove();
+        window.timePickerInstance = null;
     }
 }
+
 document.addEventListener("DOMContentLoaded", () => {
-    // اطمینان از اجرای تنها یک نمونه
     if (!window.timePickerInstance) {
         window.timePickerInstance = new TimePicker();
     }
