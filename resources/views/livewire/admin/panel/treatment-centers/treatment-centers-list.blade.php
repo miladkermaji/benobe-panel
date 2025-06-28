@@ -66,7 +66,7 @@
                   <th class="align-middle">پزشکان</th>
                   <th class="align-middle">تخصص‌ها</th>
                   <th class="align-middle">بیمه‌ها</th>
-                  <th class="align-middle">سرویس‌ها</th>
+                  <th class="align-middle">خدمات</th>
                   <th class="align-middle">استان</th>
                   <th class="align-middle">شهر</th>
                   <th class="align-middle">آدرس</th>
@@ -81,7 +81,7 @@
               <tbody>
                 @if ($readyToLoad)
                   @forelse ($treatmentCenters as $index => $item)
-                    <tr class="align-middle" x-data="{ showDoctors: false, showSpecialties: false, showInsurances: false, showServices: false  }">
+                    <tr class="align-middle" x-data="{ showDoctors: false, showSpecialties: false, showInsurances: false, showServices: false }">
                       <td class="text-center">
                         <input type="checkbox" wire:model.live="selectedHospitals" value="{{ $item->id }}"
                           class="form-check-input m-0 align-middle">
@@ -142,21 +142,23 @@
                         </div>
                       </td>
                       <td>
-    <button class="btn btn-link text-primary p-0" @click="showServices = !showServices">
-        <span class="badge bg-warning-subtle text-warning">{{ count($item->service_ids ?? []) }} سرویس</span>
-    </button>
-    <div x-show="showServices" x-transition class="mt-2 p-2 border rounded shadow-sm" style="max-height: 150px; overflow-y: auto;">
-        @if (empty($item->service_ids))
-            <span class="text-muted">بدون سرویس</span>
-        @else
-            @foreach ($item->service_ids as $serviceId)
-                <div class="py-1 border-bottom">
-                    {{ $services[$serviceId] ?? 'نامشخص' }}
-                </div>
-            @endforeach
-        @endif
-    </div>
-</td>
+                        <button class="btn btn-link text-primary p-0" @click="showServices = !showServices">
+                          <span class="badge bg-warning-subtle text-warning">{{ count($item->service_ids ?? []) }}
+                            خدمت</span>
+                        </button>
+                        <div x-show="showServices" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if (empty($item->service_ids))
+                            <span class="text-muted">بدون خدمت</span>
+                          @else
+                            @foreach ($item->service_ids as $serviceId)
+                              <div class="py-1 border-bottom">
+                                {{ $services[$serviceId] ?? 'نامشخص' }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </td>
                       <td>{{ $item->province?->name ?? '-' }}</td>
                       <td>{{ $item->city?->name ?? '-' }}</td>
                       <td>
@@ -238,7 +240,7 @@
           <div class="clinics-cards d-md-none">
             @if ($readyToLoad)
               @forelse ($treatmentCenters as $index => $item)
-                <div class="clinic-card mb-3 p-3 border rounded-2 shadow-sm" x-data="{ open: false, showDoctors: false, showSpecialties: false, showInsurances: false, showServices: false  }">
+                <div class="clinic-card mb-3 p-3 border rounded-2 shadow-sm" x-data="{ open: false, showDoctors: false, showSpecialties: false, showInsurances: false, showServices: false }">
                   <div class="clinic-card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
                       <input type="checkbox" wire:model.live="selectedHospitals" value="{{ $item->id }}"
@@ -345,24 +347,26 @@
                       </span>
                     </div>
                     <div class="clinic-card-item">
-    <span class="clinic-card-label">سرویس‌ها:</span>
-    <span class="clinic-card-value">
-        <button class="btn btn-link text-primary p-0" @click="showServices = !showServices">
-            <span class="badge bg-warning-subtle text-warning">{{ count($item->service_ids ?? []) }} سرویس</span>
-        </button>
-        <div x-show="showServices" x-transition class="mt-2 p-2 border rounded shadow-sm" style="max-height: 150px; overflow-y: auto;">
-            @if (empty($item->service_ids))
-                <span class="text-muted">بدون سرویس</span>
-            @else
-                @foreach ($item->service_ids as $serviceId)
-                    <div class="py-1 border-bottom">
-                        {{ $services[$serviceId] ?? 'نامشخص' }}
+                      <span class="clinic-card-label">خدمات:</span>
+                      <span class="clinic-card-value">
+                        <button class="btn btn-link text-primary p-0" @click="showServices = !showServices">
+                          <span class="badge bg-warning-subtle text-warning">{{ count($item->service_ids ?? []) }}
+                            خدمت</span>
+                        </button>
+                        <div x-show="showServices" x-transition class="mt-2 p-2 border rounded shadow-sm"
+                          style="max-height: 150px; overflow-y: auto;">
+                          @if (empty($item->service_ids))
+                            <span class="text-muted">بدون خدمت</span>
+                          @else
+                            @foreach ($item->service_ids as $serviceId)
+                              <div class="py-1 border-bottom">
+                                {{ $services[$serviceId] ?? 'نامشخص' }}
+                              </div>
+                            @endforeach
+                          @endif
+                        </div>
+                      </span>
                     </div>
-                @endforeach
-            @endif
-        </div>
-    </span>
-</div>
                     <div class="clinic-card-item">
                       <span class="clinic-card-label">استان:</span>
                       <span class="clinic-card-value">{{ $item->province?->name ?? '-' }}</span>

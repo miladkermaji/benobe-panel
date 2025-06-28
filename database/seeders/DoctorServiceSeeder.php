@@ -12,8 +12,8 @@ class DoctorServiceSeeder extends Seeder
     public function run(): void
     {
         Log::info('Starting DoctorService Seeding...');
-        $batchSize = 50; // تولید 50 سرویس در هر دسته
-        for ($i = 0; $i < 6; $i++) { // 6 دسته 50 تایی = 300 سرویس
+        $batchSize = 50; // تولید 50 خدمت در هر دسته
+        for ($i = 0; $i < 6; $i++) { // 6 دسته 50 تایی = 300 خدمت
             Schema::disableForeignKeyConstraints();
             DoctorService::factory()->count($batchSize)->create();
             Schema::enableForeignKeyConstraints();

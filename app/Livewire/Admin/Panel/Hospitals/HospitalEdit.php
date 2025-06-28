@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Livewire\Admin\Panel\Hospitals;
 
 use App\Models\Zone;
@@ -51,10 +50,10 @@ class HospitalEdit extends Component
     public $provinces = [];
     public $insurances = [];
     public $cities = [];
-public $Center_tariff_type;
-public $Daycare_centers;
-public $service_ids = [];
-public $services;
+    public $Center_tariff_type;
+    public $Daycare_centers;
+    public $service_ids = [];
+    public $services;
     public function mount($id)
     {
         $this->hospital = MedicalCenter::findOrFail($id);
@@ -63,14 +62,14 @@ public $services;
         $this->phone_numbers = $this->hospital->phone_numbers ?: [''];
         $this->specialty_ids = $this->hospital->specialty_ids ? array_map('strval', $this->hospital->specialty_ids) : [];
         $this->insurance_ids = $this->hospital->insurance_ids ? array_map('strval', $this->hospital->insurance_ids) : [];
-        
-$this->services = \App\Models\Service::all();
 
-$this->service_ids = $this->hospital->service_ids ? array_map('strval', $this->hospital->service_ids) : [];
+        $this->services = \App\Models\Service::all();
+
+        $this->service_ids = $this->hospital->service_ids ? array_map('strval', $this->hospital->service_ids) : [];
 
 
-$this->Center_tariff_type = $this->hospital->Center_tariff_type;
-$this->Daycare_centers = $this->hospital->Daycare_centers;
+        $this->Center_tariff_type = $this->hospital->Center_tariff_type;
+        $this->Daycare_centers = $this->hospital->Daycare_centers;
 
         // تنظیم روزهای کاری
         $workingDays = $this->hospital->working_days ?? [];
@@ -185,7 +184,7 @@ $this->Daycare_centers = $this->hospital->Daycare_centers;
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
             'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
 'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
-'service_ids.*.exists' => 'سرویس انتخاب‌شده معتبر نیست.',
+'service_ids.*.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -221,7 +220,7 @@ $this->Daycare_centers = $this->hospital->Daycare_centers;
         // حذف doctor_ids از $data چون در جدول medical_centers ذخیره نمی‌شود
         unset($data['doctor_ids']);
 
-$data['service_ids'] = $this->service_ids;
+        $data['service_ids'] = $this->service_ids;
 
         $this->hospital->update($data);
         $this->hospital->doctors()->sync($this->doctor_ids); // به‌روزرسانی رابطه چند به چند

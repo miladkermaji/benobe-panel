@@ -14,7 +14,8 @@ use Livewire\WithPagination;
 
 class DoctorServiceList extends Component
 {
-    use WithPagination, HasSelectedClinic;
+    use WithPagination;
+    use HasSelectedClinic;
 
     public $openServices = [];
     protected $paginationTheme = 'bootstrap';
@@ -88,7 +89,7 @@ class DoctorServiceList extends Component
                 'status' => 1,
                 'parent_id' => null,
             ]);
-            Log::info('سرویس ویزیت پیش‌فرض برای پزشک با ID ' . $doctorId . ' ایجاد شد.');
+            Log::info('خدمت ویزیت پیش‌فرض برای پزشک با ID ' . $doctorId . ' ایجاد شد.');
         } else {
             Log::info('ویزیت پیش‌فرض ایجاد نشد چون حداقل یک خدمت برای پزشک با ID ' . $doctorId . ' وجود دارد.');
         }
@@ -168,7 +169,7 @@ class DoctorServiceList extends Component
     {
         $item = DoctorService::findOrFail($id);
         $item->update(['status' => !$item->status]);
-        $this->dispatch('show-alert', type: $item->status ? 'success' : 'info', message: $item->status ? 'سرویس فعال شد!' : 'سرویس غیرفعال شد!');
+        $this->dispatch('show-alert', type: $item->status ? 'success' : 'info', message: $item->status ? 'خدمت فعال شد!' : 'خدمت غیرفعال شد!');
     }
 
     public function confirmDelete($id)
@@ -180,7 +181,7 @@ class DoctorServiceList extends Component
     {
         $item = DoctorService::findOrFail($id);
         $item->delete();
-        $this->dispatch('show-alert', type: 'success', message: 'سرویس با موفقیت حذف شد!');
+        $this->dispatch('show-alert', type: 'success', message: 'خدمت با موفقیت حذف شد!');
     }
 
     public function updatedSearch()
@@ -212,13 +213,13 @@ class DoctorServiceList extends Component
     public function deleteSelected()
     {
         if (empty($this->selectedDoctorServices)) {
-            $this->dispatch('show-alert', type: 'warning', message: 'هیچ سرویسی انتخاب نشده است.');
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ خدمتی انتخاب نشده است.');
             return;
         }
         DoctorService::whereIn('id', $this->selectedDoctorServices)->delete();
         $this->selectedDoctorServices = [];
         $this->selectAll = false;
-        $this->dispatch('show-alert', type: 'success', message: 'سرویس‌های انتخاب‌شده با موفقیت حذف شدند!');
+        $this->dispatch('show-alert', type: 'success', message: 'خدماتی انتخاب‌شده با موفقیت حذف شدند!');
     }
 
     public function render()

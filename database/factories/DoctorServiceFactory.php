@@ -15,7 +15,7 @@ class DoctorServiceFactory extends Factory
     {
         $faker = Faker::create('fa_IR'); // تنظیم لوکال فارسی
 
-        // لیست نمونه‌ای از نام‌های سرویس‌های پزشکی
+        // لیست نمونه‌ای از نام‌های خدماتی پزشکی
         $serviceNames = [
             'ویزیت عمومی', 'ویزیت تخصصی قلب', 'جراحی عمومی', 'آزمایش خون',
             'سونوگرافی', 'رادیولوژی', 'فیزیوتراپی', 'مشاوره تغذیه',
@@ -32,7 +32,7 @@ class DoctorServiceFactory extends Factory
             'price' => $faker->randomFloat(2, 50000, 2000000), // قیمت بین 50,000 تا 2,000,000 تومان
             'discount' => $faker->optional(0.3)->randomFloat(2, 10000, 500000), // تخفیف با 30% احتمال
             'status' => $faker->randomElement([0, 1, 2]), // فرض بر وجود 3 وضعیت
-            'parent_id' => $faker->optional(0.2)->numberBetween(1, 50), // 20% احتمال داشتن سرویس مادر
+            'parent_id' => $faker->optional(0.2)->numberBetween(1, 50), // 20% احتمال داشتن خدمت مادر
             'created_at' => $faker->dateTimeThisYear(),
             'updated_at' => $faker->dateTimeThisYear(),
         ];

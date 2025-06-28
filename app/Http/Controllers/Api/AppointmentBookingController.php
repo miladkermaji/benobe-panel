@@ -51,8 +51,8 @@ class AppointmentBookingController extends Controller
                 'appointment_date.date_format' => 'فرمت تاریخ نوبت باید به شکل YYYY-MM-DD باشد (مثلاً 2025-03-22).',
                 'appointment_time.required'    => 'زمان نوبت الزامی است.',
                 'appointment_time.date_format' => 'فرمت زمان نوبت باید به شکل HH:MM باشد (مثلاً 14:30).',
-                'service_type.required'        => 'نوع سرویس الزامی است.',
-                'service_type.in'              => 'نوع سرویس باید یکی از مقادیر in_person, phone, text, video باشد.',
+                'service_type.required'        => 'نوع خدمت الزامی است.',
+                'service_type.in'              => 'نوع خدمت باید یکی از مقادیر in_person, phone, text, video باشد.',
             ]);
 
             $appointmentDate = $request->input('appointment_date');
@@ -172,8 +172,8 @@ class AppointmentBookingController extends Controller
                 'appointment_date.date_format' => 'فرمت تاریخ نوبت باید به شکل YYYY-MM-DD باشد (مثلاً 2025-03-22).',
                 'appointment_time.required'    => 'زمان نوبت الزامی است.',
                 'appointment_time.date_format' => 'فرمت زمان نوبت باید به شکل HH:MM باشد (مثلاً 14:30).',
-                'service_type.required'        => 'نوع سرویس الزامی است.',
-                'service_type.in'              => 'نوع سرویس باید یکی از مقادیر in_person, phone, text, video باشد.',
+                'service_type.required'        => 'نوع خدمت الزامی است.',
+                'service_type.in'              => 'نوع خدمت باید یکی از مقادیر in_person, phone, text, video باشد.',
                 'patient_type.required'        => 'نوع بیمار الزامی است.',
                 'patient_type.in'              => 'نوع بیمار باید یکی از مقادیر self یا relative باشد.',
                 'first_name.required_if'       => 'نام بیمار الزامی است وقتی نوع بیمار relative باشد.',
@@ -470,7 +470,7 @@ class AppointmentBookingController extends Controller
                 ], 404);
             }
 
-            // تأیید پرداخت از طریق سرویس پرداخت (فقط اگر وضعیت pending باشد)
+            // تأیید پرداخت از طریق خدمت پرداخت (فقط اگر وضعیت pending باشد)
             $isPaymentSuccessful = false;
             if ($transaction->status === 'pending') {
                 $verifiedTransaction = $this->paymentService->verify();

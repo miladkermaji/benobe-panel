@@ -12,17 +12,17 @@ return new class () extends Migration {
     {
         Schema::create('doctor_services', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('doctor_id')->comment('شناسه دکتر مربوط به سرویس');
-            $table->unsignedBigInteger('clinic_id')->nullable()->comment('شناسه کلینیک مربوط به سرویس');
+            $table->unsignedBigInteger('doctor_id')->comment('شناسه دکتر مربوط به خدمت');
+            $table->unsignedBigInteger('clinic_id')->nullable()->comment('شناسه کلینیک مربوط به خدمت');
             $table->foreignId('insurance_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('set null');
-            $table->string('name')->comment('نام سرویس');
-            $table->text('description')->nullable()->comment('توضیحات سرویس');
+            $table->string('name')->comment('نام خدمت');
+            $table->text('description')->nullable()->comment('توضیحات خدمت');
             $table->integer('duration')->comment('مدت زمان خدمت (به دقیقه)');
-            $table->decimal('price', 12, 2)->comment('قیمت سرویس');
+            $table->decimal('price', 12, 2)->comment('قیمت خدمت');
             $table->decimal('discount', 8, 2)->nullable()->comment('تخفیف اختیاری');
             $table->tinyInteger('status')->default(0);
-            $table->unsignedBigInteger('parent_id')->nullable()->comment('شناسه سرویس مادر (برای زیرگروه‌ها)');
+            $table->unsignedBigInteger('parent_id')->nullable()->comment('شناسه خدمت مادر (برای زیرگروه‌ها)');
             $table->timestamps();
 
             // تعریف کلیدهای خارجی

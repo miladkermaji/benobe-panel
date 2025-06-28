@@ -65,7 +65,7 @@
                   <option value="{{ $service->id }}">{{ $service->name }}</option>
                 @endforeach
               </select>
-              <label for="service_ids" class="form-label">سرویس‌های بیمارستان</label>
+              <label for="service_ids" class="form-label">خدمات بیمارستان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="address" class="form-control" id="address" placeholder=" ">
@@ -266,10 +266,10 @@
           width: '100%'
         });
         $('#service_ids').select2({
-    dir: 'rtl',
-    placeholder: 'انتخاب کنید',
-    width: '100%'
-});
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
 
       }
       initializeSelect2();
@@ -310,8 +310,8 @@
         @this.set('payment_methods', $(this).val());
       });
       $('#service_ids').on('change', function() {
-    @this.set('service_ids', $(this).val());
-});
+        @this.set('service_ids', $(this).val());
+      });
 
       Livewire.on('show-alert', (event) => toastr[event.type](event.message));
     });

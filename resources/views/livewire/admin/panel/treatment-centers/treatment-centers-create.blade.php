@@ -65,7 +65,7 @@
                   <option value="{{ $service->id }}">{{ $service->name }}</option>
                 @endforeach
               </select>
-              <label for="service_ids" class="form-label">سرویس‌های بیمارستان</label>
+              <label for="service_ids" class="form-label">خدمات بیمارستان</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="address" class="form-control" id="address" placeholder=" ">

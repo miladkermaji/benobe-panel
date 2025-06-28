@@ -59,14 +59,14 @@
               <label for="insurance_ids" class="form-label">بیمه‌های کلینیک</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-    <select wire:model.live="service_ids" class="form-select select2" id="service_ids" multiple>
-        <option value="">انتخاب کنید</option>
-        @foreach ($services as $service)
-            <option value="{{ $service->id }}">{{ $service->name }}</option>
-        @endforeach
-    </select>
-    <label for="service_ids" class="form-label">سرویس‌های بیمارستان</label>
-</div>
+              <select wire:model.live="service_ids" class="form-select select2" id="service_ids" multiple>
+                <option value="">انتخاب کنید</option>
+                @foreach ($services as $service)
+                  <option value="{{ $service->id }}">{{ $service->name }}</option>
+                @endforeach
+              </select>
+              <label for="service_ids" class="form-label">خدمات بیمارستان</label>
+            </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="address" class="form-control" id="address" placeholder=" ">
               <label for="address" class="form-label">آدرس</label>
@@ -159,26 +159,26 @@
               </div>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-    <select wire:model="Center_tariff_type" class="form-select select2" id="Center_tariff_type">
-        <option value="">انتخاب کنید</option>
-        <option value="governmental">دولتی</option>
-        <option value="special">ویژه</option>
-        <option value="else">سایر</option>
-    </select>
-    <label for="Center_tariff_type" class="form-label">نوع تعرفه مرکز</label>
-</div>
-<div class="col-6 col-md-6 position-relative mt-5">
-    <select wire:model="Daycare_centers" class="form-select select2" id="Daycare_centers">
-        <option value="">انتخاب کنید</option>
-        <option value="yes">بله</option>
-        <option value="no">خیر</option>
-    </select>
-    <label for="Daycare_centers" class="form-label">مرکز شبانه‌روزی</label>
-</div>
+              <select wire:model="Center_tariff_type" class="form-select select2" id="Center_tariff_type">
+                <option value="">انتخاب کنید</option>
+                <option value="governmental">دولتی</option>
+                <option value="special">ویژه</option>
+                <option value="else">سایر</option>
+              </select>
+              <label for="Center_tariff_type" class="form-label">نوع تعرفه مرکز</label>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <select wire:model="Daycare_centers" class="form-select select2" id="Daycare_centers">
+                <option value="">انتخاب کنید</option>
+                <option value="yes">بله</option>
+                <option value="no">خیر</option>
+              </select>
+              <label for="Daycare_centers" class="form-label">مرکز شبانه‌روزی</label>
+            </div>
             <div class="col-12 position-relative mt-5">
               <label class="form-label fw-bold text-dark mb-3">انتخاب روزهای کاری</label>
               <div class="d-flex flex-wrap gap-3 mt-4 border rounded-lg px-2">
-                @foreach (['saturday' => 'شنبه','sunday' => 'یک‌شنبه','monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+                @foreach (['saturday' => 'شنبه', 'sunday' => 'یک‌شنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                   <div class="form-check d-flex align-items-center">
                     <input class="form-check-input" type="checkbox"
                       wire:model.live="working_days.{{ $day }}" id="working_days_{{ $day }}"
@@ -259,10 +259,10 @@
           width: '100%'
         });
         $('#service_ids').select2({
-    dir: 'rtl',
-    placeholder: 'انتخاب کنید',
-    width: '100%'
-});
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
         $('#insurance_ids').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
@@ -292,15 +292,20 @@
       Livewire.on('set-select2-initial', (event) => {
         setTimeout(() => {
           const data = event || {};
-          if (data.doctor_ids && Array.isArray(data.doctor_ids)) $('#doctor_ids').val(data.doctor_ids).trigger('change');
-          if (data.specialty_ids && Array.isArray(data.specialty_ids)) $('#specialty_ids').val(data.specialty_ids).trigger('change');
-          if (data.insurance_ids && Array.isArray(data.insurance_ids)) $('#insurance_ids').val(data.insurance_ids).trigger('change');
+          if (data.doctor_ids && Array.isArray(data.doctor_ids)) $('#doctor_ids').val(data.doctor_ids)
+            .trigger('change');
+          if (data.specialty_ids && Array.isArray(data.specialty_ids)) $('#specialty_ids').val(data
+            .specialty_ids).trigger('change');
+          if (data.insurance_ids && Array.isArray(data.insurance_ids)) $('#insurance_ids').val(data
+            .insurance_ids).trigger('change');
           if (data.province_id) $('#province_id').val(data.province_id).trigger('change');
           if (data.city_id) $('#city_id').val(data.city_id).trigger('change');
           if (data.payment_methods) $('#payment_methods').val(data.payment_methods).trigger('change');
-          if (data.Center_tariff_type) $('#Center_tariff_type').val(data.Center_tariff_type).trigger('change');
-          if (data.service_ids && Array.isArray(data.service_ids)) $('#service_ids').val(data.service_ids).trigger('change');
-if (data.Daycare_centers) $('#Daycare_centers').val(data.Daycare_centers).trigger('change');
+          if (data.Center_tariff_type) $('#Center_tariff_type').val(data.Center_tariff_type).trigger(
+            'change');
+          if (data.service_ids && Array.isArray(data.service_ids)) $('#service_ids').val(data.service_ids)
+            .trigger('change');
+          if (data.Daycare_centers) $('#Daycare_centers').val(data.Daycare_centers).trigger('change');
         }, 200);
       });
 
@@ -327,8 +332,8 @@ if (data.Daycare_centers) $('#Daycare_centers').val(data.Daycare_centers).trigge
         @this.set('doctor_ids', $(this).val());
       });
       $('#service_ids').on('change', function() {
-    @this.set('service_ids', $(this).val());
-});
+        @this.set('service_ids', $(this).val());
+      });
       $('#specialty_ids').on('change', function() {
         @this.set('specialty_ids', $(this).val());
       });

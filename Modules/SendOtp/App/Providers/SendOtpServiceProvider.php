@@ -39,7 +39,7 @@ class SendOtpServiceProvider extends ServiceProvider
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
 
-        // Binding سرویس‌ها
+        // Binding خدمات
         $this->app->bind(MessageInterface::class, SmsService::class);
     }
 

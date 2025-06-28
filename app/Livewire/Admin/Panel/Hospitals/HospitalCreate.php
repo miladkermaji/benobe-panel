@@ -150,7 +150,7 @@ class HospitalCreate extends Component
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
             'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
              'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
-             'service_ids.*.exists' => 'سرویس انتخاب‌شده معتبر نیست.',
+             'service_ids.*.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
 
         ]);
 

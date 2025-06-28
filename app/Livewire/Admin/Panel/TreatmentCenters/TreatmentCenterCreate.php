@@ -149,7 +149,7 @@ class TreatmentCenterCreate extends Component
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
             'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
 'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
-'service_ids.*.exists' => 'سرویس انتخاب‌شده معتبر نیست.',
+'service_ids.*.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -177,7 +177,7 @@ class TreatmentCenterCreate extends Component
         // حذف doctor_ids از $data چون در جدول medical_centers ذخیره نمی‌شود
         unset($data['doctor_ids']);
 
-$data['service_ids'] = $this->service_ids;
+        $data['service_ids'] = $this->service_ids;
 
         $medicalCenter = MedicalCenter::create($data);
         $medicalCenter->doctors()->sync($this->doctor_ids); // ذخیره رابطه چند به چند

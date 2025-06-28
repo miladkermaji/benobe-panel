@@ -58,8 +58,8 @@ class ClinicCreate extends Component
         $this->doctors = Doctor::all();
         $this->specialties = Specialty::all();
         $this->insurances = Insurance::all();
-        
-$this->services = \App\Models\Service::all();
+
+        $this->services = \App\Models\Service::all();
 
         $this->provinces = Zone::where('level', 1)->get();
         $this->cities = [];
@@ -146,7 +146,7 @@ $this->services = \App\Models\Service::all();
             'phone_numbers.*.regex' => 'شماره‌های تماس باید با ۰۹ شروع شوند و ۱۱ رقم باشند.',
             'specialty_ids.*.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
-            'service_ids.*.exists' => 'سرویس انتخاب‌شده معتبر نیست.',
+            'service_ids.*.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -174,7 +174,7 @@ $this->services = \App\Models\Service::all();
         // حذف doctor_ids از $data چون در جدول medical_centers ذخیره نمی‌شود
         unset($data['doctor_ids']);
 
-$data['service_ids'] = $this->service_ids;
+        $data['service_ids'] = $this->service_ids;
 
         $medicalCenter = MedicalCenter::create($data);
         $medicalCenter->doctors()->sync($this->doctor_ids); // ذخیره رابطه چند به چند

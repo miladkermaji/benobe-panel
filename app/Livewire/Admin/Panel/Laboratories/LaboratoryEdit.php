@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 
 class LaboratoryEdit extends Component
 {
-       use WithFileUploads;
+    use WithFileUploads;
 
     public $laboratory;
     public $doctor_ids = [];
@@ -50,10 +50,10 @@ class LaboratoryEdit extends Component
     public $provinces = [];
     public $insurances = [];
     public $cities = [];
-public $Center_tariff_type;
-public $Daycare_centers;
-public $service_ids = [];
-public $services;
+    public $Center_tariff_type;
+    public $Daycare_centers;
+    public $service_ids = [];
+    public $services;
     public function mount($id)
     {
         $this->laboratory = MedicalCenter::findOrFail($id);
@@ -63,12 +63,12 @@ public $services;
         $this->specialty_ids = $this->laboratory->specialty_ids ? array_map('strval', $this->laboratory->specialty_ids) : [];
         $this->insurance_ids = $this->laboratory->insurance_ids ? array_map('strval', $this->laboratory->insurance_ids) : [];
 
-$this->Center_tariff_type = $this->hospital->Center_tariff_type;
-$this->Daycare_centers = $this->hospital->Daycare_centers;
+        $this->Center_tariff_type = $this->hospital->Center_tariff_type;
+        $this->Daycare_centers = $this->hospital->Daycare_centers;
 
-$this->services = \App\Models\Service::all();
+        $this->services = \App\Models\Service::all();
 
-$this->service_ids = $this->hospital->service_ids ? array_map('strval', $this->hospital->service_ids) : [];
+        $this->service_ids = $this->hospital->service_ids ? array_map('strval', $this->hospital->service_ids) : [];
 
         // تنظیم روزهای کاری
         $workingDays = $this->laboratory->working_days ?? [];
@@ -183,7 +183,7 @@ $this->service_ids = $this->hospital->service_ids ? array_map('strval', $this->h
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
             'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
 'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
-'service_ids.*.exists' => 'سرویس انتخاب‌شده معتبر نیست.',
+'service_ids.*.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -219,7 +219,7 @@ $this->service_ids = $this->hospital->service_ids ? array_map('strval', $this->h
         // حذف doctor_ids از $data چون در جدول medical_centers ذخیره نمی‌شود
         unset($data['doctor_ids']);
 
-$data['service_ids'] = $this->service_ids;
+        $data['service_ids'] = $this->service_ids;
 
         $this->laboratory->update($data);
         $this->laboratory->doctors()->sync($this->doctor_ids); // به‌روزرسانی رابطه چند به چند

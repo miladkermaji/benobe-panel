@@ -50,7 +50,7 @@ class DoctorListingController extends Controller
             if (! in_array($serviceType, $validServiceTypes)) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'نوع سرویس نامعتبر است. مقادیر مجاز: in_person, phone, text, video',
+                    'message' => 'نوع خدمت نامعتبر است. مقادیر مجاز: in_person, phone, text, video',
                     'data'    => null,
                 ], 400);
             }
@@ -156,7 +156,7 @@ class DoctorListingController extends Controller
                     });
                 }
 
-                // فیلتر کردن بر اساس نوع سرویس (مشاوره)
+                // فیلتر کردن بر اساس نوع خدمت (مشاوره)
                 if ($serviceType && $serviceType !== 'in_person') {
                     $query->whereHas('counselingConfig', function ($q) use ($serviceType) {
                         $q->where('online_consultation', true)

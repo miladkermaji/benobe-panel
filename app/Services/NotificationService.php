@@ -28,9 +28,9 @@ class NotificationService
 
     private function sendPushNotification($mobile, $data)
     {
-        // اینجا می‌توانید از سرویس‌های مختلف پوش نوتیفیکیشن استفاده کنید
+        // اینجا می‌توانید از خدماتی مختلف پوش نوتیفیکیشن استفاده کنید
         // مثلاً Firebase Cloud Messaging (FCM)
-        // یا سرویس‌های دیگر مانند OneSignal
+        // یا خدماتی دیگر مانند OneSignal
 
         // مثال استفاده از FCM:
         /*

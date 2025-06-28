@@ -7,7 +7,7 @@
           class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
-        <h5 class="mb-0 fw-bold text-shadow">افزودن آزمایشگاه  جدید</h5>
+        <h5 class="mb-0 fw-bold text-shadow">افزودن آزمایشگاه جدید</h5>
       </div>
       <a href="{{ route('admin.panel.laboratories.index') }}"
         class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">
@@ -59,14 +59,14 @@
               <label for="insurance_ids" class="form-label">بیمه‌های آزمایشگاه </label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-    <select wire:model.live="service_ids" class="form-select select2" id="service_ids" multiple>
-        <option value="">انتخاب کنید</option>
-        @foreach ($services as $service)
-            <option value="{{ $service->id }}">{{ $service->name }}</option>
-        @endforeach
-    </select>
-    <label for="service_ids" class="form-label">سرویس‌های بیمارستان</label>
-</div>
+              <select wire:model.live="service_ids" class="form-select select2" id="service_ids" multiple>
+                <option value="">انتخاب کنید</option>
+                @foreach ($services as $service)
+                  <option value="{{ $service->id }}">{{ $service->name }}</option>
+                @endforeach
+              </select>
+              <label for="service_ids" class="form-label">خدمات بیمارستان</label>
+            </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="address" class="form-control" id="address" placeholder=" ">
               <label for="address" class="form-label">آدرس</label>
@@ -148,7 +148,7 @@
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">
                 <input class="form-check-input" type="checkbox" id="is_main_center" wire:model="is_main_center">
-                <label class="form-check-label fw-medium" for="is_main_center">آزمایشگاه  اصلی</label>
+                <label class="form-check-label fw-medium" for="is_main_center">آزمایشگاه اصلی</label>
               </div>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
@@ -159,26 +159,26 @@
               </div>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-    <select wire:model="Center_tariff_type" class="form-select select2" id="Center_tariff_type">
-        <option value="">انتخاب کنید</option>
-        <option value="governmental">دولتی</option>
-        <option value="special">ویژه</option>
-        <option value="else">سایر</option>
-    </select>
-    <label for="Center_tariff_type" class="form-label">نوع تعرفه مرکز</label>
-</div>
-<div class="col-6 col-md-6 position-relative mt-5">
-    <select wire:model="Daycare_centers" class="form-select select2" id="Daycare_centers">
-        <option value="">انتخاب کنید</option>
-        <option value="yes">بله</option>
-        <option value="no">خیر</option>
-    </select>
-    <label for="Daycare_centers" class="form-label">مرکز شبانه‌روزی</label>
-</div>
+              <select wire:model="Center_tariff_type" class="form-select select2" id="Center_tariff_type">
+                <option value="">انتخاب کنید</option>
+                <option value="governmental">دولتی</option>
+                <option value="special">ویژه</option>
+                <option value="else">سایر</option>
+              </select>
+              <label for="Center_tariff_type" class="form-label">نوع تعرفه مرکز</label>
+            </div>
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <select wire:model="Daycare_centers" class="form-select select2" id="Daycare_centers">
+                <option value="">انتخاب کنید</option>
+                <option value="yes">بله</option>
+                <option value="no">خیر</option>
+              </select>
+              <label for="Daycare_centers" class="form-label">مرکز شبانه‌روزی</label>
+            </div>
             <div class="col-12 position-relative mt-5">
               <label class="form-label fw-bold text-dark mb-3">انتخاب روزهای کاری</label>
               <div class="d-flex flex-wrap gap-3 mt-4 border rounded-lg px-2">
-                @foreach (['saturday' => 'شنبه','sunday' => 'یک‌شنبه','monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+                @foreach (['saturday' => 'شنبه', 'sunday' => 'یک‌شنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                   <div class="form-check d-flex align-items-center">
                     <input class="form-check-input" type="checkbox"
                       wire:model.live="working_days.{{ $day }}" id="working_days_{{ $day }}"
@@ -251,10 +251,10 @@
           width: '100%'
         });
         $('#service_ids').select2({
-    dir: 'rtl',
-    placeholder: 'انتخاب کنید',
-    width: '100%'
-});
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
         $('#province_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
@@ -300,8 +300,8 @@
         @this.set('insurance_ids', $(this).val());
       });
       $('#service_ids').on('change', function() {
-    @this.set('service_ids', $(this).val());
-});
+        @this.set('service_ids', $(this).val());
+      });
       $('#province_id').on('change', function() {
         @this.set('province_id', $(this).val());
       });
