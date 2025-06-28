@@ -7,6 +7,7 @@ use App\Models\Hospital;
 use App\Models\Doctor;
 use App\Models\Specialty;
 use App\Models\Appointment;
+use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -18,8 +19,9 @@ class HospitalController extends Controller
     {
         try {
             // دریافت اطلاعات بیمارستان بر اساس slug
-            $hospital = Hospital::with(['province', 'city', 'doctors', 'doctors.specialty', 'doctors.province', 'doctors.city'])
+            $hospital = MedicalCenter::with(['province', 'city', 'doctors', 'doctors.specialty', 'doctors.province', 'doctors.city'])
                 ->where('slug', $slug)
+                ->where('type', 'hospital')
                 ->where('is_active', true)
                 ->first();
 
