@@ -309,7 +309,7 @@ body {
     .notification-box {
         width: 93vw !important;
         right: inherit !important;
-        left: -50px !important;
+        left: -20px !important;
     }
     .header{
         padding: 5px !important;
