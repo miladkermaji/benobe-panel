@@ -30,7 +30,7 @@
     flex-direction: column;
     gap: 16px;
     direction: ltr;
-    animation: slideIn 0.05s ease-in-out;
+    animation: slideIn 0.02s ease-in-out;
 }
 
 .timepicker-time {
