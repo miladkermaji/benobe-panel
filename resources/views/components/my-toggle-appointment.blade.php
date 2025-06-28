@@ -24,12 +24,19 @@
             if (result.isConfirmed) {
               tempChecked = false;
               $wire.set('autoScheduling', false);
-              $wire.call('updateAutoScheduling');
-              Swal.fire({
-                title: 'تغییر به حالت دستی',
-                text: 'نوبت‌دهی با موفقیت به حالت دستی تغییر یافت.',
-                icon: 'success',
-                confirmButtonText: 'باشه'
+              $wire.call('updateAutoScheduling').then(() => {
+                Swal.fire({
+                  title: 'تغییر به حالت دستی',
+                  text: 'نوبت‌دهی با موفقیت به حالت دستی تغییر یافت. صفحه در حال بارگذاری مجدد است...',
+                  icon: 'success',
+                  timer: 1500,
+                  showConfirmButton: false,
+                  didOpen: () => {
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 1500);
+                  }
+                });
               });
             } else {
               $event.target.checked = true;
@@ -39,12 +46,19 @@
         } else {
           tempChecked = true;
           $wire.set('autoScheduling', true);
-          $wire.call('updateAutoScheduling');
-          Swal.fire({
-            title: 'تغییر به حالت آنلاین + دستی',
-            text: 'نوبت‌دهی با موفقیت به حالت آنلاین + دستی تغییر یافت.',
-            icon: 'success',
-            confirmButtonText: 'باشه'
+          $wire.call('updateAutoScheduling').then(() => {
+            Swal.fire({
+              title: 'تغییر به حالت آنلاین + دستی',
+              text: 'نوبت‌دهی با موفقیت به حالت آنلاین + دستی تغییر یافت. صفحه در حال بارگذاری مجدد است...',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false,
+              didOpen: () => {
+                setTimeout(() => {
+                  window.location.reload();
+                }, 1500);
+              }
+            });
           });
         }
       "
