@@ -175,10 +175,13 @@ class LaboratoryList extends Component
         $specialties = Specialty::pluck('name', 'id');
         $insurances = Insurance::pluck('name', 'id');
 
+$services = \App\Models\Service::pluck('name', 'id');
+
         return view('livewire.admin.panel.laboratories.laboratory-list', [
             'laboratories' => $items,
             'specialties' => $specialties,
             'insurances' => $insurances,
+            'services' => $services,
         ]);
     }
 }

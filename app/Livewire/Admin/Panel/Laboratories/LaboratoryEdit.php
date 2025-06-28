@@ -52,6 +52,8 @@ class LaboratoryEdit extends Component
     public $cities = [];
 public $Center_tariff_type;
 public $Daycare_centers;
+public $service_ids = [];
+public $services;
     public function mount($id)
     {
         $this->laboratory = MedicalCenter::findOrFail($id);
@@ -63,6 +65,10 @@ public $Daycare_centers;
 
 $this->Center_tariff_type = $this->hospital->Center_tariff_type;
 $this->Daycare_centers = $this->hospital->Daycare_centers;
+
+$this->services = \App\Models\Service::all();
+
+$this->service_ids = $this->hospital->service_ids ? array_map('strval', $this->hospital->service_ids) : [];
 
         // تنظیم روزهای کاری
         $workingDays = $this->laboratory->working_days ?? [];
@@ -87,6 +93,7 @@ $this->Daycare_centers = $this->hospital->Daycare_centers;
             'payment_methods' => $this->payment_methods,
             'Center_tariff_type' => $this->Center_tariff_type,
 'Daycare_centers' => $this->Daycare_centers,
+'service_ids' => $this->service_ids,
         ]);
     }
 
@@ -144,6 +151,8 @@ $this->Daycare_centers = $this->hospital->Daycare_centers;
             'insurance_ids.*' => 'exists:insurances,id',
             'Center_tariff_type' => 'nullable|in:governmental,special,else',
 'Daycare_centers' => 'nullable|in:yes,no',
+'service_ids' => 'nullable|array',
+'service_ids.*' => 'exists:services,id',
         ], [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
             'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
@@ -174,6 +183,7 @@ $this->Daycare_centers = $this->hospital->Daycare_centers;
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
             'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
 'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
+'service_ids.*.exists' => 'سرویس انتخاب‌شده معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -208,6 +218,8 @@ $this->Daycare_centers = $this->hospital->Daycare_centers;
 
         // حذف doctor_ids از $data چون در جدول medical_centers ذخیره نمی‌شود
         unset($data['doctor_ids']);
+
+$data['service_ids'] = $this->service_ids;
 
         $this->laboratory->update($data);
         $this->laboratory->doctors()->sync($this->doctor_ids); // به‌روزرسانی رابطه چند به چند

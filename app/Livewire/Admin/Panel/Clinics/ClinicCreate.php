@@ -48,13 +48,19 @@ class ClinicCreate extends Component
     public $provinces = [];
     public $insurances = [];
     public $cities = [];
-public $Center_tariff_type;
-public $Daycare_centers;
+    public $Center_tariff_type;
+    public $Daycare_centers;
+    public $service_ids = [];
+    public $services;
+
     public function mount()
     {
         $this->doctors = Doctor::all();
         $this->specialties = Specialty::all();
         $this->insurances = Insurance::all();
+        
+$this->services = \App\Models\Service::all();
+
         $this->provinces = Zone::where('level', 1)->get();
         $this->cities = [];
     }
@@ -111,6 +117,8 @@ public $Daycare_centers;
             'specialty_ids.*' => 'exists:specialties,id',
             'insurance_ids' => 'nullable|array',
             'insurance_ids.*' => 'exists:insurances,id',
+            'service_ids' => 'nullable|array',
+'service_ids.*' => 'exists:services,id',
         ], [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
             'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
@@ -138,6 +146,7 @@ public $Daycare_centers;
             'phone_numbers.*.regex' => 'شماره‌های تماس باید با ۰۹ شروع شوند و ۱۱ رقم باشند.',
             'specialty_ids.*.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
+            'service_ids.*.exists' => 'سرویس انتخاب‌شده معتبر نیست.',
         ]);
 
         if ($validator->fails()) {
@@ -164,6 +173,8 @@ public $Daycare_centers;
 
         // حذف doctor_ids از $data چون در جدول medical_centers ذخیره نمی‌شود
         unset($data['doctor_ids']);
+
+$data['service_ids'] = $this->service_ids;
 
         $medicalCenter = MedicalCenter::create($data);
         $medicalCenter->doctors()->sync($this->doctor_ids); // ذخیره رابطه چند به چند

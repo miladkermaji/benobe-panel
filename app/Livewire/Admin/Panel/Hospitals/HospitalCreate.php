@@ -50,12 +50,17 @@ class HospitalCreate extends Component
     public $cities = [];
     public $Center_tariff_type;
     public $Daycare_centers;
+    public $service_ids = [];
+    public $services;
 
     public function mount()
     {
         $this->doctors = Doctor::all();
         $this->specialties = Specialty::all();
         $this->insurances = Insurance::all();
+
+        $this->services = \App\Models\Service::all();
+
         $this->provinces = Zone::where('level', 1)->get();
         $this->cities = [];
     }
@@ -114,6 +119,8 @@ class HospitalCreate extends Component
             'insurance_ids.*' => 'exists:insurances,id',
             'Center_tariff_type' => 'nullable|in:governmental,special,else',
             'Daycare_centers' => 'nullable|in:yes,no',
+            'service_ids' => 'nullable|array',
+'service_ids.*' => 'exists:services,id',
         ], [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
             'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
@@ -143,6 +150,7 @@ class HospitalCreate extends Component
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
             'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
              'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
+             'service_ids.*.exists' => 'سرویس انتخاب‌شده معتبر نیست.',
 
         ]);
 
@@ -170,6 +178,8 @@ class HospitalCreate extends Component
 
         // حذف doctor_ids از $data چون در جدول medical_centers ذخیره نمی‌شود
         unset($data['doctor_ids']);
+
+        $data['service_ids'] = $this->service_ids;
 
         $medicalCenter = MedicalCenter::create($data);
         $medicalCenter->doctors()->sync($this->doctor_ids); // ذخیره رابطه چند به چند

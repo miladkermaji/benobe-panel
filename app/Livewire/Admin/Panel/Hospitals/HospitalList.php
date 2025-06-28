@@ -175,10 +175,13 @@ class HospitalList extends Component
         $specialties = Specialty::pluck('name', 'id');
         $insurances = Insurance::pluck('name', 'id');
 
+$services = \App\Models\Service::pluck('name', 'id');
+
         return view('livewire.admin.panel.hospitals.hospital-list', [
             'hospitals' => $items,
             'specialties' => $specialties,
             'insurances' => $insurances,
+            'services' => $services,
         ]);
     }
 }

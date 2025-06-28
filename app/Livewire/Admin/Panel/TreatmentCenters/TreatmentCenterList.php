@@ -174,11 +174,15 @@ class TreatmentCenterList extends Component
         // بارگذاری تخصص‌ها و بیمه‌ها برای استفاده در قالب
         $specialties = Specialty::pluck('name', 'id');
         $insurances = Insurance::pluck('name', 'id');
+        
+$services = \App\Models\Service::pluck('name', 'id');
+
 
         return view('livewire.admin.panel.treatment-centers.treatment-centers-list', [
             'treatmentCenters' => $items,
             'specialties' => $specialties,
             'insurances' => $insurances,
+            'services' => $services,
         ]);
     }
 }

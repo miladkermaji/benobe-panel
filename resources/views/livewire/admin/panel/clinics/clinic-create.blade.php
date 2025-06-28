@@ -58,6 +58,15 @@
               </select>
               <label for="insurance_ids" class="form-label">بیمه‌های کلینیک</label>
             </div>
+            <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+    <select wire:model.live="service_ids" class="form-select select2" id="service_ids" multiple>
+        <option value="">انتخاب کنید</option>
+        @foreach ($services as $service)
+            <option value="{{ $service->id }}">{{ $service->name }}</option>
+        @endforeach
+    </select>
+    <label for="service_ids" class="form-label">سرویس‌های بیمارستان</label>
+</div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="address" class="form-control" id="address" placeholder=" ">
               <label for="address" class="form-label">آدرس</label>
@@ -246,6 +255,11 @@
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
+        $('#service_ids').select2({
+    dir: 'rtl',
+    placeholder: 'انتخاب کنید',
+    width: '100%'
+});
         $('#city_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
@@ -291,6 +305,9 @@
       $('#city_id').on('change', function() {
         @this.set('city_id', $(this).val());
       });
+      $('#service_ids').on('change', function() {
+    @this.set('service_ids', $(this).val());
+});
       $('#payment_methods').on('change', function() {
         @this.set('payment_methods', $(this).val());
       });

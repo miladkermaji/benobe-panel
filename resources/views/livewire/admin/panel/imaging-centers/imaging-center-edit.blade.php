@@ -58,6 +58,15 @@
               </select>
               <label for="insurance_ids" class="form-label">بیمه‌های مرکز تصویر برداری </label>
             </div>
+            <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+    <select wire:model.live="service_ids" class="form-select select2" id="service_ids" multiple>
+        <option value="">انتخاب کنید</option>
+        @foreach ($services as $service)
+            <option value="{{ $service->id }}">{{ $service->name }}</option>
+        @endforeach
+    </select>
+    <label for="service_ids" class="form-label">سرویس‌های بیمارستان</label>
+</div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="address" class="form-control" id="address" placeholder=" ">
               <label for="address" class="form-label">آدرس</label>
@@ -269,6 +278,11 @@
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
+        $('#service_ids').select2({
+    dir: 'rtl',
+    placeholder: 'انتخاب کنید',
+    width: '100%'
+});
       }
 
       setTimeout(() => {
@@ -285,6 +299,7 @@
           if (data.city_id) $('#city_id').val(data.city_id).trigger('change');
           if (data.payment_methods) $('#payment_methods').val(data.payment_methods).trigger('change');
           if (data.Center_tariff_type) $('#Center_tariff_type').val(data.Center_tariff_type).trigger('change');
+          if (data.service_ids && Array.isArray(data.service_ids)) $('#service_ids').val(data.service_ids).trigger('change');
 if (data.Daycare_centers) $('#Daycare_centers').val(data.Daycare_centers).trigger('change');
         }, 200);
       });
@@ -326,7 +341,9 @@ if (data.Daycare_centers) $('#Daycare_centers').val(data.Daycare_centers).trigge
       $('#payment_methods').on('change', function() {
         @this.set('payment_methods', $(this).val());
       });
-
+$('#service_ids').on('change', function() {
+    @this.set('service_ids', $(this).val());
+});
       Livewire.on('show-alert', (event) => toastr[event.type](event.message));
     });
   </script>

@@ -174,10 +174,13 @@ class ClinicList extends Component
         $specialties = Specialty::pluck('name', 'id');
         $insurances = Insurance::pluck('name', 'id');
 
+        $services = \App\Models\Service::pluck('name', 'id');
+
         return view('livewire.admin.panel.clinics.clinic-list', [
             'clinics' => $items,
             'specialties' => $specialties,
             'insurances' => $insurances,
+            'services' => $services,
         ]);
     }
 }
