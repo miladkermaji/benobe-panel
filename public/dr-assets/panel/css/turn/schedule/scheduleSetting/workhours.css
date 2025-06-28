@@ -149,7 +149,6 @@ body {
     position: absolute;
     top: -0.625rem;
     background: var(--background-card);
-    font-size: var(--font-size-label);
     font-weight: 600;
     color: var(--text-secondary);
     padding: 0 0.25rem;
