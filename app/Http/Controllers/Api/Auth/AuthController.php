@@ -82,21 +82,40 @@ public function loginRegister(Request $request)
 
         $loginAttempts = new LoginAttemptsService();
 
-        // اگر شماره موبایل در یکی از جداول وجود داشت
-        if ($user || $doctor || $secretary || $manager) {
-            // انتخاب کاربر از اولین جدول که شماره موبایل در آن پیدا شده
-            $existingUser = $user ?? $doctor ?? $secretary ?? $manager;
-
-            // اطمینان از اینکه کاربر فعال است (اگر جدول status دارد)
-            if (isset($existingUser->status) && $existingUser->status === 0) {
-                $existingUser->update(['status' => 1]);
-            }
+        // تعیین نوع کاربر و مدل مربوطه
+        if ($doctor) {
+            $existingUser = $doctor;
+            $userType = 'doctor';
+            $otpData = [
+                'doctor_id' => $doctor->id,
+            ];
+        } elseif ($secretary) {
+            $existingUser = $secretary;
+            $userType = 'secretary';
+            $otpData = [
+                'secretary_id' => $secretary->id,
+            ];
+        } elseif ($manager) {
+            $existingUser = $manager;
+            $userType = 'manager';
+            $otpData = [
+                'manager_id' => $manager->id,
+            ];
         } else {
-            // اگر شماره موبایل در هیچ جدولی نبود، کاربر جدید در جدول users ایجاد می‌شود
-            $existingUser = User::create([
-                'mobile' => $formattedMobile,
-                'status' => 1,
-            ]);
+            // اگر کاربر در هیچ جدولی نبود، در جدول users ثبت شود
+            if (!$user) {
+                $user = User::create([
+                    'mobile' => $formattedMobile,
+                    'status' => 1,
+                ]);
+            } elseif ($user->status === 0) {
+                $user->update(['status' => 1]);
+            }
+            $existingUser = $user;
+            $userType = 'user';
+            $otpData = [
+                'user_id' => $user->id,
+            ];
         }
 
         if ($loginAttempts->isLocked($formattedMobile)) {
@@ -116,23 +135,25 @@ public function loginRegister(Request $request)
         $otpCode = rand(1000, 9999);
         $token = Str::random(60);
 
-        Otp::create([
+        // ایجاد رکورد OTP با کلید خارجی مناسب
+        Otp::create(array_merge([
             'token' => $token,
-            'user_id' => $existingUser->id,
             'otp_code' => $otpCode,
-            'login_id' => $existingUser->mobile,
-            'type' => 0,
-        ]);
+            'login_id' => $formattedMobile,
+            'type' => 0, // 0 برای شماره موبایل
+            'used' => 0,
+            'status' => 0,
+        ], $otpData));
 
         LoginSession::create([
             'token' => $token,
-            'user_id' => $existingUser->id,
+            'user_id' => $user ? $user->id : null, // فقط برای کاربران جدول users
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100285, $existingUser->mobile, [$otpCode])
+            SmsService::create(100285, $formattedMobile, [$otpCode])
         );
         $messagesService->send();
 
