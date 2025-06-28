@@ -210,7 +210,7 @@
               @endif
             </div>
             <div class="col-12 position-relative mt-5">
-              <label class="form-label fw-bold text-dark mb-3">شماره‌های تماس اضافی</label>
+              <label class="form-label fw-bold text-dark mb-3" style="z-index: 1;">شماره‌های تماس اضافی</label>
               <div class="phone-numbers">
                 @foreach ($phone_numbers as $index => $phone)
                   <div class="input-group mb-2" wire:ignore.self>
