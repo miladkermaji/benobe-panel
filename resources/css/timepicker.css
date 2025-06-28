@@ -6,12 +6,12 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
-    z-index: 9999; /* افزایش z-index */
+    z-index: 9999;
     animation: fadeIn 0.1s ease-in-out;
 }
 
 .timepicker {
-    z-index: 10000; /* افزایش z-index */
+    z-index: 10000;
     font-family: "Vazir", sans-serif;
     position: fixed;
     top: 50%;
@@ -127,7 +127,6 @@
     transform: translateY(-1px);
 }
 
-/* ریسپانسیو برای صفحه‌های کوچک */
 @media (max-width: 768px) {
     .timepicker-content {
         width: 280px;
