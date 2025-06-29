@@ -114,7 +114,22 @@
     Livewire.on('navigateTo', (event) => {
       window.Livewire.navigate(event.url);
     });
-
+  document.addEventListener('DOMContentLoaded', () => {
+      if (typeof toastr !== 'undefined') {
+        toastr.options = {
+          timeOut: 10000,
+          progressBar: true,
+          positionClass: 'toast-top-right',
+          preventDuplicates: true, // جلوگیری از نمایش توسترهای تکراری
+          newestOnTop: true,
+          maxOpened: 1, // فقط یک توستر در هر لحظه
+          closeButton: false,
+          
+        };
+        
+      }
+      toastr.options.rtl = true;
+    });
     // تابع فرمت زمان مشابه سیستم OTP
     function formatConditionalTime(seconds) {
       if (isNaN(seconds) || seconds < 0) return '0 ثانیه';

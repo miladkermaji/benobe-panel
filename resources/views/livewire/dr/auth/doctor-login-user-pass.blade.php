@@ -134,5 +134,21 @@
     document.addEventListener('livewire:initialized', () => {
       document.querySelector('input[wire\\:model="password"]').focus();
     });
+      document.addEventListener('DOMContentLoaded', () => {
+      if (typeof toastr !== 'undefined') {
+        toastr.options = {
+          timeOut: 10000,
+          progressBar: true,
+          positionClass: 'toast-top-right',
+          preventDuplicates: true, // جلوگیری از نمایش توسترهای تکراری
+          newestOnTop: true,
+          maxOpened: 1, // فقط یک توستر در هر لحظه
+          closeButton: false,
+          
+        };
+        
+      }
+      toastr.options.rtl = true;
+    });
   </script>
 @endpush

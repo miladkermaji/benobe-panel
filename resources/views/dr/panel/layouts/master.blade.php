@@ -35,6 +35,7 @@
 
       // اطمینان از عدم تکرار توستر
       toastr.clear(); // پاک کردن توسترهای قبلی
+      toastr.options.rtl = true;
       if (toastrData.type === 'success') {
         toastr.success(toastrData.message);
       } else if (toastrData.type === 'warning') {

@@ -80,6 +80,8 @@
           closeButton: false
         };
       }
+        toastr.options.rtl = true;
+
     });
 
     Livewire.on('otpSent', (data) => {

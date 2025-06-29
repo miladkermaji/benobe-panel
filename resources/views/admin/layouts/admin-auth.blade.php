@@ -78,9 +78,12 @@
           preventDuplicates: true, // جلوگیری از نمایش توسترهای تکراری
           newestOnTop: true,
           maxOpened: 1, // فقط یک توستر در هر لحظه
-          closeButton: false
+          closeButton: false,
+          
         };
+        
       }
+      toastr.options.rtl = true;
     });
 
     Livewire.on('otpSent', (data) => {
