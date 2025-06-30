@@ -163,6 +163,12 @@ class UserSubscriptionController extends Controller
                 return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('طرح اشتراک یافت نشد.'));
             }
 
+            // چک وجود کاربر
+            if (!\App\Models\User::where('id', $meta['user_id'])->exists()) {
+                Log::error('User not found for subscription', ['user_id' => $meta['user_id']]);
+                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('کاربر یافت نشد.'));
+            }
+
             // لاگ کامل داده‌های ورودی
             Log::info('Trying to create UserSubscription', [
                 'user_id' => $meta['user_id'],
