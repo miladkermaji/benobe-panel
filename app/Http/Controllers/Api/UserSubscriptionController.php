@@ -88,13 +88,11 @@ class UserSubscriptionController extends Controller
             'plan_id' => $plan->id,
         ];
 
-        $frontendUrl = config('app.frontend_url', 'https://emr-benobe.ir');
-        $successRedirect = $frontendUrl . '/payment/success';
-        $errorRedirect = $frontendUrl . '/payment/error';
-        $callbackUrl = url('/api/v2/subscriptions/payment/callback');
+        $successRedirect = route('api.v2.subscriptions.payment.callback');
+        $errorRedirect = route('api.v2.subscriptions.payment.callback');
 
         try {
-            $paymentResponse = $this->paymentService->pay($amount, $callbackUrl, $meta, $successRedirect, $errorRedirect);
+            $paymentResponse = $this->paymentService->pay($amount, null, $meta, $successRedirect, $errorRedirect);
 
             if ($paymentResponse instanceof \Shetabit\Multipay\RedirectionForm) {
                 return response()->json([
@@ -130,25 +128,23 @@ class UserSubscriptionController extends Controller
      */
     public function paymentCallback(Request $request)
     {
-        Log::info('UserSubscriptionController::paymentCallback - called', [
-            'input' => $request->all(),
-            'query' => $request->query(),
-        ]);
-
+        $transactionId = $request->input('transaction_id');
         $authority = $request->input('Authority');
         $status = $request->input('Status');
 
-        // فراخوانی متد verify برای آپدیت وضعیت تراکنش
-        $transaction = app(\Modules\Payment\Services\PaymentService::class)->verify();
-        if (!$transaction || $transaction->status !== 'paid') {
-            Log::warning('Payment callback received for a non-successful transaction.', [
-                'transaction_id' => $authority,
-                'status' => $transaction ? $transaction->status : 'not_found',
-            ]);
-            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش یافت نشد یا موفقیت آمیز نبود.'));
+        if ($status !== 'OK' || !$authority) {
+            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش ناموفق بود یا توسط شما لغو شد.'));
         }
 
         try {
+            // Use the authority to find the transaction
+            $transaction = Transaction::where('transaction_id', $authority)->firstOrFail();
+
+            if ($transaction->status !== 'successful') {
+                Log::warning('Payment callback received for a non-successful transaction.', ['transaction_id' => $authority]);
+                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش یافت نشد یا موفقیت آمیز نبود.'));
+            }
+
             // Check if subscription was already created for this transaction to prevent duplicates
             $existingSubscription = UserSubscription::where('transaction_id', $transaction->id)->first();
             if ($existingSubscription) {
@@ -163,14 +159,7 @@ class UserSubscriptionController extends Controller
                 return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('طرح اشتراک یافت نشد.'));
             }
 
-            // چک وجود کاربر
-            if (!\App\Models\User::where('id', $meta['user_id'])->exists()) {
-                Log::error('User not found for subscription', ['user_id' => $meta['user_id']]);
-                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('کاربر یافت نشد.'));
-            }
-
-            // لاگ کامل داده‌های ورودی
-            Log::info('Trying to create UserSubscription', [
+            UserSubscription::create([
                 'user_id' => $meta['user_id'],
                 'plan_id' => $meta['plan_id'],
                 'transaction_id' => $transaction->id,
@@ -179,37 +168,8 @@ class UserSubscriptionController extends Controller
                 'remaining_appointments' => $plan->appointment_count,
                 'status' => true,
             ]);
-            try {
-                $subscription = UserSubscription::create([
-                    'user_id' => $meta['user_id'],
-                    'plan_id' => $meta['plan_id'],
-                    'transaction_id' => $transaction->id,
-                    'start_date' => now()->toDateString(),
-                    'end_date' => now()->addDays($plan->duration_days)->toDateString(),
-                    'remaining_appointments' => $plan->appointment_count,
-                    'status' => true,
-                    'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
-                ]);
-                Log::info('UserSubscription created successfully', [
-                    'id' => $subscription->id,
-                    'user_id' => $meta['user_id'],
-                    'plan_id' => $meta['plan_id'],
-                    'transaction_id_numeric' => $transaction->id,
-                    'transaction_id_string' => $transaction->transaction_id,
-                ]);
-                return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما با موفقیت فعال شد.'));
-            } catch (\Exception $e) {
-                Log::error('UserSubscription create failed', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                    'user_id' => $meta['user_id'],
-                    'plan_id' => $meta['plan_id'],
-                    'transaction_id_numeric' => $transaction->id,
-                    'transaction_id_string' => $transaction->transaction_id,
-                    'meta' => $meta,
-                ]);
-                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('خطا در ذخیره اشتراک. لطفا با پشتیبانی تماس بگیرید.'));
-            }
+
+            return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما با موفقیت فعال شد.'));
 
         } catch (\Exception $e) {
             Log::error('Could not create subscription after payment.', [

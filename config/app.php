@@ -244,7 +244,7 @@ return [
         'URL'            => Illuminate\Support\Facades\URL::class,
         'Validator'      => Illuminate\Support\Facades\Validator::class,
         'View'           => Illuminate\Support\Facades\View::class,
-'Redis' => Illuminate\Support\Facades\Redis::class,
+        'Redis' => Illuminate\Support\Facades\Redis::class,
         // Custom Aliases
         'Helper'         => App\Helpers\Helpers::class,
         /* 'verta' => \Hekmatinasser\Verta\Verta::class, */
