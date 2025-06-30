@@ -27,7 +27,7 @@
           @for ($i = 0; $i < 4; $i++)
             <input wire:model="otpCode.{{ $i }}" inputmode="numeric" maxlength="1"
               class="form-control otp-input text-center custom-rounded border"
-              style="width: 60px; height: 60px; font-size: 1.5rem;">
+              style="width: 60px; height: 60px; font-size: 1.5rem;" autocomplete="one-time-code">
           @endfor
         </div>
         @error('otpCode')
@@ -427,7 +427,7 @@
       }
       setupOtpInputs();
     });
-      document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
       if (typeof toastr !== 'undefined') {
         toastr.options = {
           timeOut: 10000,
@@ -437,9 +437,9 @@
           newestOnTop: true,
           maxOpened: 1, // فقط یک توستر در هر لحظه
           closeButton: false,
-          
+
         };
-        
+
       }
       toastr.options.rtl = true;
     });
