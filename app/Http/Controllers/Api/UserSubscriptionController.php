@@ -130,6 +130,11 @@ class UserSubscriptionController extends Controller
      */
     public function paymentCallback(Request $request)
     {
+        Log::info('UserSubscriptionController::paymentCallback - called', [
+            'input' => $request->all(),
+            'query' => $request->query(),
+        ]);
+
         $transactionId = $request->input('transaction_id');
         $authority = $request->input('Authority');
         $status = $request->input('Status');
