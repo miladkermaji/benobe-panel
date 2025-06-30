@@ -188,29 +188,37 @@ class UserSubscriptionController extends Controller
                 'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
             ]);
 
-            UserSubscription::create([
-                'subscribable_id' => $subscribable->id,
-                'subscribable_type' => get_class($subscribable),
-                'plan_id' => $meta['plan_id'],
-                'transaction_id' => $transaction->id,
-                'start_date' => now()->toDateString(),
-                'end_date' => now()->addDays($plan->duration_days)->toDateString(),
-                'remaining_appointments' => $plan->appointment_count,
-                'status' => true,
-                'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
-            ]);
-
-            Log::info('After create subscription', [
-                'subscribable_id' => $subscribable->id,
-                'subscribable_type' => get_class($subscribable),
-                'plan_id' => $meta['plan_id'],
-                'transaction_id' => $transaction->id,
-                'start_date' => now()->toDateString(),
-                'end_date' => now()->addDays($plan->duration_days)->toDateString(),
-                'remaining_appointments' => $plan->appointment_count,
-                'status' => true,
-                'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
-            ]);
+            try {
+                $subscription = UserSubscription::create([
+                    'subscribable_id' => $subscribable->id,
+                    'subscribable_type' => get_class($subscribable),
+                    'plan_id' => $meta['plan_id'],
+                    'transaction_id' => $transaction->id,
+                    'start_date' => now()->toDateString(),
+                    'end_date' => now()->addDays($plan->duration_days)->toDateString(),
+                    'remaining_appointments' => $plan->appointment_count,
+                    'status' => true,
+                    'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
+                ]);
+                Log::info('Subscription created successfully', ['subscription' => $subscription]);
+            } catch (\Exception $e) {
+                Log::error('Failed to create subscription', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                    'data' => [
+                        'subscribable_id' => $subscribable->id,
+                        'subscribable_type' => get_class($subscribable),
+                        'plan_id' => $meta['plan_id'],
+                        'transaction_id' => $transaction->id,
+                        'start_date' => now()->toDateString(),
+                        'end_date' => now()->addDays($plan->duration_days)->toDateString(),
+                        'remaining_appointments' => $plan->appointment_count,
+                        'status' => true,
+                        'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
+                    ]
+                ]);
+                throw $e;
+            }
 
             return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما با موفقیت فعال شد.'));
 
