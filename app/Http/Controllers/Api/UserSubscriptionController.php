@@ -179,11 +179,13 @@ class UserSubscriptionController extends Controller
         // اگر تراکنش قبلاً paid شده بود، خروجی موفقیت و اطلاعات اشتراک را برگردان
         if ($transaction->status === 'paid') {
             $existingSubscription = \App\Models\UserSubscription::where('transaction_id', $transaction->id)->first();
+            $plan = $existingSubscription ? $existingSubscription->plan : null;
             return response()->json([
                 'success' => true,
                 'message' => $existingSubscription ? 'اشتراک شما قبلا با موفقیت فعال شده است.' : 'اشتراک شما با موفقیت فعال شد.',
                 'authority' => $transaction->transaction_id,
                 'subscription' => $existingSubscription,
+                'plan' => $plan,
             ], 200, ['Content-Type' => 'application/json']);
         }
 
@@ -258,11 +260,13 @@ class UserSubscriptionController extends Controller
                     'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
                 ]);
                 Log::info('Subscription created successfully', ['subscription' => $subscription]);
+                $planModel = $subscription->plan;
                 return response()->json([
                     'success' => true,
                     'message' => 'اشتراک شما با موفقیت فعال شد.',
                     'authority' => $transaction->transaction_id,
                     'subscription' => $subscription,
+                    'plan' => $planModel,
                 ], 200, ['Content-Type' => 'application/json']);
             } catch (\Exception $e) {
                 Log::error('Failed to create subscription', [
