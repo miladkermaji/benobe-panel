@@ -32,7 +32,8 @@ class UserSubscriptionController extends Controller
         $user = Auth::user();
 
         $activeSubscription = UserSubscription::with('plan')
-            ->where('user_id', $user->id)
+            ->where('subscribable_id', $user->id)
+            ->where('subscribable_type', get_class($user))
             ->where('status', true)
             ->where('end_date', '>=', now()->toDateString())
             ->where('remaining_appointments', '>', 0)
