@@ -20,7 +20,13 @@ class Manager extends Authenticatable implements JWTSubject
 
     protected $table = 'managers';
 
-    protected $guarded = ['id'];
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'mobile',
+        'is_active'
+    ];
 
     protected $hidden = [
         'password',
@@ -38,7 +44,7 @@ class Manager extends Authenticatable implements JWTSubject
 
     public function doctors()
     {
-        return $this->hasMany(Doctor::class);
+        return $this->hasMany(Doctor::class, 'manager_id');
     }
 
     /**
