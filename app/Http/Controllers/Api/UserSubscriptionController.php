@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\UserAppointmentFee;
-use App\Models\UserMembershipPlan;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
 use App\Models\UserSubscription;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use App\Models\UserAppointmentFee;
+use App\Models\UserMembershipPlan;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Modules\Payment\Services\PaymentService;
 
@@ -126,15 +128,56 @@ class UserSubscriptionController extends Controller
      */
     public function paymentCallback(Request $request)
     {
-        // For simplicity, we redirect to a frontend route with transaction status
-        // The frontend will then display the appropriate message to the user.
-        // A more robust implementation would verify the payment here and update the subscription.
-        if ($request->has('transaction_id')) {
-            // You should verify the transaction status with your payment service here
-            // and then activate the subscription.
-            return redirect()->away(config('app.frontend_url') . '/payment/success?transaction_id=' . $request->transaction_id);
+        $transactionId = $request->input('transaction_id');
+        $authority = $request->input('Authority');
+        $status = $request->input('Status');
+
+        if ($status !== 'OK' || !$authority) {
+            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش ناموفق بود یا توسط شما لغو شد.'));
         }
 
-        return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . $request->input('message', 'تراکنش ناموفق بود.'));
+        try {
+            // Use the authority to find the transaction
+            $transaction = Transaction::where('transaction_id', $authority)->firstOrFail();
+
+            if ($transaction->status !== 'successful') {
+                Log::warning('Payment callback received for a non-successful transaction.', ['transaction_id' => $authority]);
+                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش یافت نشد یا موفقیت آمیز نبود.'));
+            }
+
+            // Check if subscription was already created for this transaction to prevent duplicates
+            $existingSubscription = UserSubscription::where('transaction_id', $transaction->id)->first();
+            if ($existingSubscription) {
+                return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما قبلا با موفقیت فعال شده است.'));
+            }
+
+            $meta = json_decode($transaction->meta, true);
+            $plan = UserMembershipPlan::find($meta['plan_id']);
+
+            if (!$plan) {
+                Log::error('Plan not found for subscription creation after payment.', ['transaction_id' => $authority, 'plan_id' => $meta['plan_id']]);
+                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('طرح اشتراک یافت نشد.'));
+            }
+
+            UserSubscription::create([
+                'user_id' => $meta['user_id'],
+                'plan_id' => $meta['plan_id'],
+                'transaction_id' => $transaction->id,
+                'start_date' => now()->toDateString(),
+                'end_date' => now()->addDays($plan->duration_days)->toDateString(),
+                'remaining_appointments' => $plan->appointment_count,
+                'status' => true,
+            ]);
+
+            return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما با موفقیت فعال شد.'));
+
+        } catch (\Exception $e) {
+            Log::error('Could not create subscription after payment.', [
+                'authority' => $authority,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('خطا در فعال‌سازی اشتراک. لطفا با پشتیبانی تماس بگیرید.'));
+        }
     }
 }

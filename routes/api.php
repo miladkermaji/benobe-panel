@@ -52,7 +52,7 @@ Route::prefix('v2')->group(function () {
     });
 
     // Payment callback does not need auth middleware
-    Route::get('v2/subscriptions/payment/callback', [UserSubscriptionController::class, 'paymentCallback'])->name('api.v2.subscriptions.payment.callback');
+    Route::get('subscriptions/payment/callback', [UserSubscriptionController::class, 'paymentCallback'])->name('api.v2.subscriptions.payment.callback');
 });
 
 // مسیرهای عمومی
