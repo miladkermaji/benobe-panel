@@ -85,9 +85,15 @@ class UserSubscriptionController extends Controller
 
         $meta = [
             'type' => 'subscription_purchase',
-            'user_id' => $user->id,
             'plan_id' => $plan->id,
         ];
+        if ($user instanceof \App\Models\Doctor) {
+            $meta['doctor_id'] = $user->id;
+        } elseif ($user instanceof \App\Models\Secretary) {
+            $meta['secretary_id'] = $user->id;
+        } else {
+            $meta['user_id'] = $user->id;
+        }
 
         $successRedirect = route('api.v2.subscriptions.payment.callback');
         $errorRedirect = route('api.v2.subscriptions.payment.callback');
