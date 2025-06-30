@@ -219,7 +219,11 @@ class UserSubscriptionController extends Controller
                 throw $e;
             }
 
-            return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما با موفقیت فعال شد.'));
+            return response()->json([
+                'success' => true,
+                'message' => 'اشتراک شما با موفقیت فعال شد.',
+                'subscription' => $subscription,
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Could not create subscription after payment.', [
