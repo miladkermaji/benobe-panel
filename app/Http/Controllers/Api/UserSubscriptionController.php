@@ -92,8 +92,11 @@ class UserSubscriptionController extends Controller
         $successRedirect = $frontendUrl . '/payment/success';
         $errorRedirect = $frontendUrl . '/payment/error';
 
+        // تعیین آدرس صحیح کال‌بک برای سابسکریپشن
+        $callbackUrl = config('app.url', 'https://emr-benobe.ir') . '/api/v2/subscriptions/payment/callback';
+
         try {
-            $paymentResponse = $this->paymentService->pay($amount, null, $meta, $successRedirect, $errorRedirect);
+            $paymentResponse = $this->paymentService->pay($amount, $callbackUrl, $meta, $successRedirect, $errorRedirect);
 
             if ($paymentResponse instanceof \Shetabit\Multipay\RedirectionForm) {
                 return response()->json([
