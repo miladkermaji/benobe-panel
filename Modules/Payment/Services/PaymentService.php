@@ -23,7 +23,7 @@ class PaymentService
     public function pay($amount, $callbackUrl = null, $meta = [], $successRedirect = null, $errorRedirect = null)
     {
         $gateway = $this->getActiveGateway();
-        $callbackUrl = $callbackUrl ?? route('payment.callback');
+        $callbackUrl = $callbackUrl ?? route('api.v2.subscriptions.payment.callback');
 
         Log::info('PaymentService::pay - Initiating payment', [
             'amount' => $amount,
