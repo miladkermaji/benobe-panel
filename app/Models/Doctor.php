@@ -9,6 +9,7 @@ use App\Models\DoctorTag;
 use App\Models\Secretary;
 use App\Models\Specialty;
 use Morilog\Jalali\Jalalian;
+use App\Models\Admin\Manager;
 use App\Models\MedicalCenter;
 use App\Models\DoctorDocument;
 use App\Models\UserDoctorLike;
@@ -17,6 +18,7 @@ use App\Models\DoctorWorkSchedule;
 use Laravel\Jetstream\HasProfilePhoto;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Storage;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -24,7 +26,7 @@ use App\Models\Doctors\DoctorManagement\DoctorTariff;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Doctor extends Authenticatable
+class Doctor extends Authenticatable implements JWTSubject
 {
     use HasApiTokens;
     use HasFactory;
@@ -237,7 +239,7 @@ class Doctor extends Authenticatable
         return $this->belongsTo(Zone::class, 'province_id');
     }
 
-   
+
 
     public function city()
     {
@@ -462,5 +464,30 @@ class Doctor extends Authenticatable
         }
 
         return $this->permissions()->first();
+    }
+
+    public function manager()
+    {
+        return $this->belongsTo(Manager::class);
+    }
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }
