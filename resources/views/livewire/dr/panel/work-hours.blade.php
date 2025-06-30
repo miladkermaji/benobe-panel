@@ -159,7 +159,7 @@
                                   <input type="text"
                                     class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 start-time bg-white"
                                     data-timepicker id="morning-start-{{ $englishDay }}-0"
-                                    wire:model.live.debounce.500ms="slots.{{ $englishDay }}.0.start_time"
+                                    wire:model.live="slots.{{ $englishDay }}.0.start_time"
                                     wire:change="autoSaveTimeSlot('{{ $englishDay }}', 0)" />
                                 </div>
                                 <div class="form-group position-relative timepicker-ui">
@@ -168,7 +168,7 @@
                                   <input type="text"
                                     class="form-control h-50 timepicker-ui-input text-center fw-bold font-size-13 end-time bg-white"
                                     data-timepicker id="morning-end-{{ $englishDay }}-0"
-                                    wire:model.live.debounce.500ms="slots.{{ $englishDay }}.0.end_time"
+                                    wire:model.live="slots.{{ $englishDay }}.0.end_time"
                                     wire:change="autoSaveTimeSlot('{{ $englishDay }}', 0)" />
                                 </div>
                                 <div class="form-group position-relative">
@@ -177,7 +177,7 @@
                                   <input type="text"
                                     class="form-control h-50 text-center max-appointments bg-white"
                                     id="morning-patients-{{ $englishDay }}-0"
-                                    wire:model.live.debounce.500ms="slots.{{ $englishDay }}.0.max_appointments"
+                                    wire:model.live="slots.{{ $englishDay }}.0.max_appointments"
                                     wire:change="autoSaveTimeSlot('{{ $englishDay }}', 0)" x-data="{ day: '{{ $englishDay }}', index: '0' }"
                                     @click="$dispatch('open-modal', { name: 'calculator-modal', day: day, index: index })"
                                     readonly />
@@ -443,7 +443,7 @@
                             <input type="text"
                               class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
                               data-timepicker
-                              wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.start_time"
+                              wire:model.live="scheduleSettings.{{ $day }}.0.start_time"
                               wire:change="autoSaveSchedule('{{ $day }}', 0)">
                           </div>
                           <div class="form-group position-relative timepicker-ui">
@@ -451,7 +451,7 @@
                             <input type="text"
                               class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
                               data-timepicker
-                              wire:model.live.debounce.500ms="scheduleSettings.{{ $day }}.0.end_time"
+                              wire:model.live="scheduleSettings.{{ $day }}.0.end_time"
                               wire:change="autoSaveSchedule('{{ $day }}', 0)">
                           </div>
                           <!-- دکمه‌های غیرفعال برای ردیف خالی -->
