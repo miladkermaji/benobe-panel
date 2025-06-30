@@ -33,6 +33,7 @@ return new class extends Migration
             $table->json('working_days')->nullable();
             $table->json('specialty_ids')->nullable();
             $table->json('insurance_ids')->nullable();
+             $table->json('service_ids')->nullable();
             $table->text('avatar')->nullable();
             $table->json('documents')->nullable();
             $table->json('galleries')->nullable();

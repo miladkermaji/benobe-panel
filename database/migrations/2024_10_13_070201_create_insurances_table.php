@@ -18,6 +18,7 @@ return new class () extends Migration {
             $table->unsignedInteger('appointment_price')->nullable();
             $table->unsignedInteger('insurance_percent')->nullable();
             $table->unsignedInteger('final_price')->nullable();
+            $table->boolean('status')->default(true);
             $table->timestamps();
 
             // اضافه کردن ایندکس‌ها
