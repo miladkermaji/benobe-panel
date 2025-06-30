@@ -92,6 +92,12 @@ class UserSubscriptionController extends Controller
         try {
             $paymentResponse = $this->paymentService->pay($amount, null, $meta, $successRedirect, $errorRedirect);
 
+            if ($paymentResponse instanceof \Shetabit\Multipay\RedirectionForm) {
+                return response()->json([
+                    'payment_url' => $paymentResponse->getAction(),
+                ]);
+            }
+
             if ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
                 return response()->json([
                     'payment_url' => $paymentResponse->getTargetUrl(),
