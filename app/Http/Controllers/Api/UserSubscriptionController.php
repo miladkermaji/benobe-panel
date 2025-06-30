@@ -75,6 +75,26 @@ class UserSubscriptionController extends Controller
         ]);
 
         $user = Auth::user();
+
+        // جلوگیری از خرید مجدد اشتراک فعال
+        $activeSubscription = UserSubscription::where('subscribable_id', $user->id)
+            ->where('subscribable_type', get_class($user))
+            ->where('status', true)
+            ->where('end_date', '>=', now()->toDateString())
+            ->where('remaining_appointments', '>', 0)
+            ->first();
+        if ($activeSubscription) {
+            return response()->json([
+                'success' => false,
+                'message' => 'شما هم‌اکنون یک اشتراک فعال دارید و امکان خرید مجدد وجود ندارد.',
+                'subscription' => [
+                    'plan_name' => $activeSubscription->plan->name,
+                    'remaining_appointments' => $activeSubscription->remaining_appointments,
+                    'end_date' => $activeSubscription->end_date,
+                ],
+            ], 400);
+        }
+
         $plan = UserMembershipPlan::find($request->plan_id);
 
         if (!$plan || !$plan->status) {
