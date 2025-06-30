@@ -389,35 +389,39 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            // دریافت توکن از درخواست
             $token = JWTAuth::getToken();
 
             if ($token) {
-                // ابطال توکن در سرور
                 JWTAuth::invalidate($token);
             }
 
-            // دریافت کاربر لاگین شده
-            $user = Auth::guard('api')->user();
+            $user = Auth::user();
 
             if ($user) {
+                $userType = 'unknown';
+                if ($user instanceof \App\Models\Doctor) {
+                    $userType = 'doctor';
+                } elseif ($user instanceof \App\Models\Secretary) {
+                    $userType = 'secretary';
+                } elseif ($user instanceof \App\Models\Admin\Manager) {
+                    $userType = 'manager';
+                } elseif ($user instanceof \App\Models\User) {
+                    $userType = 'user';
+                }
+
                 $logoutTime = now();
                 LoginLog::where('user_id', $user->id)
+                    ->where('user_type', $userType)
                     ->whereNull('logout_at')
                     ->latest()
                     ->first()?->update(['logout_at' => $logoutTime]);
-
-                // حذف کوکی توکن
-                return response()->json([
-                    'status'  => 'success',
-                    'message' => 'با موفقیت خارج شدید',
-                ])->withCookie(cookie()->forget('auth_token'));
             }
 
             return response()->json([
                 'status'  => 'success',
                 'message' => 'با موفقیت خارج شدید',
-            ], 200);
+            ])->withCookie(cookie()->forget('auth_token'));
+
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 'error',
@@ -429,7 +433,7 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
         if (! $user) {
             return response()->json(['status' => 'error', 'message' => 'کاربر لاگین نکرده است'], 401);
         }
@@ -523,170 +527,90 @@ class AuthController extends Controller
        */
     public function updateProfile(Request $request)
     {
-        Log::info('UpdateProfile - Headers: ' . json_encode($request->headers->all()));
-        Log::info('UpdateProfile - Cookies: ' . json_encode($request->cookies->all()));
+        // The `custom-auth.jwt` middleware has already authenticated the user.
+        $model = Auth::user();
 
-        // گرفتن توکن از کوکی یا هدر
-        $token = $request->cookie('auth_token') ?: $request->bearerToken();
-        Log::info('UpdateProfile - Token retrieved: ' . ($token ?: 'None'));
-
-        if (!$token) {
-            Log::warning('UpdateProfile - No token provided');
+        if (!$model) {
+            Log::warning('UpdateProfile - User not authenticated');
             return response()->json([
                 'status' => 'error',
-                'message' => 'توکن یافت نشد',
+                'message' => 'کاربر احراز هویت نشده است',
                 'data' => null,
             ], 401);
         }
 
-        try {
-            // اعتبارسنجی توکن و گرفتن کاربر
-            $payload = JWTAuth::setToken($token)->getPayload();
-            Log::info('UpdateProfile - Token payload: ' . json_encode($payload->toArray()));
+        Log::info('UpdateProfile - User authenticated', ['user_id' => $model->id, 'user_class' => get_class($model)]);
 
-            $user = JWTAuth::setToken($token)->authenticate();
-            if (!$user) {
-                Log::warning('UpdateProfile - User not found for token: ' . $token);
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'کاربر یافت نشد',
-                    'data' => null,
-                ], 401);
-            }
+        // Define common validation fields
+        $commonFields = [
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'national_code' => 'nullable|string|size:10',
+            'date_of_birth' => 'nullable|date|before:today',
+            'sex' => 'nullable|in:male,female,other',
+            'zone_city_id' => 'nullable|exists:zone,id,level,2',
+            'zone_province_id' => 'nullable|exists:zone,id,level,1',
+            'email' => 'nullable|email',
+            'address' => 'nullable|string|max:1000',
+        ];
 
-            Log::info('UpdateProfile - User authenticated: ' . $user->id);
+        $userForSync = null;
 
-            // تشخیص نوع کاربر با بررسی شماره موبایل در جداول دیگر
-            $mobile = $user->mobile;
-            $doctor = Doctor::where('mobile', $mobile)->first();
-            $secretary = Secretary::where('mobile', $mobile)->first();
-            $manager = Manager::where('mobile', $mobile)->first();
-
-            // تعریف فیلدهای مجاز برای به‌روزرسانی در هر جدول
-            $commonFields = [
-                'first_name' => 'nullable|string|max:255',
-                'last_name' => 'nullable|string|max:255',
-                'national_code' => 'nullable|string|size:10',
-                'date_of_birth' => 'nullable|date|before:today',
-                'sex' => 'nullable|in:male,female',
-                'zone_city_id' => 'nullable|exists:zone,id,level,2',
-                'zone_province_id' => 'nullable|exists:zone,id,level,1',
-                'email' => 'nullable|email',
-                'address' => 'nullable|string|max:1000',
-            ];
-
-            // تنظیم اعتبارسنجی بر اساس نوع کاربر
-            if ($doctor) {
-                $model = $doctor;
-                $table = 'doctors';
-                $validationRules = array_merge($commonFields, [
-                    'national_code' => 'nullable|string|size:10|unique:doctors,national_code,' . $doctor->id,
-                    'email' => 'nullable|email|unique:doctors,email,' . $doctor->id,
-                ]);
-            } elseif ($secretary) {
-                $model = $secretary;
-                $table = 'secretaries';
-                $validationRules = array_merge($commonFields, [
-                    'national_code' => 'nullable|string|size:10|unique:secretaries,national_code,' . $secretary->id . ',id,doctor_id,' . ($secretary->doctor_id ?? 'NULL') . ',clinic_id,' . ($secretary->clinic_id ?? 'NULL'),
-                    'email' => 'nullable|email|unique:secretaries,email,' . $secretary->id,
-                ]);
-            } elseif ($manager) {
-                $model = $manager;
-                $table = 'managers';
-                $validationRules = array_merge($commonFields, [
-                    'national_code' => 'nullable|string|size:10|unique:managers,national_code,' . $manager->id,
-                    'email' => 'nullable|email|unique:managers,email,' . $manager->id,
-                ]);
-            } else {
-                $model = $user;
-                $table = 'users';
-                $validationRules = array_merge($commonFields, [
-                    'national_code' => 'nullable|string|size:10|unique:users,national_code,' . $user->id,
-                    'email' => 'nullable|email|unique:users,email,' . $user->id,
-                ]);
-            }
-
-            // اعتبارسنجی درخواست
-            $request->validate($validationRules);
-
-            // به‌روزرسانی اطلاعات در جدول مربوطه
-            $updateData = [
-                'first_name' => $request->input('first_name', $model->first_name),
-                'last_name' => $request->input('last_name', $model->last_name),
-                'national_code' => $request->input('national_code', $model->national_code),
-                'date_of_birth' => $request->input('date_of_birth', $model->date_of_birth),
-                'sex' => $request->input('sex', $model->sex ?? null),
-                'zone_city_id' => $request->input('zone_city_id', $model->zone_city_id ?? null),
-                'zone_province_id' => $request->input('zone_province_id', $model->zone_province_id ?? null),
-                'email' => $request->input('email', $model->email),
-                'address' => $request->input('address', $model->address),
-            ];
-
-            // حذف فیلدهای null یا غیرمجاز برای جداول خاص
-            $updateData = array_filter($updateData, function ($value, $key) use ($table) {
-                // برای جدول users، فیلد sex به صورت male/female است
-                if ($table === 'users' && $key === 'sex' && !in_array($value, ['male', 'female'])) {
-                    return false;
-                }
-                // برای جدول doctors، فیلد sex می‌تواند other هم باشد
-                if ($table === 'doctors' && $key === 'sex' && !in_array($value, ['male', 'female', 'other'])) {
-                    return false;
-                }
-                // برای جدول managers، فیلد sex می‌تواند other هم باشد
-                if ($table === 'managers' && $key === 'sex' && !in_array($value, ['male', 'female', 'other'])) {
-                    return false;
-                }
-                // برای جدول secretaries، فیلد sex فقط male/female است
-                if ($table === 'secretaries' && $key === 'sex' && !in_array($value, ['male', 'female'])) {
-                    return false;
-                }
-                return $value !== null;
-            }, ARRAY_FILTER_USE_BOTH);
-
-            $model->update($updateData);
-
-            // اگر کاربر در جدول دیگری بود، اطلاعات پایه را در جدول users هم به‌روزرسانی کنیم
-            if ($table !== 'users') {
-                $user->update([
-                    'first_name' => $request->input('first_name', $user->first_name),
-                    'last_name' => $request->input('last_name', $user->last_name),
-                    'national_code' => $request->input('national_code', $user->national_code),
-                    'date_of_birth' => $request->input('date_of_birth', $user->date_of_birth),
-                    'sex' => in_array($request->input('sex'), ['male', 'female']) ? $request->input('sex') : $user->sex,
-                    'zone_city_id' => $request->input('zone_city_id', $user->zone_city_id),
-                    'zone_province_id' => $request->input('zone_province_id', $user->zone_province_id),
-                    'email' => $request->input('email', $user->email),
-                    'address' => $request->input('address', $user->address),
-                ]);
-            }
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'اطلاعات با موفقیت به‌روزرسانی شد',
-                'data' => ['user' => $model->fresh()],
-            ], 200);
-
-        } catch (TokenExpiredException $e) {
-            Log::error('UpdateProfile - Token expired: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'توکن منقضی شده است. لطفاً دوباره وارد شوید.',
-                'data' => null,
-            ], 401);
-        } catch (TokenInvalidException $e) {
-            Log::error('UpdateProfile - Token invalid: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'توکن نامعتبر است.',
-                'data' => null,
-            ], 401);
-        } catch (JWTException $e) {
-            Log::error('UpdateProfile - JWT error: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'خطا در پردازش توکن: ' . $e->getMessage(),
-                'data' => null,
-            ], 401);
+        // Determine validation rules based on user type
+        if ($model instanceof Doctor) {
+            $validationRules = array_merge($commonFields, [
+                'national_code' => 'nullable|string|size:10|unique:doctors,national_code,' . $model->id,
+                'email' => 'nullable|email|unique:doctors,email,' . $model->id,
+            ]);
+            $userForSync = User::where('mobile', $model->mobile)->first();
+        } elseif ($model instanceof Secretary) {
+            $validationRules = array_merge($commonFields, [
+                'sex' => 'nullable|in:male,female', // Secretaries have limited gender options
+                'national_code' => 'nullable|string|size:10|unique:secretaries,national_code,' . $model->id . ',id,doctor_id,' . ($model->doctor_id ?? 'NULL') . ',clinic_id,' . ($model->clinic_id ?? 'NULL'),
+                'email' => 'nullable|email|unique:secretaries,email,' . $model->id,
+            ]);
+            $userForSync = User::where('mobile', $model->mobile)->first();
+        } elseif ($model instanceof Manager) {
+            $validationRules = array_merge($commonFields, [
+                'national_code' => 'nullable|string|size:10|unique:managers,national_code,' . $model->id,
+                'email' => 'nullable|email|unique:managers,email,' . $model->id,
+            ]);
+            $userForSync = User::where('mobile', $model->mobile)->first();
+        } elseif ($model instanceof User) {
+            $validationRules = array_merge($commonFields, [
+                'sex' => 'nullable|in:male,female', // Users have limited gender options
+                'national_code' => 'nullable|string|size:10|unique:users,national_code,' . $model->id,
+                'email' => 'nullable|email|unique:users,email,' . $model->id,
+            ]);
+        } else {
+            Log::error('UpdateProfile - Unknown user type', ['user_class' => get_class($model)]);
+            return response()->json(['status' => 'error', 'message' => 'نوع کاربر پشتیبانی نمی‌شود.'], 400);
         }
+
+        // Validate the request
+        $request->validate($validationRules);
+
+        // Get only the valid fields from the request
+        $updateData = $request->only(array_keys($commonFields));
+        $updateData = array_filter($updateData, fn ($value) => $value !== null);
+
+        // Update the primary model
+        $model->update($updateData);
+
+        // If the user is a doctor/secretary/manager, also sync their data with the main users table
+        if ($userForSync) {
+            $userUpdateData = $updateData;
+            // The 'users' table might not support 'other' for sex
+            if (isset($userUpdateData['sex']) && !in_array($userUpdateData['sex'], ['male', 'female'])) {
+                unset($userUpdateData['sex']);
+            }
+            $userForSync->update($userUpdateData);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'اطلاعات با موفقیت به‌روزرسانی شد',
+            'data' => ['user' => $model->fresh()],
+        ], 200);
     }
 }
