@@ -176,7 +176,31 @@ class UserSubscriptionController extends Controller
                 return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('کاربر یا پزشک یا منشی یافت نشد.'));
             }
 
+            Log::info('Before create subscription', [
+                'subscribable_id' => $subscribable->id,
+                'subscribable_type' => get_class($subscribable),
+                'plan_id' => $meta['plan_id'],
+                'transaction_id' => $transaction->id,
+                'start_date' => now()->toDateString(),
+                'end_date' => now()->addDays($plan->duration_days)->toDateString(),
+                'remaining_appointments' => $plan->appointment_count,
+                'status' => true,
+                'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
+            ]);
+
             UserSubscription::create([
+                'subscribable_id' => $subscribable->id,
+                'subscribable_type' => get_class($subscribable),
+                'plan_id' => $meta['plan_id'],
+                'transaction_id' => $transaction->id,
+                'start_date' => now()->toDateString(),
+                'end_date' => now()->addDays($plan->duration_days)->toDateString(),
+                'remaining_appointments' => $plan->appointment_count,
+                'status' => true,
+                'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
+            ]);
+
+            Log::info('After create subscription', [
                 'subscribable_id' => $subscribable->id,
                 'subscribable_type' => get_class($subscribable),
                 'plan_id' => $meta['plan_id'],
