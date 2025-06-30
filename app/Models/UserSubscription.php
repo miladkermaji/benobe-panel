@@ -11,7 +11,8 @@ class UserSubscription extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'subscribable_id',
+        'subscribable_type',
         'plan_id',
         'transaction_id',
         'start_date',
@@ -26,6 +27,11 @@ class UserSubscription extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
+
+    public function subscribable()
+    {
+        return $this->morphTo();
+    }
 
     public function user()
     {

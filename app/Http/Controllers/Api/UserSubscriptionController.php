@@ -154,19 +154,31 @@ class UserSubscriptionController extends Controller
             $meta = json_decode($transaction->meta, true);
             $plan = UserMembershipPlan::find($meta['plan_id']);
 
-            if (!$plan) {
-                Log::error('Plan not found for subscription creation after payment.', ['transaction_id' => $authority, 'plan_id' => $meta['plan_id']]);
-                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('طرح اشتراک یافت نشد.'));
+            // تشخیص نوع کاربر برای polymorphic
+            $mobile = null;
+            $subscribable = null;
+            if (isset($meta['user_id'])) {
+                $subscribable = \App\Models\User::find($meta['user_id']);
+            } elseif (isset($meta['doctor_id'])) {
+                $subscribable = \App\Models\Doctor::find($meta['doctor_id']);
+            } elseif (isset($meta['secretary_id'])) {
+                $subscribable = \App\Models\Secretary::find($meta['secretary_id']);
+            }
+            if (!$subscribable) {
+                Log::error('Subscribable not found for subscription', ['meta' => $meta]);
+                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('کاربر یا پزشک یا منشی یافت نشد.'));
             }
 
             UserSubscription::create([
-                'user_id' => $meta['user_id'],
+                'subscribable_id' => $subscribable->id,
+                'subscribable_type' => get_class($subscribable),
                 'plan_id' => $meta['plan_id'],
                 'transaction_id' => $transaction->id,
                 'start_date' => now()->toDateString(),
                 'end_date' => now()->addDays($plan->duration_days)->toDateString(),
                 'remaining_appointments' => $plan->appointment_count,
                 'status' => true,
+                'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
             ]);
 
             return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما با موفقیت فعال شد.'));
