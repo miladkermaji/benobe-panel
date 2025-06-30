@@ -128,22 +128,41 @@ class PaymentService
         try {
             $authority = request()->input('Authority');
             if (!$authority) {
-                Log::error('PaymentService::verify - No Authority provided in callback request');
+                Log::error('PaymentService::verify - No Authority provided in callback request', [
+                    'input' => request()->all(),
+                ]);
                 return false;
             }
 
             $transaction = Transaction::where('transaction_id', $authority)->first();
             if (!$transaction) {
-                Log::error("PaymentService::verify - No transaction found for Authority: {$authority}");
+                Log::error("PaymentService::verify - No transaction found for Authority: {$authority}", [
+                    'input' => request()->all(),
+                    'authority' => $authority,
+                ]);
                 return false;
             }
 
             if ($transaction->status !== 'pending') {
-                Log::warning("PaymentService::verify - Transaction {$authority} is not in pending status: {$transaction->status}");
+                Log::warning("PaymentService::verify - Transaction {$authority} is not in pending status: {$transaction->status}", [
+                    'transaction' => $transaction->toArray(),
+                ]);
                 return $transaction->status === 'paid' ? $transaction : false;
             }
 
-            $receipt = Payment::amount($transaction->amount)->transactionId($authority)->verify();
+            try {
+                $receipt = Payment::amount($transaction->amount)->transactionId($authority)->verify();
+            } catch (\Exception $e) {
+                Log::error('PaymentService::verify - Exception from gateway verify', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                    'authority' => $authority,
+                    'transaction' => $transaction->toArray(),
+                ]);
+                $transaction->update(['status' => 'failed']);
+                return false;
+            }
+
             $transactionId = $receipt->getReferenceId();
 
             $receiptDetails = [
@@ -194,7 +213,9 @@ class PaymentService
         } catch (\Shetabit\Multipay\Exceptions\InvalidPaymentException $e) {
             Log::error("PaymentService::verify - InvalidPaymentException: {$e->getMessage()}", [
                 'authority' => request()->input('Authority'),
+                'input' => request()->all(),
                 'transaction' => $transaction ? $transaction->toArray() : null,
+                'trace' => $e->getTraceAsString(),
             ]);
             if ($transaction) {
                 $transaction->update(['status' => 'failed']);
@@ -203,8 +224,9 @@ class PaymentService
         } catch (\Exception $e) {
             Log::error("PaymentService::verify - General error: {$e->getMessage()}", [
                 'authority' => request()->input('Authority'),
-                'trace' => $e->getTraceAsString(),
+                'input' => request()->all(),
                 'transaction' => $transaction ? $transaction->toArray() : null,
+                'trace' => $e->getTraceAsString(),
             ]);
             if ($transaction) {
                 $transaction->update(['status' => 'failed']);
