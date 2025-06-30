@@ -88,7 +88,6 @@ class LoginUserPass extends Component
         $manager = Manager::where('mobile', $formattedMobile)->first();
 
         if (!$manager) {
-            $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
             $this->addError('password', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
@@ -97,19 +96,18 @@ class LoginUserPass extends Component
 
         // بررسی فعال بودن قابلیت ورود با رمز عبور
         if (($user->static_password_enabled ?? 0) !== 1) {
-            $loginAttempts->incrementLoginAttempt(
-                $user->id,
-                $formattedMobile,
-                null,
-                null,
-                $manager ? $manager->id : null,
-            );
             $this->addError('password', 'شما قابلیت ورود با رمز عبور را فعال نکرده‌اید.');
             return;
         }
 
-        // بررسی رمز عبور و وضعیت حساب
-        if (!Hash::check($this->password, $user->password) || $user->status !== 1) {
+        // بررسی وضعیت حساب
+        if ($user->status !== 1) {
+            $this->addError('password', 'حساب کاربری شما غیرفعال است.');
+            return;
+        }
+
+        // بررسی رمز عبور
+        if (!Hash::check($this->password, $user->password)) {
             $loginAttempts->incrementLoginAttempt(
                 $user->id,
                 $formattedMobile,
@@ -118,7 +116,7 @@ class LoginUserPass extends Component
                 $manager ? $manager->id : null,
             );
 
-            $this->addError('password', 'رمز عبور نادرست است یا حساب غیرفعال است.');
+            $this->addError('password', 'رمز عبور نادرست است.');
             $this->dispatch('password-error');
             return;
         }

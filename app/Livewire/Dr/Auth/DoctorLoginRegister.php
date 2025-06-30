@@ -76,7 +76,6 @@ class DoctorLoginRegister extends Component
 
         // بررسی وجود کاربر
         if (!$doctor && !$secretary) {
-            $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
             $this->addError('mobile', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
@@ -85,13 +84,6 @@ class DoctorLoginRegister extends Component
 
         // بررسی وضعیت کاربر
         if ($user->status === 0) {
-            $loginAttempts->incrementLoginAttempt(
-                $user->id,
-                $formattedMobile,
-                $doctor ? $doctor->id : null,
-                $secretary ? $secretary->id : null,
-                null
-            );
             $this->addError('mobile', 'حساب کاربری شما هنوز تأیید نشده است.');
             return;
         }
@@ -101,15 +93,6 @@ class DoctorLoginRegister extends Component
             $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($formattedMobile));
             return;
         }
-
-        // افزایش تعداد تلاش‌ها
-        $loginAttempts->incrementLoginAttempt(
-            $user->id,
-            $formattedMobile,
-            $doctor ? $doctor->id : null,
-            $secretary ? $secretary->id : null,
-            null
-        );
 
         session(['step1_completed' => true, 'login_mobile' => $formattedMobile]);
 

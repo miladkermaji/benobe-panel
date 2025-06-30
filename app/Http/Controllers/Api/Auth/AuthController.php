@@ -131,7 +131,6 @@ class AuthController extends Controller
             ], 429);
         }
 
-        $loginAttempts->incrementLoginAttempt($existingUser->id, $formattedMobile, '', '', '');
         $otpCode = rand(1000, 9999);
         $token = Str::random(60);
 

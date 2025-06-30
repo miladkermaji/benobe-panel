@@ -94,15 +94,6 @@ class LoginRegister extends Component
             return;
         }
 
-        // افزایش تعداد تلاش‌ها
-        $loginAttempts->incrementLoginAttempt(
-            $user->id,
-            $formattedMobile,
-            null,
-            null,
-            $manager ? $manager->id : null
-        );
-
         session(['step1_completed' => true, 'login_mobile' => $formattedMobile]);
 
         // بررسی فعال بودن رمز عبور ثابت

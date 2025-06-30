@@ -71,6 +71,17 @@ class DoctorLoginConfirm extends Component
     public function loginConfirm()
     {
         $otpCode = strrev(implode('', $this->otpCode));
+
+        if (empty(trim($otpCode))) {
+            $this->addError('otpCode', 'لطفاً کد تأیید را وارد کنید.');
+            return;
+        }
+
+        if (strlen($otpCode) < 4) {
+            $this->addError('otpCode', 'کد تأیید باید ۴ رقم باشد.');
+            return;
+        }
+
         $loginSession = LoginSession::where('token', $this->token)
             ->where('step', 2)
             ->where('expires_at', '>', now())
