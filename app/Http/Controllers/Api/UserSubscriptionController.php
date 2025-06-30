@@ -97,10 +97,9 @@ class UserSubscriptionController extends Controller
 
         $successRedirect = route('api.v2.subscriptions.payment.callback');
         $errorRedirect = route('api.v2.subscriptions.payment.callback');
-        $callbackUrl = url('/api/v2/subscriptions/payment/callback');
 
         try {
-            $paymentResponse = $this->paymentService->pay($amount, $callbackUrl, $meta, $successRedirect, $errorRedirect);
+            $paymentResponse = $this->paymentService->pay($amount, null, $meta, $successRedirect, $errorRedirect);
 
             if ($paymentResponse instanceof \Shetabit\Multipay\RedirectionForm) {
                 return response()->json([
