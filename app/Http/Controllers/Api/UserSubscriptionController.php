@@ -147,7 +147,7 @@ class UserSubscriptionController extends Controller
             // Use the authority to find the transaction
             $transaction = Transaction::where('transaction_id', $authority)->firstOrFail();
 
-            if ($transaction->status !== 'successful') {
+            if ($transaction->status !== 'paid') {
                 Log::warning('Payment callback received for a non-successful transaction.', ['transaction_id' => $authority]);
                 return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش یافت نشد یا موفقیت آمیز نبود.'));
             }
