@@ -266,7 +266,11 @@ class AuthController extends Controller
         }
 
         $user->update(['mobile_verified_at' => Carbon::now()]);
-        $jwtToken = Auth::guard($guard)->login($user);
+
+        // Add the guard to the token claims to identify user type in middleware
+        $customClaims = ['guard' => $guard];
+        $jwtToken = JWTAuth::claims($customClaims)->fromUser($user);
+
         $loginAttempts->resetLoginAttempts($user->mobile);
 
         LoginSession::where('token', $token)->delete();
