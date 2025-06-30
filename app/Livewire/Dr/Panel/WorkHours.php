@@ -1264,20 +1264,18 @@ class Workhours extends Component
                     $appointmentSettings = is_array($schedule->appointment_settings)
                         ? $schedule->appointment_settings
                         : json_decode($schedule->appointment_settings, true) ?? [];
-                    $existingIndex = array_search((int)$index, array_column($appointmentSettings, 'work_hour_key'));
+
+                    $existingIndex = false;
+                    if (!empty($appointmentSettings)) {
+                        $existingIndex = array_search((int)$index, array_column($appointmentSettings, 'work_hour_key'));
+                    }
+
                     if ($existingIndex !== false) {
                         $appointmentSettings[$existingIndex] = $newSetting;
                     } else {
                         $appointmentSettings[] = $newSetting;
                     }
-                    $schedule->update([
-                        'appointment_settings' => json_encode(array_values($appointmentSettings)),
-                    ]);
-                    Log::info('Updated appointment settings', [
-                        'schedule_id' => $schedule->id,
-                        'day' => $schedule->day,
-                        'appointment_settings' => $appointmentSettings,
-                    ]);
+                    $schedule->update(['appointment_settings' => json_encode(array_values($appointmentSettings))]);
                 }
                 DB::commit();
                 // رفرش داده‌ها
@@ -1846,35 +1844,48 @@ class Workhours extends Component
                 $existingDays = $schedules->pluck('day')->toArray();
                 $missingDays = array_diff($daysOfWeek, $existingDays);
 
-                // ایجاد رکوردهای جدید برای روزهای缺失
-                foreach ($missingDays as $missingDay) {
-                    DoctorWorkSchedule::create([
-                        'doctor_id' => $doctorId,
-                        'day' => $missingDay,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
-                        'is_working' => false,
-                        'work_hours' => json_encode([]),
-                        'appointment_settings' => json_encode([]),
-                    ]);
+                if (!empty($missingDays)) {
+                    $newSchedulesData = [];
+                    foreach ($missingDays as $missingDay) {
+                        $newSchedulesData[] = [
+                            'doctor_id' => $doctorId,
+                            'day' => $missingDay,
+                            'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                            'is_working' => false,
+                            'work_hours' => '[]',
+                            'appointment_settings' => '[]',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                    }
+                    DoctorWorkSchedule::insert($newSchedulesData);
+
+                    $schedules = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                        ->whereIn('day', $daysOfWeek)
+                        ->where(function ($query) {
+                            if ($this->activeClinicId !== 'default') {
+                                $query->where('clinic_id', $this->activeClinicId);
+                            } else {
+                                $query->whereNull('clinic_id');
+                            }
+                        })
+                        ->get();
                 }
 
-                // به‌روزرسانی تنظیمات نوبت‌دهی فقط در صورتی که هیچ تنظیماتی وجود نداشته باشد
+                // به‌روزرسانی تنظیمات نوبت‌دهی
                 foreach ($schedules as $schedule) {
-                    $appointmentSettings = [];
-                    if (is_string($schedule->appointment_settings)) {
-                        $decodedSettings = json_decode($schedule->appointment_settings, true);
-                        $appointmentSettings = is_array($decodedSettings) ? $decodedSettings : [];
-                    } elseif (is_array($schedule->appointment_settings)) {
-                        $appointmentSettings = $schedule->appointment_settings;
-                    } else {
-                        $appointmentSettings = [];
-                    }
+                    $appointmentSettings = is_array($schedule->appointment_settings)
+                        ? $schedule->appointment_settings
+                        : json_decode($schedule->appointment_settings, true) ?? [];
 
-                    // فقط اگر تنظیمات نوبت‌دهی خالی باشد، تنظیم جدید اضافه شود
-                    if (empty($appointmentSettings)) {
+                    $existingKey = array_search((int)$index, array_column($appointmentSettings, 'work_hour_key'));
+
+                    if ($existingKey !== false) {
+                        $appointmentSettings[$existingKey] = $newSetting;
+                    } else {
                         $appointmentSettings[] = $newSetting;
-                        $schedule->update(['appointment_settings' => json_encode(array_values($appointmentSettings))]);
                     }
+                    $schedule->update(['appointment_settings' => json_encode(array_values($appointmentSettings))]);
                 }
 
                 DB::commit();
