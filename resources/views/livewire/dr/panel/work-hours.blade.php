@@ -310,9 +310,9 @@
             </div>
           </div>
           <div class="w-100 d-flex justify-content-end mt-3">
-            <button type="button"
+            <button type="button" id="saveEmergencyTimesBtn"
               class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-              wire:click="saveEmergencyTimes" {{ !$autoScheduling ? 'disabled' : '' }}>
+              wire:click="saveEmergencyTimes">
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -856,12 +856,13 @@
                 const start = timeToMinutes(startTime) + (i * slotDuration);
                 times.push(minutesToTime(start));
               }
+              const autoScheduling = @this.get('autoScheduling');
+              const $saveButton = $('#saveEmergencyTimesBtn');
+              $saveButton.prop('disabled', !autoScheduling);
+
               let currentEmergencyTimes = [];
               try {
-                const workSchedule = @this.workSchedules.find(s => s.day === day);
-                const autoScheduling = @this.autoScheduling;
-
-
+                const workSchedule = @this.get('workSchedules').find(s => s.day === day);
                 currentEmergencyTimes = workSchedule && workSchedule.emergency_times ? workSchedule
                   .emergency_times : [];
               } catch (error) {
@@ -873,8 +874,11 @@
               $timesContainer.empty();
               times.forEach(time => {
                 const isSaved = currentEmergencyTimes.includes(time);
+                const buttonClass = autoScheduling ? (isSaved ? 'btn-primary' : 'btn-outline-primary') :
+                  'btn-primary';
+                const disabledAttr = !autoScheduling ? 'disabled' : '';
                 const $button = $(`
-                <button type="button" class="btn btn-sm time-slot-btn ${@this.autoScheduling ? (isSaved  ? 'btn-primary' : 'btn-outline-primary' ) :'btn-primary'}" data-time="${time}" {{ !$autoScheduling ? 'disabled' : '' }}>
+                <button type="button" class="btn btn-sm time-slot-btn ${buttonClass}" data-time="${time}" ${disabledAttr}>
                   ${time}
                 </button>
               `);
@@ -1243,6 +1247,32 @@
               }
             });
           });
+        });
+
+        window.addEventListener('auto-scheduling-changed', event => {
+          const isEnabled = event.detail.isEnabled;
+          const $modal = $('#emergency-times').closest('.modal');
+
+          if ($modal.is(':visible')) {
+            const $timeSlotButtons = $modal.find('.time-slot-btn');
+            const $saveButton = $('#saveEmergencyTimesBtn');
+
+            $saveButton.prop('disabled', !isEnabled);
+
+            $timeSlotButtons.each(function() {
+              const $btn = $(this);
+              $btn.prop('disabled', !isEnabled);
+
+              if (isEnabled) {
+                const time = $btn.data('time');
+                const isSaved = @this.get('emergencyTimes').includes(time);
+                $btn.removeClass('btn-primary btn-outline-primary').addClass(isSaved ? 'btn-primary' :
+                  'btn-outline-primary');
+              } else {
+                $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+              }
+            });
+          }
         });
       });
     </script>
