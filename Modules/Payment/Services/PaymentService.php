@@ -33,17 +33,21 @@ class PaymentService
             'error_redirect' => $errorRedirect,
         ]);
 
-        $transactableType = 'App\Models\User';
+        $transactableType = 'App\\Models\\User';
         $transactableId = null;
 
-        if (isset($meta['doctor_id']) && ($meta['type'] === 'profile_upgrade' || $meta['type'] === 'wallet_charge')) {
-            $transactableType = 'App\Models\Doctor';
+        if (isset($meta['doctor_id'])) {
+            $transactableType = 'App\\Models\\Doctor';
             $transactableId = $meta['doctor_id'];
+        } elseif (isset($meta['secretary_id'])) {
+            $transactableType = 'App\\Models\\Secretary';
+            $transactableId = $meta['secretary_id'];
         } else {
             $user = Auth::user();
             if (!$user) {
                 throw new \Exception('کاربر احراز هویت نشده است.');
             }
+            $transactableType = get_class($user);
             $transactableId = $user->id;
         }
 
