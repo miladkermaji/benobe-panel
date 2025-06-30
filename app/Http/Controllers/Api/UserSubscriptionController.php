@@ -92,7 +92,13 @@ class UserSubscriptionController extends Controller
         try {
             $paymentResponse = $this->paymentService->pay($amount, null, $meta, $successRedirect, $errorRedirect);
 
-            if (isset($paymentResponse['payment_url'])) {
+            if ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
+                return response()->json([
+                    'payment_url' => $paymentResponse->getTargetUrl(),
+                ]);
+            }
+
+            if (is_array($paymentResponse) && isset($paymentResponse['payment_url'])) {
                 return response()->json([
                     'payment_url' => $paymentResponse['payment_url'],
                 ]);
@@ -101,7 +107,8 @@ class UserSubscriptionController extends Controller
             return response()->json(['message' => 'خطا در ایجاد لینک پرداخت.'], 500);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            \Illuminate\Support\Facades\Log::error($e);
+            return response()->json(['message' => 'خطای سرور: ' . $e->getMessage()], 500);
         }
     }
 
