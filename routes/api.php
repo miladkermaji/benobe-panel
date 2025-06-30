@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\MedicalCentersController;
 use App\Http\Controllers\Api\TeleCounselingController;
 use App\Http\Controllers\Api\DoctorAppointmentController;
 use App\Http\Controllers\Api\AppointmentBookingController;
+use App\Http\Controllers\Api\UserSubscriptionController;
 use Modules\Payment\App\Http\Controllers\PaymentController;
 
 // مسیرهای نسخه 1 (یا بدون نسخه - قبلی)
@@ -42,6 +43,10 @@ Route::prefix('v2')->group(function () {
         Route::prefix('appointments')->group(function () {
             Route::get('book/{doctorId}', [AppointmentBookingController::class, 'getBookingDetails'])->name('api.v2.appointments.booking-details');
             Route::post('book/{doctorId}', [AppointmentBookingController::class, 'bookAppointment'])->name('api.v2.appointments.book');
+        });
+
+        Route::prefix('subscriptions')->group(function () {
+            Route::get('details', [UserSubscriptionController::class, 'getSubscriptionDetails'])->name('api.v2.subscriptions.details');
         });
     });
 });
