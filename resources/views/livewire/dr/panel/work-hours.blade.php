@@ -327,7 +327,7 @@
           <div class="w-100 d-flex justify-content-end mt-3">
             <button type="button"
               class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
-              wire:click="saveEmergencyTimes" {{ !$autoScheduling ? 'disabled' : '' }}>
+              wire:click="saveEmergencyTimes" {{ !$autoScheduling ? "disabled" : "" }}>
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -693,17 +693,21 @@
                 $timeCount.prop('disabled', true);
               }
 
-              // تابع برای فراخوانی saveCalculator با debounce
-              let debounceTimeout;
-              const debounceSaveCalculator = () => {
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(() => {
-                  if (@this.get('calculator.start_time') && @this.get('calculator.end_time') && @this.get(
-                      'calculator.appointment_count')) {
-                    @this.call('saveCalculator');
-                  }
-                }, 500); // تأخیر 500 میلی‌ثانیه
-              };
+              $appointmentCount.on('focus', function() {
+                $countRadio.prop('checked', true).trigger('change');
+                $timeRadio.prop('checked', false);
+                $appointmentCount.prop('disabled', false);
+                $timeCount.prop('disabled', true);
+                @this.set('calculationMode', 'count');
+              });
+
+              $timeCount.on('focus', function() {
+                $timeRadio.prop('checked', true).trigger('change');
+                $countRadio.prop('checked', false);
+                $timeCount.prop('disabled', false);
+                $appointmentCount.prop('disabled', true);
+                @this.set('calculationMode', 'time');
+              });
 
               $appointmentCount.on('input', function() {
                 const count = parseInt($(this).val());
@@ -712,7 +716,6 @@
                   $timeCount.val(timePerAppointment);
                   @this.set('calculator.appointment_count', count);
                   @this.set('calculator.time_per_appointment', timePerAppointment);
-                  debounceSaveCalculator();
                 } else {
                   $timeCount.val('');
                   @this.set('calculator.appointment_count', null);
@@ -727,7 +730,6 @@
                   $appointmentCount.val(appointmentCount);
                   @this.set('calculator.time_per_appointment', time);
                   @this.set('calculator.appointment_count', appointmentCount);
-                  debounceSaveCalculator();
                 } else {
                   $appointmentCount.val('');
                   @this.set('calculator.appointment_count', null);
@@ -740,9 +742,6 @@
                   $appointmentCount.prop('disabled', false);
                   $timeCount.prop('disabled', true);
                   @this.set('calculationMode', 'count');
-                  if (@this.get('calculator.appointment_count')) {
-                    debounceSaveCalculator();
-                  }
                 }
               });
 
@@ -751,9 +750,6 @@
                   $timeCount.prop('disabled', false);
                   $appointmentCount.prop('disabled', true);
                   @this.set('calculationMode', 'time');
-                  if (@this.get('calculator.time_per_appointment')) {
-                    debounceSaveCalculator();
-                  }
                 }
               });
 
@@ -843,8 +839,8 @@
               try {
                 const workSchedule = @this.workSchedules.find(s => s.day === day);
                 const autoScheduling = @this.autoScheduling;
-
-
+                
+                
                 currentEmergencyTimes = workSchedule && workSchedule.emergency_times ? workSchedule
                   .emergency_times : [];
               } catch (error) {
@@ -857,7 +853,7 @@
               times.forEach(time => {
                 const isSaved = currentEmergencyTimes.includes(time);
                 const $button = $(`
-                <button type="button" class="btn btn-sm time-slot-btn ${@this.autoScheduling ? (isSaved  ? 'btn-primary' : 'btn-outline-primary' ) :'btn-primary'}" data-time="${time}" {{ !$autoScheduling ? 'disabled' : '' }}>
+                <button type="button" class="btn btn-sm time-slot-btn ${@this.autoScheduling ? (isSaved  ? 'btn-primary' : 'btn-outline-primary' ) :'btn-primary'}" data-time="${time}" {{ !$autoScheduling ? 'disabled': '' }}>
                   ${time}
                 </button>
               `);
