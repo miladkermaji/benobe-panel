@@ -236,14 +236,20 @@ class UserSubscriptionController extends Controller
                         'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
                     ]
                 ]);
-                throw $e;
+                return response()->json([
+                    'success' => false,
+                    'message' => 'خطا در ثبت اشتراک. لطفا با پشتیبانی تماس بگیرید.',
+                    'authority' => $transaction->transaction_id,
+                ], 500);
             }
 
+            // خروجی جیسون با authority و فورس json
             return response()->json([
                 'success' => true,
                 'message' => 'اشتراک شما با موفقیت فعال شد.',
+                'authority' => $transaction->transaction_id,
                 'subscription' => $subscription,
-            ]);
+            ], 200, ['Content-Type' => 'application/json']);
 
         } catch (\Exception $e) {
             Log::error('Could not create subscription after payment.', [
