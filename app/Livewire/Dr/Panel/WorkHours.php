@@ -1856,7 +1856,7 @@ public function saveCalculator()
             ]);
             $this->dispatch('close-calculator-modal');
             $this->dispatch('refresh-work-hours');
-            $this->reset(['calculator', 'calculationMode']);
+            /* $this->reset(['calculator', 'calculationMode']); */
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
