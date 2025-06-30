@@ -159,14 +159,22 @@ class UserSubscriptionController extends Controller
         $status = $request->input('Status');
 
         if ($status !== 'OK' || !$authority) {
-            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش ناموفق بود یا توسط شما لغو شد.'));
+            return response()->json([
+                'success' => false,
+                'message' => 'تراکنش ناموفق بود یا توسط شما لغو شد.',
+                'authority' => $authority,
+            ], 400, ['Content-Type' => 'application/json']);
         }
 
         // مرحله مهم: verify
         $verifiedTransaction = app(\Modules\Payment\Services\PaymentService::class)->verify();
         if (!$verifiedTransaction || $verifiedTransaction->status !== 'paid') {
             Log::warning('Payment callback received for a non-successful transaction after verify.', ['transaction_id' => $authority]);
-            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش یافت نشد یا موفقیت آمیز نبود.'));
+            return response()->json([
+                'success' => false,
+                'message' => 'تراکنش یافت نشد یا موفقیت آمیز نبود.',
+                'authority' => $authority,
+            ], 404, ['Content-Type' => 'application/json']);
         }
         $transaction = $verifiedTransaction;
 
@@ -174,7 +182,12 @@ class UserSubscriptionController extends Controller
             // Check if subscription was already created for this transaction to prevent duplicates
             $existingSubscription = UserSubscription::where('transaction_id', $transaction->id)->first();
             if ($existingSubscription) {
-                return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما قبلا با موفقیت فعال شده است.'));
+                return response()->json([
+                    'success' => true,
+                    'message' => 'اشتراک شما قبلا با موفقیت فعال شده است.',
+                    'authority' => $transaction->transaction_id,
+                    'subscription' => $existingSubscription,
+                ], 200, ['Content-Type' => 'application/json']);
             }
 
             $meta = json_decode($transaction->meta, true);
@@ -192,7 +205,11 @@ class UserSubscriptionController extends Controller
             }
             if (!$subscribable) {
                 Log::error('Subscribable not found for subscription', ['meta' => $meta]);
-                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('کاربر یا پزشک یا منشی یافت نشد.'));
+                return response()->json([
+                    'success' => false,
+                    'message' => 'کاربر یا پزشک یا منشی یافت نشد.',
+                    'authority' => $transaction->transaction_id,
+                ], 404, ['Content-Type' => 'application/json']);
             }
 
             Log::info('Before create subscription', [
@@ -220,6 +237,12 @@ class UserSubscriptionController extends Controller
                     'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
                 ]);
                 Log::info('Subscription created successfully', ['subscription' => $subscription]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'اشتراک شما با موفقیت فعال شد.',
+                    'authority' => $transaction->transaction_id,
+                    'subscription' => $subscription,
+                ], 200, ['Content-Type' => 'application/json']);
             } catch (\Exception $e) {
                 Log::error('Failed to create subscription', [
                     'error' => $e->getMessage(),
@@ -240,16 +263,8 @@ class UserSubscriptionController extends Controller
                     'success' => false,
                     'message' => 'خطا در ثبت اشتراک. لطفا با پشتیبانی تماس بگیرید.',
                     'authority' => $transaction->transaction_id,
-                ], 500);
+                ], 500, ['Content-Type' => 'application/json']);
             }
-
-            // خروجی جیسون با authority و فورس json
-            return response()->json([
-                'success' => true,
-                'message' => 'اشتراک شما با موفقیت فعال شد.',
-                'authority' => $transaction->transaction_id,
-                'subscription' => $subscription,
-            ], 200, ['Content-Type' => 'application/json']);
 
         } catch (\Exception $e) {
             Log::error('Could not create subscription after payment.', [
@@ -257,7 +272,11 @@ class UserSubscriptionController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('خطا در فعال‌سازی اشتراک. لطفا با پشتیبانی تماس بگیرید.'));
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در فعال‌سازی اشتراک. لطفا با پشتیبانی تماس بگیرید.',
+                'authority' => $authority,
+            ], 500, ['Content-Type' => 'application/json']);
         }
     }
 }
