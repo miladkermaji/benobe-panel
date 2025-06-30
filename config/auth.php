@@ -16,9 +16,9 @@ return [
     'defaults' => [
         'guard' => 'web',
         'passwords' => 'users'
-        
+
     ],
-    
+
 
     /*
     |--------------------------------------------------------------------------
@@ -45,6 +45,18 @@ return [
         'api' => [
         'driver' => 'jwt',
         'provider' => 'users',
+    ],
+    'doctor-api' => [
+        'driver' => 'jwt',
+        'provider' => 'doctors',
+    ],
+    'secretary-api' => [
+        'driver' => 'jwt',
+        'provider' => 'secretaries',
+    ],
+    'manager-api' => [
+        'driver' => 'jwt',
+        'provider' => 'managers',
     ],
     'custom-auth.jwt' => [
             'driver' => 'jwt',
@@ -89,7 +101,7 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
-            'table'=>'users'
+            'table' => 'users'
         ],
         'managers' => [
             'driver' => 'eloquent',
