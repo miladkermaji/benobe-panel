@@ -144,7 +144,7 @@ class DoctorLoginRegister extends Component
 
         // ارسال پیامک
         $messagesService = new MessageService(
-            SmsService::create(100285, $user->mobile, [$otpCode])
+            SmsService::create(100286, $user->mobile, [$otpCode])
         );
         $response = $messagesService->send();
         Log::info('SMS send response', ['response' => $response]);

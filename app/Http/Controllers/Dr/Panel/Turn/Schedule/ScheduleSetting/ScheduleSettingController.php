@@ -1281,7 +1281,7 @@ class ScheduleSettingController extends Controller
 
             $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
             $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-            $templateId = ($gatewayName === 'pishgamrayan') ? 100285 : null;
+            $templateId = ($gatewayName === 'pishgamrayan') ? 100286 : null;
 
             SendSmsNotificationJob::dispatch(
                 $message,

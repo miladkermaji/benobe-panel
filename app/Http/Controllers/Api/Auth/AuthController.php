@@ -58,7 +58,7 @@ class AuthController extends Controller
      *   }
      * }
      */
-public function loginRegister(Request $request)
+    public function loginRegister(Request $request)
     {
         $request->validate([
             'mobile' => [
@@ -153,7 +153,7 @@ public function loginRegister(Request $request)
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100285, $formattedMobile, [$otpCode])
+            SmsService::create(100286, $formattedMobile, [$otpCode])
         );
         $messagesService->send();
 
@@ -337,7 +337,7 @@ public function loginRegister(Request $request)
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100285, $otp->user->mobile, [$otpCode])
+            SmsService::create(100286, $otp->user->mobile, [$otpCode])
         );
         $messagesService->send();
 
@@ -494,7 +494,7 @@ public function loginRegister(Request $request)
        *   "data": null
        * }
        */
-public function updateProfile(Request $request)
+    public function updateProfile(Request $request)
     {
         Log::info('UpdateProfile - Headers: ' . json_encode($request->headers->all()));
         Log::info('UpdateProfile - Cookies: ' . json_encode($request->cookies->all()));
