@@ -48,15 +48,11 @@ Route::prefix('v2')->group(function () {
         Route::prefix('subscriptions')->group(function () {
             Route::get('details', [UserSubscriptionController::class, 'getSubscriptionDetails'])->name('api.v2.subscriptions.details');
             Route::post('purchase', [UserSubscriptionController::class, 'purchaseSubscription'])->name('api.v2.subscriptions.purchase');
-
-            Route::get('payment/callback', [UserSubscriptionController::class, 'paymentCallback'])->name('api.v2.subscriptions.payment.callback');
-
         });
     });
+    // اضافه کردن روت callback به صورت مستقل و خارج از middleware
+    Route::get('subscriptions/payment/callback', [UserSubscriptionController::class, 'paymentCallback'])->name('api.v2.subscriptions.payment.callback');
 });
-
-// اضافه کردن روت callback به صورت مستقل
-
 
 // مسیرهای عمومی
 Route::prefix('zone')->group(function () {
