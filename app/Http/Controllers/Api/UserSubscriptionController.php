@@ -88,8 +88,8 @@ class UserSubscriptionController extends Controller
             'plan_id' => $plan->id,
         ];
 
-        $successRedirect = config('app.frontend_url') . '/payment/success';
-        $errorRedirect = config('app.frontend_url') . '/payment/error';
+        $successRedirect = route('api.v2.subscriptions.payment.callback');
+        $errorRedirect = route('api.v2.subscriptions.payment.callback');
 
         try {
             $paymentResponse = $this->paymentService->pay($amount, null, $meta, $successRedirect, $errorRedirect);
@@ -128,82 +128,56 @@ class UserSubscriptionController extends Controller
      */
     public function paymentCallback(Request $request)
     {
-        $transactionId = $request->input('transaction_id') ?? $request->input('Authority');
+        $transactionId = $request->input('transaction_id');
+        $authority = $request->input('Authority');
         $status = $request->input('Status');
 
-        if (!$transactionId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'پارامتر transaction_id یا Authority در درخواست وجود ندارد.',
-                'data' => null,
-            ], 400);
+        if ($status !== 'OK' || !$authority) {
+            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش ناموفق بود یا توسط شما لغو شد.'));
         }
 
         try {
-            $transaction = Transaction::where('transaction_id', $transactionId)->first();
-            if (!$transaction) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'تراکنش با این شناسه یافت نشد.',
-                    'data' => null,
-                ], 404);
+            // Use the authority to find the transaction
+            $transaction = Transaction::where('transaction_id', $authority)->firstOrFail();
+
+            if ($transaction->status !== 'successful') {
+                Log::warning('Payment callback received for a non-successful transaction.', ['transaction_id' => $authority]);
+                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش یافت نشد یا موفقیت آمیز نبود.'));
             }
 
-            $isPaymentSuccessful = $transaction->status === 'successful';
-            $subscription = UserSubscription::where('transaction_id', $transaction->id)->first();
-
-            if ($isPaymentSuccessful && !$subscription) {
-                $meta = json_decode($transaction->meta, true);
-                $plan = UserMembershipPlan::find($meta['plan_id'] ?? null);
-                if ($plan) {
-                    $subscription = UserSubscription::create([
-                        'user_id' => $meta['user_id'],
-                        'plan_id' => $meta['plan_id'],
-                        'transaction_id' => $transaction->id,
-                        'start_date' => now()->toDateString(),
-                        'end_date' => now()->addDays($plan->duration_days)->toDateString(),
-                        'remaining_appointments' => $plan->appointment_count,
-                        'status' => true,
-                    ]);
-                }
+            // Check if subscription was already created for this transaction to prevent duplicates
+            $existingSubscription = UserSubscription::where('transaction_id', $transaction->id)->first();
+            if ($existingSubscription) {
+                return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما قبلا با موفقیت فعال شده است.'));
             }
 
-            $responseData = [
-                'success' => $isPaymentSuccessful,
-                'message' => $isPaymentSuccessful ? 'پرداخت و فعال‌سازی اشتراک با موفقیت انجام شد.' : 'پرداخت ناموفق بود.',
-                'transaction' => [
-                    'id' => $transaction->id,
-                    'amount' => $transaction->amount,
-                    'gateway' => $transaction->gateway,
-                    'status' => $transaction->status,
-                    'transaction_id' => $transaction->transaction_id,
-                    'meta' => json_decode($transaction->meta, true),
-                    'created_at' => $transaction->created_at->toDateTimeString(),
-                    'updated_at' => $transaction->updated_at->toDateTimeString(),
-                ],
-                'subscription' => $subscription,
-            ];
+            $meta = json_decode($transaction->meta, true);
+            $plan = UserMembershipPlan::find($meta['plan_id']);
 
-            if ($request->wantsJson() || $request->isJson() || $request->ajax()) {
-                return response()->json($responseData, $isPaymentSuccessful ? 200 : 400);
+            if (!$plan) {
+                Log::error('Plan not found for subscription creation after payment.', ['transaction_id' => $authority, 'plan_id' => $meta['plan_id']]);
+                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('طرح اشتراک یافت نشد.'));
             }
 
-            if ($isPaymentSuccessful) {
-                return redirect()->away(config('app.frontend_url') . '/payment/success?transaction_id=' . $transactionId);
-            } else {
-                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode($responseData['message']));
-            }
+            UserSubscription::create([
+                'user_id' => $meta['user_id'],
+                'plan_id' => $meta['plan_id'],
+                'transaction_id' => $transaction->id,
+                'start_date' => now()->toDateString(),
+                'end_date' => now()->addDays($plan->duration_days)->toDateString(),
+                'remaining_appointments' => $plan->appointment_count,
+                'status' => true,
+            ]);
+
+            return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما با موفقیت فعال شد.'));
+
         } catch (\Exception $e) {
-            Log::error('Subscription paymentCallback error', [
-                'transaction_id' => $transactionId,
+            Log::error('Could not create subscription after payment.', [
+                'authority' => $authority,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return response()->json([
-                'success' => false,
-                'message' => 'خطای سرور در پردازش نتیجه پرداخت',
-                'data' => null,
-            ], 500);
+            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('خطا در فعال‌سازی اشتراک. لطفا با پشتیبانی تماس بگیرید.'));
         }
     }
 }
