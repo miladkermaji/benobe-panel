@@ -128,110 +128,82 @@ class UserSubscriptionController extends Controller
      */
     public function paymentCallback(Request $request)
     {
-        $transactionId = $request->input('transaction_id');
-        $authority = $request->input('Authority');
+        $transactionId = $request->input('transaction_id') ?? $request->input('Authority');
         $status = $request->input('Status');
 
-        $success = false;
-        $message = '';
-
-        if ($status !== 'OK' || !$authority) {
-            $message = 'تراکنش ناموفق بود یا توسط شما لغو شد.';
-            if ($request->wantsJson() || $request->isJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $message,
-                    'transaction_id' => $transactionId ?? $authority,
-                    'status' => $status,
-                ], 400);
-            }
-            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode($message));
+        if (!$transactionId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'پارامتر transaction_id یا Authority در درخواست وجود ندارد.',
+                'data' => null,
+            ], 400);
         }
 
         try {
-            $transaction = Transaction::where('transaction_id', $authority)->firstOrFail();
-
-            if ($transaction->status !== 'successful') {
-                $message = 'تراکنش یافت نشد یا موفقیت آمیز نبود.';
-                if ($request->wantsJson() || $request->isJson() || $request->ajax()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => $message,
-                        'transaction_id' => $transactionId ?? $authority,
-                        'status' => $status,
-                    ], 400);
-                }
-                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode($message));
+            $transaction = Transaction::where('transaction_id', $transactionId)->first();
+            if (!$transaction) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'تراکنش با این شناسه یافت نشد.',
+                    'data' => null,
+                ], 404);
             }
 
-            $existingSubscription = UserSubscription::where('transaction_id', $transaction->id)->first();
-            if ($existingSubscription) {
-                $success = true;
-                $message = 'اشتراک شما قبلا با موفقیت فعال شده است.';
-                if ($request->wantsJson() || $request->isJson() || $request->ajax()) {
-                    return response()->json([
-                        'success' => true,
-                        'message' => $message,
-                        'transaction_id' => $transactionId ?? $authority,
-                        'status' => $status,
+            $isPaymentSuccessful = $transaction->status === 'successful';
+            $subscription = UserSubscription::where('transaction_id', $transaction->id)->first();
+
+            if ($isPaymentSuccessful && !$subscription) {
+                $meta = json_decode($transaction->meta, true);
+                $plan = UserMembershipPlan::find($meta['plan_id'] ?? null);
+                if ($plan) {
+                    $subscription = UserSubscription::create([
+                        'user_id' => $meta['user_id'],
+                        'plan_id' => $meta['plan_id'],
+                        'transaction_id' => $transaction->id,
+                        'start_date' => now()->toDateString(),
+                        'end_date' => now()->addDays($plan->duration_days)->toDateString(),
+                        'remaining_appointments' => $plan->appointment_count,
+                        'status' => true,
                     ]);
                 }
-                return redirect()->away(config('app.frontend_url') . '/payment/success?transaction_id=' . ($transactionId ?? $authority));
             }
 
-            $meta = json_decode($transaction->meta, true);
-            $plan = UserMembershipPlan::find($meta['plan_id']);
-            if (!$plan) {
-                $message = 'طرح اشتراک یافت نشد.';
-                if ($request->wantsJson() || $request->isJson() || $request->ajax()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => $message,
-                        'transaction_id' => $transactionId ?? $authority,
-                        'status' => $status,
-                    ], 400);
-                }
-                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode($message));
-            }
+            $responseData = [
+                'success' => $isPaymentSuccessful,
+                'message' => $isPaymentSuccessful ? 'پرداخت و فعال‌سازی اشتراک با موفقیت انجام شد.' : 'پرداخت ناموفق بود.',
+                'transaction' => [
+                    'id' => $transaction->id,
+                    'amount' => $transaction->amount,
+                    'gateway' => $transaction->gateway,
+                    'status' => $transaction->status,
+                    'transaction_id' => $transaction->transaction_id,
+                    'meta' => json_decode($transaction->meta, true),
+                    'created_at' => $transaction->created_at->toDateTimeString(),
+                    'updated_at' => $transaction->updated_at->toDateTimeString(),
+                ],
+                'subscription' => $subscription,
+            ];
 
-            UserSubscription::create([
-                'user_id' => $meta['user_id'],
-                'plan_id' => $meta['plan_id'],
-                'transaction_id' => $transaction->id,
-                'start_date' => now()->toDateString(),
-                'end_date' => now()->addDays($plan->duration_days)->toDateString(),
-                'remaining_appointments' => $plan->appointment_count,
-                'status' => true,
-            ]);
-
-            $success = true;
-            $message = 'اشتراک شما با موفقیت فعال شد.';
             if ($request->wantsJson() || $request->isJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => $message,
-                    'transaction_id' => $transactionId ?? $authority,
-                    'status' => $status,
-                ]);
+                return response()->json($responseData, $isPaymentSuccessful ? 200 : 400);
             }
-            return redirect()->away(config('app.frontend_url') . '/payment/success?transaction_id=' . ($transactionId ?? $authority));
 
+            if ($isPaymentSuccessful) {
+                return redirect()->away(config('app.frontend_url') . '/payment/success?transaction_id=' . $transactionId);
+            } else {
+                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode($responseData['message']));
+            }
         } catch (\Exception $e) {
-            $message = 'خطا در فعال‌سازی اشتراک. لطفا با پشتیبانی تماس بگیرید.';
-            Log::error('Could not create subscription after payment.', [
-                'authority' => $authority,
+            Log::error('Subscription paymentCallback error', [
+                'transaction_id' => $transactionId,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            if ($request->wantsJson() || $request->isJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $message,
-                    'transaction_id' => $transactionId ?? $authority,
-                    'status' => $status,
-                ], 500);
-            }
-            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode($message));
+            return response()->json([
+                'success' => false,
+                'message' => 'خطای سرور در پردازش نتیجه پرداخت',
+                'data' => null,
+            ], 500);
         }
     }
 }
