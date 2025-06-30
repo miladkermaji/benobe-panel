@@ -322,7 +322,40 @@
     </div>
 
     <!-- مودال تنظیم زمان‌بندی -->
-    <div>
+    <div x-data="{
+        handleDayToggle(event, day) {
+            const checkbox = event.target;
+    
+            if (!checkbox.checked) { // User is trying to uncheck
+                // Immediately revert the uncheck, pending confirmation
+                checkbox.checked = true;
+    
+                Swal.fire({
+                    title: 'آیا مطمئن هستید؟',
+                    text: 'تنظیمات این روز حذف خواهد شد!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'بله، حذف کن!',
+                    cancelButtonText: 'انصراف'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        @this.call('deleteScheduleSettingsForDay', day);
+                    }
+                });
+            } else { // User is checking
+                @this.set(`selectedScheduleDays.${day}`, true);
+            }
+        }
+    }"
+      @day-setting-deleted.window="
+        const day = $event.detail.day;
+        const checkbox = document.getElementById(`schedule-day-${day}`);
+        if (checkbox) {
+            checkbox.checked = false;
+        }
+    ">
       <x-modal id="scheduleModal" name="schedule-modal" :title="'برنامه باز شدن نوبت‌های ' .
           ([
               'saturday' => 'شنبه',
@@ -352,7 +385,8 @@
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                     <div class="d-flex align-items-center">
                       <input type="checkbox" class="form-check-input me-1" id="schedule-day-{{ $day }}"
-                        wire:model.live="selectedScheduleDays.{{ $day }}" data-day="{{ $day }}">
+                        data-day="{{ $day }}" @if ($selectedScheduleDays[$day]) checked @endif
+                        @click="handleDayToggle($event, '{{ $day }}')">
                       <label class="mb-0 fw-bold px-0 font-size-12"
                         for="schedule-day-{{ $day }}">{{ $label }}</label>
                     </div>
@@ -442,16 +476,14 @@
                             <label class="label-top-input-special-takhasos font-size-11">از</label>
                             <input type="text"
                               class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
-                              data-timepicker
-                              wire:model.live="scheduleSettings.{{ $day }}.0.start_time"
+                              data-timepicker wire:model.live="scheduleSettings.{{ $day }}.0.start_time"
                               wire:change="autoSaveSchedule('{{ $day }}', 0)">
                           </div>
                           <div class="form-group position-relative timepicker-ui">
                             <label class="label-top-input-special-takhasos font-size-11">تا</label>
                             <input type="text"
                               class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
-                              data-timepicker
-                              wire:model.live="scheduleSettings.{{ $day }}.0.end_time"
+                              data-timepicker wire:model.live="scheduleSettings.{{ $day }}.0.end_time"
                               wire:change="autoSaveSchedule('{{ $day }}', 0)">
                           </div>
                           <!-- دکمه‌های غیرفعال برای ردیف خالی -->

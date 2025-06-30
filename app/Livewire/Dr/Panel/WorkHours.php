@@ -2444,4 +2444,81 @@ class Workhours extends Component
     {
         return view('livewire.dr.panel.work-hours');
     }
+
+    public function deleteScheduleSettingsForDay($day)
+    {
+        try {
+            if (!in_array($day, ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'])) {
+                throw new \Exception('روز نامعتبر است');
+            }
+
+            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+                $currentClinicId = request()->route('clinic') ?? 'default';
+                $this->activeClinicId = $currentClinicId;
+            } else {
+                $clinicId = $this->activeClinicId;
+                $this->activeClinicId = $clinicId ?? 'default';
+            }
+
+            $workHourKey = $this->scheduleModalIndex;
+
+            $allSchedules = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
+                ->where(function ($query) {
+                    if ($this->activeClinicId !== 'default') {
+                        $query->where('clinic_id', $this->activeClinicId);
+                    } else {
+                        $query->whereNull('clinic_id');
+                    }
+                })->get();
+
+            DB::beginTransaction();
+
+            foreach ($allSchedules as $schedule) {
+                $settings = is_array($schedule->appointment_settings)
+                    ? $schedule->appointment_settings
+                    : json_decode($schedule->appointment_settings, true) ?? [];
+
+                if (empty($settings)) {
+                    continue;
+                }
+
+                $settingsModified = false;
+                $updatedSettings = [];
+
+                foreach ($settings as $setting) {
+                    if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$workHourKey) {
+                        if (isset($setting['days']) && is_array($setting['days'])) {
+                            $dayIndex = array_search($day, $setting['days']);
+                            if ($dayIndex !== false) {
+                                unset($setting['days'][$dayIndex]);
+                                $settingsModified = true;
+                            }
+
+                            if (!empty(array_values($setting['days']))) {
+                                $updatedSettings[] = $setting;
+                            }
+                        }
+                    } else {
+                        $updatedSettings[] = $setting;
+                    }
+                }
+
+                if ($settingsModified) {
+                    $schedule->update(['appointment_settings' => json_encode(array_values($updatedSettings))]);
+                }
+            }
+
+            DB::commit();
+
+            $this->selectedScheduleDays[$day] = false;
+            unset($this->scheduleSettings[$day]);
+            $this->dispatch('day-setting-deleted', day: $day);
+            $this->showSuccessMessage('تنظیمات برای روز انتخاب شده با موفقیت حذف شد.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in deleteScheduleSettingsForDay: ' . $e->getMessage());
+            $this->showErrorMessage($e->getMessage() ?: 'خطا در حذف تنظیمات روز.');
+        }
+    }
 }
