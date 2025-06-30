@@ -11,6 +11,7 @@ return new class () extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('plan_id')->constrained('user_membership_plans')->onDelete('cascade');
+            $table->foreignId('transaction_id')->nullable()->constrained('transactions')->onDelete('set null');
             $table->date('start_date');
             $table->date('end_date');
             $table->integer('remaining_appointments');

@@ -47,8 +47,12 @@ Route::prefix('v2')->group(function () {
 
         Route::prefix('subscriptions')->group(function () {
             Route::get('details', [UserSubscriptionController::class, 'getSubscriptionDetails'])->name('api.v2.subscriptions.details');
+            Route::post('purchase', [UserSubscriptionController::class, 'purchaseSubscription'])->name('api.v2.subscriptions.purchase');
         });
     });
+
+    // Payment callback does not need auth middleware
+    Route::get('v2/subscriptions/payment/callback', [UserSubscriptionController::class, 'paymentCallback'])->name('api.v2.subscriptions.payment.callback');
 });
 
 // مسیرهای عمومی
