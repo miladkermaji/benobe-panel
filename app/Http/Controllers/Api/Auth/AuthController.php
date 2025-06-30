@@ -461,35 +461,26 @@ class AuthController extends Controller
      */
     public function verifyToken(Request $request)
     {
-        try {
-            // توکن رو از کوکی یا هدر بگیر (مثل میدلور)
-            $token = $request->cookie('auth_token') ?? $request->bearerToken();
+        // The middleware has already validated the token and authenticated the user.
+        // We just need to get the user from the Auth facade.
+        $user = Auth::user();
 
-            if (! $token) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'توکن ارائه نشده است',
-                    'data'    => null,
-                ], 401);
-            }
-
-            // اعتبارسنجی توکن
-            $user = JWTAuth::setToken($token)->authenticate();
-
-            return response()->json([
-                'status'  => 'success',
-                'message' => 'توکن معتبر است',
-                'data'    => [
-                    'user' => $user,
-                ],
-            ], 200);
-        } catch (JWTException $e) {
+        if (!$user) {
+            // This case should not be reached if middleware is working correctly.
             return response()->json([
                 'status'  => 'error',
-                'message' => $e->getMessage(),
+                'message' => 'کاربر یافت نشد. لطفاً دوباره وارد شوید.',
                 'data'    => null,
             ], 401);
         }
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'توکن معتبر است',
+            'data'    => [
+                'user' => $user,
+            ],
+        ], 200);
     }
     /**
        * @bodyParam first_name string optional نام کاربر
