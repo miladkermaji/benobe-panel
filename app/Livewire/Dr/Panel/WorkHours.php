@@ -351,35 +351,67 @@ class Workhours extends Component
         }
         $this->scheduleModalDay = $day;
         $this->scheduleModalIndex = $index;
-        $this->selectedScheduleDays = array_fill_keys(['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'], false);
-        $this->scheduleSettings = [];
+
         $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-        foreach ($daysOfWeek as $d) {
-            $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
-                ->where('day', $d)
-                ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
-                    } else {
-                        $query->whereNull('clinic_id');
-                    }
-                })->first();
+        $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
+        $this->scheduleSettings = [];
+
+        $allSchedules = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
+            ->where(function ($query) {
+                if ($this->activeClinicId !== 'default') {
+                    $query->where('clinic_id', $this->activeClinicId);
+                } else {
+                    $query->whereNull('clinic_id');
+                }
+            })
+            ->get();
+
+        $foundAllSettingsForIndex = [];
+        foreach ($allSchedules as $schedule) {
             if ($schedule && $schedule->appointment_settings) {
                 $settings = is_array($schedule->appointment_settings)
                     ? $schedule->appointment_settings
                     : json_decode($schedule->appointment_settings, true) ?? [];
-                $filteredSettings = array_values(array_filter($settings, fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index));
-                if (!empty($filteredSettings)) {
-                    foreach ($filteredSettings as $i => $setting) {
-                        $this->scheduleSettings[$d][$i] = [
+
+                $filtered = array_filter($settings, fn ($s) => isset($s['work_hour_key']) && (int) $s['work_hour_key'] === (int) $index);
+                if (!empty($filtered)) {
+                    $foundAllSettingsForIndex = array_merge($foundAllSettingsForIndex, array_values($filtered));
+                }
+            }
+        }
+
+        $uniqueSettings = [];
+        foreach ($foundAllSettingsForIndex as $setting) {
+            $key = ($setting['start_time'] ?? '') . '-' . ($setting['end_time'] ?? '');
+            if (!isset($uniqueSettings[$key])) {
+                $uniqueSettings[$key] = $setting;
+            } else {
+                if (isset($uniqueSettings[$key]['days'], $setting['days'])) {
+                    $uniqueSettings[$key]['days'] = array_unique(array_merge($uniqueSettings[$key]['days'], $setting['days']));
+                }
+            }
+        }
+
+        $uniqueSettings = array_values($uniqueSettings);
+
+        foreach ($uniqueSettings as $settingIndex => $setting) {
+            if (isset($setting['days']) && is_array($setting['days'])) {
+                foreach ($setting['days'] as $settingDay) {
+                    if (in_array($settingDay, $daysOfWeek)) {
+                        $this->selectedScheduleDays[$settingDay] = true;
+                        if (!isset($this->scheduleSettings[$settingDay])) {
+                            $this->scheduleSettings[$settingDay] = [];
+                        }
+                        // Add the setting to the day
+                        $this->scheduleSettings[$settingDay][$settingIndex] = [
                             'start_time' => $setting['start_time'],
                             'end_time' => $setting['end_time'],
                         ];
                     }
-                    $this->selectedScheduleDays[$d] = true;
                 }
             }
         }
+
         $this->refreshWorkSchedules();
         $this->dispatch('refresh-schedule-settings');
     }
