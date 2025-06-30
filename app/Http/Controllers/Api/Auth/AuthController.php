@@ -231,19 +231,47 @@ class AuthController extends Controller
             ], 429);
         }
 
-        if (! $otp || $otp->otp_code !== $request->otpCode) {
-            $userId = $otp->user_id ?? null;
-            $loginAttempts->incrementLoginAttempt($userId, $mobile, '', '', '');
+        if (!$otp || $otp->otp_code !== $request->otpCode) {
+            $userId = $otp->user_id ?? $otp->doctor_id ?? $otp->secretary_id ?? $otp->manager_id ?? null;
+            $userType = $otp->user_id ? 'user' : ($otp->doctor_id ? 'doctor' : ($otp->secretary_id ? 'secretary' : ($otp->manager_id ? 'manager' : 'unknown')));
+            $loginAttempts->incrementLoginAttempt($userId, $mobile, $userType, '', '');
             return response()->json(['status' => 'error', 'message' => 'کد تأیید وارد شده صحیح نیست.', 'data' => null], 422);
         }
 
         $otp->update(['used' => 1]);
-        $user = $otp->user;
+
+        $user = null;
+        $guard = null;
+        $userType = '';
+
+        if ($otp->doctor_id) {
+            $user = Doctor::find($otp->doctor_id);
+            $guard = 'doctor-api';
+            $userType = 'doctor';
+        } elseif ($otp->secretary_id) {
+            $user = Secretary::find($otp->secretary_id);
+            $guard = 'secretary-api';
+            $userType = 'secretary';
+        } elseif ($otp->manager_id) {
+            $user = Manager::find($otp->manager_id);
+            $guard = 'manager-api';
+            $userType = 'manager';
+        } elseif ($otp->user_id) {
+            $user = User::find($otp->user_id);
+            $guard = 'api';
+            $userType = 'user';
+        }
+
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'کاربر یافت نشد.', 'data' => null], 404);
+        }
+
         $user->update(['mobile_verified_at' => Carbon::now()]);
-        $jwtToken = Auth::guard('api')->login($user);
+        $jwtToken = Auth::guard($guard)->login($user);
         $loginAttempts->resetLoginAttempts($user->mobile);
+
         LoginSession::where('token', $token)->delete();
-        LoginLog::create(['user_id' => $user->id, 'user_type' => 'user', 'login_at' => now(), 'ip_address' => $request->ip(), 'device' => $request->header('User-Agent')]);
+        LoginLog::create(['user_id' => $user->id, 'user_type' => $userType, 'login_at' => now(), 'ip_address' => $request->ip(), 'device' => $request->header('User-Agent')]);
 
         return response()->json([
             'status' => 'success',
