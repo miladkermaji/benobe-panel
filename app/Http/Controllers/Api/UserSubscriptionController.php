@@ -160,7 +160,8 @@ class UserSubscriptionController extends Controller
                 return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('طرح اشتراک یافت نشد.'));
             }
 
-            UserSubscription::create([
+            // لاگ کامل داده‌های ورودی
+            Log::info('Trying to create UserSubscription', [
                 'user_id' => $meta['user_id'],
                 'plan_id' => $meta['plan_id'],
                 'transaction_id' => $transaction->id,
@@ -169,8 +170,25 @@ class UserSubscriptionController extends Controller
                 'remaining_appointments' => $plan->appointment_count,
                 'status' => true,
             ]);
-
-            return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما با موفقیت فعال شد.'));
+            try {
+                $subscription = UserSubscription::create([
+                    'user_id' => $meta['user_id'],
+                    'plan_id' => $meta['plan_id'],
+                    'transaction_id' => $transaction->id,
+                    'start_date' => now()->toDateString(),
+                    'end_date' => now()->addDays($plan->duration_days)->toDateString(),
+                    'remaining_appointments' => $plan->appointment_count,
+                    'status' => true,
+                ]);
+                Log::info('UserSubscription created successfully', ['id' => $subscription->id]);
+                return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما با موفقیت فعال شد.'));
+            } catch (\Exception $e) {
+                Log::error('UserSubscription create failed', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('خطا در ذخیره اشتراک. لطفا با پشتیبانی تماس بگیرید.'));
+            }
 
         } catch (\Exception $e) {
             Log::error('Could not create subscription after payment.', [
