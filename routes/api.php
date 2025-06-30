@@ -50,10 +50,10 @@ Route::prefix('v2')->group(function () {
             Route::post('purchase', [UserSubscriptionController::class, 'purchaseSubscription'])->name('api.v2.subscriptions.purchase');
         });
     });
-
-    // Payment callback does not need auth middleware
-    Route::get('subscriptions/payment/callback', [UserSubscriptionController::class, 'paymentCallback'])->name('api.v2.subscriptions.payment.callback');
 });
+
+// اضافه کردن روت callback به صورت مستقل
+Route::get('v2/subscriptions/payment/callback', [UserSubscriptionController::class, 'paymentCallback'])->name('api.v2.subscriptions.payment.callback');
 
 // مسیرهای عمومی
 Route::prefix('zone')->group(function () {
