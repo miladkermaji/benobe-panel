@@ -166,7 +166,28 @@ class UserSubscriptionController extends Controller
             ], 400, ['Content-Type' => 'application/json']);
         }
 
-        // مرحله مهم: verify
+        // پیدا کردن تراکنش با Authority
+        $transaction = \App\Models\Transaction::where('transaction_id', $authority)->first();
+        if (!$transaction) {
+            return response()->json([
+                'success' => false,
+                'message' => 'تراکنش یافت نشد.',
+                'authority' => $authority,
+            ], 404, ['Content-Type' => 'application/json']);
+        }
+
+        // اگر تراکنش قبلاً paid شده بود، خروجی موفقیت و اطلاعات اشتراک را برگردان
+        if ($transaction->status === 'paid') {
+            $existingSubscription = \App\Models\UserSubscription::where('transaction_id', $transaction->id)->first();
+            return response()->json([
+                'success' => true,
+                'message' => $existingSubscription ? 'اشتراک شما قبلا با موفقیت فعال شده است.' : 'اشتراک شما با موفقیت فعال شد.',
+                'authority' => $transaction->transaction_id,
+                'subscription' => $existingSubscription,
+            ], 200, ['Content-Type' => 'application/json']);
+        }
+
+        // اگر تراکنش pending بود، verify را اجرا کن
         $verifiedTransaction = app(\Modules\Payment\Services\PaymentService::class)->verify();
         if (!$verifiedTransaction || $verifiedTransaction->status !== 'paid') {
             Log::warning('Payment callback received for a non-successful transaction after verify.', ['transaction_id' => $authority]);
