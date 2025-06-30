@@ -179,13 +179,25 @@ class UserSubscriptionController extends Controller
                     'end_date' => now()->addDays($plan->duration_days)->toDateString(),
                     'remaining_appointments' => $plan->appointment_count,
                     'status' => true,
+                    'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
                 ]);
-                Log::info('UserSubscription created successfully', ['id' => $subscription->id]);
+                Log::info('UserSubscription created successfully', [
+                    'id' => $subscription->id,
+                    'user_id' => $meta['user_id'],
+                    'plan_id' => $meta['plan_id'],
+                    'transaction_id_numeric' => $transaction->id,
+                    'transaction_id_string' => $transaction->transaction_id,
+                ]);
                 return redirect()->away(config('app.frontend_url') . '/payment/success?message=' . urlencode('اشتراک شما با موفقیت فعال شد.'));
             } catch (\Exception $e) {
                 Log::error('UserSubscription create failed', [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
+                    'user_id' => $meta['user_id'],
+                    'plan_id' => $meta['plan_id'],
+                    'transaction_id_numeric' => $transaction->id,
+                    'transaction_id_string' => $transaction->transaction_id,
+                    'meta' => $meta,
                 ]);
                 return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('خطا در ذخیره اشتراک. لطفا با پشتیبانی تماس بگیرید.'));
             }
