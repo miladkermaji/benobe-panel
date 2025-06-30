@@ -88,8 +88,8 @@ class UserSubscriptionController extends Controller
             'plan_id' => $plan->id,
         ];
 
-        $successRedirect = route('api.v2.subscriptions.payment.callback');
-        $errorRedirect = route('api.v2.subscriptions.payment.callback');
+        $successRedirect = config('app.frontend_url') . '/payment/success';
+        $errorRedirect = config('app.frontend_url') . '/payment/error';
 
         try {
             $paymentResponse = $this->paymentService->pay($amount, null, $meta, $successRedirect, $errorRedirect);
