@@ -135,7 +135,6 @@ class UserSubscriptionController extends Controller
      */
     public function paymentCallback(Request $request)
     {
-        $transactionId = $request->input('transaction_id');
         $authority = $request->input('Authority');
         $status = $request->input('Status');
 
@@ -143,15 +142,15 @@ class UserSubscriptionController extends Controller
             return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش ناموفق بود یا توسط شما لغو شد.'));
         }
 
+        // مرحله مهم: verify
+        $verifiedTransaction = app(\Modules\Payment\Services\PaymentService::class)->verify();
+        if (!$verifiedTransaction || $verifiedTransaction->status !== 'paid') {
+            Log::warning('Payment callback received for a non-successful transaction after verify.', ['transaction_id' => $authority]);
+            return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش یافت نشد یا موفقیت آمیز نبود.'));
+        }
+        $transaction = $verifiedTransaction;
+
         try {
-            // Use the authority to find the transaction
-            $transaction = Transaction::where('transaction_id', $authority)->firstOrFail();
-
-            if ($transaction->status !== 'paid') {
-                Log::warning('Payment callback received for a non-successful transaction.', ['transaction_id' => $authority]);
-                return redirect()->away(config('app.frontend_url') . '/payment/error?message=' . urlencode('تراکنش یافت نشد یا موفقیت آمیز نبود.'));
-            }
-
             // Check if subscription was already created for this transaction to prevent duplicates
             $existingSubscription = UserSubscription::where('transaction_id', $transaction->id)->first();
             if ($existingSubscription) {
