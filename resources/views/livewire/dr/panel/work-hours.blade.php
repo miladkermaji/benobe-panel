@@ -141,22 +141,7 @@
                                     <x-custom-tooltip title="حذف برنامه کاری" placement="top">
                                       <button class="btn btn-light btn-sm remove-row-btn"
                                         {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}
-                                        x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
-                                        @click="Swal.fire({
-                                    title: 'آیا مطمئن هستید؟',
-                                    text: 'این ساعت کاری حذف خواهد شد و قابل بازگشت نیست!',
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#3085d6',
-                                    cancelButtonColor: '#d33',
-                                    confirmButtonText: 'بله، حذف کن!',
-                                    cancelButtonText: 'خیر',
-                                    reverseButtons: true
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        @this.call('removeSlot', day, index);
-                                    }
-                                })">
+                                        data-day="{{ $englishDay }}" data-index="{{ $index }}">
                                         <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
                                       </button>
                                     </x-custom-tooltip>
@@ -969,10 +954,8 @@
 
           $(document).on('click', '.remove-row-btn', function(e) {
             e.preventDefault();
-            const day = $(this).closest('[data-slot-id]').find('.schedule-btn').data('day');
-            console.log(day);
-            
-            const index = $(this).closest('[data-slot-id]').find('.schedule-btn').data('index');
+            const day = $(this).data('day');
+            const index = $(this).data('index');
             if ($(this).is(':disabled')) return;
             Swal.fire({
               title: 'آیا مطمئن هستید؟',
