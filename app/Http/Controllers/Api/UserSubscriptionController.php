@@ -108,7 +108,6 @@ class UserSubscriptionController extends Controller
                 ]);
             }
 
-            
             if (is_array($paymentResponse) && isset($paymentResponse['payment_url'])) {
                 return response()->json([
                     'payment_url' => $paymentResponse['payment_url'],
