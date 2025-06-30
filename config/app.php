@@ -251,4 +251,6 @@ return [
         'PaymentService' => Modules\Payment\Services\PaymentService::class,
     ],
 
+    'frontend_url'    => env('FRONTEND_URL', 'https://emr-benobe.ir'),
+
 ];

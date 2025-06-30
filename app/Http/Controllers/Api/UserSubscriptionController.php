@@ -88,8 +88,9 @@ class UserSubscriptionController extends Controller
             'plan_id' => $plan->id,
         ];
 
-        $successRedirect = route('api.v2.subscriptions.payment.callback');
-        $errorRedirect = route('api.v2.subscriptions.payment.callback');
+        $frontendUrl = config('app.frontend_url', 'https://emr-benobe.ir');
+        $successRedirect = $frontendUrl . '/payment/success';
+        $errorRedirect = $frontendUrl . '/payment/error';
 
         try {
             $paymentResponse = $this->paymentService->pay($amount, null, $meta, $successRedirect, $errorRedirect);
