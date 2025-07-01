@@ -141,7 +141,7 @@ class DoctorLoginUserPass extends Component
                 'type' => 0,
             ]);
 
-            $messagesService = new MessageService(SmsService::create(100285, $user->mobile, [$otpCode]));
+            $messagesService = new MessageService(SmsService::create(100286, $user->mobile, [$otpCode]));
             $response = $messagesService->send();
             Log::info('SMS send response', ['response' => $response]);
 
