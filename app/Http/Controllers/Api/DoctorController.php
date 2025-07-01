@@ -189,15 +189,15 @@ class DoctorController extends Controller
                 }
 
                 return [
-                    'id'                  => $bestDoctor->doctor->id,
-                    'name'                => $bestDoctor->doctor->first_name . ' ' . $bestDoctor->doctor->last_name,
-                    'specialty'           => $bestDoctor->doctor->specialty ? $bestDoctor->doctor->specialty->name : null,
-                    'hospital'            => $bestDoctor->hospital ? $bestDoctor->hospital->name : null,
+                    'id'                  => optional($bestDoctor->doctor)->id,
+                    'name'                => optional($bestDoctor->doctor)->first_name . ' ' . optional($bestDoctor->doctor)->last_name,
+                    'specialty'           => optional(optional($bestDoctor->doctor)->specialty)->name,
+                    'hospital'            => optional($bestDoctor->hospital)->name,
                     'star_rating'         => $bestDoctor->star_rating,
                     'appointment_count'   => $appointmentCount,
                     'max_appointments'    => $slotData['max_appointments'],
-                    'image'               => $bestDoctor->doctor->profile_photo_path ? asset('storage/' . $bestDoctor->doctor->profile_photo_path) : null,
-                    'province'            => $bestDoctor->doctor->province ? $bestDoctor->doctor->province->name : null,
+                    'image'               => optional($bestDoctor->doctor)->profile_photo_path ? asset('storage/' . optional($bestDoctor->doctor)->profile_photo_path) : null,
+                    'province'            => optional(optional($bestDoctor->doctor)->province)->name,
                     'next_available_slot' => $jalaliDate,
                 ];
             })->values();
