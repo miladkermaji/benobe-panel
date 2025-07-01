@@ -57,7 +57,9 @@ class DoctorController extends Controller
 
             // احراز هویت کاربر
             try {
-                $user = JWTAuth::setToken($token)->authenticate();
+
+                $user = Auth::user();
+
                 if (! $user) {
                     return response()->json([
                         'status'  => 'error',
