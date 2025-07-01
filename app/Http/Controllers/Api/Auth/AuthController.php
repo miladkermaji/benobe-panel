@@ -152,7 +152,7 @@ class AuthController extends Controller
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100285, $formattedMobile, [$otpCode])
+            SmsService::create(100286, $formattedMobile, [$otpCode])
         );
         $messagesService->send();
 
@@ -368,7 +368,7 @@ class AuthController extends Controller
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100285, $otp->user->mobile, [$otpCode])
+            SmsService::create(100286, $otp->user->mobile, [$otpCode])
         );
         $messagesService->send();
 
