@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Clinic;
 use App\Models\Doctor;
 use App\Models\Appointment;
+use App\Models\MedicalCenter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -32,5 +33,11 @@ class BestDoctor extends Model
     public function appointments()
     {
         return $this->hasManyThrough(Appointment::class, Doctor::class, 'id', 'doctor_id', 'doctor_id', 'id');
+    }
+
+    public function hospital()
+    {
+        return $this->belongsTo(MedicalCenter::class, 'id')
+            ->where('type', 'hospital');
     }
 }
