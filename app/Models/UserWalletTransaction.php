@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -6,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserWalletTransaction extends Model
 {
     protected $fillable = [
-        'user_id', 'amount', 'status', 'type', 'description', 'registered_at', 'paid_at',
+        'walletable_id', 'walletable_type', 'amount', 'status', 'type', 'description', 'registered_at', 'paid_at',
     ];
 
     protected $casts = [
@@ -14,8 +15,8 @@ class UserWalletTransaction extends Model
         'paid_at'       => 'datetime',
     ];
 
-    public function user()
+    public function walletable()
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 }

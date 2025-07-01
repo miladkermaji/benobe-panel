@@ -50,7 +50,8 @@ class AppointmentController extends Controller
 
             // پیدا کردن نوبت
             $appointment = Appointment::where('id', $id)
-                ->where('patient_id', $user->id)
+                ->where('patientable_id', $user->id)
+                ->where('patientable_type', get_class($user))
                 ->first();
 
             if (! $appointment) {
@@ -172,7 +173,8 @@ class AppointmentController extends Controller
             }
 
             // گرفتن نوبت‌های کاربر
-            $appointments = Appointment::where('patient_id', $user->id)
+            $appointments = Appointment::where('patientable_id', $user->id)
+                ->where('patientable_type', get_class($user))
                 ->with([
                     'doctor' => function ($query) {
                         $query->select('id', 'first_name', 'last_name', 'specialty_id')
@@ -183,15 +185,14 @@ class AppointmentController extends Controller
                     'clinic' => function ($query) {
                         $query->select('id', 'address');
                     },
-                    'patient' => function ($query) {
-                        $query->select('id', 'mobile', 'first_name', 'last_name');
-                    },
+                    'patientable',
                 ])
-                ->select('id', 'doctor_id', 'clinic_id', 'patient_id', 'appointment_date', 'appointment_time', 'status', 'consultation_type', 'fee', 'notes', 'tracking_code')
+                ->select('id', 'doctor_id', 'clinic_id', 'patientable_id', 'patientable_type', 'appointment_date', 'appointment_time', 'status', 'consultation_type', 'fee', 'notes', 'tracking_code')
                 ->get();
 
             // فرمت کردن داده‌ها
             $formattedAppointments = $appointments->map(function ($appointment) {
+                $patient = $appointment->patientable;
                 return [
                     'id' => $appointment->id,
                     'tracking_code' => $appointment->tracking_code ?? 'نامشخص',
@@ -210,9 +211,9 @@ class AppointmentController extends Controller
                         'id' => $appointment->clinic->id,
                         'address' => $appointment->clinic->address,
                     ] : null,
-                    'patient' => $appointment->patient ? [
-                        'mobile' => $appointment->patient->mobile,
-                        'name' => $appointment->patient->first_name . ' ' . $appointment->patient->last_name,
+                    'patient' => $patient ? [
+                        'mobile' => $patient->mobile ?? null,
+                        'name' => ($patient->first_name ?? '') . ' ' . ($patient->last_name ?? ''),
                     ] : null,
                 ];
             });

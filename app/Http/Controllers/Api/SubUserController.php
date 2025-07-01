@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -81,18 +82,37 @@ class SubUserController extends Controller
             // گرفتن کاربران زیرمجموعه با اطلاعات کامل
             $subUsers = SubUser::with([
                 'doctor' => function ($query) {
-                    $query->select('id','mobile', 'first_name', 'last_name', 'license_number', 'profile_photo_path');
+                    $query->select('id', 'mobile', 'first_name', 'last_name', 'license_number', 'profile_photo_path');
                 },
-                'user'   => function ($query) {
-                    $query->select('id', 'mobile','first_name', 'last_name', 'profile_photo_path'); // اگه فیلد name یا چیز دیگه‌ای دارید، اضافه کنید
-                },
+                'subuserable' // morph relation
             ])
-                ->select('id', 'doctor_id', 'user_id', 'status', 'created_at', 'updated_at')
+                ->select('id', 'doctor_id', 'subuserable_id', 'subuserable_type', 'status', 'created_at', 'updated_at')
                 ->where('status', 'active')
                 ->get();
 
             // فرمت کردن داده‌ها
             $formattedSubUsers = $subUsers->map(function ($subUser) {
+                $subuserable = $subUser->subuserable;
+                $subuserableData = null;
+                if ($subuserable) {
+                    if ($subUser->subuserable_type === 'App\\Models\\User') {
+                        $subuserableData = [
+                            'id'                 => $subuserable->id,
+                            'mobile'             => $subuserable->mobile,
+                            'first_name'         => $subuserable->first_name ?? null,
+                            'last_name'          => $subuserable->last_name ?? null,
+                            'profile_photo_path' => $subuserable->profile_photo_path ?? null,
+                        ];
+                    } elseif ($subUser->subuserable_type === 'App\\Models\\Doctor') {
+                        $subuserableData = [
+                            'id'                 => $subuserable->id,
+                            'first_name'         => $subuserable->first_name,
+                            'last_name'          => $subuserable->last_name,
+                            'license_number'     => $subuserable->license_number,
+                            'profile_photo_path' => $subuserable->profile_photo_path,
+                        ];
+                    } // add more types if needed
+                }
                 return [
                     'id'         => $subUser->id,
                     'status'     => $subUser->status,
@@ -105,15 +125,7 @@ class SubUserController extends Controller
                         'license_number'     => $subUser->doctor->license_number,
                         'profile_photo_path' => $subUser->doctor->profile_photo_path,
                     ] : null,
-                    'user'       => $subUser->user ? [
-                        'id'                 => $subUser->user->id,
-                        'mobile'             => $subUser->user->mobile,
-                        'first_name'         => $subUser->user->first_name,
-                        'last_name'          => $subUser->user->last_name,
-                        'profile_photo_path' => $subUser->user->profile_photo_path,
-                        // اگه فیلد name یا چیز دیگه‌ای توی جدول users دارید، اینجا اضافه کنید
-                        // 'name' => $subUser->user->name,
-                    ] : null,
+                    'subuserable' => $subuserableData,
                 ];
             });
 

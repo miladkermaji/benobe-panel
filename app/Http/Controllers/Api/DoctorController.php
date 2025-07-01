@@ -74,7 +74,8 @@ class DoctorController extends Controller
             }
 
             // گرفتن پزشکان لایک‌شده
-            $likedDoctors = UserDoctorLike::where('user_id', $user->id)
+            $likedDoctors = UserDoctorLike::where('likeable_id', $user->id)
+                ->where('likeable_type', 'App\\Models\\User')
                 ->with([
                     'doctor' => function ($query) {
                         $query->select('id', 'first_name', 'last_name', 'specialty_id', 'license_number', 'profile_photo_path')
@@ -83,14 +84,15 @@ class DoctorController extends Controller
                             }]);
                     },
                 ])
-                ->select('id', 'user_id', 'doctor_id', 'liked_at')
+                ->select('id', 'likeable_id', 'likeable_type', 'doctor_id', 'liked_at')
                 ->get()
                 ->pluck('doctor')
                 ->filter();
 
             // فرمت کردن داده‌ها
-            $formattedDoctors = $likedDoctors->map(function ($doctor) {
-                $like = UserDoctorLike::where('user_id', Auth::guard('user')->user()->id)
+            $formattedDoctors = $likedDoctors->map(function ($doctor) use ($user) {
+                $like = UserDoctorLike::where('likeable_id', $user->id)
+                    ->where('likeable_type', 'App\\Models\\User')
                     ->where('doctor_id', $doctor->id)
                     ->first();
 

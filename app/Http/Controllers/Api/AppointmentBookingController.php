@@ -209,41 +209,29 @@ class AppointmentBookingController extends Controller
                 // گرفتن کاربر احراز هویت‌شده
                 $authenticatedUser = $request->attributes->get('user');
 
-                // اگر doctor بود
-                if ($authenticatedUser instanceof \App\Models\Doctor) {
-                    $user = \App\Models\User::firstOrCreate(
-                        ['mobile' => $authenticatedUser->mobile],
-                        [
-                            'first_name' => $authenticatedUser->first_name,
-                            'last_name' => $authenticatedUser->last_name,
-                            'status' => 1,
-                        ]
-                    );
-                    $authenticatedUser = $user;
+                // پیدا کردن یا ایجاد بیمار
+                $patient = null;
+                if ($patientType === 'self') {
+                    $patient = $authenticatedUser;
+                } else {
+                    $patient = User::create([
+                        'first_name' => $request->input('first_name'),
+                        'last_name' => $request->input('last_name'),
+                        'national_code' => $request->input('national_code'),
+                        'mobile' => $request->input('mobile'),
+                        'email' => $request->input('email'),
+                        'created_by' => $authenticatedUser->id,
+                        'user_type' => 0,
+                        'status' => 1,
+                    ]);
                 }
-                // اگر secretary بود
-                if ($authenticatedUser instanceof \App\Models\Secretary) {
-                    $user = \App\Models\User::firstOrCreate(
-                        ['mobile' => $authenticatedUser->mobile],
-                        [
-                            'first_name' => $authenticatedUser->first_name,
-                            'last_name' => $authenticatedUser->last_name,
-                            'status' => 1,
-                        ]
-                    );
-                    $authenticatedUser = $user;
-                }
-                // اگر manager بود
-                if ($authenticatedUser instanceof \App\Models\Admin\Manager) {
-                    $user = \App\Models\User::firstOrCreate(
-                        ['mobile' => $authenticatedUser->mobile],
-                        [
-                            'first_name' => $authenticatedUser->first_name,
-                            'last_name' => $authenticatedUser->last_name,
-                            'status' => 1,
-                        ]
-                    );
-                    $authenticatedUser = $user;
+
+                if (!$patient) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'کاربر (بیمار) یافت نشد یا ایجاد نشد.',
+                        'data' => null,
+                    ], 400);
                 }
 
                 // پیدا کردن پزشک
@@ -293,31 +281,6 @@ class AppointmentBookingController extends Controller
                 // پاک‌سازی نوبت‌های ناموفق
                 $this->cleanupPendingAppointments($doctor->id, $appointmentDate, $appointmentTime, $serviceType, $clinicId);
 
-                // پیدا کردن یا ایجاد بیمار
-                $patient = null;
-                if ($patientType === 'self') {
-                    $patient = $authenticatedUser;
-                } else {
-                    $patient = User::create([
-                        'first_name' => $request->input('first_name'),
-                        'last_name' => $request->input('last_name'),
-                        'national_code' => $request->input('national_code'),
-                        'mobile' => $request->input('mobile'),
-                        'email' => $request->input('email'),
-                        'created_by' => $authenticatedUser->id,
-                        'user_type' => 0,
-                        'status' => 1,
-                    ]);
-                }
-
-                if (!$patient) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'کاربر (بیمار) یافت نشد یا ایجاد نشد.',
-                        'data' => null,
-                    ], 400);
-                }
-
                 // محاسبه هزینه‌ها
                 $depositAmount = 0;
                 $infrastructureFee = InfrastructureFee::where('appointment_type', $serviceType)
@@ -353,7 +316,8 @@ class AppointmentBookingController extends Controller
                 // ثبت نوبت
                 $appointmentData = [
                     'doctor_id' => $doctor->id,
-                    'patient_id' => $patient->id,
+                    'patientable_id' => $patient->id,
+                    'patientable_type' => get_class($patient),
                     'clinic_id' => $clinicId,
                     'appointment_date' => $appointmentDate,
                     'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),

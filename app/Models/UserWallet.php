@@ -1,18 +1,19 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class UserWallet extends Model
 {
-    protected $fillable = ['user_id', 'balance'];
+    protected $fillable = ['walletable_id', 'walletable_type', 'balance'];
 
     protected $casts = [
         'balance' => 'decimal:2',
     ];
 
-    public function user()
+    public function walletable()
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 }

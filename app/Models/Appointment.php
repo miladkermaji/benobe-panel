@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Appointment extends Model
 {
-    use SoftDeletes,HasFactory;
+    use SoftDeletes;
+    use HasFactory;
     protected $fillable = [
         'doctor_id',
         'patient_id',
@@ -52,9 +53,9 @@ class Appointment extends Model
     {
         return $this->belongsTo(Clinic::class);
     }
-    public function patient()
+    public function patientable()
     {
-        return $this->belongsTo(User::class, 'patient_id');
+        return $this->morphTo();
     }
 
     public function insurance()

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -68,7 +69,9 @@ class WalletController extends Controller
             }
 
             // گرفتن کیف پول کاربر
-            $wallet = UserWallet::where('user_id', $user->id)->first();
+            $wallet = UserWallet::where('walletable_id', $user->id)
+                ->where('walletable_type', 'App\\Models\\User')
+                ->first();
             if (! $wallet) {
                 return response()->json([
                     'status'  => 'error',
@@ -164,8 +167,9 @@ class WalletController extends Controller
             }
 
             // گرفتن تراکنش‌های کاربر
-            $transactions = UserWalletTransaction::where('user_id', $user->id)
-                ->select('id', 'user_id', 'amount', 'status', 'type', 'description', 'registered_at', 'paid_at')
+            $transactions = UserWalletTransaction::where('walletable_id', $user->id)
+                ->where('walletable_type', 'App\\Models\\User')
+                ->select('id', 'walletable_id', 'amount', 'status', 'type', 'description', 'registered_at', 'paid_at')
                 ->get();
 
             // فرمت کردن داده‌ها

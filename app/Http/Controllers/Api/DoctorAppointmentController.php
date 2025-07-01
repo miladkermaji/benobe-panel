@@ -23,12 +23,15 @@ use App\Models\DoctorCounselingHoliday;
 use App\Models\CounselingDailySchedules;
 use App\Models\DoctorCounselingHolidays;
 use App\Models\DoctorCounselingWorkSchedule;
+use Illuminate\Support\Facades\Auth;
 
 class DoctorAppointmentController extends Controller
 {
     public function getAppointmentOptions(Request $request, $doctorId)
     {
         try {
+            $user = Auth::user();
+
             $doctor = Doctor::find($doctorId);
             if (!$doctor) {
                 return response()->json([

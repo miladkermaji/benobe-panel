@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -73,17 +74,31 @@ class OrderController extends Controller
             }
 
             // گرفتن سفارشات کاربر
-            $orders = Order::where('user_id', $user->id)
+            $orders = Order::where('orderable_id', $user->id)
+                ->where('orderable_type', 'App\\Models\\User')
                 ->with([
-                    'user' => function ($query) {
-                        $query->select('id', 'mobile', 'first_name', 'last_name');
-                    },
+                    'orderable' // morph relation
                 ])
-                ->select('id', 'user_id', 'order_code', 'total_amount', 'status', 'order_date', 'notes')
+                ->select('id', 'orderable_id', 'orderable_type', 'order_code', 'total_amount', 'status', 'order_date', 'notes')
                 ->get();
 
             // فرمت کردن داده‌ها
             $formattedOrders = $orders->map(function ($order) {
+                $orderable = $order->orderable;
+                $orderableData = null;
+                if ($orderable) {
+                    if ($order->orderable_type === 'App\\Models\\User') {
+                        $orderableData = [
+                            'mobile' => $orderable->mobile,
+                            'name'   => trim(($orderable->first_name ?? '') . ' ' . ($orderable->last_name ?? '')),
+                        ];
+                    } elseif ($order->orderable_type === 'App\\Models\\Doctor') {
+                        $orderableData = [
+                            'mobile' => $orderable->mobile ?? null,
+                            'name'   => trim(($orderable->first_name ?? '') . ' ' . ($orderable->last_name ?? '')),
+                        ];
+                    } // add more types if needed
+                }
                 return [
                     'id'           => $order->id,
                     'order_code'   => $order->order_code,
@@ -91,10 +106,7 @@ class OrderController extends Controller
                     'status'       => $order->status,
                     'order_date'   => $order->order_date ? $order->order_date->format('Y-m-d') : null,
                     'notes'        => $order->notes,
-                    'user'         => $order->user ? [
-                        'mobile' => $order->user->mobile,
-                        'name'   => $order->user->first_name . ' ' . $order->user->last_name,
-                    ] : null,
+                    'orderable'    => $orderableData,
                 ];
             });
 
