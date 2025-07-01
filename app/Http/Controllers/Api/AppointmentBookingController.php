@@ -341,6 +341,8 @@ class AppointmentBookingController extends Controller
                     'appointment_id' => $appointment->id,
                     'appointment_type' => $serviceType === 'in_person' ? 'in_person' : 'counseling',
                     'infrastructure_fee' => $infrastructureFee,
+                    'patientable_id' => $patient->id,
+                    'patientable_type' => get_class($patient),
                 ];
 
                 // دریافت URL درگاه پرداخت
@@ -489,6 +491,14 @@ class AppointmentBookingController extends Controller
                         : CounselingAppointment::find($appointmentId);
 
                     if ($appointment) {
+                        // اگر patientable_id یا patientable_type نال است، مقداردهی کن
+                        if (is_null($appointment->patientable_id) || is_null($appointment->patientable_type)) {
+                            if (isset($meta['patientable_id']) && isset($meta['patientable_type'])) {
+                                $appointment->patientable_id = $meta['patientable_id'];
+                                $appointment->patientable_type = $meta['patientable_type'];
+                                $appointment->save();
+                            }
+                        }
                         $validPaymentStatuses = ['pending', 'paid', 'unpaid'];
                         $validStatuses = [
                             'scheduled', 'cancelled', 'attended', 'missed', 'pending_review',
@@ -531,6 +541,14 @@ class AppointmentBookingController extends Controller
                         : CounselingAppointment::find($appointmentId);
 
                     if ($appointment) {
+                        // اگر patientable_id یا patientable_type نال است، مقداردهی کن
+                        if (is_null($appointment->patientable_id) || is_null($appointment->patientable_type)) {
+                            if (isset($meta['patientable_id']) && isset($meta['patientable_type'])) {
+                                $appointment->patientable_id = $meta['patientable_id'];
+                                $appointment->patientable_type = $meta['patientable_type'];
+                                $appointment->save();
+                            }
+                        }
                         $validPaymentStatuses = ['pending', 'paid', 'unpaid'];
                         $validStatuses = [
                             'scheduled', 'cancelled', 'attended', 'missed', 'pending_review',
