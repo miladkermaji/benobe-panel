@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\UserWallet;
-use App\Models\UserWalletTransaction;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Models\UserWalletTransaction;
 
 class WalletController extends Controller
 {
@@ -149,7 +150,9 @@ class WalletController extends Controller
 
             // احراز هویت کاربر
             try {
-                $user = JWTAuth::setToken($token)->authenticate();
+
+                $user = Auth::user();
+
                 if (! $user) {
                     return response()->json([
                         'status'  => 'error',
