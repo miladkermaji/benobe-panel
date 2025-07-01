@@ -42,6 +42,7 @@ class Appointment extends Model
     protected $casts = [
         'appointment_date' => 'date',           // تبدیل به Carbon برای تاریخ
         'appointment_time' => 'datetime:H:i:s', // تبدیل به Carbon برای زمان
+        'reserved_at' => 'datetime', // اضافه کردن cast برای reserved_at
     ];
     public function doctor()
     {
