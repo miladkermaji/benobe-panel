@@ -30,6 +30,37 @@ class UserSubscriptionController extends Controller
     public function getSubscriptionDetails(): JsonResponse
     {
         $user = Auth::user();
+        // تبدیل نقش doctor/secretary/manager به user
+        if ($user instanceof \App\Models\Doctor) {
+            $user = \App\Models\User::firstOrCreate(
+                ['mobile' => $user->mobile],
+                [
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'status' => 1,
+                ]
+            );
+        }
+        if ($user instanceof \App\Models\Secretary) {
+            $user = \App\Models\User::firstOrCreate(
+                ['mobile' => $user->mobile],
+                [
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'status' => 1,
+                ]
+            );
+        }
+        if ($user instanceof \App\Models\Admin\Manager) {
+            $user = \App\Models\User::firstOrCreate(
+                ['mobile' => $user->mobile],
+                [
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'status' => 1,
+                ]
+            );
+        }
 
         $activeSubscription = UserSubscription::with('plan')
             ->where('subscribable_id', $user->id)
@@ -75,6 +106,37 @@ class UserSubscriptionController extends Controller
         ]);
 
         $user = Auth::user();
+        // تبدیل نقش doctor/secretary/manager به user
+        if ($user instanceof \App\Models\Doctor) {
+            $user = \App\Models\User::firstOrCreate(
+                ['mobile' => $user->mobile],
+                [
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'status' => 1,
+                ]
+            );
+        }
+        if ($user instanceof \App\Models\Secretary) {
+            $user = \App\Models\User::firstOrCreate(
+                ['mobile' => $user->mobile],
+                [
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'status' => 1,
+                ]
+            );
+        }
+        if ($user instanceof \App\Models\Admin\Manager) {
+            $user = \App\Models\User::firstOrCreate(
+                ['mobile' => $user->mobile],
+                [
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'status' => 1,
+                ]
+            );
+        }
 
         // جلوگیری از خرید مجدد اشتراک فعال
         $activeSubscription = UserSubscription::where('subscribable_id', $user->id)
