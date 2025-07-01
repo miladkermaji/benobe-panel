@@ -145,11 +145,11 @@ class DoctorController extends Controller
      */
     public function getBestDoctors(Request $request)
     {
+        Log::info('getBestDoctors called', ['request' => $request->all()]);
         try {
-            // بررسی وجود پارامتر limit
             $limit = $request->has('limit') ? (int) $request->input('limit') : null;
+            Log::info('getBestDoctors: limit', ['limit' => $limit]);
 
-            // گرفتن پزشکان برتر با Eager Loading
             $bestDoctors = BestDoctor::where('status', true)
                 ->with([
                     'doctor'       => function ($query) {
@@ -173,7 +173,8 @@ class DoctorController extends Controller
                 ->groupBy('doctor_id')
                 ->map(fn ($group) => $group->first());
 
-            // فرمت کردن داده‌ها
+            Log::info('getBestDoctors: bestDoctors loaded', ['count' => $bestDoctors->count()]);
+
             $formattedDoctors = $bestDoctors->map(function ($bestDoctor) {
                 $slotData = $this->getNextAvailableSlot($bestDoctor->doctor);
                 $jalaliDate = null;
@@ -181,7 +182,7 @@ class DoctorController extends Controller
                     $date       = Carbon::parse($slotData['next_available_slot']);
                     $jalaliDate = \Morilog\Jalali\Jalalian::fromCarbon($date)->format('Y-m-d');
                 }
-                return [
+                $result = [
                     'id'                  => optional($bestDoctor->doctor)->id,
                     'name'                => optional($bestDoctor->doctor)->first_name . ' ' . optional($bestDoctor->doctor)->last_name,
                     'specialty'           => optional(optional($bestDoctor->doctor)->specialty)->name,
@@ -190,7 +191,11 @@ class DoctorController extends Controller
                     'province'            => optional(optional($bestDoctor->doctor)->province)->name,
                     'next_available_slot' => $jalaliDate,
                 ];
+                Log::info('getBestDoctors: formatted doctor', $result);
+                return $result;
             })->values();
+
+            Log::info('getBestDoctors: formattedDoctors ready', ['count' => $formattedDoctors->count()]);
 
             return response()->json([
                 'status' => 'success',
@@ -198,6 +203,10 @@ class DoctorController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
+            Log::error('getBestDoctors error', [
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
