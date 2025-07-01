@@ -149,6 +149,48 @@ class AppointmentBookingController extends Controller
         }
     }
 
+    /**
+     * بررسی وضعیت رزرو با کد رهگیری
+     */
+    public function getReservationStatus(Request $request)
+    {
+        $trackingCode = $request->input('tracking_code');
+        if (!$trackingCode) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'کد رهگیری ارسال نشده است.',
+                'data' => null,
+            ], 400);
+        }
+        $appointment = Appointment::where('tracking_code', $trackingCode)->first();
+        if (!$appointment) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'رزروی با این کد رهگیری یافت نشد.',
+                'data' => null,
+            ], 404);
+        }
+        $now = now();
+        $reservedAt = $appointment->reserved_at;
+        $expiresAt = $reservedAt ? $reservedAt->addMinutes(10) : null;
+        $remaining = $expiresAt && $now->lessThan($expiresAt) ? $now->diffInSeconds($expiresAt) : 0;
+        $isExpired = $expiresAt && $now->greaterThanOrEqualTo($expiresAt);
+        $status = $appointment->payment_status === 'paid' ? 'paid' : ($isExpired ? 'expired' : 'pending');
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'tracking_code' => $trackingCode,
+                'appointment_id' => $appointment->id,
+                'doctor_id' => $appointment->doctor_id,
+                'appointment_date' => $appointment->appointment_date,
+                'appointment_time' => $appointment->appointment_time,
+                'status' => $status,
+                'remaining_seconds' => $remaining,
+                'reserved_at' => $reservedAt,
+                'expires_at' => $expiresAt,
+            ],
+        ]);
+    }
 
     public function bookAppointment(Request $request, $doctorId)
     {
@@ -195,6 +237,9 @@ class AppointmentBookingController extends Controller
                 'clinic_id.integer'            => 'شناسه کلینیک باید یک عدد صحیح باشد.',
                 'clinic_id.exists'             => 'کلینیک انتخاب‌شده وجود ندارد.',
             ]);
+
+            // پاک‌سازی رزروهای منقضی‌شده قبل از رزرو جدید
+            $this->cleanupExpiredPendingAppointments($doctorId);
 
             // استفاده از تراکنش برای جلوگیری از رزروهای همزمان
             return DB::transaction(function () use ($request, $doctorId) {
@@ -278,9 +323,6 @@ class AppointmentBookingController extends Controller
                     ], 400);
                 }
 
-                // پاک‌سازی نوبت‌های ناموفق
-                $this->cleanupPendingAppointments($doctor->id, $appointmentDate, $appointmentTime, $serviceType, $clinicId);
-
                 // محاسبه هزینه‌ها
                 $depositAmount = 0;
                 $infrastructureFee = InfrastructureFee::where('appointment_type', $serviceType)
@@ -297,14 +339,12 @@ class AppointmentBookingController extends Controller
 
                 $totalFee = $depositAmount + $infrastructureFee;
 
-                // تولید کد رهگیری (فقط عدد)
+                // تولید کد رهگیری (قبل از پرداخت)
                 $trackingCode = null;
                 $maxAttempts = 10;
                 for ($i = 0; $i < $maxAttempts; $i++) {
                     $trackingCode = mt_rand(10000000, 99999999);
-                    $exists = $serviceType === 'in_person'
-                        ? Appointment::where('tracking_code', $trackingCode)->exists()
-                        : CounselingAppointment::where('tracking_code', $trackingCode)->exists();
+                    $exists = Appointment::where('tracking_code', $trackingCode)->exists();
                     if (!$exists) {
                         break;
                     }
@@ -313,7 +353,7 @@ class AppointmentBookingController extends Controller
                     }
                 }
 
-                // ثبت نوبت
+                // ثبت نوبت (pending)
                 $appointmentData = [
                     'doctor_id' => $doctor->id,
                     'patientable_id' => $patient->id,
@@ -328,13 +368,9 @@ class AppointmentBookingController extends Controller
                     'payment_status' => 'pending',
                     'appointment_type' => $serviceType,
                 ];
-
-                if ($serviceType === 'in_person') {
-                    $appointment = Appointment::create($appointmentData);
-                } else {
-                    $appointmentData['appointment_type'] = $serviceType;
-                    $appointment = CounselingAppointment::create($appointmentData);
-                }
+                $appointment = $serviceType === 'in_person'
+                    ? Appointment::create($appointmentData)
+                    : CounselingAppointment::create($appointmentData);
 
                 // اطلاعات اضافی برای تراکنش
                 $meta = [
@@ -357,9 +393,10 @@ class AppointmentBookingController extends Controller
                 // پاسخ مینیمال
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'نوبت با موفقیت ثبت شد. لطفاً به درگاه پرداخت هدایت شوید.',
+                    'message' => 'نوبت با موفقیت رزرو شد. لطفاً به درگاه پرداخت هدایت شوید.',
                     'payment_url' => $redirection->getTargetUrl(),
                     'tracking_code' => $trackingCode,
+                    'expires_in_seconds' => 600,
                 ], 200);
             });
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -378,6 +415,24 @@ class AppointmentBookingController extends Controller
                 'message' => 'خطای سرور',
                 'data' => null,
             ], 500);
+        }
+    }
+
+    /**
+     * پاک‌سازی رزروهای pending منقضی‌شده
+     */
+    private function cleanupExpiredPendingAppointments($doctorId)
+    {
+        $expired = Appointment::where('doctor_id', $doctorId)
+            ->where('status', 'scheduled')
+            ->where('payment_status', 'pending')
+            ->where('reserved_at', '<', now()->subMinutes(10))
+            ->get();
+        foreach ($expired as $appointment) {
+            $appointment->update([
+                'status' => 'cancelled',
+                'payment_status' => 'unpaid',
+            ]);
         }
     }
 
