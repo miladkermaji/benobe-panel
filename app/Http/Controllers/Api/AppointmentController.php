@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentController extends Controller
 {
@@ -39,7 +40,7 @@ class AppointmentController extends Controller
     {
         try {
             // احراز هویت کاربر
-            $user = JWTAuth::setToken($request->cookie('auth_token') ?: $request->bearerToken())->authenticate();
+            $user = Auth::user();
             if (! $user) {
                 return response()->json([
                     'status'  => 'error',
@@ -155,7 +156,7 @@ class AppointmentController extends Controller
 
             // احراز هویت کاربر
             try {
-                $user = JWTAuth::setToken($token)->authenticate();
+                $user = Auth::user();
                 if (!$user) {
                     return response()->json([
                         'status'  => 'error',
