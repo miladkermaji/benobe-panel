@@ -164,7 +164,7 @@ class DoctorController extends Controller
                     'hospital'     => fn ($query) => $query->select('id', 'name'),
                     'appointments' => fn ($query) => $query->where('appointments.status', 'scheduled'),
                 ])
-                ->select('id', 'doctor_id', 'hospital_id', 'star_rating')
+                ->select(['id', 'doctor_id', 'star_rating'])
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
