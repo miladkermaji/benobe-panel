@@ -106,9 +106,9 @@
           @forelse ($subUsers as $index => $subUser)
             <tr>
               <td>{{ $index + 1 }}</td>
-              <td>{{ $subUser->user->first_name }} {{ $subUser->user->last_name }}</td>
-              <td>{{ $subUser->user->mobile }}</td>
-              <td>{{ $subUser->user->national_code }}</td>
+              <td>{{ $subUser->subuserable->first_name ?? '' }} {{ $subUser->subuserable->last_name ?? '' }}</td>
+              <td>{{ $subUser->subuserable->mobile ?? '' }}</td>
+              <td>{{ $subUser->subuserable->national_code ?? '' }}</td>
               <td>
                 <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="{{ $subUser->id }}"
                   title="ویرایش">
@@ -173,9 +173,9 @@
           const row = `
             <tr>
               <td>${index + 1}</td>
-              <td>${subUser.user.first_name} ${subUser.user.last_name}</td>
-              <td>${subUser.user.mobile}</td>
-              <td>${subUser.user.national_code}</td>
+              <td>${subUser.subuserable.first_name} ${subUser.subuserable.last_name}</td>
+              <td>${subUser.subuserable.mobile}</td>
+              <td>${subUser.subuserable.national_code}</td>
               <td>
                 <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${subUser.id}" title="ویرایش">
                   <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">

@@ -14,7 +14,7 @@ class SubUserController extends Controller
     public function index()
     {
         $doctorId = Auth::guard('doctor')->id();
-        $subUsers = SubUser::with('user')->where('doctor_id', $doctorId)->get();
+        $subUsers = SubUser::with('subuserable')->where('doctor_id', $doctorId)->get();
         $users = User::all();
 
         return view('dr.panel.profile.subuser', compact('subUsers', 'users'));
@@ -36,7 +36,8 @@ class SubUserController extends Controller
         $doctorId = Auth::guard('doctor')->id();
 
         $existingSubUser = SubUser::where('doctor_id', $doctorId)
-            ->where('user_id', $request->user_id)
+            ->where('subuserable_id', $request->user_id)
+            ->where('subuserable_type', User::class)
             ->first();
 
         if ($existingSubUser) {
@@ -44,25 +45,26 @@ class SubUserController extends Controller
         }
 
         SubUser::create([
-            'doctor_id' => $doctorId,
-            'user_id'   => $request->user_id,
+            'doctor_id'        => $doctorId,
+            'subuserable_id'   => $request->user_id,
+            'subuserable_type' => User::class,
         ]);
 
         return response()->json([
             'message'  => 'کاربر زیرمجموعه با موفقیت اضافه شد!',
-            'subUsers' => SubUser::where('doctor_id', $doctorId)->with('user')->get(),
+            'subUsers' => SubUser::where('doctor_id', $doctorId)->with('subuserable')->get(),
             'users'    => User::all(),
         ]);
     }
 
     public function edit($id)
     {
-        $subUser = SubUser::with('user')->findOrFail($id);
+        $subUser = SubUser::with('subuserable')->findOrFail($id);
         $users   = User::all();
 
         return response()->json([
             'id'      => $subUser->id,
-            'user_id' => $subUser->user_id,
+            'user_id' => $subUser->subuserable_id,
             'users'   => $users,
         ]);
     }
@@ -82,24 +84,26 @@ class SubUserController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if ($subUser->user_id == $request->user_id) {
+        if ($subUser->subuserable_id == $request->user_id && $subUser->subuserable_type == User::class) {
             return response()->json(['message' => 'بدون تغییر! مقدار جدید همان مقدار قبلی است.']);
         }
 
         $existingSubUser = SubUser::where('doctor_id', $subUser->doctor_id)
-            ->where('user_id', $request->user_id)
+            ->where('subuserable_id', $request->user_id)
+            ->where('subuserable_type', User::class)
             ->first();
 
         if ($existingSubUser) {
             return response()->json(['error' => 'این کاربر قبلاً به لیست اضافه شده است!'], 422);
         }
 
-        $subUser->user_id = $request->user_id;
+        $subUser->subuserable_id = $request->user_id;
+        $subUser->subuserable_type = User::class;
         $subUser->save();
 
         return response()->json([
             'message'  => 'کاربر زیرمجموعه با موفقیت ویرایش شد!',
-            'subUsers' => SubUser::where('doctor_id', $subUser->doctor_id)->with('user')->get(),
+            'subUsers' => SubUser::where('doctor_id', $subUser->doctor_id)->with('subuserable')->get(),
             'users'    => User::all(),
         ]);
     }
@@ -112,7 +116,7 @@ class SubUserController extends Controller
 
         return response()->json([
             'message'  => 'کاربر زیرمجموعه حذف شد!',
-            'subUsers' => SubUser::where('doctor_id', $doctorId)->with('user')->get(),
+            'subUsers' => SubUser::where('doctor_id', $doctorId)->with('subuserable')->get(),
         ]);
     }
 }
