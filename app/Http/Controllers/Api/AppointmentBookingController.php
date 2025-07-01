@@ -208,12 +208,42 @@ class AppointmentBookingController extends Controller
 
                 // گرفتن کاربر احراز هویت‌شده
                 $authenticatedUser = $request->attributes->get('user');
-                if (!$authenticatedUser) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'لطفاً ابتدا وارد حساب کاربری خود شوید.',
-                        'data' => null,
-                    ], 401);
+
+                // اگر doctor بود
+                if ($authenticatedUser instanceof \App\Models\Doctor) {
+                    $user = \App\Models\User::firstOrCreate(
+                        ['mobile' => $authenticatedUser->mobile],
+                        [
+                            'first_name' => $authenticatedUser->first_name,
+                            'last_name' => $authenticatedUser->last_name,
+                            'status' => 1,
+                        ]
+                    );
+                    $authenticatedUser = $user;
+                }
+                // اگر secretary بود
+                if ($authenticatedUser instanceof \App\Models\Secretary) {
+                    $user = \App\Models\User::firstOrCreate(
+                        ['mobile' => $authenticatedUser->mobile],
+                        [
+                            'first_name' => $authenticatedUser->first_name,
+                            'last_name' => $authenticatedUser->last_name,
+                            'status' => 1,
+                        ]
+                    );
+                    $authenticatedUser = $user;
+                }
+                // اگر manager بود
+                if ($authenticatedUser instanceof \App\Models\Admin\Manager) {
+                    $user = \App\Models\User::firstOrCreate(
+                        ['mobile' => $authenticatedUser->mobile],
+                        [
+                            'first_name' => $authenticatedUser->first_name,
+                            'last_name' => $authenticatedUser->last_name,
+                            'status' => 1,
+                        ]
+                    );
+                    $authenticatedUser = $user;
                 }
 
                 // پیدا کردن پزشک
