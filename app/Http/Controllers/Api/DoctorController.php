@@ -175,27 +175,17 @@ class DoctorController extends Controller
 
             // فرمت کردن داده‌ها
             $formattedDoctors = $bestDoctors->map(function ($bestDoctor) {
-                // تعداد نوبت‌های رزرو شده
-                $appointmentCount = $bestDoctor->appointments->count();
-
-                // محاسبه اولین نوبت خالی و حداکثر نوبت‌ها
                 $slotData = $this->getNextAvailableSlot($bestDoctor->doctor);
-
-                // تبدیل تاریخ به شمسی اگه وجود داشته باشه
                 $jalaliDate = null;
                 if ($slotData['next_available_slot']) {
                     $date       = Carbon::parse($slotData['next_available_slot']);
-                    $jalaliDate = \Morilog\Jalali\Jalalian::fromCarbon($date)->format('Y-m-d H:i');
+                    $jalaliDate = \Morilog\Jalali\Jalalian::fromCarbon($date)->format('Y-m-d');
                 }
-
                 return [
                     'id'                  => optional($bestDoctor->doctor)->id,
                     'name'                => optional($bestDoctor->doctor)->first_name . ' ' . optional($bestDoctor->doctor)->last_name,
                     'specialty'           => optional(optional($bestDoctor->doctor)->specialty)->name,
-                    'hospital'            => optional($bestDoctor->hospital)->name,
                     'star_rating'         => $bestDoctor->star_rating,
-                    'appointment_count'   => $appointmentCount,
-                    'max_appointments'    => $slotData['max_appointments'],
                     'image'               => optional($bestDoctor->doctor)->profile_photo_path ? asset('storage/' . optional($bestDoctor->doctor)->profile_photo_path) : null,
                     'province'            => optional(optional($bestDoctor->doctor)->province)->name,
                     'next_available_slot' => $jalaliDate,
