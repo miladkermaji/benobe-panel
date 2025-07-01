@@ -37,7 +37,7 @@ class BestDoctor extends Model
 
     public function hospital()
     {
-        return $this->belongsTo(MedicalCenter::class, 'id')
+        return $this->belongsTo(MedicalCenter::class, 'hospital_id')
             ->where('type', 'hospital');
     }
 }
