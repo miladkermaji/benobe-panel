@@ -305,11 +305,12 @@ $this->getSelectedClinicId()
         // 3. بیماران جدید - هفتگی
         $newPatientsQuery = Appointment::where('doctor_id', $doctorId)
             ->where($clinicCondition)
-            ->join('users', 'appointments.patient_id', '=', 'users.id');
+            ->where('patientable_type', 'App\\Models\\User')
+            ->join('users', 'appointments.patientable_id', '=', 'users.id');
 
         $newPatients = $newPatientsQuery
             ->selectRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%u') as week,
-                         COUNT(DISTINCT appointments.patient_id) as total_patients")
+                         COUNT(DISTINCT appointments.patientable_id) as total_patients")
             ->groupByRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%u')")
             ->orderByRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%u')")
             ->get();
