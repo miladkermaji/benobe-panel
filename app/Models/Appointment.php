@@ -22,6 +22,7 @@ class Appointment extends Model
         'appointment_type',
         'appointment_date',
         'appointment_time',
+        'reserved_at',
         'status',
         'notes',
         'description',
