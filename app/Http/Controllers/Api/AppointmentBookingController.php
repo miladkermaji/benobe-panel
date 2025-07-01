@@ -497,6 +497,31 @@ class AppointmentBookingController extends Controller
 
     /**
      * نمایش نتیجه پرداخت و به‌روزرسانی وضعیت نوبت
+     *
+     * @OA\Get(
+     *   path="/appointments/payment/result",
+     *   summary="نمایش نتیجه پرداخت و به‌روزرسانی وضعیت نوبت",
+     *   description="این متد نتیجه پرداخت را بر اساس transaction_id یا Authority بررسی می‌کند.",
+     *   tags={"Appointments"},
+     *   @OA\Parameter(
+     *     name="transaction_id",
+     *     in="query",
+     *     required=false,
+     *     description="شناسه تراکنش پرداخت (Transaction ID)",
+     *     @OA\Schema(type="string")
+     *   ),
+     *   @OA\Parameter(
+     *     name="Authority",
+     *     in="query",
+     *     required=false,
+     *     description="کد Authority برگشتی از درگاه پرداخت",
+     *     @OA\Schema(type="string")
+     *   ),
+     *   @OA\Response(response=200, description="پرداخت موفق یا ناموفق"),
+     *   @OA\Response(response=400, description="پارامتر ارسال نشده یا خطای اعتبارسنجی"),
+     *   @OA\Response(response=404, description="تراکنش یافت نشد"),
+     *   @OA\Response(response=500, description="خطای سرور")
+     * )
      */
     public function paymentResult(Request $request)
     {
