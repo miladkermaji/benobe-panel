@@ -35,6 +35,8 @@ class Appointment extends Model
         'notification_sent',
         'include_holidays',
         'disabled_days',
+        'patientable_id',
+        'patientable_type',
     ];
     protected $casts = [
         'appointment_date' => 'date',           // تبدیل به Carbon برای تاریخ
