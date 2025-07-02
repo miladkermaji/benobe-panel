@@ -358,13 +358,7 @@
   }
 
   @media (max-width: 640px) {
-    .toggle-appointment-row {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.5rem;
-      padding: 0.6rem 0.5rem;
-      min-width: 0;
-    }
+ 
 
     .toggle-appointment-label {
       justify-content: center;
