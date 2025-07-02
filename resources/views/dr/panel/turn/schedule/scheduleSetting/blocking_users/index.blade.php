@@ -155,28 +155,32 @@
           <div class="notes-cards d-md-none">
             @forelse ($blockedUsers as $index => $blockedUser)
               <div class="note-card mb-3" data-id="{{ $blockedUser->id }}">
-                <div class="note-card-header d-flex justify-content-between align-items-center">
+                <div class="note-card-header d-flex justify-content-between align-items-center"
+                  onclick="toggleMobileCard(this, event)">
                   <div class="d-flex align-items-center gap-2">
                     <input type="checkbox" class="form-check-input m-0 align-middle select-user"
                       value="{{ $blockedUser->id }}">
                     <span class="badge bg-primary-subtle text-primary">
-                      {{ $blockedUser->user->first_name }} {{ $blockedUser->user->last_name }}
+                      {{ $blockedUser->user->first_name }} {{ $blockedUser->user->last_name }} <span
+                        class="text-secondary">({{ $blockedUser->user->mobile }})</span>
                     </span>
                   </div>
-                  <div class="d-flex gap-1">
-                    <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
+                  <div class="d-flex gap-1 align-items-center">
+                    <button type="button" class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
                         <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                       </svg>
                     </button>
+                    <span class="dropdown-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </span>
                   </div>
                 </div>
-                <div class="note-card-body">
-                  <div class="note-card-item">
-                    <span class="note-card-label">شماره موبایل:</span>
-                    <span class="note-card-value">{{ $blockedUser->user->mobile }}</span>
-                  </div>
+                <div class="note-card-body" style="display:none;">
                   <div class="note-card-item">
                     <span class="note-card-label">تاریخ شروع:</span>
                     <span
@@ -509,26 +513,27 @@
 
       const card = `
                 <div class="note-card mb-3" data-id="${user.id}">
-                    <div class="note-card-header d-flex justify-content-between align-items-center">
+                    <div class="note-card-header d-flex justify-content-between align-items-center" onclick="toggleMobileCard(this, event)">
                         <div class="d-flex align-items-center gap-2">
                             <input type="checkbox" class="form-check-input m-0 align-middle select-user" value="${user.id}">
                             <span class="badge bg-primary-subtle text-primary">
-                                ${user.user.first_name} ${user.user.last_name}
+                                ${user.user.first_name} ${user.user.last_name} <span class='text-secondary'>(${user.user.mobile})</span>
                             </span>
                         </div>
-                        <div class="d-flex gap-1">
-                            <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
+                        <div class="d-flex gap-1 align-items-center">
+                            <button type="button" class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                                 </svg>
                             </button>
+                            <span class="dropdown-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </span>
                         </div>
                     </div>
-                    <div class="note-card-body">
-                        <div class="note-card-item">
-                            <span class="note-card-label">شماره موبایل:</span>
-                            <span class="note-card-value">${user.user.mobile}</span>
-                        </div>
+                    <div class="note-card-body" style="display:none;">
                         <div class="note-card-item">
                             <span class="note-card-label">تاریخ شروع:</span>
                             <span class="note-card-value">${blockedAt}</span>
@@ -751,6 +756,23 @@
           });
         }
       });
+    }
+
+    // آکاردئون کارت موبایل
+    function toggleMobileCard(header, event) {
+      // اگر روی دکمه حذف یا آیکون فلش کلیک شد، آکاردئون اجرا نشود
+      if (event && (event.target.closest('.delete-user-btn') || event.target.closest('.dropdown-icon'))) {
+        return;
+      }
+      const card = header.closest('.note-card');
+      const body = card.querySelector('.note-card-body');
+      if (!card.classList.contains('open')) {
+        card.classList.add('open');
+        body.style.display = 'block';
+      } else {
+        card.classList.remove('open');
+        body.style.display = 'none';
+      }
     }
 
     $(document).ready(function() {
