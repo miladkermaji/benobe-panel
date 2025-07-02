@@ -86,6 +86,7 @@
       document.addEventListener("DOMContentLoaded", () => {
         window.addEventListener("load", () => {
           const loader = document.getElementById("global-loader");
+          setTimeout(() => loader.classList.add("hidden"), 400);
         });
       });
     </script>

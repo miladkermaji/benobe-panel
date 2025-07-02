@@ -52,7 +52,10 @@
 </head>
 
 <body>
+  <x-global-loader />
+
   <main class="min-h-screen">
+
     <div class="login-wrapper d-flex  justify-content-center align-items-center h-100vh">
       {{ $slot }}
     </div>
@@ -68,6 +71,11 @@
 
   @livewireScripts
   <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      window.addEventListener("load", () => {
+        const loader = document.getElementById("global-loader");
+      });
+    });
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof toastr !== 'undefined') {
         toastr.options = {
@@ -80,7 +88,7 @@
           closeButton: false
         };
       }
-        toastr.options.rtl = true;
+      toastr.options.rtl = true;
 
     });
 
