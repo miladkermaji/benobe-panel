@@ -194,5 +194,6 @@ class DoctorLoginUserPass extends Component
     public function render()
     {
         return view('livewire.dr.auth.doctor-login-user-pass')->layout('dr.layouts.dr-auth');
+        ;
     }
 }

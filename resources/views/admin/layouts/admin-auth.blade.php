@@ -52,7 +52,6 @@
 </head>
 
 <body>
-  <x-global-loader />
 
   <main class="min-h-screen">
     <div class="login-wrapper d-flex w-100 justify-content-center align-items-center h-100vh">
@@ -71,11 +70,7 @@
   @livewireScripts
   @once
   <script>
-      document.addEventListener("DOMContentLoaded", () => {
-      window.addEventListener("load", () => {
-        const loader = document.getElementById("global-loader");
-      });
-    });
+
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof toastr !== 'undefined') {
         toastr.options = {
