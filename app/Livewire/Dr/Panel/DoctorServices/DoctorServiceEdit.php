@@ -25,6 +25,7 @@ class DoctorServiceEdit extends Component
     public $currentPricingIndex = null;
     public $isSaving = false;
     protected $previousState = [];
+    protected $listeners = ['autoSave' => 'save'];
 
     public function mount($id)
     {
@@ -190,7 +191,7 @@ class DoctorServiceEdit extends Component
         $this->save();
     }
 
-    private function save()
+    public function save()
     {
         $this->isSaving = true;
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
