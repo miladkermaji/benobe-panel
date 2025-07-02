@@ -143,6 +143,17 @@
   body.modal-open {
     overflow: hidden;
   }
+
+  @media (max-width: 425px) {
+    .xai-modal-container {
+      border-radius: 0 !important;
+    }
+
+    .xai-modal-header {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+    }
+  }
 </style>
 
 @props(['name', 'id', 'title', 'size' => 'md'])

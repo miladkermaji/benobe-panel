@@ -62,7 +62,7 @@
                         <div id="morning-{{ $englishDay }}-details" class="mt-4">
                           @if (!empty($slots[$englishDay]))
                             @foreach ($slots[$englishDay] as $index => $slot)
-                              <div class="mt-3 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11"
+                              <div class="mt-2 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11"
                                 data-slot-id="{{ $slot['id'] ?? '' }}">
                                 <div class="d-flex justify-content-start align-items-center gap-4">
                                   <div class="form-group position-relative timepicker-ui">
@@ -146,7 +146,7 @@
                               </div>
                             @endforeach
                           @else
-                            <div class="mt-3 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11"
+                            <div class="mt-2 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11"
                               data-slot-id="">
                               <div class="d-flex justify-content-start align-items-center gap-4">
                                 <div class="form-group position-relative timepicker-ui">
