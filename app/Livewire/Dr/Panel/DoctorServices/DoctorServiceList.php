@@ -24,6 +24,7 @@ class DoctorServiceList extends Component
         'clinicSelected',
         'setSelectedClinicId' => 'setSelectedClinicId',
         'refreshDoctorServiceList' => 'loadDoctorServices',
+        'deleteSelectedConfirmed' => 'deleteSelected',
     ];
     public $perPage = 100;
     public $search = '';
@@ -219,7 +220,7 @@ class DoctorServiceList extends Component
         DoctorService::whereIn('id', $this->selectedDoctorServices)->delete();
         $this->selectedDoctorServices = [];
         $this->selectAll = false;
-        $this->dispatch('show-alert', type: 'success', message: 'خدماتی انتخاب‌شده با موفقیت حذف شدند!');
+        $this->dispatch('show-alert', type: 'success', message: 'خدمات انتخاب‌شده با موفقیت حذف شدند!');
     }
 
     public function render()

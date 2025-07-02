@@ -23,7 +23,7 @@
           </svg>
           افزودن خدمت
         </a>
-        <button wire:click="deleteSelected" class="btn btn-danger d-flex align-items-center gap-2"
+        <button id="delete-selected-btn" class="btn btn-danger d-flex align-items-center gap-2"
           @if (empty($selectedDoctorServices)) disabled @endif>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
@@ -163,6 +163,26 @@
             Livewire.dispatch('deleteDoctorServiceConfirmed', {
               id: event.id
             });
+          }
+        });
+      });
+
+      // حذف گروهی با تایید و dispatch
+      $(document).on('click', '#delete-selected-btn', function(e) {
+        if ($(this).is('[disabled]')) return;
+        e.preventDefault();
+        Swal.fire({
+          title: 'حذف گروهی خدمات',
+          text: 'آیا مطمئن هستید که می‌خواهید همه خدمات انتخاب‌شده را حذف کنید؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('deleteSelectedConfirmed');
           }
         });
       });
