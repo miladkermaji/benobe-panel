@@ -151,7 +151,7 @@
 
   <!-- بخش محتوا با جدول بوت‌استرپ -->
   <div class="container subuser-content w-100 d-flex justify-content-center mt-4">
-    <div class="subuser-content-wrapper p-3 w-100">
+    <div class="subuser-content-wrapper  w-100">
       <div class="w-100 d-flex justify-content-end">
         <button class="btn my-btn-primary h-50 add-secretary-btn" id="add-secretary-btn">افزودن منشی جدید</button>
       </div>
@@ -173,7 +173,7 @@
           </button>
         </div>
       </div>
-      <div class="mt-2 table-responsive">
+      <div class="mt-2 table-responsive d-none d-md-block">
         <table class="table table-modern table-hover" id="secretary-list">
           <thead>
             <tr>
@@ -230,6 +230,70 @@
             @endforelse
           </tbody>
         </table>
+      </div>
+      <!-- کارت‌های منشی برای موبایل/تبلت -->
+      <div class="notes-cards d-md-none">
+        @forelse ($secretaries as $index => $secretary)
+          <div class="note-card mb-3" data-id="{{ $secretary->id }}">
+            <div class="note-card-header d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-2">
+                <input type="checkbox" class="form-check-input m-0 align-middle select-secretary"
+                  value="{{ $secretary->id }}">
+                <span
+                  class="badge bg-primary-subtle text-primary">{{ $secretary->gender === 'male' ? 'مرد' : 'زن' }}</span>
+              </div>
+              <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-gradient-success px-2 py-1 edit-btn" data-id="{{ $secretary->id }}"
+                  title="ویرایش">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path
+                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                </button>
+                <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-btn" data-id="{{ $secretary->id }}"
+                  title="حذف">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="note-card-body">
+              <div class="note-card-item">
+                <span class="note-card-label">نام و نام خانوادگی:</span>
+                <span class="note-card-value">{{ $secretary->first_name }} {{ $secretary->last_name }}</span>
+              </div>
+              <div class="note-card-item">
+                <span class="note-card-label">شماره موبایل:</span>
+                <span class="note-card-value">{{ $secretary->mobile }}</span>
+              </div>
+              <div class="note-card-item">
+                <span class="note-card-label">کدملی:</span>
+                <span class="note-card-value">{{ $secretary->national_code }}</span>
+              </div>
+              <div class="note-card-item">
+                <span class="note-card-label">وضعیت:</span>
+                <div class="form-check form-switch d-inline-block">
+                  <input class="form-check-input" type="checkbox" role="switch" data-id="{{ $secretary->id }}"
+                    data-status="{{ $secretary->status }}" {{ $secretary->status == 1 ? 'checked' : '' }}
+                    onchange="toggleStatus(this)" style="width: 3em; height: 1.5em; margin-top: 0;">
+                </div>
+              </div>
+            </div>
+          </div>
+        @empty
+          <div class="text-center py-4">
+            <div class="d-flex justify-content-center align-items-center flex-column">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" class="text-muted mb-2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+              <p class="text-muted fw-medium">شما منشی فعالی ندارید</p>
+            </div>
+          </div>
+        @endforelse
       </div>
     </div>
   </div>
