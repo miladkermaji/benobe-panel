@@ -23,7 +23,6 @@
       <div class="row g-4">
         <div class="col-12">
           <div class="bg-light p-3 rounded-3 shadow-sm hover:shadow-md transition-all">
-            <label class="form-label fw-bold text-dark mb-2">آپلود مدارک</label>
             <input type="file" wire:model="files" multiple class="form-control input-shiny"
               accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
             @foreach ($files as $index => $file)
