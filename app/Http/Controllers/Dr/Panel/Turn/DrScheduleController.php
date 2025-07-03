@@ -10,6 +10,7 @@ use Morilog\Jalali\Jalalian;
 use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Dr\Controller;
+use App\Models\User;
 
 class DrScheduleController extends Controller
 {
@@ -343,11 +344,13 @@ class DrScheduleController extends Controller
         }
 
         $subUserIds = SubUser::where('doctor_id', $doctor->id)
-            ->pluck('user_id')
+            ->where('subuserable_type', \App\Models\User::class)
+            ->pluck('subuserable_id')
             ->toArray();
 
-        $appointments = Appointment::with(['patient'])
-            ->whereIn('patient_id', $subUserIds)
+        $appointments = Appointment::with(['patientable'])
+            ->whereIn('patientable_id', $subUserIds)
+            ->where('patientable_type', User::class)
             ->orderBy('appointment_date', 'desc')
             ->paginate(10);
 

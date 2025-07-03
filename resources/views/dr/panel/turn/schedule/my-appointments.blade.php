@@ -51,8 +51,8 @@
                 {{ $statusInfo['label'] }}
               </span>
               <span class="mx-2 btn-details">
-                <img class="btn-show-details cursor-pointer" src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}"
-                  alt="جزئیات">
+                <img class="btn-show-details cursor-pointer"
+                  src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" alt="جزئیات">
               </span>
               <div class="drop-side-details-content d-none">
                 <div class="d-flex flex-column p-2">
@@ -91,7 +91,7 @@
               <div class="d-flex align-items-center justify-content-between">
                 <span class="font-size-13 mt-2 fw-bold">مراجعه‌کننده:</span>
                 <span class="text-sm fw-bold font-size-13 mt-2">
-                  {{ $appointment->patient->first_name }} {{ $appointment->patient->last_name }}
+                  {{ $appointment->patientable?->first_name }} {{ $appointment->patientable?->last_name }}
                 </span>
               </div>
               <div class="d-flex align-items-center justify-content-between">
@@ -111,7 +111,8 @@
               <img class="btn-show-details" src="{{ asset('dr-assets/icons/location.svg') }}" alt="موقعیت">
             </div>
             <span class="text-sm line-clamp-2" data-testid="location__address">
-              {{ $appointment->doctor->city->name ?? 'نامشخص' }}، {{ $appointment->doctor->province->name ?? 'نامشخص' }}
+              {{ $appointment->doctor->city->name ?? 'نامشخص' }}،
+              {{ $appointment->doctor->province->name ?? 'نامشخص' }}
             </span>
           </a>
         </div>
@@ -226,7 +227,8 @@
 
     // Hide details when clicking outside
     $(document).on('click', function(event) {
-      if (!$(event.target).closest('.drop-side-details-content').length && !$(event.target).hasClass('btn-show-details')) {
+      if (!$(event.target).closest('.drop-side-details-content').length && !$(event.target).hasClass(
+          'btn-show-details')) {
         $('.drop-side-details-content').addClass('d-none');
         $('.share-options').remove();
       }
@@ -242,7 +244,11 @@
       const shareUrl = $(this).data('share-url');
       const shareTitle = $(this).data('share-title');
       const shareText = $(this).data('share-text');
-      const shareData = { title: shareTitle, text: shareText, url: shareUrl };
+      const shareData = {
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl
+      };
 
       if (navigator.share) {
         navigator.share(shareData)
