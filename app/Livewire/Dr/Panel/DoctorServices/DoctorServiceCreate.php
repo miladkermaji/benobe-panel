@@ -131,7 +131,7 @@ class DoctorServiceCreate extends Component
                     $this->duration = $doctorService->duration;
                     $this->description = $doctorService->description;
                     $this->pricing = [[
-                        'insurance_id' => $doctorService->insurance_id,
+                        'insurance_id' => null, // بیمه جدید انتخاب شود
                         'price' => $doctorService->price,
                         'discount' => $doctorService->discount,
                         'final_price' => $doctorService->price - ($doctorService->price * $doctorService->discount / 100),
@@ -153,7 +153,7 @@ class DoctorServiceCreate extends Component
                 }
             }
         }
-        $this->save();
+        // هیچ ذخیره‌ای انجام نشود
     }
 
     public function updatedClinicId($value)
@@ -225,35 +225,40 @@ class DoctorServiceCreate extends Component
             return;
         }
 
-        // بررسی وجود رکورد تکراری
-        foreach ($this->pricing as $pricing) {
-            $exists = DoctorService::where('doctor_id', $doctorId)
-                ->where('service_id', $this->service_id)
-                ->where('insurance_id', $pricing['insurance_id'])
-                ->where('clinic_id', $this->clinic_id)
-                ->exists();
-            if ($exists) {
-                $this->dispatch('show-alert', type: 'error', message: 'این خدمت با بیمه ' . Insurance::find($pricing['insurance_id'])->name . ' و کلینیک انتخاب‌شده قبلاً تعریف شده است.');
-                $this->isSaving = false;
-                return;
-            }
-        }
-
-        // ذخیره‌سازی
+        // ذخیره‌سازی یا آپدیت رکورد
         $service = Service::find($this->service_id);
         foreach ($this->pricing as $pricing) {
-            DoctorService::create([
-                'doctor_id' => $doctorId,
-                'service_id' => $this->service_id,
-                'clinic_id' => $this->clinic_id,
-                'insurance_id' => $pricing['insurance_id'],
-                'name' => $service->name,
-                'description' => $this->description,
-                'status' => true,
-                'duration' => $this->duration,
-                'price' => $pricing['price'],
-                'discount' => $pricing['discount'] ?? 0,
-            ]);
+            $doctorService = DoctorService::where('doctor_id', $doctorId)
+                ->where('service_id', $this->service_id)
+                ->where('clinic_id', $this->clinic_id)
+                ->where('insurance_id', $pricing['insurance_id'])
+                ->first();
+
+            if ($doctorService) {
+                // اگر رکورد وجود داشت، آپدیت کن
+                $doctorService->update([
+                    'name' => $service->name,
+                    'description' => $this->description,
+                    'status' => true,
+                    'duration' => $this->duration,
+                    'price' => $pricing['price'],
+                    'discount' => $pricing['discount'] ?? 0,
+                ]);
+            } else {
+                // اگر نبود، ایجاد کن
+                DoctorService::create([
+                    'doctor_id' => $doctorId,
+                    'service_id' => $this->service_id,
+                    'clinic_id' => $this->clinic_id,
+                    'insurance_id' => $pricing['insurance_id'],
+                    'name' => $service->name,
+                    'description' => $this->description,
+                    'status' => true,
+                    'duration' => $this->duration,
+                    'price' => $pricing['price'],
+                    'discount' => $pricing['discount'] ?? 0,
+                ]);
+            }
         }
 
         $this->previousState = $currentState;

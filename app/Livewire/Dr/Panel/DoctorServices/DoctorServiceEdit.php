@@ -115,18 +115,6 @@ class DoctorServiceEdit extends Component
         $this->currentPricingIndex = null;
     }
 
-    public function addPricingRow()
-    {
-        $this->pricing[] = [
-            'id' => null,
-            'insurance_id' => null,
-            'price' => 0,
-            'discount' => 0,
-            'final_price' => 0,
-        ];
-        $this->save();
-    }
-
     public function removePricingRow($index)
     {
         if (isset($this->pricing[$index]['id'])) {
@@ -267,20 +255,6 @@ class DoctorServiceEdit extends Component
             if (isset($pricing['id']) && $pricing['id']) {
                 // به‌روزرسانی رکورد موجود
                 DoctorService::find($pricing['id'])->update([
-                    'service_id' => $this->service_id,
-                    'clinic_id' => $this->clinic_id,
-                    'insurance_id' => $pricing['insurance_id'],
-                    'name' => $service->name,
-                    'description' => $this->description,
-                    'duration' => $this->duration,
-                    'price' => $pricing['price'],
-                    'discount' => $pricing['discount'] ?? 0,
-                    'status' => true,
-                ]);
-            } else {
-                // ایجاد رکورد جدید
-                DoctorService::create([
-                    'doctor_id' => $doctorId,
                     'service_id' => $this->service_id,
                     'clinic_id' => $this->clinic_id,
                     'insurance_id' => $pricing['insurance_id'],

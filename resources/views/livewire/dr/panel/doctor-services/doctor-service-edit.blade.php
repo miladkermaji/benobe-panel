@@ -126,16 +126,6 @@
                 </div>
               </div>
             @endforeach
-            <!-- دکمه افزودن ردیف قیمت‌گذاری -->
-            <div class="col-lg-12 mt-3">
-              <button wire:click="addPricingRow" class="btn btn-outline-primary btn-sm">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                افزودن ردیف قیمت‌گذاری
-              </button>
-            </div>
           </div>
         </div>
       </div>
