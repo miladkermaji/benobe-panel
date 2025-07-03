@@ -25,6 +25,8 @@ class DoctorServiceCreate extends Component
     public $currentPricingIndex = null;
     public $isSaving = false;
     protected $previousState = [];
+    public $pendingInsuranceIndex = null;
+    public $pendingInsuranceOldValue = null;
 
     public function mount()
     {
@@ -82,10 +84,54 @@ class DoctorServiceCreate extends Component
 
     public function updatedPricing($value, $name)
     {
-        $index = explode('.', $name)[0];
+        $parts = explode('.', $name);
+        $index = $parts[0];
+        $field = $parts[1] ?? null;
+        if ($field === 'insurance_id' && isset($this->pricing[$index])) {
+            $insuranceId = $value;
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $exists = DoctorService::where('doctor_id', $doctorId)
+                ->where('service_id', $this->service_id)
+                ->where('clinic_id', $this->clinic_id)
+                ->where('insurance_id', $insuranceId)
+                ->exists();
+            if ($exists) {
+                $service = Service::find($this->service_id);
+                $insurance = Insurance::find($insuranceId);
+                $this->pendingInsuranceIndex = $index;
+                $this->pendingInsuranceOldValue = $this->pricing[$index]['insurance_id'];
+                $this->dispatch(
+                    'confirm-edit',
+                    serviceName: $service ? $service->name : 'نامشخص',
+                    insuranceName: $insurance ? $insurance->name : 'نامشخص'
+                );
+                return;
+            }
+        }
         if (isset($this->pricing[$index])) {
             $this->pricing[$index]['final_price'] = $this->pricing[$index]['price'] - ($this->pricing[$index]['price'] * ($this->pricing[$index]['discount'] ?? 0) / 100);
             $this->save();
+        }
+    }
+
+    public function confirmEditInsurance()
+    {
+        if ($this->pendingInsuranceIndex !== null) {
+            $index = $this->pendingInsuranceIndex;
+            $this->pricing[$index]['final_price'] = $this->pricing[$index]['price'] - ($this->pricing[$index]['price'] * ($this->pricing[$index]['discount'] ?? 0) / 100);
+            $this->save();
+            $this->pendingInsuranceIndex = null;
+            $this->pendingInsuranceOldValue = null;
+        }
+    }
+
+    public function cancelEditInsurance()
+    {
+        if ($this->pendingInsuranceIndex !== null && $this->pendingInsuranceOldValue !== null) {
+            $index = $this->pendingInsuranceIndex;
+            $this->pricing[$index]['insurance_id'] = $this->pendingInsuranceOldValue;
+            $this->pendingInsuranceIndex = null;
+            $this->pendingInsuranceOldValue = null;
         }
     }
 
