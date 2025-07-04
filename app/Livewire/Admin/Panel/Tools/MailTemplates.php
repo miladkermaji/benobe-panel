@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Panel\Tools;
 
-use App\Models\Admin\Tools\MailTemplate\MailTemplate;
+use App\Models\MailTemplate;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
