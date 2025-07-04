@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Panel\Tools\Redirects;
 
-use App\Models\Admin\Panel\Tools\Redirect;
+use App\Models\Redirect;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;

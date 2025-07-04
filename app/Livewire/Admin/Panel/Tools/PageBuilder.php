@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Admin\Panel\Tools;
 
-use App\Models\Admin\Panel\Tools\Element;
-use App\Models\Admin\Panel\Tools\Page;
-use App\Models\Admin\Panel\Tools\PageBuilderSetting;
-use App\Models\Admin\Panel\Tools\Template;
+use App\Models\Page;
+use App\Models\Element;
+use App\Models\Template;
+use App\Models\PageBuilderSetting;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -81,6 +81,7 @@ class PageBuilder extends Component
         try {
             $this->pages     = Page::all();
             $this->templates = Template::where('is_public', true)->get();
+            $this->elements  = collect();
             $this->loadDefaultSettings();
             $this->startAutoSave();
         } catch (\Exception $e) {
@@ -161,7 +162,7 @@ class PageBuilder extends Component
             $this->pages = Page::all();
             if ($this->selectedPage && $this->selectedPage->id === $pageId) {
                 $this->selectedPage    = null;
-                $this->elements        = [];
+                $this->elements        = collect();
                 $this->metaTitle       = '';
                 $this->metaDescription = '';
                 $this->isActive        = true;

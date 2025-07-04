@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Panel\Tools;
 
-use App\Models\Admin\Panel\Tools\File;
+use App\Models\File;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -88,7 +88,8 @@ class FileManager extends Component
     public function deleteItem($path)
     {
         if (Storage::disk('public')->exists($path)) {
-            if (Storage::disk('public')->directoryExists($path)) {
+            $fileRecord = File::where('path', $path)->first();
+            if ($fileRecord && $fileRecord->type === 'folder') {
                 Storage::disk('public')->deleteDirectory($path);
                 File::where('path', $path)->orWhere('path', 'like', "$path/%")->delete();
             } else {

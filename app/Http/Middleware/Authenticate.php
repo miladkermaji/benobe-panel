@@ -67,9 +67,9 @@ class Authenticate extends BaseMiddleware
                 return response()->json(['status' => 'error', 'message' => 'توکن نامعتبر است.'], 401);
             } elseif ($e instanceof TokenExpiredException) {
                 return response()->json(['status' => 'error', 'message' => 'توکن منقضی شده است.'], 401);
-            } else {
+            } /* else {
                 return response()->json(['status' => 'error', 'message' => 'نیاز به احراز هویت است (توکن ارائه نشده یا خطای دیگر).'], 401);
-            }
+            } */
         }
 
         return $next($request);
