@@ -1,128 +1,252 @@
 <div class="container-fluid py-4" dir="rtl" wire:init="loadDoctorServices">
   <!-- هدر -->
-  <div class="service-header d-flex justify-content-between flex-wrap mb-3">
-    <div>
-      <h1 class="header-title">مدیریت خدمات و بیمه‌ها</h1>
+  <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
+      <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+          <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0">مدیریت خدمات و بیمه‌ها</h1>
+        </div>
+        <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+          <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
+            <div class="search-container position-relative" style="max-width: 100%;">
+              <input type="text"
+                class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                wire:model.live="search" placeholder="جستجو در خدمات..."
+                style="padding-right: 20px; text-align: right; direction: rtl;">
+              <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                style="z-index: 5; top: 50%; right: 8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+                  <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                </svg>
+              </span>
+            </div>
+            <a href="{{ route('dr.panel.doctor-services.create') }}"
+              class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 add-btn-responsive">
+              <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              <span>افزودن</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="header-actions d-flex">
-      <div class="search-container">
-        <input type="text" class="search-input" wire:model.live="search" placeholder="جستجو در خدمات...">
-        <span class="search-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)"
-            stroke-width="2">
-            <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
-          </svg>
-        </span>
-      </div>
-      <div class="action-buttons d-flex gap-2">
-        <a href="{{ route('dr.panel.doctor-services.create') }}"
-          class="btn btn-primary d-flex align-items-center gap-2">
-          <svg style="transform: rotate(180deg)" width="18" height="18" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          افزودن خدمت
-        </a>
-        <button id="delete-selected-btn" class="btn btn-danger d-flex align-items-center gap-2"
-          @if (empty($selectedDoctorServices)) disabled @endif>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-          </svg>
-          حذف انتخاب‌شده‌ها
-        </button>
-      </div>
+  </div>
+
+  <!-- عملیات گروهی -->
+  <div class="group-actions p-2 border-bottom" x-data="{ show: false }" x-show="$wire.selectedDoctorServices.length > 0">
+    <div class="d-flex align-items-center gap-2 justify-content-end">
+      <select class="form-select form-select-sm" style="max-width: 200px;" wire:model="groupAction">
+        <option value="">عملیات گروهی</option>
+        <option value="delete">حذف انتخاب شده‌ها</option>
+        <option value="status_active">فعال کردن</option>
+        <option value="status_inactive">غیرفعال کردن</option>
+      </select>
+      <button class="btn btn-sm btn-primary" wire:click="executeGroupAction" wire:loading.attr="disabled">
+        <span wire:loading.remove>اجرا</span>
+        <span wire:loading>در حال اجرا...</span>
+      </button>
     </div>
   </div>
 
   <!-- جدول خدمات -->
   <div class="services-container">
     @if ($readyToLoad)
-      @forelse ($services as $service)
-        <!-- نوار خدمت -->
-        <div class="service-section">
-          <div class="service-header" wire:click="toggleChildren('{{ $service->id }}')">
-            <div class="service-header-row">
-              <h5 class="service-title fw-bold">{{ $service->name }}</h5>
-              <div
-                class="service-toggle mobile-toggle-icon {{ in_array($service->id, $openServices) ? 'rotate-180' : '' }}">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2">
-                  <path d="M6 9l6 6 6-6" />
+      <div class="table-responsive text-nowrap d-none d-md-block">
+        <table class="table table-hover w-100 m-0">
+          <thead>
+            <tr>
+              <th class="text-center align-middle" style="width: 40px;">
+                <div class="d-flex justify-content-center align-items-center">
+                  <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
+                </div>
+              </th>
+              <th class="align-middle">نام خدمت</th>
+              <th class="align-middle">نام بیمه</th>
+              <th class="align-middle">توضیحات</th>
+              <th class="align-middle">زمان</th>
+              <th class="align-middle">قیمت</th>
+              <th class="align-middle">تخفیف</th>
+              <th class="align-middle">قیمت نهایی</th>
+              <th class="text-center align-middle">وضعیت</th>
+              <th class="text-center align-middle">عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse ($services as $service)
+              <tr class="align-middle bg-primary-subtle service-row-main" style="border-bottom: 2px solid #e5e7eb;">
+                <td class="text-center">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <input type="checkbox" wire:model.live="selectedDoctorServices" value="service-{{ $service->id }}"
+                      class="form-check-input m-0 align-middle">
+                  </div>
+                </td>
+                <td colspan="9">
+                  <div class="d-flex justify-content-between align-items-center w-100">
+                    <span class="fw-bold text-dark" style="font-size: 1.1rem;">{{ $service->name }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary ms-2 px-2 py-1"
+                      wire:click="toggleChildren({{ $service->id }})">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2"
+                        style="transition: transform 0.2s; {{ in_array($service->id, $openServices) ? 'transform: rotate(180deg);' : '' }}">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              @if (in_array($service->id, $openServices))
+                @foreach ($service->doctorServices as $doctorService)
+                  <tr class="align-middle service-row-child" style="background: #fff; border-top: 1px solid #e5e7eb;">
+                    <td class="text-center">
+                      <div class="d-flex justify-content-center align-items-center">
+                        <input type="checkbox" wire:model.live="selectedDoctorServices" value="{{ $doctorService->id }}"
+                          class="form-check-input m-0 align-middle">
+                      </div>
+                    </td>
+                    <td></td>
+                    <td>{{ $doctorService->insurance->name ?? 'بیمه نامشخص' }}</td>
+                    <td>{{ $doctorService->description ?? 'بدون توضیحات' }}</td>
+                    <td>{{ $doctorService->duration ? $doctorService->duration . ' دقیقه' : '---' }}</td>
+                    <td>{{ $doctorService->price ? number_format($doctorService->price) . ' تومان' : '---' }}</td>
+                    <td>
+                      @if ($doctorService->discount > 0 && $doctorService->price)
+                        {{ number_format(($doctorService->price * $doctorService->discount) / 100) . ' تومان' }}
+                      @else
+                        ---
+                      @endif
+                    </td>
+                    <td>
+                      {{ $doctorService->price ? number_format($doctorService->price - ($doctorService->price * $doctorService->discount) / 100) . ' تومان' : '---' }}
+                    </td>
+                    <td class="text-center">
+                      <button wire:click="toggleStatus({{ $doctorService->id }})"
+                        class="status-badge {{ $doctorService->status ? 'status-active' : 'status-inactive' }}">
+                        {{ $doctorService->status ? 'فعال' : 'غیرفعال' }}
+                      </button>
+                    </td>
+                    <td class="text-center">
+                      <a href="{{ route('dr.panel.doctor-services.edit', $doctorService->id) }}"
+                        class="btn btn-sm btn-gradient-success px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path
+                            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      </a>
+                      <button wire:click="confirmDelete({{ $doctorService->id }})"
+                        class="btn btn-sm btn-gradient-danger px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                @endforeach
+              @endif
+            @empty
+              <tr>
+                <td colspan="10" class="text-center py-4">
+                  <div class="d-flex justify-content-center align-items-center flex-column">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2" class="text-muted mb-2">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                    <p class="text-muted fw-medium">هیچ خدمتی یافت نشد.</p>
+                  </div>
+                </td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+      <!-- کارت‌های موبایل/تبلت -->
+      <div class="notes-cards d-md-none">
+        @if ($readyToLoad)
+          @forelse ($services as $service)
+            <div class="note-card mb-3" style="border: 1px solid #e5e7eb; background: #f8fafc;">
+              <div class="note-card-header d-flex justify-content-between align-items-center"
+                style="background: #e6f0fa;">
+                <span class="fw-bold text-dark" style="font-size: 1.1rem;">{{ $service->name }}</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary ms-2 px-2 py-1"
+                  wire:click="toggleChildren({{ $service->id }})">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2"
+                    style="transition: transform 0.2s; {{ in_array($service->id, $openServices) ? 'transform: rotate(180deg);' : '' }}">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+              </div>
+              @if (in_array($service->id, $openServices))
+                @foreach ($service->doctorServices as $doctorService)
+                  <div class="note-card-body border-top" style="background: #fff; border-top: 1px solid #e5e7eb;">
+                    <div class="note-card-item"><span class="note-card-label">نام بیمه:</span><span
+                        class="note-card-value">{{ $doctorService->insurance->name ?? 'بیمه نامشخص' }}</span></div>
+                    <div class="note-card-item"><span class="note-card-label">توضیحات:</span><span
+                        class="note-card-value">{{ $doctorService->description ?? 'بدون توضیحات' }}</span></div>
+                    <div class="note-card-item"><span class="note-card-label">زمان:</span><span
+                        class="note-card-value">{{ $doctorService->duration ? $doctorService->duration . ' دقیقه' : '---' }}</span>
+                    </div>
+                    <div class="note-card-item"><span class="note-card-label">قیمت:</span><span
+                        class="note-card-value">{{ $doctorService->price ? number_format($doctorService->price) . ' تومان' : '---' }}</span>
+                    </div>
+                    <div class="note-card-item"><span class="note-card-label">تخفیف:</span><span
+                        class="note-card-value">
+                        @if ($doctorService->discount > 0 && $doctorService->price)
+                          {{ number_format(($doctorService->price * $doctorService->discount) / 100) . ' تومان' }}@else---
+                        @endif
+                      </span></div>
+                    <div class="note-card-item"><span class="note-card-label">قیمت نهایی:</span><span
+                        class="note-card-value">{{ $doctorService->price ? number_format($doctorService->price - ($doctorService->price * $doctorService->discount) / 100) . ' تومان' : '---' }}</span>
+                    </div>
+                    <div class="note-card-item"><span class="note-card-label">وضعیت:</span><button
+                        wire:click="toggleStatus({{ $doctorService->id }})"
+                        class="status-badge {{ $doctorService->status ? 'status-active' : 'status-inactive' }}">{{ $doctorService->status ? 'فعال' : 'غیرفعال' }}</button>
+                    </div>
+                    <div class="note-card-item">
+                      <a href="{{ route('dr.panel.doctor-services.edit', $doctorService->id) }}"
+                        class="btn btn-sm btn-gradient-success px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path
+                            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                        ویرایش
+                      </a>
+                      <button wire:click="confirmDelete({{ $doctorService->id }})"
+                        class="btn btn-sm btn-gradient-danger px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        </svg>
+                        حذف
+                      </button>
+                    </div>
+                  </div>
+                @endforeach
+              @endif
+            </div>
+          @empty
+            <div class="text-center py-4">
+              <div class="d-flex justify-content-center align-items-center flex-column">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" class="text-muted mb-2">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
+                <p class="text-muted fw-medium">هیچ خدمتی یافت نشد.</p>
               </div>
             </div>
-          </div>
-          <div class="services-table {{ in_array($service->id, $openServices) ? 'show' : '' }}">
-            <div class="table-header">
-              <span>نام بیمه</span>
-              <span>توضیحات</span>
-              <span>زمان</span>
-              <span>قیمت</span>
-              <span>تخفیف</span>
-              <span>قیمت نهایی</span>
-              <span>وضعیت</span>
-              <span>عملیات</span>
+          @endforelse
+        @else
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">در حال بارگذاری...</span>
             </div>
-            @foreach ($service->doctorServices as $doctorService)
-              <div class="service-row">
-                <div class="service-name">
-                  <input type="checkbox" wire:model.live="selectedDoctorServices" value="{{ $doctorService->id }}"
-                    class="form-check-input">
-                  <span>{{ $doctorService->insurance->name ?? 'بیمه نامشخص' }}</span>
-                </div>
-                <div class="service-description">{{ $doctorService->description ?? 'بدون توضیحات' }}</div>
-                <div class="service-duration">
-                  {{ $doctorService->duration ? $doctorService->duration . ' دقیقه' : '---' }}</div>
-                <div class="service-price">
-                  <span
-                    class="price-badge {{ $doctorService->price ? 'price-active' : '' }}">{{ $doctorService->price ? number_format($doctorService->price) . ' تومان' : '---' }}</span>
-                </div>
-                <div class="service-discount">
-                  <span class="price-badge {{ $doctorService->discount > 0 ? 'discount-active' : '' }}">
-                    @if ($doctorService->discount > 0 && $doctorService->price)
-                      {{ number_format(($doctorService->price * $doctorService->discount) / 100) . ' تومان' }}
-                    @else
-                      ---
-                    @endif
-                  </span>
-                </div>
-                <div class="service-final-price">
-                  <span
-                    class="price-badge {{ $doctorService->price ? 'final-price-active' : '' }}">{{ $doctorService->price ? number_format($doctorService->price - ($doctorService->price * $doctorService->discount) / 100) . ' تومان' : '---' }}</span>
-                </div>
-                <div class="service-status">
-                  <button wire:click="toggleStatus({{ $doctorService->id }})"
-                    class="status-badge {{ $doctorService->status ? 'status-active' : 'status-inactive' }}">{{ $doctorService->status ? 'فعال' : 'غیرفعال' }}</button>
-                </div>
-                <div class="service-actions">
-                  <a href="{{ route('dr.panel.doctor-services.edit', $doctorService->id) }}"
-                    class="btn btn-outline-primary btn-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2">
-                      <path
-                        d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                    </svg>
-                  </a>
-                  <button wire:click="confirmDelete({{ $doctorService->id }})" class="btn btn-outline-danger btn-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2">
-                      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            @endforeach
           </div>
-        </div>
-      @empty
-        <div class="empty-state">
-          <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)"
-            stroke-width="2" class="mb-2">
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-          <p class="text-muted">هیچ خدمتی یافت نشد.</p>
-        </div>
-      @endforelse
+        @endif
+      </div>
     @else
       <div class="loading-state">
         <p class="text-muted">در حال بارگذاری خدمات...</p>
@@ -189,3 +313,5 @@
     });
   </script>
 </div>
+
+

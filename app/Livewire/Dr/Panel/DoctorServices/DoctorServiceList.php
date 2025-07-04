@@ -38,6 +38,20 @@ class DoctorServiceList extends Component
     {
         $this->perPage = max($this->perPage, 1);
         $this->selectedClinicId = $this->getSelectedClinicId();
+        // باز بودن پیش‌فرض در دسکتاپ
+        if ($this->isDesktop()) {
+            $this->openServices = Service::whereHas('doctorServices', function ($query) {
+                $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+                $query->where('doctor_id', $doctorId);
+            })->pluck('id')->toArray();
+        }
+    }
+
+    private function isDesktop()
+    {
+        // اگر نیاز به تشخیص دقیق‌تر داشتی، می‌توانی از user-agent یا کوکی استفاده کنی
+        // اینجا فرض می‌کنیم همیشه دسکتاپ است (برای تست)
+        return true;
     }
 
     public function setSelectedClinicId($clinicId)
