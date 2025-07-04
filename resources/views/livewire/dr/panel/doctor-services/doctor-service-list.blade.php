@@ -104,7 +104,7 @@
               </tr>
               @if (in_array($service->id, $openServices))
                 @foreach ($service->doctorServices as $doctorService)
-                  <tr class="align-middle service-row-child" style="background: #fff; border-top: 1px solid #e5e7eb;">
+                  <tr class="align-middle service-row-child" style="background: #fff; border-top: 3px solid #bdbdbd;">
                     <td class="text-center">
                       <div class="d-flex justify-content-center align-items-center">
                         <input type="checkbox" wire:model.live="selectedDoctorServices" value="{{ $doctorService->id }}"
@@ -115,16 +115,22 @@
                     <td>{{ $doctorService->insurance->name ?? 'بیمه نامشخص' }}</td>
                     <td>{{ $doctorService->description ?? 'بدون توضیحات' }}</td>
                     <td>{{ $doctorService->duration ? $doctorService->duration . ' دقیقه' : '---' }}</td>
-                    <td>{{ $doctorService->price ? number_format($doctorService->price) . ' تومان' : '---' }}</td>
                     <td>
-                      @if ($doctorService->discount > 0 && $doctorService->price)
-                        {{ number_format(($doctorService->price * $doctorService->discount) / 100) . ' تومان' }}
-                      @else
-                        ---
-                      @endif
+                      <span
+                        class="badge bg-primary-subtle text-primary">{{ $doctorService->price ? number_format($doctorService->price) . ' تومان' : '---' }}</span>
                     </td>
                     <td>
-                      {{ $doctorService->price ? number_format($doctorService->price - ($doctorService->price * $doctorService->discount) / 100) . ' تومان' : '---' }}
+                      <span class="badge bg-danger-subtle text-danger">
+                        @if ($doctorService->discount > 0 && $doctorService->price)
+                          {{ number_format(($doctorService->price * $doctorService->discount) / 100) . ' تومان' }}
+                        @else
+                          ---
+                        @endif
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        class="badge bg-success-subtle text-success">{{ $doctorService->price ? number_format($doctorService->price - ($doctorService->price * $doctorService->discount) / 100) . ' تومان' : '---' }}</span>
                     </td>
                     <td class="text-center">
                       <button wire:click="toggleStatus({{ $doctorService->id }})"
@@ -197,7 +203,7 @@
               </div>
               @if (in_array($service->id, $openServices))
                 @foreach ($service->doctorServices as $doctorService)
-                  <div class="note-card-body border-top" style="background: #fff; border-top: 1px solid #e5e7eb;">
+                  <div class="note-card-body border-top" style="background: #fff; border-top: 3px solid #bdbdbd;">
                     <div class="note-card-item"><span class="note-card-label">نام بیمه:</span><span
                         class="note-card-value">{{ $doctorService->insurance->name ?? 'بیمه نامشخص' }}</span></div>
                     <div class="note-card-item"><span class="note-card-label">توضیحات:</span><span
@@ -206,16 +212,16 @@
                         class="note-card-value">{{ $doctorService->duration ? $doctorService->duration . ' دقیقه' : '---' }}</span>
                     </div>
                     <div class="note-card-item"><span class="note-card-label">قیمت:</span><span
-                        class="note-card-value">{{ $doctorService->price ? number_format($doctorService->price) . ' تومان' : '---' }}</span>
+                        class="badge bg-primary-subtle text-primary">{{ $doctorService->price ? number_format($doctorService->price) . ' تومان' : '---' }}</span>
                     </div>
                     <div class="note-card-item"><span class="note-card-label">تخفیف:</span><span
-                        class="note-card-value">
+                        class="badge bg-danger-subtle text-danger">
                         @if ($doctorService->discount > 0 && $doctorService->price)
                           {{ number_format(($doctorService->price * $doctorService->discount) / 100) . ' تومان' }}@else---
                         @endif
                       </span></div>
                     <div class="note-card-item"><span class="note-card-label">قیمت نهایی:</span><span
-                        class="note-card-value">{{ $doctorService->price ? number_format($doctorService->price - ($doctorService->price * $doctorService->discount) / 100) . ' تومان' : '---' }}</span>
+                        class="badge bg-success-subtle text-success">{{ $doctorService->price ? number_format($doctorService->price - ($doctorService->price * $doctorService->discount) / 100) . ' تومان' : '---' }}</span>
                     </div>
                     <div class="note-card-item"><span class="note-card-label">وضعیت:</span><button
                         wire:click="toggleStatus({{ $doctorService->id }})"
