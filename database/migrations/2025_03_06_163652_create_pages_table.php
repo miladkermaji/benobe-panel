@@ -18,7 +18,8 @@ return new class extends Migration
             $table->text('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // سازنده صفحه
+            $table->foreignId('user_id')->constrained('managers')->onDelete('cascade'); // سازنده صفحه
+            
             $table->timestamps();
         });
     }

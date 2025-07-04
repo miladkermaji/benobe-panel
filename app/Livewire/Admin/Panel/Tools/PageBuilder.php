@@ -4,13 +4,14 @@ namespace App\Livewire\Admin\Panel\Tools;
 
 use App\Models\Page;
 use App\Models\Element;
+use Livewire\Component;
 use App\Models\Template;
+use Illuminate\Support\Str;
+use Livewire\WithFileUploads;
 use App\Models\PageBuilderSetting;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Livewire\Component;
-use Livewire\WithFileUploads;
 
 class PageBuilder extends Component
 {
@@ -123,7 +124,7 @@ class PageBuilder extends Component
                 'meta_title'       => $this->metaTitle,
                 'meta_description' => $this->metaDescription,
                 'is_active'        => $this->isActive,
-                'user_id'          => auth('manager')->id(),
+                'user_id'          => Auth::guard('manager')->user()->id,
             ]);
 
             $this->pages->push($page); // اضافه کردن صفحه جدید به لیست بدون رفرش کوئری
