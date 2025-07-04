@@ -78,9 +78,14 @@
               <tr class="align-middle bg-primary-subtle service-row-main" style="border-bottom: 2px solid #e5e7eb;">
                 <td class="text-center">
                   <div class="d-flex justify-content-center align-items-center">
-                    <input type="checkbox" wire:model.live="selectedDoctorServices" value="service-{{ $service->id }}"
-                      class="form-check-input m-0 align-middle" @if (in_array('service-' . $service->id, $selectedDoctorServices)) checked @endif
-                      wire:change="toggleParentCheckbox({{ $service->id }})">
+                    @php
+                      $doctorServiceIds = collect($service->doctorServices)->pluck('id')->toArray();
+                      $allChildrenSelected =
+                          count($doctorServiceIds) && !array_diff($doctorServiceIds, $selectedDoctorServices);
+                    @endphp
+                    <input type="checkbox" class="form-check-input m-0 align-middle"
+                      wire:change="toggleParentCheckbox({{ $service->id }})"
+                      @if ($allChildrenSelected) checked @endif>
                   </div>
                 </td>
                 <td colspan="9">
@@ -171,10 +176,14 @@
               <div class="note-card-header d-flex justify-content-between align-items-center"
                 style="background: #e6f0fa;">
                 <div class="d-flex align-items-center gap-2">
-                  <input type="checkbox" wire:model.live="selectedDoctorServices"
-                    value="service-{{ $service->id }}" class="form-check-input m-0 align-middle"
-                    @if (in_array('service-' . $service->id, $selectedDoctorServices)) checked @endif
-                    wire:change="toggleParentCheckbox({{ $service->id }})">
+                  @php
+                    $doctorServiceIds = collect($service->doctorServices)->pluck('id')->toArray();
+                    $allChildrenSelected =
+                        count($doctorServiceIds) && !array_diff($doctorServiceIds, $selectedDoctorServices);
+                  @endphp
+                  <input type="checkbox" class="form-check-input m-0 align-middle"
+                    wire:change="toggleParentCheckbox({{ $service->id }})"
+                    @if ($allChildrenSelected) checked @endif>
                   <span class="fw-bold text-dark" style="font-size: 1.1rem;">{{ $service->name }}</span>
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-secondary ms-2 px-2 py-1"

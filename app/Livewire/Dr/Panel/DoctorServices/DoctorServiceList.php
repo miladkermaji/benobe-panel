@@ -243,17 +243,19 @@ class DoctorServiceList extends Component
             return;
         }
         $doctorServiceIds = collect($service->doctorServices)->pluck('id')->toArray();
-        if (in_array($parentKey, $this->selectedDoctorServices)) {
-            // انتخاب: همه بیمه‌های زیرمجموعه را اضافه کن
-            foreach ($doctorServiceIds as $id) {
-                if (!in_array($id, $this->selectedDoctorServices)) {
-                    $this->selectedDoctorServices[] = $id;
-                }
-            }
-        } else {
-            // برداشتن: همه بیمه‌های زیرمجموعه را حذف کن
-            $this->selectedDoctorServices = array_diff($this->selectedDoctorServices, $doctorServiceIds);
+        if (count($doctorServiceIds) === 0) {
+            return;
         }
+
+        if (count(array_intersect($doctorServiceIds, $this->selectedDoctorServices)) === count($doctorServiceIds)) {
+            // اگر همه انتخاب بودن، یعنی کاربر می‌خواهد همه را بردارد
+            $this->selectedDoctorServices = array_diff($this->selectedDoctorServices, $doctorServiceIds);
+        } else {
+            // اگر حتی یکی انتخاب نبود، همه را انتخاب کن
+            $this->selectedDoctorServices = array_unique(array_merge($this->selectedDoctorServices, $doctorServiceIds));
+        }
+        // آرایه را ری‌ست کن تا Livewire متوجه تغییر شود
+        $this->selectedDoctorServices = array_values($this->selectedDoctorServices);
     }
 
     public function toggleChildren($id)
@@ -302,6 +304,9 @@ class DoctorServiceList extends Component
         }
 
         $this->groupAction = '';
+        $this->selectedDoctorServices = [];
+        $this->selectAll = false;
+        $this->openServices = [];
     }
 
     private function updateStatus($status)
