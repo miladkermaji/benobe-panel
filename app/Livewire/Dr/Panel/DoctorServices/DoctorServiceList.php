@@ -306,7 +306,6 @@ class DoctorServiceList extends Component
         $this->groupAction = '';
         $this->selectedDoctorServices = [];
         $this->selectAll = false;
-        $this->openServices = [];
     }
 
     private function updateStatus($status)
