@@ -213,7 +213,8 @@ class PageBuilder extends Component
             return;
         }
         try {
-            $order = Element::where('page_id', $this->selectedPage->id)->max('order') + 1;
+            $order = Element::where('page_id', $this->selectedPage->id)->max('order') ?? 0;
+            $order += 1;
             Element::create([
                 'page_id'  => $this->selectedPage->id,
                 'type'     => $type,
@@ -302,7 +303,8 @@ class PageBuilder extends Component
             return;
         }
         try {
-            $order = Element::where('page_id', $this->selectedPage->id)->max('order') + 1;
+            $order = Element::where('page_id', $this->selectedPage->id)->max('order') ?? 0;
+            $order += 1;
             Element::create([
                 'page_id'  => $this->selectedPage->id,
                 'type'     => $this->copiedElement->type,

@@ -6,5 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Template extends Model
 {
-    protected $fillable = ['name', 'status','description']; // فیلدها رو می‌تونی دستی تغییر بدی
+    protected $fillable = [
+        'name',
+        'structure',
+        'is_public',
+    ];
+
+    protected $casts = [
+        'structure' => 'array',
+        'is_public' => 'boolean',
+    ];
 }
