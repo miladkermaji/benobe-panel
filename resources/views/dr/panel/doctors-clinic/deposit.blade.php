@@ -150,27 +150,30 @@
     const isCustomPrice = $('#isCustomPrice');
     const clinics = @json($clinics->pluck('name', 'id')->toArray());
 
-    depositSelect.on('change', function() {
-      const isCustom = this.value === 'custom';
-      customPriceContainer.toggle(isCustom);
-      isCustomPrice.val(isCustom ? '1' : '0');
-      // اگر قیمت دلخواه انتخاب شده، مقدار deposit_amount را خالی کنیم
-      if (isCustom) {
-        $(this).val('');
-      }
-    });
+ depositSelect.on('change', function() {
+  const isCustom = this.value === 'custom';
+  customPriceContainer.toggle(isCustom);
+  isCustomPrice.val(isCustom ? '1' : '0');
+  customPriceInput.prop('required', isCustom); // این خط را اضافه کنید
+  if (isCustom) {
+    $(this).val('');
+  } else {
+    customPriceInput.val('');
+  }
+});
 
-    noDepositCheckbox.on('change', function() {
-      const isChecked = this.checked;
-      depositSelect.prop('disabled', isChecked);
-      customPriceInput.prop('disabled', isChecked);
-      customPriceContainer.toggle(!isChecked && depositSelect.val() === 'custom');
-      if (isChecked) {
-        depositSelect.val('');
-        customPriceInput.val('');
-        isCustomPrice.val('0');
-      }
-    });
+noDepositCheckbox.on('change', function() {
+  const isChecked = this.checked;
+  depositSelect.prop('disabled', isChecked);
+  customPriceInput.prop('disabled', isChecked);
+  customPriceContainer.toggle(!isChecked && depositSelect.val() === 'custom');
+  customPriceInput.prop('required', !isChecked && depositSelect.val() === 'custom'); // این خط را اضافه کنید
+  if (isChecked) {
+    depositSelect.val('');
+    customPriceInput.val('');
+    isCustomPrice.val('0');
+  }
+});
 
     form.on('submit', async function(e) {
       e.preventDefault();
