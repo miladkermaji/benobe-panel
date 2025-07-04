@@ -79,7 +79,8 @@
                 <td class="text-center">
                   <div class="d-flex justify-content-center align-items-center">
                     <input type="checkbox" wire:model.live="selectedDoctorServices" value="service-{{ $service->id }}"
-                      class="form-check-input m-0 align-middle">
+                      class="form-check-input m-0 align-middle" @if (in_array('service-' . $service->id, $selectedDoctorServices)) checked @endif
+                      wire:change="toggleParentCheckbox({{ $service->id }})">
                   </div>
                 </td>
                 <td colspan="9">
@@ -169,7 +170,13 @@
             <div class="note-card mb-3" style="border: 1px solid #e5e7eb; background: #f8fafc;">
               <div class="note-card-header d-flex justify-content-between align-items-center"
                 style="background: #e6f0fa;">
-                <span class="fw-bold text-dark" style="font-size: 1.1rem;">{{ $service->name }}</span>
+                <div class="d-flex align-items-center gap-2">
+                  <input type="checkbox" wire:model.live="selectedDoctorServices"
+                    value="service-{{ $service->id }}" class="form-check-input m-0 align-middle"
+                    @if (in_array('service-' . $service->id, $selectedDoctorServices)) checked @endif
+                    wire:change="toggleParentCheckbox({{ $service->id }})">
+                  <span class="fw-bold text-dark" style="font-size: 1.1rem;">{{ $service->name }}</span>
+                </div>
                 <button type="button" class="btn btn-sm btn-outline-secondary ms-2 px-2 py-1"
                   wire:click="toggleChildren({{ $service->id }})">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"

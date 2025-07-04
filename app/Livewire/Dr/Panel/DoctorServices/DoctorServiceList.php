@@ -32,6 +32,7 @@ class DoctorServiceList extends Component
     public $selectedDoctorServices = [];
     public $selectAll = false;
     public $selectedClinicId = 'default';
+    public $groupAction = '';
     protected $queryString = ['search' => ['except' => '']];
 
     public function mount()
@@ -212,8 +213,47 @@ class DoctorServiceList extends Component
 
     public function updatedSelectedDoctorServices()
     {
-        $currentPageIds = $this->getDoctorServicesQuery()->pluck('doctorServices')->flatten()->pluck('id')->toArray();
+        $services = $this->getDoctorServicesQuery();
+        foreach ($services as $service) {
+            $doctorServiceIds = collect($service->doctorServices)->pluck('id')->toArray();
+            $parentKey = 'service-' . $service->id;
+            // اگر همه بیمه‌های این خدمت انتخاب شده باشند، پدر را هم انتخاب کن
+            if (!array_diff($doctorServiceIds, $this->selectedDoctorServices) && count($doctorServiceIds)) {
+                if (!in_array($parentKey, $this->selectedDoctorServices)) {
+                    $this->selectedDoctorServices[] = $parentKey;
+                }
+            } else {
+                // اگر حتی یکی انتخاب نشده بود، پدر را بردار
+                if (($key = array_search($parentKey, $this->selectedDoctorServices)) !== false) {
+                    unset($this->selectedDoctorServices[$key]);
+                }
+            }
+        }
+        // منطق انتخاب همه
+        $currentPageIds = $services->pluck('doctorServices')->flatten()->pluck('id')->toArray();
         $this->selectAll = !empty($this->selectedDoctorServices) && count(array_diff($currentPageIds, $this->selectedDoctorServices)) === 0;
+    }
+
+    public function toggleParentCheckbox($serviceId)
+    {
+        $parentKey = 'service-' . $serviceId;
+        $services = $this->getDoctorServicesQuery();
+        $service = $services->where('id', $serviceId)->first();
+        if (!$service) {
+            return;
+        }
+        $doctorServiceIds = collect($service->doctorServices)->pluck('id')->toArray();
+        if (in_array($parentKey, $this->selectedDoctorServices)) {
+            // انتخاب: همه بیمه‌های زیرمجموعه را اضافه کن
+            foreach ($doctorServiceIds as $id) {
+                if (!in_array($id, $this->selectedDoctorServices)) {
+                    $this->selectedDoctorServices[] = $id;
+                }
+            }
+        } else {
+            // برداشتن: همه بیمه‌های زیرمجموعه را حذف کن
+            $this->selectedDoctorServices = array_diff($this->selectedDoctorServices, $doctorServiceIds);
+        }
     }
 
     public function toggleChildren($id)
@@ -235,6 +275,43 @@ class DoctorServiceList extends Component
         $this->selectedDoctorServices = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'خدمات انتخاب‌شده با موفقیت حذف شدند!');
+    }
+
+    public function executeGroupAction()
+    {
+        if (empty($this->selectedDoctorServices)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ خدمتی انتخاب نشده است.');
+            return;
+        }
+
+        if (empty($this->groupAction)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        switch ($this->groupAction) {
+            case 'delete':
+                $this->deleteSelected();
+                break;
+            case 'status_active':
+                $this->updateStatus(true);
+                break;
+            case 'status_inactive':
+                $this->updateStatus(false);
+                break;
+        }
+
+        $this->groupAction = '';
+    }
+
+    private function updateStatus($status)
+    {
+        DoctorService::whereIn('id', $this->selectedDoctorServices)
+            ->update(['status' => $status]);
+
+        $this->selectedDoctorServices = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت خدمات انتخاب‌شده با موفقیت تغییر کرد.');
     }
 
     public function render()
