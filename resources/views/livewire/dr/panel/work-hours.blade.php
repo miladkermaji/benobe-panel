@@ -13,8 +13,14 @@
         <div class="card border border-radius-11 p-3 mb-4 bg-white shadow-sm {{ !$autoScheduling ? '' : 'd-none' }}">
           <div class="card-header d-flex align-items-center justify-content-between">
             <h6 class="mb-0">تنظیمات تایید دو مرحله ای نوبت‌های دستی</h6>
-            <i class="fas fa-question-circle text-muted" style="cursor: pointer; font-size: 16px;"
-              title="در فیلد اول می‌توانید مشخص کنید که چند ساعت قبل از زمان نوبت پیامک تأیید نهایی نوبت ارسال شود و در فیلد دوم، می‌توانید مشخص کنید بیمار چند ساعت مهلت دارد نوبت خود را تأیید کند، در غیر این صورت نوبت لغو خواهد شد. در زیر با استفاده از گزینه بلی یا خیر می‌توانید این امکان را فعال یا غیرفعال نمایید."></i>
+            @component('components.custom-tooltip', [
+                'title' =>
+                    'در فیلد اول می‌توانید مشخص کنید که چند ساعت قبل از زمان نوبت پیامک تأیید نهایی نوبت ارسال شود و در فیلد دوم، می‌توانید مشخص کنید بیمار چند ساعت مهلت دارد نوبت خود را تأیید کند، در غیر این صورت نوبت لغو خواهد شد. در زیر با استفاده از گزینه بلی یا خیر می‌توانید این امکان را فعال یا غیرفعال نمایید.',
+                'placement' => 'top',
+                'trigger' => 'hover',
+            ])
+              <span class="toggle-appointment-help" tabindex="0">&#9432;</span>
+            @endcomponent
           </div>
           <div class="card-body">
             <div class="row">
