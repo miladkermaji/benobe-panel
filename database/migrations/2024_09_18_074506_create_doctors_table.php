@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
@@ -70,6 +71,12 @@ return new class () extends Migration {
         SET uuid = CONCAT("DR-", id)
         WHERE uuid IS NULL
     ');
+    
+// اجرای Seeder به صورت خودکار
+Artisan::call('db:seed', [
+   '--class' => 'DoctorSeeder',
+        ]);
+
 
     }
 

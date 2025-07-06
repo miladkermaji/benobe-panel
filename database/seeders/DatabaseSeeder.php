@@ -25,5 +25,11 @@ class DatabaseSeeder extends Seeder
             'mobile' => '09182718639',
             'password' => '$2y$10$83OINZ6XjLtx/kNqOeZEiuSt/5tHS5fi0uDg5WoNCA4PIcxPBsI6q',
         ]);
+
+        // اجرای seeder های خودکار
+        $this->call([
+            ZoneSeeder::class,
+            DoctorSeeder::class,
+        ]);
     }
 }
