@@ -16,53 +16,95 @@ class DoctorSeeder extends Seeder
         $json = File::get(storage_path('app/doctors.json'));
         $data = json_decode($json, true);
 
-        foreach ($data as $doctorData) {
-            // بررسی اینکه آیا دکتر قبلاً وجود دارد یا نه
-            $existingDoctor = DB::table('doctors')
-                ->where('email', $doctorData['email'])
-                ->orWhere('mobile', $doctorData['mobile'])
-                ->first();
+        $totalDoctors = count($data);
+        $createdCount = 0;
+        $skippedCount = 0;
+        $errorCount = 0;
 
-            if (!$existingDoctor) {
-                // تبدیل جنسیت از فرمت قدیمی به جدید
-                $sex = $this->convertSex($doctorData['sex'] ?? 'male');
+        $this->command->info("Total doctors in JSON: {$totalDoctors}");
 
-                // ایجاد slug از نام نمایشی
-                $slug = Str::slug($doctorData['display_name'] ?? $doctorData['first_name'] . ' ' . $doctorData['last_name']);
+        foreach ($data as $index => $doctorData) {
+            try {
+                // بررسی اینکه آیا دکتر قبلاً وجود دارد یا نه
+                $existingDoctor = null;
 
-                // ایجاد UUID
-                $uuid = 'DR-' . $doctorData['id'];
+                if (!empty($doctorData['email'])) {
+                    $existingDoctor = DB::table('doctors')->where('email', $doctorData['email'])->first();
+                }
 
-                // هش کردن پسورد
-                $hashedPassword = Hash::make($doctorData['password'] ?? 'password123');
+                if (!$existingDoctor && !empty($doctorData['mobile'])) {
+                    $existingDoctor = DB::table('doctors')->where('mobile', $doctorData['mobile'])->first();
+                }
 
-                DB::table('doctors')->insert([
-                    'id' => $doctorData['id'],
-                    'uuid' => $uuid,
-                    'first_name' => $doctorData['first_name'] ?? null,
-                    'last_name' => $doctorData['last_name'] ?? null,
-                    'display_name' => $doctorData['display_name'] ?? null,
-                    'sex' => $sex,
-                    'mobile' => $doctorData['mobile'] ?? null,
-                    'email' => $doctorData['email'] ?? null,
-                    'national_code' => $doctorData['national_code'] ?? null,
-                    'password' => $hashedPassword,
-                    'address' => $doctorData['address'] ?? null,
-                    'profile_photo_path' => $doctorData['profile_photo_path'] ?? null,
-                    'slug' => $slug,
-                    'is_active' => true,
-                    'is_verified' => true,
-                    'profile_completed' => true,
-                    'status' => 1,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                if (!$existingDoctor) {
+                    // تبدیل جنسیت از فرمت قدیمی به جدید
+                    $sex = $this->convertSex($doctorData['sex'] ?? 'male');
 
-                $this->command->info("Doctor {$doctorData['display_name']} created successfully.");
-            } else {
-                $this->command->info("Doctor {$doctorData['display_name']} already exists, skipping...");
+                    // ایجاد slug از نام نمایشی
+                    $displayName = $doctorData['display_name'] ?? $doctorData['first_name'] . ' ' . $doctorData['last_name'];
+                    $slug = Str::slug($displayName ?: 'doctor-' . $doctorData['id']);
+
+                    // ایجاد UUID
+                    $uuid = 'DR-' . $doctorData['id'];
+
+                    // هش کردن پسورد
+                    $hashedPassword = Hash::make($doctorData['password'] ?? 'password123');
+
+                    // ایجاد email منحصر به فرد اگر null باشد
+                    $email = $doctorData['email'];
+                    if (empty($email)) {
+                        $email = 'doctor' . $doctorData['id'] . '@benobe.ir';
+                    }
+
+                    // ایجاد mobile منحصر به فرد اگر null باشد
+                    $mobile = $doctorData['mobile'];
+                    if (empty($mobile)) {
+                        $mobile = '0910000' . str_pad($doctorData['id'], 4, '0', STR_PAD_LEFT);
+                    }
+
+                    DB::table('doctors')->insert([
+                        'id' => $doctorData['id'],
+                        'uuid' => $uuid,
+                        'first_name' => $doctorData['first_name'] ?? null,
+                        'last_name' => $doctorData['last_name'] ?? null,
+                        'display_name' => $displayName,
+                        'sex' => $sex,
+                        'mobile' => $mobile,
+                        'email' => $email,
+                        'national_code' => $doctorData['national_code'] ?? null,
+                        'password' => $hashedPassword,
+                        'address' => $doctorData['address'] ?? null,
+                        'profile_photo_path' => $doctorData['profile_photo_path'] ?? null,
+                        'slug' => $slug,
+                        'is_active' => true,
+                        'is_verified' => true,
+                        'profile_completed' => true,
+                        'status' => 1,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    $createdCount++;
+                    if ($createdCount % 50 == 0) {
+                        $this->command->info("Created {$createdCount} doctors so far...");
+                    }
+                } else {
+                    $skippedCount++;
+                    if ($skippedCount % 50 == 0) {
+                        $this->command->info("Skipped {$skippedCount} doctors so far...");
+                    }
+                }
+            } catch (\Exception $e) {
+                $errorCount++;
+                $this->command->error("Error creating doctor ID {$doctorData['id']}: " . $e->getMessage());
             }
         }
+
+        $this->command->info("Seeding completed!");
+        $this->command->info("Total doctors in JSON: {$totalDoctors}");
+        $this->command->info("Created: {$createdCount}");
+        $this->command->info("Skipped (already exists): {$skippedCount}");
+        $this->command->info("Errors: {$errorCount}");
     }
 
     /**
