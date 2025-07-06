@@ -20,7 +20,7 @@ return new class () extends Migration {
 
             // اضافه کردن ایندکس‌ها
             $table->index('ip_address');
-            $table->index('user_agent');
+            // حذف index از user_agent به دلیل مشکل MySQL با TEXT columns
         });
     }
 

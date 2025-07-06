@@ -12,7 +12,7 @@ return new class () extends Migration {
             $table->id();
 
             $table->unsignedBigInteger('hospital_id')->nullable();
-            $table->foreign('hospital_id')->references('id')->on('hospitals')->onDelete('set null');
+            $table->foreign('hospital_id')->references('id')->on('medical_centers')->where('type','hospital')->onDelete('set null');
 
             $table->string('uuid')->nullable()->unique();
             $table->string('first_name')->nullable();
