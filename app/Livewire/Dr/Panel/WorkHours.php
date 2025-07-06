@@ -2618,6 +2618,12 @@ class Workhours extends Component
             ];
             $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
+
+            // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
+            $this->manualNobatActive = (bool) $setting->is_active;
+            $this->manualNobatSendLink = (int) $setting->duration_send_link;
+            $this->manualNobatConfirmLink = (int) $setting->duration_confirm_link;
+
             $this->showSuccessMessage('تنظیمات نوبت دستی با موفقیت ذخیره شد');
         } catch (\Exception $e) {
             $this->showErrorMessage($e->getMessage() ?: 'خطا در ذخیره تنظیمات نوبت دستی');
@@ -2645,6 +2651,11 @@ class Workhours extends Component
 
             $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
+
+            // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
+            $this->manualNobatActive = (bool) $setting->is_active;
+            $this->manualNobatSendLink = (int) $setting->duration_send_link;
+            $this->manualNobatConfirmLink = (int) $setting->duration_confirm_link;
 
             $this->showSuccessMessage($this->manualNobatActive ? 'نوبت‌دهی دستی فعال شد' : 'نوبت‌دهی دستی غیرفعال شد');
         } catch (\Exception $e) {
@@ -2679,6 +2690,11 @@ class Workhours extends Component
             $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
 
+            // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
+            $this->manualNobatActive = (bool) $setting->is_active;
+            $this->manualNobatSendLink = (int) $setting->duration_send_link;
+            $this->manualNobatConfirmLink = (int) $setting->duration_confirm_link;
+
             Log::info('Manual appointment setting updated automatically', [
                 'doctor_id' => $doctorId,
                 'clinic_id' => $clinicId,
@@ -2694,6 +2710,96 @@ class Workhours extends Component
                 'value' => $value
             ]);
             $this->showErrorMessage($e->getMessage() ?: 'خطا در ذخیره خودکار وضعیت نوبت‌دهی دستی');
+        }
+    }
+
+    // متد auto-save برای تغییر مدت زمان ارسال لینک
+    public function updatedManualNobatSendLink($value)
+    {
+        try {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+            $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+
+            $data = [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $clinicId,
+            ];
+
+            $values = [
+                'is_active' => (bool) $this->manualNobatActive,
+                'duration_send_link' => (int) $value,
+                'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
+            ];
+
+            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $this->manualNobatSettingId = $setting->id;
+
+            // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
+            $this->manualNobatActive = (bool) $setting->is_active;
+            $this->manualNobatSendLink = (int) $setting->duration_send_link;
+            $this->manualNobatConfirmLink = (int) $setting->duration_confirm_link;
+
+            Log::info('Manual appointment send link duration updated automatically', [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $clinicId,
+                'duration_send_link' => $value,
+                'setting_id' => $setting->id
+            ]);
+
+            $this->showSuccessMessage('مدت زمان ارسال لینک با موفقیت بروزرسانی شد');
+        } catch (\Exception $e) {
+            Log::error('Error in updatedManualNobatSendLink: ' . $e->getMessage(), [
+                'doctor_id' => $doctorId ?? null,
+                'clinic_id' => $clinicId ?? null,
+                'value' => $value
+            ]);
+            $this->showErrorMessage($e->getMessage() ?: 'خطا در ذخیره خودکار مدت زمان ارسال لینک');
+        }
+    }
+
+    // متد auto-save برای تغییر مدت زمان اعتبار لینک
+    public function updatedManualNobatConfirmLink($value)
+    {
+        try {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+            $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+
+            $data = [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $clinicId,
+            ];
+
+            $values = [
+                'is_active' => (bool) $this->manualNobatActive,
+                'duration_send_link' => (int) $this->manualNobatSendLink,
+                'duration_confirm_link' => (int) $value,
+            ];
+
+            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $this->manualNobatSettingId = $setting->id;
+
+            // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
+            $this->manualNobatActive = (bool) $setting->is_active;
+            $this->manualNobatSendLink = (int) $setting->duration_send_link;
+            $this->manualNobatConfirmLink = (int) $setting->duration_confirm_link;
+
+            Log::info('Manual appointment confirm link duration updated automatically', [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $clinicId,
+                'duration_confirm_link' => $value,
+                'setting_id' => $setting->id
+            ]);
+
+            $this->showSuccessMessage('مدت زمان اعتبار لینک با موفقیت بروزرسانی شد');
+        } catch (\Exception $e) {
+            Log::error('Error in updatedManualNobatConfirmLink: ' . $e->getMessage(), [
+                'doctor_id' => $doctorId ?? null,
+                'clinic_id' => $clinicId ?? null,
+                'value' => $value
+            ]);
+            $this->showErrorMessage($e->getMessage() ?: 'خطا در ذخیره خودکار مدت زمان اعتبار لینک');
         }
     }
 
