@@ -23,7 +23,7 @@
                 <div class="p-1 rounded bg-white"
                   style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
                   <x-my-toggle-yes-no :isChecked="$manualNobatActive" id="manual-nobat-active" model="manualNobatActive"
-                    day="آیا تأیید دو مرحله‌ای نوبت‌های دستی فعال باشد؟" wire:change="updateManualNobatActive" />
+                    day="آیا تأیید دو مرحله‌ای نوبت‌های دستی فعال باشد؟" />
                 </div>
               </div>
 

@@ -2572,20 +2572,121 @@ class Workhours extends Component
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
             $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+
             $data = [
                 'doctor_id' => $doctorId,
                 'clinic_id' => $clinicId,
             ];
+
             $values = [
                 'is_active' => (bool) $this->manualNobatActive,
                 'duration_send_link' => (int) $this->manualNobatSendLink,
                 'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
             ];
+
             $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
+
             $this->showSuccessMessage($this->manualNobatActive ? 'نوبت‌دهی دستی فعال شد' : 'نوبت‌دهی دستی غیرفعال شد');
         } catch (\Exception $e) {
+            Log::error('Error in updateManualNobatActive: ' . $e->getMessage(), [
+                'doctor_id' => $doctorId ?? null,
+                'clinic_id' => $clinicId ?? null,
+                'manual_nobat_active' => $this->manualNobatActive ?? null
+            ]);
             $this->showErrorMessage($e->getMessage() ?: 'خطا در تغییر وضعیت نوبت‌دهی دستی');
+        }
+    }
+
+    // متد auto-save برای تغییر وضعیت نوبت دستی
+    public function updatedManualNobatActive($value)
+    {
+        try {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+            $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+
+            $data = [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $clinicId,
+            ];
+
+            $values = [
+                'is_active' => (bool) $value,
+                'duration_send_link' => (int) $this->manualNobatSendLink,
+                'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
+            ];
+
+            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $this->manualNobatSettingId = $setting->id;
+
+            Log::info('Manual appointment setting updated automatically', [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $clinicId,
+                'is_active' => $value,
+                'setting_id' => $setting->id
+            ]);
+
+            $this->showSuccessMessage($value ? 'تاییدیه نوبت دستی فعال شد' : 'تاییدیه نوبت دستی غیرفعال شد');
+        } catch (\Exception $e) {
+            Log::error('Error in updatedManualNobatActive: ' . $e->getMessage(), [
+                'doctor_id' => $doctorId ?? null,
+                'clinic_id' => $clinicId ?? null,
+                'value' => $value
+            ]);
+            $this->showErrorMessage($e->getMessage() ?: 'خطا در ذخیره خودکار وضعیت نوبت‌دهی دستی');
+        }
+    }
+
+    // متد auto-save برای تغییر وضعیت باز بودن مطب در تعطیلات
+    public function updatedHolidayAvailability($value)
+    {
+        try {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+            DB::beginTransaction();
+
+            $data = [
+                'auto_scheduling' => (bool) $this->autoScheduling,
+                'online_consultation' => (bool) $this->onlineConsultation,
+                'holiday_availability' => (bool) $value,
+            ];
+
+            if ($this->autoScheduling) {
+                $data['calendar_days'] = (int) $this->calendarDays;
+            }
+
+            $config = DoctorAppointmentConfig::updateOrCreate(
+                [
+                    'doctor_id' => $doctorId,
+                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                ],
+                $data
+            );
+
+            // به‌روزرسانی تنظیمات در حافظه
+            $this->appointmentConfig = $config;
+            $this->holidayAvailability = (bool) $value;
+
+            DB::commit();
+
+            Log::info('Holiday availability updated automatically', [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $this->activeClinicId ?? null,
+                'holiday_availability' => $value,
+                'config_id' => $config->id
+            ]);
+
+            $this->showSuccessMessage($value ? 'باز بودن مطب در تعطیلات فعال شد' : 'باز بودن مطب در تعطیلات غیرفعال شد');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in updatedHolidayAvailability: ' . $e->getMessage(), [
+                'doctor_id' => $doctorId ?? null,
+                'clinic_id' => $this->activeClinicId ?? null,
+                'value' => $value
+            ]);
+            $this->showErrorMessage($e->getMessage() ?: 'خطا در ذخیره خودکار وضعیت باز بودن مطب در تعطیلات');
         }
     }
 }

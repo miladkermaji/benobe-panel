@@ -10,7 +10,8 @@
 <div class="toggle-yes-no {{ $class }}" dir="rtl">
   <div class="toggle-wrapper">
     <input type="checkbox" id="{{ $id }}" class="toggle-input" {{ $isChecked ? 'checked' : '' }}
-      wire:model.live="{{ $model }}" {{ $attributes->whereStartsWith('wire:change') }}>
+      wire:model.live="{{ $model }}" {{ $attributes->whereStartsWith('wire:change') }}
+      {{ $attributes->whereStartsWith('wire:model') }}>
     <label for="{{ $id }}" class="toggle-label">
       <span class="toggle-text">{{ $day }}</span>
       <div class="toggle-switch">
