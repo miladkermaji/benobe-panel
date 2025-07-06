@@ -27,7 +27,7 @@ class HeaderComponent extends Component
             $doctorId = $doctor->id;
             $doctorMobile = $doctor->mobile;
 
-            
+
             // بارگذاری کلینیک‌ها
             $this->loadClinics($doctor);
 
@@ -94,11 +94,35 @@ class HeaderComponent extends Component
 
     protected function setSelectedClinicFromDatabase($doctor)
     {
-        if ($doctor && $doctor->selectedClinic) {
-            $this->selectedClinicId = $doctor->selectedClinic->clinic_id;
-            $this->selectedClinicName = $this->selectedClinicId
-                ? $doctor->selectedClinic->clinic->name
-                : 'مشاوره آنلاین به نوبه';
+        if ($doctor) {
+            // اگر دکتر کلینیک انتخاب‌شده‌ای دارد، از آن استفاده کن
+            if ($doctor->selectedClinic) {
+                $this->selectedClinicId = $doctor->selectedClinic->clinic_id;
+                $this->selectedClinicName = $this->selectedClinicId
+                    ? $doctor->selectedClinic->clinic->name
+                    : 'مشاوره آنلاین به نوبه';
+                return;
+            }
+
+            // اگر کلینیک انتخاب‌شده‌ای ندارد، بررسی کن که آیا کلینیک فعالی دارد یا نه
+            $activeClinics = $this->clinics->where('is_active', true);
+
+            if ($activeClinics->count() > 0) {
+                // اولین کلینیک فعال را انتخاب کن
+                $firstActiveClinic = $activeClinics->first();
+                $this->selectedClinicId = $firstActiveClinic->id;
+                $this->selectedClinicName = $firstActiveClinic->name;
+
+                // کلینیک انتخاب‌شده را در دیتابیس ذخیره کن
+                $doctor->setSelectedClinic($firstActiveClinic->id);
+            } else {
+                // هیچ کلینیک فعالی ندارد، روی مشاوره آنلاین بگذار
+                $this->selectedClinicId = null;
+                $this->selectedClinicName = 'مشاوره آنلاین به نوبه';
+
+                // در دیتابیس هم null ذخیره کن
+                $doctor->setSelectedClinic(null);
+            }
         }
     }
 
