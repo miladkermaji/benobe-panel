@@ -20,6 +20,7 @@ class DoctorSeeder extends Seeder
         $createdCount = 0;
         $skippedCount = 0;
         $errorCount = 0;
+        $skippedDoctors = [];
 
         $this->command->info("Total doctors in JSON: {$totalDoctors}");
 
@@ -27,13 +28,20 @@ class DoctorSeeder extends Seeder
             try {
                 // بررسی اینکه آیا دکتر قبلاً وجود دارد یا نه
                 $existingDoctor = null;
+                $skipReason = '';
 
                 if (!empty($doctorData['email'])) {
                     $existingDoctor = DB::table('doctors')->where('email', $doctorData['email'])->first();
+                    if ($existingDoctor) {
+                        $skipReason = "Email already exists: {$doctorData['email']}";
+                    }
                 }
 
                 if (!$existingDoctor && !empty($doctorData['mobile'])) {
                     $existingDoctor = DB::table('doctors')->where('mobile', $doctorData['mobile'])->first();
+                    if ($existingDoctor) {
+                        $skipReason = "Mobile already exists: {$doctorData['mobile']}";
+                    }
                 }
 
                 if (!$existingDoctor) {
@@ -90,6 +98,14 @@ class DoctorSeeder extends Seeder
                     }
                 } else {
                     $skippedCount++;
+                    $skippedDoctors[] = [
+                        'id' => $doctorData['id'],
+                        'display_name' => $doctorData['display_name'] ?? 'Unknown',
+                        'email' => $doctorData['email'] ?? 'null',
+                        'mobile' => $doctorData['mobile'] ?? 'null',
+                        'reason' => $skipReason
+                    ];
+
                     if ($skippedCount % 50 == 0) {
                         $this->command->info("Skipped {$skippedCount} doctors so far...");
                     }
@@ -105,6 +121,16 @@ class DoctorSeeder extends Seeder
         $this->command->info("Created: {$createdCount}");
         $this->command->info("Skipped (already exists): {$skippedCount}");
         $this->command->info("Errors: {$errorCount}");
+
+        if ($skippedCount > 0) {
+            $this->command->info("\nSkipped doctors details:");
+            foreach (array_slice($skippedDoctors, 0, 10) as $skipped) {
+                $this->command->info("ID: {$skipped['id']}, Name: {$skipped['display_name']}, Email: {$skipped['email']}, Mobile: {$skipped['mobile']}, Reason: {$skipped['reason']}");
+            }
+            if (count($skippedDoctors) > 10) {
+                $this->command->info("... and " . (count($skippedDoctors) - 10) . " more");
+            }
+        }
     }
 
     /**

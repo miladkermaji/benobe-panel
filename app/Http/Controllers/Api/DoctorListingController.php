@@ -38,7 +38,7 @@ class DoctorListingController extends Controller
             $hasAvailableAppointments = $request->input('has_available_appointments', false);
             $serviceIds               = $request->input('service_ids');
             $insuranceIds             = $request->input('insurance_ids');
-            $limit                    = $request->input('limit', 30);
+            $limit                    = $request->input('limit', 50);
             $page                     = $request->input('page', 1);
             $sort                     = $request->input('sort', 'rating_desc');
             $serviceType              = $request->input('service_type', 'in_person');
