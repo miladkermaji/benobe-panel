@@ -9,6 +9,51 @@
     </div>
     <div class="workhours-content w-100 d-flex justify-content-center mb-3">
       <div class="workhours-wrapper-content p-3 pt-4">
+        <!-- تنظیمات نوبت دستی (فقط وقتی autoScheduling غیرفعال باشد) -->
+        <div class="card border border-radius-11 p-3 mb-4 bg-white shadow-sm {{ !$autoScheduling ? '' : 'd-none' }}">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="mb-0">تنظیمات تایید دو مرحله ای نوبت‌های دستی</h6>
+            <i class="fas fa-question-circle text-muted" style="cursor: pointer; font-size: 16px;"
+              title="در فیلد اول می‌توانید مشخص کنید که چند ساعت قبل از زمان نوبت پیامک تأیید نهایی نوبت ارسال شود و در فیلد دوم، می‌توانید مشخص کنید بیمار چند ساعت مهلت دارد نوبت خود را تأیید کند، در غیر این صورت نوبت لغو خواهد شد. در زیر با استفاده از گزینه بلی یا خیر می‌توانید این امکان را فعال یا غیرفعال نمایید."></i>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- تأیید دو مرحله‌ای نوبت‌های دستی -->
+              <div class="col-12 mb-3">
+                <div class="p-1 rounded bg-white"
+                  style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
+                  <x-my-toggle-yes-no :isChecked="$manualNobatActive" id="manual-nobat-active" model="manualNobatActive"
+                    day="آیا تأیید دو مرحله‌ای نوبت‌های دستی فعال باشد؟" wire:change="updateManualNobatActive" />
+                </div>
+              </div>
+
+              <!-- زمان ارسال لینک تأیید و مدت اعتبار لینک در یک ردیف (فقط وقتی toggle فعال باشد) -->
+              <div class="col-12 mb-3 mt-3 {{ $manualNobatActive ? '' : 'd-none' }} position-relative">
+                <div class="d-flex flex-column flex-md-row gap-3">
+                  <div class="flex-fill">
+                    <label class="label-top-input-special-takhasos mb-2">زمان ارسال لینک تأیید:</label>
+                    <div class="input-group position-relative">
+                      <input class="form-control ltr text-center position-relative" type="number" min="1"
+                        wire:model.live.debounce.500ms="manualNobatSendLink"
+                        wire:change="autoSaveManualNobatSetting('duration_send_link')" placeholder="مثلا: 72">
+                      <span class="input-group-text">ساعت قبل</span>
+                    </div>
+                  </div>
+                  <div class="flex-fill">
+                    <label class="label-top-input-special-takhasos mb-2">مدت زمان اعتبار لینک:</label>
+                    <div class="input-group position-relative">
+                      <input class="form-control ltr text-center position-relative" type="number" min="1"
+                        wire:model.live.debounce.500ms="manualNobatConfirmLink"
+                        wire:change="autoSaveManualNobatSetting('duration_confirm_link')" placeholder="مثلا: 48">
+                      <span class="input-group-text">ساعت</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- پایان تنظیمات نوبت دستی -->
         <div>
           <div>
             <div>
@@ -99,7 +144,7 @@
                                       readonly value="{{ $slot['max_appointments'] ?? '' }}" />
                                   </div>
                                   <!-- دکمه باز شدن نوبت‌ها -->
-                                  <div class="form-group position-relative">
+                                  <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
                                     <x-custom-tooltip title="زمانبندی باز شدن نوبت‌ها" placement="top">
                                       <button type="button" class="btn text-black btn-sm schedule-btn"
                                         x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
@@ -110,7 +155,7 @@
                                     </x-custom-tooltip>
                                   </div>
                                   <!-- دکمه نوبت‌های اورژانسی -->
-                                  <div class="form-group position-relative">
+                                  <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
                                     <x-custom-tooltip
                                       title="زمان‌های مخصوص منشی که می‌تواند برای شرایط خاص نگهدارد. این زمان‌ها غیرفعال می‌شوند تا زمانی که منشی یا پزشک آن‌ها را مجدداً فعال کند."
                                       placement="top">
@@ -179,14 +224,14 @@
                                     readonly />
                                 </div>
                                 <!-- دکمه‌های غیرفعال برای ردیف خالی -->
-                                <div class="form-group position-relative">
+                                <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
                                   <x-custom-tooltip title="زمانبندی باز شدن نوبت‌ها" placement="top">
                                     <button type="button" class="btn text-black btn-sm schedule-btn" disabled>
                                       <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
                                     </button>
                                   </x-custom-tooltip>
                                 </div>
-                                <div class="form-group position-relative">
+                                <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
                                   <x-custom-tooltip
                                     title="زمان‌های مخصوص منشی که می‌تواند برای شرایط خاص نگهدارد. این زمان‌ها غیرفعال می‌شوند تا زمانی که منشی یا پزشک آن‌ها را مجدداً فعال کند."
                                     placement="top">
@@ -473,7 +518,7 @@
                               wire:change="autoSaveSchedule('{{ $day }}', 0)">
                           </div>
                           <!-- دکمه‌های غیرفعال برای ردیف خالی -->
-                          <div class="form-group position-relative">
+                          <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
                             <x-custom-tooltip title="کپی تنظیمات" placement="top">
                               <button class="btn btn-outline-primary btn-sm copy-schedule-setting p-1" disabled>
                                 <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
@@ -481,7 +526,7 @@
                               </button>
                             </x-custom-tooltip>
                           </div>
-                          <div class="form-group position-relative">
+                          <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
                             <x-custom-tooltip title="حذف تنظیمات" placement="top">
                               <button class="btn btn-outline-danger btn-sm delete-schedule-setting p-1" disabled>
                                 <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"

@@ -4,12 +4,13 @@
     'model' => '',
     'day' => '',
     'class' => '',
+    'wire:change' => '',
 ])
 
 <div class="toggle-yes-no {{ $class }}" dir="rtl">
   <div class="toggle-wrapper">
     <input type="checkbox" id="{{ $id }}" class="toggle-input" {{ $isChecked ? 'checked' : '' }}
-      wire:model.live="{{ $model }}" wire:change="updateAutoScheduling">
+      wire:model.live="{{ $model }}" {{ $attributes->whereStartsWith('wire:change') }}>
     <label for="{{ $id }}" class="toggle-label">
       <span class="toggle-text">{{ $day }}</span>
       <div class="toggle-switch">

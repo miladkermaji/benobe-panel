@@ -148,6 +148,7 @@ body {
 .label-top-input-special-takhasos {
     position: absolute;
     top: -0.625rem;
+    bottom: inherit;
     background: var(--background-card);
     font-weight: 600;
     color: var(--text-secondary);

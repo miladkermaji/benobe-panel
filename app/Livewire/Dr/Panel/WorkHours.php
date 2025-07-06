@@ -128,6 +128,11 @@ class Workhours extends Component
         'setSelectedClinicId' => 'setSelectedClinicId',
     ];
     public $isActivationPage = false;
+    // --- Manual Appointment Setting Properties ---
+    public $manualNobatActive = false;
+    public $manualNobatSendLink = 10;
+    public $manualNobatConfirmLink = 30;
+    public $manualNobatSettingId = null;
     public function mount()
     {
         $this->showSaveButton = request()->routeIs('dr-workhours');
@@ -194,6 +199,21 @@ class Workhours extends Component
         $this->holidayAvailability = $this->appointmentConfig->holiday_availability;
         $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
         $this->dispatch('refresh-clinic-data');
+        // مقداردهی اولیه تنظیمات نوبت دستی
+        $manualSetting = \App\Models\ManualAppointmentSetting::where('doctor_id', $this->doctorId)
+            ->where('clinic_id', $this->activeClinicId !== 'default' ? $this->activeClinicId : null)
+            ->first();
+        if ($manualSetting) {
+            $this->manualNobatActive = (bool) $manualSetting->is_active;
+            $this->manualNobatSendLink = $manualSetting->duration_send_link;
+            $this->manualNobatConfirmLink = $manualSetting->duration_confirm_link;
+            $this->manualNobatSettingId = $manualSetting->id;
+        } else {
+            $this->manualNobatActive = false;
+            $this->manualNobatSendLink = 10;
+            $this->manualNobatConfirmLink = 30;
+            $this->manualNobatSettingId = null;
+        }
     }
     /**
      * Resolve clinic ID based on request or session.
@@ -2519,6 +2539,53 @@ class Workhours extends Component
             DB::rollBack();
             Log::error('Error in deleteScheduleSettingsForDay: ' . $e->getMessage());
             $this->showErrorMessage($e->getMessage() ?: 'خطا در حذف تنظیمات روز.');
+        }
+    }
+    // ذخیره خودکار هر فیلد تنظیمات نوبت دستی
+    public function autoSaveManualNobatSetting($field)
+    {
+        try {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+            $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+            $data = [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $clinicId,
+            ];
+            $values = [
+                'is_active' => (bool) $this->manualNobatActive,
+                'duration_send_link' => (int) $this->manualNobatSendLink,
+                'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
+            ];
+            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $this->manualNobatSettingId = $setting->id;
+            $this->showSuccessMessage('تنظیمات نوبت دستی با موفقیت ذخیره شد');
+        } catch (\Exception $e) {
+            $this->showErrorMessage($e->getMessage() ?: 'خطا در ذخیره تنظیمات نوبت دستی');
+        }
+    }
+
+    // متد برای toggle فعال/غیرفعال بودن نوبت دستی
+    public function updateManualNobatActive()
+    {
+        try {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+            $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+            $data = [
+                'doctor_id' => $doctorId,
+                'clinic_id' => $clinicId,
+            ];
+            $values = [
+                'is_active' => (bool) $this->manualNobatActive,
+                'duration_send_link' => (int) $this->manualNobatSendLink,
+                'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
+            ];
+            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $this->manualNobatSettingId = $setting->id;
+            $this->showSuccessMessage($this->manualNobatActive ? 'نوبت‌دهی دستی فعال شد' : 'نوبت‌دهی دستی غیرفعال شد');
+        } catch (\Exception $e) {
+            $this->showErrorMessage($e->getMessage() ?: 'خطا در تغییر وضعیت نوبت‌دهی دستی');
         }
     }
 }

@@ -59,11 +59,6 @@
                 <a href="{{ route('dr-mySpecialDays') }}">روزهای خاص</a>
               </li>
             @endif
-            @if ($this->hasPermission('dr-manual_nobat_setting'))
-              <li class="item-li {{ Request::routeIs('dr-manual_nobat_setting') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-manual_nobat_setting') }}">تنظیمات نوبت دستی</a>
-              </li>
-            @endif
             {{--    @if ($this->hasPermission('dr-manual_nobat'))
               <li class="item-li {{ Request::routeIs('dr-manual_nobat') ? 'is-active' : '' }}">
                 <a href="{{ route('dr-manual_nobat') }}">ثبت نوبت دستی</a>
