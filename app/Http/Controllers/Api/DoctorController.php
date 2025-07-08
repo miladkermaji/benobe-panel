@@ -253,7 +253,7 @@ class DoctorController extends Controller
                     ])
                     ->orderBy('created_at', 'desc')
                     ->when($limit, fn ($query) => $query->limit($limit))
-                    ->get(['id', 'first_name', 'last_name', 'specialty_id', 'profile_photo_path', 'province_id', 'created_at']);
+                    ->get();
             });
 
             // فرمت کردن داده‌ها با تبدیل تاریخ شمسی
