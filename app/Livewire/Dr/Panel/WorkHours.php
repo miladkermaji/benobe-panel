@@ -1193,6 +1193,11 @@ class Workhours extends Component
     public function autoSaveTimeSlot($day, $index)
     {
         try {
+            Log::info('autoSaveTimeSlot called', [
+                'day' => $day,
+                'index' => $index,
+                'slot_data_before' => $this->slots[$day][$index] ?? null,
+            ]);
             // اضافه کردن شرط برای تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
                 $currentClinicId = request()->route('clinic') ?? 'default';
@@ -1242,11 +1247,15 @@ class Workhours extends Component
                 $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'error']);
                 return;
             }
+            // فقط مقدار واردشده را ذخیره کن، هیچ رندی انجام نده
             $newSlot = [
                 'start' => $this->slots[$day][$index]['start_time'],
                 'end' => $this->slots[$day][$index]['end_time'],
-                'max_appointments' => (int) $this->slots[$day][$index]['max_appointments'],
+                'max_appointments' => $this->slots[$day][$index]['max_appointments'],
             ];
+            Log::info('autoSaveTimeSlot newSlot', [
+                'newSlot' => $newSlot,
+            ]);
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
             Log::info('Preparing to save slot', [
@@ -1286,22 +1295,6 @@ class Workhours extends Component
                 $existingWorkHours = is_array($workSchedule->work_hours)
                     ? $workSchedule->work_hours
                     : json_decode($workSchedule->work_hours, true) ?? [];
-                // بررسی تداخل زمانی
-                foreach ($existingWorkHours as $i => $slot) {
-                    if ($i === $index) {
-                        continue; // نادیده گرفتن ساعت کاری فعلی
-                    }
-                    if ($this->isTimeConflict($newSlot['start'], $newSlot['end'], $slot['start'], $slot['end'])) {
-                        throw new \Exception(sprintf(
-                            'زمان %s تا %s با بازه زمانی موجود %s تا %s در روز %s تداخل دارد',
-                            $newSlot['start'],
-                            $newSlot['end'],
-                            $slot['start'],
-                            $slot['end'],
-                            $this->getPersianDay($day)
-                        ));
-                    }
-                }
                 // به‌روزرسانی یا اضافه کردن ساعت کاری
                 $existingWorkHours[$index] = $newSlot;
                 // به‌روزرسانی دیتابیس
@@ -1321,7 +1314,7 @@ class Workhours extends Component
                     'end_time' => $newSlot['end'],
                     'max_appointments' => $newSlot['max_appointments'],
                 ];
-                // به‌روزرسانی تنظیمات نوبت‌دهی برای تمام روزهای هفته
+                // سایر منطق بدون تغییر
                 $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
                 $newSetting = [
                     'start_time' => '00:00',
@@ -1343,12 +1336,10 @@ class Workhours extends Component
                     $appointmentSettings = is_array($schedule->appointment_settings)
                         ? $schedule->appointment_settings
                         : json_decode($schedule->appointment_settings, true) ?? [];
-
                     $existingIndex = false;
                     if (!empty($appointmentSettings)) {
                         $existingIndex = array_search((int)$index, array_column($appointmentSettings, 'work_hour_key'));
                     }
-
                     if ($existingIndex !== false) {
                         $appointmentSettings[$existingIndex] = $newSetting;
                     } else {
@@ -1357,19 +1348,23 @@ class Workhours extends Component
                     $schedule->update(['appointment_settings' => json_encode(array_values($appointmentSettings))]);
                 }
                 DB::commit();
-                // رفرش داده‌ها
                 $this->refreshWorkSchedules();
                 Log::info('Time slot auto-saved successfully', [
                     'day' => $day,
                     'index' => $index,
                     'slot' => $this->slots[$day][$index],
                 ]);
-                // ارسال رویداد برای رفرش رابط کاربری
                 $this->dispatch('refresh-work-hours');
                 $this->modalMessage = 'ساعت کاری با موفقیت ذخیره شد';
                 $this->modalType = 'success';
                 $this->modalOpen = true;
                 $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'success']);
+                Log::info('autoSaveTimeSlot workHours after update', [
+                    'workHours' => $existingWorkHours,
+                ]);
+                Log::info('autoSaveTimeSlot slots after update', [
+                    'slots' => $this->slots[$day][$index] ?? null,
+                ]);
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Error saving work hours: ' . $e->getMessage(), [
@@ -1780,41 +1775,68 @@ class Workhours extends Component
         ];
         return $dayMap[$englishDay] ?? $englishDay;
     }
-    public function saveCalculator()
+    public function saveCalculator($day, $index, $appointmentCount, $timePerAppointment, $startTime, $endTime)
     {
         try {
-            $this->validate([
-                'calculator.day' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
-                'calculator.index' => 'required|integer',
-                'calculator.appointment_count' => 'required|integer|min:1',
-                'calculator.start_time' => 'required|date_format:H:i',
-                'calculator.end_time' => 'required|date_format:H:i|after:calculator.start_time',
-            ], [
-                'calculator.day.required' => 'لطفاً یک روز را انتخاب کنید.',
-                'calculator.day.in' => 'روز انتخاب‌شده نامعتبر است.',
-                'calculator.index.required' => 'لطفاً ایندکس را وارد کنید.',
-                'calculator.index.integer' => 'ایندکس باید یک عدد صحیح باشد.',
-                'calculator.appointment_count.required' => 'لطفاً تعداد حداکثر نوبت‌ها را وارد کنید.',
-                'calculator.appointment_count.integer' => 'تعداد نوبت‌ها باید یک عدد صحیح باشد.',
-                'calculator.appointment_count.min' => 'تعداد نوبت‌ها باید حداقل ۱ باشد.',
-                'calculator.start_time.required' => 'لطفاً زمان شروع را وارد کنید.',
-                'calculator.start_time.date_format' => 'فرمت زمان شروع باید به صورت ساعت:دقیقه باشد.',
-                'calculator.end_time.required' => 'لطفاً زمان پایان را وارد کنید.',
-                'calculator.end_time.date_format' => 'فرمت زمان پایان باید به صورت ساعت:دقیقه باشد.',
-                'calculator.end_time.after' => 'زمان پایان باید بعد از زمان شروع باشد.',
+            Log::info('saveCalculator called', [
+                'day' => $day,
+                'index' => $index,
+                'appointment_count' => $appointmentCount,
+                'time_per_appointment' => $timePerAppointment,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
             ]);
-
-            $day = $this->calculator['day'];
-            $index = $this->calculator['index'];
-            $appointmentCount = $this->calculator['appointment_count'];
-            $startTime = $this->calculator['start_time'];
-            $endTime = $this->calculator['end_time'];
+            $validator = Validator::make(
+                [
+                    'day' => $day,
+                    'index' => $index,
+                    'appointmentCount' => $appointmentCount,
+                    'startTime' => $startTime,
+                    'endTime' => $endTime,
+                ],
+                [
+                    'day' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
+                    'index' => 'required|integer',
+                    'appointmentCount' => 'required|integer|min:1',
+                    'startTime' => 'required|date_format:H:i',
+                    'endTime' => 'required|date_format:H:i|after:startTime',
+                ],
+                [
+                    'day.required' => 'لطفاً یک روز را انتخاب کنید.',
+                    'day.in' => 'روز انتخاب‌شده نامعتبر است.',
+                    'index.required' => 'لطفاً ایندکس را وارد کنید.',
+                    'index.integer' => 'ایندکس باید یک عدد صحیح باشد.',
+                    'appointmentCount.required' => 'لطفاً تعداد حداکثر نوبت‌ها را وارد کنید.',
+                    'appointmentCount.integer' => 'تعداد نوبت‌ها باید یک عدد صحیح باشد.',
+                    'appointmentCount.min' => 'تعداد نوبت‌ها باید حداقل ۱ باشد.',
+                    'startTime.required' => 'لطفاً زمان شروع را وارد کنید.',
+                    'startTime.date_format' => 'فرمت زمان شروع باید به صورت ساعت:دقیقه باشد.',
+                    'endTime.required' => 'لطفاً زمان پایان را وارد کنید.',
+                    'endTime.date_format' => 'فرمت زمان پایان باید به صورت ساعت:دقیقه باشد.',
+                    'endTime.after' => 'زمان پایان باید بعد از زمان شروع باشد.',
+                ]
+            );
+            if ($validator->fails()) {
+                $errorMessage = implode('، ', $validator->errors()->all());
+                $this->modalMessage = $errorMessage ?: 'لطفاً تمام فیلدهای مورد نیاز را پر کنید';
+                $this->modalType = 'error';
+                $this->modalOpen = true;
+                Log::error('Validation error in saveCalculator: ' . $errorMessage);
+                $this->dispatch('show-toastr', [
+                    'message' => $this->modalMessage,
+                    'type' => 'error',
+                ]);
+                $this->dispatch('close-calculator-modal');
+                return;
+            }
             $newSlot = [
                 'start' => $startTime,
                 'end' => $endTime,
                 'max_appointments' => $appointmentCount,
             ];
-
+            Log::info('saveCalculator newSlot', [
+                'newSlot' => $newSlot,
+            ]);
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
@@ -1985,7 +2007,12 @@ class Workhours extends Component
                 $this->dispatch('close-calculator-modal');
                 $this->dispatch('close-modal', ['name' => 'calculator-modal']);
                 $this->dispatch('refresh-work-hours');
-                /* $this->reset(['calculator', 'calculationMode']); */
+                Log::info('saveCalculator workHours after update', [
+                    'workHours' => $workHours,
+                ]);
+                Log::info('saveCalculator slots after update', [
+                    'slots' => $this->slots[$day][$index] ?? null,
+                ]);
             } catch (\Exception $e) {
                 DB::rollBack();
                 throw $e;
@@ -2003,7 +2030,14 @@ class Workhours extends Component
             ]);
             $this->dispatch('close-calculator-modal');
         } catch (\Exception $e) {
-            Log::error('Error in saveCalculator: ' . $e->getMessage(), ['calculator' => $this->calculator]);
+            Log::error('Error in saveCalculator: ' . $e->getMessage(), [
+                'day' => $day,
+                'index' => $index,
+                'appointment_count' => $appointmentCount,
+                'time_per_appointment' => $timePerAppointment,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+            ]);
             $this->modalMessage = $e->getMessage() ?: 'خطا در ذخیره‌سازی ساعات کاری';
             $this->modalType = 'error';
             $this->modalOpen = true;

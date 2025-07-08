@@ -142,12 +142,10 @@
                                       نوبت</label>
                                     <input type="text"
                                       class="form-control h-50 text-center max-appointments bg-white"
-                                      id="morning-patients-{{ $englishDay }}-{{ $index }}"
-                                      wire:model.live="slots.{{ $englishDay }}.{{ $index }}.max_appointments"
-                                      wire:change="autoSaveTimeSlot('{{ $englishDay }}', {{ $index }})"
-                                      x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
-                                      @click="$dispatch('open-modal', { name: 'calculator-modal', day: day, index: index })"
-                                      readonly value="{{ $slot['max_appointments'] ?? '' }}" />
+                                      id="morning-patients-{{ $englishDay }}-{{ $index }}" readonly
+                                      value="{{ $slot['max_appointments'] ?? '' }}" x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
+                                      @click="$dispatch('open-modal', { name: 'calculator-modal', day: day, index: index })" />
+                                    <!-- مقدار این input فقط با JS بعد از ذخیره مودال کلکیولیتر ست می‌شود و Livewire هیچ sync انجام نمی‌دهد -->
                                   </div>
                                   <!-- دکمه باز شدن نوبت‌ها -->
                                   <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
@@ -628,7 +626,7 @@
           </div>
           <div class="w-100 d-flex justify-content-end p-1 gap-4 mt-3">
             <button type="button" class="btn my-btn-primary w-100 d-flex justify-content-center align-items-center"
-              wire:click="saveCalculator" id="saveSelectionCalculator" style="height: 50px;">
+               id="saveSelectionCalculator" style="height: 50px;">
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -704,71 +702,92 @@
               }
               // مقداردهی اولیه فقط از اسلات
               $appointmentCount.val(maxAppointments ? parseInt(maxAppointments) : '');
-              $timeCount.val(maxAppointments && maxAppointments > 0 ? Math.round(totalMinutes / maxAppointments) :
+              $timeCount.val(maxAppointments && maxAppointments > 0 ? Math.floor(totalMinutes / maxAppointments) :
                 '');
               $appointmentCount.prop('disabled', false);
               $timeCount.prop('disabled', true);
               $countRadio.prop('checked', true);
               let isUpdating = false;
+              // فقط مقدار مقابل را برای نمایش محاسبه کن، مقدار اصلی را هرگز تغییر نده
               $appointmentCount.off('input').on('input', function() {
                 if (isUpdating) return;
                 isUpdating = true;
-                const count = parseInt($(this).val());
+                const count = parseInt(this.value);
                 if (count && !isNaN(count) && count > 0) {
-                  const timePerAppointment = Math.round(totalMinutes / count);
+                  const timePerAppointment = Math.floor(totalMinutes / count);
                   if (timePerAppointment < 5) {
                     toastr.error('تعداد نوبت‌ها بیش از حد مجاز است. حداقل زمان هر نوبت باید ۵ دقیقه باشد.');
                     $timeCount.val('');
-                    isUpdating = false;
-                    return;
+                  } else {
+                    $timeCount.val(timePerAppointment);
                   }
-                  $timeCount.val(timePerAppointment);
                 } else {
                   $timeCount.val('');
                 }
                 isUpdating = false;
               });
+              // مقدار مقابل فقط برای نمایش، مقدار اصلی هرگز تغییر نکند
               $timeCount.off('input').on('input', function() {
                 if (isUpdating) return;
                 isUpdating = true;
-                const time = parseInt($(this).val());
+                const time = parseInt(this.value);
                 if (time && !isNaN(time) && time > 0) {
                   if (time < 5) {
                     toastr.error('حداقل زمان هر نوبت باید ۵ دقیقه باشد.');
-                    $appointmentCount.val('');
-                    isUpdating = false;
-                    return;
+                    $timeCount.val('');
+                  } else {
+                    // فقط مقدار مقابل را برای نمایش محاسبه کن
+                    const appointmentCount = Math.floor(totalMinutes / time);
+                    // فقط نمایش، مقدار اصلی تغییر نکند
                   }
-                  const appointmentCount = Math.round(totalMinutes / time);
-                  $appointmentCount.val(appointmentCount);
-                } else {
-                  $appointmentCount.val('');
                 }
                 isUpdating = false;
               });
-              $countRadio.off('change').on('change', function() {
-                if ($(this).is(':checked')) {
-                  $appointmentCount.prop('disabled', false);
-                  $timeCount.prop('disabled', true);
-                }
+              // جلوگیری از هرگونه تغییر غیرمستقیم مقدار اصلی
+              $appointmentCount.on('blur', function() {
+                // هیچ کاری نکن، مقدار فقط همان است که کاربر تایپ کرده
               });
-              $timeRadio.off('change').on('change', function() {
-                if ($(this).is(':checked')) {
-                  $timeCount.prop('disabled', false);
-                  $appointmentCount.prop('disabled', true);
-                }
+              $appointmentCount.on('focus', function() {
+                // هیچ کاری نکن
               });
-              // ذخیره فقط با دکمه
+              // ذخیره فقط با مقدار تایپ‌شده کاربر
               $('#saveSelectionCalculator').off('click').on('click', function() {
+                // مقدار تایپ‌شده کاربر را دوباره در input قرار بده تا هیچ sync یا event مقدار را تغییر ندهد
+                const userTyped = $appointmentCount.data('userTyped') || $appointmentCount.val();
+                $appointmentCount.val(userTyped);
                 const count = parseInt($appointmentCount.val());
                 const time = parseInt($timeCount.val());
+                // لاگ برای دیباگ
+                console.log('مقدار ارسال به Livewire (appointment_count):', count);
                 if (!count || !time || time < 5) {
                   toastr.error('تعداد نوبت یا زمان هر نوبت نامعتبر است یا کمتر از ۵ دقیقه است.');
                   return;
                 }
-                @this.set('calculator.appointment_count', count);
-                @this.set('calculator.time_per_appointment', time);
-                @this.call('saveCalculator');
+                // مقدار زمان شروع و پایان را از inputها بگیر
+                const startTime = $(`#morning-start-${day}-${index}`).val();
+                const endTime = $(`#morning-end-${day}-${index}`).val();
+                @this.call('saveCalculator', day, index, count, time, startTime, endTime).then(() => {
+                  $(`#morning-patients-${day}-${index}`).val(count);
+                });
+              });
+              // هر بار که کاربر تایپ می‌کند، مقدار را در data-userTyped ذخیره کن
+              $appointmentCount.off('input').on('input', function() {
+                if (isUpdating) return;
+                isUpdating = true;
+                $(this).data('userTyped', this.value);
+                const count = parseInt(this.value);
+                if (count && !isNaN(count) && count > 0) {
+                  const timePerAppointment = Math.floor(totalMinutes / count);
+                  if (timePerAppointment < 5) {
+                    toastr.error('تعداد نوبت‌ها بیش از حد مجاز است. حداقل زمان هر نوبت باید ۵ دقیقه باشد.');
+                    $timeCount.val('');
+                  } else {
+                    $timeCount.val(timePerAppointment);
+                  }
+                } else {
+                  $timeCount.val('');
+                }
+                isUpdating = false;
               });
               // اطمینان از بسته شدن مودال با event
               Livewire.on('close-modal', (event) => {
@@ -885,10 +904,10 @@
                   'btn-primary';
                 const disabledAttr = !autoScheduling ? 'disabled' : '';
                 const $button = $(`
-                <button type="button" class="btn btn-sm time-slot-btn ${buttonClass}" data-time="${time}" ${disabledAttr}>
-                  ${time}
-                </button>
-              `);
+        <button type="button" class="btn btn-sm time-slot-btn ${buttonClass}" data-time="${time}" ${disabledAttr}>
+          ${time}
+        </button>
+      `);
                 $timesContainer.append($button);
               });
               $timesContainer.show();
@@ -1247,4 +1266,5 @@
       });
     </script>
   </div>
+</div>
 </div>
