@@ -72,6 +72,8 @@ class DoctorListingController extends Controller
 
                 $query = Doctor::query()
                     ->where('status', true)
+                    ->whereNotNull('first_name')->where('first_name', '!=', '')
+                    ->whereNotNull('last_name')->where('last_name', '!=', '')
                     ->with([
                         'specialty'     => fn ($q) => $q->select('id', 'name'),
                         'province'      => fn ($q) => $q->select('id', 'name'),
@@ -190,6 +192,9 @@ class DoctorListingController extends Controller
                         }])->orderBy('successful_appointments_count', 'desc');
                         break;
                     case 'appointment_asc':
+                        $query->orderBy('id', 'asc');
+                        break;
+                    default:
                         $query->orderBy('id', 'asc');
                         break;
                 }
