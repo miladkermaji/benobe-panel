@@ -1674,6 +1674,7 @@ class Workhours extends Component
     public function updatedCalculatorAppointmentCount($value)
     {
         try {
+            // فقط مقدار مقابل را محاسبه کن و مقدار ورودی کاربر را هرگز تغییر نده
             if (!$value || !is_numeric($value) || $value <= 0) {
                 $this->calculator['time_per_appointment'] = null;
                 return;
@@ -1696,7 +1697,13 @@ class Workhours extends Component
                 $this->showError('تعداد نوبت‌ها نمی‌تواند بیشتر از کل زمان باشد');
                 return;
             }
-            $this->calculator['time_per_appointment'] = round($totalMinutes / $value);
+            $timePerAppointment = $value > 0 ? $totalMinutes / $value : null;
+            if ($timePerAppointment !== null && $timePerAppointment < 5) {
+                $this->calculator['time_per_appointment'] = null;
+                $this->showError('تعداد نوبت‌ها بیش از حد مجاز است. حداقل زمان هر نوبت باید ۵ دقیقه باشد.');
+                return;
+            }
+            $this->calculator['time_per_appointment'] = $timePerAppointment;
             $this->calculationMode = 'count';
         } catch (\Exception $e) {
             Log::error('Error in updatedCalculatorAppointmentCount: ' . $e->getMessage(), [
@@ -1720,6 +1727,7 @@ class Workhours extends Component
     public function updatedCalculatorTimePerAppointment($value)
     {
         try {
+            // فقط مقدار مقابل را محاسبه کن و مقدار ورودی کاربر را هرگز تغییر نده
             if (!$value || !is_numeric($value) || $value <= 0) {
                 $this->calculator['appointment_count'] = null;
                 return;
@@ -1742,7 +1750,13 @@ class Workhours extends Component
                 $this->showError('زمان هر نوبت نمی‌تواند بیشتر از کل زمان باشد');
                 return;
             }
-            $this->calculator['appointment_count'] = round($totalMinutes / $value);
+            if ($value < 5) {
+                $this->calculator['appointment_count'] = null;
+                $this->showError('حداقل زمان هر نوبت باید ۵ دقیقه باشد.');
+                return;
+            }
+            $appointmentCount = $value > 0 ? $totalMinutes / $value : null;
+            $this->calculator['appointment_count'] = $appointmentCount;
             $this->calculationMode = 'time';
         } catch (\Exception $e) {
             Log::error('Error in updatedCalculatorTimePerAppointment: ' . $e->getMessage(), [
@@ -1792,7 +1806,7 @@ class Workhours extends Component
 
             $day = $this->calculator['day'];
             $index = $this->calculator['index'];
-            $appointmentCount = $this->calculator['appointment_count']; // اصلاح کلید
+            $appointmentCount = $this->calculator['appointment_count'];
             $startTime = $this->calculator['start_time'];
             $endTime = $this->calculator['end_time'];
             $newSlot = [
@@ -1844,14 +1858,11 @@ class Workhours extends Component
                     $workHours = $workSchedule->work_hours;
                 }
 
-                // بررسی اینکه آیا زمان‌بندی تغییر کرده است
                 $isSameTime = isset($workHours[$index]) &&
                               $workHours[$index]['start'] === $newSlot['start'] &&
                               $workHours[$index]['end'] === $newSlot['end'];
 
-                // فقط اگر زمان‌بندی تغییر کرده باشد یا اسلات جدید باشد، بررسی تطابق و تداخل انجام شود
                 if (!$isSameTime || !isset($workHours[$index])) {
-                    // بررسی تطابق کامل با سایر اسلات‌ها
                     $slotExists = array_filter($workHours, function ($slot, $i) use ($newSlot, $index) {
                         return $i !== $index && $slot['start'] === $newSlot['start'] && $slot['end'] === $newSlot['end'];
                     }, ARRAY_FILTER_USE_BOTH);
@@ -1865,7 +1876,6 @@ class Workhours extends Component
                         ));
                     }
 
-                    // بررسی تداخل زمانی با سایر اسلات‌ها
                     foreach ($workHours as $i => $slot) {
                         if ($i === $index) {
                             continue;
@@ -1883,11 +1893,9 @@ class Workhours extends Component
                     }
                 }
 
-                // اگر ایندکس وجود ندارد، اسلات جدید اضافه شود
                 if (!isset($workHours[$index])) {
                     $workHours[$index] = $newSlot;
                 } else {
-                    // ویرایش اسلات موجود
                     $workHours[$index] = $newSlot;
                 }
 
@@ -1900,7 +1908,6 @@ class Workhours extends Component
                     'max_appointments' => $appointmentCount,
                 ];
 
-                // بهینه‌سازی: ذخیره تنظیمات نوبت‌دهی برای تمام روزهای هفته
                 $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
                 $newSetting = [
                     'start_time' => '00:00',
@@ -1951,7 +1958,6 @@ class Workhours extends Component
                         ->get();
                 }
 
-                // به‌روزرسانی تنظیمات نوبت‌دهی
                 foreach ($schedules as $schedule) {
                     $appointmentSettings = is_array($schedule->appointment_settings)
                         ? $schedule->appointment_settings
@@ -1977,6 +1983,7 @@ class Workhours extends Component
                     'type' => 'success',
                 ]);
                 $this->dispatch('close-calculator-modal');
+                $this->dispatch('close-modal', ['name' => 'calculator-modal']);
                 $this->dispatch('refresh-work-hours');
                 /* $this->reset(['calculator', 'calculationMode']); */
             } catch (\Exception $e) {

@@ -606,7 +606,7 @@
                 <div class="input-group position-relative mx-2">
                   <label class="label-top-input-special-takhasos">تعداد نوبت‌ها</label>
                   <input type="number" class="form-control text-center h-50 rounded-0 border-radius-0"
-                    id="appointment-count" wire:model.live="calculator.appointment_count" style="height: 50px;">
+                    id="appointment-count" style="height: 50px;">
                   <span class="input-group-text px-2 count-span-prepand-style">نوبت</span>
                 </div>
               </div>
@@ -620,7 +620,7 @@
                 <div class="input-group position-relative mx-2">
                   <label class="label-top-input-special-takhasos">زمان هر نوبت</label>
                   <input type="number" class="form-control text-center h-50 rounded-0 border-radius-0"
-                    id="time-count" wire:model.live="calculator.time_per_appointment" style="height: 50px;">
+                    id="time-count" style="height: 50px;">
                   <span class="input-group-text px-2">دقیقه</span>
                 </div>
               </div>
@@ -702,94 +702,85 @@
                 @this.set('modalOpen', true);
                 return;
               }
-              // بازیابی مقادیر قبلی از slots
-              const currentCount = maxAppointments ? parseInt(maxAppointments) : @this.get(
-                'calculator.appointment_count');
-              const currentMode = @this.get('calculationMode');
-              if (currentCount && currentMode === 'count') {
-                $appointmentCount.val(currentCount);
-                const timePerAppointment = Math.round(totalMinutes / currentCount);
-                $timeCount.val(timePerAppointment);
-                @this.set('calculator.appointment_count', currentCount);
-                @this.set('calculator.time_per_appointment', timePerAppointment);
-                $countRadio.prop('checked', true);
-                $appointmentCount.prop('disabled', false);
-                $timeCount.prop('disabled', true);
-              } else if (currentMode === 'time' && @this.get('calculator.time_per_appointment')) {
-                const timePerAppointment = @this.get('calculator.time_per_appointment');
-                $timeCount.val(timePerAppointment);
-                const appointmentCount = Math.round(totalMinutes / timePerAppointment);
-                $appointmentCount.val(appointmentCount);
-                @this.set('calculator.time_per_appointment', timePerAppointment);
-                @this.set('calculator.appointment_count', appointmentCount);
-                $timeRadio.prop('checked', true);
-                $timeCount.prop('disabled', false);
-                $appointmentCount.prop('disabled', true);
-              } else {
-                $appointmentCount.val('');
-                $timeCount.val('');
-                @this.set('calculator.appointment_count', null);
-                @this.set('calculator.time_per_appointment', null);
-                $countRadio.prop('checked', true);
-                $appointmentCount.prop('disabled', false);
-                $timeCount.prop('disabled', true);
-              }
-              // تابع برای فراخوانی saveCalculator با debounce
-              let debounceTimeout;
-              const debounceSaveCalculator = () => {
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(() => {
-                  if (@this.get('calculator.start_time') && @this.get('calculator.end_time') && @this.get(
-                      'calculator.appointment_count')) {
-                    @this.call('saveCalculator');
-                  }
-                }, 500); // تأخیر 500 میلی‌ثانیه
-              };
-              $appointmentCount.on('input', function() {
+              // مقداردهی اولیه فقط از اسلات
+              $appointmentCount.val(maxAppointments ? parseInt(maxAppointments) : '');
+              $timeCount.val(maxAppointments && maxAppointments > 0 ? Math.round(totalMinutes / maxAppointments) :
+                '');
+              $appointmentCount.prop('disabled', false);
+              $timeCount.prop('disabled', true);
+              $countRadio.prop('checked', true);
+              let isUpdating = false;
+              $appointmentCount.off('input').on('input', function() {
+                if (isUpdating) return;
+                isUpdating = true;
                 const count = parseInt($(this).val());
                 if (count && !isNaN(count) && count > 0) {
                   const timePerAppointment = Math.round(totalMinutes / count);
+                  if (timePerAppointment < 5) {
+                    toastr.error('تعداد نوبت‌ها بیش از حد مجاز است. حداقل زمان هر نوبت باید ۵ دقیقه باشد.');
+                    $timeCount.val('');
+                    isUpdating = false;
+                    return;
+                  }
                   $timeCount.val(timePerAppointment);
-                  @this.set('calculator.appointment_count', count);
-                  @this.set('calculator.time_per_appointment', timePerAppointment);
-                  debounceSaveCalculator();
                 } else {
                   $timeCount.val('');
-                  @this.set('calculator.appointment_count', null);
-                  @this.set('calculator.time_per_appointment', null);
                 }
+                isUpdating = false;
               });
-              $timeCount.on('input', function() {
+              $timeCount.off('input').on('input', function() {
+                if (isUpdating) return;
+                isUpdating = true;
                 const time = parseInt($(this).val());
                 if (time && !isNaN(time) && time > 0) {
+                  if (time < 5) {
+                    toastr.error('حداقل زمان هر نوبت باید ۵ دقیقه باشد.');
+                    $appointmentCount.val('');
+                    isUpdating = false;
+                    return;
+                  }
                   const appointmentCount = Math.round(totalMinutes / time);
                   $appointmentCount.val(appointmentCount);
-                  @this.set('calculator.time_per_appointment', time);
-                  @this.set('calculator.appointment_count', appointmentCount);
-                  debounceSaveCalculator();
                 } else {
                   $appointmentCount.val('');
-                  @this.set('calculator.appointment_count', null);
-                  @this.set('calculator.time_per_appointment', null);
                 }
+                isUpdating = false;
               });
-              $countRadio.on('change', function() {
+              $countRadio.off('change').on('change', function() {
                 if ($(this).is(':checked')) {
                   $appointmentCount.prop('disabled', false);
                   $timeCount.prop('disabled', true);
-                  @this.set('calculationMode', 'count');
-                  if (@this.get('calculator.appointment_count')) {
-                    debounceSaveCalculator();
-                  }
                 }
               });
-              $timeRadio.on('change', function() {
+              $timeRadio.off('change').on('change', function() {
                 if ($(this).is(':checked')) {
                   $timeCount.prop('disabled', false);
                   $appointmentCount.prop('disabled', true);
-                  @this.set('calculationMode', 'time');
-                  if (@this.get('calculator.time_per_appointment')) {
-                    debounceSaveCalculator();
+                }
+              });
+              // ذخیره فقط با دکمه
+              $('#saveSelectionCalculator').off('click').on('click', function() {
+                const count = parseInt($appointmentCount.val());
+                const time = parseInt($timeCount.val());
+                if (!count || !time || time < 5) {
+                  toastr.error('تعداد نوبت یا زمان هر نوبت نامعتبر است یا کمتر از ۵ دقیقه است.');
+                  return;
+                }
+                @this.set('calculator.appointment_count', count);
+                @this.set('calculator.time_per_appointment', time);
+                @this.call('saveCalculator');
+              });
+              // اطمینان از بسته شدن مودال با event
+              Livewire.on('close-modal', (event) => {
+                const modalName = event?.name || (event && event[0]?.name) || null;
+                if (modalName === 'calculator-modal') {
+                  window.dispatchEvent(new CustomEvent('close-modal', {
+                    detail: {
+                      name: 'calculator-modal'
+                    }
+                  }));
+                  if (window.$ && $('#calculator-modal').length) {
+                    $('#calculator-modal').modal('hide');
                   }
                 }
               });
