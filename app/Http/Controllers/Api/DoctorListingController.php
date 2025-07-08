@@ -38,7 +38,7 @@ class DoctorListingController extends Controller
             $insuranceId              = $request->input('insurance_id');
             $limit                    = $request->input('limit', 50);
             $page                     = $request->input('page', 1);
-            $sort                     = $request->input('sort', 'rating_desc');
+            $sort                     = $request->input('sort', 'appointment_asc');
             $serviceType              = $request->input('service_type', 'in_person');
 
             // اعتبارسنجی پارامترها
