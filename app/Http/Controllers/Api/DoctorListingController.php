@@ -21,7 +21,7 @@ class DoctorListingController extends Controller
                 'province_id'                => 'nullable|integer|exists:zone,id',
                 'specialty_id'               => 'nullable|integer|exists:specialties,id',
                 'sex'                        => 'nullable|in:male,female,both',
-                'has_available_appointments' => 'nullable|boolean',
+                // 'has_available_appointments' => 'nullable|boolean', // حذف اعتبارسنجی بولین
                 'service_id'                 => 'nullable|integer|exists:services,id',
                 'insurance_id'               => 'nullable|integer|exists:insurances,id',
                 'limit'                      => 'nullable|integer|min:1|max:100',
@@ -33,7 +33,7 @@ class DoctorListingController extends Controller
             $provinceId               = $request->input('province_id');
             $specialtyId              = $request->input('specialty_id');
             $gender                   = $request->input('sex');
-            $hasAvailableAppointments = $request->input('has_available_appointments', false);
+            $hasAvailableAppointments = filter_var($request->input('has_available_appointments', false), FILTER_VALIDATE_BOOLEAN);
             $serviceId                = $request->input('service_id');
             $insuranceId              = $request->input('insurance_id');
             $limit                    = $request->input('limit', 50);
