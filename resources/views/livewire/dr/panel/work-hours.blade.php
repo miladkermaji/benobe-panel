@@ -568,7 +568,7 @@
           </div>
           <div class="d-flex flex-column gap-1" id="copy-schedule-day-checkboxes">
             @foreach (['saturday' => 'شنبه', 'sunday' => 'یک‌شنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
-              @if ($day !== $copySourceDay)
+              @if ($day !== ($copySourceDay ?? null))
                 <div class="form-check d-flex align-items-center" data-day="{{ $day }}">
                   <input type="checkbox" class="form-check-input me-1" id="copy-schedule-day-{{ $day }}"
                     wire:model.live="selectedCopyScheduleDays.{{ $day }}" data-day="{{ $day }}">
@@ -626,7 +626,7 @@
           </div>
           <div class="w-100 d-flex justify-content-end p-1 gap-4 mt-3">
             <button type="button" class="btn my-btn-primary w-100 d-flex justify-content-center align-items-center"
-               id="saveSelectionCalculator" style="height: 50px;">
+              id="saveSelectionCalculator" style="height: 50px;">
               <span class="button_text">ذخیره تغییرات</span>
               <div class="loader"></div>
             </button>
@@ -646,7 +646,7 @@
           </div>
           <div class="d-flex flex-column gap-2" id="day-checkboxes">
             @foreach (['saturday' => 'شنبه', 'sunday' => 'یک‌شنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
-              @if ($day !== $sourceDay)
+              @if ($day !== ($copySource['day'] ?? null))
                 <div class="form-check d-flex align-items-center" data-day="{{ $day }}">
                   <input type="checkbox" class="form-check-input me-2" id="day-{{ $day }}"
                     wire:model.live="selectedDays.{{ $day }}" data-day="{{ $day }}">
@@ -818,13 +818,6 @@
               @this.set('copySource.index', index);
               @this.set('selectedDays', []);
               @this.set('selectAllCopyModal', false);
-              setTimeout(() => {
-                const selector = `#day-checkboxes .form-check[data-day="${day}"]`;
-                const $element = $(selector);
-                if ($element.length > 0) {
-                  $element.hide();
-                }
-              }, 100);
             } catch (error) {
               console.error('Error setting copySource:', error);
               window.dispatchEvent(new CustomEvent('close-modal', {
@@ -954,13 +947,6 @@
               @this.set('copySourceIndex', index);
               @this.set('selectedCopyScheduleDays', []);
               @this.set('selectAllCopyScheduleModal', false);
-              setTimeout(() => {
-                const selector = `#copy-schedule-day-checkboxes .form-check[data-day="${day}"]`;
-                const $element = $(selector);
-                if ($element.length > 0) {
-                  $element.hide();
-                }
-              }, 100);
             } catch (error) {
               console.error('Error setting copyScheduleSource:', error);
               window.dispatchEvent(new CustomEvent('close-modal', {
