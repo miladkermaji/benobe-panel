@@ -181,7 +181,7 @@ class DoctorListingController extends Controller
                         $doctors = $query->paginate($limit, ['*'], 'page', $page);
                         $doctors->getCollection()->sortBy(function ($doctor) use ($serviceType) {
                             $slotData = $this->getNextAvailableSlot($doctor, $serviceType);
-                            return $slotData['next_available_slot'] ? Carbon::parse($slotData['next_available_slot'])->timestamp : PHP_INT_MAX;
+                            return $slotData['next_available_slot_gregorian'] ? Carbon::parse($slotData['next_available_slot_gregorian'])->timestamp : PHP_INT_MAX;
                         });
                         return $doctors;
                     case 'successful_appointments_desc':
@@ -310,6 +310,7 @@ class DoctorListingController extends Controller
 
         $slots             = [];
         $nextAvailableSlot = null;
+        $nextAvailableSlotGregorian = null;
 
         for ($i = 0; $i < $calendarDays; $i++) {
             $checkDayIndex  = ($currentDayIndex + $i) % 7;
@@ -354,6 +355,7 @@ class DoctorListingController extends Controller
                             $activeSlots[] = $slotTime;
                             if (! $nextAvailableSlot) {
                                 $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                                $nextAvailableSlotGregorian = $checkDate->toDateString() . ' ' . $slotTime;
                             }
                         }
                     } else {
@@ -361,6 +363,7 @@ class DoctorListingController extends Controller
                             $activeSlots[] = $slotTime;
                             if (! $nextAvailableSlot) {
                                 $nextAvailableSlot = "$jalaliDate ساعت $slotTime";
+                                $nextAvailableSlotGregorian = $checkDate->toDateString() . ' ' . $slotTime;
                             }
                         }
                     }
@@ -386,6 +389,7 @@ class DoctorListingController extends Controller
 
         return [
             'next_available_slot' => $nextAvailableSlot,
+            'next_available_slot_gregorian' => $nextAvailableSlotGregorian,
             'slots'               => $slots,
             'max_appointments'    => $schedules->first()->appointment_settings[0]['max_appointments'] ?? 22,
         ];
