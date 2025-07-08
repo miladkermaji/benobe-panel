@@ -181,7 +181,7 @@ class DoctorListingController extends Controller
                         $doctors = $query->paginate($limit, ['*'], 'page', $page);
                         $doctors->getCollection()->sortBy(function ($doctor) use ($serviceType) {
                             $slotData = $this->getNextAvailableSlot($doctor, $serviceType);
-                            return $slotData['next_available_slot_gregorian'] ? Carbon::parse($slotData['next_available_slot_gregorian'])->timestamp : PHP_INT_MAX;
+                            return !empty($slotData['next_available_slot_gregorian']) ? Carbon::parse($slotData['next_available_slot_gregorian'])->timestamp : PHP_INT_MAX;
                         });
                         return $doctors;
                     case 'successful_appointments_desc':
