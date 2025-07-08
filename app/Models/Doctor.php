@@ -474,7 +474,8 @@ class Doctor extends Authenticatable implements JWTSubject
 
     public function services()
     {
-        return $this->belongsToMany(Service::class, 'doctor_service', 'doctor_id', 'service_id');
+        return $this->belongsToMany(Service::class, 'doctor_services', 'doctor_id', 'service_id')
+            ->withPivot(['clinic_id', 'insurance_id', 'name', 'description', 'status', 'duration', 'price', 'discount', 'parent_id']);
     }
 
     /**
