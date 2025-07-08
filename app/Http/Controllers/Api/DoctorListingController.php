@@ -24,7 +24,7 @@ class DoctorListingController extends Controller
                 // 'has_available_appointments' => 'nullable|boolean', // حذف اعتبارسنجی بولین
                 'service_id'                 => 'nullable|integer|exists:services,id',
                 'insurance_id'               => 'nullable|integer|exists:insurances,id',
-                'limit'                      => 'nullable|integer|min:1|max:100',
+                'limit'                      => 'nullable|integer|min:1',
                 'page'                       => 'nullable|integer|min:1',
                 'sort'                       => 'nullable|in:rating_desc,views_desc,appointment_soonest,successful_appointments_desc,appointment_asc',
                 'service_type'               => 'nullable|in:in_person,phone,text,video',
