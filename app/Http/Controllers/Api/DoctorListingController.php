@@ -22,10 +22,8 @@ class DoctorListingController extends Controller
                 'specialty_id'               => 'nullable|integer|exists:specialties,id',
                 'sex'                        => 'nullable|in:male,female,both',
                 'has_available_appointments' => 'nullable|boolean',
-                'service_ids'                => 'nullable|array',
-                'service_ids.*'              => 'integer|exists:services,id',
-                'insurance_ids'              => 'nullable|array',
-                'insurance_ids.*'            => 'integer|exists:insurances,id',
+                'service_id'                 => 'nullable|integer|exists:services,id',
+                'insurance_id'               => 'nullable|integer|exists:insurances,id',
                 'limit'                      => 'nullable|integer|min:1|max:100',
                 'page'                       => 'nullable|integer|min:1',
                 'sort'                       => 'nullable|in:rating_desc,views_desc,appointment_soonest,successful_appointments_desc,appointment_asc',
@@ -36,8 +34,8 @@ class DoctorListingController extends Controller
             $specialtyId              = $request->input('specialty_id');
             $gender                   = $request->input('sex');
             $hasAvailableAppointments = $request->input('has_available_appointments', false);
-            $serviceIds               = $request->input('service_ids');
-            $insuranceIds             = $request->input('insurance_ids');
+            $serviceId                = $request->input('service_id');
+            $insuranceId              = $request->input('insurance_id');
             $limit                    = $request->input('limit', 50);
             $page                     = $request->input('page', 1);
             $sort                     = $request->input('sort', 'rating_desc');
@@ -64,11 +62,11 @@ class DoctorListingController extends Controller
             }
 
             $cacheKey = "doctors_list_{$provinceId}_{$specialtyId}_{$gender}_{$hasAvailableAppointments}_" .
-                (is_array($serviceIds) ? implode('_', $serviceIds) : 'no_services') . "_" .
-                (is_array($insuranceIds) ? implode('_', $insuranceIds) : 'no_insurances') .
+                ($serviceId ?? 'no_service') . "_" .
+                ($insuranceId ?? 'no_insurance') .
                 "_{$limit}_{$page}_{$sort}_{$serviceType}";
 
-            $doctors = Cache::remember($cacheKey, 300, function () use ($provinceId, $specialtyId, $gender, $hasAvailableAppointments, $serviceIds, $insuranceIds, $limit, $page, $sort, $serviceType) {
+            $doctors = Cache::remember($cacheKey, 300, function () use ($provinceId, $specialtyId, $gender, $hasAvailableAppointments, $serviceId, $insuranceId, $limit, $page, $sort, $serviceType) {
                 $today        = Carbon::today('Asia/Tehran');
                 $calendarDays = 30;
 
@@ -143,16 +141,16 @@ class DoctorListingController extends Controller
                 }
 
                 // فیلتر کردن بر اساس خدمات
-                if ($serviceIds) {
-                    $query->whereHas('services', function ($q) use ($serviceIds) {
-                        $q->whereIn('services.id', $serviceIds);
+                if ($serviceId) {
+                    $query->whereHas('services', function ($q) use ($serviceId) {
+                        $q->where('services.id', $serviceId);
                     });
                 }
 
-                // فیلتر کردن بر اساس بیمه‌ها
-                if ($insuranceIds) {
-                    $query->whereHas('insurances', function ($q) use ($insuranceIds) {
-                        $q->whereIn('insurances.id', $insuranceIds);
+                // فیلتر کردن بر اساس بیمه
+                if ($insuranceId) {
+                    $query->whereHas('insurances', function ($q) use ($insuranceId) {
+                        $q->where('insurances.id', $insuranceId);
                     });
                 }
 
