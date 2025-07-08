@@ -25,6 +25,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use App\Models\Doctors\DoctorManagement\DoctorTariff;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\Service;
 
 class Doctor extends Authenticatable implements JWTSubject
 {
@@ -469,6 +470,11 @@ class Doctor extends Authenticatable implements JWTSubject
     public function manager()
     {
         return $this->belongsTo(Manager::class);
+    }
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'doctor_service', 'doctor_id', 'service_id');
     }
 
     /**
