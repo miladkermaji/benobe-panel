@@ -192,10 +192,10 @@ class DoctorListingController extends Controller
                         }])->orderBy('successful_appointments_count', 'desc');
                         break;
                     case 'appointment_asc':
-                        $query->orderBy('id', 'asc');
+                        $query->orderBy('id', 'desc');
                         break;
                     default:
-                        $query->orderBy('id', 'asc');
+                        $query->orderBy('id', 'desc');
                         break;
                 }
 
