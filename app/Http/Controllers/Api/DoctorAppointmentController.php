@@ -233,6 +233,15 @@ class DoctorAppointmentController extends Controller
         $appointmentConfig = $doctor->appointmentConfig;
         $calendarDays = $appointmentConfig ? ($appointmentConfig->calendar_days ?? 30) : 30;
         $defaultDuration = $appointmentConfig ? ($appointmentConfig->appointment_duration ?? 15) : 15;
+        $autoScheduling = $appointmentConfig ? $appointmentConfig->auto_scheduling : 1;
+        if (!$autoScheduling) {
+            return [
+                'next_available_slot' => null,
+                'next_available_datetime' => null,
+                'slots' => [],
+                'max_appointments' => null,
+            ];
+        }
 
         // دریافت نوبت‌های رزروشده
         $bookedAppointments = Appointment::where('doctor_id', $doctorId)
@@ -540,8 +549,8 @@ class DoctorAppointmentController extends Controller
 
         // دریافت تنظیمات مشاوره
         $counselingConfig = DoctorCounselingConfig::where('doctor_id', $doctorId)->first();
-        if (!$counselingConfig || !$counselingConfig->{"has_{$type}_counseling"}) {
-            Log::warning("GetNextAvailableOnlineSlot - Counseling type {$type} is not enabled for doctor {$doctorId}");
+        $autoScheduling = $counselingConfig ? $counselingConfig->auto_scheduling : 1;
+        if (!$autoScheduling) {
             return [
                 'next_available_slot' => null,
                 'next_available_datetime' => null,

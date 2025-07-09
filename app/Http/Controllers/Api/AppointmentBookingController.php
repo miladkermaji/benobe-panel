@@ -777,16 +777,33 @@ class AppointmentBookingController extends Controller
 
             // محاسبه زمان‌های فعال
             $availableTimes = [];
-            foreach ($workHours as $slot) {
-                $start = Carbon::parse("{$date} {$slot['start']}", 'Asia/Tehran');
-                $end = Carbon::parse("{$date} {$slot['end']}", 'Asia/Tehran');
-
-                while ($start->lessThan($end)) {
-                    $time = $start->format('H:i');
-                    if (!in_array($time, $reservedTimes)) {
-                        $availableTimes[] = $time;
+            $autoScheduling = 1;
+            if ($serviceType === 'in_person') {
+                $config = \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctor->id)
+                    ->where('clinic_id', $mainClinic->id)
+                    ->first();
+                if ($config && !$config->auto_scheduling) {
+                    $autoScheduling = 0;
+                }
+            } else {
+                $config = \App\Models\DoctorCounselingConfig::where('doctor_id', $doctor->id)
+                    ->where('clinic_id', $mainClinic->id)
+                    ->first();
+                if ($config && !$config->auto_scheduling) {
+                    $autoScheduling = 0;
+                }
+            }
+            if ($autoScheduling) {
+                foreach ($workHours as $slot) {
+                    $start = Carbon::parse("{$date} {$slot['start']}", 'Asia/Tehran');
+                    $end = Carbon::parse("{$date} {$slot['end']}", 'Asia/Tehran');
+                    while ($start->lessThan($end)) {
+                        $time = $start->format('H:i');
+                        if (!in_array($time, $reservedTimes)) {
+                            $availableTimes[] = $time;
+                        }
+                        $start->addMinutes($duration);
                     }
-                    $start->addMinutes($duration);
                 }
             }
 
