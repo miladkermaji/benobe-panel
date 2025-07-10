@@ -20,36 +20,10 @@ class DoctorsClinicManagementController extends Controller
      */
     public function index(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $clinic = $this->getSelectedClinic();
-        $clinicId = $this->getSelectedClinicId();
-
-        // بازیابی مطب‌ها با اطلاعات شهر و استان
-        $clinics = Clinic::where('doctor_id', $doctorId)
-            ->with(['city', 'province'])
-            ->get();
-        // بازیابی و کش کردن اطلاعات استان‌ها و شهرها
-        $zones = Cache::remember('zones', 86400, function () {
-            return Zone::where('status', 1)
-                ->orderBy('sort')
-                ->get(['id', 'name', 'parent_id', 'level']);
-        });
-
-        // دسته‌بندی اطلاعات به استان و شهر
-        $provinces = $zones->where('level', 1);                       // سطح 1 => استان‌ها
-        $cities    = $zones->where('level', 2)->groupBy('parent_id'); // سطح 2 => شهرها
-
-        // پاسخ به درخواست‌های Ajax
-        if ($request->ajax()) {
-            return response()->json([
-                'clinics'   => $clinics,
-                'provinces' => $provinces,
-                'cities'    => $cities,
-            ]);
-        }
+       
 
         // ارسال داده‌ها به ویو
-        return view('dr.panel.doctors-clinic.index', compact('clinics', 'provinces', 'cities', 'clinic', 'clinicId'));
+        return view('dr.panel.doctors-clinic.index');
     }
 
     public function getProvincesAndCities()
@@ -69,16 +43,7 @@ class DoctorsClinicManagementController extends Controller
     }
     public function create()
     {
-        $zones = Cache::remember('zones', 86400, function () {
-            return Zone::where('status', 1)
-                ->orderBy('sort')
-                ->get(['id', 'name', 'parent_id', 'level']);
-        });
-
-        $provinces = $zones->where('level', 1);
-        $cities = $zones->where('level', 2)->groupBy('parent_id');
-
-        return view('dr.panel.doctors-clinic.create', compact('provinces', 'cities'));
+        return view('dr.panel.doctors-clinic.create');
     }
 
     public function store(Request $request)
@@ -168,16 +133,7 @@ class DoctorsClinicManagementController extends Controller
     public function edit($id)
     {
         $clinic = Clinic::findOrFail($id);
-        $zones = Cache::remember('zones', 86400, function () {
-            return Zone::where('status', 1)
-                ->orderBy('sort')
-                ->get(['id', 'name', 'parent_id', 'level']);
-        });
-
-        $provinces = $zones->where('level', 1);
-        $cities = $zones->where('level', 2)->groupBy('parent_id');
-
-        return view('dr.panel.doctors-clinic.edit', compact('clinic', 'provinces', 'cities'));
+        return view('dr.panel.doctors-clinic.edit', compact('clinic'));
     }
 
     public function getCitiesByProvince($provinceId)
