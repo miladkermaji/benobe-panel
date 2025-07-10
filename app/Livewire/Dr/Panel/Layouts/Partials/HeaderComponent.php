@@ -110,11 +110,11 @@ class HeaderComponent extends Component
             if ($activeClinics->count() > 0) {
                 // اولین کلینیک فعال را انتخاب کن
                 $firstActiveClinic = $activeClinics->first();
-                $this->selectedClinicId = $firstActiveClinic->id;
-                $this->selectedClinicName = $firstActiveClinic->name;
-
                 // کلینیک انتخاب‌شده را در دیتابیس ذخیره کن
                 $doctor->setSelectedClinic($firstActiveClinic->id);
+                $doctor->refresh();
+                $this->selectedClinicId = $doctor->selectedClinic->clinic_id;
+                $this->selectedClinicName = $doctor->selectedClinic->clinic->name;
             } else {
                 // هیچ کلینیک فعالی ندارد، روی مشاوره آنلاین بگذار
                 $this->selectedClinicId = null;
