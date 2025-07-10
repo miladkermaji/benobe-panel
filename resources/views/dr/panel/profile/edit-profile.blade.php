@@ -779,6 +779,11 @@
             // تنظیم شهر پیش‌فرض بر اساس دیتابیس
             if (doctorCityId) {
               cityTomSelect.setValue(doctorCityId);
+              // جلوگیری از باز شدن خودکار سلکت شهر
+              setTimeout(() => {
+                cityTomSelect.blur && cityTomSelect.blur();
+                document.activeElement && document.activeElement.blur && document.activeElement.blur();
+              }, 100);
             }
           }
         })
