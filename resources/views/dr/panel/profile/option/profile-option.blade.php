@@ -284,8 +284,10 @@
                 </div>
               </div>
               <div>
-                <label for="title${inputCount}" class="label-top-input-special-takhasos-elem-create">عنوان تخصص</label>
-                <input type="text" name="titles[${inputCount}]" id="title${inputCount}" class="form-control h-50 w-100 border-radius-6 mt-3">
+                <div class="form-group position-relative mt-2">
+                  <label for="title${inputCount}" class="label-top-input-special-takhasos-elem-create">عنوان تخصص</label>
+                  <input type="text" name="titles[${inputCount-1}]" id="title${inputCount}" class="form-control h-50 w-100 border-radius-6 mt-3">
+                </div>
               </div>
             </div>
           </div>
@@ -592,8 +594,10 @@
                             </div>
                         </div>
                         <div>
-                            <label for="title${inputCount + 1}" class="label-top-input-special-takhasos-elem-create">عنوان تخصص</label>
-                            <input type="text" name="titles[${inputCount}]" id="title${inputCount + 1}" class="form-control h-50 w-100 border-radius-6 mt-3">
+                            <div class="form-group position-relative mt-2">
+                                <label for="title${inputCount + 1}" class="label-top-input-special-takhasos-elem-create">عنوان تخصص</label>
+                                <input type="text" name="titles[${inputCount}]" id="title${inputCount + 1}" class="form-control h-50 w-100 border-radius-6 mt-3">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -880,8 +884,10 @@
                 </div>
               </div>
               <div>
-                <label for="title${index + 1}" class="label-top-input-special-takhasos-elem-create">عنوان تخصص</label>
-                <input type="text" name="titles[${index}]" id="title${index + 1}" class="form-control h-50 w-100 border-radius-6 mt-3" value="${titleValue}">
+                <div class="form-group position-relative mt-2">
+                  <label for="title${index + 1}" class="label-top-input-special-takhasos-elem-create">عنوان تخصص</label>
+                  <input type="text" name="titles[${index}]" id="title${index + 1}" class="form-control h-50 w-100 border-radius-6 mt-3" value="${titleValue}">
+                </div>
               </div>
             </div>
           </div>

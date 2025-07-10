@@ -285,7 +285,8 @@ textarea:focus {
   font-weight: bold;
   right: inherit;
   font-size: 12px;
-  bottom: 110px;
+  bottom: 158px !important;
+  top: inherit !important;
 }
 
 /* استایل آیکون‌های نمایش رمز */
