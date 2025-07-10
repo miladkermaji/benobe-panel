@@ -1,6 +1,150 @@
 {{-- resources/views/dr/panel/profile/option/profile-option.blade.php --}}
 <script>
-  
+  // تابع کمکی برای مقداردهی اولیه Tom Select
+  function initializeTomSelect(elementId, options = {}) {
+    const selectElement = document.getElementById(elementId);
+    if (selectElement && !selectElement.tomSelect) {
+      return new TomSelect(`#${elementId}`, {
+        direction: 'rtl',
+        placeholder: options.placeholder || 'انتخاب کنید',
+        allowEmptyOption: true,
+        maxOptions: null,
+        ...options
+      });
+    }
+    return selectElement ? selectElement.tomSelect : null;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // مقداردهی اولیه Tom Select برای استان و شهر
+    const provinceTomSelect = initializeTomSelect('province_id', {
+      placeholder: 'انتخاب استان'
+    });
+    const cityTomSelect = initializeTomSelect('city_id', {
+      placeholder: 'انتخاب شهر',
+    });
+
+    if (!provinceTomSelect || !cityTomSelect) {
+      console.error('خطا در مقداردهی Tom Select برای استان یا شهر');
+      return;
+    }
+
+    const provinceSelect = document.getElementById('province_id');
+    const doctorProvinceId =
+      '@if (Auth::guard('doctor')->check()){{ Auth::guard('doctor')->user()->province_id }}@elseif (Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->province_id }}@endif';
+    const doctorCityId =
+      '@if (Auth::guard('doctor')->check()){{ Auth::guard('doctor')->user()->city_id }}@elseif (Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->city_id }}@endif';
+
+    // مدیریت تغییر در انتخاب استان
+    provinceSelect.addEventListener('change', function() {
+      const provinceId = this.value;
+
+      if (provinceId) {
+        fetch(`{{ route('dr-get-cities') }}?province_id=${provinceId}`, {
+            method: 'GET',
+            headers: {
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+              'Accept': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              cityTomSelect.clear();
+              cityTomSelect.clearOptions();
+              cityTomSelect.addOption({
+                value: '',
+                text: 'انتخاب شهر'
+              });
+              data.cities.forEach(city => {
+                cityTomSelect.addOption({
+                  value: city.id,
+                  text: city.name
+                });
+              });
+              cityTomSelect.enable();
+              cityTomSelect.refreshOptions();
+
+              // اگر تغییر دستی بود، شهر رو خالی کن
+              if (provinceId !== doctorProvinceId) {
+                cityTomSelect.setValue('');
+              }
+            } else {
+              toastr.error(data.message || 'خطا در بارگذاری شهرها');
+              cityTomSelect.clear();
+              cityTomSelect.clearOptions();
+              cityTomSelect.addOption({
+                value: '',
+                text: 'خطا در بارگذاری'
+              });
+              cityTomSelect.disable();
+            }
+          })
+          .catch(error => {
+            toastr.error('خطا در ارتباط با سرور');
+            cityTomSelect.clear();
+            cityTomSelect.clearOptions();
+            cityTomSelect.addOption({
+              value: '',
+              text: 'خطا در بارگذاری'
+            });
+            cityTomSelect.disable();
+          });
+      } else {
+        cityTomSelect.clear();
+        cityTomSelect.clearOptions();
+        cityTomSelect.addOption({
+          value: '',
+          text: 'ابتدا یک استان انتخاب کنید'
+        });
+        cityTomSelect.disable();
+      }
+    });
+
+    // لود اولیه شهرها بر اساس استان دکتر
+    if (doctorProvinceId) {
+      fetch(`{{ route('dr-get-cities') }}?province_id=${doctorProvinceId}`, {
+          method: 'GET',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            cityTomSelect.clear();
+            cityTomSelect.clearOptions();
+            cityTomSelect.addOption({
+              value: '',
+              text: 'انتخاب شهر'
+            });
+            data.cities.forEach(city => {
+              cityTomSelect.addOption({
+                value: city.id,
+                text: city.name
+              });
+            });
+            cityTomSelect.enable();
+            cityTomSelect.refreshOptions();
+
+            // تنظیم شهر پیش‌فرض بر اساس دیتابیس
+            if (doctorCityId) {
+              cityTomSelect.setValue(doctorCityId);
+              // جلوگیری از باز شدن خودکار سلکت شهر
+              setTimeout(() => {
+                cityTomSelect.blur && cityTomSelect.blur();
+                document.activeElement && document.activeElement.blur && document.activeElement.blur();
+              }, 100);
+            }
+          }
+        })
+        .catch(error => {
+          console.error('خطا در لود اولیه شهرها:', error);
+        });
+    }
+  });
+
   function updateAlert() {
     fetch("{{ route('dr-check-profile-completeness') }}", {
         method: 'GET',
@@ -523,6 +667,103 @@
         toastr.error(error.message || 'خطا در برقراری ارتباط با سرور');
       });
   });
+  // --- AUTO-SAVE FOR ADDITIONAL SPECIALTIES ---
+  function showSpecialtySaveStatus(id, status) {
+    const el = document.querySelector(`#specialty-save-status-${id}`);
+    if (el) {
+      el.innerHTML = status === 'saving' ? '<span class="spinner-border spinner-border-sm text-primary"></span>' :
+        (status === 'saved' ? '<span class="text-success">ذخیره شد</span>' : '');
+      if (status === 'saved') {
+        setTimeout(() => {
+          el.innerHTML = '';
+        }, 1500);
+      }
+    }
+  }
+
+  function autoSaveSpecialty(id) {
+    const container = document.querySelector(`[data-specialty-id='${id}']`);
+    if (!container) return;
+    const degree = container.querySelector('select[name^="degrees"]')?.value;
+    const specialty = container.querySelector('select[name^="specialties"]')?.value;
+    const title = container.querySelector('input[name^="titles"]')?.value;
+    showSpecialtySaveStatus(id, 'saving');
+    // استفاده از route برای ارسال به روت اصلی
+    fetch("{{ route('dr-specialty-update') }}", {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          specialty_id: id,
+          academic_degree_id: degree,
+          specialty_id_value: specialty,
+          specialty_title: title,
+          auto_save: true
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showSpecialtySaveStatus(id, 'saved');
+        } else {
+          showSpecialtySaveStatus(id, '');
+          toastr.error(data.message || 'خطا در ذخیره تخصص');
+        }
+      })
+      .catch(() => {
+        showSpecialtySaveStatus(id, '');
+        toastr.error('خطا در ذخیره تخصص');
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.specialty-item[data-specialty-id]').forEach(function(item) {
+      const id = item.getAttribute('data-specialty-id');
+      item.querySelectorAll('select, input').forEach(function(input) {
+        input.removeAttribute('disabled');
+        input.addEventListener('change', function() {
+          autoSaveSpecialty(id);
+        });
+      });
+      // Add save status span if not exists
+      if (!item.querySelector(`#specialty-save-status-${id}`)) {
+        const statusSpan = document.createElement('span');
+        statusSpan.id = `specialty-save-status-${id}`;
+        statusSpan.className = 'mx-2';
+        item.querySelector('input[name^="titles"]').after(statusSpan);
+      }
+    });
+
+    // TomSelect for all degree and specialty selects (main and additional)
+    document.querySelectorAll('select[id^="degree"]').forEach(function(sel) {
+      if (!sel.tomselect) new TomSelect(sel, {
+        plugins: ['clear_button'],
+        placeholder: 'انتخاب درجه علمی'
+      });
+    });
+    document.querySelectorAll('select[id^="specialty"]').forEach(function(sel) {
+      if (!sel.tomselect) new TomSelect(sel, {
+        plugins: ['clear_button'],
+        placeholder: 'انتخاب تخصص'
+      });
+    });
+    if (document.getElementById('academic_degree_id') && !document.getElementById('academic_degree_id').tomselect) {
+      new TomSelect('#academic_degree_id', {
+        plugins: ['clear_button'],
+        placeholder: 'انتخاب درجه علمی'
+      });
+    }
+    if (document.getElementById('specialties_list') && !document.getElementById('specialties_list').tomselect) {
+      new TomSelect('#specialties_list', {
+        plugins: ['clear_button'],
+        placeholder: 'انتخاب تخصص'
+      });
+    }
+  });
+  // --- END AUTO-SAVE ---
   document.getElementById("specialtyEdit").addEventListener('submit', function(e) {
     e.preventDefault();
     const form = this;
@@ -532,6 +773,13 @@
 
     buttonText.style.display = 'none';
     loader.style.display = 'block';
+
+    // ذخیره تخصص‌های اضافی (غیراصلی) به صورت جداگانه
+    const additionalSpecialties = document.querySelectorAll('.specialty-item[data-specialty-id]');
+    additionalSpecialties.forEach(function(item) {
+      const id = item.getAttribute('data-specialty-id');
+      autoSaveSpecialty(id);
+    });
 
     fetch(form.action, {
         method: form.method,
@@ -557,27 +805,9 @@
         loader.style.display = 'none';
         if (data.success) {
           toastr.success(data.message || "تخصص با موفقیت به‌روز شد");
-
-          // به‌روزرسانی هشدارها و بخش‌های پروفایل
           updateAlert();
           callCheckProfileCompleteness();
           updateProfileSections(data);
-
-          // به‌روزرسانی تخصص‌ها با داده‌های جدید از سرور
-          if (data.specialties) {
-            updateSpecialties(data.specialties); // این تابع باید تخصص جدید را با ID اضافه کند
-          }
-
-          // اطمینان از اینکه دکمه حذف برای تخصص جدید فعال باشد
-          const newSpecialtyId = data.new_specialty_id; // فرض می‌کنیم سرور ID تخصص جدید را برمی‌گرداند
-          if (newSpecialtyId) {
-            const latestInputGroup = document.querySelector('#additionalInputs .specialty-item:last-child');
-            if (latestInputGroup) {
-              latestInputGroup.setAttribute('data-specialty-id', newSpecialtyId);
-              const removeButton = latestInputGroup.querySelector('.remove-form-item');
-              removeButton.setAttribute('onclick', `removeInput(this)`); // تنظیم تابع حذف
-            }
-          }
         } else {
           toastr.error(data.message || "خطا در به‌روزرسانی تخصص");
         }
@@ -960,8 +1190,8 @@
         });
     });
   });
-// مدیریت ارسال فرم
-document.getElementById("staticPasswordForm").addEventListener('submit', function(e) {
+  // مدیریت ارسال فرم
+  document.getElementById("staticPasswordForm").addEventListener('submit', function(e) {
     e.preventDefault();
     const form = this;
     const submitButton = form.querySelector('button[type="submit"]');
@@ -975,75 +1205,75 @@ document.getElementById("staticPasswordForm").addEventListener('submit', functio
         method: 'POST',
         body: new FormData(form),
         headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'X-Requested-With': 'XMLHttpRequest',
         },
-    })
-    .then(response => {
+      })
+      .then(response => {
         if (!response.ok) {
-            return response.json().then(errorData => {
-                throw {
-                    status: response.status,
-                    data: errorData
-                };
-            });
+          return response.json().then(errorData => {
+            throw {
+              status: response.status,
+              data: errorData
+            };
+          });
         }
         return response.json();
-    })
-    .then(data => {
+      })
+      .then(data => {
         buttonText.style.display = 'block';
         loader.style.display = 'none';
         if (data.success) {
-            toastr.success(data.message || 'تنظیمات رمز عبور ثابت با موفقیت به‌روزرسانی شد.');
-            passwordInput.value = '';
-            confirmPasswordInput.value = '';
-            passwordInput.placeholder = 'رمز عبور تنظیم شده است';
-            confirmPasswordInput.placeholder = 'رمز عبور تنظیم شده است';
-            clearPreviousErrors();
+          toastr.success(data.message || 'تنظیمات رمز عبور ثابت با موفقیت به‌روزرسانی شد.');
+          passwordInput.value = '';
+          confirmPasswordInput.value = '';
+          passwordInput.placeholder = 'رمز عبور تنظیم شده است';
+          confirmPasswordInput.placeholder = 'رمز عبور تنظیم شده است';
+          clearPreviousErrors();
         } else {
-            toastr.error(data.message || 'خطا در به‌روزرسانی تنظیمات');
+          toastr.error(data.message || 'خطا در به‌روزرسانی تنظیمات');
         }
-    })
-    .catch(error => {
+      })
+      .catch(error => {
         buttonText.style.display = 'block';
         loader.style.display = 'none';
         if (error.status === 422 && error.data.errors) {
-            handleValidationErrors(error.data.errors);
+          handleValidationErrors(error.data.errors);
         }
-    });
-});
+      });
+  });
 
-// تابع مدیریت خطاهای اعتبارسنجی
-function handleValidationErrors(errors) {
+  // تابع مدیریت خطاهای اعتبارسنجی
+  function handleValidationErrors(errors) {
     clearPreviousErrors();
     Object.keys(errors).forEach(field => {
-        const inputElement = document.querySelector(`[name="${field}"]`);
-        if (inputElement) {
-            // پیدا کردن div.validation-error با رفتن به parent بالاتر
-            const errorElement = inputElement.closest('.position-relative').querySelector('.validation-error');
-            if (errorElement) {
-                errorElement.textContent = errors[field][0];
-                inputElement.classList.add('is-invalid');
-            }
+      const inputElement = document.querySelector(`[name="${field}"]`);
+      if (inputElement) {
+        // پیدا کردن div.validation-error با رفتن به parent بالاتر
+        const errorElement = inputElement.closest('.position-relative').querySelector('.validation-error');
+        if (errorElement) {
+          errorElement.textContent = errors[field][0];
+          inputElement.classList.add('is-invalid');
         }
-        // اگر خطا برای password باشه و به password_confirmation مربوط باشه
-        if (field === 'password' && errors[field][0].includes('تکرار رمز عبور')) {
-            const confirmInput = document.querySelector('[name="password_confirmation"]');
-            const confirmErrorElement = confirmInput.closest('.position-relative').querySelector('.validation-error');
-            if (confirmErrorElement) {
-                confirmErrorElement.textContent = errors[field][0];
-                confirmInput.classList.add('is-invalid');
-            }
+      }
+      // اگر خطا برای password باشه و به password_confirmation مربوط باشه
+      if (field === 'password' && errors[field][0].includes('تکرار رمز عبور')) {
+        const confirmInput = document.querySelector('[name="password_confirmation"]');
+        const confirmErrorElement = confirmInput.closest('.position-relative').querySelector('.validation-error');
+        if (confirmErrorElement) {
+          confirmErrorElement.textContent = errors[field][0];
+          confirmInput.classList.add('is-invalid');
         }
+      }
     });
     toastr.error('لطفاً خطاهای فرم را بررسی کنید.');
-}
+  }
 
-// تابع پاک کردن خطاهای قبلی
-function clearPreviousErrors() {
+  // تابع پاک کردن خطاهای قبلی
+  function clearPreviousErrors() {
     document.querySelectorAll('.validation-error').forEach(el => el.textContent = '');
     document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-}
+  }
   // تنظیم اولیه وضعیت اینپوت‌ها بر اساس تاگل
 
   document.addEventListener('DOMContentLoaded', function() {
