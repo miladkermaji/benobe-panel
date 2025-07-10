@@ -132,6 +132,39 @@ class DrProfileController extends Controller
         }
 
         $doctor    = $this->getAuthenticatedDoctor();
+
+        // حالت auto_save (ویرایش تکی)
+        if ($request->has('auto_save') && $request->has('specialty_id')) {
+            $specialtyId = $request->input('specialty_id');
+            $specialtyValue = $request->input('specialty_id_value');
+            // جلوگیری از ثبت تخصص تکراری (به جز خودش)
+            $duplicate = \App\Models\DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)
+                ->where('specialty_id', $specialtyValue)
+                ->where('id', '!=', $specialtyId)
+                ->exists();
+            if ($duplicate) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'این تخصص قبلاً ثبت شده است و امکان تکرار وجود ندارد.'
+                ], 422);
+            }
+            $specialty = \App\Models\DoctorSpecialty::find($specialtyId);
+            if (!$specialty) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'تخصص مورد نظر یافت نشد.'
+                ], 404);
+            }
+            $specialty->academic_degree_id = $request->input('academic_degree_id');
+            $specialty->specialty_id = $specialtyValue;
+            $specialty->specialty_title = $request->input('specialty_title');
+            $specialty->save();
+            return response()->json([
+                'success' => true,
+                'message' => 'تخصص با موفقیت ذخیره شد.'
+            ]);
+        }
+
         $validator = Validator::make($request->all(), $request->rules());
         if ($validator->fails()) {
             return response()->json([
