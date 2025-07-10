@@ -47,7 +47,8 @@
                 <option value="status_active">فعال کردن</option>
                 <option value="status_inactive">غیرفعال کردن</option>
               </select>
-              <button class="btn btn-sm btn-primary" wire:click="executeGroupAction" wire:loading.attr="disabled">
+              <button class="btn btn-sm btn-primary" type="button" wire:click="confirmGroupDelete"
+                wire:loading.attr="disabled" id="group-action-btn">
                 <span wire:loading.remove>اجرا</span>
                 <span wire:loading>در حال اجرا...</span>
               </button>
@@ -253,6 +254,22 @@
               Livewire.dispatch('deleteClinicConfirmed', {
                 id: event.id
               });
+            }
+          });
+        });
+        Livewire.on('confirm-group-delete', () => {
+          Swal.fire({
+            title: 'حذف گروهی',
+            text: 'آیا مطمئن هستید که می‌خواهید همه موارد انتخاب شده حذف شوند؟',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'بله، حذف کن',
+            cancelButtonText: 'خیر'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Livewire.dispatch('executeGroupAction');
             }
           });
         });

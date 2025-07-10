@@ -13,7 +13,10 @@ class DoctorClinicList extends Component
 
     protected $paginationTheme = 'bootstrap';
 
-    protected $listeners = ['deleteClinicConfirmed' => 'deleteClinic'];
+    protected $listeners = [
+        'deleteClinicConfirmed' => 'deleteClinic',
+        'executeGroupAction' => 'executeGroupAction',
+    ];
 
     public $perPage = 100;
     public $search = '';
@@ -122,6 +125,15 @@ class DoctorClinicList extends Component
         $clinic->save();
 
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت مطب با موفقیت تغییر کرد.');
+    }
+
+    public function confirmGroupDelete()
+    {
+        if ($this->groupAction === 'delete') {
+            $this->dispatch('confirm-group-delete');
+        } else {
+            $this->executeGroupAction();
+        }
     }
 
     private function getClinicsQuery()
