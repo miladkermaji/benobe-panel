@@ -58,7 +58,8 @@
         </div>
       </div>
     </div>
-    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8" id="personal-data">
+    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8" id="personal-data"
+      style="overflow:hidden; position:relative;">
       <div class="d-flex justify-content-between align-items-center personal-data-clicked">
         <div>
 
@@ -212,7 +213,8 @@
       </div>
     </div>
     {{-- mobileedit modal --}}
-    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8" id="specialty-section">
+    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8" id="specialty-section"
+      style="position:relative; overflow:visible;">
       <div class="d-flex justify-content-between align-items-center">
         <div>
 
@@ -346,7 +348,8 @@
         </div>
       </div>
     </div>
-    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8" id="uuid-section">
+    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8" id="uuid-section"
+      style="overflow:hidden; position:relative;">
       <div class="d-flex justify-content-between align-items-center">
         <div>
 
@@ -400,7 +403,8 @@
         </div>
       </div>
     </div>
-    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8 " id="messengers-section">
+    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8 " id="messengers-section"
+      style="overflow:hidden; position:relative;">
       <div class="d-flex justify-content-between align-items-center">
         <div>
 
@@ -651,7 +655,6 @@
 <script src="{{ asset('dr-assets/panel/js/profile/edit-profile.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-
 </script>
 @include('dr.panel.profile.option.profile-option')
 @endsection
