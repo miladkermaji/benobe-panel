@@ -34,6 +34,11 @@
                   {{ $user->national_code }}</option>
               @endforeach
             </select>
+            @if (method_exists($users, 'links'))
+              <div class="mt-2">
+                {!! $users->links() !!}
+              </div>
+            @endif
             <small class="text-danger error-user_id mt-1"></small>
           </div>
           <div class="w-100 mt-2">

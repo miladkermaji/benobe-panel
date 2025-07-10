@@ -15,7 +15,7 @@ class SubUserController extends Controller
     {
         $doctorId = Auth::guard('doctor')->id();
         $subUsers = SubUser::with('subuserable')->where('doctor_id', $doctorId)->get();
-        $users = User::all();
+        $users = User::paginate(50); // صفحه‌بندی کاربران، هر بار ۵۰ کاربر
 
         return view('dr.panel.profile.subuser', compact('subUsers', 'users'));
     }
