@@ -12,81 +12,124 @@
 
 @section('content')
 @section('bread-crumb-title', 'مدیریت بیعانه')
-<div class="container">
-  <div class="mt-5 d-flex justify-content-between align-items-center mb-4">
-    <h1 class="fs-4 fw-bold">مدیریت بیعانه‌ها</h1>
-    <button class="btn my-btn-primary h-50" data-bs-toggle="modal" data-bs-target="#depositModal">
-      <i class="fas fa-plus me-2"></i> افزودن بیعانه
-    </button>
-  </div>
-  <div class="card table-responsive d-none d-md-block">
-    <table class="table table-hover" dir="ltr">
-      <thead>
-        <tr>
-          <th>عملیات</th>
-          <th>مطب</th>
-          <th>مبلغ (تومان)</th>
-        </tr>
-      </thead>
-      <tbody id="depositList">
-        @foreach ($deposits as $deposit)
-          <tr data-id="{{ $deposit->id }}">
-            <td>
-              <button class="btn btn-icon edit-btn btn-light rounded-circle" data-id="{{ $deposit->id }}">
-                <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+<div class="doctor-clinics-container">
+  <div class="container py-2" dir="rtl">
+    <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
+      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
+        <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0">بیعانه‌های من</h1>
+          </div>
+          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+            <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
+              <div class="search-container position-relative" style="max-width: 100%;">
+                <input type="text"
+                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                  id="depositSearchInput" placeholder="جستجو در بیعانه‌ها..."
+                  style="padding-right: 20px; text-align: right; direction: rtl;">
+                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                  style="z-index: 5; top: 50%; right: 8px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                    stroke-width="2">
+                    <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                  </svg>
+                </span>
+              </div>
+              <button
+                class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1"
+                data-bs-toggle="modal" data-bs-target="#depositModal">
+                <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span>افزودن</span>
               </button>
-              <button class="btn btn-icon delete-btn btn-light rounded-circle" data-id="{{ $deposit->id }}">
-                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-              </button>
-            </td>
-            <td>{{ $deposit->clinic_id ? $clinics->find($deposit->clinic_id)->name : 'ویزیت آنلاین' }}</td>
-            <td>{{ $deposit->deposit_amount ? number_format($deposit->deposit_amount) : 'بدون بیعانه' }}</td>
-          </tr>
-        @endforeach
-      </tbody>
-    </table>
-  </div>
-  <!-- کارت‌های بیعانه برای موبایل/تبلت -->
-  <div class="notes-cards d-md-none">
-    @foreach ($deposits as $deposit)
-      <div class="note-card mb-3 position-relative" data-id="{{ $deposit->id }}">
-        <div class="note-card-header d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center gap-2">
-            <span
-              class="badge bg-primary-subtle text-primary">{{ $deposit->clinic_id ? $clinics->find($deposit->clinic_id)->name : 'ویزیت آنلاین' }}</span>
-          </div>
-          <div class="d-flex gap-1">
-            <button class="btn btn-sm btn-gradient-success px-2 py-1 edit-btn" data-id="{{ $deposit->id }}"
-              title="ویرایش">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <path
-                  d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-            </button>
-            <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-btn" data-id="{{ $deposit->id }}"
-              title="حذف">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="note-card-body">
-          <div class="note-card-item">
-            <span class="note-card-label">مطب:</span>
-            <span
-              class="note-card-value">{{ $deposit->clinic_id ? $clinics->find($deposit->clinic_id)->name : 'ویزیت آنلاین' }}</span>
-          </div>
-          <div class="note-card-item">
-            <span class="note-card-label">مبلغ:</span>
-            <span
-              class="note-card-value">{{ $deposit->deposit_amount ? number_format($deposit->deposit_amount) : 'بدون بیعانه' }}</span>
+            </div>
           </div>
         </div>
       </div>
-    @endforeach
+    </div>
+    <div class="container-fluid px-0">
+      <div class="card shadow-sm rounded-2">
+        <div class="card-body p-0">
+          <!-- Desktop Table View -->
+          <div class="table-responsive text-nowrap d-none d-md-block">
+            <table class="table table-hover w-100 m-0" id="depositTable">
+              <thead>
+                <tr>
+                  <th class="text-center align-middle" style="width: 60px;">ردیف</th>
+                  <th class="align-middle">مطب</th>
+                  <th class="align-middle">مبلغ (تومان)</th>
+                  <th class="text-center align-middle" style="width: 120px;">عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="depositList">
+                @foreach ($deposits as $index => $deposit)
+                  <tr data-id="{{ $deposit->id }}">
+                    <td class="text-center">{{ $index + 1 }}</td>
+                    <td>{{ $deposit->clinic_id ? $clinics->find($deposit->clinic_id)->name : 'ویزیت آنلاین' }}</td>
+                    <td>{{ $deposit->deposit_amount ? number_format($deposit->deposit_amount) : 'بدون بیعانه' }}</td>
+                    <td class="text-center">
+                      <div class="d-flex justify-content-center gap-1">
+                        <button class="btn btn-icon edit-btn btn-light rounded-circle" data-id="{{ $deposit->id }}">
+                          <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                        </button>
+                        <button class="btn btn-icon delete-btn btn-light rounded-circle" data-id="{{ $deposit->id }}">
+                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+          <!-- Mobile Card View -->
+          <div class="notes-cards d-md-none">
+            @foreach ($deposits as $index => $deposit)
+              <div class="note-card mb-3">
+                <div class="note-card-header d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary-subtle text-primary">
+                      {{ $deposit->clinic_id ? $clinics->find($deposit->clinic_id)->name : 'ویزیت آنلاین' }}
+                    </span>
+                  </div>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-gradient-success px-2 py-1 edit-btn" data-id="{{ $deposit->id }}"
+                      title="ویرایش">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path
+                          d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
+                    <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-btn" data-id="{{ $deposit->id }}"
+                      title="حذف">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="note-card-body">
+                  <div class="note-card-item">
+                    <span class="note-card-label">مطب:</span>
+                    <span
+                      class="note-card-value">{{ $deposit->clinic_id ? $clinics->find($deposit->clinic_id)->name : 'ویزیت آنلاین' }}</span>
+                  </div>
+                  <div class="note-card-item">
+                    <span class="note-card-label">مبلغ:</span>
+                    <span
+                      class="note-card-value">{{ $deposit->deposit_amount ? number_format($deposit->deposit_amount) : 'بدون بیعانه' }}</span>
+                  </div>
+                </div>
+              </div>
+            @endforeach
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -150,30 +193,30 @@
     const isCustomPrice = $('#isCustomPrice');
     const clinics = @json($clinics->pluck('name', 'id')->toArray());
 
- depositSelect.on('change', function() {
-  const isCustom = this.value === 'custom';
-  customPriceContainer.toggle(isCustom);
-  isCustomPrice.val(isCustom ? '1' : '0');
-  customPriceInput.prop('required', isCustom); // این خط را اضافه کنید
-  if (isCustom) {
-    $(this).val('');
-  } else {
-    customPriceInput.val('');
-  }
-});
+    depositSelect.on('change', function() {
+      const isCustom = this.value === 'custom';
+      customPriceContainer.toggle(isCustom);
+      isCustomPrice.val(isCustom ? '1' : '0');
+      customPriceInput.prop('required', isCustom); // این خط را اضافه کنید
+      if (isCustom) {
+        $(this).val('');
+      } else {
+        customPriceInput.val('');
+      }
+    });
 
-noDepositCheckbox.on('change', function() {
-  const isChecked = this.checked;
-  depositSelect.prop('disabled', isChecked);
-  customPriceInput.prop('disabled', isChecked);
-  customPriceContainer.toggle(!isChecked && depositSelect.val() === 'custom');
-  customPriceInput.prop('required', !isChecked && depositSelect.val() === 'custom'); // این خط را اضافه کنید
-  if (isChecked) {
-    depositSelect.val('');
-    customPriceInput.val('');
-    isCustomPrice.val('0');
-  }
-});
+    noDepositCheckbox.on('change', function() {
+      const isChecked = this.checked;
+      depositSelect.prop('disabled', isChecked);
+      customPriceInput.prop('disabled', isChecked);
+      customPriceContainer.toggle(!isChecked && depositSelect.val() === 'custom');
+      customPriceInput.prop('required', !isChecked && depositSelect.val() === 'custom'); // این خط را اضافه کنید
+      if (isChecked) {
+        depositSelect.val('');
+        customPriceInput.val('');
+        isCustomPrice.val('0');
+      }
+    });
 
     form.on('submit', async function(e) {
       e.preventDefault();
