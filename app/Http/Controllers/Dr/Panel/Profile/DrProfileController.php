@@ -209,7 +209,7 @@ class DrProfileController extends Controller
                 'string',
                 'nullable',
                 'unique:doctors,uuid,' . $doctor->id ?? $doctor->doctor_id,
-                'regex:/^[a-zA-Z0-9_-]+$/',
+                'regex:/^[a-zA-Z0-9۰-۹_-]+$/u',
                 function ($attribute, $value, $fail) use ($doctor) {
                     $existingDoctor = Doctor::where('uuid', $value)
                         ->where('id', '!=', $doctor->id ?? $doctor->doctor_id)
@@ -222,7 +222,7 @@ class DrProfileController extends Controller
         ], [
             'uuid.string'    => 'شناسه باید یک رشته باشد.',
             'uuid.unique'    => 'این شناسه قبلاً استفاده شده است.',
-            'uuid.regex'     => 'شناسه فقط می‌تواند شامل حروف، اعداد، خط تیره و زیرخط باشد.',
+            'uuid.regex'     => 'شناسه فقط می‌تواند شامل حروف، اعداد (فارسی و انگلیسی)، خط تیره و زیرخط باشد.',
         ]);
 
         if ($validator->fails()) {
@@ -273,30 +273,38 @@ class DrProfileController extends Controller
             return $response;
         }
 
+        // تبدیل اعداد فارسی به انگلیسی قبل از اعتبارسنجی
+        if (class_exists('App\\Helpers\\PersianNumber')) {
+            $request->merge([
+                'ita_phone'      => \App\Helpers\PersianNumber::convertToEnglish($request->ita_phone),
+                'whatsapp_phone' => \App\Helpers\PersianNumber::convertToEnglish($request->whatsapp_phone),
+            ]);
+        }
+
         $request->validate([
             'ita_phone'      => [
                 'nullable',
                 'string',
                 'max:20',
-                'regex:/^(?!09{1}(\\d)\\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\\d{7}$/i',
+                'regex:/^(?!09{1}([0-9۰-۹])\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)[0-9۰-۹]{7}$/u',
             ],
             'ita_username'   => 'nullable|string|max:100',
             'whatsapp_phone' => [
                 'nullable',
                 'string',
                 'max:20',
-                'regex:/^(?!09{1}(\\d)\\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\\d{7}$/i',
+                'regex:/^(?!09{1}([0-9۰-۹])\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)[0-9۰-۹]{7}$/u',
             ],
             'secure_call'    => 'nullable|boolean',
         ], [
             'ita_phone.string'      => 'شماره موبایل ایتا باید یک رشته باشد.',
             'ita_phone.max'         => 'شماره موبایل ایتا نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.',
-            'ita_phone.regex'       => 'شماره موبایل ایتا را به درستی وارد کنید.',
+            'ita_phone.regex'       => 'شماره موبایل ایتا باید با اعداد فارسی یا انگلیسی و فرمت صحیح وارد شود.',
             'ita_username.string'   => 'نام کاربری ایتا باید یک رشته باشد.',
             'ita_username.max'      => 'نام کاربری ایتا نمی‌تواند بیشتر از ۱۰۰ کاراکتر باشد.',
             'whatsapp_phone.string' => 'شماره موبایل واتس‌اپ باید یک رشته باشد.',
             'whatsapp_phone.max'    => 'شماره موبایل واتس‌اپ نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.',
-            'whatsapp_phone.regex'  => 'شماره موبایل واتس‌اپ را به درستی وارد کنید.',
+            'whatsapp_phone.regex'  => 'شماره موبایل واتس‌اپ باید با اعداد فارسی یا انگلیسی و فرمت صحیح وارد شود.',
             'secure_call.boolean'   => 'وضعیت تماس امن باید یک مقدار بولین باشد.',
         ]);
 
