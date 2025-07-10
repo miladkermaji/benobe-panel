@@ -20,8 +20,11 @@ class Secretary extends Authenticatable implements JWTSubject
         'mobile',
         'national_code',
         'email',
+        'gender',
         'password',
         'is_active',
+        'city_id',
+        'province_id',
         'doctor_id',
         'clinic_id',
     ];
@@ -49,6 +52,16 @@ class Secretary extends Authenticatable implements JWTSubject
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(\App\Models\Zone::class, 'province_id');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(\App\Models\Zone::class, 'city_id');
     }
 
     public function clinic()

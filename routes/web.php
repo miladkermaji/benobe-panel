@@ -703,8 +703,9 @@ Route::prefix('dr')
 
             Route::group(['prefix' => 'secretary'], function () {
                 Route::get('/', [SecretaryManagementController::class, 'index'])->middleware('secretary.permission:secretary_management')->name('dr-secretary-management');
-                Route::post('/store', [SecretaryManagementController::class, 'store'])->middleware('secretary.permission:secretary_management')->name('dr-secretary-store');
+                Route::get('/create', [SecretaryManagementController::class, 'create'])->middleware('secretary.permission:secretary_management')->name('dr-secretary-create');
                 Route::get('/edit/{id}', [SecretaryManagementController::class, 'edit'])->middleware('secretary.permission:secretary_management')->name('dr-secretary-edit');
+                Route::post('/store', [SecretaryManagementController::class, 'store'])->middleware('secretary.permission:secretary_management')->name('dr-secretary-store');
                 Route::post('/update/{id}', [SecretaryManagementController::class, 'update'])->middleware('secretary.permission:secretary_management')->name('dr-secretary-update');
                 Route::delete('/delete/{id}', [SecretaryManagementController::class, 'destroy'])->middleware('secretary.permission:secretary_management')->name('dr-secretary-delete');
 

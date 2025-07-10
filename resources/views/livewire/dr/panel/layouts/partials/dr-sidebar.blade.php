@@ -266,6 +266,12 @@
                 <a href="{{ route('dr-secretary-management') }}">مدیریت منشی‌ها</a>
               </li>
             @endif
+            @if ($this->hasPermission('permissions'))
+              <li
+                class="item-li i-checkout__request {{ Request::routeIs('dr-secretary-permissions') ? 'is-active' : '' }}">
+                <a href="{{ route('dr-secretary-permissions') }}">دسترسی‌ها</a>
+              </li>
+            @endif
           </ul>
         </li>
       @endif
@@ -308,11 +314,7 @@
         </li>
       @endif
 
-      @if ($this->hasPermission('permissions'))
-        <li class="item-li i-checkout__request {{ Request::routeIs('dr-secretary-permissions') ? 'is-active' : '' }}">
-          <a href="{{ route('dr-secretary-permissions') }}">دسترسی‌ها</a>
-        </li>
-      @endif
+
 
       @if ($this->hasPermission('profile'))
         <li
@@ -361,13 +363,13 @@
               <li class="item-li i-user__inforamtion {{ Request::routeIs('my-dr-appointments') ? 'is-active' : '' }}">
                 <a href="{{ route('my-dr-appointments') }}">نوبت‌های من</a>
               </li>
-              @endif 
-              @if ($this->hasPermission('dr.panel.doctor-faqs.index'))
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.doctor-faqs.index') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr.panel.doctor-faqs.index') }}"> سوالات متداول</a>
-                </li>
-              @endif
+            @endif
+            @if ($this->hasPermission('dr.panel.doctor-faqs.index'))
+              <li
+                class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.doctor-faqs.index') ? 'is-active' : '' }}">
+                <a href="{{ route('dr.panel.doctor-faqs.index') }}"> سوالات متداول</a>
+              </li>
+            @endif
           </ul>
         </li>
       @endif

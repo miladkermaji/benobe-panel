@@ -1575,7 +1575,9 @@ img {
     border-radius: var(--radius-card); /* گوشه‌های گرد */
     box-shadow: 0 4px 12px var(--shadow); /* سایه ملایم */
 }
-
+.spinner-border{
+    border-radius: 50% !important;
+}
 /* Custom Spinner */
 .spinner-custom {
     width: 32px; /* کوچکتر از 44px */
