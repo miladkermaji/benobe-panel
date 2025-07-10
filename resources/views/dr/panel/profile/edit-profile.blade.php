@@ -610,33 +610,36 @@
         <div>
           <img src="{{ asset('dr-assets/icons/cogs.svg') }}" alt="" srcset="">
           <span class="txt-card-span mx-1"> تنظیمات نسخه نویسی</span>
+          <span class="badge bg-danger text-white mx-2" style="font-size: 13px;">به زودی</span>
         </div>
         <div>
           <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="" srcset="">
 
         </div>
       </div>
-      <div class="drop-toggle-styles noskheh-data-drop-toggle">
-        <div class="loading-spinner d-none"></div>
-        <div>
-          <div class="mt-3">
-            <div class="d-flex align-items-center space-s-3">
-              <div class="settings_toggle__NBCHl">
-                <div class="password_toggle__AXK9v d-flex align-items-center">
-                  <label for="switch">Toggle</label>
-                </div>
-              </div><span class="mx-2">غیرفعال کردن SMS نهایی سازی نسخه</span>
-            </div>
-            <div class="d-flex align-items-center mt-3">
-              <div class="settings_toggle__NBCHl">
-                <div class="password_toggle__AXK9v d-flex align-items-center">
-                  <label for="switch">Toggle</label>
-                </div>
-              </div><span class="mx-2"> ویرایش اطلاعات احراز هویت</span>
+      <fieldset disabled style="opacity:0.6;">
+        <div class="drop-toggle-styles noskheh-data-drop-toggle">
+          <div class="loading-spinner d-none"></div>
+          <div>
+            <div class="mt-3">
+              <div class="d-flex align-items-center space-s-3">
+                <div class="settings_toggle__NBCHl">
+                  <div class="password_toggle__AXK9v d-flex align-items-center">
+                    <label for="switch">Toggle</label>
+                  </div>
+                </div><span class="mx-2">غیرفعال کردن SMS نهایی سازی نسخه</span>
+              </div>
+              <div class="d-flex align-items-center mt-3">
+                <div class="settings_toggle__NBCHl">
+                  <div class="password_toggle__AXK9v d-flex align-items-center">
+                    <label for="switch">Toggle</label>
+                  </div>
+                </div><span class="mx-2"> ویرایش اطلاعات احراز هویت</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </fieldset>
     </div>
   </div>
 </div>
