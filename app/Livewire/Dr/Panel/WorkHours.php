@@ -1371,10 +1371,7 @@ class Workhours extends Component
                     $appointmentSettings = is_array($schedule->appointment_settings)
                         ? $schedule->appointment_settings
                         : json_decode($schedule->appointment_settings, true) ?? [];
-                    $existingIndex = false;
-                    if (!empty($appointmentSettings)) {
-                        $existingIndex = array_search((int)$index, array_column($appointmentSettings, 'work_hour_key'));
-                    }
+                    $existingIndex = array_search((int)$index, array_column($appointmentSettings, 'work_hour_key'));
                     if ($existingIndex !== false) {
                         $appointmentSettings[$existingIndex] = $newSetting;
                     } else {
