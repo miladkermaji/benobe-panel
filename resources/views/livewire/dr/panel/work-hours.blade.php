@@ -426,10 +426,19 @@
         $mainSlotStart = $slots[$scheduleModalDay][$scheduleModalIndex]['start_time'] ?? null;
         $mainSlotEnd = $slots[$scheduleModalDay][$scheduleModalIndex]['end_time'] ?? null;
         $mainSlotRange = $mainSlotStart && $mainSlotEnd ? "({$mainSlotStart} تا {$mainSlotEnd})" : '';
+        $mainSlotDayFa =
+            [
+                'saturday' => 'شنبه',
+                'sunday' => 'یکشنبه',
+                'monday' => 'دوشنبه',
+                'tuesday' => 'سه‌شنبه',
+                'wednesday' => 'چهارشنبه',
+                'thursday' => 'پنج‌شنبه',
+                'friday' => 'جمعه',
+            ][$scheduleModalDay] ?? '';
       @endphp
       <x-modal id="schedule-modal" name="schedule-modal" :show="$modalOpen"
-        title="برنامه باز شدن نوبت‌های {{ $daysFa[$scheduleModalDay] ?? '' }} {{ $mainSlotRange }}"
-        size="md-medium">
+        title="برنامه باز شدن نوبت‌های {{ $mainSlotDayFa }} {{ $mainSlotRange }}" size="md-medium">
         <x-slot:body>
           <div class="position-relative">
             <!-- لودینگ -->

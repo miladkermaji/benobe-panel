@@ -552,8 +552,27 @@ class Workhours extends Component
         if (!isset($this->scheduleSettings[$day])) {
             $this->scheduleSettings[$day] = [];
         }
-        $newIndex = count($this->scheduleSettings[$day]);
-        $this->scheduleSettings[$day][$newIndex] = [
+        // بررسی تداخل بازه‌ها
+        $existing = $this->scheduleSettings[$day];
+        // اگر بازه‌ای کل روز را پوشش داده (مثلاً 00:00 تا 23:59)، اجازه افزودن نده
+        foreach ($existing as $slot) {
+            if (
+                isset($slot['start_time'], $slot['end_time']) &&
+                $slot['start_time'] === '00:00' && $slot['end_time'] === '23:59'
+            ) {
+                $this->modalMessage = 'شما قبلاً کل روز را رزرو کرده‌اید و امکان افزودن بازه جدید وجود ندارد.';
+                $this->modalType = 'error';
+                $this->modalOpen = true;
+                $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'error']);
+                return;
+            }
+        }
+        // بررسی تداخل بازه جدید با بازه‌های قبلی (فرض: بازه جدید هنوز مقدار ندارد، پس فقط اگر هیچ بازه‌ای کل روز را نگرفته اجازه بده)
+        // اگر بازه جدید مقدار دارد (مثلاً کاربر مقدار وارد کرده)، باید تداخل را بررسی کنیم
+        // اما اینجا فقط اجازه اضافه شدن ردیف خالی را می‌دهیم اگر تداخلی با بازه‌های قبلی نباشد
+        // پس اگر بازه جدید با بازه‌های قبلی تداخل داشته باشد، ردیف جدید را اضافه نکن
+        // (در این مرحله بازه جدید مقدار ندارد، پس فقط بررسی کل روز کافی است)
+        $this->scheduleSettings[$day][] = [
             'start_time' => null,
             'end_time' => null,
         ];
