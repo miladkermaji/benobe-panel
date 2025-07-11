@@ -376,6 +376,7 @@
                     cancelButtonText: 'انصراف'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        @this.set(`selectedScheduleDays.${day}`, false); // Update Livewire property immediately
                         @this.call('deleteScheduleSettingsForDay', day);
                     }
                 });
@@ -459,7 +460,7 @@
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
                     <div class="d-flex align-items-center">
                       <input type="checkbox" class="form-check-input me-1" id="schedule-day-{{ $day }}"
-                        data-day="{{ $day }}" @if ($selectedScheduleDays[$day]) checked @endif
+                        data-day="{{ $day }}" wire:model.live="selectedScheduleDays.{{ $day }}"
                         @click="handleDayToggle($event, '{{ $day }}')">
                       <label class="mb-0 fw-bold px-0 font-size-12"
                         for="schedule-day-{{ $day }}">{{ $label }}</label>
