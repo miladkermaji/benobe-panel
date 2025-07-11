@@ -159,16 +159,54 @@ class SubUserController extends Controller
     public function searchUsers(Request $request)
     {
         $query = $request->input('q');
-        $users = User::query()
-            ->where(function ($q) use ($query) {
-                $q->where('first_name', 'like', "%{$query}%")
-                  ->orWhere('last_name', 'like', "%{$query}%")
-                  ->orWhere('national_code', 'like', "%{$query}%")
+        $users = User::query();
+        if ($query) {
+            $words = preg_split('/\s+/', trim($query));
+            $users->where(function ($q) use ($words) {
+                foreach ($words as $word) {
+                    $q->where(function ($subQ) use ($word) {
+                        $subQ->where('first_name', 'like', "%{$word}%")
+                             ->orWhere('last_name', 'like', "%{$word}%");
+                    });
+                }
+            });
+            $users->orWhere('national_code', 'like', "%{$query}%")
                   ->orWhere('mobile', 'like', "%{$query}%");
-            })
-            ->limit(20)
-            ->get();
+        }
+        $result = $users->limit(20)->get();
+        return response()->json($result);
+    }
 
-        return response()->json($users);
+    public function quickCreateUser(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name'    => 'required|string|max:100',
+            'last_name'     => 'required|string|max:100',
+            'mobile'        => 'required|string|max:20|unique:users,mobile',
+            'national_code' => 'required|string|max:20|unique:users,national_code',
+        ], [
+            'first_name.required'    => 'نام الزامی است.',
+            'last_name.required'     => 'نام خانوادگی الزامی است.',
+            'mobile.required'        => 'موبایل الزامی است.',
+            'mobile.unique'          => 'این شماره موبایل قبلاً ثبت شده است.',
+            'national_code.required' => 'کدملی الزامی است.',
+            'national_code.unique'   => 'این کدملی قبلاً ثبت شده است.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->first()], 422);
+        }
+
+        $user = new \App\Models\User();
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->mobile = $request->mobile;
+        $user->national_code = $request->national_code;
+        $user->save();
+
+        return response()->json([
+            'id' => $user->id,
+            'full_name' => $user->first_name . ' ' . $user->last_name . ' (' . $user->national_code . ')',
+        ]);
     }
 }

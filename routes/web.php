@@ -850,3 +850,4 @@ Route::prefix('dr')
 Route::get('/dr/panel/profile/subusers/list', [\App\Http\Controllers\Dr\Panel\Profile\SubUserController::class, 'list'])->name('dr-sub-users-list');
 Route::delete('/dr/panel/profile/subusers/delete-multiple', [\App\Http\Controllers\Dr\Panel\Profile\SubUserController::class, 'destroyMultiple'])->name('dr-sub-users-delete-multiple');
 Route::get('/dr/panel/profile/subusers/search-users', [\App\Http\Controllers\Dr\Panel\Profile\SubUserController::class, 'searchUsers'])->name('dr-sub-users-search-users');
+Route::post('/dr/panel/profile/subusers/quick-create-user', [\App\Http\Controllers\Dr\Panel\Profile\SubUserController::class, 'quickCreateUser'])->name('dr-sub-users-quick-create-user');
