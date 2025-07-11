@@ -538,6 +538,11 @@ class Workhours extends Component
             $this->modalOpen = true;
             $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'success']);
         } catch (\Exception $e) {
+            // اگر تداخل رخ داد، ردیف را خالی کن
+            if (isset($this->scheduleSettings[$day][$index])) {
+                $this->scheduleSettings[$day][$index]['start_time'] = null;
+                $this->scheduleSettings[$day][$index]['end_time'] = null;
+            }
             $this->modalMessage = $e->getMessage();
             $this->modalType = 'error';
             $this->modalOpen = true;
