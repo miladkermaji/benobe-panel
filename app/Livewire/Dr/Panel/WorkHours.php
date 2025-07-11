@@ -628,18 +628,15 @@ class Workhours extends Component
                 unset($appointmentSettings[$filteredKeys[$index]]);
                 $appointmentSettings = array_values($appointmentSettings);
                 $schedule->update(['appointment_settings' => json_encode($appointmentSettings)]);
-                // حذف از work_hours هم (در صورت وجود)
-                $workHours = is_array($schedule->work_hours)
-                    ? $schedule->work_hours
-                    : json_decode($schedule->work_hours, true) ?? [];
-                if (isset($workHours[$index])) {
-                    unset($workHours[$index]);
-                    $workHours = array_values($workHours);
-                    $schedule->update(['work_hours' => json_encode($workHours)]);
-                }
+                // کد حذف work_hours حذف شد؛ فقط تنظیمات زمان‌بندی پاک می‌شود
                 unset($this->scheduleSettings[$day][$index]);
                 $this->scheduleSettings[$day] = array_values($this->scheduleSettings[$day]);
-                // اگر هیچ تنظیماتی برای این روز باقی نماند، تیک روز را بردار
+                // اگر هیچ تنظیماتی برای این روز باقی نماند، تیک روز را بردار و کلید را حذف کن
+                if (empty($this->scheduleSettings[$day])) {
+                    $this->selectedScheduleDays[$day] = false;
+                    unset($this->scheduleSettings[$day]);
+                }
+                // اگر هیچ تنظیماتی برای این روز باقی نماند، تیک روز را بردار (برای اطمینان)
                 $remainingSettings = array_filter($appointmentSettings, fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex);
                 if (empty($remainingSettings)) {
                     $this->selectedScheduleDays[$day] = false;
