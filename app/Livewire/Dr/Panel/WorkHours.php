@@ -734,7 +734,7 @@ class Workhours extends Component
         'friday' => false,
     ];
     public $selectAllCopyScheduleModal = false;
-  public function deleteScheduleSetting($day, $index)
+public function deleteScheduleSetting($day, $index)
 {
     try {
         // تنظیم activeClinicId
@@ -762,32 +762,59 @@ class Workhours extends Component
         }
 
         $appointmentSettings = json_decode($schedule->appointment_settings, true) ?? [];
-        $filteredKeys = array_keys(array_filter(
-            $appointmentSettings,
-            fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
-        ));
 
-        if (isset($filteredKeys[$index])) {
-            unset($appointmentSettings[$filteredKeys[$index]]);
-            $appointmentSettings = array_values($appointmentSettings);
-            $schedule->update(['appointment_settings' => json_encode($appointmentSettings)]);
+        // یافتن تنظیم مربوط به work_hour_key و حذف روز خاص از آرایه days
+        $updatedSettings = [];
+        foreach ($appointmentSettings as $key => $setting) {
+            if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex) {
+                if (isset($setting['days']) && is_array($setting['days']) && in_array($day, $setting['days'])) {
+                    // حذف روز از آرایه days
+                    $setting['days'] = array_diff($setting['days'], [$day]);
+                    if (!empty($setting['days'])) {
+                        // اگر هنوز روزهایی در آرایه days باقی مانده، تنظیم را نگه دار
+                        $updatedSettings[] = $setting;
+                    }
+                    // اگر آرایه days خالی شد، این تنظیم حذف می‌شود
+                } else {
+                    // تنظیماتی که مربوط به این روز نیستند را نگه دار
+                    $updatedSettings[] = $setting;
+                }
+            } else {
+                // تنظیماتی که work_hour_key متفاوتی دارند را نگه دار
+                $updatedSettings[] = $setting;
+            }
+        }
 
-            // به‌روزرسانی آرایه‌های محلی
+        // به‌روزرسانی تنظیمات در دیتابیس
+        $schedule->update(['appointment_settings' => json_encode(array_values($updatedSettings))]);
+
+        // به‌روزرسانی آرایه‌های محلی
+        if (isset($this->scheduleSettings[$day][$index])) {
             unset($this->scheduleSettings[$day][$index]);
             $this->scheduleSettings[$day] = array_values($this->scheduleSettings[$day]);
-
-            // اگر هیچ تنظیمی برای روز باقی نماند
-            if (empty($this->scheduleSettings[$day])) {
-                $this->selectedScheduleDays[$day] = false;
-                unset($this->scheduleSettings[$day]);
-            }
-
-            $this->refreshWorkSchedules();
-            $this->modalMessage = 'تنظیم زمان‌بندی با موفقیت حذف شد';
-            $this->modalType = 'success';
-            $this->modalOpen = true;
-            $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'success']);
         }
+
+        // اگر هیچ تنظیمی برای روز باقی نماند
+        if (empty($this->scheduleSettings[$day])) {
+            $this->selectedScheduleDays[$day] = false;
+            unset($this->scheduleSettings[$day]);
+        }
+
+        // بررسی اینکه آیا هنوز تنظیماتی برای work_hour_key وجود دارد
+        $remainingSettings = array_filter(
+            $updatedSettings,
+            fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex
+        );
+        if (empty($remainingSettings)) {
+            $this->selectedScheduleDays[$day] = false;
+            unset($this->scheduleSettings[$day]);
+        }
+
+        $this->refreshWorkSchedules();
+        $this->modalMessage = "تنظیم زمان‌بندی برای روز $day با موفقیت حذف شد";
+        $this->modalType = 'success';
+        $this->modalOpen = true;
+        $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'success']);
     } catch (\Exception $e) {
         $this->modalMessage = $e->getMessage();
         $this->modalType = 'error';
