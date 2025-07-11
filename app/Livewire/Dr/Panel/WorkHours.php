@@ -628,6 +628,15 @@ class Workhours extends Component
                 unset($appointmentSettings[$filteredKeys[$index]]);
                 $appointmentSettings = array_values($appointmentSettings);
                 $schedule->update(['appointment_settings' => json_encode($appointmentSettings)]);
+                // حذف از work_hours هم (در صورت وجود)
+                $workHours = is_array($schedule->work_hours)
+                    ? $schedule->work_hours
+                    : json_decode($schedule->work_hours, true) ?? [];
+                if (isset($workHours[$index])) {
+                    unset($workHours[$index]);
+                    $workHours = array_values($workHours);
+                    $schedule->update(['work_hours' => json_encode($workHours)]);
+                }
                 unset($this->scheduleSettings[$day][$index]);
                 $this->scheduleSettings[$day] = array_values($this->scheduleSettings[$day]);
                 // اگر هیچ تنظیماتی برای این روز باقی نماند، تیک روز را بردار
