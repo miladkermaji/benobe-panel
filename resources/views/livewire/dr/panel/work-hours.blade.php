@@ -391,17 +391,45 @@
             checkbox.checked = false;
         }
     ">
-      <x-modal id="scheduleModal" name="schedule-modal" :title="'برنامه باز شدن نوبت‌های ' .
-          ([
-              'saturday' => 'شنبه',
-              'sunday' => 'یکشنبه',
-              'monday' => 'دوشنبه',
-              'tuesday' => 'سه‌شنبه',
-              'wednesday' => 'چهارشنبه',
-              'thursday' => 'پنج‌شنبه',
-              'friday' => 'جمعه',
-          ][$scheduleModalDay] ??
-              'نامشخص')" size="md-medium">
+      @php
+        $startTime = null;
+        $endTime = null;
+        $day = $scheduleModalDay;
+        $index = $scheduleModalIndex;
+        if (
+            !empty($scheduleSettings[$day][$index]['start_time']) &&
+            !empty($scheduleSettings[$day][$index]['end_time'])
+        ) {
+            $startTime = $scheduleSettings[$day][$index]['start_time'];
+            $endTime = $scheduleSettings[$day][$index]['end_time'];
+        } else {
+            $schedule = collect($this->workSchedules)->firstWhere('day', $day);
+            $settings =
+                $schedule && isset($schedule['appointment_settings'])
+                    ? (is_array($schedule['appointment_settings'])
+                        ? $schedule['appointment_settings']
+                        : json_decode($schedule['appointment_settings'], true) ?? [])
+                    : [];
+            $filteredSettings = array_values(
+                array_filter(
+                    $settings,
+                    fn($setting) => isset($setting['work_hour_key']) &&
+                        (int) $setting['work_hour_key'] === (int) $index,
+                ),
+            );
+            if (!empty($filteredSettings[0]['start_time']) && !empty($filteredSettings[0]['end_time'])) {
+                $startTime = $filteredSettings[0]['start_time'];
+                $endTime = $filteredSettings[0]['end_time'];
+            }
+        }
+        $timeRange = $startTime && $endTime ? "({$startTime} تا {$endTime})" : '';
+        $mainSlotStart = $slots[$scheduleModalDay][$scheduleModalIndex]['start_time'] ?? null;
+        $mainSlotEnd = $slots[$scheduleModalDay][$scheduleModalIndex]['end_time'] ?? null;
+        $mainSlotRange = $mainSlotStart && $mainSlotEnd ? "({$mainSlotStart} تا {$mainSlotEnd})" : '';
+      @endphp
+      <x-modal id="schedule-modal" name="schedule-modal" :show="$modalOpen"
+        title="برنامه باز شدن نوبت‌های {{ $daysFa[$scheduleModalDay] ?? '' }} {{ $mainSlotRange }}"
+        size="md-medium">
         <x-slot:body>
           <div class="position-relative">
             <!-- لودینگ -->
@@ -482,7 +510,7 @@
                             <!-- دکمه‌های کپی و حذف -->
                             <div class="form-group position-relative">
                               <x-custom-tooltip title="کپی تنظیمات" placement="top">
-                                <button class="btn btn-outline-primary btn-sm copy-schedule-setting p-1"
+                                <button class="my-btn btn-light btn-sm copy-schedule-setting p-1"
                                   x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
                                   @click="$dispatch('open-modal', { name: 'copy-schedule-modal', day: day, index: index })"
                                   {{ empty($setting['start_time']) || empty($setting['end_time']) ? 'disabled' : '' }}>
@@ -493,7 +521,7 @@
                             </div>
                             <div class="form-group position-relative">
                               <x-custom-tooltip title="حذف تنظیمات" placement="top">
-                                <button class="btn btn-outline-danger btn-sm delete-schedule-setting p-1"
+                                <button class="my-btn btn-light btn-sm delete-schedule-setting p-1"
                                   x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
                                   @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', day, index);}})"
                                   {{ empty($setting['start_time']) || empty($setting['end_time']) ? 'disabled' : '' }}>
@@ -524,7 +552,7 @@
                           <!-- دکمه‌های غیرفعال برای ردیف خالی -->
                           <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
                             <x-custom-tooltip title="کپی تنظیمات" placement="top">
-                              <button class="btn btn-outline-primary btn-sm copy-schedule-setting p-1" disabled>
+                              <button class="my-btn btn-light btn-sm copy-schedule-setting p-1" disabled>
                                 <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
                                   style="width: 14px; height: 14px;">
                               </button>
@@ -532,7 +560,7 @@
                           </div>
                           <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
                             <x-custom-tooltip title="حذف تنظیمات" placement="top">
-                              <button class="btn btn-outline-danger btn-sm delete-schedule-setting p-1" disabled>
+                              <button class="my-btn btn-outline-danger btn-sm delete-schedule-setting p-1" disabled>
                                 <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
                                   style="width: 14px; height: 14px;">
                               </button>
