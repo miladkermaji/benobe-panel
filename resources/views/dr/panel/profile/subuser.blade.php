@@ -27,18 +27,11 @@
         <form id="add-subuser-form" method="post">
           @csrf
           <div class="w-100 position-relative mt-4 field-wrapper field-user_id">
-            <label class="label-top-input-special-takhasos">انتخاب کاربر:</label>
-            <select name="user_id" id="user-select" class="form-control h-50 w-100">
-              @foreach ($users as $user)
-                <option value="{{ $user->id }}">{{ $user->first_name }} {{ $user->last_name }} --
-                  {{ $user->national_code }}</option>
-              @endforeach
-            </select>
-            @if (method_exists($users, 'links'))
-              <div class="mt-2">
-                {!! $users->links() !!}
-              </div>
-            @endif
+            <label class="label-top-input-special-takhasos">جستجوی کاربر:</label>
+            <input type="text" id="add-user-search" class="form-control h-50 w-100" autocomplete="off"
+              placeholder="نام، نام خانوادگی یا کدملی را وارد کنید...">
+            <input type="hidden" name="user_id" id="add-user-id">
+            <div id="add-user-search-results" class="search-results-list"></div>
             <small class="text-danger error-user_id mt-1"></small>
           </div>
           <div class="w-100 mt-2">
@@ -70,8 +63,11 @@
           @csrf
           <input type="hidden" name="id" id="edit-subuser-id">
           <div class="w-100 position-relative mt-4 field-wrapper field-user_id">
-            <label class="label-top-input-special-takhasos">انتخاب کاربر:</label>
-            <select name="user_id" id="edit-user-select" class="form-control h-50 w-100"></select>
+            <label class="label-top-input-special-takhasos">جستجوی کاربر:</label>
+            <input type="text" id="edit-user-search" class="form-control h-50 w-100" autocomplete="off"
+              placeholder="نام، نام خانوادگی یا کدملی را وارد کنید...">
+            <input type="hidden" name="user_id" id="edit-user-id">
+            <div id="edit-user-search-results" class="search-results-list"></div>
             <small class="text-danger error-user_id mt-1"></small>
           </div>
           <div class="w-100 mt-2">
@@ -170,6 +166,634 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('scripts')
+<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script>
+  function renderSubUserLoading() {
+    $('#subuser-list-tbody').html(
+      `<tr><td colspan="6" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">در حال بارگذاری...</span>
+        </div>
+      </td></tr>`
+    );
+    $('#subuser-notes-cards').html(
+      `<div class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">در حال بارگذاری...</span>
+        </div>
+      </div>`
+    );
+  }
+
+  function renderSubUserTable(subUsers, from) {
+    let html = '';
+    if (!subUsers.length) {
+      html = `<tr><td colspan="6" class="text-center py-4">شما کاربر زیرمجموعه‌ای ندارید</td></tr>`;
+    } else {
+      subUsers.forEach(function(subUser, idx) {
+        html += `<tr>
+          <td class="text-center"><input type="checkbox" class="form-check-input subuser-checkbox" value="${subUser.id}"></td>
+          <td class="text-center">${from + idx}</td>
+          <td>${subUser.subuserable?.first_name ?? ''} ${subUser.subuserable?.last_name ?? ''}</td>
+          <td>${subUser.subuserable?.mobile ?? ''}</td>
+          <td>${subUser.subuserable?.national_code ?? ''}</td>
+          <td class="text-center">
+            <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${subUser.id}" title="ویرایش">
+              <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+            </button>
+            <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${subUser.id}" title="حذف">
+              <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+            </button>
+          </td>
+        </tr>`;
+      });
+    }
+    $('#subuser-list-tbody').html(html);
+  }
+
+  function renderSubUserCards(subUsers) {
+    let html = '';
+    if (!subUsers.length) {
+      html = `<div class="text-center py-4">
+        <div class="d-flex justify-content-center align-items-center flex-column">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+          <p class="text-muted fw-medium">شما کاربر زیرمجموعه‌ای ندارید</p>
+        </div>
+      </div>`;
+    } else {
+      subUsers.forEach(function(subUser) {
+        html += `<div class="note-card mb-3" data-id="${subUser.id}">
+          <div class="note-card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <input type="checkbox" class="form-check-input subuser-checkbox" value="${subUser.id}">
+              <span class="fw-bold">${subUser.subuserable?.first_name ?? ''} ${subUser.subuserable?.last_name ?? ''}</span>
+            </div>
+            <div class="d-flex gap-1">
+              <button class="btn btn-sm btn-gradient-success px-2 py-1 edit-btn" data-id="${subUser.id}" title="ویرایش">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+              <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-btn" data-id="${subUser.id}" title="حذف">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="note-card-body">
+            <div class="note-card-item">
+              <span class="note-card-label">نام و نام خانوادگی:</span>
+              <span class="note-card-value">${subUser.subuserable?.first_name ?? ''} ${subUser.subuserable?.last_name ?? ''}</span>
+            </div>
+            <div class="note-card-item">
+              <span class="note-card-label">شماره موبایل:</span>
+              <span class="note-card-value">${subUser.subuserable?.mobile ?? ''}</span>
+            </div>
+            <div class="note-card-item">
+              <span class="note-card-label">کدملی:</span>
+              <span class="note-card-value">${subUser.subuserable?.national_code ?? ''}</span>
+            </div>
+          </div>
+        </div>`;
+      });
+    }
+    $('#subuser-notes-cards').html(html);
+  }
+
+  function renderSubUserPagination(paginate) {
+    let html = '';
+    if (paginate.total > 0) {
+      html += `<div class="text-muted">نمایش ${paginate.from} تا ${paginate.to} از ${paginate.total} ردیف</div>`;
+      if (paginate.last_page > 1) {
+        html += `<nav><ul class="pagination pagination-sm mb-0">`;
+        for (let i = 1; i <= paginate.last_page; i++) {
+          html += `<li class="page-item${i === paginate.current_page ? ' active' : ''}">
+            <a class="page-link subuser-page-link" href="#" data-page="${i}">${i}</a>
+          </li>`;
+        }
+        html += `</ul></nav>`;
+      }
+    }
+    $('#subuser-pagination-container').html(html);
+  }
+
+  function fetchSubUsers(page = 1, search = '') {
+    renderSubUserLoading();
+    $.ajax({
+      url: "{{ route('dr-sub-users-list') }}",
+      data: {
+        page,
+        search
+      },
+      success: function(res) {
+        renderSubUserTable(res.data, res.from);
+        renderSubUserCards(res.data);
+        renderSubUserPagination(res);
+      },
+      error: function() {
+        $('#subuser-list-tbody').html(
+          '<tr><td colspan="6" class="text-center text-danger">خطا در دریافت داده‌ها</td></tr>');
+        $('#subuser-notes-cards').html('<div class="text-center text-danger">خطا در دریافت داده‌ها</div>');
+        $('#subuser-pagination-container').html('');
+      }
+    });
+  }
+
+  // حذف TomSelect و اضافه کردن جستجوی زنده برای هر دو مودال
+  $(document).ready(function() {
+    // افزودن کاربر زیرمجموعه - جستجوی زنده
+    $('#add-user-search').on('input', function() {
+      const query = $(this).val();
+      const $results = $('#add-user-search-results');
+      $('#add-user-id').val('');
+      if (query.length < 2) {
+        $results.empty().hide();
+        return;
+      }
+      $.ajax({
+        url: "{{ route('dr-sub-users-search-users') }}",
+        data: {
+          q: query
+        },
+        success: function(res) {
+          if (res.length === 0) {
+            $results.html('<div class="search-result-item text-muted">نتیجه‌ای یافت نشد</div>').show();
+          } else {
+            let html = '';
+            res.forEach(function(user) {
+              html +=
+                `<div class="search-result-item" data-id="${user.id}" data-name="${user.first_name} ${user.last_name} (${user.national_code})">${user.first_name} ${user.last_name} <span class="text-muted">(${user.national_code})</span></div>`;
+            });
+            $results.html(html).show();
+          }
+        },
+        error: function() {
+          $results.html('<div class="search-result-item text-danger">خطا در جستجو</div>').show();
+        }
+      });
+    });
+    $(document).on('click', '#add-user-search-results .search-result-item', function() {
+      const id = $(this).data('id');
+      const name = $(this).data('name');
+      $('#add-user-search').val(name);
+      $('#add-user-id').val(id);
+      $('#add-user-search-results').empty().hide();
+    });
+    // بستن لیست نتایج با کلیک بیرون
+    $(document).on('click', function(e) {
+      if (!$(e.target).closest('#add-user-search, #add-user-search-results').length) {
+        $('#add-user-search-results').empty().hide();
+      }
+    });
+
+    // ویرایش کاربر زیرمجموعه - جستجوی زنده
+    let editingUserId = null;
+    $(document).on('click', '.edit-btn', function() {
+      const id = $(this).data('id');
+      editingUserId = id;
+      $('#editSubUserModal').modal('show');
+      $('#edit-user-search').val('');
+      $('#edit-user-id').val('');
+      $('#edit-user-search-results').empty().hide();
+      $.ajax({
+        url: "{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id),
+        method: 'GET',
+        success: function(response) {
+          if (response.user) {
+            const name =
+              `${response.user.first_name} ${response.user.last_name} (${response.user.national_code})`;
+            $('#edit-user-search').val(name);
+            $('#edit-user-id').val(response.user.id);
+          }
+          $('#edit-subuser-id').val(response.id);
+        }
+      });
+    });
+    $('#edit-user-search').on('input', function() {
+      const query = $(this).val();
+      const $results = $('#edit-user-search-results');
+      $('#edit-user-id').val('');
+      if (query.length < 2) {
+        $results.empty().hide();
+        return;
+      }
+      $.ajax({
+        url: "{{ route('dr-sub-users-search-users') }}",
+        data: {
+          q: query
+        },
+        success: function(res) {
+          if (res.length === 0) {
+            $results.html('<div class="search-result-item text-muted">نتیجه‌ای یافت نشد</div>').show();
+          } else {
+            let html = '';
+            res.forEach(function(user) {
+              html +=
+                `<div class="search-result-item" data-id="${user.id}" data-name="${user.first_name} ${user.last_name} (${user.national_code})">${user.first_name} ${user.last_name} <span class="text-muted">(${user.national_code})</span></div>`;
+            });
+            $results.html(html).show();
+          }
+        },
+        error: function() {
+          $results.html('<div class="search-result-item text-danger">خطا در جستجو</div>').show();
+        }
+      });
+    });
+    $(document).on('click', '#edit-user-search-results .search-result-item', function() {
+      const id = $(this).data('id');
+      const name = $(this).data('name');
+      $('#edit-user-search').val(name);
+      $('#edit-user-id').val(id);
+      $('#edit-user-search-results').empty().hide();
+    });
+    $(document).on('click', function(e) {
+      if (!$(e.target).closest('#edit-user-search, #edit-user-search-results').length) {
+        $('#edit-user-search-results').empty().hide();
+      }
+    });
+  });
+
+  $(document).ready(function() {
+    fetchSubUsers();
+
+    $('#subuser-search-input').on('input', function() {
+      fetchSubUsers(1, $(this).val());
+    });
+
+    $(document).on('click', '.subuser-page-link', function(e) {
+      e.preventDefault();
+      const page = $(this).data('page');
+      const search = $('#subuser-search-input').val();
+      fetchSubUsers(page, search);
+    });
+
+    // انتخاب گروهی
+    function updateGroupActionsVisibility() {
+      const checked = $('.subuser-checkbox:checked').length;
+      if (checked > 0) {
+        $('#subuser-group-actions').removeClass('d-none');
+      } else {
+        $('#subuser-group-actions').addClass('d-none');
+      }
+    }
+
+    $(document).on('change', '#subuser-select-all', function() {
+      const checked = $(this).is(':checked');
+      $('.subuser-checkbox').prop('checked', checked);
+      updateGroupActionsVisibility();
+    });
+    $(document).on('change', '.subuser-checkbox', function() {
+      const all = $('.subuser-checkbox').length;
+      const checked = $('.subuser-checkbox:checked').length;
+      $('#subuser-select-all').prop('checked', all === checked && all > 0);
+      updateGroupActionsVisibility();
+    });
+
+    // حذف گروهی
+    $('#subuser-group-action-btn').on('click', function() {
+      const action = $('#subuser-group-action-select').val();
+      const ids = $('.subuser-checkbox:checked').map(function() {
+        return $(this).val();
+      }).get();
+      if (action === 'delete' && ids.length > 0) {
+        Swal.fire({
+          title: 'حذف گروهی',
+          text: 'آیا مطمئن هستید که می‌خواهید همه موارد انتخاب شده حذف شوند؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            $.ajax({
+              url: "{{ route('dr-sub-users-delete-multiple') }}",
+              method: 'DELETE',
+              data: {
+                ids: ids
+              },
+              headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+              },
+              success: function(res) {
+                toastr.success(res.message);
+                fetchSubUsers();
+                $('#subuser-select-all').prop('checked', false);
+                updateGroupActionsVisibility();
+              },
+              error: function(xhr) {
+                toastr.error(xhr.responseJSON?.error || 'خطا در حذف گروهی!');
+              }
+            });
+          }
+        });
+      }
+    });
+
+    // بهبود لود مودال ویرایش با TomSelect ajax (live search)
+    let editUserSelect;
+    $(document).on('click', '.edit-btn', function() {
+      const id = $(this).data('id');
+      const $btn = $(this);
+      $btn.prop('disabled', true);
+      $('#editSubUserModal').modal('show');
+      $('#edit-user-select').html('<option>در حال بارگذاری...</option>');
+      $.ajax({
+        url: "{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id),
+        method: 'GET',
+        cache: true,
+        success: function(response) {
+          $('#edit-subuser-id').val(response.id);
+          if (editUserSelect) {
+            editUserSelect.destroy();
+          }
+          // مقدار اولیه را اضافه کن
+          $('#edit-user-select').html('');
+          if (response.user) {
+            $('#edit-user-select').append(
+              `<option value="${response.user.id}" selected>${response.user.first_name} ${response.user.last_name} (${response.user.national_code})</option>`
+            );
+          }
+          editUserSelect = new TomSelect("#edit-user-select", {
+            valueField: 'id',
+            labelField: 'full_name',
+            searchField: ['first_name', 'last_name', 'national_code', 'mobile'],
+            create: false,
+            plugins: ['clear_button'],
+            load: function(query, callback) {
+              if (!query.length) return callback();
+              $.ajax({
+                url: "{{ route('dr-sub-users-search-users') }}",
+                data: {
+                  q: query
+                },
+                success: function(res) {
+                  callback(res.map(user => ({
+                    id: user.id,
+                    full_name: `${user.first_name} ${user.last_name} (${user.national_code})`,
+                  })));
+                },
+                error: function() {
+                  callback();
+                }
+              });
+            },
+            render: {
+              option: function(data, escape) {
+                return `<div>${escape(data.full_name)}</div>`;
+              },
+              item: function(data, escape) {
+                return `<div>${escape(data.full_name)}</div>`;
+              }
+            }
+          });
+        },
+        error: function() {
+          toastr.error('خطا در دریافت اطلاعات کاربر!');
+          $('#editSubUserModal').modal('hide');
+        },
+        complete: function() {
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+
+    $('#add-subuser-btn').on('click', function() {
+      $('#addSubUserModal').modal('show');
+    });
+
+    function updateSubUserList(subUsers) {
+      const container = $('#subuser-list tbody');
+      container.empty();
+
+      // آپدیت جدول دسکتاپ
+      if (subUsers.length === 0) {
+        container.append(
+          `<tr><td colspan="5" class="text-center">شما کاربر زیرمجموعه‌ای ندارید</td></tr>`
+        );
+      } else {
+        subUsers.forEach((subUser, index) => {
+          const row = `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${subUser.subuserable.first_name} ${subUser.subuserable.last_name}</td>
+              <td>${subUser.subuserable.mobile}</td>
+              <td>${subUser.subuserable.national_code}</td>
+              <td>
+                <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${subUser.id}" title="ویرایش">
+                  <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                </button>
+                <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${subUser.id}" title="حذف">
+                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                </button>
+              </td>
+            </tr>`;
+          container.append(row);
+        });
+      }
+
+      // آپدیت کارت‌های موبایل
+      const mobileContainer = $('.notes-cards');
+      mobileContainer.empty();
+      if (subUsers.length === 0) {
+        mobileContainer.append(`
+          <div class="text-center py-4">
+            <div class="d-flex justify-content-center align-items-center flex-column">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+              <p class="text-muted fw-medium">شما کاربر زیرمجموعه‌ای ندارید</p>
+            </div>
+          </div>
+        `);
+      } else {
+        subUsers.forEach((subUser, index) => {
+          const card = `
+            <div class="note-card mb-3" data-id="${subUser.id}">
+              <div class="note-card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge bg-primary-subtle text-primary">${subUser.subuserable.national_code ?? ''}</span>
+                </div>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm btn-gradient-success px-2 py-1 edit-btn" data-id="${subUser.id}" title="ویرایش">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </button>
+                  <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-btn" data-id="${subUser.id}" title="حذف">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="note-card-body">
+                <div class="note-card-item">
+                  <span class="note-card-label">نام و نام خانوادگی:</span>
+                  <span class="note-card-value">${subUser.subuserable.first_name ?? ''} ${subUser.subuserable.last_name ?? ''}</span>
+                </div>
+                <div class="note-card-item">
+                  <span class="note-card-label">شماره موبایل:</span>
+                  <span class="note-card-value">${subUser.subuserable.mobile ?? ''}</span>
+                </div>
+                <div class="note-card-item">
+                  <span class="note-card-label">کدملی:</span>
+                  <span class="note-card-value">${subUser.subuserable.national_code ?? ''}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          mobileContainer.append(card);
+        });
+      }
+    }
+
+    $('#add-subuser-form').on('submit', function(e) {
+      e.preventDefault();
+      const form = $(this);
+      const submitButton = form.find('button[type="submit"]');
+      const loader = submitButton.find('.loader');
+      const buttonText = submitButton.find('.button_text');
+
+      // بررسی انتخاب کاربر
+      if (!$('#add-user-id').val()) {
+        form.find('.error-user_id').text('لطفاً یک کاربر را انتخاب کنید.');
+        form.find('.field-user_id').addClass('has-error');
+        return;
+      }
+
+      buttonText.hide();
+      loader.show();
+
+      form.find('.text-danger').text('');
+      form.find('.field-wrapper').removeClass('has-error');
+
+      $.ajax({
+        url: "{{ route('dr-sub-users-store') }}",
+        method: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+          toastr.success('کاربر زیرمجموعه با موفقیت اضافه شد!');
+          $('#addSubUserModal').modal('hide');
+          $('body').removeClass('modal-open');
+          $('.modal-backdrop').remove();
+          updateSubUserList(response.subUsers);
+          // ریست اینپوت‌ها
+          $('#add-user-search').val('');
+          $('#add-user-id').val('');
+          $('#add-user-search-results').empty().hide();
+        },
+        error: function(xhr) {
+          if (xhr.status === 422) {
+            const errors = xhr.responseJSON.errors;
+            Object.keys(errors).forEach(function(key) {
+              form.find(`.error-${key}`).text(errors[key][0]);
+              form.find(`.field-${key}`).addClass('has-error');
+            });
+          } else {
+            toastr.error('خطا در ذخیره اطلاعات!');
+          }
+        },
+        complete: function() {
+          buttonText.show();
+          loader.hide();
+        },
+      });
+    });
+
+    $('#edit-subuser-form').on('submit', function(e) {
+      e.preventDefault();
+      const id = $('#edit-subuser-id').val();
+      const form = $(this);
+      const submitButton = form.find('button[type="submit"]');
+      const loader = submitButton.find('.loader');
+      const buttonText = submitButton.find('.button_text');
+
+      // بررسی انتخاب کاربر
+      if (!$('#edit-user-id').val()) {
+        form.find('.error-user_id').text('لطفاً یک کاربر را انتخاب کنید.');
+        form.find('.field-user_id').addClass('has-error');
+        return;
+      }
+
+      buttonText.hide();
+      loader.show();
+
+      form.find('.text-danger').text('');
+      form.find('.field-wrapper').removeClass('has-error');
+
+      $.ajax({
+        url: "{{ route('dr-sub-users-update', ':id') }}".replace(':id', id),
+        method: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+          toastr.success('کاربر زیرمجموعه با موفقیت ویرایش شد!');
+          $('#editSubUserModal').modal('hide');
+          $('body').removeClass('modal-open');
+          $('.modal-backdrop').remove();
+          updateSubUserList(response.subUsers);
+          // ریست اینپوت‌ها
+          $('#edit-user-search').val('');
+          $('#edit-user-id').val('');
+          $('#edit-user-search-results').empty().hide();
+        },
+        error: function(xhr) {
+          if (xhr.status === 422) {
+            const errors = xhr.responseJSON.errors;
+            Object.keys(errors).forEach(function(key) {
+              form.find(`.error-${key}`).text(errors[key][0]);
+              form.find(`.field-${key}`).addClass('has-error');
+            });
+          } else {
+            toastr.error('خطا در ویرایش کاربر!');
+          }
+        },
+        complete: function() {
+          buttonText.show();
+          loader.hide();
+        },
+      });
+    });
+
+    $(document).on('click', '.delete-btn', function() {
+      const id = $(this).data('id');
+
+      Swal.fire({
+        title: 'آیا مطمئن هستید؟',
+        text: 'این عمل قابل بازگشت نیست!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'بله',
+        cancelButtonText: 'لغو',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: "{{ route('dr-sub-users-delete', ':id') }}".replace(':id', id),
+            method: 'DELETE',
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+              toastr.success('کاربر زیرمجموعه با موفقیت حذف شد!');
+              updateSubUserList(response.subUsers);
+            },
+            error: function() {
+              toastr.error('خطا در حذف کاربر!');
+            },
+          });
+        }
+      });
+    });
+  });
+</script>
 @endsection
 
 @section('scripts')
@@ -325,18 +949,6 @@
       fetchSubUsers(page, search);
     });
 
-    // Initialize TomSelect once on page load
-    const addUserSelect = new TomSelect("#user-select", {
-      create: false,
-      plugins: ['clear_button'],
-      maxOptions: 50,
-      render: {
-        option: function(data, escape) {
-          return `<div>${escape(data.text)}</div>`;
-        }
-      }
-    });
-
     // انتخاب گروهی
     function updateGroupActionsVisibility() {
       const checked = $('.subuser-checkbox:checked').length;
@@ -401,7 +1013,7 @@
       }
     });
 
-    // بهبود لود مودال ویرایش با TomSelect ajax
+    // بهبود لود مودال ویرایش با TomSelect ajax (live search)
     let editUserSelect;
     $(document).on('click', '.edit-btn', function() {
       const id = $(this).data('id');
@@ -418,17 +1030,17 @@
           if (editUserSelect) {
             editUserSelect.destroy();
           }
+          // مقدار اولیه را اضافه کن
+          $('#edit-user-select').html('');
+          if (response.user) {
+            $('#edit-user-select').append(
+              `<option value="${response.user.id}" selected>${response.user.first_name} ${response.user.last_name} (${response.user.national_code})</option>`
+            );
+          }
           editUserSelect = new TomSelect("#edit-user-select", {
             valueField: 'id',
             labelField: 'full_name',
             searchField: ['first_name', 'last_name', 'national_code', 'mobile'],
-            maxOptions: 20,
-            options: response.user ? [{
-              id: response.user.id,
-              full_name: `${response.user.first_name} ${response.user.last_name} -- ${response.user.national_code}`,
-              selected: true
-            }] : [],
-            items: response.user ? [response.user.id] : [],
             create: false,
             plugins: ['clear_button'],
             load: function(query, callback) {
@@ -441,7 +1053,7 @@
                 success: function(res) {
                   callback(res.map(user => ({
                     id: user.id,
-                    full_name: `${user.first_name} ${user.last_name} -- ${user.national_code}`,
+                    full_name: `${user.first_name} ${user.last_name} (${user.national_code})`,
                   })));
                 },
                 error: function() {
@@ -451,6 +1063,9 @@
             },
             render: {
               option: function(data, escape) {
+                return `<div>${escape(data.full_name)}</div>`;
+              },
+              item: function(data, escape) {
                 return `<div>${escape(data.full_name)}</div>`;
               }
             }
@@ -563,6 +1178,13 @@
       const loader = submitButton.find('.loader');
       const buttonText = submitButton.find('.button_text');
 
+      // بررسی انتخاب کاربر
+      if (!$('#add-user-id').val()) {
+        form.find('.error-user_id').text('لطفاً یک کاربر را انتخاب کنید.');
+        form.find('.field-user_id').addClass('has-error');
+        return;
+      }
+
       buttonText.hide();
       loader.show();
 
@@ -579,6 +1201,10 @@
           $('body').removeClass('modal-open');
           $('.modal-backdrop').remove();
           updateSubUserList(response.subUsers);
+          // ریست اینپوت‌ها
+          $('#add-user-search').val('');
+          $('#add-user-id').val('');
+          $('#add-user-search-results').empty().hide();
         },
         error: function(xhr) {
           if (xhr.status === 422) {
@@ -606,6 +1232,13 @@
       const loader = submitButton.find('.loader');
       const buttonText = submitButton.find('.button_text');
 
+      // بررسی انتخاب کاربر
+      if (!$('#edit-user-id').val()) {
+        form.find('.error-user_id').text('لطفاً یک کاربر را انتخاب کنید.');
+        form.find('.field-user_id').addClass('has-error');
+        return;
+      }
+
       buttonText.hide();
       loader.show();
 
@@ -622,6 +1255,10 @@
           $('body').removeClass('modal-open');
           $('.modal-backdrop').remove();
           updateSubUserList(response.subUsers);
+          // ریست اینپوت‌ها
+          $('#edit-user-search').val('');
+          $('#edit-user-id').val('');
+          $('#edit-user-search-results').empty().hide();
         },
         error: function(xhr) {
           if (xhr.status === 422) {
