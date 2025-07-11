@@ -359,111 +359,123 @@ class Workhours extends Component
     public $isEditingSchedule = false; // نشان‌دهنده حالت ویرایش
     public $editingSettingIndex = null; // ایندکس تنظیم در حال ویرایش
     public $editingSetting = null; // داده‌های تنظیم در حال ویرایش
-    public function openScheduleModal($day, $index)
-    {
-        // اضافه کردن شرط برای تنظیم activeClinicId
-        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = request()->route('clinic') ?? 'default';
-            $this->activeClinicId = $currentClinicId;
-        } else {
-            $clinicId = $this->activeClinicId;
-            $this->activeClinicId = $clinicId ?? 'default';
-        }
-        $this->scheduleModalDay = $day;
-        $this->scheduleModalIndex = $index;
+  public function openScheduleModal($day, $index)
+{
+    // تنظیم activeClinicId
+    if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+        $currentClinicId = request()->route('clinic') ?? 'default';
+        $this->activeClinicId = $currentClinicId;
+    } else {
+        $clinicId = $this->activeClinicId;
+        $this->activeClinicId = $clinicId ?? 'default';
+    }
 
-        $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-        $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
-        $this->scheduleSettings = [];
+    $this->scheduleModalDay = $day;
+    $this->scheduleModalIndex = $index;
 
-        $allSchedules = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
-            ->where(function ($query) {
-                if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
-                } else {
-                    $query->whereNull('clinic_id');
-                }
-            })
-            ->get();
+    $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+    $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
+    $this->scheduleSettings = [];
 
-        $foundAllSettingsForIndex = [];
-        foreach ($allSchedules as $schedule) {
-            if ($schedule && $schedule->appointment_settings) {
-                $settings = is_array($schedule->appointment_settings)
-                    ? $schedule->appointment_settings
-                    : json_decode($schedule->appointment_settings, true) ?? [];
-
-                $filtered = array_filter($settings, fn ($s) => isset($s['work_hour_key']) && (int) $s['work_hour_key'] === (int) $index);
-                if (!empty($filtered)) {
-                    $foundAllSettingsForIndex = array_merge($foundAllSettingsForIndex, array_values($filtered));
-                }
-            }
-        }
-
-        $uniqueSettings = [];
-        foreach ($foundAllSettingsForIndex as $setting) {
-            $key = ($setting['start_time'] ?? '') . '-' . ($setting['end_time'] ?? '');
-            if (!isset($uniqueSettings[$key])) {
-                $uniqueSettings[$key] = $setting;
+    // دریافت تمام برنامه‌های کاری
+    $allSchedules = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
+        ->where(function ($query) {
+            if ($this->activeClinicId !== 'default') {
+                $query->where('clinic_id', $this->activeClinicId);
             } else {
-                if (isset($uniqueSettings[$key]['days'], $setting['days'])) {
-                    $uniqueSettings[$key]['days'] = array_unique(array_merge($uniqueSettings[$key]['days'], $setting['days']));
+                $query->whereNull('clinic_id');
+            }
+        })
+        ->get();
+
+    // جمع‌آوری تنظیمات مرتبط با work_hour_key مورد نظر
+    $foundAllSettingsForIndex = [];
+    foreach ($allSchedules as $schedule) {
+        if ($schedule && $schedule->appointment_settings) {
+            $settings = is_array($schedule->appointment_settings)
+                ? $schedule->appointment_settings
+                : json_decode($schedule->appointment_settings, true) ?? [];
+
+            $filtered = array_filter($settings, fn ($s) => isset($s['work_hour_key']) && (int) $s['work_hour_key'] === (int) $index);
+            if (!empty($filtered)) {
+                foreach ($filtered as $setting) {
+                    $setting['schedule_day'] = $schedule->day; // ذخیره روز مربوط به تنظیم
+                    $foundAllSettingsForIndex[] = $setting;
                 }
             }
         }
+    }
 
-        $uniqueSettings = array_values($uniqueSettings);
+    // حذف تنظیمات تکراری
+    $uniqueSettings = [];
+    foreach ($foundAllSettingsForIndex as $setting) {
+        $key = ($setting['start_time'] ?? '') . '-' . ($setting['end_time'] ?? '') . '-' . ($setting['work_hour_key'] ?? '');
+        if (!isset($uniqueSettings[$key])) {
+            $uniqueSettings[$key] = $setting;
+        } else {
+            if (isset($uniqueSettings[$key]['days'], $setting['days'])) {
+                $uniqueSettings[$key]['days'] = array_unique(array_merge($uniqueSettings[$key]['days'], $setting['days']));
+            }
+        }
+    }
+    $uniqueSettings = array_values($uniqueSettings);
 
-        // بازسازی scheduleSettings و selectedScheduleDays برای همه روزهایی که در days تنظیم آمده‌اند و کلید درست است
-        $this->scheduleSettings = [];
-        $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
+    // بازسازی scheduleSettings و selectedScheduleDays
+    $this->scheduleSettings = [];
+    $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
 
-        // الگوریتم نهایی: اگر تنظیم اختصاصی برای روز جاری وجود داشت فقط همان روز تیک بخورد و فقط همان بازه نمایش داده شود، اگر نه همه روزهای داخل days تیک بخورند و مقدار مشترک را ببینند
-        $this->scheduleSettings = [];
-        $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
+    // بررسی تنظیم اختصاصی برای روز جاری
+    $hasExclusive = false;
+    foreach ($uniqueSettings as $setting) {
+        if (
+            isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index &&
+            isset($setting['days']) && is_array($setting['days']) &&
+            count($setting['days']) === 1 && $setting['days'][0] === $day &&
+            $setting['schedule_day'] === $day
+        ) {
+            $hasExclusive = true;
+            $this->selectedScheduleDays[$day] = true;
+            $this->scheduleSettings[$day][] = [
+                'start_time' => $setting['start_time'],
+                'end_time' => $setting['end_time'],
+            ];
+            break;
+        }
+    }
 
-        // ابتدا بررسی کن آیا تنظیم اختصاصی برای روز جاری وجود دارد یا نه
-        $hasExclusive = false;
+    // اگر تنظیم اختصاصی نبود، تنظیمات مشترک را برای روزهای مرتبط اعمال کن
+    if (!$hasExclusive) {
         foreach ($uniqueSettings as $setting) {
             if (
                 isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index &&
                 isset($setting['days']) && is_array($setting['days']) &&
-                count($setting['days']) === 1 && $setting['days'][0] === $day
+                in_array($day, $setting['days'])
             ) {
-                $hasExclusive = true;
-                $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
-                $this->selectedScheduleDays[$day] = true;
-                $this->scheduleSettings[$day][] = [
-                    'start_time' => $setting['start_time'],
-                    'end_time' => $setting['end_time'],
-                ];
-                break;
-            }
-        }
-
-        // اگر تنظیم اختصاصی نبود، همه روزهای داخل days را تیک بزن و مقدار مشترک را نمایش بده
-        if (!$hasExclusive) {
-            foreach ($uniqueSettings as $setting) {
-                if (
-                    isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index &&
-                    isset($setting['days']) && is_array($setting['days'])
-                ) {
-                    foreach ($setting['days'] as $d) {
-                        if (in_array($d, $daysOfWeek)) {
-                            $this->selectedScheduleDays[$d] = true;
-                            $this->scheduleSettings[$d][] = [
-                                'start_time' => $setting['start_time'],
-                                'end_time' => $setting['end_time'],
-                            ];
-                        }
+                foreach ($setting['days'] as $d) {
+                    if (in_array($d, $daysOfWeek)) {
+                        $this->selectedScheduleDays[$d] = true;
+                        $this->scheduleSettings[$d][] = [
+                            'start_time' => $setting['start_time'],
+                            'end_time' => $setting['end_time'],
+                        ];
                     }
                 }
             }
         }
-
-        $this->refreshWorkSchedules();
-        $this->dispatch('refresh-schedule-settings');
     }
+
+    // اگر هیچ تنظیمی برای روز جاری وجود نداشت، یک تنظیم خالی اضافه کن
+    if (empty($this->scheduleSettings[$day])) {
+        $this->selectedScheduleDays[$day] = true;
+        $this->scheduleSettings[$day][] = [
+            'start_time' => null,
+            'end_time' => null,
+        ];
+    }
+
+    $this->refreshWorkSchedules();
+    $this->dispatch('refresh-schedule-settings');
+}
     public function autoSaveSchedule($day, $index)
     {
         try {
