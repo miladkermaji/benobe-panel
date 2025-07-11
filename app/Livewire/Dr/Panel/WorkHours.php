@@ -524,13 +524,12 @@ class Workhours extends Component
                 'days' => [$day],
                 'work_hour_key' => (int)$this->scheduleModalIndex,
             ];
-            $filteredKeys = array_keys(array_filter($appointmentSettings, fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex));
-            if (isset($filteredKeys[$index])) {
-                $actualIndex = $filteredKeys[$index];
-                $appointmentSettings[$actualIndex] = $newSetting;
-            } else {
-                $appointmentSettings[] = $newSetting;
-            }
+            // حذف همه بازه‌های قبلی با work_hour_key فعلی و افزودن فقط بازه جدید
+            $appointmentSettings = array_values(array_filter(
+                $appointmentSettings,
+                fn ($setting) => !(isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex)
+            ));
+            $appointmentSettings[] = $newSetting;
             $schedule->update(['appointment_settings' => json_encode(array_values($appointmentSettings))]);
             $this->selectedScheduleDays[$day] = true;
             $this->refreshWorkSchedules();
