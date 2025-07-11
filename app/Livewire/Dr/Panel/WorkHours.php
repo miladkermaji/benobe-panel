@@ -476,8 +476,8 @@ class Workhours extends Component
                 [$hours, $minutes] = explode(':', $time);
                 return (int)$hours * 60 + (int)$minutes;
             };
-            $newStartMinutes = $timeToMinutes($newStartTime);
-            $newEndMinutes = $timeToMinutes($newEndTime);
+            $newStartMinutes = $this->timeToMinutes($newStartTime);
+            $newEndMinutes = $this->timeToMinutes($newEndTime);
             $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
                 ->where('day', $day)
                 ->where(function ($query) {
@@ -499,10 +499,15 @@ class Workhours extends Component
                 ? $schedule->appointment_settings
                 : json_decode($schedule->appointment_settings, true) ?? [];
             // بررسی تداخل زمانی
+
+            $filteredKeys = array_keys(array_filter($appointmentSettings, fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex));
+            $actualIndex = $filteredKeys[$index] ?? null;
+
+
             foreach ($appointmentSettings as $key => $setting) {
-                if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex && $key !== $index) {
-                    $existingStartMinutes = $timeToMinutes($setting['start_time']);
-                    $existingEndMinutes = $timeToMinutes($setting['end_time']);
+                if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex && $key !== $actualIndex) {
+                    $existingStartMinutes = $this->timeToMinutes($setting['start_time']);
+                    $existingEndMinutes = $this->timeToMinutes($setting['end_time']);
                     if (
                         ($newStartMinutes >= $existingStartMinutes && $newStartMinutes < $existingEndMinutes) ||
                         ($newEndMinutes > $existingStartMinutes && $newEndMinutes <= $existingEndMinutes) ||
@@ -512,6 +517,7 @@ class Workhours extends Component
                     }
                 }
             }
+
             $newSetting = [
                 'start_time' => $newStartTime,
                 'end_time' => $newEndTime,
@@ -1917,19 +1923,28 @@ class Workhours extends Component
                         ));
                     }
 
-                    foreach ($workHours as $i => $slot) {
-                        if ($i === $index) {
-                            continue;
-                        }
-                        if ($this->isTimeConflict($newSlot['start'], $newSlot['end'], $slot['start'], $slot['end'])) {
-                            throw new \Exception(sprintf(
-                                'زمان %s تا %s با بازه زمانی موجود %s تا %s در روز %s تداخل دارد',
-                                $newSlot['start'],
-                                $newSlot['end'],
-                                $slot['start'],
-                                $slot['end'],
-                                $this->getPersianDay($day)
-                            ));
+                    // پیدا کردن کلید واقعی تنظیم در حال ویرایش
+                    $filteredKeys = array_keys(array_filter($workHours, fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex));
+                    $actualIndex = $filteredKeys[$index] ?? null;
+                    // بررسی تداخل زمانی
+                    foreach ($workHours as $key => $setting) {
+                        if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex && $key !== $actualIndex) {
+                            $existingStartMinutes = $this->timeToMinutes($setting['start_time']);
+                            $existingEndMinutes = $this->timeToMinutes($setting['end_time']);
+                            if (
+                                ($newSlot['start'] >= $existingStartMinutes && $newSlot['start'] < $existingEndMinutes) ||
+                                ($newSlot['end'] > $existingStartMinutes && $newSlot['end'] <= $existingEndMinutes) ||
+                                ($newSlot['start'] <= $existingStartMinutes && $newSlot['end'] >= $existingEndMinutes)
+                            ) {
+                                throw new \Exception(sprintf(
+                                    'زمان %s تا %s با بازه زمانی موجود %s تا %s در روز %s تداخل دارد',
+                                    $newSlot['start'],
+                                    $newSlot['end'],
+                                    $setting['start_time'],
+                                    $setting['end_time'],
+                                    $this->getPersianDay($day)
+                                ));
+                            }
                         }
                     }
                 }
