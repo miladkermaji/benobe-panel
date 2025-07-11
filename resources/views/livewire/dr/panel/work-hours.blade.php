@@ -376,12 +376,13 @@
                     cancelButtonText: 'انصراف'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        @this.set(`selectedScheduleDays.${day}`, false); // Update Livewire property immediately
+                        @this.set(`selectedScheduleDays.${day}`, false);
                         @this.call('deleteScheduleSettingsForDay', day);
                     }
                 });
             } else { // User is checking
                 @this.set(`selectedScheduleDays.${day}`, true);
+                @this.call('addScheduleSetting', day);
             }
         }
     }"
@@ -390,42 +391,10 @@
     const checkbox = document.getElementById(`schedule-day-${day}`);
     if (checkbox) {
         checkbox.checked = false;
-        // به‌روزرسانی مدل Livewire برای اطمینان
         @this.set(`selectedScheduleDays.${day}`, false);
     }
 ">
       @php
-        $startTime = null;
-        $endTime = null;
-        $day = $scheduleModalDay;
-        $index = $scheduleModalIndex;
-        if (
-            !empty($scheduleSettings[$day][$index]['start_time']) &&
-            !empty($scheduleSettings[$day][$index]['end_time'])
-        ) {
-            $startTime = $scheduleSettings[$day][$index]['start_time'];
-            $endTime = $scheduleSettings[$day][$index]['end_time'];
-        } else {
-            $schedule = collect($this->workSchedules)->firstWhere('day', $day);
-            $settings =
-                $schedule && isset($schedule['appointment_settings'])
-                    ? (is_array($schedule['appointment_settings'])
-                        ? $schedule['appointment_settings']
-                        : json_decode($schedule['appointment_settings'], true) ?? [])
-                    : [];
-            $filteredSettings = array_values(
-                array_filter(
-                    $settings,
-                    fn($setting) => isset($setting['work_hour_key']) &&
-                        (int) $setting['work_hour_key'] === (int) $index,
-                ),
-            );
-            if (!empty($filteredSettings[0]['start_time']) && !empty($filteredSettings[0]['end_time'])) {
-                $startTime = $filteredSettings[0]['start_time'];
-                $endTime = $filteredSettings[0]['end_time'];
-            }
-        }
-        $timeRange = $startTime && $endTime ? "({$startTime} تا {$endTime})" : '';
         $mainSlotStart = $slots[$scheduleModalDay][$scheduleModalIndex]['start_time'] ?? null;
         $mainSlotEnd = $slots[$scheduleModalDay][$scheduleModalIndex]['end_time'] ?? null;
         $mainSlotRange = $mainSlotStart && $mainSlotEnd ? "({$mainSlotStart} تا {$mainSlotEnd})" : '';
@@ -470,7 +439,7 @@
               </div>
               <!-- بخش تنظیمات زمان‌بندی برای هر روز -->
               <div class="schedule-settings-section border-section">
-                <h6 class="section-title mb-2"> باز شدن نوبت ها</h6>
+                <h6 class="section-title mb-2">باز شدن نوبت‌ها</h6>
                 @foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day)
                   @if ($selectedScheduleDays[$day])
                     <div class="work-hours-{{ $day }} mb-2 border-333 p-2 border-radius-11">
@@ -489,13 +458,18 @@
                             array_filter(
                                 $settings,
                                 fn($setting) => isset($setting['work_hour_key']) &&
-                                    (int) $setting['work_hour_key'] === (int) $this->scheduleModalIndex,
+                                    (int) $setting['work_hour_key'] === (int) $this->scheduleModalIndex &&
+                                    ((isset($setting['day']) && $setting['day'] === $day) ||
+                                        (isset($setting['days']) &&
+                                            is_array($setting['days']) &&
+                                            in_array($day, $setting['days']))),
                             ),
                         );
-                        // ترکیب تنظیمات ذخیره‌شده و تنظیمات جدید
                         $combinedSettings = !empty($this->scheduleSettings[$day])
                             ? $this->scheduleSettings[$day]
-                            : $filteredSettings;
+                            : (!empty($filteredSettings)
+                                ? [$filteredSettings[0]]
+                                : []);
                       @endphp
                       @if (!empty($combinedSettings))
                         @foreach ($combinedSettings as $index => $setting)
@@ -519,7 +493,6 @@
                                 wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
                                 value="{{ $setting['end_time'] ?? '' }}">
                             </div>
-                            <!-- دکمه‌های کپی و حذف -->
                             <div class="form-group position-relative">
                               <x-custom-tooltip title="کپی تنظیمات" placement="top">
                                 <button class="my-btn btn-light btn-sm copy-schedule-setting p-1"
@@ -561,8 +534,7 @@
                               data-timepicker wire:model.live="scheduleSettings.{{ $day }}.0.end_time"
                               wire:change="autoSaveSchedule('{{ $day }}', 0)">
                           </div>
-                          <!-- دکمه‌های غیرفعال برای ردیف خالی -->
-                          <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
+                          <div class="form-group position-relative">
                             <x-custom-tooltip title="کپی تنظیمات" placement="top">
                               <button class="my-btn btn-light btn-sm copy-schedule-setting p-1" disabled>
                                 <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
@@ -570,7 +542,7 @@
                               </button>
                             </x-custom-tooltip>
                           </div>
-                          <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
+                          <div class="form-group position-relative">
                             <x-custom-tooltip title="حذف تنظیمات" placement="top">
                               <button class="my-btn btn-outline-danger btn-sm delete-schedule-setting p-1" disabled>
                                 <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
