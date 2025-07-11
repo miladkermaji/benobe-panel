@@ -746,6 +746,17 @@ public function deleteScheduleSetting($day, $index)
             $this->activeClinicId = $clinicId ?? 'default';
         }
 
+        // نگاشت روزهای انگلیسی به فارسی
+        $dayTranslations = [
+            'saturday' => 'شنبه',
+            'sunday' => 'یکشنبه',
+            'monday' => 'دوشنبه',
+            'tuesday' => 'سه‌شنبه',
+            'wednesday' => 'چهارشنبه',
+            'thursday' => 'پنج‌شنبه',
+            'friday' => 'جمعه',
+        ];
+
         // دریافت برنامه کاری برای روز جاری
         $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
             ->where('day', $this->scheduleModalDay)
@@ -811,10 +822,14 @@ public function deleteScheduleSetting($day, $index)
         }
 
         $this->refreshWorkSchedules();
-        $this->modalMessage = "تنظیم زمان‌بندی برای روز $day با موفقیت حذف شد";
+        // استفاده از نام روز به فارسی در پیام
+        $persianDay = $dayTranslations[$day] ?? $day;
+        $this->modalMessage = "تنظیمات برای روز $persianDay با موفقیت حذف شد";
         $this->modalType = 'success';
         $this->modalOpen = true;
         $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'success']);
+        // اعلان به‌روزرسانی UI
+        $this->dispatch('day-setting-deleted', ['day' => $day]);
     } catch (\Exception $e) {
         $this->modalMessage = $e->getMessage();
         $this->modalType = 'error';
@@ -833,6 +848,17 @@ public function deleteScheduleSettingsForDay($day)
             $clinicId = $this->activeClinicId;
             $this->activeClinicId = $clinicId ?? 'default';
         }
+
+        // نگاشت روزهای انگلیسی به فارسی
+        $dayTranslations = [
+            'saturday' => 'شنبه',
+            'sunday' => 'یکشنبه',
+            'monday' => 'دوشنبه',
+            'tuesday' => 'سه‌شنبه',
+            'wednesday' => 'چهارشنبه',
+            'thursday' => 'پنج‌شنبه',
+            'friday' => 'جمعه',
+        ];
 
         // دریافت برنامه کاری برای روز جاری
         $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
@@ -871,7 +897,9 @@ public function deleteScheduleSettingsForDay($day)
 
         $this->refreshWorkSchedules();
         $this->dispatch('day-setting-deleted', ['day' => $day]);
-        $this->modalMessage = "تنظیمات برای روز $day با موفقیت حذف شد";
+        // استفاده از نام روز به فارسی در پیام
+        $persianDay = $dayTranslations[$day] ?? $day;
+        $this->modalMessage = "تنظیمات برای روز $persianDay با موفقیت حذف شد";
         $this->modalType = 'success';
         $this->modalOpen = true;
         $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'success']);

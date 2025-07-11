@@ -385,12 +385,14 @@
         }
     }"
       @day-setting-deleted.window="
-        const day = $event.detail.day;
-        const checkbox = document.getElementById(`schedule-day-${day}`);
-        if (checkbox) {
-            checkbox.checked = false;
-        }
-    ">
+    const day = $event.detail.day;
+    const checkbox = document.getElementById(`schedule-day-${day}`);
+    if (checkbox) {
+        checkbox.checked = false;
+        // به‌روزرسانی مدل Livewire برای اطمینان
+        @this.set(`selectedScheduleDays.${day}`, false);
+    }
+">
       @php
         $startTime = null;
         $endTime = null;
@@ -496,9 +498,9 @@
                       @endphp
                       @if (!empty($combinedSettings))
                         @foreach ($combinedSettings as $index => $setting)
-                          <div class="form-row d-flex align-items-center  mb-1 bg-active-slot border-radius-11 p-3"
+                          <div class="form-row d-flex align-items-center mb-1 bg-active-slot border-radius-11 p-3"
                             wire:key="setting-{{ $day }}-{{ $index }}-{{ $scheduleModalIndex }}">
-                            <div class="form-group position-relative timepicker-ui ">
+                            <div class="form-group position-relative timepicker-ui">
                               <label class="label-top-input-special-takhasos font-size-11">از</label>
                               <input type="text"
                                 class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
@@ -507,7 +509,7 @@
                                 wire:change="autoSaveSchedule('{{ $day }}', {{ $index }})"
                                 value="{{ $setting['start_time'] ?? '' }}">
                             </div>
-                            <div class="form-group position-relative timepicker-ui ">
+                            <div class="form-group position-relative timepicker-ui">
                               <label class="label-top-input-special-takhasos font-size-11">تا</label>
                               <input type="text"
                                 class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
