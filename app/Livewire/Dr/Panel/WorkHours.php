@@ -414,19 +414,48 @@ class Workhours extends Component
 
         $uniqueSettings = array_values($uniqueSettings);
 
-        foreach ($uniqueSettings as $settingIndex => $setting) {
-            if (isset($setting['days']) && is_array($setting['days'])) {
-                foreach ($setting['days'] as $settingDay) {
-                    if (in_array($settingDay, $daysOfWeek)) {
-                        $this->selectedScheduleDays[$settingDay] = true;
-                        if (!isset($this->scheduleSettings[$settingDay])) {
-                            $this->scheduleSettings[$settingDay] = [];
+        // بازسازی scheduleSettings و selectedScheduleDays برای همه روزهایی که در days تنظیم آمده‌اند و کلید درست است
+        $this->scheduleSettings = [];
+        $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
+
+        // الگوریتم نهایی: اگر تنظیم اختصاصی برای روز جاری وجود داشت فقط همان روز تیک بخورد و فقط همان بازه نمایش داده شود، اگر نه همه روزهای داخل days تیک بخورند و مقدار مشترک را ببینند
+        $this->scheduleSettings = [];
+        $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
+
+        // ابتدا بررسی کن آیا تنظیم اختصاصی برای روز جاری وجود دارد یا نه
+        $hasExclusive = false;
+        foreach ($uniqueSettings as $setting) {
+            if (
+                isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index &&
+                isset($setting['days']) && is_array($setting['days']) &&
+                count($setting['days']) === 1 && $setting['days'][0] === $day
+            ) {
+                $hasExclusive = true;
+                $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
+                $this->selectedScheduleDays[$day] = true;
+                $this->scheduleSettings[$day][] = [
+                    'start_time' => $setting['start_time'],
+                    'end_time' => $setting['end_time'],
+                ];
+                break;
+            }
+        }
+
+        // اگر تنظیم اختصاصی نبود، همه روزهای داخل days را تیک بزن و مقدار مشترک را نمایش بده
+        if (!$hasExclusive) {
+            foreach ($uniqueSettings as $setting) {
+                if (
+                    isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index &&
+                    isset($setting['days']) && is_array($setting['days'])
+                ) {
+                    foreach ($setting['days'] as $d) {
+                        if (in_array($d, $daysOfWeek)) {
+                            $this->selectedScheduleDays[$d] = true;
+                            $this->scheduleSettings[$d][] = [
+                                'start_time' => $setting['start_time'],
+                                'end_time' => $setting['end_time'],
+                            ];
                         }
-                        // Add the setting to the day
-                        $this->scheduleSettings[$settingDay][$settingIndex] = [
-                            'start_time' => $setting['start_time'],
-                            'end_time' => $setting['end_time'],
-                        ];
                     }
                 }
             }
@@ -813,7 +842,10 @@ class Workhours extends Component
                     if (!empty($appointmentSettings)) {
                         $this->scheduleSettings[$day] = [];
                         foreach ($appointmentSettings as $index => $setting) {
-                            if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex) {
+                            if (
+                                isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex &&
+                                isset($setting['days']) && is_array($setting['days']) && in_array($day, $setting['days'])
+                            ) {
                                 $this->scheduleSettings[$day][] = [
                                     'start_time' => $setting['start_time'] ?? null,
                                     'end_time' => $setting['end_time'] ?? null,
