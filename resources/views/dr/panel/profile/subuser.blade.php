@@ -768,7 +768,7 @@
           $('#addSubUserModal').modal('hide');
           $('body').removeClass('modal-open');
           $('.modal-backdrop').remove();
-          updateSubUserList(response.subUsers);
+          fetchSubUsers();
           // ریست اینپوت‌ها
           $('#add-user-search').val('');
           $('#add-user-id').val('');
@@ -822,7 +822,7 @@
           $('#editSubUserModal').modal('hide');
           $('body').removeClass('modal-open');
           $('.modal-backdrop').remove();
-          updateSubUserList(response.subUsers);
+          fetchSubUsers();
           // ریست اینپوت‌ها
           $('#edit-user-search').val('');
           $('#edit-user-id').val('');
@@ -866,10 +866,16 @@
             },
             success: function(response) {
               toastr.success('کاربر زیرمجموعه با موفقیت حذف شد!');
-              updateSubUserList(response.subUsers);
+              fetchSubUsers();
             },
-            error: function() {
-              toastr.error('خطا در حذف کاربر!');
+            error: function(xhr) {
+              if (xhr.status === 404) {
+                toastr.error('کاربر مورد نظر پیدا نشد یا قبلاً حذف شده است.');
+                fetchSubUsers();
+              } else {
+                toastr.error('خطا در حذف کاربر!');
+                fetchSubUsers();
+              }
             },
           });
         }

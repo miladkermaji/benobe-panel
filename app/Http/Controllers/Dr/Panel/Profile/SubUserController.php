@@ -53,7 +53,6 @@ class SubUserController extends Controller
         return response()->json([
             'message'  => 'کاربر زیرمجموعه با موفقیت اضافه شد!',
             'subUsers' => SubUser::where('doctor_id', $doctorId)->with('subuserable')->get(),
-            'users'    => User::all(),
         ]);
     }
 
@@ -104,13 +103,17 @@ class SubUserController extends Controller
         return response()->json([
             'message'  => 'کاربر زیرمجموعه با موفقیت ویرایش شد!',
             'subUsers' => SubUser::where('doctor_id', $subUser->doctor_id)->with('subuserable')->get(),
-            'users'    => User::all(),
         ]);
     }
 
     public function destroy($id)
     {
-        $subUser  = SubUser::findOrFail($id);
+        $subUser  = SubUser::find($id);
+        if (!$subUser) {
+            return response()->json([
+                'error' => 'کاربر مورد نظر پیدا نشد یا قبلاً حذف شده است.'
+            ], 404);
+        }
         $doctorId = $subUser->doctor_id;
         $subUser->delete();
 
