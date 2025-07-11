@@ -89,104 +89,84 @@
 
 <!-- بخش محتوا با جدول بوت‌استرپ -->
 <div class="container subuser-content w-100 d-flex justify-content-center mt-4">
-  <div class="subuser-content-wrapper  w-100">
-    <div class="w-100 d-flex justify-content-end">
-      <button class="btn my-btn-primary h-50 add-subuser-btn" id="add-subuser-btn">افزودن کاربر جدید</button>
-    </div>
-    <div class="p-3">
-      <h4 class="text-dark fw-bold">لیست کاربران زیرمجموعه</h4>
-    </div>
-    <div class="mt-2 table-responsive d-none d-md-block">
-      <table class="table table-modern table-hover" id="subuser-list">
-        <thead>
-          <tr>
-            <th>ردیف</th>
-            <th>نام و نام خانوادگی</th>
-            <th>شماره موبایل</th>
-            <th>کدملی</th>
-            <th>عملیات</th>
-          </tr>
-        </thead>
-        <tbody>
-          @forelse ($subUsers as $index => $subUser)
-            <tr>
-              <td>{{ $index + 1 }}</td>
-              <td>{{ $subUser->subuserable->first_name ?? '' }} {{ $subUser->subuserable->last_name ?? '' }}</td>
-              <td>{{ $subUser->subuserable->mobile ?? '' }}</td>
-              <td>{{ $subUser->subuserable->national_code ?? '' }}</td>
-              <td>
-                <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="{{ $subUser->id }}"
-                  title="ویرایش">
-                  <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
-                </button>
-                <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="{{ $subUser->id }}"
-                  title="حذف">
-                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                </button>
-              </td>
-            </tr>
-          @empty
-            <tr>
-              <td colspan="5" class="text-center">شما کاربر زیرمجموعه‌ای ندارید</td>
-            </tr>
-          @endforelse
-        </tbody>
-      </table>
-    </div>
-    <!-- کارت‌های کاربران زیرمجموعه برای موبایل/تبلت -->
-    <div class="notes-cards d-md-none">
-      @forelse ($subUsers as $index => $subUser)
-        <div class="note-card mb-3" data-id="{{ $subUser->id }}">
-          <div class="note-card-header d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-2">
-              <span
-                class="badge bg-primary-subtle text-primary">{{ $subUser->subuserable->national_code ?? '' }}</span>
-            </div>
-            <div class="d-flex gap-1">
-              <button class="btn btn-sm btn-gradient-success px-2 py-1 edit-btn" data-id="{{ $subUser->id }}"
-                title="ویرایش">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2">
-                  <path
-                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+  <div class="subuser-content-wrapper w-100">
+    <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
+      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
+        <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0">کاربران زیرمجموعه من</h1>
+          </div>
+          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+            <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
+              <div class="search-container position-relative" style="max-width: 100%;">
+                <input type="text" id="subuser-search-input"
+                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                  placeholder="جستجو در کاربران..." style="padding-right: 20px; text-align: right; direction: rtl;">
+                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                  style="z-index: 5; top: 50%; right: 8px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                    stroke-width="2">
+                    <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                  </svg>
+                </span>
+              </div>
+              <button
+                class="btn btn-gradient-success rounded-1 px-3 py-1 d-flex align-items-center gap-1 add-subuser-btn"
+                id="add-subuser-btn">
+                <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14" />
                 </svg>
-              </button>
-              <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-btn" data-id="{{ $subUser->id }}"
-                title="حذف">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2">
-                  <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                </svg>
+                <span>افزودن</span>
               </button>
             </div>
           </div>
-          <div class="note-card-body">
-            <div class="note-card-item">
-              <span class="note-card-label">نام و نام خانوادگی:</span>
-              <span class="note-card-value">{{ $subUser->subuserable->first_name ?? '' }}
-                {{ $subUser->subuserable->last_name ?? '' }}</span>
-            </div>
-            <div class="note-card-item">
-              <span class="note-card-label">شماره موبایل:</span>
-              <span class="note-card-value">{{ $subUser->subuserable->mobile ?? '' }}</span>
-            </div>
-            <div class="note-card-item">
-              <span class="note-card-label">کدملی:</span>
-              <span class="note-card-value">{{ $subUser->subuserable->national_code ?? '' }}</span>
-            </div>
+        </div>
+      </div>
+    </div>
+    <div class="card shadow-sm rounded-2">
+      <div class="card-body p-0">
+        <div class="group-actions p-2 border-bottom d-none" id="subuser-group-actions">
+          <div class="d-flex align-items-center gap-2 justify-content-end">
+            <select class="form-select form-select-sm" style="max-width: 200px;" id="subuser-group-action-select">
+              <option value="">عملیات گروهی</option>
+              <option value="delete">حذف انتخاب شده‌ها</option>
+            </select>
+            <button class="btn btn-sm btn-primary" type="button" id="subuser-group-action-btn">
+              <span>اجرا</span>
+            </button>
           </div>
         </div>
-      @empty
-        <div class="text-center py-4">
-          <div class="d-flex justify-content-center align-items-center flex-column">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" class="text-muted mb-2">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-            <p class="text-muted fw-medium">شما کاربر زیرمجموعه‌ای ندارید</p>
-          </div>
+        <div class="table-responsive text-nowrap d-none d-md-block">
+          <table class="table table-hover w-100 m-0" id="subuser-list-table">
+            <thead>
+              <tr>
+                <th class="text-center align-middle" style="width: 40px;">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <input type="checkbox" id="subuser-select-all" class="form-check-input m-0 align-middle">
+                  </div>
+                </th>
+                <th class="text-center align-middle" style="width: 60px;">ردیف</th>
+                <th class="align-middle">نام و نام خانوادگی</th>
+                <th class="align-middle">شماره موبایل</th>
+                <th class="align-middle">کدملی</th>
+                <th class="text-center align-middle" style="width: 120px;">عملیات</th>
+              </tr>
+            </thead>
+            <tbody id="subuser-list-tbody">
+              <!-- Rows will be rendered by JS -->
+            </tbody>
+          </table>
         </div>
-      @endforelse
+        <!-- Mobile Card View -->
+        <div class="notes-cards d-md-none" id="subuser-notes-cards">
+          <!-- Cards will be rendered by JS -->
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-3 px-3 flex-wrap gap-2"
+          id="subuser-pagination-container">
+          <!-- Pagination will be rendered by JS -->
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -197,11 +177,154 @@
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 <script src="{{ asset('dr-assets/js/select2/select2.js') }}"></script>
 <script>
-  var appointmentsSearchUrl = "{{ route('search.appointments') }}";
-  var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
-</script>
-<script>
+  function renderSubUserLoading() {
+    $('#subuser-list-tbody').html(
+      `<tr><td colspan="6" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">در حال بارگذاری...</span>
+        </div>
+      </td></tr>`
+    );
+    $('#subuser-notes-cards').html(
+      `<div class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">در حال بارگذاری...</span>
+        </div>
+      </div>`
+    );
+  }
+
+  function renderSubUserTable(subUsers, from) {
+    let html = '';
+    if (!subUsers.length) {
+      html = `<tr><td colspan="6" class="text-center py-4">شما کاربر زیرمجموعه‌ای ندارید</td></tr>`;
+    } else {
+      subUsers.forEach(function(subUser, idx) {
+        html += `<tr>
+          <td class="text-center"><input type="checkbox" class="form-check-input subuser-checkbox" value="${subUser.id}"></td>
+          <td class="text-center">${from + idx}</td>
+          <td>${subUser.subuserable?.first_name ?? ''} ${subUser.subuserable?.last_name ?? ''}</td>
+          <td>${subUser.subuserable?.mobile ?? ''}</td>
+          <td>${subUser.subuserable?.national_code ?? ''}</td>
+          <td class="text-center">
+            <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${subUser.id}" title="ویرایش">
+              <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+            </button>
+            <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${subUser.id}" title="حذف">
+              <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+            </button>
+          </td>
+        </tr>`;
+      });
+    }
+    $('#subuser-list-tbody').html(html);
+  }
+
+  function renderSubUserCards(subUsers) {
+    let html = '';
+    if (!subUsers.length) {
+      html = `<div class="text-center py-4">
+        <div class="d-flex justify-content-center align-items-center flex-column">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+          <p class="text-muted fw-medium">شما کاربر زیرمجموعه‌ای ندارید</p>
+        </div>
+      </div>`;
+    } else {
+      subUsers.forEach(function(subUser) {
+        html += `<div class="note-card mb-3" data-id="${subUser.id}">
+          <div class="note-card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <input type="checkbox" class="form-check-input subuser-checkbox" value="${subUser.id}">
+              <span class="fw-bold">${subUser.subuserable?.first_name ?? ''} ${subUser.subuserable?.last_name ?? ''}</span>
+            </div>
+            <div class="d-flex gap-1">
+              <button class="btn btn-sm btn-gradient-success px-2 py-1 edit-btn" data-id="${subUser.id}" title="ویرایش">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+              <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-btn" data-id="${subUser.id}" title="حذف">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="note-card-body">
+            <div class="note-card-item">
+              <span class="note-card-label">نام و نام خانوادگی:</span>
+              <span class="note-card-value">${subUser.subuserable?.first_name ?? ''} ${subUser.subuserable?.last_name ?? ''}</span>
+            </div>
+            <div class="note-card-item">
+              <span class="note-card-label">شماره موبایل:</span>
+              <span class="note-card-value">${subUser.subuserable?.mobile ?? ''}</span>
+            </div>
+            <div class="note-card-item">
+              <span class="note-card-label">کدملی:</span>
+              <span class="note-card-value">${subUser.subuserable?.national_code ?? ''}</span>
+            </div>
+          </div>
+        </div>`;
+      });
+    }
+    $('#subuser-notes-cards').html(html);
+  }
+
+  function renderSubUserPagination(paginate) {
+    let html = '';
+    if (paginate.total > 0) {
+      html += `<div class="text-muted">نمایش ${paginate.from} تا ${paginate.to} از ${paginate.total} ردیف</div>`;
+      if (paginate.last_page > 1) {
+        html += `<nav><ul class="pagination pagination-sm mb-0">`;
+        for (let i = 1; i <= paginate.last_page; i++) {
+          html += `<li class="page-item${i === paginate.current_page ? ' active' : ''}">
+            <a class="page-link subuser-page-link" href="#" data-page="${i}">${i}</a>
+          </li>`;
+        }
+        html += `</ul></nav>`;
+      }
+    }
+    $('#subuser-pagination-container').html(html);
+  }
+
+  function fetchSubUsers(page = 1, search = '') {
+    renderSubUserLoading();
+    $.ajax({
+      url: "{{ route('dr-sub-users-list') }}",
+      data: {
+        page,
+        search
+      },
+      success: function(res) {
+        renderSubUserTable(res.data, res.from);
+        renderSubUserCards(res.data);
+        renderSubUserPagination(res);
+      },
+      error: function() {
+        $('#subuser-list-tbody').html(
+          '<tr><td colspan="6" class="text-center text-danger">خطا در دریافت داده‌ها</td></tr>');
+        $('#subuser-notes-cards').html('<div class="text-center text-danger">خطا در دریافت داده‌ها</div>');
+        $('#subuser-pagination-container').html('');
+      }
+    });
+  }
+
   $(document).ready(function() {
+    fetchSubUsers();
+
+    $('#subuser-search-input').on('input', function() {
+      fetchSubUsers(1, $(this).val());
+    });
+
+    $(document).on('click', '.subuser-page-link', function(e) {
+      e.preventDefault();
+      const page = $(this).data('page');
+      const search = $('#subuser-search-input').val();
+      fetchSubUsers(page, search);
+    });
+
     // Initialize TomSelect once on page load
     const addUserSelect = new TomSelect("#user-select", {
       create: false,
@@ -214,7 +337,134 @@
       }
     });
 
+    // انتخاب گروهی
+    function updateGroupActionsVisibility() {
+      const checked = $('.subuser-checkbox:checked').length;
+      if (checked > 0) {
+        $('#subuser-group-actions').removeClass('d-none');
+      } else {
+        $('#subuser-group-actions').addClass('d-none');
+      }
+    }
+
+    $(document).on('change', '#subuser-select-all', function() {
+      const checked = $(this).is(':checked');
+      $('.subuser-checkbox').prop('checked', checked);
+      updateGroupActionsVisibility();
+    });
+    $(document).on('change', '.subuser-checkbox', function() {
+      const all = $('.subuser-checkbox').length;
+      const checked = $('.subuser-checkbox:checked').length;
+      $('#subuser-select-all').prop('checked', all === checked && all > 0);
+      updateGroupActionsVisibility();
+    });
+
+    // حذف گروهی
+    $('#subuser-group-action-btn').on('click', function() {
+      const action = $('#subuser-group-action-select').val();
+      const ids = $('.subuser-checkbox:checked').map(function() {
+        return $(this).val();
+      }).get();
+      if (action === 'delete' && ids.length > 0) {
+        Swal.fire({
+          title: 'حذف گروهی',
+          text: 'آیا مطمئن هستید که می‌خواهید همه موارد انتخاب شده حذف شوند؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            $.ajax({
+              url: "{{ route('dr-sub-users-delete-multiple') }}",
+              method: 'DELETE',
+              data: {
+                ids: ids
+              },
+              headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+              },
+              success: function(res) {
+                toastr.success(res.message);
+                fetchSubUsers();
+                $('#subuser-select-all').prop('checked', false);
+                updateGroupActionsVisibility();
+              },
+              error: function(xhr) {
+                toastr.error(xhr.responseJSON?.error || 'خطا در حذف گروهی!');
+              }
+            });
+          }
+        });
+      }
+    });
+
+    // بهبود لود مودال ویرایش با TomSelect ajax
     let editUserSelect;
+    $(document).on('click', '.edit-btn', function() {
+      const id = $(this).data('id');
+      const $btn = $(this);
+      $btn.prop('disabled', true);
+      $('#editSubUserModal').modal('show');
+      $('#edit-user-select').html('<option>در حال بارگذاری...</option>');
+      $.ajax({
+        url: "{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id),
+        method: 'GET',
+        cache: true,
+        success: function(response) {
+          $('#edit-subuser-id').val(response.id);
+          if (editUserSelect) {
+            editUserSelect.destroy();
+          }
+          editUserSelect = new TomSelect("#edit-user-select", {
+            valueField: 'id',
+            labelField: 'full_name',
+            searchField: ['first_name', 'last_name', 'national_code', 'mobile'],
+            maxOptions: 20,
+            options: response.user ? [{
+              id: response.user.id,
+              full_name: `${response.user.first_name} ${response.user.last_name} -- ${response.user.national_code}`,
+              selected: true
+            }] : [],
+            items: response.user ? [response.user.id] : [],
+            create: false,
+            plugins: ['clear_button'],
+            load: function(query, callback) {
+              if (!query.length) return callback();
+              $.ajax({
+                url: "{{ route('dr-sub-users-search-users') }}",
+                data: {
+                  q: query
+                },
+                success: function(res) {
+                  callback(res.map(user => ({
+                    id: user.id,
+                    full_name: `${user.first_name} ${user.last_name} -- ${user.national_code}`,
+                  })));
+                },
+                error: function() {
+                  callback();
+                }
+              });
+            },
+            render: {
+              option: function(data, escape) {
+                return `<div>${escape(data.full_name)}</div>`;
+              }
+            }
+          });
+        },
+        error: function() {
+          toastr.error('خطا در دریافت اطلاعات کاربر!');
+          $('#editSubUserModal').modal('hide');
+        },
+        complete: function() {
+          $btn.prop('disabled', false);
+        }
+      });
+    });
 
     $('#add-subuser-btn').on('click', function() {
       $('#addSubUserModal').modal('show');
@@ -345,53 +595,6 @@
           buttonText.show();
           loader.hide();
         },
-      });
-    });
-
-    $(document).on('click', '.edit-btn', function() {
-      const id = $(this).data('id');
-      const $btn = $(this);
-      $btn.prop('disabled', true);
-
-      // Show modal immediately with loading state
-      $('#editSubUserModal').modal('show');
-      $('#edit-user-select').html('<option>در حال بارگذاری...</option>');
-
-      $.ajax({
-        url: "{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id),
-        method: 'GET',
-        cache: true,
-        success: function(response) {
-          $('#edit-subuser-id').val(response.id);
-
-          // Destroy existing TomSelect instance if exists
-          if (editUserSelect) {
-            editUserSelect.destroy();
-          }
-
-          // Populate select options
-          const options = response.users.map(user => ({
-            value: user.id,
-            text: `${user.first_name} ${user.last_name} -- ${user.national_code}`,
-            selected: user.id === response.user_id
-          }));
-
-          // Initialize new TomSelect instance
-          editUserSelect = new TomSelect("#edit-user-select", {
-            options: options,
-            items: [response.user_id],
-            create: false,
-            plugins: ['clear_button'],
-            maxOptions: 50
-          });
-        },
-        error: function() {
-          toastr.error('خطا در دریافت اطلاعات کاربر!');
-          $('#editSubUserModal').modal('hide');
-        },
-        complete: function() {
-          $btn.prop('disabled', false);
-        }
       });
     });
 

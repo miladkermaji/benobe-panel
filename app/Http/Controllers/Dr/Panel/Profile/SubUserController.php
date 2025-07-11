@@ -60,12 +60,12 @@ class SubUserController extends Controller
     public function edit($id)
     {
         $subUser = SubUser::with('subuserable')->findOrFail($id);
-        $users   = User::all();
+        $user = User::find($subUser->subuserable_id);
 
         return response()->json([
             'id'      => $subUser->id,
             'user_id' => $subUser->subuserable_id,
-            'users'   => $users,
+            'user'    => $user,
         ]);
     }
 
@@ -118,5 +118,57 @@ class SubUserController extends Controller
             'message'  => 'کاربر زیرمجموعه حذف شد!',
             'subUsers' => SubUser::where('doctor_id', $doctorId)->with('subuserable')->get(),
         ]);
+    }
+
+    public function destroyMultiple(Request $request)
+    {
+        $doctorId = Auth::guard('doctor')->id();
+        $ids = $request->input('ids', []);
+        if (!is_array($ids) || empty($ids)) {
+            return response()->json(['error' => 'هیچ کاربری انتخاب نشده است.'], 422);
+        }
+        SubUser::where('doctor_id', $doctorId)->whereIn('id', $ids)->delete();
+        $subUsers = SubUser::where('doctor_id', $doctorId)->with('subuserable')->orderByDesc('id')->paginate(20);
+        return response()->json([
+            'message' => 'کاربران زیرمجموعه با موفقیت حذف شدند!',
+            'subUsers' => $subUsers
+        ]);
+    }
+
+    public function list(Request $request)
+    {
+        $doctorId = Auth::guard('doctor')->id();
+        $query = SubUser::with('subuserable')->where('doctor_id', $doctorId);
+
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->whereHas('subuserable', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%$search%")
+                  ->orWhere('last_name', 'like', "%$search%")
+                  ->orWhere('mobile', 'like', "%$search%")
+                  ->orWhere('national_code', 'like', "%$search%");
+            });
+        }
+
+        $perPage = $request->get('per_page', 20);
+        $subUsers = $query->orderByDesc('id')->paginate($perPage);
+
+        return response()->json($subUsers);
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $query = $request->input('q');
+        $users = User::query()
+            ->where(function ($q) use ($query) {
+                $q->where('first_name', 'like', "%{$query}%")
+                  ->orWhere('last_name', 'like', "%{$query}%")
+                  ->orWhere('national_code', 'like', "%{$query}%")
+                  ->orWhere('mobile', 'like', "%{$query}%");
+            })
+            ->limit(20)
+            ->get();
+
+        return response()->json($users);
     }
 }
