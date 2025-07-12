@@ -1239,6 +1239,40 @@
               }
             });
           });
+          // --- Close modals after copy or emergency save ---
+          Livewire.on('close-checkbox-modal', () => {
+            window.dispatchEvent(new CustomEvent('close-modal', {
+              detail: {
+                name: 'checkbox-modal'
+              }
+            }));
+            if (window.$ && $('#checkbox-modal').length) {
+              $('#checkbox-modal').modal('hide');
+            }
+          });
+          Livewire.on('close-emergency-modal', () => {
+            @this.set('isEmergencyModalOpen', false);
+            window.dispatchEvent(new CustomEvent('close-modal', {
+              detail: {
+                name: 'emergency-modal'
+              }
+            }));
+            if (window.$ && $('#emergency-modal').length) {
+              $('#emergency-modal').modal('hide');
+            }
+          });
+          Livewire.on('close-modal', (event) => {
+            const modalName = event?.name || (event && event[0]?.name) || null;
+            if (modalName === 'copy-schedule-modal') {
+              @this.set('copySourceDay', null);
+              @this.set('copySourceIndex', null);
+              @this.set('selectedCopyScheduleDays', []);
+              @this.set('selectAllCopyScheduleModal', false);
+              if (window.$ && $('#copy-schedule-modal').length) {
+                $('#copy-schedule-modal').modal('hide');
+              }
+            }
+          });
         });
         window.addEventListener('auto-scheduling-changed', event => {
           const isEnabled = event.detail.isEnabled;
