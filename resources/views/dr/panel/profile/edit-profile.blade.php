@@ -700,37 +700,45 @@
 
           <!-- لیست سوالات متداول -->
           <div class="mt-4">
-            <h6 class="text-right fw-bold d-block font-size-13 mb-3">سوالات متداول شما</h6>
-            <div id="faqsList">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="text-right fw-bold d-block font-size-13 mb-0">سوالات متداول شما</h6>
+              <span class="badge bg-primary">{{ count($doctorFaqs) }} سوال</span>
+            </div>
+            
+            <div id="faqsList" class="faqs-container">
               @forelse($doctorFaqs as $faq)
-                <div class="faq-item border border-slate-200 rounded-lg p-3 mb-3" data-faq-id="{{ $faq->id }}">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div class="flex-grow-1">
-                      <div class="d-flex align-items-center mb-2">
-                        <span class="badge {{ $faq->is_active ? 'bg-success' : 'bg-secondary' }} me-2">
-                          {{ $faq->is_active ? 'فعال' : 'غیرفعال' }}
-                        </span>
-                        <span class="badge bg-info me-2">ترتیب: {{ $faq->order }}</span>
+                <div class="faq-item-compact" data-faq-id="{{ $faq->id }}">
+                  <div class="faq-item-header-compact">
+                    <div class="faq-item-main">
+                      <div class="faq-item-title">
+                        <h6 class="faq-question-text">{{ $faq->question }}</h6>
+                        <div class="faq-item-badges">
+                          <span class="badge {{ $faq->is_active ? 'bg-success' : 'bg-secondary' }} badge-sm">
+                            {{ $faq->is_active ? 'فعال' : 'غیرفعال' }}
+                          </span>
+                          <span class="badge bg-info badge-sm">ترتیب: {{ $faq->order }}</span>
+                        </div>
                       </div>
-                      <h6 class="fw-bold mb-2">{{ $faq->question }}</h6>
-                      <p class="text-muted mb-0">{{ Str::limit($faq->answer, 150) }}</p>
+                      <div class="faq-item-actions-compact">
+                        <button type="button" class="btn btn-sm btn-light edit-faq-btn" 
+                                data-faq-id="{{ $faq->id }}" title="ویرایش">
+                          <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش" style="width: 14px; height: 14px;">
+                        </button>
+                        <button type="button" class="btn btn-sm btn-light delete-faq-btn" 
+                                data-faq-id="{{ $faq->id }}" title="حذف">
+                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 14px; height: 14px;">
+                        </button>
+                      </div>
                     </div>
-                    <div class="d-flex gap-2 ms-3">
-                      <button type="button" class="btn btn-sm btn-light edit-faq-btn" 
-                              data-faq-id="{{ $faq->id }}" title="ویرایش">
-                        <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش" style="width: 16px; height: 16px;">
-                      </button>
-                      <button type="button" class="btn btn-sm btn-light delete-faq-btn" 
-                              data-faq-id="{{ $faq->id }}" title="حذف">
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 16px; height: 16px;">
-                      </button>
+                    <div class="faq-item-preview">
+                      <p class="faq-answer-preview">{{ Str::limit($faq->answer, 80) }}</p>
                     </div>
                   </div>
                 </div>
               @empty
-                <div class="text-center py-4">
-                  <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" style="width: 48px; height: 48px; opacity: 0.5;" class="mb-3">
-                  <p class="text-muted">هنوز سوال متداولی اضافه نکرده‌اید.</p>
+                <div class="faq-empty-state">
+                  <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" class="faq-empty-icon">
+                  <p class="faq-empty-text">هنوز سوال متداولی اضافه نکرده‌اید.</p>
                 </div>
               @endforelse
             </div>

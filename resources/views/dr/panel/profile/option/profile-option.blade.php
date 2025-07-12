@@ -1983,34 +1983,32 @@
     
     faqs.forEach(faq => {
       const faqHtml = `
-        <div class="faq-item" data-faq-id="${faq.id}">
-          <div class="faq-item-header">
-            <div class="faq-item-status">
-              <span class="status-badge ${faq.is_active ? 'active' : 'inactive'}">
-                ${faq.is_active ? 'فعال' : 'غیرفعال'}
-              </span>
-              <span class="order-badge">ترتیب: ${faq.order}</span>
+        <div class="faq-item-compact" data-faq-id="${faq.id}">
+          <div class="faq-item-header-compact">
+            <div class="faq-item-main">
+              <div class="faq-item-title">
+                <h6 class="faq-question-text">${faq.question}</h6>
+                <div class="faq-item-badges">
+                  <span class="badge ${faq.is_active ? 'bg-success' : 'bg-secondary'} badge-sm">
+                    ${faq.is_active ? 'فعال' : 'غیرفعال'}
+                  </span>
+                  <span class="badge bg-info badge-sm">ترتیب: ${faq.order}</span>
+                </div>
+              </div>
+              <div class="faq-item-actions-compact">
+                <button type="button" class="btn btn-sm btn-light edit-faq-btn" 
+                        data-faq-id="${faq.id}" title="ویرایش">
+                  <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش" style="width: 14px; height: 14px;">
+                </button>
+                <button type="button" class="btn btn-sm btn-light delete-faq-btn" 
+                        data-faq-id="${faq.id}" title="حذف">
+                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 14px; height: 14px;">
+                </button>
+              </div>
             </div>
-            <div class="faq-item-actions">
-              <button type="button" class="action-btn edit-btn edit-faq-btn" 
-                      data-faq-id="${faq.id}" title="ویرایش">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M18.5 2.50023C18.8978 2.10297 19.4374 1.87891 20 1.87891C20.5626 1.87891 21.1022 2.10297 21.5 2.50023C21.8978 2.89749 22.1219 3.43705 22.1219 3.99973C22.1219 4.56241 21.8978 5.10197 21.5 5.49923L12 14.9992L8 15.9992L9 11.9992L18.5 2.50023Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-              <button type="button" class="action-btn delete-btn delete-faq-btn" 
-                      data-faq-id="${faq.id}" title="حذف">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 6H5H21" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
+            <div class="faq-item-preview">
+              <p class="faq-answer-preview">${faq.answer.length > 80 ? faq.answer.substring(0, 80) + '...' : faq.answer}</p>
             </div>
-          </div>
-          <div class="faq-item-content">
-            <h6 class="faq-question">${faq.question}</h6>
-            <p class="faq-answer">${faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer}</p>
           </div>
         </div>
       `;
@@ -2024,9 +2022,9 @@
     if (!faqsList) return;
     
     faqsList.innerHTML = `
-      <div class="text-center py-4">
-        <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" style="width: 48px; height: 48px; opacity: 0.5;" class="mb-3">
-        <p class="text-muted">هنوز سوال متداولی اضافه نکرده‌اید.</p>
+      <div class="faq-empty-state">
+        <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" class="faq-empty-icon">
+        <p class="faq-empty-text">هنوز سوال متداولی اضافه نکرده‌اید.</p>
       </div>
     `;
   }
