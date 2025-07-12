@@ -4,24 +4,45 @@ namespace App\Livewire\Dr\Panel\Layouts\Partials;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DoctorSpecialty;
+use App\Models\Specialty;
+use App\Models\DoctorPermission;
 
 class DrSidebar extends Component
 {
     public $specialtyName;
     public $permissions = [];
 
+    protected $listeners = ['specialtyUpdated' => 'updateSpecialtyName'];
+
+    public function updateSpecialtyName()
+    {
+        $this->mount();
+    }
+
     public function mount()
     {
         if (Auth::guard('doctor')->check()) {
             $doctor = Auth::guard('doctor')->user();
-            $this->specialtyName = optional($doctor)->specialty?->name ?? 'نامشخص';
+
+            // دریافت تخصص اصلی از جدول doctor_specialty
+            $mainSpecialty = DoctorSpecialty::where('doctor_id', $doctor->id)->where('is_main', true)->first();
+
+            if ($mainSpecialty) {
+                // دریافت نام تخصص
+                $specialty = Specialty::find($mainSpecialty->specialty_id);
+                $this->specialtyName = $specialty ? $specialty->name : 'نامشخص';
+            } else {
+                $this->specialtyName = 'نامشخص';
+            }
+
             // Get permissions from database
-            $permissionRecord = $doctor->permissions()->first();
+            $permissionRecord = DoctorPermission::where('doctor_id', $doctor->id)->first();
             $this->permissions = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
         } elseif (Auth::guard('secretary')->check()) {
             $this->specialtyName = 'منشی';
             $secretary = Auth::guard('secretary')->user();
-            $permissionRecord = $secretary->permissions()->first();
+            $permissionRecord = DoctorPermission::where('doctor_id', $secretary->doctor_id)->first();
             $this->permissions = $permissionRecord ? json_decode($permissionRecord->permissions ?? '[]', true) : [];
         }
     }

@@ -811,6 +811,7 @@ Route::prefix('dr')
                 Route::post('/send-mobile-otp', [DrProfileController::class, 'sendMobileOtp'])->middleware('secretary.permission:profile')->name('dr-send-mobile-otp');
                 Route::post('/mobile-confirm/{token}', [DrProfileController::class, 'mobileConfirm'])->middleware('secretary.permission:profile')->name('dr-mobile-confirm');
                 Route::post('/dr-specialty-update', [DrProfileController::class, 'DrSpecialtyUpdate'])->middleware('secretary.permission:profile')->name('dr-specialty-update');
+                Route::get('/dr-get-current-specialty', [DrProfileController::class, 'getCurrentSpecialtyName'])->middleware('secretary.permission:profile')->name('dr-get-current-specialty');
                 Route::delete('/dr/delete-specialty/{id}', [DrProfileController::class, 'deleteSpecialty'])->middleware('secretary.permission:profile')->name('dr-delete-specialty');
                 Route::post('/dr-uuid-update', [DrProfileController::class, 'DrUUIDUpdate'])->middleware('secretary.permission:profile')->name('dr-uuid-update');
                 Route::put('/dr-profile-messengers', [DrProfileController::class, 'updateMessengers'])->middleware('secretary.permission:profile')->name('dr-messengers-update');

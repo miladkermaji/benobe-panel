@@ -179,9 +179,14 @@ class DrProfileController extends Controller
             $specialty->specialty_id = $specialtyValue;
             $specialty->specialty_title = $request->input('specialty_title');
             $specialty->save();
+
             return response()->json([
                 'success' => true,
-                'message' => 'تخصص با موفقیت ذخیره شد.'
+                'message' => 'تخصص با موفقیت ذخیره شد.',
+                'update_sidebar' => true, // فلگ برای بروزرسانی سایدبار
+                'specialty_title' => $request->input('specialty_title'),
+                'academic_degree_id' => $request->input('academic_degree_id'),
+                'specialty_id' => $specialtyValue,
             ]);
         }
 
@@ -237,6 +242,10 @@ class DrProfileController extends Controller
                 'success'     => true,
                 'message'     => 'اطلاعات تخصص با موفقیت به‌روزرسانی شد.',
                 'specialties' => $updatedSpecialties,
+                'update_sidebar' => true, // فلگ برای بروزرسانی سایدبار
+                'specialty_title' => $request->specialty_title,
+                'academic_degree_id' => $request->academic_degree_id,
+                'specialty_id' => $request->specialty_id,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -677,6 +686,35 @@ class DrProfileController extends Controller
             'message' => 'شماره موبایل با موفقیت تغییر یافت',
             'mobile'  => $request->mobile,
         ]);
+    }
+
+    public function getCurrentSpecialtyName()
+    {
+        try {
+            $doctor = $this->getAuthenticatedDoctor();
+
+            // دریافت تخصص اصلی از جدول doctor_specialty
+            $mainSpecialty = DoctorSpecialty::where('doctor_id', $doctor->id)->where('is_main', true)->first();
+
+            if ($mainSpecialty) {
+                // دریافت نام تخصص
+                $specialty = Specialty::find($mainSpecialty->specialty_id);
+                $specialtyName = $specialty ? $specialty->name : 'نامشخص';
+            } else {
+                $specialtyName = 'نامشخص';
+            }
+
+            return response()->json([
+                'success' => true,
+                'specialty_name' => $specialtyName,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در دریافت نام تخصص',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function destroy(string $id)

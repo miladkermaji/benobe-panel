@@ -656,10 +656,17 @@
         loader.style.display = 'none';
         if (data.success) {
           toastr.success(data.message || "تخصص با موفقیت به‌روز شد");
-
           updateAlert();
           callCheckProfileCompleteness();
           updateProfileSections(data);
+          
+          // بروزرسانی لحظه‌ای سایدبار
+          if (data.update_sidebar) {
+            updateSidebarSpecialty();
+          }
+          
+          // بروزرسانی بخش تخصص در پروفایل
+          updateProfileSpecialtySection(data);
         } else {
           toastr.error(data.message || "خطا در به‌روزرسانی تخصص");
         }
@@ -712,6 +719,14 @@
       .then(data => {
         if (data.success) {
           showSpecialtySaveStatus(id, 'saved');
+          
+          // بروزرسانی لحظه‌ای سایدبار
+          if (data.update_sidebar) {
+            updateSidebarSpecialty();
+          }
+          
+          // بروزرسانی بخش تخصص در پروفایل
+          updateProfileSpecialtySection(data);
         } else {
           showSpecialtySaveStatus(id, '');
           toastr.error(data.message || 'خطا در ذخیره تخصص');
@@ -1557,5 +1572,64 @@
       .catch(error => {
         toastr.error('خطا در حذف تخصص');
       });
+  }
+
+  // تابع بروزرسانی لحظه‌ای سایدبار
+  function updateSidebarSpecialty() {
+    fetch("{{ route('dr-get-current-specialty') }}", {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').getAttribute('content')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const sidebarSpecialtyElement = document.querySelector('#takhasos-txt');
+          if (sidebarSpecialtyElement) {
+            sidebarSpecialtyElement.textContent = data.specialty_name;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('خطا در بروزرسانی سایدبار:', error);
+      });
+  }
+
+  // تابع بروزرسانی بخش تخصص در پروفایل
+  function updateProfileSpecialtySection(data) {
+    if (data.specialty_title) {
+      // بروزرسانی عنوان تخصص
+      const specialtyTitleInput = document.querySelector('input[name="specialty_title"]');
+      if (specialtyTitleInput) {
+        specialtyTitleInput.value = data.specialty_title;
+      }
+    }
+    
+    if (data.academic_degree_id) {
+      // بروزرسانی درجه علمی
+      const academicDegreeSelect = document.querySelector('select[name="academic_degree_id"]');
+      if (academicDegreeSelect) {
+        academicDegreeSelect.value = data.academic_degree_id;
+        // بروزرسانی TomSelect اگر استفاده می‌شود
+        if (academicDegreeSelect.tomselect) {
+          academicDegreeSelect.tomselect.setValue(data.academic_degree_id);
+        }
+      }
+    }
+    
+    if (data.specialty_id) {
+      // بروزرسانی تخصص
+      const specialtySelect = document.querySelector('select[name="specialty_id"]');
+      if (specialtySelect) {
+        specialtySelect.value = data.specialty_id;
+        // بروزرسانی TomSelect اگر استفاده می‌شود
+        if (specialtySelect.tomselect) {
+          specialtySelect.tomselect.setValue(data.specialty_id);
+        }
+      }
+    }
   }
 </script>
