@@ -1099,10 +1099,7 @@ public function copyScheduleSetting($replace = false)
         $currentSchedule->update(['appointment_settings' => json_encode(array_values($updatedSettings))]);
         $this->selectedScheduleDays[$this->copySourceDay] = true;
 
-        // بازنشانی کامل آرایه‌های محلی
-        $this->refreshWorkSchedules();
-
-        // بازسازی آرایه scheduleSettings فقط برای مودال جاری
+        // بازسازی آرایه scheduleSettings برای همه روزهای انتخاب‌شده
         $this->scheduleSettings = [];
         foreach ($this->workSchedules as $schedule) {
             $day = $schedule['day'];
@@ -1111,17 +1108,18 @@ public function copyScheduleSetting($replace = false)
             }
             $appointmentSettings = $schedule['appointment_settings'] ?? [];
             if (!empty($appointmentSettings)) {
-                $this->scheduleSettings[$day] = [];
                 foreach ($appointmentSettings as $setting) {
                     if (
                         isset($setting['work_hour_key']) &&
                         (int)$setting['work_hour_key'] === (int)$this->copySourceIndex &&
                         isset($setting['day'])
                     ) {
-                        $this->scheduleSettings[$day][] = [
+                        $targetDay = $setting['day'];
+                        $this->scheduleSettings[$targetDay][] = [
                             'start_time' => $setting['start_time'] ?? null,
                             'end_time' => $setting['end_time'] ?? null,
                         ];
+                        $this->selectedScheduleDays[$targetDay] = true; // فعال کردن روز هدف در UI
                     }
                 }
             }
@@ -1133,6 +1131,7 @@ public function copyScheduleSetting($replace = false)
         $this->modalOpen = true;
         $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'success']);
         $this->dispatch('close-modal', ['name' => 'copy-schedule-modal']);
+        $this->dispatch('refresh-schedule-settings'); // رفرش UI مودال اسکجول
         DB::commit();
 
         // لاگ‌گذاری برای دیباگ
@@ -1141,6 +1140,7 @@ public function copyScheduleSetting($replace = false)
             'source_day' => $this->copySourceDay,
             'target_days' => $selectedTargetDays,
             'appointment_settings' => $updatedSettings,
+            'schedule_settings' => $this->scheduleSettings,
         ]);
     } catch (\Exception $e) {
         DB::rollBack();
