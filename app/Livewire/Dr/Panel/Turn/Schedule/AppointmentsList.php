@@ -1609,12 +1609,12 @@ class AppointmentsList extends Component
                     'status' => 'cancelled',
                     'updated_at' => now(),
                 ]);
-                if ($appointment->patient && $appointment->patient->mobile) {
+                if ($appointment->patientable && $appointment->patientable->mobile) {
                     $dateJalali = Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d');
                     $message = "کاربر گرامی، نوبت شما در تاریخ {$dateJalali} لغو شد.";
                     SendSmsNotificationJob::dispatch(
                         $message,
-                        [$appointment->patient->mobile],
+                        [$appointment->patientable->mobile],
                         null,
                         []
                     )->delay(now()->addSeconds(5));
@@ -1704,7 +1704,7 @@ class AppointmentsList extends Component
                 'blockReason.max' => 'دلیل مسدود کردن نمی‌تواند بیشتر از 255 کاراکتر باشد.',
             ]);
             if ($this->blockAppointmentId && empty($this->selectedMobiles)) {
-                $appointment = Appointment::with('patient')->find($this->blockAppointmentId);
+                $appointment = Appointment::with('patientable')->find($this->blockAppointmentId);
                 if (!$appointment) {
                     $this->dispatch('show-toastr', [
                         'type' => 'error',
@@ -1713,7 +1713,7 @@ class AppointmentsList extends Component
                     $this->dispatch('showModal', 'block-user-modal');
                     return;
                 }
-                if (!$appointment->patient || !$appointment->patient->mobile) {
+                if (!$appointment->patientable || !$appointment->patientable->mobile) {
                     $this->dispatch('show-toastr', [
                         'type' => 'error',
                         'message' => 'کاربر یا شماره موبایل مرتبط با این نوبت یافت نشد.',
@@ -1721,7 +1721,7 @@ class AppointmentsList extends Component
                     $this->dispatch('showModal', 'block-user-modal');
                     return;
                 }
-                $this->selectedMobiles = [$appointment->patient->mobile];
+                $this->selectedMobiles = [$appointment->patientable->mobile];
             }
             if (empty($this->selectedMobiles)) {
                 $this->dispatch('show-toastr', [
