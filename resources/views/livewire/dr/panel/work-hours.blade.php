@@ -569,7 +569,7 @@
           </div>
           <div class="mt-2">
             <button type="button" class="btn my-btn-primary h-40 w-100 font-size-12"
-              wire:click="copyScheduleSetting" id="copy-btn">
+              wire:click="copyScheduleSetting(false)" id="copy-btn">
               ذخیره
               <div class="loader"></div>
             </button>
@@ -624,7 +624,7 @@
       </x-modal>
     </div>
     <!-- مودال کپی برنامه کاری -->
-    <div>
+    <div >
       <x-modal name="checkbox-modal" title="کپی برنامه کاری" size="sm">
         <x-slot:body>
           <p>روزهایی که می‌خواهید برنامه کاری به آن‌ها کپی شود را انتخاب کنید:</p>
@@ -932,9 +932,18 @@
           }
           if (modalName === 'copy-schedule-modal') {
             try {
+              @this.call('openCopyScheduleModal', day, index);
               @this.set('copySourceDay', day);
               @this.set('copySourceIndex', index);
-              @this.set('selectedCopyScheduleDays', []);
+              @this.set('selectedCopyScheduleDays', {
+                'saturday': false,
+                'sunday': false,
+                'monday': false,
+                'tuesday': false,
+                'wednesday': false,
+                'thursday': false,
+                'friday': false
+              });
               @this.set('selectAllCopyScheduleModal', false);
             } catch (error) {
               console.error('Error setting copyScheduleSource:', error);
@@ -1066,7 +1075,15 @@
             if (modalName === 'copy-schedule-modal') {
               @this.set('copySourceDay', null);
               @this.set('copySourceIndex', null);
-              @this.set('selectedCopyScheduleDays', []);
+              @this.set('selectedCopyScheduleDays', {
+                'saturday': false,
+                'sunday': false,
+                'monday': false,
+                'tuesday': false,
+                'wednesday': false,
+                'thursday': false,
+                'friday': false
+              });
               @this.set('selectAllCopyScheduleModal', false);
             }
           });
@@ -1243,7 +1260,15 @@
             if (modalName === 'copy-schedule-modal') {
               @this.set('copySourceDay', null);
               @this.set('copySourceIndex', null);
-              @this.set('selectedCopyScheduleDays', []);
+              @this.set('selectedCopyScheduleDays', {
+                'saturday': false,
+                'sunday': false,
+                'monday': false,
+                'tuesday': false,
+                'wednesday': false,
+                'thursday': false,
+                'friday': false
+              });
               @this.set('selectAllCopyScheduleModal', false);
               if (window.$ && $('#copy-schedule-modal').length) {
                 $('#copy-schedule-modal').modal('hide');

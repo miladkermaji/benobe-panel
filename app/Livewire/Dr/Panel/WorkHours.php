@@ -333,11 +333,18 @@ class Workhours extends Component
             $clinicId = $this->activeClinicId;
             $this->activeClinicId = $clinicId ?? 'default';
         }
+
         $this->scheduleModalDay = $day;
         $this->scheduleModalIndex = $index;
+
+        // تنظیم copySourceDay و copySourceIndex برای کپی
+        $this->copySourceDay = $day;
+        $this->copySourceIndex = $index;
+
         $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
         $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
         $this->scheduleSettings = [];
+
         // دریافت برنامه کاری برای روز مبدا
         $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
             ->where('day', $this->scheduleModalDay)
@@ -348,8 +355,10 @@ class Workhours extends Component
                     $query->whereNull('clinic_id');
                 }
             })->first();
+
         if ($schedule && $schedule->appointment_settings) {
             $settings = json_decode($schedule->appointment_settings, true) ?? [];
+
             foreach ($settings as $setting) {
                 if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index) {
                     // ساختار جدید (با کلید day)
@@ -374,6 +383,7 @@ class Workhours extends Component
                 }
             }
         }
+
         // اگر هیچ تنظیمی برای روز جاری وجود نداشت
         if (empty($this->scheduleSettings[$day])) {
             $this->selectedScheduleDays[$day] = true;
@@ -382,6 +392,7 @@ class Workhours extends Component
                 'end_time' => null,
             ];
         }
+
         $this->refreshWorkSchedules();
         $this->dispatch('refresh-schedule-settings');
     }
@@ -890,6 +901,34 @@ class Workhours extends Component
     }
     public function copyScheduleSetting($replace = false)
     {
+        // اطمینان از مقداردهی پراپرتی‌های کلیدی
+        if (empty($this->copySourceDay) && !empty($this->scheduleModalDay)) {
+            $this->copySourceDay = $this->scheduleModalDay;
+        }
+        if ((is_null($this->copySourceIndex) || $this->copySourceIndex === '') && !is_null($this->scheduleModalIndex)) {
+            $this->copySourceIndex = $this->scheduleModalIndex;
+        }
+
+        // اگر هنوز مقدار ندارند، از copySource استفاده کن (برای مودال checkbox-modal)
+        if (empty($this->copySourceDay) && !empty($this->copySource['day'])) {
+            $this->copySourceDay = $this->copySource['day'];
+        }
+        if ((is_null($this->copySourceIndex) || $this->copySourceIndex === '') && isset($this->copySource['index'])) {
+            $this->copySourceIndex = $this->copySource['index'];
+        }
+
+        // بررسی وجود مقادیر ضروری
+        if (empty($this->copySourceDay) || is_null($this->copySourceIndex) || $this->copySourceIndex === '') {
+            Log::error('copySourceDay or copySourceIndex is still empty before copy!', [
+                'copySourceDay' => $this->copySourceDay,
+                'copySourceIndex' => $this->copySourceIndex,
+                'scheduleModalDay' => $this->scheduleModalDay,
+                'scheduleModalIndex' => $this->scheduleModalIndex,
+                'copySource' => $this->copySource
+            ]);
+            throw new \Exception('اطلاعات منبع کپی نامعتبر است. لطفاً مجدداً تلاش کنید.');
+        }
+
         try {
             // تنظیم activeClinicId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
@@ -899,31 +938,46 @@ class Workhours extends Component
                 $clinicId = $this->activeClinicId;
                 $this->activeClinicId = $clinicId ?? 'default';
             }
-            Log::info($this->selectedCopyScheduleDays);
-            // اعتبارسنجی روزهای انتخاب‌شده
-            if (empty(array_filter($this->selectedCopyScheduleDays))) {
+
+            // اعتبارسنجی روزهای انتخاب‌شده - ابتدا از selectedCopyScheduleDays، سپس از selectedDays
+            $filteredDays = array_filter($this->selectedCopyScheduleDays);
+
+            // اگر selectedCopyScheduleDays خالی است، از selectedDays استفاده کن
+            if (empty($filteredDays)) {
+                $filteredDays = array_filter($this->selectedDays);
+            }
+
+            if (empty($filteredDays)) {
                 throw new \Exception('هیچ روزی برای کپی انتخاب نشده است');
             }
+
             // دریافت تنظیمات منبع
             $sourceSchedule = collect($this->workSchedules)->firstWhere('day', $this->copySourceDay);
+
             if (!$sourceSchedule) {
                 throw new \Exception('تنظیمات برای روز مبدا یافت نشد');
             }
+
             $sourceSettings = is_array($sourceSchedule['appointment_settings'])
                 ? $sourceSchedule['appointment_settings']
                 : json_decode($sourceSchedule['appointment_settings'], true) ?? [];
+
             // فیلتر کردن تنظیمات منبع برای work_hour_key مشخص
             $filteredSettings = array_values(array_filter(
                 $sourceSettings,
                 fn ($setting) => isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->copySourceIndex
                     && isset($setting['day']) && $setting['day'] === $this->copySourceDay
             ));
+
             if (empty($filteredSettings)) {
                 throw new \Exception('تنظیم انتخاب‌شده برای کپی یافت نشد');
             }
+
             $sourceSetting = $filteredSettings[0];
-            $selectedTargetDays = array_keys(array_filter($this->selectedCopyScheduleDays));
+            $selectedTargetDays = array_keys($filteredDays);
+
             $conflicts = [];
+
             // پیدا کردن schedule برای مودال جاری (بر اساس copySourceDay)
             $currentSchedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
                 ->where('day', $this->copySourceDay)
@@ -934,23 +988,29 @@ class Workhours extends Component
                         $query->whereNull('clinic_id');
                     }
                 })->first();
+
             if (!$currentSchedule) {
                 throw new \Exception('رکورد زمان‌بندی برای روز مبدا یافت نشد');
             }
+
             $currentSettings = is_array($currentSchedule->appointment_settings)
                 ? $currentSchedule->appointment_settings
                 : json_decode($currentSchedule->appointment_settings, true) ?? [];
+
             DB::beginTransaction();
+
             // اگر replace = false، بررسی تداخل انجام شود
             if (!$replace) {
                 foreach ($selectedTargetDays as $targetDay) {
                     if ($targetDay === $this->copySourceDay) {
                         continue;
                     }
+
                     // بررسی تداخل فقط در appointment_settings مودال جاری
                     foreach ($currentSettings as $setting) {
                         if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] !== (int)$this->copySourceIndex
                             && isset($setting['day']) && $setting['day'] === $targetDay) {
+
                             if ($this->isTimeConflict(
                                 $sourceSetting['start_time'],
                                 $sourceSetting['end_time'],
@@ -965,22 +1025,26 @@ class Workhours extends Component
                         }
                     }
                 }
+
                 if (!empty($conflicts)) {
                     $this->dispatch('show-conflict-alert', ['conflicts' => $conflicts]);
                     DB::rollBack();
                     return;
                 }
             }
+
             // به‌روزرسانی تنظیمات فقط در مودال جاری (رکورد روز منبع)
             $updatedSettings = array_filter(
                 $currentSettings,
                 fn ($setting) => !(isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->copySourceIndex
                     && isset($setting['day']) && in_array($setting['day'], $selectedTargetDays))
             );
+
             foreach ($selectedTargetDays as $targetDay) {
                 if ($targetDay === $this->copySourceDay) {
                     continue;
                 }
+
                 $updatedSettings[] = [
                     'day' => $targetDay,
                     'start_time' => $sourceSetting['start_time'],
@@ -988,11 +1052,14 @@ class Workhours extends Component
                     'work_hour_key' => (int)$this->copySourceIndex,
                 ];
             }
+
             // ذخیره در دیتابیس فقط برای روز منبع
             $currentSchedule->update(['appointment_settings' => json_encode(array_values($updatedSettings))]);
             $this->selectedScheduleDays[$this->copySourceDay] = true;
+
             // ابتدا workSchedules را بروزرسانی کن
             $this->refreshWorkSchedules();
+
             // بازسازی آرایه scheduleSettings برای همه روزهای انتخاب‌شده
             $this->scheduleSettings = [];
             foreach ($this->workSchedules as $schedule) {
@@ -1018,6 +1085,7 @@ class Workhours extends Component
                     }
                 }
             }
+
             $this->selectAllCopyScheduleModal = false;
             $this->modalMessage = $replace ? 'تنظیمات با موفقیت جایگزین شد' : 'تنظیمات با موفقیت کپی شد';
             $this->modalType = 'success';
@@ -1026,9 +1094,13 @@ class Workhours extends Component
             $this->dispatch('close-modal', ['name' => 'copy-schedule-modal']);
             $this->dispatch('refresh-schedule-settings'); // رفرش UI مودال اسکجول
             DB::commit();
-            // لاگ‌گذاری برای دیباگ
+
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Copy schedule setting error:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             $this->modalMessage = $e->getMessage() ?: 'خطا در کپی تنظیمات';
             $this->modalType = 'error';
             $this->modalOpen = true;
@@ -2597,5 +2669,11 @@ class Workhours extends Component
             DB::rollBack();
             $this->showErrorMessage($e->getMessage() ?: 'خطا در ذخیره خودکار وضعیت باز بودن مطب در تعطیلات');
         }
+    }
+    public function openCopyScheduleModal($day, $index)
+    {
+        $this->copySourceDay = $day;
+        $this->copySourceIndex = $index;
+        Log::info('openCopyScheduleModal called', ['copySourceDay' => $day, 'copySourceIndex' => $index]);
     }
 }
