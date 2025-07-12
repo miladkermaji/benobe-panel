@@ -87,7 +87,11 @@
         <li
           class="item-li i-moshavere {{ Request::routeIs('dr-moshavere_setting') || Request::routeIs('dr-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-            مشاوره
+            <div class="d-flex align-items-center">
+             
+              مشاوره
+               <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
+            </div>
             <div class="d-flex justify-content-end w-100 align-items-center">
               <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
                 xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
@@ -99,25 +103,25 @@
           </a>
           <ul class="drop-toggle d-none">
             @if ($this->hasPermission('dr-moshavere_setting'))
-              <li class="item-li i-courses {{ Request::routeIs('dr-moshavere_setting') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-moshavere_setting') }}">برنامه‌ریزی مشاوره</a>
+              <li class="item-li i-courses {{ Request::routeIs('dr-moshavere_setting') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">برنامه‌ریزی مشاوره</a>
               </li>
             @endif
             @if ($this->hasPermission('dr-moshavere_waiting'))
               <li
-                class="item-li i-user__inforamtion {{ Request::routeIs('dr-moshavere_waiting') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-moshavere_waiting') }}">گزارش مشاوره</a>
+                class="item-li i-user__inforamtion {{ Request::routeIs('dr-moshavere_waiting') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">گزارش مشاوره</a>
               </li>
             @endif
             @if ($this->hasPermission('dr-mySpecialDays-counseling'))
               <li
-                class="item-li i-user__inforamtion {{ Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-mySpecialDays-counseling') }}">روزهای خاص</a>
+                class="item-li i-user__inforamtion {{ Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">روزهای خاص</a>
               </li>
             @endif
             @if ($this->hasPermission('consult-term.index'))
-              <li class="item-li i-user__inforamtion {{ Request::routeIs('consult-term.index') ? 'is-active' : '' }}">
-                <a href="{{ route('consult-term.index') }}">قوانین مشاوره</a>
+              <li class="item-li i-user__inforamtion {{ Request::routeIs('consult-term.index') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">قوانین مشاوره</a>
               </li>
             @endif
           </ul>
