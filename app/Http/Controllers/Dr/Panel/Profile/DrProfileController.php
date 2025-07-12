@@ -187,6 +187,7 @@ class DrProfileController extends Controller
                 'specialty_title' => $request->input('specialty_title'),
                 'academic_degree_id' => $request->input('academic_degree_id'),
                 'specialty_id' => $specialtyValue,
+                'specialty_name' => \App\Models\Specialty::find($specialtyValue)->name ?? '',
             ]);
         }
 
@@ -246,6 +247,16 @@ class DrProfileController extends Controller
                 'specialty_title' => $request->specialty_title,
                 'academic_degree_id' => $request->academic_degree_id,
                 'specialty_id' => $request->specialty_id,
+                'specialty_name' => \App\Models\Specialty::find($request->specialty_id)->name ?? '',
+                'additional_specialties' => $updatedSpecialties->map(function ($specialty) {
+                    return [
+                        'id' => $specialty->id,
+                        'academic_degree_id' => $specialty->academic_degree_id,
+                        'specialty_id' => $specialty->specialty_id,
+                        'specialty_title' => $specialty->specialty_title,
+                        'is_main' => $specialty->is_main,
+                    ];
+                }),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -700,14 +711,23 @@ class DrProfileController extends Controller
                 // دریافت نام تخصص
                 $specialty = Specialty::find($mainSpecialty->specialty_id);
                 $specialtyName = $specialty ? $specialty->name : 'نامشخص';
-            } else {
-                $specialtyName = 'نامشخص';
-            }
 
-            return response()->json([
-                'success' => true,
-                'specialty_name' => $specialtyName,
-            ]);
+                return response()->json([
+                    'success' => true,
+                    'specialty_name' => $specialtyName,
+                    'specialty_title' => $mainSpecialty->specialty_title,
+                    'academic_degree_id' => $mainSpecialty->academic_degree_id,
+                    'specialty_id' => $mainSpecialty->specialty_id,
+                ]);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'specialty_name' => 'نامشخص',
+                    'specialty_title' => '',
+                    'academic_degree_id' => null,
+                    'specialty_id' => null,
+                ]);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

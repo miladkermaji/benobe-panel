@@ -1587,10 +1587,14 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
+          // بروزرسانی سایدبار
           const sidebarSpecialtyElement = document.querySelector('#takhasos-txt');
           if (sidebarSpecialtyElement) {
             sidebarSpecialtyElement.textContent = data.specialty_name;
           }
+          
+          // بروزرسانی بخش پروفایل
+          updateProfileSpecialtySection(data);
         }
       })
       .catch(error => {
@@ -1600,11 +1604,14 @@
 
   // تابع بروزرسانی بخش تخصص در پروفایل
   function updateProfileSpecialtySection(data) {
+    console.log('Updating profile specialty section with data:', data);
+    
     if (data.specialty_title) {
       // بروزرسانی عنوان تخصص
       const specialtyTitleInput = document.querySelector('input[name="specialty_title"]');
       if (specialtyTitleInput) {
         specialtyTitleInput.value = data.specialty_title;
+        console.log('Updated specialty title to:', data.specialty_title);
       }
     }
     
@@ -1617,6 +1624,7 @@
         if (academicDegreeSelect.tomselect) {
           academicDegreeSelect.tomselect.setValue(data.academic_degree_id);
         }
+        console.log('Updated academic degree to:', data.academic_degree_id);
       }
     }
     
@@ -1629,7 +1637,26 @@
         if (specialtySelect.tomselect) {
           specialtySelect.tomselect.setValue(data.specialty_id);
         }
+        console.log('Updated specialty to:', data.specialty_id);
       }
     }
+    
+    // بروزرسانی نام تخصص در بالای پروفایل
+    if (data.specialty_name) {
+      const profileSpecialtyBadge = document.querySelector('.profile-header-name + .badge');
+      if (profileSpecialtyBadge) {
+        profileSpecialtyBadge.textContent = data.specialty_name;
+        console.log('Updated profile header specialty to:', data.specialty_name);
+      }
+    }
+    
+    // بروزرسانی تخصص‌های اضافی اگر وجود داشته باشند
+    if (data.additional_specialties && Array.isArray(data.additional_specialties)) {
+      updateSpecialties(data.additional_specialties);
+      console.log('Updated additional specialties');
+    }
+    
+    // بروزرسانی وضعیت دکمه اضافه کردن
+    updateAddButtonState();
   }
 </script>
