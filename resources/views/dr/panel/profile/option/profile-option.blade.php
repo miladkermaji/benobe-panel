@@ -1624,28 +1624,34 @@
       emptyMessage.remove();
     }
     const faqHtml = `
-      <div class="faq-item border border-slate-200 rounded-lg p-3 mb-3" data-faq-id="${faq.id}">
-        <div class="d-flex justify-content-between align-items-start">
-          <div class="flex-grow-1">
-            <div class="d-flex align-items-center mb-2">
-              <span class="badge ${faq.is_active ? 'bg-success' : 'bg-secondary'} me-2">
-                ${faq.is_active ? 'فعال' : 'غیرفعال'}
-              </span>
-              <span class="badge bg-info me-2">ترتیب: ${faq.order}</span>
-            </div>
-            <h6 class="fw-bold mb-2">${faq.question}</h6>
-            <p class="text-muted mb-0">${faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer}</p>
+      <div class="faq-item" data-faq-id="${faq.id}">
+        <div class="faq-item-header">
+          <div class="faq-item-status">
+            <span class="status-badge ${faq.is_active ? 'active' : 'inactive'}">
+              ${faq.is_active ? 'فعال' : 'غیرفعال'}
+            </span>
+            <span class="order-badge">ترتیب: ${faq.order}</span>
           </div>
-          <div class="d-flex gap-2 ms-3">
-            <button type="button" class="btn btn-sm btn-outline-primary edit-faq-btn" 
+          <div class="faq-item-actions">
+            <button type="button" class="action-btn edit-btn edit-faq-btn" 
                     data-faq-id="${faq.id}" title="ویرایش">
-              <img src="{{ asset('dr-assets/icons/pencil-edit.svg') }}" alt="ویرایش" style="width: 16px; height: 16px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18.5 2.50023C18.8978 2.10297 19.4374 1.87891 20 1.87891C20.5626 1.87891 21.1022 2.10297 21.5 2.50023C21.8978 2.89749 22.1219 3.43705 22.1219 3.99973C22.1219 4.56241 21.8978 5.10197 21.5 5.49923L12 14.9992L8 15.9992L9 11.9992L18.5 2.50023Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </button>
-            <button type="button" class="btn btn-sm btn-outline-danger delete-faq-btn" 
+            <button type="button" class="action-btn delete-btn delete-faq-btn" 
                     data-faq-id="${faq.id}" title="حذف">
-              <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 16px; height: 16px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6H5H21" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </button>
           </div>
+        </div>
+        <div class="faq-item-content">
+          <h6 class="faq-question">${faq.question}</h6>
+          <p class="faq-answer">${faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer}</p>
         </div>
       </div>
     `;
@@ -1743,63 +1749,67 @@
     if (existingModal) {
       existingModal.remove();
     }
+    
     const modalHtml = `
-      <div class="modal fade" id="editFaqModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content border-radius-6">
-            <div class="modal-header">
-              <h5 class="modal-title">ویرایش سوال متداول</h5>
-              <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <form id="editFaqForm">
-                <input type="hidden" id="edit_faq_id" value="${faq.id}">
-                <div class="row">
-                  <div class="col-md-6">
-                    <label for="edit_question" class="label-top-input">سوال</label>
-                    <input type="text" id="edit_question" name="question" class="form-control h-50 w-100 border-radius-6 mt-3" 
-                           value="${faq.question}" maxlength="255">
-                    <div class="text-danger validation-error mt-1 font-size-13"></div>
-                  </div>
-                  <div class="col-md-6">
-                    <label for="edit_order" class="label-top-input">ترتیب نمایش</label>
-                    <input type="number" id="edit_order" name="order" class="form-control h-50 w-100 border-radius-6 mt-3" 
-                           value="${faq.order}" min="0">
-                    <div class="text-danger validation-error mt-1 font-size-13"></div>
-                  </div>
+      <div class="modal-overlay" id="editFaqModal">
+        <div class="modal-container">
+          <div class="modal-header">
+            <h5 class="modal-title">ویرایش سوال متداول</h5>
+            <button type="button" class="modal-close" onclick="closeEditFaqModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="editFaqForm">
+              <input type="hidden" id="edit_faq_id" value="${faq.id}">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="edit_question" class="form-label">سوال</label>
+                  <input type="text" id="edit_question" name="question" class="form-control" 
+                         value="${faq.question}" maxlength="255">
+                  <div class="validation-error"></div>
                 </div>
-                <div class="mt-3">
-                  <textarea id="edit_answer" name="answer" class="form-control w-100 border-radius-6 mt-3" 
-                            rows="3">${faq.answer}</textarea>
-                  <div class="text-danger validation-error mt-1 font-size-13"></div>
+                <div class="form-group">
+                  <label for="edit_order" class="form-label">ترتیب نمایش</label>
+                  <input type="number" id="edit_order" name="order" class="form-control" 
+                         value="${faq.order}" min="0">
+                  <div class="validation-error"></div>
                 </div>
-                <div class="mt-3">
-                  <div class="form-check">
-                    <input type="checkbox" id="edit_is_active" name="is_active" class="form-check-input" 
-                           ${faq.is_active ? 'checked' : ''}>
-                    <label for="edit_is_active" class="form-check-label">فعال</label>
-                  </div>
-                </div>
-                <div class="mt-3">
-                  <button type="submit" class="btn my-btn-primary w-100 h-50 border-radius-4 d-flex justify-content-center align-items-center">
-                    <span class="button_text">ذخیره تغییرات</span>
-                    <div class="loader"></div>
-                  </button>
-                </div>
-              </form>
-            </div>
+              </div>
+              <div class="form-group">
+                <label for="edit_answer" class="form-label">پاسخ</label>
+                <textarea id="edit_answer" name="answer" class="form-control" rows="3">${faq.answer}</textarea>
+                <div class="validation-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="edit_is_active" name="is_active" ${faq.is_active ? 'checked' : ''}>
+                  <span class="checkmark"></span>
+                  فعال
+                </label>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEditFaqModal()">انصراف</button>
+                <button type="submit" class="btn btn-primary">
+                  <span class="button_text">ذخیره تغییرات</span>
+                  <div class="loader"></div>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
     `;
+    
     // اضافه کردن modal جدید
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
     // نمایش modal
     const modalElement = document.getElementById('editFaqModal');
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
+    modalElement.classList.add('show');
+    
     // اضافه کردن event listener برای فرم ویرایش
     document.getElementById('editFaqForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -1808,9 +1818,11 @@
       const buttonText = button.querySelector('.button_text');
       const loader = button.querySelector('.loader');
       const faqId = document.getElementById('edit_faq_id').value;
+      
       // نمایش لودینگ
       buttonText.style.display = 'none';
       loader.style.display = 'block';
+      
       fetch(`{{ route('dr-faqs-update', ['id' => '__ID__']) }}`.replace('__ID__', faqId), {
         method: 'PUT',
         headers: {
@@ -1836,7 +1848,7 @@
         if (data.success) {
           toastr.success(data.message);
           updateFaqInList(data.faq);
-          modal.hide();
+          closeEditFaqModal();
         } else {
           toastr.error(data.message || 'خطا در ویرایش سوال متداول');
         }
@@ -1850,25 +1862,34 @@
         loader.style.display = 'none';
       });
     });
-    // حذف modal از DOM پس از بسته شدن
-    modalElement.addEventListener('hidden.bs.modal', function() {
-      modalElement.remove();
-    });
   }
+  
+  function closeEditFaqModal() {
+    const modalElement = document.getElementById('editFaqModal');
+    if (modalElement) {
+      modalElement.classList.remove('show');
+      setTimeout(() => {
+        modalElement.remove();
+      }, 300);
+    }
+  }
+  
   function updateFaqInList(faq) {
     const faqItem = document.querySelector(`[data-faq-id="${faq.id}"]`);
     if (faqItem) {
-      const badge = faqItem.querySelector('.badge');
-      const orderBadge = faqItem.querySelector('.badge.bg-info');
-      const question = faqItem.querySelector('h6');
-      const answer = faqItem.querySelector('p');
-      badge.className = `badge ${faq.is_active ? 'bg-success' : 'bg-secondary'} me-2`;
-      badge.textContent = faq.is_active ? 'فعال' : 'غیرفعال';
+      const statusBadge = faqItem.querySelector('.status-badge');
+      const orderBadge = faqItem.querySelector('.order-badge');
+      const question = faqItem.querySelector('.faq-question');
+      const answer = faqItem.querySelector('.faq-answer');
+      
+      statusBadge.className = `status-badge ${faq.is_active ? 'active' : 'inactive'}`;
+      statusBadge.textContent = faq.is_active ? 'فعال' : 'غیرفعال';
       orderBadge.textContent = `ترتیب: ${faq.order}`;
       question.textContent = faq.question;
       answer.textContent = faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer;
     }
   }
+  
   // ==================== سوالات متداول ====================
   
   // تابع مدیریت باز و بسته شدن بخش FAQ

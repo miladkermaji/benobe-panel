@@ -694,11 +694,11 @@
                       <p class="text-muted mb-0">{{ Str::limit($faq->answer, 150) }}</p>
                     </div>
                     <div class="d-flex gap-2 ms-3">
-                      <button type="button" class="btn btn-sm btn-outline-primary edit-faq-btn" 
+                      <button type="button" class="btn btn-sm btn-light edit-faq-btn" 
                               data-faq-id="{{ $faq->id }}" title="ویرایش">
-                        <img src="{{ asset('dr-assets/icons/pencil-edit.svg') }}" alt="ویرایش" style="width: 16px; height: 16px;">
+                        <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش" style="width: 16px; height: 16px;">
                       </button>
-                      <button type="button" class="btn btn-sm btn-outline-danger delete-faq-btn" 
+                      <button type="button" class="btn btn-sm btn-light delete-faq-btn" 
                               data-faq-id="{{ $faq->id }}" title="حذف">
                         <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 16px; height: 16px;">
                       </button>
