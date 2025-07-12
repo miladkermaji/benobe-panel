@@ -40,13 +40,13 @@
           <div class="mx-2 mt-3">
             <span class="d-block fw-bold font-size-15 profile-header-name text-dark">
               @if (Auth::guard('doctor')->check())
-                {{ Auth::guard('doctor')->user()->first_name . ' ' . Auth::guard('doctor')->user()->last_name }}
+                {{ $academicDegreeTitle ? $academicDegreeTitle . ' ' : '' }}{{ Auth::guard('doctor')->user()->first_name . ' ' . Auth::guard('doctor')->user()->last_name }}
               @elseif(Auth::guard('secretary')->check())
-                {{ Auth::guard('secretary')->user()->doctor->first_name . ' ' . Auth::guard('secretary')->user()->doctor->last_name }}
+                {{ $academicDegreeTitle ? $academicDegreeTitle . ' ' : '' }}{{ Auth::guard('secretary')->user()->doctor->first_name . ' ' . Auth::guard('secretary')->user()->doctor->last_name }}
               @endif
             </span>
             <span class="badge badge-light p-2 border-radius-8 mt-3 mx-3 font-size-13 cursor-pointer">
-              {{ $specialtyName }}
+              {{ $firstSpecialtyName ?: $specialtyName }}
             </span>
           </div>
         </div>

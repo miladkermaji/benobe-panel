@@ -109,6 +109,24 @@ class DrProfileController extends Controller
         $specialties        = Specialty::getOptimizedList();
         $incompleteSections = $doctor->getIncompleteProfileSections();
 
+        // دریافت درجه علمی و اولین تخصص برای نمایش در هدر پروفایل
+        $academicDegreeTitle = '';
+        $firstSpecialtyName = '';
+
+        if ($currentSpecialty) {
+            // دریافت عنوان درجه علمی
+            if ($currentSpecialty->academic_degree_id) {
+                $academicDegree = AcademicDegree::find($currentSpecialty->academic_degree_id);
+                $academicDegreeTitle = $academicDegree ? $academicDegree->title : '';
+            }
+
+            // دریافت نام اولین تخصص
+            if ($currentSpecialty->specialty_id) {
+                $specialty = Specialty::find($currentSpecialty->specialty_id);
+                $firstSpecialtyName = $specialty ? $specialty->name : '';
+            }
+        }
+
         return view("dr.panel.profile.edit-profile", compact([
             'specialtyName',
             'academic_degrees',
@@ -120,6 +138,8 @@ class DrProfileController extends Controller
             'messengers',
             'doctor',
             'incompleteSections',
+            'academicDegreeTitle',
+            'firstSpecialtyName',
         ]));
     }
 
