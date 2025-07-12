@@ -32,7 +32,6 @@
                     day="آیا تأیید دو مرحله‌ای نوبت‌های دستی فعال باشد؟" />
                 </div>
               </div>
-
               <!-- زمان ارسال لینک تأیید و مدت اعتبار لینک در یک ردیف (فقط وقتی toggle فعال باشد) -->
               <div class="col-12 mb-3 mt-3 {{ $manualNobatActive ? '' : 'd-none' }} position-relative">
                 <div class="d-flex flex-column flex-md-row gap-3">
@@ -747,7 +746,6 @@
                 const count = parseInt($appointmentCount.val());
                 const time = parseInt($timeCount.val());
                 // لاگ برای دیباگ
-                console.log('مقدار ارسال به Livewire (appointment_count):', count);
                 if (!count || !time || time < 5) {
                   toastr.error('تعداد نوبت یا زمان هر نوبت نامعتبر است یا کمتر از ۵ دقیقه است.');
                   return;
@@ -793,7 +791,6 @@
                 }
               });
             } catch (error) {
-              console.error('Error in CalculatorModal:', error);
               window.dispatchEvent(new CustomEvent('close-modal', {
                 detail: {
                   name: 'calculator-modal'
@@ -808,7 +805,6 @@
               @this.set('selectedDays', []);
               @this.set('selectAllCopyModal', false);
             } catch (error) {
-              console.error('Error setting copySource:', error);
               window.dispatchEvent(new CustomEvent('close-modal', {
                 detail: {
                   name: 'checkbox-modal'
@@ -874,7 +870,6 @@
                 currentEmergencyTimes = workSchedule && workSchedule.emergency_times ? workSchedule
                   .emergency_times : [];
               } catch (error) {
-                console.error('Error accessing emergency_times:', error);
                 currentEmergencyTimes = [];
               }
               @this.set('emergencyTimes', currentEmergencyTimes);
@@ -907,7 +902,6 @@
               });
               setTimeout(() => {}, 100);
             } catch (error) {
-              console.error('Error in emergencyModal:', error);
               window.dispatchEvent(new CustomEvent('close-modal', {
                 detail: {
                   name: 'emergency-modal'
@@ -921,7 +915,6 @@
               $('#scheduleLoading').removeClass('d-none');
               $('.modal-content-inner').hide();
             } catch (error) {
-              console.error('Error in scheduleModal:', error);
               toastr.error('خطا در بارگذاری مودال: ' + error.message);
               window.dispatchEvent(new CustomEvent('close-modal', {
                 detail: {
@@ -946,7 +939,6 @@
               });
               @this.set('selectAllCopyScheduleModal', false);
             } catch (error) {
-              console.error('Error setting copyScheduleSource:', error);
               window.dispatchEvent(new CustomEvent('close-modal', {
                 detail: {
                   name: 'copy-schedule-modal'
@@ -1055,12 +1047,10 @@
                 $('#timepicker-save-section').addClass('d-none');
               }).catch((error) => {
                 toggleButtonLoading($button, false);
-                console.error('Error saving schedule:', error);
                 toastr.error('خطا در ذخیره زمان‌بندی: ' + (error.message || 'خطای ناشناخته'));
               });
             } catch (error) {
               toggleButtonLoading($button, false);
-              console.error('Error in saveSchedule click:', error);
               toastr.error('خطا در ذخیره زمان‌بندی: ' + error.message);
             }
           });
@@ -1091,7 +1081,6 @@
             let conflictsObj = Array.isArray(event) && event[0] && event[0].conflicts ? event[0].conflicts :
               event.conflicts || event;
             if (!conflictsObj || typeof conflictsObj !== 'object' || Object.keys(conflictsObj).length === 0) {
-              console.warn('No valid conflicts data, proceeding with copyScheduleSetting');
               return;
             }
             const persianDayMap = {
@@ -1107,12 +1096,10 @@
             let hasConflicts = false;
             Object.keys(conflictsObj).forEach(day => {
               if (!persianDayMap[day]) {
-                console.warn(`Day ${day} not found in persianDayMap`);
                 return;
               }
               const conflictDetails = conflictsObj[day];
               if (!conflictDetails || !Array.isArray(conflictDetails)) {
-                console.warn(`No conflict details for day ${day}`);
                 return;
               }
               hasConflicts = true;
@@ -1125,7 +1112,6 @@
               conflictMessage += '</ul></li>';
             });
             if (!hasConflicts) {
-              console.warn('No valid conflicts found, proceeding with copyScheduleSetting');
               return;
             }
             conflictMessage += '<p>آیا می‌خواهید داده‌های موجود را جایگزین کنید؟</p>';
@@ -1163,8 +1149,6 @@
             let conflictsObj = Array.isArray(event) && event[0] && event[0].conflicts ? event[0].conflicts :
               event.conflicts || event;
             if (!conflictsObj || typeof conflictsObj !== 'object' || Object.keys(conflictsObj).length === 0) {
-              console.warn('No valid conflicts data, proceeding with copySchedule');
-              return;
               return;
             }
             const persianDayMap = {
@@ -1180,12 +1164,10 @@
             let hasConflicts = false;
             Object.keys(conflictsObj).forEach(day => {
               if (!persianDayMap[day]) {
-                console.warn(`Day ${day} not found in persianDayMap`);
                 return;
               }
               const conflictDetails = conflictsObj[day];
               if (!conflictDetails || (!conflictDetails.work_hours && !conflictDetails.emergency_times)) {
-                console.warn(`No conflict details for day ${day}`);
                 return;
               }
               hasConflicts = true;
@@ -1206,8 +1188,6 @@
               conflictMessage += '</ul></li>';
             });
             if (!hasConflicts) {
-              console.warn('No valid conflicts found, proceeding with copySchedule');
-              return;
               return;
             }
             conflictMessage += '<p>آیا می‌خواهید داده‌های موجود را جایگزین کنید؟</p>';
