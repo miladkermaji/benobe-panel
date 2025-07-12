@@ -900,4 +900,18 @@ class DrProfileController extends Controller
             'faq' => $faq,
         ]);
     }
+
+    public function indexFaqs()
+    {
+        $doctor = $this->getAuthenticatedDoctor();
+
+        $faqs = DoctorFaq::where('doctor_id', $doctor->id)
+            ->orderBy('order', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'faqs' => $faqs,
+        ]);
+    }
 }

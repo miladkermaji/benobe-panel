@@ -840,7 +840,7 @@ Route::prefix('dr')
                 Route::put('/faqs/{id}/update', [DrProfileController::class, 'updateFaq'])->name('dr-faqs-update');
                 Route::delete('/faqs/{id}/delete', [DrProfileController::class, 'deleteFaq'])->name('dr-faqs-delete');
                 Route::get('/faqs/{id}', [DrProfileController::class, 'getFaq'])->name('dr-faqs-get');
-
+                Route::get('/faqs', [DrProfileController::class, 'indexFaqs'])->name('dr-faqs-index');
             });
 
 

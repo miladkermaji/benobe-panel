@@ -1600,7 +1600,7 @@
         .then(data => {
           if (data.success) {
             toastr.success(data.message);
-            addFaqToList(data.faq);
+            refreshFaqList(); // بروزرسانی کامل لیست از سرور
             faqForm.reset();
           } else {
             toastr.error(data.message || 'خطا در افزودن سوال متداول');
@@ -1619,10 +1619,14 @@
   // افزودن سوال جدید به لیست
   function addFaqToList(faq) {
     const faqsList = document.getElementById('faqsList');
+    if (!faqsList) return;
+    
+    // حذف پیام خالی اگر وجود دارد
     const emptyMessage = faqsList.querySelector('.text-center');
     if (emptyMessage) {
       emptyMessage.remove();
     }
+    
     const faqHtml = `
       <div class="faq-item" data-faq-id="${faq.id}">
         <div class="faq-item-header">
@@ -1688,24 +1692,14 @@
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        const faqItem = document.querySelector(`[data-faq-id="${faqId}"]`);
-        faqItem.remove();
         toastr.success(data.message);
-        // اگر لیست خالی شد، پیام خالی نمایش بده
-        const faqsList = document.getElementById('faqsList');
-        if (faqsList.children.length === 0) {
-          faqsList.innerHTML = `
-            <div class="text-center py-4">
-              <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" style="width: 48px; height: 48px; opacity: 0.5;" class="mb-3">
-              <p class="text-muted">هنوز سوال متداولی اضافه نکرده‌اید.</p>
-            </div>
-          `;
-        }
+        refreshFaqList(); // بروزرسانی کامل لیست از سرور
       } else {
         toastr.error(data.message || 'خطا در حذف سوال متداول');
       }
     })
     .catch(error => {
+      console.error('Error deleting FAQ:', error);
       toastr.error('خطا در برقراری ارتباط با سرور');
     });
   }
@@ -1847,7 +1841,7 @@
       .then(data => {
         if (data.success) {
           toastr.success(data.message);
-          updateFaqInList(data.faq);
+          refreshFaqList(); // بروزرسانی کامل لیست از سرور
           closeEditFaqModal();
         } else {
           toastr.error(data.message || 'خطا در ویرایش سوال متداول');
@@ -1882,11 +1876,22 @@
       const question = faqItem.querySelector('.faq-question');
       const answer = faqItem.querySelector('.faq-answer');
       
-      statusBadge.className = `status-badge ${faq.is_active ? 'active' : 'inactive'}`;
-      statusBadge.textContent = faq.is_active ? 'فعال' : 'غیرفعال';
-      orderBadge.textContent = `ترتیب: ${faq.order}`;
-      question.textContent = faq.question;
-      answer.textContent = faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer;
+      if (statusBadge) {
+        statusBadge.className = `status-badge ${faq.is_active ? 'active' : 'inactive'}`;
+        statusBadge.textContent = faq.is_active ? 'فعال' : 'غیرفعال';
+      }
+      
+      if (orderBadge) {
+        orderBadge.textContent = `ترتیب: ${faq.order}`;
+      }
+      
+      if (question) {
+        question.textContent = faq.question;
+      }
+      
+      if (answer) {
+        answer.textContent = faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer;
+      }
     }
   }
   
@@ -1928,6 +1933,105 @@
   });
   
   // فرم افزودن سوال متداول
+  // تابع بروزرسانی لیست سوالات متداول از سرور
+  function refreshFaqList() {
+    const faqsList = document.getElementById('faqsList');
+    if (!faqsList) return;
+    
+    // نمایش لودینگ
+    faqsList.innerHTML = `
+      <div class="text-center py-4">
+        <div class="loading-spinner"></div>
+        <p class="text-muted mt-2">در حال بارگذاری...</p>
+      </div>
+    `;
+    
+    // دریافت لیست جدید از سرور
+    fetch("{{ route('dr-faqs-index') }}", {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.faqs) {
+        renderFaqList(data.faqs);
+      } else {
+        showEmptyFaqList();
+      }
+    })
+    .catch(error => {
+      console.error('Error refreshing FAQ list:', error);
+      showEmptyFaqList();
+    });
+  }
+  
+  // تابع نمایش لیست سوالات متداول
+  function renderFaqList(faqs) {
+    const faqsList = document.getElementById('faqsList');
+    if (!faqsList) return;
+    
+    if (!faqs || faqs.length === 0) {
+      showEmptyFaqList();
+      return;
+    }
+    
+    faqsList.innerHTML = '';
+    
+    faqs.forEach(faq => {
+      const faqHtml = `
+        <div class="faq-item" data-faq-id="${faq.id}">
+          <div class="faq-item-header">
+            <div class="faq-item-status">
+              <span class="status-badge ${faq.is_active ? 'active' : 'inactive'}">
+                ${faq.is_active ? 'فعال' : 'غیرفعال'}
+              </span>
+              <span class="order-badge">ترتیب: ${faq.order}</span>
+            </div>
+            <div class="faq-item-actions">
+              <button type="button" class="action-btn edit-btn edit-faq-btn" 
+                      data-faq-id="${faq.id}" title="ویرایش">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M18.5 2.50023C18.8978 2.10297 19.4374 1.87891 20 1.87891C20.5626 1.87891 21.1022 2.10297 21.5 2.50023C21.8978 2.89749 22.1219 3.43705 22.1219 3.99973C22.1219 4.56241 21.8978 5.10197 21.5 5.49923L12 14.9992L8 15.9992L9 11.9992L18.5 2.50023Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <button type="button" class="action-btn delete-btn delete-faq-btn" 
+                      data-faq-id="${faq.id}" title="حذف">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 6H5H21" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="faq-item-content">
+            <h6 class="faq-question">${faq.question}</h6>
+            <p class="faq-answer">${faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer}</p>
+          </div>
+        </div>
+      `;
+      faqsList.insertAdjacentHTML('beforeend', faqHtml);
+    });
+  }
+  
+  // تابع نمایش لیست خالی
+  function showEmptyFaqList() {
+    const faqsList = document.getElementById('faqsList');
+    if (!faqsList) return;
+    
+    faqsList.innerHTML = `
+      <div class="text-center py-4">
+        <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" style="width: 48px; height: 48px; opacity: 0.5;" class="mb-3">
+        <p class="text-muted">هنوز سوال متداولی اضافه نکرده‌اید.</p>
+      </div>
+    `;
+  }
+  
+  // افزودن سوال جدید به لیست
 </script>
 
 
