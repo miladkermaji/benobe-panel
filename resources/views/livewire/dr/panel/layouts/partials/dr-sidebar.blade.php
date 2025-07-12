@@ -138,8 +138,11 @@
       @if ($this->hasPermission('prescription'))
         <li
           class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('dr-patient-records') ? 'is-active' : '' }}">
-          <a href="#">
-            نسخه الکترونیک
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            <div class="d-flex align-items-center">
+              نسخه الکترونیک
+              <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
+            </div>
             <div class="d-flex justify-content-end w-100 align-items-center">
               <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
                 xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
@@ -151,27 +154,29 @@
           </a>
           <ul class="drop-toggle d-none">
             @if ($this->hasPermission('dr-patient-records'))
-              <li class="item-li"><a href="{{ route('dr-patient-records') }}">پرونده پزشکی</a></li>
+              <li class="item-li" style="opacity: 0.5; pointer-events: none;">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">پرونده پزشکی</a>
+              </li>
             @endif
             @if ($this->hasPermission('prescription.index'))
-              <li class="item-li i-courses {{ Request::routeIs('prescription.index') ? 'is-active' : '' }}">
-                <a href="{{ route('prescription.index') }}">نسخه‌های ثبت شده</a>
+              <li class="item-li i-courses {{ Request::routeIs('prescription.index') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه‌های ثبت شده</a>
               </li>
             @endif
             @if ($this->hasPermission('providers.index'))
-              <li class="item-li i-courses {{ Request::routeIs('providers.index') ? 'is-active' : '' }}">
-                <a href="{{ route('providers.index') }}">بیمه‌های من</a>
+              <li class="item-li i-courses {{ Request::routeIs('providers.index') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">بیمه‌های من</a>
               </li>
             @endif
             @if ($this->hasPermission('favorite.templates.index'))
-              <li class="item-li i-courses {{ Request::routeIs('favorite.templates.index') ? 'is-active' : '' }}">
-                <a href="{{ route('favorite.templates.index') }}">نسخه پراستفاده</a>
+              <li class="item-li i-courses {{ Request::routeIs('favorite.templates.index') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه پراستفاده</a>
               </li>
             @endif
             @if ($this->hasPermission('templates.favorite.service.index'))
               <li
-                class="item-li i-courses {{ Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}">
-                <a href="{{ route('templates.favorite.service.index') }}">اقلام پراستفاده</a>
+                class="item-li i-courses {{ Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">اقلام پراستفاده</a>
               </li>
             @endif
           </ul>
@@ -238,8 +243,11 @@
       @if ($this->hasPermission('patient_records'))
         <li
           class="item-li i-checkout__request {{ Request::routeIs('dr-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-          id="gozaresh-mali">
-          <a href="{{ route('dr-patient-records') }}">پرونده الکترونیک</a>
+          id="gozaresh-mali" style="opacity: 0.5; pointer-events: none;">
+          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;" class="d-flex align-items-center">
+            پرونده الکترونیک
+            <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
+          </a>
         </li>
       @endif
 
