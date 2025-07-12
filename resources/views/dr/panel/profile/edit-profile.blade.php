@@ -648,15 +648,15 @@
           
           <!-- بخش افزودن سوال جدید - Dropdown -->
           <div class="mt-4">
-            <div class="d-flex justify-content-between align-items-center faq-add-toggle" style="cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e5e7eb;">
-              <div class="d-flex align-items-center">
+            <div class="faq-add-toggle">
+              <div class="d-flex align-items-center justify-content-center">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
                   <path d="M12 5V19M5 12H19" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 <span class="fw-bold text-primary">افزودن سوال متداول جدید</span>
               </div>
               <div class="faq-add-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s ease;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 9L12 15L18 9" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </div>
