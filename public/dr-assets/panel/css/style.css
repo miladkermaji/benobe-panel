@@ -1197,6 +1197,48 @@ svg {
     border-left: 1px solid rgba(0, 0, 0, 0.02); /* حاشیه ظریف برای بافت */
 }
 
+/* هاور شیک برای سایدبار مینیمایز شده */
+.sidebar__nav.is-active:hover {
+    background: linear-gradient(145deg, #e2e8f0, #f0f6ff); /* رنگ هاور ملایم */
+    box-shadow: 0 6px 20px rgba(49, 130, 206, 0.15); /* سایه آبی ملایم */
+    transform: translateX(-5px); /* حرکت نرم به چپ */
+    transition: all 0.3s ease;
+}
+
+/* هاور برای منوها در حالت مینیمایز */
+.sidebar__nav.is-active ul li:hover {
+    background: rgba(49, 130, 206, 0.1); /* پس‌زمینه آبی ملایم */
+    border-radius: 8px;
+    margin: 2px 4px;
+    transition: all 0.3s ease;
+}
+
+/* هاور برای منوهای فعال در حالت مینیمایز */
+.sidebar__nav.is-active ul li.is-active:hover {
+    background: rgba(49, 130, 206, 0.2); /* پس‌زمینه آبی تیره‌تر */
+    box-shadow: 0 2px 8px rgba(49, 130, 206, 0.2);
+}
+
+/* هاور برای آیکون‌ها در حالت مینیمایز */
+.sidebar__nav.is-active ul li:hover a::before {
+    color: #3182ce; /* رنگ آبی فعال */
+    transform: scale(1.1); /* بزرگ‌نمایی نرم */
+    transition: all 0.3s ease;
+}
+
+/* هاور برای پروفایل در حالت مینیمایز */
+.sidebar__nav.is-active .profile__info:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
+    transition: all 0.3s ease;
+}
+
+/* افکت موج برای کلیک در حالت مینیمایز */
+.sidebar__nav.is-active ul li:active {
+    transform: scale(0.95);
+    transition: all 0.1s ease;
+}
+
 .h-30 {
     height: 30px !important;
 }
