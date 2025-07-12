@@ -1182,7 +1182,9 @@
           body: JSON.stringify({
             ita_phone: form.querySelector('input[name="ita_phone"]').value,
             ita_username: form.querySelector('input[name="ita_username"]').value,
-            whatsapp_phone: form.querySelector('input[name="whatsapp_phone"]').value,
+            telegram_phone: form.querySelector('input[name="telegram_phone"]').value,
+            telegram_username: form.querySelector('input[name="telegram_username"]').value,
+            instagram_username: form.querySelector('input[name="instagram_username"]').value,
             secure_call: form.querySelector('input[name="secure_call"]').checked ? 1 : 0,
           }),
         })

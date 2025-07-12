@@ -350,7 +350,7 @@ class DrProfileController extends Controller
         if (class_exists('App\\Helpers\\PersianNumber')) {
             $request->merge([
                 'ita_phone'      => \App\Helpers\PersianNumber::convertToEnglish($request->ita_phone),
-                'whatsapp_phone' => \App\Helpers\PersianNumber::convertToEnglish($request->whatsapp_phone),
+                'telegram_phone' => \App\Helpers\PersianNumber::convertToEnglish($request->telegram_phone),
             ]);
         }
 
@@ -362,12 +362,14 @@ class DrProfileController extends Controller
                 'regex:/^(?!09{1}([0-9۰-۹])\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)[0-9۰-۹]{7}$/u',
             ],
             'ita_username'   => 'nullable|string|max:100',
-            'whatsapp_phone' => [
+            'telegram_phone' => [
                 'nullable',
                 'string',
                 'max:20',
                 'regex:/^(?!09{1}([0-9۰-۹])\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)[0-9۰-۹]{7}$/u',
             ],
+            'telegram_username' => 'nullable|string|max:100',
+            'instagram_username' => 'nullable|string|max:100',
             'secure_call'    => 'nullable|boolean',
         ], [
             'ita_phone.string'      => 'شماره موبایل ایتا باید یک رشته باشد.',
@@ -375,9 +377,13 @@ class DrProfileController extends Controller
             'ita_phone.regex'       => 'شماره موبایل ایتا باید با اعداد فارسی یا انگلیسی و فرمت صحیح وارد شود.',
             'ita_username.string'   => 'نام کاربری ایتا باید یک رشته باشد.',
             'ita_username.max'      => 'نام کاربری ایتا نمی‌تواند بیشتر از ۱۰۰ کاراکتر باشد.',
-            'whatsapp_phone.string' => 'شماره موبایل واتس‌اپ باید یک رشته باشد.',
-            'whatsapp_phone.max'    => 'شماره موبایل واتس‌اپ نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.',
-            'whatsapp_phone.regex'  => 'شماره موبایل واتس‌اپ باید با اعداد فارسی یا انگلیسی و فرمت صحیح وارد شود.',
+            'telegram_phone.string' => 'شماره موبایل تلگرام باید یک رشته باشد.',
+            'telegram_phone.max'    => 'شماره موبایل تلگرام نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.',
+            'telegram_phone.regex'  => 'شماره موبایل تلگرام باید با اعداد فارسی یا انگلیسی و فرمت صحیح وارد شود.',
+            'telegram_username.string' => 'نام کاربری تلگرام باید یک رشته باشد.',
+            'telegram_username.max'    => 'نام کاربری تلگرام نمی‌تواند بیشتر از ۱۰۰ کاراکتر باشد.',
+            'instagram_username.string' => 'نام کاربری اینستاگرام باید یک رشته باشد.',
+            'instagram_username.max'    => 'نام کاربری اینستاگرام نمی‌تواند بیشتر از ۱۰۰ کاراکتر باشد.',
             'secure_call.boolean'   => 'وضعیت تماس امن باید یک مقدار بولین باشد.',
         ]);
 
@@ -391,9 +397,18 @@ class DrProfileController extends Controller
         );
 
         $doctor->messengers()->updateOrCreate(
-            ['messenger_type' => 'whatsapp'],
+            ['messenger_type' => 'telegram'],
             [
-                'phone_number'   => $request->whatsapp_phone,
+                'phone_number'   => $request->telegram_phone,
+                'username'       => $request->telegram_username,
+                'is_secure_call' => $request->secure_call,
+            ]
+        );
+
+        $doctor->messengers()->updateOrCreate(
+            ['messenger_type' => 'instagram'],
+            [
+                'username'       => $request->instagram_username,
                 'is_secure_call' => $request->secure_call,
             ]
         );
@@ -559,6 +574,50 @@ class DrProfileController extends Controller
                 'success' => false,
                 'message' => 'خطا در بررسی وضعیت پروفایل',
                 'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function debugProfileCompletion()
+    {
+        try {
+            $doctor = $this->getAuthenticatedDoctor();
+
+            // بررسی پیام‌رسان‌های موجود
+            $messengers = $doctor->messengers;
+            $messengerInfo = [];
+
+            foreach ($messengers as $messenger) {
+                $messengerInfo[] = [
+                    'id' => $messenger->id,
+                    'type' => $messenger->messenger_type,
+                    'phone' => $messenger->phone_number,
+                    'username' => $messenger->username,
+                    'has_data' => !empty($messenger->phone_number) || !empty($messenger->username)
+                ];
+            }
+
+            // بررسی منطق تکمیل پروفایل
+            $isComplete = $doctor->isProfileComplete();
+            $incompleteSections = $doctor->getIncompleteProfileSections();
+
+            return response()->json([
+                'success' => true,
+                'doctor_id' => $doctor->id,
+                'profile_completed' => $doctor->profile_completed,
+                'is_complete_logic' => $isComplete,
+                'messengers' => $messengerInfo,
+                'incomplete_sections' => $incompleteSections,
+                'messengers_exists' => $doctor->messengers()->exists(),
+                'messengers_contains_data' => $doctor->messengers->contains(function ($messenger) {
+                    return $messenger->phone_number || $messenger->username;
+                })
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در بررسی وضعیت پروفایل',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

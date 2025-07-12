@@ -420,9 +420,8 @@
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="alert alert-warning mt-2 text-center">
-            <span class="text-sm fw-bold d-block font-size-15">لطفا شماره و نام کاربری پیام رسان ایتا یا شماره
-              واتساپ خود را وارد.</span>
-            <span class="font-size-15 mt-1">شماره موبایل این پیام رسان ها در دسترس بیمار قرار میگیرد.</span>
+            <span class="text-sm fw-bold d-block font-size-15">لطفا شماره و نام کاربری پیام رسان ایتا، تلگرام یا نام کاربری اینستاگرام خود را وارد کنید (اختیاری).</span>
+            <span class="font-size-15 mt-1">اطلاعات پیام‌رسان‌ها در صورت نیاز در دسترس بیمار قرار می‌گیرد.</span>
           </div>
           <form id="messengersForm">
             @csrf
@@ -455,14 +454,33 @@
             <div class="d-flex align-items-center justify-content-start gap-20 mt-2">
               <div
                 class="d-flex justify-content-center gap-1 align-items-center border border-solid py-2 px-3 rounded-lg">
-                <img src="{{ asset('dr-assets/icons/whatsapp-svgrepo-com.svg') }}" alt="">
-                <span class="text-sm mx-1 font-size-13">واتساپ</span>
+                <img src="{{ asset('dr-assets/icons/telegram.svg') }}" alt="">
+                <span class="text-sm mx-1 font-size-13">تلگرام</span>
               </div>
               <div class="w-100">
                 <div class="w-100">
-                  <input type="text" name="whatsapp_phone" class="form-control h-50 border-radius-4 col-12"
-                    placeholder="شماره موبایل" maxlength="11"
-                    value="{{ $messengers->where('messenger_type', 'whatsapp')->first()->phone_number ?? '' }}">
+                  <input type="text" name="telegram_phone" class="form-control h-50 border-radius-4 col-12"
+                    placeholder="شماره موبایل (اختیاری)" maxlength="11"
+                    value="{{ $messengers->where('messenger_type', 'telegram')->first()->phone_number ?? '' }}">
+                </div>
+                <div class="mt-2 w-100">
+                  <input type="text" name="telegram_username" class="form-control h-50 border-radius-4 mt-2"
+                    placeholder="نام کاربری تلگرام (اختیاری)"
+                    value="{{ $messengers->where('messenger_type', 'telegram')->first()->username ?? '' }}">
+                </div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center justify-content-start gap-20 mt-2">
+              <div
+                class="d-flex justify-content-center gap-1 align-items-center border border-solid py-2 px-3 rounded-lg">
+                <img src="{{ asset('dr-assets/icons/instagram.svg') }}" alt="">
+                <span class="text-sm mx-1 font-size-13">اینستاگرام</span>
+              </div>
+              <div class="w-100">
+                <div class="w-100">
+                  <input type="text" name="instagram_username" class="form-control h-50 border-radius-4 col-12"
+                    placeholder="نام کاربری اینستاگرام (اختیاری)"
+                    value="{{ $messengers->where('messenger_type', 'instagram')->first()->username ?? '' }}">
                 </div>
               </div>
             </div>
@@ -483,7 +501,7 @@
                   <div class="password_toggle__AXK9v">
                     <input type="checkbox" id="secure_call" name="secure_call" value="1"
                       {{ ($messengers->where('messenger_type', 'ita')->first()->is_secure_call ?? false) ||
-                      ($messengers->where('messenger_type', 'whatsapp')->first()->is_secure_call ?? false)
+                      ($messengers->where('messenger_type', 'telegram')->first()->is_secure_call ?? false)
                           ? 'checked'
                           : '' }}>
                     <label for="secure_call">Toggle</label>

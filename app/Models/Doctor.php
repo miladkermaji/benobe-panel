@@ -294,7 +294,7 @@ class Doctor extends Authenticatable implements JWTSubject
         $this->doctorSpecialties()->where('is_main', true)->exists() &&
         $this->uuid &&
         $this->messengers()->exists() &&
-        $this->messengers->every(function ($messenger) {
+        $this->messengers->contains(function ($messenger) {
             return $messenger->phone_number || $messenger->username;
         });
     }
@@ -330,8 +330,8 @@ class Doctor extends Authenticatable implements JWTSubject
             $incompleteSections[] = 'آیدی';
         }
         if (
-            ! $this->messengers()->exists() || $this->messengers->contains(function ($messenger) {
-                return ! $messenger->phone_number && ! $messenger->username;
+            ! $this->messengers()->exists() || ! $this->messengers->contains(function ($messenger) {
+                return $messenger->phone_number || $messenger->username;
             })
         ) {
             $incompleteSections[] = 'پیام‌رسان‌ها';
