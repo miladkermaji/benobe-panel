@@ -266,6 +266,11 @@ class Doctor extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(DoctorMessenger::class);
     }
+
+    public function faqs()
+    {
+        return $this->hasMany(DoctorFaq::class);
+    }
     public function getSpecialtyNameAttribute()
     {
         return $this->specialty ? $this->specialty->name : 'نامشخص';

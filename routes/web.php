@@ -835,12 +835,11 @@ Route::prefix('dr')
                 Route::get('/dr/get-cities', [DrProfileController::class, 'getCities'])->name('dr-get-cities')->middleware('auth:doctor,secretary');
                 Route::get('/debug-profile-completion', [DrProfileController::class, 'debugProfileCompletion'])->name('dr-debug-profile-completion');
 
-                Route::prefix('doctor-faqs')->group(function () {
-                    Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController::class, 'index'])->middleware('secretary.permission:profile')->name('dr.panel.doctor-faqs.index');
-                    Route::get('/create', [\App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController::class, 'create'])->name('dr.panel.doctor-faqs.create');
-                    Route::get('/edit/{id}', [\App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController::class, 'edit'])->name('dr.panel.doctor-faqs.edit');
-                });
-
+                // Routes for Doctor FAQs
+                Route::post('/faqs/store', [DrProfileController::class, 'storeFaq'])->name('dr-faqs-store');
+                Route::put('/faqs/{id}/update', [DrProfileController::class, 'updateFaq'])->name('dr-faqs-update');
+                Route::delete('/faqs/{id}/delete', [DrProfileController::class, 'deleteFaq'])->name('dr-faqs-delete');
+                Route::get('/faqs/{id}', [DrProfileController::class, 'getFaq'])->name('dr-faqs-get');
 
             });
 

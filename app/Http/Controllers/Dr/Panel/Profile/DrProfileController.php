@@ -23,6 +23,7 @@ use App\Http\Requests\DoctorSpecialtyRequest;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Models\Secretary;
+use App\Models\DoctorFaq;
 
 class DrProfileController extends Controller
 {
@@ -108,6 +109,7 @@ class DrProfileController extends Controller
         $messengers         = $doctor->messengers;
         $specialties        = Specialty::getOptimizedList();
         $incompleteSections = $doctor->getIncompleteProfileSections();
+        $doctorFaqs         = $doctor->faqs()->orderBy('order', 'asc')->get();
 
         // دریافت درجه علمی و اولین تخصص برای نمایش در هدر پروفایل
         $academicDegreeTitle = '';
@@ -140,6 +142,7 @@ class DrProfileController extends Controller
             'incompleteSections',
             'academicDegreeTitle',
             'firstSpecialtyName',
+            'doctorFaqs',
         ]));
     }
 
@@ -799,5 +802,102 @@ class DrProfileController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    // متدهای مربوط به سوالات متداول
+    public function storeFaq(Request $request)
+    {
+        $doctor = $this->getAuthenticatedDoctor();
+
+        $request->validate([
+            'question' => 'required|string|max:255',
+            'answer' => 'required|string',
+            'is_active' => 'boolean',
+            'order' => 'integer|min:0',
+        ], [
+            'question.required' => 'فیلد سوال الزامی است.',
+            'question.string' => 'سوال باید یک رشته متنی باشد.',
+            'question.max' => 'سوال نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
+            'answer.required' => 'فیلد پاسخ الزامی است.',
+            'answer.string' => 'پاسخ باید یک رشته متنی باشد.',
+            'is_active.boolean' => 'وضعیت باید فعال یا غیرفعال باشد.',
+            'order.integer' => 'ترتیب باید یک عدد صحیح باشد.',
+            'order.min' => 'ترتیب نمی‌تواند کمتر از ۰ باشد.',
+        ]);
+
+        $faq = DoctorFaq::create([
+            'doctor_id' => $doctor->id,
+            'question' => $request->question,
+            'answer' => $request->answer,
+            'is_active' => $request->is_active ?? true,
+            'order' => $request->order ?? 0,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'سوال متداول با موفقیت ایجاد شد.',
+            'faq' => $faq,
+        ]);
+    }
+
+    public function updateFaq(Request $request, $id)
+    {
+        $doctor = $this->getAuthenticatedDoctor();
+
+        $faq = DoctorFaq::where('doctor_id', $doctor->id)->findOrFail($id);
+
+        $request->validate([
+            'question' => 'required|string|max:255',
+            'answer' => 'required|string',
+            'is_active' => 'boolean',
+            'order' => 'integer|min:0',
+        ], [
+            'question.required' => 'فیلد سوال الزامی است.',
+            'question.string' => 'سوال باید یک رشته متنی باشد.',
+            'question.max' => 'سوال نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
+            'answer.required' => 'فیلد پاسخ الزامی است.',
+            'answer.string' => 'پاسخ باید یک رشته متنی باشد.',
+            'is_active.boolean' => 'وضعیت باید فعال یا غیرفعال باشد.',
+            'order.integer' => 'ترتیب باید یک عدد صحیح باشد.',
+            'order.min' => 'ترتیب نمی‌تواند کمتر از ۰ باشد.',
+        ]);
+
+        $faq->update([
+            'question' => $request->question,
+            'answer' => $request->answer,
+            'is_active' => $request->is_active ?? $faq->is_active,
+            'order' => $request->order ?? $faq->order,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'سوال متداول با موفقیت به‌روزرسانی شد.',
+            'faq' => $faq->fresh(),
+        ]);
+    }
+
+    public function deleteFaq($id)
+    {
+        $doctor = $this->getAuthenticatedDoctor();
+
+        $faq = DoctorFaq::where('doctor_id', $doctor->id)->findOrFail($id);
+        $faq->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'سوال متداول با موفقیت حذف شد.',
+        ]);
+    }
+
+    public function getFaq($id)
+    {
+        $doctor = $this->getAuthenticatedDoctor();
+
+        $faq = DoctorFaq::where('doctor_id', $doctor->id)->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'faq' => $faq,
+        ]);
     }
 }

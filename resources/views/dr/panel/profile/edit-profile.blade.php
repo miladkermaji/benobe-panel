@@ -628,6 +628,94 @@
         </div>
       </div>
     </div>
+    <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8" id="faq-section">
+      <div class="d-flex justify-content-between align-items-center faq-section-clicked">
+        <div>
+          <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="">
+          <span class="txt-card-span mx-1">سوالات متداول</span>
+        </div>
+        <div>
+          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="">
+        </div>
+      </div>
+      <div class="drop-toggle-styles faq-section-drop-toggle">
+        <div class="loading-spinner d-none"></div>
+        <div>
+          <div class="alert alert-info mt-2 text-center">
+            <span class="text-sm fw-bold d-block font-size-15">سوالات متداول شما در پروفایل عمومی نمایش داده می‌شود.</span>
+            <span class="font-size-15 mt-1">این بخش به بیماران کمک می‌کند تا سوالات رایج را مشاهده کنند.</span>
+          </div>
+          
+          <!-- فرم افزودن سوال جدید -->
+          <form id="faqForm" class="mt-3">
+            @csrf
+            <div class="row">
+              <div class="col-md-6">
+                <label for="question" class="label-top-input">سوال</label>
+                <input type="text" id="question" name="question" class="form-control h-50 w-100 border-radius-6 mt-3" 
+                       placeholder="سوال خود را وارد کنید..." maxlength="255">
+                <div class="text-danger validation-error mt-1 font-size-13"></div>
+              </div>
+              <div class="col-md-6">
+                <label for="order" class="label-top-input">ترتیب نمایش</label>
+                <input type="number" id="order" name="order" class="form-control h-50 w-100 border-radius-6 mt-3" 
+                       placeholder="0" min="0" value="0">
+                <div class="text-danger validation-error mt-1 font-size-13"></div>
+              </div>
+            </div>
+            <div class="mt-3">
+              <textarea id="answer" name="answer" class="form-control w-100 border-radius-6 mt-3" 
+                        rows="3" placeholder="پاسخ خود را وارد کنید..."></textarea>
+              <div class="text-danger validation-error mt-1 font-size-13"></div>
+            </div>
+            <div class="mt-3">
+              <button type="submit" class="btn my-btn-primary w-100 h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                <span class="button_text">افزودن سوال متداول</span>
+                <div class="loader"></div>
+              </button>
+            </div>
+          </form>
+
+          <!-- لیست سوالات متداول -->
+          <div class="mt-4">
+            <h6 class="text-right fw-bold d-block font-size-13 mb-3">سوالات متداول شما</h6>
+            <div id="faqsList">
+              @forelse($doctorFaqs as $faq)
+                <div class="faq-item border border-slate-200 rounded-lg p-3 mb-3" data-faq-id="{{ $faq->id }}">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                      <div class="d-flex align-items-center mb-2">
+                        <span class="badge {{ $faq->is_active ? 'bg-success' : 'bg-secondary' }} me-2">
+                          {{ $faq->is_active ? 'فعال' : 'غیرفعال' }}
+                        </span>
+                        <span class="badge bg-info me-2">ترتیب: {{ $faq->order }}</span>
+                      </div>
+                      <h6 class="fw-bold mb-2">{{ $faq->question }}</h6>
+                      <p class="text-muted mb-0">{{ Str::limit($faq->answer, 150) }}</p>
+                    </div>
+                    <div class="d-flex gap-2 ms-3">
+                      <button type="button" class="btn btn-sm btn-outline-primary edit-faq-btn" 
+                              data-faq-id="{{ $faq->id }}" title="ویرایش">
+                        <img src="{{ asset('dr-assets/icons/pencil-edit.svg') }}" alt="ویرایش" style="width: 16px; height: 16px;">
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-danger delete-faq-btn" 
+                              data-faq-id="{{ $faq->id }}" title="حذف">
+                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 16px; height: 16px;">
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              @empty
+                <div class="text-center py-4">
+                  <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" style="width: 48px; height: 48px; opacity: 0.5;" class="mb-3">
+                  <p class="text-muted">هنوز سوال متداولی اضافه نکرده‌اید.</p>
+                </div>
+              @endforelse
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8">
       <div class="d-flex justify-content-between align-items-center">
         <div>

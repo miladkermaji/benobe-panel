@@ -14,7 +14,6 @@
     }
     return selectElement ? selectElement.tomSelect : null;
   }
-
   document.addEventListener('DOMContentLoaded', function() {
     // مقداردهی اولیه Tom Select برای استان و شهر
     const provinceTomSelect = initializeTomSelect('province_id', {
@@ -23,22 +22,18 @@
     const cityTomSelect = initializeTomSelect('city_id', {
       placeholder: 'انتخاب شهر',
     });
-
     if (!provinceTomSelect || !cityTomSelect) {
       console.error('خطا در مقداردهی Tom Select برای استان یا شهر');
       return;
     }
-
     const provinceSelect = document.getElementById('province_id');
     const doctorProvinceId =
       '@if (Auth::guard('doctor')->check()){{ Auth::guard('doctor')->user()->province_id }}@elseif (Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->province_id }}@endif';
     const doctorCityId =
       '@if (Auth::guard('doctor')->check()){{ Auth::guard('doctor')->user()->city_id }}@elseif (Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->city_id }}@endif';
-
     // مدیریت تغییر در انتخاب استان
     provinceSelect.addEventListener('change', function() {
       const provinceId = this.value;
-
       if (provinceId) {
         fetch(`{{ route('dr-get-cities') }}?province_id=${provinceId}`, {
             method: 'GET',
@@ -64,7 +59,6 @@
               });
               cityTomSelect.enable();
               cityTomSelect.refreshOptions();
-
               // اگر تغییر دستی بود، شهر رو خالی کن
               if (provinceId !== doctorProvinceId) {
                 cityTomSelect.setValue('');
@@ -100,7 +94,6 @@
         cityTomSelect.disable();
       }
     });
-
     // لود اولیه شهرها بر اساس استان دکتر
     if (doctorProvinceId) {
       fetch(`{{ route('dr-get-cities') }}?province_id=${doctorProvinceId}`, {
@@ -127,7 +120,6 @@
             });
             cityTomSelect.enable();
             cityTomSelect.refreshOptions();
-
             // تنظیم شهر پیش‌فرض بر اساس دیتابیس
             if (doctorCityId) {
               cityTomSelect.setValue(doctorCityId);
@@ -144,7 +136,6 @@
         });
     }
   });
-
   function updateAlert() {
     fetch("{{ route('dr-check-profile-completeness') }}", {
         method: 'GET',
@@ -161,7 +152,6 @@
         if (existingAlert) {
           existingAlert.remove();
         }
-
         // اگر پروفایل کامل نیست
         if (!profileData.profile_completed) {
           // ایجاد هشدار
@@ -177,7 +167,6 @@
                     </span>
                 </div>
             `;
-
           // اضافه کردن هشدار به بالای محتوا
           const mainContent = document.querySelector('.main-content');
           mainContent.insertAdjacentHTML('afterbegin', alertHtml);
@@ -218,7 +207,6 @@
       searchField: ['name'],
       maxOptions: 1000,
       placeholder: 'انتخاب تخصص...',
-
       render: {
         option: function(item, escape) {
           return `<div>
@@ -233,7 +221,6 @@
     const addButton = document.getElementById('addButton');
     const additionalInputs = document.getElementById('additionalInputs');
     let inputCount = 0; // شمارش ورودی‌های اضافی
-
     addButton.addEventListener('click', () => {
       // بررسی اینکه آیا ردیف آخر پر شده است یا نه
       const lastInputGroup = additionalInputs.querySelector('.specialty-item:last-child');
@@ -241,7 +228,6 @@
         const degreeSelect = lastInputGroup.querySelector('select[name^="degrees"]');
         const specialtySelect = lastInputGroup.querySelector('select[name^="specialties"]');
         const titleInput = lastInputGroup.querySelector('input[name^="titles"]');
-
         if (!degreeSelect.value || !specialtySelect.value || !titleInput.value.trim()) {
           Swal.fire({
             title: 'لطفاً ردیف فعلی را کامل کنید',
@@ -251,7 +237,6 @@
           return; // اگر ردیف آخر پر نشده، از ادامه جلوگیری می‌کنیم
         }
       }
-
       if (inputCount < 3) {
         inputCount++;
         const newInputGroup = document.createElement('div');
@@ -294,7 +279,6 @@
         </div>
       `;
         additionalInputs.appendChild(newInputGroup);
-
         // راه‌اندازی TomSelect برای ردیف جدید
         new TomSelect(`#degree${inputCount}`, {
           plugins: ['clear_button'],
@@ -314,7 +298,6 @@
           searchField: ['name'],
           placeholder: 'انتخاب تخصص...',
         });
-
         // به‌روزرسانی وضعیت دکمه
         updateAddButtonState();
       } else {
@@ -325,25 +308,21 @@
       }
     });
   });
-
   function updateAddButtonState() {
     const addButton = document.getElementById('addButton');
     const additionalInputs = document.getElementById('additionalInputs');
     const existingSpecialtiesCount = additionalInputs.querySelectorAll('.specialty-item').length;
-
     // اگر تعداد تخصص‌ها به حداکثر رسیده، دکمه غیرفعال بشه
     if (existingSpecialtiesCount >= 2) { // حداکثر 2 تخصص اضافی
       addButton.disabled = true;
       return;
     }
-
     // بررسی ردیف آخر
     const lastInputGroup = additionalInputs.querySelector('.specialty-item:last-child');
     if (lastInputGroup) {
       const degreeSelect = lastInputGroup.querySelector('select[name^="degrees"]');
       const specialtySelect = lastInputGroup.querySelector('select[name^="specialties"]');
       const titleInput = lastInputGroup.querySelector('input[name^="titles"]');
-
       // اگر ردیف آخر ناقص باشه، دکمه غیرفعال می‌شه
       if (!degreeSelect.value || !specialtySelect.value || !titleInput.value.trim()) {
         addButton.disabled = true;
@@ -355,7 +334,6 @@
       addButton.disabled = false;
     }
   }
-
   // تابع بررسی وضعیت پروفایل در زمان بارگذاری اولیه
   function checkInitialProfileCompleteness() {
     fetch("{{ route('dr-check-profile-completeness') }}", {
@@ -373,7 +351,6 @@
         if (existingAlert) {
           existingAlert.remove();
         }
-
         // اگر پروفایل کامل نیست
         if (!profileData.profile_completed) {
           // ایجاد هشدار
@@ -389,11 +366,9 @@
                     </span>
                 </div>
             `;
-
           // اضافه کردن هشدار به بالای محتوا
           const mainContent = document.querySelector('.main-content');
           mainContent.insertAdjacentHTML('afterbegin', alertHtml);
-
           // نقشه‌بندی بخش‌ها
           const sectionMappings = {
             'نام': '#personal-data',
@@ -404,7 +379,6 @@
             'آیدی': '#uuid-section',
             'پیام‌رسان‌ها': '#messengers-section'
           };
-
           // حذف کلاس‌های قبلی
           Object.values(sectionMappings).forEach(selector => {
             const section = document.querySelector(selector);
@@ -412,7 +386,6 @@
               section.classList.remove('border', 'border-warning');
             }
           });
-
           // اضافه کردن کلاس به بخش‌های ناقص
           profileData.incomplete_sections.forEach(section => {
             const selector = sectionMappings[section];
@@ -429,18 +402,15 @@
         console.error('خطا در بررسی وضعیت پروفایل:', error);
       });
   }
-
   // اجرای تابع در زمان بارگذاری اولیه صفحه
   document.addEventListener('DOMContentLoaded', function() {
     checkInitialProfileCompleteness();
   });
   const deleteSpecialtyRoute = "{{ route('dr-delete-specialty', ['id' => '__ID__']) }}";
-
   function removeInput(button) {
     // پیدا کردن المان والد که ممکنه دارای data-specialty-id باشه
     const inputGroup = button.closest('.specialty-item');
     const specialtyId = inputGroup.getAttribute('data-specialty-id');
-
     // اگر specialtyId وجود نداره (ردیف جدیده و توی دیتابیس نیست)
     if (!specialtyId) {
       Swal.fire({
@@ -462,7 +432,6 @@
       });
       return; // از تابع خارج شو
     }
-
     // اگر specialtyId وجود داره (توی دیتابیس ذخیره شده)
     Swal.fire({
       title: 'آیا مطمئن هستید؟',
@@ -526,7 +495,6 @@
       ...options
     });
   }
-
   function initAllTomSelects() {
     // درجه علمی
     initTomSelect('#academic_degree_id', {
@@ -659,12 +627,10 @@
           updateAlert();
           callCheckProfileCompleteness();
           updateProfileSections(data);
-          
           // بروزرسانی لحظه‌ای سایدبار
           if (data.update_sidebar) {
             updateSidebarSpecialty();
           }
-          
           // بروزرسانی بخش تخصص در پروفایل
           updateProfileSpecialtySection(data);
         } else {
@@ -691,7 +657,6 @@
       }
     }
   }
-
   function autoSaveSpecialty(id) {
     const container = document.querySelector(`[data-specialty-id='${id}']`);
     if (!container) return;
@@ -719,12 +684,10 @@
       .then(data => {
         if (data.success) {
           showSpecialtySaveStatus(id, 'saved');
-          
           // بروزرسانی لحظه‌ای سایدبار
           if (data.update_sidebar) {
             updateSidebarSpecialty();
           }
-          
           // بروزرسانی بخش تخصص در پروفایل
           updateProfileSpecialtySection(data);
         } else {
@@ -737,7 +700,6 @@
         toastr.error('خطا در ذخیره تخصص');
       });
   }
-
   document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.specialty-item[data-specialty-id]').forEach(function(item) {
       const id = item.getAttribute('data-specialty-id');
@@ -755,7 +717,6 @@
         item.querySelector('input[name^="titles"]').after(statusSpan);
       }
     });
-
     // TomSelect for all degree and specialty selects (main and additional)
     document.querySelectorAll('select[id^="degree"]').forEach(function(sel) {
       if (!sel.tomselect) new TomSelect(sel, {
@@ -789,17 +750,14 @@
     const submitButton = form.querySelector('button[type="submit"]');
     const loader = submitButton.querySelector('.loader');
     const buttonText = submitButton.querySelector('.button_text');
-
     buttonText.style.display = 'none';
     loader.style.display = 'block';
-
     // ذخیره تخصص‌های اضافی (غیراصلی) به صورت جداگانه
     const additionalSpecialties = document.querySelectorAll('.specialty-item[data-specialty-id]');
     additionalSpecialties.forEach(function(item) {
       const id = item.getAttribute('data-specialty-id');
       autoSaveSpecialty(id);
     });
-
     fetch(form.action, {
         method: form.method,
         body: new FormData(form),
@@ -839,40 +797,33 @@
   });
   document.addEventListener('DOMContentLoaded', function() {
     const additionalInputs = document.getElementById('additionalInputs');
-
     // اضافه کردن رویداد به ورودی‌ها برای بررسی لحظه‌ای
     additionalInputs.addEventListener('input', function(e) {
       if (e.target.matches('select[name^="degrees"], select[name^="specialties"], input[name^="titles"]')) {
         updateAddButtonState();
       }
     });
-
     additionalInputs.addEventListener('change', function(e) {
       if (e.target.matches('select[name^="degrees"], select[name^="specialties"]')) {
         updateAddButtonState();
       }
     });
   });
-
   function updateSpecialties(specialties) {
     if (!specialties || !Array.isArray(specialties)) {
       console.error('داده‌های تخصص‌ها نامعتبر است:', specialties);
       return;
     }
-
     const additionalInputs = document.getElementById('additionalInputs');
     additionalInputs.innerHTML = ''; // پاک کردن تخصص‌های قبلی
-
     specialties.forEach((specialty, index) => {
       if (!specialty.is_main) { // فقط تخصص‌های غیراصلی
         const newInputGroup = document.createElement('div');
         newInputGroup.classList.add('w-100', 'mt-3', 'specialty-item');
         newInputGroup.setAttribute('data-specialty-id', specialty.id);
-
         // اطمینان از اینکه مقدار عنوان تخصص به درستی تنظیم شود
         const titleValue = specialty.speciality_title || specialty.specialty_title ||
           ''; // پشتیبانی از هر دو نام فیلد
-
         newInputGroup.innerHTML = `
         <div>
           <div class="text-left mt-3 remove-form-item" onclick="removeInput(this)">
@@ -908,7 +859,6 @@
           </div>
         </div>
       `;
-
         additionalInputs.appendChild(newInputGroup);
         initTomSelect(`#degree${index + 1}`, {
           placeholder: 'انتخاب درجه علمی'
@@ -918,7 +868,6 @@
         });
       }
     });
-
     updateAddButtonState();
   }
   document.getElementById("uuid-form").addEventListener('submit', function(e) {
@@ -1018,7 +967,6 @@
       /^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/;
     if (!mobileRegex.test(newMobile)) {
       toastr.error("شماره موبایل نامعتبر است");
-
       // بازگردانی دکمه به حالت اولیه
       buttonText.style.display = 'block';
       loader.style.display = 'none';
@@ -1043,7 +991,6 @@
         document.querySelector('.otp-input').focus();
         startResendTimer();
         toastr.success("کد تایید ارسال شد");
-
       },
       error: function(xhr) {
         toastr.error(xhr.responseJSON.message || "خطا در ارسال کد");
@@ -1063,23 +1010,19 @@
     const verifyButton = document.querySelector('#otpInputStep button');
     const loader = verifyButton.querySelector('.loader');
     const buttonText = verifyButton.querySelector('.button_text');
-
     // بررسی کامل بودن کد
     if (otpCode.length !== 4) {
       toastr.error("لطفاً تمام ارقام کد را وارد کنید");
       return;
     }
-
     // اطمینان از وجود otpToken
     if (!otpToken) {
       toastr.error("توکن OTP در دسترس نیست. لطفاً دوباره کد را درخواست کنید.");
       return;
     }
-
     // مخفی کردن متن دکمه و نمایش لودینگ
     buttonText.style.display = 'none';
     loader.style.display = 'block';
-
     // تولید URL با استفاده از route و otpToken
     $.ajax({
       url: "{{ route('dr-mobile-confirm', ':token') }}".replace(':token', otpToken),
@@ -1196,7 +1139,6 @@
           // نمایش پیام موفقیت یا خطا
           if (data.success) {
             toastr.success(data.message);
-
             updateAlert();
             callCheckProfileCompleteness();
             updateProfileSections(data);
@@ -1220,10 +1162,8 @@
     const submitButton = form.querySelector('button[type="submit"]');
     const loader = submitButton.querySelector('.loader');
     const buttonText = submitButton.querySelector('.button_text');
-
     buttonText.style.display = 'none';
     loader.style.display = 'block';
-
     fetch(form.action, {
         method: 'POST',
         body: new FormData(form),
@@ -1265,7 +1205,6 @@
         }
       });
   });
-
   // تابع مدیریت خطاهای اعتبارسنجی
   function handleValidationErrors(errors) {
     clearPreviousErrors();
@@ -1291,26 +1230,22 @@
     });
     toastr.error('لطفاً خطاهای فرم را بررسی کنید.');
   }
-
   // تابع پاک کردن خطاهای قبلی
   function clearPreviousErrors() {
     document.querySelectorAll('.validation-error').forEach(el => el.textContent = '');
     document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
   }
   // تنظیم اولیه وضعیت اینپوت‌ها بر اساس تاگل
-
   document.addEventListener('DOMContentLoaded', function() {
     const toggleSwitch = document.querySelector('input[name="static_password_enabled"]');
     const passwordInput = document.querySelector('input[name="password"]');
     const confirmPasswordInput = document.querySelector('input[name="password_confirmation"]');
     const saveButton = document.getElementById('btn-save-pass');
     const statusText = document.querySelector('#static_password_status');
-
     // تابع آپدیت متن وضعیت
     function updateStatusText(isEnabled) {
       statusText.textContent = isEnabled ? 'رمز عبور ثابت فعال است' : 'رمز عبور ثابت غیرفعال است';
     }
-
     // تابع مدیریت وضعیت اینپوت‌ها
     function updateInputsState(isEnabled) {
       if (isEnabled) {
@@ -1330,20 +1265,17 @@
         clearPreviousErrors();
       }
     }
-
     // مدیریت تغییر تاگل
     toggleSwitch.addEventListener('change', function() {
       const isEnabled = this.checked;
       updateStatusText(isEnabled);
       updateInputsState(isEnabled);
-
       // اگر تاگل غیرفعال شد، درخواست به سرور برای غیرفعال کردن رمز عبور
       if (!isEnabled) {
         const loader = document.createElement('div');
         loader.className = 'loader';
         loader.style.display = 'block';
         this.parentElement.appendChild(loader);
-
         fetch("{{ route('dr-static-password-update') }}", {
             method: 'POST',
             headers: {
@@ -1386,7 +1318,6 @@
     const secretInput = document.querySelector('input[name="two_factor_secret"]');
     const saveButton = document.getElementById('btn-save-two-factor');
     const statusText = document.querySelector('#two_factor_status');
-
     // تابع آپدیت متن وضعیت
     function updateStatusText(isEnabled) {
       statusText.textContent = isEnabled ? 'گذرواژه دو مرحله‌ای فعال است' : 'گذرواژه دو مرحله‌ای غیرفعال است';
@@ -1398,7 +1329,6 @@
       loader.className = 'loader';
       loader.style.display = 'block';
       this.parentElement.appendChild(loader);
-
       fetch("{{ route('dr-two-factor-update') }}", {
           method: 'POST',
           headers: {
@@ -1429,20 +1359,16 @@
           // بازگرداندن تاگل به حالت قبلی
           toggleSwitch.checked = !isEnabled;
           updateStatusText(!isEnabled);
-
         });
     });
   });
-
   document.addEventListener('DOMContentLoaded', function() {
     const incompleteSections = @json($doctor->getIncompleteProfileSections());
-
     if (incompleteSections.includes('پیام‌رسان‌ها')) {
       document.getElementById('messengers-section').classList.add('border-warning');
     }
     // همین‌طور برای سایر بخش‌ها
   });
-
   function checkProfileCompleteness() {
     fetch("{{ route('dr-check-profile-completeness') }}", {
         method: 'GET',
@@ -1471,10 +1397,8 @@
         toastr.error("خطا در دریافت اطلاعات پروفایل");
       });
   }
-
   function updateProfileSections(data) {
     console.log('Update Profile Sections Called');
-
     fetch("{{ route('dr-check-profile-completeness') }}", {
         method: 'GET',
         headers: {
@@ -1503,7 +1427,6 @@
           'آیدی': '#uuid-section',
           'پیام‌رسان‌ها': '#messengers-section'
         };
-
         // حذف کلاس‌های قبلی
         Object.values(sectionMappings).forEach(selector => {
           const section = document.querySelector(selector);
@@ -1511,7 +1434,6 @@
             section.classList.remove('border', 'border-warning');
           }
         });
-
         // اضافه کردن کلاس به بخش‌های ناقص
         profileData.incomplete_sections.forEach(section => {
           const selector = sectionMappings[section];
@@ -1531,14 +1453,11 @@
   function callCheckProfileCompleteness() {
     checkProfileCompleteness();
   }
-
   // فراخوانی در زمان بارگذاری اولیه صفحه
   document.addEventListener('DOMContentLoaded', checkProfileCompleteness);
-
   function togglePassword(inputId) {
     const input = document.getElementById(inputId);
     const icon = input.parentElement.querySelector('.show-pass');
-
     if (input.type === 'password') {
       input.type = 'text';
       icon.src = "{{ asset('dr-assets/icons/show-pass.svg') }}"; // آیکون نمایش
@@ -1547,12 +1466,9 @@
       icon.src = "{{ asset('dr-assets/icons/hide-pass.svg') }}"; // آیکون مخفی
     }
   }
-
-
   // تابع حذف تخصص بدون رفرش
   function removeSpecialty(element, specialtyId) {
     const deleteSpecialtyRoute = "{{ route('dr-delete-specialty', ['id' => '__ID__']) }}";
-
     const url = deleteSpecialtyRoute.replace('__ID__', specialtyId);
     fetch(url, {
         method: 'DELETE',
@@ -1575,7 +1491,6 @@
         toastr.error('خطا در حذف تخصص');
       });
   }
-
   // تابع بروزرسانی لحظه‌ای سایدبار
   function updateSidebarSpecialty() {
     fetch("{{ route('dr-get-current-specialty') }}", {
@@ -1594,7 +1509,6 @@
           if (sidebarSpecialtyElement) {
             sidebarSpecialtyElement.textContent = data.specialty_name;
           }
-          
           // بروزرسانی بخش پروفایل
           updateProfileSpecialtySection(data);
         }
@@ -1603,11 +1517,9 @@
         console.error('خطا در بروزرسانی سایدبار:', error);
       });
   }
-
   // تابع بروزرسانی بخش تخصص در پروفایل
   function updateProfileSpecialtySection(data) {
     console.log('Updating profile specialty section with data:', data);
-    
     if (data.specialty_title) {
       // بروزرسانی عنوان تخصص
       const specialtyTitleInput = document.querySelector('input[name="specialty_title"]');
@@ -1616,7 +1528,6 @@
         console.log('Updated specialty title to:', data.specialty_title);
       }
     }
-    
     if (data.academic_degree_id) {
       // بروزرسانی درجه علمی
       const academicDegreeSelect = document.querySelector('select[name="academic_degree_id"]');
@@ -1629,7 +1540,6 @@
         console.log('Updated academic degree to:', data.academic_degree_id);
       }
     }
-    
     if (data.specialty_id) {
       // بروزرسانی تخصص
       const specialtySelect = document.querySelector('select[name="specialty_id"]');
@@ -1642,7 +1552,6 @@
         console.log('Updated specialty to:', data.specialty_id);
       }
     }
-    
     // بروزرسانی نام تخصص در بالای پروفایل
     if (data.specialty_name) {
       const profileSpecialtyBadge = document.querySelector('.profile-header-name + .badge');
@@ -1651,14 +1560,353 @@
         console.log('Updated profile header specialty to:', data.specialty_name);
       }
     }
-    
     // بروزرسانی تخصص‌های اضافی اگر وجود داشته باشند
     if (data.additional_specialties && Array.isArray(data.additional_specialties)) {
       updateSpecialties(data.additional_specialties);
       console.log('Updated additional specialties');
     }
-    
     // بروزرسانی وضعیت دکمه اضافه کردن
     updateAddButtonState();
   }
+  // ==================== سوالات متداول ====================
+  // فرم افزودن سوال متداول
+  document.addEventListener('DOMContentLoaded', function() {
+    const faqForm = document.getElementById('faqForm');
+    if (faqForm) {
+      faqForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(faqForm);
+        const button = faqForm.querySelector('button[type="submit"]');
+        const buttonText = button.querySelector('.button_text');
+        const loader = button.querySelector('.loader');
+        // نمایش لودینگ
+        buttonText.style.display = 'none';
+        loader.style.display = 'block';
+        fetch("{{ route('dr-faqs-store') }}", {
+          method: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            question: formData.get('question'),
+            answer: formData.get('answer'),
+            order: formData.get('order') || 0,
+            is_active: true
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            toastr.success(data.message);
+            addFaqToList(data.faq);
+            faqForm.reset();
+          } else {
+            toastr.error(data.message || 'خطا در افزودن سوال متداول');
+          }
+        })
+        .catch(error => {
+          toastr.error('خطا در برقراری ارتباط با سرور');
+        })
+        .finally(() => {
+          buttonText.style.display = 'block';
+          loader.style.display = 'none';
+        });
+      });
+    }
+  });
+  // افزودن سوال جدید به لیست
+  function addFaqToList(faq) {
+    const faqsList = document.getElementById('faqsList');
+    const emptyMessage = faqsList.querySelector('.text-center');
+    if (emptyMessage) {
+      emptyMessage.remove();
+    }
+    const faqHtml = `
+      <div class="faq-item border border-slate-200 rounded-lg p-3 mb-3" data-faq-id="${faq.id}">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center mb-2">
+              <span class="badge ${faq.is_active ? 'bg-success' : 'bg-secondary'} me-2">
+                ${faq.is_active ? 'فعال' : 'غیرفعال'}
+              </span>
+              <span class="badge bg-info me-2">ترتیب: ${faq.order}</span>
+            </div>
+            <h6 class="fw-bold mb-2">${faq.question}</h6>
+            <p class="text-muted mb-0">${faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer}</p>
+          </div>
+          <div class="d-flex gap-2 ms-3">
+            <button type="button" class="btn btn-sm btn-outline-primary edit-faq-btn" 
+                    data-faq-id="${faq.id}" title="ویرایش">
+              <img src="{{ asset('dr-assets/icons/pencil-edit.svg') }}" alt="ویرایش" style="width: 16px; height: 16px;">
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger delete-faq-btn" 
+                    data-faq-id="${faq.id}" title="حذف">
+              <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 16px; height: 16px;">
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    faqsList.insertAdjacentHTML('beforeend', faqHtml);
+  }
+  // حذف سوال متداول
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.delete-faq-btn')) {
+      const faqId = e.target.closest('.delete-faq-btn').getAttribute('data-faq-id');
+      Swal.fire({
+        title: 'حذف سوال متداول',
+        text: 'آیا مطمئن هستید که می‌خواهید این سوال متداول را حذف کنید؟',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'بله، حذف کن',
+        cancelButtonText: 'خیر'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deleteFaq(faqId);
+        }
+      });
+    }
+  });
+  function deleteFaq(faqId) {
+    fetch(`{{ route('dr-faqs-delete', ['id' => '__ID__']) }}`.replace('__ID__', faqId), {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'Accept': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const faqItem = document.querySelector(`[data-faq-id="${faqId}"]`);
+        faqItem.remove();
+        toastr.success(data.message);
+        // اگر لیست خالی شد، پیام خالی نمایش بده
+        const faqsList = document.getElementById('faqsList');
+        if (faqsList.children.length === 0) {
+          faqsList.innerHTML = `
+            <div class="text-center py-4">
+              <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" style="width: 48px; height: 48px; opacity: 0.5;" class="mb-3">
+              <p class="text-muted">هنوز سوال متداولی اضافه نکرده‌اید.</p>
+            </div>
+          `;
+        }
+      } else {
+        toastr.error(data.message || 'خطا در حذف سوال متداول');
+      }
+    })
+    .catch(error => {
+      toastr.error('خطا در برقراری ارتباط با سرور');
+    });
+  }
+  // ویرایش سوال متداول
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.edit-faq-btn')) {
+      const faqId = e.target.closest('.edit-faq-btn').getAttribute('data-faq-id');
+      editFaq(faqId);
+    }
+  });
+  function editFaq(faqId) {
+    fetch(`{{ route('dr-faqs-get', ['id' => '__ID__']) }}`.replace('__ID__', faqId), {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        showEditFaqModal(data.faq);
+      } else {
+        toastr.error(data.message || 'خطا در دریافت اطلاعات سوال متداول');
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching FAQ:', error);
+      toastr.error('خطا در برقراری ارتباط با سرور');
+    });
+  }
+  function showEditFaqModal(faq) {
+    // حذف modal قبلی اگر وجود دارد
+    const existingModal = document.getElementById('editFaqModal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+    const modalHtml = `
+      <div class="modal fade" id="editFaqModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content border-radius-6">
+            <div class="modal-header">
+              <h5 class="modal-title">ویرایش سوال متداول</h5>
+              <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="editFaqForm">
+                <input type="hidden" id="edit_faq_id" value="${faq.id}">
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="edit_question" class="label-top-input">سوال</label>
+                    <input type="text" id="edit_question" name="question" class="form-control h-50 w-100 border-radius-6 mt-3" 
+                           value="${faq.question}" maxlength="255">
+                    <div class="text-danger validation-error mt-1 font-size-13"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="edit_order" class="label-top-input">ترتیب نمایش</label>
+                    <input type="number" id="edit_order" name="order" class="form-control h-50 w-100 border-radius-6 mt-3" 
+                           value="${faq.order}" min="0">
+                    <div class="text-danger validation-error mt-1 font-size-13"></div>
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <textarea id="edit_answer" name="answer" class="form-control w-100 border-radius-6 mt-3" 
+                            rows="3">${faq.answer}</textarea>
+                  <div class="text-danger validation-error mt-1 font-size-13"></div>
+                </div>
+                <div class="mt-3">
+                  <div class="form-check">
+                    <input type="checkbox" id="edit_is_active" name="is_active" class="form-check-input" 
+                           ${faq.is_active ? 'checked' : ''}>
+                    <label for="edit_is_active" class="form-check-label">فعال</label>
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <button type="submit" class="btn my-btn-primary w-100 h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                    <span class="button_text">ذخیره تغییرات</span>
+                    <div class="loader"></div>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    // اضافه کردن modal جدید
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    // نمایش modal
+    const modalElement = document.getElementById('editFaqModal');
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+    // اضافه کردن event listener برای فرم ویرایش
+    document.getElementById('editFaqForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const button = this.querySelector('button[type="submit"]');
+      const buttonText = button.querySelector('.button_text');
+      const loader = button.querySelector('.loader');
+      const faqId = document.getElementById('edit_faq_id').value;
+      // نمایش لودینگ
+      buttonText.style.display = 'none';
+      loader.style.display = 'block';
+      fetch(`{{ route('dr-faqs-update', ['id' => '__ID__']) }}`.replace('__ID__', faqId), {
+        method: 'PUT',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+          question: formData.get('question'),
+          answer: formData.get('answer'),
+          order: formData.get('order') || 0,
+          is_active: document.getElementById('edit_is_active').checked
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          toastr.success(data.message);
+          updateFaqInList(data.faq);
+          modal.hide();
+        } else {
+          toastr.error(data.message || 'خطا در ویرایش سوال متداول');
+        }
+      })
+      .catch(error => {
+        console.error('Error updating FAQ:', error);
+        toastr.error('خطا در برقراری ارتباط با سرور');
+      })
+      .finally(() => {
+        buttonText.style.display = 'block';
+        loader.style.display = 'none';
+      });
+    });
+    // حذف modal از DOM پس از بسته شدن
+    modalElement.addEventListener('hidden.bs.modal', function() {
+      modalElement.remove();
+    });
+  }
+  function updateFaqInList(faq) {
+    const faqItem = document.querySelector(`[data-faq-id="${faq.id}"]`);
+    if (faqItem) {
+      const badge = faqItem.querySelector('.badge');
+      const orderBadge = faqItem.querySelector('.badge.bg-info');
+      const question = faqItem.querySelector('h6');
+      const answer = faqItem.querySelector('p');
+      badge.className = `badge ${faq.is_active ? 'bg-success' : 'bg-secondary'} me-2`;
+      badge.textContent = faq.is_active ? 'فعال' : 'غیرفعال';
+      orderBadge.textContent = `ترتیب: ${faq.order}`;
+      question.textContent = faq.question;
+      answer.textContent = faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer;
+    }
+  }
+  // ==================== سوالات متداول ====================
+  
+  // تابع مدیریت باز و بسته شدن بخش FAQ
+  document.addEventListener('DOMContentLoaded', function() {
+    const faqSection = document.getElementById('faq-section');
+    const faqHeader = faqSection?.querySelector('.faq-section-clicked');
+    const faqContent = faqSection?.querySelector('.faq-section-drop-toggle');
+    
+    if (faqHeader && faqContent) {
+      faqHeader.addEventListener('click', function() {
+        // تغییر وضعیت نمایش محتوا
+        if (faqContent.classList.contains('show')) {
+          faqContent.classList.remove('show');
+          // تغییر آیکون caret
+          const caretIcon = faqHeader.querySelector('img[src*="caret"]');
+          if (caretIcon) {
+            caretIcon.style.transform = 'rotate(0deg)';
+          }
+        } else {
+          faqContent.classList.add('show');
+          // تغییر آیکون caret
+          const caretIcon = faqHeader.querySelector('img[src*="caret"]');
+          if (caretIcon) {
+            caretIcon.style.transform = 'rotate(180deg)';
+          }
+        }
+      });
+      
+      // تنظیم اولیه آیکون caret
+      const caretIcon = faqHeader.querySelector('img[src*="caret"]');
+      if (caretIcon) {
+        caretIcon.style.transition = 'transform 0.3s ease';
+        caretIcon.style.transform = 'rotate(0deg)';
+      }
+    }
+  });
+  
+  // فرم افزودن سوال متداول
 </script>
+
+
