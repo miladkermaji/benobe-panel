@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Dr\Controller;
 use App\Traits\HasSelectedClinic;
+use App\Helpers\PersianNumber;
 
 class DoctorsClinicManagementController extends Controller
 {
@@ -20,7 +21,7 @@ class DoctorsClinicManagementController extends Controller
      */
     public function index(Request $request)
     {
-       
+
 
         // ارسال داده‌ها به ویو
         return view('dr.panel.doctors-clinic.index');
@@ -191,6 +192,14 @@ class DoctorsClinicManagementController extends Controller
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $selectedClinicId = $this->getSelectedClinicId();
 
+            // تبدیل اعداد فارسی به انگلیسی
+            if ($request->has('custom_price') && $request->custom_price) {
+                $request->merge(['custom_price' => PersianNumber::convertToEnglish($request->custom_price)]);
+            }
+            if ($request->has('deposit_amount') && $request->deposit_amount) {
+                $request->merge(['deposit_amount' => PersianNumber::convertToEnglish($request->deposit_amount)]);
+            }
+
             // قوانین اعتبارسنجی پویا
             $rules = [
                 'is_custom_price' => 'required|boolean',
@@ -285,6 +294,14 @@ class DoctorsClinicManagementController extends Controller
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $selectedClinicId = $this->getSelectedClinicId();
+
+            // تبدیل اعداد فارسی به انگلیسی
+            if ($request->has('custom_price') && $request->custom_price) {
+                $request->merge(['custom_price' => PersianNumber::convertToEnglish($request->custom_price)]);
+            }
+            if ($request->has('deposit_amount') && $request->deposit_amount) {
+                $request->merge(['deposit_amount' => PersianNumber::convertToEnglish($request->deposit_amount)]);
+            }
 
             // قوانین اعتبارسنجی پویا
             $rules = [

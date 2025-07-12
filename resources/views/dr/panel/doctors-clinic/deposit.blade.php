@@ -13,7 +13,7 @@
 @section('content')
 @section('bread-crumb-title', 'مدیریت بیعانه')
 <div class="doctor-clinics-container">
-  <div class="container py-2" dir="rtl">
+  <div class="container py-2 mt-3" dir="rtl">
     <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
@@ -87,7 +87,7 @@
           <!-- Mobile Card View -->
           <div class="notes-cards d-md-none">
             @foreach ($deposits as $index => $deposit)
-              <div class="note-card mb-3">
+              <div class="note-card mb-3" data-id="{{ $deposit->id }}">
                 <div class="note-card-header d-flex justify-content-between align-items-center">
                   <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-primary-subtle text-primary">
@@ -159,15 +159,15 @@
           </div>
           <div class="mb-3 position-relative" id="customPriceContainer" style="display: none;">
             <label for="customPrice" class="label-top-input-special-takhasos">مبلغ دلخواه (تومان)</label>
-            <input type="number" name="custom_price" id="customPrice" class="form-control h-50"
-              placeholder="مبلغ را وارد کنید" min="0" step="1" required>
+            <input type="text" name="custom_price" id="customPrice" class="form-control h-50"
+              placeholder="مبلغ را وارد کنید" pattern="[0-9]*" inputmode="numeric" required>
           </div>
           <div class="form-check mb-3 position-relative">
             <input class="form-check-input position-relative" type="checkbox" name="no_deposit" id="noDeposit"
               value="1">
             <label class="form-check-label" for="noDeposit">بدون بیعانه</label>
           </div>
-          <button type="submit" class="btn my-btn-primary h-50 w-100">ذخیره</button>
+          <button type="button" class="btn my-btn-primary h-50 w-100" id="submitDepositBtn">ذخیره</button>
         </form>
       </div>
     </div>
@@ -180,9 +180,6 @@
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 <script>
   $(document).ready(function() {
-    // مدیریت dropdown
-
-
     const modal = $('#depositModal');
     const form = $('#depositForm');
     const depositSelect = $('#depositAmount');
@@ -193,13 +190,36 @@
     const isCustomPrice = $('#isCustomPrice');
     const clinics = @json($clinics->pluck('name', 'id')->toArray());
 
+    // Function to convert Persian/Farsi numbers to English numbers
+    function convertPersianToEnglishNumbers(str) {
+      const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+      
+      for (let i = 0; i < 10; i++) {
+        str = str.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
+      }
+      return str;
+    }
+
+    // Function to convert English numbers to Persian/Farsi numbers for display
+    function convertEnglishToPersianNumbers(str) {
+      const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+      const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      
+      for (let i = 0; i < 10; i++) {
+        str = str.replace(new RegExp(englishNumbers[i], 'g'), persianNumbers[i]);
+      }
+      return str;
+    }
+
     depositSelect.on('change', function() {
       const isCustom = this.value === 'custom';
       customPriceContainer.toggle(isCustom);
       isCustomPrice.val(isCustom ? '1' : '0');
-      customPriceInput.prop('required', isCustom); // این خط را اضافه کنید
+      customPriceInput.prop('required', isCustom);
       if (isCustom) {
-        $(this).val('');
+        // Don't clear the select value when custom is selected
+        customPriceInput.focus();
       } else {
         customPriceInput.val('');
       }
@@ -209,45 +229,186 @@
       const isChecked = this.checked;
       depositSelect.prop('disabled', isChecked);
       customPriceInput.prop('disabled', isChecked);
-      customPriceContainer.toggle(!isChecked && depositSelect.val() === 'custom');
-      customPriceInput.prop('required', !isChecked && depositSelect.val() === 'custom'); // این خط را اضافه کنید
+      
       if (isChecked) {
         depositSelect.val('');
         customPriceInput.val('');
         isCustomPrice.val('0');
+        customPriceContainer.hide();
+      } else {
+        // Re-enable and show custom price container if it was custom before
+        if (depositSelect.val() === 'custom') {
+          customPriceContainer.show();
+        }
+      }
+      
+      customPriceInput.prop('required', !isChecked && depositSelect.val() === 'custom');
+    });
+
+    // Handle Enter key in form inputs
+    form.find('input, select').on('keypress', function(e) {
+      if (e.which === 13) { // Enter key
+        e.preventDefault();
+        $('#submitDepositBtn').click();
       }
     });
 
-    form.on('submit', async function(e) {
-      e.preventDefault();
+    // Prevent custom price input from being cleared in Chrome
+    let customPriceValue = '';
+    
+    customPriceInput.on('input', function() {
+      // Convert Persian numbers to English and only allow numbers
+      let value = convertPersianToEnglishNumbers($(this).val());
+      value = value.replace(/[^0-9]/g, '');
+      $(this).val(value);
+      customPriceValue = value;
+    });
+
+    customPriceInput.on('blur', function(e) {
+      // Store the current value
+      customPriceValue = $(this).val();
+    });
+
+    customPriceInput.on('focus', function() {
+      // Restore value if it was cleared
+      if (!$(this).val() && customPriceValue) {
+        $(this).val(customPriceValue);
+      }
+    });
+
+    // Also prevent on focusout
+    customPriceInput.on('focusout', function(e) {
+      // Ensure value is preserved
+      if (!$(this).val() && customPriceValue) {
+        setTimeout(() => {
+          $(this).val(customPriceValue);
+        }, 10);
+      }
+    });
+
+    // Prevent form reset when clicking outside
+    $(document).on('click', function(e) {
+      if (!$(e.target).closest('#depositModal').length) {
+        // Click outside modal - preserve custom price value
+        if (customPriceValue && !customPriceInput.val()) {
+          setTimeout(() => {
+            customPriceInput.val(customPriceValue);
+          }, 50);
+        }
+      }
+    });
+
+    // Additional protection for Chrome
+    customPriceInput.attr('autocomplete', 'off');
+    customPriceInput.attr('data-chrome-fix', 'true');
+    
+    // Prevent the input from losing focus and value
+    customPriceInput.on('mouseleave', function() {
+      if (customPriceValue && !$(this).val()) {
+        $(this).val(customPriceValue);
+      }
+    });
+
+    // Monitor for value changes and restore if needed
+    setInterval(() => {
+      if (customPriceValue && !customPriceInput.val() && depositSelect.val() === 'custom') {
+        customPriceInput.val(customPriceValue);
+      }
+    }, 100);
+
+    // Prevent the input from being cleared when clicking the submit button
+    $('#submitDepositBtn').on('mousedown', function() {
+      if (customPriceValue && !customPriceInput.val()) {
+        customPriceInput.val(customPriceValue);
+      }
+    });
+
+    $('#submitDepositBtn').on('click', async function() {
+      // Ensure custom price value is preserved before submission
+      if (customPriceValue && !customPriceInput.val() && depositSelect.val() === 'custom') {
+        customPriceInput.val(customPriceValue);
+      }
+      
       const id = $('#depositId').val();
       const isUpdate = !!id;
       const url = isUpdate ?
         '{{ route('doctors.clinic.deposit.update', ':id') }}'.replace(':id', id) :
         '{{ route('doctors.clinic.deposit.store') }}';
-      const submitBtn = $(this).find('button[type="submit"]');
+      const submitBtn = $(this);
       submitBtn.prop('disabled', true).text('در حال ذخیره...');
 
       // اعتبارسنجی سمت کلاینت
-      if (!noDepositCheckbox.prop('checked') && depositSelect.val() === 'custom' && !customPriceInput.val()) {
-        toastr.error('لطفاً مبلغ دلخواه را وارد کنید.');
-        submitBtn.prop('disabled', false).text('ذخیره');
-        return;
+      const isNoDeposit = noDepositCheckbox.prop('checked');
+      const selectedAmount = depositSelect.val();
+      const customPrice = customPriceInput.val();
+      
+      console.log('Form validation:', {
+        isNoDeposit,
+        selectedAmount,
+        customPrice,
+        isCustomPrice: isCustomPrice.val(),
+        customPriceValue
+      });
+      
+      if (!isNoDeposit) {
+        // Check if custom price is selected (either by select or by having a custom value)
+        const isCustomSelected = selectedAmount === 'custom' || (customPrice && !['50000', '100000', '150000'].includes(customPrice));
+        
+        if (isCustomSelected && !customPrice) {
+          toastr.error('لطفاً مبلغ دلخواه را وارد کنید.');
+          submitBtn.prop('disabled', false).text('ذخیره');
+          customPriceInput.focus();
+          return;
+        }
+        
+        if (!selectedAmount && !customPrice) {
+          toastr.error('لطفاً مبلغ بیعانه را انتخاب کنید یا مبلغ دلخواه وارد کنید.');
+          submitBtn.prop('disabled', false).text('ذخیره');
+          depositSelect.focus();
+          return;
+        }
       }
 
       try {
+        // Prepare form data
+        const formData = new FormData(form[0]);
+        
+        // Ensure is_custom_price is set correctly
+        const isCustomSelected = selectedAmount === 'custom' || (customPrice && !['50000', '100000', '150000'].includes(customPrice));
+        
+        if (isCustomSelected) {
+          formData.set('is_custom_price', '1');
+          // If custom is selected but no amount in select, set deposit_amount to custom
+          if (selectedAmount === 'custom') {
+            formData.set('deposit_amount', 'custom');
+          }
+        } else {
+          formData.set('is_custom_price', '0');
+        }
+        
+        // If no deposit is checked, ensure deposit_amount is empty
+        if (isNoDeposit) {
+          formData.set('deposit_amount', '');
+          formData.set('custom_price', '');
+        }
+        
         const response = await fetch(url, {
           method: 'POST',
           headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             'Accept': 'application/json',
           },
-          body: new FormData(this)
+          body: formData
         });
         const data = await response.json();
         if (data.success) {
           toastr.success(data.message);
-          updateDepositList(data.deposit);
+          if (isUpdate) {
+            updateDepositItem(data.deposit);
+          } else {
+            addDepositItem(data.deposit);
+          }
+          resetForm();
           modal.modal('hide');
         } else {
           toastr.error(data.message || 'خطایی رخ داد');
@@ -264,17 +425,42 @@
 
     $(document).on('click', '.edit-btn', function() {
       const id = $(this).data('id');
-      const row = $(`tr[data-id="${id}"], .table-card .card[data-id="${id}"]`);
-      const amount = row.find('td:eq(2), .card-body strong:contains("مبلغ")').text().trim() === 'بدون بیعانه' ?
-        '' :
-        row.find('td:eq(2), .card-body strong:contains("مبلغ")').text().replace(/,/g, '');
+      const row = $(`tr[data-id="${id}"]`);
+      const card = $(`.note-card[data-id="${id}"]`);
+      
+      let amount = '';
+      if (row.length) {
+        // Desktop view
+        const amountText = row.find('td:eq(2)').text().trim();
+        amount = amountText === 'بدون بیعانه' ? '' : amountText.replace(/,/g, '');
+      } else if (card.length) {
+        // Mobile view
+        const amountElement = card.find('.note-card-item').filter(function() {
+          return $(this).find('.note-card-label').text().includes('مبلغ');
+        }).find('.note-card-value');
+        const amountText = amountElement.text().trim();
+        amount = amountText === 'بدون بیعانه' ? '' : amountText.replace(/,/g, '');
+      }
+      
       modalTitle.text('ویرایش بیعانه');
       $('#depositId').val(id);
-      depositSelect.val(amount && !['50000', '100000', '150000'].includes(amount) ? 'custom' : amount);
-      customPriceInput.val(amount && !['50000', '100000', '150000'].includes(amount) ? amount : '');
+      
+      // Determine if it's a custom price
+      const isCustomPrice = amount && !['50000', '100000', '150000'].includes(amount);
+      
+      if (isCustomPrice) {
+        depositSelect.val('custom');
+        customPriceInput.val(amount);
+        isCustomPrice.val('1');
+        customPriceContainer.show();
+      } else {
+        depositSelect.val(amount);
+        customPriceInput.val('');
+        isCustomPrice.val('0');
+        customPriceContainer.hide();
+      }
+      
       noDepositCheckbox.prop('checked', amount === '');
-      customPriceContainer.toggle(depositSelect.val() === 'custom');
-      isCustomPrice.val(depositSelect.val() === 'custom' ? '1' : '0');
       depositSelect.prop('disabled', noDepositCheckbox.prop('checked'));
       customPriceInput.prop('disabled', noDepositCheckbox.prop('checked'));
       modal.modal('show');
@@ -301,13 +487,12 @@
               headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                 'Accept': 'application/json',
-              },
-              body: new FormData(form[0])
+              }
             });
             const data = await response.json();
             if (data.success) {
               toastr.success(data.message);
-              $(`tr[data-id="${id}"], .table-card .card[data-id="${id}"]`).remove();
+              removeDepositItem(id);
             } else {
               toastr.error(data.message || 'خطا در حذف');
             }
@@ -318,57 +503,131 @@
       });
     });
 
-    function updateDepositList(deposit) {
-      const tbody = $('#depositList');
-      const tableCard = $('.table-card');
+    function resetForm() {
+      form[0].reset();
+      $('#depositId').val('');
+      modalTitle.text('افزودن بیعانه');
+      customPriceContainer.hide();
+      depositSelect.prop('disabled', false);
+      customPriceInput.prop('disabled', false);
+      isCustomPrice.val('0');
+      noDepositCheckbox.prop('checked', false);
+      customPriceValue = ''; // Reset the stored custom price value
+    }
+
+    function addDepositItem(deposit) {
       const clinicName = deposit.clinic_id ? clinics[deposit.clinic_id] || 'نامشخص' : 'ویزیت آنلاین';
+      const amountText = deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه';
+      
+      // Desktop table row
+      const newRowIndex = $('#depositList tr').length + 1;
       const rowHtml = `
-            <tr data-id="${deposit.id}">
-                <td>
-                    <button class="btn btn-icon edit-btn" data-id="${deposit.id}">
-                        <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
-                    </button>
-                    <button class="btn btn-icon delete-btn" data-id="${deposit.id}">
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                    </button>
-                </td>
-                <td>${clinicName}</td>
-                <td>${deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه'}</td>
-            </tr>
-        `;
-      const cardHtml = `
-            <div class="card mb-3 position-relative" data-id="${deposit.id}">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>مطب:</strong> ${clinicName}<br>
-                            <strong>مبلغ:</strong> ${deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه'}
-                        </div>
-                        <div>
-                            <button class="btn btn-icon edit-btn" data-id="${deposit.id}">
-                                <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
-                            </button>
-                            <button class="btn btn-icon delete-btn" data-id="${deposit.id}">
-                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        <tr data-id="${deposit.id}">
+          <td class="text-center">${newRowIndex}</td>
+          <td>${clinicName}</td>
+          <td>${amountText}</td>
+          <td class="text-center">
+            <div class="d-flex justify-content-center gap-1">
+              <button class="btn btn-icon edit-btn btn-light rounded-circle" data-id="${deposit.id}">
+                <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+              </button>
+              <button class="btn btn-icon delete-btn btn-light rounded-circle" data-id="${deposit.id}">
+                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+              </button>
             </div>
-        `;
-      const existingRow = $(`tr[data-id="${deposit.id}"]`);
-      const existingCard = $(`.table-card .card[data-id="${deposit.id}"]`);
-      if (existingRow.length) {
-        existingRow.replaceWith(rowHtml);
-      } else {
-        tbody.append(rowHtml);
+          </td>
+        </tr>
+      `;
+      
+      // Mobile card
+      const cardHtml = `
+        <div class="note-card mb-3" data-id="${deposit.id}">
+          <div class="note-card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-primary-subtle text-primary">
+                ${clinicName}
+              </span>
+            </div>
+            <div class="d-flex gap-1">
+              <button class="btn btn-sm btn-gradient-success px-2 py-1 edit-btn" data-id="${deposit.id}" title="ویرایش">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+              <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-btn" data-id="${deposit.id}" title="حذف">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="note-card-body">
+            <div class="note-card-item">
+              <span class="note-card-label">مطب:</span>
+              <span class="note-card-value">${clinicName}</span>
+            </div>
+            <div class="note-card-item">
+              <span class="note-card-label">مبلغ:</span>
+              <span class="note-card-value">${amountText}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      $('#depositList').append(rowHtml);
+      $('.notes-cards').append(cardHtml);
+      
+      // Update row numbers
+      updateRowNumbers();
+    }
+
+    function updateDepositItem(deposit) {
+      const clinicName = deposit.clinic_id ? clinics[deposit.clinic_id] || 'نامشخص' : 'ویزیت آنلاین';
+      const amountText = deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه';
+      
+      // Update desktop table row
+      const row = $(`tr[data-id="${deposit.id}"]`);
+      if (row.length) {
+        row.find('td:eq(1)').text(clinicName);
+        row.find('td:eq(2)').text(amountText);
       }
-      if (existingCard.length) {
-        existingCard.replaceWith(cardHtml);
-      } else {
-        tableCard.append(cardHtml);
+      
+      // Update mobile card
+      const card = $(`.note-card[data-id="${deposit.id}"]`);
+      if (card.length) {
+        card.find('.badge').text(clinicName);
+        card.find('.note-card-value').each(function() {
+          const label = $(this).prev('.note-card-label').text();
+          if (label.includes('مطب')) {
+            $(this).text(clinicName);
+          } else if (label.includes('مبلغ')) {
+            $(this).text(amountText);
+          }
+        });
       }
     }
+
+    function removeDepositItem(id) {
+      // Remove from desktop table
+      $(`tr[data-id="${id}"]`).remove();
+      
+      // Remove from mobile cards
+      $(`.note-card[data-id="${id}"]`).remove();
+      
+      // Update row numbers
+      updateRowNumbers();
+    }
+
+    function updateRowNumbers() {
+      $('#depositList tr').each(function(index) {
+        $(this).find('td:first').text(index + 1);
+      });
+    }
+
+    // Reset form when modal is hidden
+    modal.on('hidden.bs.modal', function() {
+      resetForm();
+    });
   });
 </script>
 @endsection

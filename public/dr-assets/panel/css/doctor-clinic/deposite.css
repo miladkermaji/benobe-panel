@@ -738,10 +738,7 @@ body {
     }
 }
 
-/* مخفی کردن گزینه‌های پنل */
-.myPanelOption {
-    display: none !important;
-}
+
 
 /* استایل کارت‌های موبایل برای یادداشت‌ها */
 .notes-cards {
