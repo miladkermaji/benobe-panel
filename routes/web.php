@@ -69,6 +69,7 @@ use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationW
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
+use App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController;
 
 //manager login routes
 /* login manager routes */
@@ -780,6 +781,13 @@ Route::prefix('dr')
                     Route::get('templates/create', [FavoriteTemplatesController::class, 'create'])->middleware('secretary.permission:prescription')->name('favorite.templates.create');
                     Route::get('templates/service', [ServiceController::class, 'index'])->middleware('secretary.permission:prescription')->name('templates.favorite.service.index');
                 });
+            });
+
+            // Doctor FAQs Routes
+            Route::prefix('doctor-faqs')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController::class, 'index'])->name('dr.panel.doctor-faqs.index');
+                Route::get('/create', [\App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController::class, 'create'])->name('dr.panel.doctor-faqs.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController::class, 'edit'])->name('dr.panel.doctor-faqs.edit');
             });
 
             Route::get('bime', [DRBimeController::class, 'index'])->middleware('secretary.permission:insurance')->name('dr-bime');

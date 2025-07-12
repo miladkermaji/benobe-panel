@@ -57,7 +57,16 @@ class AddDefaultDoctorPermissions extends Command
             "dr-my-performance-chart",
             "messages",
             "dr-panel-tickets",
-            "#"
+            "#",
+            "prescription",
+            "dr-patient-records",
+            "prescription.index",
+            "providers.index",
+            "favorite.templates.index",
+            "templates.favorite.service.index",
+            "patient_records",
+            "dr-patient-records",
+            "dr.panel.doctor-faqs.index"
         ];
 
         $doctors = Doctor::all();
