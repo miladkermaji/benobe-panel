@@ -109,11 +109,6 @@
                 <a href="{{ route('dr-moshavere_waiting') }}">گزارش مشاوره</a>
               </li>
             @endif
-            @if ($this->hasPermission('dr.panel.doctornotes.index'))
-              <li class="item-li {{ Request::routeIs('dr.panel.doctornotes.index') ? 'is-active' : '' }}">
-                <a href="{{ route('dr.panel.doctornotes.index') }}"> توضیحات نوبت</a>
-              </li>
-            @endif
             @if ($this->hasPermission('dr-mySpecialDays-counseling'))
               <li
                 class="item-li i-user__inforamtion {{ Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
