@@ -1169,8 +1169,9 @@ svg {
     align-items: center;
     margin-bottom: 10px;
     position: fixed;
+    height: 80px;
     top: 0;
-    width: calc(100% - 300px); /* افزایش عرض از 280px به 300px */
+    width: calc(100% - 280px); /* افزایش عرض از 280px به 300px */
     z-index: 900;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* سایه خیلی نرم */
     transition: width 200ms ease;
