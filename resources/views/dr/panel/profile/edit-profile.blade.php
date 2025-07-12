@@ -646,35 +646,57 @@
             <span class="font-size-15 mt-1">این بخش به بیماران کمک می‌کند تا سوالات رایج را مشاهده کنند.</span>
           </div>
           
-          <!-- فرم افزودن سوال جدید -->
-          <form id="faqForm" class="mt-3">
-            @csrf
-            <div class="row">
-              <div class="col-md-6">
-                <label for="question" class="label-top-input">سوال</label>
-                <input type="text" id="question" name="question" class="form-control h-50 w-100 border-radius-6 mt-3" 
-                       placeholder="سوال خود را وارد کنید..." maxlength="255">
-                <div class="text-danger validation-error mt-1 font-size-13"></div>
+          <!-- بخش افزودن سوال جدید - Dropdown -->
+          <div class="mt-4">
+            <div class="d-flex justify-content-between align-items-center faq-add-toggle" style="cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e5e7eb;">
+              <div class="d-flex align-items-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
+                  <path d="M12 5V19M5 12H19" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="fw-bold text-primary">افزودن سوال متداول جدید</span>
               </div>
-              <div class="col-md-6">
-                <label for="order" class="label-top-input">ترتیب نمایش</label>
-                <input type="number" id="order" name="order" class="form-control h-50 w-100 border-radius-6 mt-3" 
-                       placeholder="0" min="0" value="0">
-                <div class="text-danger validation-error mt-1 font-size-13"></div>
+              <div class="faq-add-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s ease;">
+                  <path d="M6 9L12 15L18 9" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </div>
             </div>
-            <div class="mt-3">
-              <textarea id="answer" name="answer" class="form-control w-100 border-radius-6 mt-3" 
-                        rows="3" placeholder="پاسخ خود را وارد کنید..."></textarea>
-              <div class="text-danger validation-error mt-1 font-size-13"></div>
+            
+            <!-- فرم افزودن سوال جدید - مخفی شده -->
+            <div class="faq-add-form">
+              <form id="faqForm" class="mt-3 p-3">
+                @csrf
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="question" class="label-top-input">سوال</label>
+                    <input type="text" id="question" name="question" class="form-control h-50 w-100 border-radius-6 mt-3" 
+                           placeholder="سوال خود را وارد کنید..." maxlength="255">
+                    <div class="text-danger validation-error mt-1 font-size-13"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="order" class="label-top-input">ترتیب نمایش</label>
+                    <input type="number" id="order" name="order" class="form-control h-50 w-100 border-radius-6 mt-3" 
+                           placeholder="0" min="0" value="0">
+                    <div class="text-danger validation-error mt-1 font-size-13"></div>
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <textarea id="answer" name="answer" class="form-control w-100 border-radius-6 mt-3" 
+                            rows="3" placeholder="پاسخ خود را وارد کنید..."></textarea>
+                  <div class="text-danger validation-error mt-1 font-size-13"></div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                  <button type="submit" class="btn my-btn-primary flex-grow-1 h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                    <span class="button_text">افزودن سوال متداول</span>
+                    <div class="loader"></div>
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary h-50 border-radius-4 px-3 faq-add-cancel">
+                    انصراف
+                  </button>
+                </div>
+              </form>
             </div>
-            <div class="mt-3">
-              <button type="submit" class="btn my-btn-primary w-100 h-50 border-radius-4 d-flex justify-content-center align-items-center">
-                <span class="button_text">افزودن سوال متداول</span>
-                <div class="loader"></div>
-              </button>
-            </div>
-          </form>
+          </div>
 
           <!-- لیست سوالات متداول -->
           <div class="mt-4">

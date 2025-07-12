@@ -2032,6 +2032,83 @@
   }
   
   // افزودن سوال جدید به لیست
+  
+  // ==================== مدیریت Dropdown افزودن FAQ ====================
+  document.addEventListener('DOMContentLoaded', function() {
+    const faqAddToggle = document.querySelector('.faq-add-toggle');
+    const faqAddForm = document.querySelector('.faq-add-form');
+    const faqAddIcon = document.querySelector('.faq-add-icon svg');
+    const faqAddCancel = document.querySelector('.faq-add-cancel');
+    
+    if (faqAddToggle && faqAddForm) {
+      // کلیک روی دکمه افزودن
+      faqAddToggle.addEventListener('click', function(event) {
+        event.stopPropagation(); // جلوگیری از انتشار رویداد به والدین
+        
+        const isOpen = faqAddForm.classList.contains('open');
+        
+        if (isOpen) {
+          // بستن فرم
+          faqAddForm.classList.remove('open');
+          faqAddIcon.style.transform = 'rotate(0deg)';
+          faqAddToggle.style.background = '#f8fafc';
+          faqAddToggle.style.borderColor = '#e5e7eb';
+        } else {
+          // باز کردن فرم
+          faqAddForm.classList.add('open');
+          faqAddIcon.style.transform = 'rotate(180deg)';
+          faqAddToggle.style.background = '#eff6ff';
+          faqAddToggle.style.borderColor = '#3b82f6';
+        }
+      });
+      
+      // دکمه انصراف
+      if (faqAddCancel) {
+        faqAddCancel.addEventListener('click', function(event) {
+          event.stopPropagation(); // جلوگیری از انتشار رویداد به والدین
+          
+          faqAddForm.classList.remove('open');
+          faqAddIcon.style.transform = 'rotate(0deg)';
+          faqAddToggle.style.background = '#f8fafc';
+          faqAddToggle.style.borderColor = '#e5e7eb';
+          
+          // پاک کردن فرم
+          const form = document.getElementById('faqForm');
+          if (form) {
+            form.reset();
+            // پاک کردن پیام‌های خطا
+            const errorElements = form.querySelectorAll('.validation-error');
+            errorElements.forEach(el => el.textContent = '');
+          }
+        });
+      }
+      
+      // بستن فرم بعد از افزودن موفق
+      const faqForm = document.getElementById('faqForm');
+      if (faqForm) {
+        // جلوگیری از انتشار کلیک‌های داخل فرم به والدین
+        faqForm.addEventListener('click', function(event) {
+          event.stopPropagation();
+        });
+        
+        const originalSubmitHandler = faqForm.onsubmit;
+        faqForm.addEventListener('submit', function(e) {
+          // اگر فرم قبلاً submit handler داشته، آن را حفظ کن
+          if (originalSubmitHandler) {
+            originalSubmitHandler.call(this, e);
+          }
+          
+          // بعد از submit موفق، فرم را ببند
+          setTimeout(() => {
+            faqAddForm.classList.remove('open');
+            faqAddIcon.style.transform = 'rotate(0deg)';
+            faqAddToggle.style.background = '#f8fafc';
+            faqAddToggle.style.borderColor = '#e5e7eb';
+          }, 1000); // کمی تاخیر برای نمایش پیام موفقیت
+        });
+      }
+    }
+  });
 </script>
 
 

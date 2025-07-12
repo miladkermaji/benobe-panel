@@ -1089,3 +1089,83 @@ input[type="password"] {
 .btn.loading .loader {
     display: inline-block;
 }
+
+/* FAQ Add Dropdown Styles */
+.faq-add-toggle {
+    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    background: #f8fafc;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 10;
+}
+
+.faq-add-toggle:hover {
+    background: #eff6ff !important;
+    border-color: #3b82f6 !important;
+}
+
+.faq-add-toggle:active {
+    transform: scale(0.98);
+}
+
+.faq-add-icon svg {
+    transition: transform 0.3s ease;
+}
+
+.faq-add-form {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+    position: relative;
+    z-index: 5;
+}
+
+.faq-add-form.open {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.faq-add-form form {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-top: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 5;
+}
+
+.faq-add-cancel {
+    transition: all 0.2s ease;
+}
+
+.faq-add-cancel:hover {
+    background-color: #6b7280;
+    color: white;
+}
+
+/* Responsive adjustments for FAQ add dropdown */
+@media (max-width: 768px) {
+    .faq-add-toggle {
+        padding: 10px;
+    }
+
+    .faq-add-form form {
+        padding: 0.75rem;
+    }
+
+    .faq-add-toggle .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
