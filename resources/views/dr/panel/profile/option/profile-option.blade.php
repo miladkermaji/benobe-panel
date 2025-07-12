@@ -1015,73 +1015,142 @@
   // تابع تایید کد OTP
   function verifyOtpCode() {
     const otpInputs = document.querySelectorAll('.otp-input');
-    const otpCode = Array.from(otpInputs).map(input => input.value).join('');
+    
+    // تبدیل اعداد فارسی به انگلیسی
+    const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    
+    // جمع‌آوری مقادیر از input fields با تبدیل اعداد فارسی
+    const otpValues = Array.from(otpInputs).map(input => {
+      let value = input.value.trim();
+      
+      // تبدیل اعداد فارسی به انگلیسی
+      for (let i = 0; i < persianNumbers.length; i++) {
+        value = value.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
+      }
+      
+      // بررسی اینکه مقدار خالی نباشد
+      if (value === '' || value === null || value === undefined) {
+        return null;
+      }
+      
+      // بررسی اینکه فقط اعداد انگلیسی باشد
+      if (!/^[0-9]$/.test(value)) {
+        return null;
+      }
+      
+      return value;
+    });
+    
+    // بررسی اینکه تمام مقادیر وارد شده‌اند
+    if (otpValues.some(value => value === null)) {
+      toastr.error("لطفاً تمام ارقام کد را وارد کنید");
+      return;
+    }
+    
+    const otpCode = otpValues.join('');
     const newMobile = $('#newMobileNumber').val();
     const verifyButton = document.querySelector('#otpInputStep button');
     const loader = verifyButton.querySelector('.loader');
     const buttonText = verifyButton.querySelector('.button_text');
+    
     // بررسی کامل بودن کد
     if (otpCode.length !== 4) {
       toastr.error("لطفاً تمام ارقام کد را وارد کنید");
       return;
     }
+    
+    // بررسی اینکه تمام ارقام عددی هستند
+    if (!/^\d{4}$/.test(otpCode)) {
+      toastr.error("کد تأیید باید فقط شامل اعداد باشد");
+      return;
+    }
+    
     // اطمینان از وجود otpToken
     if (!otpToken) {
       toastr.error("توکن OTP در دسترس نیست. لطفاً دوباره کد را درخواست کنید.");
       return;
     }
     
-    // تبدیل اعداد فارسی به انگلیسی
-    const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-    const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    // تبدیل اعداد فارسی به انگلیسی برای موبایل
     let convertedMobile = newMobile;
     for (let i = 0; i < persianNumbers.length; i++) {
       convertedMobile = convertedMobile.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
     }
     
+    // تبدیل کد OTP به آرایه‌ای از اعداد صحیح
+    const otpArray = otpCode.split('').map(digit => {
+      const num = parseInt(digit, 10);
+      return isNaN(num) ? null : num;
+    }).filter(digit => digit !== null);
+    
+    // بررسی اینکه آرایه OTP معتبر است
+    if (otpArray.length !== 4 || otpArray.some(digit => digit < 0 || digit > 9)) {
+      toastr.error("کد تأیید نامعتبر است. لطفاً تمام ارقام را وارد کنید.");
+      return;
+    }
+    
+    // Debug: نمایش داده‌های ارسالی
+    console.log('Original OTP Values:', Array.from(otpInputs).map(input => input.value));
+    console.log('Converted OTP Values:', otpValues);
+    console.log('OTP Code:', otpCode);
+    console.log('OTP Array:', otpArray);
+    console.log('Mobile:', convertedMobile);
+    
     // مخفی کردن متن دکمه و نمایش لودینگ
     buttonText.style.display = 'none';
     loader.style.display = 'block';
+    
     // تولید URL با استفاده از route و otpToken
-    $.ajax({
-      url: "{{ route('dr-mobile-confirm', ':token') }}".replace(':token', otpToken),
+    fetch("{{ route('dr-mobile-confirm', ':token') }}".replace(':token', otpToken), {
       method: 'POST',
-      data: {
-        otp: otpCode.split('').map(Number),
-        mobile: convertedMobile
-      },
       headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
       },
-      success: function(response) {
-        // بررسی دقیق پاسخ موفقیت
-        if (response.success) {
-          toastr.success(response.message);
-          // به‌روزرسانی المان‌های موبایل در صفحه
-          $('input[name="mobile"]').val(response.mobile);
-          // بستن مودال
-          $('#mobileEditModal').modal('hide');
-          // رفرش صفحه برای اطمینان
-          setTimeout(() => {
-            location.reload();
-          }, 1000);
-        } else {
-          toastr.error(response.message || "خطا در تغییر شماره موبایل");
-        }
-      },
-      error: function(xhr) {
-        // مدیریت خطاهای سرور
-        let errorMessage = "خطا در تایید کد";
-        if (xhr.responseJSON && xhr.responseJSON.message) {
-          errorMessage = xhr.responseJSON.message;
-        }
-        toastr.error(errorMessage);
-      },
-      complete: function() {
-        // بازگردانی دکمه به حالت اولیه
-        buttonText.style.display = 'block';
-        loader.style.display = 'none';
+      body: JSON.stringify({
+        otp: otpArray,
+        mobile: convertedMobile
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(errorData => {
+          throw new Error(errorData.message || 'خطای نامشخص');
+        });
       }
+      return response.json();
+    })
+    .then(response => {
+      // بررسی دقیق پاسخ موفقیت
+      if (response.success) {
+        toastr.success(response.message);
+        // به‌روزرسانی المان‌های موبایل در صفحه
+        $('input[name="mobile"]').val(response.mobile);
+        // بستن مودال
+        $('#mobileEditModal').modal('hide');
+        // رفرش صفحه برای اطمینان
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else {
+        toastr.error(response.message || "خطا در تغییر شماره موبایل");
+      }
+    })
+    .catch(error => {
+      // مدیریت خطاهای سرور
+      let errorMessage = "خطا در تایید کد";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      toastr.error(errorMessage);
+    })
+    .finally(() => {
+      // بازگردانی دکمه به حالت اولیه
+      buttonText.style.display = 'block';
+      loader.style.display = 'none';
     });
   }
   // تابع شروع تایمر ارسال مجدد
@@ -1112,21 +1181,67 @@
         const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
         const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         let value = this.value;
+        
+        // تبدیل اعداد فارسی به انگلیسی
         for (let i = 0; i < persianNumbers.length; i++) {
           value = value.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
         }
         
-        // محدود کردن به یک کاراکتر عددی
-        this.value = value.replace(/[^0-9]/g, '');
+        // محدود کردن به یک کاراکتر عددی انگلیسی
+        value = value.replace(/[^0-9]/g, '');
+        
+        // محدود کردن به یک کاراکتر
+        this.value = value.substring(0, 1);
         
         // حرکت از چپ به راست برای RTL
         if (this.value.length === 1 && index < otpInputs.length - 1) {
           otpInputs[index + 1].focus();
         }
       });
+      
       input.addEventListener('keydown', function(e) {
+        // اجازه دادن به کلیدهای Backspace, Delete, Tab, Arrow keys
+        if ([8, 9, 37, 38, 39, 40, 46].includes(e.keyCode)) {
+          return;
+        }
+        
+        // اجازه دادن فقط به اعداد 0-9
+        if (e.keyCode >= 48 && e.keyCode <= 57) {
+          return;
+        }
+        
+        // اجازه دادن به اعداد از numpad
+        if (e.keyCode >= 96 && e.keyCode <= 105) {
+          return;
+        }
+        
+        // جلوگیری از سایر کلیدها
+        e.preventDefault();
+      });
+      
+      // مدیریت Backspace برای حرکت به اینپوت قبلی
+      input.addEventListener('keyup', function(e) {
         if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
           otpInputs[index - 1].focus();
+        }
+      });
+      
+      input.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+        const numbers = pastedText.replace(/[^0-9]/g, '').split('');
+        
+        // پر کردن اینپوت‌ها با اعداد paste شده
+        otpInputs.forEach((input, i) => {
+          if (numbers[i]) {
+            input.value = numbers[i];
+          }
+        });
+        
+        // فوکوس روی آخرین اینپوت پر شده یا اولین اینپوت خالی
+        const lastFilledIndex = Math.min(numbers.length - 1, otpInputs.length - 1);
+        if (lastFilledIndex < otpInputs.length - 1) {
+          otpInputs[lastFilledIndex + 1].focus();
         }
       });
     });

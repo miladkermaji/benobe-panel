@@ -834,6 +834,7 @@ Route::prefix('dr')
 
                 Route::get('/dr/get-cities', [DrProfileController::class, 'getCities'])->name('dr-get-cities')->middleware('auth:doctor,secretary');
                 Route::get('/debug-profile-completion', [DrProfileController::class, 'debugProfileCompletion'])->name('dr-debug-profile-completion');
+                Route::post('/debug-otp-validation', [DrProfileController::class, 'debugOtpValidation'])->name('dr-debug-otp-validation');
 
                 // Routes for Doctor FAQs
                 Route::post('/faqs/store', [DrProfileController::class, 'storeFaq'])->name('dr-faqs-store');

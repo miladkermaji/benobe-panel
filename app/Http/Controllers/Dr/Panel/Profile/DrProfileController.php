@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use App\Models\Otp;
 use App\Models\Zone;
 use App\Models\Doctor;
+use App\Models\DoctorFaq;
+use App\Models\Secretary;
 use App\Models\Specialty;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -13,6 +15,7 @@ use App\Models\AcademicDegree;
 use App\Models\DoctorSpecialty;
 use Illuminate\Support\Facades\DB;
 use App\Traits\HandlesRateLimiting;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Dr\Controller;
@@ -22,8 +25,6 @@ use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\DoctorSpecialtyRequest;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
-use App\Models\Secretary;
-use App\Models\DoctorFaq;
 
 class DrProfileController extends Controller
 {
@@ -700,6 +701,14 @@ class DrProfileController extends Controller
             return $response;
         }
 
+        // Debug: نمایش داده‌های دریافتی
+        Log::info('Mobile Confirm Request Data:', [
+            'all_data' => $request->all(),
+            'otp' => $request->otp,
+            'mobile' => $request->mobile,
+            'token' => $token
+        ]);
+
         // تبدیل اعداد فارسی به انگلیسی
         $mobile = $request->mobile;
         if (class_exists('App\\Helpers\\PersianNumber')) {
@@ -713,9 +722,73 @@ class DrProfileController extends Controller
 
         $request->merge(['mobile' => $mobile]);
 
+        // تبدیل OTP آرایه به اعداد صحیح و تبدیل اعداد فارسی
+        $otpArray = $request->otp;
+        Log::info('Mobile Confirm Request Data:', [
+            'all_data' => $request->all(),
+            'otp' => $request->otp,
+            'mobile' => $request->mobile,
+            'token' => $token
+        ]);
+
+        if (!is_array($otpArray)) {
+            Log::error('OTP is not an array:', ['otp' => $otpArray]);
+            return response()->json([
+                'success' => false,
+                'message' => 'کد تأیید باید به صورت آرایه باشد.',
+            ], 422);
+        }
+
+        if (count($otpArray) !== 4) {
+            return response()->json([
+                'success' => false,
+                'message' => 'کد تأیید باید دقیقاً ۴ رقم باشد.',
+            ], 422);
+        }
+
+        $convertedOtp = [];
+        $persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        $englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+        foreach ($otpArray as $index => $otpDigit) {
+            // بررسی اینکه مقدار null یا خالی نباشد
+            if ($otpDigit === null || $otpDigit === '') {
+                Log::error('Empty or null OTP digit found:', ['index' => $index, 'digit' => $otpDigit]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'تمام ارقام کد تأیید باید وارد شوند.',
+                ], 422);
+            }
+
+            // تبدیل اعداد فارسی به انگلیسی
+            $convertedDigit = str_replace($persianNumbers, $englishNumbers, (string)$otpDigit);
+
+            // بررسی اینکه فقط اعداد باشد
+            if (!is_numeric($convertedDigit)) {
+                Log::error('Non-numeric OTP digit found:', ['index' => $index, 'original' => $otpDigit, 'converted' => $convertedDigit]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'کد تأیید باید فقط شامل اعداد باشد.',
+                ], 422);
+            }
+
+            // بررسی محدوده عدد (0-9)
+            $digitValue = (int)$convertedDigit;
+            if ($digitValue < 0 || $digitValue > 9) {
+                Log::error('OTP digit out of range:', ['index' => $index, 'value' => $digitValue]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'هر رقم کد تأیید باید بین ۰ تا ۹ باشد.',
+                ], 422);
+            }
+
+            $convertedOtp[] = $digitValue;
+        }
+
+        $request->merge(['otp' => $convertedOtp]);
+        Log::info('OTP Array after conversion:', ['converted_otp' => $convertedOtp]);
+
         $validator = Validator::make($request->all(), [
-            'otp'    => 'required|array',
-            'otp.*'  => 'required|numeric|digits:1',
             'mobile' => [
                 'required',
                 'regex:/^(?!09{1}([0-9۰-۹])\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)[0-9۰-۹]{7}$/u',
@@ -729,11 +802,6 @@ class DrProfileController extends Controller
                 },
             ],
         ], [
-            'otp.required'      => 'کد تأیید الزامی است.',
-            'otp.array'         => 'کد تأیید باید به صورت آرایه باشد.',
-            'otp.*.required'    => 'هر رقم کد تأیید الزامی است.',
-            'otp.*.numeric'     => 'هر رقم کد تأیید باید عددی باشد.',
-            'otp.*.digits'      => 'هر رقم کد تأیید باید یک رقمی باشد.',
             'mobile.required'   => 'شماره موبایل الزامی است.',
             'mobile.regex'      => 'شماره موبایل نامعتبر است.',
         ]);
@@ -938,6 +1006,52 @@ class DrProfileController extends Controller
         return response()->json([
             'success' => true,
             'faqs' => $faqs,
+        ]);
+    }
+
+    public function debugOtpValidation(Request $request)
+    {
+        // تست تبدیل OTP
+        $testOtp = $request->input('otp', []);
+        Log::info('Debug OTP Test:', [
+            'original_otp' => $testOtp,
+            'is_array' => is_array($testOtp),
+            'count' => is_array($testOtp) ? count($testOtp) : 'not array'
+        ]);
+
+        if (is_array($testOtp)) {
+            $convertedOtp = [];
+            $persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+            $englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+            foreach ($testOtp as $index => $otpDigit) {
+                $original = $otpDigit;
+                $convertedDigit = str_replace($persianNumbers, $englishNumbers, (string)$otpDigit);
+                $isNumeric = is_numeric($convertedDigit);
+                $finalValue = $isNumeric ? (int)$convertedDigit : null;
+
+                $convertedOtp[] = [
+                    'index' => $index,
+                    'original' => $original,
+                    'converted' => $convertedDigit,
+                    'is_numeric' => $isNumeric,
+                    'final_value' => $finalValue
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'debug_info' => [
+                    'original_otp' => $testOtp,
+                    'conversion_details' => $convertedOtp,
+                    'all_numeric' => collect($convertedOtp)->every('is_numeric')
+                ]
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'OTP باید آرایه باشد'
         ]);
     }
 }

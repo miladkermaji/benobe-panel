@@ -188,13 +188,13 @@
             <div id="otpInputStep" style="display:none;">
               <label class="label-top fw-bold">کد تایید 4 رقمی را وارد کنید</label>
               <div class="d-flex justify-content-center gap-10 mt-2" dir="ltr">
-                <input type="text" maxlength="1" class="form-control otp-input text-center"
+                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
                   style="width:70px;height:60px">
-                <input type="text" maxlength="1" class="form-control otp-input text-center"
+                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
                   style="width:70px;height:60px">
-                <input type="text" maxlength="1" class="form-control otp-input text-center"
+                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
                   style="width:70px;height:60px">
-                <input type="text" maxlength="1" class="form-control otp-input text-center"
+                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
                   style="width:70px;height:60px">
               </div>
               <div class="d-flex mt-3">
