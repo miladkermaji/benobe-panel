@@ -437,7 +437,7 @@ class DrProfileController extends Controller
             'password' => 'required_if:static_password_enabled,true|string|min:6|confirmed',
         ], [
             'static_password_enabled.required' => 'وضعیت رمز عبور ثابت الزامی است.',
-            'static_password_enabled.boolean' => 'وضعیت رمز عبور ثابت باید یک مقدار بولین باشد.',
+            'static_password_enabled.boolean' => 'وضعیت رمز عبور ثابت باید یکمقدار بولین باشد.',
             'password.required_if' => 'رمز عبور الزامی است.',
             'password.string' => 'رمز عبور باید یک رشته باشد.',
             'password.min' => 'رمز عبور باید حداقل ۶ کاراکتر باشد.',
@@ -639,10 +639,23 @@ class DrProfileController extends Controller
             return $response;
         }
 
+        // تبدیل اعداد فارسی به انگلیسی
+        $mobile = $request->mobile;
+        if (class_exists('App\\Helpers\\PersianNumber')) {
+            $mobile = \App\Helpers\PersianNumber::convertToEnglish($mobile);
+        } else {
+            // تبدیل دستی اعداد فارسی به انگلیسی
+            $persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+            $englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            $mobile = str_replace($persianNumbers, $englishNumbers, $mobile);
+        }
+
+        $request->merge(['mobile' => $mobile]);
+
         $request->validate([
             'mobile' => [
                 'required',
-                'regex:/^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/',
+                'regex:/^(?!09{1}([0-9۰-۹])\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)[0-9۰-۹]{7}$/u',
                 function ($attribute, $value, $fail) {
                     $existingDoctor = Doctor::where('mobile', $value)->first();
                     if ($existingDoctor) {
@@ -656,7 +669,7 @@ class DrProfileController extends Controller
         ]);
 
         $doctor = $this->getAuthenticatedDoctor();
-        return $this->sendOtp($doctor, $request->mobile);
+        return $this->sendOtp($doctor, $mobile);
     }
 
     private function sendOtp(Doctor $doctor, $newMobile)
@@ -687,12 +700,25 @@ class DrProfileController extends Controller
             return $response;
         }
 
+        // تبدیل اعداد فارسی به انگلیسی
+        $mobile = $request->mobile;
+        if (class_exists('App\\Helpers\\PersianNumber')) {
+            $mobile = \App\Helpers\PersianNumber::convertToEnglish($mobile);
+        } else {
+            // تبدیل دستی اعداد فارسی به انگلیسی
+            $persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+            $englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            $mobile = str_replace($persianNumbers, $englishNumbers, $mobile);
+        }
+
+        $request->merge(['mobile' => $mobile]);
+
         $validator = Validator::make($request->all(), [
             'otp'    => 'required|array',
             'otp.*'  => 'required|numeric|digits:1',
             'mobile' => [
                 'required',
-                'regex:/^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/',
+                'regex:/^(?!09{1}([0-9۰-۹])\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)[0-9۰-۹]{7}$/u',
                 function ($attribute, $value, $fail) {
                     $existingDoctor = Doctor::where('mobile', $value)
                         ->where('id', '!=', Auth::guard('doctor')->id())
@@ -742,7 +768,7 @@ class DrProfileController extends Controller
 
         $currentDoctor = $this->getAuthenticatedDoctor();
         $updateResult  = $currentDoctor->update([
-            'mobile' => $request->mobile,
+            'mobile' => $mobile,
         ]);
 
         if (! $updateResult) {
@@ -757,7 +783,7 @@ class DrProfileController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'شماره موبایل با موفقیت تغییر یافت',
-            'mobile'  => $request->mobile,
+            'mobile'  => $mobile,
         ]);
     }
 

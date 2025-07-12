@@ -963,20 +963,30 @@
     buttonText.style.display = 'none';
     loader.style.display = 'block';
     // اعتبارسنجی شماره موبایل با Regex دقیق
+    // تبدیل اعداد فارسی به انگلیسی
+    const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    let convertedMobile = newMobile;
+    for (let i = 0; i < persianNumbers.length; i++) {
+      convertedMobile = convertedMobile.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
+    }
+    
     const mobileRegex =
       /^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/;
-    if (!mobileRegex.test(newMobile)) {
+    if (!mobileRegex.test(convertedMobile)) {
       toastr.error("شماره موبایل نامعتبر است");
       // بازگردانی دکمه به حالت اولیه
       buttonText.style.display = 'block';
       loader.style.display = 'none';
       return;
     }
+    
+    // استفاده از شماره تبدیل شده برای ارسال به سرور
     $.ajax({
       url: "{{ route('dr-send-mobile-otp') }}",
       method: 'POST',
       data: {
-        mobile: newMobile
+        mobile: convertedMobile
       },
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1020,6 +1030,15 @@
       toastr.error("توکن OTP در دسترس نیست. لطفاً دوباره کد را درخواست کنید.");
       return;
     }
+    
+    // تبدیل اعداد فارسی به انگلیسی
+    const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    let convertedMobile = newMobile;
+    for (let i = 0; i < persianNumbers.length; i++) {
+      convertedMobile = convertedMobile.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
+    }
+    
     // مخفی کردن متن دکمه و نمایش لودینگ
     buttonText.style.display = 'none';
     loader.style.display = 'block';
@@ -1029,7 +1048,7 @@
       method: 'POST',
       data: {
         otp: otpCode.split('').map(Number),
-        mobile: newMobile
+        mobile: convertedMobile
       },
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1089,8 +1108,17 @@
     });
     otpInputs.forEach((input, index) => {
       input.addEventListener('input', function() {
+        // تبدیل اعداد فارسی به انگلیسی
+        const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        let value = this.value;
+        for (let i = 0; i < persianNumbers.length; i++) {
+          value = value.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
+        }
+        
         // محدود کردن به یک کاراکتر عددی
-        this.value = this.value.replace(/[^0-9]/g, '');
+        this.value = value.replace(/[^0-9]/g, '');
+        
         // حرکت از چپ به راست برای RTL
         if (this.value.length === 1 && index < otpInputs.length - 1) {
           otpInputs[index + 1].focus();
