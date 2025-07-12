@@ -15,7 +15,6 @@ class Appointment extends Model
     use HasFactory;
     protected $fillable = [
         'doctor_id',
-        'patient_id',
         'clinic_id',
         'pattern_id',
         'insurance_id',
@@ -66,10 +65,7 @@ class Appointment extends Model
     {
         return $this->belongsTo(Insurance::class);
     }
-    public function pattern()
-    {
-        return $this->belongsTo(AppointmentPattern::class);
-    }
+
     public function getJalaliAppointmentDateAttribute()
     {
         return Jalalian::fromCarbon($this->appointment_date)->format('Y/m/d');

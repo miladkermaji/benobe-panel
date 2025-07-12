@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Dr\Panel\Turn;
 
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Admin;
 use App\Models\SubUser;
+use App\Models\Secretary;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Morilog\Jalali\Jalalian;
+use App\Models\Admin\Manager;
 use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Dr\Controller;
-use App\Models\User;
 
 class DrScheduleController extends Controller
 {
@@ -39,7 +42,7 @@ class DrScheduleController extends Controller
         $filterType = $request->input('type');
         $now = Carbon::now()->format('Y-m-d');
 
-        $appointments = Appointment::with(['doctor', 'patient', 'insurance', 'clinic'])
+        $appointments = Appointment::with(['doctor', 'patientable', 'insurance', 'clinic'])
             ->where('doctor_id', $doctor->id)
             ->where('appointment_date', $now);
 
@@ -123,7 +126,7 @@ class DrScheduleController extends Controller
 
         $query = Appointment::where('doctor_id', $doctorId)
             ->whereDate('appointment_date', $gregorianDate)
-            ->with(['patient', 'insurance']);
+            ->with(['patientable', 'insurance']);
 
         if ($selectedClinicId === 'default') {
             $query->whereNull('clinic_id');
@@ -199,15 +202,19 @@ class DrScheduleController extends Controller
             ], 500);
         }
 
-        $appointmentsQuery = Appointment::with('patient', 'insurance')
+        $appointmentsQuery = Appointment::with('patientable', 'insurance')
             ->whereDate('appointment_date', $gregorianDate)
-            ->whereHas('patient', function ($q) use ($query) {
-                $q->where('first_name', 'like', "%$query%")
-                    ->orWhere('last_name', 'like', "%$query%")
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%$query%"])
-                    ->orWhere('mobile', 'like', "%$query%")
-                    ->orWhere('national_code', 'like', "%$query%");
-            });
+            ->whereHasMorph(
+                'patientable',
+                [User::class, Secretary::class, Manager::class],
+                function ($q) use ($query) {
+                    $q->where('first_name', 'like', "%$query%")
+                        ->orWhere('last_name', 'like', "%$query%")
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%$query%"])
+                        ->orWhere('mobile', 'like', "%$query%")
+                        ->orWhere('national_code', 'like', "%$query%");
+                }
+            );
 
         if ($selectedClinicId === 'default') {
             $appointmentsQuery->whereNull('clinic_id');
@@ -259,11 +266,11 @@ class DrScheduleController extends Controller
         $oldDateJalali = Jalalian::fromDateTime($oldDate)->format('Y/m/d');
         $newDateJalali = Jalalian::fromDateTime($newDate)->format('Y/m/d');
 
-        if ($appointment->patient && $appointment->patient->mobile) {
+        if ($appointment->patientable && $appointment->patientable->mobile) {
             $message = "کاربر گرامی، نوبت شما از تاریخ {$oldDateJalali} به {$newDateJalali} تغییر یافت.";
             SendSmsNotificationJob::dispatch(
                 $message,
-                [$appointment->patient->mobile],
+                [$appointment->patientable->mobile],
                 null,
                 []
             )->delay(now()->addSeconds(5));
@@ -295,7 +302,7 @@ class DrScheduleController extends Controller
             $query->where('attendance_status', $attendanceStatus);
         }
 
-        $appointments = $query->with(['patient', 'doctor', 'clinic', 'insurance'])->paginate(10);
+        $appointments = $query->with(['patientable', 'doctor', 'clinic', 'insurance'])->paginate(10);
 
         return response()->json([
             'success' => true,

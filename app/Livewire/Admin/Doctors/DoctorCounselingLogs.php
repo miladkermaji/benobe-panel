@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin\Doctors;
 
 use App\Helpers\JalaliHelper;
@@ -156,7 +157,7 @@ class DoctorCounselingLogs extends Component
             $appointment->update(['status' => 'cancelled']);
 
             // ارسال پیامک برای لغو نوبت
-            $user         = \App\Models\User::findOrFail($appointment->patient_id);
+            $user         = $appointment->patient;
             $doctor       = Doctor::findOrFail($appointment->doctor_id);
             $doctorName   = $doctor->first_name . ' ' . $doctor->last_name;
             $trackingCode = $appointment->tracking_code;
@@ -258,7 +259,7 @@ class DoctorCounselingLogs extends Component
             $appointment->update(['status' => $newStatus]);
 
             // ارسال پیامک به کاربر (اختیاری، بر اساس نیاز)
-            $user         = \App\Models\User::findOrFail($appointment->patient_id);
+            $user         = $appointment->patient;
             $doctor       = Doctor::findOrFail($appointment->doctor_id);
             $doctorName   = $doctor->first_name . ' ' . $doctor->last_name;
             $trackingCode = $appointment->tracking_code;
@@ -288,18 +289,18 @@ class DoctorCounselingLogs extends Component
         $startDateGregorian = $this->startDate ? JalaliHelper::parsePersianTextDate($this->startDate) : null;
         $endDateGregorian   = $this->endDate ? JalaliHelper::parsePersianTextDate($this->endDate) : null;
         return CounselingAppointment::with(['doctor', 'patient', 'doctor.province', 'doctor.city'])
-            ->when($this->reqDoctor && $this->reqDoctor != '0', fn($q) => $q->where('doctor_id', $this->reqDoctor))
-            ->when($this->mobile, fn($q) => $q->whereHas('patient', fn($q2) => $q2->where('mobile', 'like', '%' . trim($this->mobile) . '%')))
-            ->when($this->trackingCode, fn($q) => $q->where('tracking_code', 'like', '%' . trim($this->trackingCode) . '%'))
-            ->when($this->startDate, fn($q) => $q->whereDate('appointment_date', '>=', $startDateGregorian))
-            ->when($this->endDate, fn($q) => $q->whereDate('appointment_date', '<=', $endDateGregorian))
-            ->when($this->search, fn($q) => $q->where(function ($query) {
+            ->when($this->reqDoctor && $this->reqDoctor != '0', fn ($q) => $q->where('doctor_id', $this->reqDoctor))
+            ->when($this->mobile, fn ($q) => $q->whereHas('patient', fn ($q2) => $q2->where('mobile', 'like', '%' . trim($this->mobile) . '%')))
+            ->when($this->trackingCode, fn ($q) => $q->where('tracking_code', 'like', '%' . trim($this->trackingCode) . '%'))
+            ->when($this->startDate, fn ($q) => $q->whereDate('appointment_date', '>=', $startDateGregorian))
+            ->when($this->endDate, fn ($q) => $q->whereDate('appointment_date', '<=', $endDateGregorian))
+            ->when($this->search, fn ($q) => $q->where(function ($query) {
                 $searchTerm = '%' . trim($this->search) . '%';
-                $query->whereHas('doctor', fn($q2) => $q2->where('first_name', 'like', $searchTerm)
+                $query->whereHas('doctor', fn ($q2) => $q2->where('first_name', 'like', $searchTerm)
                         ->orWhere('last_name', 'like', $searchTerm)
                         ->orWhere('mobile', 'like', $searchTerm)
                         ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$searchTerm])) // جستجو بر اساس نام کامل پزشک
-                    ->orWhereHas('patient', fn($q2) => $q2->where('first_name', 'like', $searchTerm)
+                    ->orWhereHas('patient', fn ($q2) => $q2->where('first_name', 'like', $searchTerm)
                             ->orWhere('last_name', 'like', $searchTerm)
                             ->orWhere('mobile', 'like', $searchTerm)
                             ->orWhere('national_code', 'like', $searchTerm)

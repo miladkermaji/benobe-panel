@@ -1266,8 +1266,8 @@ class ScheduleSettingController extends Controller
 
         foreach ($appointments as $appointment) {
             if ($appointment->status !== 'cancelled' && $appointment->status !== 'attended') { // فقط اگه لغو یا ویزیت نشده باشه
-                if ($appointment->patient && $appointment->patient->mobile) {
-                    $recipients[] = $appointment->patient->mobile;
+                if ($appointment->patientable && $appointment->patientable->mobile) {
+                    $recipients[] = $appointment->patientable->mobile;
                 }
                 $appointment->status = 'cancelled';
                 $appointment->save();
@@ -1385,8 +1385,8 @@ class ScheduleSettingController extends Controller
                 $appointment->appointment_date = $newDateGregorian;
                 $appointment->save();
 
-                if ($appointment->patient && $appointment->patient->mobile) {
-                    $recipients[] = $appointment->patient->mobile;
+                if ($appointment->patientable && $appointment->patientable->mobile) {
+                    $recipients[] = $appointment->patientable->mobile;
                 }
             }
 
@@ -1491,8 +1491,8 @@ class ScheduleSettingController extends Controller
                 $appointment->save();
 
                 // اضافه کردن شماره موبایل به لیست دریافت‌کنندگان پیامک
-                if ($appointment->patient && $appointment->patient->mobile) {
-                    $recipients[] = $appointment->patient->mobile;
+                if ($appointment->patientable && $appointment->patientable->mobile) {
+                    $recipients[] = $appointment->patientable->mobile;
                 }
             }
 

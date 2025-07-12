@@ -268,62 +268,62 @@ class BlockingUsersController extends Controller
         }
     }
 
-public function updateStatus(Request $request)
-{
-    try {
-        $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
+    public function updateStatus(Request $request)
+    {
+        try {
+            $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
 
-        $userBlocking = UserBlocking::where('id', $request->id)
-            ->where('clinic_id', $clinicId)
-            ->firstOrFail();
+            $userBlocking = UserBlocking::where('id', $request->id)
+                ->where('clinic_id', $clinicId)
+                ->firstOrFail();
 
-        $userBlocking->status = $request->status;
-        $userBlocking->save();
+            $userBlocking->status = $request->status;
+            $userBlocking->save();
 
-        $user = $userBlocking->user;
-        $doctor = $userBlocking->doctor;
-        $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+            $user = $userBlocking->user;
+            $doctor = $userBlocking->doctor;
+            $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
 
-        if ($request->status == 1) {
-            $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
-            $defaultTemplateId = 100254;
-        } else {
-            $message = "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.";
-            $defaultTemplateId = 100255;
+            if ($request->status == 1) {
+                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید.";
+                $defaultTemplateId = 100254;
+            } else {
+                $message = "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.";
+                $defaultTemplateId = 100255;
+            }
+
+            $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+            $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+            $templateId = ($gatewayName === 'pishgamrayan') ? $defaultTemplateId : null;
+
+            SendSmsNotificationJob::dispatch(
+                $message,
+                [$user->mobile],
+                $templateId,
+                [$doctorName]
+            )->delay(now()->addSeconds(5));
+
+            SmsTemplate::create([
+                'doctor_id' => $doctor->id,
+                'clinic_id' => $clinicId,
+                'user_id' => $user->id,
+                'identifier' => Str::random(11),
+                'title' => $request->status == 1 ? 'مسدودی کاربر' : 'رفع مسدودی',
+                'content' => $message,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'وضعیت با موفقیت به‌روزرسانی شد .',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در به‌روزرسانی وضعیت کاربر.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
-        $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-        $templateId = ($gatewayName === 'pishgamrayan') ? $defaultTemplateId : null;
-
-        SendSmsNotificationJob::dispatch(
-            $message,
-            [$user->mobile],
-            $templateId,
-            [$doctorName]
-        )->delay(now()->addSeconds(5));
-
-        SmsTemplate::create([
-            'doctor_id' => $doctor->id,
-            'clinic_id' => $clinicId,
-            'user_id' => $user->id,
-            'identifier' => Str::random(11),
-            'title' => $request->status == 1 ? 'مسدودی کاربر' : 'رفع مسدودی',
-            'content' => $message,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'وضعیت با موفقیت به‌روزرسانی شد .',
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'خطا در به‌روزرسانی وضعیت کاربر.',
-            'error' => $e->getMessage(),
-        ], 500);
     }
-}
 
     public function sendMessage(Request $request)
     {
@@ -357,7 +357,10 @@ public function updateStatus(Request $request)
                 $rules['specific_recipient'] = [
                     'required',
                     Rule::exists('users', 'mobile')->where(function ($query) use ($doctorId) {
-                        $query->whereIn('id', DB::table('appointments')->where('doctor_id', $doctorId)->pluck('patient_id'));
+                        $query->whereIn('id', DB::table('appointments')
+                            ->where('doctor_id', $doctorId)
+                            ->where('patientable_type', 'App\\Models\\User')
+                            ->pluck('patientable_id'));
                     }),
                 ];
             }
@@ -372,7 +375,8 @@ public function updateStatus(Request $request)
             if ($validated['recipient_type'] === 'all') {
                 $recipients = DB::table('appointments')
                     ->where('doctor_id', $doctorId)
-                    ->join('users', 'appointments.patient_id', '=', 'users.id')
+                    ->where('patientable_type', 'App\\Models\\User')
+                    ->join('users', 'appointments.patientable_id', '=', 'users.id')
                     ->distinct()
                     ->pluck('users.mobile')
                     ->toArray();
@@ -550,124 +554,124 @@ public function updateStatus(Request $request)
         }
     }
     public function groupAction(Request $request)
-{
-    try {
-        $request->validate([
-            'user_ids' => 'required|array',
-            'user_ids.*' => 'exists:user_blockings,id',
-            'action' => 'required|in:delete,status_active,status_inactive',
-            'selectedClinicId' => 'nullable|string',
-        ]);
+    {
+        try {
+            $request->validate([
+                'user_ids' => 'required|array',
+                'user_ids.*' => 'exists:user_blockings,id',
+                'action' => 'required|in:delete,status_active,status_inactive',
+                'selectedClinicId' => 'nullable|string',
+            ]);
 
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
-        $userIds = $request->input('user_ids');
-        $action = $request->input('action');
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
+            $userIds = $request->input('user_ids');
+            $action = $request->input('action');
 
-        $userBlockings = UserBlocking::whereIn('id', $userIds)
-            ->where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId)
-            ->with('user')
-            ->get();
+            $userBlockings = UserBlocking::whereIn('id', $userIds)
+                ->where('doctor_id', $doctorId)
+                ->where('clinic_id', $clinicId)
+                ->with('user')
+                ->get();
 
-        if ($userBlockings->isEmpty()) {
+            if ($userBlockings->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'هیچ کاربری برای انجام عملیات یافت نشد.',
+                ], 422);
+            }
+
+            $doctor = Doctor::find($doctorId);
+            $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+            $recipients = [];
+            $smsMessages = [];
+
+            foreach ($userBlockings as $userBlocking) {
+                if ($action === 'delete') {
+                    if ($userBlocking->status == 1) {
+                        $recipients[] = $userBlocking->user->mobile;
+                        $smsMessages[] = [
+                            'user_id' => $userBlocking->user_id,
+                            'message' => "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.",
+                            'template_id' => 100255,
+                            'title' => 'رفع مسدودی',
+                        ];
+                        $userBlocking->status = 0;
+                        $userBlocking->save();
+                    }
+                    $userBlocking->delete();
+                } elseif ($action === 'status_active' || $action === 'status_inactive') {
+                    $newStatus = $action === 'status_active' ? 1 : 0;
+                    if ($userBlocking->status != $newStatus) {
+                        $userBlocking->status = $newStatus;
+                        $userBlocking->save();
+                        $recipients[] = $userBlocking->user->mobile;
+                        $smsMessages[] = [
+                            'user_id' => $userBlocking->user_id,
+                            'message' => $newStatus == 1
+                                ? "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید."
+                                : "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.",
+                            'template_id' => $newStatus == 1 ? 100254 : 100255,
+                            'title' => $newStatus == 1 ? 'مسدودی کاربر' : 'رفع مسدودی',
+                        ];
+                    }
+                }
+            }
+
+            // ارسال پیامک‌ها و ثبت در SmsTemplate
+            if (!empty($recipients)) {
+                $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+
+                foreach ($smsMessages as $sms) {
+                    $templateId = ($gatewayName === 'pishgamrayan') ? $sms['template_id'] : null;
+                    SendSmsNotificationJob::dispatch(
+                        $sms['message'],
+                        [$userBlocking->user->mobile], // اصلاح: استفاده از موبایل کاربر
+                        $templateId,
+                        [$doctorName]
+                    )->delay(now()->addSeconds(5));
+
+                    SmsTemplate::create([
+                        'doctor_id' => $doctorId,
+                        'clinic_id' => $clinicId,
+                        'user_id' => $sms['user_id'],
+                        'identifier' => Str::random(11),
+                        'title' => $sms['title'],
+                        'content' => $sms['message'],
+                    ]);
+                }
+            }
+
+            $message = '';
+            switch ($action) {
+                case 'delete':
+                    $message = 'کاربران انتخاب‌شده با موفقیت حذف شدند.';
+                    break;
+                case 'status_active':
+                    $message = 'وضعیت کاربران انتخاب‌شده به مسدود تغییر کرد.';
+                    break;
+                case 'status_inactive':
+                    $message = 'وضعیت کاربران انتخاب‌شده به آزاد تغییر کرد.';
+                    break;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'هیچ کاربری برای انجام عملیات یافت نشد.',
+                'message' => 'خطا در اطلاعات ارسالی!',
+                'errors' => $e->errors(),
             ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در اجرای عملیات گروهی!',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $doctor = Doctor::find($doctorId);
-        $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
-        $recipients = [];
-        $smsMessages = [];
-
-        foreach ($userBlockings as $userBlocking) {
-            if ($action === 'delete') {
-                if ($userBlocking->status == 1) {
-                    $recipients[] = $userBlocking->user->mobile;
-                    $smsMessages[] = [
-                        'user_id' => $userBlocking->user_id,
-                        'message' => "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.",
-                        'template_id' => 100255,
-                        'title' => 'رفع مسدودی',
-                    ];
-                    $userBlocking->status = 0;
-                    $userBlocking->save();
-                }
-                $userBlocking->delete();
-            } elseif ($action === 'status_active' || $action === 'status_inactive') {
-                $newStatus = $action === 'status_active' ? 1 : 0;
-                if ($userBlocking->status != $newStatus) {
-                    $userBlocking->status = $newStatus;
-                    $userBlocking->save();
-                    $recipients[] = $userBlocking->user->mobile;
-                    $smsMessages[] = [
-                        'user_id' => $userBlocking->user_id,
-                        'message' => $newStatus == 1
-                            ? "کاربر گرامی، شما توسط پزشک {$doctorName} در کلینیک انتخابی مسدود شده‌اید. جهت اطلاعات بیشتر تماس بگیرید."
-                            : "کاربر گرامی، شما توسط پزشک {$doctorName} از حالت مسدودی خارج شدید. اکنون دسترسی شما فعال است.",
-                        'template_id' => $newStatus == 1 ? 100254 : 100255,
-                        'title' => $newStatus == 1 ? 'مسدودی کاربر' : 'رفع مسدودی',
-                    ];
-                }
-            }
-        }
-
-        // ارسال پیامک‌ها و ثبت در SmsTemplate
-        if (!empty($recipients)) {
-            $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
-            $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-
-            foreach ($smsMessages as $sms) {
-                $templateId = ($gatewayName === 'pishgamrayan') ? $sms['template_id'] : null;
-                SendSmsNotificationJob::dispatch(
-                    $sms['message'],
-                    [$userBlocking->user->mobile], // اصلاح: استفاده از موبایل کاربر
-                    $templateId,
-                    [$doctorName]
-                )->delay(now()->addSeconds(5));
-
-                SmsTemplate::create([
-                    'doctor_id' => $doctorId,
-                    'clinic_id' => $clinicId,
-                    'user_id' => $sms['user_id'],
-                    'identifier' => Str::random(11),
-                    'title' => $sms['title'],
-                    'content' => $sms['message'],
-                ]);
-            }
-        }
-
-        $message = '';
-        switch ($action) {
-            case 'delete':
-                $message = 'کاربران انتخاب‌شده با موفقیت حذف شدند.';
-                break;
-            case 'status_active':
-                $message = 'وضعیت کاربران انتخاب‌شده به مسدود تغییر کرد.';
-                break;
-            case 'status_inactive':
-                $message = 'وضعیت کاربران انتخاب‌شده به آزاد تغییر کرد.';
-                break;
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => $message,
-        ]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'خطا در اطلاعات ارسالی!',
-            'errors' => $e->errors(),
-        ], 422);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'خطا در اجرای عملیات گروهی!',
-            'error' => $e->getMessage(),
-        ], 500);
     }
-}
 }

@@ -2,11 +2,14 @@
 
 namespace App\Livewire\Dr\Panel\Turn\Schedule;
 
+use Exception;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Admin;
 use App\Models\Doctor;
 use App\Models\SubUser;
 use Livewire\Component;
+use App\Models\Secretary;
 use App\Models\Appointment;
 use App\Models\SmsTemplate;
 use Illuminate\Support\Str;
@@ -14,6 +17,7 @@ use Livewire\Attributes\On;
 use App\Models\UserBlocking;
 use Livewire\WithPagination;
 use Morilog\Jalali\Jalalian;
+use App\Models\Admin\Manager;
 use App\Models\DoctorHoliday;
 use App\Models\DoctorService;
 use Livewire\Attributes\Validate;
@@ -26,7 +30,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
-use Exception;
 
 class ManualNobatList extends Component
 {
@@ -441,13 +444,17 @@ class ManualNobatList extends Component
         });
 
         $query->when($this->searchQuery, function ($query) {
-            $query->whereHas('patient', function ($q) {
-                $q->where('first_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
-                    ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
-            });
+            $query->whereHasMorph(
+                'patientable',
+                [User::class, Secretary::class, Manager::class],
+                function ($q) {
+                    $q->where('first_name', 'like', "%{$this->searchQuery}%")
+                        ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
+                        ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
+                        ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
+                }
+            );
         });
 
         try {
@@ -1464,12 +1471,12 @@ class ManualNobatList extends Component
                     'status' => 'cancelled',
                     'updated_at' => now(),
                 ]);
-                if ($appointment->patient && $appointment->patient->mobile) {
+                if ($appointment->patientable && $appointment->patientable->mobile) {
                     $dateJalali = Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d');
                     $message = "کاربر گرامی، نوبت شما در تاریخ {$dateJalali} لغو شد.";
                     SendSmsNotificationJob::dispatch(
                         $message,
-                        [$appointment->patient->mobile],
+                        [$appointment->patientable->mobile],
                         null,
                         []
                     )->delay(now()->addSeconds(5));
@@ -1559,7 +1566,7 @@ class ManualNobatList extends Component
                 'blockReason.max' => 'دلیل مسدود کردن نمی‌تواند بیشتر از 255 کاراکتر باشد.',
             ]);
             if ($this->blockAppointmentId && empty($this->selectedMobiles)) {
-                $appointment = Appointment::with('patient')->find($this->blockAppointmentId);
+                $appointment = Appointment::with('patientable')->find($this->blockAppointmentId);
                 if (!$appointment) {
                     $this->dispatch('show-toastr', [
                         'type' => 'error',
@@ -1568,7 +1575,7 @@ class ManualNobatList extends Component
                     $this->dispatch('showModal', 'block-user-modal');
                     return;
                 }
-                if (!$appointment->patient || !$appointment->patient->mobile) {
+                if (!$appointment->patientable || !$appointment->patientable->mobile) {
                     $this->dispatch('show-toastr', [
                         'type' => 'error',
                         'message' => 'کاربر یا شماره موبایل مرتبط با این نوبت یافت نشد.',
@@ -1576,7 +1583,7 @@ class ManualNobatList extends Component
                     $this->dispatch('showModal', 'block-user-modal');
                     return;
                 }
-                $this->selectedMobiles = [$appointment->patient->mobile];
+                $this->selectedMobiles = [$appointment->patientable->mobile];
             }
             if (empty($this->selectedMobiles)) {
                 $this->dispatch('show-toastr', [
@@ -1669,7 +1676,8 @@ class ManualNobatList extends Component
         if ($this->recipientType === 'all') {
             $recipients = DB::table('appointments')
                 ->where('doctor_id', $doctorId)
-                ->join('users', 'appointments.patient_id', '=', 'users.id')
+                ->where('patientable_type', 'App\\Models\\User')
+                ->join('users', 'appointments.patientable_id', '=', 'users.id')
                 ->distinct()
                 ->pluck('users.mobile')
                 ->toArray();
@@ -2113,7 +2121,8 @@ class ManualNobatList extends Component
 
             // Create the appointment
             $appointment = Appointment::create([
-                'patient_id' => $user->id,
+                'patientable_id' => $user->id,
+                'patientable_type' => 'App\\Models\\User',
                 'doctor_id' => $doctor->id,
                 'clinic_id' => $clinicId,
                 'appointment_date' => $gregorianDate,

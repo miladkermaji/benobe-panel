@@ -75,12 +75,12 @@ class AppointmentList extends Component
 
     private function getAppointmentsQuery()
     {
-        return Appointment::with('doctor', 'patient')
+        return Appointment::with('doctor', 'patientable')
             ->where(function ($query) {
                 $query->whereHas('doctor', function ($q) {
                     $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])
                       ->orWhere('national_code', 'like', '%' . $this->search . '%');
-                })->orWhereHas('patient', function ($q) {
+                })->orWhereHas('patientable', function ($q) {
                     $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%'])
                       ->orWhere('national_code', 'like', '%' . $this->search . '%');
                 })->orWhere('tracking_code', 'like', '%' . $this->search . '%');

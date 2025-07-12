@@ -74,7 +74,8 @@ class AppointmentCreate extends Component
 
         Appointment::create([
             'doctor_id' => $this->doctor_id,
-            'patient_id' => $this->patient_id,
+            'patientable_id' => $this->patient_id,
+            'patientable_type' => $this->patient_id ? 'App\\Models\\User' : null,
             'appointment_date' => $miladiDate,
             'appointment_time' => $this->appointment_time,
             'status' => $this->status,

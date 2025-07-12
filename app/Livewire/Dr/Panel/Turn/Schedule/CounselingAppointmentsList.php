@@ -4,9 +4,11 @@ namespace App\Livewire\Dr\Panel\Turn\Schedule;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Admin;
 use App\Models\Doctor;
 use App\Models\SubUser;
 use Livewire\Component;
+use App\Models\Secretary;
 use App\Models\Appointment;
 use App\Models\SmsTemplate;
 use Illuminate\Support\Str;
@@ -14,6 +16,7 @@ use Livewire\Attributes\On;
 use App\Models\UserBlocking;
 use Livewire\WithPagination;
 use Morilog\Jalali\Jalalian;
+use App\Models\Admin\Manager;
 use App\Models\DoctorHoliday;
 use App\Models\DoctorService;
 use App\Traits\HasSelectedClinic;
@@ -34,7 +37,6 @@ use App\Models\DoctorCounselingWorkSchedule;
 
 class CounselingAppointmentsList extends Component
 {
-
     use WithPagination;
     public $selectedServiceIds = [];
     public $calendarYear;
@@ -149,7 +151,7 @@ class CounselingAppointmentsList extends Component
         $this->calendarYear = Jalalian::now()->getYear();
         $this->calendarMonth = Jalalian::now()->getMonth();
         $doctor = $this->getAuthenticatedDoctor();
-        $this->selectedClinicId = 
+        $this->selectedClinicId =
 $this->getSelectedClinicId();
 
         if ($doctor) {
@@ -378,13 +380,17 @@ $this->getSelectedClinicId();
             $query->where('attendance_status', $this->attendanceStatus);
         }
         if ($this->searchQuery) {
-            $query->whereHas('patient', function ($q) {
-                $q->where('first_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
-                    ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
-                    ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
-            });
+            $query->whereHasMorph(
+                'patientable',
+                [User::class, Secretary::class, Manager::class],
+                function ($q) {
+                    $q->where('first_name', 'like', "%{$this->searchQuery}%")
+                        ->orWhere('last_name', 'like', "%{$this->searchQuery}%")
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$this->searchQuery}%"])
+                        ->orWhere('mobile', 'like', "%{$this->searchQuery}%")
+                        ->orWhere('national_code', 'like', "%{$this->searchQuery}%");
+                }
+            );
         }
         $appointments = $query->orderBy('appointment_date', 'desc')->paginate($this->pagination['per_page']);
         $jalaliDate = Jalalian::fromCarbon(Carbon::parse($gregorianDate));
@@ -1165,12 +1171,12 @@ $this->getSelectedClinicId();
                     'status' => 'cancelled',
                     'updated_at' => now(),
                 ]);
-                if ($appointment->patient && $appointment->patient->mobile) {
+                if ($appointment->patientable && $appointment->patientable->mobile) {
                     $dateJalali = Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d');
                     $message = "کاربر گرامی، نوبت شما در تاریخ {$dateJalali} لغو شد.";
                     SendSmsNotificationJob::dispatch(
                         $message,
-                        [$appointment->patient->mobile],
+                        [$appointment->patientable->mobile],
                         null,
                         []
                     )->delay(now()->addSeconds(5));
@@ -1392,7 +1398,7 @@ $this->getSelectedClinicId();
         if ($this->recipientType === 'all') {
             $recipients = DB::table('counseling_appointments')
                 ->where('doctor_id', $doctorId)
-                ->join('users', 'appointments.patient_id', '=', 'users.id')
+                ->join('users', 'counseling_appointments.patient_id', '=', 'users.id')
                 ->distinct()
                 ->pluck('users.mobile')
                 ->toArray();

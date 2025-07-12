@@ -29,7 +29,7 @@ class AppointmentEdit extends Component
     {
         $this->appointment = Appointment::findOrFail($id);
         $this->doctor_id = $this->appointment->doctor_id;
-        $this->patient_id = $this->appointment->patient_id;
+        $this->patient_id = $this->appointment->patientable_id;
         $this->appointment_date = Jalalian::fromCarbon($this->appointment->appointment_date)->format('Y/m/d');
         $this->appointment_time = $this->appointment->appointment_time->format('H:i');
         $this->status = $this->appointment->status;
@@ -88,7 +88,8 @@ class AppointmentEdit extends Component
 
         $this->appointment->update([
             'doctor_id' => $this->doctor_id,
-            'patient_id' => $this->patient_id,
+            'patientable_id' => $this->patient_id,
+            'patientable_type' => $this->patient_id ? 'App\\Models\\User' : null,
             'appointment_date' => $miladiDate,
             'appointment_time' => $this->appointment_time,
             'status' => $this->status,

@@ -100,14 +100,15 @@
                     <td>
                       <input type="checkbox" class="appointment-checkbox form-check-input"
                         value="{{ $appointment->id }}" data-status="{{ $appointment->status }}"
-                        data-mobile="{{ $appointment->patient->mobile ?? '' }}"
+                        data-mobile="{{ $appointment->patientable->mobile ?? '' }}"
+                        data-national-code="{{ $appointment->patientable->national_code ?? '' }}"
                         wire:model="cancelIds.{{ $appointment->id }}">
                     </td>
                     <td class="fw-bold">
-                      {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
+                      {{ $appointment->patientable ? $appointment->patientable->first_name . ' ' . $appointment->patientable->last_name : '-' }}
                     </td>
-                    <td>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</td>
-                    <td>{{ $appointment->patient ? $appointment->patient->national_code : '-' }}</td>
+                    <td>{{ $appointment->patientable ? $appointment->patientable->mobile : '-' }}</td>
+                    <td>{{ $appointment->patientable ? $appointment->patientable->national_code : '-' }}</td>
                     <td>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}</td>
                     <td>{{ $appointment->appointment_time->format('H:i') ?? '-' }}</td>
                     <td>
@@ -205,10 +206,11 @@
                 <div class="card-header">
                   <input type="checkbox" class="appointment-checkbox form-check-input"
                     value="{{ $appointment->id }}" data-status="{{ $appointment->status }}"
-                    data-mobile="{{ $appointment->patient->mobile ?? '' }}"
+                    data-mobile="{{ $appointment->patientable->mobile ?? '' }}"
+                    data-national-code="{{ $appointment->patientable->national_code ?? '' }}"
                     wire:model="cancelIds.{{ $appointment->id }}">
                   <span
-                    class="fw-bold">{{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}</span>
+                    class="fw-bold">{{ $appointment->patientable ? $appointment->patientable->first_name . ' ' . $appointment->patientable->last_name : '-' }}</span>
                   <button class="toggle-details">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                       xmlns="http://www.w3.org/2000/svg">
@@ -221,7 +223,7 @@
                 <div class="card-body">
                   <div class="card-item">
                     <span class="label">شماره موبایل:</span>
-                    <span>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</span>
+                    <span>{{ $appointment->patientable ? $appointment->patientable->mobile : '-' }}</span>
                   </div>
                   <div class="card-item">
                     <span class="label">تاریخ نوبت:</span>
@@ -243,7 +245,7 @@
                   </div>
                   <div class="card-item d-none details">
                     <span class="label">کد ملی:</span>
-                    <span>{{ $appointment->patient ? $appointment->patient->national_code : '-' }}</span>
+                    <span>{{ $appointment->patientable ? $appointment->patientable->national_code : '-' }}</span>
                   </div>
                   <div class="card-item d-none details">
                     <span class="label">بیعانه:</span>

@@ -69,9 +69,9 @@
                             <input type="checkbox" wire:model.live="selectedAppointments" value="{{ $appointment->id }}"
                               class="form-check-input m-0 align-middle shadow-sm">
                           </td>
-                          <td class="align-middle text-text-primary">{{ $appointment->patient->full_name }}</td>
-                          <td class="align-middle text-text-secondary">{{ $appointment->patient->phone }}</td>
-                          <td class="align-middle text-text-secondary">{{ $appointment->patient->national_code }}</td>
+                          <td class="align-middle text-text-primary">{{ $appointment->patientable->full_name }}</td>
+                          <td class="align-middle text-text-secondary">{{ $appointment->patientable->phone }}</td>
+                          <td class="align-middle text-text-secondary">{{ $appointment->patientable->national_code }}</td>
                           <td class="align-middle text-text-primary">
                             {{ \Morilog\Jalali\Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d') }}
                             {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') }}
@@ -137,7 +137,7 @@
                           <div class="d-flex align-items-center gap-2">
                             <input type="checkbox" wire:model.live="selectedAppointments"
                               value="{{ $appointment->id }}" class="form-check-input m-0 align-middle shadow-sm">
-                            <span class="text-text-primary font-medium">{{ $appointment->patient->full_name }}</span>
+                            <span class="text-text-primary font-medium">{{ $appointment->patientable->full_name }}</span>
                           </div>
                           <span
                             class="badge {{ $appointment->payment_status === 'paid' ? 'bg-label-success' : 'bg-label-danger' }}">
@@ -148,11 +148,11 @@
                         <div class="d-flex flex-column gap-2">
                           <div class="d-flex justify-content-between">
                             <span class="text-text-secondary">شماره موبایل:</span>
-                            <span class="text-text-primary">{{ $appointment->patient->phone }}</span>
+                            <span class="text-text-primary">{{ $appointment->patientable->phone }}</span>
                           </div>
                           <div class="d-flex justify-content-between">
                             <span class="text-text-secondary">کد ملی:</span>
-                            <span class="text-text-primary">{{ $appointment->patient->national_code }}</span>
+                            <span class="text-text-primary">{{ $appointment->patientable->national_code }}</span>
                           </div>
                           <div class="d-flex justify-content-between">
                             <span class="text-text-secondary">زمان نوبت:</span>

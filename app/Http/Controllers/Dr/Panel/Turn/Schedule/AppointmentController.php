@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Dr\Panel\Turn\Schedule;
 
 use App\Http\Controllers\Dr\Controller;
@@ -218,7 +219,7 @@ class AppointmentController extends Controller
             }
         }
 
-        $appointments = Appointment::with('patient')
+        $appointments = Appointment::with('patientable')
             ->where('doctor_id', $doctorId)
             ->when($selectedClinicId === 'default', function ($query) {
                 return $query->whereNull('clinic_id');
@@ -230,12 +231,12 @@ class AppointmentController extends Controller
                 return $query->where('appointment_date', $gregorianDate);
             })
             ->when($userMobile, function ($query, $userMobile) {
-                return $query->whereHas('patient', function ($query) use ($userMobile) {
+                return $query->whereHas('patientable', function ($query) use ($userMobile) {
                     $query->where('mobile', 'like', '%' . $userMobile . '%');
                 });
             })
             ->when($userName, function ($query, $userName) {
-                return $query->whereHas('patient', function ($query) use ($userName) {
+                return $query->whereHas('patientable', function ($query) use ($userName) {
                     $query->where(function ($query) use ($userName) {
                         $query->where('first_name', 'like', '%' . $userName . '%')
                             ->orWhere('last_name', 'like', '%' . $userName . '%');
@@ -243,7 +244,7 @@ class AppointmentController extends Controller
                 });
             })
             ->when($userNationalId, function ($query, $userNationalId) {
-                return $query->whereHas('patient', function ($query) use ($userNationalId) {
+                return $query->whereHas('patientable', function ($query) use ($userNationalId) {
                     $query->where('national_code', 'like', '%' . $userNationalId . '%');
                 });
             })
