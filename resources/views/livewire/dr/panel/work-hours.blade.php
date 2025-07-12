@@ -1075,6 +1075,16 @@
                 'friday': false
               });
               @this.set('selectAllCopyScheduleModal', false);
+              
+              // بستن مودال و پاک کردن backdrop
+              setTimeout(() => {
+                if (window.$ && $('#copy-schedule-modal').length) {
+                  $('#copy-schedule-modal').modal('hide');
+                }
+                // حذف backdrop های باقی‌مانده
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open').css('padding-right', '');
+              }, 100);
             }
           });
           Livewire.on('show-conflict-alert', (event) => {
@@ -1248,11 +1258,54 @@
                 'friday': false
               });
               @this.set('selectAllCopyScheduleModal', false);
-              if (window.$ && $('#copy-schedule-modal').length) {
-                $('#copy-schedule-modal').modal('hide');
-              }
+              
+              // بستن مودال و پاک کردن backdrop
+              setTimeout(() => {
+                if (window.$ && $('#copy-schedule-modal').length) {
+                  $('#copy-schedule-modal').modal('hide');
+                }
+                // حذف backdrop های باقی‌مانده
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open').css('padding-right', '');
+              }, 100);
             }
           });
+          
+          // اضافه کردن event listener برای refresh-work-hours
+          Livewire.on('refresh-work-hours', () => {
+            setTimeout(() => {
+              // اطمینان از پاک شدن backdrop ها
+              $('.modal-backdrop').remove();
+              $('body').removeClass('modal-open').css('padding-right', '');
+              
+              // رفرش UI بدون reload
+              @this.call('refreshWorkSchedules');
+              @this.dispatch('refresh-clinic-data');
+            }, 300);
+          });
+          
+          // اضافه کردن event listener برای refresh-schedule-settings
+          Livewire.on('refresh-schedule-settings', () => {
+            setTimeout(() => {
+              // اطمینان از پاک شدن backdrop ها
+              $('.modal-backdrop').remove();
+              $('body').removeClass('modal-open').css('padding-right', '');
+            }, 200);
+          });
+          
+          // اضافه کردن event listener برای اطمینان از بسته شدن مودال‌ها
+          $(document).on('hidden.bs.modal', '.modal', function() {
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open').css('padding-right', '');
+          });
+          
+          // بررسی و پاک کردن backdrop های اضافی هر 2 ثانیه
+          setInterval(() => {
+            if (!$('.modal.show').length) {
+              $('.modal-backdrop').remove();
+              $('body').removeClass('modal-open').css('padding-right', '');
+            }
+          }, 2000);
         });
         window.addEventListener('auto-scheduling-changed', event => {
           const isEnabled = event.detail.isEnabled;

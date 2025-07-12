@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Livewire\Dr\Panel;
+
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Clinic;
@@ -19,6 +21,7 @@ use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+
 class Workhours extends Component
 {
     use HasSelectedClinic;
@@ -1052,8 +1055,11 @@ class Workhours extends Component
             $this->modalType = 'success';
             $this->modalOpen = true;
             $this->dispatch('show-toastr', ['message' => $this->modalMessage, 'type' => 'success']);
+
+            // تاخیر کوتاه قبل از بستن مودال
             $this->dispatch('close-modal', ['name' => 'copy-schedule-modal']);
             $this->dispatch('refresh-schedule-settings'); // رفرش UI مودال اسکجول
+            $this->dispatch('refresh-work-hours'); // رفرش کامل UI
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
