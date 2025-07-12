@@ -10,7 +10,6 @@ use App\Models\Transaction;
 use Livewire\WithPagination;
 use Morilog\Jalali\Jalalian;
 use Illuminate\Support\Carbon;
-use App\Models\ManualAppointment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -183,12 +182,13 @@ class FinancialReport extends Component
 
         $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
             ->where('payment_status', 'paid')
+            ->where('appointment_type', '!=', 'manual')
             ->selectRaw('DATE(appointment_date) as date, SUM(final_price) as total')
             ->whereBetween('appointment_date', [$start, $end])
             ->groupBy('date');
 
-        $manualAppointmentsQuery = ManualAppointment::where('doctor_id', $doctorId)
-            ->whereNotNull('final_price')
+        $manualAppointmentsQuery = Appointment::where('doctor_id', $doctorId)
+            ->where('appointment_type', 'manual')
             ->selectRaw('DATE(appointment_date) as date, SUM(final_price) as total')
             ->whereBetween('appointment_date', [$start, $end])
             ->groupBy('date');
@@ -203,7 +203,7 @@ class FinancialReport extends Component
         $this->applyFilters($transactionsQuery, 'Transaction');
         $this->applyFilters($walletTransactionsQuery, 'DoctorWalletTransaction');
         $this->applyFilters($appointmentsQuery, 'Appointment');
-        $this->applyFilters($manualAppointmentsQuery, 'ManualAppointment');
+        $this->applyFilters($manualAppointmentsQuery, 'Appointment');
         $this->applyFilters($counselingAppointmentsQuery, 'CounselingAppointment');
 
         // لاگ کوئری‌ها
@@ -297,9 +297,10 @@ class FinancialReport extends Component
         $transactionsTotal = Transaction::whereJsonContains('meta->doctor_id', $doctorId);
         $walletTransactionsTotal = DoctorWalletTransaction::where('doctor_id', $doctorId);
         $appointmentsTotal = Appointment::where('doctor_id', $doctorId)
-            ->where('payment_status', 'paid');
-        $manualAppointmentsTotal = ManualAppointment::where('doctor_id', $doctorId)
-            ->whereNotNull('final_price');
+            ->where('payment_status', 'paid')
+            ->where('appointment_type', '!=', 'manual');
+        $manualAppointmentsTotal = Appointment::where('doctor_id', $doctorId)
+            ->where('appointment_type', 'manual');
         $counselingAppointmentsTotal = CounselingAppointment::where('doctor_id', $doctorId)
             ->where('payment_status', 'paid');
 
@@ -315,7 +316,7 @@ class FinancialReport extends Component
         $this->applyFilters($transactionsTotal, 'Transaction');
         $this->applyFilters($walletTransactionsTotal, 'DoctorWalletTransaction');
         $this->applyFilters($appointmentsTotal, 'Appointment');
-        $this->applyFilters($manualAppointmentsTotal, 'ManualAppointment');
+        $this->applyFilters($manualAppointmentsTotal, 'Appointment');
         $this->applyFilters($counselingAppointmentsTotal, 'CounselingAppointment');
 
         $total = $transactionsTotal->sum('amount')
@@ -521,9 +522,10 @@ class FinancialReport extends Component
         $transactionsQuery = Transaction::whereJsonContains('meta->doctor_id', $doctorId);
         $walletTransactionsQuery = DoctorWalletTransaction::where('doctor_id', $doctorId);
         $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
-            ->where('payment_status', 'paid');
-        $manualAppointmentsQuery = ManualAppointment::where('doctor_id', $doctorId)
-            ->whereNotNull('final_price');
+            ->where('payment_status', 'paid')
+            ->where('appointment_type', '!=', 'manual');
+        $manualAppointmentsQuery = Appointment::where('doctor_id', $doctorId)
+            ->where('appointment_type', 'manual');
         $counselingAppointmentsQuery = CounselingAppointment::where('doctor_id', $doctorId)
             ->where('payment_status', 'paid');
 
