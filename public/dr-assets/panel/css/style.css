@@ -605,7 +605,7 @@ svg {
 }
 
 .sidebar__nav.is-active {
-    right: -170px;
+    right: -200px;
     transition: all 250ms ease;
 }
 
@@ -628,19 +628,45 @@ svg {
     position: relative;
 }
 
+/* بهبود استایل منوهای اصلی */
 .sidebar__nav ul li a {
     font-size: 14.5px;
     font-weight: 700;
     width: 100%;
     margin: 5px 0;
-    padding: 10px 50px;
+    padding: 10px 70px 10px 20px; /* افزایش padding راست از 60px به 70px */
     white-space: nowrap;
     border-radius: 8px;
     display: flex;
-    justify-content: start;
+    justify-content: space-between; /* تغییر به space-between */
     color: #212121;
     align-items: center;
     transition: all 0.8s ease;
+    position: relative; /* اضافه کردن position relative */
+}
+
+/* استایل برای محتوای داخلی منو */
+.sidebar__nav ul li a .d-flex {
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    display: flex; /* اطمینان از flex بودن */
+}
+
+/* بهبود فاصله بین متن و آیکون */
+.sidebar__nav ul li a .d-flex .d-flex {
+    margin-right: 0;
+    margin-left: auto;
+    display: flex; /* اطمینان از flex بودن */
+    align-items: center;
+    gap: 12px; /* افزایش فاصله بین badge و آیکون از 8px به 12px */
+}
+
+/* استایل برای متن و badge در کنار هم */
+.sidebar__nav ul li a .d-flex .d-flex .d-flex {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* فاصله بین متن و badge */
 }
 
 .sidebar__nav ul li.is-active a {
@@ -674,7 +700,6 @@ svg {
     padding: 0;
     display: none;
     background: rgba(49, 130, 206, 0.06);
-
 }
 
 .drop-toggle.is-active {
@@ -702,7 +727,7 @@ svg {
 
 .drop-toggle li a {
     font-size: 13px;
-    padding: 12px 20px 12px 40px;
+    padding: 12px 20px 12px 50px;
     color: #1a202c;
     font-weight: 600;
     transition: all 0.3s ease;
@@ -710,6 +735,7 @@ svg {
     margin: 4px 8px;
     background: transparent;
     text-decoration: none;
+    position: relative;
 }
 
 .drop-toggle li a::before {
@@ -775,6 +801,7 @@ svg {
     height: 10px;
     fill: #4a5568;
     transition: transform 0.3s ease;
+    flex-shrink: 0; /* جلوگیری از کوچک شدن آیکون */
 }
 
 /* افکت موج برای کلیک */
@@ -790,7 +817,7 @@ svg {
     position: absolute;
     font-size: 23px;
     top: 10px;
-    right: 15px;
+    right: 20px;
     color: #636e72;
 }
 .sidebar__nav ul li.is-active a::before {
@@ -1102,7 +1129,7 @@ svg {
     width: 50px;
     height: 50px;
     position: relative;
-    left: -87px;
+    left: -107px;
     margin-bottom: 7px;
 }
 
@@ -1128,7 +1155,7 @@ svg {
 }
 
 .content {
-    margin-right: 250px;
+    margin-right: 280px; /* افزایش margin از 280px به 300px */
     padding-top: 70px; /* فاصله برای جلوگیری از پوشیده شدن محتوا توسط هدر */
     transition: all 200ms ease;
 }
@@ -1143,7 +1170,7 @@ svg {
     margin-bottom: 10px;
     position: fixed;
     top: 0;
-    width: calc(100% - 250px);
+    width: calc(100% - 300px); /* افزایش عرض از 280px به 300px */
     z-index: 900;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* سایه خیلی نرم */
     transition: width 200ms ease;
@@ -1152,7 +1179,7 @@ svg {
 
 /* سایدبار با رنگ روشن و سایه نرم */
 .sidebar__nav {
-    width: 250px;
+    width: 280px; /* افزایش عرض از 280px به 300px */
     background: linear-gradient(145deg, #ffffff, #f0f6ff);
 
     height: 100vh;
@@ -2387,3 +2414,32 @@ span.tagRemove:hover {
     }
 }
 /* breadcrub styles */
+
+/* بهبود استایل badge "به زودی" */
+.badge {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+    border-radius: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-block;
+    line-height: 1.2;
+}
+
+/* استایل خاص برای badge های قرمز */
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+    border-radius: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-block;
+    line-height: 1.2;
+}
+
+/* مخفی کردن badge ها هنگام کوچک شدن سایدبار */
+.sidebar__nav.is-active .badge {
+    display: none !important;
+}

@@ -88,9 +88,8 @@
           class="item-li i-moshavere {{ Request::routeIs('dr-moshavere_setting') || Request::routeIs('dr-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             <div class="d-flex align-items-center">
-             
               مشاوره
-               <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
+              <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
             </div>
             <div class="d-flex justify-content-end w-100 align-items-center">
               <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
@@ -179,6 +178,16 @@
                 <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">اقلام پراستفاده</a>
               </li>
             @endif
+             @if ($this->hasPermission('patient_records'))
+        <li
+          class="item-li i-checkout__request {{ Request::routeIs('dr-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          id="gozaresh-mali" style="opacity: 0.5; pointer-events: none;">
+          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;" class="d-flex align-items-center">
+            پرونده الکترونیک
+       
+          </a>
+        </li>
+      @endif
           </ul>
         </li>
       @endif
@@ -240,16 +249,7 @@
         </li>
       @endif
 
-      @if ($this->hasPermission('patient_records'))
-        <li
-          class="item-li i-checkout__request {{ Request::routeIs('dr-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-          id="gozaresh-mali" style="opacity: 0.5; pointer-events: none;">
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;" class="d-flex align-items-center">
-            پرونده الکترونیک
-            <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
-          </a>
-        </li>
-      @endif
+     
 
       @if ($this->hasPermission('secretary_management'))
         <li
