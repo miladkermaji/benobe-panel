@@ -817,7 +817,7 @@ svg {
     position: absolute;
     font-size: 23px;
     top: 10px;
-    right: 20px;
+    right: 30px;
     color: #636e72;
 }
 .sidebar__nav ul li.is-active a::before {
