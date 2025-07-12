@@ -88,7 +88,7 @@
           class="item-li i-moshavere {{ Request::routeIs('dr-moshavere_setting') || Request::routeIs('dr-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             <div class="d-flex align-items-center">
-              مشاوره
+              <span class="fw-bold">مشاوره</span>
               <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
             </div>
             <div class="d-flex justify-content-end w-100 align-items-center">
@@ -139,7 +139,10 @@
           class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('dr-patient-records') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             <div class="d-flex align-items-center">
+              <span class="fw-bold">
               نسخه الکترونیک
+
+              </span>
               <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
             </div>
             <div class="d-flex justify-content-end w-100 align-items-center">

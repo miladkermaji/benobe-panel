@@ -1199,9 +1199,13 @@ svg {
 
 /* هاور شیک برای سایدبار مینیمایز شده */
 .sidebar__nav.is-active:hover {
-    background: linear-gradient(145deg, #e2e8f0, #f0f6ff); /* رنگ هاور ملایم */
-    box-shadow: 0 6px 20px rgba(49, 130, 206, 0.15); /* سایه آبی ملایم */
-    transform: translateX(-5px); /* حرکت نرم به چپ */
+    background: linear-gradient(
+        145deg,
+        #ffffff,
+        #f0f6ff
+    ); /* برگشت به رنگ اصلی */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* برگشت به سایه اصلی */
+    transform: none; /* حذف حرکت */
     transition: all 0.3s ease;
 }
 
@@ -2483,6 +2487,15 @@ span.tagRemove:hover {
 }
 
 /* مخفی کردن badge ها هنگام کوچک شدن سایدبار */
-.sidebar__nav.is-active .badge {
-    display: none !important;
+@media (min-width: 992px) {
+    .sidebar__nav.is-active .badge {
+        display: none !important;
+    }
+}
+
+/* نمایش badge ها در موبایل */
+@media (max-width: 991px) {
+    .sidebar__nav .badge {
+        display: inline-block !important;
+    }
 }
