@@ -1211,38 +1211,59 @@ class AppointmentsList extends Component
             }
             $remainingIds = [];
             $appointments = Appointment::whereIn('id', $appointmentIds)->get();
-
-            // If we have selected times for multiple appointments
-            if (is_array($selectedTime)) {
-                foreach ($appointments as $appointment) {
-                    $newTime = $selectedTime[$appointment->id] ?? null;
-                    if (!$newTime || !in_array($newTime, $availableSlots)) {
-                        $remainingIds[] = $appointment->id;
-                        continue;
-                    }
-                    $appointment->appointment_date = $newDate;
-                    $appointment->appointment_time = $newTime;
-                    $appointment->save();
+            $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+            $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+            $templateId = 100284;
+            foreach ($appointments as $appointment) {
+                $oldDateJalali = Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d');
+                $oldDayName = Jalalian::fromDateTime($appointment->appointment_date)->format('l');
+                $oldTime = Carbon::parse($appointment->appointment_time)->format('H:i');
+                // زمان جدید:
+                if (is_array($selectedTime)) {
+                    $newTime = $selectedTime[$appointment->id] ?? ($availableSlots[0] ?? null);
+                } else {
+                    $newTime = $selectedTime && in_array($selectedTime, $availableSlots) ? $selectedTime : ($availableSlots[0] ?? null);
                 }
-            } else {
-                // Single appointment or no specific times provided
-                foreach ($appointments as $appointment) {
-                    // If a specific time was selected, use it
-                    if ($selectedTime && !empty($selectedTime) && in_array($selectedTime, $availableSlots)) {
-                        $newTime = $selectedTime;
+                if (!$newTime) {
+                    $remainingIds[] = $appointment->id;
+                    continue;
+                }
+                $appointment->appointment_date = $newDate;
+                $appointment->appointment_time = $newTime;
+                $appointment->save();
+                // پیامک جابجایی
+                if ($appointment->patientable && $appointment->patientable->mobile) {
+                    $user = $appointment->patientable;
+                    $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+                    $newDateJalali = Jalalian::fromDateTime($newDate)->format('Y/m/d');
+                    $newDayName = Jalalian::fromDateTime($newDate)->format('l');
+                    $params = [
+                        $user->first_name . ' ' . $user->last_name,
+                        $oldDateJalali,
+                        $oldDayName,
+                        $oldTime,
+                        $newDateJalali,
+                        $newDayName,
+                        $newTime,
+                        $doctorName
+                    ];
+                    $message = "کاربر گرامی {0} نوبت شما از  تاریخ {1} روز {2} ساعت {3} به تاریخ {4} روز {5} ساعت {6} توسط پزشک {7} تغیر یافت.";
+                    $message = str_replace(['{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}'], $params, $message);
+                    if ($gatewayName === 'pishgamrayan') {
+                        SendSmsNotificationJob::dispatch(
+                            $message,
+                            [$user->mobile],
+                            $templateId,
+                            $params
+                        )->delay(now()->addSeconds(5));
                     } else {
-                        // Otherwise, use the first available slot
-                        $newTime = $availableSlots[0] ?? null;
+                        SendSmsNotificationJob::dispatch(
+                            $message,
+                            [$user->mobile],
+                            null,
+                            $params
+                        )->delay(now()->addSeconds(5));
                     }
-
-                    if (!$newTime) {
-                        $remainingIds[] = $appointment->id;
-                        continue;
-                    }
-
-                    $appointment->appointment_date = $newDate;
-                    $appointment->appointment_time = $newTime;
-                    $appointment->save();
                 }
             }
             return $remainingIds;
@@ -1624,14 +1645,43 @@ class AppointmentsList extends Component
                     'updated_at' => now(),
                 ]);
                 if ($appointment->patientable && $appointment->patientable->mobile) {
+                    $user = $appointment->patientable;
+                    $doctor = $this->getAuthenticatedDoctor();
+                    $doctorName = $doctor ? ($doctor->first_name . ' ' . $doctor->last_name) : '';
                     $dateJalali = Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d');
-                    $message = "کاربر گرامی، نوبت شما در تاریخ {$dateJalali} لغو شد.";
-                    SendSmsNotificationJob::dispatch(
-                        $message,
-                        [$appointment->patientable->mobile],
-                        null,
-                        []
-                    )->delay(now()->addSeconds(5));
+                    $dayName = Jalalian::fromDateTime($appointment->appointment_date)->format("l");
+                    $time = Carbon::parse($appointment->appointment_time)->format('H:i');
+                    $fee = $appointment->fee ?? 0;
+                    $refundText = $fee > 0 ? 'و مبلغ ' . number_format($fee) . ' ریال به حساب شما به زودی بازگردانده می‌شود.' : '';
+                    $link = 'https://emr-benobe.ir/doctors';
+                    $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                    $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+                    $templateId = 100283;
+                    $params = [
+                        $user->first_name . ' ' . $user->last_name,
+                        $dateJalali,
+                        $dayName,
+                        $time,
+                        $doctorName . ($refundText ? '، ' . $refundText : ''),
+                        $link
+                    ];
+                    $message = "کاربر گرامی {0} نوبت تاریخ {1} روز {2} ساعت {3} توسط پزشک {4} لغو گردید، برای دریافت مجدد نوبت به لینک زیر مراجعه کنید. {5}";
+                    $message = str_replace(['{0}','{1}','{2}','{3}','{4}','{5}'], $params, $message);
+                    if ($gatewayName === 'pishgamrayan') {
+                        SendSmsNotificationJob::dispatch(
+                            $message,
+                            [$user->mobile],
+                            $templateId,
+                            $params
+                        )->delay(now()->addSeconds(5));
+                    } else {
+                        SendSmsNotificationJob::dispatch(
+                            $message,
+                            [$user->mobile],
+                            null,
+                            $params
+                        )->delay(now()->addSeconds(5));
+                    }
                 }
             }
             $this->dispatch('appointments-cancelled', [

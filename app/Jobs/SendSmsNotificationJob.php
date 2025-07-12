@@ -55,25 +55,26 @@ class SendSmsNotificationJob implements ShouldQueue
                     $user = User::where('mobile', $recipient)->first();
                     $userFullName = $user ? ($user->first_name . ' ' . $user->last_name) : 'کاربر گرامی';
 
-                    $smsService = new MessageService(
-                        SmsService::createMessage(
-                            $this->message,
-                            [$recipient],
-                            null,
-                            $jalaliSendDateTime
-                        )
+                    // Create SmsService directly
+                    $smsService = SmsService::createMessage(
+                        $this->message,
+                        [$recipient],
+                        null,
+                        $jalaliSendDateTime
                     );
 
-                    // تنظیم مستقیم پراپرتی‌ها
+                    // Set template ID and parameters directly on SmsService
                     if ($gatewayName === 'pishgamrayan' && $this->templateId) {
-                        $smsService->message->setOtpId($this->templateId); // استفاده از متد
-                        $smsService->message->setParameters($this->params); // استفاده از متد
+                        $smsService->setOtpId($this->templateId);
+                        $smsService->setParameters($this->params);
                     } else {
-                        $smsService->message->setOtpId(null); // استفاده از متد
-                        $smsService->message->setParameters([]); // استفاده از متد
+                        $smsService->setOtpId(null);
+                        $smsService->setParameters([]);
                     }
 
-                    $response = $smsService->send();
+                    // Create MessageService and send
+                    $messageService = new MessageService($smsService);
+                    $response = $messageService->send();
 
                     Log::info('پیامک با موفقیت ارسال شد', [
                         'recipient' => $recipient,
