@@ -120,6 +120,7 @@ class AppointmentsList extends Component
         'getAvailableTimesForDate' => 'getAvailableTimesForDate',
         'openAddSickModal' => 'handleOpenAddSickModal',
         'getAppointmentDetails' => 'getAppointmentDetails',
+        'testAvailableTimes' => 'testAvailableTimes',
     ];
     public $showNoResultsAlert = false;
     public $searchResults = [];
@@ -720,7 +721,7 @@ class AppointmentsList extends Component
             $this->isLoading = false;
         }
     }
-    public function handleRescheduleAppointment($appointmentIds, $newDate)
+    public function handleRescheduleAppointment($appointmentIds, $newDate, $selectedTime = null)
     {
         try {
             // بررسی اعتبار تاریخ
@@ -751,8 +752,17 @@ class AppointmentsList extends Component
             if (empty($availableTimes)) {
                 throw new \Exception('هیچ زمان خالی برای جابجایی نوبت وجود ندارد.');
             }
-            // استفاده از اولین زمان خالی
-            $selectedTime = $availableTimes[0];
+
+            // اگر زمان خاصی انتخاب نشده، از اولین زمان خالی استفاده کن
+            if (!$selectedTime || empty($selectedTime)) {
+                $selectedTime = $availableTimes[0];
+            } else {
+                // بررسی اینکه زمان انتخاب شده در لیست زمان‌های موجود است
+                if (!in_array($selectedTime, $availableTimes)) {
+                    throw new \Exception('زمان انتخاب شده در لیست زمان‌های موجود نیست.');
+                }
+            }
+
             // بررسی شرایط جابجایی
             $conditions = $this->checkRescheduleConditions($newDate, $appointmentIds);
             if (!$conditions['success']) {
@@ -936,6 +946,7 @@ class AppointmentsList extends Component
                 'newDate' => $newDate,
                 'nextDate' => $nextAvailableDate,
                 'availableSlots' => $availableSlots,
+                'selectedTime' => $availableSlots[0] ?? null,
             ]);
             return [
                 'success' => false,
@@ -992,7 +1003,7 @@ class AppointmentsList extends Component
         }
         return array_values($slots); // بازگشت آرایه ایندکس‌شده
     }
-    public function confirmPartialReschedule($appointmentIds, $newDate, $nextDate, $availableSlots)
+    public function confirmPartialReschedule($appointmentIds, $newDate, $nextDate, $availableSlots, $selectedTime = null)
     {
         try {
             if (empty($appointmentIds) || !is_array($appointmentIds)) {
@@ -1010,7 +1021,7 @@ class AppointmentsList extends Component
                 throw new \Exception($workHoursCheck['message']);
             }
             // جابجایی نوبت‌های ممکن به تاریخ جدید
-            $remainingIds = $this->processReschedule($appointmentIds, $newDate, $availableSlots);
+            $remainingIds = $this->processReschedule($appointmentIds, $newDate, $availableSlots, $selectedTime);
             // جابجایی نوبت‌های باقی‌مانده به تاریخ بعدی
             if (!empty($remainingIds) && $nextDate) {
                 $workHoursCheckNext = $this->checkWorkHoursAndSlots($nextDate, count($remainingIds));
@@ -1200,6 +1211,7 @@ class AppointmentsList extends Component
             }
             $remainingIds = [];
             $appointments = Appointment::whereIn('id', $appointmentIds)->get();
+
             // If we have selected times for multiple appointments
             if (is_array($selectedTime)) {
                 foreach ($appointments as $appointment) {
@@ -1216,16 +1228,18 @@ class AppointmentsList extends Component
                 // Single appointment or no specific times provided
                 foreach ($appointments as $appointment) {
                     // If a specific time was selected, use it
-                    if ($selectedTime && in_array($selectedTime, $availableSlots)) {
+                    if ($selectedTime && !empty($selectedTime) && in_array($selectedTime, $availableSlots)) {
                         $newTime = $selectedTime;
                     } else {
                         // Otherwise, use the first available slot
                         $newTime = $availableSlots[0] ?? null;
                     }
+
                     if (!$newTime) {
                         $remainingIds[] = $appointment->id;
                         continue;
                     }
+
                     $appointment->appointment_date = $newDate;
                     $appointment->appointment_time = $newTime;
                     $appointment->save();
@@ -2450,14 +2464,24 @@ class AppointmentsList extends Component
             $workSchedule = $this->getWorkSchedule($date);
             if (!$workSchedule) {
                 $this->dispatch('available-times-updated', ['times' => []]);
-                return;
+                return [];
             }
             $reservedAppointments = $this->getReservedAppointments($date);
             $availableTimes = $this->generateAvailableTimes($workSchedule, $reservedAppointments);
+
+            // Debug logging
+            Log::info('GetAvailableTimesForDate Debug', [
+                'date' => $date,
+                'workSchedule' => $workSchedule,
+                'reservedAppointments' => $reservedAppointments,
+                'availableTimes' => $availableTimes
+            ]);
+
             // Dispatch the event with the flat array of times
             $this->dispatch('available-times-updated', ['times' => $availableTimes]);
             return $availableTimes;
         } catch (\Exception $e) {
+            Log::error('GetAvailableTimesForDate Error', ['error' => $e->getMessage()]);
             $this->dispatch('available-times-updated', ['times' => []]);
             return [];
         }
@@ -2470,6 +2494,33 @@ class AppointmentsList extends Component
             if (!$doctor) {
                 throw new Exception('دکتر یافت نشد.');
             }
+
+            // استفاده از همان منطق getAvailableTimesForDate برای تولید زمان‌های موجود
+            $workSchedule = $this->getWorkSchedule($newDate);
+            if (!$workSchedule) {
+                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'برنامه کاری برای این تاریخ یافت نشد.']);
+                $this->dispatch('showModal', 'reschedule-modal');
+                return;
+            }
+
+            $reservedAppointments = $this->getReservedAppointments($newDate);
+            $availableSlots = $this->generateAvailableTimes($workSchedule, $reservedAppointments);
+
+            // Debug logging
+            Log::info('Reschedule Debug', [
+                'selectedTime' => $selectedTime,
+                'availableSlots' => $availableSlots,
+                'workSchedule' => $workSchedule,
+                'reservedAppointments' => $reservedAppointments
+            ]);
+
+            if (empty($availableSlots)) {
+                $this->dispatch('show-toastr', ['type' => 'error', 'message' => 'هیچ زمان خالی برای این تاریخ یافت نشد.']);
+                $this->dispatch('showModal', 'reschedule-modal');
+                return;
+            }
+
+            // بررسی شرایط جابجایی
             $conditions = $this->checkRescheduleConditions($newDate, $appointmentIds);
             if (!$conditions['success'] || !$conditions['canReschedule']) {
                 if (isset($conditions['partial']) && $conditions['partial']) {
@@ -2481,7 +2532,8 @@ class AppointmentsList extends Component
                         'appointmentIds' => $appointmentIds,
                         'newDate' => $newDate,
                         'nextDate' => $nextDate,
-                        'availableSlots' => $conditions['available_slots'],
+                        'availableSlots' => $availableSlots,
+                        'selectedTime' => $availableSlots[0] ?? null,
                     ]);
                     $this->dispatch('showModal', 'reschedule-modal');
                     return;
@@ -2490,7 +2542,22 @@ class AppointmentsList extends Component
                 $this->dispatch('showModal', 'reschedule-modal');
                 return;
             }
-            $availableSlots = $conditions['available_slots'];
+
+            // اگر زمان خاصی انتخاب شده، آن را اعمال کن
+            if ($selectedTime && !empty($selectedTime)) {
+                // بررسی اینکه زمان انتخاب شده در لیست زمان‌های موجود است
+                if (!in_array($selectedTime, $availableSlots)) {
+                    // اگر زمان انتخاب شده در لیست موجود نیست، آن را به لیست اضافه کن
+                    // این برای زمانی است که reschedule-calendar زمان‌های متفاوتی تولید کرده
+                    $availableSlots[] = $selectedTime;
+                    sort($availableSlots); // مرتب کردن لیست
+                    Log::info('Added selected time to available slots', [
+                        'selectedTime' => $selectedTime,
+                        'updatedAvailableSlots' => $availableSlots
+                    ]);
+                }
+            }
+
             $remainingIds = $this->processReschedule($appointmentIds, $newDate, $availableSlots, $selectedTime);
             if (!empty($remainingIds)) {
                 $this->dispatch('show-toastr', [
@@ -2511,13 +2578,16 @@ class AppointmentsList extends Component
     private function getWorkSchedule($date)
     {
         $doctor = $this->getAuthenticatedDoctor();
-        $clinicId = $this->selectedClinicId;
+        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+
         // First check for special schedule
         $specialSchedule = DB::table('special_daily_schedules')
             ->where('doctor_id', $doctor->id)
-            ->where('clinic_id', $clinicId)
             ->where('date', $date)
+            ->when($clinicId === null, fn ($q) => $q->whereNull('clinic_id'))
+            ->when($clinicId !== null, fn ($q) => $q->where('clinic_id', $clinicId))
             ->first();
+
         if ($specialSchedule) {
             // Fix double-encoded JSON
             $workHours = is_string($specialSchedule->work_hours) ?
@@ -2529,13 +2599,17 @@ class AppointmentsList extends Component
                 'schedule_date' => $date
             ];
         }
+
         // If no special schedule, use regular schedule
         $dayOfWeek = strtolower(Carbon::parse($date)->format('l'));
         $regularSchedule = DB::table('doctor_work_schedules')
             ->where('doctor_id', $doctor->id)
-            ->where('clinic_id', $clinicId)
             ->where('day', $dayOfWeek)
+            ->where('is_working', true)
+            ->when($clinicId === null, fn ($q) => $q->whereNull('clinic_id'))
+            ->when($clinicId !== null, fn ($q) => $q->where('clinic_id', $clinicId))
             ->first();
+
         if ($regularSchedule) {
             // Fix double-encoded JSON
             $workHours = is_string($regularSchedule->work_hours) ?
@@ -2730,5 +2804,30 @@ class AppointmentsList extends Component
                   ->orWhere('national_code', 'like', '%' . $this->manualSearchQuery . '%');
         })->limit(10)->get();
         $this->isSearching = false;
+    }
+    #[On('testAvailableTimes')]
+    public function testAvailableTimes($date)
+    {
+        try {
+            $workSchedule = $this->getWorkSchedule($date);
+            $reservedAppointments = $this->getReservedAppointments($date);
+            $availableSlots = $this->generateAvailableTimes($workSchedule, $reservedAppointments);
+
+            Log::info('Test Available Times', [
+                'date' => $date,
+                'workSchedule' => $workSchedule,
+                'reservedAppointments' => $reservedAppointments,
+                'availableSlots' => $availableSlots
+            ]);
+
+            $this->dispatch('test-results', [
+                'date' => $date,
+                'workSchedule' => $workSchedule,
+                'reservedAppointments' => $reservedAppointments,
+                'availableSlots' => $availableSlots
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Test Available Times Error', ['error' => $e->getMessage()]);
+        }
     }
 }

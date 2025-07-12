@@ -1095,7 +1095,8 @@
             appointmentIds,
             newDate,
             nextDate,
-            availableSlots
+            availableSlots,
+            selectedTime
           } = data;
           if (!message || !appointmentIds || !newDate || !nextDate || !availableSlots) {
             console.error('Invalid data received in show-partial-reschedule-confirm', data);
@@ -1120,7 +1121,7 @@
               Livewire.dispatchTo(
                 'dr.panel.turn.schedule.appointments-list',
                 'confirm-partial-reschedule',
-                [appointmentIds, newDate, nextDate, availableSlots]
+                [appointmentIds, newDate, nextDate, availableSlots, selectedTime]
               );
               window.dispatchEvent(new CustomEvent('close-modal', {
                 detail: {
@@ -1131,14 +1132,15 @@
           });
         });
         Livewire.on('show-first-available-confirm', (event) => {
-          const data = event[0] || {};
+          const data = event[0] || event;
           const {
             message,
             appointmentIds,
             newDate,
             availableSlots,
             isFullCapacity,
-            nextDate
+            nextDate,
+            selectedTime
           } = data;
           if (!message || !appointmentIds || !newDate || !availableSlots) {
             console.error('Invalid data in show-first-available-confirm', data);
@@ -1169,7 +1171,7 @@
                 Livewire.dispatchTo(
                   'dr.panel.turn.schedule.appointments-list',
                   'rescheduleAppointment',
-                  [appointmentIds, newDate]
+                  [appointmentIds, newDate, selectedTime]
                 );
               } else {
                 Livewire.dispatchTo(
@@ -1187,7 +1189,7 @@
               Livewire.dispatchTo(
                 'dr.panel.turn.schedule.appointments-list',
                 'rescheduleAppointment',
-                [appointmentIds, nextDate]
+                [appointmentIds, nextDate, selectedTime]
               );
               window.dispatchEvent(new CustomEvent('close-modal', {
                 detail: {
