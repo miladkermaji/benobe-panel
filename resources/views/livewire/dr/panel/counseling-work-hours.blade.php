@@ -1092,7 +1092,7 @@
           // بررسی معتبر بودن conflictsObj
           if (!conflictsObj || typeof conflictsObj !== 'object' || Object.keys(conflictsObj).length === 0) {
             console.warn('No valid conflicts data, proceeding with copySchedule');
-            @this.call('copySchedule', false);
+            return;
             return;
           }
           const persianDayMap = {
@@ -1142,7 +1142,7 @@
           // اگر هیچ تداخل معتبری وجود نداشت، عملیات کپی ادامه یابد
           if (!hasConflicts) {
             console.warn('No valid conflicts found, proceeding with copySchedule');
-            @this.call('copySchedule', false);
+            return;
             return;
           }
           conflictMessage += '<p>آیا می‌خواهید داده‌های موجود را جایگزین کنید؟</p>';

@@ -1092,7 +1092,6 @@
               event.conflicts || event;
             if (!conflictsObj || typeof conflictsObj !== 'object' || Object.keys(conflictsObj).length === 0) {
               console.warn('No valid conflicts data, proceeding with copyScheduleSetting');
-              @this.call('copyScheduleSetting');
               return;
             }
             const persianDayMap = {
@@ -1127,7 +1126,6 @@
             });
             if (!hasConflicts) {
               console.warn('No valid conflicts found, proceeding with copyScheduleSetting');
-              @this.call('copyScheduleSetting');
               return;
             }
             conflictMessage += '<p>آیا می‌خواهید داده‌های موجود را جایگزین کنید؟</p>';
@@ -1166,7 +1164,7 @@
               event.conflicts || event;
             if (!conflictsObj || typeof conflictsObj !== 'object' || Object.keys(conflictsObj).length === 0) {
               console.warn('No valid conflicts data, proceeding with copySchedule');
-              @this.call('copySchedule', false);
+              return;
               return;
             }
             const persianDayMap = {
@@ -1209,7 +1207,7 @@
             });
             if (!hasConflicts) {
               console.warn('No valid conflicts found, proceeding with copySchedule');
-              @this.call('copySchedule', false);
+              return;
               return;
             }
             conflictMessage += '<p>آیا می‌خواهید داده‌های موجود را جایگزین کنید؟</p>';
