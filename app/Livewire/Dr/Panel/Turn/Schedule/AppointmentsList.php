@@ -31,8 +31,9 @@ use Illuminate\Support\Facades\Validator;
 
 class AppointmentsList extends Component
 {
-    use WithPagination,HasSelectedClinic;
-    
+    use WithPagination;
+    use HasSelectedClinic;
+
     public $isLoadingServices = false;
     public $isLoadingFinalPrice = false;
     public $showPatientForm = false;
@@ -192,14 +193,14 @@ class AppointmentsList extends Component
             // لود داده‌های اولیه
             $doctor = $this->getAuthenticatedDoctor();
             if ($doctor) {
-                $this->selectedClinicId = 
+                $this->selectedClinicId =
                $this->getSelectedClinicId();
 
 
                 // پاک کردن کش‌های قبلی
                 Cache::forget("appointments_doctor_{$doctor->id}_*");
 
-               // لود همزمان داده‌ها
+                // لود همزمان داده‌ها
                 $this->loadClinics();
                 $this->loadBlockedUsers();
                 $this->loadMessages();
@@ -306,7 +307,8 @@ class AppointmentsList extends Component
                 ->select(DB::raw('appointment_date, COUNT(*) as appointment_count'))
                 ->where('doctor_id', $doctorId)
                 ->where('status', '!=', 'cancelled')
-                ->whereNull('deleted_at');
+                ->whereNull('deleted_at')
+                ->where('patientable_type', 'App\\Models\\User');
             if ($selectedClinicId === 'default') {
                 $appointmentsQuery->whereNull('clinic_id');
             } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
@@ -422,7 +424,10 @@ class AppointmentsList extends Component
                 'users.mobile',
                 'users.national_code'
             ])
-            ->join('users', 'appointments.patient_id', '=', 'users.id')
+            ->join('users', function ($join) {
+                $join->on('appointments.patientable_id', '=', 'users.id')
+                     ->where('appointments.patientable_type', '=', 'App\\Models\\User');
+            })
             ->where('appointments.doctor_id', $doctor->id)
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
                 return $query->where('appointments.clinic_id', $this->selectedClinicId);
@@ -549,7 +554,7 @@ class AppointmentsList extends Component
         $this->resetPage();
         $this->appointments = [];
         $this->loadAppointments();
-        
+
         // Force Livewire to re-render the component
         $this->dispatch('$refresh');
     }
@@ -1818,8 +1823,9 @@ class AppointmentsList extends Component
         $userId = null;
         if ($this->recipientType === 'all') {
             $recipients = DB::table('appointments')
-                ->where('doctor_id', $doctorId)
-                ->join('users', 'appointments.patient_id', '=', 'users.id')
+                ->where('appointments.doctor_id', $doctorId)
+                ->where('appointments.patientable_type', 'App\\Models\\User')
+                ->join('users', 'appointments.patientable_id', '=', 'users.id')
                 ->distinct()
                 ->pluck('users.mobile')
                 ->toArray();
@@ -2039,6 +2045,7 @@ class AppointmentsList extends Component
             ->where('appointment_date', $date)
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
+            ->where('patientable_type', 'App\\Models\\User')
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->select('id', 'appointment_date')
@@ -2057,6 +2064,7 @@ class AppointmentsList extends Component
             ->whereBetween('appointment_date', [$startDate, $endDate])
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
+            ->where('patientable_type', 'App\\Models\\User')
             ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->select('appointment_date')
@@ -2068,6 +2076,7 @@ class AppointmentsList extends Component
                     'count' => Appointment::where('appointment_date', $appointment->appointment_date)
                         ->where('status', '!=', 'cancelled')
                         ->whereNull('deleted_at')
+                        ->where('patientable_type', 'App\\Models\\User')
                         ->count(),
                 ];
             });
@@ -2176,8 +2185,9 @@ class AppointmentsList extends Component
     {
         $this->resetAddSickModal();
     }
-    
-    public function resetAddSickModal(){
+
+    public function resetAddSickModal()
+    {
         $this->reset([
             'selectedUserId',
             'firstName',
@@ -2255,7 +2265,8 @@ class AppointmentsList extends Component
             }
 
             // Check for existing appointment
-            $existingAppointment = Appointment::where('patient_id', $user->id)
+            $existingAppointment = Appointment::where('patientable_id', $user->id)
+                ->where('patientable_type', 'App\\Models\\User')
                 ->where('doctor_id', $doctor->id)
                 ->whereDate('appointment_date', $gregorianDate)
                 ->first();
@@ -2269,7 +2280,8 @@ class AppointmentsList extends Component
 
             // Create the appointment
             $appointment = Appointment::create([
-                'patient_id' => $user->id,
+                'patientable_id' => $user->id,
+                'patientable_type' => 'App\\Models\\User',
                 'doctor_id' => $doctor->id,
                 'clinic_id' => $clinicId,
                 'appointment_date' => $gregorianDate,
@@ -2558,6 +2570,7 @@ class AppointmentsList extends Component
             ->whereDate('appointment_date', $date)
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
+            ->where('patientable_type', 'App\\Models\\User')
             ->when($clinicId === null, fn ($q) => $q->whereNull('clinic_id'))
             ->when($clinicId !== null, fn ($q) => $q->where('clinic_id', $clinicId))
             ->get()
@@ -2670,6 +2683,7 @@ class AppointmentsList extends Component
                     ->where('appointment_date', $date)
                     ->where('status', '!=', 'cancelled')
                     ->whereNull('deleted_at')
+                    ->where('patientable_type', 'App\\Models\\User')
                     ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                     ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                     ->count();
@@ -2695,6 +2709,7 @@ class AppointmentsList extends Component
                     ->whereBetween('appointment_date', [$startDate, $endDate])
                     ->where('status', '!=', 'cancelled')
                     ->whereNull('deleted_at')
+                    ->where('patientable_type', 'App\\Models\\User')
                     ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                     ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                     ->groupBy('appointment_date')
