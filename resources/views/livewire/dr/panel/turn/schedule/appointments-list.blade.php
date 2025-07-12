@@ -242,13 +242,13 @@
                   <tr>
                     <td><input type="checkbox" class="appointment-checkbox form-check-input"
                         value="{{ $appointment->id }}" data-status="{{ $appointment->status }}"
-                        data-mobile="{{ $appointment->patient->mobile ?? '' }}"
+                        data-mobile="{{ $appointment->patientable->mobile ?? '' }}"
                         wire:model="cancelIds.{{ $appointment->id }}"></td>
                     <td class="fw-bold">
-                      {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
+                      {{ $appointment->patientable ? ($appointment->patientable->first_name ?? '') . ' ' . ($appointment->patientable->last_name ?? '') : '-' }}
                     </td>
-                    <td>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</td>
-                    <td>{{ $appointment->patient ? $appointment->patient->national_code : '-' }}</td>
+                    <td>{{ $appointment->patientable->mobile ?? '-' }}</td>
+                    <td>{{ $appointment->patientable->national_code ?? '-' }}</td>
                     <td>{{ Jalalian::fromCarbon(Carbon::parse($appointment->appointment_date))->format('Y/m/d') }}
                       <span class="fw-bold d-block">
                         {{ $appointment->appointment_time->format('H:i') ?? '-' }}
@@ -337,7 +337,7 @@
                           <button class="btn btn-light shadow-sm manual-appointment-btn" x-data
                             @click="
                               $dispatch('open-modal', { name: 'add-sick-modal' });
-                              $wire.selectUser({{ $appointment->patient->id ?? 'null' }});
+                              $wire.selectUser({{ $appointment->patientable->id ?? 'null' }});
                             ">
                             <img src="{{ asset('dr-assets/icons/add-appointment.svg') }}" alt="ثبت نوبت دستی">
                           </button>
@@ -370,12 +370,12 @@
                     <input type="checkbox" class="appointment-checkbox form-check-input"
                       value="{{ $appointment->id }}" 
                       data-status="{{ $appointment->status }}"
-                      data-mobile="{{ $appointment->patient->mobile ?? '' }}"
+                      data-mobile="{{ $appointment->patientable->mobile ?? '' }}"
                       wire:model="cancelIds.{{ $appointment->id }}">
                     <span class="fw-bold text-end">
-                      {{ $appointment->patient ? $appointment->patient->first_name . ' ' . $appointment->patient->last_name : '-' }}
-                      @if ($appointment->patient && $appointment->patient->national_code)
-                        <span class="text-muted">کدملی : {{ $appointment->patient->national_code }}</span>
+                      {{ $appointment->patientable ? ($appointment->patientable->first_name ?? '') . ' ' . ($appointment->patientable->last_name ?? '') : '-' }}
+                      @if ($appointment->patientable && $appointment->patientable->national_code)
+                        <span class="text-muted">کدملی : {{ $appointment->patientable->national_code }}</span>
                       @endif
                     </span>
                   </div>
@@ -390,7 +390,7 @@
                 <div class="card-body">
                   <div class="card-item">
                     <span class="label">شماره موبایل:</span>
-                    <span>{{ $appointment->patient ? $appointment->patient->mobile : '-' }}</span>
+                    <span>{{ $appointment->patientable->mobile ?? '-' }}</span>
                   </div>
                   <div class="card-item">
                     <span class="label">زمان نوبت:</span>
@@ -473,7 +473,7 @@
                         <button class="btn btn-light shadow-sm manual-appointment-btn" x-data
                           @click="
                             $dispatch('open-modal', { name: 'add-sick-modal' });
-                            $wire.selectUser({{ $appointment->patient->id ?? 'null' }});
+                            $wire.selectUser({{ $appointment->patientable->id ?? 'null' }});
                           ">
                           <img src="{{ asset('dr-assets/icons/add-appointment.svg') }}" alt="ثبت نوبت دستی"
                             style="width: 20px; height: 20px;">

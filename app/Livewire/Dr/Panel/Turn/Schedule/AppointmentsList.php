@@ -416,44 +416,33 @@ class AppointmentsList extends Component
             return;
         }
 
-        $query = Appointment::query()
-            ->select([
-                'appointments.*',
-                'users.first_name',
-                'users.last_name',
-                'users.mobile',
-                'users.national_code'
-            ])
-            ->join('users', function ($join) {
-                $join->on('appointments.patientable_id', '=', 'users.id')
-                     ->where('appointments.patientable_type', '=', 'App\\Models\\User');
-            })
-            ->where('appointments.doctor_id', $doctor->id)
+        $query = Appointment::with('patientable')
+            ->where('doctor_id', $doctor->id)
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
-                return $query->where('appointments.clinic_id', $this->selectedClinicId);
+                return $query->where('clinic_id', $this->selectedClinicId);
             });
 
         // بهینه‌سازی فیلتر تاریخ
         if ($this->filterStatus === 'manual') {
-            $query->where('appointments.appointment_type', 'manual');
+            $query->where('appointment_type', 'manual');
         } else {
             if ($this->dateFilter) {
                 $today = Carbon::today();
                 switch ($this->dateFilter) {
                     case 'current_week':
-                        $query->whereBetween('appointments.appointment_date', [
+                        $query->whereBetween('appointment_date', [
                             $today->copy()->startOfWeek(Carbon::SATURDAY),
                             $today->copy()->endOfWeek(Carbon::FRIDAY)
                         ]);
                         break;
                     case 'current_month':
-                        $query->whereBetween('appointments.appointment_date', [
+                        $query->whereBetween('appointment_date', [
                             $today->copy()->startOfMonth(),
                             $today->copy()->endOfMonth()
                         ]);
                         break;
                     case 'current_year':
-                        $query->whereBetween('appointments.appointment_date', [
+                        $query->whereBetween('appointment_date', [
                             $today->copy()->startOfYear(),
                             $today->copy()->endOfYear()
                         ]);
@@ -461,33 +450,34 @@ class AppointmentsList extends Component
                 }
             } elseif (!$this->isSearchingAllDates && $this->filterStatus !== 'all') {
                 $query->when($this->selectedDate, function ($query) {
-                    return $query->whereDate('appointments.appointment_date', $this->selectedDate);
+                    return $query->whereDate('appointment_date', $this->selectedDate);
                 });
             }
         }
 
         // بهینه‌سازی فیلتر وضعیت
         if ($this->filterStatus && $this->filterStatus !== 'manual' && $this->filterStatus !== 'all') {
-            $query->where('appointments.status', $this->filterStatus);
+            $query->where('status', $this->filterStatus);
         }
 
         // بهینه‌سازی جستجو
         if ($this->searchQuery) {
             $searchQuery = '%' . $this->searchQuery . '%';
             $query->where(function ($q) use ($searchQuery) {
-                $q->where('users.first_name', 'like', $searchQuery)
-                  ->orWhere('users.last_name', 'like', $searchQuery)
-                  ->orWhere('users.mobile', 'like', $searchQuery)
-                  ->orWhere('users.national_code', 'like', $searchQuery)
-                  ->orWhereRaw("CONCAT(users.first_name, ' ', users.last_name) LIKE ?", [$searchQuery]);
+                $q->whereHasMorph('patientable', ['App\\Models\\User', 'App\\Models\\Secretary', 'App\\Models\\Admin\\Manager'], function ($q2) use ($searchQuery) {
+                    $q2->where('first_name', 'like', $searchQuery)
+                        ->orWhere('last_name', 'like', $searchQuery)
+                        ->orWhere('mobile', 'like', $searchQuery)
+                        ->orWhere('national_code', 'like', $searchQuery)
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$searchQuery]);
+                });
             });
         }
 
         try {
-            // استفاده از chunk به جای cursor برای مدیریت بهتر حافظه
             $this->appointments = [];
-            $query->orderBy('appointments.appointment_date', 'desc')
-                  ->orderBy('appointments.appointment_time', 'desc')
+            $query->orderBy('appointment_date', 'desc')
+                  ->orderBy('appointment_time', 'desc')
                   ->chunk(100, function ($appointments) {
                       foreach ($appointments as $appointment) {
                           $this->appointments[] = $appointment;
