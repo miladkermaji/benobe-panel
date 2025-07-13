@@ -596,8 +596,8 @@ class AuthController extends Controller
         // تبدیل تاریخ تولد شمسی به میلادی اگر مقدار داشت
         if (isset($updateData['date_of_birth']) && !empty($updateData['date_of_birth'])) {
             try {
-                // اگر پکیج morilog/jalali نصب است
-                $updateData['date_of_birth'] = \Morilog\Jalali\Jalalian::fromFormat('Y-m-d', $updateData['date_of_birth'])->toCarbon()->format('Y-m-d');
+                $date = str_replace('/', '-', $updateData['date_of_birth']); // پشتیبانی از هر دو فرمت
+                $updateData['date_of_birth'] = \Morilog\Jalali\Jalalian::fromFormat('Y-m-d', $date)->toCarbon()->format('Y-m-d');
             } catch (\Exception $e) {
                 // اگر تبدیل نشد، مقدار را تغییر نده
             }
