@@ -112,6 +112,9 @@ Route::prefix('medical-centers')->group(function () {
     Route::get('/laboratories', [MedicalCentersController::class, 'getLaboratories'])->name('api.medical-centers.laboratories');
     Route::get('/cities', [MedicalCentersController::class, 'getCitiesWithCenters'])->name('api.medical-centers.cities');
     Route::get('/all', [MedicalCentersController::class, 'getAllCenters'])->name('api.medical-centers.all');
+    Route::get('/specialties', [MedicalCentersController::class, 'getCenterSpecialties'])->name('api.medical-centers.specialties');
+    Route::get('/treatment-center-specialties', [MedicalCentersController::class, 'getTreatmentCenterSpecialties'])->name('api.medical-centers.treatment-center-specialties');
+    Route::get('/center-types', [MedicalCentersController::class, 'getCenterTypes'])->name('api.medical-centers.center-types');
 });
 
 Route::prefix('reviews')->group(function () {

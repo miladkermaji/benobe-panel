@@ -94,7 +94,11 @@ class MedicalCentersController extends Controller
      *       "name": "کلینیک نمونه",
      *       "address": "تهران، خیابان اصلی",
      *       "doctor_count": 5,
-     *       "province": "تهران"
+     *       "province": "تهران",
+     *       "province_id": 1,
+     *       "city": "تهران",
+     *       "city_id": 2,
+     *       "slug": "clinic-sample"
      *     }
      *   ]
      * }
@@ -116,7 +120,7 @@ class MedicalCentersController extends Controller
                     'province' => fn ($query) => $query->select('id', 'name'),
                     'city' => fn ($query) => $query->select('id', 'name')
                 ])
-                ->select('id', 'name', 'address', 'province_id', 'city_id')
+                ->select('id', 'name', 'address', 'province_id', 'city_id', 'slug')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -133,6 +137,7 @@ class MedicalCentersController extends Controller
                     'province_id'  => $clinic->province_id,
                     'city'         => $clinic->city ? $clinic->city->name : null,
                     'city_id'      => $clinic->city_id,
+                    'slug'         => $clinic->slug,
                 ];
             })->values();
 
@@ -165,7 +170,11 @@ class MedicalCentersController extends Controller
      *       "name": "درمانگاه نمونه",
      *       "address": "تهران، خیابان اصلی",
      *       "doctor_count": 3,
-     *       "province": "تهران"
+     *       "province": "تهران",
+     *       "province_id": 1,
+     *       "city": "تهران",
+     *       "city_id": 2,
+     *       "slug": "treatment-center-sample"
      *     }
      *   ]
      * }
@@ -187,7 +196,7 @@ class MedicalCentersController extends Controller
                     'province' => fn ($query) => $query->select('id', 'name'),
                     'city' => fn ($query) => $query->select('id', 'name')
                 ])
-                ->select('id', 'name', 'address', 'province_id', 'city_id')
+                ->select('id', 'name', 'address', 'province_id', 'city_id', 'slug')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -204,6 +213,7 @@ class MedicalCentersController extends Controller
                     'province_id'  => $treatmentCenter->province_id,
                     'city'         => $treatmentCenter->city ? $treatmentCenter->city->name : null,
                     'city_id'      => $treatmentCenter->city_id,
+                    'slug'         => $treatmentCenter->slug,
                 ];
             })->values();
 
@@ -236,7 +246,11 @@ class MedicalCentersController extends Controller
      *       "name": "مرکز تصویربرداری نمونه",
      *       "address": "تهران، خیابان اصلی",
      *       "doctor_count": 2,
-     *       "province": "تهران"
+     *       "province": "تهران",
+     *       "province_id": 1,
+     *       "city": "تهران",
+     *       "city_id": 2,
+     *       "slug": "imaging-center-sample"
      *     }
      *   ]
      * }
@@ -258,7 +272,7 @@ class MedicalCentersController extends Controller
                     'province' => fn ($query) => $query->select('id', 'name'),
                     'city' => fn ($query) => $query->select('id', 'name')
                 ])
-                ->select('id', 'name', 'address', 'province_id', 'city_id')
+                ->select('id', 'name', 'address', 'province_id', 'city_id', 'slug')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -275,6 +289,7 @@ class MedicalCentersController extends Controller
                     'province_id'  => $imagingCenter->province_id,
                     'city'         => $imagingCenter->city ? $imagingCenter->city->name : null,
                     'city_id'      => $imagingCenter->city_id,
+                    'slug'         => $imagingCenter->slug,
                 ];
             })->values();
 
@@ -307,7 +322,11 @@ class MedicalCentersController extends Controller
      *       "name": "بیمارستان نمونه",
      *       "address": "تهران، خیابان اصلی",
      *       "doctor_count": 10,
-     *       "province": "تهران"
+     *       "province": "تهران",
+     *       "province_id": 1,
+     *       "city": "تهران",
+     *       "city_id": 2,
+     *       "slug": "hospital-sample"
      *     }
      *   ]
      * }
@@ -329,7 +348,7 @@ class MedicalCentersController extends Controller
                     'province' => fn ($query) => $query->select('id', 'name'),
                     'city' => fn ($query) => $query->select('id', 'name')
                 ])
-                ->select('id', 'name', 'address', 'province_id', 'city_id')
+                ->select('id', 'name', 'address', 'province_id', 'city_id', 'slug')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -346,6 +365,7 @@ class MedicalCentersController extends Controller
                     'province_id'  => $hospital->province_id,
                     'city'         => $hospital->city ? $hospital->city->name : null,
                     'city_id'      => $hospital->city_id,
+                    'slug'         => $hospital->slug,
                 ];
             })->values();
 
@@ -378,7 +398,11 @@ class MedicalCentersController extends Controller
      *       "name": "لابراتوار نمونه",
      *       "address": "تهران، خیابان اصلی",
      *       "doctor_count": 4,
-     *       "province": "تهران"
+     *       "province": "تهران",
+     *       "province_id": 1,
+     *       "city": "تهران",
+     *       "city_id": 2,
+     *       "slug": "laboratory-sample"
      *     }
      *   ]
      * }
@@ -400,7 +424,7 @@ class MedicalCentersController extends Controller
                     'province' => fn ($query) => $query->select('id', 'name'),
                     'city' => fn ($query) => $query->select('id', 'name')
                 ])
-                ->select('id', 'name', 'address', 'province_id', 'city_id')
+                ->select('id', 'name', 'address', 'province_id', 'city_id', 'slug')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -417,6 +441,7 @@ class MedicalCentersController extends Controller
                     'province_id'  => $laboratory->province_id,
                     'city'         => $laboratory->city ? $laboratory->city->name : null,
                     'city_id'      => $laboratory->city_id,
+                    'slug'         => $laboratory->slug,
                 ];
             })->values();
 
@@ -510,7 +535,8 @@ class MedicalCentersController extends Controller
  *       "name": "درمانگاه سعدی",
  *       "type": "treatment_centers",
  *       "province": "کردستان",
- *       "avatar": "http://example.com/images/center-avatar.png"
+ *       "avatar": "http://example.com/images/center-avatar.png",
+ *       "slug": "treatment-center-saadi"
  *     }
  *   ]
  * }
@@ -529,7 +555,7 @@ class MedicalCentersController extends Controller
                 ->with([
                     'province' => fn ($q) => $q->select('id', 'name')->where('level', 1)
                 ])
-                ->select('id', 'name', 'type', 'province_id', 'avatar')
+                ->select('id', 'name', 'type', 'province_id', 'avatar', 'slug')
                 ->inRandomOrder();
 
             $centers = $query->get()->map(function ($center) {
@@ -539,6 +565,7 @@ class MedicalCentersController extends Controller
                     'type'     => $center->type,
                     'province' => $center->province ? $center->province->name : null,
                     'avatar'   => $center->avatar ? Storage::url($center->avatar) : url('/default-avatar.png'),
+                    'slug'     => $center->slug,
                 ];
             });
 
@@ -562,42 +589,66 @@ class MedicalCentersController extends Controller
         }
     }
 
-
-
-
-    public function list(Request $request)
+    /**
+     * گرفتن لیست تخصص‌های مراکز درمانی
+     *
+     * این متد لیستی از تخصص‌هایی که در مراکز درمانی فعال وجود دارند را برمی‌گرداند.
+     * پارامتر اختیاری `limit` برای محدود کردن تعداد نتایج وجود دارد (اگر مشخص نشود، همه را برمی‌گرداند).
+     * پارامتر اختیاری `center_type` برای فیلتر کردن بر اساس نوع مرکز درمانی.
+     *
+     * @queryParam limit integer تعداد آیتم‌ها (اختیاری، اگر نباشد همه برگردانده می‌شود)
+     * @queryParam center_type string نوع مرکز درمانی (اختیاری، hospital, treatment_centers, clinic, imaging_center, laboratory, pharmacy, policlinic)
+     * @response 200 {
+     *   "status": "success",
+     *   "data": [
+     *     {
+     *       "id": 1,
+     *       "name": "قلب و عروق",
+     *       "description": "تخصص در درمان بیماری‌های قلب و عروق",
+     *       "center_count": 15,
+     *       "provinces": [
+     *         {
+     *           "id": 1,
+     *           "name": "تهران"
+     *         }
+     *       ],
+     *       "cities": [
+     *         {
+     *           "id": 2,
+     *           "name": "تهران"
+     *         }
+     *       ]
+     *     }
+     *   ]
+     * }
+     * @response 422 {
+     *   "status": "error",
+     *   "message": "خطا در اعتبارسنجی",
+     *   "errors": {
+     *     "center_type": ["نوع مرکز معتبر نیست."]
+     *   }
+     * }
+     * @response 500 {
+     *   "status": "error",
+     *   "message": "خطای سرور",
+     *   "data": null
+     * }
+     */
+    public function getCenterSpecialties(Request $request)
     {
         try {
-            // لاگ درخواست
-            Log::info('درخواست لیست مراکز درمانی', ['params' => $request->all()]);
-
             // اعتبارسنجی ورودی‌ها
             $validator = Validator::make($request->all(), [
-                'province_id' => 'nullable|exists:zone,id',
-                'city_id' => 'nullable|exists:zone,id',
+                'limit' => 'nullable|integer|min:1|max:100',
                 'center_type' => 'nullable|in:hospital,treatment_centers,clinic,imaging_center,laboratory,pharmacy,policlinic',
-                'specialty_ids' => 'sometimes|nullable|string|exists:specialties,id',
-                'insurance_ids' => 'sometimes|nullable|string|exists:insurances,id',
-                'service_ids' => 'sometimes|nullable|string|exists:services,id',
-                'tariff_type' => 'nullable|in:governmental,special,else',
-                'sort_by' => 'nullable|in:average_rating,reviews_count',
-                'sort_direction' => 'nullable|in:asc,desc',
-                'per_page' => 'nullable|integer|min:1|max:100',
             ], [
-                'province_id.exists' => 'استان انتخاب‌شده معتبر نیست.',
-                'city_id.exists' => 'شهر انتخاب‌شده معتبر نیست.',
+                'limit.integer' => 'تعداد آیتم‌ها باید عدد باشد.',
+                'limit.min' => 'تعداد آیتم‌ها باید حداقل ۱ باشد.',
+                'limit.max' => 'تعداد آیتم‌ها نمی‌تواند بیشتر از ۱۰۰ باشد.',
                 'center_type.in' => 'نوع مرکز معتبر نیست.',
-                'specialty_ids.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
-                'insurance_ids.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
-                'service_ids.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
-                'tariff_type.in' => 'نوع تعرفه معتبر نیست.',
-                'sort_by.in' => 'معیار مرتب‌سازی معتبر نیست.',
-                'sort_direction.in' => 'جهت مرتب‌سازی معتبر نیست.',
-                'per_page.integer' => 'تعداد در هر صفحه باید عدد باشد.',
             ]);
 
             if ($validator->fails()) {
-                Log::warning('خطا در اعتبارسنجی ورودی‌ها', ['errors' => $validator->errors()]);
                 return response()->json([
                     'status' => 'error',
                     'message' => 'خطا در اعتبارسنجی',
@@ -605,159 +656,302 @@ class MedicalCentersController extends Controller
                 ], 422);
             }
 
-            // فیلترها
-            $filters = [
-                'province_id' => $request->input('province_id'),
-                'city_id' => $request->input('city_id'),
-                'center_type' => $request->input('center_type'),
-                'specialty_ids' => $request->has('specialty_ids') ? (is_array($request->input('specialty_ids')) ? $request->input('specialty_ids') : [$request->input('specialty_ids')]) : null,
-                'insurance_ids' => $request->has('insurance_ids') ? (is_array($request->input('insurance_ids')) ? $request->input('insurance_ids') : [$request->input('insurance_ids')]) : null,
-                'service_ids' => $request->has('service_ids') ? (is_array($request->input('service_ids')) ? $request->input('service_ids') : [$request->input('service_ids')]) : null,
-                'tariff_type' => $request->input('tariff_type'),
-            ];
+            $limit = $request->input('limit');
+            $centerType = $request->input('center_type');
 
-            // لاگ فیلترها
-            Log::info('فیلترهای اعمال‌شده', ['filters' => $filters]);
+            // گرفتن تمام تخصص‌های موجود در مراکز درمانی فعال
+            $query = MedicalCenter::where('is_active', 1)
+                ->whereNotNull('specialty_ids')
+                ->where('specialty_ids', '!=', '[]')
+                ->with([
+                    'province' => fn ($query) => $query->select('id', 'name'),
+                    'city' => fn ($query) => $query->select('id', 'name')
+                ])
+                ->select('id', 'name', 'specialty_ids', 'province_id', 'city_id', 'type');
 
-            // مرتب‌سازی
-            $sortBy = $request->input('sort_by', 'average_rating');
-            $sortDirection = $request->input('sort_direction', 'desc');
-            $perPage = $request->input('per_page', 10);
+            // فیلتر بر اساس نوع مرکز اگر مشخص شده باشد
+            if ($centerType) {
+                $query->where('type', $centerType);
+            }
 
-            // کوئری برای مراکز درمانی
-            $query = MedicalCenter::query()
-                ->active()
-                ->with(['province', 'city', 'doctors'])
-                ->filter($filters)
-                ->orderBy($sortBy, $sortDirection);
+            $medicalCenters = $query->get();
 
-            // لاگ تعداد مراکز
-            Log::info('تعداد مراکز درمانی قبل از صفحه‌بندی', ['count' => $query->count()]);
+            // استخراج تمام آیدی‌های تخصص‌ها
+            $allSpecialtyIds = [];
+            foreach ($medicalCenters as $center) {
+                if (is_array($center->specialty_ids)) {
+                    $allSpecialtyIds = array_merge($allSpecialtyIds, $center->specialty_ids);
+                }
+            }
 
-            // صفحه‌بندی
-            $medicalCenters = $query->paginate($perPage);
+            // حذف آیدی‌های تکراری
+            $uniqueSpecialtyIds = array_unique($allSpecialtyIds);
 
-            // دریافت لیست استان‌ها (با کش)
-            $provinces = Cache::remember('medical_centers_provinces', 1440, function () {
-                $provinces = Zone::where('level', 1)
-                    ->where('status', 1)
-                    ->select('id', 'name')
-                    ->orderBy('name')
-                    ->get();
-                Log::info('تعداد استان‌ها', ['count' => $provinces->count()]);
-                return $provinces;
-            });
+            if (empty($uniqueSpecialtyIds)) {
+                return response()->json([
+                    'status' => 'success',
+                    'data'   => [],
+                    'filters' => [
+                        'center_type' => $centerType,
+                        'total_centers' => $medicalCenters->count(),
+                    ]
+                ], 200);
+            }
 
-            // دریافت لیست شهرها (با کش)
-            $cities = Cache::remember('medical_centers_cities', 1440, function () {
-                $cities = Zone::where('level', 2)
-                    ->where('status', 1)
-                    ->select('id', 'name', 'parent_id as province_id')
-                    ->orderBy('name')
-                    ->get();
-                Log::info('تعداد شهرها', ['count' => $cities->count()]);
-                return $cities;
-            });
+            // گرفتن اطلاعات تخصص‌ها
+            $specialties = Specialty::whereIn('id', $uniqueSpecialtyIds)
+                ->where('status', 1)
+                ->select('id', 'name', 'description')
+                ->orderBy('name')
+                ->get();
 
-            // دریافت لیست تخصص‌ها (با کش)
-            $specialties = Cache::remember('medical_centers_specialties', 1440, function () {
-                $specialties = Specialty::where('status', 1)
-                    ->select('id', 'name')
-                    ->orderBy('name')
-                    ->get();
-                Log::info('تعداد تخصص‌ها', ['count' => $specialties->count()]);
-                return $specialties;
-            });
+            // محاسبه تعداد مراکز برای هر تخصص
+            $formattedSpecialties = $specialties->map(function ($specialty) use ($medicalCenters) {
+                $centerCount = 0;
+                $provinces = [];
+                $cities = [];
 
-            // دریافت لیست بیمه‌ها (با کش)
-            $insurances = Cache::remember('medical_centers_insurances', 1440, function () {
-                $insurances = Insurance::where('status', 1)
-                    ->select('id', 'name')
-                    ->orderBy('name')
-                    ->get();
-                Log::info('تعداد بیمه‌ها', ['count' => $insurances->count()]);
-                return $insurances;
-            });
+                foreach ($medicalCenters as $center) {
+                    if (is_array($center->specialty_ids) && in_array($specialty->id, $center->specialty_ids)) {
+                        $centerCount++;
 
-            // دریافت لیست خدمات (با کش)
-            $services = Cache::remember('medical_centers_services', 1440, function () {
-                $services = Service::where('status', true)
-                    ->select('id', 'name')
-                    ->orderBy('name')
-                    ->get();
-                Log::info('تعداد خدمات', ['count' => $services->count()]);
-                return $services;
-            });
+                        // جمع‌آوری استان‌ها و شهرها
+                        if ($center->province) {
+                            $provinces[$center->province_id] = [
+                                'id' => $center->province_id,
+                                'name' => $center->province->name
+                            ];
+                        }
 
-            // لیست انواع مراکز
-            $centerTypes = [
-                'hospital' => 'بیمارستان',
-                'treatment_centers' => 'مراکز درمانی',
-                'clinic' => 'کلینیک',
-                'imaging_center' => 'مرکز تصویربرداری',
-                'laboratory' => 'آزمایشگاه',
-                'pharmacy' => 'داروخانه',
-                'policlinic' => 'پلی‌کلینیک',
-            ];
+                        if ($center->city) {
+                            $cities[$center->city_id] = [
+                                'id' => $center->city_id,
+                                'name' => $center->city->name
+                            ];
+                        }
+                    }
+                }
 
-            // لیست انواع تعرفه‌ها
-            $tariffTypes = [
-                'governmental' => 'دولتی',
-                'special' => 'ویژه',
-                'else' => 'سایر',
-            ];
+                return [
+                    'id'           => $specialty->id,
+                    'name'         => $specialty->name,
+                    'description'  => $specialty->description,
+                    'center_count' => $centerCount,
+                    'provinces'    => array_values($provinces),
+                    'cities'       => array_values($cities),
+                ];
+            })->values();
 
-            // پاسخ
+            // اعمال محدودیت تعداد اگر مشخص شده باشد
+            if ($limit !== null) {
+                $formattedSpecialties = $formattedSpecialties->take($limit);
+            }
+
             return response()->json([
                 'status' => 'success',
-                'message' => 'لیست مراکز درمانی و اطلاعات فیلترها با موفقیت دریافت شد.',
-                'data' => [
-                    'medical_centers' => MedicalCenterResource::collection($medicalCenters),
-                    'zones' => [
-                        'provinces' => ZoneResource::collection($provinces),
-                        'cities' => ZoneResource::collection($cities),
-                    ],
-                    'specialties' => SpecialtyResource::collection($specialties),
-                    'insurances' => InsuranceResource::collection($insurances),
-                    'services' => ServiceResource::collection($services),
-                    'center_types' => $centerTypes,
-                    'tariff_types' => $tariffTypes,
-                ],
-                'pagination' => [
-                    'current_page' => $medicalCenters->currentPage(),
-                    'last_page' => $medicalCenters->lastPage(),
-                    'per_page' => $medicalCenters->perPage(),
-                    'total' => $medicalCenters->total(),
-                ],
+                'data'   => $formattedSpecialties,
+                'filters' => [
+                    'center_type' => $centerType,
+                    'total_centers' => $medicalCenters->count(),
+                    'total_specialties' => $formattedSpecialties->count(),
+                ]
             ], 200);
+
         } catch (\Exception $e) {
-            Log::error('خطا در دریافت لیست مراکز درمانی و اطلاعات فیلترها: ' . $e->getMessage());
+            Log::error('GetCenterSpecialties - Error: ' . $e->getMessage());
             return response()->json([
-                'status' => 'error',
-                'message' => 'خطایی در سرور رخ داد. لطفاً دوباره تلاش کنید.',
+                'status'  => 'error',
+                'message' => 'خطای سرور',
+                'data'    => null,
             ], 500);
         }
     }
 
-    public function getProfile($slug)
+    /**
+     * گرفتن لیست انواع مراکز درمانی برای کشویی
+     *
+     * این متد لیستی از انواع مراکز درمانی موجود را برای استفاده در کشویی برمی‌گرداند.
+     *
+     * @response 200 {
+     *   "status": "success",
+     *   "data": [
+     *     {
+     *       "value": "hospital",
+     *       "label": "بیمارستان"
+     *     },
+     *     {
+     *       "value": "treatment_centers",
+     *       "label": "مراکز درمانی"
+     *     }
+     *   ]
+     * }
+     * @response 500 {
+     *   "status": "error",
+     *   "message": "خطای سرور",
+     *   "data": null
+     * }
+     */
+    public function getCenterTypes()
     {
         try {
-            $medicalCenter = MedicalCenter::where('slug', $slug)
-                ->active()
-                ->with(['province', 'city', 'doctors'])
-                ->firstOrFail();
+            $centerTypes = [
+                ['value' => 'hospital', 'label' => 'بیمارستان'],
+                ['value' => 'treatment_centers', 'label' => 'مراکز درمانی'],
+                ['value' => 'clinic', 'label' => 'کلینیک'],
+                ['value' => 'imaging_center', 'label' => 'مرکز تصویربرداری'],
+                ['value' => 'laboratory', 'label' => 'آزمایشگاه'],
+                ['value' => 'pharmacy', 'label' => 'داروخانه'],
+                ['value' => 'policlinic', 'label' => 'پلی‌کلینیک'],
+            ];
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'اطلاعات مرکز درمانی با موفقیت دریافت شد.',
-                'data' => new MedicalCenterResource($medicalCenter),
+                'data'   => $centerTypes,
             ], 200);
+
         } catch (\Exception $e) {
-            Log::error('خطا در دریافت پروفایل مرکز درمانی: ' . $e->getMessage());
+            Log::error('GetCenterTypes - Error: ' . $e->getMessage());
             return response()->json([
-                'status' => 'error',
-                'message' => 'مرکز درمانی یافت نشد یا خطایی رخ داد.',
-            ], 404);
+                'status'  => 'error',
+                'message' => 'خطای سرور',
+                'data'    => null,
+            ], 500);
+        }
+    }
+
+    /**
+     * گرفتن لیست تخصص‌های درمانگاه‌ها
+     *
+     * این متد لیستی از تخصص‌هایی که در درمانگاه‌های فعال وجود دارند را برمی‌گرداند.
+     * پارامتر اختیاری `limit` برای محدود کردن تعداد نتایج وجود دارد (اگر مشخص نشود، همه را برمی‌گرداند).
+     *
+     * @queryParam limit integer تعداد آیتم‌ها (اختیاری، اگر نباشد همه برگردانده می‌شود)
+     * @response 200 {
+     *   "status": "success",
+     *   "data": [
+     *     {
+     *       "id": 1,
+     *       "name": "قلب و عروق",
+     *       "description": "تخصص در درمان بیماری‌های قلب و عروق",
+     *       "center_count": 8,
+     *       "provinces": [
+     *         {
+     *           "id": 1,
+     *           "name": "تهران"
+     *         }
+     *       ],
+     *       "cities": [
+     *         {
+     *           "id": 2,
+     *           "name": "تهران"
+     *         }
+     *       ]
+     *     }
+     *   ]
+     * }
+     * @response 500 {
+     *   "status": "error",
+     *   "message": "خطای سرور",
+     *   "data": null
+     * }
+     */
+    public function getTreatmentCenterSpecialties(Request $request)
+    {
+        try {
+            $limit = $request->has('limit') ? (int) $request->input('limit') : null;
+
+            // گرفتن تمام تخصص‌های موجود در درمانگاه‌های فعال
+            $query = MedicalCenter::where('is_active', 1)
+                ->where('type', 'treatment_centers')
+                ->whereNotNull('specialty_ids')
+                ->where('specialty_ids', '!=', '[]')
+                ->with([
+                    'province' => fn ($query) => $query->select('id', 'name'),
+                    'city' => fn ($query) => $query->select('id', 'name')
+                ])
+                ->select('id', 'name', 'specialty_ids', 'province_id', 'city_id');
+
+            $treatmentCenters = $query->get();
+
+            // استخراج تمام آیدی‌های تخصص‌ها
+            $allSpecialtyIds = [];
+            foreach ($treatmentCenters as $center) {
+                if (is_array($center->specialty_ids)) {
+                    $allSpecialtyIds = array_merge($allSpecialtyIds, $center->specialty_ids);
+                }
+            }
+
+            // حذف آیدی‌های تکراری
+            $uniqueSpecialtyIds = array_unique($allSpecialtyIds);
+
+            if (empty($uniqueSpecialtyIds)) {
+                return response()->json([
+                    'status' => 'success',
+                    'data'   => [],
+                ], 200);
+            }
+
+            // گرفتن اطلاعات تخصص‌ها
+            $specialties = Specialty::whereIn('id', $uniqueSpecialtyIds)
+                ->where('status', 1)
+                ->select('id', 'name', 'description')
+                ->orderBy('name')
+                ->get();
+
+            // محاسبه تعداد مراکز برای هر تخصص
+            $formattedSpecialties = $specialties->map(function ($specialty) use ($treatmentCenters) {
+                $centerCount = 0;
+                $provinces = [];
+                $cities = [];
+
+                foreach ($treatmentCenters as $center) {
+                    if (is_array($center->specialty_ids) && in_array($specialty->id, $center->specialty_ids)) {
+                        $centerCount++;
+
+                        // جمع‌آوری استان‌ها و شهرها
+                        if ($center->province) {
+                            $provinces[$center->province_id] = [
+                                'id' => $center->province_id,
+                                'name' => $center->province->name
+                            ];
+                        }
+
+                        if ($center->city) {
+                            $cities[$center->city_id] = [
+                                'id' => $center->city_id,
+                                'name' => $center->city->name
+                            ];
+                        }
+                    }
+                }
+
+                return [
+                    'id'           => $specialty->id,
+                    'name'         => $specialty->name,
+                    'description'  => $specialty->description,
+                    'center_count' => $centerCount,
+                    'provinces'    => array_values($provinces),
+                    'cities'       => array_values($cities),
+                ];
+            })->values();
+
+            // اعمال محدودیت تعداد اگر مشخص شده باشد
+            if ($limit !== null) {
+                $formattedSpecialties = $formattedSpecialties->take($limit);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data'   => $formattedSpecialties,
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('GetTreatmentCenterSpecialties - Error: ' . $e->getMessage());
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'خطای سرور',
+                'data'    => null,
+            ], 500);
         }
     }
 }
