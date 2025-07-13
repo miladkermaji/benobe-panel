@@ -1651,18 +1651,28 @@ class AppointmentsList extends Component
                     $dateJalali = Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d');
                     $dayName = Jalalian::fromDateTime($appointment->appointment_date)->format("l");
                     $time = Carbon::parse($appointment->appointment_time)->format('H:i');
+
+                    // بررسی فیلد fee برای نمایش متن بازگشت مبلغ
                     $fee = $appointment->fee ?? 0;
-                    $refundText = $fee > 0 ? 'و مبلغ ' . number_format($fee) . ' ریال به حساب شما به زودی بازگردانده می‌شود.' : '';
+                    $refundText = '';
+                    if ($fee > 0) {
+                        $refundText = 'و مبلغ ' . number_format($fee) . ' ریال به حساب شما به زودی بازگردانده می‌شود.';
+                    }
+
                     $link = 'https://emr-benobe.ir/doctors';
                     $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
                     $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
                     $templateId = 100283;
+
+                    // فقط متن بازگشت مبلغ (بدون نام پزشک)
+                    $doctorText = $refundText;
+
                     $params = [
                         $user->first_name . ' ' . $user->last_name,
                         $dateJalali,
                         $dayName,
                         $time,
-                        $doctorName . ($refundText ? '، ' . $refundText : ''),
+                        $doctorText,
                         $link
                     ];
                     $message = "کاربر گرامی {0} نوبت تاریخ {1} روز {2} ساعت {3} توسط پزشک {4} لغو گردید، برای دریافت مجدد نوبت به لینک زیر مراجعه کنید. {5}";
