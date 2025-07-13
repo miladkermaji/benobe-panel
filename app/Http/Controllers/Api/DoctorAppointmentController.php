@@ -614,11 +614,9 @@ class DoctorAppointmentController extends Controller
                 }
                 // بررسی appointment_settings برای max_appointments یا duration
                 $appointmentSettings = is_string($specialSchedule->appointment_settings) ? json_decode($specialSchedule->appointment_settings, true) : $specialSchedule->appointment_settings;
+                $duration = $this->getAppointmentDuration($appointmentSettings, $dayName, $defaultDuration);
                 if (!empty($appointmentSettings) && isset($appointmentSettings[0]['max_appointments'])) {
                     $maxAppointments = $appointmentSettings[0]['max_appointments'];
-                }
-                if (!empty($appointmentSettings) && isset($appointmentSettings[0]['appointment_duration']) && $appointmentSettings[0]['appointment_duration'] > 0) {
-                    $duration = $appointmentSettings[0]['appointment_duration'];
                 }
             } else {
                 $schedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
@@ -633,11 +631,9 @@ class DoctorAppointmentController extends Controller
                     }
                     // بررسی appointment_settings برای max_appointments یا duration
                     $appointmentSettings = is_string($schedule->appointment_settings) ? json_decode($schedule->appointment_settings, true) : $schedule->appointment_settings;
+                    $duration = $this->getAppointmentDuration($appointmentSettings, $dayName, $defaultDuration);
                     if (!empty($appointmentSettings) && isset($appointmentSettings['max_appointments'])) {
                         $maxAppointments = $appointmentSettings['max_appointments'];
-                    }
-                    if (!empty($appointmentSettings) && isset($appointmentSettings['appointment_duration']) && $appointmentSettings['appointment_duration'] > 0) {
-                        $duration = $appointmentSettings['appointment_duration'];
                     }
                 }
             }
@@ -803,5 +799,36 @@ class DoctorAppointmentController extends Controller
             'next_available_datetime' => $nextAvailableDateTime,
             'slots' => $slots,
         ];
+    }
+
+    /**
+     * استخراج مدت زمان نوبت از appointment_settings برای روز مشخص
+     * پشتیبانی از فرمت‌های قدیمی و جدید
+     */
+    private function getAppointmentDuration($appointmentSettings, $dayOfWeek, $defaultDuration = 15)
+    {
+        if (empty($appointmentSettings)) {
+            return $defaultDuration;
+        }
+
+        // فرمت جدید: هر آیتم شامل 'day' field
+        if (isset($appointmentSettings[0]['day'])) {
+            // پیدا کردن تنظیمات برای روز فعلی
+            foreach ($appointmentSettings as $setting) {
+                if (isset($setting['day']) && $setting['day'] === $dayOfWeek) {
+                    return $setting['appointment_duration'] ?? $defaultDuration;
+                }
+            }
+            return $defaultDuration;
+        }
+
+        // فرمت قدیمی: هر آیتم شامل 'days' array
+        foreach ($appointmentSettings as $setting) {
+            if (isset($setting['days']) && is_array($setting['days']) && in_array($dayOfWeek, $setting['days'])) {
+                return $setting['appointment_duration'] ?? $defaultDuration;
+            }
+        }
+
+        return $defaultDuration;
     }
 }
