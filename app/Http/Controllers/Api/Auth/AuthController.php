@@ -593,6 +593,15 @@ class AuthController extends Controller
                 unset($updateData[$field]);
             }
         }
+        // تبدیل تاریخ تولد شمسی به میلادی اگر مقدار داشت
+        if (isset($updateData['date_of_birth']) && !empty($updateData['date_of_birth'])) {
+            try {
+                // اگر پکیج morilog/jalali نصب است
+                $updateData['date_of_birth'] = \Morilog\Jalali\Jalalian::fromFormat('Y-m-d', $updateData['date_of_birth'])->toCarbon()->format('Y-m-d');
+            } catch (\Exception $e) {
+                // اگر تبدیل نشد، مقدار را تغییر نده
+            }
+        }
         $updateData = array_filter($updateData, fn ($value) => $value !== null);
 
         // Update the primary model
@@ -608,10 +617,19 @@ class AuthController extends Controller
             $userForSync->update($userUpdateData);
         }
 
+        // بازگرداندن اطلاعات استان و شهر به صورت relation
+        $relations = [];
+        if (method_exists($model, 'zoneCity')) {
+            $relations[] = 'zoneCity';
+        }
+        if (method_exists($model, 'zoneProvince')) {
+            $relations[] = 'zoneProvince';
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'اطلاعات با موفقیت به‌روزرسانی شد',
-            'data' => ['user' => $model->fresh()],
+            'data' => ['user' => $model->fresh($relations)],
         ], 200);
     }
 }
