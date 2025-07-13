@@ -339,7 +339,6 @@ class DoctorProfileController extends Controller
             ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
             ->get();
 
-
         $slots = [];
         $nextAvailableSlot = null;
 
@@ -350,32 +349,26 @@ class DoctorProfileController extends Controller
             $jalaliDate = Jalalian::fromCarbon($checkDate)->format('j F Y');
             $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
 
-
-
             $dayAppointments = $bookedAppointments->filter(function ($appointment) use ($checkDate) {
                 return Carbon::parse($appointment->appointment_date)->isSameDay($checkDate);
             });
-
 
             $activeSlots = [];
             $inactiveSlots = [];
 
             foreach ($schedules as $schedule) {
                 if ($schedule->day !== $dayName) {
-
                     continue;
                 }
 
                 $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
                 if (!is_array($workHours) || empty($workHours)) {
-
                     continue;
                 }
                 $workHour = $workHours[0];
 
                 $startTime = Carbon::parse("{$checkDate->toDateString()} {$workHour['start']}", 'Asia/Tehran');
                 $endTime = Carbon::parse("{$checkDate->toDateString()} {$workHour['end']}", 'Asia/Tehran');
-
 
                 $currentTime = $startTime->copy();
                 while ($currentTime->lessThan($endTime)) {
@@ -429,10 +422,17 @@ class DoctorProfileController extends Controller
             }
         }
 
+        // استفاده از helper function برای استخراج max_appointments
+        $appointmentSettings = $schedules->first()->appointment_settings ?? [];
+        if (is_string($appointmentSettings)) {
+            $appointmentSettings = json_decode($appointmentSettings, true) ?? [];
+        }
+        $maxAppointments = $this->getMaxAppointmentsFromSettings($appointmentSettings, 22);
+
         $result = [
             'next_available_slot' => $nextAvailableSlot,
             'slots' => $slots,
-            'max_appointments' => $schedules->first()->appointment_settings[0]['max_appointments'] ?? 22,
+            'max_appointments' => $maxAppointments,
         ];
 
         return $result;
@@ -445,8 +445,6 @@ class DoctorProfileController extends Controller
         $now = Carbon::now('Asia/Tehran');
         $daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         $currentDayIndex = $today->dayOfWeek;
-
-
 
         $counselingConfig = DoctorCounselingConfig::where('doctor_id', $doctorId)->first();
         $calendarDays = $counselingConfig ? ($counselingConfig->calendar_days ?? 30) : 30;
@@ -469,7 +467,6 @@ class DoctorProfileController extends Controller
             ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
             ->get();
 
-
         $slots = [];
         $nextAvailableSlot = null;
 
@@ -480,33 +477,27 @@ class DoctorProfileController extends Controller
             $jalaliDate = Jalalian::fromCarbon($checkDate)->format('j F Y');
             $persianDayName = Jalalian::fromCarbon($checkDate)->format('l');
 
-
-
             // فیلتر کردن نوبت‌ها برای این روز خاص
             $dayAppointments = $bookedAppointments->filter(function ($appointment) use ($checkDate) {
                 return Carbon::parse($appointment->appointment_date)->isSameDay($checkDate);
             });
-
 
             $activeSlots = [];
             $inactiveSlots = [];
 
             foreach ($schedules as $schedule) {
                 if ($schedule->day !== $dayName) {
-
                     continue;
                 }
 
                 $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
                 if (!is_array($workHours) || empty($workHours)) {
-
                     continue;
                 }
                 $workHour = $workHours[0];
 
                 $startTime = Carbon::parse("{$checkDate->toDateString()} {$workHour['start']}", 'Asia/Tehran');
                 $endTime = Carbon::parse("{$checkDate->toDateString()} {$workHour['end']}", 'Asia/Tehran');
-
 
                 $currentTime = $startTime->copy();
                 while ($currentTime->lessThan($endTime)) {
