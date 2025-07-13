@@ -587,6 +587,12 @@ class AuthController extends Controller
 
         // Get only the valid fields from the request
         $updateData = $request->only(array_keys($commonFields));
+        // جلوگیری از پاک شدن مقدار قبلی شهر و استان در صورت ارسال null یا خالی
+        foreach (["zone_city_id", "zone_province_id"] as $field) {
+            if (array_key_exists($field, $updateData) && ($updateData[$field] === null || $updateData[$field] === '')) {
+                unset($updateData[$field]);
+            }
+        }
         $updateData = array_filter($updateData, fn ($value) => $value !== null);
 
         // Update the primary model
