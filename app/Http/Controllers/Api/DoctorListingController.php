@@ -298,7 +298,7 @@ class DoctorListingController extends Controller
 
         $appointmentConfig = $doctor->appointmentConfig;
         $calendarDays      = $appointmentConfig ? ($appointmentConfig->calendar_days ?? 30) : 30;
-        $duration          = $appointmentConfig ? ($appointmentConfig->appointment_duration ?? 15) : 15;
+        $defaultDuration   = $appointmentConfig ? ($appointmentConfig->appointment_duration ?? 15) : 15;
 
         $schedules = $doctor->workSchedules;
         if ($schedules->isEmpty()) {
@@ -316,6 +316,15 @@ class DoctorListingController extends Controller
         $slots             = [];
         $nextAvailableSlot = null;
         $nextAvailableSlotGregorian = null;
+
+        // فیکس کردن مشکل appointment_settings - اطمینان از decode شدن
+        $firstSchedule = $schedules->first();
+        $appointmentSettings = $firstSchedule ? (
+            is_string($firstSchedule->appointment_settings)
+                ? json_decode($firstSchedule->appointment_settings, true)
+                : $firstSchedule->appointment_settings
+        ) : [];
+        $maxAppointments = $this->getMaxAppointmentsFromSettings($appointmentSettings);
 
         for ($i = 0; $i < $calendarDays; $i++) {
             $checkDayIndex  = ($currentDayIndex + $i) % 7;
@@ -338,6 +347,10 @@ class DoctorListingController extends Controller
                     continue;
                 }
                 $workHour = $workHours[0];
+
+                // استفاده از تابع کمکی برای استخراج duration
+                $appointmentSettings = is_string($schedule->appointment_settings) ? json_decode($schedule->appointment_settings, true) : $schedule->appointment_settings;
+                $duration = $this->getAppointmentDuration($appointmentSettings, $dayName, $defaultDuration);
 
                 $startTime = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['start'], 'Asia/Tehran');
                 $endTime   = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['end'], 'Asia/Tehran');
@@ -396,7 +409,71 @@ class DoctorListingController extends Controller
             'next_available_slot' => $nextAvailableSlot,
             'next_available_slot_gregorian' => $nextAvailableSlotGregorian,
             'slots'               => $slots,
-            'max_appointments'    => $schedules->first()->appointment_settings[0]['max_appointments'] ?? 22,
+            'max_appointments'    => $maxAppointments,
         ];
+    }
+
+    /**
+     * استخراج مدت زمان نوبت از appointment_settings برای روز مشخص
+     * پشتیبانی از فرمت‌های قدیمی و جدید
+     */
+    private function getAppointmentDuration($appointmentSettings, $dayOfWeek, $defaultDuration = 15)
+    {
+        // اطمینان از اینکه appointmentSettings آرایه است
+        if (empty($appointmentSettings) || !is_array($appointmentSettings)) {
+            return $defaultDuration;
+        }
+
+        // فرمت جدید: هر آیتم شامل 'day' field
+        if (isset($appointmentSettings[0]['day'])) {
+            // پیدا کردن تنظیمات برای روز فعلی
+            foreach ($appointmentSettings as $setting) {
+                if (is_array($setting) && isset($setting['day']) && $setting['day'] === $dayOfWeek) {
+                    return $setting['appointment_duration'] ?? $defaultDuration;
+                }
+            }
+            return $defaultDuration;
+        }
+
+        // فرمت قدیمی: هر آیتم شامل 'days' array
+        foreach ($appointmentSettings as $setting) {
+            if (is_array($setting) && isset($setting['days']) && is_array($setting['days']) && in_array($dayOfWeek, $setting['days'])) {
+                return $setting['appointment_duration'] ?? $defaultDuration;
+            }
+        }
+
+        return $defaultDuration;
+    }
+
+    /**
+     * استخراج حداکثر تعداد نوبت از appointment_settings
+     * پشتیبانی از فرمت‌های قدیمی و جدید
+     */
+    private function getMaxAppointmentsFromSettings($appointmentSettings, $defaultMaxAppointments = 22)
+    {
+        // اطمینان از اینکه appointmentSettings آرایه است
+        if (empty($appointmentSettings) || !is_array($appointmentSettings)) {
+            return $defaultMaxAppointments;
+        }
+
+        // فرمت جدید: هر آیتم شامل 'day' field
+        if (isset($appointmentSettings[0]['day'])) {
+            // پیدا کردن اولین تنظیمات که max_appointments داشته باشد
+            foreach ($appointmentSettings as $setting) {
+                if (is_array($setting) && isset($setting['max_appointments']) && $setting['max_appointments'] > 0) {
+                    return $setting['max_appointments'];
+                }
+            }
+            return $defaultMaxAppointments;
+        }
+
+        // فرمت قدیمی: هر آیتم شامل 'days' array
+        foreach ($appointmentSettings as $setting) {
+            if (is_array($setting) && isset($setting['max_appointments']) && $setting['max_appointments'] > 0) {
+                return $setting['max_appointments'];
+            }
+        }
+
+        return $defaultMaxAppointments;
     }
 }
