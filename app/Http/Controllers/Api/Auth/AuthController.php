@@ -626,10 +626,19 @@ class AuthController extends Controller
             $relations[] = 'zoneProvince';
         }
 
+        $user = $model->fresh($relations);
+        if ($user->date_of_birth) {
+            try {
+                $user->date_of_birth_jalali = \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($user->date_of_birth))->format('Y/m/d');
+            } catch (\Exception $e) {
+                $user->date_of_birth_jalali = null;
+            }
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'اطلاعات با موفقیت به‌روزرسانی شد',
-            'data' => ['user' => $model->fresh($relations)],
+            'data' => ['user' => $user],
         ], 200);
     }
 }
