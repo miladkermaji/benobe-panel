@@ -54,7 +54,7 @@ class MedicalCentersController extends Controller
     {
         try {
             $clinicsCount          = MedicalCenter::where('is_active', 1)->where('type', 'clinic')->count();
-            $treatmentCentersCount = MedicalCenter::where('is_active', 1)->where('type', 'treatment_center')->count();
+            $treatmentCentersCount = MedicalCenter::where('is_active', 1)->where('type', 'treatment_centers')->count();
             $imagingCentersCount   = MedicalCenter::where('is_active', 1)->where('type', 'imaging_center')->count();
             $hospitalsCount        = MedicalCenter::where('is_active', 1)->where('type', 'hospital')->count();
             $laboratoriesCount     = MedicalCenter::where('is_active', 1)->where('type', 'laboratory')->count();
@@ -175,7 +175,7 @@ class MedicalCentersController extends Controller
             $limit = $request->has('limit') ? (int) $request->input('limit') : null;
 
             $treatmentCenters = MedicalCenter::where('is_active', 1)
-            ->where('type', 'treatment_center')
+            ->where('type', 'treatment_centers')
                 ->withCount('doctor')
                 ->with(['province' => fn ($query) => $query->select('id', 'name')])
                 ->select('id', 'name', 'address', 'province_id')

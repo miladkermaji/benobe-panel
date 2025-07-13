@@ -41,7 +41,7 @@ class TreatmentCenterCreate extends Component
     public $documents = [];
     public $phone_numbers = [''];
     public $location_confirmed = false;
-    public $type = 'treatmentCenter';
+    public $type = 'treatment_centers';
 
     public $doctors = [];
     public $specialties = [];
@@ -68,7 +68,7 @@ class TreatmentCenterCreate extends Component
     {
         $this->cities = Zone::where('level', 2)->where('parent_id', $value)->get();
         $this->city_id = null;
-        $this->dispatch('refresh-select2', cities: $this->cities->toArray());
+        $this->dispatch('refresh-select2', cities: $this->cities);
     }
 
     public function addPhoneNumber()
@@ -111,7 +111,7 @@ class TreatmentCenterCreate extends Component
             'phone_numbers' => 'nullable|array',
             'phone_numbers.*' => 'string|regex:/^09[0-9]{9}$/',
             'location_confirmed' => 'boolean',
-            'type' => 'required|in:treatmentCenter,treatment_centers,clinic,imaging_center,treatmentCenter,pharmacy',
+            'type' => 'required|in:hospital,treatment_centers,clinic,imaging_center,laboratory,pharmacy,policlinic',
             'specialty_ids' => 'nullable|array',
             'specialty_ids.*' => 'exists:specialties,id',
             'insurance_ids' => 'nullable|array',

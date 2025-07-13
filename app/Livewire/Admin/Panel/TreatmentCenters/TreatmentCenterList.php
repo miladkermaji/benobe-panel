@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class TreatmentCenterList extends Component
 {
-     use WithPagination;
+    use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -158,7 +158,7 @@ class TreatmentCenterList extends Component
 
     private function getTreatmentCentersQuery()
     {
-        return MedicalCenter::where('type', 'treatmentCenter')
+        return MedicalCenter::where('type', 'treatment_centers')
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('description', 'like', '%' . $this->search . '%')
@@ -174,8 +174,8 @@ class TreatmentCenterList extends Component
         // بارگذاری تخصص‌ها و بیمه‌ها برای استفاده در قالب
         $specialties = Specialty::pluck('name', 'id');
         $insurances = Insurance::pluck('name', 'id');
-        
-$services = \App\Models\Service::pluck('name', 'id');
+
+        $services = \App\Models\Service::pluck('name', 'id');
 
 
         return view('livewire.admin.panel.treatment-centers.treatment-centers-list', [

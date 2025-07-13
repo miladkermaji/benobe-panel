@@ -9,7 +9,7 @@
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">افزودن درمانگاه جدید</h5>
       </div>
-      <a href="{{ route('admin.panel.treatment-center.index') }}"
+      <a href="{{ route('admin.panel.treatment-centers.index') }}"
         class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">
         <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">

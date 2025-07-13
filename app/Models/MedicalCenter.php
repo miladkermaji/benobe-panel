@@ -45,6 +45,10 @@ class MedicalCenter extends Model
     {
         return $this->belongsToMany(Doctor::class, 'doctor_medical_center');
     }
+      public function doctor()
+    {
+        return $this->belongsTo(Doctor::class, 'id');
+    }
     public function sluggable(): array
     {
         return [

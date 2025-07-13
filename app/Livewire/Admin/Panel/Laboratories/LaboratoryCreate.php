@@ -112,7 +112,7 @@ class LaboratoryCreate extends Component
             'phone_numbers' => 'nullable|array',
             'phone_numbers.*' => 'string|regex:/^09[0-9]{9}$/',
             'location_confirmed' => 'boolean',
-            'type' => 'required|in:laboratory,treatment_centers,clinic,imaging_center,pharmacy',
+            'type' => 'required|in:hospital,treatment_centers,clinic,imaging_center,laboratory,pharmacy,policlinic',
             'specialty_ids' => 'nullable|array',
             'specialty_ids.*' => 'exists:specialties,id',
             'insurance_ids' => 'nullable|array',

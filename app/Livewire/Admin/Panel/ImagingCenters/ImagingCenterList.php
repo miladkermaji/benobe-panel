@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ImagingCenterList extends Component
 {
-   use WithPagination;
+    use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -158,7 +158,7 @@ class ImagingCenterList extends Component
 
     private function getImagingCentersQuery()
     {
-        return MedicalCenter::where('type', 'imagingCenter')
+        return MedicalCenter::where('type', 'imaging_center')
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('description', 'like', '%' . $this->search . '%')
@@ -175,7 +175,7 @@ class ImagingCenterList extends Component
         $specialties = Specialty::pluck('name', 'id');
         $insurances = Insurance::pluck('name', 'id');
 
-$services = \App\Models\Service::pluck('name', 'id');
+        $services = \App\Models\Service::pluck('name', 'id');
 
         return view('livewire.admin.panel.imaging-centers.imaging-center-list', [
             'imagingCenters' => $items,
