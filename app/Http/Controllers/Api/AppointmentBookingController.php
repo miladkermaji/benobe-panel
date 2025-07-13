@@ -736,7 +736,9 @@ class AppointmentBookingController extends Controller
 
             $workHours = json_decode($workSchedule->work_hours, true);
             $appointmentSettings = json_decode($workSchedule->appointment_settings, true);
-            $duration = $appointmentSettings[0]['appointment_duration'] ?? 15;
+
+            // Get duration using helper method
+            $duration = $this->getAppointmentDuration($appointmentSettings, $dayOfWeek, 15);
 
             // محاسبه duration بر اساس max_appointments
             if (!empty($workHours) && isset($workHours[0]['max_appointments'])) {
@@ -1132,7 +1134,8 @@ class AppointmentBookingController extends Controller
         }
 
         // بررسی رزروهای قبلی با وضعیت‌های scheduled, pending_review و paid
-        $duration = $appointmentSettings[0]['appointment_duration'] ?? ($config->appointment_duration ?? 15);
+        $duration = $this->getAppointmentDuration($appointmentSettings, $dayOfWeek, $config->appointment_duration ?? 15);
+
         $startTime = Carbon::parse("$appointmentDate $appointmentTime", 'Asia/Tehran');
         $endTime = $startTime->copy()->addMinutes($duration);
 
@@ -1190,5 +1193,39 @@ class AppointmentBookingController extends Controller
                 Cache::forget("next_available_slot_doctor_{$doctorId}_{$type}");
             }
         }
+    }
+
+    /**
+     * استخراج مدت زمان نوبت از appointment_settings برای روز مشخص
+     * پشتیبانی از فرمت‌های قدیمی و جدید
+     */
+    private function getAppointmentDuration($appointmentSettings, $dayOfWeek, $defaultDuration = 15)
+    {
+        if (empty($appointmentSettings)) {
+            return $defaultDuration;
+        }
+
+        // New format: each item has 'day' field
+        if (isset($appointmentSettings[0]['day'])) {
+            foreach ($appointmentSettings as $setting) {
+                if (isset($setting['day']) && $setting['day'] === $dayOfWeek) {
+                    return $setting['appointment_duration'] ?? $defaultDuration;
+                }
+            }
+        }
+        // Old format: each item has 'days' array
+        elseif (isset($appointmentSettings[0]['days'])) {
+            foreach ($appointmentSettings as $setting) {
+                if (isset($setting['days']) && is_array($setting['days']) && in_array($dayOfWeek, $setting['days'])) {
+                    return $setting['appointment_duration'] ?? $defaultDuration;
+                }
+            }
+        }
+        // Fallback: try to get from first item
+        elseif (isset($appointmentSettings[0]['appointment_duration'])) {
+            return $appointmentSettings[0]['appointment_duration'];
+        }
+
+        return $defaultDuration;
     }
 }
