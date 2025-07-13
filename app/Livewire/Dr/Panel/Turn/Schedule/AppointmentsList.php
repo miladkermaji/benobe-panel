@@ -1675,8 +1675,33 @@ class AppointmentsList extends Component
                         $doctorText,
                         $link
                     ];
-                    $message = "کاربر گرامی {0} نوبت تاریخ {1} روز {2} ساعت {3} توسط پزشک {4} لغو گردید، برای دریافت مجدد نوبت به لینک زیر مراجعه کنید. {5}";
-                    $message = str_replace(['{0}','{1}','{2}','{3}','{4}','{5}'], $params, $message);
+
+                    // انتخاب متن مناسب بر اساس وجود یا عدم وجود مبلغ بازگشتی
+                    if (!empty($refundText)) {
+                        $message = "کاربر گرامی {0} نوبت تاریخ {1} روز {2} ساعت {3} توسط پزشک {4} {5} لغو گردید، برای دریافت مجدد نوبت به لینک زیر مراجعه کنید. {6}";
+                        $params = [
+                            $user->first_name . ' ' . $user->last_name,
+                            $dateJalali,
+                            $dayName,
+                            $time,
+                            $doctorName,
+                            $refundText,
+                            $link
+                        ];
+                    } else {
+                        $message = "کاربر گرامی {0} نوبت تاریخ {1} روز {2} ساعت {3} توسط پزشک {4} لغو گردید، برای دریافت مجدد نوبت به لینک زیر مراجعه کنید. {5}";
+                        $params = [
+                            $user->first_name . ' ' . $user->last_name,
+                            $dateJalali,
+                            $dayName,
+                            $time,
+                            $doctorName,
+                            $link
+                        ];
+                    }
+
+                    $message = str_replace(['{0}','{1}','{2}','{3}','{4}','{5}','{6}'], $params, $message);
+
                     if ($gatewayName === 'pishgamrayan') {
                         SendSmsNotificationJob::dispatch(
                             $message,
