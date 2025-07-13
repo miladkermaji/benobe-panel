@@ -112,8 +112,11 @@ class MedicalCentersController extends Controller
             $clinics = MedicalCenter::where('is_active', 1)
             ->where('type', 'clinic')
                 ->withCount('doctor')
-                ->with(['province' => fn ($query) => $query->select('id', 'name')])
-                ->select('id', 'name', 'address', 'province_id')
+                ->with([
+                    'province' => fn ($query) => $query->select('id', 'name'),
+                    'city' => fn ($query) => $query->select('id', 'name')
+                ])
+                ->select('id', 'name', 'address', 'province_id', 'city_id')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -127,6 +130,9 @@ class MedicalCentersController extends Controller
                     'address'      => $clinic->address,
                     'doctor_count' => $clinic->doctor_count,
                     'province'     => $clinic->province ? $clinic->province->name : null,
+                    'province_id'  => $clinic->province_id,
+                    'city'         => $clinic->city ? $clinic->city->name : null,
+                    'city_id'      => $clinic->city_id,
                 ];
             })->values();
 
@@ -177,8 +183,11 @@ class MedicalCentersController extends Controller
             $treatmentCenters = MedicalCenter::where('is_active', 1)
             ->where('type', 'treatment_centers')
                 ->withCount('doctor')
-                ->with(['province' => fn ($query) => $query->select('id', 'name')])
-                ->select('id', 'name', 'address', 'province_id')
+                ->with([
+                    'province' => fn ($query) => $query->select('id', 'name'),
+                    'city' => fn ($query) => $query->select('id', 'name')
+                ])
+                ->select('id', 'name', 'address', 'province_id', 'city_id')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -192,6 +201,9 @@ class MedicalCentersController extends Controller
                     'address'      => $treatmentCenter->address,
                     'doctor_count' => $treatmentCenter->doctor_count,
                     'province'     => $treatmentCenter->province ? $treatmentCenter->province->name : null,
+                    'province_id'  => $treatmentCenter->province_id,
+                    'city'         => $treatmentCenter->city ? $treatmentCenter->city->name : null,
+                    'city_id'      => $treatmentCenter->city_id,
                 ];
             })->values();
 
@@ -242,8 +254,11 @@ class MedicalCentersController extends Controller
             $imagingCenters = MedicalCenter::where('is_active', 1)
                 ->withCount('doctor')
                 ->where('type', 'imaging_center')
-                ->with(['province' => fn ($query) => $query->select('id', 'name')])
-                ->select('id', 'name', 'address', 'province_id')
+                ->with([
+                    'province' => fn ($query) => $query->select('id', 'name'),
+                    'city' => fn ($query) => $query->select('id', 'name')
+                ])
+                ->select('id', 'name', 'address', 'province_id', 'city_id')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -257,6 +272,9 @@ class MedicalCentersController extends Controller
                     'address'      => $imagingCenter->address,
                     'doctor_count' => $imagingCenter->doctor_count,
                     'province'     => $imagingCenter->province ? $imagingCenter->province->name : null,
+                    'province_id'  => $imagingCenter->province_id,
+                    'city'         => $imagingCenter->city ? $imagingCenter->city->name : null,
+                    'city_id'      => $imagingCenter->city_id,
                 ];
             })->values();
 
@@ -307,8 +325,11 @@ class MedicalCentersController extends Controller
             $hospitals = MedicalCenter::where('is_active', 1)
                 ->withCount('doctor')
                 ->where('type', 'hospital')
-                ->with(['province' => fn ($query) => $query->select('id', 'name')])
-                ->select('id', 'name', 'address', 'province_id')
+                ->with([
+                    'province' => fn ($query) => $query->select('id', 'name'),
+                    'city' => fn ($query) => $query->select('id', 'name')
+                ])
+                ->select('id', 'name', 'address', 'province_id', 'city_id')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -322,6 +343,9 @@ class MedicalCentersController extends Controller
                     'address'      => $hospital->address,
                     'doctor_count' => $hospital->doctor_count,
                     'province'     => $hospital->province ? $hospital->province->name : null,
+                    'province_id'  => $hospital->province_id,
+                    'city'         => $hospital->city ? $hospital->city->name : null,
+                    'city_id'      => $hospital->city_id,
                 ];
             })->values();
 
@@ -372,8 +396,11 @@ class MedicalCentersController extends Controller
             $laboratories = MedicalCenter::where('is_active', 1)
                 ->withCount('doctor')
                 ->where('type', 'laboratory')
-                ->with(['province' => fn ($query) => $query->select('id', 'name')])
-                ->select('id', 'name', 'address', 'province_id')
+                ->with([
+                    'province' => fn ($query) => $query->select('id', 'name'),
+                    'city' => fn ($query) => $query->select('id', 'name')
+                ])
+                ->select('id', 'name', 'address', 'province_id', 'city_id')
                 ->when($limit !== null, function ($query) use ($limit) {
                     return $query->limit($limit);
                 })
@@ -387,6 +414,9 @@ class MedicalCentersController extends Controller
                     'address'      => $laboratory->address,
                     'doctor_count' => $laboratory->doctor_count,
                     'province'     => $laboratory->province ? $laboratory->province->name : null,
+                    'province_id'  => $laboratory->province_id,
+                    'city'         => $laboratory->city ? $laboratory->city->name : null,
+                    'city_id'      => $laboratory->city_id,
                 ];
             })->values();
 
