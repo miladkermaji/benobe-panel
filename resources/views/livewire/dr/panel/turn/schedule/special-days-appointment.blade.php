@@ -337,7 +337,7 @@
                       <div class="form-group position-relative">
                         <x-custom-tooltip title="حذف تنظیمات" placement="top">
                           <button class="my-btn btn-light btn-sm delete-schedule-setting p-1"
-                            @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', day, $wire.scheduleModalIndex);}})"
+                            @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', '{{ $day }}', $wire.scheduleModalIndex);}})"
                             {{ empty($scheduleSettings[$day]['start_time']) || empty($scheduleSettings[$day]['end_time']) ? 'disabled' : '' }}>
                             <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
                               style="width: 14px; height: 14px;">
