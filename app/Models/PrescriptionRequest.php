@@ -16,6 +16,13 @@ class PrescriptionRequest extends Model
         'insurance_id',
         'price',
         'payment_status',
+        'clinic_id',
+        'transaction_id',
+    ];
+
+    protected $casts = [
+        'tracking_code' => 'integer',
+        'price' => 'integer',
     ];
 
     public function requestable()
@@ -36,5 +43,15 @@ class PrescriptionRequest extends Model
     public function insurance()
     {
         return $this->belongsTo(Insurance::class);
+    }
+
+    public function clinic()
+    {
+        return $this->belongsTo(Clinic::class);
+    }
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
     }
 }

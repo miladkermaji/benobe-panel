@@ -31,6 +31,7 @@ class Clinic extends Model
         'latitude',
         'longitude',
         'consultation_fee',
+        'prescription_fee',
         'payment_methods',
         'working_days',
         'avatar', // JSON field, though we'll use a separate table for galleries
@@ -46,6 +47,7 @@ class Clinic extends Model
         'documents'          => 'array',
         'working_days'       => 'array',
         'location_confirmed' => 'boolean',
+        'prescription_fee' => 'decimal:2',
     ];
 
     public function city()
