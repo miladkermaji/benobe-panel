@@ -1324,6 +1324,7 @@ $this->getSelectedClinicId();
         }
         $this->isProcessing = true;
         try {
+            $this->selectedScheduleDays[$day] = false;
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = \App\Models\SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
@@ -1335,17 +1336,17 @@ $this->getSelectedClinicId();
                 return;
             }
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
-            // پیدا کردن تنظیمات مربوط به این work_hour_key و روز
+            // حذف فقط آبجکت با day و work_hour_key
             $updatedSettings = array_filter(
                 $appointmentSettings,
-                fn ($setting) => !(isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex && (
-                    (isset($setting['day']) && $setting['day'] === $day) ||
-                    (isset($setting['days']) && is_array($setting['days']) && in_array($day, $setting['days']))
-                ))
+                fn ($setting) =>
+                !(isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$this->scheduleModalIndex && isset($setting['day']) && $setting['day'] === $day)
             );
             $specialSchedule->appointment_settings = json_encode(array_values($updatedSettings));
             $specialSchedule->save();
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
+            // مقداردهی مجدد چک‌باکس‌ها
+            $this->selectedScheduleDays[$day] = false;
             $this->dispatch('refresh-schedule-settings');
             $persianDay = [
                 'saturday' => 'شنبه',
@@ -1637,7 +1638,6 @@ $this->getSelectedClinicId();
             }
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             $index = $this->scheduleModalIndex;
-            // پیدا کردن تنظیم منبع برای این work_hour_key
             $sourceSetting = null;
             foreach ($appointmentSettings as $setting) {
                 if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index) {
@@ -1654,31 +1654,10 @@ $this->getSelectedClinicId();
                 $this->dispatch('show-toastr', type: 'error', message: 'هیچ روزی برای کپی انتخاب نشده است.');
                 return;
             }
-            // حذف تنظیمات قبلی این work_hour_key برای روزهای هدف
-            $updatedSettings = [];
-            foreach ($appointmentSettings as $setting) {
-                if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index) {
-                    // ساختار جدید
-                    if (isset($setting['day']) && !in_array($setting['day'], $targetDays)) {
-                        $updatedSettings[] = $setting;
-                    }
-                    // ساختار قدیمی
-                    if (isset($setting['days']) && is_array($setting['days'])) {
-                        $remainingDays = array_diff($setting['days'], $targetDays);
-                        if (!empty($remainingDays)) {
-                            $updatedSettings[] = [
-                                'days' => array_values($remainingDays),
-                                'start_time' => $setting['start_time'],
-                                'end_time' => $setting['end_time'],
-                                'work_hour_key' => $setting['work_hour_key'],
-                            ];
-                        }
-                    }
-                } else {
-                    $updatedSettings[] = $setting;
-                }
-            }
-            // افزودن تنظیمات جدید برای روزهای هدف
+            // حذف تنظیمات قبلی این work_hour_key و روز
+            $updatedSettings = array_filter($appointmentSettings, function ($setting) use ($index, $targetDays) {
+                return !(isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index && isset($setting['day']) && in_array($setting['day'], $targetDays));
+            });
             foreach ($targetDays as $day) {
                 $updatedSettings[] = [
                     'day' => $day,
