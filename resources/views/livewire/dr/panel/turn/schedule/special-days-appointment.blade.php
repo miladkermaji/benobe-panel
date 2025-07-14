@@ -255,114 +255,114 @@
   </x-modal>
 
   <!-- مودال تنظیم زمان‌بندی -->
-  <x-modal name="scheduleModal" title="تنظیم زمان‌بندی" size="md-medium"
-    wire:key="schedule-modal-{{ $selectedDate ?? 'default' }}">
-    <x-slot:body>
-      <div class="position-relative">
-        <div class="loading-overlay d-none" id="scheduleLoading">
-          <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">در حال بارگذاری...</span>
+  <div x-data="{
+      handleDayToggle(event, day) {
+          const checkbox = event.target;
+          if (!checkbox.checked) { // User is trying to uncheck
+              // Immediately revert the uncheck, pending confirmation
+              checkbox.checked = true;
+              Swal.fire({
+                  title: 'آیا مطمئن هستید؟',
+                  text: 'تنظیمات این روز حذف خواهد شد!',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'بله، حذف کن!',
+                  cancelButtonText: 'انصراف'
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      @this.set(`selectedScheduleDays.${day}`, false);
+                      @this.call('deleteScheduleSetting', day, $wire.scheduleModalIndex);
+                  }
+              });
+          } else { // User is checking
+              @this.set(`selectedScheduleDays.${day}`, true);
+              // فقط یک ردیف خالی اضافه کن اگر وجود ندارد
+              @this.call('saveSchedule');
+          }
+      }
+  }">
+    <x-modal name="scheduleModal" title="تنظیم زمان‌بندی" size="md-medium"
+      wire:key="schedule-modal-{{ $selectedDate ?? 'default' }}">
+      <x-slot:body>
+        <div class="position-relative">
+          <div class="loading-overlay d-none" id="scheduleLoading">
+            <div class="spinner-border text-primary" role="status">
+              <span class="sr-only">در حال بارگذاری...</span>
+            </div>
+            <p class="mt-2">در حال بارگذاری...</p>
           </div>
-          <p class="mt-2">در حال بارگذاری...</p>
-        </div>
-        <div class="modal-content-inner">
-          <!-- بخش انتخاب روزها -->
-          <div class="schedule-days-section border-section">
-            <h6 class="section-title">انتخاب روزها</h6>
-            <div class="day-schedule-grid">
-              <div class="day-checkbox form-check select-all-checkbox">
-                <input type="checkbox" class="form-check-input" id="select-all-schedule-days"
-                  wire:model.live="selectAllScheduleModal">
-                <label class="form-check-label" for="select-all-schedule-days">انتخاب همه</label>
+          <div class="modal-content-inner">
+            <!-- بخش انتخاب روزها -->
+            <div class="schedule-days-section border-section mb-2">
+              <h6 class="section-title mb-2">انتخاب روزها</h6>
+              <div class="d-flex justify-content-start gap-3 bg-light p-2 border-radius-11 align-items-center"
+                style="overflow-x: scroll;overflow-y: hidden">
+                @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+                  <div class="d-flex align-items-center">
+                    <input type="checkbox" class="form-check-input me-1" id="schedule-day-{{ $day }}"
+                      data-day="{{ $day }}" wire:model.live="selectedScheduleDays.{{ $day }}"
+                      @click="handleDayToggle($event, '{{ $day }}')">
+                    <label class="mb-0 fw-bold px-0 font-size-12"
+                      for="schedule-day-{{ $day }}">{{ $label }}</label>
+                  </div>
+                @endforeach
               </div>
-              @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
-                <div class="day-checkbox form-check">
-                  <input type="checkbox" class="form-check-input schedule-day-checkbox"
-                    id="schedule-day-{{ $day }}" wire:model.live="selectedScheduleDays.{{ $day }}"
-                    data-day="{{ $day }}">
-                  <label class="form-check-label" for="schedule-day-{{ $day }}">{{ $label }}</label>
-                </div>
+            </div>
+            <!-- بخش تنظیمات زمان‌بندی برای هر روز -->
+            <div class="schedule-settings-section border-section">
+              <h6 class="section-title mb-2">باز شدن نوبت‌ها</h6>
+              @foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day)
+                @if ($selectedScheduleDays[$day] ?? false)
+                  <div class="work-hours-{{ $day }} mb-2 border-333 p-2 border-radius-11">
+                    <h6 class="mb-1 font-size-13">
+                      {{ ['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'][$day] . ' ' . 'ها' }}
+                    </h6>
+                    <div class="form-row d-flex align-items-center mb-1 bg-active-slot border-radius-11 p-3">
+                      <div class="form-group position-relative timepicker-ui">
+                        <label class="label-top-input-special-takhasos font-size-11">از</label>
+                        <input type="text"
+                          class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 start-time bg-white"
+                          data-timepicker wire:model.live="scheduleSettings.{{ $day }}.start_time"
+                          wire:change="saveSchedule">
+                      </div>
+                      <div class="form-group position-relative timepicker-ui">
+                        <label class="label-top-input-special-takhasos font-size-11">تا</label>
+                        <input type="text"
+                          class="form-control h-40 timepicker-ui-input text-center fw-bold font-size-12 end-time bg-white"
+                          data-timepicker wire:model.live="scheduleSettings.{{ $day }}.end_time"
+                          wire:change="saveSchedule">
+                      </div>
+                      <div class="form-group position-relative">
+                        <x-custom-tooltip title="حذف تنظیمات" placement="top">
+                          <button class="my-btn btn-light btn-sm delete-schedule-setting p-1"
+                            @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', day, $wire.scheduleModalIndex);}})"
+                            {{ empty($scheduleSettings[$day]['start_time']) || empty($scheduleSettings[$day]['end_time']) ? 'disabled' : '' }}>
+                            <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
+                              style="width: 14px; height: 14px;">
+                          </button>
+                        </x-custom-tooltip>
+                      </div>
+                    </div>
+                    <div class="add-new-row mt-1">
+                      <button class="add-row-btn btn btn-sm btn-light p-1 font-size-12" data-tooltip="true"
+                        data-placement="bottom" data-original-title="اضافه کردن تنظیم جدید"
+                        wire:click="saveSchedule">
+                        <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt=""
+                          style="width: 14px; height: 14px;">
+                        <span>افزودن</span>
+                      </button>
+                    </div>
+                  </div>
+                @endif
               @endforeach
             </div>
           </div>
-          <!-- بخش تنظیم بازه زمانی و دکمه ذخیره -->
-          <div class="timepicker-save-section border-section">
-            <h6 class="section-title">تنظیم بازه زمانی</h6>
-            <div class="timepicker-grid">
-              <div class="form-group">
-                <label class="label-top-input-special-takhasos">شروع</label>
-                <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
-                  id="schedule-start"
-                  wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.start">
-              </div>
-              <div class="form-group">
-                <label class="label-top-input-special-takhasos">پایان</label>
-                <input data-timepicker type="text" class="form-control timepicker-ui-input text-center fw-bold"
-                  id="schedule-end"
-                  wire:model.live.debounce.300ms="workSchedule.data.work_hours.{{ $scheduleModalIndex }}.end">
-              </div>
-              <button type="button" class="btn my-btn-primary save-schedule-btn" id="saveSchedule"
-                wire:click="saveSchedule" @if ($isProcessing) disabled @endif>
-                <span class="button_text">ذخیره تغییرات</span>
-                <div class="loader"></div>
-              </button>
-            </div>
-          </div>
-          <!-- بخش لیست تنظیمات ذخیره‌شده -->
-          <div class="schedule-settings-section border-section">
-            <h6 class="section-title">تنظیمات ذخیره‌شده</h6>
-            <div class="schedule-settings-list">
-              @if ($scheduleModalDay && $scheduleModalIndex !== null)
-                @php
-                  $settings = $workSchedule['data']['appointment_settings'] ?? [];
-                  $filteredSettings = array_values(
-                      array_filter(
-                          $settings,
-                          fn($setting) => isset($setting['work_hour_key']) &&
-                              (int) $setting['work_hour_key'] === (int) $scheduleModalIndex,
-                      ),
-                  );
-                  $dayTranslations = [
-                      'saturday' => 'شنبه',
-                      'sunday' => 'یکشنبه',
-                      'monday' => 'دوشنبه',
-                      'tuesday' => 'سه‌شنبه',
-                      'wednesday' => 'چهارشنبه',
-                      'thursday' => 'پنج‌شنبه',
-                      'friday' => 'جمعه',
-                  ];
-                @endphp
-                @if (!empty($filteredSettings))
-                  @foreach ($filteredSettings as $index => $setting)
-                    <div class="schedule-setting-item"
-                      wire:key="setting-{{ $scheduleModalDay }}-{{ $index }}-{{ $selectedDate ?? 'default' }}">
-                      <span class="setting-text">
-                        از {{ $setting['start_time'] }} تا {{ $setting['end_time'] }} (روزها:
-                        {{ implode(', ', array_map(fn($day) => $dayTranslations[$day] ?? $day, $setting['days'] ?? [])) }})
-                      </span>
-                      <button class="btn btn-light delete-schedule-setting" data-day="{{ $scheduleModalDay }}"
-                        data-index="{{ $index }}"
-                        wire:click="deleteScheduleSetting('{{ $scheduleModalDay }}', {{ $index }})">
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                      </button>
-                    </div>
-                  @endforeach
-                @else
-                  <div class="alert alert-info text-center">
-                    هیچ تنظیم زمان‌بندی برای این بازه زمانی ذخیره نشده است.
-                  </div>
-                @endif
-              @else
-                <div class="alert alert-info text-center">
-                  روز یا بازه زمانی انتخاب نشده است.
-                </div>
-              @endif
-            </div>
-          </div>
         </div>
-      </div>
-    </x-slot>
-  </x-modal>
+      </x-slot:body>
+    </x-modal>
+  </div>
   <x-modal name="add-slot-modal" title="تأیید افزودن ردیف جدید" size="sm"
     wire:key="add-slot-modal-{{ $selectedDate ?? 'default' }}">
     <x-slot:body>
