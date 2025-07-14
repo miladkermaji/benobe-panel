@@ -54,4 +54,10 @@ class PrescriptionRequest extends Model
     {
         return $this->belongsTo(Transaction::class);
     }
+
+    public function insulins()
+    {
+        return $this->belongsToMany(Insulin::class, 'prescription_insulin_request')
+            ->withPivot('count');
+    }
 }

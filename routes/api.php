@@ -157,3 +157,7 @@ Route::prefix('medical-centers')->group(function () {
     Route::get('/list', [MedicalCentersController::class, 'list'])->name('api.medical-centers.list');
     Route::get('/{slug}/profile', [MedicalCentersController::class, 'getProfile'])->name('api.medical-centers.profile');
 });
+
+Route::get('prescriptions/insurances', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'prescriptionInsurances']);
+Route::get('prescriptions/insulins', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'insulins']);
+Route::match(['get', 'post'], 'prescriptions/payment/callback', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'prescriptionPaymentCallback'])->name('api.prescriptions.payment.callback');

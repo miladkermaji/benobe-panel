@@ -9,7 +9,9 @@ return new class () extends Migration {
     {
         Schema::table('prescription_requests', function (Blueprint $table) {
             if (!Schema::hasColumn('prescription_requests', 'type')) {
-                $table->enum('type', ['renew_lab', 'renew_drug', 'renew_insulin', 'other'])->nullable()->after('patient_id');
+                $table->enum('type', ['renew_lab', 'renew_drug', 'renew_insulin', 'sonography', 'mri', 'other'])->nullable()->after('requestable_type');
+            } else {
+                $table->enum('type', ['renew_lab', 'renew_drug', 'renew_insulin', 'sonography', 'mri', 'other'])->nullable()->change();
             }
             if (!Schema::hasColumn('prescription_requests', 'description')) {
                 $table->string('description', 80)->nullable()->change();

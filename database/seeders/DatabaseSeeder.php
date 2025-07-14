@@ -18,18 +18,12 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-        \App\Models\Admin\Manager::factory(1)->create();
-
-        \App\Models\Admin\Manager::factory()->create([
-            'email' => 'miladkermaji09@gmail.com',
-            'mobile' => '09182718639',
-            'password' => '$2y$10$83OINZ6XjLtx/kNqOeZEiuSt/5tHS5fi0uDg5WoNCA4PIcxPBsI6q',
-        ]);
-
         // اجرای seeder های خودکار
         $this->call([
             ZoneSeeder::class,
             DoctorSeeder::class,
+            InsulinSeeder::class,
+            PrescriptionInsuranceSeeder::class,
         ]);
     }
 }
