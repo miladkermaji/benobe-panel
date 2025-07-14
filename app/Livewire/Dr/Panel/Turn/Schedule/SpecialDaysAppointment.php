@@ -52,6 +52,16 @@ class SpecialDaysAppointment extends Component
     public $showAddSlotModal = false;
     public $savePreviousRows = true;
     public $scheduleSettings = [];
+    public $selectedCopyScheduleDays = [
+        'saturday' => false,
+        'sunday' => false,
+        'monday' => false,
+        'tuesday' => false,
+        'wednesday' => false,
+        'thursday' => false,
+        'friday' => false,
+    ];
+    public $selectAllCopyScheduleModal = false;
     protected $listeners = [
         'openHolidayModal' => 'handleOpenHolidayModal',
         'openTransferModal' => 'handleOpenTransferModal',
@@ -1315,7 +1325,7 @@ $this->getSelectedClinicId();
         $this->isProcessing = true;
         try {
             $doctorId = $this->getAuthenticatedDoctor()->id;
-            $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
+            $specialSchedule = \App\Models\SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
                 ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
@@ -1337,7 +1347,16 @@ $this->getSelectedClinicId();
             $specialSchedule->save();
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->dispatch('refresh-schedule-settings');
-            $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات برای روز ' . $day . ' با موفقیت حذف شد');
+            $persianDay = [
+                'saturday' => 'شنبه',
+                'sunday' => 'یکشنبه',
+                'monday' => 'دوشنبه',
+                'tuesday' => 'سه‌شنبه',
+                'wednesday' => 'چهارشنبه',
+                'thursday' => 'پنج‌شنبه',
+                'friday' => 'جمعه',
+            ][$day] ?? $day;
+            $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات برای روز ' . $persianDay . ' با موفقیت حذف شد');
         } catch (\Exception $e) {
             $this->dispatch('show-toastr', type: 'error', message: 'خطا در حذف تنظیمات زمان‌بندی: ' . $e->getMessage());
         } finally {
@@ -1589,6 +1608,106 @@ $this->getSelectedClinicId();
     }
     public function initializeCalculator($params)
     {
+    }
+    public function updatedSelectAllCopyScheduleModal($value)
+    {
+        $days = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        foreach ($days as $day) {
+            if ($day !== ($this->scheduleModalDay ?? null)) {
+                $this->selectedCopyScheduleDays[$day] = $value;
+            }
+        }
+    }
+    public function copyScheduleSetting($replace = false)
+    {
+        if ($this->isProcessing) {
+            return;
+        }
+        $this->isProcessing = true;
+        try {
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $specialSchedule = \App\Models\SpecialDailySchedule::where('doctor_id', $doctorId)
+                ->where('date', $this->selectedDate)
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->first();
+            if (!$specialSchedule) {
+                $this->dispatch('show-toastr', type: 'error', message: 'برنامه کاری برای این تاریخ یافت نشد.');
+                return;
+            }
+            $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
+            $index = $this->scheduleModalIndex;
+            // پیدا کردن تنظیم منبع برای این work_hour_key
+            $sourceSetting = null;
+            foreach ($appointmentSettings as $setting) {
+                if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index) {
+                    $sourceSetting = $setting;
+                    break;
+                }
+            }
+            if (!$sourceSetting) {
+                $this->dispatch('show-toastr', type: 'error', message: 'تنظیم منبع برای کپی یافت نشد.');
+                return;
+            }
+            $targetDays = array_keys(array_filter($this->selectedCopyScheduleDays));
+            if (empty($targetDays)) {
+                $this->dispatch('show-toastr', type: 'error', message: 'هیچ روزی برای کپی انتخاب نشده است.');
+                return;
+            }
+            // حذف تنظیمات قبلی این work_hour_key برای روزهای هدف
+            $updatedSettings = [];
+            foreach ($appointmentSettings as $setting) {
+                if (isset($setting['work_hour_key']) && (int)$setting['work_hour_key'] === (int)$index) {
+                    // ساختار جدید
+                    if (isset($setting['day']) && !in_array($setting['day'], $targetDays)) {
+                        $updatedSettings[] = $setting;
+                    }
+                    // ساختار قدیمی
+                    if (isset($setting['days']) && is_array($setting['days'])) {
+                        $remainingDays = array_diff($setting['days'], $targetDays);
+                        if (!empty($remainingDays)) {
+                            $updatedSettings[] = [
+                                'days' => array_values($remainingDays),
+                                'start_time' => $setting['start_time'],
+                                'end_time' => $setting['end_time'],
+                                'work_hour_key' => $setting['work_hour_key'],
+                            ];
+                        }
+                    }
+                } else {
+                    $updatedSettings[] = $setting;
+                }
+            }
+            // افزودن تنظیمات جدید برای روزهای هدف
+            foreach ($targetDays as $day) {
+                $updatedSettings[] = [
+                    'day' => $day,
+                    'start_time' => $sourceSetting['start_time'],
+                    'end_time' => $sourceSetting['end_time'],
+                    'work_hour_key' => (int)$index,
+                ];
+            }
+            $specialSchedule->appointment_settings = json_encode(array_values($updatedSettings));
+            $specialSchedule->save();
+            $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
+            $this->dispatch('refresh-schedule-settings');
+            $this->dispatch('show-toastr', type: 'success', message: 'تنظیمات با موفقیت کپی شد.');
+            $this->dispatch('close-modal', ['name' => 'copy-schedule-modal']);
+            $this->selectAllCopyScheduleModal = false;
+            $this->selectedCopyScheduleDays = [
+                'saturday' => false,
+                'sunday' => false,
+                'monday' => false,
+                'tuesday' => false,
+                'wednesday' => false,
+                'thursday' => false,
+                'friday' => false,
+            ];
+        } catch (\Exception $e) {
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در کپی تنظیمات: ' . $e->getMessage());
+        } finally {
+            $this->isProcessing = false;
+        }
     }
     public function render()
     {

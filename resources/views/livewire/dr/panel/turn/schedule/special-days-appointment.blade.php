@@ -335,9 +335,20 @@
                           wire:change="saveSchedule">
                       </div>
                       <div class="form-group position-relative">
+                        <x-custom-tooltip title="کپی تنظیمات" placement="top">
+                          <button class="my-btn btn-light btn-sm copy-schedule-setting p-1"
+                            x-data="{ day: '{{ $day }}', index: '{{ $scheduleModalIndex }}' }"
+                            @click="$dispatch('open-modal', { name: 'copy-schedule-modal', day: day, index: index })"
+                            {{ empty($scheduleSettings[$day]['start_time']) || empty($scheduleSettings[$day]['end_time']) ? 'disabled' : '' }}>
+                            <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
+                              style="width: 14px; height: 14px;">
+                          </button>
+                        </x-custom-tooltip>
+                      </div>
+                      <div class="form-group position-relative">
                         <x-custom-tooltip title="حذف تنظیمات" placement="top">
                           <button class="my-btn btn-light btn-sm delete-schedule-setting p-1"
-                            @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', '{{ $day }}', $wire.scheduleModalIndex);}})"
+                            @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم زمان‌بندی حذف خواهد شد!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', '{{ $day }}', $wire.scheduleModalIndex);}})"
                             {{ empty($scheduleSettings[$day]['start_time']) || empty($scheduleSettings[$day]['end_time']) ? 'disabled' : '' }}>
                             <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
                               style="width: 14px; height: 14px;">
@@ -384,6 +395,35 @@
         </button>
       </div>
     </x-slot>
+  </x-modal>
+  <x-modal name="copy-schedule-modal" title="کپی تنظیم زمان‌بندی" size="sm">
+    <x-slot:body>
+      <p class="font-size-12 mb-2">روزهایی که می‌خواهید تنظیمات به آن‌ها کپی شود:</p>
+      <div class="mb-2">
+        <input type="checkbox" class="form-check-input me-1" id="select-all-copy-schedule-days"
+          wire:model.live="selectAllCopyScheduleModal">
+        <label class="fw-bold mb-0 font-size-12" for="select-all-copy-schedule-days">انتخاب همه</label>
+      </div>
+      <div class="d-flex flex-column gap-1" id="copy-schedule-day-checkboxes">
+        @foreach (['saturday' => 'شنبه', 'sunday' => 'یک‌شنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $day => $label)
+          @if ($day !== ($scheduleModalDay ?? null))
+            <div class="form-check d-flex align-items-center" data-day="{{ $day }}">
+              <input type="checkbox" class="form-check-input me-1" id="copy-schedule-day-{{ $day }}"
+                wire:model.live="selectedCopyScheduleDays.{{ $day }}" data-day="{{ $day }}">
+              <label class="fw-bold mb-0 font-size-12"
+                for="copy-schedule-day-{{ $day }}">{{ $label }}</label>
+            </div>
+          @endif
+        @endforeach
+      </div>
+      <div class="mt-2">
+        <button type="button" class="btn my-btn-primary h-40 w-100 font-size-12"
+          wire:click="copyScheduleSetting(false)" id="copy-btn">
+          ذخیره
+          <div class="loader"></div>
+        </button>
+      </div>
+    </x-slot:body>
   </x-modal>
   <script>
     // تعریف متغیرهای جهانی
