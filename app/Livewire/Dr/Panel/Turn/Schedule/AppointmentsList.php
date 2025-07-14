@@ -1662,46 +1662,18 @@ class AppointmentsList extends Component
                     $link = 'https://emr-benobe.ir/doctors';
                     $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
                     $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-                    $templateId = 100283;
+                    $templateId = 100287;
 
-                    // فقط متن بازگشت مبلغ (بدون نام پزشک)
-                    $doctorText = $refundText;
-
+                    $message = "کاربر گرامی {0} نوبت تاریخ {1} روز {2} ساعت {3} توسط پزشک {4} لغو گردید، برای دریافت مجدد نوبت به لینک زیر مراجعه کنید. {5}\n{6}";
                     $params = [
                         $user->first_name . ' ' . $user->last_name,
                         $dateJalali,
                         $dayName,
                         $time,
-                        $doctorText,
+                        $doctorName,
+                        $refundText, // مبلغ بازگشتی یا خالی
                         $link
                     ];
-
-                    // انتخاب متن مناسب بر اساس وجود یا عدم وجود مبلغ بازگشتی
-
-                    if (!empty($refundText)) {
-                        $message = "کاربر گرامی {0} نوبت تاریخ {1} روز {2} ساعت {3} توسط پزشک {4} {5} لغو گردید، برای دریافت مجدد نوبت به لینک زیر مراجعه کنید. {6}";
-                        $params = [
-                            $user->first_name . ' ' . $user->last_name,
-                            $dateJalali,
-                            $dayName,
-                            $time,
-                            $doctorName,
-                            $refundText,
-                            $link
-                        ];
-                    } else {
-                        $message = "کاربر گرامی {0} نوبت تاریخ {1} روز {2} ساعت {3} توسط پزشک {4} لغو گردید، برای دریافت مجدد نوبت به لینک زیر مراجعه کنید. {5}";
-                        $params = [
-                            $user->first_name . ' ' . $user->last_name,
-                            $dateJalali,
-                            $dayName,
-                            $time,
-                            $doctorName,
-                            $link
-                        ];
-                    }
-
-
                     $message = str_replace(['{0}','{1}','{2}','{3}','{4}','{5}','{6}'], $params, $message);
 
                     if ($gatewayName === 'pishgamrayan') {
@@ -2381,6 +2353,45 @@ class AppointmentsList extends Component
                 'payment_status' => 'unpaid',
                 'appointment_type' => 'manual'
             ]);
+
+            // ارسال پیامک ثبت نوبت دستی
+            try {
+                $doctorName = $doctor->first_name . ' ' . $doctor->last_name;
+                $dateJalali = Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d');
+                $dayName = Jalalian::fromDateTime($appointment->appointment_date)->format("l");
+                $time = Carbon::parse($appointment->appointment_time)->format('H:i');
+                $templateId = 100288;
+                $params = [
+                    $user->first_name . ' ' . $user->last_name,
+                    $dateJalali,
+                    $dayName,
+                    $time,
+                    $doctorName
+                ];
+                $message = "کاربر گرامی {0} نوبت شما در تاریخ {1} روز {2} ساعت {3} توسط پزشک {4}  با موفقیت ثبت شد.";
+                $message = str_replace(['{0}','{1}','{2}','{3}','{4}'], $params, $message);
+
+                $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+
+                if ($gatewayName === 'pishgamrayan') {
+                    SendSmsNotificationJob::dispatch(
+                        $message,
+                        [$user->mobile],
+                        $templateId,
+                        $params
+                    )->delay(now()->addSeconds(5));
+                } else {
+                    SendSmsNotificationJob::dispatch(
+                        $message,
+                        [$user->mobile],
+                        null,
+                        $params
+                    )->delay(now()->addSeconds(5));
+                }
+            } catch (\Exception $e) {
+                Log::error('Error sending manual appointment SMS: ' . $e->getMessage());
+            }
 
             // Clear cache
             $cacheKey = "appointments_doctor_{$doctor->id}_clinic_{$clinicId}_date_{$gregorianDate}";
