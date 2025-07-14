@@ -155,7 +155,22 @@ class PaymentService
             }
 
             try {
+                Log::info('PaymentService::verify - About to call gateway verify', [
+                    'amount' => $transaction->amount,
+                    'authority' => $authority,
+                ]);
                 $receipt = Payment::amount($transaction->amount)->transactionId($authority)->verify();
+                Log::info('PaymentService::verify - Gateway verify response', [
+                    'receipt' => $receipt,
+                ]);
+                if (!$receipt) {
+                    Log::error('PaymentService::verify - Gateway returned null receipt', [
+                        'authority' => $authority,
+                        'transaction' => $transaction->toArray(),
+                    ]);
+                    $transaction->update(['status' => 'failed']);
+                    return false;
+                }
             } catch (\Exception $e) {
                 Log::error('PaymentService::verify - Exception from gateway verify', [
                     'error' => $e->getMessage(),

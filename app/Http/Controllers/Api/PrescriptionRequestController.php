@@ -166,11 +166,31 @@ class PrescriptionRequestController extends Controller
         $payment_url = null;
         // اگر قیمت دارد، پرداخت را با PaymentService انجام بده
         if ($price) {
+            $prescription = $user->prescriptions()->create([
+                'type' => $validated['type'],
+                'description' => $validated['type'] === 'other' ? $validated['description'] : null,
+                'doctor_id' => $validated['doctor_id'],
+                'prescription_insurance_id' => $validated['prescription_insurance_id'] ?? null,
+                'clinic_id' => $clinic?->id,
+                'price' => $price,
+                'status' => 'pending',
+                'payment_status' => $price ? 'pending' : 'paid',
+                'transaction_id' => $transaction_id,
+                'referral_code' => $request->input('referral_code'),
+            ]);
+            // اگر نوع renew_insulin بود، انسولین‌ها را ذخیره کن
+            if ($validated['type'] === 'renew_insulin' && !empty($validated['insulins'])) {
+                foreach ($validated['insulins'] as $insulin) {
+                    $prescription->insulins()->attach($insulin['id'], ['count' => $insulin['count']]);
+                }
+            }
+            // اگر پرداخت نیاز دارد، prescription_id را در meta ذخیره کن و فقط payment_url را برگردان
             $meta = [
                 'type' => 'prescription_request',
                 'clinic_id' => $clinic?->id,
                 'doctor_id' => $validated['doctor_id'],
                 'user_id' => $user->id,
+                'prescription_id' => $prescription->id,
             ];
             $successRedirect = route('payment.callback');
             $errorRedirect = route('payment.callback');
@@ -209,9 +229,8 @@ class PrescriptionRequestController extends Controller
             'prescription_insurance_id' => $validated['prescription_insurance_id'] ?? null,
             'clinic_id' => $clinic?->id,
             'price' => $price,
-            // 'tracking_code' => $tracking_code, // حذف ثبت کد رهگیری
             'status' => 'pending',
-            'payment_status' => 'paid',
+            'payment_status' => $price ? 'pending' : 'paid',
             'transaction_id' => $transaction_id,
             'referral_code' => $request->input('referral_code'),
         ]);
@@ -220,6 +239,37 @@ class PrescriptionRequestController extends Controller
             foreach ($validated['insulins'] as $insulin) {
                 $prescription->insulins()->attach($insulin['id'], ['count' => $insulin['count']]);
             }
+        }
+        // اگر پرداخت نیاز دارد، prescription_id را در meta ذخیره کن و فقط payment_url را برگردان
+        if ($price) {
+            $meta = [
+                'type' => 'prescription_request',
+                'clinic_id' => $clinic?->id,
+                'doctor_id' => $validated['doctor_id'],
+                'user_id' => $user->id,
+                'prescription_id' => $prescription->id,
+            ];
+            $successRedirect = route('payment.callback');
+            $errorRedirect = route('payment.callback');
+            try {
+                $paymentResponse = $this->paymentService->pay($price, route('api.prescriptions.payment.callback'), $meta, $successRedirect, $errorRedirect);
+                if ($paymentResponse instanceof \Shetabit\Multipay\RedirectionForm) {
+                    $payment_url = $paymentResponse->getAction();
+                } elseif ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
+                    $payment_url = $paymentResponse->getTargetUrl();
+                } elseif (is_array($paymentResponse) && isset($paymentResponse['payment_url'])) {
+                    $payment_url = $paymentResponse['payment_url'];
+                } else {
+                    return response()->json(['message' => 'خطا در ایجاد لینک پرداخت.'], 500);
+                }
+            } catch (\Exception $e) {
+                Log::error($e);
+                return response()->json(['message' => 'خطای سرور: ' . $e->getMessage()], 500);
+            }
+            return response()->json([
+                'status' => 'success',
+                'payment_url' => $payment_url,
+            ], 201);
         }
         $prescription->load(['clinic', 'transaction', 'insulins']);
         return response()->json([
@@ -255,6 +305,14 @@ class PrescriptionRequestController extends Controller
         }
         // اگر تراکنش قبلاً paid شده بود
         if ($transaction->status === 'paid') {
+            $meta = json_decode($transaction->meta, true);
+            if (isset($meta['prescription_id'])) {
+                $prescription = \App\Models\PrescriptionRequest::find($meta['prescription_id']);
+                if ($prescription && $prescription->payment_status !== 'paid') {
+                    $prescription->payment_status = 'paid';
+                    $prescription->save();
+                }
+            }
             return response()->json([
                 'success' => true,
                 'message' => 'پرداخت نسخه قبلاً با موفقیت انجام شده است.',
@@ -270,7 +328,15 @@ class PrescriptionRequestController extends Controller
                 'authority' => $authority,
             ], 404);
         }
-        // اینجا می‌توان prescription را به وضعیت paid تغییر داد یا هر منطق دیگری
+        // بعد از پرداخت موفق، prescription را به paid تغییر بده
+        $meta = json_decode($verifiedTransaction->meta, true);
+        if (isset($meta['prescription_id'])) {
+            $prescription = \App\Models\PrescriptionRequest::find($meta['prescription_id']);
+            if ($prescription && $prescription->payment_status !== 'paid') {
+                $prescription->payment_status = 'paid';
+                $prescription->save();
+            }
+        }
         return response()->json([
             'success' => true,
             'message' => 'پرداخت نسخه با موفقیت انجام شد.',
