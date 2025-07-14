@@ -82,6 +82,11 @@ Route::middleware(['custom-auth.jwt'])->group(function () {
     Route::prefix('doctors')->group(function () {
         Route::get('/my_doctors', [DoctorController::class, 'getMyDoctors'])->name('api.doctors.my_doctors');
     });
+
+    Route::prefix('prescriptions')->group(function () {
+        Route::get('/my', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'myPrescriptions'])->name('api.prescriptions.my');
+        Route::post('/request', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'requestPrescription'])->name('api.prescriptions.request');
+    });
 });
 
 Route::prefix('menus')->group(function () {

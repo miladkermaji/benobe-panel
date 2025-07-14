@@ -12,7 +12,7 @@ return new class () extends Migration {
             $table->morphs('requestable'); // user, doctor, manager, secretary
             $table->unsignedBigInteger('doctor_id')->nullable();
             $table->unsignedBigInteger('patient_id')->nullable();
-            $table->enum('type', ['drug', 'lab', 'radiology', 'biopsy', 'sonography', 'mri']);
+            /* $table->enum('type', ['drug', 'lab', 'radiology', 'biopsy', 'sonography', 'mri']); */
             $table->text('description')->nullable();
             $table->string('tracking_code')->unique();
             $table->enum('status', ['pending', 'paid', 'rejected', 'completed'])->default('pending');
