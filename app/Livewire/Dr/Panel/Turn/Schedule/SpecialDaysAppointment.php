@@ -984,6 +984,7 @@ $this->getSelectedClinicId();
         }
         $this->isProcessing = true;
         try {
+            $this->ensureSpecialDailyScheduleFromDoctorWorkSchedule();
             $startTime = $this->calculator['start_time'];
             $endTime = $this->calculator['end_time'];
             $appointmentCount = $this->calculator['appointment_count'];
@@ -1096,6 +1097,7 @@ $this->getSelectedClinicId();
         }
         $this->isProcessing = true;
         try {
+            $this->ensureSpecialDailyScheduleFromDoctorWorkSchedule();
             $doctorId = $this->getAuthenticatedDoctor()->id;
             // دریافت یا ایجاد ردیف در SpecialDailySchedule
             $specialSchedule = SpecialDailySchedule::firstOrCreate(
@@ -1220,6 +1222,7 @@ $this->getSelectedClinicId();
         }
         $this->isProcessing = true;
         try {
+            $this->ensureSpecialDailyScheduleFromDoctorWorkSchedule();
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::firstOrCreate(
                 [
@@ -1565,6 +1568,7 @@ $this->getSelectedClinicId();
         }
         $this->isProcessing = true;
         try {
+            $this->ensureSpecialDailyScheduleFromDoctorWorkSchedule();
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::firstOrCreate(
                 [
@@ -1750,5 +1754,32 @@ $this->getSelectedClinicId();
             }
         }
         return $normalized;
+    }
+    private function ensureSpecialDailyScheduleFromDoctorWorkSchedule()
+    {
+        if (!$this->isFromSpecialDailySchedule && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours'])) {
+            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $specialSchedule = SpecialDailySchedule::firstOrCreate(
+                [
+                    'doctor_id' => $doctorId,
+                    'date' => $this->selectedDate,
+                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                ],
+                [
+                    'work_hours' => json_encode([]),
+                    'appointment_settings' => json_encode([]),
+                    'emergency_times' => json_encode([[]]),
+                ]
+            );
+            $workHours = $this->workSchedule['data']['work_hours'];
+            $appointmentSettings = $this->workSchedule['data']['appointment_settings'] ?? [];
+            $emergencyTimes = $this->workSchedule['data']['emergency_times'] ?? [[]];
+            $specialSchedule->work_hours = json_encode($workHours);
+            $specialSchedule->appointment_settings = json_encode($this->normalizeAppointmentSettingsFormat($appointmentSettings, $workHours));
+            $specialSchedule->emergency_times = json_encode($emergencyTimes);
+            $specialSchedule->save();
+            $this->isFromSpecialDailySchedule = true;
+            $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
+        }
     }
 }
