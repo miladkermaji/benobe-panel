@@ -751,7 +751,7 @@ $this->getSelectedClinicId();
                 return is_array($times) ? $times : [];
             }, $emergencyTimes));
             $specialSchedule->work_hours = json_encode($workHours);
-            $specialSchedule->appointment_settings = json_encode($appointmentSettings);
+            $specialSchedule->appointment_settings = json_encode($this->normalizeAppointmentSettingsFormat($appointmentSettings, $workHours));
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
             $this->workSchedule = [
@@ -759,7 +759,7 @@ $this->getSelectedClinicId();
                 'data' => [
                     'day' => strtolower(Carbon::parse($this->selectedDate)->englishDayOfWeek),
                     'work_hours' => $workHours,
-                    'appointment_settings' => $appointmentSettings,
+                    'appointment_settings' => $this->normalizeAppointmentSettingsFormat($appointmentSettings, $workHours),
                     'emergency_times' => $emergencyTimes,
                 ],
             ];
@@ -1044,7 +1044,7 @@ $this->getSelectedClinicId();
             $emergencyTimes[$index] = $emergencyTimes[$index] ?? [];
             // ذخیره داده‌ها در دیتابیس
             $specialSchedule->work_hours = json_encode($workHours);
-            $specialSchedule->appointment_settings = json_encode($appointmentSettings);
+            $specialSchedule->appointment_settings = json_encode($this->normalizeAppointmentSettingsFormat($appointmentSettings, $workHours));
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
             // به‌روزرسانی workSchedule
@@ -1185,7 +1185,7 @@ $this->getSelectedClinicId();
             $emergencyTimes = array_values(array_map(fn ($times) => is_array($times) ? array_values($times) : [], $emergencyTimes));
             // ذخیره داده‌ها
             $specialSchedule->work_hours = json_encode($workHours);
-            $specialSchedule->appointment_settings = json_encode($appointmentSettings);
+            $specialSchedule->appointment_settings = json_encode($this->normalizeAppointmentSettingsFormat($appointmentSettings, $workHours));
             $specialSchedule->emergency_times = json_encode($emergencyTimes);
             $specialSchedule->save();
             // به‌روزرسانی workSchedule
@@ -1277,7 +1277,7 @@ $this->getSelectedClinicId();
                     'work_hour_key' => (int)$index,
                 ];
             }
-            $specialSchedule->appointment_settings = json_encode(array_values($updatedSettings));
+            $specialSchedule->appointment_settings = json_encode($this->normalizeAppointmentSettingsFormat($updatedSettings, $workHours));
             $specialSchedule->save();
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->dispatch('refresh-schedule-settings');
@@ -1589,7 +1589,7 @@ $this->getSelectedClinicId();
                 ];
             }
             $specialSchedule->work_hours = json_encode($workHours);
-            $specialSchedule->appointment_settings = json_encode($appointmentSettings);
+            $specialSchedule->appointment_settings = json_encode($this->normalizeAppointmentSettingsFormat($appointmentSettings, $workHours));
             $specialSchedule->save();
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             $this->hasWorkHoursMessage = $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
@@ -1636,6 +1636,8 @@ $this->getSelectedClinicId();
             $appointmentSettings = $specialSchedule->appointment_settings ? json_decode($specialSchedule->appointment_settings, true) : [];
             $index = $this->scheduleModalIndex;
             $sourceDay = $this->scheduleModalDay;
+            // اضافه شد: تعریف workHours برای نرمال‌سازی
+            $workHours = $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
             // پیدا کردن منبع فقط از رکوردی که day آن scheduleModalDay است و work_hour_key برابر با index است
             $sourceSetting = null;
             foreach ($appointmentSettings as $setting) {
@@ -1672,7 +1674,7 @@ $this->getSelectedClinicId();
                     'work_hour_key' => (int)$index,
                 ];
             }
-            $specialSchedule->appointment_settings = json_encode(array_values($updatedSettings));
+            $specialSchedule->appointment_settings = json_encode($this->normalizeAppointmentSettingsFormat(array_values($updatedSettings), $workHours));
             $specialSchedule->save();
             // مقداردهی مجدد state و UI
             $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
@@ -1719,5 +1721,34 @@ $this->getSelectedClinicId();
     public function render()
     {
         return view('livewire.dr.panel.turn.schedule.special-days-appointment');
+    }
+    /**
+     * نرمال‌سازی فرمت appointment_settings به آرایه‌ای از آبجکت‌های دارای day, start_time, end_time, work_hour_key
+     */
+    private function normalizeAppointmentSettingsFormat($appointmentSettings, $workHours = [])
+    {
+        $normalized = [];
+        // اگر ساختار قدیمی (days) وجود دارد، به جدید تبدیل کن
+        foreach ($appointmentSettings as $setting) {
+            if (isset($setting['days']) && is_array($setting['days'])) {
+                foreach ($setting['days'] as $day) {
+                    $normalized[] = [
+                        'day' => $day,
+                        'start_time' => $setting['start_time'] ?? ($workHours[$setting['work_hour_key']]['start'] ?? '09:00'),
+                        'end_time' => $setting['end_time'] ?? ($workHours[$setting['work_hour_key']]['end'] ?? '23:00'),
+                        'work_hour_key' => $setting['work_hour_key'],
+                    ];
+                }
+            } elseif (isset($setting['day'])) {
+                // اگر ساختار جدید است، همان را اضافه کن
+                $normalized[] = [
+                    'day' => $setting['day'],
+                    'start_time' => $setting['start_time'] ?? ($workHours[$setting['work_hour_key']]['start'] ?? '09:00'),
+                    'end_time' => $setting['end_time'] ?? ($workHours[$setting['work_hour_key']]['end'] ?? '23:00'),
+                    'work_hour_key' => $setting['work_hour_key'],
+                ];
+            }
+        }
+        return $normalized;
     }
 }
