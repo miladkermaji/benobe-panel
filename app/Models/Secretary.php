@@ -78,6 +78,11 @@ class Secretary extends Authenticatable implements JWTSubject
         return $this->morphMany(Transaction::class, 'transactable');
     }
 
+    public function prescriptions()
+    {
+        return $this->morphMany(PrescriptionRequest::class, 'requestable');
+    }
+
     public function manager()
     {
         return $this->belongsTo(Manager::class);

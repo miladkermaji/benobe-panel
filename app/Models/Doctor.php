@@ -26,6 +26,7 @@ use App\Models\Doctors\DoctorManagement\DoctorTariff;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\Service;
+use App\Models\PrescriptionRequest;
 
 class Doctor extends Authenticatable implements JWTSubject
 {
@@ -481,6 +482,11 @@ class Doctor extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany(Service::class, 'doctor_services', 'doctor_id', 'service_id')
             ->withPivot(['clinic_id', 'insurance_id', 'name', 'description', 'status', 'duration', 'price', 'discount', 'parent_id']);
+    }
+
+    public function prescriptions()
+    {
+        return $this->morphMany(PrescriptionRequest::class, 'requestable');
     }
 
     /**

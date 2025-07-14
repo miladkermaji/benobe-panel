@@ -15,6 +15,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Morilog\Jalali\Jalalian;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Models\PrescriptionRequest;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -114,5 +115,10 @@ class User extends Authenticatable implements JWTSubject
     public function reviews()
     {
         return $this->morphMany(Review::class, 'reviewable');
+    }
+
+    public function prescriptions()
+    {
+        return $this->morphMany(PrescriptionRequest::class, 'requestable');
     }
 }
