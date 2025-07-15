@@ -389,9 +389,11 @@
               <li
                 class="item-li i-user__inforamtion {{ Request::routeIs('dr-edit-profile-upgrade') ? 'is-active' : '' }}"
                 style="opacity: 0.5; pointer-events: none;">
-                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;" class="d-flex align-items-center">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;"
+                  class="d-flex align-items-center">
                   ارتقا حساب
-                  <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
+                  <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
+                    زودی</span>
                 </a>
               </li>
             @endif
