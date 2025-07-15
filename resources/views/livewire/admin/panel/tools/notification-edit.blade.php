@@ -1,3 +1,57 @@
+<script>
+  function notificationForm() {
+    return {
+      mode: @entangle('target_mode'),
+      recipients: [],
+      selectedRecipients: @entangle('selected_recipients'),
+      search: '',
+      loading: false,
+      init() {
+        const self = this;
+        $('#selected_recipients').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%',
+          ajax: {
+            url: '/admin/panel/tools/recipients-search',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+              return {
+                q: params.term
+              };
+            },
+            processResults: function(data) {
+              return {
+                results: data
+              };
+            },
+            cache: true
+          },
+          minimumInputLength: 2
+        }).on('change', function() {
+          let val = $(this).val() || [];
+          if (!Array.isArray(val)) val = [val];
+          if ((self.selectedRecipients || []).join(',') !== val.join(',')) {
+            self.selectedRecipients = val;
+          }
+        });
+        this.$nextTick(() => {
+          let arr = this.selectedRecipients || [];
+          if (!Array.isArray(arr)) arr = [arr];
+          $('#selected_recipients').val(arr).trigger('change');
+        });
+        this.$watch('selectedRecipients', value => {
+          let arr = value || [];
+          if (!Array.isArray(arr)) arr = [arr];
+          if (($('#selected_recipients').val() || []).join(',') !== arr.join(',')) {
+            $('#selected_recipients').val(arr).trigger('change');
+          }
+        });
+      }
+    }
+  }
+</script>
 <div x-data="notificationForm()">
   <div class="container-fluid py-4" dir="rtl">
     <div class="card shadow-lg border-0 rounded-3 overflow-hidden" style="background: #ffffff;">
@@ -134,61 +188,5 @@
           toastr[event.type](event.message);
         });
       });
-    </script>
-    <script>
-      function notificationForm() {
-        return {
-          mode: @entangle('target_mode'),
-          recipients: [],
-          selectedRecipients: @entangle('selected_recipients'),
-          search: '',
-          loading: false,
-          init() {
-            const self = this;
-            $('#selected_recipients').select2({
-              dir: 'rtl',
-              placeholder: 'انتخاب کنید',
-              width: '100%',
-              ajax: {
-                url: '/admin/panel/tools/recipients-search',
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                  return {
-                    q: params.term
-                  };
-                },
-                processResults: function(data) {
-                  return {
-                    results: data
-                  };
-                },
-                cache: true
-              },
-              minimumInputLength: 2
-            }).on('change', function() {
-              let val = $(this).val() || [];
-              if (!Array.isArray(val)) val = [val];
-              if ((self.selectedRecipients || []).join(',') !== val.join(',')) {
-                self.selectedRecipients = val;
-              }
-            });
-
-            // مقدار اولیه را فقط یک بار ست کن
-            this.$nextTick(() => {
-              let arr = this.selectedRecipients || [];
-              if (!Array.isArray(arr)) arr = [arr];
-              $('#selected_recipients').val(arr).trigger('change');
-            });
-
-            this.$watch('selectedRecipients', value => {
-              let arr = value || [];
-              if (!Array.isArray(arr)) arr = [arr];
-              if (($('#selected_recipients').val() || []).join(',') !== arr.join(',')) {
-                $('#selected_recipients').val(arr).trigger('change');
-              }
-            });
-          }
-        }
     </script>
   </div>

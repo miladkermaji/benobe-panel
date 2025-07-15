@@ -228,11 +228,19 @@ class NotificationCreate extends Component
 
     public function render()
     {
+        if (empty($this->users)) {
+            $this->users = User::select('id', 'first_name', 'last_name', 'mobile')->get();
+        }
+        if (empty($this->doctors)) {
+            $this->doctors = Doctor::select('id', 'first_name', 'last_name', 'mobile')->get();
+        }
+        if (empty($this->secretaries)) {
+            $this->secretaries = Secretary::select('id', 'first_name', 'last_name', 'mobile')->get();
+        }
         $allRecipients = collect()
             ->merge($this->users->map(fn ($u) => ['id' => "App\\Models\\User:{$u->id}", 'text' => $u->first_name . ' ' . $u->last_name . ' (بیمار)']))
             ->merge($this->doctors->map(fn ($d) => ['id' => "App\\Models\\Doctor:{$d->id}", 'text' => $d->first_name . ' ' . $d->last_name . ' (پزشک)']))
             ->merge($this->secretaries->map(fn ($s) => ['id' => "App\\Models\\Secretary:{$s->id}", 'text' => $s->first_name . ' ' . $s->last_name . ' (منشی)']));
-
         return view('livewire.admin.panel.tools.notification-create', [
             'allRecipients' => $allRecipients,
         ]);
