@@ -146,8 +146,10 @@
                     </td>
                     <td>{{ jdate($item->created_at)->format('Y/m/d H:i') }}</td>
                     <td>
-                      <button class="btn btn-sm btn-primary" wire:click="editTrackingCode({{ $item->id }})">پاسخ
-                        نسخه</button>
+                      <button
+                        class="btn btn-sm btn-primary @if ($item->status === 'completed') disabled bg-secondary border-0 @endif"
+                        wire:click="editTrackingCode({{ $item->id }})"
+                        @if ($item->status === 'completed') disabled @endif>پاسخ نسخه</button>
                     </td>
                   </tr>
                   @empty
@@ -167,8 +169,8 @@
       <!-- Modal ثبت کد رهگیری -->
       <div class="modal fade" id="trackingModal" tabindex="-1" aria-labelledby="trackingModalLabel" aria-hidden="true"
         wire:ignore.self>
-        <div class="modal-dialog">
-          <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered"> <!-- اضافه کردن modal-dialog-centered برای وسط چین شدن عمودی -->
+          <div class="modal-content tracking-modal-animate"> <!-- کلاس افکت -->
             <div class="modal-header">
               <h5 class="modal-title" id="trackingModalLabel">ثبت/ویرایش کد رهگیری نسخه</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -183,6 +185,23 @@
           </div>
         </div>
       </div>
+      <style>
+        .tracking-modal-animate {
+          animation: trackingModalFadeInScale 0.35s cubic-bezier(.4, 2, .6, 1) both;
+        }
+
+        @keyframes trackingModalFadeInScale {
+          0% {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      </style>
       <script>
         document.addEventListener('livewire:init', function() {
           Livewire.on('showTrackingModal', () => {

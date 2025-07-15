@@ -47,6 +47,7 @@ class PrescriptionList extends Component
         $presc = PrescriptionRequest::find($this->editId);
         if ($presc) {
             $presc->tracking_code = $this->tracking_code;
+            $presc->status = 'completed';
             $presc->save();
             $this->dispatch('show-alert', type: 'success', message: 'کد رهگیری با موفقیت ثبت شد.');
             $this->editId = null;
