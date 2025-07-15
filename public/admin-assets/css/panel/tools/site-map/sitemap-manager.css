@@ -236,13 +236,7 @@ body {
 .glass-header {
     background: var(--gradient-header);
     border-radius: var(--radius-nav);
-    padding: 0.75rem;
-    box-shadow: 0 4px 16px var(--shadow);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: nowrap;
+
 }
 
 /* جدول */
@@ -1279,6 +1273,9 @@ body {
     border: none;
     color: white;
     transition: all 0.3s ease;
+}
+.bg-primary{
+    background-color: var(--gradient-heade) !important;
 }
 
 .btn-gradient-primary:hover,
