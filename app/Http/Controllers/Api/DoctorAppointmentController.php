@@ -41,40 +41,43 @@ class DoctorAppointmentController extends Controller
                 ], 404);
             }
 
+            $selectedClinicId = $request->query('clinic_id');
+            if (!$selectedClinicId) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'کلینیک اجباری است',
+                    'data'    => null,
+                ], 400);
+            }
+
+            if (!is_numeric($selectedClinicId) || $selectedClinicId <= 0) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'شناسه کلینیک نامعتبر است',
+                    'data'    => null,
+                ], 400);
+            }
+
             $clinics = Clinic::where('doctor_id', $doctorId)
                 ->where('is_active', true)
                 ->select('id', 'name', 'province_id', 'city_id', 'address', 'phone_number', 'is_main_clinic')
                 ->get();
 
-            $selectedClinicId = $request->query('clinic_id');
-            $selectedClinic = null;
-            if ($selectedClinicId) {
-                if (!is_numeric($selectedClinicId) || $selectedClinicId <= 0) {
-                    return response()->json([
-                        'status'  => 'error',
-                        'message' => 'شناسه کلینیک نامعتبر است',
-                        'data'    => null,
-                    ], 400);
-                }
-
-                $selectedClinic = $clinics->where('id', (int)$selectedClinicId)->first();
-                if (!$selectedClinic) {
-                    Log::warning("GetAppointmentOptions - Clinic not found or does not belong to doctor", [
-                        'doctor_id' => $doctorId,
-                        'clinic_id' => $selectedClinicId,
-                        'clinics_count' => $clinics->count(),
-                    ]);
-                    return response()->json([
-                        'status'  => 'error',
-                        'message' => 'کلینیک مورد نظر یافت نشد یا به این پزشک تعلق ندارد',
-                        'data'    => null,
-                    ], 404);
-                }
+            $selectedClinic = $clinics->where('id', (int)$selectedClinicId)->first();
+            if (!$selectedClinic) {
+                Log::warning("GetAppointmentOptions - Clinic not found or does not belong to doctor", [
+                    'doctor_id' => $doctorId,
+                    'clinic_id' => $selectedClinicId,
+                    'clinics_count' => $clinics->count(),
+                ]);
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'کلینیک مورد نظر یافت نشد یا به این پزشک تعلق ندارد',
+                    'data'    => null,
+                ], 404);
             }
 
-            $inPersonData = $selectedClinic
-                ? $this->getInPersonAppointmentData($doctor, $selectedClinic)
-                : $this->getInPersonAppointmentDataForAllClinics($doctor, $clinics);
+            $inPersonData = $this->getInPersonAppointmentData($doctor, $selectedClinic);
             $onlineData = $this->getOnlineAppointmentData($doctor);
 
             return response()->json([
@@ -100,14 +103,14 @@ class DoctorAppointmentController extends Controller
                             'is_main_clinic' => $clinic->is_main_clinic,
                         ];
                     }),
-                    'selected_clinic' => $selectedClinic ? [
+                    'selected_clinic' => [
                         'id'           => $selectedClinic->id,
                         'name'         => $selectedClinic->name,
                         'province'     => $selectedClinic->province ? $selectedClinic->province->name : null,
                         'city'         => $selectedClinic->city ? $selectedClinic->city->name : null,
                         'address'      => $selectedClinic->address,
                         'phone_number' => $selectedClinic->phone_number,
-                    ] : null,
+                    ],
                     'appointment_types' => [
                         'in_person' => $inPersonData,
                         'online'    => array_merge(
@@ -131,6 +134,22 @@ class DoctorAppointmentController extends Controller
         }
     }
 
+    // Helper to get DoctorAppointmentConfig for a doctor and clinic, strict by clinic_id
+    private function getDoctorAppointmentConfig($doctorId, $clinicId = null)
+    {
+        if (is_null($clinicId)) {
+            // فقط رکورد جنرال
+            return \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctorId)
+                ->whereNull('clinic_id')
+                ->first();
+        } else {
+            // فقط رکورد اختصاصی کلینیک
+            return \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctorId)
+                ->where('clinic_id', $clinicId)
+                ->first();
+        }
+    }
+
     private function getInPersonAppointmentDataForAllClinics($doctor, $clinics)
     {
         $data = [
@@ -145,6 +164,9 @@ class DoctorAppointmentController extends Controller
                 ->where('clinic_id', $clinic->id)
                 ->where('appointment_type', 'in_person')
                 ->first();
+            // استفاده از helper جدید
+            $appointmentConfig = $this->getDoctorAppointmentConfig($doctor->id, $clinic->id);
+            $autoScheduling = $appointmentConfig ? $appointmentConfig->auto_scheduling : 1;
 
             if ($slotData['next_available_slot']) {
                 $data['clinics'][] = [
@@ -157,6 +179,7 @@ class DoctorAppointmentController extends Controller
                     'next_available_slot' => $slotData['next_available_slot'],
                     'next_available_datetime' => $slotData['next_available_datetime'],
                     'slots' => $slotData['slots'],
+                    'auto_scheduling' => $autoScheduling,
                 ];
                 if (!$data['next_available_datetime'] || Carbon::parse($slotData['next_available_datetime'])->lt(Carbon::parse($data['next_available_datetime']))) {
                     $data['next_available_slot'] = $slotData['next_available_slot'];
@@ -175,6 +198,9 @@ class DoctorAppointmentController extends Controller
             ->where('clinic_id', $clinic->id)
             ->where('appointment_type', 'in_person')
             ->first();
+        // استفاده از helper جدید
+        $appointmentConfig = $this->getDoctorAppointmentConfig($doctor->id, $clinic->id);
+        $autoScheduling = $appointmentConfig ? $appointmentConfig->auto_scheduling : 1;
 
         return [
             'next_available_slot' => $slotData['next_available_slot'],
@@ -187,6 +213,7 @@ class DoctorAppointmentController extends Controller
                 'address'   => $clinic->address,
                 'notes'     => $notes ? $notes->notes : 'ملاحظات خاصی برای این نوبت ثبت نشده است',
                 'slots'     => $slotData['slots'],
+                'auto_scheduling' => $autoScheduling,
             ],
         ];
     }
@@ -230,7 +257,7 @@ class DoctorAppointmentController extends Controller
         $currentDayIndex = $today->dayOfWeek;
 
         // دریافت تنظیمات نوبت‌دهی
-        $appointmentConfig = $doctor->appointmentConfig;
+        $appointmentConfig = $this->getDoctorAppointmentConfig($doctor->id, $clinicId);
         $calendarDays = $appointmentConfig ? ($appointmentConfig->calendar_days ?? 30) : 30;
         $defaultDuration = $appointmentConfig ? ($appointmentConfig->appointment_duration ?? 15) : 15;
         $autoScheduling = $appointmentConfig ? $appointmentConfig->auto_scheduling : 1;
