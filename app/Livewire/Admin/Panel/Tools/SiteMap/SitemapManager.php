@@ -3,10 +3,10 @@
 namespace App\Livewire\Admin\Panel\Tools\SiteMap;
 
 use Livewire\Component;
+use App\Models\CrawlLog;
+use App\Models\SitemapUrl;
 use Spatie\Sitemap\Sitemap;
 use Illuminate\Support\Facades\Log;
-use App\Models\Admin\Panel\Tools\CrawlLog;
-use App\Models\Admin\Panel\Tools\SitemapUrl;
 use Spatie\Sitemap\Tags\Url as SitemapUrlTag;
 use App\Jobs\Admin\Panel\Tools\CrawlSiteForSitemap;
 
