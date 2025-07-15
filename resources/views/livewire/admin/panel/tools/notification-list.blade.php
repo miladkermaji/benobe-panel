@@ -54,7 +54,7 @@
     <div class="card shadow-sm d-none d-lg-block rounded-2">
       <div class="card-body p-0">
         <div class="table-responsive text-nowrap">
-          <table class="table table-bordered table-hover w-100 m-0 align-middle">
+          <table class="table  w-100 m-0 align-middle">
             <thead class="table-dark">
               <tr>
                 <th class="text-center align-middle" style="width: 50px;">
