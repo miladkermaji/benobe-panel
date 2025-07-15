@@ -1,6 +1,6 @@
 <div class="container-fluid py-4" dir="rtl">
   <!-- هدر -->
-  <header class="glass-header p-4 rounded-xl mb-5 shadow-lg animate__animated animate__fadeIn">
+  <header class="glass-header p-4  mb-5 shadow-lg animate__animated animate__fadeIn">
     <div class="d-flex align-items-center justify-content-start gap-3 flex-nowrap">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
         class="animate-pulse">
@@ -13,7 +13,7 @@
 
   <!-- ابزارها -->
   <div class="container-fluid px-0 mb-5">
-    <div class="bg-light p-4 rounded-xl shadow-sm animate__animated animate__fadeInUp">
+    <div class="bg-light p-4  shadow-sm animate__animated animate__fadeInUp">
       <div class="row g-4 align-items-center">
         <div class="col-md-4 col-sm-12">
           <div class="input-group align-items-center">
@@ -26,7 +26,7 @@
             <input type="email" class="form-control input-modern border-0 shadow-none flex-grow-1"
               wire:model="newEmail" placeholder="ایمیل جدید">
             <button wire:click="addMember"
-              class="btn btn-gradient-success px-4 py-2 d-flex align-items-center gap-2 shadow-sm rounded-end-xl">
+              class="btn btn-gradient-success px-4 py-2 d-flex align-items-center gap-2 shadow-sm mx-3">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
               </svg>
@@ -72,7 +72,7 @@
       <div class="card-body p-0">
         <!-- جدول - فقط در دسکتاپ -->
         <div class="table-responsive text-nowrap d-none d-lg-block">
-          <table class="table table-bordered table-hover w-100 m-0 rounded-xl">
+          <table class="table w-100 m-0 ">
             <thead class="glass-header text-white">
               <tr>
                 <th class="text-center align-middle py-3"><input type="checkbox" wire:model.live="selectAll"
