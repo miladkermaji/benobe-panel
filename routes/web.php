@@ -866,3 +866,7 @@ Route::middleware(['doctor'])->prefix('dr/panel')->group(function () {
     // ... existing code ...
     Route::get('my-prescriptions', [\App\Http\Controllers\Dr\Panel\DoctorPrescriptionController::class, 'index'])->name('dr.panel.my-prescriptions');
 });
+
+Route::middleware(['web', 'manager'])->prefix('admin/panel/tools')->group(function () {
+    Route::get('/recipients-search', [\App\Http\Controllers\Admin\Panel\Tools\Notification\NotificationController::class, 'recipientsSearch']);
+});
