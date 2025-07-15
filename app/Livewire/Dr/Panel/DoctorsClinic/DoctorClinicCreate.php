@@ -20,6 +20,7 @@ class DoctorClinicCreate extends Component
     public $description;
     public $provinces;
     public $cities;
+    public $prescription_fee = null;
 
     public function mount()
     {
@@ -49,6 +50,7 @@ class DoctorClinicCreate extends Component
             'postal_code' => $this->postal_code,
             'address' => $this->address,
             'description' => $this->description,
+            'prescription_fee' => $this->prescription_fee,
         ], [
             'name' => 'required|string|max:255',
             'phone_numbers' => 'required|array|min:1',
@@ -58,12 +60,15 @@ class DoctorClinicCreate extends Component
             'postal_code' => 'nullable|string',
             'address' => 'nullable|string',
             'description' => 'nullable|string',
+            'prescription_fee' => 'nullable|numeric|min:0',
         ], [
             'name.required' => 'وارد کردن نام مطب الزامی است.',
             'phone_numbers.required' => 'وارد کردن حداقل یک شماره موبایل الزامی است.',
             'phone_numbers.*.required' => 'وارد کردن شماره موبایل الزامی است.',
             'province_id.required' => 'انتخاب استان الزامی است.',
             'city_id.required' => 'انتخاب شهر الزامی است.',
+            'prescription_fee.numeric' => 'تعرفه نسخه باید عددی باشد.',
+            'prescription_fee.min' => 'تعرفه نسخه نمی‌تواند منفی باشد.',
         ]);
 
         if ($validator->fails()) {
@@ -80,6 +85,7 @@ class DoctorClinicCreate extends Component
             'postal_code' => $this->postal_code,
             'address' => $this->address,
             'description' => $this->description,
+            'prescription_fee' => $this->prescription_fee,
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'مطب با موفقیت ایجاد شد!');

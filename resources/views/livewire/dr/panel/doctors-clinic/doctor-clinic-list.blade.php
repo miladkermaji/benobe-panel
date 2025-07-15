@@ -70,6 +70,7 @@
                   <th class="align-middle">شهر</th>
                   <th class="align-middle">آدرس</th>
                   <th class="align-middle">توضیحات</th>
+                  <th class="align-middle">تعرفه نسخه</th>
                   <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
                   <th class="text-center align-middle" style="width: 120px;">عملیات</th>
                 </tr>
@@ -90,6 +91,9 @@
                       <td>{{ $item->city ? $item->city->name : 'نامشخص' }}</td>
                       <td>{{ $item->address ?? '---' }}</td>
                       <td>{{ $item->description ?? '---' }}</td>
+                      <td>
+                        {{ $item->prescription_fee !== null ? number_format($item->prescription_fee) . ' تومان' : '---' }}
+                      </td>
                       <td class="text-center">
                         <div class="form-check form-switch d-flex justify-content-center">
                           <input class="form-check-input" type="checkbox" role="switch"
@@ -120,7 +124,7 @@
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="9" class="text-center py-4">
+                      <td colspan="10" class="text-center py-4">
                         <div class="d-flex justify-content-center align-items-center flex-column">
                           <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" class="text-muted mb-2">
@@ -133,7 +137,7 @@
                   @endforelse
                 @else
                   <tr>
-                    <td colspan="9" class="text-center py-4">
+                    <td colspan="10" class="text-center py-4">
                       <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">در حال بارگذاری...</span>
                       </div>
@@ -190,6 +194,11 @@
                     <div class="note-card-item">
                       <span class="note-card-label">توضیحات:</span>
                       <span class="note-card-value">{{ $item->description ?? '---' }}</span>
+                    </div>
+                    <div class="note-card-item">
+                      <span class="note-card-label">تعرفه نسخه:</span>
+                      <span
+                        class="note-card-value">{{ $item->prescription_fee !== null ? number_format($item->prescription_fee) . ' تومان' : '---' }}</span>
                     </div>
                     <div class="note-card-item">
                       <span class="note-card-label">وضعیت:</span>

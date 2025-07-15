@@ -33,6 +33,14 @@
                   placeholder="شماره موبایل" required>
                 <label for="clinic-phone" class="form-label">شماره موبایل</label>
               </div>
+              <div class="col-md-6 col-sm-12 position-relative mt-4">
+                <input wire:model.defer="prescription_fee" type="number" min="0" step="0.01"
+                  class="form-control" id="clinic-prescription-fee" placeholder="تعرفه نسخه (تومان)">
+                <label for="clinic-prescription-fee" class="form-label">تعرفه نسخه (تومان)</label>
+                @error('prescription_fee')
+                  <span class="text-danger">{{ $message }}</span>
+                @enderror
+              </div>
               <div class="col-md-6 col-sm-12 position-relative mt-4" wire:ignore>
                 <select wire:model="province_id" class="form-select select2-province" id="province_id" required>
                   <option value="">انتخاب استان</option>
