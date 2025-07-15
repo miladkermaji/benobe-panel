@@ -246,6 +246,22 @@
           }
         });
       });
+      Livewire.on('confirm-delete-selected', () => {
+        Swal.fire({
+          title: 'حذف گروهی اعلان‌ها',
+          text: 'آیا مطمئن هستید که می‌خواهید همه اعلان‌های انتخاب‌شده حذف شوند؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('deleteSelected');
+          }
+        });
+      });
     });
   </script>
 </div>

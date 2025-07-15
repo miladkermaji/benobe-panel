@@ -14,6 +14,7 @@ class NotificationList extends Component
     public $selectAll             = false;
     public $selectedNotifications = [];
     public $readyToLoad           = false;
+    public $groupAction = null;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -72,6 +73,26 @@ class NotificationList extends Component
         $this->selectedNotifications = [];
         $this->selectAll             = false;
         $this->dispatch('show-alert', type: 'success', message: 'اعلان‌های انتخاب‌شده با موفقیت حذف شدند.');
+    }
+
+    public function executeGroupAction()
+    {
+        switch ($this->groupAction) {
+            case 'status_active':
+                Notification::whereIn('id', $this->selectedNotifications)->update(['is_active' => true]);
+                $this->dispatch('show-alert', type: 'success', message: 'اعلان‌های انتخاب‌شده فعال شدند.');
+                break;
+            case 'status_inactive':
+                Notification::whereIn('id', $this->selectedNotifications)->update(['is_active' => false]);
+                $this->dispatch('show-alert', type: 'success', message: 'اعلان‌های انتخاب‌شده غیرفعال شدند.');
+                break;
+            case 'delete':
+                $this->dispatch('confirm-delete-selected');
+                break;
+            default:
+                $this->dispatch('show-alert', type: 'warning', message: 'هیچ عملیات معتبری انتخاب نشده است.');
+        }
+        $this->groupAction = null;
     }
 
     public function getTypeLabel($type)
