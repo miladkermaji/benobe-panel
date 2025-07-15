@@ -57,7 +57,6 @@ class DoctorAppointmentController extends Controller
                     'data'    => null,
                 ], 400);
             }
-            
 
             $clinics = Clinic::where('doctor_id', $doctorId)
                 ->where('is_active', true)
