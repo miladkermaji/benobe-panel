@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Admin\Panel\Tools\Redirects;
 
-use App\Models\Admin\Panel\Tools\Redirect;
-use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
+use App\Models\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class RedirectEdit extends Component
 {

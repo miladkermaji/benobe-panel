@@ -1,88 +1,111 @@
-<div class="container-fluid py-2" dir="rtl" wire:init="loadRedirects">
-  <div
-    class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت ریدایرکت‌ها</h1>
-    <div class="search-box position-relative flex-grow-1" style="max-width: 400px;">
-      <input type="text" class="form-control border-0 shadow-none bg-white text-dark ps-5 " wire:model.live="search"
-        placeholder="جستجو در ریدایرکت‌ها...">
-      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 5;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
-          <circle cx="11" cy="11" r="8" />
-          <path d="M21 21l-4.35-4.35" />
-        </svg>
-      </span>
+<div class="redirects-container">
+  <div class="container py-2 mt-3" dir="rtl" wire:init="loadRedirects">
+    <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
+      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
+        <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0">مدیریت ریدایرکت‌ها</h1>
+          </div>
+          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+            <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
+              <div class="search-container position-relative" style="max-width: 100%;">
+                <input type="text"
+                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                  wire:model.live="search" placeholder="جستجو در ریدایرکت‌ها..."
+                  style="padding-right: 20px; text-align: right; direction: rtl;">
+                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                  style="z-index: 5; top: 50%; right: 8px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                    stroke-width="2">
+                    <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                  </svg>
+                </span>
+              </div>
+              <a href="{{ route('admin.panel.tools.redirects.create') }}"
+                class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1">
+                <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span>افزودن</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="d-flex gap-2 flex-shrink-0 flex-wrap justify-content-center buttons-container">
-      <a href="{{ route('admin.panel.tools.redirects.create') }}"
-        class="btn btn-success text-white px-4 d-flex align-items-center gap-2">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-        <span>افزودن ریدایرکت</span>
-      </a>
-      <button wire:click="deleteSelected" class="btn btn-gradient-danger  px-4 d-flex align-items-center gap-2"
-        @if (empty($selectedRedirects)) disabled @endif>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-        </svg>
-        <span>حذف انتخاب‌شده‌ها</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- جدول ریدایرکت‌ها -->
-  <div class="container-fluid px-0">
-    <div class="card shadow-sm">
-      <div class="card-body p-0">
-        <!-- Desktop View -->
-        <div class="d-none d-lg-block">
-          <div class="table-responsive text-nowrap">
-            <table class="table table-bordered table-hover w-100 m-0">
-              <thead class="glass-header text-white">
+    <div class="container-fluid px-0">
+      <div class="card shadow-sm rounded-2">
+        <div class="card-body p-0">
+          <!-- Group Actions -->
+          <div class="group-actions p-2 border-bottom" x-data="{ show: false }"
+            x-show="$wire.selectedRedirects.length > 0">
+            <div class="d-flex align-items-center gap-2 justify-content-end">
+              <select class="form-select form-select-sm" style="max-width: 200px;" wire:model="groupAction">
+                <option value="">عملیات گروهی</option>
+                <option value="delete">حذف انتخاب شده‌ها</option>
+                <option value="status_active">فعال کردن</option>
+                <option value="status_inactive">غیرفعال کردن</option>
+              </select>
+              <button class="btn btn-sm btn-primary" wire:click="executeGroupAction" wire:loading.attr="disabled">
+                <span wire:loading.remove>اجرا</span>
+                <span wire:loading>در حال اجرا...</span>
+              </button>
+            </div>
+          </div>
+          <!-- Desktop Table View -->
+          <div class="table-responsive text-nowrap d-none d-md-block">
+            <table class="table table-hover w-100 m-0">
+              <thead>
                 <tr>
-                  <th class="text-center align-middle" style="width: 50px;">
-                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
+                  <th class="text-center align-middle" style="width: 40px;">
+                    <div class="d-flex justify-content-center align-items-center">
+                      <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
+                    </div>
                   </th>
-                  <th class="text-center align-middle" style="width: 70px;">ردیف</th>
+                  <th class="text-center align-middle" style="width: 60px;">ردیف</th>
                   <th class="align-middle">آدرس مبدا</th>
                   <th class="align-middle">آدرس مقصد</th>
                   <th class="text-center align-middle" style="width: 100px;">کد وضعیت</th>
                   <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
-                  <th class="text-center align-middle" style="width: 150px;">عملیات</th>
+                  <th class="text-center align-middle" style="width: 120px;">عملیات</th>
                 </tr>
               </thead>
               <tbody>
                 @if ($readyToLoad)
-                  @forelse ($redirects as $index => $redirect)
-                    <tr>
-                      <td class="text-center align-middle">
-                        <input type="checkbox" wire:model.live="selectedRedirects" value="{{ $redirect->id }}"
-                          class="form-check-input m-0 align-middle">
-                      </td>
-                      <td class="text-center align-middle">{{ $redirects->firstItem() + $index }}</td>
-                      <td class="align-middle">{{ $redirect->source_url }}</td>
-                      <td class="align-middle">{{ $redirect->target_url }}</td>
-                      <td class="text-center align-middle">{{ $redirect->status_code }}</td>
-                      <td class="text-center align-middle">
-                        <div class="form-check form-switch d-flex justify-content-center">
-                          <input class="form-check-input" type="checkbox" role="switch"
-                            wire:click="toggleStatus({{ $redirect->id }})" @checked($redirect->is_active)>
+                  @forelse ($redirects as $index => $item)
+                    <tr class="align-middle">
+                      <td class="text-center">
+                        <div class="d-flex justify-content-center align-items-center">
+                          <input type="checkbox" wire:model.live="selectedRedirects" value="{{ $item->id }}"
+                            class="form-check-input m-0 align-middle">
                         </div>
                       </td>
-                      <td class="text-center align-middle">
-                        <div class="d-flex justify-content-center gap-2">
-                          <a href="{{ route('admin.panel.tools.redirects.edit', $redirect->id) }}"
-                            class="btn btn-custom rounded-circle p-2 d-flex align-items-center justify-content-center">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      <td class="text-center">{{ $redirects->firstItem() + $index }}</td>
+                      <td>{{ $item->source_url }}</td>
+                      <td>{{ $item->target_url }}</td>
+                      <td class="text-center">{{ $item->status_code }}</td>
+                      <td class="text-center">
+                        <div class="form-check form-switch d-flex justify-content-center">
+                          <input class="form-check-input" type="checkbox" role="switch"
+                            wire:click="toggleStatus({{ $item->id }})" {{ $item->is_active ? 'checked' : '' }}
+                            style="width: 3em; height: 1.5em; margin-top: 0;">
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+                          <a href="{{ route('admin.panel.tools.redirects.edit', $item->id) }}"
+                            class="btn btn-sm btn-gradient-success px-2 py-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                               stroke-width="2">
                               <path
                                 d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
                           </a>
-                          <button wire:click="confirmDelete({{ $redirect->id }})"
-                            class="btn btn-danger rounded-circle p-2 d-flex align-items-center justify-content-center">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
+                          <button wire:click="confirmDelete({{ $item->id }})"
+                            class="btn btn-sm btn-gradient-danger px-2 py-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
                               <path
                                 d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                             </svg>
@@ -92,10 +115,10 @@
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="7" class="text-center py-5">
+                      <td colspan="7" class="text-center py-4">
                         <div class="d-flex justify-content-center align-items-center flex-column">
-                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" class="text-muted mb-3">
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-2">
                             <path d="M5 12h14M12 5l7 7-7 7" />
                           </svg>
                           <p class="text-muted fw-medium">هیچ ریدایرکتی یافت نشد.</p>
@@ -105,101 +128,105 @@
                   @endforelse
                 @else
                   <tr>
-                    <td colspan="7" class="text-center py-5">در حال بارگذاری ریدایرکت‌ها...</td>
+                    <td colspan="7" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
+                      </div>
+                    </td>
                   </tr>
                 @endif
               </tbody>
             </table>
           </div>
-        </div>
-
-        <!-- Mobile & Tablet View -->
-        <div class="d-lg-none">
-          @if ($readyToLoad)
-            @forelse($redirects as $redirect)
-              <div class="card mb-3 shadow-sm">
-                <div class="card-body d-flex flex-column gap-2">
-                  <div class="d-flex align-items-center justify-content-between">
-                    <div class="form-check">
-                      <input type="checkbox" wire:model.live="selectedRedirects" value="{{ $redirect->id }}"
-                        class="form-check-input">
+          <!-- Mobile Card View -->
+          <div class="redirects-cards d-md-none">
+            @if ($readyToLoad)
+              @forelse ($redirects as $index => $item)
+                <div class="note-card mb-3">
+                  <div class="note-card-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                      <input type="checkbox" wire:model.live="selectedRedirects" value="{{ $item->id }}"
+                        class="form-check-input m-0 align-middle">
+                      <span class="badge bg-primary-subtle text-primary">
+                        {{ $item->status_code }}
+                      </span>
                     </div>
-                    <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch"
-                        wire:click="toggleStatus({{ $redirect->id }})" @checked($redirect->is_active)>
+                    <div class="d-flex gap-1">
+                      <a href="{{ route('admin.panel.tools.redirects.edit', $item->id) }}"
+                        class="btn btn-sm btn-gradient-success  px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path
+                            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      </a>
+                      <button wire:click="confirmDelete({{ $item->id }})"
+                        class="btn btn-sm btn-gradient-danger  px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        </svg>
+                      </button>
                     </div>
                   </div>
-                  <div class="d-flex flex-column gap-1">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <span class="text-muted small">آدرس مبدا:</span>
-                      <span class="fw-medium">{{ $redirect->source_url }}</span>
+                  <div class="note-card-body">
+                    <div class="note-card-item">
+                      <span class="note-card-label">آدرس مبدا:</span>
+                      <span class="note-card-value">{{ $item->source_url }}</span>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                      <span class="text-muted small">آدرس مقصد:</span>
-                      <span class="fw-medium">{{ $redirect->target_url }}</span>
+                    <div class="note-card-item">
+                      <span class="note-card-label">آدرس مقصد:</span>
+                      <span class="note-card-value">{{ $item->target_url }}</span>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                      <span class="text-muted small">کد وضعیت:</span>
-                      <span class="fw-medium">{{ $redirect->status_code }}</span>
+                    <div class="note-card-item">
+                      <span class="note-card-label">وضعیت:</span>
+                      <div class="form-check form-switch d-inline-block">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                          wire:click="toggleStatus({{ $item->id }})" {{ $item->is_active ? 'checked' : '' }}
+                          style="width: 3em; height: 1.5em; margin-top: 0;">
+                      </div>
                     </div>
-                  </div>
-                  <div class="d-flex align-items-center gap-2 justify-content-end mt-2">
-                    <a href="{{ route('admin.panel.tools.redirects.edit', $redirect->id) }}"
-                      class="btn btn-custom rounded-circle p-1 d-flex align-items-center justify-content-center">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path
-                          d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                      </svg>
-                    </a>
-                    <button wire:click="confirmDelete({{ $redirect->id }})"
-                      class="btn btn-danger rounded-circle p-1 d-flex align-items-center justify-content-center">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                      </svg>
-                    </button>
                   </div>
                 </div>
-              </div>
-            @empty
-              <div class="text-center text-muted p-3">
-                <div class="d-flex justify-content-center align-items-center flex-column">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" class="text-muted mb-3">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                  <p class="text-muted fw-medium">هیچ ریدایرکتی یافت نشد.</p>
+              @empty
+                <div class="text-center py-4">
+                  <div class="d-flex justify-content-center align-items-center flex-column">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2" class="text-muted mb-2">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                    <p class="text-muted fw-medium">هیچ ریدایرکتی یافت نشد.</p>
+                  </div>
+                </div>
+              @endforelse
+            @else
+              <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">در حال بارگذاری...</span>
                 </div>
               </div>
-            @endforelse
-          @else
-            <div class="text-center text-muted p-3">
-              در حال بارگذاری ریدایرکت‌ها...
-            </div>
-          @endif
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
-          <div class="text-muted">نمایش {{ $redirects ? $redirects->firstItem() : 0 }} تا
-            {{ $redirects ? $redirects->lastItem() : 0 }} از {{ $redirects ? $redirects->total() : 0 }} ردیف
+            @endif
           </div>
-          @if ($redirects && $redirects->hasPages())
-            {{ $redirects->links('livewire::bootstrap') }}
-          @endif
+          <div class="d-flex justify-content-between align-items-center mt-3 px-3 flex-wrap gap-2">
+            @if ($readyToLoad)
+              <div class="text-muted">
+                نمایش {{ $redirects->firstItem() }} تا {{ $redirects->lastItem() }}
+                از {{ $redirects->total() }} ردیف
+              </div>
+              @if ($redirects->hasPages())
+                {{ $redirects->links('livewire::bootstrap') }}
+              @endif
+            @endif
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/tools/redirect/redirect.css') }}">
-
-
   <script>
     document.addEventListener('livewire:init', function() {
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });
-
       Livewire.on('confirm-delete', (event) => {
         Swal.fire({
           title: 'حذف ریدایرکت',
@@ -215,6 +242,22 @@
             Livewire.dispatch('deleteRedirectConfirmed', {
               id: event.id
             });
+          }
+        });
+      });
+      Livewire.on('confirm-delete-selected', () => {
+        Swal.fire({
+          title: 'حذف گروهی ریدایرکت‌ها',
+          text: 'آیا مطمئن هستید که می‌خواهید ریدایرکت‌های انتخاب‌شده را حذف کنید؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('deleteSelectedConfirmed');
           }
         });
       });
