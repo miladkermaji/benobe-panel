@@ -20,6 +20,7 @@ class PrescriptionList extends Component
     public $date_to = '';
     public $tracking_code = '';
     public $editId = null;
+    public $doctor_description = '';
     protected $paginationTheme = 'bootstrap';
 
     protected $listeners = ['refreshList' => '$refresh'];
@@ -35,9 +36,11 @@ class PrescriptionList extends Component
     {
         $this->editId = $id;
         $this->tracking_code = '';
+        $this->doctor_description = '';
         $presc = PrescriptionRequest::find($id);
         if ($presc) {
             $this->tracking_code = $presc->tracking_code;
+            $this->doctor_description = $presc->doctor_description;
         }
         $this->dispatch('showTrackingModal');
     }
@@ -47,11 +50,13 @@ class PrescriptionList extends Component
         $presc = PrescriptionRequest::find($this->editId);
         if ($presc) {
             $presc->tracking_code = $this->tracking_code;
+            $presc->doctor_description = $this->doctor_description;
             $presc->status = 'completed';
             $presc->save();
-            $this->dispatch('show-alert', type: 'success', message: 'کد رهگیری با موفقیت ثبت شد.');
+            $this->dispatch('show-alert', type: 'success', message: 'کد رهگیری و توضیحات پزشک با موفقیت ثبت شد.');
             $this->editId = null;
             $this->tracking_code = '';
+            $this->doctor_description = '';
             $this->dispatch('hideTrackingModal');
             $this->dispatch('refreshList');
         }

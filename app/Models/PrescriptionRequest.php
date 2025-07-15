@@ -11,6 +11,7 @@ class PrescriptionRequest extends Model
         'patient_id',
         'type',
         'description',
+        'doctor_description',
         'tracking_code',
         'status',
         'prescription_insurance_id',

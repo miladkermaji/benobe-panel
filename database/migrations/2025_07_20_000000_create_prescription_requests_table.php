@@ -13,6 +13,7 @@ return new class () extends Migration {
             $table->unsignedBigInteger('doctor_id')->nullable();
             $table->unsignedBigInteger('patient_id')->nullable();
             $table->text('description')->nullable();
+            $table->text('doctor_description')->nullable(); // توضیحات پزشک
             $table->string('tracking_code')->unique();
             $table->enum('status', ['pending', 'paid', 'rejected', 'completed'])->default('pending');
             $table->unsignedBigInteger('prescription_insurance_id')->nullable();

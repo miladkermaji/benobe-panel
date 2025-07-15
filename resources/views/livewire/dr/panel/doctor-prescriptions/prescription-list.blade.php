@@ -62,21 +62,27 @@
                         @case('renew_lab')
                           آزمایش
                         @break
+
                         @case('renew_drug')
                           دارو
                         @break
+
                         @case('renew_insulin')
                           انسولین
                         @break
+
                         @case('sonography')
                           سونوگرافی
                         @break
+
                         @case('mri')
                           MRI
                         @break
+
                         @case('other')
                           سایر
                         @break
+
                         @default
                           -
                       @endswitch
@@ -89,12 +95,15 @@
                         @case('pending')
                           <span class="badge bg-warning text-dark">در انتظار</span>
                         @break
+
                         @case('paid')
                           <span class="badge bg-success">پرداخت شده</span>
                         @break
+
                         @case('failed')
                           <span class="badge bg-danger">ناموفق</span>
                         @break
+
                         @default
                           -
                       @endswitch
@@ -174,21 +183,27 @@
                                 @case('renew_lab')
                                   آزمایش
                                 @break
+
                                 @case('renew_drug')
                                   دارو
                                 @break
+
                                 @case('renew_insulin')
                                   انسولین
                                 @break
+
                                 @case('sonography')
                                   سونوگرافی
                                 @break
+
                                 @case('mri')
                                   MRI
                                 @break
+
                                 @case('other')
                                   سایر
                                 @break
+
                                 @default
                                   -
                               @endswitch
@@ -204,12 +219,15 @@
                                 @case('pending')
                                   در انتظار
                                 @break
+
                                 @case('paid')
                                   پرداخت شده
                                 @break
+
                                 @case('failed')
                                   ناموفق
                                 @break
+
                                 @default
                                   -
                               @endswitch
@@ -227,7 +245,8 @@
                               <span class="note-card-value">
                                 @foreach ($item->insulins as $insulin)
                                   <span class="badge bg-info text-dark mb-1">{{ $insulin->name }}
-                                    ({{ $insulin->pivot->count }})</span>
+                                    ({{ $insulin->pivot->count }})
+                                  </span>
                                 @endforeach
                               </span>
                             </div>
@@ -271,8 +290,9 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <input type="text" class="form-control" wire:model.defer="tracking_code"
+                  <input type="text" class="form-control mb-2" wire:model.defer="tracking_code"
                     placeholder="کد رهگیری نسخه">
+                  <textarea class="form-control" wire:model.defer="doctor_description" placeholder="توضیحات پزشک" rows="3"></textarea>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
@@ -309,6 +329,7 @@
                 }
               });
             });
+
             function toggleAccordion(btn) {
               var content = btn.closest('.card').querySelector('.accordion-content');
               content.classList.toggle('show');
