@@ -103,7 +103,7 @@ class AppointmentBookingController extends Controller
 
             if ($existingAppointment) {
                 $trackingCode = $existingAppointment->tracking_code;
-                $reservedAt = $existingAppointment->reserved_at;
+                $reservedAt = $existingAppointment->reserved_at ? $existingAppointment->reserved_at->copy()->setTimezone('Asia/Tehran') : null;
             } else {
                 // تولید کد رهگیری یکتا (قبل از پرداخت)
                 $trackingCode = null;
@@ -126,12 +126,12 @@ class AppointmentBookingController extends Controller
                     'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),
                     'fee' => $depositAmount + $infrastructureFee,
                     'tracking_code' => $trackingCode,
-                    'reserved_at' => now(),
+                    'reserved_at' => now('Asia/Tehran'),
                     'status' => 'scheduled',
                     'payment_status' => 'pending',
                     'appointment_type' => $serviceType,
                 ]);
-                $reservedAt = $appointment->reserved_at;
+                $reservedAt = $appointment->reserved_at ? $appointment->reserved_at->copy()->setTimezone('Asia/Tehran') : null;
             }
 
             // آماده‌سازی داده‌ها برای نمایش
@@ -158,7 +158,7 @@ class AppointmentBookingController extends Controller
                     'total_amount'       => $depositAmount + $infrastructureFee,
                 ],
                 'tracking_code' => $trackingCode, // اضافه کردن کد رهگیری به خروجی
-                'reserved_at' => $reservedAt,
+                'reserved_at' => $reservedAt ? $reservedAt->toDateTimeString() : null,
             ];
 
             return response()->json([
@@ -197,7 +197,11 @@ class AppointmentBookingController extends Controller
                 'data' => null,
             ], 400);
         }
+        // جستجو در هر دو جدول
         $appointment = Appointment::where('tracking_code', $trackingCode)->first();
+        if (!$appointment) {
+            $appointment = CounselingAppointment::where('tracking_code', $trackingCode)->first();
+        }
         if (!$appointment) {
             return response()->json([
                 'status' => 'error',
@@ -205,13 +209,13 @@ class AppointmentBookingController extends Controller
                 'data' => null,
             ], 404);
         }
-        $now = now();
-        $reservedAt = $appointment->reserved_at;
-        $expiresAt = $reservedAt ? $reservedAt->addMinutes(10) : null;
+        $now = now('Asia/Tehran');
+        $reservedAt = $appointment->reserved_at ? $appointment->reserved_at->copy()->setTimezone('Asia/Tehran') : null;
+        $expiresAt = $reservedAt ? $reservedAt->copy()->addMinutes(10) : null;
         $remaining = $expiresAt && $now->lessThan($expiresAt) ? $now->diffInSeconds($expiresAt) : 0;
         $isExpired = $expiresAt && $now->greaterThanOrEqualTo($expiresAt);
         $status = $appointment->payment_status === 'paid' ? 'paid' : ($isExpired ? 'expired' : 'pending');
-        return response()->json([
+        $response = [
             'status' => 'success',
             'data' => [
                 'tracking_code' => $trackingCode,
@@ -221,10 +225,16 @@ class AppointmentBookingController extends Controller
                 'appointment_time' => $appointment->appointment_time,
                 'status' => $status,
                 'remaining_seconds' => $remaining,
-                'reserved_at' => $reservedAt,
-                'expires_at' => $expiresAt,
+                'reserved_at' => $reservedAt ? $reservedAt->toDateTimeString() : null,
+                'expires_at' => $expiresAt ? $expiresAt->toDateTimeString() : null,
             ],
-        ]);
+        ];
+        if ($status === 'expired' && $remaining === 0) {
+            $response['message'] = 'مهلت پرداخت شما به پایان رسید و این نوبت دیگر قابل پرداخت نیست. لطفاً مجدداً اقدام به رزرو نوبت نمایید.';
+            // حذف رکورد نوبت از دیتابیس
+            $appointment->delete();
+        }
+        return response()->json($response);
     }
 
     public function bookAppointment(Request $request, $doctorId)
@@ -398,7 +408,7 @@ class AppointmentBookingController extends Controller
                     'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),
                     'fee' => $totalFee,
                     'tracking_code' => $trackingCode,
-                    'reserved_at' => now(),
+                    'reserved_at' => now('Asia/Tehran'),
                     'status' => 'scheduled',
                     'payment_status' => 'pending',
                     'appointment_type' => $serviceType,
