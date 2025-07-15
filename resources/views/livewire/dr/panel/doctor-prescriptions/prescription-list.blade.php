@@ -166,17 +166,12 @@
                         wire:ignore
                         style="cursor:pointer; background: linear-gradient(90deg, #4f9acd 0%, #2e86c1 100%); min-height:38px; color:#fff; transition: background 0.3s;"
                         aria-controls="prescCollapse{{ $item->id }}">
-                        <span class="fw-bold text-white small">{{ optional($item->patient)->first_name }}
-                          {{ optional($item->patient)->last_name }}
+                        <span class="fw-bold text-white small">
+                          {{ optional($item->patient)->first_name }} {{ optional($item->patient)->last_name }}
+                          @if (optional($item->patient)->national_code)
+                            <span class="text-white-50"> ({{ optional($item->patient)->national_code }})</span>
+                          @endif
                         </span>
-                        <button type="button" class="btn btn-link p-0 ms-1 align-baseline" title="اطلاعات بیمار"
-                          wire:click.stop="showPatientInfo({{ optional($item->patient)->id }})">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="10" stroke="#fff" stroke-width="2" />
-                            <path d="M12 8v2m0 4h.01" stroke="#fff" stroke-width="2" stroke-linecap="round" />
-                          </svg>
-                        </button>
                         <button type="button" class="chevron-icon ms-2 btn btn-link p-0 shadow-none"
                           onclick="toggleAccordion(this)">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -360,28 +355,113 @@
             </div>
             <div class="modal-body">
               @if ($selectedPatient)
-                <div class="mb-2"><strong>نام و نام خانوادگی:</strong> {{ $selectedPatient['full_name'] }}</div>
-                <div class="mb-2"><strong>کد ملی:</strong> {{ $selectedPatient['national_code'] }}</div>
-                <div class="mb-2"><strong>شماره موبایل:</strong> {{ $selectedPatient['mobile'] }}</div>
-                @if ($selectedPatient['date_of_birth'])
-                  <div class="mb-2"><strong>تاریخ تولد:</strong> {{ $selectedPatient['date_of_birth'] }}</div>
-                @endif
-                @if ($selectedPatient['sex'])
-                  <div class="mb-2"><strong>جنسیت:</strong>
-                    {{ $selectedPatient['sex'] == 'male' ? 'مرد' : ($selectedPatient['sex'] == 'female' ? 'زن' : $selectedPatient['sex']) }}
-                  </div>
-                @endif
-                @if ($selectedPatient['province'] || $selectedPatient['city'])
-                  <div class="mb-2"><strong>استان/شهر:</strong>
-                    {{ $selectedPatient['province'] }}{{ $selectedPatient['province'] && $selectedPatient['city'] ? ' / ' : '' }}{{ $selectedPatient['city'] }}
-                  </div>
-                @endif
-                @if ($selectedPatient['address'])
-                  <div class="mb-2"><strong>آدرس:</strong> {{ $selectedPatient['address'] }}</div>
-                @endif
-                @if ($selectedPatient['email'])
-                  <div class="mb-2"><strong>ایمیل:</strong> {{ $selectedPatient['email'] }}</div>
-                @endif
+                <div class="bg-light rounded-3 p-3 mb-2 border" style="font-size:1.04em;">
+                  <ul class="list-unstyled mb-0">
+                    <li class="d-flex align-items-center mb-2">
+                      <span class="me-2 text-primary">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"
+                          viewBox="0 0 24 24">
+                          <path
+                            d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z" />
+                        </svg>
+                      </span>
+                      <span class="fw-bold">نام و نام خانوادگی:</span>
+                      <span class="ms-2">{{ $selectedPatient['full_name'] }}</span>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                      <span class="me-2 text-info">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                          viewBox="0 0 24 24">
+                          <path d="M4 7V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3" />
+                          <rect width="16" height="12" x="4" y="7" rx="2" />
+                          <path d="M8 11h8M8 15h6" />
+                        </svg>
+                      </span>
+                      <span class="fw-bold">کد ملی:</span>
+                      <span class="ms-2">{{ $selectedPatient['national_code'] }}</span>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                      <span class="me-2 text-success">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                          viewBox="0 0 24 24">
+                          <path
+                            d="M3 5.5A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5v13A2.5 2.5 0 0 1 18.5 21h-13A2.5 2.5 0 0 1 3 18.5v-13z" />
+                          <path d="M7 10h.01M12 10h.01M17 10h.01M7 14h.01M12 14h.01M17 14h.01" />
+                        </svg>
+                      </span>
+                      <span class="fw-bold">شماره موبایل:</span>
+                      <span class="ms-2">{{ $selectedPatient['mobile'] }}</span>
+                    </li>
+                    @if ($selectedPatient['date_of_birth'])
+                      <li class="d-flex align-items-center mb-2">
+                        <span class="me-2 text-warning">
+                          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                            viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 6v6l4 2" />
+                          </svg>
+                        </span>
+                        <span class="fw-bold">تاریخ تولد:</span>
+                        <span class="ms-2">{{ $selectedPatient['date_of_birth'] }}</span>
+                      </li>
+                    @endif
+                    @if ($selectedPatient['sex'])
+                      <li class="d-flex align-items-center mb-2">
+                        <span class="me-2 text-secondary">
+                          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                            viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 8v4" />
+                            <path d="M12 16h.01" />
+                          </svg>
+                        </span>
+                        <span class="fw-bold">جنسیت:</span>
+                        <span
+                          class="ms-2">{{ $selectedPatient['sex'] == 'male' ? 'مرد' : ($selectedPatient['sex'] == 'female' ? 'زن' : $selectedPatient['sex']) }}</span>
+                      </li>
+                    @endif
+                    @if ($selectedPatient['province'] || $selectedPatient['city'])
+                      <li class="d-flex align-items-center mb-2">
+                        <span class="me-2 text-primary">
+                          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                            viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                            <circle cx="12" cy="9" r="2.5" />
+                          </svg>
+                        </span>
+                        <span class="fw-bold">استان/شهر:</span>
+                        <span
+                          class="ms-2">{{ $selectedPatient['province'] }}{{ $selectedPatient['province'] && $selectedPatient['city'] ? ' / ' : '' }}{{ $selectedPatient['city'] }}</span>
+                      </li>
+                    @endif
+                    @if ($selectedPatient['address'])
+                      <li class="d-flex align-items-center mb-2">
+                        <span class="me-2 text-dark">
+                          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                            viewBox="0 0 24 24">
+                            <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                          </svg>
+                        </span>
+                        <span class="fw-bold">آدرس:</span>
+                        <span class="ms-2">{{ $selectedPatient['address'] }}</span>
+                      </li>
+                    @endif
+                    @if ($selectedPatient['email'])
+                      <li class="d-flex align-items-center mb-2">
+                        <span class="me-2 text-danger">
+                          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                            viewBox="0 0 24 24">
+                            <rect x="2" y="4" width="20" height="16" rx="2" />
+                            <path d="M22 6 12 13 2 6" />
+                          </svg>
+                        </span>
+                        <span class="fw-bold">ایمیل:</span>
+                        <span class="ms-2">{{ $selectedPatient['email'] }}</span>
+                      </li>
+                    @endif
+                  </ul>
+                </div>
               @else
                 <div class="text-danger">اطلاعاتی برای این بیمار یافت نشد.</div>
               @endif
