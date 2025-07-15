@@ -1,6 +1,6 @@
 <div class="container-fluid py-2 mt-3" dir="rtl" wire:init="loadInitialData">
   <!-- Header -->
-  <div class="bg-dark bg-gradient text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
+  <div class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
     <div class="d-flex align-items-center flex-grow-1 gap-3 header-title">
       <h1 class="m-0 h3 fw-light">مدیریت نقشه سایت</h1>
       <a href="{{ route('admin.tools.sitemap.settings') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1">
@@ -239,7 +239,7 @@
         <!-- Desktop View -->
         <div class="d-none d-lg-block">
           <div class="table-responsive p-0 m-0">
-            <table class="table table-bordered table-hover w-100 m-0 align-middle">
+            <table class="table  w-100 m-0 align-middle">
               <thead class="table-dark">
                 <tr>
                   <th class="text-center align-middle" style="width: 50px;">
