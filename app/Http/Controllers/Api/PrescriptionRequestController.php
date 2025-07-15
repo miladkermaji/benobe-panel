@@ -32,10 +32,10 @@ class PrescriptionRequestController extends Controller
                 'data' => null,
             ], 401);
         }
-        $prescriptions = $user->prescriptions()->with(['clinic', 'transaction'])->latest()->get();
+        $prescriptions = $user->prescriptions()->with(['clinic', 'transaction', 'insurances.parent'])->latest()->get();
         return response()->json([
             'status' => 'success',
-            'data' => $prescriptions,
+            'data' => \App\Http\Resources\PrescriptionRequestResource::collection($prescriptions),
         ]);
     }
 
@@ -171,14 +171,18 @@ class PrescriptionRequestController extends Controller
                 'description' => $validated['type'] === 'other' ? $validated['description'] : null,
                 'doctor_id' => $validated['doctor_id'],
                 'patient_id' => $user->id,
-                'prescription_insurance_id' => $validated['prescription_insurance_id'] ?? null,
                 'clinic_id' => $clinic?->id,
                 'price' => $price,
                 'status' => 'pending',
                 'payment_status' => $price ? 'pending' : 'paid',
                 'transaction_id' => $transaction_id,
-                'referral_code' => $request->input('referral_code'),
             ]);
+            // Attach insurance(s) with referral_code to pivot
+            if (!empty($validated['prescription_insurance_id'])) {
+                $prescription->insurances()->attach($validated['prescription_insurance_id'], [
+                    'referral_code' => $request->input('referral_code'),
+                ]);
+            }
             // اگر نوع renew_insulin بود، انسولین‌ها را ذخیره کن
             if ($validated['type'] === 'renew_insulin' && !empty($validated['insulins'])) {
                 foreach ($validated['insulins'] as $insulin) {
@@ -228,14 +232,18 @@ class PrescriptionRequestController extends Controller
             'description' => $validated['type'] === 'other' ? $validated['description'] : null,
             'doctor_id' => $validated['doctor_id'],
             'patient_id' => $user->id,
-            'prescription_insurance_id' => $validated['prescription_insurance_id'] ?? null,
             'clinic_id' => $clinic?->id,
             'price' => $price,
             'status' => 'pending',
             'payment_status' => $price ? 'pending' : 'paid',
             'transaction_id' => $transaction_id,
-            'referral_code' => $request->input('referral_code'),
         ]);
+        // Attach insurance(s) with referral_code to pivot
+        if (!empty($validated['prescription_insurance_id'])) {
+            $prescription->insurances()->attach($validated['prescription_insurance_id'], [
+                'referral_code' => $request->input('referral_code'),
+            ]);
+        }
         // اگر نوع renew_insulin بود، انسولین‌ها را ذخیره کن
         if ($validated['type'] === 'renew_insulin' && !empty($validated['insulins'])) {
             foreach ($validated['insulins'] as $insulin) {

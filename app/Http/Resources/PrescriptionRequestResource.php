@@ -17,8 +17,24 @@ class PrescriptionRequestResource extends JsonResource
             'description' => $this->description,
             'doctor_id' => $this->doctor_id,
             'clinic' => $this->whenLoaded('clinic'),
-            'prescription_insurance' => $this->whenLoaded('prescriptionInsurance'),
-            'referral_code' => $this->referral_code,
+            'insurances' => $this->whenLoaded('insurances', function () {
+                $referralNames = ['سلامت همگانی(ایرانیان)', 'کمیته امداد', 'سایر اقشار', 'بهزیستی'];
+                return $this->insurances->map(function ($insurance) use ($referralNames) {
+                    $parent = $insurance->relationLoaded('parent') ? $insurance->parent : null;
+                    $needsReferral = false;
+                    if ($parent && $parent->id == 3 && in_array($insurance->name, $referralNames)) {
+                        $needsReferral = true;
+                    }
+                    return [
+                        'id' => $insurance->id,
+                        'name' => $insurance->name,
+                        'parent_id' => $parent ? $parent->id : null,
+                        'parent_name' => $parent ? $parent->name : null,
+                        'needs_referral_code' => $needsReferral,
+                        'referral_code' => $insurance->pivot->referral_code,
+                    ];
+                });
+            }),
             'price' => $this->price,
             'status' => $this->status,
             'payment_status' => $this->payment_status,

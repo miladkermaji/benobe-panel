@@ -89,7 +89,7 @@ class PrescriptionList extends Component
     public function render()
     {
         $doctor = Auth::guard('doctor')->user();
-        $query = PrescriptionRequest::with(['patient', 'prescriptionInsurance', 'clinic', 'insulins'])
+        $query = PrescriptionRequest::with(['patient', 'insurances.parent', 'clinic', 'insulins'])
             ->where('doctor_id', $doctor->id);
         if ($this->search) {
             $query->where(function ($q) {
@@ -105,7 +105,9 @@ class PrescriptionList extends Component
             $query->where('type', $this->type);
         }
         if ($this->insurance) {
-            $query->where('prescription_insurance_id', $this->insurance);
+            $query->whereHas('insurances', function ($q) {
+                $q->where('prescription_insurance_id', $this->insurance);
+            });
         }
         if ($this->status) {
             $query->where('status', $this->status);

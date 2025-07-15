@@ -11,7 +11,6 @@ return new class () extends Migration {
             $table->id();
             $table->string('name');
             $table->foreignId('parent_id')->nullable()->constrained('prescription_insurances')->onDelete('cascade');
-            $table->string('referral_code')->nullable();
             $table->timestamps();
         });
     }

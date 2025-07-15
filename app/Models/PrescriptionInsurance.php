@@ -9,7 +9,6 @@ class PrescriptionInsurance extends Model
     protected $fillable = [
         'name',
         'parent_id',
-        'referral_code',
     ];
 
     public function parent()
@@ -20,5 +19,12 @@ class PrescriptionInsurance extends Model
     public function children()
     {
         return $this->hasMany(PrescriptionInsurance::class, 'parent_id');
+    }
+
+    public function prescriptions()
+    {
+        return $this->belongsToMany(\App\Models\PrescriptionRequest::class, 'prescription_request_insurance', 'prescription_insurance_id', 'prescription_request_id')
+            ->withPivot('referral_code')
+            ->withTimestamps();
     }
 }

@@ -15,6 +15,7 @@ return new class () extends Migration {
             $table->text('description')->nullable();
             $table->text('doctor_description')->nullable(); // توضیحات پزشک
             $table->string('tracking_code')->unique();
+            $table->string('referral_code')->nullable();
             $table->enum('status', ['pending', 'paid', 'rejected', 'completed'])->default('pending');
             $table->unsignedBigInteger('prescription_insurance_id')->nullable();
             $table->unsignedInteger('price')->nullable();

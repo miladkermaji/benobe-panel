@@ -93,7 +93,27 @@
                           -
                       @endswitch
                     </td>
-                    <td>{{ optional($item->prescriptionInsurance)->name ?? '-' }}</td>
+                    <td>
+                      @if ($item->insurances && $item->insurances->count())
+                        @foreach ($item->insurances as $insurance)
+                          {{ $insurance->name }}
+                          @php
+                            $parent = $insurance->parent;
+                            $referralNames = ['سلامت همگانی(ایرانیان)', 'کمیته امداد', 'سایر اقشار', 'بهزیستی'];
+                            $needsReferral = $parent && $parent->id == 3 && in_array($insurance->name, $referralNames);
+                          @endphp
+                          @if ($needsReferral)
+                            <span class="text-secondary small"> (کد ارجاع:
+                              {{ $insurance->pivot->referral_code ?: '-' }})</span>
+                          @endif
+                          @if (!$loop->last)
+                            ,
+                          @endif
+                        @endforeach
+                      @else
+                        -
+                      @endif
+                    </td>
                     <td>{{ optional($item->clinic)->name ?? '-' }}</td>
                     <td>
                       {{ $item->price ? number_format($item->price) . ' تومان' : '-' }}
@@ -217,8 +237,28 @@
                               @endswitch
                             </span></div>
                           <div class="note-card-item"><span class="note-card-label">بیمه:</span><span
-                              class="note-card-value">{{ optional($item->prescriptionInsurance)->name ?? '-' }}</span>
-                          </div>
+                              class="note-card-value">
+                              @if ($item->insurances && $item->insurances->count())
+                                @foreach ($item->insurances as $insurance)
+                                  {{ $insurance->name }}
+                                  @php
+                                    $parent = $insurance->parent;
+                                    $referralNames = ['سلامت همگانی(ایرانیان)', 'کمیته امداد', 'سایر اقشار', 'بهزیستی'];
+                                    $needsReferral =
+                                        $parent && $parent->id == 3 && in_array($insurance->name, $referralNames);
+                                  @endphp
+                                  @if ($needsReferral)
+                                    <span class="text-secondary small"> (کد ارجاع:
+                                      {{ $insurance->pivot->referral_code ?: '-' }})</span>
+                                  @endif
+                                  @if (!$loop->last)
+                                    ,
+                                  @endif
+                                @endforeach
+                              @else
+                                -
+                              @endif
+                            </span></div>
                           <div class="note-card-item"><span class="note-card-label">کلینیک:</span><span
                               class="note-card-value">{{ optional($item->clinic)->name ?? '-' }}</span></div>
                           <div class="note-card-item"><span class="note-card-label">مبلغ:</span><span

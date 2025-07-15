@@ -19,6 +19,7 @@ class PrescriptionRequest extends Model
         'payment_status',
         'clinic_id',
         'transaction_id',
+        'referral_code',
     ];
 
     protected $casts = [
@@ -41,9 +42,17 @@ class PrescriptionRequest extends Model
         return $this->belongsTo(User::class, 'patient_id');
     }
 
-    public function prescriptionInsurance()
+    public function insurances()
     {
-        return $this->belongsTo(\App\Models\PrescriptionInsurance::class, 'prescription_insurance_id');
+        return $this->belongsToMany(\App\Models\PrescriptionInsurance::class, 'prescription_request_insurance', 'prescription_request_id', 'prescription_insurance_id')
+            ->withPivot('referral_code')
+            ->withTimestamps();
+    }
+
+    public function getReferralCodeFor($insuranceId)
+    {
+        $insurance = $this->insurances->firstWhere('id', $insuranceId);
+        return $insurance ? $insurance->pivot->referral_code : null;
     }
 
     public function clinic()
