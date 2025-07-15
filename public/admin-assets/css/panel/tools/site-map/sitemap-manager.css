@@ -1230,47 +1230,63 @@ body {
 .table thead th {
     width: auto !important;
 }
- .btn-gradient-primary {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
+.btn-gradient-primary {
+    background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-dark)
+    );
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
 
-    .btn-gradient-success {
-      background: linear-gradient(135deg, var(--success-color), var(--success-dark));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
+.btn-gradient-success {
+    background: linear-gradient(
+        135deg,
+        var(--success-color),
+        var(--success-dark)
+    );
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
 
-    .btn-gradient-danger {
-      background: linear-gradient(135deg, var(--danger-color), var(--danger-dark));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
+.btn-gradient-danger {
+    background: linear-gradient(
+        135deg,
+        var(--danger-color),
+        var(--danger-dark)
+    );
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
 
-    .btn-gradient-info {
-      background: linear-gradient(135deg, var(--info-color), var(--info-dark));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
+.btn-gradient-info {
+    background: linear-gradient(135deg, var(--info-color), var(--info-dark));
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
 
-    .btn-gradient-warning {
-      background: linear-gradient(135deg, var(--warning-color), var(--warning-dark));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
+.btn-gradient-warning {
+    background: linear-gradient(
+        135deg,
+        var(--warning-color),
+        var(--warning-dark)
+    );
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
 
-    .btn-gradient-primary:hover,
-    .btn-gradient-success:hover,
-    .btn-gradient-danger:hover,
-    .btn-gradient-info:hover,
-    .btn-gradient-warning:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      color: white;
-    }
+.btn-gradient-primary:hover,
+.btn-gradient-success:hover,
+.btn-gradient-danger:hover,
+.btn-gradient-info:hover,
+.btn-gradient-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: white;
+}
