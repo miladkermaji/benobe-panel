@@ -27,6 +27,18 @@ class NotificationCreate extends Component
     public $end_at;
     public $target_mode            = 'group';
 
+    // --- اضافه کردن متغیرهای کش برای کاربران، پزشکان و منشی‌ها ---
+    protected $users;
+    protected $doctors;
+    protected $secretaries;
+
+    public function mount()
+    {
+        $this->users = User::select('id', 'first_name', 'last_name', 'mobile')->get();
+        $this->doctors = Doctor::select('id', 'first_name', 'last_name', 'mobile')->get();
+        $this->secretaries = Secretary::select('id', 'first_name', 'last_name', 'mobile')->get();
+    }
+
     public function store()
     {
         $data = [
@@ -131,53 +143,60 @@ class NotificationCreate extends Component
         ];
 
         $notification = Notification::create($notificationData);
-
-        $recipientNumbers = []; // آرایه شماره‌های گیرنده
-
+        $recipientNumbers = [];
+        $recipientsToInsert = [];
         Log::info('شروع جمع‌آوری گیرنده‌ها', [
             'target_mode' => $this->target_mode,
             'is_active'   => $this->is_active,
         ]);
-
         if ($this->target_mode === 'single') {
-            $notification->recipients()->create([
+            $recipientsToInsert[] = [
                 'recipient_type' => 'phone',
                 'recipient_id'   => null,
-                'phone_number'   => $this->single_phone, // تغییر به phone_number
-            ]);
+                'phone_number'   => $this->single_phone,
+            ];
             $recipientNumbers = [$this->single_phone];
         } elseif ($this->target_mode === 'multiple') {
             foreach ($this->selected_recipients as $recipient) {
                 [$type, $id] = explode(':', $recipient);
-                $model = $type::find($id);
-                $notification->recipients()->create([
+                $model = null;
+                if ($type === 'App\\Models\\User') {
+                    $model = $this->users->firstWhere('id', $id);
+                } elseif ($type === 'App\\Models\\Doctor') {
+                    $model = $this->doctors->firstWhere('id', $id);
+                } elseif ($type === 'App\\Models\\Secretary') {
+                    $model = $this->secretaries->firstWhere('id', $id);
+                }
+                $recipientsToInsert[] = [
                     'recipient_type' => $type,
                     'recipient_id'   => $id,
-                    'phone_number'   => $model->mobile ?? null, // تغییر به phone_number
-                ]);
+                    'phone_number'   => $model->mobile ?? null,
+                ];
                 if ($model && $model->mobile) {
                     $recipientNumbers[] = $model->mobile;
                 }
             }
         } elseif ($this->target_mode === 'group') {
             $recipients = match ($this->target_group) {
-                'all' => collect()->merge(User::all())->merge(Doctor::all())->merge(Secretary::all()),
-                'doctors'     => Doctor::all(),
-                'secretaries' => Secretary::all(),
-                'patients'    => User::all(),
+                'all' => $this->users->concat($this->doctors)->concat($this->secretaries),
+                'doctors' => $this->doctors,
+                'secretaries' => $this->secretaries,
+                'patients' => $this->users,
             };
             foreach ($recipients as $recipient) {
-                $notification->recipients()->create([
-                    'recipient_type' => $recipient->getMorphClass(),
+                $recipientsToInsert[] = [
+                    'recipient_type' => get_class($recipient),
                     'recipient_id'   => $recipient->id,
-                    'phone_number'   => $recipient->mobile ?? null, // تغییر به phone_number
-                ]);
+                    'phone_number'   => $recipient->mobile ?? null,
+                ];
                 if ($recipient->mobile) {
                     $recipientNumbers[] = $recipient->mobile;
                 }
             }
         }
-
+        if (count($recipientsToInsert)) {
+            $notification->recipients()->insert($recipientsToInsert);
+        }
         Log::info('گیرنده‌ها جمع‌آوری شدند', [
             'recipient_numbers' => $recipientNumbers,
             'is_active'         => $this->is_active,
@@ -210,9 +229,9 @@ class NotificationCreate extends Component
     public function render()
     {
         $allRecipients = collect()
-            ->merge(User::all()->map(fn ($u) => ['id' => "App\\Models\\User:{$u->id}", 'text' => $u->first_name . ' ' . $u->last_name . ' (بیمار)']))
-            ->merge(Doctor::all()->map(fn ($d) => ['id' => "App\\Models\\Doctor:{$d->id}", 'text' => $d->first_name . ' ' . $d->last_name . ' (پزشک)']))
-            ->merge(Secretary::all()->map(fn ($s) => ['id' => "App\\Models\\Secretary:{$s->id}", 'text' => $s->first_name . ' ' . $s->last_name . ' (منشی)']));
+            ->merge($this->users->map(fn ($u) => ['id' => "App\\Models\\User:{$u->id}", 'text' => $u->first_name . ' ' . $u->last_name . ' (بیمار)']))
+            ->merge($this->doctors->map(fn ($d) => ['id' => "App\\Models\\Doctor:{$d->id}", 'text' => $d->first_name . ' ' . $d->last_name . ' (پزشک)']))
+            ->merge($this->secretaries->map(fn ($s) => ['id' => "App\\Models\\Secretary:{$s->id}", 'text' => $s->first_name . ' ' . $s->last_name . ' (منشی)']));
 
         return view('livewire.admin.panel.tools.notification-create', [
             'allRecipients' => $allRecipients,
