@@ -53,10 +53,15 @@
                   <tr>
                     <td>{{ $prescriptions->firstItem() + $index }}</td>
                     <td>
-                      {{ optional($item->patient)->first_name }} {{ optional($item->patient)->last_name }}<br>
-                      <span class="text-primary fw-bold small d-block mt-1"
-                        style="letter-spacing:0.5px; font-size:0.98em;">کد ملی:
-                        {{ optional($item->patient)->national_code }}</span>
+                      {{ optional($item->patient)->first_name }} {{ optional($item->patient)->last_name }}
+                      <button type="button" class="btn btn-link p-0 ms-1 align-baseline" title="اطلاعات بیمار"
+                        wire:click="showPatientInfo({{ optional($item->patient)->id }})">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                          xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="12" cy="12" r="10" stroke="#4f9acd" stroke-width="2" />
+                          <path d="M12 8v2m0 4h.01" stroke="#4f9acd" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                      </button>
                     </td>
                     <td>
                       @switch($item->type)
@@ -164,9 +169,16 @@
                         style="cursor:pointer; background: linear-gradient(90deg, #4f9acd 0%, #2e86c1 100%); min-height:38px; color:#fff; transition: background 0.3s;"
                         aria-controls="prescCollapse{{ $item->id }}">
                         <span class="fw-bold text-white small">{{ optional($item->patient)->first_name }}
-                          {{ optional($item->patient)->last_name }}<span class="text-white-50">
-                            ({{ optional($item->patient)->national_code ?? '-' }})
-                          </span></span>
+                          {{ optional($item->patient)->last_name }}
+                        </span>
+                        <button type="button" class="btn btn-link p-0 ms-1 align-baseline" title="اطلاعات بیمار"
+                          wire:click.stop="showPatientInfo({{ optional($item->patient)->id }})">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#fff" stroke-width="2" />
+                            <path d="M12 8v2m0 4h.01" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+                          </svg>
+                        </button>
                         <button type="button" class="chevron-icon ms-2 btn btn-link p-0 shadow-none"
                           onclick="toggleAccordion(this)">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -338,3 +350,61 @@
           </script>
         </div>
       </div>
+
+      {{-- Patient Info Modal --}}
+      <div class="modal fade" id="patientInfoModal" tabindex="-1" aria-labelledby="patientInfoModalLabel"
+        aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="patientInfoModalLabel">اطلاعات بیمار</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+            </div>
+            <div class="modal-body">
+              @if ($selectedPatient)
+                <div class="mb-2"><strong>نام و نام خانوادگی:</strong> {{ $selectedPatient['full_name'] }}</div>
+                <div class="mb-2"><strong>کد ملی:</strong> {{ $selectedPatient['national_code'] }}</div>
+                <div class="mb-2"><strong>شماره موبایل:</strong> {{ $selectedPatient['mobile'] }}</div>
+                @if ($selectedPatient['date_of_birth'])
+                  <div class="mb-2"><strong>تاریخ تولد:</strong> {{ $selectedPatient['date_of_birth'] }}</div>
+                @endif
+                @if ($selectedPatient['sex'])
+                  <div class="mb-2"><strong>جنسیت:</strong>
+                    {{ $selectedPatient['sex'] == 'male' ? 'مرد' : ($selectedPatient['sex'] == 'female' ? 'زن' : $selectedPatient['sex']) }}
+                  </div>
+                @endif
+                @if ($selectedPatient['province'] || $selectedPatient['city'])
+                  <div class="mb-2"><strong>استان/شهر:</strong>
+                    {{ $selectedPatient['province'] }}{{ $selectedPatient['province'] && $selectedPatient['city'] ? ' / ' : '' }}{{ $selectedPatient['city'] }}
+                  </div>
+                @endif
+                @if ($selectedPatient['address'])
+                  <div class="mb-2"><strong>آدرس:</strong> {{ $selectedPatient['address'] }}</div>
+                @endif
+                @if ($selectedPatient['email'])
+                  <div class="mb-2"><strong>ایمیل:</strong> {{ $selectedPatient['email'] }}</div>
+                @endif
+              @else
+                <div class="text-danger">اطلاعاتی برای این بیمار یافت نشد.</div>
+              @endif
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        document.addEventListener('livewire:init', function() {
+          Livewire.on('showPatientInfoModal', () => {
+            setTimeout(function() {
+              var modal = new bootstrap.Modal(document.getElementById('patientInfoModal'));
+              modal.show();
+            }, 100);
+          });
+          Livewire.on('hidePatientInfoModal', () => {
+            var modal = bootstrap.Modal.getInstance(document.getElementById('patientInfoModal'));
+            if (modal) modal.hide();
+          });
+        });
+      </script>

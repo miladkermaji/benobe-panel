@@ -21,6 +21,7 @@ class PrescriptionList extends Component
     public $tracking_code = '';
     public $editId = null;
     public $doctor_description = '';
+    public $selectedPatient = null;
     protected $paginationTheme = 'bootstrap';
 
     protected $listeners = ['refreshList' => '$refresh'];
@@ -60,6 +61,29 @@ class PrescriptionList extends Component
             $this->dispatch('hideTrackingModal');
             $this->dispatch('refreshList');
         }
+    }
+
+    public function showPatientInfo($patientId)
+    {
+        $patient = \App\Models\User::with(['province', 'city'])->find($patientId);
+        if ($patient) {
+            $this->selectedPatient = [
+                'first_name' => $patient->first_name,
+                'last_name' => $patient->last_name,
+                'full_name' => $patient->full_name,
+                'national_code' => $patient->national_code,
+                'mobile' => $patient->mobile,
+                'email' => $patient->email,
+                'date_of_birth' => $patient->date_of_birth,
+                'sex' => $patient->sex,
+                'province' => $patient->province ? $patient->province->name : null,
+                'city' => $patient->city ? $patient->city->name : null,
+                'address' => $patient->address,
+            ];
+        } else {
+            $this->selectedPatient = null;
+        }
+        $this->dispatch('showPatientInfoModal');
     }
 
     public function render()
