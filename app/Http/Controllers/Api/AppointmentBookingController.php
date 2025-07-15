@@ -72,16 +72,6 @@ class AppointmentBookingController extends Controller
                 ], 404);
             }
 
-            // بررسی در دسترس بودن نوبت
-            $isSlotAvailable = $this->checkSlotAvailability($doctor, $appointmentDate, $appointmentTime, $serviceType);
-            if (! $isSlotAvailable) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'این نوبت دیگر در دسترس نیست.',
-                    'data'    => null,
-                ], 400);
-            }
-
             // اطلاعات کلینیک
             $mainClinic = $doctor->clinics()->where('is_active', true)->where('is_main_clinic', true)->first()
                 ?? $doctor->clinics()->where('is_active', true)->first();
@@ -100,6 +90,49 @@ class AppointmentBookingController extends Controller
             $infrastructureFee = InfrastructureFee::where('appointment_type', $serviceType)
                 ->where('is_active', true)
                 ->first()->fee ?? 0;
+
+            // بررسی وجود رزرو موقت فعال برای همین اسلات
+            $existingAppointment = Appointment::where('doctor_id', $doctor->id)
+                ->where('clinic_id', $mainClinic ? $mainClinic->id : null)
+                ->where('appointment_date', $appointmentDate)
+                ->whereRaw("TIME_FORMAT(appointment_time, '%H:%i') = ?", [$appointmentTime])
+                ->where('status', 'scheduled')
+                ->where('payment_status', 'pending')
+                ->where('reserved_at', '>=', now()->subMinutes(10))
+                ->first();
+
+            if ($existingAppointment) {
+                $trackingCode = $existingAppointment->tracking_code;
+                $reservedAt = $existingAppointment->reserved_at;
+            } else {
+                // تولید کد رهگیری یکتا (قبل از پرداخت)
+                $trackingCode = null;
+                $maxAttempts = 10;
+                for ($i = 0; $i < $maxAttempts; $i++) {
+                    $trackingCode = mt_rand(10000000, 99999999);
+                    $exists = Appointment::where('tracking_code', $trackingCode)->exists();
+                    if (!$exists) {
+                        break;
+                    }
+                    if ($i === $maxAttempts - 1) {
+                        throw new \Exception('نمی‌توان کد رهگیری یکتا تولید کرد. لطفاً دوباره تلاش کنید.');
+                    }
+                }
+                // ثبت رزرو موقت
+                $appointment = Appointment::create([
+                    'doctor_id' => $doctor->id,
+                    'clinic_id' => $mainClinic ? $mainClinic->id : null,
+                    'appointment_date' => $appointmentDate,
+                    'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),
+                    'fee' => $depositAmount + $infrastructureFee,
+                    'tracking_code' => $trackingCode,
+                    'reserved_at' => now(),
+                    'status' => 'scheduled',
+                    'payment_status' => 'pending',
+                    'appointment_type' => $serviceType,
+                ]);
+                $reservedAt = $appointment->reserved_at;
+            }
 
             // آماده‌سازی داده‌ها برای نمایش
             $data = [
@@ -124,6 +157,8 @@ class AppointmentBookingController extends Controller
                     'infrastructure_fee' => $infrastructureFee,
                     'total_amount'       => $depositAmount + $infrastructureFee,
                 ],
+                'tracking_code' => $trackingCode, // اضافه کردن کد رهگیری به خروجی
+                'reserved_at' => $reservedAt,
             ];
 
             return response()->json([
@@ -756,20 +791,32 @@ class AppointmentBookingController extends Controller
                 ]);
             }
 
-            // دریافت زمان‌های رزروشده
+            // دریافت زمان‌های رزروشده (اصلاح شده)
             $reservedTimes = $serviceType === 'in_person'
                 ? Appointment::where('doctor_id', $doctor->id)
                     ->where('clinic_id', $mainClinic->id)
                     ->where('appointment_date', $date)
                     ->whereIn('status', ['scheduled', 'pending_review'])
-                    ->where('payment_status', 'paid')
+                    ->where(function ($query) {
+                        $query->where('payment_status', 'paid')
+                              ->orWhere(function ($q) {
+                                  $q->where('payment_status', 'pending')
+                                    ->where('reserved_at', '>=', now()->subMinutes(10));
+                              });
+                    })
                     ->pluck('appointment_time')
                     ->toArray()
                 : CounselingAppointment::where('doctor_id', $doctor->id)
                     ->where('clinic_id', $mainClinic->id)
                     ->where('appointment_date', $date)
                     ->whereIn('status', ['scheduled', 'pending_review'])
-                    ->where('payment_status', 'paid')
+                    ->where(function ($query) {
+                        $query->where('payment_status', 'paid')
+                              ->orWhere(function ($q) {
+                                  $q->where('payment_status', 'pending')
+                                    ->where('reserved_at', '>=', now()->subMinutes(10));
+                              });
+                    })
                     ->pluck('appointment_time')
                     ->toArray();
 
