@@ -42,7 +42,6 @@
                   <th>کلینیک</th>
                   <th>مبلغ</th>
                   <th>پرداخت</th>
-                  <th>وضعیت</th>
                   <th>توضیحات</th>
                   <th>انسولین‌ها</th>
                   <th>کد رهگیری</th>
@@ -63,27 +62,21 @@
                         @case('renew_lab')
                           آزمایش
                         @break
-
                         @case('renew_drug')
                           دارو
                         @break
-
                         @case('renew_insulin')
                           انسولین
                         @break
-
                         @case('sonography')
                           سونوگرافی
                         @break
-
                         @case('mri')
                           MRI
                         @break
-
                         @case('other')
                           سایر
                         @break
-
                         @default
                           -
                       @endswitch
@@ -96,37 +89,12 @@
                         @case('pending')
                           <span class="badge bg-warning text-dark">در انتظار</span>
                         @break
-
                         @case('paid')
                           <span class="badge bg-success">پرداخت شده</span>
                         @break
-
                         @case('failed')
                           <span class="badge bg-danger">ناموفق</span>
                         @break
-
-                        @default
-                          -
-                      @endswitch
-                    </td>
-                    <td>
-                      @switch($item->status)
-                        @case('pending')
-                          <span class="badge bg-secondary">در انتظار</span>
-                        @break
-
-                        @case('paid')
-                          <span class="badge bg-success">پرداخت شده</span>
-                        @break
-
-                        @case('rejected')
-                          <span class="badge bg-danger">رد شده</span>
-                        @break
-
-                        @case('completed')
-                          <span class="badge bg-primary">پایان یافته</span>
-                        @break
-
                         @default
                           -
                       @endswitch
@@ -155,7 +123,13 @@
                       <button
                         class="btn btn-sm btn-primary @if ($item->status === 'completed') disabled bg-secondary border-0 @endif"
                         wire:click="editTrackingCode({{ $item->id }})"
-                        @if ($item->status === 'completed') disabled @endif>پاسخ نسخه</button>
+                        @if ($item->status === 'completed') disabled @endif>
+                        @if ($item->status === 'completed')
+                          پاسخ داده شده
+                        @else
+                          پاسخ نسخه
+                        @endif
+                      </button>
                     </td>
                   </tr>
                   @empty
@@ -200,27 +174,21 @@
                                 @case('renew_lab')
                                   آزمایش
                                 @break
-
                                 @case('renew_drug')
                                   دارو
                                 @break
-
                                 @case('renew_insulin')
                                   انسولین
                                 @break
-
                                 @case('sonography')
                                   سونوگرافی
                                 @break
-
                                 @case('mri')
                                   MRI
                                 @break
-
                                 @case('other')
                                   سایر
                                 @break
-
                                 @default
                                   -
                               @endswitch
@@ -230,51 +198,25 @@
                           </div>
                           <div class="note-card-item"><span class="note-card-label">کلینیک:</span><span
                               class="note-card-value">{{ optional($item->clinic)->name ?? '-' }}</span></div>
-                          <div class="note-card-item"><span class="note-card-label">مبلغ:</span><span
-                              class="note-card-value">{{ $item->price ? number_format($item->price) . ' تومان' : '-' }}</span>
-                          </div>
-                          <div class="note-card-item"><span class="note-card-label">وضعیت:</span><span
-                              class="note-card-value">
-                              @switch($item->status)
-                                @case('pending')
-                                  در انتظار
-                                @break
-
-                                @case('paid')
-                                  پرداخت شده
-                                @break
-
-                                @case('rejected')
-                                  رد شده
-                                @break
-
-                                @case('completed')
-                                  پایان یافته
-                                @break
-
-                                @default
-                                  -
-                              @endswitch
-                            </span></div>
                           <div class="note-card-item"><span class="note-card-label">وضعیت پرداخت:</span><span
                               class="note-card-value">
                               @switch($item->payment_status)
                                 @case('pending')
                                   در انتظار
                                 @break
-
                                 @case('paid')
                                   پرداخت شده
                                 @break
-
                                 @case('failed')
                                   ناموفق
                                 @break
-
                                 @default
                                   -
                               @endswitch
                             </span></div>
+                          <div class="note-card-item"><span class="note-card-label">مبلغ:</span><span
+                              class="note-card-value">{{ $item->price ? number_format($item->price) . ' تومان' : '-' }}</span>
+                          </div>
                           <div class="note-card-item"><span class="note-card-label">تاریخ:</span><span
                               class="note-card-value">{{ jdate($item->created_at)->format('Y/m/d H:i') }}</span></div>
                           <div class="note-card-item"><span class="note-card-label">توضیحات:</span><span
@@ -285,8 +227,7 @@
                               <span class="note-card-value">
                                 @foreach ($item->insulins as $insulin)
                                   <span class="badge bg-info text-dark mb-1">{{ $insulin->name }}
-                                    ({{ $insulin->pivot->count }})
-                                  </span>
+                                    ({{ $insulin->pivot->count }})</span>
                                 @endforeach
                               </span>
                             </div>
@@ -295,7 +236,13 @@
                             <button
                               class="btn btn-sm btn-primary w-100 @if ($item->status === 'completed') disabled bg-secondary border-0 @endif"
                               wire:click="editTrackingCode({{ $item->id }})"
-                              @if ($item->status === 'completed') disabled @endif>پاسخ نسخه</button>
+                              @if ($item->status === 'completed') disabled @endif>
+                              @if ($item->status === 'completed')
+                                پاسخ داده شده
+                              @else
+                                پاسخ نسخه
+                              @endif
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -334,196 +281,6 @@
               </div>
             </div>
           </div>
-          <style>
-            .tracking-modal-animate {
-              animation: trackingModalFadeInScale 0.35s cubic-bezier(.4, 2, .6, 1) both;
-            }
-
-            @keyframes trackingModalFadeInScale {
-              0% {
-                opacity: 0;
-                transform: scale(0.8);
-              }
-
-              100% {
-                opacity: 1;
-                transform: scale(1);
-              }
-            }
-
-            .prescription-card {
-              border: 1px solid #e3e3e3;
-              transition: box-shadow 0.2s;
-            }
-
-            .prescription-card:hover {
-              box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.08);
-            }
-
-            .search-filter-bar {
-              width: 100%;
-            }
-
-            @media (max-width: 991px) {
-              .search-filter-bar {
-                flex-direction: row !important;
-                gap: 0.5rem !important;
-                align-items: stretch !important;
-                justify-content: stretch !important;
-                margin-bottom: 0.5rem;
-              }
-
-              .search-container {
-                width: 100%;
-                min-width: 0;
-              }
-            }
-
-            .search-icon {
-              font-size: 1.1rem;
-              color: #b0b0b0;
-            }
-
-            .prescription-card-header {
-              background: var(--gradient-primary);
-              color: #fff;
-              border-radius: 0.75rem 0.75rem 0 0;
-            }
-
-            .chevron-icon {
-              font-size: 1.3rem;
-              transition: transform 0.2s;
-            }
-
-            .prescription-card .collapse:not(.show)+.chevron-icon {
-              transform: rotate(0deg);
-            }
-
-            .prescription-card .collapse.show+.chevron-icon {
-              transform: rotate(180deg);
-            }
-
-            .prescription-card-header-mobile {
-              background: linear-gradient(90deg, #4f9acd 0%, #2e86c1 100%) !important;
-              color: #fff !important;
-              border-radius: 0.75rem 0.75rem 0 0;
-              min-height: 38px;
-              padding: 0.4rem 0.7rem !important;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              transition: background 0.3s;
-            }
-
-            .prescription-card-header-mobile .fw-bold {
-              color: #fff !important;
-              font-size: 1rem;
-            }
-
-            .prescription-card-header-mobile .text-white-50 {
-              color: rgba(255, 255, 255, 0.7) !important;
-              font-size: 0.95em;
-            }
-
-            .chevron-icon {
-              font-size: 1.5rem;
-              color: #fff;
-              margin-right: 0.5rem;
-              margin-left: 0.5rem;
-              display: flex;
-              align-items: center;
-              transition: transform 0.3s;
-            }
-
-            .prescription-card-header-mobile[aria-expanded="true"] .chevron-icon {
-              transform: rotate(180deg);
-            }
-
-            .collapse.collapse-animated {
-              transition: height 0.35s cubic-bezier(.4, 2, .6, 1), opacity 0.35s cubic-bezier(.4, 2, .6, 1);
-            }
-
-            @media (max-width: 991px) {
-              .search-filter-bar .d-flex {
-                flex-direction: row-reverse !important;
-              }
-
-              .filter-select-mobile {
-                order: 2;
-                margin-right: auto;
-                margin-left: 0;
-              }
-
-              .search-container {
-                order: 1;
-                margin-left: 0.5rem;
-              }
-            }
-
-            .note-card-item {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              padding: 0.25rem 0 0.15rem 0;
-              border-bottom: 1px solid var(--border-neutral);
-              font-size: 0.93em;
-              min-height: 28px;
-            }
-
-            .note-card-label {
-              color: var(--text-secondary);
-              font-size: 0.92em;
-              min-width: 70px;
-            }
-
-            .note-card-value {
-              color: var(--text-primary);
-              font-size: 0.97em;
-              text-align: left;
-              flex: 1;
-            }
-
-            .note-card-item:last-child {
-              border-bottom: none;
-            }
-
-            @media (max-width: 991px) {
-              .note-card-item {
-                padding: 0.18rem 0 0.12rem 0;
-                font-size: 0.91em;
-                min-height: 24px;
-              }
-
-              .note-card-label {
-                font-size: 0.89em;
-                min-width: 60px;
-              }
-
-              .note-card-value {
-                font-size: 0.93em;
-              }
-            }
-
-            .accordion-content {
-              max-height: 0;
-              overflow: hidden;
-              transition: max-height 0.35s cubic-bezier(.4, 2, .6, 1), opacity 0.35s cubic-bezier(.4, 2, .6, 1);
-              opacity: 0;
-            }
-
-            .accordion-content.show {
-              max-height: 1000px;
-              opacity: 1;
-            }
-
-            .chevron-icon svg {
-              transition: transform 0.3s;
-            }
-
-            .chevron-icon.open svg {
-              transform: rotate(180deg);
-            }
-          </style>
           <script>
             document.addEventListener('livewire:init', function() {
               Livewire.on('showTrackingModal', () => {
@@ -552,7 +309,6 @@
                 }
               });
             });
-
             function toggleAccordion(btn) {
               var content = btn.closest('.card').querySelector('.accordion-content');
               content.classList.toggle('show');
