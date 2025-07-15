@@ -39,6 +39,7 @@
 
 @unless (Request::routeIs($excludedRoutes))
   <link rel="stylesheet" href="{{ asset('admin-assets/css/my-form.css') }}">
+  <link rel="stylesheet" href="{{ asset('admin-assets/css/my-custom-styles.css') }}">
 @endunless
 {{-- tom select --}}
 @vite(['resources/css/app.css', 'resources/css/timepicker.css', 'resources/js/app.js', 'resources/js/timepicker.js'])

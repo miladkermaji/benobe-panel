@@ -20,6 +20,7 @@ class UserList extends Component
     public $readyToLoad   = false;
     public $selectedUsers = [];
     public $selectAll     = false;
+    public $groupAction = '';
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -84,6 +85,43 @@ class UserList extends Component
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'کاربران انتخاب شده با موفقیت حذف شدند!');
         Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
+    }
+
+    public function executeGroupAction()
+    {
+        if (empty($this->selectedUsers)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ کاربری انتخاب نشده است.');
+            return;
+        }
+
+        if (empty($this->groupAction)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        switch ($this->groupAction) {
+            case 'delete':
+                $this->deleteSelected();
+                break;
+            case 'status_active':
+                $this->updateStatus(true);
+                break;
+            case 'status_inactive':
+                $this->updateStatus(false);
+                break;
+        }
+
+        $this->groupAction = '';
+    }
+
+    private function updateStatus($status)
+    {
+        User::whereIn('id', $this->selectedUsers)
+            ->update(['status' => $status]);
+
+        $this->selectedUsers = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت کاربران انتخاب‌شده با موفقیت تغییر کرد.');
     }
 
     protected function getUsersQuery()
