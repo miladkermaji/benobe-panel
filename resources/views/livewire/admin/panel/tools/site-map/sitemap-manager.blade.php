@@ -1,4 +1,4 @@
-<div class="container-fluid py-2" dir="rtl" wire:init="loadInitialData">
+<div class="container-fluid py-2 mt-3" dir="rtl" wire:init="loadInitialData">
   <!-- هدر -->
   <div
     class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -55,7 +55,6 @@
       </button>
     </div>
   </div>
-
   <!-- نوار پیشرفت و URLها -->
   <div class="mb-5" wire:poll.1000ms="updateCrawlProgress"
     @if (!$isCrawling) style="display: none;" @endif>
@@ -86,7 +85,6 @@
       </div>
     </div>
   </div>
-
   <!-- فرم افزودن URL -->
   <div class="container-fluid px-0 mb-5">
     <!-- Desktop View -->
@@ -135,7 +133,6 @@
         </div>
       </div>
     </div>
-
     <!-- Mobile & Tablet View -->
     <div class="d-lg-none">
       <button type="button"
@@ -149,7 +146,6 @@
       </button>
     </div>
   </div>
-
   <!-- Modal -->
   <div wire:ignore class="modal fade" id="addUrlModal" tabindex="-1" aria-labelledby="addUrlModalLabel"
     aria-hidden="true">
@@ -207,16 +203,15 @@
       </div>
     </div>
   </div>
-
   <!-- جدول URLها -->
-  <div class="container-fluid px-0 mt-3">
+  <div class="container-fluid px-0">
     <div class="card shadow-sm">
       <div class="card-body p-0" style="border-radius:0;">
         <!-- Desktop View -->
         <div class="d-none d-lg-block">
           <div class="table-responsive p-0 m-0" style="border-radius:0;">
             <table class="table table-bordered table-hover w-100 m-0 align-middle" style="border-radius:0;">
-              <thead class="glass-header text-white">
+              <thead class=" text-white">
                 <tr>
                   <th class="text-center align-middle" style="width: 50px;">
                     <div class="d-flex justify-content-center">
@@ -365,7 +360,6 @@
       </div>
     </div>
   </div>
-
   <!-- پیش‌نمایش نقشه سایت -->
   @if ($previewXml)
     <div class="container-fluid px-0 mb-5">
@@ -380,169 +374,11 @@
       </div>
     </div>
   @endif
-
-  <style>
-    :root {
-      --primary-color: #0ea5e9;
-      --primary-dark: #0284c7;
-      --success-color: #22c55e;
-      --success-dark: #16a34a;
-      --danger-color: #ef4444;
-      --danger-dark: #dc2626;
-      --warning-color: #f59e0b;
-      --warning-dark: #d97706;
-      --info-color: #3b82f6;
-      --info-dark: #2563eb;
-    }
-
-    .glass-header {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    }
-
-    .btn-gradient-primary {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    .btn-gradient-success {
-      background: linear-gradient(135deg, var(--success-color), var(--success-dark));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    .btn-gradient-danger {
-      background: linear-gradient(135deg, var(--danger-color), var(--danger-dark));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    .btn-gradient-info {
-      background: linear-gradient(135deg, var(--info-color), var(--info-dark));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    .btn-gradient-warning {
-      background: linear-gradient(135deg, var(--warning-color), var(--warning-dark));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    .btn-gradient-primary:hover,
-    .btn-gradient-success:hover,
-    .btn-gradient-danger:hover,
-    .btn-gradient-info:hover,
-    .btn-gradient-warning:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      color: white;
-    }
-
-    .form-check-input:checked {
-      background-color: var(--primary-color);
-      border-color: var(--primary-color);
-    }
-
-    .form-check-input:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 0.25rem rgba(14, 165, 233, 0.25);
-    }
-
-    .form-switch .form-check-input {
-      width: 3em;
-      height: 1.5em;
-    }
-
-    .form-switch .form-check-input:checked {
-      background-color: var(--success-color);
-      border-color: var(--success-color);
-    }
-
-    .table {
-      background: white;
-    }
-
-    .table thead th {
-      border-bottom: none;
-      font-weight: 600;
-    }
-
-    .table tbody tr:hover {
-      background-color: #f8fafc;
-    }
-
-    .card {
-      border: none;
-      transition: all 0.3s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .vscode-preview {
-      background: #1e1e1e;
-      color: #d4d4d4;
-      border-radius: 8px;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .vscode-preview::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    .vscode-preview::-webkit-scrollbar-track {
-      background: #1e1e1e;
-    }
-
-    .vscode-preview::-webkit-scrollbar-thumb {
-      background: #424242;
-      border-radius: 4px;
-    }
-
-    .vscode-preview::-webkit-scrollbar-thumb:hover {
-      background: #4f4f4f;
-    }
-
-    @media (max-width: 768px) {
-      .header-title {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .buttons-container {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-      }
-
-      .form-control,
-      .form-select {
-        font-size: 0.9rem;
-      }
-    }
-  </style>
-
   <script>
     document.addEventListener('livewire:init', function() {
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });
-
       Livewire.on('confirm-delete', (event) => {
         Swal.fire({
           title: 'حذف مسیر',
@@ -561,7 +397,6 @@
           }
         });
       });
-
       Livewire.on('confirm-delete-selected', () => {
         Swal.fire({
           title: 'حذف مسیرهای انتخاب‌شده',
