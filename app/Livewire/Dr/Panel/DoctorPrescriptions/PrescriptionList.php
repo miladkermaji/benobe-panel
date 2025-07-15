@@ -14,7 +14,7 @@ class PrescriptionList extends Component
     public $search = '';
     public $type = '';
     public $insurance = '';
-    public $status = '';
+    public $status = 'pending'; // مقدار پیش‌فرض فقط در انتظار
     public $payment_status = '';
     public $date_from = '';
     public $date_to = '';
@@ -90,7 +90,7 @@ class PrescriptionList extends Component
         if ($this->date_to) {
             $query->whereDate('created_at', '<=', $this->date_to);
         }
-        $prescriptions = $query->orderByDesc('created_at')->paginate(15);
+        $prescriptions = $query->orderByDesc('created_at')->paginate(30);
         $insurances = \App\Models\PrescriptionInsurance::all();
         return view('livewire.dr.panel.doctor-prescriptions.prescription-list', compact('prescriptions', 'insurances'));
     }
