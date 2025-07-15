@@ -93,14 +93,6 @@
                     </td>
                     <td class="text-center align-middle">
                       <div class="d-flex justify-content-center gap-2">
-                        <a href="{{ route('admin.panel.tools.notifications.edit', $item->id) }}"
-                          class="btn btn-gradient-success rounded-pill px-3">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path
-                              d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                          </svg>
-                        </a>
                         <button wire:click="confirmDelete({{ $item->id }})"
                           class="btn btn-gradient-danger rounded-pill px-3">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -153,14 +145,6 @@
                 </span>
               </div>
               <div class="d-flex gap-1">
-                <a href="{{ route('admin.panel.tools.notifications.edit', $item->id) }}"
-                  class="btn btn-sm btn-gradient-success  px-2 py-1">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2">
-                    <path
-                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                </a>
                 <button wire:click="confirmDelete({{ $item->id }})"
                   class="btn btn-sm btn-gradient-danger  px-2 py-1">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"

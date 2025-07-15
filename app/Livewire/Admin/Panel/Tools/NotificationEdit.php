@@ -28,9 +28,9 @@ class NotificationEdit extends Component
     public $target_mode;
 
     // --- اضافه کردن متغیرهای کش برای کاربران، پزشکان و منشی‌ها ---
-    protected $users;
-    protected $doctors;
-    protected $secretaries;
+    public $users;
+    public $doctors;
+    public $secretaries;
 
     public function mount($id)
     {
@@ -259,6 +259,16 @@ class NotificationEdit extends Component
 
     public function render()
     {
+        // اطمینان از مقداردهی متغیرهای کش قبل از استفاده
+        if (!$this->users) {
+            $this->users = User::select('id', 'first_name', 'last_name', 'mobile')->get();
+        }
+        if (!$this->doctors) {
+            $this->doctors = Doctor::select('id', 'first_name', 'last_name', 'mobile')->get();
+        }
+        if (!$this->secretaries) {
+            $this->secretaries = Secretary::select('id', 'first_name', 'last_name', 'mobile')->get();
+        }
         $allRecipients = collect()
             ->merge($this->users->map(fn ($u) => ['id' => "App\\Models\\User:{$u->id}", 'text' => $u->first_name . ' ' . $u->last_name . ' (بیمار)']))
             ->merge($this->doctors->map(fn ($d) => ['id' => "App\\Models\\Doctor:{$d->id}", 'text' => $d->first_name . ' ' . $d->last_name . ' (پزشک)']))
