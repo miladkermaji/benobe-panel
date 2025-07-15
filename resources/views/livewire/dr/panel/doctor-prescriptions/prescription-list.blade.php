@@ -97,24 +97,22 @@
                     <td>{{ optional($item->clinic)->name ?? '-' }}</td>
                     <td>
                       {{ $item->price ? number_format($item->price) . ' تومان' : '-' }}
-                      <div class="small mt-1 text-muted fw-bold">
-                        (@switch($item->payment_status)
-                          @case('pending')
-                            <span class="text-warning">در انتظار</span>
-                          @break
+                      @switch($item->payment_status)
+                        @case('pending')
+                          <span class="badge bg-warning text-dark ms-1 align-middle">در انتظار</span>
+                        @break
 
-                          @case('paid')
-                            <span class="text-success">پرداخت شده</span>
-                          @break
+                        @case('paid')
+                          <span class="badge bg-success ms-1 align-middle">پرداخت شده</span>
+                        @break
 
-                          @case('failed')
-                            <span class="text-danger">ناموفق</span>
-                          @break
+                        @case('failed')
+                          <span class="badge bg-danger ms-1 align-middle">ناموفق</span>
+                        @break
 
-                          @default
-                            -
-                        @endswitch)
-                      </div>
+                        @default
+                          <span class="badge bg-secondary ms-1 align-middle">-</span>
+                      @endswitch
                     </td>
                     <td><span title="{{ $item->description }}">{{ \Str::limit($item->description, 30) }}</span></td>
                     <td>
@@ -230,22 +228,22 @@
                               class="note-card-value">{{ optional($item->clinic)->name ?? '-' }}</span></div>
                           <div class="note-card-item"><span class="note-card-label">مبلغ:</span><span
                               class="note-card-value">{{ $item->price ? number_format($item->price) . ' تومان' : '-' }}
-                              <span class="ms-1 text-muted fw-bold">(@switch($item->payment_status)
-                                  @case('pending')
-                                    <span class="text-warning">در انتظار</span>
-                                  @break
+                              @switch($item->payment_status)
+                                @case('pending')
+                                  <span class="badge bg-warning text-dark ms-1 align-middle">در انتظار</span>
+                                @break
 
-                                  @case('paid')
-                                    <span class="text-success">پرداخت شده</span>
-                                  @break
+                                @case('paid')
+                                  <span class="badge bg-success ms-1 align-middle">پرداخت شده</span>
+                                @break
 
-                                  @case('failed')
-                                    <span class="text-danger">ناموفق</span>
-                                  @break
+                                @case('failed')
+                                  <span class="badge bg-danger ms-1 align-middle">ناموفق</span>
+                                @break
 
-                                  @default
-                                    -
-                                @endswitch)</span>
+                                @default
+                                  <span class="badge bg-secondary ms-1 align-middle">-</span>
+                              @endswitch
                             </span></div>
                           <div class="note-card-item"><span class="note-card-label">تاریخ:</span><span
                               class="note-card-value">{{ jdate($item->created_at)->format('Y/m/d H:i') }}</span></div>
