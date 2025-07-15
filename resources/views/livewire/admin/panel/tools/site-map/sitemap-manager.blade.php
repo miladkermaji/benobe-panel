@@ -93,22 +93,24 @@
     <div class="d-none d-lg-block">
       <div class="bg-light p-4 rounded-3 shadow-sm border">
         <div class="row g-3 align-items-end">
-          <div class="col-md-5">
-            <label class="form-label fw-bold text-dark">آدرس URL</label>
-            <input type="text" wire:model="newUrl" class="form-control bg-white border-dark text-dark"
+          <div class="col-md-5 position-relative">
+            <label class="form-label fw-bold text-dark" for="url-input">آدرس URL</label>
+            <input id="url-input" type="text" wire:model="newUrl" class="form-control bg-white border-dark text-dark"
               placeholder="https://example.com/page">
           </div>
-          <div class="col-md-2">
-            <label class="form-label fw-bold text-dark">اولویت</label>
-            <select wire:model="newPriority" class="form-select bg-white border-dark text-dark custom-select">
+          <div class="col-md-2 position-relative">
+            <label class="form-label fw-bold text-dark" for="priority-input">اولویت</label>
+            <select id="priority-input" wire:model="newPriority"
+              class="form-select bg-white border-dark text-dark custom-select">
               @for ($i = 1.0; $i >= 0.1; $i -= 0.1)
                 <option value="{{ number_format($i, 1) }}">{{ number_format($i, 1) }}</option>
               @endfor
             </select>
           </div>
-          <div class="col-md-2">
-            <label class="form-label fw-bold text-dark">فرکانس تغییر</label>
-            <select wire:model="newFrequency" class="form-select bg-white border-dark text-dark custom-select">
+          <div class="col-md-2 position-relative">
+            <label class="form-label fw-bold text-dark" for="frequency-input">فرکانس تغییر</label>
+            <select id="frequency-input" wire:model="newFrequency"
+              class="form-select bg-white border-dark text-dark custom-select">
               <option value="always">همیشه</option>
               <option value="hourly">ساعتی</option>
               <option value="daily">روزانه</option>
@@ -118,9 +120,10 @@
               <option value="never">هرگز</option>
             </select>
           </div>
-          <div class="col-md-2">
-            <label class="form-label fw-bold text-dark">نوع</label>
-            <select wire:model="newType" class="form-select bg-white border-dark text-dark custom-select">
+          <div class="col-md-2 position-relative">
+            <label class="form-label fw-bold text-dark" for="type-input">نوع</label>
+            <select id="type-input" wire:model="newType"
+              class="form-select bg-white border-dark text-dark custom-select">
               <option value="page">صفحه</option>
               <option value="image">تصویر</option>
               <option value="video">ویدیو</option>
@@ -159,21 +162,23 @@
         <div class="modal-body">
           <div class="d-flex flex-column gap-3">
             <div>
-              <label class="form-label fw-bold text-dark">آدرس URL</label>
-              <input type="text" wire:model="newUrl" class="form-control bg-white border-dark text-dark"
-                placeholder="https://example.com/page">
+              <label class="form-label fw-bold text-dark" for="modal-url-input">آدرس URL</label>
+              <input id="modal-url-input" type="text" wire:model="newUrl"
+                class="form-control bg-white border-dark text-dark" placeholder="https://example.com/page">
             </div>
             <div>
-              <label class="form-label fw-bold text-dark">اولویت</label>
-              <select wire:model="newPriority" class="form-select bg-white border-dark text-dark custom-select">
+              <label class="form-label fw-bold text-dark" for="modal-priority-input">اولویت</label>
+              <select id="modal-priority-input" wire:model="newPriority"
+                class="form-select bg-white border-dark text-dark custom-select">
                 @for ($i = 1.0; $i >= 0.1; $i -= 0.1)
                   <option value="{{ number_format($i, 1) }}">{{ number_format($i, 1) }}</option>
                 @endfor
               </select>
             </div>
             <div>
-              <label class="form-label fw-bold text-dark">فرکانس تغییر</label>
-              <select wire:model="newFrequency" class="form-select bg-white border-dark text-dark custom-select">
+              <label class="form-label fw-bold text-dark" for="modal-frequency-input">فرکانس تغییر</label>
+              <select id="modal-frequency-input" wire:model="newFrequency"
+                class="form-select bg-white border-dark text-dark custom-select">
                 <option value="always">همیشه</option>
                 <option value="hourly">ساعتی</option>
                 <option value="daily">روزانه</option>
@@ -184,8 +189,9 @@
               </select>
             </div>
             <div>
-              <label class="form-label fw-bold text-dark">نوع</label>
-              <select wire:model="newType" class="form-select bg-white border-dark text-dark custom-select">
+              <label class="form-label fw-bold text-dark" for="modal-type-input">نوع</label>
+              <select id="modal-type-input" wire:model="newType"
+                class="form-select bg-white border-dark text-dark custom-select">
                 <option value="page">صفحه</option>
                 <option value="image">تصویر</option>
                 <option value="video">ویدیو</option>
@@ -205,11 +211,11 @@
   <!-- جدول URLها -->
   <div class="container-fluid px-0 mt-3">
     <div class="card shadow-sm">
-      <div class="card-body p-0">
+      <div class="card-body p-0" style="border-radius:0;">
         <!-- Desktop View -->
         <div class="d-none d-lg-block">
-          <div class="table-responsive text-nowrap">
-            <table class="table table-bordered table-hover w-100 m-0">
+          <div class="table-responsive p-0 m-0" style="border-radius:0;">
+            <table class="table table-bordered table-hover w-100 m-0 align-middle" style="border-radius:0;">
               <thead class="glass-header text-white">
                 <tr>
                   <th class="text-center align-middle" style="width: 50px;">
@@ -235,7 +241,10 @@
                             class="form-check-input m-0 align-middle">
                         </div>
                       </td>
-                      <td class="text-center align-middle">{{ $url['url'] }}</td>
+                      <td class="text-break text-center align-middle" style="max-width: 350px; direction: ltr;">
+                        <span class="d-inline-block text-truncate" style="max-width: 340px;"
+                          title="{{ $url['url'] }}">{{ $url['url'] }}</span>
+                      </td>
                       <td class="text-center align-middle">{{ $url['priority'] }}</td>
                       <td class="text-center align-middle">{{ $url['frequency'] }}</td>
                       <td class="text-center align-middle">{{ $url['type'] }}</td>
@@ -277,7 +286,6 @@
             </table>
           </div>
         </div>
-
         <!-- Mobile & Tablet View -->
         <div class="d-lg-none">
           @if ($readyToLoad)
@@ -297,7 +305,8 @@
                   <div class="d-flex flex-column gap-1">
                     <div class="d-flex justify-content-between align-items-center">
                       <span class="text-muted small">آدرس:</span>
-                      <span class="fw-medium">{{ $url['url'] }}</span>
+                      <span class="fw-medium text-break"
+                        style="direction: ltr; max-width: 180px; display: inline-block;">{{ $url['url'] }}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                       <span class="text-muted small">اولویت:</span>
@@ -340,7 +349,6 @@
             </div>
           @endif
         </div>
-
         <div class="d-flex justify-content-between align-items-center mt-4 px-4 flex-wrap gap-3">
           <div class="text-muted">
             @if (is_array($urls))
