@@ -1,260 +1,155 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'خطا - به نوبه')</title>
-    @vite(['resources/js/app.js', 'resources/css/app.css'])
-    <style>
-        @import url('{{ asset('app-assets/fonts/vazir/font-face.css') }}');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@yield('title', 'خطا - به نوبه')</title>
+  @vite(['resources/js/app.js', 'resources/css/app.css'])
+  <!-- Lalezar for error code (فارسی فانتزی) -->
+  <link href="https://cdn.fontcdn.ir/Font/Persian/Lalezar/Lalezar.css" rel="stylesheet">
+  <style>
+    @import url('{{ asset('app-assets/fonts/vazir/font-face.css') }}');
 
-        :root {
-            /* پالت رنگی */
-            --primary: #2E86C1;
-            --primary-light: #84CAF9;
-            --secondary: #1DEB3C;
-            --background-light: #F0F8FF;
-            --background-card: #FFFFFF;
-            --text-primary: #000000;
-            --text-secondary: #707070;
-            --border-neutral: #E5E7EB;
-            --shadow: rgba(0, 0, 0, 0.35);
-            --gradient-primary: linear-gradient(45deg, #84CAF9, #2E86C1);
-            --radius-card: 1.5rem;
-            --radius-button: 0.75rem;
-        }
+    body {
+      font-family: 'Vazir', sans-serif;
+      background: #f6fafd;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    .error-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
 
-        body {
-            font-family: 'Vazir', sans-serif;
-            background: var(--gradient-primary);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow-x: hidden; /* جلوگیری از اسکرول افقی */
-            position: relative;
-        }
+    .error-card {
+      background: #fff;
+      border-radius: 2rem;
+      box-shadow: 0 8px 32px 0 rgba(44, 62, 80, 0.13), 0 1.5px 8px 0 rgba(46, 134, 193, 0.08);
+      padding: 1.5rem 2.2rem 1.2rem 2.2rem;
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto;
+    }
 
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="20" cy="20" r="2" fill="%2384CAF9" opacity="0.5"/%3E%3Ccircle cx="80" cy="80" r="3" fill="%232E86C1" opacity="0.5"/%3E%3Ccircle cx="50" cy="30" r="2" fill="%232E86C1" opacity="0.5"/%3E%3C/svg%3E');
-            animation: particleMove 10s linear infinite;
-            z-index: -1;
-        }
+    .error-icon {
+      font-size: 3.8rem;
+      color: #2E86C1;
+      margin-bottom: 0.7rem;
+      display: block;
+      filter: drop-shadow(0 2px 8px #84caf977);
+    }
 
-        .error-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            width: 100%;
-            max-width: 90vw; /* عرض نسبی */
-            min-height: 50vh; /* حداقل ارتفاع */
-            animation: zoomIn 0.6s ease-out;
-        }
+    .error-code {
+      font-size: 3.2rem;
+      font-weight: 900;
+      color: #222;
+      margin-bottom: 0.4rem;
+      letter-spacing: 2px;
+      font-family: 'Lalezar', cursive;
+      animation: errorCodePulse 1.5s infinite alternate;
+      text-shadow: 0 2px 12px #2E86C133;
+    }
 
-        .error-card {
-            background: var(--background-card);
-            border-radius: var(--radius-card);
-            box-shadow: 0 8px 24px var(--shadow), 0 0 20px rgba(132, 202, 249, 0.3);
-            padding: 1.5rem;
-            text-align: center;
-            width: 100%;
-            max-width: 28rem; /* عرض حداکثر برای دسکتاپ */
-            position: relative;
-            overflow: hidden;
-            border: 2px solid var(--primary-light);
-            aspect-ratio: unset; /* حذف نسبت مربعی برای انعطاف‌پذیری بیشتر */
-        }
+    @keyframes errorCodePulse {
+      0% {
+        transform: scale(1) rotate(-2deg);
+        color: #2E86C1;
+        text-shadow: 0 2px 8px #84caf977;
+      }
 
-        .error-icon {
-            font-size: clamp(3rem, 10vw, 4.5rem); /* اندازه فونت نسبی */
-            color: var(--primary);
-            margin-bottom: 0.75rem;
-            text-shadow: 0 0 8px var(--primary-light), 0 0 16px var(--primary);
-            animation: glow 1.5s infinite ease-in-out;
-        }
+      50% {
+        transform: scale(1.08) rotate(2deg);
+        color: #1b4f72;
+        text-shadow: 0 4px 16px #84caf955;
+      }
 
-        .error-code {
-            font-size: clamp(2.5rem, 8vw, 3.5rem);
-            font-weight: 900;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 5px var(--shadow), 0 0 6px var(--primary-light);
-            letter-spacing: 1.5px;
-            animation: textPop 0.7s ease-out;
-        }
+      100% {
+        transform: scale(1) rotate(-2deg);
+        color: #2E86C1;
+        text-shadow: 0 2px 8px #84caf977;
+      }
+    }
 
-        .error-message {
-            font-size: clamp(1.2rem, 5vw, 1.5rem);
-            font-weight: 800;
-            color: var(--text-secondary);
-            margin-bottom: 0.75rem;
-            text-shadow: 0 1px 3px var(--shadow);
-        }
+    .error-message {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #2E86C1;
+      margin-bottom: 0.7rem;
+      letter-spacing: 0.5px;
+    }
 
-        .error-content {
-            font-size: clamp(0.9rem, 4vw, 1.125rem);
-            font-weight: 600;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
+    .error-content {
+      font-size: 1.08rem;
+      color: #666;
+      margin-bottom: 1.2rem;
+      line-height: 1.7;
+    }
 
-        .btn-home {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--gradient-primary);
-            color: var(--background-card);
-            padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 4vw, 2rem);
-            border-radius: var(--radius-button);
-            text-decoration: none;
-            font-size: clamp(0.9rem, 3.5vw, 1.125rem);
-            font-weight: 700;
-            transition: transform 0.3s, box-shadow 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
+    .btn-home {
+      display: inline-block;
+      background: linear-gradient(90deg, #2E86C1 60%, #84CAF9 100%);
+      color: #fff;
+      padding: 0.7rem 2.2rem;
+      border-radius: 1.1rem;
+      text-decoration: none;
+      font-size: 1.08rem;
+      font-weight: 800;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 12px rgba(44, 62, 80, 0.13);
+      border: none;
+    }
 
-        .btn-home::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.4s;
-        }
+    .btn-home:hover {
+      background: linear-gradient(90deg, #1b4f72 60%, #2E86C1 100%);
+    }
 
-        .btn-home:hover::before {
-            left: 100%;
-        }
+    @media (max-width: 600px) {
+      .error-card {
+        padding: 1.5rem 0.5rem 1.2rem 0.5rem;
+        max-width: 98vw;
+      }
 
-        .btn-home:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 16px var(--shadow);
-            color: var(--background-card);
-        }
+      .error-icon {
+        font-size: 2.6rem;
+      }
 
-        /* انیمیشن‌ها */
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
+      .error-code {
+        font-size: 1.2rem;
+      }
 
-        @keyframes glow {
-            0% { text-shadow: 0 0 8px var(--primary-light), 0 0 16px var(--primary); }
-            50% { text-shadow: 0 0 12px var(--primary-light), 0 0 24px var(--primary); }
-            100% { text-shadow: 0 0 8px var(--primary-light), 0 0 16px var(--primary); }
-        }
+      .error-message {
+        font-size: 0.98rem;
+      }
 
-        @keyframes textPop {
-            0% { transform: scale(0.5); opacity: 0; }
-            70% { transform: scale(1.15); opacity: 1; }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes particleMove {
-            0% { background-position: 0 0; }
-            100% { background-position: 80px 80px; }
-        }
-
-        /* مدیا کوئری‌ها */
-        @media (max-width: 768px) {
-            .error-container {
-                padding: 0.75rem;
-                max-width: 95vw;
-            }
-
-            .error-card {
-                padding: 1.25rem;
-                max-width: 90vw;
-            }
-
-            .error-icon {
-                font-size: clamp(2.5rem, 8vw, 4rem);
-                margin-bottom: 0.5rem;
-            }
-
-            .error-code {
-                font-size: clamp(2rem, 7vw, 3rem);
-            }
-
-            .error-message {
-                font-size: clamp(1rem, 4.5vw, 1.3rem);
-            }
-
-            .error-content {
-                font-size: clamp(0.85rem, 3.5vw, 1rem);
-            }
-
-            .btn-home {
-                padding: clamp(0.4rem, 1.5vw, 0.6rem) clamp(0.8rem, 3vw, 1.5rem);
-                font-size: clamp(0.8rem, 3vw, 1rem);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .error-container {
-                padding: 0.5rem;
-            }
-
-            .error-card {
-                padding: 1rem;
-                max-width: 100vw;
-                border-radius: 1rem;
-            }
-
-            .error-icon {
-                font-size: clamp(2rem, 7vw, 3.5rem);
-                margin-bottom: 0.4rem;
-            }
-
-            .error-code {
-                font-size: clamp(1.8rem, 6vw, 2.5rem);
-            }
-
-            .error-message {
-                font-size: clamp(0.9rem, 4vw, 1.2rem);
-            }
-
-            .error-content {
-                font-size: clamp(0.8rem, 3vw, 0.9rem);
-                line-height: 1.4;
-            }
-
-            .btn-home {
-                padding: clamp(0.35rem, 1.2vw, 0.5rem) clamp(0.7rem, 2.5vw, 1.2rem);
-                font-size: clamp(0.75rem, 2.8vw, 0.9rem);
-            }
-        }
-    </style>
+      .error-content {
+        font-size: 0.93rem;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="particles"></div>
-    <div class="error-container">
-        <div class="error-card">
-            <span class="error-icon">@yield('icon')</span>
-            <h1 class="error-code">@yield('code')</h1>
-            <p class="error-message">@yield('message')</p>
-            <div class="error-content">
-                @yield('content')
-            </div>
-            <a href="/" class="btn-home">برگشت به صفحه اصلی</a>
-        </div>
+  <div class="error-container">
+    <div class="error-card">
+      <span class="error-icon">@yield('icon')</span>
+      <h1 class="error-code">@yield('code')</h1>
+      <p class="error-message">@yield('message')</p>
+      <div class="error-content">
+        @yield('content')
+      </div>
+      <a href="/" class="btn-home">بازگشت به خانه</a>
     </div>
+  </div>
 </body>
+
 </html>
