@@ -39,6 +39,11 @@ class DrSidebar extends Component
             // Get permissions from database
             $permissionRecord = DoctorPermission::where('doctor_id', $doctor->id)->first();
             $this->permissions = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
+
+            // اضافه کردن مجوز نسخه های من
+            if (!in_array('my-prescriptions', $this->permissions)) {
+                $this->permissions[] = 'my-prescriptions';
+            }
         } elseif (Auth::guard('secretary')->check()) {
             $this->specialtyName = 'منشی';
             $secretary = Auth::guard('secretary')->user();

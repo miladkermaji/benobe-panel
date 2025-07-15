@@ -861,3 +861,8 @@ Route::get('/dr/panel/profile/subusers/list', [\App\Http\Controllers\Dr\Panel\Pr
 Route::delete('/dr/panel/profile/subusers/delete-multiple', [\App\Http\Controllers\Dr\Panel\Profile\SubUserController::class, 'destroyMultiple'])->name('dr-sub-users-delete-multiple');
 Route::get('/dr/panel/profile/subusers/search-users', [\App\Http\Controllers\Dr\Panel\Profile\SubUserController::class, 'searchUsers'])->name('dr-sub-users-search-users');
 Route::post('/dr/panel/profile/subusers/quick-create-user', [\App\Http\Controllers\Dr\Panel\Profile\SubUserController::class, 'quickCreateUser'])->name('dr-sub-users-quick-create-user');
+
+Route::middleware(['doctor'])->prefix('dr/panel')->group(function () {
+    // ... existing code ...
+    Route::get('my-prescriptions', [\App\Http\Controllers\Dr\Panel\DoctorPrescriptionController::class, 'index'])->name('dr.panel.my-prescriptions');
+});

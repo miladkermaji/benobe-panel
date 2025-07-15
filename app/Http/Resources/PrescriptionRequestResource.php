@@ -17,7 +17,7 @@ class PrescriptionRequestResource extends JsonResource
             'description' => $this->description,
             'doctor_id' => $this->doctor_id,
             'clinic' => $this->whenLoaded('clinic'),
-            'prescription_insurance' => $this->whenLoaded('insurance'),
+            'prescription_insurance' => $this->whenLoaded('prescriptionInsurance'),
             'referral_code' => $this->referral_code,
             'price' => $this->price,
             'status' => $this->status,

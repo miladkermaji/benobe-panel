@@ -62,4 +62,13 @@ class PrescriptionController extends Controller
     {
         //
     }
+
+    public function myPrescriptions()
+    {
+        $doctor = auth('doctor')->user();
+        $prescriptions = \App\Models\PrescriptionRequest::where('doctor_id', $doctor->id)
+            ->orderByDesc('created_at')
+            ->paginate(20);
+        return view('dr.panel.noskhe-electronic.prescription.my-prescriptions', compact('prescriptions'));
+    }
 }

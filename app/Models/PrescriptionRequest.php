@@ -13,7 +13,7 @@ class PrescriptionRequest extends Model
         'description',
         'tracking_code',
         'status',
-        'insurance_id',
+        'prescription_insurance_id',
         'price',
         'payment_status',
         'clinic_id',
@@ -40,9 +40,9 @@ class PrescriptionRequest extends Model
         return $this->belongsTo(User::class, 'patient_id');
     }
 
-    public function insurance()
+    public function prescriptionInsurance()
     {
-        return $this->belongsTo(Insurance::class);
+        return $this->belongsTo(\App\Models\PrescriptionInsurance::class, 'prescription_insurance_id');
     }
 
     public function clinic()
@@ -61,4 +61,3 @@ class PrescriptionRequest extends Model
             ->withPivot('count');
     }
 }
- 

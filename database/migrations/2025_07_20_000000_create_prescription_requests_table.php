@@ -12,18 +12,17 @@ return new class () extends Migration {
             $table->morphs('requestable'); // user, doctor, manager, secretary
             $table->unsignedBigInteger('doctor_id')->nullable();
             $table->unsignedBigInteger('patient_id')->nullable();
-            /* $table->enum('type', ['drug', 'lab', 'radiology', 'biopsy', 'sonography', 'mri']); */
             $table->text('description')->nullable();
             $table->string('tracking_code')->unique();
             $table->enum('status', ['pending', 'paid', 'rejected', 'completed'])->default('pending');
-            $table->unsignedBigInteger('insurance_id')->nullable();
+            $table->unsignedBigInteger('prescription_insurance_id')->nullable();
             $table->unsignedInteger('price')->nullable();
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
             $table->timestamps();
 
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('set null');
             $table->foreign('patient_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('insurance_id')->references('id')->on('insurances')->onDelete('set null');
+            $table->foreign('prescription_insurance_id')->references('id')->on('prescription_insurances')->onDelete('set null');
         });
     }
 

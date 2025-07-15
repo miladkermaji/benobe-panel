@@ -170,6 +170,7 @@ class PrescriptionRequestController extends Controller
                 'type' => $validated['type'],
                 'description' => $validated['type'] === 'other' ? $validated['description'] : null,
                 'doctor_id' => $validated['doctor_id'],
+                'patient_id' => $user->id,
                 'prescription_insurance_id' => $validated['prescription_insurance_id'] ?? null,
                 'clinic_id' => $clinic?->id,
                 'price' => $price,
@@ -226,6 +227,7 @@ class PrescriptionRequestController extends Controller
             'type' => $validated['type'],
             'description' => $validated['type'] === 'other' ? $validated['description'] : null,
             'doctor_id' => $validated['doctor_id'],
+            'patient_id' => $user->id,
             'prescription_insurance_id' => $validated['prescription_insurance_id'] ?? null,
             'clinic_id' => $clinic?->id,
             'price' => $price,
@@ -368,4 +370,3 @@ class PrescriptionRequestController extends Controller
         ]);
     }
 }
- 

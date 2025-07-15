@@ -83,6 +83,30 @@
         </li>
       @endif
 
+      @if ($this->hasPermission('my-prescriptions'))
+        <li class="item-li i-banners {{ Request::routeIs('dr.panel.my-prescriptions') ? 'is-active' : '' }}">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            <div class="d-flex align-items-center">
+              <span class="fw-bold">نسخه های من</span>
+              <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">جدید</span>
+            </div>
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li i-courses {{ Request::routeIs('dr.panel.my-prescriptions') ? 'is-active' : '' }}">
+              <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
+            </li>
+          </ul>
+        </li>
+      @endif
+
       @if ($this->hasPermission('consult'))
         <li
           class="item-li i-moshavere {{ Request::routeIs('dr-moshavere_setting') || Request::routeIs('dr-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
@@ -102,24 +126,27 @@
           </a>
           <ul class="drop-toggle d-none">
             @if ($this->hasPermission('dr-moshavere_setting'))
-              <li class="item-li i-courses {{ Request::routeIs('dr-moshavere_setting') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+              <li class="item-li i-courses {{ Request::routeIs('dr-moshavere_setting') ? 'is-active' : '' }}"
+                style="opacity: 0.5; pointer-events: none;">
                 <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">برنامه‌ریزی مشاوره</a>
               </li>
             @endif
             @if ($this->hasPermission('dr-moshavere_waiting'))
-              <li
-                class="item-li i-user__inforamtion {{ Request::routeIs('dr-moshavere_waiting') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+              <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-moshavere_waiting') ? 'is-active' : '' }}"
+                style="opacity: 0.5; pointer-events: none;">
                 <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">گزارش مشاوره</a>
               </li>
             @endif
             @if ($this->hasPermission('dr-mySpecialDays-counseling'))
               <li
-                class="item-li i-user__inforamtion {{ Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+                class="item-li i-user__inforamtion {{ Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}"
+                style="opacity: 0.5; pointer-events: none;">
                 <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">روزهای خاص</a>
               </li>
             @endif
             @if ($this->hasPermission('consult-term.index'))
-              <li class="item-li i-user__inforamtion {{ Request::routeIs('consult-term.index') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+              <li class="item-li i-user__inforamtion {{ Request::routeIs('consult-term.index') ? 'is-active' : '' }}"
+                style="opacity: 0.5; pointer-events: none;">
                 <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">قوانین مشاوره</a>
               </li>
             @endif
@@ -140,7 +167,7 @@
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             <div class="d-flex align-items-center">
               <span class="fw-bold">
-              نسخه الکترونیک
+                نسخه الکترونیک
 
               </span>
               <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
@@ -161,36 +188,41 @@
               </li>
             @endif
             @if ($this->hasPermission('prescription.index'))
-              <li class="item-li i-courses {{ Request::routeIs('prescription.index') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+              <li class="item-li i-courses {{ Request::routeIs('prescription.index') ? 'is-active' : '' }}"
+                style="opacity: 0.5; pointer-events: none;">
                 <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه‌های ثبت شده</a>
               </li>
             @endif
             @if ($this->hasPermission('providers.index'))
-              <li class="item-li i-courses {{ Request::routeIs('providers.index') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+              <li class="item-li i-courses {{ Request::routeIs('providers.index') ? 'is-active' : '' }}"
+                style="opacity: 0.5; pointer-events: none;">
                 <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">بیمه‌های من</a>
               </li>
             @endif
             @if ($this->hasPermission('favorite.templates.index'))
-              <li class="item-li i-courses {{ Request::routeIs('favorite.templates.index') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+              <li class="item-li i-courses {{ Request::routeIs('favorite.templates.index') ? 'is-active' : '' }}"
+                style="opacity: 0.5; pointer-events: none;">
                 <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه پراستفاده</a>
               </li>
             @endif
             @if ($this->hasPermission('templates.favorite.service.index'))
               <li
-                class="item-li i-courses {{ Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}" style="opacity: 0.5; pointer-events: none;">
+                class="item-li i-courses {{ Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}"
+                style="opacity: 0.5; pointer-events: none;">
                 <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">اقلام پراستفاده</a>
               </li>
             @endif
-             @if ($this->hasPermission('patient_records'))
-        <li
-          class="item-li i-checkout__request {{ Request::routeIs('dr-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-          id="gozaresh-mali" style="opacity: 0.5; pointer-events: none;">
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;" class="d-flex align-items-center">
-            پرونده الکترونیک
-       
-          </a>
-        </li>
-      @endif
+            @if ($this->hasPermission('patient_records'))
+              <li
+                class="item-li i-checkout__request {{ Request::routeIs('dr-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+                id="gozaresh-mali" style="opacity: 0.5; pointer-events: none;">
+                <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;"
+                  class="d-flex align-items-center">
+                  پرونده الکترونیک
+
+                </a>
+              </li>
+            @endif
           </ul>
         </li>
       @endif
@@ -252,7 +284,7 @@
         </li>
       @endif
 
-     
+
 
       @if ($this->hasPermission('secretary_management'))
         <li

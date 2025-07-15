@@ -23,6 +23,14 @@ return new class () extends Migration {
             } else {
                 $table->unsignedBigInteger('tracking_code')->nullable()->change();
             }
+            if (!Schema::hasColumn('prescription_requests', 'prescription_insurance_id')) {
+                $table->unsignedBigInteger('prescription_insurance_id')->nullable()->after('status');
+                $table->foreign('prescription_insurance_id')->references('id')->on('prescription_insurances')->onDelete('set null');
+            }
+            if (Schema::hasColumn('prescription_requests', 'insurance_id')) {
+                $table->dropForeign(['insurance_id']);
+                $table->dropColumn('insurance_id');
+            }
             if (!Schema::hasColumn('prescription_requests', 'clinic_id')) {
                 $table->unsignedBigInteger('clinic_id')->nullable()->after('price');
                 $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('set null');
@@ -46,6 +54,10 @@ return new class () extends Migration {
             if (Schema::hasColumn('prescription_requests', 'tracking_code')) {
                 $table->dropColumn('tracking_code');
             }
+            if (Schema::hasColumn('prescription_requests', 'prescription_insurance_id')) {
+                $table->dropForeign(['prescription_insurance_id']);
+                $table->dropColumn('prescription_insurance_id');
+            }
             if (Schema::hasColumn('prescription_requests', 'clinic_id')) {
                 $table->dropForeign(['clinic_id']);
                 $table->dropColumn('clinic_id');
@@ -57,4 +69,3 @@ return new class () extends Migration {
         });
     }
 };
- 
