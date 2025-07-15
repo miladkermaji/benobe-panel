@@ -61,3 +61,4 @@ class PrescriptionRequest extends Model
             ->withPivot('count');
     }
 }
+ 
