@@ -15,7 +15,7 @@
 
 @section('content')
   @include('dr.panel.my-tools.loader-btn')
-  <div class="blocking_users_container" dir="rtl">
+  <div class="blocking_users_container mt-3" dir="rtl">
     <div class="container px-0">
       <!-- هدر -->
       <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">

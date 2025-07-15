@@ -1,4 +1,4 @@
-<div class="container-fluid py-2" dir="rtl">
+<div class="container-fluid py-2 mt-3" dir="rtl">
   <div
     class="header-custom p-2 rounded-lg mb-3 shadow-sm d-flex flex-column flex-md-row justify-content-between align-items-center gap-2"
     style="background: var(--background-light); border: 1px solid var(--border-neutral);">

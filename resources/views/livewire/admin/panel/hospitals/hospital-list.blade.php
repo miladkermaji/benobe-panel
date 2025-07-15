@@ -1,5 +1,5 @@
 <div class="clinics-container">
-  <div class="container py-2" dir="rtl" wire:init="loadHospitals">
+  <div class="container py-2 mt-3" dir="rtl" wire:init="loadHospitals">
     <div class="glass-header text-white p-2 rounded-2 mb-4 mt-3 shadow-lg bg-gradient-primary">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">

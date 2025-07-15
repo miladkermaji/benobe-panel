@@ -44,23 +44,25 @@
           </div>
         </div>
         <div class="w-100 mt-3">
-          <button type="submit" class="btn my-btn-primary h-50 w-100">درخواست تسویه حساب</button>
+          <button type="submit" class="btn my-btn-primary h-50 d-flex justify-content-center w-100">درخواست تسویه
+            حساب</button>
         </div>
       </form>
     </div>
   </div>
 
   <div class="mt-3 w-100">
-    <div class="alert alert-warning">
-      <p><i class="fa fa-info-circle fa-2x"></i> موجودی قابل برداشت شامل هزینه‌های نوبت‌های حضوری ویزیت‌شده و مشاوره‌های آنلاین تکمیل‌شده (پاسخ‌داده‌شده) است که هنوز تسویه نشده‌اند.</p>
-  </div>
     <div class="card border-0 shadow-sm rounded-3">
       <div class="card-header bg-white p-4 border-bottom">
         <span class="fw-bold">درخواست‌های من</span>
+        <span class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
+          title="موجودی قابل برداشت شامل هزینه‌های نوبت‌های حضوری ویزیت‌شده و مشاوره‌های آنلاین تکمیل‌شده (پاسخ‌داده‌شده) است که هنوز تسویه نشده‌اند.">
+          <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" srcset="">
+        </span>
       </div>
       <div class="card-body p-4">
         <div class="table-responsive">
-          <table class="table table-hover table-bordered align-middle">
+          <table class="table table-light align-middle">
             <thead class="table-light">
               <tr>
                 <th class="text-center">ردیف</th>
@@ -94,8 +96,8 @@
                   <td class="text-center">
                     <button class="btn btn-outline-danger btn-sm rounded-circle delete-transaction"
                       data-id="{{ $request->id }}">
-                      <svg  width="16" height="16" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                       </svg>
                     </button>
@@ -184,6 +186,14 @@
             }
           });
         });
+      });
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
       });
     });
   </script>

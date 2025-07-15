@@ -1,4 +1,4 @@
-<div class="container-fluid py-2" dir="rtl">
+<div class="container-fluid py-2 mt-3" dir="rtl">
   <div
     class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-3">
     <h1 class="m-0 h3 font-thin flex-grow-1" style="min-width: 200px;">مدیریت تنظیمات بیعانه</h1>

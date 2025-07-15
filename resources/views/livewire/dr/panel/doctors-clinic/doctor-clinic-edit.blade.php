@@ -1,4 +1,4 @@
-<div class="container-fluid py-2" dir="rtl">
+<div class="container-fluid py-2 mt-3" dir="rtl">
   <div class="card shadow-lg border-0 rounded-2 overflow-hidden" style="background: #ffffff;">
     <div
       class="card-header bg-gradient-primary text-white p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
