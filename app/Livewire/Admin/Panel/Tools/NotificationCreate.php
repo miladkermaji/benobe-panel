@@ -41,6 +41,16 @@ class NotificationCreate extends Component
 
     public function store()
     {
+        // اطمینان از مقداردهی متغیرهای کش قبل از استفاده
+        if (!$this->users) {
+            $this->users = User::select('id', 'first_name', 'last_name', 'mobile')->get();
+        }
+        if (!$this->doctors) {
+            $this->doctors = Doctor::select('id', 'first_name', 'last_name', 'mobile')->get();
+        }
+        if (!$this->secretaries) {
+            $this->secretaries = Secretary::select('id', 'first_name', 'last_name', 'mobile')->get();
+        }
         $data = [
             'title'               => $this->title,
             'message'             => $this->message,
@@ -151,6 +161,7 @@ class NotificationCreate extends Component
         ]);
         if ($this->target_mode === 'single') {
             $recipientsToInsert[] = [
+                'notification_id' => $notification->id,
                 'recipient_type' => 'phone',
                 'recipient_id'   => null,
                 'phone_number'   => $this->single_phone,
@@ -168,6 +179,7 @@ class NotificationCreate extends Component
                     $model = $this->secretaries->firstWhere('id', $id);
                 }
                 $recipientsToInsert[] = [
+                    'notification_id' => $notification->id,
                     'recipient_type' => $type,
                     'recipient_id'   => $id,
                     'phone_number'   => $model->mobile ?? null,
@@ -185,6 +197,7 @@ class NotificationCreate extends Component
             };
             foreach ($recipients as $recipient) {
                 $recipientsToInsert[] = [
+                    'notification_id' => $notification->id,
                     'recipient_type' => get_class($recipient),
                     'recipient_id'   => $recipient->id,
                     'phone_number'   => $recipient->mobile ?? null,

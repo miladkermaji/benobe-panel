@@ -10,6 +10,11 @@ class NotificationList extends Component
 {
     use WithPagination;
 
+    protected $listeners = [
+        'deleteSelected' => 'deleteSelected',
+        'deleteNotificationConfirmed' => 'deleteNotificationConfirmed',
+    ];
+
     public $search                = '';
     public $selectAll             = false;
     public $selectedNotifications = [];
