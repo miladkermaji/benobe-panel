@@ -231,8 +231,8 @@ class AppointmentBookingController extends Controller
         ];
         if ($status === 'expired' && $remaining === 0) {
             $response['message'] = 'مهلت پرداخت شما به پایان رسید و این نوبت دیگر قابل پرداخت نیست. لطفاً مجدداً اقدام به رزرو نوبت نمایید.';
-            // حذف رکورد نوبت از دیتابیس
-            $appointment->delete();
+            // حذف کامل رکورد نوبت از دیتابیس (force delete)
+            $appointment->forceDelete();
         }
         return response()->json($response);
     }
