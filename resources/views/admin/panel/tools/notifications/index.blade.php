@@ -1,6 +1,6 @@
 @extends('admin.panel.layouts.master')
 @section('styles')
-  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/page-builder/page-builder.css') }}">
+  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/notification/notification.css') }}">
   <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/doctor/doctor.css') }}">
 @endsection
 @section('site-header')
