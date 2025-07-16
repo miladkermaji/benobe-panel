@@ -1171,6 +1171,17 @@ body {
     .glass-header .d-flex.flex-column > div {
         width: 100%;
     }
+    .search-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+    }
+    .search-input {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        display: block !important;
+    }
 }
 
 @media (max-width: 576px) {
@@ -1209,6 +1220,10 @@ body {
     .note-card-body {
         border-radius: 0.15rem !important;
     }
+    .note-card-header {
+        background: var(--gradient-primary) !important;
+        color: #222 !important;
+    }
     .note-card-header .fw-bold {
         color: #222 !important;
         font-weight: 700;
@@ -1217,6 +1232,7 @@ body {
         color: #fff !important;
         font-weight: 500;
         font-size: 0.97em;
+        opacity: 1;
     }
 }
 @media (max-width: 767px) {
@@ -1225,5 +1241,22 @@ body {
     .note-card-header,
     .note-card-body {
         border-radius: 0.12rem !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .glass-header .d-flex.flex-md-row {
+        justify-content: flex-end !important;
+        text-align: left !important;
+    }
+    .glass-header .form-select,
+    .glass-header .btn-gradient-success {
+        width: auto !important;
+    }
+    .glass-header .form-select {
+        max-width: 120px !important;
+    }
+    .glass-header .btn-gradient-success {
+        max-width: 150px !important;
     }
 }

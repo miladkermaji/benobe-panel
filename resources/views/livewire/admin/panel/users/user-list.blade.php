@@ -6,13 +6,13 @@
           <div class="d-flex align-items-center gap-3">
             <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0">مدیریت کاربران</h1>
           </div>
-          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
-            <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
-              <div class="search-container position-relative" style="max-width: 100%;">
+          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 w-100">
+            <div class="d-flex gap-2 flex-shrink-0 justify-content-center w-100 flex-column flex-md-row">
+              <div class="search-container position-relative flex-grow-1 mb-2 mb-md-0 w-100">
                 <input type="text"
-                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start w-100"
                   wire:model.live="search" placeholder="جستجو بر اساس نام، نام خانوادگی، موبایل یا ایمیل..."
-                  style="padding-right: 20px; text-align: right; direction: rtl;">
+                  style="padding-right: 20px; text-align: right; direction: rtl; width: 100%; max-width: 400px; min-width: 200px;">
                 <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
                   style="z-index: 5; top: 50%; right: 8px;">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
@@ -21,14 +21,14 @@
                   </svg>
                 </span>
               </div>
-              <select class="form-select form-select-sm w-auto" style="width: 110px; min-width: 0;"
+              <select class="form-select form-select-sm w-100 mb-2 mb-md-0" style="min-width: 0;"
                 wire:model.live="statusFilter">
                 <option value="">همه وضعیت‌ها</option>
                 <option value="active">فقط فعال</option>
                 <option value="inactive">فقط غیرفعال</option>
               </select>
               <a href="{{ route('admin.panel.users.create') }}"
-                class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1">
+                class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 w-100 w-md-auto justify-content-center justify-content-md-start">
                 <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
@@ -101,8 +101,8 @@
                         <div class="position-relative" style="width: 40px; height: 40px;">
                           <img loading="lazy"
                             src="{{ str_starts_with($user->profile_photo_url, 'http') ? $user->profile_photo_url : asset('admin-assets/images/default-avatar.png') }}"
-                            class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;"
-                            alt="پروفایل" onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+                            class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل"
+                            onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
                         </div>
                       </td>
                       <td class="align-middle">{{ $user->first_name }}</td>
