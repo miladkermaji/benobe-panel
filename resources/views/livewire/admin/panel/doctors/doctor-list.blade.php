@@ -122,8 +122,10 @@
                       </td>
                       <td class="align-middle">رایگان</td>
                       <td class="align-middle">رایگان</td>
-                      <td class="align-middle">{{ $item->province?->name ?? '---' }} /
-                        {{ $item->city?->name ?? '---' }}</td>
+                      <td class="align-middle">
+                         {{ $item->province ? $item->province->name : 'ندارد' }} /
+                        {{ $item->city ? $item->city->name : 'ندارد' }}
+                      </td>
                       <td class="text-center align-middle">
                         <button wire:click="confirmToggleStatus({{ $item->id }})"
                           class="badge {{ $item->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
@@ -218,8 +220,10 @@
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">شهر:</span>
-                      <span class="note-card-value">{{ $item->province?->name ?? '---' }} /
-                        {{ $item->city?->name ?? '---' }}</span>
+                      <span class="note-card-value">
+                        {{ $item->province ? $item->province->name : 'ندارد' }} /
+                        {{ $item->city ? $item->city->name : 'ندارد' }}
+                      </span>
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">وضعیت:</span>
