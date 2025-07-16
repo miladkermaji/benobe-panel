@@ -222,108 +222,107 @@
                     return 'بدون پزشک';
                 });
               @endphp
-              @forelse ($grouped as $doctorId => $doctorSpecialties)
-                <div class="mb-3 p-2 rounded-3 shadow-sm" style="border: 2px solid #b3c2d1; background: #f5f7fa;">
-                  <div class="fw-bold text-primary mb-2" style="font-size: 1.08rem;">
-                    <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2"
-                      style="vertical-align: middle; margin-left: 6px;">
-                      <circle cx="9" cy="9" r="8" />
-                      <path d="M9 5v4l3 2" />
+              @foreach ($grouped as $doctorId => $doctorSpecialties)
+                <div class="mb-3 p-2 rounded-3 shadow-sm" x-data="{ open: false }"
+                  style="border: 2px solid #b3c2d1; background: #f5f7fa;">
+                  <div class="fw-bold text-primary mb-2 d-flex align-items-center justify-content-between"
+                    style="font-size: 1.08rem; cursor:pointer;" @click="open = !open">
+                    <span>
+                      <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2"
+                        style="vertical-align: middle; margin-left: 6px;">
+                        <circle cx="9" cy="9" r="8" />
+                        <path d="M9 5v4l3 2" />
+                      </svg>
+                      @php
+                        $firstSpecialty = collect($doctorSpecialties)->first(function ($item) {
+                            return isset($item->doctor) && is_object($item->doctor);
+                        });
+                      @endphp
+                      @if ($firstSpecialty)
+                        {{ $firstSpecialty->doctor->first_name . ' ' . $firstSpecialty->doctor->last_name }}
+                      @else
+                        بدون پزشک
+                      @endif
+                    </span>
+                    <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                      <path d="M6 9l6 6 6-6" />
                     </svg>
-                    @php
-                      $firstSpecialty = collect($doctorSpecialties)->first(function ($item) {
-                          return isset($item->doctor) && is_object($item->doctor);
-                      });
-                    @endphp
-                    @if ($firstSpecialty)
-                      {{ $firstSpecialty->doctor->first_name . ' ' . $firstSpecialty->doctor->last_name }}
-                    @else
-                      بدون پزشک
-                    @endif
                   </div>
-                  @foreach ($doctorSpecialties as $specialty)
-                    {{-- همین منطق را برای موبایل هم اعمال کن --}}
-                    @if (isset($specialty->doctor) && is_object($specialty->doctor))
-                      <div class="specialty-card mb-2 p-2 rounded-2"
-                        style="background: #fff; border: 1px solid #e3e6ea;">
-                        <div class="specialty-card-header d-flex justify-content-between align-items-center px-2 py-2"
-                          style="cursor:pointer;">
-                          <span class="fw-bold">
-                            {{ $specialty->specialty_title ?? 'بدون عنوان' }}
-                            <span
-                              class="text-muted">({{ $specialty->doctor->first_name . ' ' . $specialty->doctor->last_name }})</span>
-                          </span>
-                        </div>
-                        <div class="specialty-card-body px-2 py-2">
-                          <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
-                            <span class="specialty-card-label">نام پزشک:</span>
-                            <span class="specialty-card-value">
-                              {{ $specialty->doctor->first_name . ' ' . $specialty->doctor->last_name }}
+                  <div x-show="open" x-transition>
+                    @foreach ($doctorSpecialties as $specialty)
+                      @if (isset($specialty->doctor) && is_object($specialty->doctor))
+                        <div class="specialty-card mb-2 p-2 rounded-2"
+                          style="background: #fff; border: 1px solid #e3e6ea;">
+                          <div
+                            class="specialty-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                            style="cursor:pointer;">
+                            <span class="fw-bold">
+                              {{ $specialty->specialty_title ?? 'بدون عنوان' }}
+                              <span
+                                class="text-muted">({{ $specialty->doctor->first_name . ' ' . $specialty->doctor->last_name }})</span>
                             </span>
                           </div>
-                          <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
-                            <span class="specialty-card-label">نام تخصص:</span>
-                            <span class="specialty-card-value">{{ $specialty->specialty->name ?? 'نامشخص' }}</span>
-                          </div>
-                          <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
-                            <span class="specialty-card-label">عنوان تخصص:</span>
-                            <span
-                              class="specialty-card-value">{{ $specialty->specialty_title ?? 'بدون عنوان' }}</span>
-                          </div>
-                          <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
-                            <span class="specialty-card-label">درجه علمی:</span>
-                            <span class="specialty-card-value">
-                              @if (isset($specialty->academicDegree) && is_object($specialty->academicDegree))
-                                {{ $specialty->academicDegree->title }}
-                              @else
-                                بدون درجه
-                              @endif
-                            </span>
-                          </div>
-                          <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
-                            <span class="specialty-card-label">تخصص اصلی:</span>
-                            <button wire:click="confirmToggleMain({{ $specialty->id }})"
-                              class="badge {{ $specialty->is_main ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
-                              {{ $specialty->is_main ? 'اصلی' : 'غیراصلی' }}
-                            </button>
-                          </div>
-                          <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
-                            <span class="specialty-card-label">عملیات:</span>
-                            <div class="d-flex gap-2">
-                              <a href="{{ route('admin.panel.doctor-specialties.edit', $specialty->id) }}"
-                                class="btn btn-gradient-primary rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                </svg>
-                              </a>
-                              <button wire:click="confirmDelete({{ $specialty->id }})"
-                                class="btn btn-gradient-danger rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                </svg>
+                          <div class="specialty-card-body px-2 py-2">
+                            <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
+                              <span class="specialty-card-label">نام پزشک:</span>
+                              <span
+                                class="specialty-card-value">{{ $specialty->doctor->first_name . ' ' . $specialty->doctor->last_name }}</span>
+                            </div>
+                            <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
+                              <span class="specialty-card-label">نام تخصص:</span>
+                              <span class="specialty-card-value">{{ $specialty->specialty->name ?? 'نامشخص' }}</span>
+                            </div>
+                            <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
+                              <span class="specialty-card-label">عنوان تخصص:</span>
+                              <span
+                                class="specialty-card-value">{{ $specialty->specialty_title ?? 'بدون عنوان' }}</span>
+                            </div>
+                            <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
+                              <span class="specialty-card-label">درجه علمی:</span>
+                              <span class="specialty-card-value">
+                                @if (isset($specialty->academicDegree) && is_object($specialty->academicDegree))
+                                  {{ $specialty->academicDegree->title }}
+                                @else
+                                  بدون درجه
+                                @endif
+                              </span>
+                            </div>
+                            <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
+                              <span class="specialty-card-label">تخصص اصلی:</span>
+                              <button wire:click="confirmToggleMain({{ $specialty->id }})"
+                                class="badge {{ $specialty->is_main ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
+                                {{ $specialty->is_main ? 'اصلی' : 'غیراصلی' }}
                               </button>
+                            </div>
+                            <div class="specialty-card-item d-flex justify-content-between align-items-center py-1">
+                              <span class="specialty-card-label">عملیات:</span>
+                              <div class="d-flex gap-2">
+                                <a href="{{ route('admin.panel.doctor-specialties.edit', $specialty->id) }}"
+                                  class="btn btn-gradient-primary rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                  </svg>
+                                </a>
+                                <button wire:click="confirmDelete({{ $specialty->id }})"
+                                  class="btn btn-gradient-danger rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                  </svg>
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    @endif
-                  @endforeach
-                </div>
-              @empty
-                <div class="text-center py-4">
-                  <div class="d-flex justify-content-center align-items-center flex-column">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2" class="text-muted mb-2">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                    <p class="text-muted fw-medium">هیچ تخصصی یافت نشد.</p>
+                      @endif
+                    @endforeach
                   </div>
                 </div>
-              @endforelse
+              @endforeach
             @else
               <div class="text-center py-4">
                 <div class="spinner-border text-primary" role="status">
