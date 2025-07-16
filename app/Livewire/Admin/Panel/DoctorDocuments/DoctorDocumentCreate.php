@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Doctor;
 use App\Models\DoctorDocument;
+use Illuminate\Support\Facades\Cache;
 
 class DoctorDocumentCreate extends Component
 {
@@ -49,6 +50,7 @@ class DoctorDocumentCreate extends Component
             'title' => $this->title,
             'is_verified' => $this->is_verified,
         ]);
+        Cache::forget('doctor_documents_' . ($this->search ?? '') . '_status__page_1');
 
         $this->dispatch('show-alert', type: 'success', message: 'مدرک با موفقیت ثبت شد!');
         return redirect()->route('admin.panel.doctor-documents.index');

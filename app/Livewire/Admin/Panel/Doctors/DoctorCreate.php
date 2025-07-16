@@ -6,6 +6,7 @@ use App\Models\Doctor;
 use App\Models\Zone;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Morilog\Jalali\Jalalian;
@@ -169,6 +170,7 @@ class DoctorCreate extends Component
             'appointment_fee'    => $this->appointment_fee,
             'visit_fee'          => $this->visit_fee,
         ]);
+        Cache::forget('doctors_' . ($this->search ?? '') . '_status__page_1');
 
         $this->dispatch('show-alert', type: 'success', message: 'پزشک با موفقیت ایجاد شد!');
         return redirect()->route('admin.panel.doctors.index');

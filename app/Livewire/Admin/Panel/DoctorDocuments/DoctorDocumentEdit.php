@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use App\Models\DoctorDocument;
 use App\Models\Doctor;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class DoctorDocumentEdit extends Component
 {
@@ -67,6 +68,7 @@ class DoctorDocumentEdit extends Component
         }
 
         $this->document->update($data);
+        Cache::forget('doctor_documents_' . ($this->search ?? '') . '_status__page_1');
 
         $this->dispatch('show-alert', type: 'success', message: 'مدرک با موفقیت به‌روزرسانی شد!');
         return redirect()->route('admin.panel.doctor-documents.index');

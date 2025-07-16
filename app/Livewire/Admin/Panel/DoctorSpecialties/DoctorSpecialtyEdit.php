@@ -8,6 +8,7 @@ use App\Models\DoctorSpecialty;
 use App\Models\Doctor;
 use App\Models\Specialty;
 use App\Models\AcademicDegree;
+use Illuminate\Support\Facades\Cache;
 
 class DoctorSpecialtyEdit extends Component
 {
@@ -86,6 +87,7 @@ class DoctorSpecialtyEdit extends Component
             'specialty_title' => $this->specialty_title,
             'is_main' => $this->is_main,
         ]);
+        Cache::forget('doctor_specialties_' . ($this->search ?? '') . '_status__page_1');
 
         $this->dispatch('show-alert', type: 'success', message: 'تخصص پزشک با موفقیت به‌روزرسانی شد!');
         return redirect()->route('admin.panel.doctor-specialties.index');
