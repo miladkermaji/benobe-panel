@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Panel\Specialties;
 
 use App\Models\Specialty;
 use Livewire\Component;
+use Illuminate\Support\Facades\Cache;
 
 class SpecialtyCreate extends Component
 {
@@ -33,6 +34,7 @@ class SpecialtyCreate extends Component
             'description' => $this->description,
             'status'      => $this->status,
         ]);
+        Cache::forget('specialties_' . $this->search . '_page_' . ($this->getPage() ?? 1));
 
         $this->dispatch('show-alert', type: 'success', message: 'تخصص با موفقیت ایجاد شد!');
         return redirect()->route('admin.panel.specialties.index');

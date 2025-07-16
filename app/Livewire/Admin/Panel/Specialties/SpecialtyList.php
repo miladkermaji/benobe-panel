@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Panel\Specialties;
 use App\Models\Specialty;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Cache;
 
 class SpecialtyList extends Component
 {
@@ -38,6 +39,7 @@ class SpecialtyList extends Component
     {
         $item = Specialty::findOrFail($id);
         $item->update(['status' => ! $item->status]);
+        Cache::forget('specialties_' . $this->search . '_page_' . $this->getPage());
         $this->dispatch('show-alert', type: $item->status ? 'success' : 'info', message: $item->status ? 'فعال شد!' : 'غیرفعال شد!');
     }
 
@@ -50,6 +52,7 @@ class SpecialtyList extends Component
     {
         $item = Specialty::findOrFail($id);
         $item->delete();
+        Cache::forget('specialties_' . $this->search . '_page_' . $this->getPage());
         $this->dispatch('show-alert', type: 'success', message: 'تخصص حذف شد!');
     }
 
@@ -78,6 +81,7 @@ class SpecialtyList extends Component
         }
 
         Specialty::whereIn('id', $this->selectedSpecialties)->delete();
+        Cache::forget('specialties_' . $this->search . '_page_' . $this->getPage());
         $this->selectedSpecialties = [];
         $this->selectAll           = false;
         $this->dispatch('show-alert', type: 'success', message: 'تخصص‌های انتخاب‌شده حذف شدند!');
