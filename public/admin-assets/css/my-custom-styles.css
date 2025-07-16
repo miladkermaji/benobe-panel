@@ -1213,6 +1213,9 @@ body {
         width: 100%;
     }
 }
+tr{
+    color: #333 !important;
+}
 @media (max-width: 991px) {
     .card,
     .note-card,
