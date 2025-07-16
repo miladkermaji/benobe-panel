@@ -13,6 +13,7 @@ class DoctorPermissions extends Component
     public $search = '';
     public $expandedDoctors = [];
     public $permissionsConfig;
+    public $perPage = 50;
 
     public function mount()
     {
@@ -65,7 +66,7 @@ class DoctorPermissions extends Component
                         });
                 });
             })
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         return view('livewire.admin.panel.doctors.doctor-permissions', [
             'doctors' => $doctors
