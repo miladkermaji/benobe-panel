@@ -30,6 +30,7 @@ class DoctorDocumentList extends Component
     public $statusFilter = '';
     public $applyToAllFiltered = false;
     public $totalFilteredCount = 0;
+    public $openDoctors = [];
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -221,6 +222,15 @@ class DoctorDocumentList extends Component
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت تأیید مدارک انتخاب‌شده با موفقیت تغییر کرد.');
         Cache::forget('doctor_documents_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
+    }
+
+    public function toggleDoctorRow($doctorId)
+    {
+        if (in_array($doctorId, $this->openDoctors)) {
+            $this->openDoctors = array_diff($this->openDoctors, [$doctorId]);
+        } else {
+            $this->openDoctors[] = $doctorId;
+        }
     }
 
     private function getDocumentsQuery()

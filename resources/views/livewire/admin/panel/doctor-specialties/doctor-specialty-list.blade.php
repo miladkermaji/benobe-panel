@@ -88,6 +88,7 @@
                   <th class="align-middle">درجه علمی</th>
                   <th class="text-center align-middle" style="width: 100px;">تخصص اصلی</th>
                   <th class="text-center align-middle" style="width: 150px;">عملیات</th>
+                  <th class="text-center align-middle" style="width: 40px;"></th>
                 </tr>
               </thead>
               <tbody>
@@ -125,62 +126,79 @@
                           بدون پزشک
                         @endif
                       </td>
+                      <td class="text-center align-middle" style="width: 40px;">
+                        <button wire:click="toggleDoctorRow('{{ $doctorId }}')"
+                          class="w-100 d-flex justify-content-center align-items-center btn btn-link p-0"
+                          style="height: 100%;">
+                          @if (in_array($doctorId, $openDoctors))
+                            <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2">
+                              <path d="M6 15l6-6 6 6" />
+                            </svg>
+                          @else
+                            <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2">
+                              <path d="M6 9l6 6 6-6" />
+                            </svg>
+                          @endif
+                        </button>
+                      </td>
                     </tr>
-                    @foreach ($doctorSpecialties as $specialty)
-                      {{-- فقط اگر doctor معتبر بود اطلاعات تخصص را نمایش بده --}}
-                      @if (isset($specialty->doctor) && is_object($specialty->doctor))
-                        <tr style="border-bottom: 1px solid #e3e6ea; background: #fff;">
-                          <td class="text-center align-middle">
-                            <input type="checkbox" wire:model.live="selectedSpecialties" value="{{ $specialty->id }}"
-                              class="form-check-input m-0 align-middle">
-                          </td>
-                          <td class="text-center align-middle">{{ $specialties->firstItem() + $rowIndex }}</td>
-                          <td class="align-middle">
-                            {{ $specialty->doctor->first_name . ' ' . $specialty->doctor->last_name }}
-                          </td>
-                          <td class="align-middle">
-                            {{ $specialty->specialty->name ?? 'نامشخص' }}
-                          </td>
-                          <td class="align-middle">
-                            {{ $specialty->specialty_title ?? 'بدون عنوان' }}
-                          </td>
-                          <td class="align-middle">
-                            @if (isset($specialty->academicDegree) && is_object($specialty->academicDegree))
-                              {{ $specialty->academicDegree->title }}
-                            @else
-                              بدون درجه
-                            @endif
-                          </td>
-                          <td class="text-center align-middle">
-                            <button wire:click="confirmToggleMain({{ $specialty->id }})"
-                              class="badge {{ $specialty->is_main ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
-                              {{ $specialty->is_main ? 'اصلی' : 'غیراصلی' }}
-                            </button>
-                          </td>
-                          <td class="text-center align-middle">
-                            <div class="d-flex justify-content-center gap-2">
-                              <a href="{{ route('admin.panel.doctor-specialties.edit', $specialty->id) }}"
-                                class="btn btn-gradient-primary rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                </svg>
-                              </a>
-                              <button wire:click="confirmDelete({{ $specialty->id }})"
-                                class="btn btn-gradient-danger rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                </svg>
+                    @if (in_array($doctorId, $openDoctors))
+                      @foreach ($doctorSpecialties as $specialty)
+                        @if (isset($specialty->doctor) && is_object($specialty->doctor))
+                          <tr style="border-bottom: 1px solid #e3e6ea; background: #fff;">
+                            <td class="text-center align-middle">
+                              <input type="checkbox" wire:model.live="selectedSpecialties"
+                                value="{{ $specialty->id }}" class="form-check-input m-0 align-middle">
+                            </td>
+                            <td class="text-center align-middle">{{ $specialties->firstItem() + $rowIndex }}</td>
+                            <td class="align-middle">
+                              {{ $specialty->doctor->first_name . ' ' . $specialty->doctor->last_name }}
+                            </td>
+                            <td class="align-middle">
+                              {{ $specialty->specialty->name ?? 'نامشخص' }}
+                            </td>
+                            <td class="align-middle">
+                              {{ $specialty->specialty_title ?? 'بدون عنوان' }}
+                            </td>
+                            <td class="align-middle">
+                              @if (isset($specialty->academicDegree) && is_object($specialty->academicDegree))
+                                {{ $specialty->academicDegree->title }}
+                              @else
+                                بدون درجه
+                              @endif
+                            </td>
+                            <td class="text-center align-middle">
+                              <button wire:click="confirmToggleMain({{ $specialty->id }})"
+                                class="badge {{ $specialty->is_main ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
+                                {{ $specialty->is_main ? 'اصلی' : 'غیراصلی' }}
                               </button>
-                            </div>
-                          </td>
-                        </tr>
-                        @php $rowIndex++; @endphp
-                      @endif
-                    @endforeach
+                            </td>
+                            <td class="text-center align-middle">
+                              <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ route('admin.panel.doctor-specialties.edit', $specialty->id) }}"
+                                  class="btn btn-gradient-primary rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                  </svg>
+                                </a>
+                                <button wire:click="confirmDelete({{ $specialty->id }})"
+                                  class="btn btn-gradient-danger rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </td>
+                            <td class="text-center align-middle"></td>
+                          </tr>
+                          @php $rowIndex++; @endphp
+                        @endif
+                      @endforeach
+                    @endif
                   @empty
                     <tr>
                       <td colspan="8" class="text-center py-4">
