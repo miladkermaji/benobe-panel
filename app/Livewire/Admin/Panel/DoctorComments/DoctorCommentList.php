@@ -32,6 +32,8 @@ class DoctorCommentList extends Component
     public $totalFilteredCount = 0;
     public $replyText = [];
     public $replyingTo = null;
+    public $openRow = null; // For desktop dropdown
+    public $openDoctors = []; // For group expand/collapse
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -110,6 +112,20 @@ class DoctorCommentList extends Component
         $this->replyingTo = null;
         $this->dispatch('show-alert', type: 'success', message: 'پاسخ با موفقیت ثبت شد!');
         Cache::forget('doctor_comments_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
+    }
+
+    public function toggleRow($id)
+    {
+        $this->openRow = $this->openRow === $id ? null : $id;
+    }
+
+    public function toggleDoctorRow($doctorId)
+    {
+        if (in_array($doctorId, $this->openDoctors)) {
+            $this->openDoctors = array_diff($this->openDoctors, [$doctorId]);
+        } else {
+            $this->openDoctors[] = $doctorId;
+        }
     }
 
     public function updatedSearch()

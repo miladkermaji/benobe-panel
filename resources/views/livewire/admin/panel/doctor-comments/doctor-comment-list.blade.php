@@ -89,6 +89,7 @@
                   <th class="align-middle">پاسخ</th>
                   <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
                   <th class="text-center align-middle" style="width: 200px;">عملیات</th>
+                  <th class="text-center align-middle" style="width: 40px;"></th>
                 </tr>
               </thead>
               <tbody>
@@ -126,69 +127,88 @@
                           بدون پزشک
                         @endif
                       </td>
+                      <td class="text-center align-middle" style="width: 40px;">
+                        <button wire:click="toggleDoctorRow('{{ $doctorId }}')"
+                          class="w-100 d-flex justify-content-center align-items-center btn btn-link p-0"
+                          style="height: 100%;">
+                          @if (in_array($doctorId, $openDoctors))
+                            <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2">
+                              <path d="M6 15l6-6 6 6" />
+                            </svg>
+                          @else
+                            <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2">
+                              <path d="M6 9l6 6 6-6" />
+                            </svg>
+                          @endif
+                        </button>
+                      </td>
                     </tr>
-                    @foreach ($doctorComments as $comment)
-                      @if (isset($comment->doctor) && is_object($comment->doctor))
-                        <tr style="border-bottom: 1px solid #e3e6ea; background: #fff;">
-                          <td class="text-center align-middle">
-                            <input type="checkbox" wire:model.live="selectedDoctorComments" value="{{ $comment->id }}"
-                              class="form-check-input m-0 align-middle">
-                          </td>
-                          <td class="text-center align-middle">{{ $comments->firstItem() + $rowIndex }}</td>
-                          <td class="align-middle">
-                            {{ $comment->doctor->first_name . ' ' . $comment->doctor->last_name }}
-                          </td>
-                          <td class="align-middle">{{ $comment->user_name }}</td>
-                          <td class="align-middle">{{ $comment->user_phone ?? 'ثبت نشده' }}</td>
-                          <td class="align-middle">{{ \Illuminate\Support\Str::limit($comment->comment, 50) }}</td>
-                          <td class="align-middle">{{ $comment->reply ? \Illuminate\Support\Str::limit($comment->reply, 50) : 'بدون پاسخ' }}</td>
-                          <td class="text-center align-middle">
-                            <button wire:click="confirmToggleStatus({{ $comment->id }})"
-                              class="badge {{ $comment->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
-                              {{ $comment->status ? 'فعال' : 'غیرفعال' }}
-                            </button>
-                          </td>
-                          <td class="text-center align-middle">
-                            <div class="d-flex justify-content-center gap-2">
-                              <a href="{{ route('admin.panel.doctor-comments.edit', $comment->id) }}"
-                                class="btn btn-gradient-primary rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                </svg>
-                              </a>
-                              <button wire:click="toggleReply({{ $comment->id }})"
-                                class="btn btn-gradient-info rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M21 11.5a8.38 8.38 0 01-11.9 7.6L3 21l1.9-5.7a8.38 8.38 0 017.6-11.9A8.38 8.38 0 0121 11.5z" />
-                                </svg>
+                    @if (in_array($doctorId, $openDoctors))
+                      @foreach ($doctorComments as $comment)
+                        @if (isset($comment->doctor) && is_object($comment->doctor))
+                          <tr style="border-bottom: 1px solid #e3e6ea; background: #fff;">
+                            <td class="text-center align-middle">
+                              <input type="checkbox" wire:model.live="selectedDoctorComments"
+                                value="{{ $comment->id }}" class="form-check-input m-0 align-middle">
+                            </td>
+                            <td class="text-center align-middle">{{ $comments->firstItem() + $rowIndex }}</td>
+                            <td class="align-middle">
+                              {{ $comment->doctor->first_name . ' ' . $comment->doctor->last_name }}
+                            </td>
+                            <td class="align-middle">{{ $comment->user_name }}</td>
+                            <td class="align-middle">{{ $comment->user_phone ?? 'ثبت نشده' }}</td>
+                            <td class="align-middle">{{ \Illuminate\Support\Str::limit($comment->comment, 50) }}</td>
+                            <td class="align-middle">
+                              {{ $comment->reply ? \Illuminate\Support\Str::limit($comment->reply, 50) : 'بدون پاسخ' }}
+                            </td>
+                            <td class="text-center align-middle">
+                              <button wire:click="confirmToggleStatus({{ $comment->id }})"
+                                class="badge {{ $comment->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
+                                {{ $comment->status ? 'فعال' : 'غیرفعال' }}
                               </button>
-                              <button wire:click="confirmDelete({{ $comment->id }})"
-                                class="btn btn-gradient-danger rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                </svg>
-                              </button>
-                            </div>
-                            @if ($replyingTo === $comment->id)
-                              <div class="mt-3 p-3 bg-light rounded-2">
-                                <textarea wire:model.live="replyText.{{ $comment->id }}"
-                                  class="form-control mb-2" rows="3"
-                                  placeholder="پاسخ خود را بنویسید..."></textarea>
-                                <button wire:click="saveReply({{ $comment->id }})"
-                                  class="btn btn-gradient-success rounded-pill px-3">ارسال پاسخ</button>
+                            </td>
+                            <td class="text-center align-middle">
+                              <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ route('admin.panel.doctor-comments.edit', $comment->id) }}"
+                                  class="btn btn-gradient-primary rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                  </svg>
+                                </a>
+                                <button wire:click="toggleReply({{ $comment->id }})"
+                                  class="btn btn-gradient-info rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M21 11.5a8.38 8.38 0 01-11.9 7.6L3 21l1.9-5.7a8.38 8.38 0 017.6-11.9A8.38 8.38 0 0121 11.5z" />
+                                  </svg>
+                                </button>
+                                <button wire:click="confirmDelete({{ $comment->id }})"
+                                  class="btn btn-gradient-danger rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                  </svg>
+                                </button>
                               </div>
-                            @endif
-                          </td>
-                        </tr>
-                        @php $rowIndex++; @endphp
-                      @endif
-                    @endforeach
+                              @if ($replyingTo === $comment->id)
+                                <div class="mt-3 p-3 bg-light rounded-2">
+                                  <textarea wire:model.live="replyText.{{ $comment->id }}" class="form-control mb-2" rows="3"
+                                    placeholder="پاسخ خود را بنویسید..."></textarea>
+                                  <button wire:click="saveReply({{ $comment->id }})"
+                                    class="btn btn-gradient-success rounded-pill px-3">ارسال پاسخ</button>
+                                </div>
+                              @endif
+                            </td>
+                            <td class="text-center align-middle"></td>
+                          </tr>
+                          @php $rowIndex++; @endphp
+                        @endif
+                      @endforeach
+                    @endif
                   @empty
                     <tr>
                       <td colspan="9" class="text-center py-4">
@@ -262,8 +282,7 @@
                       @if (isset($comment->doctor) && is_object($comment->doctor))
                         <div class="comment-card mb-2 p-2 rounded-2"
                           style="background: #fff; border: 1px solid #e3e6ea;">
-                          <div
-                            class="comment-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                          <div class="comment-card-header d-flex justify-content-between align-items-center px-2 py-2"
                             style="cursor:pointer;">
                             <span class="fw-bold">
                               {{ \Illuminate\Support\Str::limit($comment->comment, 30) }}
@@ -283,8 +302,7 @@
                             </div>
                             <div class="comment-card-item d-flex justify-content-between align-items-center py-1">
                               <span class="comment-card-label">شماره تماس:</span>
-                              <span
-                                class="comment-card-value">{{ $comment->user_phone ?? 'ثبت نشده' }}</span>
+                              <span class="comment-card-value">{{ $comment->user_phone ?? 'ثبت نشده' }}</span>
                             </div>
                             <div class="comment-card-item d-flex justify-content-between align-items-center py-1">
                               <span class="comment-card-label">نظر:</span>
@@ -334,8 +352,7 @@
                             </div>
                             @if ($replyingTo === $comment->id)
                               <div class="mt-3 p-3 bg-light rounded-2">
-                                <textarea wire:model.live="replyText.{{ $comment->id }}"
-                                  class="form-control mb-2" rows="3"
+                                <textarea wire:model.live="replyText.{{ $comment->id }}" class="form-control mb-2" rows="3"
                                   placeholder="پاسخ خود را بنویسید..."></textarea>
                                 <button wire:click="saveReply({{ $comment->id }})"
                                   class="btn btn-gradient-success rounded-pill px-3">ارسال پاسخ</button>
