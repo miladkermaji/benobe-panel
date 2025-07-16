@@ -122,6 +122,7 @@ class UserBlockingCreate extends Component
             'unblocked_at' => $unblockedAtMiladi,
             'reason' => $this->reason,
             'status' => $this->status,
+            'manager_id' => \Illuminate\Support\Facades\Auth::guard('manager')->user()->id,
         ]);
 
         if ($userBlocking) {

@@ -106,7 +106,6 @@ class UserBlockingList extends Component
             }
             $this->dispatch('show-alert', type: 'info', message: 'مسدودیت غیرفعال شد!');
         }
-        Cache::forget('user_blockings_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
     }
 
     public function confirmDelete($id)
@@ -123,7 +122,6 @@ class UserBlockingList extends Component
         }
         $item->delete();
         $this->dispatch('show-alert', type: 'success', message: 'رکورد مسدودیت با موفقیت حذف شد!');
-        Cache::forget('user_blockings_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
     }
 
     public function updatedSearch()
@@ -138,17 +136,13 @@ class UserBlockingList extends Component
 
     public function updatedSelectAll($value)
     {
-        $currentPageIds = Cache::remember('user_blockings_ids_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage(), now()->addMinutes(5), function () {
-            return $this->getUserBlockingsQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
-        });
+        $currentPageIds = $this->getUserBlockingsQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
         $this->selectedUserBlockings = $value ? $currentPageIds : [];
     }
 
     public function updatedSelectedUserBlockings()
     {
-        $currentPageIds = Cache::remember('user_blockings_ids_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage(), now()->addMinutes(5), function () {
-            return $this->getUserBlockingsQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
-        });
+        $currentPageIds = $this->getUserBlockingsQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
         $this->selectAll = !empty($this->selectedUserBlockings) && count(array_diff($currentPageIds, $this->selectedUserBlockings)) === 0;
     }
 
@@ -163,7 +157,6 @@ class UserBlockingList extends Component
             $this->groupAction = '';
             $this->resetPage();
             $this->dispatch('show-alert', type: 'success', message: 'همه رکوردهای مسدودیت فیلترشده حذف شدند!');
-            Cache::forget('user_blockings_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
             return;
         }
         if (empty($this->selectedUserBlockings)) {
@@ -174,7 +167,6 @@ class UserBlockingList extends Component
         $this->selectedUserBlockings = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'رکوردهای مسدودیت انتخاب‌شده با موفقیت حذف شدند!');
-        Cache::forget('user_blockings_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
     }
 
     public function executeGroupAction()
@@ -209,7 +201,6 @@ class UserBlockingList extends Component
             $this->applyToAllFiltered = false;
             $this->groupAction = '';
             $this->resetPage();
-            Cache::forget('user_blockings_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
             return;
         }
 
@@ -270,7 +261,6 @@ class UserBlockingList extends Component
         $this->selectedUserBlockings = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت رکوردهای مسدودیت انتخاب‌شده با موفقیت تغییر کرد.');
-        Cache::forget('user_blockings_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
     }
 
     private function getUserBlockingsQuery()
@@ -309,10 +299,7 @@ class UserBlockingList extends Component
 
     public function render()
     {
-        $cacheKey = 'user_blockings_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage();
-        $userBlockings = $this->readyToLoad ? Cache::remember($cacheKey, now()->addMinutes(5), function () {
-            return $this->getUserBlockingsQuery()->paginate($this->perPage);
-        }) : [];
+        $userBlockings = $this->readyToLoad ? $this->getUserBlockingsQuery()->paginate($this->perPage) : [];
         $this->totalFilteredCount = $this->readyToLoad ? $this->getUserBlockingsQuery()->count() : 0;
 
         return view('livewire.admin.panel.user-blockings.user-blocking-list', [
