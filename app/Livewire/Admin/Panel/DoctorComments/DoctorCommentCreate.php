@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Panel\DoctorComments;
 use Livewire\Component;
 use App\Models\DoctorComment;
 use App\Models\Doctor;
+use Illuminate\Support\Facades\Cache;
 
 class DoctorCommentCreate extends Component
 {
@@ -39,6 +40,7 @@ class DoctorCommentCreate extends Component
 
         $validated['ip_address'] = request()->ip();
         DoctorComment::create($validated);
+        Cache::forget('doctor_comments__status__page_1');
 
         $this->dispatch('show-alert', type: 'success', message: 'نظر با موفقیت ثبت شد!');
         return redirect()->route('admin.panel.doctor-comments.index');

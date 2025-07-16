@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\DoctorComment;
 use App\Models\Doctor;
+use Illuminate\Support\Facades\Cache;
 
 class DoctorCommentList extends Component
 {
@@ -15,27 +16,31 @@ class DoctorCommentList extends Component
 
     protected $listeners = [
         'deleteDoctorCommentConfirmed' => 'deleteDoctorComment',
+        'deleteSelectedConfirmed' => 'deleteSelected',
+        'toggleStatusConfirmed' => 'toggleStatusConfirmed',
         'replySubmitted' => 'saveReply'
     ];
 
-    public $perPage = 100; // برای پیجینیشن اصلی پزشکان
-    public $perPageComments = 5; // برای پیجینیشن نظرات هر پزشک
+    public $perPage = 50;
     public $search = '';
     public $readyToLoad = false;
     public $selectedDoctorComments = [];
-    public $selectAll = [];
-    public $expandedDoctors = [];
+    public $selectAll = false;
+    public $groupAction = '';
+    public $statusFilter = '';
+    public $applyToAllFiltered = false;
+    public $totalFilteredCount = 0;
     public $replyText = [];
     public $replyingTo = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
+        'statusFilter' => ['except' => '']
     ];
 
     public function mount()
     {
         $this->perPage = max($this->perPage, 1);
-        $this->perPageComments = max($this->perPageComments, 1);
     }
 
     public function loadDoctorComments()
@@ -43,20 +48,32 @@ class DoctorCommentList extends Component
         $this->readyToLoad = true;
     }
 
-    public function toggleDoctor($doctorId)
+    public function confirmToggleStatus($id)
     {
-        if (in_array($doctorId, $this->expandedDoctors)) {
-            $this->expandedDoctors = array_diff($this->expandedDoctors, [$doctorId]);
-        } else {
-            $this->expandedDoctors[] = $doctorId;
+        $comment = DoctorComment::find($id);
+        if (!$comment) {
+            $this->dispatch('show-alert', type: 'error', message: 'نظر یافت نشد.');
+            return;
         }
+        $doctorName = $comment->doctor->first_name . ' ' . $comment->doctor->last_name;
+        $action = $comment->status ? 'غیرفعال کردن' : 'فعال کردن';
+
+        $this->dispatch('confirm-toggle-status', id: $id, name: $doctorName, action: $action);
     }
 
-    public function toggleStatus($id)
+    public function toggleStatusConfirmed($id)
     {
-        $comment = DoctorComment::findOrFail($id);
+        $comment = DoctorComment::find($id);
+        if (!$comment) {
+            $this->dispatch('show-alert', type: 'error', message: 'نظر یافت نشد.');
+            return;
+        }
+
         $comment->update(['status' => !$comment->status]);
-        $this->dispatch('show-alert', type: $comment->status ? 'success' : 'info', message: $comment->status ? 'نظر فعال شد!' : 'نظر غیرفعال شد!');
+
+        $this->dispatch('show-alert', type: 'success', message: $comment->status ? 'نظر فعال شد!' : 'نظر غیرفعال شد!');
+        Cache::forget('doctor_comments_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
+        $this->resetPage();
     }
 
     public function confirmDelete($id)
@@ -66,9 +83,14 @@ class DoctorCommentList extends Component
 
     public function deleteDoctorComment($id)
     {
-        $comment = DoctorComment::findOrFail($id);
+        $comment = DoctorComment::find($id);
+        if (!$comment) {
+            $this->dispatch('show-alert', type: 'error', message: 'نظر یافت نشد.');
+            return;
+        }
         $comment->delete();
         $this->dispatch('show-alert', type: 'success', message: 'نظر با موفقیت حذف شد!');
+        Cache::forget('doctor_comments_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
     }
 
     public function toggleReply($commentId)
@@ -79,14 +101,61 @@ class DoctorCommentList extends Component
 
     public function saveReply($commentId)
     {
-        $comment = DoctorComment::findOrFail($commentId);
-        $comment->update(['reply' => $this->replyText[$commentId]]); // Assuming a 'reply' column exists
+        $comment = DoctorComment::find($commentId);
+        if (!$comment) {
+            $this->dispatch('show-alert', type: 'error', message: 'نظر یافت نشد.');
+            return;
+        }
+        $comment->update(['reply' => $this->replyText[$commentId]]);
         $this->replyingTo = null;
         $this->dispatch('show-alert', type: 'success', message: 'پاسخ با موفقیت ثبت شد!');
+        Cache::forget('doctor_comments_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
     }
 
-    public function toggleSelectedStatus()
+    public function updatedSearch()
     {
+        $this->resetPage();
+    }
+
+    public function updatedStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSelectAll($value)
+    {
+        $currentPageIds = Cache::remember('doctor_comments_ids_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage(), now()->addMinutes(5), function () {
+            return $this->getCommentsQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
+        });
+        $this->selectedDoctorComments = $value ? $currentPageIds : [];
+    }
+
+    public function updatedSelectedDoctorComments()
+    {
+        $currentPageIds = Cache::remember('doctor_comments_ids_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage(), now()->addMinutes(5), function () {
+            return $this->getCommentsQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
+        });
+        $this->selectAll = !empty($this->selectedDoctorComments) && count(array_diff($currentPageIds, $this->selectedDoctorComments)) === 0;
+    }
+
+    public function deleteSelected($allFiltered = null)
+    {
+        if ($allFiltered === 'allFiltered') {
+            $query = $this->getCommentsQuery();
+            $comments = $query->get();
+            foreach ($comments as $comment) {
+                $comment->delete();
+            }
+            $this->selectedDoctorComments = [];
+            $this->selectAll = false;
+            $this->applyToAllFiltered = false;
+            $this->groupAction = '';
+            $this->resetPage();
+            $this->dispatch('show-alert', type: 'success', message: 'همه نظرات فیلترشده حذف شدند!');
+            Cache::forget('doctor_comments_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
+            return;
+        }
+
         if (empty($this->selectedDoctorComments)) {
             $this->dispatch('show-alert', type: 'warning', message: 'هیچ نظری انتخاب نشده است.');
             return;
@@ -94,84 +163,111 @@ class DoctorCommentList extends Component
 
         $comments = DoctorComment::whereIn('id', $this->selectedDoctorComments)->get();
         foreach ($comments as $comment) {
-            $comment->update(['status' => !$comment->status]);
+            $comment->delete();
         }
-        $this->dispatch('show-alert', type: 'success', message: 'وضعیت نظرات انتخاب‌شده تغییر کرد!');
+        $this->selectedDoctorComments = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'نظرات انتخاب‌شده حذف شدند!');
+        Cache::forget('doctor_comments_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
     }
 
-    public function deleteSelected()
+    public function executeGroupAction()
     {
-        if (empty($this->selectedDoctorComments)) {
+        if (empty($this->selectedDoctorComments) && !$this->applyToAllFiltered) {
             $this->dispatch('show-alert', type: 'warning', message: 'هیچ نظری انتخاب نشده است.');
             return;
         }
 
-        DoctorComment::whereIn('id', $this->selectedDoctorComments)->delete();
+        if (empty($this->groupAction)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        if ($this->applyToAllFiltered) {
+            $query = $this->getCommentsQuery();
+            switch ($this->groupAction) {
+                case 'delete':
+                    $this->dispatch('confirm-delete-selected', ['allFiltered' => true]);
+                    return;
+                case 'activate':
+                    $query->update(['status' => true]);
+                    $this->dispatch('show-alert', type: 'success', message: 'همه نظرات فیلترشده فعال شدند!');
+                    break;
+                case 'deactivate':
+                    $query->update(['status' => false]);
+                    $this->dispatch('show-alert', type: 'success', message: 'همه نظرات فیلترشده غیرفعال شدند!');
+                    break;
+            }
+            $this->selectedDoctorComments = [];
+            $this->selectAll = false;
+            $this->applyToAllFiltered = false;
+            $this->groupAction = '';
+            $this->resetPage();
+            Cache::forget('doctor_comments_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
+            return;
+        }
+
+        switch ($this->groupAction) {
+            case 'delete':
+                $this->dispatch('confirm-delete-selected', ['allFiltered' => false]);
+                break;
+            case 'activate':
+                $this->updateStatus(true);
+                break;
+            case 'deactivate':
+                $this->updateStatus(false);
+                break;
+        }
+
+        $this->groupAction = '';
+    }
+
+    private function updateStatus($status)
+    {
+        $comments = DoctorComment::whereIn('id', $this->selectedDoctorComments)->get();
+        foreach ($comments as $comment) {
+            $comment->update(['status' => $status]);
+        }
+
         $this->selectedDoctorComments = [];
-        $this->selectAll = [];
-        $this->dispatch('show-alert', type: 'success', message: 'نظرات انتخاب‌شده حذف شدند!');
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت نظرات انتخاب‌شده با موفقیت تغییر کرد.');
+        Cache::forget('doctor_comments_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
     }
 
-    public function updatedSearch()
+    private function getCommentsQuery()
     {
-        $this->resetPage();
-        $this->expandedDoctors = []; // بستن همه تاشوها بعد جستجو
-    }
-
-    public function updatedSelectAll($value, $doctorId)
-    {
-        $doctorComments = $this->getDoctorComments($doctorId);
-        $commentIds = $doctorComments->pluck('id')->toArray();
-        if ($value) {
-            $this->selectedDoctorComments = array_unique(array_merge($this->selectedDoctorComments, $commentIds));
-        } else {
-            $this->selectedDoctorComments = array_diff($this->selectedDoctorComments, $commentIds);
-        }
-    }
-
-    public function updatedSelectedDoctorComments()
-    {
-        foreach ($this->doctors as $doctor) {
-            $doctorComments = $this->getDoctorComments($doctor->id);
-            $commentIds = $doctorComments->pluck('id')->toArray();
-            $this->selectAll[$doctor->id] = !empty($this->selectedDoctorComments) &&
-                count(array_diff($commentIds, $this->selectedDoctorComments)) === 0;
-        }
-    }
-
-    public function getDoctorComments($doctorId)
-    {
-        return DoctorComment::where('doctor_id', $doctorId)
-            ->where(function ($query) {
-                $query->where('user_name', 'like', '%' . $this->search . '%')
-                      ->orWhere('comment', 'like', '%' . $this->search . '%');
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate($this->perPageComments, ['*'], "comments_page_{$doctorId}");
-    }
-
-    public function getDoctorsProperty()
-    {
-        return Doctor::where(function ($query) {
-            $query->where('first_name', 'like', '%' . $this->search . '%')
+        $query = DoctorComment::with(['doctor'])
+            ->whereHas('doctor', function ($q) {
+                $q->where('first_name', 'like', '%' . $this->search . '%')
                   ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                  ->orWhereHas('comments', function ($q) {
-                      $q->where('user_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('comment', 'like', '%' . $this->search . '%');
-                  });
-        })
-            ->orderBy('created_at', 'desc')
-            ->get();
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%']);
+            })
+            ->orWhere(function ($q) {
+                $q->where('user_name', 'like', '%' . $this->search . '%')
+                  ->orWhere('comment', 'like', '%' . $this->search . '%');
+            });
+
+        if ($this->statusFilter === 'active') {
+            $query->where('status', true);
+        } elseif ($this->statusFilter === 'inactive') {
+            $query->where('status', false);
+        }
+
+        return $query->orderBy('created_at', 'desc');
     }
 
     public function render()
     {
-        $doctors = $this->readyToLoad ? $this->doctors : [];
-        foreach ($doctors as $doctor) {
-            $doctor->comments = $this->getDoctorComments($doctor->id);
-        }
+        $cacheKey = 'doctor_comments_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage();
+        $comments = $this->readyToLoad ? Cache::remember($cacheKey, now()->addMinutes(5), function () {
+            return $this->getCommentsQuery()->paginate($this->perPage);
+        }) : [];
+        $this->totalFilteredCount = $this->readyToLoad ? $this->getCommentsQuery()->count() : 0;
+
         return view('livewire.admin.panel.doctor-comments.doctor-comment-list', [
-            'doctors' => $doctors,
+            'comments' => $comments,
+            'totalFilteredCount' => $this->totalFilteredCount,
         ]);
     }
 }

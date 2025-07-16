@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Panel\DoctorComments;
 use Livewire\Component;
 use App\Models\DoctorComment;
 use App\Models\Doctor;
+use Illuminate\Support\Facades\Cache;
 
 class DoctorCommentEdit extends Component
 {
@@ -51,6 +52,7 @@ class DoctorCommentEdit extends Component
             'comment' => $validated['comment_text'],
             'status' => $validated['status'],
         ]);
+        Cache::forget('doctor_comments__status__page_1');
 
         $this->dispatch('show-alert', type: 'success', message: 'نظر با موفقیت به‌روزرسانی شد!');
         return redirect()->route('admin.panel.doctor-comments.index');
