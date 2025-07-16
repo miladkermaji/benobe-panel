@@ -109,9 +109,11 @@
               @endforelse
             </tbody>
           </table>
-          <div class="d-flex justify-content-center my-3">
-            {{ $doctors->links() }}
-          </div>
+          @if ($doctors->hasPages())
+            <div class="pagination-container d-flex justify-content-center my-3">
+              {{ $doctors->onEachSide(1)->links('livewire::bootstrap') }}
+            </div>
+          @endif
         </div>
         <!-- Mobile Card View (original UI) -->
         <div class="d-md-none">
@@ -196,7 +198,7 @@
             <div class="text-muted">نمایش {{ $doctors->firstItem() }} تا {{ $doctors->lastItem() }} از
               {{ $doctors->total() }} پزشک</div>
             @if ($doctors->hasPages())
-              <div class="pagination-container">
+              <div class="pagination-container d-flex justify-content-center my-3">
                 {{ $doctors->onEachSide(1)->links('livewire::bootstrap') }}
               </div>
             @endif
