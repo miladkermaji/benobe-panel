@@ -56,7 +56,7 @@ class DoctorList extends Component
         }
         $doctorName = $item->first_name . ' ' . $item->last_name;
         $action = $item->status ? 'غیرفعال کردن' : 'فعال کردن';
-       
+
         $this->dispatch('confirm-toggle-status', id: $id, name: $doctorName, action: $action);
     }
 
@@ -247,11 +247,10 @@ class DoctorList extends Component
                 )->delay(now()->addSeconds(5));
             }
         }
-
+        Cache::forget('doctors_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
         $this->selectedDoctors = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت پزشکان انتخاب‌شده با موفقیت تغییر کرد.');
-        Cache::forget('doctors_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
     }
 
     private function sendBulkActivationSms($doctors)
@@ -285,7 +284,7 @@ class DoctorList extends Component
     private function getDoctorsQuery()
     {
         return Doctor::query()
-            ->with(['province' => fn($q) => $q->select('id', 'name'), 'city' => fn($q) => $q->select('id', 'name')])
+            ->with(['province' => fn ($q) => $q->select('id', 'name'), 'city' => fn ($q) => $q->select('id', 'name')])
             ->when($this->search, function ($query) {
                 $search = trim($this->search);
                 $query->where(function ($q) use ($search) {

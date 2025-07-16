@@ -170,7 +170,10 @@ class DoctorCreate extends Component
             'appointment_fee'    => $this->appointment_fee,
             'visit_fee'          => $this->visit_fee,
         ]);
-        Cache::forget('doctors_' . ($this->search ?? '') . '_status__page_1');
+        Cache::forget('doctors__status__page_1');
+        foreach (glob(storage_path('framework/cache/data/doctors_*')) as $filename) {
+            @unlink($filename);
+        }
 
         $this->dispatch('show-alert', type: 'success', message: 'پزشک با موفقیت ایجاد شد!');
         return redirect()->route('admin.panel.doctors.index');

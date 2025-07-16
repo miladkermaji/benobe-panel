@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Illuminate\Support\Facades\Cache;
 
 class DoctorEdit extends Component
 {
@@ -209,6 +210,10 @@ class DoctorEdit extends Component
         }
 
         $this->doctor->update($data);
+        Cache::forget('doctors__status__page_1');
+        foreach (glob(storage_path('framework/cache/data/doctors_*')) as $filename) {
+            @unlink($filename);
+        }
 
         $this->dispatch('show-alert', type: 'success', message: 'پزشک با موفقیت به‌روزرسانی شد!');
         return redirect()->route('admin.panel.doctors.index');
