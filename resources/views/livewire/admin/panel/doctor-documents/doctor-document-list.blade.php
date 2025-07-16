@@ -124,16 +124,18 @@
                           بدون پزشک
                         @endif
                       </td>
-                      <td class="text-center align-middle" style="width: 40px;">
+                      <td class="text-center align-middle" style="width: 40px; padding: 0;">
                         <button wire:click="toggleDoctorRow('{{ $doctorId }}')"
-                          class="w-100 d-flex justify-content-center align-items-center btn btn-link p-0"
-                          style="height: 100%;">
+                          class="d-flex justify-content-center align-items-center w-100 h-100 border-0 bg-transparent"
+                          style="min-height: 40px; min-width: 40px;">
                           @if (in_array($doctorId, $openDoctors))
-                            <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2">
+                            <svg width="20" height="20" fill="none" stroke="#0d6efd" stroke-width="2"
+                              style="display: block;">
                               <path d="M6 15l6-6 6 6" />
                             </svg>
                           @else
-                            <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2">
+                            <svg width="20" height="20" fill="none" stroke="#0d6efd" stroke-width="2"
+                              style="display: block;">
                               <path d="M6 9l6 6 6-6" />
                             </svg>
                           @endif
