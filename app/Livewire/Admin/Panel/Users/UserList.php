@@ -13,7 +13,7 @@ class UserList extends Component
 
     protected $paginationTheme = 'bootstrap';
 
-    protected $listeners = ['deleteUserConfirmed' => 'deleteUser'];
+    protected $listeners = ['deleteUserConfirmed' => 'deleteUser', 'deleteSelectedConfirmed' => 'deleteSelected'];
 
     public $perPage       = 50;
     public $search        = '';
@@ -85,17 +85,28 @@ class UserList extends Component
         $this->selectAll = !empty($this->selectedUsers) && count(array_diff($currentPageIds, $this->selectedUsers)) === 0;
     }
 
-    public function deleteSelected()
+    public function deleteSelected($allFiltered = null)
     {
+        if ($allFiltered === 'allFiltered') {
+            $query = $this->getUsersQuery();
+            $query->delete();
+            $this->selectedUsers = [];
+            $this->selectAll = false;
+            $this->applyToAllFiltered = false;
+            $this->groupAction = '';
+            $this->resetPage();
+            $this->dispatch('show-alert', type: 'success', message: 'همه کاربران فیلترشده حذف شدند!');
+            \Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
+            return;
+        }
         if (empty($this->selectedUsers)) {
             return;
         }
-
-        User::whereIn('id', $this->selectedUsers)->delete();
+        \App\Models\User::whereIn('id', $this->selectedUsers)->delete();
         $this->selectedUsers = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'کاربران انتخاب شده با موفقیت حذف شدند!');
-        Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
+        \Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
     }
 
     public function executeGroupAction()
@@ -114,9 +125,9 @@ class UserList extends Component
             $query = $this->getUsersQuery();
             switch ($this->groupAction) {
                 case 'delete':
-                    $query->delete();
-                    $this->dispatch('show-alert', type: 'success', message: 'همه کاربران فیلترشده حذف شدند!');
-                    break;
+                    // SweetAlert تایید حذف گروهی همه فیلترشده‌ها
+                    $this->dispatch('confirm-delete-selected', ['allFiltered' => true]);
+                    return;
                 case 'status_active':
                     $query->update(['status' => true]);
                     $this->dispatch('show-alert', type: 'success', message: 'همه کاربران فیلترشده فعال شدند!');
@@ -137,7 +148,8 @@ class UserList extends Component
 
         switch ($this->groupAction) {
             case 'delete':
-                $this->deleteSelected();
+                // SweetAlert تایید حذف گروهی انتخاب شده‌ها
+                $this->dispatch('confirm-delete-selected', ['allFiltered' => false]);
                 break;
             case 'status_active':
                 $this->updateStatus(true);

@@ -244,7 +244,7 @@
         </div>
       </div>
       <script>
-        document.addEventListener('livewire:init', function() {
+        document.addEventListener('DOMContentLoaded', function() {
           Livewire.on('show-alert', (event) => {
             toastr[event.type](event.message);
           });
@@ -263,6 +263,28 @@
                 Livewire.dispatch('deleteUserConfirmed', {
                   id: event.id
                 });
+              }
+            });
+          });
+          Livewire.on('confirm-delete-selected', function(data) {
+            let text = data.allFiltered ?
+              'آیا از حذف همه کاربران فیلترشده مطمئن هستید؟ این عملیات غیرقابل بازگشت است.' :
+              'آیا از حذف کاربران انتخاب شده مطمئن هستید؟ این عملیات غیرقابل بازگشت است.';
+            Swal.fire({
+              title: 'تایید حذف گروهی',
+              text: text,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'بله، حذف شود',
+              cancelButtonText: 'لغو',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                if (data.allFiltered) {
+                  Livewire.dispatch('deleteSelectedConfirmed', 'allFiltered');
+                } else {
+                  Livewire.dispatch('deleteSelectedConfirmed');
+                }
               }
             });
           });
