@@ -21,9 +21,13 @@ class UserList extends Component
     public $selectedUsers = [];
     public $selectAll     = false;
     public $groupAction = '';
+    public $statusFilter = '';
+    public $applyToAllFiltered = false;
+    public $totalFilteredCount = 0;
 
     protected $queryString = [
         'search' => ['except' => ''],
+        'statusFilter' => ['except' => ''],
     ];
 
     public function mount()
@@ -62,15 +66,22 @@ class UserList extends Component
         $this->resetPage();
     }
 
+    public function updatedStatusFilter()
+    {
+        $this->resetPage();
+    }
+
     public function updatedSelectAll($value)
     {
-        $currentPageIds = $this->getUsersQuery()->pluck('id')->toArray();
+        // فقط آی‌دی‌های صفحه فعلی را انتخاب کن
+        $currentPageIds = $this->getUsersQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
         $this->selectedUsers = $value ? $currentPageIds : [];
     }
 
     public function updatedSelectedUsers()
     {
-        $currentPageIds = $this->getUsersQuery()->pluck('id')->toArray();
+        // فقط آی‌دی‌های صفحه فعلی را بررسی کن
+        $currentPageIds = $this->getUsersQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
         $this->selectAll = !empty($this->selectedUsers) && count(array_diff($currentPageIds, $this->selectedUsers)) === 0;
     }
 
@@ -89,13 +100,38 @@ class UserList extends Component
 
     public function executeGroupAction()
     {
-        if (empty($this->selectedUsers)) {
+        if (empty($this->selectedUsers) && !$this->applyToAllFiltered) {
             $this->dispatch('show-alert', type: 'warning', message: 'هیچ کاربری انتخاب نشده است.');
             return;
         }
 
         if (empty($this->groupAction)) {
             $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        if ($this->applyToAllFiltered) {
+            $query = $this->getUsersQuery();
+            switch ($this->groupAction) {
+                case 'delete':
+                    $query->delete();
+                    $this->dispatch('show-alert', type: 'success', message: 'همه کاربران فیلترشده حذف شدند!');
+                    break;
+                case 'status_active':
+                    $query->update(['status' => true]);
+                    $this->dispatch('show-alert', type: 'success', message: 'همه کاربران فیلترشده فعال شدند!');
+                    break;
+                case 'status_inactive':
+                    $query->update(['status' => false]);
+                    $this->dispatch('show-alert', type: 'success', message: 'همه کاربران فیلترشده غیرفعال شدند!');
+                    break;
+            }
+            $this->selectedUsers = [];
+            $this->selectAll = false;
+            $this->applyToAllFiltered = false;
+            $this->groupAction = '';
+            $this->resetPage();
+            Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
             return;
         }
 
@@ -128,20 +164,39 @@ class UserList extends Component
     {
         return User::query()
             ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('first_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('mobile', 'like', '%' . $this->search . '%')
-                        ->orWhere('email', 'like', '%' . $this->search . '%');
+                $search = trim($this->search);
+                $query->where(function ($q) use ($search) {
+                    // جستجوی ترکیبی نام و نام خانوادگی
+                    if (str_contains($search, ' ')) {
+                        [$first, $last] = array_pad(explode(' ', $search, 2), 2, null);
+                        $q->orWhere(function ($qq) use ($first, $last) {
+                            $qq->where('first_name', 'like', "%$first%")
+                               ->where('last_name', 'like', "%$last%") ;
+                        });
+                    }
+                    $q->orWhere('first_name', 'like', "%$search%")
+                      ->orWhere('last_name', 'like', "%$search%")
+                      ->orWhere('mobile', 'like', "%$search%")
+                      ->orWhere('email', 'like', "%$search%") ;
                 });
+            })
+            ->when($this->statusFilter, function ($query) {
+                if ($this->statusFilter === 'active') {
+                    $query->where('status', true);
+                } elseif ($this->statusFilter === 'inactive') {
+                    $query->where('status', false);
+                }
             })
             ->orderBy('created_at', 'desc');
     }
 
     public function render()
     {
+        $query = $this->getUsersQuery();
+        $this->totalFilteredCount = $this->readyToLoad ? $query->count() : 0;
         return view('livewire.admin.panel.users.user-list', [
-            'users' => $this->readyToLoad ? $this->getUsersQuery()->paginate($this->perPage) : [],
+            'users' => $this->readyToLoad ? $query->paginate($this->perPage) : [],
+            'totalFilteredCount' => $this->totalFilteredCount,
         ]);
     }
 }

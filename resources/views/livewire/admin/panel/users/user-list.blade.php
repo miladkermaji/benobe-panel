@@ -11,7 +11,7 @@
               <div class="search-container position-relative" style="max-width: 100%;">
                 <input type="text"
                   class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
-                  wire:model.live="search" placeholder="جستجو در کاربران..."
+                  wire:model.live="search" placeholder="جستجو بر اساس نام، نام خانوادگی، موبایل یا ایمیل..."
                   style="padding-right: 20px; text-align: right; direction: rtl;">
                 <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
                   style="z-index: 5; top: 50%; right: 8px;">
@@ -21,6 +21,12 @@
                   </svg>
                 </span>
               </div>
+              <select class="form-select form-select-sm w-auto" style="width: 110px; min-width: 0;"
+                wire:model.live="statusFilter">
+                <option value="">همه وضعیت‌ها</option>
+                <option value="active">فقط فعال</option>
+                <option value="inactive">فقط غیرفعال</option>
+              </select>
               <a href="{{ route('admin.panel.users.create') }}"
                 class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1">
                 <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -38,7 +44,8 @@
       <div class="card shadow-sm rounded-2">
         <div class="card-body p-0">
           <!-- Group Actions -->
-          <div class="group-actions p-2 border-bottom" x-data="{ show: false }" x-show="$wire.selectedUsers.length > 0">
+          <div class="group-actions p-2 border-bottom" x-data="{ show: false }"
+            x-show="$wire.selectedUsers.length > 0 || $wire.applyToAllFiltered">
             <div class="d-flex align-items-center gap-2 justify-content-end">
               <select class="form-select form-select-sm" style="max-width: 200px;" wire:model="groupAction">
                 <option value="">عملیات گروهی</option>
@@ -46,6 +53,12 @@
                 <option value="status_active">فعال کردن</option>
                 <option value="status_inactive">غیرفعال کردن</option>
               </select>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="applyToAllFiltered" wire:model="applyToAllFiltered">
+                <label class="form-check-label" for="applyToAllFiltered">
+                  اعمال روی همه نتایج فیلترشده ({{ $totalFilteredCount ?? 0 }})
+                </label>
+              </div>
               <button class="btn btn-sm btn-primary" wire:click="executeGroupAction" wire:loading.attr="disabled">
                 <span wire:loading.remove>اجرا</span>
                 <span wire:loading>در حال اجرا...</span>
@@ -88,8 +101,8 @@
                         <div class="position-relative" style="width: 40px; height: 40px;">
                           <img loading="lazy"
                             src="{{ str_starts_with($user->profile_photo_url, 'http') ? $user->profile_photo_url : asset('admin-assets/images/default-avatar.png') }}"
-                            class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل"
-                            onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+                            class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;"
+                            alt="پروفایل" onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
                         </div>
                       </td>
                       <td class="align-middle">{{ $user->first_name }}</td>
