@@ -186,10 +186,10 @@ class AppointmentsList extends Component
             $this->redirectBack = urldecode(request()->query('redirect_back', url()->previous()));
 
             // تنظیم تاریخ‌های پیش‌فرض برای مسدودیت
-            $now = Jalalian::now();
+            $now = Carbon::now();
             $this->blockedAt = $now->format('Y-m-d');
-            $this->calendarYear = $now->getYear();
-            $this->calendarMonth = $now->getMonth();
+            $this->calendarYear = $now->year;
+            $this->calendarMonth = $now->month;
 
             // لود داده‌های اولیه
             $doctor = $this->getAuthenticatedDoctor();
