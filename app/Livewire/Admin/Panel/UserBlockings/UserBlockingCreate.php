@@ -20,22 +20,16 @@ class UserBlockingCreate extends Component
     public $reason;
     public $clinic_id;
     public $status = true;
-    public $users = [];
-    public $doctors = [];
     public $clinics = [];
 
     public function mount()
     {
-        $this->users = User::select('id', 'first_name', 'last_name', 'mobile')->get();
-        $this->doctors = Doctor::select('id', 'first_name', 'last_name', 'mobile')->get();
         $this->clinics = Clinic::select('id', 'name')->get();
     }
 
     public function updatedType($value)
     {
         $this->user_id = null;
-        $items = $value === 'user' ? $this->users : $this->doctors;
-        $this->dispatch('select2:refresh', items: $items->toArray());
     }
 
     public function getUsersProperty()

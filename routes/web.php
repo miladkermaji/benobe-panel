@@ -211,6 +211,9 @@ Route::prefix('admin')
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'create'])->name('admin.panel.user-blockings.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'edit'])->name('admin.panel.user-blockings.edit');
 
+            // AJAX search for users/doctors for Select2
+            Route::get('/search-users', [\App\Http\Controllers\Admin\Panel\UserBlocking\UserBlockingController::class, 'searchUsers'])->name('admin.panel.user-blockings.search-users');
+
             Route::post('/doctor-blocking-users/group-action', [BlockingUsersController::class, 'groupAction'])->name('doctor-blocking-users.group-action');
 
         });

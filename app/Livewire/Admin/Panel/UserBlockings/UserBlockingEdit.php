@@ -21,8 +21,6 @@ class UserBlockingEdit extends Component
     public $reason;
     public $clinic_id;
     public $status;
-    public $users;
-    public $doctors;
     public $clinics;
 
     public function mount($id)
@@ -37,18 +35,12 @@ class UserBlockingEdit extends Component
         $this->reason = $this->userBlocking->reason;
         $this->clinic_id = $this->userBlocking->clinic_id;
         $this->status = $this->userBlocking->status;
-        $this->users = User::select('id', 'first_name', 'last_name', 'mobile')->get();
-        $this->doctors = Doctor::select('id', 'first_name', 'last_name', 'mobile')->get();
         $this->clinics = Clinic::select('id', 'name')->get();
-        $items = $this->type === 'user' ? $this->users : $this->doctors;
-        $this->dispatch('select2:refresh', items: $items->toArray(), selected: $this->user_id);
     }
 
     public function updatedType($value)
     {
         $this->user_id = null;
-        $items = $value === 'user' ? $this->users : $this->doctors;
-        $this->dispatch('select2:refresh', items: $items->toArray());
     }
 
     public function update()

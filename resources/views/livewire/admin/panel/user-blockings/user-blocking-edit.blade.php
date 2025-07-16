@@ -13,7 +13,7 @@
       <form wire:submit="update">
         <div class="row">
           <div class="col-md-6 mb-3">
-            <label class="form-label">نوع کاربر</label>
+            <label class="label-top-input-special-takhasos">نوع کاربر</label>
             <select wire:model="type" class="form-select" disabled>
               <option value="">انتخاب کنید</option>
               <option value="user" {{ $userBlocking->user_id ? 'selected' : '' }}>کاربر</option>
@@ -22,23 +22,10 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label">کاربر</label>
+            <label class="label-top-input-special-takhasos">کاربر</label>
             <div wire:ignore>
               <select wire:model.live="user_id" class="form-select select2" id="user_id">
                 <option value="">انتخاب کنید</option>
-                @if ($type == 'user')
-                  @foreach ($users as $user)
-                    <option value="{{ $user->id }}">
-                      {{ $user->first_name . ' ' . $user->last_name . ' (' . $user->mobile . ')' }}
-                    </option>
-                  @endforeach
-                @elseif ($type == 'doctor')
-                  @foreach ($doctors as $doctor)
-                    <option value="{{ $doctor->id }}">
-                      {{ $doctor->first_name . ' ' . $doctor->last_name . ' (' . $doctor->mobile . ')' }}
-                    </option>
-                  @endforeach
-                @endif
               </select>
             </div>
             @error('user_id')
@@ -47,7 +34,7 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label">تاریخ شروع</label>
+            <label class="label-top-input-special-takhasos">تاریخ شروع</label>
             <input type="text" wire:model="blocked_at" class="form-control" id="blocked_at">
             @error('blocked_at')
               <div class="text-danger mt-1">{{ $message }}</div>
@@ -55,7 +42,7 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label">تاریخ پایان</label>
+            <label class="label-top-input-special-takhasos">تاریخ پایان</label>
             <input type="text" wire:model="unblocked_at" class="form-control" id="unblocked_at">
             @error('unblocked_at')
               <div class="text-danger mt-1">{{ $message }}</div>
@@ -63,7 +50,7 @@
           </div>
 
           <div class="col-12 mb-3">
-            <label class="form-label">دلیل</label>
+            <label class="label-top-input-special-takhasos">دلیل</label>
             <textarea wire:model="reason" class="form-control" rows="3"></textarea>
             @error('reason')
               <div class="text-danger mt-1">{{ $message }}</div>
@@ -99,51 +86,60 @@
   <script>
     let select2Initialized = false;
 
+    function getType() {
+      return '{{ $type }}';
+    }
+
+    function setInitialUser() {
+      var userId = '{{ $user_id ?? '' }}';
+      if (userId) {
+        $.ajax({
+          url: '{{ route('admin.panel.user-blockings.search-users') }}',
+          data: {
+            q: '',
+            type: getType()
+          },
+          dataType: 'json',
+          success: function(data) {
+            var found = data.results.find(x => x.id == userId);
+            if (found) {
+              var option = new Option(found.text, found.id, true, true);
+              $('#user_id').append(option).trigger('change');
+            }
+          }
+        });
+      }
+    }
+
     function initializeSelect2() {
       if (select2Initialized) return;
-
       $('#user_id').select2({
         dir: 'rtl',
         placeholder: 'انتخاب کنید',
         width: '100%',
-        data: [{
-          id: '',
-          text: 'انتخاب کنید'
-        }]
-      });
-      select2Initialized = true;
-    }
-
-    function refreshSelect2(items, selected) {
-      if (select2Initialized) {
-        $('#user_id').select2('destroy');
-        select2Initialized = false;
-      }
-
-      $('#user_id').empty().select2({
-        dir: 'rtl',
-        placeholder: 'انتخاب کنید',
-        width: '100%',
-        data: [{
-            id: '',
-            text: 'انتخاب کنید'
+        ajax: {
+          url: '{{ route('admin.panel.user-blockings.search-users') }}',
+          dataType: 'json',
+          delay: 250,
+          data: function(params) {
+            return {
+              q: params.term,
+              type: getType()
+            };
           },
-          ...items.map(item => ({
-            id: item.id,
-            text: item.first_name + ' ' + item.last_name + ' (' + item.mobile + ')'
-          }))
-        ]
+          processResults: function(data) {
+            return {
+              results: data.results
+            };
+          },
+          cache: true
+        }
       });
       select2Initialized = true;
-
-      if (selected) {
-        $('#user_id').val(selected).trigger('change');
-      }
+      setInitialUser();
     }
-
     document.addEventListener('DOMContentLoaded', function() {
       initializeSelect2();
-
       $('#user_id').on('change', function() {
         let component = document.querySelector('[wire\\:id][wire\\:initial-data*="user-blocking-edit"]');
         if (component) {
@@ -151,7 +147,6 @@
           Livewire.find(id).set('user_id', $(this).val());
         }
       });
-
       jalaliDatepicker.startWatch({
         minDate: "attr",
         maxDate: "attr",
@@ -166,7 +161,6 @@
           });
         }
       });
-
       document.getElementById('blocked_at').addEventListener('change', function() {
         let component = document.querySelector('[wire\\:id][wire\\:initial-data*="user-blocking-edit"]');
         if (component) {
@@ -174,7 +168,6 @@
           Livewire.find(id).set('blocked_at', this.value);
         }
       });
-
       document.getElementById('unblocked_at').addEventListener('change', function() {
         let component = document.querySelector('[wire\\:id][wire\\:initial-data*="user-blocking-edit"]');
         if (component) {
@@ -183,12 +176,7 @@
         }
       });
     });
-
     document.addEventListener('livewire:init', function() {
-      Livewire.on('select2:refresh', (event) => {
-        refreshSelect2(event.items || [], event.selected);
-      });
-
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });
