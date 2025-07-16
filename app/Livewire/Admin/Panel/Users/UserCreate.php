@@ -53,6 +53,33 @@ class UserCreate extends Component
 
     public function store()
     {
+        // تبدیل اعداد فارسی به انگلیسی
+        $this->mobile = $this->convertPersianNumbers($this->mobile);
+        $this->national_code = $this->convertPersianNumbers($this->national_code);
+        $this->date_of_birth = $this->convertPersianNumbers($this->date_of_birth);
+
+        $messages = [
+            'first_name.required' => 'وارد کردن نام الزامی است.',
+            'last_name.required' => 'وارد کردن نام خانوادگی الزامی است.',
+            'email.required' => 'وارد کردن ایمیل الزامی است.',
+            'email.email' => 'ایمیل وارد شده معتبر نیست.',
+            'email.unique' => 'این ایمیل قبلاً ثبت شده است.',
+            'mobile.required' => 'وارد کردن شماره موبایل الزامی است.',
+            'mobile.regex' => 'فرمت شماره موبایل صحیح نیست (مثال: ۰۹۱۲۳۴۵۶۷۸۹).',
+            'mobile.unique' => 'این شماره موبایل قبلاً ثبت شده است.',
+            'password.required' => 'وارد کردن رمز عبور الزامی است.',
+            'password.min' => 'رمز عبور باید حداقل ۸ کاراکتر باشد.',
+            'password.max' => 'رمز عبور نباید بیشتر از ۵۰ کاراکتر باشد.',
+            'national_code.digits' => 'کد ملی باید ۱۰ رقم باشد.',
+            'national_code.unique' => 'این کد ملی قبلاً ثبت شده است.',
+            'sex.required' => 'انتخاب جنسیت الزامی است.',
+            'sex.in' => 'جنسیت انتخاب شده معتبر نیست.',
+            'zone_province_id.required' => 'انتخاب استان الزامی است.',
+            'zone_province_id.exists' => 'استان انتخاب شده معتبر نیست.',
+            'zone_city_id.required' => 'انتخاب شهر الزامی است.',
+            'zone_city_id.exists' => 'شهر انتخاب شده معتبر نیست.',
+        ];
+
         $validated = $this->validate([
             'first_name' => 'required|string|max:50',
             'last_name' => 'required|string|max:50',
@@ -66,7 +93,7 @@ class UserCreate extends Component
             'photo' => 'nullable|image|max:2048',
             'zone_province_id' => 'required|exists:zone,id',
             'zone_city_id' => 'required|exists:zone,id',
-        ]);
+        ], $messages);
 
         if ($this->photo) {
             $validated['profile_photo_path'] = $this->photo->store('profile-photos', 'public');
@@ -83,5 +110,15 @@ class UserCreate extends Component
     public function render()
     {
         return view('livewire.admin.panel.users.user-create');
+    }
+
+    /**
+     * تبدیل اعداد فارسی به انگلیسی
+     */
+    private function convertPersianNumbers($string)
+    {
+        $persian = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+        $english = ['0','1','2','3','4','5','6','7','8','9'];
+        return str_replace($persian, $english, $string);
     }
 }

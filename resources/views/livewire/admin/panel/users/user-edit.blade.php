@@ -47,31 +47,52 @@
               <input type="text" wire:model="first_name" class="form-control" id="first_name" placeholder=" "
                 required>
               <label for="first_name" class="form-label">نام</label>
+              @error('first_name')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="last_name" class="form-control" id="last_name" placeholder=" " required>
               <label for="last_name" class="form-label">نام خانوادگی</label>
+              @error('last_name')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="email" wire:model="email" class="form-control" id="email" placeholder=" " required>
               <label for="email" class="form-label">ایمیل</label>
+              @error('email')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="mobile" class="form-control" id="mobile" placeholder=" " required>
               <label for="mobile" class="form-label">موبایل</label>
+              @error('mobile')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="password" wire:model="password" class="form-control" id="password" placeholder=" ">
               <label for="password" class="form-label">رمز عبور (اختیاری)</label>
+              @error('password')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="national_code" class="form-control" id="national_code" placeholder=" ">
               <label for="national_code" class="form-label">کد ملی (اختیاری)</label>
+              @error('national_code')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="date_of_birth" class="form-control jalali-datepicker text-end"
                 id="date_of_birth" placeholder="" data-jdp>
               <label for="date_of_birth" class="form-label">تاریخ تولد (اختیاری)</label>
+              @error('date_of_birth')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <select wire:model="sex" class="form-select" id="sex">
@@ -80,6 +101,9 @@
                 <option value="female">زن</option>
               </select>
               <label for="sex" class="form-label">جنسیت</label>
+              @error('sex')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
               <select class="form-select select2" id="zone_province_id" wire:model.live="zone_province_id">
@@ -89,6 +113,9 @@
                 @endforeach
               </select>
               <label for="zone_province_id" class="form-label">استان</label>
+              @error('zone_province_id')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
               <select class="form-select select2" id="zone_city_id" wire:model="zone_city_id">
@@ -98,6 +125,9 @@
                 @endforeach
               </select>
               <label for="zone_city_id" class="form-label">شهر</label>
+              @error('zone_city_id')
+                <span class="text-danger small">{{ $message }}</span>
+              @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">
