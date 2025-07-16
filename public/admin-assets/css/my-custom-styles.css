@@ -1045,8 +1045,8 @@ body {
 }
 
 .note-card-header {
-    background: var(--gradient-primary);
-    color: #ffffff;
+    background: #f5f7fa !important;
+    color: #3333;
     padding: 0.75rem;
     display: flex;
     justify-content: space-between;
@@ -1224,7 +1224,7 @@ tr{
         border-radius: 0.15rem !important;
     }
     .note-card-header {
-        background: var(--gradient-primary) !important;
+        background: #f5f7fa !important;
         color: #222 !important;
     }
     .note-card-header .fw-bold {
@@ -1232,7 +1232,7 @@ tr{
         font-weight: 700;
     }
     .note-card-header .text-muted {
-        color: #fff !important;
+        color: #333 !important;
         font-weight: 500;
         font-size: 0.97em;
         opacity: 1;
