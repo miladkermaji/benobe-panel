@@ -235,7 +235,7 @@ body {
 /* هدر شیشه‌ای */
 .glass-header {
     background: var(--gradient-header);
-    border-radius: var(--radius-nav);
+    border-radius:6px;
     padding: 0.75rem;
     box-shadow: 0 4px 16px var(--shadow);
     display: flex;
@@ -251,7 +251,6 @@ body {
     max-width: 100%;
     border-collapse: collapse;
     background: var(--background-card);
-    border-radius: var(--radius-button);
     overflow: hidden;
     box-shadow: 0 3px 10px var(--shadow);
     margin: 0;
@@ -291,7 +290,6 @@ body {
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border-radius: var(--radius-button);
 }
 
 /* آیکون جستجو */
@@ -1263,3 +1261,23 @@ tr{
         max-width: 150px !important;
     }
 }
+.custom-checkbox-input.form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 0.5em;
+    vertical-align: middle;
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, .15);
+  }
+
+  .permission-item {
+    box-shadow: 0 4px 24px 0 rgba(13, 110, 253, 0.10), 0 1.5px 6px 0 rgba(0, 0, 0, 0.08);
+    background: #fff;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .custom-checkbox-label {
+    vertical-align: middle;
+    display: inline-block;
+    margin-bottom: 0;
+  }

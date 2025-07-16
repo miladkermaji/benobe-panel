@@ -1,6 +1,7 @@
+
 <div class="container-fluid py-4" dir="rtl">
   <div
-    class="glass-header p-4 rounded-xl mb-6 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-4">
+    class="glass-header p-4  mb-6 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-4">
     <h1 class="m-0 h3 font-light flex-grow-1" style="min-width: 200px; color: var(--text-primary);">مدیریت دسترسی‌های
       پزشکان</h1>
     <div class="input-group flex-grow-1 position-relative" style="max-width: 450px;">
@@ -19,7 +20,7 @@
     <div class="card shadow-xl rounded-2xl overflow-hidden bg-background-card">
       <div class="card-body p-0">
         <div class="table-responsive text-nowrap d-none d-md-block">
-          <table class="table table-hover w-100 m-0">
+          <table class="table  w-100 m-0">
             <tbody>
               @forelse ($doctors as $doctor)
                 <tr style="background: #f5f7fa; border-top: 2px solid #b3c2d1;">
@@ -55,7 +56,7 @@
                         @endphp
                         @foreach ($permissionsConfig as $permissionKey => $permissionData)
                           <div
-                            class="permission-item p-3 rounded-xl shadow-md bg-background-card hover:bg-background-light transition-all duration-300 mb-2">
+                            class="permission-item p-3  shadow-md bg-background-card transition-all duration-300 mb-2">
                             <div class="d-flex align-items-center mb-2">
                               <label class="custom-checkbox flex items-center gap-2">
                                 <input type="checkbox" class="custom-checkbox-input parent-checkbox form-check-input"
@@ -150,7 +151,7 @@
                     @endphp
                     @foreach ($permissionsConfig as $permissionKey => $permissionData)
                       <div
-                        class="permission-item p-3 rounded-xl shadow-md bg-background-card hover:bg-background-light transition-all duration-300">
+                        class="permission-item p-3  shadow-md bg-background-card transition-all duration-300">
                         <div class="d-flex align-items-center mb-2">
                           <label class="custom-checkbox flex items-center gap-2">
                             <input type="checkbox" class="custom-checkbox-input parent-checkbox form-check-input"
