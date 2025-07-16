@@ -24,9 +24,29 @@
         <div class="col-12 col-md-10 col-lg-8">
           <div class="text-center mb-4">
             <div class="position-relative d-inline-block">
-              <img src="{{ $filePreview }}" class="rounded shadow border-2 border-white"
-                style="max-width: 200px; max-height: 200px; object-fit: cover;" alt="پیش‌نمایش مدرک"
-                wire:loading.class="opacity-50" wire:target="file">
+              @php
+                $ext = pathinfo($filePreview, PATHINFO_EXTENSION);
+                $isImage = in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp']);
+              @endphp
+              @if ($isImage)
+                <img src="{{ $filePreview }}" class="rounded shadow border-2 border-white"
+                  style="max-width: 200px; max-height: 200px; object-fit: cover;" alt="پیش‌نمایش مدرک"
+                  wire:loading.class="opacity-50" wire:target="file">
+              @else
+                <a href="{{ $filePreview }}" target="_blank"
+                  class="btn btn-outline-primary d-flex flex-column align-items-center justify-content-center"
+                  style="min-width: 200px; min-height: 120px;">
+                  <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="12" y1="17" x2="12" y2="13" />
+                  </svg>
+                  <span class="mt-2">دانلود فایل مدرک</span>
+                  <span class="small text-muted">{{ basename($filePreview) }}</span>
+                </a>
+              @endif
               <label for="file"
                 class="btn my-btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 p-2 shadow"
                 style="transform: translate(10%, 10%);">
@@ -89,20 +109,25 @@
 
 
   <script>
-    document.addEventListener('livewire:init', function() {
+    document.addEventListener('DOMContentLoaded', function() {
       $('#doctor_id').select2({
         dir: 'rtl',
         placeholder: 'انتخاب کنید',
         width: '100%'
       });
+      // Set initial value on first load
+      $('#doctor_id').val(@json($doctor_id)).trigger('change');
 
       $('#doctor_id').on('select2:select', function() {
         @this.set('doctor_id', $(this).val());
       });
-
-      Livewire.on('show-alert', (event) => {
+       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });
+    });
+    // Also update value after every Livewire update
+    document.addEventListener('livewire:update', function() {
+      $('#doctor_id').val(@json($doctor_id)).trigger('change');
     });
   </script>
 </div>

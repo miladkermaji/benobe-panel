@@ -6,6 +6,7 @@ use App\Models\BestDoctor;
 use App\Models\Doctor;
 use App\Models\Clinic;
 use Livewire\Component;
+use Illuminate\Support\Facades\Cache;
 
 class BestDoctorEdit extends Component
 {
@@ -88,6 +89,7 @@ class BestDoctorEdit extends Component
         $updated                           = $this->bestdoctor->save();
 
         if ($updated) {
+            Cache::forget('best_doctors__status__page_1');
             $this->dispatch('show-alert', type: 'success', message: 'بهترین پزشک با موفقیت ویرایش شد!');
             $this->dispatch('refresh-index');
             return redirect()->route('admin.panel.best-doctors.index');

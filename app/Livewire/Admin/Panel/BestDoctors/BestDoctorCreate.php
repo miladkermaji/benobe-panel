@@ -7,6 +7,7 @@ use App\Models\Doctor;
 use App\Models\Clinic;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class BestDoctorCreate extends Component
 {
@@ -110,6 +111,7 @@ class BestDoctorCreate extends Component
                 'best_consultant' => $this->best_consultant,
                 'status'          => $this->status,
             ]);
+            Cache::forget('best_doctors__status__page_1');
 
             Log::info('BestDoctor created successfully', ['id' => $bestDoctor->id]);
 
