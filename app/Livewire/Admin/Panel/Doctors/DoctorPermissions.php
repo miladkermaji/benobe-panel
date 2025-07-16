@@ -11,24 +11,24 @@ class DoctorPermissions extends Component
     use WithPagination;
 
     public $search = '';
-    public $expandedDoctors = [];
+    public $openDoctors = [];
     public $permissionsConfig;
     public $perPage = 50;
 
     public function mount()
     {
         $this->permissionsConfig = config('doctor-permissions');
-        $this->expandedDoctors = session('expandedDoctors', []);
+        $this->openDoctors = session('openDoctors', []);
     }
 
-    public function toggleDoctor($doctorId)
+    public function toggleDoctorRow($doctorId)
     {
-        if (in_array($doctorId, $this->expandedDoctors)) {
-            $this->expandedDoctors = array_diff($this->expandedDoctors, [$doctorId]);
+        if (in_array($doctorId, $this->openDoctors)) {
+            $this->openDoctors = array_diff($this->openDoctors, [$doctorId]);
         } else {
-            $this->expandedDoctors[] = $doctorId;
+            $this->openDoctors[] = $doctorId;
         }
-        session(['expandedDoctors' => $this->expandedDoctors]);
+        session(['openDoctors' => $this->openDoctors]);
     }
 
     public function updatePermissions($doctorId, $permissions)

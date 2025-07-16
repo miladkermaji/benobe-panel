@@ -35,15 +35,22 @@
                   <td class="text-center align-middle" style="width: 40px; padding: 0;">
                     <button type="button" tabindex="-1"
                       class="d-flex justify-content-center align-items-center w-100 h-100 border-0 bg-transparent p-0 m-0"
-                      style="min-width: 40px; min-height: 40px;" wire:click="toggleDoctor({{ $doctor->id }})">
-                      <svg width="20" height="20" fill="none" stroke="#0d6efd" stroke-width="2"
-                        style="display: block; transition: transform 0.2s; {{ in_array($doctor->id, $expandedDoctors) ? 'transform: rotate(180deg);' : '' }}">
-                        <path d="M6 9l6 6 6-6" />
-                      </svg>
+                      style="min-width: 40px; min-height: 40px;" wire:click="toggleDoctorRow('{{ $doctor->id }}')">
+                      @if (in_array($doctor->id, $openDoctors))
+                        <svg width="20" height="20" fill="none" stroke="#0d6efd" stroke-width="2"
+                          style="display: block; transition: transform 0.2s; transform: rotate(180deg);">
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      @else
+                        <svg width="20" height="20" fill="none" stroke="#0d6efd" stroke-width="2"
+                          style="display: block; transition: transform 0.2s;">
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      @endif
                     </button>
                   </td>
                 </tr>
-                @if (in_array($doctor->id, $expandedDoctors))
+                @if (in_array($doctor->id, $openDoctors))
                   <tr>
                     <td class="align-middle" colspan="2">
                       <div class="permissions-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -132,8 +139,8 @@
                     ({{ $doctor->national_code }})
                   @endif
                 </span>
-                <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                  stroke="#0d6efd" stroke-width="2" style="transition: transform 0.2s;">
+                <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                  fill="none" stroke="#0d6efd" stroke-width="2" style="transition: transform 0.2s;">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </div>
