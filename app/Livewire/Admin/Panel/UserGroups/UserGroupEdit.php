@@ -5,6 +5,8 @@ namespace App\Livewire\Admin\Panel\UserGroups;
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UserGroup;
+use App\Models\User;
+use App\Models\Doctor;
 
 class UserGroupEdit extends Component
 {
@@ -12,6 +14,7 @@ class UserGroupEdit extends Component
     public $name;
     public $description;
     public $is_active;
+    public $type = 'user'; // Default value, change logic as needed
 
     public function mount($id)
     {
@@ -19,6 +22,8 @@ class UserGroupEdit extends Component
         $this->name = $this->usergroup->name;
         $this->description = $this->usergroup->description;
         $this->is_active = $this->usergroup->is_active;
+        // Set type here if you have logic to determine user/doctor
+        // $this->type = ...;
     }
 
     public function update()
@@ -58,6 +63,12 @@ class UserGroupEdit extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.user-groups.user-group-edit');
+        $users = User::all();
+        $doctors = Doctor::all();
+        return view('livewire.admin.panel.user-groups.user-group-edit', [
+            'type' => $this->type,
+            'users' => $users,
+            'doctors' => $doctors,
+        ]);
     }
 }
