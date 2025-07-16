@@ -323,7 +323,7 @@ body {
     .container-fluid {
         padding: 0 0.5rem;
     }
-     .container {
+    .container {
         max-width: 100% !important;
     }
     .glass-header {
@@ -1200,5 +1200,30 @@ body {
 
     .glass-header .d-flex.gap-2 > * {
         width: 100%;
+    }
+}
+@media (max-width: 991px) {
+    .card,
+    .note-card,
+    .note-card-header,
+    .note-card-body {
+        border-radius: 0.15rem !important;
+    }
+    .note-card-header .fw-bold {
+        color: #222 !important;
+        font-weight: 700;
+    }
+    .note-card-header .text-muted {
+        color: #fff !important;
+        font-weight: 500;
+        font-size: 0.97em;
+    }
+}
+@media (max-width: 767px) {
+    .card,
+    .note-card,
+    .note-card-header,
+    .note-card-body {
+        border-radius: 0.12rem !important;
     }
 }

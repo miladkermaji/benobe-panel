@@ -15,7 +15,7 @@ class UserList extends Component
 
     protected $listeners = ['deleteUserConfirmed' => 'deleteUser'];
 
-    public $perPage       = 10;
+    public $perPage       = 50;
     public $search        = '';
     public $readyToLoad   = false;
     public $selectedUsers = [];

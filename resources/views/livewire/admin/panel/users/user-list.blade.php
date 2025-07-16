@@ -166,19 +166,33 @@
           <div class="notes-cards d-md-none">
             @if ($readyToLoad)
               @forelse ($users as $index => $user)
-                <div class="note-card mb-3">
-                  <div class="note-card-header d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2">
-                      <input type="checkbox" wire:model.live="selectedUsers" value="{{ $user->id }}"
-                        class="form-check-input m-0 align-middle">
-                      <div class="position-relative" style="width: 40px; height: 40px;">
-                        <img loading="lazy"
-                          src="{{ str_starts_with($user->profile_photo_url, 'http') ? $user->profile_photo_url : asset('admin-assets/images/default-avatar.png') }}"
-                          class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل"
-                          onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
-                      </div>
+                <div class="note-card mb-2" x-data="{ open: false }">
+                  <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                    @click="open = !open" style="cursor:pointer;">
+                    <span class="fw-bold">{{ $user->first_name }} {{ $user->last_name }} <span
+                        class="text-muted">({{ $user->national_code ?? '-' }})</span></span>
+                    <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </div>
+                  <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">ایمیل:</span>
+                      <span class="note-card-value">{{ $user->email }}</span>
                     </div>
-                    <div class="d-flex gap-1">
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">موبایل:</span>
+                      <span class="note-card-value">{{ $user->mobile }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">وضعیت:</span>
+                      <button wire:click="toggleStatus({{ $user->id }})"
+                        class="badge {{ $user->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                        {{ $user->status ? 'فعال' : 'غیرفعال' }}
+                      </button>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <a href="{{ route('admin.panel.users.edit', $user->id) }}"
                         class="btn btn-gradient-primary btn-sm rounded-pill px-3">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -193,35 +207,6 @@
                           stroke-width="2">
                           <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                         </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="note-card-body">
-                    <div class="note-card-item">
-                      <span class="note-card-label">نام:</span>
-                      <span class="note-card-value">{{ $user->first_name }}</span>
-                    </div>
-                    <div class="note-card-item">
-                      <span class="note-card-label">نام خانوادگی:</span>
-                      <span class="note-card-value">{{ $user->last_name }}</span>
-                    </div>
-                    <div class="note-card-item">
-                      <span class="note-card-label">ایمیل:</span>
-                      <span class="note-card-value">{{ $user->email }}</span>
-                    </div>
-                    <div class="note-card-item">
-                      <span class="note-card-label">موبایل:</span>
-                      <span class="note-card-value">{{ $user->mobile }}</span>
-                    </div>
-                    <div class="note-card-item">
-                      <span class="note-card-label">کد ملی:</span>
-                      <span class="note-card-value">{{ $user->national_code ?? '-' }}</span>
-                    </div>
-                    <div class="note-card-item">
-                      <span class="note-card-label">وضعیت:</span>
-                      <button wire:click="toggleStatus({{ $user->id }})"
-                        class="badge {{ $user->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
-                        {{ $user->status ? 'فعال' : 'غیرفعال' }}
                       </button>
                     </div>
                   </div>
