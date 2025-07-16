@@ -1,6 +1,6 @@
 <div class="container-fluid py-4" dir="rtl">
   <div class="glass-header p-4  mb-6 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-4">
-    <h1 class="m-0 h3 font-light flex-grow-1" style="min-width: 200px; color: var(--text-primary);">مدیریت دسترسی‌های
+    <h1 class="m-0 h3 font-light flex-grow-1" style="min-width: 200px; color: var(--text-primary);"> دسترسی‌های
       پزشکان</h1>
     <div class="input-group flex-grow-1 position-relative" style="max-width: 450px;">
       <input type="text"
