@@ -96,7 +96,7 @@ class UserList extends Component
             $this->groupAction = '';
             $this->resetPage();
             $this->dispatch('show-alert', type: 'success', message: 'همه کاربران فیلترشده حذف شدند!');
-            \Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
+            Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
             return;
         }
         if (empty($this->selectedUsers)) {
@@ -106,7 +106,7 @@ class UserList extends Component
         $this->selectedUsers = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'کاربران انتخاب شده با موفقیت حذف شدند!');
-        \Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
+        Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
     }
 
     public function executeGroupAction()
