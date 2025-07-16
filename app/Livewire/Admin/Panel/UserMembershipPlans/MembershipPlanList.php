@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\UserMembershipPlan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class MembershipPlanList extends Component
 {
@@ -63,6 +64,7 @@ class MembershipPlanList extends Component
             return;
         }
         $plan->delete();
+        Cache::forget('membership_plans_' . $this->search . '_page_' . $this->getPage());
         $this->dispatch('show-alert', type: 'success', message: 'طرح عضویت با موفقیت حذف شد!');
         $this->resetPage();
     }
@@ -93,6 +95,7 @@ class MembershipPlanList extends Component
 
         UserMembershipPlan::whereIn('id', $this->selectedPlans)
             ->delete();
+        Cache::forget('membership_plans_' . $this->search . '_page_' . $this->getPage());
         $this->selectedPlans = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'طرح‌های عضویت انتخاب‌شده حذف شدند!');
@@ -103,6 +106,7 @@ class MembershipPlanList extends Component
     {
         $plan = UserMembershipPlan::findOrFail($id);
         $plan->update(['status' => !$plan->status]);
+        Cache::forget('membership_plans_' . $this->search . '_page_' . $this->getPage());
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت طرح عضویت با موفقیت تغییر کرد!');
     }
 

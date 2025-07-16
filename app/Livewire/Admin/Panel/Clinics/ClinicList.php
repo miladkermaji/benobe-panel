@@ -8,6 +8,7 @@ use App\Models\MedicalCenter;
 use App\Models\Specialty;
 use App\Models\Insurance;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class ClinicList extends Component
 {
@@ -61,6 +62,7 @@ class ClinicList extends Component
             }
         }
         $item->delete();
+        Cache::forget('clinics_' . $this->search . '_page_' . ($this->getPage() ?? 1));
         $this->dispatch('show-alert', type: 'success', message: 'کلینیک حذف شد!');
     }
 
@@ -142,6 +144,7 @@ class ClinicList extends Component
             }
             $clinic->delete();
         }
+        Cache::forget('clinics_' . $this->search . '_page_' . ($this->getPage() ?? 1));
         $this->selectedClinics = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'کلینیک‌های انتخاب‌شده حذف شدند!');
@@ -152,6 +155,7 @@ class ClinicList extends Component
         $item = MedicalCenter::findOrFail($id);
         $item->is_active = !$item->is_active;
         $item->save();
+        Cache::forget('clinics_' . $this->search . '_page_' . ($this->getPage() ?? 1));
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت کلینیک با موفقیت تغییر کرد.');
     }
 

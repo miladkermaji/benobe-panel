@@ -44,8 +44,8 @@ class UserGroupList extends Component
     {
         $userGroup = UserGroup::findOrFail($id);
         $userGroup->update(['is_active' => !$userGroup->is_active]);
-        $this->dispatch('show-alert', type: $userGroup->is_active ? 'success' : 'info', message: $userGroup->is_active ? 'فعال شد!' : 'غیرفعال شد!');
         Cache::forget('user_groups_' . $this->search . '_page_' . $this->getPage());
+        $this->dispatch('show-alert', type: $userGroup->is_active ? 'success' : 'info', message: $userGroup->is_active ? 'فعال شد!' : 'غیرفعال شد!');
     }
 
     public function confirmDelete($id)
@@ -57,8 +57,8 @@ class UserGroupList extends Component
     {
         $userGroup = UserGroup::findOrFail($id);
         $userGroup->delete();
-        $this->dispatch('show-alert', type: 'success', message: 'گروه کاربری با موفقیت حذف شد!');
         Cache::forget('user_groups_' . $this->search . '_page_' . $this->getPage());
+        $this->dispatch('show-alert', type: 'success', message: 'گروه کاربری با موفقیت حذف شد!');
     }
 
     public function updatedSearch()
@@ -102,10 +102,10 @@ class UserGroupList extends Component
             return;
         }
         UserGroup::whereIn('id', $this->selectedUserGroups)->delete();
+        Cache::forget('user_groups_' . $this->search . '_page_' . $this->getPage());
         $this->selectedUserGroups = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'گروه‌های کاربری انتخاب‌شده با موفقیت حذف شدند!');
-        Cache::forget('user_groups_' . $this->search . '_page_' . $this->getPage());
     }
 
     public function executeGroupAction()

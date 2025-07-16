@@ -170,6 +170,7 @@ class UserList extends Component
         $this->selectedUsers = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت کاربران انتخاب‌شده با موفقیت تغییر کرد.');
+        Cache::forget('users_' . $this->search . '_page_' . $this->getPage());
     }
 
     protected function getUsersQuery()

@@ -73,6 +73,7 @@ class UserBlockingList extends Component
 
         $oldStatus = $item->status;
         $item->update(['status' => !$item->status]);
+        Cache::forget('user_blockings_' . $this->search . '_page_' . $this->getPage());
 
         if ($item->status && !$oldStatus) {
             if ($item->user_id) {
@@ -121,6 +122,7 @@ class UserBlockingList extends Component
             return;
         }
         $item->delete();
+        Cache::forget('user_blockings_' . $this->search . '_page_' . $this->getPage());
         $this->dispatch('show-alert', type: 'success', message: 'رکورد مسدودیت با موفقیت حذف شد!');
     }
 
@@ -157,6 +159,7 @@ class UserBlockingList extends Component
             $this->groupAction = '';
             $this->resetPage();
             $this->dispatch('show-alert', type: 'success', message: 'همه رکوردهای مسدودیت فیلترشده حذف شدند!');
+            Cache::forget('user_blockings_' . $this->search . '_page_' . $this->getPage());
             return;
         }
         if (empty($this->selectedUserBlockings)) {
@@ -164,6 +167,7 @@ class UserBlockingList extends Component
             return;
         }
         UserBlocking::whereIn('id', $this->selectedUserBlockings)->delete();
+        Cache::forget('user_blockings_' . $this->search . '_page_' . $this->getPage());
         $this->selectedUserBlockings = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'رکوردهای مسدودیت انتخاب‌شده با موفقیت حذف شدند!');

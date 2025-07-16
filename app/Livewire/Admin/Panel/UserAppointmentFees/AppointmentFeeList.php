@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\UserAppointmentFee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class AppointmentFeeList extends Component
 {
@@ -59,6 +60,7 @@ class AppointmentFeeList extends Component
     {
         $fee = UserAppointmentFee::findOrFail($id);
         $fee->delete();
+        Cache::forget('appointment_fees_' . $this->search . '_page_' . $this->getPage());
         $this->dispatch('show-alert', type: 'success', message: 'حق نوبت با موفقیت حذف شد!');
         $this->resetPage();
     }
@@ -88,6 +90,7 @@ class AppointmentFeeList extends Component
         }
 
         UserAppointmentFee::whereIn('id', $this->selectedFees)->delete();
+        Cache::forget('appointment_fees_' . $this->search . '_page_' . $this->getPage());
         $this->selectedFees = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'حق نوبت‌های انتخاب‌شده حذف شدند!');
