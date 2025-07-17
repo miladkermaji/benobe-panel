@@ -91,7 +91,14 @@
             <li class="item-li"><a href="{{ route('admin.panel.doctor-specialties.index') }}">تخصص های پزشک</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.doctor-comments.index') }}">نظرات بیماران</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.doctors.permissions') }}">مدیریت دسترسی‌ها</a></li>
-            <li class="item-li"><a href="#">ارتقا حساب پزشکان</a></li>
+            <li class="item-li" style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)"
+                style="color: #6c757d; cursor: not-allowed; display: flex; align-items: center;">
+                ارتقا حساب پزشکان
+                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
+                  زودی</span>
+              </a>
+            </li>
           </ul>
         </li>
         <!-- حق عضویت -->
