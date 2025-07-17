@@ -873,3 +873,6 @@ Route::middleware(['doctor'])->prefix('dr/panel')->group(function () {
 Route::middleware(['web', 'manager'])->prefix('admin/panel/tools')->group(function () {
     Route::get('/recipients-search', [\App\Http\Controllers\Admin\Panel\Tools\Notification\NotificationController::class, 'recipientsSearch']);
 });
+
+// Route for AJAX user search (for Select2 in subscription forms)
+Route::get('/admin/api/users/search', [\App\Http\Controllers\Admin\UserSearchController::class, 'search']);

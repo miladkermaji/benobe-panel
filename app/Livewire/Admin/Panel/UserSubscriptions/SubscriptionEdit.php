@@ -20,7 +20,6 @@ class SubscriptionEdit extends Component
     public $end_date;
     public $status;
     public $description;
-    public $users = [];
     public $plans = [];
 
     public function mount(UserSubscription $userSubscription)
@@ -41,15 +40,9 @@ class SubscriptionEdit extends Component
         $this->status = $userSubscription->status;
         $this->description = $userSubscription->description;
 
-        $this->users = User::select('id', 'first_name', 'last_name')
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->first_name . ' ' . $user->last_name
-                ];
-            });
-        $this->plans = UserMembershipPlan::where('status', true)->select('id', 'name')->get();
+        $this->plans = cache()->remember('active_membership_plans', 60, function () {
+            return UserMembershipPlan::where('status', true)->select('id', 'name')->get();
+        });
 
         Log::info('Subscription Edit Loaded', [
             'id' => $userSubscription->id,

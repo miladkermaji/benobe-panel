@@ -19,20 +19,13 @@ class SubscriptionCreate extends Component
     public $end_date;
     public $status = true;
     public $description;
-    public $users = [];
     public $plans = [];
 
     public function mount()
     {
-        $this->users = User::select('id', 'first_name', 'last_name')
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->first_name . ' ' . $user->last_name
-                ];
-            });
-        $this->plans = UserMembershipPlan::where('status', true)->select('id', 'name')->get();
+        $this->plans = cache()->remember('active_membership_plans', 60, function () {
+            return UserMembershipPlan::where('status', true)->select('id', 'name')->get();
+        });
     }
 
     public function save()

@@ -24,16 +24,11 @@
         <div class="col-12 col-md-10 col-lg-8">
           <div class="row g-4">
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="user_id" class="form-select select2" id="user_id">
-                <option value="">انتخاب کنید</option>
-                @foreach ($users as $user)
-                  <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
-                @endforeach
-              </select>
+              <select id="user_id" class="form-select select2-ajax" wire:model.defer="user_id"></select>
               <label for="user_id" class="form-label">کاربر</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model="plan_id" class="form-select select2" id="plan_id">
+              <select wire:model.defer="plan_id" class="form-select select2" id="plan_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($plans as $plan)
                   <option value="{{ $plan->id }}">{{ $plan->name }}</option>
@@ -42,22 +37,22 @@
               <label for="plan_id" class="form-label">طرح عضویت</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="start_date" class="form-control jalali-datepicker text-end"
+              <input type="text" wire:model.defer="start_date" class="form-control jalali-datepicker text-end"
                 id="start_date" placeholder="" data-jdp>
               <label for="start_date" class="form-label">تاریخ شروع</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="end_date" class="form-control jalali-datepicker text-end" id="end_date"
-                placeholder="" data-jdp>
+              <input type="text" wire:model.defer="end_date" class="form-control jalali-datepicker text-end"
+                id="end_date" placeholder="" data-jdp>
               <label for="end_date" class="form-label">تاریخ پایان</label>
             </div>
             <div class="col-12 position-relative mt-5">
-              <textarea wire:model="description" class="form-control" id="description" rows="4" placeholder=" "></textarea>
+              <textarea wire:model.defer="description" class="form-control" id="description" rows="4" placeholder=" "></textarea>
               <label for="description" class="form-label">توضیحات (اختیاری)</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">
-                <input class="form-check-input" type="checkbox" id="status" wire:model="status">
+                <input class="form-check-input" type="checkbox" id="status" wire:model.defer="status">
                 <label class="form-check-label fw-medium" for="status">
                   وضعیت: <span
                     class="px-2 text-{{ $status ? 'success' : 'danger' }}">{{ $status ? 'فعال' : 'غیرفعال' }}</span>
@@ -87,7 +82,23 @@
         $('#user_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
-          width: '100%'
+          width: '100%',
+          ajax: {
+            url: '/admin/api/users/search',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+              return {
+                q: params.term
+              };
+            },
+            processResults: function(data) {
+              return {
+                results: data.results
+              };
+            },
+            cache: true
+          }
         });
         $('#plan_id').select2({
           dir: 'rtl',
@@ -95,12 +106,14 @@
           width: '100%'
         });
 
+        // مقداردهی اولیه برای حالت ویرایش
         const userId = @json($user_id);
-        const planId = @json($plan_id);
-
-        if (userId) {
-          $('#user_id').val(userId).trigger('change');
+        const userName = @json(isset($user_name) ? $user_name : '');
+        if (userId && userName) {
+          var userOption = new Option(userName, userId, true, true);
+          $('#user_id').append(userOption).trigger('change');
         }
+        const planId = @json($plan_id);
         if (planId) {
           $('#plan_id').val(planId).trigger('change');
         }
