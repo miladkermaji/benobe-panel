@@ -653,7 +653,45 @@ class MedicalCentersController extends Controller
     {
         try {
             $perPage = (int) $request->input('per_page', 20);
-            $centers = MedicalCenter::where('is_active', 1)->paginate($perPage);
+            $query = MedicalCenter::where('is_active', 1);
+
+            // فیلتر استان
+            if ($request->filled('province_id')) {
+                $query->where('province_id', $request->input('province_id'));
+            }
+            // فیلتر شهر
+            if ($request->filled('city_id')) {
+                $query->where('city_id', $request->input('city_id'));
+            }
+            // فیلتر نوع مرکز
+            if ($request->filled('center_type')) {
+                $query->where('type', $request->input('center_type'));
+            }
+            // فیلتر نوع تعرفه
+            if ($request->filled('tariff_type')) {
+                $query->where('Center_tariff_type', $request->input('tariff_type'));
+            }
+            // فیلتر تخصص
+            if ($request->filled('specialty_id')) {
+                $query->whereJsonContains('specialty_ids', (string)$request->input('specialty_id'));
+            }
+            // فیلتر خدمات
+            if ($request->filled('service_id')) {
+                $query->whereJsonContains('service_ids', (string)$request->input('service_id'));
+            }
+            // فیلتر بیمه
+            if ($request->filled('insurance_id')) {
+                $query->whereJsonContains('insurance_ids', (string)$request->input('insurance_id'));
+            }
+
+            // مرتب‌سازی
+            if ($request->filled('sort_by')) {
+                $sortBy = $request->input('sort_by');
+                $sortDir = $request->input('sort_dir', 'desc');
+                $query->orderBy($sortBy, $sortDir);
+            }
+
+            $centers = $query->paginate($perPage);
 
             // Provinces (level 1)
             $provinces = \App\Models\Zone::where('level', 1)
@@ -664,7 +702,7 @@ class MedicalCentersController extends Controller
                         'id' => $province->id,
                         'name' => $province->name,
                         'province_id' => $province->id,
-                        'cities' => '', // می‌توانید لیست شهرها را اینجا قرار دهید
+                        'cities' => '',
                     ];
                 });
 
