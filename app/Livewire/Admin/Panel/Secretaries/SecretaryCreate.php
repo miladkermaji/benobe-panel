@@ -60,11 +60,9 @@ class SecretaryCreate extends Component
 
     public function store()
     {
-        Log::info('Store secretary called', [
+        Log::info('store secretary', [
             'doctor_id' => $this->doctor_id,
             'clinic_id' => $this->clinic_id,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
         ]);
         $this->validate([
             'first_name' => 'required|string|max:255',
@@ -75,7 +73,7 @@ class SecretaryCreate extends Component
             'email' => 'nullable|email|unique:secretaries,email',
             'password' => 'nullable|min:6',
             'doctor_id' => 'nullable|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'required|exists:clinics,id',
             'is_active' => 'boolean',
             'profile_photo' => 'nullable|image|max:2048',
         ], [
@@ -84,6 +82,7 @@ class SecretaryCreate extends Component
             'last_name.required' => 'لطفاً نام خانوادگی را وارد کنید.',
             'last_name.max' => 'نام خانوادگی نباید بیشتر از ۲۵۵ کاراکتر باشد.',
             'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
+            'clinic_id.required' => 'لطفاً  مطب را انتخاب کنید.',
             'mobile.regex' => 'شماره موبایل باید با ۰۹ شروع شده و ۱۱ رقم باشد.',
             'mobile.unique' => 'این شماره موبایل قبلاً ثبت شده است.',
             'national_code.required' => 'لطفاً کد ملی را وارد کنید.',

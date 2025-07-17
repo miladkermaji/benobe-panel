@@ -2,11 +2,12 @@
 
 namespace App\Livewire\Admin\Panel\Secretaries;
 
-use Livewire\Component;
-use Livewire\WithFileUploads;
-use App\Models\Secretary;
-use App\Models\Doctor;
 use App\Models\Clinic;
+use App\Models\Doctor;
+use Livewire\Component;
+use App\Models\Secretary;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -65,6 +66,10 @@ class SecretaryEdit extends Component
 
     public function update()
     {
+        Log::info('update secretary', [
+            'doctor_id' => $this->doctor_id,
+            'clinic_id' => $this->clinic_id,
+        ]);
         $this->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -74,7 +79,7 @@ class SecretaryEdit extends Component
             'email' => 'nullable|email|unique:secretaries,email,' . $this->secretary->id,
             'password' => 'nullable|min:6',
             'doctor_id' => 'nullable|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'required|exists:clinics,id',
             'is_active' => 'boolean',
             'profile_photo' => 'nullable|image|max:2048',
         ], [
@@ -83,6 +88,7 @@ class SecretaryEdit extends Component
             'last_name.required' => 'لطفاً نام خانوادگی را وارد کنید.',
             'last_name.max' => 'نام خانوادگی نباید بیشتر از ۲۵۵ کاراکتر باشد.',
             'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
+            'clinic_id.required' => 'لطفاً  مطب را انتخاب کنید.',
             'mobile.regex' => 'شماره موبایل باید با ۰۹ شروع شده و ۱۱ رقم باشد.',
             'mobile.unique' => 'این شماره موبایل قبلاً ثبت شده است.',
             'national_code.required' => 'لطفاً کد ملی را وارد کنید.',
