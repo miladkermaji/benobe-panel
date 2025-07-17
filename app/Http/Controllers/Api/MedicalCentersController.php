@@ -590,6 +590,30 @@ class MedicalCentersController extends Controller
     }
 
     /**
+     * لیست همه مراکز درمانی فعال
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function list(Request $request)
+    {
+        try {
+            $centers = MedicalCenter::where('is_active', 1)->get();
+            return response()->json([
+                'status' => 'success',
+                'data' => $centers,
+            ], 200);
+        } catch (\Exception $e) {
+            \Log::error('MedicalCentersController@list - Error: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطای سرور',
+                'data' => null,
+            ], 500);
+        }
+    }
+
+    /**
      * گرفتن لیست تخصص‌های مراکز درمانی
      *
      * این متد لیستی از تخصص‌هایی که در مراکز درمانی فعال وجود دارند را برمی‌گرداند.

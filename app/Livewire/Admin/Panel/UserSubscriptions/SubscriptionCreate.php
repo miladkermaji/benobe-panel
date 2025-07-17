@@ -100,7 +100,9 @@ class SubscriptionCreate extends Component
                 'status' => $this->status,
                 'description' => $this->description,
                 'admin_id' => Auth::guard('manager')->user()->id,
-                'remaining_appointments' => $plan->appointment_count ?? 0
+                'remaining_appointments' => $plan->appointment_count ?? 0,
+                'subscribable_id' => $this->user_id,
+                'subscribable_type' => \App\Models\User::class,
             ]);
 
             $this->dispatch('show-alert', type: 'success', message: 'اشتراک با موفقیت ایجاد شد!');
