@@ -22,7 +22,7 @@
             <tbody>
               @forelse ($doctors as $doctor)
             <tbody x-data="{ open: false }">
-              <tr style="background: #f5f7fa; border-top: 2px solid #b3c2d1;">
+              <tr style="background: #f5f7fa; border-top: 2px solid #b3c2d1; cursor:pointer;" @click="open = !open">
                 <td class="py-2 px-3 fw-bold text-primary" style="font-size: 1.05rem;">
                   <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2"
                     style="vertical-align: middle; margin-left: 6px;">
@@ -34,15 +34,13 @@
                   @endif
                 </td>
                 <td class="text-center align-middle" style="width: 40px; padding: 0;">
-                  <button type="button" tabindex="-1"
-                    class="d-flex justify-content-center align-items-center w-100 h-100 border-0 bg-transparent p-0 m-0"
-                    style="min-width: 40px; min-height: 40px;" @click="open = !open">
+                  <span class="d-flex justify-content-center align-items-center w-100 h-100 p-0 m-0">
                     <svg width="20" height="20" fill="none" stroke="#0d6efd" stroke-width="2"
                       :style="open ? 'display: block; transition: transform 0.2s; transform: rotate(180deg);' :
                           'display: block; transition: transform 0.2s;'">
                       <path d="M6 9l6 6 6-6" />
                     </svg>
-                  </button>
+                  </span>
                 </td>
               </tr>
               <tr x-show="open" x-transition>
