@@ -111,7 +111,7 @@
                       </td>
                       <td class="text-center align-middle">
                         <button wire:click="toggleStatus({{ $subscription->id }})"
-                          class="badge {{ $subscription->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                          class="badge {{ $subscription->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
                           {{ $subscription->status ? 'فعال' : 'غیرفعال' }}
                         </button>
                       </td>
@@ -194,7 +194,7 @@
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">وضعیت:</span>
                       <button wire:click="toggleStatus({{ $subscription->id }})"
-                        class="badge {{ $subscription->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                        class="badge {{ $subscription->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
                         {{ $subscription->status ? 'فعال' : 'غیرفعال' }}
                       </button>
                     </div>
