@@ -60,7 +60,7 @@
                         </span>
                         @if ($secretary->clinic)
                           <span
-                            class="badge-comment bg-gradient-primary text-white font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">{{ $secretary->clinic->name }}</span>
+                            class="badge-comment bg-gradient-primary  font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">{{ $secretary->clinic->name }}</span>
                         @else
                           <span
                             class="badge-comment bg-gradient-info text-white font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">ویزیت
@@ -174,7 +174,7 @@
                       </span>
                       @if ($secretary->clinic)
                         <span
-                          class="badge-comment bg-gradient-primary text-white font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">{{ $secretary->clinic->name }}</span>
+                          class="badge-comment bg-gradient-primary  font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">{{ $secretary->clinic->name }}</span>
                       @else
                         <span
                           class="badge-comment bg-gradient-info text-white font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">ویزیت
