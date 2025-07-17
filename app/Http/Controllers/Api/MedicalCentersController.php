@@ -652,10 +652,82 @@ class MedicalCentersController extends Controller
     public function list(Request $request)
     {
         try {
-            $centers = MedicalCenter::where('is_active', 1)->get();
+            $perPage = (int) $request->input('per_page', 20);
+            $centers = MedicalCenter::where('is_active', 1)->paginate($perPage);
+
+            // Provinces (level 1)
+            $provinces = \App\Models\Zone::where('level', 1)
+                ->select('id', 'name')
+                ->get()
+                ->map(function ($province) {
+                    return [
+                        'id' => $province->id,
+                        'name' => $province->name,
+                        'province_id' => $province->id,
+                        'cities' => '', // می‌توانید لیست شهرها را اینجا قرار دهید
+                    ];
+                });
+
+            // Cities (level 2)
+            $cities = \App\Models\Zone::where('level', 2)
+                ->select('id', 'name', 'parent_id as province_id')
+                ->get()
+                ->map(function ($city) {
+                    return [
+                        'id' => $city->id,
+                        'name' => $city->name,
+                        'province_id' => $city->province_id,
+                        'cities' => '',
+                    ];
+                });
+
+            // Specialties
+            $specialties = \App\Models\Specialty::select('id', 'name')->get();
+
+            // Insurances
+            $insurances = \App\Models\Insurance::select('id', 'name')->get();
+
+            // Services
+            $services = \App\Models\Service::select('id', 'name', 'description')->get();
+
+            // Center types
+            $center_types = [
+                'clinic' => 'کلینیک',
+                'hospital' => 'بیمارستان',
+                'treatment_centers' => 'درمانگاه',
+                'imaging_center' => 'تصویربرداری',
+                'laboratory' => 'آزمایشگاه',
+                'pharmacy' => 'داروخانه',
+                'policlinic' => 'پلی‌کلینیک',
+            ];
+
+            // Tariff types
+            $tariff_types = [
+                'public' => 'دولتی',
+                'private' => 'خصوصی',
+            ];
+
             return response()->json([
                 'status' => 'success',
-                'data' => $centers,
+                'message' => 'عملیات با موفقیت انجام شد',
+                'data' => [
+                    'medical_centers' => $centers->items(),
+                    'zones' => [
+                        'provinces' => $provinces,
+                        'cities' => $cities,
+                    ],
+                    'specialties' => $specialties,
+                    'insurances' => $insurances,
+                    'services' => $services,
+                    'center_types' => $center_types,
+                    'tariff_types' => $tariff_types,
+                ],
+                'pagination' => [
+                    'current_page' => (string) $centers->currentPage(),
+                    'last_page' => (string) $centers->lastPage(),
+                    'per_page' => (string) $centers->perPage(),
+                    'total' => (string) $centers->total(),
+                ],
             ], 200);
         } catch (\Exception $e) {
             Log::error('MedicalCentersController@list - Error: ' . $e->getMessage());
