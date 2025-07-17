@@ -44,11 +44,7 @@ class DoctorAppointmentController extends Controller
             $selectedClinicId = $request->query('clinic_id');
             if ($selectedClinicId !== null) {
                 if (!is_numeric($selectedClinicId) || $selectedClinicId <= 0) {
-                    return response()->json([
-                        'status'  => 'error',
-                        'message' => 'شناسه کلینیک نامعتبر است',
-                        'data'    => null,
-                    ], 400);
+                    $selectedClinicId = null;
                 }
             }
 
@@ -60,25 +56,14 @@ class DoctorAppointmentController extends Controller
             $selectedClinic = null;
             if ($selectedClinicId) {
                 $selectedClinic = $clinics->where('id', (int)$selectedClinicId)->first();
-                if (!$selectedClinic) {
-                    Log::warning("GetAppointmentOptions - Clinic not found or does not belong to doctor", [
-                        'doctor_id' => $doctorId,
-                        'clinic_id' => $selectedClinicId,
-                        'clinics_count' => $clinics->count(),
-                    ]);
-                    return response()->json([
-                        'status'  => 'error',
-                        'message' => 'کلینیک مورد نظر یافت نشد یا به این پزشک تعلق ندارد',
-                        'data'    => null,
-                    ], 404);
-                }
+                // اگر کلینیک پیدا نشد، selected_clinic را null بگذار و خطا نده
             }
 
             // اگر کلینیک انتخاب شده باشد، فقط همان کلینیک و نوبت حضوری آن را بده
             if ($selectedClinic) {
                 $inPersonData = $this->getInPersonAppointmentData($doctor, $selectedClinic);
             } else {
-                // اگر کلینیک انتخاب نشده، اطلاعات همه کلینیک‌ها و نوبت حضوری همه را بده
+                // اگر کلینیک انتخاب نشده یا پیدا نشد، اطلاعات همه کلینیک‌ها و نوبت حضوری همه را بده
                 $inPersonData = $this->getInPersonAppointmentDataForAllClinics($doctor, $clinics);
             }
             $onlineData = $this->getOnlineAppointmentData($doctor);
