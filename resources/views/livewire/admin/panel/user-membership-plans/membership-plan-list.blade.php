@@ -1,19 +1,18 @@
 <div class="container-fluid py-4" dir="rtl" wire:init="loadPlans">
   <!-- Header Section -->
   <div class="glass-header mb-4">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center w-100">
       <div class="d-flex align-items-center gap-3">
-
         <h4 class="mb-0 fw-bold text-white">طرح‌های عضویت</h4>
       </div>
-      <div class="d-flex gap-3">
-
+      <div class="d-flex">
         <a href="{{ route('admin.panel.user-membership-plans.create') }}"
-          class="btn btn-success btn-sm rounded-pill px-4 py-2 d-flex align-items-center text-white gap-2 shadow-sm hover-shadow-lg transition-all">
+          class="btn btn-success btn-sm rounded-3 px-2 py-1 d-flex align-items-center flex-nowrap text-white gap-1 shadow-sm hover-shadow-lg transition-all"
+          style="max-width: 120px; min-width: 0; white-space: nowrap;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 5v14M5 12h14" />
           </svg>
-          افزودن
+          <span class="d-none d-sm-inline">افزودن</span>
         </a>
       </div>
     </div>
@@ -166,7 +165,7 @@
                       <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
                       <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                     </svg>
-                    ویرایش
+                    <span class="d-none d-sm-inline">ویرایش</span>
                   </a>
                   <button wire:click="confirmDelete({{ $plan->id }})" class="btn btn-sm rounded-pill px-3"
                     style="background: #dc3545; color: white;">
@@ -174,7 +173,7 @@
                       stroke-width="2">
                       <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
                     </svg>
-                    حذف
+                    <span class="d-none d-sm-inline">حذف</span>
                   </button>
                 </div>
                 <div class="form-check form-switch">
