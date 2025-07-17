@@ -112,7 +112,7 @@
                       <td class="align-middle">{{ $user->national_code ?? '-' }}</td>
                       <td class="text-center align-middle">
                         <button wire:click="toggleStatus({{ $user->id }})"
-                          class="badge {{ $user->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                          class="badge {{ $user->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
                           {{ $user->status ? 'فعال' : 'غیرفعال' }}
                         </button>
                       </td>
@@ -188,7 +188,7 @@
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">وضعیت:</span>
                       <button wire:click="toggleStatus({{ $user->id }})"
-                        class="badge {{ $user->status ? 'bg-label-success' : 'bg-label-danger' }} border-0 cursor-pointer">
+                        class="badge {{ $user->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
                         {{ $user->status ? 'فعال' : 'غیرفعال' }}
                       </button>
                     </div>
