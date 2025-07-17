@@ -177,6 +177,20 @@
         toastr[event.type](event.message);
       });
 
+      Livewire.on('refresh-clinic-select2', (event) => {
+        const clinics = event.clinics || [];
+        $('#clinic_id').select2('destroy');
+        $('#clinic_id').empty().select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%',
+          data: clinics.map(clinic => ({
+            id: clinic.id,
+            text: clinic.name
+          }))
+        });
+      });
+
       document.addEventListener('livewire:updated', function() {
         initializeSelect2();
       });

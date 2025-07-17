@@ -47,6 +47,13 @@ class SecretaryEdit extends Component
         $this->clinics = Clinic::all();
     }
 
+    public function updatedDoctorId($value)
+    {
+        $this->clinics = Clinic::where('doctor_id', $value)->get();
+        $this->clinic_id = null;
+        $this->dispatch('refresh-clinic-select2', clinics: $this->clinics->toArray());
+    }
+
     public function getPhotoPreviewProperty()
     {
         return $this->profile_photo

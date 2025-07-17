@@ -9,6 +9,7 @@ use App\Models\Doctor;
 use App\Models\Clinic;
 use App\Models\SecretaryPermission;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class SecretaryCreate extends Component
 {
@@ -32,7 +33,24 @@ class SecretaryCreate extends Component
     public function mount()
     {
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = $this->doctor_id ? Clinic::where('doctor_id', $this->doctor_id)->get() : collect();
+    }
+
+    public function updatedDoctorId($value)
+    {
+        $clinics = Clinic::where('doctor_id', $value)->get();
+        Log::info('updatedDoctorId', [
+            'doctor_id' => $value,
+            'clinics' => $clinics->toArray(),
+        ]);
+        $this->clinics = $clinics;
+        $this->clinic_id = null;
+        $this->dispatch('refresh-clinic-select2', clinics: $clinics->toArray());
+    }
+
+    public function updatedClinicId($value)
+    {
+        Log::info('Clinic selected', ['clinic_id' => $value]);
     }
 
     public function getPhotoPreviewProperty()
@@ -42,6 +60,12 @@ class SecretaryCreate extends Component
 
     public function store()
     {
+        Log::info('Store secretary called', [
+            'doctor_id' => $this->doctor_id,
+            'clinic_id' => $this->clinic_id,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+        ]);
         $this->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -137,6 +161,9 @@ class SecretaryCreate extends Component
 
     public function render()
     {
-        return view('livewire.admin.panel.secretaries.secretary-create');
+        return view('livewire.admin.panel.secretaries.secretary-create', [
+            'doctors' => $this->doctors,
+            'clinics' => $this->clinics ? $this->clinics->toArray() : [],
+        ]);
     }
 }

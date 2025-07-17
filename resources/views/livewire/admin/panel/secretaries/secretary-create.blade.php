@@ -112,6 +112,7 @@
               @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+           
               <select wire:model="clinic_id" class="form-select select2" id="clinic_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($clinics as $clinic)
@@ -135,7 +136,7 @@
           </div>
 
           <div class="text-end mt-4 w-100 d-flex justify-content-end">
-            <button wire:click="store"
+            <button wire:click="store" onclick="console.log('Store secretary called')"
               class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
@@ -168,14 +169,39 @@
       initializeSelect2();
 
       $('#doctor_id').on('change', function() {
+        console.log('Doctor selected:', $(this).val());
         @this.set('doctor_id', $(this).val());
       });
       $('#clinic_id').on('change', function() {
+        console.log('Clinic selected:', $(this).val());
         @this.set('clinic_id', $(this).val());
       });
 
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
+      });
+
+      Livewire.hook('message.processed', (message, component) => {
+        $('#clinic_id').select2('destroy');
+        $('#clinic_id').select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%'
+        });
+      });
+
+      Livewire.on('refresh-clinic-select2', (event) => {
+        const clinics = event.clinics || [];
+        $('#clinic_id').select2('destroy');
+        $('#clinic_id').empty().select2({
+          dir: 'rtl',
+          placeholder: 'انتخاب کنید',
+          width: '100%',
+          data: clinics.map(clinic => ({
+            id: clinic.id,
+            text: clinic.name
+          }))
+        });
       });
 
       document.addEventListener('livewire:updated', function() {
