@@ -114,6 +114,8 @@ class SubscriptionEdit extends Component
             'end_date' => $endDateMiladi,
             'status' => $this->status,
             'description' => $this->description,
+            'subscribable_id' => $this->user_id,
+            'subscribable_type' => \App\Models\User::class,
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'اشتراک با موفقیت به‌روزرسانی شد!');

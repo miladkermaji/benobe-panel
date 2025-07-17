@@ -594,6 +594,60 @@ class MedicalCentersController extends Controller
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     *
+     * @response 200 {
+     *   "status": "success",
+     *   "message": "عملیات با موفقیت انجام شد",
+     *   "data": {
+     *     "medical_centers": [
+     *       {
+     *         "id": 1,
+     *         "name": "کلینیک نمونه",
+     *         "type": "clinic",
+     *         "province_id": 1,
+     *         "city_id": 2,
+     *         "address": "تهران، خیابان اصلی",
+     *         "slug": "clinic-sample"
+     *       }
+     *     ],
+     *     "zones": {
+     *       "provinces": [
+     *         { "id": 1, "name": "تهران", "province_id": 1, "cities": "..." }
+     *       ],
+     *       "cities": [
+     *         { "id": 2, "name": "تهران", "province_id": 1, "cities": "..." }
+     *       ]
+     *     },
+     *     "specialties": [
+     *       { "id": 1, "name": "قلب و عروق" }
+     *     ],
+     *     "insurances": [
+     *       { "id": 1, "name": "تامین اجتماعی" }
+     *     ],
+     *     "services": [
+     *       { "id": 1, "name": "ویزیت", "description": "..." }
+     *     ],
+     *     "center_types": {
+     *       "clinic": "کلینیک",
+     *       "hospital": "بیمارستان"
+     *     },
+     *     "tariff_types": {
+     *       "public": "دولتی",
+     *       "private": "خصوصی"
+     *     }
+     *   },
+     *   "pagination": {
+     *     "current_page": "1",
+     *     "last_page": "10",
+     *     "per_page": "20",
+     *     "total": "200"
+     *   }
+     * }
+     * @response 500 {
+     *   "status": "error",
+     *   "message": "خطای سرور",
+     *   "data": null
+     * }
      */
     public function list(Request $request)
     {
@@ -604,7 +658,7 @@ class MedicalCentersController extends Controller
                 'data' => $centers,
             ], 200);
         } catch (\Exception $e) {
-            \Log::error('MedicalCentersController@list - Error: ' . $e->getMessage());
+            Log::error('MedicalCentersController@list - Error: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'خطای سرور',
