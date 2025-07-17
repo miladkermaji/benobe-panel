@@ -42,20 +42,14 @@ class DoctorAppointmentController extends Controller
             }
 
             $selectedClinicId = $request->query('clinic_id');
-            if (!$selectedClinicId) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'کلینیک اجباری است',
-                    'data'    => null,
-                ], 400);
-            }
-
-            if (!is_numeric($selectedClinicId) || $selectedClinicId <= 0) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'شناسه کلینیک نامعتبر است',
-                    'data'    => null,
-                ], 400);
+            if ($selectedClinicId !== null) {
+                if (!is_numeric($selectedClinicId) || $selectedClinicId <= 0) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'شناسه کلینیک نامعتبر است',
+                        'data'    => null,
+                    ], 400);
+                }
             }
 
             $clinics = Clinic::where('doctor_id', $doctorId)
@@ -63,21 +57,30 @@ class DoctorAppointmentController extends Controller
                 ->select('id', 'name', 'province_id', 'city_id', 'address', 'phone_number', 'is_main_clinic')
                 ->get();
 
-            $selectedClinic = $clinics->where('id', (int)$selectedClinicId)->first();
-            if (!$selectedClinic) {
-                Log::warning("GetAppointmentOptions - Clinic not found or does not belong to doctor", [
-                    'doctor_id' => $doctorId,
-                    'clinic_id' => $selectedClinicId,
-                    'clinics_count' => $clinics->count(),
-                ]);
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'کلینیک مورد نظر یافت نشد یا به این پزشک تعلق ندارد',
-                    'data'    => null,
-                ], 404);
+            $selectedClinic = null;
+            if ($selectedClinicId) {
+                $selectedClinic = $clinics->where('id', (int)$selectedClinicId)->first();
+                if (!$selectedClinic) {
+                    Log::warning("GetAppointmentOptions - Clinic not found or does not belong to doctor", [
+                        'doctor_id' => $doctorId,
+                        'clinic_id' => $selectedClinicId,
+                        'clinics_count' => $clinics->count(),
+                    ]);
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'کلینیک مورد نظر یافت نشد یا به این پزشک تعلق ندارد',
+                        'data'    => null,
+                    ], 404);
+                }
             }
 
-            $inPersonData = $this->getInPersonAppointmentData($doctor, $selectedClinic);
+            // اگر کلینیک انتخاب شده باشد، فقط همان کلینیک و نوبت حضوری آن را بده
+            if ($selectedClinic) {
+                $inPersonData = $this->getInPersonAppointmentData($doctor, $selectedClinic);
+            } else {
+                // اگر کلینیک انتخاب نشده، اطلاعات همه کلینیک‌ها و نوبت حضوری همه را بده
+                $inPersonData = $this->getInPersonAppointmentDataForAllClinics($doctor, $clinics);
+            }
             $onlineData = $this->getOnlineAppointmentData($doctor);
 
             return response()->json([
@@ -103,14 +106,14 @@ class DoctorAppointmentController extends Controller
                             'is_main_clinic' => $clinic->is_main_clinic,
                         ];
                     }),
-                    'selected_clinic' => [
+                    'selected_clinic' => $selectedClinic ? [
                         'id'           => $selectedClinic->id,
                         'name'         => $selectedClinic->name,
                         'province'     => $selectedClinic->province ? $selectedClinic->province->name : null,
                         'city'         => $selectedClinic->city ? $selectedClinic->city->name : null,
                         'address'      => $selectedClinic->address,
                         'phone_number' => $selectedClinic->phone_number,
-                    ],
+                    ] : null,
                     'appointment_types' => [
                         'in_person' => $inPersonData,
                         'online'    => array_merge(
