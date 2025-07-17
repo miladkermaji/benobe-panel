@@ -1,7 +1,6 @@
 <div class="container-fluid py-4" dir="rtl">
   <div class="glass-header p-4  mb-6 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-4">
-    <h1 class="m-0 h3 font-light flex-grow-1" style="min-width: 200px; color: var(--text-primary);"> دسترسی‌های
-      پزشکان</h1>
+    <h1 class="m-0 h3 font-light flex-grow-1" style="min-width: 200px; color: var(--text-primary);">دسترسی‌های پزشکان</h1>
     <div class="input-group flex-grow-1 position-relative" style="max-width: 450px;">
       <input type="text"
         class="form-control border-0 shadow-none bg-background-card text-text-primary ps-5 rounded-full h-12"
@@ -18,11 +17,11 @@
     <div class="card shadow-xl rounded-2xl overflow-hidden bg-background-card">
       <div class="card-body p-0">
         <div class="table-responsive text-nowrap d-none d-md-block">
-          <table class="table  w-100 m-0">
+          <table class="table w-100 m-0">
             <tbody>
               @forelse ($doctors as $doctor)
             <tbody x-data="{ open: false }">
-              <tr style="background: #f5f7fa; border-top: 2px solid #b3c2d1; cursor:pointer;" @click="open = !open">
+              <tr style="background: #f5f7fa;  cursor:pointer;" @click="open = !open">
                 <td class="py-2 px-3 fw-bold text-primary" style="font-size: 1.05rem;">
                   <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2"
                     style="vertical-align: middle; margin-left: 6px;">
@@ -52,7 +51,7 @@
                       $savedPermissions = is_array($savedPermissions) ? $savedPermissions : [];
                     @endphp
                     @foreach ($permissionsConfig as $permissionKey => $permissionData)
-                      <div class="permission-item p-3  shadow-md bg-background-card transition-all duration-300 mb-2">
+                      <div class="permission-item p-3 shadow-md bg-background-card transition-all duration-300 mb-2">
                         <div class="d-flex align-items-center mb-2">
                           <label class="custom-checkbox flex items-center gap-2">
                             <input type="checkbox" class="custom-checkbox-input parent-checkbox form-check-input"
@@ -106,11 +105,6 @@
             @endforelse
             </tbody>
           </table>
-          @if ($doctors->hasPages())
-            <div class="pagination-container d-flex justify-content-center my-3">
-              {{ $doctors->onEachSide(1)->links('livewire::bootstrap') }}
-            </div>
-          @endif
         </div>
         <!-- Mobile Card View (original UI) -->
         <div class="d-md-none">
@@ -191,15 +185,6 @@
               </div>
             </div>
           @endforelse
-          <div class="d-flex justify-content-between align-items-center px-4 flex-wrap gap-3">
-            <div class="text-muted">نمایش {{ $doctors->firstItem() }} تا {{ $doctors->lastItem() }} از
-              {{ $doctors->total() }} پزشک</div>
-            @if ($doctors->hasPages())
-              <div class="pagination-container d-flex justify-content-center my-3">
-                {{ $doctors->onEachSide(1)->links('livewire::bootstrap') }}
-              </div>
-            @endif
-          </div>
         </div>
       </div>
     </div>
