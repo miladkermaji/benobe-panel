@@ -27,6 +27,13 @@
                 <option value="active">فقط فعال</option>
                 <option value="inactive">فقط غیرفعال</option>
               </select>
+              <select class="form-select form-select-sm w-100 mb-2 mb-md-0" style="min-width: 0;"
+                wire:model.live="userTypeFilter">
+                <option value="all">همه نوع کاربرها</option>
+                <option value="doctor">پزشک</option>
+                <option value="secretary">منشی</option>
+                <option value="patient">بیمار</option>
+              </select>
               <a href="{{ route('admin.panel.users.create') }}"
                 class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 w-100 w-md-auto justify-content-center justify-content-md-start">
                 <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -82,6 +89,7 @@
                   <th class="align-middle">ایمیل</th>
                   <th class="align-middle">موبایل</th>
                   <th class="align-middle">کد ملی</th>
+                  <th class="align-middle">نوع کاربر</th>
                   <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
                   <th class="text-center align-middle" style="width: 150px;">عملیات</th>
                 </tr>
@@ -101,8 +109,8 @@
                         <div class="position-relative" style="width: 40px; height: 40px;">
                           <img loading="lazy"
                             src="{{ str_starts_with($user->profile_photo_url, 'http') ? $user->profile_photo_url : asset('admin-assets/images/default-avatar.png') }}"
-                            class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل"
-                            onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+                            class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;"
+                            alt="پروفایل" onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
                         </div>
                       </td>
                       <td class="align-middle">{{ $user->first_name }}</td>
@@ -110,6 +118,15 @@
                       <td class="align-middle">{{ $user->email }}</td>
                       <td class="align-middle">{{ $user->mobile }}</td>
                       <td class="align-middle">{{ $user->national_code ?? '-' }}</td>
+                      <td class="align-middle">
+                        @if (isset($user->user_type) && $user->user_type === 'doctor')
+                          پزشک
+                        @elseif(isset($user->user_type) && $user->user_type === 'secretary')
+                          منشی
+                        @else
+                          بیمار
+                        @endif
+                      </td>
                       <td class="text-center align-middle">
                         <button wire:click="toggleStatus({{ $user->id }})"
                           class="badge {{ $user->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
@@ -184,6 +201,18 @@
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">موبایل:</span>
                       <span class="note-card-value">{{ $user->mobile }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">نوع کاربر:</span>
+                      <span class="note-card-value">
+                        @if (isset($user->user_type) && $user->user_type === 'doctor')
+                          پزشک
+                        @elseif(isset($user->user_type) && $user->user_type === 'secretary')
+                          منشی
+                        @else
+                          بیمار
+                        @endif
+                      </span>
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">وضعیت:</span>

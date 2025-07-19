@@ -24,6 +24,7 @@ class UserList extends Component
     public $statusFilter = '';
     public $applyToAllFiltered = false;
     public $totalFilteredCount = 0;
+    public $userTypeFilter = 'all'; // new filter: all, doctor, secretary, patient
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -67,6 +68,11 @@ class UserList extends Component
     }
 
     public function updatedStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedUserTypeFilter()
     {
         $this->resetPage();
     }
@@ -200,15 +206,106 @@ class UserList extends Component
                     $query->where('status', false);
                 }
             })
+            ->when($this->userTypeFilter, function ($query) {
+                if ($this->userTypeFilter === 'doctor') {
+                    $query->where('user_type', 'doctor');
+                } elseif ($this->userTypeFilter === 'secretary') {
+                    $query->where('user_type', 'secretary');
+                } elseif ($this->userTypeFilter === 'patient') {
+                    $query->where('user_type', 'patient');
+                }
+            })
             ->orderBy('created_at', 'desc');
     }
 
     public function render()
     {
-        $query = $this->getUsersQuery();
-        $this->totalFilteredCount = $this->readyToLoad ? $query->count() : 0;
+        $perPage = $this->perPage;
+        $search = trim($this->search);
+        $statusFilter = $this->statusFilter;
+        $userTypeFilter = $this->userTypeFilter;
+
+        if ($userTypeFilter === 'doctor') {
+            $query = \App\Models\Doctor::query();
+            if ($search) {
+                if (str_contains($search, ' ')) {
+                    [$first, $last] = array_pad(explode(' ', $search, 2), 2, null);
+                    $query->where('first_name', 'like', "%$first%")
+                          ->where('last_name', 'like', "%$last%") ;
+                } else {
+                    $query->where(function ($q) use ($search) {
+                        $q->orWhere('first_name', 'like', "%$search%")
+                          ->orWhere('last_name', 'like', "%$search%")
+                          ->orWhere('mobile', 'like', "%$search%")
+                          ->orWhere('email', 'like', "%$search%") ;
+                    });
+                }
+            }
+            if ($statusFilter === 'active') {
+                $query->where('is_active', true);
+            } elseif ($statusFilter === 'inactive') {
+                $query->where('is_active', false);
+            }
+            $users = $query->orderByDesc('created_at')->paginate($perPage);
+            foreach ($users as $item) {
+                $item->user_type = 'doctor';
+            }
+        } elseif ($userTypeFilter === 'secretary') {
+            $query = \App\Models\Secretary::query();
+            if ($search) {
+                if (str_contains($search, ' ')) {
+                    [$first, $last] = array_pad(explode(' ', $search, 2), 2, null);
+                    $query->where('first_name', 'like', "%$first%")
+                          ->where('last_name', 'like', "%$last%") ;
+                } else {
+                    $query->where(function ($q) use ($search) {
+                        $q->orWhere('first_name', 'like', "%$search%")
+                          ->orWhere('last_name', 'like', "%$search%")
+                          ->orWhere('mobile', 'like', "%$search%")
+                          ->orWhere('email', 'like', "%$search%") ;
+                    });
+                }
+            }
+            if ($statusFilter === 'active') {
+                $query->where('is_active', true);
+            } elseif ($statusFilter === 'inactive') {
+                $query->where('is_active', false);
+            }
+            $users = $query->orderByDesc('created_at')->paginate($perPage);
+            foreach ($users as $item) {
+                $item->user_type = 'secretary';
+            }
+        } else { // patient یا all
+            $query = User::query();
+            if ($search) {
+                if (str_contains($search, ' ')) {
+                    [$first, $last] = array_pad(explode(' ', $search, 2), 2, null);
+                    $query->where('first_name', 'like', "%$first%")
+                          ->where('last_name', 'like', "%$last%") ;
+                } else {
+                    $query->where(function ($q) use ($search) {
+                        $q->orWhere('first_name', 'like', "%$search%")
+                          ->orWhere('last_name', 'like', "%$search%")
+                          ->orWhere('mobile', 'like', "%$search%")
+                          ->orWhere('email', 'like', "%$search%") ;
+                    });
+                }
+            }
+            if ($statusFilter === 'active') {
+                $query->where('status', true);
+            } elseif ($statusFilter === 'inactive') {
+                $query->where('status', false);
+            }
+            $users = $query->orderByDesc('created_at')->paginate($perPage);
+            foreach ($users as $item) {
+                $item->user_type = 'patient';
+            }
+        }
+
+        $this->totalFilteredCount = $users->total();
+
         return view('livewire.admin.panel.users.user-list', [
-            'users' => $this->readyToLoad ? $query->paginate($this->perPage) : [],
+            'users' => $users,
             'totalFilteredCount' => $this->totalFilteredCount,
         ]);
     }
