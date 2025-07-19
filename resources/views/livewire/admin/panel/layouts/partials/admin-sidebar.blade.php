@@ -158,7 +158,14 @@
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('admin.panel.users.index') }}">لیست بیماران</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.sub-users.index') }}">کاربران زیرمجموعه</a></li>
-            <li class="item-li"><a href="{{ route('dr-patient-records') }}">پرونده پزشکی</a></li>
+            <li class="item-li" style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)"
+                style="color: #6c757d; cursor: not-allowed; display: flex; align-items: center;">
+                پرونده پزشکی
+                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
+                  زودی</span>
+              </a>
+            </li>
           </ul>
         </li>
         <!-- مدیریت مراکز درمانی -->

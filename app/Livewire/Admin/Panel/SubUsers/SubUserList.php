@@ -56,12 +56,14 @@ class SubUserList extends Component
     public function render()
     {
         $doctors = $this->readyToLoad
-            ? Doctor::with(['subUsers' => function ($query) {
-                $query->whereHas('user', function ($q) {
+            ? Doctor::with(['subUsers' => function (
+                $query
+            ) {
+                $query->whereHasMorph('subuserable', [\App\Models\User::class], function ($q) {
                     $q->where('first_name', 'like', '%' . $this->search . '%')
                       ->orWhere('last_name', 'like', '%' . $this->search . '%')
                       ->orWhere('mobile', 'like', '%' . $this->search . '%');
-                });
+                })->with('subuserable');
             }])
             ->where(function ($query) {
                 $query->where('first_name', 'like', '%' . $this->search . '%')
