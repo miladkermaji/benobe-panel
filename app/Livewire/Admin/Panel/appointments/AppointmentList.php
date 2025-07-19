@@ -22,6 +22,10 @@ class AppointmentList extends Component
     public $expandedDoctors = [];
     public $doctorPages = [];
     public $selectedAppointments = [];
+    public $selectAll = false;
+    public $groupAction = '';
+    public $applyToAllFiltered = false;
+    public $totalFilteredCount = 0;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -73,6 +77,96 @@ class AppointmentList extends Component
         $this->doctorPages = [];
     }
 
+    public function updatedSelectAll($value)
+    {
+        $currentPageIds = $this->getCurrentPageAppointmentIds();
+        $this->selectedAppointments = $value ? $currentPageIds : [];
+    }
+
+    public function updatedSelectedAppointments()
+    {
+        $currentPageIds = $this->getCurrentPageAppointmentIds();
+        $this->selectAll = !empty($this->selectedAppointments) && count(array_diff($currentPageIds, $this->selectedAppointments)) === 0;
+    }
+
+    private function getCurrentPageAppointmentIds()
+    {
+        $ids = [];
+        foreach ($this->doctors as $doctor) {
+            foreach ($doctor['appointments'] as $appointment) {
+                $ids[] = $appointment->id;
+            }
+        }
+        return $ids;
+    }
+
+    public function deleteSelected($allFiltered = null)
+    {
+        if ($allFiltered === 'allFiltered') {
+            $query = $this->getAppointmentsQuery();
+            $appointments = $query->get();
+            foreach ($appointments as $appointment) {
+                $appointment->delete();
+            }
+            $this->selectedAppointments = [];
+            $this->selectAll = false;
+            $this->applyToAllFiltered = false;
+            $this->groupAction = '';
+            $this->resetPage();
+            $this->dispatch('show-alert', type: 'success', message: 'همه نوبت‌های فیلترشده حذف شدند!');
+            return;
+        }
+
+        if (empty($this->selectedAppointments)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ نوبتی انتخاب نشده است.');
+            return;
+        }
+
+        $appointments = Appointment::whereIn('id', $this->selectedAppointments)->get();
+        foreach ($appointments as $appointment) {
+            $appointment->delete();
+        }
+        $this->selectedAppointments = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'نوبت‌های انتخاب‌شده حذف شدند!');
+    }
+
+    public function executeGroupAction()
+    {
+        if (empty($this->selectedAppointments) && !$this->applyToAllFiltered) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ نوبتی انتخاب نشده است.');
+            return;
+        }
+
+        if (empty($this->groupAction)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        if ($this->applyToAllFiltered) {
+            $query = $this->getAppointmentsQuery();
+            switch ($this->groupAction) {
+                case 'delete':
+                    $this->dispatch('confirm-delete-selected', ['allFiltered' => true]);
+                    return;
+            }
+            $this->selectedAppointments = [];
+            $this->selectAll = false;
+            $this->applyToAllFiltered = false;
+            $this->groupAction = '';
+            $this->resetPage();
+            return;
+        }
+
+        switch ($this->groupAction) {
+            case 'delete':
+                $this->dispatch('confirm-delete-selected', ['allFiltered' => false]);
+                break;
+        }
+
+        $this->groupAction = '';
+    }
+
     private function getAppointmentsQuery()
     {
         return Appointment::with('doctor', 'patientable')
@@ -104,6 +198,7 @@ class AppointmentList extends Component
                     'lastPage' => ceil($appointments->count() / $this->appointmentsPerPage),
                 ];
             }) : [];
+        $this->totalFilteredCount = $this->readyToLoad ? $this->getAppointmentsQuery()->count() : 0;
 
         return view('livewire.admin.panel.appointments.appointment-list', [
             'doctors' => $doctors,
