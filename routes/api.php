@@ -89,6 +89,8 @@ Route::middleware(['custom-auth.jwt'])->group(function () {
     });
 });
 
+Route::post('prescriptions/user-by-national-code', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'getOrCreateUserByNationalCode'])->name('api.prescriptions.user-by-national-code');
+
 Route::prefix('menus')->group(function () {
     Route::get('/custom', [MenuController::class, 'getCustomMenus'])->name('api.menus.custom');
 });

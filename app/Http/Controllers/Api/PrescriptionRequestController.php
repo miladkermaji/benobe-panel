@@ -377,4 +377,53 @@ class PrescriptionRequestController extends Controller
             'data' => $insulins,
         ]);
     }
+
+    /**
+     * دریافت یا ثبت اطلاعات کاربر بر اساس کد ملی
+     * اگر کاربر با کد ملی وجود داشت، اطلاعاتش را برمی‌گرداند، در غیر این صورت ثبت می‌کند.
+     */
+    public function getOrCreateUserByNationalCode(Request $request)
+    {
+        $validated = $request->validate([
+            'full_name' => 'required|string|max:100',
+            'national_code' => 'required|string|size:10|regex:/^[0-9]{10}$/',
+            'phone' => 'required|string|regex:/^09[0-9]{9}$/',
+        ], [
+            'full_name.required' => 'نام و نام خانوادگی الزامی است.',
+            'national_code.required' => 'کد ملی الزامی است.',
+            'national_code.size' => 'کد ملی باید 10 رقم باشد.',
+            'national_code.regex' => 'فرمت کد ملی معتبر نیست.',
+            'phone.required' => 'شماره تلفن الزامی است.',
+            'phone.regex' => 'فرمت شماره تلفن معتبر نیست.',
+        ]);
+
+        // تلاش برای یافتن کاربر با کد ملی
+        $user = \App\Models\User::where('national_code', $validated['national_code'])->first();
+        if ($user) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'کاربر یافت شد.',
+                'data' => $user,
+            ], 200);
+        }
+
+        // تقسیم نام کامل به نام و نام خانوادگی
+        $names = preg_split('/\s+/', trim($validated['full_name']), 2);
+        $first_name = $names[0] ?? '';
+        $last_name = $names[1] ?? '';
+
+        $user = \App\Models\User::create([
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'national_code' => $validated['national_code'],
+            'mobile' => $validated['phone'],
+            'status' => 1,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'کاربر جدید با موفقیت ثبت شد.',
+            'data' => $user,
+        ], 201);
+    }
 }
