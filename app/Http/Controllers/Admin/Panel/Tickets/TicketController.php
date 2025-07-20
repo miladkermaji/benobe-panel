@@ -11,4 +11,14 @@ class TicketController extends Controller
     {
         return view('admin.panel.tickets.index');
     }
+
+    public function create()
+    {
+        return view('admin.panel.tickets.create');
+    }
+
+    public function show($id)
+    {
+        return view('admin.panel.tickets.show', compact('id'));
+    }
 }

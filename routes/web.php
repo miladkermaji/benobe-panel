@@ -881,3 +881,9 @@ Route::middleware(['web', 'auth:manager'])->prefix('admin/panel')->name('admin.p
     // ... existing code ...
     Route::get('/tickets', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'index'])->name('tickets.index');
 });
+
+Route::prefix('admin/panel/tickets')->name('admin.panel.tickets.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'create'])->name('create');
+    Route::get('/{id}', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'show'])->name('show');
+});

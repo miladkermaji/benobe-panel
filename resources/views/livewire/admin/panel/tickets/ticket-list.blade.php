@@ -29,6 +29,14 @@
                 <option value="pending">در حال بررسی</option>
                 <option value="closed">بسته</option>
               </select>
+              <a href="{{ route('admin.panel.tickets.create') }}"
+                class="btn btn-success d-flex align-items-center gap-1 mb-2 mb-md-0">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                افزودن تیکت
+              </a>
             </div>
           </div>
         </div>
@@ -113,15 +121,23 @@
                                   'pending' => 'bg-warning',
                                   'closed' => 'bg-danger',
                               ][$ticket->status] ?? 'bg-secondary';
+                          $statusFa =
+                              [
+                                  'open' => 'باز',
+                                  'answered' => 'پاسخ داده شده',
+                                  'pending' => 'در حال بررسی',
+                                  'closed' => 'بسته',
+                              ][$ticket->status] ?? $ticket->status;
                         @endphp
-                        <span class="badge {{ $statusClass }}">{{ __($ticket->status) }}</span>
+                        <span class="badge {{ $statusClass }}">{{ $statusFa }}</span>
                       </td>
                       <td class="align-middle">{{ jdate($ticket->created_at)->format('Y/m/d H:i') }}</td>
                       <td class="text-center align-middle">
                         <div class="d-flex justify-content-center gap-2">
-                          <a href="#" class="btn btn-gradient-primary rounded-pill px-3" title="مشاهده">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
+                          <a href="{{ route('admin.panel.tickets.show', $ticket->id) }}"
+                            class="btn btn-gradient-primary rounded-pill px-3" title="مشاهده">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
                               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                               <circle cx="12" cy="12" r="3" />
                             </svg>
@@ -198,14 +214,15 @@
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">وضعیت:</span>
-                      <span class="badge {{ $statusClass }}">{{ __($ticket->status) }}</span>
+                      <span class="badge {{ $statusClass }}">{{ $statusFa }}</span>
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">تاریخ:</span>
                       <span class="note-card-value">{{ jdate($ticket->created_at)->format('Y/m/d H:i') }}</span>
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
-                      <a href="#" class="btn btn-gradient-primary btn-sm rounded-pill px-3" title="مشاهده">
+                      <a href="{{ route('admin.panel.tickets.show', $ticket->id) }}"
+                        class="btn btn-gradient-primary btn-sm rounded-pill px-3" title="مشاهده">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
                           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
