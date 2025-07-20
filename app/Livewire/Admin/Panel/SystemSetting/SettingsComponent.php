@@ -3,8 +3,8 @@
 namespace App\Livewire\Admin\Panel\SystemSetting;
 
 use Livewire\Component;
+use App\Models\AdminSystemSetting;
 use Illuminate\Support\Facades\Log;
-use App\Models\Admin\Dashboard\SystemSetting\AdminSystemSetting;
 
 class SettingsComponent extends Component
 {

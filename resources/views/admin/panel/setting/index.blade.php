@@ -1,7 +1,7 @@
 @extends('admin.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('admin-assets/css/panel/service/service.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('admin-assets/css/panel/setting/admin-system-setting.css') }}" rel="stylesheet" />
 @endsection
 
 @section('site-header')
