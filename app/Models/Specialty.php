@@ -55,9 +55,4 @@ class Specialty extends Model
         );
     }
 
-    public function medicalCenters()
-    {
-        return $this->belongsToMany(MedicalCenter::class, 'medical_center_specialty', 'specialty_id', 'medical_center_id');
-    }
-
 }

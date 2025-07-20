@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Specialty;
 use App\Models\Doctor;
+use App\Models\Specialty;
+use Illuminate\Http\Request;
 use App\Models\MedicalCenter;
 use App\Models\FrequentSearch;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 
 class SearchController extends Controller
 {
@@ -18,9 +19,24 @@ class SearchController extends Controller
         $cityId = $request->input('city_id');
         $limit = 15;
 
-        // حالت ۱: اگر search_text خالی بود فقط جستجوهای پرتکرار
+        $userId = auth('api')->id() ?? auth()->id();
+        Log::info($userId);
+        // اگر طول کلمه جستجو کمتر یا مساوی 2 بود، خروجی خالی برگردان
+        if (mb_strlen($searchText) > 0 && mb_strlen($searchText) <= 2) {
+            return response()->json([
+                'specialties' => [],
+                'doctors' => [],
+                'medical_centers' => [],
+                'frequent_searches' => [],
+                'services' => [],
+            ]);
+        }
+        // حالت ۱: اگر search_text خالی بود فقط جستجوهای پرتکرار کاربر جاری
         if ($searchText === '') {
             $frequentSearches = FrequentSearch::with('specialty')
+                ->when($userId, function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })
                 ->orderByDesc('search_count')
                 ->limit($limit)
                 ->get();
@@ -45,7 +61,7 @@ class SearchController extends Controller
                     });
                 }
             })
-            ->with(['doctors', 'medicalCenters'])
+            // ->with(['doctors', 'medicalCenters']) // حذف با توجه به نبود جدول واسط
             ->limit($limit)
             ->get();
 
@@ -95,8 +111,11 @@ class SearchController extends Controller
         }
         $medicalCenters = $medicalCentersQuery->limit($limit)->get();
 
-        // جستجوهای پرتکرار
+        // جستجوهای پرتکرار فقط برای کاربر جاری
         $frequentSearches = FrequentSearch::with('specialty')
+            ->when($userId, function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
             ->where(function ($q) use ($words) {
                 foreach ($words as $word) {
                     $q->where('search_text', 'like', "%$word%") ;
