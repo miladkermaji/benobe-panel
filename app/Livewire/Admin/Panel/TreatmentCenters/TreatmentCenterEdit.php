@@ -65,10 +65,10 @@ class TreatmentCenterEdit extends Component
 
         $this->services = \App\Models\Service::all();
 
-        $this->Center_tariff_type = $this->hospital->Center_tariff_type;
-        $this->Daycare_centers = $this->hospital->Daycare_centers;
+        $this->Center_tariff_type = $this->treatmentCenter->Center_tariff_type;
+        $this->Daycare_centers = $this->treatmentCenter->Daycare_centers;
 
-        $this->service_ids = $this->hospital->service_ids ? array_map('strval', $this->hospital->service_ids) : [];
+        $this->service_ids = $this->treatmentCenter->service_ids ? array_map('strval', $this->treatmentCenter->service_ids) : [];
 
         // تنظیم روزهای کاری
         $workingDays = $this->treatmentCenter->working_days ?? [];
