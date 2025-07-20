@@ -18,15 +18,19 @@ class ImagingCenterList extends Component
 
     protected $listeners = ['deleteImagingCenterConfirmed' => 'deleteImagingCenter'];
 
-    public $perPage = 100;
+    public $perPage = 50;
     public $search = '';
     public $readyToLoad = false;
     public $selectedImagingCenters = [];
     public $selectAll = false;
     public $groupAction = '';
+    public $statusFilter = '';
+    public $applyToAllFiltered = false;
+    public $totalFilteredCount = 0;
 
     protected $queryString = [
         'search' => ['except' => ''],
+        'statusFilter' => ['except' => ''],
     ];
 
     public function mount()
@@ -34,9 +38,31 @@ class ImagingCenterList extends Component
         $this->perPage = max($this->perPage, 1);
     }
 
-    public function loadimagingCenters()
+    public function loadImagingCenters()
     {
         $this->readyToLoad = true;
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSelectAll($value)
+    {
+        $currentPageIds = $this->getImagingCentersQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
+        $this->selectedImagingCenters = $value ? $currentPageIds : [];
+    }
+
+    public function updatedSelectedImagingCenters()
+    {
+        $currentPageIds = $this->getImagingCentersQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
+        $this->selectAll = !empty($this->selectedImagingCenters) && count(array_diff($currentPageIds, $this->selectedImagingCenters)) === 0;
     }
 
     public function confirmDelete($id)
@@ -47,7 +73,6 @@ class ImagingCenterList extends Component
     public function deleteImagingCenter($id)
     {
         $item = MedicalCenter::findOrFail($id);
-        // حذف فایل‌های مرتبط
         if ($item->avatar) {
             Storage::disk('public')->delete($item->avatar);
         }
@@ -62,41 +87,67 @@ class ImagingCenterList extends Component
             }
         }
         $item->delete();
-        $this->dispatch('show-alert', type: 'success', message: 'کلینیک حذف شد!');
+        $this->dispatch('show-alert', type: 'success', message: 'مرکز تصویربرداری حذف شد!');
     }
 
-    public function updatedSearch()
+    public function deleteSelected($allFiltered = null)
     {
-        $this->resetPage();
-    }
-
-    public function updatedSelectAll($value)
-    {
-        $currentPageIds = $this->getImagingCentersQuery()->pluck('id')->toArray();
-        $this->selectedImagingCenters = $value ? $currentPageIds : [];
-    }
-
-    public function updatedselectedImagingCenters()
-    {
-        $currentPageIds = $this->getImagingCentersQuery()->pluck('id')->toArray();
-        $this->selectAll = !empty($this->selectedImagingCenters) && count(array_diff($currentPageIds, $this->selectedImagingCenters)) === 0;
+        if ($allFiltered === 'allFiltered') {
+            $query = $this->getImagingCentersQuery();
+            $query->delete();
+            $this->selectedImagingCenters = [];
+            $this->selectAll = false;
+            $this->applyToAllFiltered = false;
+            $this->groupAction = '';
+            $this->resetPage();
+            $this->dispatch('show-alert', type: 'success', message: 'همه مراکز تصویربرداری فیلترشده حذف شدند!');
+            return;
+        }
+        if (empty($this->selectedImagingCenters)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ مرکز تصویربرداری انتخاب نشده است.');
+            return;
+        }
+        MedicalCenter::whereIn('id', $this->selectedImagingCenters)->delete();
+        $this->selectedImagingCenters = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'مراکز تصویربرداری انتخاب شده حذف شدند!');
     }
 
     public function executeGroupAction()
     {
-        if (empty($this->selectedImagingCenters)) {
-            $this->dispatch('show-alert', type: 'warning', message: 'هیچ کلینیکی انتخاب نشده است.');
+        if (empty($this->selectedImagingCenters) && !$this->applyToAllFiltered) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ مرکز تصویربرداری انتخاب نشده است.');
             return;
         }
-
         if (empty($this->groupAction)) {
             $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
             return;
         }
-
+        if ($this->applyToAllFiltered) {
+            $query = $this->getImagingCentersQuery();
+            switch ($this->groupAction) {
+                case 'delete':
+                    $this->dispatch('confirm-delete-selected', ['allFiltered' => true]);
+                    return;
+                case 'status_active':
+                    $query->update(['is_active' => true]);
+                    $this->dispatch('show-alert', type: 'success', message: 'همه مراکز تصویربرداری فیلترشده فعال شدند!');
+                    break;
+                case 'status_inactive':
+                    $query->update(['is_active' => false]);
+                    $this->dispatch('show-alert', type: 'success', message: 'همه مراکز تصویربرداری فیلترشده غیرفعال شدند!');
+                    break;
+            }
+            $this->selectedImagingCenters = [];
+            $this->selectAll = false;
+            $this->applyToAllFiltered = false;
+            $this->groupAction = '';
+            $this->resetPage();
+            return;
+        }
         switch ($this->groupAction) {
             case 'delete':
-                $this->deleteSelected();
+                $this->dispatch('confirm-delete-selected', ['allFiltered' => false]);
                 break;
             case 'status_active':
                 $this->updateStatus(true);
@@ -105,7 +156,6 @@ class ImagingCenterList extends Component
                 $this->updateStatus(false);
                 break;
         }
-
         $this->groupAction = '';
     }
 
@@ -113,75 +163,55 @@ class ImagingCenterList extends Component
     {
         MedicalCenter::whereIn('id', $this->selectedImagingCenters)
             ->update(['is_active' => $status]);
-
         $this->selectedImagingCenters = [];
         $this->selectAll = false;
-        $this->dispatch('show-alert', type: 'success', message: 'وضعیت مراکز تصویربرداری  های انتخاب‌شده با موفقیت تغییر کرد.');
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت مراکز تصویربرداری انتخاب‌شده با موفقیت تغییر کرد.');
     }
 
-    public function deleteSelected()
-    {
-        if (empty($this->selectedImagingCenters)) {
-            $this->dispatch('show-alert', type: 'warning', message: 'هیچ کلینیکی انتخاب نشده است.');
-            return;
-        }
-
-        $imagingCenters = MedicalCenter::whereIn('id', $this->selectedImagingCenters)->get();
-        foreach ($imagingCenters as $imagingCenter) {
-            if ($imagingCenter->avatar) {
-                Storage::disk('public')->delete($imagingCenter->avatar);
-            }
-            if ($imagingCenter->documents) {
-                foreach ($imagingCenter->documents as $document) {
-                    Storage::disk('public')->delete($document);
-                }
-            }
-            if ($imagingCenter->galleries) {
-                foreach ($imagingCenter->galleries as $gallery) {
-                    Storage::disk('public')->delete($gallery['image_path']);
-                }
-            }
-            $imagingCenter->delete();
-        }
-        $this->selectedImagingCenters = [];
-        $this->selectAll = false;
-        $this->dispatch('show-alert', type: 'success', message: 'مراکز تصویربرداری  های انتخاب‌شده حذف شدند!');
-    }
-
-    public function toggleStatus($id)
-    {
-        $item = MedicalCenter::findOrFail($id);
-        $item->is_active = !$item->is_active;
-        $item->save();
-        $this->dispatch('show-alert', type: 'success', message: 'وضعیت کلینیک با موفقیت تغییر کرد.');
-    }
-
-    private function getImagingCentersQuery()
+    protected function getImagingCentersQuery()
     {
         return MedicalCenter::where('type', 'imaging_center')
-            ->where(function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('description', 'like', '%' . $this->search . '%')
-                    ->orWhere('title', 'like', '%' . $this->search . '%');
+            ->when($this->search, function ($query) {
+                $search = trim($this->search);
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                      ->orWhere('description', 'like', "%$search%")
+                      ->orWhere('title', 'like', "%$search%")
+                      ->orWhereHas('doctors', function ($qq) use ($search) {
+                          $qq->where('first_name', 'like', "%$search%")
+                             ->orWhere('last_name', 'like', "%$search%") ;
+                      })
+                      ->orWhereHas('province', function ($qq) use ($search) {
+                          $qq->where('name', 'like', "%$search%") ;
+                      })
+                      ->orWhereHas('city', function ($qq) use ($search) {
+                          $qq->where('name', 'like', "%$search%") ;
+                      });
+                });
             })
-            ->with(['doctors', 'province', 'city'])
-            ->paginate($this->perPage);
+            ->when($this->statusFilter, function ($query) {
+                if ($this->statusFilter === 'active') {
+                    $query->where('is_active', true);
+                } elseif ($this->statusFilter === 'inactive') {
+                    $query->where('is_active', false);
+                }
+            })
+            ->orderBy('created_at', 'desc');
     }
 
     public function render()
     {
-        $items = $this->readyToLoad ? $this->getImagingCentersQuery() : null;
-        // بارگذاری تخصص‌ها و بیمه‌ها برای استفاده در قالب
+        $this->totalFilteredCount = $this->readyToLoad ? $this->getImagingCentersQuery()->count() : 0;
+        $items = $this->readyToLoad ? $this->getImagingCentersQuery()->paginate($this->perPage) : null;
         $specialties = Specialty::pluck('name', 'id');
         $insurances = Insurance::pluck('name', 'id');
-
         $services = \App\Models\Service::pluck('name', 'id');
-
         return view('livewire.admin.panel.imaging-centers.imaging-center-list', [
             'imagingCenters' => $items,
             'specialties' => $specialties,
             'insurances' => $insurances,
             'services' => $services,
+            'totalFilteredCount' => $this->totalFilteredCount,
         ]);
     }
 }
