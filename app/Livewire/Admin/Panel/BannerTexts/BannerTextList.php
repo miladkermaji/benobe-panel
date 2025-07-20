@@ -19,6 +19,10 @@ class BannerTextList extends Component
     public $readyToLoad         = false;
     public $selectedbannertexts = [];
     public $selectAll           = false;
+    public $groupAction = '';
+    public $applyToAllFiltered = false;
+    public $statusFilter = '';
+    public $totalFilteredCount = 0;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -73,39 +77,92 @@ class BannerTextList extends Component
         $this->selectAll = ! empty($this->selectedbannertexts) && count(array_diff($currentPageIds, $this->selectedbannertexts)) === 0;
     }
 
-    public function deleteSelected()
+    public function updatedStatusFilter()
     {
-        if (empty($this->selectedbannertexts)) {
+        $this->resetPage();
+    }
+
+    public function updatedGroupAction()
+    {
+        // Optional: reset selection or handle UI
+    }
+
+    public function executeGroupAction()
+    {
+        if ($this->groupAction === 'delete') {
+            $this->confirmDeleteSelected();
+        } elseif ($this->groupAction === 'status_active') {
+            $this->updateSelectedStatus(true);
+        } elseif ($this->groupAction === 'status_inactive') {
+            $this->updateSelectedStatus(false);
+        }
+    }
+
+    public function confirmDeleteSelected()
+    {
+        if (empty($this->selectedbannertexts) && !$this->applyToAllFiltered) {
             $this->dispatch('show-alert', type: 'warning', message: 'هیچ بنری انتخاب نشده است.');
             return;
         }
+        $this->dispatch('confirm-delete-selected');
+    }
 
-        $items = BannerText::whereIn('id', $this->selectedbannertexts)->get();
+    public function deleteSelectedConfirmed()
+    {
+        $ids = $this->applyToAllFiltered
+            ? $this->getbannertextsQueryRaw()->pluck('id')->toArray()
+            : $this->selectedbannertexts;
+        $items = \App\Models\BannerText::whereIn('id', $ids)->get();
         foreach ($items as $item) {
             if ($item->image_path && \Storage::disk('public')->exists($item->image_path)) {
                 \Storage::disk('public')->delete($item->image_path);
             }
         }
-        BannerText::whereIn('id', $this->selectedbannertexts)->delete();
+        \App\Models\BannerText::whereIn('id', $ids)->delete();
         $this->selectedbannertexts = [];
-        $this->selectAll           = false;
+        $this->selectAll = false;
+        $this->applyToAllFiltered = false;
         $this->dispatch('show-alert', type: 'success', message: 'بنرهای انتخاب‌شده حذف شدند!');
+    }
+
+    public function updateSelectedStatus($status)
+    {
+        $ids = $this->applyToAllFiltered
+            ? $this->getbannertextsQueryRaw()->pluck('id')->toArray()
+            : $this->selectedbannertexts;
+        \App\Models\BannerText::whereIn('id', $ids)->update(['status' => $status]);
+        $this->selectedbannertexts = [];
+        $this->selectAll = false;
+        $this->applyToAllFiltered = false;
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت بنرها بروزرسانی شد.');
+    }
+
+    private function getbannertextsQueryRaw()
+    {
+        $query = \App\Models\BannerText::query();
+        if ($this->search) {
+            $query->where('main_text', 'like', '%' . $this->search . '%')
+                ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(switch_words, '$[*]')) LIKE ?", ['%' . $this->search . '%'])
+                ->orWhere('image_path', 'like', '%' . $this->search . '%');
+        }
+        if ($this->statusFilter !== '') {
+            $query->where('status', $this->statusFilter === 'active' ? 1 : 0);
+        }
+        return $query;
     }
 
     private function getbannertextsQuery()
     {
-        return BannerText::where('main_text', 'like', '%' . $this->search . '%')
-            ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(switch_words, '$[*]')) LIKE ?", ['%' . $this->search . '%'])
-            ->orWhere('image_path', 'like', '%' . $this->search . '%')
-            ->paginate($this->perPage);
+        return $this->getbannertextsQueryRaw()->paginate($this->perPage);
     }
 
     public function render()
     {
+        $this->totalFilteredCount = $this->readyToLoad ? $this->getbannertextsQueryRaw()->count() : 0;
         $items = $this->readyToLoad ? $this->getbannertextsQuery() : null;
-
         return view('livewire.admin.panel.banner-texts.banner-text-list', [
             'bannertexts' => $items,
+            'totalFilteredCount' => $this->totalFilteredCount,
         ]);
     }
 }
