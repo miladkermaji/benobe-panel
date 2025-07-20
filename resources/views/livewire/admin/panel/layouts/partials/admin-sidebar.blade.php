@@ -332,7 +332,7 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
-            <li class="item-li"><a href="{{ route('dr-panel-tickets') }}">تیکت‌های پشتیبانی</a></li>
+            <li class="item-li"><a href="">تیکت‌های پشتیبانی</a></li>
           </ul>
         </li>
         <!-- خروج -->
