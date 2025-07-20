@@ -887,3 +887,5 @@ Route::prefix('admin/panel/tickets')->name('admin.panel.tickets.')->group(functi
     Route::get('/create', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'create'])->name('create');
     Route::get('/{id}', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'show'])->name('show');
 });
+
+Route::get('/admin/api/doctors/search', [\App\Http\Controllers\Admin\DoctorSearchController::class, 'search']);

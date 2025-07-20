@@ -24,7 +24,7 @@
 
   @include('admin.panel.layouts.partials.sidebar')
   <div class="content">
-  
+
     @include('admin.panel.layouts.partials.header')
     <x-global-loader />
     @yield('content')
@@ -33,6 +33,7 @@
 </body>
 @include('admin.panel.layouts.partials.scripts')
 @yield('scripts')
+@stack('scripts')
 <script>
   // اسکریپت نویگیشن Livewire
   Livewire.on('navigateTo', (event) => {

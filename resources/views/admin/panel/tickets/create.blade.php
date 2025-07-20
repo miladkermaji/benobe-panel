@@ -1,5 +1,8 @@
 @extends('admin.panel.layouts.master')
+@section('styles')
 
+
+@endsection
 @section('site-header')
   {{ 'افزودن تیکت جدید | پنل مدیریت' }}
 @endsection
