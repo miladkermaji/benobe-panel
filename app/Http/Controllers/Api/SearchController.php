@@ -9,6 +9,7 @@ use App\Models\MedicalCenter;
 use App\Models\FrequentSearch;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class SearchController extends Controller
 {
@@ -19,7 +20,16 @@ class SearchController extends Controller
         $cityId = $request->input('city_id');
         $limit = 15;
 
-        $userId = auth('api')->id() ?? auth()->id();
+        $token = $request->bearerToken() ?: $request->cookie('auth_token');
+        if ($token) {
+            try {
+                app(\App\Http\Middleware\JwtMiddleware::class)->handle($request, function () {});
+            } catch (\Exception $e) {
+                // اگر توکن نامعتبر بود، userId همچنان null می‌ماند و خطا نمی‌دهیم
+            }
+        }
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $userId = $user ? $user->id : null;
         Log::info($userId);
         // اگر طول کلمه جستجو کمتر یا مساوی 2 بود، خروجی خالی برگردان
         if (mb_strlen($searchText) > 0 && mb_strlen($searchText) <= 2) {
@@ -125,6 +135,32 @@ class SearchController extends Controller
             ->limit($limit)
             ->get();
 
+        // واکشی ۱۰ تخصص پرتکرار (بر اساس specialty_id)
+        $frequentSearches = FrequentSearch::with('specialty')
+            ->whereNotNull('specialty_id')
+            ->orderByDesc('search_count')
+            ->limit(10)
+            ->get();
+
+$specialtyId = $request->input('specialty_id');
+
+        // اگر specialty_id ارسال شده و جزو لیست نبود، آن را به ابتدای خروجی اضافه کن
+        if ($specialtyId) {
+            $alreadyInList = $frequentSearches->contains('specialty_id', $specialtyId);
+            if (!$alreadyInList) {
+                $specialty = \App\Models\Specialty::find($specialtyId);
+                if ($specialty) {
+                    $frequentSearches->prepend((object)[
+                        'specialty_id' => $specialtyId,
+                        'specialty' => $specialty,
+                        'search_text' => $specialty->name,
+                        'search_count' => 0,
+                    ]);
+                    $frequentSearches = $frequentSearches->take(10);
+                }
+            }
+        }
+
         // خدمات (سرویس‌ها) با اطلاعات دکترها
         // اگر کاربر نام پزشک را وارد کند، خدمات مربوط به آن پزشک هم نمایش داده شود
         $doctorIds = Doctor::where('is_active', 1)
@@ -156,11 +192,32 @@ class SearchController extends Controller
             ->limit($limit)
             ->get();
 
+        $specialtyId = $request->input('specialty_id');
+        // ذخیره جستجوی پرتکرار (نمونه پیاده‌سازی)
+        if ($searchText && mb_strlen($searchText) > 2) {
+            $frequentSearch = FrequentSearch::where('search_text', $searchText)
+                ->where('user_id', $userId)
+                ->when($specialtyId, function ($q) use ($specialtyId) {
+                    $q->where('specialty_id', $specialtyId);
+                })
+                ->first();
+            if ($frequentSearch) {
+                $frequentSearch->increment('search_count');
+            } else {
+                FrequentSearch::create([
+                    'search_text' => $searchText,
+                    'user_id' => $userId,
+                    'specialty_id' => $specialtyId,
+                    'search_count' => 1,
+                ]);
+            }
+        }
+
         return response()->json([
             'specialties' => $specialties,
             'doctors' => $doctors,
             'medical_centers' => $medicalCenters,
-            'frequent_searches' => $frequentSearches,
+            'frequent_searches' => $frequentSearches->values(),
             'services' => $services,
         ]);
     }
