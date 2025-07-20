@@ -42,14 +42,14 @@
                 <option value="doctor">پزشکان</option>
                 <option value="secretary">منشی‌ها</option>
               </select>
-              <a href="{{ route('admin.panel.transactions.create') }}"
+            {{--   <a href="{{ route('admin.panel.transactions.create') }}"
                 class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 w-100 w-md-auto justify-content-center justify-content-md-start">
                 <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
                 <span>افزودن</span>
-              </a>
+              </a> --}}
             </div>
           </div>
         </div>
