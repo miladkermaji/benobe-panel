@@ -14,12 +14,11 @@ class SubUserCreate extends Component
     public $user_id;
     public $status = 'active';
     public $doctors;
-    public $users;
 
     public function mount()
     {
         $this->doctors = Doctor::all();
-        $this->users = User::all();
+        // Remove users loading - will use AJAX instead
     }
 
     public function store()

@@ -15,7 +15,7 @@ class SubUserEdit extends Component
     public $user_id;
     public $status;
     public $doctors;
-    public $users;
+    public $currentUser; // For storing current user data
 
     public function mount($id)
     {
@@ -24,7 +24,9 @@ class SubUserEdit extends Component
         $this->user_id = $this->subUser->user_id;
         $this->status = $this->subUser->status;
         $this->doctors = Doctor::all();
-        $this->users = User::all();
+        
+        // Get current user data for display in edit form
+        $this->currentUser = User::find($this->user_id);
     }
 
     public function update()

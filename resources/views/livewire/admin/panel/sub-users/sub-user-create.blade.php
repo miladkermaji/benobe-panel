@@ -36,13 +36,7 @@
               @enderror
             </div>
             <div class="col-12 position-relative mt-5" wire:ignore>
-              <select wire:model="user_id" class="form-select select2" id="user_id" required>
-                <option value="">انتخاب کنید</option>
-                @foreach ($users as $user)
-                  <option value="{{ $user->id }}">
-                    {{ $user->first_name . ' ' . $user->last_name . ' (' . $user->mobile . ')' }}</option>
-                @endforeach
-              </select>
+              <select id="user_id" class="form-select select2-ajax" required></select>
               <label for="user_id" class="form-label">کاربر</label>
               @error('user_id')
                 <span class="text-danger">{{ $message }}</span>
@@ -88,7 +82,23 @@
         $('#user_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
-          width: '100%'
+          width: '100%',
+          ajax: {
+            url: '/admin/api/users/search',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+              return {
+                q: params.term
+              };
+            },
+            processResults: function(data) {
+              return {
+                results: data.results
+              };
+            },
+            cache: true
+          }
         });
         $('#status').select2({
           dir: 'rtl',
@@ -108,6 +118,23 @@
       $('#status').on('change', function() {
         @this.set('status', $(this).val());
       });
+      // Set selected user if editing
+      if (@this.user_id) {
+        $.ajax({
+          type: 'GET',
+          url: '/admin/api/users/search',
+          data: {
+            q: ''
+          },
+          success: function(data) {
+            var user = data.results.find(u => u.id == @this.user_id);
+            if (user) {
+              var option = new Option(user.text, user.id, true, true);
+              $('#user_id').append(option).trigger('change');
+            }
+          }
+        });
+      }
 
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
