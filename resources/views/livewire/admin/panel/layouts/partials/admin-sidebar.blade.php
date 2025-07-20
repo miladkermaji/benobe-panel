@@ -255,7 +255,14 @@
             <li class="item-li"><a href="{{ route('admin.panel.specialties.index') }}">مدیریت تخصص ها</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.zones.index') }}"> شهر و استان</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.reviews.index') }}">مدیریت نظرات</a></li>
-            <li class="item-li"><a href="#">مدیریت تبلیغات</a></li>
+            <li class="item-li" style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)"
+                style="color: #6c757d; cursor: not-allowed; display: flex; align-items: center;">
+                مدیریت تبلیغات
+                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
+                  زودی</span>
+              </a>
+            </li>
           </ul>
         </li>
         <!-- تنظیمات سایت -->
@@ -300,9 +307,7 @@
             <li class="item-li"><a href="{{ route('dr-panel-tickets') }}">تیکت‌های پشتیبانی</a></li>
             <li class="item-li"><a href="#">ارسال تیکت جدید</a></li>
             <li class="item-li"><a href="#">سوالات متداول</a></li>
-            <li class="item-li"><a href="#">راهنمای سیستم</a></li>
-            <li class="item-li"><a href="#">چت آنلاین</a></li>
-            <li class="item-li"><a href="#">تماس با ما</a></li>
+
           </ul>
         </li>
         <!-- خروج -->
