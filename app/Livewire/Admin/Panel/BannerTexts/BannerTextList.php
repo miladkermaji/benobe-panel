@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Admin\Panel\Bannertexts;
 
-use App\Models\BannerText;
 use Livewire\Component;
+use App\Models\BannerText;
 use Livewire\WithPagination;
+use Illuminate\Support\FacadesStorage;
+use Illuminate\Support\Facades\Storage;
 
 class BannerTextList extends Component
 {
@@ -53,8 +55,8 @@ class BannerTextList extends Component
     public function deleteBannerText($id)
     {
         $item = BannerText::findOrFail($id);
-        if ($item->image_path && \Storage::disk('public')->exists($item->image_path)) {
-            \Storage::disk('public')->delete($item->image_path);
+        if ($item->image_path && Storage::disk('public')->exists($item->image_path)) {
+            Storage::disk('public')->delete($item->image_path);
         }
         $item->delete();
         $this->dispatch('show-alert', type: 'success', message: 'بنر حذف شد!');
@@ -114,8 +116,8 @@ class BannerTextList extends Component
             : $this->selectedbannertexts;
         $items = \App\Models\BannerText::whereIn('id', $ids)->get();
         foreach ($items as $item) {
-            if ($item->image_path && \Storage::disk('public')->exists($item->image_path)) {
-                \Storage::disk('public')->delete($item->image_path);
+            if ($item->image_path && Storage::disk('public')->exists($item->image_path)) {
+                Storage::disk('public')->delete($item->image_path);
             }
         }
         \App\Models\BannerText::whereIn('id', $ids)->delete();
