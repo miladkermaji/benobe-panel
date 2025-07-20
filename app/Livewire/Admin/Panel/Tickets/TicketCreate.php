@@ -25,7 +25,18 @@ class TicketCreate extends Component
 
     public function submit()
     {
-        $this->validate();
+        $messages = [
+            'title.required' => 'لطفاً عنوان تیکت را وارد کنید.',
+            'title.string' => 'عنوان تیکت باید متن باشد.',
+            'title.max' => 'عنوان تیکت نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+            'description.required' => 'لطفاً توضیحات تیکت را وارد کنید.',
+            'description.string' => 'توضیحات باید متن باشد.',
+            'user_id.exists' => 'کاربر انتخاب‌شده معتبر نیست.',
+            'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
+            'status.required' => 'لطفاً وضعیت تیکت را انتخاب کنید.',
+            'status.in' => 'وضعیت انتخاب‌شده معتبر نیست.',
+        ];
+        $this->validate($this->rules, $messages);
         Ticket::create([
             'title' => $this->title,
             'description' => $this->description,

@@ -28,6 +28,7 @@ class TicketShow extends Component
             'responseMessage' => 'required|string',
         ], [
             'responseMessage.required' => 'لطفاً متن پاسخ را وارد کنید.',
+            'responseMessage.string' => 'متن پاسخ باید یک رشته باشد.',
         ]);
 
         $response = TicketResponse::create([
