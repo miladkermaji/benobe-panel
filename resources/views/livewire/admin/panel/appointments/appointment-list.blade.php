@@ -306,7 +306,7 @@
           <div class="d-flex justify-content-between align-items-center px-4 flex-wrap gap-3">
             <div class="text-muted">تعداد کل: {{ collect($doctors)->sum('totalAppointments') }}</div>
             {{-- صفحه‌بندی اگر نیاز بود اضافه شود --}}
-          </div>
+      </div>
     </div>
   </div>
 </div>
@@ -354,9 +354,9 @@
               } else {
                 Livewire.dispatch('deleteSelected');
               }
-            }
-          });
-        });
+        }
+      });
+    });
   });
 </script>
   </div>

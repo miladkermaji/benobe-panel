@@ -79,7 +79,7 @@
                 <tr>
                   <th class="text-center align-middle" style="width: 40px;">
                     <div class="d-flex justify-content-center align-items-center">
-                      <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
+                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                     </div>
                   </th>
                   <th class="text-center align-middle" style="width: 60px;">ردیف</th>
@@ -106,7 +106,7 @@
                       <td class="text-center">
                         <div class="d-flex justify-content-center align-items-center">
                           <input type="checkbox" wire:model.live="selectedTreatmentCenters" value="{{ $item->id }}"
-                            class="form-check-input m-0 align-middle">
+                          class="form-check-input m-0 align-middle">
                         </div>
                       </td>
                       <td class="text-center">{{ $treatmentCenters->firstItem() + $index }}</td>
@@ -115,31 +115,31 @@
                         @if ($item->doctors && count($item->doctors))
                           <span class="badge bg-primary-subtle text-primary">{{ $item->doctors->count() }} پزشک</span>
                         @else
-                          <span class="text-muted">بدون پزشک</span>
-                        @endif
+                            <span class="text-muted">بدون پزشک</span>
+                          @endif
                       </td>
                       <td class="align-middle">
                         @if (!empty($item->specialty_ids))
                           <span class="badge bg-info-subtle text-info">{{ count($item->specialty_ids) }} تخصص</span>
                         @else
-                          <span class="text-muted">بدون تخصص</span>
-                        @endif
+                            <span class="text-muted">بدون تخصص</span>
+                          @endif
                       </td>
                       <td class="align-middle">
                         @if (!empty($item->insurance_ids))
                           <span class="badge bg-success-subtle text-success">{{ count($item->insurance_ids) }}
                             بیمه</span>
                         @else
-                          <span class="text-muted">بدون بیمه</span>
-                        @endif
+                            <span class="text-muted">بدون بیمه</span>
+                          @endif
                       </td>
                       <td class="align-middle">
                         @if (!empty($item->service_ids))
                           <span class="badge bg-warning-subtle text-warning">{{ count($item->service_ids) }}
                             خدمت</span>
                         @else
-                          <span class="text-muted">بدون خدمت</span>
-                        @endif
+                            <span class="text-muted">بدون خدمت</span>
+                          @endif
                       </td>
                       <td class="align-middle">{{ $item->province?->name ?? '-' }}</td>
                       <td class="align-middle">{{ $item->city?->name ?? '-' }}</td>
@@ -229,8 +229,8 @@
                         class="text-muted">({{ $item->province?->name ?? '-' }})</span></span>
                     <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
                       fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg>
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
                   </div>
                   <div class="note-card-body px-2 py-2" x-show="open" x-transition>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
@@ -239,8 +239,8 @@
                         @if ($item->doctors && count($item->doctors))
                           <span class="badge bg-primary-subtle text-primary">{{ $item->doctors->count() }} پزشک</span>
                         @else
-                          <span class="text-muted">بدون پزشک</span>
-                        @endif
+                            <span class="text-muted">بدون پزشک</span>
+                          @endif
                       </span>
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
@@ -249,8 +249,8 @@
                         @if (!empty($item->specialty_ids))
                           <span class="badge bg-info-subtle text-info">{{ count($item->specialty_ids) }} تخصص</span>
                         @else
-                          <span class="text-muted">بدون تخصص</span>
-                        @endif
+                            <span class="text-muted">بدون تخصص</span>
+                          @endif
                       </span>
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
@@ -260,8 +260,8 @@
                           <span class="badge bg-success-subtle text-success">{{ count($item->insurance_ids) }}
                             بیمه</span>
                         @else
-                          <span class="text-muted">بدون بیمه</span>
-                        @endif
+                            <span class="text-muted">بدون بیمه</span>
+                          @endif
                       </span>
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
@@ -271,8 +271,8 @@
                           <span class="badge bg-warning-subtle text-warning">{{ count($item->service_ids) }}
                             خدمت</span>
                         @else
-                          <span class="text-muted">بدون خدمت</span>
-                        @endif
+                            <span class="text-muted">بدون خدمت</span>
+                          @endif
                       </span>
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
@@ -307,7 +307,7 @@
                         class="badge {{ $item->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
                         {{ $item->is_active ? 'فعال' : 'غیرفعال' }}
                       </button>
-                    </div>
+                      </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <a href="{{ route('admin.panel.treatment-centers.edit', $item->id) }}"
                         class="btn btn-gradient-primary btn-sm rounded-pill px-3">

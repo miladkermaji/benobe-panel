@@ -82,7 +82,7 @@ class ServiceList extends Component
             $this->selectAll = false;
             $this->applyToAllFiltered = false;
             $this->groupAction = '';
-            $this->resetPage();
+        $this->resetPage();
             $this->dispatch('show-alert', type: 'success', message: 'همه خدمات فیلترشده حذف شدند!');
             return;
         }
