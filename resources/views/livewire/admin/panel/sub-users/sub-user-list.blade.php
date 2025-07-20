@@ -1,3 +1,10 @@
+@if (session('success'))
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      toastr.success(@json(session('success')));
+    });
+  </script>
+@endif
 <div class="subusers-container">
   <div class="container py-2 mt-3" dir="rtl" wire:init="loadSubUsers">
     <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
