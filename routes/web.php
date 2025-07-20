@@ -876,3 +876,8 @@ Route::middleware(['web', 'manager'])->prefix('admin/panel/tools')->group(functi
 
 // Route for AJAX user search (for Select2 in subscription forms)
 Route::get('/admin/api/users/search', [\App\Http\Controllers\Admin\UserSearchController::class, 'search']);
+
+Route::middleware(['web', 'auth:manager'])->prefix('admin/panel')->name('admin.panel.')->group(function () {
+    // ... existing code ...
+    Route::get('/tickets', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'index'])->name('tickets.index');
+});
