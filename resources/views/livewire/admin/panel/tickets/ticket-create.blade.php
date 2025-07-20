@@ -1,41 +1,42 @@
 <div id="ticket-create-form" class="container py-4" dir="rtl">
   <div class="card shadow-sm rounded-2">
-    <div class="card-header bg-success text-white">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
       <h4 class="mb-0">افزودن تیکت جدید</h4>
+      <a href="{{ route('admin.panel.tickets.index') }}" class="btn btn-light btn-sm">بازگشت به لیست</a>
     </div>
     <div class="card-body">
       <form wire:submit.prevent="submit">
-        <div class="mb-3">
-          <label class="form-label">عنوان تیکت <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" wire:model.defer="title">
-          @error('title')
-            <span class="text-danger">{{ $message }}</span>
-          @enderror
-        </div>
-        <div class="mb-3">
-          <label class="form-label">توضیحات <span class="text-danger">*</span></label>
-          <textarea class="form-control" rows="4" wire:model.defer="description"></textarea>
-          @error('description')
-            <span class="text-danger">{{ $message }}</span>
-          @enderror
-        </div>
         <div class="mb-3" wire:ignore>
-          <label class="form-label">کاربر</label>
+          <label for="user_id" class="label-top-input-special-takhasos">کاربر</label>
           <select id="user_id" class="form-select select2-ajax" wire:model.defer="user_id"></select>
           @error('user_id')
             <span class="text-danger">{{ $message }}</span>
           @enderror
         </div>
         <div class="mb-3" wire:ignore>
-          <label class="form-label">پزشک</label>
+          <label for="doctor_id" class="label-top-input-special-takhasos">پزشک</label>
           <select id="doctor_id" class="form-select select2-ajax-doctor" wire:model.defer="doctor_id"></select>
           @error('doctor_id')
             <span class="text-danger">{{ $message }}</span>
           @enderror
         </div>
         <div class="mb-3">
-          <label class="form-label">وضعیت</label>
-          <select class="form-select" wire:model.defer="status">
+          <label for="title" class="label-top-input-special-takhasos">عنوان تیکت <span class="text-danger">*</span></label>
+          <input id="title" type="text" class="form-control" wire:model.defer="title">
+          @error('title')
+            <span class="text-danger">{{ $message }}</span>
+          @enderror
+        </div>
+        <div class="mb-3">
+          <label for="description" class="label-top-input-special-takhasos">توضیحات <span class="text-danger">*</span></label>
+          <textarea id="description" class="form-control" rows="4" wire:model.defer="description"></textarea>
+          @error('description')
+            <span class="text-danger">{{ $message }}</span>
+          @enderror
+        </div>
+        <div class="mb-3">
+          <label for="status" class="label-top-input-special-takhasos">وضعیت</label>
+          <select id="status" class="form-select" wire:model.defer="status">
             <option value="open">باز</option>
             <option value="answered">پاسخ داده شده</option>
             <option value="pending">در حال بررسی</option>

@@ -26,7 +26,9 @@
   --warning: #d97706;
   --info: #17a2b8;
 }
-
+.bg-primary{
+  background-color: var(--primary) !important;
+}
 .myPanelOption {
   display: none !important;
 }

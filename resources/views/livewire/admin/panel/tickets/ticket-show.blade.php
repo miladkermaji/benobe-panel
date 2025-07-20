@@ -1,7 +1,8 @@
 <div class="container py-4" dir="rtl">
   <div class="card shadow-sm rounded-2">
-    <div class="card-header bg-primary text-white">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
       <h4 class="mb-0">مشاهده تیکت</h4>
+      <a href="{{ route('admin.panel.tickets.index') }}" class="btn btn-light btn-sm">بازگشت به لیست</a>
     </div>
     <div class="card-body">
       @if ($ticket)
@@ -71,7 +72,7 @@
                 @endif
               </strong>
               <p class="mb-1">{{ $response->message }}</p>
-              <small class="text-muted">{{ jdate($response->created_at)->ago() }}</small>
+              <small class="text-white">{{ jdate($response->created_at)->ago() }}</small>
             </div>
           @empty
             <div class="alert alert-info text-center">هیچ پاسخی ثبت نشده است.</div>
@@ -80,7 +81,7 @@
         @if ($ticket->status !== 'closed')
           <form wire:submit.prevent="storeResponse" class="mt-4">
             <div class="mb-3">
-              <label class="form-label">ارسال پاسخ</label>
+              <label class="label-top-input-special-takhasos">ارسال پاسخ</label>
               <textarea class="form-control" rows="3" wire:model.defer="responseMessage" placeholder="پاسخ خود را بنویسید..."></textarea>
               @error('responseMessage')
                 <span class="text-danger">{{ $message }}</span>

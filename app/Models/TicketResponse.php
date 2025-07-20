@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\User;
@@ -33,8 +34,13 @@ class TicketResponse extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-     public function manager()
+    public function manager()
     {
         return $this->belongsTo(Manager::class, 'manager_id');
+    }
+
+    public function secretary()
+    {
+        return $this->belongsTo(\App\Models\Secretary::class);
     }
 }
