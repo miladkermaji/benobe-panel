@@ -15,6 +15,7 @@ class MedicalCenter extends Model
 
     protected $fillable = [
         'name', 'title', 'address', 'secretary_phone', 'phone_number', 'postal_code',
+        'siam_code',
         'province_id', 'city_id', 'is_main_center', 'start_time', 'end_time',
         'description', 'latitude', 'longitude', 'consultation_fee', 'payment_methods',
         'is_active', 'working_days', 'avatar', 'documents', 'phone_numbers',
@@ -45,7 +46,7 @@ class MedicalCenter extends Model
     {
         return $this->belongsToMany(Doctor::class, 'doctor_medical_center');
     }
-      public function doctor()
+    public function doctor()
     {
         return $this->belongsTo(Doctor::class, 'id');
     }
