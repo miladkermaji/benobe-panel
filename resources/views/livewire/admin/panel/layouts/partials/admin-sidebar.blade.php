@@ -283,10 +283,38 @@
             <li class="item-li"><a href="{{ route('admin.panel.banner-texts.index') }}">بنر صفحه اصلی</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.footer-contents.index') }}">فوتر</a></li>
             <li class="item-li"><a href="{{ route('admin.panel.setting.index') }}">تنظیمات عمومی</a></li>
-            <li class="item-li"><a href="#">تنظیمات اعلان‌ها</a></li>
-            <li class="item-li"><a href="#">پشتیبان‌گیری</a></li>
-            <li class="item-li"><a href="#">تنظیمات زبان</a></li>
-            <li class="item-li"><a href="{{ route('dr-edit-profile-security') }}">تنظیمات امنیتی</a></li>
+            <li class="item-li" style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)"
+                style="color: #6c757d; cursor: not-allowed; display: flex; align-items: center;">
+                تنظیمات اعلان‌ها
+                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
+                  زودی</span>
+              </a>
+            </li>
+            <li class="item-li" style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)"
+                style="color: #6c757d; cursor: not-allowed; display: flex; align-items: center;">
+                پشتیبان‌گیری
+                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
+                  زودی</span>
+              </a>
+            </li>
+            <li class="item-li" style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)"
+                style="color: #6c757d; cursor: not-allowed; display: flex; align-items: center;">
+                تنظیمات زبان
+                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
+                  زودی</span>
+              </a>
+            </li>
+            <li class="item-li" style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)"
+                style="color: #6c757d; cursor: not-allowed; display: flex; align-items: center;">
+                تنظیمات امنیتی
+                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
+                  زودی</span>
+              </a>
+            </li>
           </ul>
         </li>
 
@@ -305,9 +333,6 @@
           </a>
           <ul class="drop-toggle d-none">
             <li class="item-li"><a href="{{ route('dr-panel-tickets') }}">تیکت‌های پشتیبانی</a></li>
-            <li class="item-li"><a href="#">ارسال تیکت جدید</a></li>
-            <li class="item-li"><a href="#">سوالات متداول</a></li>
-
           </ul>
         </li>
         <!-- خروج -->
