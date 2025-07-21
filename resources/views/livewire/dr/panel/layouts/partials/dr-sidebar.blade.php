@@ -629,6 +629,20 @@
             transform: translateX(-50%) translateY(0);
           }
         }
+
+        /* Fix for dashboard dropdown (first item, right edge) */
+        .mobile-bottom-nav__item--dashboard .mobile-bottom-nav__dropdown {
+          left: auto;
+          right: 0;
+          transform: none;
+        }
+
+        /* Fix for other dropdown (last item, left edge) */
+        .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
+          left: 0;
+          right: auto;
+          transform: none;
+        }
       }
 
       @media (min-width: 769px) {
@@ -686,7 +700,7 @@
   </div>
   <div class="mobile-bottom-nav" wire:ignore>
     <!-- داشبورد -->
-    <div class="mobile-bottom-nav__item" data-group="dashboard">
+    <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard">
       <svg viewBox="0 0 24 24">
         <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
       </svg>
@@ -755,7 +769,7 @@
       </div>
     </div>
     <!-- سایر -->
-    <div class="mobile-bottom-nav__item" data-group="other">
+    <div class="mobile-bottom-nav__item mobile-bottom-nav__item--other" data-group="other">
       <svg viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" fill="#eee" />
         <text x="12" y="16" text-anchor="middle" font-size="16" fill="#888">...</text>
