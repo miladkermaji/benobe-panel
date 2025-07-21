@@ -708,25 +708,26 @@
   <div class="mobile-bottom-nav" wire:ignore>
     <!-- داشبورد -->
     @if ($this->hasPermission('dashboard'))
-      <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard">
+      <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard"
+        data-has-submenu="true">
         <svg viewBox="0 0 24 24">
           <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
         </svg>
         <div class="mobile-bottom-nav__label">داشبورد</div>
-        <div class="mobile-bottom-nav__dropdown">
+        <div class="mobile-bottom-nav__dropdown" style="display:none">
           <a href="{{ route('dr-panel') }}">داشبورد</a>
         </div>
       </div>
     @endif
     <!-- نوبت‌ها -->
     @if ($this->hasPermission('appointments'))
-      <div class="mobile-bottom-nav__item" data-group="appointments">
+      <div class="mobile-bottom-nav__item" data-group="appointments" data-has-submenu="true">
         <svg viewBox="0 0 24 24">
           <path
             d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm0-13H5V5h14v1z" />
         </svg>
         <div class="mobile-bottom-nav__label">نوبت‌ها</div>
-        <div class="mobile-bottom-nav__dropdown">
+        <div class="mobile-bottom-nav__dropdown" style="display:none">
           @if ($this->hasPermission('dr-appointments'))
             <a href="{{ route('dr-appointments') }}">لیست نوبت‌ها</a>
           @endif
@@ -753,13 +754,13 @@
     @endif
     <!-- مشاوره -->
     @if ($this->hasPermission('consult'))
-      <div class="mobile-bottom-nav__item" data-group="consult">
+      <div class="mobile-bottom-nav__item" data-group="consult" data-has-submenu="true">
         <svg viewBox="0 0 24 24">
           <path
             d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
         </svg>
         <div class="mobile-bottom-nav__label">مشاوره</div>
-        <div class="mobile-bottom-nav__dropdown">
+        <div class="mobile-bottom-nav__dropdown" style="display:none">
           @if ($this->hasPermission('dr-moshavere_setting'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی <span
                 class="soon-label">به زودی</span></a>
@@ -781,13 +782,13 @@
     @endif
     <!-- پروفایل -->
     @if ($this->hasPermission('profile'))
-      <div class="mobile-bottom-nav__item" data-group="profile">
+      <div class="mobile-bottom-nav__item" data-group="profile" data-has-submenu="true">
         <svg viewBox="0 0 24 24">
           <path
             d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
         </svg>
         <div class="mobile-bottom-nav__label">پروفایل</div>
-        <div class="mobile-bottom-nav__dropdown">
+        <div class="mobile-bottom-nav__dropdown" style="display:none">
           @if ($this->hasPermission('dr-edit-profile'))
             <a href="{{ route('dr-edit-profile') }}">ویرایش پروفایل</a>
           @endif
@@ -821,19 +822,19 @@
             d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8-2V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v2C2.9 6 2 6.9 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
         </svg>
         <div class="mobile-bottom-nav__label">ساعت کاری</div>
-        <div class="mobile-bottom-nav__dropdown">
+        <div class="mobile-bottom-nav__dropdown" style="display:none">
           <a href="{{ route('dr-workhours') }}">ساعت کاری</a>
         </div>
       </div>
     @endif
     <!-- سایر -->
-    <div class="mobile-bottom-nav__item mobile-bottom-nav__item--other" data-group="other">
+    <div class="mobile-bottom-nav__item mobile-bottom-nav__item--other" data-group="other" data-has-submenu="true">
       <svg viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" fill="#eee" />
         <text x="12" y="16" text-anchor="middle" font-size="16" fill="#888">...</text>
       </svg>
       <div class="mobile-bottom-nav__label">سایر</div>
-      <div class="mobile-bottom-nav__dropdown">
+      <div class="mobile-bottom-nav__dropdown" style="display:none">
         @if ($this->hasPermission('statistics'))
           <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
         @endif
@@ -899,4 +900,148 @@
       </div>
     </div>
   </div>
+  <!-- Overlay for mobile submenu -->
+  <div id="mobile-submenu-overlay" class="mobile-submenu-overlay">
+    <div class="mobile-submenu-header">
+      <button id="close-mobile-submenu" class="close-mobile-submenu-btn" aria-label="بستن">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="mobile-submenu-list" id="mobile-submenu-list">
+      <!-- زیرمنوها اینجا قرار می‌گیرند -->
+    </div>
+  </div>
+  <style>
+    .mobile-submenu-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(255, 255, 255, 0.98);
+      z-index: 20001;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      overflow-y: auto;
+      transition: opacity 0.2s;
+    }
+
+    .mobile-submenu-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .mobile-submenu-header {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 16px 16px 0 16px;
+      background: transparent;
+    }
+
+    .close-mobile-submenu-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      margin: 0;
+      outline: none;
+    }
+
+    .mobile-submenu-list {
+      width: 100%;
+      margin-top: 24px;
+      padding: 0 24px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .mobile-submenu-list a {
+      display: block;
+      background: #f7f7fa;
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 16px;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.04);
+      border: 1px solid #e0e0e0;
+      transition: background 0.2s, color 0.2s;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .mobile-submenu-list a:hover {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    @media (min-width: 769px) {
+      .mobile-submenu-overlay {
+        display: none !important;
+      }
+    }
+  </style>
+  <script>
+    (function() {
+      let navItems;
+      let lastOpen = null;
+      let overlay = document.getElementById('mobile-submenu-overlay');
+      let closeBtn = document.getElementById('close-mobile-submenu');
+      let submenuList = document.getElementById('mobile-submenu-list');
+
+      function closeOverlay() {
+        overlay.classList.remove('active');
+        submenuList.innerHTML = '';
+      }
+
+      function openOverlayWithSubmenu(submenuHtml) {
+        submenuList.innerHTML = submenuHtml;
+        overlay.classList.add('active');
+      }
+
+      function setupMobileNavOverlay() {
+        navItems = document.querySelectorAll('.mobile-bottom-nav__item[data-has-submenu="true"]');
+        navItems.forEach(item => {
+          item.onclick = function(e) {
+            if (window.innerWidth > 768) return;
+            let dropdown = item.querySelector('.mobile-bottom-nav__dropdown');
+            if (dropdown) {
+              let links = dropdown.innerHTML;
+              openOverlayWithSubmenu(links);
+            }
+          };
+        });
+        if (closeBtn) {
+          closeBtn.onclick = function() {
+            closeOverlay();
+          };
+        }
+        // بستن با کلیک روی بیرون overlay
+        overlay.addEventListener('click', function(e) {
+          if (e.target === overlay) {
+            closeOverlay();
+          }
+        });
+      }
+      document.addEventListener('DOMContentLoaded', function() {
+        setupMobileNavOverlay();
+      });
+      window.addEventListener('resize', function() {
+        if (window.innerWidth <= 768) {
+          setupMobileNavOverlay();
+        }
+      });
+      document.addEventListener('livewire:update', function() {
+        setupMobileNavOverlay();
+      });
+    })();
+  </script>
 </div>
