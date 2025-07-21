@@ -35,20 +35,6 @@
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
-            <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="user_name" class="form-control" id="user_name" placeholder=" " required>
-              <label for="user_name" class="form-label">نام کاربر</label>
-              @error('user_name')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-            <div class="col-6 col-md-6 position-relative mt-5">
-              <input type="text" wire:model="user_phone" class="form-control" id="user_phone" placeholder=" ">
-              <label for="user_phone" class="form-label">شماره تماس (اختیاری)</label>
-              @error('user_phone')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
             <div class="col-12 position-relative mt-5">
               <textarea wire:model="comment" class="form-control" id="comment" rows="4" placeholder=" " required></textarea>
               <label for="comment" class="form-label">متن نظر</label>

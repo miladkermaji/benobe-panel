@@ -253,23 +253,20 @@ class DoctorCommentList extends Component
 
     private function getCommentsQuery()
     {
-        $query = DoctorComment::with(['doctor'])
+        $query = DoctorComment::with(['doctor', 'userable'])
             ->whereHas('doctor', function ($q) {
                 $q->where('first_name', 'like', '%' . $this->search . '%')
                   ->orWhere('last_name', 'like', '%' . $this->search . '%')
                   ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $this->search . '%']);
             })
             ->orWhere(function ($q) {
-                $q->where('user_name', 'like', '%' . $this->search . '%')
-                  ->orWhere('comment', 'like', '%' . $this->search . '%');
+                $q->where('comment', 'like', '%' . $this->search . '%');
             });
-
         if ($this->statusFilter === 'active') {
             $query->where('status', true);
         } elseif ($this->statusFilter === 'inactive') {
             $query->where('status', false);
         }
-
         return $query->orderBy('created_at', 'desc');
     }
 

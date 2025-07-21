@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Cache;
 class DoctorCommentCreate extends Component
 {
     public $doctor_id;
-    public $user_name;
-    public $user_phone;
     public $comment;
     public $status = false;
     public $doctors;
@@ -25,16 +23,11 @@ class DoctorCommentCreate extends Component
     {
         $validated = $this->validate([
             'doctor_id' => 'required|exists:doctors,id',
-            'user_name' => 'required|string|max:255',
-            'user_phone' => 'nullable|string|max:15',
             'comment' => 'required|string',
             'status' => 'boolean',
         ], [
             'doctor_id.required' => 'لطفاً پزشک را انتخاب کنید.',
             'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
-            'user_name.required' => 'لطفاً نام کاربر را وارد کنید.',
-            'user_name.max' => 'نام کاربر نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
-            'user_phone.max' => 'شماره تماس نمی‌تواند بیشتر از ۱۵ کاراکتر باشد.',
             'comment.required' => 'لطفاً متن نظر را وارد کنید.',
         ]);
 

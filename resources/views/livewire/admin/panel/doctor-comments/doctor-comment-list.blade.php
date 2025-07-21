@@ -149,8 +149,26 @@
                       <td class="align-middle">
                         {{ $comment->doctor->first_name . ' ' . $comment->doctor->last_name }}
                       </td>
-                      <td class="align-middle">{{ $comment->user_name }}</td>
-                      <td class="align-middle">{{ $comment->user_phone ?? 'ثبت نشده' }}</td>
+                      <td class="align-middle">
+                        @if ($comment->userable)
+                          @if (property_exists($comment->userable, 'first_name'))
+                            {{ $comment->userable->first_name . ' ' . $comment->userable->last_name }}
+                          @elseif(property_exists($comment->userable, 'name'))
+                            {{ $comment->userable->name }}
+                          @else
+                            {{ $comment->userable->id }}
+                          @endif
+                        @else
+                          ---
+                        @endif
+                      </td>
+                      <td class="align-middle">
+                        @if ($comment->userable && property_exists($comment->userable, 'mobile'))
+                          {{ $comment->userable->mobile }}
+                        @else
+                          ---
+                        @endif
+                      </td>
                       <td class="align-middle">{{ \Illuminate\Support\Str::limit($comment->comment, 50) }}</td>
                       <td class="align-middle">
                         {{ $comment->reply ? \Illuminate\Support\Str::limit($comment->reply, 50) : 'بدون پاسخ' }}
@@ -291,11 +309,29 @@
                             </div>
                             <div class="comment-card-item d-flex justify-content-between align-items-center py-1">
                               <span class="comment-card-label">نام کاربر:</span>
-                              <span class="comment-card-value">{{ $comment->user_name }}</span>
+                              <span class="comment-card-value">
+                                @if ($comment->userable)
+                                  @if (property_exists($comment->userable, 'first_name'))
+                                    {{ $comment->userable->first_name . ' ' . $comment->userable->last_name }}
+                                  @elseif(property_exists($comment->userable, 'name'))
+                                    {{ $comment->userable->name }}
+                                  @else
+                                    {{ $comment->userable->id }}
+                                  @endif
+                                @else
+                                  ---
+                                @endif
+                              </span>
                             </div>
                             <div class="comment-card-item d-flex justify-content-between align-items-center py-1">
                               <span class="comment-card-label">شماره تماس:</span>
-                              <span class="comment-card-value">{{ $comment->user_phone ?? 'ثبت نشده' }}</span>
+                              <span class="comment-card-value">
+                                @if ($comment->userable && property_exists($comment->userable, 'mobile'))
+                                  {{ $comment->userable->mobile }}
+                                @else
+                                  ---
+                                @endif
+                              </span>
                             </div>
                             <div class="comment-card-item d-flex justify-content-between align-items-center py-1">
                               <span class="comment-card-label">نظر:</span>
