@@ -526,7 +526,8 @@
           width: 100vw;
           background: rgba(255, 255, 255, 0.95);
           box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
-          z-index: 15000;
+          z-index: 25000;
+          /* بالاتر از overlay */
           justify-content: space-around;
           align-items: center;
           padding: 0;
@@ -708,15 +709,14 @@
   <div class="mobile-bottom-nav" wire:ignore>
     <!-- داشبورد -->
     @if ($this->hasPermission('dashboard'))
-      <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard"
-        data-has-submenu="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
-        </svg>
-        <div class="mobile-bottom-nav__label">داشبورد</div>
-        <div class="mobile-bottom-nav__dropdown" style="display:none">
-          <a href="{{ route('dr-panel') }}">داشبورد</a>
-        </div>
+      <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard">
+        <a href="{{ route('dr-panel') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+          </svg>
+          <div class="mobile-bottom-nav__label">داشبورد</div>
+        </a>
       </div>
     @endif
     <!-- نوبت‌ها -->
@@ -817,14 +817,14 @@
     <!-- ساعت کاری -->
     @if ($this->hasPermission('dr-workhours'))
       <div class="mobile-bottom-nav__item" data-group="workhours">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8-2V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v2C2.9 6 2 6.9 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
-        </svg>
-        <div class="mobile-bottom-nav__label">ساعت کاری</div>
-        <div class="mobile-bottom-nav__dropdown" style="display:none">
-          <a href="{{ route('dr-workhours') }}">ساعت کاری</a>
-        </div>
+        <a href="{{ route('dr-workhours') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8-2V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v2C2.9 6 2 6.9 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
+          </svg>
+          <div class="mobile-bottom-nav__label">ساعت کاری</div>
+        </a>
       </div>
     @endif
     <!-- سایر -->
@@ -1010,11 +1010,13 @@
       function closeOverlay() {
         overlay.classList.remove('active');
         submenuList.innerHTML = '';
+        document.body.style.overflow = '';
       }
 
       function openOverlayWithSubmenu(submenuHtml) {
         submenuList.innerHTML = submenuHtml;
         overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
       }
 
       function setupMobileNavOverlay() {
@@ -1024,8 +1026,15 @@
             if (window.innerWidth > 768) return;
             let dropdown = item.querySelector('.mobile-bottom-nav__dropdown');
             if (dropdown) {
-              let links = dropdown.innerHTML;
-              openOverlayWithSubmenu(links);
+              // اگر فقط یک لینک دارد مستقیم برو به لینک
+              let links = Array.from(dropdown.querySelectorAll('a')).filter(a => a.href && a.href !==
+                'javascript:void(0)');
+              if (links.length === 1) {
+                window.location.href = links[0].href;
+                return;
+              }
+              let html = dropdown.innerHTML;
+              openOverlayWithSubmenu(html);
             }
           };
         });
