@@ -97,17 +97,4 @@ class DoctorCommentController extends Controller
         $comment = DoctorComment::with(['doctor', 'appointment', 'userable'])->findOrFail($id);
         return response()->json($comment);
     }
-
-    // حذف نظر (فقط توسط ادمین یا صاحب نظر)
-    public function destroy($id)
-    {
-        $comment = DoctorComment::findOrFail($id);
-        $user = Auth::user();
-        // فقط ادمین یا صاحب نظر (بر اساس userable) اجازه حذف دارد
-        if ($user && ($user->is_admin ?? false || ($comment->userable_id == $user->id && $comment->userable_type == get_class($user)))) {
-            $comment->delete();
-            return response()->json(['success' => true]);
-        }
-        return response()->json(['success' => false, 'message' => 'اجازه حذف ندارید.'], 403);
-    }
 }
