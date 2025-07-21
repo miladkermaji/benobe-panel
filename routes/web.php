@@ -102,6 +102,17 @@ Route::prefix('admin')
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'edit'])->name('admin.panel.clinic-deposit-settings.edit');
         });
 
+        Route::prefix('tickets')->name('admin.panel.tickets.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'create'])->name('create');
+            Route::get('/{id}', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'show'])->name('show');
+            
+
+Route::get('/tickets', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'index'])->name('tickets.index');
+
+
+        });
+
         Route::prefix('doctor-wallets')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'index'])->name('admin.panel.doctor-wallets.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\DoctorWallet\DoctorWalletController::class, 'create'])->name('admin.panel.doctor-wallets.create');
@@ -877,15 +888,8 @@ Route::middleware(['web', 'manager'])->prefix('admin/panel/tools')->group(functi
 // Route for AJAX user search (for Select2 in subscription forms)
 Route::get('/admin/api/users/search', [\App\Http\Controllers\Admin\UserSearchController::class, 'search']);
 
-Route::middleware(['web', 'auth:manager'])->prefix('admin/panel')->name('admin.panel.')->group(function () {
-    // ... existing code ...
-    Route::get('/tickets', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'index'])->name('tickets.index');
-});
 
-Route::prefix('admin/panel/tickets')->name('admin.panel.tickets.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'index'])->name('index');
-    Route::get('/create', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'create'])->name('create');
-    Route::get('/{id}', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'show'])->name('show');
-});
+
+
 
 Route::get('/admin/api/doctors/search', [\App\Http\Controllers\Admin\DoctorSearchController::class, 'search']);
