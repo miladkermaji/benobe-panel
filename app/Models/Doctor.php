@@ -250,7 +250,7 @@ class Doctor extends Authenticatable implements JWTSubject
     // رابطه با کاربران زیرمجموعه
     public function subUsers()
     {
-        return $this->hasMany(SubUser::class, 'owner_id')->where('owner_type', self::class);
+        return $this->morphMany(\App\Models\SubUser::class, 'owner');
     }
     public function academicDegree()
     {

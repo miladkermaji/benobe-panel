@@ -121,4 +121,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->morphMany(PrescriptionRequest::class, 'requestable');
     }
+
+    public function subUsers()
+    {
+        return $this->morphMany(\App\Models\SubUser::class, 'owner');
+    }
 }

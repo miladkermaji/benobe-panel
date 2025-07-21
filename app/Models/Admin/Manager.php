@@ -52,6 +52,11 @@ class Manager extends Authenticatable implements JWTSubject
         return $this->morphMany(\App\Models\PrescriptionRequest::class, 'requestable');
     }
 
+    public function subUsers()
+    {
+        return $this->morphMany(\App\Models\SubUser::class, 'owner');
+    }
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *

@@ -48,7 +48,10 @@ class Secretary extends Authenticatable implements JWTSubject
     {
         return [];
     }
-
+    public function subUsers()
+    {
+        return $this->morphMany(\App\Models\SubUser::class, 'owner');
+    }
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);

@@ -24,23 +24,36 @@
         <div class="col-12 col-md-10 col-lg-8">
           <div class="row g-4">
             <div class="col-12 position-relative mt-5" wire:ignore>
-              <select wire:model="doctor_id" class="form-select select2" id="doctor_id" required>
+              <label for="owner_type" class="form-label">نوع مالک</label>
+              <select wire:model="owner_type" class="form-select" id="owner_type" required>
                 <option value="">انتخاب کنید</option>
-                @foreach ($doctors as $doctor)
-                  <option value="{{ $doctor->id }}" {{ $doctor->id == $doctor_id ? 'selected' : '' }}>
-                    {{ $doctor->first_name . ' ' . $doctor->last_name }}
-                  </option>
+                @foreach ($ownerTypes as $type => $label)
+                  <option value="{{ $type }}">{{ $label }}</option>
                 @endforeach
               </select>
-              <label for="doctor_id" class="form-label">پزشک</label>
-              @error('doctor_id')
+              @error('owner_type')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
             <div class="col-12 position-relative mt-5" wire:ignore>
-              <select id="user_id" class="form-select select2-ajax" required></select>
-              <label for="user_id" class="form-label">کاربر</label>
-              @error('user_id')
+              <label for="owner_id" class="form-label">مالک</label>
+              <select wire:model="owner_id" class="form-select select2" id="owner_id" required>
+                <option value="">انتخاب کنید</option>
+                @foreach ($owners as $owner)
+                  <option value="{{ $owner->id }}">
+                    @if ($owner_type === 'App\\Models\\Doctor')
+                      {{ $owner->first_name . ' ' . $owner->last_name }}
+                    @elseif ($owner_type === 'App\\Models\\Secretary')
+                      {{ $owner->first_name . ' ' . $owner->last_name }}
+                    @elseif ($owner_type === 'App\\Models\\Admin\\Manager')
+                      {{ $owner->name }}
+                    @elseif ($owner_type === 'App\\Models\\User')
+                      {{ $owner->first_name . ' ' . $owner->last_name }}
+                    @endif
+                  </option>
+                @endforeach
+              </select>
+              @error('owner_id')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
@@ -77,31 +90,10 @@
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
-        $('#doctor_id').select2({
+        $('#owner_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
-        });
-        $('#user_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%',
-          ajax: {
-            url: '/admin/api/users/search',
-            dataType: 'json',
-            delay: 250,
-            data: function(params) {
-              return {
-                q: params.term
-              };
-            },
-            processResults: function(data) {
-              return {
-                results: data.results
-              };
-            },
-            cache: true
-          }
         });
         $('#status').select2({
           dir: 'rtl',
@@ -112,11 +104,11 @@
 
       initializeSelect2();
 
-      $('#doctor_id').on('change', function() {
-        @this.set('doctor_id', $(this).val());
+      $('#owner_type').on('change', function() {
+        @this.set('owner_type', $(this).val());
       });
-      $('#user_id').on('change', function() {
-        @this.set('user_id', $(this).val());
+      $('#owner_id').on('change', function() {
+        @this.set('owner_id', $(this).val());
       });
       $('#status').on('change', function() {
         @this.set('status', $(this).val());
@@ -133,7 +125,7 @@
             var user = data.results.find(u => u.id == @this.user_id);
             if (user) {
               var option = new Option(user.text, user.id, true, true);
-              $('#user_id').append(option).trigger('change');
+              $('#owner_id').append(option).trigger('change');
             }
           }
         });

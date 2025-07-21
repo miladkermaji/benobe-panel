@@ -202,49 +202,52 @@ class SubUserList extends Component
 
     public function render()
     {
-        $doctors = $this->readyToLoad
-            ? Doctor::with(['subUsers' => function ($query) {
-                $query->with('subuserable')
-                    ->when($this->search, function ($q) {
+        $owners = collect();
+        foreach ([
+            'App\\Models\\Doctor',
+            'App\\Models\\Secretary',
+            'App\\Models\\Admin\\Manager',
+            'App\\Models\\User',
+        ] as $model) {
+            if (class_exists($model)) {
+                $owners = $owners->concat($model::with(['subUsers' => function ($query) {
+                    $query->with('subuserable')
+                        ->when($this->search, function ($q) {
+                            $search = trim($this->search);
+                            $q->whereHasMorph('subuserable', [\App\Models\User::class], function ($qq) use ($search) {
+                                $qq->where('first_name', 'like', "%$search%")
+                                    ->orWhere('last_name', 'like', "%$search%")
+                                    ->orWhere('mobile', 'like', "%$search%") ;
+                            });
+                        })
+                        ->when($this->statusFilter, function ($q) {
+                            if ($this->statusFilter === 'active') {
+                                $q->where('status', 'active');
+                            } elseif ($this->statusFilter === 'inactive') {
+                                $q->where('status', 'inactive');
+                            }
+                        })
+                        ->orderBy('created_at', 'desc');
+                }])->whereHas('subUsers', function ($query) {
+                    if (!empty($this->search)) {
                         $search = trim($this->search);
-                        $q->whereHasMorph('subuserable', [\App\Models\User::class], function ($qq) use ($search) {
-                            $qq->where('first_name', 'like', "%$search%")
+                        $query->whereHasMorph('subuserable', [\App\Models\User::class], function ($q) use ($search) {
+                            $q->where('first_name', 'like', "%$search%")
                                 ->orWhere('last_name', 'like', "%$search%")
                                 ->orWhere('mobile', 'like', "%$search%") ;
                         });
-                    })
-                    ->when($this->statusFilter, function ($q) {
-                        if ($this->statusFilter === 'active') {
-                            $q->where('status', 'active');
-                        } elseif ($this->statusFilter === 'inactive') {
-                            $q->where('status', 'inactive');
-                        }
-                    })
-                    ->orderBy('created_at', 'desc');
-            }])
-            ->whereHas('subUsers', function ($query) {
-                $query->where('owner_type', Doctor::class);
-                if (!empty($this->search)) {
-                    $search = trim($this->search);
-                    $query->whereHasMorph('subuserable', [\App\Models\User::class], function ($q) use ($search) {
-                        $q->where('first_name', 'like', "%$search%")
-                            ->orWhere('last_name', 'like', "%$search%")
-                            ->orWhere('mobile', 'like', "%$search%") ;
-                    });
-                }
-                if ($this->statusFilter === 'active') {
-                    $query->where('status', 'active');
-                } elseif ($this->statusFilter === 'inactive') {
-                    $query->where('status', 'inactive');
-                }
-            })
-            ->get()
-            : collect();
-
+                    }
+                    if ($this->statusFilter === 'active') {
+                        $query->where('status', 'active');
+                    } elseif ($this->statusFilter === 'inactive') {
+                        $query->where('status', 'inactive');
+                    }
+                })->get());
+            }
+        }
         $this->totalFilteredCount = $this->readyToLoad ? $this->getSubUsersQuery()->count() : 0;
-
         return view('livewire.admin.panel.sub-users.sub-user-list', [
-            'doctors' => $doctors,
+            'owners' => $owners,
             'totalFilteredCount' => $this->totalFilteredCount,
         ]);
     }
