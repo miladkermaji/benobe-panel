@@ -49,7 +49,6 @@
                   <a href="{{ route('dr-appointments') }}"> لیست نوبت ها</a>
                 </li>
               @endif
-
               @if ($this->hasPermission('dr.panel.doctornotes.index'))
                 <li class="item-li {{ Request::routeIs('dr.panel.doctornotes.index') ? 'is-active' : '' }}">
                   <a href="{{ route('dr.panel.doctornotes.index') }}"> توضیحات نوبت</a>
@@ -83,7 +82,6 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('my-prescriptions'))
           <li class="item-li i-banners {{ Request::routeIs('dr.panel.my-prescriptions') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -107,7 +105,6 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('consult'))
           <li
             class="item-li i-moshavere {{ Request::routeIs('dr-moshavere_setting') || Request::routeIs('dr-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
@@ -156,14 +153,12 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('insurance'))
           <li
             class="item-li i-checkout__request {{ Request::routeIs('dr.panel.doctor-services.index') ? 'is-active' : '' }}">
             <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
           </li>
         @endif
-
         @if ($this->hasPermission('prescription'))
           <li
             class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('dr-patient-records') ? 'is-active' : '' }}">
@@ -171,7 +166,6 @@
               <div class="d-flex align-items-center">
                 <span class="fw-bold">
                   نسخه الکترونیک
-
                 </span>
                 <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
                   زودی</span>
@@ -223,14 +217,12 @@
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;"
                     class="d-flex align-items-center">
                     پرونده الکترونیک
-
                   </a>
                 </li>
               @endif
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('financial_reports'))
           <li
             class="item-li i-my__peyments {{ Request::routeIs('dr-wallet') || Request::routeIs('dr-payment-setting') || Request::routeIs('dr.panel.financial-reports.index') || Request::routeIs('dr-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
@@ -267,7 +259,6 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('patient_communication'))
           <li class="item-li i-users {{ Request::routeIs('dr.panel.send-message') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -288,9 +279,6 @@
             </ul>
           </li>
         @endif
-
-
-
         @if ($this->hasPermission('secretary_management'))
           <li
             class="item-li i-user__secratary {{ Request::routeIs('dr-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
@@ -322,7 +310,6 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('clinic_management'))
           <li
             class="item-li i-clinic {{ Request::routeIs('dr-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('dr.panel.clinics.medical-documents') || Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
@@ -360,9 +347,6 @@
             </ul>
           </li>
         @endif
-
-
-
         @if ($this->hasPermission('profile'))
           <li
             class="item-li i-users {{ Request::routeIs('dr-edit-profile') || Request::routeIs('dr-edit-profile-security') || Request::routeIs('dr-edit-profile-upgrade') || Request::routeIs('dr-my-performance') || Request::routeIs('dr-subuser') || Request::routeIs('my-dr-appointments') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
@@ -428,13 +412,11 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('statistics'))
           <li class="item-li i-transactions {{ Request::routeIs('dr-my-performance-chart') ? 'is-active' : '' }}">
             <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
           </li>
         @endif
-
         @if ($this->hasPermission('messages'))
           <li class="item-li i-comments {{ Request::routeIs('dr-panel-tickets') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -464,40 +446,30 @@
         @endif
       </ul>
     </div>
-
     <script>
       document.addEventListener('livewire:init', () => {
         toastr.options = {
           positionClass: 'toast-top-right',
           timeOut: 3000,
         };
-
         const photoInput = document.getElementById('profile-photo-input');
         const profileImg = document.getElementById('profile-photo-img');
-
         if (photoInput) {
           photoInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
-              console.log('Photo selected:', this.files[0].name);
               uploadPhoto(this.files[0]);
             }
           });
-
           photoInput.addEventListener('dblclick', function() {
-            console.log('Double click on input');
             this.click();
           });
         }
-
         if (profileImg) {
           profileImg.addEventListener('dblclick', function() {
-            console.log('Double click on image');
             photoInput.click();
           });
-
           profileImg.addEventListener('contextmenu', function(e) {
             e.preventDefault();
-            console.log('Right click on image');
             photoInput.click();
           });
         }
@@ -506,9 +478,6 @@
           const formData = new FormData();
           formData.append('photo', file);
           formData.append('_token', '{{ csrf_token() }}');
-
-          console.log('Uploading photo...');
-
           fetch("{{ route('dr.upload-photo') }}", {
               method: 'POST',
               body: formData,
@@ -523,7 +492,6 @@
               return response.text();
             })
             .then(text => {
-              console.log('Raw server response:', text);
               const data = JSON.parse(text);
               if (data.success) {
                 toastr.success(data.message);
@@ -540,7 +508,6 @@
         }
       });
     </script>
-
     <!-- Bottom Navigation for Mobile -->
     <style>
       @media (max-width: 768px) {
@@ -660,9 +627,6 @@
         }
       }
     </style>
-
-
-
     <script>
       (function() {
         let navItems;
@@ -679,31 +643,25 @@
           navItems = document.querySelectorAll('.mobile-bottom-nav__item');
           navItems.forEach(item => {
             item.onclick = function(e) {
-              console.log('کلیک روی آیتم منو:', item, 'کلاس open دارد؟', item.classList.contains('open'));
               if (e.target.closest('.mobile-bottom-nav__dropdown')) {
-                console.log('کلیک روی dropdown داخلی.');
                 return;
               }
               // اگر همین آیتم باز است، فقط ببند
               if (item.classList.contains('open')) {
                 item.classList.remove('open');
                 lastOpen = null;
-                console.log('dropdown بسته شد');
               } else {
                 navItems.forEach(i => i.classList.remove('open'));
                 item.classList.add('open');
                 lastOpen = item;
-                console.log('dropdown باز شد برای آیتم:', item);
               }
             };
           });
         }
-
         document.addEventListener('DOMContentLoaded', function() {
           setupMobileNavDropdowns();
           document.addEventListener('click', closeAllDropdowns);
         });
-
         window.addEventListener('resize', function() {
           if (window.innerWidth <= 768) {
             setupMobileNavDropdowns();
