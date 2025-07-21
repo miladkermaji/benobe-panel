@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,11 +9,11 @@ class SubUser extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['doctor_id', 'subuserable_id', 'subuserable_type', 'status'];
+    protected $fillable = ['owner_id', 'owner_type', 'subuserable_id', 'subuserable_type', 'status'];
 
-    public function doctor()
+    public function owner()
     {
-        return $this->belongsTo(Doctor::class);
+        return $this->morphTo();
     }
 
     public function subuserable()

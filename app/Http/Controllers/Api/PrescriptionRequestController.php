@@ -397,13 +397,50 @@ class PrescriptionRequestController extends Controller
             'phone.regex' => 'فرمت شماره تلفن معتبر نیست.',
         ]);
 
-        // تلاش برای یافتن کاربر با کد ملی
-        $user = \App\Models\User::where('national_code', $validated['national_code'])->first();
-        if ($user) {
+        // جستجو در همه مدل‌ها
+        $models = [
+            ['model' => \App\Models\User::class, 'type' => 'user'],
+            ['model' => \App\Models\Doctor::class, 'type' => 'doctor'],
+            ['model' => \App\Models\Secretary::class, 'type' => 'secretary'],
+            ['model' => \App\Models\Admin\Manager::class, 'type' => 'manager'],
+        ];
+        $found = null;
+        $foundType = null;
+        foreach ($models as $item) {
+            $found = $item['model']::where('national_code', $validated['national_code'])->first();
+            if ($found) {
+                $foundType = $item['model'];
+                break;
+            }
+        }
+
+        // گرفتن کاربر جاری (مالک) از همه گاردها
+        $owner = Auth::user() ?? Auth::guard('doctor')->user() ?? Auth::guard('manager')->user() ?? Auth::guard('secretary')->user();
+        if (!$owner) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'کاربر احراز هویت نشده است.',
+                'data' => null,
+            ], 401);
+        }
+        $ownerType = get_class($owner);
+        $ownerId = $owner->id;
+
+        if ($found) {
+            // ثبت در sub_users
+            \App\Models\SubUser::firstOrCreate([
+                'owner_id' => $ownerId,
+                'owner_type' => $ownerType,
+                'subuserable_id' => $found->id,
+                'subuserable_type' => $foundType,
+            ], [
+                'status' => 'active',
+            ]);
             return response()->json([
                 'status' => 'success',
                 'message' => 'کاربر یافت شد.',
-                'data' => $user,
+                'data' => $found,
+                'model_type' => class_basename($foundType),
             ], 200);
         }
 
@@ -419,11 +456,53 @@ class PrescriptionRequestController extends Controller
             'mobile' => $validated['phone'],
             'status' => 1,
         ]);
+        // ثبت کاربر جدید در sub_users
+        \App\Models\SubUser::create([
+            'owner_id' => $ownerId,
+            'owner_type' => $ownerType,
+            'subuserable_id' => $user->id,
+            'subuserable_type' => \App\Models\User::class,
+            'status' => 'active',
+        ]);
 
         return response()->json([
             'status' => 'success',
             'message' => 'کاربر جدید با موفقیت ثبت شد.',
             'data' => $user,
+            'model_type' => 'User',
         ], 201);
+    }
+
+    /**
+     * لیست کاربران زیرمجموعه برای کاربر لاگین شده
+     */
+    public function mySubUsers(Request $request)
+    {
+        $owner = Auth::user() ?? Auth::guard('doctor')->user() ?? Auth::guard('manager')->user() ?? Auth::guard('secretary')->user();
+        if (!$owner) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'کاربر احراز هویت نشده است.',
+                'data' => null,
+            ], 401);
+        }
+        $subUsers = \App\Models\SubUser::with('subuserable')
+            ->where('owner_id', $owner->id)
+            ->where('owner_type', get_class($owner))
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'status' => $item->status,
+                    'created_at' => $item->created_at,
+                    'updated_at' => $item->updated_at,
+                    'model_type' => class_basename($item->subuserable_type),
+                    'user' => $item->subuserable,
+                ];
+            });
+        return response()->json([
+            'status' => 'success',
+            'data' => $subUsers,
+        ]);
     }
 }
