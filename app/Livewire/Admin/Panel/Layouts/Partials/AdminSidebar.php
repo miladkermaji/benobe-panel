@@ -35,7 +35,7 @@ class AdminSidebar extends Component
     public function render()
     {
         if (! $this->user) {
-            return redirect()->route('admin.login');
+            return redirect()->route('admin.auth.login-register-form');
         }
 
         return view('livewire.admin.panel.layouts.partials.admin-sidebar');
