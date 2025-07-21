@@ -575,7 +575,7 @@ body {
 
 @media screen and (max-width: 389px) {
      .myPanelOption .dropdown-trigger {
-        max-width: 230px;
+        max-width: 210px;
     }
 }
 @media screen and (max-width: 432px) {
