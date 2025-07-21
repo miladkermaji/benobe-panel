@@ -524,64 +524,73 @@
           bottom: 0;
           left: 0;
           width: 100vw;
-          background: #fff;
-          box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.08);
+          background: rgba(255, 255, 255, 0.95);
+          box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
           z-index: 15000;
           justify-content: space-around;
           align-items: center;
           padding: 0;
-          height: 64px;
-          border-top: 1px solid #eee;
-          overflow-x: visible !important;
+          height: 68px;
+          border-top: 1.5px solid #e0e0e0;
+          backdrop-filter: blur(8px);
         }
 
         .mobile-bottom-nav__item {
           position: relative;
           flex: 1 0 60px;
           text-align: center;
-          padding: 8px 0 0 0;
+          padding: 6px 0 0 0;
           cursor: pointer;
-          /* برای موقعیت‌دهی درست dropdown */
           transition: background 0.2s;
           min-width: 60px;
+          border-radius: 18px 18px 0 0;
+          margin: 0 2px;
         }
 
         .mobile-bottom-nav__item svg {
           display: block;
           margin: 0 auto 2px auto;
-          width: 24px;
-          height: 24px;
-          fill: #666;
-          transition: fill 0.2s;
+          width: 28px;
+          height: 28px;
+          fill: #888;
+          transition: fill 0.2s, transform 0.2s;
+          filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04));
         }
 
         .mobile-bottom-nav__item.active svg,
-        .mobile-bottom-nav__item:active svg {
-          fill: #007bff;
+        .mobile-bottom-nav__item:active svg,
+        .mobile-bottom-nav__item.open svg {
+          fill: #1976d2;
+          transform: scale(1.12);
         }
 
         .mobile-bottom-nav__label {
           font-size: 11px;
           color: #444;
           font-weight: 500;
+          letter-spacing: 0.2px;
+          margin-top: 2px;
+          opacity: 0.92;
         }
 
-        /* تست موقعیت و نمایش dropdown */
+        .mobile-bottom-nav__item:active,
+        .mobile-bottom-nav__item.open {
+          background: linear-gradient(90deg, #e3f2fd 0%, #fce4ec 100%);
+          box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
+        }
+
         .mobile-bottom-nav__dropdown {
           position: absolute;
-          bottom: 64px;
+          bottom: 68px;
           left: 50%;
           transform: translateX(-50%);
           min-width: 180px;
           background: #fff;
-          box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
-          border-radius: 12px 12px 0 0;
+          box-shadow: 0 2px 16px rgba(25, 118, 210, 0.10);
+          border-radius: 16px 16px 0 0;
           padding: 8px 0;
           z-index: 20000;
           animation: dropdownIn 0.25s;
-        }
-
-        .mobile-bottom-nav__dropdown {
           display: none;
         }
 
@@ -591,12 +600,13 @@
 
         .mobile-bottom-nav__dropdown a {
           display: block;
-          padding: 10px 20px;
+          padding: 12px 24px;
           color: #333;
           text-decoration: none;
-          font-size: 14px;
+          font-size: 15px;
           border-bottom: 1px solid #f2f2f2;
-          transition: background 0.2s;
+          transition: background 0.2s, color 0.2s;
+          border-radius: 8px;
         }
 
         .mobile-bottom-nav__dropdown a:last-child {
@@ -604,8 +614,8 @@
         }
 
         .mobile-bottom-nav__dropdown a:hover {
-          background: #f7f7f7;
-          color: #007bff;
+          background: #e3f2fd;
+          color: #1976d2;
         }
 
         @keyframes dropdownIn {
