@@ -223,6 +223,7 @@ class SubUserList extends Component
                     ->orderBy('created_at', 'desc');
             }])
             ->whereHas('subUsers', function ($query) {
+                $query->where('owner_type', Doctor::class);
                 if (!empty($this->search)) {
                     $search = trim($this->search);
                     $query->whereHasMorph('subuserable', [\App\Models\User::class], function ($q) use ($search) {

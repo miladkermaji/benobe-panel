@@ -20,8 +20,8 @@ class SubUserEdit extends Component
     public function mount($id)
     {
         $this->subUser = SubUser::findOrFail($id);
-        $this->doctor_id = $this->subUser->doctor_id;
-        $this->user_id = $this->subUser->user_id;
+        $this->doctor_id = $this->subUser->owner_id;
+        $this->user_id = $this->subUser->subuserable_id;
         $this->status = $this->subUser->status;
         $this->doctors = Doctor::all();
 
@@ -38,7 +38,8 @@ class SubUserEdit extends Component
                     'required',
                     'exists:users,id',
                     function ($attribute, $value, $fail) {
-                        $exists = \App\Models\SubUser::where('doctor_id', $this->doctor_id)
+                        $exists = \App\Models\SubUser::where('owner_id', $this->doctor_id)
+                            ->where('owner_type', \App\Models\Doctor::class)
                             ->where('subuserable_id', $value)
                             ->where('subuserable_type', \App\Models\User::class)
                             ->where('id', '!=', $this->subUser->id)
@@ -59,7 +60,8 @@ class SubUserEdit extends Component
             ]);
 
             $this->subUser->update([
-                'doctor_id' => $this->doctor_id,
+                'owner_id' => $this->doctor_id,
+                'owner_type' => \App\Models\Doctor::class,
                 'subuserable_id' => $this->user_id,
                 'subuserable_type' => User::class,
                 'status' => $this->status,
@@ -84,7 +86,8 @@ class SubUserEdit extends Component
                 'required',
                 'exists:users,id',
                 function ($attribute, $value, $fail) {
-                    $exists = \App\Models\SubUser::where('doctor_id', $this->doctor_id)
+                    $exists = \App\Models\SubUser::where('owner_id', $this->doctor_id)
+                        ->where('owner_type', \App\Models\Doctor::class)
                         ->where('subuserable_id', $value)
                         ->where('subuserable_type', \App\Models\User::class)
                         ->where('id', '!=', $this->subUser->id)

@@ -30,7 +30,8 @@ class SubUserCreate extends Component
                     'required',
                     'exists:users,id',
                     function ($attribute, $value, $fail) {
-                        $exists = \App\Models\SubUser::where('doctor_id', $this->doctor_id)
+                        $exists = \App\Models\SubUser::where('owner_id', $this->doctor_id)
+                            ->where('owner_type', \App\Models\Doctor::class)
                             ->where('subuserable_id', $value)
                             ->where('subuserable_type', \App\Models\User::class)
                             ->exists();
@@ -49,8 +50,9 @@ class SubUserCreate extends Component
                 'status.in' => 'وضعیت انتخاب‌شده معتبر نیست.',
             ]);
 
-            SubUser::create([
-                'doctor_id' => $this->doctor_id,
+            \App\Models\SubUser::create([
+                'owner_id' => $this->doctor_id,
+                'owner_type' => \App\Models\Doctor::class,
                 'subuserable_id' => $this->user_id,
                 'subuserable_type' => User::class,
                 'status' => $this->status,
@@ -81,7 +83,8 @@ class SubUserCreate extends Component
                     $value,
                     $fail
                 ) {
-                    $exists = \App\Models\SubUser::where('doctor_id', $this->doctor_id)
+                    $exists = \App\Models\SubUser::where('owner_id', $this->doctor_id)
+                        ->where('owner_type', \App\Models\Doctor::class)
                         ->where('subuserable_id', $value)
                         ->where('subuserable_type', \App\Models\User::class)
                         ->exists();

@@ -350,7 +350,8 @@ class DrScheduleController extends Controller
             abort(403, 'شما به این بخش دسترسی ندارید.');
         }
 
-        $subUserIds = SubUser::where('doctor_id', $doctor->id)
+        $subUserIds = SubUser::where('owner_id', $doctor->id)
+            ->where('owner_type', \App\Models\Doctor::class)
             ->where('subuserable_type', \App\Models\User::class)
             ->pluck('subuserable_id')
             ->toArray();
