@@ -946,6 +946,9 @@
       align-items: center;
       padding: 16px 16px 0 16px;
       background: transparent;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
 
     .close-mobile-submenu-btn {
@@ -964,6 +967,10 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+      overflow-y: auto;
+      flex: 1 1 0;
+      max-height: calc(100vh - 68px - 64px);
+      /* 64px تقریبی هدر */
     }
 
     .mobile-submenu-list a {
