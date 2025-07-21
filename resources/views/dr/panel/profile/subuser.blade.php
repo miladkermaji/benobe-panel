@@ -220,6 +220,15 @@
 <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 <script>
+  // --- TomSelect Safe Init ---
+  function safeInitTomSelect(selector, options = {}) {
+    var el = document.querySelector(selector);
+    if (el && !el.tomselect) {
+      return new TomSelect(el, options);
+    }
+    return null;
+  }
+  // --- End TomSelect Safe Init ---
   function renderSubUserLoading() {
     $('#subuser-list-tbody').html(
       `<tr><td colspan="6" class="text-center py-4">

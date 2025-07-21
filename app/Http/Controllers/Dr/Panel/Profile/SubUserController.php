@@ -14,7 +14,10 @@ class SubUserController extends Controller
     public function index()
     {
         $doctorId = Auth::guard('doctor')->id();
-        $subUsers = SubUser::with('subuserable')->where('doctor_id', $doctorId)->get();
+        $subUsers = SubUser::with('subuserable')
+            ->where('owner_id', $doctorId)
+            ->where('owner_type', \App\Models\Doctor::class)
+            ->get();
         $users = User::paginate(50); // صفحه‌بندی کاربران، هر بار ۵۰ کاربر
 
         return view('dr.panel.profile.subuser', compact('subUsers', 'users'));
@@ -35,7 +38,8 @@ class SubUserController extends Controller
 
         $doctorId = Auth::guard('doctor')->id();
 
-        $existingSubUser = SubUser::where('doctor_id', $doctorId)
+        $existingSubUser = SubUser::where('owner_id', $doctorId)
+            ->where('owner_type', \App\Models\Doctor::class)
             ->where('subuserable_id', $request->user_id)
             ->where('subuserable_type', User::class)
             ->first();
@@ -45,14 +49,15 @@ class SubUserController extends Controller
         }
 
         SubUser::create([
-            'doctor_id'        => $doctorId,
+            'owner_id'        => $doctorId,
+            'owner_type'      => \App\Models\Doctor::class,
             'subuserable_id'   => $request->user_id,
             'subuserable_type' => User::class,
         ]);
 
         return response()->json([
             'message'  => 'کاربر زیرمجموعه با موفقیت اضافه شد!',
-            'subUsers' => SubUser::where('doctor_id', $doctorId)->with('subuserable')->get(),
+            'subUsers' => SubUser::where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->get(),
         ]);
     }
 
@@ -87,9 +92,12 @@ class SubUserController extends Controller
             return response()->json(['message' => 'بدون تغییر! مقدار جدید همان مقدار قبلی است.']);
         }
 
-        $existingSubUser = SubUser::where('doctor_id', $subUser->doctor_id)
+        $doctorId = Auth::guard('doctor')->id();
+        $existingSubUser = SubUser::where('owner_id', $doctorId)
+            ->where('owner_type', \App\Models\Doctor::class)
             ->where('subuserable_id', $request->user_id)
             ->where('subuserable_type', User::class)
+            ->where('id', '!=', $subUser->id)
             ->first();
 
         if ($existingSubUser) {
@@ -102,7 +110,7 @@ class SubUserController extends Controller
 
         return response()->json([
             'message'  => 'کاربر زیرمجموعه با موفقیت ویرایش شد!',
-            'subUsers' => SubUser::where('doctor_id', $subUser->doctor_id)->with('subuserable')->get(),
+            'subUsers' => SubUser::where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->get(),
         ]);
     }
 
@@ -114,12 +122,12 @@ class SubUserController extends Controller
                 'error' => 'کاربر مورد نظر پیدا نشد یا قبلاً حذف شده است.'
             ], 404);
         }
-        $doctorId = $subUser->doctor_id;
+        $doctorId = $subUser->owner_id;
         $subUser->delete();
 
         return response()->json([
             'message'  => 'کاربر زیرمجموعه حذف شد!',
-            'subUsers' => SubUser::where('doctor_id', $doctorId)->with('subuserable')->get(),
+            'subUsers' => SubUser::where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->get(),
         ]);
     }
 
@@ -130,8 +138,8 @@ class SubUserController extends Controller
         if (!is_array($ids) || empty($ids)) {
             return response()->json(['error' => 'هیچ کاربری انتخاب نشده است.'], 422);
         }
-        SubUser::where('doctor_id', $doctorId)->whereIn('id', $ids)->delete();
-        $subUsers = SubUser::where('doctor_id', $doctorId)->with('subuserable')->orderByDesc('id')->paginate(20);
+        SubUser::where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class)->whereIn('id', $ids)->delete();
+        $subUsers = SubUser::where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->orderByDesc('id')->paginate(20);
         return response()->json([
             'message' => 'کاربران زیرمجموعه با موفقیت حذف شدند!',
             'subUsers' => $subUsers
@@ -141,7 +149,7 @@ class SubUserController extends Controller
     public function list(Request $request)
     {
         $doctorId = Auth::guard('doctor')->id();
-        $query = SubUser::with('subuserable')->where('doctor_id', $doctorId);
+        $query = SubUser::with('subuserable')->where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class);
 
         if ($request->has('search') && $request->search) {
             $search = $request->search;
