@@ -922,7 +922,8 @@
       top: 0;
       left: 0;
       width: 100vw;
-      height: 100vh;
+      height: calc(100vh - 68px);
+      /* ارتفاع منهای منوی پایین */
       background: rgba(255, 255, 255, 0.98);
       z-index: 20001;
       flex-direction: column;
@@ -930,6 +931,8 @@
       align-items: stretch;
       overflow-y: auto;
       transition: opacity 0.2s;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
     }
 
     .mobile-submenu-overlay.active {
