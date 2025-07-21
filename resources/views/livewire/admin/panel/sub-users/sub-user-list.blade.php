@@ -116,25 +116,28 @@
                     @endphp
               <tbody x-data="{ open: false }">
                 <tr style="background: #e9f1fa; cursor:pointer;" @click="open = !open">
-                  <td colspan="8" class="fw-bold text-primary py-3 px-3" style="font-size: 1.1rem;">
-                    <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2"
-                      style="vertical-align: middle; margin-left: 6px; transition: transform 0.2s;"
-                      :class="open ? 'rotate-90' : ''">
-                      <circle cx="9" cy="9" r="8" />
-                      <path d="M9 5v4l3 2" />
-                    </svg>
-                    {{ $ownerFullName }}
-                    <span class="badge bg-secondary mx-2">
-                      @if ($owner instanceof \App\Models\Doctor)
-                        پزشک
-                      @elseif ($owner instanceof \App\Models\Secretary)
-                        منشی
-                      @elseif ($owner instanceof \App\Models\Admin\Manager)
-                        مدیر
-                      @elseif ($owner instanceof \App\Models\User)
-                        کاربر عادی
-                      @endif
-                    </span>
+                  <td colspan="8" style="font-size: 1.1rem;">
+                    <div class="d-flex justify-content-between flex-row-reverse align-items-center w-100">
+                      <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2"
+                        style="vertical-align: middle; transition: transform 0.2s; margin-right: 0; margin-left: 12px;"
+                        :class="open ? 'rotate-90' : ''">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                      <span class="fw-bold text-primary py-3 px-3">
+                        {{ $ownerFullName }}
+                        <span class="badge bg-secondary mx-2">
+                          @if ($owner instanceof \App\Models\Doctor)
+                            پزشک
+                          @elseif ($owner instanceof \App\Models\Secretary)
+                            منشی
+                          @elseif ($owner instanceof \App\Models\Admin\Manager)
+                            مدیر
+                          @elseif ($owner instanceof \App\Models\User)
+                            کاربر عادی
+                          @endif
+                        </span>
+                      </span>
+                    </div>
                   </td>
                 </tr>
                 @foreach ($owner->subUsers as $subUser)
@@ -219,8 +222,14 @@
                 <div class="mb-3 p-2 rounded-3 shadow-sm" x-data="{ open: false }"
                   style="border: 2px solid #b3c2d1; background: #f5f7fa;">
                   <!-- هدر مجزا برای هر owner -->
-                  <div class="fw-bold text-primary mb-2 d-flex align-items-center justify-content-between"
-                    style="font-size: 1.08rem;">
+                  <div
+                    class="fw-bold text-primary mb-2 d-flex align-items-center justify-content-between flex-row-reverse"
+                    style="font-size: 1.08rem; cursor:pointer;" @click="open = !open">
+                    <svg :class="open ? 'rotate-180' : ''" width="20" height="20" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2"
+                      style="transition: transform 0.2s; margin-right: 0; margin-left: 8px;">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
                     <span>
                       {{ $ownerFullName }}
                       <span class="badge bg-secondary mx-2">
@@ -235,10 +244,6 @@
                         @endif
                       </span>
                     </span>
-                    <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
-                      fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg>
                   </div>
                   <div x-show="open" x-transition>
                     @foreach ($owner->subUsers as $subUser)
@@ -346,6 +351,10 @@
     <style>
       .rotate-90 {
         transform: rotate(90deg) !important;
+      }
+
+      .rotate-180 {
+        transform: rotate(180deg) !important;
       }
     </style>
   </div>
