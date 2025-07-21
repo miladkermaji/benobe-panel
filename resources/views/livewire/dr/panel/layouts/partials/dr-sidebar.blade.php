@@ -727,13 +727,13 @@
         <a href="{{ route('dr-panel') }}">داشبورد</a>
       </div>
     </div>
-    <!-- نوبت‌ها و نسخه‌ها -->
+    <!-- نوبت‌ها -->
     <div class="mobile-bottom-nav__item" data-group="appointments">
       <svg viewBox="0 0 24 24">
         <path
           d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm0-13H5V5h14v1z" />
       </svg>
-      <div class="mobile-bottom-nav__label">نوبت‌ها و نسخه‌ها</div>
+      <div class="mobile-bottom-nav__label">نوبت‌ها</div>
       <div class="mobile-bottom-nav__dropdown">
         <a href="{{ route('dr-appointments') }}">لیست نوبت‌ها</a>
         <a href="{{ route('dr.panel.doctornotes.index') }}">توضیحات نوبت</a>
@@ -742,24 +742,20 @@
         <a href="{{ route('dr-vacation') }}">تعطیلات</a>
         <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
         <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه‌ها</a>
-        <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
-        <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
-        <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
-        <a href="{{ route('dr-secretary-management') }}">مدیریت منشی‌ها</a>
-        <a href="{{ route('dr-secretary-permissions') }}">دسترسی‌های منشی</a>
       </div>
     </div>
-    <!-- مالی -->
-    <div class="mobile-bottom-nav__item" data-group="finance">
+    <!-- مشاوره -->
+    <div class="mobile-bottom-nav__item" data-group="consult">
       <svg viewBox="0 0 24 24">
         <path
-          d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8-2V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v2C2.9 6 2 6.9 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
+          d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
       </svg>
-      <div class="mobile-bottom-nav__label">مالی</div>
+      <div class="mobile-bottom-nav__label">مشاوره</div>
       <div class="mobile-bottom-nav__dropdown">
-        <a href="{{ route('dr.panel.financial-reports.index') }}">گزارش مالی</a>
-        <a href="{{ route('dr-payment-setting') }}">پرداخت</a>
-        <a href="{{ route('dr-wallet-charge') }}">شارژ کیف پول</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی مشاوره</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش مشاوره</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین مشاوره</a>
       </div>
     </div>
     <!-- پروفایل -->
@@ -774,19 +770,52 @@
         <a href="{{ route('dr-edit-profile-security') }}">امنیت</a>
         <a href="{{ route('dr-my-performance') }}">عملکرد من</a>
         <a href="{{ route('dr-subuser') }}">کاربران زیرمجموعه</a>
+        <a href="{{ route('my-dr-appointments') }}">نوبت‌های من</a>
         <a href="{{ route('dr.panel.doctor-faqs.index') }}">سوالات متداول</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">ارتقا حساب</a>
       </div>
     </div>
-    <!-- پیام‌ها -->
-    <div class="mobile-bottom-nav__item" data-group="messages">
+    <!-- ساعت کاری -->
+    <div class="mobile-bottom-nav__item" data-group="workhours">
       <svg viewBox="0 0 24 24">
-        <path d="M20 2H4c-1.1 0-2 .9-2 2v16l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H6l-4 4V4h18v10z" />
+        <path
+          d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8-2V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v2C2.9 6 2 6.9 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
       </svg>
-      <div class="mobile-bottom-nav__label">پیام‌ها</div>
+      <div class="mobile-bottom-nav__label">ساعت کاری</div>
       <div class="mobile-bottom-nav__dropdown">
+        <a href="{{ route('dr-workhours') }}">ساعت کاری</a>
+      </div>
+    </div>
+    <!-- سایر -->
+    <div class="mobile-bottom-nav__item" data-group="other">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" fill="#eee" />
+        <text x="12" y="16" text-anchor="middle" font-size="16" fill="#888">...</text>
+      </svg>
+      <div class="mobile-bottom-nav__label">سایر</div>
+      <div class="mobile-bottom-nav__dropdown">
+        <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
         <a href="{{ route('dr-panel-tickets') }}">تیکت‌ها</a>
         <a href="{{ route('dr.panel.send-message') }}">ارسال پیام</a>
+        <a href="#">صفحه گفتگو</a>
+        <a href="{{ route('dr.panel.financial-reports.index') }}">گزارش مالی</a>
+        <a href="{{ route('dr-payment-setting') }}">پرداخت</a>
+        <a href="{{ route('dr-wallet-charge') }}">شارژ کیف پول</a>
+        <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
+        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
+        <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">نسخه الکترونیک</div>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده پزشکی</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه‌های ثبت شده</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">بیمه‌های من</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه پراستفاده</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">اقلام پراستفاده</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده الکترونیک</a>
+        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
+        <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
+        <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
+        <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
+        <a href="{{ route('dr-secretary-management') }}">مدیریت منشی‌ها</a>
+        <a href="{{ route('dr-secretary-permissions') }}">دسترسی‌های منشی</a>
       </div>
     </div>
   </div>
-</div>
