@@ -126,7 +126,7 @@
       </div>
     </div>
     <!-- نمودار مقایسه کلینیک‌ها -->
-    
+
     <div class="col-md-4">
       <div class="chart-card">
         <div class="card-body">
@@ -248,4 +248,61 @@
   };
 </script>
 <script src="{{ asset('admin-assets/panel/js/dashboard/dashboard.js') }}"></script>
+<script>
+  (function() {
+    const slider = document.querySelector('.top-s-a-wrapper');
+    if (!slider) return;
+    let isDown = false;
+    let startX, scrollLeft;
+
+    slider.addEventListener('mousedown', (e) => {
+      isDown = true;
+      slider.classList.add('grabbing');
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
+      e.preventDefault();
+    });
+
+    slider.addEventListener('mouseleave', () => {
+      isDown = false;
+      slider.classList.remove('grabbing');
+    });
+
+    slider.addEventListener('mouseup', () => {
+      isDown = false;
+      slider.classList.remove('grabbing');
+    });
+
+    slider.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      const x = e.pageX - slider.offsetLeft;
+      const walk = x - startX;
+      slider.scrollLeft = scrollLeft - walk;
+      e.preventDefault();
+    });
+
+    // جلوگیری از اجرای لینک هنگام drag
+    let dragMoved = false;
+    slider.addEventListener('mousedown', () => {
+      dragMoved = false;
+    });
+    slider.addEventListener('mousemove', () => {
+      if (isDown) dragMoved = true;
+    });
+    slider.querySelectorAll('.stat-card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        if (dragMoved) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+        }
+      }, true);
+    });
+  })();
+</script>
+<style>
+  .top-s-a-wrapper.grabbing {
+    cursor: grabbing !important;
+    user-select: none;
+  }
+</style>
 @endsection
