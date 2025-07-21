@@ -650,6 +650,13 @@
           display: none !important;
         }
       }
+
+      .soon-label {
+        font-size: 10px;
+        color: #d32f2f;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
     </style>
     <script>
       (function() {
@@ -734,10 +741,14 @@
       </svg>
       <div class="mobile-bottom-nav__label">مشاوره</div>
       <div class="mobile-bottom-nav__dropdown">
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی مشاوره</a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش مشاوره</a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص</a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین مشاوره</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی مشاوره
+          <span class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش مشاوره <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین مشاوره <span
+            class="soon-label">به زودی</span></a>
       </div>
     </div>
     <!-- پروفایل -->
@@ -754,7 +765,8 @@
         <a href="{{ route('dr-subuser') }}">کاربران زیرمجموعه</a>
         <a href="{{ route('my-dr-appointments') }}">نوبت‌های من</a>
         <a href="{{ route('dr.panel.doctor-faqs.index') }}">سوالات متداول</a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">ارتقا حساب</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">ارتقا حساب <span
+            class="soon-label">به زودی</span></a>
       </div>
     </div>
     <!-- ساعت کاری -->
@@ -786,12 +798,18 @@
         <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">نسخه الکترونیک</div>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده پزشکی</a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه‌های ثبت شده</a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">بیمه‌های من</a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه پراستفاده</a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">اقلام پراستفاده</a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده الکترونیک</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده پزشکی <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه‌های ثبت شده <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">بیمه‌های من <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه پراستفاده <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">اقلام پراستفاده <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده الکترونیک <span
+            class="soon-label">به زودی</span></a>
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
         <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
