@@ -712,21 +712,29 @@
       <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard">
         <a href="{{ route('dr-panel') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <svg viewBox="0 0 24 24">
-            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
-          </svg>
-          <div class="mobile-bottom-nav__label">داشبورد</div>
+          <div class="mobile-bottom-nav__activebox">
+            <div class="mobile-bottom-nav__icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+              </svg>
+            </div>
+            <div class="mobile-bottom-nav__label">داشبورد</div>
+          </div>
         </a>
       </div>
     @endif
     <!-- نوبت‌ها -->
     @if ($this->hasPermission('appointments'))
       <div class="mobile-bottom-nav__item" data-group="appointments" data-has-submenu="true">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm0-13H5V5h14v1z" />
-        </svg>
-        <div class="mobile-bottom-nav__label">نوبت‌ها</div>
+        <div class="mobile-bottom-nav__activebox">
+          <div class="mobile-bottom-nav__icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm0-13H5V5h14v1z" />
+            </svg>
+          </div>
+          <div class="mobile-bottom-nav__label">نوبت‌ها</div>
+        </div>
         <div class="mobile-bottom-nav__dropdown" style="display:none">
           @if ($this->hasPermission('dr-appointments'))
             <a href="{{ route('dr-appointments') }}">لیست نوبت‌ها</a>
@@ -755,11 +763,15 @@
     <!-- مشاوره -->
     @if ($this->hasPermission('consult'))
       <div class="mobile-bottom-nav__item" data-group="consult" data-has-submenu="true">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
-        </svg>
-        <div class="mobile-bottom-nav__label">مشاوره</div>
+        <div class="mobile-bottom-nav__activebox">
+          <div class="mobile-bottom-nav__icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+            </svg>
+          </div>
+          <div class="mobile-bottom-nav__label">مشاوره</div>
+        </div>
         <div class="mobile-bottom-nav__dropdown" style="display:none">
           @if ($this->hasPermission('dr-moshavere_setting'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی <span
@@ -783,11 +795,15 @@
     <!-- پروفایل -->
     @if ($this->hasPermission('profile'))
       <div class="mobile-bottom-nav__item" data-group="profile" data-has-submenu="true">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
-        </svg>
-        <div class="mobile-bottom-nav__label">پروفایل</div>
+        <div class="mobile-bottom-nav__activebox">
+          <div class="mobile-bottom-nav__icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+            </svg>
+          </div>
+          <div class="mobile-bottom-nav__label">پروفایل</div>
+        </div>
         <div class="mobile-bottom-nav__dropdown" style="display:none">
           @if ($this->hasPermission('dr-edit-profile'))
             <a href="{{ route('dr-edit-profile') }}">ویرایش پروفایل</a>
@@ -819,21 +835,29 @@
       <div class="mobile-bottom-nav__item" data-group="workhours">
         <a href="{{ route('dr-workhours') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8-2V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v2C2.9 6 2 6.9 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
-          </svg>
-          <div class="mobile-bottom-nav__label">ساعت کاری</div>
+          <div class="mobile-bottom-nav__activebox">
+            <div class="mobile-bottom-nav__icon">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8-2V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v2C2.9 6 2 6.9 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
+              </svg>
+            </div>
+            <div class="mobile-bottom-nav__label">ساعت کاری</div>
+          </div>
         </a>
       </div>
     @endif
     <!-- سایر -->
     <div class="mobile-bottom-nav__item mobile-bottom-nav__item--other" data-group="other" data-has-submenu="true">
-      <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" fill="#eee" />
-        <text x="12" y="16" text-anchor="middle" font-size="16" fill="#888">...</text>
-      </svg>
-      <div class="mobile-bottom-nav__label">سایر</div>
+      <div class="mobile-bottom-nav__activebox">
+        <div class="mobile-bottom-nav__icon">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="#eee" />
+            <text x="12" y="16" text-anchor="middle" font-size="16" fill="#888">...</text>
+          </svg>
+        </div>
+        <div class="mobile-bottom-nav__label">سایر</div>
+      </div>
       <div class="mobile-bottom-nav__dropdown" style="display:none">
         @if ($this->hasPermission('statistics'))
           <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
@@ -998,6 +1022,33 @@
         display: none !important;
       }
     }
+
+    .mobile-bottom-nav__activebox {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .mobile-bottom-nav__item.active .mobile-bottom-nav__activebox {
+      background: linear-gradient(90deg, #a7c7ff 0%, #fbc2eb 100%);
+      box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
+      border-radius: 16px;
+      padding: 6px 8px 4px 8px;
+    }
+
+    .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg {
+      fill: #1976d2;
+      transform: scale(1.12);
+      transition: fill 0.2s, transform 0.2s;
+    }
+
+    .mobile-bottom-nav__item.active .mobile-bottom-nav__label {
+      color: #1976d2;
+      font-weight: bold;
+    }
   </style>
   <script>
     (function() {
@@ -1011,12 +1062,17 @@
         overlay.classList.remove('active');
         submenuList.innerHTML = '';
         document.body.style.overflow = '';
+        // حذف کلاس active از همه آیتم‌ها
+        document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
       }
 
-      function openOverlayWithSubmenu(submenuHtml) {
+      function openOverlayWithSubmenu(submenuHtml, parentItem) {
         submenuList.innerHTML = submenuHtml;
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        // حذف active از همه و اضافه کردن به آیتم فعلی
+        document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
+        if (parentItem) parentItem.classList.add('active');
       }
 
       function setupMobileNavOverlay() {
@@ -1026,7 +1082,6 @@
             if (window.innerWidth > 768) return;
             let dropdown = item.querySelector('.mobile-bottom-nav__dropdown');
             if (dropdown) {
-              // اگر فقط یک لینک دارد مستقیم برو به لینک
               let links = Array.from(dropdown.querySelectorAll('a')).filter(a => a.href && a.href !==
                 'javascript:void(0)');
               if (links.length === 1) {
@@ -1034,7 +1089,7 @@
                 return;
               }
               let html = dropdown.innerHTML;
-              openOverlayWithSubmenu(html);
+              openOverlayWithSubmenu(html, item);
             }
           };
         });
