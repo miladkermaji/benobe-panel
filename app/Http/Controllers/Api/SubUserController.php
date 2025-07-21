@@ -63,7 +63,7 @@ class SubUserController extends Controller
 
             // احراز هویت کاربر
             try {
-                $user = Auth::user();
+                $user = Auth::user() ?? Auth::guard('doctor')->user() ?? Auth::guard('manager')->user() ?? Auth::guard('secretary')->user();
                 if (! $user) {
                     return response()->json([
                         'status'  => 'error',
@@ -80,19 +80,15 @@ class SubUserController extends Controller
                 ], 401);
             }
 
-            // گرفتن کاربران زیرمجموعه با اطلاعات کامل
-            $subUsers = SubUser::with([
-                'doctor' => function ($query) {
-                    $query->select('id', 'mobile', 'first_name', 'last_name', 'license_number', 'profile_photo_path');
-                },
-                'subuserable' // morph relation
-            ])
-                ->select('id', 'doctor_id', 'subuserable_id', 'subuserable_type', 'status', 'created_at', 'updated_at')
+            // گرفتن کاربران زیرمجموعه با اطلاعات کامل (مطابق owner)
+            $subUsers = SubUser::with(['subuserable'])
+                ->where('owner_id', $user->id)
+                ->where('owner_type', get_class($user))
                 ->where('status', 'active')
                 ->get();
 
             // فرمت کردن داده‌ها
-            $formattedSubUsers = $subUsers->map(function ($subUser) {
+            $formattedSubUsers = $subUsers->map(function ($subUser) use ($user) {
                 $subuserable = $subUser->subuserable;
                 $subuserableData = null;
                 if ($subuserable) {
@@ -119,13 +115,6 @@ class SubUserController extends Controller
                     'status'     => $subUser->status,
                     'created_at' => $subUser->created_at ? $subUser->created_at->toIso8601String() : null,
                     'updated_at' => $subUser->updated_at ? $subUser->updated_at->toIso8601String() : null,
-                    'doctor'     => $subUser->doctor ? [
-                        'id'                 => $subUser->doctor->id,
-                        'first_name'         => $subUser->doctor->first_name,
-                        'last_name'          => $subUser->doctor->last_name,
-                        'license_number'     => $subUser->doctor->license_number,
-                        'profile_photo_path' => $subUser->doctor->profile_photo_path,
-                    ] : null,
                     'subuserable' => $subuserableData,
                 ];
             });
