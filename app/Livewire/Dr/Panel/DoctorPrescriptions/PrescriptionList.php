@@ -63,7 +63,7 @@ class PrescriptionList extends Component
         }
     }
 
-    public function showPatientInfo($patientId)
+    public function showPatientInfo($patientId = null)
     {
         $patient = \App\Models\User::with(['province', 'city'])->find($patientId);
         if ($patient) {
