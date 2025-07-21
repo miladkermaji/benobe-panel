@@ -93,6 +93,7 @@ Route::middleware(['custom-auth.jwt'])->group(function () {
     Route::post('/register/medical-center', [\App\Http\Controllers\Api\RegisterDoctorMedicalCenterController::class, 'registerMedicalCenter'])->name('api.register.medical-center');
     Route::post('prescriptions/user-by-national-code', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'getOrCreateUserByNationalCode'])->name('api.prescriptions.user-by-national-code');
     Route::get('prescriptions/my-sub-users', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'mySubUsers'])->name('api.prescriptions.my-sub-users');
+    Route::apiResource('doctor-comments', \App\Http\Controllers\Api\DoctorCommentController::class)->only(['index', 'store', 'show', 'destroy']);
 });
 
 Route::prefix('menus')->group(function () {

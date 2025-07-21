@@ -29,32 +29,32 @@
                   style="z-index: 5; top: 50%; right: 8px;">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
                     stroke-width="2">
-                    <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
-                  </svg>
-                </span>
-              </div>
+          <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+        </svg>
+      </span>
+    </div>
               <select class="form-select form-select-sm w-100 mb-2 mb-md-0" style="min-width: 0;"
                 wire:model.live="statusFilter">
                 <option value="">همه وضعیت‌ها</option>
                 <option value="active">فقط فعال</option>
                 <option value="inactive">فقط غیرفعال</option>
               </select>
-              <a href="{{ route('admin.panel.sub-users.create') }}"
+      <a href="{{ route('admin.panel.sub-users.create') }}"
                 class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 w-100 w-md-auto justify-content-center justify-content-md-start">
                 <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                <span>افزودن</span>
-              </a>
-            </div>
-          </div>
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        <span>افزودن</span>
+      </a>
+    </div>
+  </div>
         </div>
       </div>
     </div>
-    <div class="container-fluid px-0">
+  <div class="container-fluid px-0">
       <div class="card shadow-sm rounded-2">
-        <div class="card-body p-0">
+      <div class="card-body p-0">
           <!-- Group Actions -->
           <div class="group-actions p-2 border-bottom" x-data="{ show: false }"
             x-show="$wire.selectedSubUsers.length > 0 || $wire.applyToAllFiltered">
@@ -87,14 +87,14 @@
                   </th>
                   <th class="text-center align-middle" style="width: 60px;">ردیف</th>
                   <th class="align-middle">نام مالک</th>
-                  <th class="align-middle">نام کاربر</th>
-                  <th class="align-middle">موبایل</th>
-                  <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
-                  <th class="text-center align-middle" style="width: 150px;">عملیات</th>
+                          <th class="align-middle">نام کاربر</th>
+                          <th class="align-middle">موبایل</th>
+                          <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
+                          <th class="text-center align-middle" style="width: 150px;">عملیات</th>
                   <th class="text-center align-middle" style="width: 40px;"></th>
-                </tr>
-              </thead>
-              <tbody>
+                        </tr>
+                      </thead>
+                      <tbody>
                 @php
                   $hasAnySubUser = false;
                 @endphp
@@ -118,7 +118,7 @@
                 <tr style="background: #e9f1fa; cursor:pointer;" @click="open = !open">
                   <td colspan="8" style="font-size: 1.1rem;">
                     <div class="d-flex justify-content-between flex-row-reverse align-items-center w-100">
-                      <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2"
+                    <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2"
                         style="vertical-align: middle; transition: transform 0.2s; margin-right: 0; margin-left: 12px;"
                         :class="open ? 'rotate-90' : ''">
                         <polyline points="6 9 12 15 18 9" />
@@ -136,7 +136,7 @@
                             کاربر عادی
                           @endif
                         </span>
-                      </span>
+                    </span>
                     </div>
                   </td>
                 </tr>
@@ -145,39 +145,39 @@
                     <td class="text-center align-middle">
                       <input type="checkbox" wire:model.live="selectedSubUsers" value="{{ $subUser->id }}"
                         class="form-check-input m-0 align-middle">
-                    </td>
+                            </td>
                     <td class="text-center align-middle">{{ $loop->parent->iteration }}.{{ $loop->iteration }}</td>
                     <td class="align-middle">{{ $ownerFullName }}</td>
                     <td class="align-middle">
                       {{ $subUser->subuserable->first_name . ' ' . $subUser->subuserable->last_name }}</td>
                     <td class="align-middle">{{ $subUser->subuserable->mobile }}</td>
-                    <td class="text-center align-middle">
-                      <button wire:click="toggleStatus({{ $subUser->id }})"
+                            <td class="text-center align-middle">
+                              <button wire:click="toggleStatus({{ $subUser->id }})"
                         class="badge {{ $subUser->status === 'active' ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
-                        {{ $subUser->status === 'active' ? 'فعال' : 'غیرفعال' }}
-                      </button>
-                    </td>
-                    <td class="text-center align-middle">
-                      <div class="d-flex justify-content-center gap-2">
-                        <a href="{{ route('admin.panel.sub-users.edit', $subUser->id) }}"
-                          class="btn btn-gradient-success rounded-pill px-3">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <path
-                              d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                          </svg>
-                        </a>
-                        <button wire:click="confirmDelete({{ $subUser->id }})"
-                          class="btn btn-gradient-danger rounded-pill px-3">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
+                                {{ $subUser->status === 'active' ? 'فعال' : 'غیرفعال' }}
+                              </button>
+                            </td>
+                            <td class="text-center align-middle">
+                              <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ route('admin.panel.sub-users.edit', $subUser->id) }}"
+                                  class="btn btn-gradient-success rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                      d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                  </svg>
+                                </a>
+                                <button wire:click="confirmDelete({{ $subUser->id }})"
+                                  class="btn btn-gradient-danger rounded-pill px-3">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
+                                  </svg>
+                                </button>
+                              </div>
+                            </td>
                     <td class="text-center align-middle"></td>
-                  </tr>
+                          </tr>
                 @endforeach
               </tbody>
               @endforeach
@@ -187,8 +187,8 @@
                     <div class="d-flex justify-content-center align-items-center flex-column">
                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" class="text-muted mb-2">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg>
+                                  <path d="M5 12h14M12 5l7 7-7 7" />
+                                </svg>
                       <p class="text-muted fw-medium">هیچ کاربر زیرمجموعه‌ای یافت نشد.</p>
                     </div>
                   </td>
@@ -199,12 +199,12 @@
                 <td colspan="8" class="text-center py-4">
                   <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">در حال بارگذاری...</span>
-                  </div>
-                </td>
-              </tr>
+                              </div>
+                            </td>
+                          </tr>
               @endif
-              </tbody>
-            </table>
+                      </tbody>
+                    </table>
           </div>
           <!-- Mobile Card View -->
           <div class="subusers-cards d-md-none">
@@ -282,24 +282,24 @@
                           <div class="subuser-card-item d-flex justify-content-between align-items-center py-1">
                             <span class="subuser-card-label">عملیات:</span>
                             <div class="d-flex gap-2">
-                              <a href="{{ route('admin.panel.sub-users.edit', $subUser->id) }}"
-                                class="btn btn-gradient-success rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                </svg>
-                              </a>
-                              <button wire:click="confirmDelete({{ $subUser->id }})"
-                                class="btn btn-gradient-danger rounded-pill px-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                </svg>
-                              </button>
-                            </div>
+                            <a href="{{ route('admin.panel.sub-users.edit', $subUser->id) }}"
+                              class="btn btn-gradient-success rounded-pill px-3">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path
+                                  d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                              </svg>
+                            </a>
+                            <button wire:click="confirmDelete({{ $subUser->id }})"
+                              class="btn btn-gradient-danger rounded-pill px-3">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path
+                                  d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                              </svg>
+                            </button>
                           </div>
+                        </div>
                         </div>
                       </div>
                     @endforeach
@@ -310,7 +310,7 @@
               <div class="text-center py-4">
                 <div class="spinner-border text-primary" role="status">
                   <span class="visually-hidden">در حال بارگذاری...</span>
-                </div>
+            </div>
               </div>
             @endif
           </div>
@@ -318,36 +318,36 @@
           <div class="d-flex justify-content-between align-items-center px-4 flex-wrap gap-3">
             <div class="text-muted">تعداد کل: {{ $totalFilteredCount }}</div>
             {{-- صفحه‌بندی اگر نیاز بود اضافه شود --}}
-          </div>
-        </div>
+              </div>
+            </div>
       </div>
     </div>
-    <script>
-      document.addEventListener('livewire:init', function() {
-        Livewire.on('show-alert', (event) => {
-          toastr[event.type](event.message);
-        });
+  <script>
+    document.addEventListener('livewire:init', function() {
+      Livewire.on('show-alert', (event) => {
+        toastr[event.type](event.message);
+      });
 
-        Livewire.on('confirm-delete', (event) => {
-          Swal.fire({
-            title: 'حذف کاربر زیرمجموعه',
-            text: 'آیا مطمئن هستید که می‌خواهید این کاربر را حذف کنید؟',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'بله، حذف کن',
-            cancelButtonText: 'خیر'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              Livewire.dispatch('deleteSubUser', {
-                id: event.id
-              });
-            }
-          });
+      Livewire.on('confirm-delete', (event) => {
+        Swal.fire({
+          title: 'حذف کاربر زیرمجموعه',
+          text: 'آیا مطمئن هستید که می‌خواهید این کاربر را حذف کنید؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('deleteSubUser', {
+              id: event.id
+            });
+          }
         });
       });
-    </script>
+    });
+  </script>
     <style>
       .rotate-90 {
         transform: rotate(90deg) !important;
