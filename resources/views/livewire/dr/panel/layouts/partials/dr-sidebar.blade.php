@@ -741,13 +741,13 @@
       </svg>
       <div class="mobile-bottom-nav__label">مشاوره</div>
       <div class="mobile-bottom-nav__dropdown">
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی مشاوره
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی 
           <span class="soon-label">به زودی</span></a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش مشاوره <span
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش  <span
             class="soon-label">به زودی</span></a>
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
             class="soon-label">به زودی</span></a>
-        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین مشاوره <span
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین  <span
             class="soon-label">به زودی</span></a>
       </div>
     </div>
