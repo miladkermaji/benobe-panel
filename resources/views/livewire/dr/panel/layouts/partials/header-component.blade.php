@@ -15,9 +15,9 @@
         </div>
       </div>
       <div class="header__left d-flex flex-end item-center margin-top-2">
-     <div class="myPanelOption p-3">
+     <div class="myPanelOption p-3 p-md-3">
     <div class="d-flex align-items-center">
-        <div class="my-tooltip mx-2 d-none d-md-block">
+        <div class="my-tooltip mx-2">
             <x-custom-tooltip title="از این قسمت، مرکزی که در آن مشغول تجویز و طبابت هستید را انتخاب کنید" placement="bottom">
                 <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg"
                      class="lg:block svg-help" color="#3f4079" data-tip="true" data-for="centerSelect" currentItem="false">
@@ -111,7 +111,7 @@
       
         
         <!-- اسکریپت برای مدیریت باز و بسته شدن پنل -->
-        <div class="d-flex notif-option px-3">
+        <div class="d-flex notif-option px-2 px-md-3">
           <div class="position-relative">
             <!-- آیکون زنگوله -->
             <span
@@ -182,7 +182,7 @@
         </div>
         <!-- تغییر لینک لاگ‌اوت به نویگیشن Livewire -->
         <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('dr.auth.logout') }}' })"
-          class="logout" title="خروج"></a>
+          class="logout ms-2" title="خروج"></a>
       </div>
     </div>
     <script>

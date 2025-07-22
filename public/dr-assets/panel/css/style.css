@@ -1178,6 +1178,24 @@ svg {
     border: 1px solid rgba(0, 0, 0, 0.03); /* حاشیه ظریف برای بافت */
 }
 
+/* تنظیمات واکنش‌گرا برای هدر */
+@media (max-width: 768px) {
+    .header {
+        padding: 5px 15px;
+        height: auto;
+        min-height: 70px;
+    }
+    
+    .header__right {
+        flex: 0 1 auto;
+    }
+    
+    .header__left {
+        flex: 1 1 auto;
+        justify-content: flex-end;
+    }
+}
+
 /* سایدبار با رنگ روشن و سایه نرم */
 .sidebar__nav {
     width: 280px; /* افزایش عرض از 280px به 300px */
@@ -1308,6 +1326,23 @@ svg {
     left: 27px;
     /*z-index: 324;*/
     display: none;
+}
+
+/* واکنش‌گرایی برای باکس اعلان‌ها */
+@media (max-width: 768px) {
+    .dropdown__notification {
+        min-width: 280px;
+        width: 90%;
+        left: 5%;
+        right: 5%;
+        padding: 15px;
+    }
+    
+    .notification-box {
+        width: 280px !important;
+        left: auto !important;
+        right: 0 !important;
+    }
 }
 
 .dropdown__notification.is-active {

@@ -311,9 +311,7 @@ body {
         right: inherit !important;
         left: -20px !important;
     }
-    .header {
-        padding: 5px !important;
-    }
+  
     .top-details-sicks-cards .rounded-lg span {
         font-size: 13px;
     }
@@ -483,6 +481,11 @@ body {
     }
 }
 
+@media screen and (max-width: 456px) {
+    .dropdown-trigger {
+        width:250px !important;
+    }
+}
 @media screen and (max-width: 430px) {
     .top-dr-panel {
         width: 100%;
@@ -510,10 +513,7 @@ body {
         flex-wrap: wrap;
     }
 
-    .my-tooltip.mx-2 {
-        margin-right: 0 !important;
-        margin-left: 0 !important;
-    }
+  
 
     .my-dropdown-menu {
         width: 306px !important;
@@ -526,7 +526,9 @@ body {
         top: 42px;
         z-index: 45;
     }
-
+    .dropdown-trigger {
+        width:220px !important;
+    }
     .svg-help {
         display: none;
     }
@@ -538,7 +540,15 @@ body {
         display: flex;
         flex-wrap: wrap;
     }
-
+    .dropdown-trigger {
+        width:190px !important;
+    }
+    .logout {
+        margin-right: 0 !important;
+      }
+      .notif-option {
+        padding: 0 2px !important;
+      }
     .my-dropdown-menu {
         width: 306px !important;
         min-height: 87px;
@@ -623,9 +633,7 @@ body {
     .selectDate_datepicker__xkZeS {
         border: 1px solid #ddd;
     }
-    .my-tooltip {
-        display: none !important;
-    }
+   
     .my-form-control {
         width: 92vw;
         background-color: #ebeff8;
@@ -1817,14 +1825,13 @@ img {
 }
 
 /* پاسخ‌گویی به سایزهای مختلف */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     .myPanelOption {
         padding: 8px !important;
         display: flex;
         justify-content: end;
     }
 
-   
     .myPanelOption .dropdown {
         display: flex;
         justify-content: end;
@@ -1833,5 +1840,33 @@ img {
     .myPanelOption .dropdown-menu {
         width: 100%;
         max-width: 100%;
+    }
+
+    /* بهبود نمایش هدر در سایز موبایل */
+    .header__left {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 5px;
+        overflow:hidden !important;
+    }
+
+    .header__left > div {
+        margin: 0 !important;
+    }
+
+    .dropdown-trigger {
+        width: 300px;
+        min-width: 150px;
+        max-width: 400px;
+    }
+
+    .notif-option {
+        padding: 0 5px !important;
+    }
+
+    /* تنظیم فاصله بین آیکون‌ها */
+    .logout {
+        margin-right: 5px;
     }
 }
