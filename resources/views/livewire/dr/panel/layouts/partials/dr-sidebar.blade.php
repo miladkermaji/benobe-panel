@@ -524,16 +524,16 @@
           bottom: 0;
           left: 0;
           width: 100vw;
-          background: rgba(255, 255, 255, 0.95);
-          box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+          background: rgba(255, 255, 255, 0.98);
+          box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08);
           z-index: 25000;
           /* بالاتر از overlay */
           justify-content: space-around;
           align-items: center;
           padding: 0;
           height: 68px;
-          border-top: 1.5px solid #e0e0e0;
-          backdrop-filter: blur(8px);
+          border-top: 1px solid rgba(224, 224, 224, 0.8);
+          backdrop-filter: blur(10px);
         }
 
         .mobile-bottom-nav__item {
@@ -542,7 +542,7 @@
           text-align: center;
           padding: 6px 0 0 0;
           cursor: pointer;
-          transition: background 0.2s;
+          transition: all 0.3s ease;
           min-width: 60px;
           border-radius: 18px 18px 0 0;
           margin: 0 2px;
@@ -551,10 +551,10 @@
         .mobile-bottom-nav__item svg {
           display: block;
           margin: 0 auto 2px auto;
-          width: 28px;
-          height: 28px;
+          width: 24px;
+          height: 24px;
           fill: #888;
-          transition: fill 0.2s, transform 0.2s;
+          transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04));
         }
 
@@ -562,7 +562,7 @@
         .mobile-bottom-nav__item:active svg,
         .mobile-bottom-nav__item.open svg {
           fill: #1976d2;
-          transform: scale(1.12);
+          transform: scale(1.15);
         }
 
         .mobile-bottom-nav__label {
@@ -570,13 +570,14 @@
           color: #444;
           font-weight: 500;
           letter-spacing: 0.2px;
-          margin-top: 2px;
+          margin-top: 4px;
           opacity: 0.92;
+          transition: all 0.3s ease;
         }
 
         .mobile-bottom-nav__item:active,
         .mobile-bottom-nav__item.open {
-          background: linear-gradient(90deg, #e3f2fd 0%, #fce4ec 100%);
+          background: linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%);
           box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
         }
 
@@ -591,7 +592,7 @@
           border-radius: 16px 16px 0 0;
           padding: 8px 0;
           z-index: 20000;
-          animation: dropdownIn 0.25s;
+          animation: dropdownIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           display: none;
         }
 
@@ -601,13 +602,15 @@
 
         .mobile-bottom-nav__dropdown a {
           display: block;
-          padding: 12px 24px;
+          padding: 12px 20px;
           color: #333;
           text-decoration: none;
-          font-size: 15px;
-          border-bottom: 1px solid #f2f2f2;
-          transition: background 0.2s, color 0.2s;
-          border-radius: 8px;
+          font-size: 14px;
+          border-bottom: 1px solid rgba(242, 242, 242, 0.7);
+          transition: all 0.25s ease;
+          border-radius: 10px;
+          margin: 4px 8px;
+          font-weight: 500;
         }
 
         .mobile-bottom-nav__dropdown a:last-child {
@@ -615,19 +618,24 @@
         }
 
         .mobile-bottom-nav__dropdown a:hover {
-          background: #e3f2fd;
+          background: linear-gradient(135deg, rgba(227, 242, 253, 0.7) 0%, rgba(252, 228, 236, 0.7) 100%);
           color: #1976d2;
+          transform: translateX(3px);
+          box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
         }
 
         @keyframes dropdownIn {
-          from {
+          0% {
             opacity: 0;
-            transform: translateX(-50%) translateY(20px);
+            transform: translateX(-50%) translateY(20px) scale(0.95);
           }
-
-          to {
+          70% {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(-50%) translateY(-5px) scale(1.02);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
           }
         }
 
@@ -636,6 +644,22 @@
           left: auto;
           right: 0;
           transform: none;
+          animation: dropdownInRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes dropdownInRight {
+          0% {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          70% {
+            opacity: 1;
+            transform: translateY(-5px) scale(1.02);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
         }
 
         /* Fix for other dropdown (last item, left edge) */
@@ -643,6 +667,22 @@
           left: 0;
           right: auto;
           transform: none;
+          animation: dropdownInLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes dropdownInLeft {
+          0% {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          70% {
+            opacity: 1;
+            transform: translateY(-5px) scale(1.02);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
         }
       }
 
@@ -928,7 +968,7 @@
   <div id="mobile-submenu-overlay" class="mobile-submenu-overlay">
     <div class="mobile-submenu-header">
       <button id="close-mobile-submenu" class="close-mobile-submenu-btn" aria-label="بستن">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
@@ -954,14 +994,22 @@
       justify-content: flex-start;
       align-items: stretch;
       overflow-y: auto;
-      transition: opacity 0.2s;
-      border-bottom-left-radius: 18px;
-      border-bottom-right-radius: 18px;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
     }
 
     .mobile-submenu-overlay.active {
       display: flex;
       opacity: 1;
+      animation: overlayFadeIn 0.3s ease-out;
+    }
+
+    @keyframes overlayFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .mobile-submenu-header {
@@ -976,21 +1024,31 @@
     }
 
     .close-mobile-submenu-btn {
-      background: none;
+      background: rgba(240, 240, 240, 0.8);
       border: none;
       cursor: pointer;
-      padding: 4px;
+      padding: 8px;
       margin: 0;
       outline: none;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-mobile-submenu-btn:hover {
+      background: rgba(220, 220, 220, 0.9);
+      transform: scale(1.05);
     }
 
     .mobile-submenu-list {
       width: 100%;
-      margin-top: 24px;
+      margin-top: 20px;
       padding: 0 24px 24px 24px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       overflow-y: auto;
       flex: 1 1 0;
       max-height: calc(100vh - 68px - 64px);

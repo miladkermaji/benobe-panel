@@ -1831,7 +1831,10 @@ img {
         display: flex;
         justify-content: end;
     }
-
+    .row > *{
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
     .myPanelOption .dropdown {
         display: flex;
         justify-content: end;
