@@ -510,6 +510,11 @@
     </script>
     <!-- Bottom Navigation for Mobile -->
     <style>
+      @media (max-width: 425px) {
+        .mobile-bottom-nav__label{
+          font-size: 9px !important;
+        }
+      }
       @media (max-width: 768px) {
 
         .sidebar__nav,
@@ -522,6 +527,7 @@
           display: flex;
           position: fixed;
           bottom: 0;
+          overflow: hidden !important;
           left: 0;
           width: 100vw;
           background: rgba(255, 255, 255, 0.98);
@@ -538,14 +544,25 @@
 
         .mobile-bottom-nav__item {
           position: relative;
-          flex: 1 0 60px;
+          flex: 1 1 0px;
           text-align: center;
           padding: 6px 0 0 0;
           cursor: pointer;
           transition: all 0.3s ease;
-          min-width: 60px;
+          min-width: 0;
           border-radius: 18px 18px 0 0;
           margin: 0 2px;
+          overflow: hidden;
+        }
+
+        @media (max-width: 400px) {
+          .mobile-bottom-nav__label {
+            font-size: 10px;
+          }
+          .mobile-bottom-nav__item svg {
+            width: 22px;
+            height: 22px;
+          }
         }
 
         .mobile-bottom-nav__item svg {
@@ -587,9 +604,11 @@
           left: 50%;
           transform: translateX(-50%);
           min-width: 180px;
+          width: max-content;
+          max-width: 95vw;
           background: #fff;
           box-shadow: 0 2px 16px rgba(25, 118, 210, 0.10);
-          border-radius: 16px 16px 0 0;
+          border-radius: 16px;
           padding: 8px 0;
           z-index: 20000;
           animation: dropdownIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -642,7 +661,7 @@
         /* Fix for dashboard dropdown (first item, right edge) */
         .mobile-bottom-nav__item--dashboard .mobile-bottom-nav__dropdown {
           left: auto;
-          right: 0;
+          right: 2.5vw;
           transform: none;
           animation: dropdownInRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -664,7 +683,7 @@
 
         /* Fix for other dropdown (last item, left edge) */
         .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
-          left: 0;
+          left: 2.5vw;
           right: auto;
           transform: none;
           animation: dropdownInLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
