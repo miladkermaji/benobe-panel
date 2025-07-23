@@ -397,7 +397,7 @@ class PrescriptionRequestController extends Controller
             'phone.regex' => 'فرمت شماره تلفن معتبر نیست.',
         ]);
 
-        // جستجو در همه مدل‌ها
+        // جستجو در همه مدل‌ها فقط بر اساس کد ملی
         $models = [
             ['model' => \App\Models\User::class, 'type' => 'user'],
             ['model' => \App\Models\Doctor::class, 'type' => 'doctor'],
@@ -427,7 +427,7 @@ class PrescriptionRequestController extends Controller
         $ownerId = $owner->id;
 
         if ($found) {
-            // ثبت در sub_users
+            // فقط ثبت در sub_users
             \App\Models\SubUser::firstOrCreate([
                 'owner_id' => $ownerId,
                 'owner_type' => $ownerType,
@@ -444,20 +444,10 @@ class PrescriptionRequestController extends Controller
             ], 200);
         }
 
-        // تقسیم نام کامل به نام و نام خانوادگی
+        // اگر کد ملی نبود، کاربر جدید در مدل User بساز
         $names = preg_split('/\s+/', trim($validated['full_name']), 2);
         $first_name = $names[0] ?? '';
         $last_name = $names[1] ?? '';
-
-        // بررسی تکراری نبودن شماره موبایل
-        $mobileExists = \App\Models\User::where('mobile', $validated['phone'])->exists();
-        if ($mobileExists) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'این شماره موبایل قبلاً ثبت شده است.',
-                'data' => null,
-            ], 409);
-        }
 
         $user = \App\Models\User::create([
             'first_name' => $first_name,
