@@ -397,23 +397,6 @@ class PrescriptionRequestController extends Controller
             'phone.regex' => 'فرمت شماره تلفن معتبر نیست.',
         ]);
 
-        // جستجو در همه مدل‌ها فقط بر اساس کد ملی
-        $models = [
-            ['model' => \App\Models\User::class, 'type' => 'user'],
-            ['model' => \App\Models\Doctor::class, 'type' => 'doctor'],
-            ['model' => \App\Models\Secretary::class, 'type' => 'secretary'],
-            ['model' => \App\Models\Admin\Manager::class, 'type' => 'manager'],
-        ];
-        $found = null;
-        $foundType = null;
-        foreach ($models as $item) {
-            $found = $item['model']::where('national_code', $validated['national_code'])->first();
-            if ($found) {
-                $foundType = $item['model'];
-                break;
-            }
-        }
-
         // گرفتن کاربر جاری (مالک) از همه گاردها
         $owner = Auth::user() ?? Auth::guard('doctor')->user() ?? Auth::guard('manager')->user() ?? Auth::guard('secretary')->user();
         if (!$owner) {
@@ -426,28 +409,44 @@ class PrescriptionRequestController extends Controller
         $ownerType = get_class($owner);
         $ownerId = $owner->id;
 
-        if ($found) {
-            // فقط ثبت در sub_users
-            \App\Models\SubUser::firstOrCreate([
-                'owner_id' => $ownerId,
-                'owner_type' => $ownerType,
-                'subuserable_id' => $found->id,
-                'subuserable_type' => $foundType,
-            ], [
-                'status' => 'active',
-            ]);
-            return response()->json([
-                'status' => 'success',
-                'message' => 'کاربر یافت شد.',
-                'data' => $found,
-                'model_type' => class_basename($foundType),
-            ], 200);
-        }
-
-        // اگر کد ملی نبود، کاربر جدید در مدل User بساز
+        // اگر کد ملی نبود، کاربر جدید در مدل User بساز یا اگر شماره موبایل قبلاً وجود داشت، همان کاربر را به زیرمجموعه اضافه کن
         $names = preg_split('/\s+/', trim($validated['full_name']), 2);
         $first_name = $names[0] ?? '';
         $last_name = $names[1] ?? '';
+
+        $mobileUser = \App\Models\User::where('mobile', $validated['phone'])->first();
+        if ($mobileUser) {
+            // بررسی وجود در جدول sub_users
+            $alreadySubUser = \App\Models\SubUser::where([
+                'owner_id' => $ownerId,
+                'owner_type' => $ownerType,
+                'subuserable_id' => $mobileUser->id,
+                'subuserable_type' => \App\Models\User::class,
+            ])->exists();
+
+            if ($alreadySubUser) {
+                return response()->json([
+                    'status' => 'info',
+                    'message' => 'این کاربر قبلاً به زیرمجموعه شما اضافه شده است.',
+                    'data' => $mobileUser,
+                    'model_type' => 'User',
+                ], 200);
+            } else {
+                \App\Models\SubUser::create([
+                    'owner_id' => $ownerId,
+                    'owner_type' => $ownerType,
+                    'subuserable_id' => $mobileUser->id,
+                    'subuserable_type' => \App\Models\User::class,
+                    'status' => 'active',
+                ]);
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'کاربر با این شماره موبایل قبلاً ثبت شده بود و به زیرمجموعه شما اضافه شد.',
+                    'data' => $mobileUser,
+                    'model_type' => 'User',
+                ], 200);
+            }
+        }
 
         $user = \App\Models\User::create([
             'first_name' => $first_name,
