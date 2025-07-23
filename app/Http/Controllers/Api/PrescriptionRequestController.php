@@ -409,6 +409,15 @@ class PrescriptionRequestController extends Controller
         $ownerType = get_class($owner);
         $ownerId = $owner->id;
 
+        // اگر شماره موبایل وارد شده، همان شماره موبایل کاربر لاگین‌شده باشد
+        if ($owner instanceof \App\Models\User && $owner->mobile === $validated['phone']) {
+            return response()->json([
+                'status' => 'info',
+                'message' => 'شما نمی‌توانید شماره موبایل خودتان را به عنوان زیرمجموعه اضافه کنید.',
+                'data' => null,
+            ], 200);
+        }
+
         // اگر کد ملی نبود، کاربر جدید در مدل User بساز یا اگر شماره موبایل قبلاً وجود داشت، همان کاربر را به زیرمجموعه اضافه کن
         $names = preg_split('/\s+/', trim($validated['full_name']), 2);
         $first_name = $names[0] ?? '';
