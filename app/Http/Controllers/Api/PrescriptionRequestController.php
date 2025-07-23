@@ -449,6 +449,16 @@ class PrescriptionRequestController extends Controller
         $first_name = $names[0] ?? '';
         $last_name = $names[1] ?? '';
 
+        // بررسی تکراری نبودن شماره موبایل
+        $mobileExists = \App\Models\User::where('mobile', $validated['phone'])->exists();
+        if ($mobileExists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'این شماره موبایل قبلاً ثبت شده است.',
+                'data' => null,
+            ], 409);
+        }
+
         $user = \App\Models\User::create([
             'first_name' => $first_name,
             'last_name' => $last_name,
