@@ -170,3 +170,5 @@ Route::get('prescriptions/insulins', [\App\Http\Controllers\Api\PrescriptionRequ
 Route::match(['get', 'post'], 'prescriptions/payment/callback', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'prescriptionPaymentCallback'])->name('api.prescriptions.payment.callback');
 
 Route::match(['get', 'post'], 'search', [\App\Http\Controllers\Api\SearchController::class, 'search'])->name('api.search');
+
+Route::get('public-doctor-comments/{doctor_id}', [\App\Http\Controllers\Api\DoctorCommentController::class, 'publicDoctorComments']);

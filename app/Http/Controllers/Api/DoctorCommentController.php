@@ -97,4 +97,16 @@ class DoctorCommentController extends Controller
         $comment = DoctorComment::with(['doctor', 'appointment', 'userable'])->findOrFail($id);
         return response()->json($comment);
     }
+
+    // نمایش نظرات فعال یک پزشک خاص بدون نیاز به لاگین (public)
+    public function publicDoctorComments(Request $request, $doctor_id)
+    {
+        $perPage = $request->input('per_page', 20);
+        $comments = DoctorComment::with(['doctor', 'appointment', 'userable'])
+            ->where('doctor_id', $doctor_id)
+            ->where('status', true)
+            ->latest()
+            ->paginate($perPage);
+        return response()->json($comments);
+    }
 }
