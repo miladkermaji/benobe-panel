@@ -13,7 +13,7 @@ class DoctorCommentController extends Controller
     // لیست نظرات (با فیلتر doctor_id و status و paginate سفارشی)
     public function index(Request $request)
     {
-        $user = \Auth::user();
+        $user = Auth::user();
         $query = DoctorComment::with(['doctor', 'appointment', 'userable']);
         if ($request->doctor_id) {
             $query->where('doctor_id', $request->doctor_id);

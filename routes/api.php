@@ -77,6 +77,7 @@ Route::middleware(['custom-auth.jwt'])->group(function () {
 
     Route::prefix('sub_users')->group(function () {
         Route::get('list/', [SubUserController::class, 'getSubUsers'])->name('api.sub_users.index');
+        Route::post('add', [SubUserController::class, 'addSubUser'])->name('api.sub_users.add');
     });
 
     Route::prefix('doctors')->group(function () {
