@@ -82,6 +82,7 @@ Route::middleware(['custom-auth.jwt'])->group(function () {
 
     Route::prefix('doctors')->group(function () {
         Route::get('/my_doctors', [DoctorController::class, 'getMyDoctors'])->name('api.doctors.my_doctors');
+        Route::post('/like', [DoctorController::class, 'likeDoctor'])->middleware('custom-auth.jwt')->name('api.doctors.like');
     });
 
     Route::prefix('prescriptions')->group(function () {
@@ -147,6 +148,7 @@ Route::middleware(['api'])->group(function () {
     Route::get('/payment/result', [AppointmentBookingController::class, 'paymentResult'])->name('api.payment.result');
     Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 });
+
 
 Route::prefix('doctors')->group(function () {
     Route::get('/{doctorId}/profile', [DoctorProfileController::class, 'getDoctorProfile'])->name('api.doctors.profile');

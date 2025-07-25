@@ -123,6 +123,76 @@ class DoctorController extends Controller
     }
 
     /**
+     * افزودن یک دکتر به لیست لایک‌شده‌های کاربر
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function likeDoctor(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            if (! $user) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'کاربر یافت نشد',
+                    'data'    => null,
+                ], 401);
+            }
+
+            $doctorId = $request->input('doctor_id');
+            if (! $doctorId) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'doctor_id ارسال نشده است',
+                    'data'    => null,
+                ], 422);
+            }
+
+            $doctor = \App\Models\Doctor::find($doctorId);
+            if (! $doctor) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'دکتر یافت نشد',
+                    'data'    => null,
+                ], 404);
+            }
+
+            // چک کن قبلاً لایک نشده باشد
+            $alreadyLiked = \App\Models\UserDoctorLike::where('likeable_id', $user->id)
+                ->where('likeable_type', get_class($user))
+                ->where('doctor_id', $doctorId)
+                ->first();
+            if ($alreadyLiked) {
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'این دکتر قبلاً لایک شده است',
+                    'data'    => null,
+                ], 200);
+            }
+
+            \App\Models\UserDoctorLike::create([
+                'likeable_id'   => $user->id,
+                'likeable_type' => get_class($user),
+                'doctor_id'     => $doctorId,
+                'liked_at'      => now(),
+            ]);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'دکتر با موفقیت لایک شد',
+                'data'    => null,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'خطای سرور',
+                'data'    => null,
+            ], 500);
+        }
+    }
+
+    /**
      * گرفتن لیست پزشکان برتر
      *
      * @queryParam limit integer تعداد آیتم‌ها (اختیاری، اگر نباشد همه برگردانده می‌شود)
@@ -198,7 +268,7 @@ class DoctorController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            
+
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
