@@ -707,6 +707,7 @@ class AppointmentBookingController extends Controller
                                 $userMobile = $appointment->mobile;
                                 $userName = $appointment->first_name . ' ' . $appointment->last_name;
                             }
+                            Log::info($userMobile);
                             if ($userMobile) {
                                 $templateId = 100282;
                                 $params = [
