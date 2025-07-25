@@ -120,7 +120,6 @@ class HospitalController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
-            Log::error('GetHospitalDetails - Error: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'خطای سرور',
@@ -160,7 +159,6 @@ class HospitalController extends Controller
             'next_available_datetime' => $appointmentDateTime->toDateTimeString(),
         ];
     } catch (\Exception $e) {
-        Log::error('GetNextAvailableSlot - Error: ' . $e->getMessage());
         return [
             'next_available_slot' => 'خطا در محاسبه نوبت',
             'next_available_datetime' => null,

@@ -145,10 +145,8 @@ class DoctorController extends Controller
      */
     public function getBestDoctors(Request $request)
     {
-        Log::info('getBestDoctors called', ['request' => $request->all()]);
         try {
             $limit = $request->has('limit') ? (int) $request->input('limit') : null;
-            Log::info('getBestDoctors: limit', ['limit' => $limit]);
 
             $bestDoctors = BestDoctor::where('status', true)
                 ->with([
@@ -173,7 +171,6 @@ class DoctorController extends Controller
                 ->groupBy('doctor_id')
                 ->map(fn ($group) => $group->first());
 
-            Log::info('getBestDoctors: bestDoctors loaded', ['count' => $bestDoctors->count()]);
 
             $formattedDoctors = $bestDoctors->map(function ($bestDoctor) {
                 $slotData = $this->getNextAvailableSlot($bestDoctor->doctor);
@@ -191,11 +188,9 @@ class DoctorController extends Controller
                     'province'            => optional(optional($bestDoctor->doctor)->province)->name,
                     'next_available_slot' => $jalaliDate,
                 ];
-                Log::info('getBestDoctors: formatted doctor', $result);
                 return $result;
             })->values();
 
-            Log::info('getBestDoctors: formattedDoctors ready', ['count' => $formattedDoctors->count()]);
 
             return response()->json([
                 'status' => 'success',
@@ -203,10 +198,7 @@ class DoctorController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('getBestDoctors error', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
+            
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',

@@ -145,7 +145,6 @@ class UserSubscriptionController extends Controller
             return response()->json(['message' => 'خطا در ایجاد لینک پرداخت.'], 500);
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error($e);
             return response()->json(['message' => 'خطای سرور: ' . $e->getMessage()], 500);
         }
     }
@@ -195,7 +194,7 @@ class UserSubscriptionController extends Controller
         // اگر تراکنش pending بود، verify را اجرا کن
         $verifiedTransaction = app(\Modules\Payment\Services\PaymentService::class)->verify();
         if (!$verifiedTransaction || $verifiedTransaction->status !== 'paid') {
-            Log::warning('Payment callback received for a non-successful transaction after verify.', ['transaction_id' => $authority]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'تراکنش یافت نشد یا موفقیت آمیز نبود.',
@@ -232,7 +231,6 @@ class UserSubscriptionController extends Controller
                 $subscribable = \App\Models\Admin\Manager::find($meta['manager_id']);
             }
             if (!$subscribable) {
-                Log::error('Subscribable not found for subscription', ['meta' => $meta]);
                 return response()->json([
                     'success' => false,
                     'message' => 'کاربر یا پزشک یا منشی یافت نشد.',
@@ -240,17 +238,7 @@ class UserSubscriptionController extends Controller
                 ], 404, ['Content-Type' => 'application/json']);
             }
 
-            Log::info('Before create subscription', [
-                'subscribable_id' => $subscribable->id,
-                'subscribable_type' => get_class($subscribable),
-                'plan_id' => $meta['plan_id'],
-                'transaction_id' => $transaction->id,
-                'start_date' => now()->toDateString(),
-                'end_date' => now()->addDays($plan->duration_days)->toDateString(),
-                'remaining_appointments' => $plan->appointment_count,
-                'status' => true,
-                'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
-            ]);
+           
 
             try {
                 $subscription = UserSubscription::create([
@@ -264,7 +252,6 @@ class UserSubscriptionController extends Controller
                     'status' => true,
                     'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
                 ]);
-                Log::info('Subscription created successfully', ['subscription' => $subscription]);
                 $planModel = $subscription->plan;
                 return response()->json([
                     'success' => true,
@@ -274,21 +261,7 @@ class UserSubscriptionController extends Controller
                     'plan' => $planModel,
                 ], 200, ['Content-Type' => 'application/json']);
             } catch (\Exception $e) {
-                Log::error('Failed to create subscription', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                    'data' => [
-                        'subscribable_id' => $subscribable->id,
-                        'subscribable_type' => get_class($subscribable),
-                        'plan_id' => $meta['plan_id'],
-                        'transaction_id' => $transaction->id,
-                        'start_date' => now()->toDateString(),
-                        'end_date' => now()->addDays($plan->duration_days)->toDateString(),
-                        'remaining_appointments' => $plan->appointment_count,
-                        'status' => true,
-                        'description' => 'transaction_id from gateway: ' . ($transaction->transaction_id ?? 'null'),
-                    ]
-                ]);
+               
                 return response()->json([
                     'success' => false,
                     'message' => 'خطا در ثبت اشتراک. لطفا با پشتیبانی تماس بگیرید.',
@@ -297,11 +270,7 @@ class UserSubscriptionController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('Could not create subscription after payment.', [
-                'authority' => $authority,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+           
             return response()->json([
                 'success' => false,
                 'message' => 'خطا در فعال‌سازی اشتراک. لطفا با پشتیبانی تماس بگیرید.',

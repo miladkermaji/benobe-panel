@@ -72,7 +72,6 @@ class SubUserController extends Controller
                     ], 401);
                 }
             } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-                Log::error('GetSubUsers - JWT Error: ' . $e->getMessage());
                 return response()->json([
                     'status'  => 'error',
                     'message' => 'توکن نامعتبر است: ' . $e->getMessage(),
@@ -125,7 +124,6 @@ class SubUserController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetSubUsers - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',

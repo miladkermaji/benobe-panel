@@ -109,11 +109,7 @@ class DoctorAppointmentController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
-            Log::error('GetAppointmentOptions - Error: ' . $e->getMessage(), [
-                'doctor_id' => $doctorId,
-                'request'   => $request->all(),
-                'exception' => $e->getTraceAsString(),
-            ]);
+          
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور. لطفاً دوباره تلاش کنید.',
@@ -289,7 +285,7 @@ class DoctorAppointmentController extends Controller
             if ($holidays && $holidays->holiday_dates) {
                 $holidayDates = is_string($holidays->holiday_dates) ? json_decode($holidays->holiday_dates, true) : $holidays->holiday_dates;
                 if (in_array($checkDateString, $holidayDates)) {
-                    Log::warning("GetNextAvailableSlot - Date {$checkDateString} is a holiday for doctor {$doctorId}");
+                  
                     continue;
                 }
             }
@@ -316,14 +312,7 @@ class DoctorAppointmentController extends Controller
                     $endTime = Carbon::parse($checkDateString . ' ' . $workHours[0]['end'], 'Asia/Tehran');
                     $totalMinutes = $startTime->diffInMinutes($endTime);
                     $duration = floor($totalMinutes / $maxAppointments);
-                    Log::debug("GetNextAvailableSlot - Calculated duration", [
-                        'doctor_id' => $doctorId,
-                        'clinic_id' => $clinicId,
-                        'day' => $dayName,
-                        'total_minutes' => $totalMinutes,
-                        'max_appointments' => $maxAppointments,
-                        'duration' => $duration,
-                    ]);
+                   
                 }
             } else {
                 $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
@@ -348,7 +337,6 @@ class DoctorAppointmentController extends Controller
             }
 
             if (empty($workHours)) {
-                Log::warning("GetNextAvailableSlot - No work hours for doctor {$doctorId} on {$dayName}");
                 continue;
             }
 
@@ -368,21 +356,7 @@ class DoctorAppointmentController extends Controller
                 }
             }
 
-            Log::debug("GetNextAvailableSlot - Work hours and max appointments", [
-                'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
-                'day' => $dayName,
-                'work_hours' => $workHours,
-                'max_appointments' => $maxAppointments,
-            ]);
-
-            Log::debug("GetNextAvailableSlot - Normalized emergency times", [
-                'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
-                'day' => $dayName,
-                'original_emergency_times' => $emergencyTimes,
-                'normalized_emergency_times' => $normalizedEmergencyTimes,
-            ]);
+          
 
             $dayAppointments = $bookedAppointments->filter(function ($appointment) use ($checkDate) {
                 return Carbon::parse($appointment->appointment_date)->isSameDay($checkDate);
@@ -395,27 +369,15 @@ class DoctorAppointmentController extends Controller
                     $time = $appointment->appointment_time;
                     if (preg_match('/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/', $time)) {
                         $correctedTime = Carbon::parse($time, 'Asia/Tehran')->format('H:i:s');
-                        Log::warning("Invalid appointment_time format detected, corrected", [
-                            'appointment_id' => $appointment->id,
-                            'original_time' => $time,
-                            'corrected_time' => $correctedTime,
-                        ]);
+                       
                         $time = $correctedTime;
                     } elseif (!preg_match('/\d{2}:\d{2}:\d{2}/', $time)) {
-                        Log::error("Invalid appointment_time format", [
-                            'appointment_id' => $appointment->id,
-                            'appointment_time' => $time,
-                        ]);
+                        
                         continue;
                     }
                     $bookedTimes[] = $time;
                 } catch (\Exception $e) {
-                    Log::error("Error parsing appointment time", [
-                        'appointment_id' => $appointment->id,
-                        'appointment_date' => $appointment->appointment_date,
-                        'appointment_time' => $appointment->appointment_time,
-                        'error' => $e->getMessage(),
-                    ]);
+                    
                 }
             }
 
@@ -424,12 +386,7 @@ class DoctorAppointmentController extends Controller
 
             foreach ($workHours as $workHour) {
                 if (!isset($workHour['start']) || !isset($workHour['end'])) {
-                    Log::warning("Invalid work_hours structure", [
-                        'doctor_id' => $doctorId,
-                        'clinic_id' => $clinicId,
-                        'day' => $dayName,
-                        'work_hour' => $workHour,
-                    ]);
+                   
                     continue;
                 }
 
@@ -440,21 +397,9 @@ class DoctorAppointmentController extends Controller
                 if (isset($workHour['max_appointments']) && $workHour['max_appointments'] > 0) {
                     $totalMinutes = $startTime->diffInMinutes($endTime);
                     $duration = floor($totalMinutes / $workHour['max_appointments']);
-                    Log::debug("GetNextAvailableSlot - Calculated duration", [
-                        'doctor_id' => $doctorId,
-                        'clinic_id' => $clinicId,
-                        'day' => $dayName,
-                        'total_minutes' => $totalMinutes,
-                        'max_appointments' => $workHour['max_appointments'],
-                        'duration' => $duration,
-                    ]);
+                   
                 } else {
-                    Log::warning("GetNextAvailableSlot - No max_appointments set for work hour", [
-                        'doctor_id' => $doctorId,
-                        'clinic_id' => $clinicId,
-                        'day' => $dayName,
-                        'work_hour' => $workHour,
-                    ]);
+                   
                     continue;
                 }
 
@@ -474,21 +419,10 @@ class DoctorAppointmentController extends Controller
                                     break;
                                 }
                             } else {
-                                Log::warning("Invalid emergency_time format after normalization", [
-                                    'doctor_id' => $doctorId,
-                                    'clinic_id' => $clinicId,
-                                    'day' => $dayName,
-                                    'emergency_time' => $emergencyTime,
-                                ]);
+                                
                             }
                         } catch (\Exception $e) {
-                            Log::error("Error parsing emergency_time", [
-                                'doctor_id' => $doctorId,
-                                'clinic_id' => $clinicId,
-                                'day' => $dayName,
-                                'emergency_time' => $emergencyTime,
-                                'error' => $e->getMessage(),
-                            ]);
+                           
                         }
                     }
 
@@ -605,7 +539,7 @@ class DoctorAppointmentController extends Controller
             if ($holidays && $holidays->holiday_dates) {
                 $holidayDates = is_string($holidays->holiday_dates) ? json_decode($holidays->holiday_dates, true) : $holidays->holiday_dates;
                 if (in_array($checkDateString, $holidayDates)) {
-                    Log::warning("GetNextAvailableOnlineSlot - Date {$checkDateString} is a counseling holiday for doctor {$doctorId}");
+                   
                     continue;
                 }
             }
@@ -654,7 +588,7 @@ class DoctorAppointmentController extends Controller
             }
 
             if (empty($workHours)) {
-                Log::warning("GetNextAvailableOnlineSlot - No work hours for doctor {$doctorId} on {$dayName}");
+               
                 continue;
             }
 
@@ -668,19 +602,7 @@ class DoctorAppointmentController extends Controller
                 }
             }
 
-            Log::debug("GetNextAvailableOnlineSlot - Work hours and max appointments", [
-                'doctor_id' => $doctorId,
-                'day' => $dayName,
-                'work_hours' => $workHours,
-                'max_appointments' => $maxAppointments,
-            ]);
-
-            Log::debug("GetNextAvailableOnlineSlot - Normalized emergency times", [
-                'doctor_id' => $doctorId,
-                'day' => $dayName,
-                'original_emergency_times' => $emergencyTimes,
-                'normalized_emergency_times' => $normalizedEmergencyTimes,
-            ]);
+           
 
             $dayAppointments = $bookedAppointments->filter(function ($appointment) use ($checkDate) {
                 return Carbon::parse($appointment->appointment_date)->isSameDay($checkDate);
@@ -691,11 +613,7 @@ class DoctorAppointmentController extends Controller
 
             foreach ($workHours as $workHour) {
                 if (!isset($workHour['start']) || !isset($workHour['end'])) {
-                    Log::warning("Invalid work_hours structure", [
-                        'doctor_id' => $doctorId,
-                        'day' => $dayName,
-                        'work_hour' => $workHour,
-                    ]);
+                    
                     continue;
                 }
 
@@ -708,13 +626,7 @@ class DoctorAppointmentController extends Controller
                     $duration = floor($totalMinutes / $workHour['max_appointments']);
                 }
 
-                Log::debug("GetNextAvailableOnlineSlot - Calculated duration", [
-                    'doctor_id' => $doctorId,
-                    'day' => $dayName,
-                    'total_minutes' => $startTime->diffInMinutes($endTime),
-                    'max_appointments' => $workHour['max_appointments'] ?? null,
-                    'duration' => $duration,
-                ]);
+                
 
                 $currentTime = $startTime->copy();
                 while ($currentTime->lessThan($endTime)) {
@@ -731,19 +643,10 @@ class DoctorAppointmentController extends Controller
                                     break;
                                 }
                             } else {
-                                Log::warning("Invalid emergency_time format after normalization", [
-                                    'doctor_id' => $doctorId,
-                                    'day' => $dayName,
-                                    'emergency_time' => $emergencyTime,
-                                ]);
+                                
                             }
                         } catch (\Exception $e) {
-                            Log::error("Error parsing emergency_time", [
-                                'doctor_id' => $doctorId,
-                                'day' => $dayName,
-                                'emergency_time' => $emergencyTime,
-                                'error' => $e->getMessage(),
-                            ]);
+                           
                         }
                     }
 
@@ -760,12 +663,7 @@ class DoctorAppointmentController extends Controller
                             $apptEnd = $apptStart->copy()->addMinutes($duration);
                             return $currentTime->lt($apptEnd) && $currentTime->gte($apptStart);
                         } catch (\Exception $e) {
-                            Log::error("Error parsing booked appointment time", [
-                                'appointment_id' => $appointment->id,
-                                'appointment_date' => $appointment->appointment_date,
-                                'appointment_time' => $appointment->appointment_time,
-                                'error' => $e->getMessage(),
-                            ]);
+                         
                             return false;
                         }
                     });

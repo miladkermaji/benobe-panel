@@ -68,7 +68,6 @@ class OrderController extends Controller
                     ], 401);
                 }
             } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-                Log::error('GetOrders - JWT Error: ' . $e->getMessage());
                 return response()->json([
                     'status'  => 'error',
                     'message' => 'توکن نامعتبر است: ' . $e->getMessage(),
@@ -119,7 +118,6 @@ class OrderController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetOrders - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',

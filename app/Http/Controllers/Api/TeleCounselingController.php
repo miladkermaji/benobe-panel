@@ -69,7 +69,6 @@ class TeleCounselingController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('TeleCounseling - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطایی در سرور رخ داده است',

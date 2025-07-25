@@ -71,7 +71,6 @@ class MedicalCentersController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetStats - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -147,7 +146,6 @@ class MedicalCentersController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetClinics - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -223,7 +221,6 @@ class MedicalCentersController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetTreatmentCenters - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -299,7 +296,6 @@ class MedicalCentersController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetImagingCenters - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -375,7 +371,6 @@ class MedicalCentersController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetHospitals - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -451,7 +446,6 @@ class MedicalCentersController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetLaboratories - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -510,10 +504,7 @@ class MedicalCentersController extends Controller
                 'data'   => $formattedProvinces,
             ], 200);
         } catch (\Exception $e) {
-            Log::channel('api')->error('GetCitiesWithCenters - Error: ', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
+           
 
             return response()->json([
                 'status'  => 'error',
@@ -576,10 +567,7 @@ class MedicalCentersController extends Controller
                 'data'   => $formattedCenters,
             ], 200);
         } catch (\Exception $e) {
-            Log::channel('api')->error('GetAllCenters - Error: ', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
+            
 
             return response()->json([
                 'status'  => 'error',
@@ -768,7 +756,6 @@ class MedicalCentersController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
-            Log::error('MedicalCentersController@list - Error: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'خطای سرور',
@@ -946,7 +933,6 @@ class MedicalCentersController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetCenterSpecialties - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -998,7 +984,6 @@ class MedicalCentersController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetCenterTypes - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -1134,7 +1119,6 @@ class MedicalCentersController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetTreatmentCenterSpecialties - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',

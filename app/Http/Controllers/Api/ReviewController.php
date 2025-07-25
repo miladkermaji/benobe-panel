@@ -87,7 +87,6 @@ class ReviewController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetReviews - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطایی در سرور رخ داده است',
@@ -210,7 +209,6 @@ class ReviewController extends Controller
                 'data'    => null,
             ], 422);
         } catch (\Exception $e) {
-            Log::error('StoreReview - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطایی در سرور رخ داده است',

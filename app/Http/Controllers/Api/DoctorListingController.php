@@ -276,10 +276,7 @@ class DoctorListingController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
-            Log::error('GetDoctors - Error: ' . $e->getMessage(), [
-                'request'   => $request->all(),
-                'exception' => $e->getTraceAsString(),
-            ]);
+            
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',

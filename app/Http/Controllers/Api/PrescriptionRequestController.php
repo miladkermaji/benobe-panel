@@ -211,7 +211,6 @@ class PrescriptionRequestController extends Controller
                     return response()->json(['message' => 'خطا در ایجاد لینک پرداخت.'], 500);
                 }
             } catch (\Exception $e) {
-                Log::error($e);
                 return response()->json(['message' => 'خطای سرور: ' . $e->getMessage()], 500);
             }
             // خروجی فقط payment_url
@@ -273,7 +272,6 @@ class PrescriptionRequestController extends Controller
                     return response()->json(['message' => 'خطا در ایجاد لینک پرداخت.'], 500);
                 }
             } catch (\Exception $e) {
-                Log::error($e);
                 return response()->json(['message' => 'خطای سرور: ' . $e->getMessage()], 500);
             }
             return response()->json([

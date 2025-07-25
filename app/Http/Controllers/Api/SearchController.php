@@ -30,7 +30,6 @@ class SearchController extends Controller
         }
         $user = \Illuminate\Support\Facades\Auth::user();
         $userId = $user ? $user->id : null;
-        Log::info($userId);
         // اگر طول کلمه جستجو کمتر یا مساوی 2 بود، خروجی خالی برگردان
         if (mb_strlen($searchText) > 0 && mb_strlen($searchText) <= 2) {
             return response()->json([
