@@ -152,6 +152,20 @@ class UserSubscriptionController extends Controller
     }
 
     /**
+     * لیست همه پلن‌های فعال اشتراک
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllPlans(): JsonResponse
+    {
+        $plans = \App\Models\UserMembershipPlan::where('status', true)->get();
+        return response()->json([
+            'status' => 'success',
+            'plans' => $plans,
+        ]);
+    }
+
+    /**
      * Handle payment callback.
      *
      * @param \Illuminate\Http\Request $request

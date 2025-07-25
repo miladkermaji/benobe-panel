@@ -48,6 +48,7 @@ Route::prefix('v2')->group(function () {
         Route::prefix('subscriptions')->group(function () {
             Route::get('details', [UserSubscriptionController::class, 'getSubscriptionDetails'])->name('api.v2.subscriptions.details');
             Route::post('purchase', [UserSubscriptionController::class, 'purchaseSubscription'])->name('api.v2.subscriptions.purchase');
+            Route::get('plans', [UserSubscriptionController::class, 'getAllPlans'])->name('api.v2.subscriptions.plans');
         });
     });
     // اضافه کردن روت callback به صورت مستقل و خارج از middleware
