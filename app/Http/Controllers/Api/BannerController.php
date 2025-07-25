@@ -59,7 +59,6 @@ class BannerController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetBannerText - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',

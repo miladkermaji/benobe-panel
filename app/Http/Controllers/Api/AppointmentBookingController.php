@@ -196,7 +196,7 @@ class AppointmentBookingController extends Controller
                 'errors'  => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
-         
+
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -490,7 +490,7 @@ class AppointmentBookingController extends Controller
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
-           
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'خطای سرور',
@@ -616,26 +616,26 @@ class AppointmentBookingController extends Controller
     public function paymentResult(Request $request)
     {
         try {
-          
-// چک کردن وجود transaction_id
-$transactionId = $request->input('transaction_id') ?? $request->input('Authority');
-if (!$transactionId) {
-    return response()->json([
-        'status'  => 'error',
-        'message' => 'پارامتر transaction_id یا Authority در درخواست وجود ندارد.',
-        'data'    => null,
-    ], 400);
-}
 
-// پیدا کردن تراکنش
-$transaction = Transaction::where('transaction_id', $transactionId)->first();
-if (!$transaction) {
-    return response()->json([
-        'status'  => 'error',
-        'message' => 'تراکنش با این شناسه یافت نشد.',
-        'data'    => null,
-    ], 404);
-}
+            // چک کردن وجود transaction_id
+            $transactionId = $request->input('transaction_id') ?? $request->input('Authority');
+            if (!$transactionId) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'پارامتر transaction_id یا Authority در درخواست وجود ندارد.',
+                    'data'    => null,
+                ], 400);
+            }
+
+            // پیدا کردن تراکنش
+            $transaction = Transaction::where('transaction_id', $transactionId)->first();
+            if (!$transaction) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'تراکنش با این شناسه یافت نشد.',
+                    'data'    => null,
+                ], 404);
+            }
 
 
             // تأیید پرداخت از طریق خدمت پرداخت (فقط اگر وضعیت pending باشد)
@@ -716,18 +716,16 @@ if (!$transaction) {
                                 $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
                                 $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
                                 if ($gatewayName === 'pishgamrayan') {
-                                    SendSmsNotificationJob::dispatch(
+                                    \App\Jobs\SendSmsNotificationJob::dispatch(
                                         $message,
                                         [$userMobile],
                                         $templateId,
                                         $params
                                     )->delay(now()->addSeconds(5));
                                 } else {
-                                    SendSmsNotificationJob::dispatch(
+                                    \App\Jobs\SendSmsNotificationJob::dispatch(
                                         $message,
-                                        [$userMobile],
-                                        null,
-                                        $params
+                                        [$userMobile]
                                     )->delay(now()->addSeconds(5));
                                 }
                             }
@@ -807,7 +805,7 @@ if (!$transaction) {
 
             return response()->json($data, $isPaymentSuccessful ? 200 : 400);
         } catch (\Exception $e) {
-          
+
 
             return response()->json([
                 'status' => 'error',
@@ -816,7 +814,7 @@ if (!$transaction) {
             ], 500);
         }
     }
-    
+
 
     public function getAppointmentOptions(Request $request, $doctorId)
     {
@@ -876,7 +874,7 @@ if (!$transaction) {
                 $endTime = Carbon::parse("{$date} {$workHours[0]['end']}", 'Asia/Tehran');
                 $totalMinutes = $startTime->diffInMinutes($endTime);
                 $duration = floor($totalMinutes / $workHours[0]['max_appointments']);
-                
+
             }
 
             // دریافت زمان‌های رزروشده (اصلاح شده)
@@ -941,7 +939,7 @@ if (!$transaction) {
                 }
             }
 
-            
+
 
             return response()->json([
                 'status' => 'success',
@@ -951,7 +949,7 @@ if (!$transaction) {
                 ],
             ], 200);
         } catch (\Exception $e) {
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'خطای سرور',
@@ -973,7 +971,7 @@ if (!$transaction) {
 
         // بررسی تاریخ گذشته
         if ($appointmentDateCarbon->lessThan($today)) {
-            
+
             return false;
         }
 
@@ -991,13 +989,13 @@ if (!$transaction) {
 
         $appointmentOptions = $this->getAppointmentOptions($request, $doctor->id);
         if ($appointmentOptions->getStatusCode() !== 200) {
-            
+
             return false;
         }
 
         $responseData = json_decode($appointmentOptions->getContent(), true);
         if (!isset($responseData['data']['available_times'])) {
-            
+
             return false;
         }
 
@@ -1005,7 +1003,7 @@ if (!$transaction) {
 
         // بررسی اینکه زمان درخواستی در لیست زمان‌های مجاز هست یا نه
         if (!in_array($appointmentTime, $availableTimes)) {
-           
+
             return false;
         }
 
@@ -1020,7 +1018,7 @@ if (!$transaction) {
             if ($holidays && $holidays->holiday_dates) {
                 $holidayDates = json_decode($holidays->holiday_dates, true);
                 if (in_array($appointmentDate, $holidayDates)) {
-                    
+
                     return false;
                 }
             }
@@ -1034,7 +1032,7 @@ if (!$transaction) {
             if ($holidays && $holidays->holiday_dates) {
                 $holidayDates = json_decode($holidays->holiday_dates, true);
                 if (in_array($appointmentDate, $holidayDates)) {
-                    
+
                     return false;
                 }
             }
@@ -1064,7 +1062,7 @@ if (!$transaction) {
             $appointmentSettings = json_decode($specialSchedule->appointment_settings, true);
             $emergencyTimes = json_decode($specialSchedule->emergency_times, true) ?? [];
 
-           
+
         } else {
             // استفاده از برنامه کاری عادی
             $workSchedule = null;
@@ -1089,7 +1087,7 @@ if (!$transaction) {
             }
 
             if (!$workSchedule || !$workSchedule->is_working) {
-              
+
                 return false;
             }
 
@@ -1097,12 +1095,12 @@ if (!$transaction) {
             $appointmentSettings = json_decode($workSchedule->appointment_settings, true);
             $emergencyTimes = json_decode($workSchedule->emergency_times, true) ?? [];
 
-           
+
         }
 
         // Validate work hours structure
         if (!is_array($workHours) || empty($workHours)) {
-           
+
             return false;
         }
 
@@ -1110,7 +1108,7 @@ if (!$transaction) {
         $appointmentTimeCarbon = Carbon::parse($appointmentTime, 'Asia/Tehran');
         foreach ($emergencyTimes as $emergency) {
             if (!isset($emergency['start']) || !isset($emergency['end'])) {
-               
+
                 continue;
             }
 
@@ -1118,11 +1116,11 @@ if (!$transaction) {
                 $start = Carbon::parse($emergency['start'], 'Asia/Tehran');
                 $end = Carbon::parse($emergency['end'], 'Asia/Tehran');
                 if ($appointmentTimeCarbon->between($start, $end)) {
-                    
+
                     return false;
                 }
             } catch (\Exception $e) {
-               
+
                 continue;
             }
         }
@@ -1133,7 +1131,7 @@ if (!$transaction) {
 
         foreach ($workHours as $slot) {
             if (!isset($slot['start']) || !isset($slot['end'])) {
-               
+
                 continue;
             }
 
@@ -1170,27 +1168,27 @@ if (!$transaction) {
                         $existingAppointments = $existingAppointmentsQuery->count();
 
                         if ($existingAppointments >= $maxAppointments) {
-                            
+
                             return false;
                         }
                     }
                     break;
                 }
             } catch (\Exception $e) {
-               
+
                 continue;
             }
         }
 
         if (!$isWithinWorkHours) {
-           
+
             return false;
         }
 
         // شرط جدید: مقایسه زمان فعلی با زمان پایان ساعات کاری برای نوبت‌های امروز
         if ($latestEndTime && $appointmentDateCarbon->isToday()) {
             if ($currentTime->greaterThan($latestEndTime)) {
-               
+
                 return false;
             }
         }
@@ -1212,7 +1210,7 @@ if (!$transaction) {
         }
 
         if (!$config) {
-            
+
             return false;
         }
 
@@ -1223,7 +1221,7 @@ if (!$transaction) {
                 in_array($serviceType, $consultationTypes);
 
             if (!$isCounselingAllowed) {
-                
+
                 return false;
             }
         }
@@ -1234,7 +1232,7 @@ if (!$transaction) {
         $startTime = Carbon::parse("$appointmentDate $appointmentTime", 'Asia/Tehran');
         $endTime = $startTime->copy()->addMinutes($duration);
 
-       
+
 
         $existingAppointment = null;
         if ($serviceType === 'in_person') {
@@ -1247,7 +1245,7 @@ if (!$transaction) {
             $existingAppointment = $existingAppointmentQuery->first();
 
             if ($existingAppointment) {
-               
+
                 return false;
             }
         } else {
@@ -1260,13 +1258,13 @@ if (!$transaction) {
             $existingAppointment = $existingAppointmentQuery->first();
 
             if ($existingAppointment) {
-               
+
                 return false;
             }
         }
 
         // دیباگ: لاگ کردن در صورت عدم یافتن رزرو
-        
+
 
         return true;
     }

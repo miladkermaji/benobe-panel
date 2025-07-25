@@ -91,7 +91,6 @@ class AppointmentController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('CancelAppointment - Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -165,7 +164,6 @@ class AppointmentController extends Controller
                     ], 401);
                 }
             } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-                Log::error('GetAppointments - JWT Error: ' . $e->getMessage());
                 return response()->json([
                     'status'  => 'error',
                     'message' => 'توکن نامعتبر است: ' . $e->getMessage(),
@@ -225,7 +223,6 @@ class AppointmentController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('GetAppointments - Error: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'خطای سرور',
