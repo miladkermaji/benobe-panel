@@ -622,29 +622,27 @@ class AppointmentBookingController extends Controller
     public function paymentResult(Request $request)
     {
         try {
-            // اعتبارسنجی ورودی‌ها
-            $validated = $request->validate([
-                'transaction_id' => 'nullable|string',
-                'Authority' => 'nullable|string',
-            ]);
-            $transactionId = $validated['transaction_id'] ?? $validated['Authority'] ?? null;
-            if (!$transactionId) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'پارامتر transaction_id یا Authority در ورودی الزامی است. لطفاً یکی از این دو را ارسال کنید.',
-                    'data'    => null,
-                ], 400);
-            }
+          
+// چک کردن وجود transaction_id
+$transactionId = $request->input('transaction_id') ?? $request->input('Authority');
+if (!$transactionId) {
+    return response()->json([
+        'status'  => 'error',
+        'message' => 'پارامتر transaction_id یا Authority در درخواست وجود ندارد.',
+        'data'    => null,
+    ], 400);
+}
 
-            // پیدا کردن تراکنش
-            $transaction = Transaction::where('transaction_id', $transactionId)->first();
-            if (!$transaction) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'تراکنش با این شناسه یافت نشد.',
-                    'data'    => null,
-                ], 404);
-            }
+// پیدا کردن تراکنش
+$transaction = Transaction::where('transaction_id', $transactionId)->first();
+if (!$transaction) {
+    return response()->json([
+        'status'  => 'error',
+        'message' => 'تراکنش با این شناسه یافت نشد.',
+        'data'    => null,
+    ], 404);
+}
+
 
             // تأیید پرداخت از طریق خدمت پرداخت (فقط اگر وضعیت pending باشد)
             $isPaymentSuccessful = false;
@@ -827,6 +825,8 @@ class AppointmentBookingController extends Controller
             ], 500);
         }
     }
+    
+
     public function getAppointmentOptions(Request $request, $doctorId)
     {
         try {
