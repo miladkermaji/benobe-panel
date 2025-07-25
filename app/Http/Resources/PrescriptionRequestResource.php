@@ -49,6 +49,7 @@ class PrescriptionRequestResource extends JsonResource
                 });
             }),
             'tracking_code' => $this->tracking_code,
+            'doctor_description' => $this->doctor_description,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
