@@ -636,7 +636,6 @@ class AppointmentBookingController extends Controller
 
             // پیدا کردن تراکنش
             $transaction = \App\Models\Transaction::where('transaction_id', $transactionId)
-                ->orWhere('authority', $transactionId)
                 ->latest()
                 ->first();
             Log::info('paymentResult - transaction', ['transaction' => $transaction]);
