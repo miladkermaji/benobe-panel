@@ -62,6 +62,26 @@ class PaymentController
             $meta = json_decode($transaction->meta, true) ?? [];
             Log::info('PaymentController::callback - Transaction meta', ['meta' => $meta]);
 
+            // اگر پرداخت مربوط به رزرو نوبت بود، متد paymentResult را اجرا کن
+            if (isset($meta['appointment_id']) && isset($meta['appointment_type'])) {
+                try {
+                    // فراخوانی داخلی کنترلر و متد paymentResult
+                    $controller = app(\App\Http\Controllers\Api\AppointmentBookingController::class);
+                    $paymentResultRequest = Request::create(
+                        '/appointments/payment/result',
+                        'GET',
+                        ['transaction_id' => $transaction->transaction_id]
+                    );
+                    $controller->paymentResult($paymentResultRequest);
+                    Log::info('PaymentController::callback - paymentResult called internally for appointment');
+                } catch (\Exception $e) {
+                    Log::error('PaymentController::callback - Error calling paymentResult internally', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                }
+            }
+
             $successRedirect = $meta['success_redirect'] ?? route('appointment.payment.result');
             $errorRedirect = $meta['error_redirect'] ?? route('appointment.payment.result');
 
