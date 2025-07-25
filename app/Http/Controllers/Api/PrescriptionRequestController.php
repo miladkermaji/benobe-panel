@@ -421,6 +421,42 @@ class PrescriptionRequestController extends Controller
         $first_name = $names[0] ?? '';
         $last_name = $names[1] ?? '';
 
+        // ابتدا بر اساس کد ملی جستجو کن
+        $userByNationalCode = \App\Models\User::where('national_code', $validated['national_code'])->first();
+        if ($userByNationalCode) {
+            // بررسی وجود در جدول sub_users
+            $alreadySubUser = \App\Models\SubUser::where([
+                'owner_id' => $ownerId,
+                'owner_type' => $ownerType,
+                'subuserable_id' => $userByNationalCode->id,
+                'subuserable_type' => \App\Models\User::class,
+            ])->exists();
+
+            if ($alreadySubUser) {
+                return response()->json([
+                    'status' => 'info',
+                    'message' => 'این کاربر قبلاً به زیرمجموعه شما اضافه شده است.',
+                    'data' => $userByNationalCode,
+                    'model_type' => 'User',
+                ], 200);
+            } else {
+                \App\Models\SubUser::create([
+                    'owner_id' => $ownerId,
+                    'owner_type' => $ownerType,
+                    'subuserable_id' => $userByNationalCode->id,
+                    'subuserable_type' => \App\Models\User::class,
+                    'status' => 'active',
+                ]);
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'کاربر با این کد ملی قبلاً ثبت شده بود و به زیرمجموعه شما اضافه شد.',
+                    'data' => $userByNationalCode,
+                    'model_type' => 'User',
+                ], 200);
+            }
+        }
+
+        // اگر با کد ملی پیدا نشد، با موبایل چک کن
         $mobileUser = \App\Models\User::where('mobile', $validated['phone'])->first();
         if ($mobileUser) {
             // بررسی وجود در جدول sub_users
@@ -455,6 +491,7 @@ class PrescriptionRequestController extends Controller
             }
         }
 
+        // اگر هیچ‌کدام نبود، کاربر جدید بساز
         $user = \App\Models\User::create([
             'first_name' => $first_name,
             'last_name' => $last_name,
