@@ -44,6 +44,16 @@ class RegisterDoctorMedicalCenterController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        // اعتبارسنجی تعلق شهر به استان
+        $city = \App\Models\Zone::where('id', $request->city_id)->where('parent_id', $request->province_id)->first();
+        if (!$city) {
+            return response()->json([
+                'errors' => [
+                    'city_id' => ['شهر انتخاب‌شده متعلق به استان انتخاب‌شده نیست.']
+                ]
+            ], 422);
+        }
+
         if (Doctor::where('national_code', $request->national_code)->exists()) {
             return response()->json(['errors' => ['national_code' => ['پزشکی با این کد ملی قبلاً ثبت شده است.']]], 422);
         }
@@ -70,16 +80,16 @@ class RegisterDoctorMedicalCenterController extends Controller
     // ثبت‌نام مرکز درمانی
     public function registerMedicalCenter(Request $request)
     {
-       
-$messages = [
-    'title.required' => 'وارد کردن نام مرکز درمانی الزامی است.',
-    'type.required' => 'انتخاب نوع مرکز درمانی الزامی است.',
-    'type.in' => 'نوع مرکز درمانی باید یکی از گزینه‌های مجاز باشد: بیمارستان، مرکز درمانی، کلینیک، مرکز تصویربرداری، آزمایشگاه، داروخانه یا پلی‌کلینیک.',
-    'province_id.required' => 'انتخاب استان الزامی است.',
-    'province_id.exists' => 'استان انتخاب‌شده معتبر نیست.',
-    'city_id.required' => 'انتخاب شهر الزامی است.',
-    'city_id.exists' => 'شهر انتخاب‌شده معتبر نیست.',
-];
+
+        $messages = [
+            'title.required' => 'وارد کردن نام مرکز درمانی الزامی است.',
+            'type.required' => 'انتخاب نوع مرکز درمانی الزامی است.',
+            'type.in' => 'نوع مرکز درمانی باید یکی از گزینه‌های مجاز باشد: بیمارستان، مرکز درمانی، کلینیک، مرکز تصویربرداری، آزمایشگاه، داروخانه یا پلی‌کلینیک.',
+            'province_id.required' => 'انتخاب استان الزامی است.',
+            'province_id.exists' => 'استان انتخاب‌شده معتبر نیست.',
+            'city_id.required' => 'انتخاب شهر الزامی است.',
+            'city_id.exists' => 'شهر انتخاب‌شده معتبر نیست.',
+        ];
 
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
@@ -92,6 +102,16 @@ $messages = [
         ], $messages);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // اعتبارسنجی تعلق شهر به استان
+        $city = \App\Models\Zone::where('id', $request->city_id)->where('parent_id', $request->province_id)->first();
+        if (!$city) {
+            return response()->json([
+                'errors' => [
+                    'city_id' => ['شهر انتخاب‌شده متعلق به استان انتخاب‌شده نیست.']
+                ]
+            ], 422);
         }
 
         if ($request->siam_code && MedicalCenter::where('siam_code', $request->siam_code)->exists()) {
