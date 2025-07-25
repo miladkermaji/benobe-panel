@@ -2,13 +2,13 @@
 
 namespace App\CrawlObservers;
 
+use App\Models\CrawlLog;
+use App\Models\SitemapUrl;
 use Psr\Http\Message\UriInterface;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Psr\Http\Message\ResponseInterface;
-use App\Models\Admin\Panel\Tools\CrawlLog;
 use GuzzleHttp\Exception\RequestException;
-use App\Models\Admin\Panel\Tools\SitemapUrl;
 use Spatie\Crawler\CrawlObservers\CrawlObserver;
 
 class SitemapCrawler extends CrawlObserver
@@ -63,15 +63,17 @@ class SitemapCrawler extends CrawlObserver
 
     private function guessPriority(string $url): float
     {
-        if ($url === URL::to('/'))
+        if ($url === URL::to('/')) {
             return 1.0;
+        }
         return str_contains($url, '/blog') || str_contains($url, '/product') ? 0.9 : 0.8;
     }
 
     private function guessFrequency(string $url): string
     {
-        if ($url === URL::to('/'))
+        if ($url === URL::to('/')) {
             return 'daily';
+        }
         return str_contains($url, '/blog') ? 'weekly' : 'monthly';
     }
 }
