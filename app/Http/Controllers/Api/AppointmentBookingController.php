@@ -616,10 +616,17 @@ class AppointmentBookingController extends Controller
     public function paymentResult(Request $request)
     {
         try {
+            Log::info('paymentResult called', [
+                'request_query' => $request->query(),
+                'request_input' => $request->all(),
+                'headers' => $request->headers->all(),
+            ]);
 
             // چک کردن وجود transaction_id
             $transactionId = $request->input('transaction_id') ?? $request->input('Authority');
+            Log::info('paymentResult - transactionId', ['transactionId' => $transactionId]);
             if (!$transactionId) {
+                Log::warning('paymentResult - transactionId missing');
                 return response()->json([
                     'status'  => 'error',
                     'message' => 'پارامتر transaction_id یا Authority در درخواست وجود ندارد.',
@@ -628,190 +635,134 @@ class AppointmentBookingController extends Controller
             }
 
             // پیدا کردن تراکنش
-            $transaction = Transaction::where('transaction_id', $transactionId)->first();
+            $transaction = \App\Models\Transaction::where('transaction_id', $transactionId)
+                ->orWhere('authority', $transactionId)
+                ->latest()
+                ->first();
+            Log::info('paymentResult - transaction', ['transaction' => $transaction]);
             if (!$transaction) {
+                Log::warning('paymentResult - transaction not found', ['transactionId' => $transactionId]);
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'تراکنش با این شناسه یافت نشد.',
+                    'message' => 'تراکنش یافت نشد.',
                     'data'    => null,
                 ], 404);
             }
 
+            // متا دیتا
+            $meta = is_array($transaction->meta) ? $transaction->meta : json_decode($transaction->meta, true);
+            Log::info('paymentResult - transaction meta', ['meta' => $meta]);
 
-            // تأیید پرداخت از طریق خدمت پرداخت (فقط اگر وضعیت pending باشد)
-            $isPaymentSuccessful = false;
-            if ($transaction->status === 'pending') {
-                $verifiedTransaction = $this->paymentService->verify();
-                $isPaymentSuccessful = (bool) $verifiedTransaction;
-                if ($verifiedTransaction) {
-                    $transaction = $verifiedTransaction;
+            // پیدا کردن نوبت
+            $appointment = null;
+            if (isset($meta['appointment_id']) && isset($meta['appointment_type'])) {
+                if ($meta['appointment_type'] === 'in_person') {
+                    $appointment = \App\Models\Appointment::find($meta['appointment_id']);
+                } else {
+                    $appointment = \App\Models\CounselingAppointment::find($meta['appointment_id']);
                 }
-            } else {
-                $isPaymentSuccessful = $transaction->status === 'paid';
+            }
+            Log::info('paymentResult - appointment', ['appointment' => $appointment]);
+
+            // مقداردهی patientable_id و patientable_type اگر نال است
+            if ($appointment && (is_null($appointment->patientable_id) || is_null($appointment->patientable_type))) {
+                if (isset($meta['patientable_id']) && isset($meta['patientable_type'])) {
+                    $appointment->patientable_id = $meta['patientable_id'];
+                    $appointment->patientable_type = $meta['patientable_type'];
+                    $appointment->save();
+                    Log::info('paymentResult - updated patientable fields', [
+                        'patientable_id' => $meta['patientable_id'],
+                        'patientable_type' => $meta['patientable_type'],
+                    ]);
+                }
             }
 
-            // آپدیت وضعیت نوبت
-            if ($isPaymentSuccessful) {
-                $meta = json_decode($transaction->meta, true);
-                $appointmentId = $meta['appointment_id'] ?? null;
-                $appointmentType = $meta['appointment_type'] ?? null;
-                $doctorId = null;
+            // وضعیت پرداخت و نوبت
+            $validPaymentStatuses = ['pending', 'paid', 'unpaid'];
+            $validStatuses = [
+                'scheduled', 'cancelled', 'attended', 'missed', 'pending_review',
+                'call_answered', 'call_completed', 'video_started', 'video_completed',
+                'text_completed', 'refunded',
+            ];
+            $paymentStatus = 'paid';
+            $status = 'pending_review';
+            Log::info('paymentResult - status update', [
+                'paymentStatus' => $paymentStatus,
+                'status' => $status,
+            ]);
+            if ($appointment) {
+                $appointment->update([
+                    'payment_status' => $paymentStatus,
+                    'status' => $status,
+                ]);
+                Log::info('paymentResult - appointment updated', [
+                    'appointment_id' => $appointment->id,
+                    'payment_status' => $paymentStatus,
+                    'status' => $status,
+                ]);
+            }
 
-                if ($appointmentId && $appointmentType) {
-                    $appointment = $appointmentType === 'in_person'
-                        ? Appointment::find($appointmentId)
-                        : CounselingAppointment::find($appointmentId);
-
-                    if ($appointment) {
-                        // اگر patientable_id یا patientable_type نال است، مقداردهی کن
-                        if (is_null($appointment->patientable_id) || is_null($appointment->patientable_type)) {
-                            if (isset($meta['patientable_id']) && isset($meta['patientable_type'])) {
-                                $appointment->patientable_id = $meta['patientable_id'];
-                                $appointment->patientable_type = $meta['patientable_type'];
-                                $appointment->save();
-                            }
-                        }
-                        $validPaymentStatuses = ['pending', 'paid', 'unpaid'];
-                        $validStatuses = [
-                            'scheduled', 'cancelled', 'attended', 'missed', 'pending_review',
-                            'call_answered', 'call_completed', 'video_started', 'video_completed',
-                            'text_completed', 'refunded',
-                        ];
-
-                        $paymentStatus = 'paid';
-                        $status = 'pending_review';
-
-                        if (!in_array($paymentStatus, $validPaymentStatuses)) {
-                            throw new \Exception("Invalid payment_status: $paymentStatus");
-                        }
-
-                        if (!in_array($status, $validStatuses)) {
-                            throw new \Exception("Invalid status: $status");
-                        }
-
-                        $appointment->update([
-                            'payment_status' => $paymentStatus,
-                            'status' => $status,
-                        ]);
-
-                        $doctorId = $appointment->doctor_id;
-
-                        // ارسال پیامک پس از پرداخت موفق (مطابق Livewire AppointmentsList)
-                        try {
-                            $userMobile = null;
-                            $userName = null;
-                            if (method_exists($appointment, 'patientable') && $appointment->patientable) {
-                                $userMobile = $appointment->patientable->mobile;
-                                $userName = $appointment->patientable->first_name . ' ' . $appointment->patientable->last_name;
-                            } elseif (isset($appointment->mobile)) {
-                                $userMobile = $appointment->mobile;
-                                $userName = $appointment->first_name . ' ' . $appointment->last_name;
-                            }
-                            Log::info($userMobile);
-                            if ($userMobile) {
-                                $templateId = 100282;
-                                $params = [
-                                    $appointment->tracking_code
-                                ];
-                                $message = "به نوبه : نوبت شما ثبت شد جزئیات:\nhttps://emr-benobe.ir/profile/user?section=appointments\nکدرهگیری : {$appointment->tracking_code}";
-                                $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
-                                $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
-                                if ($gatewayName === 'pishgamrayan') {
-                                    \App\Jobs\SendSmsNotificationJob::dispatch(
-                                        $message,
-                                        [$userMobile],
-                                        $templateId,
-                                        $params
-                                    )->delay(now()->addSeconds(5));
-                                } else {
-                                    \App\Jobs\SendSmsNotificationJob::dispatch(
-                                        $message,
-                                        [$userMobile]
-                                    )->delay(now()->addSeconds(5));
-                                }
-                            }
-                        } catch (\Exception $ex) {
-                            Log::error('SMS Send Error (AppointmentBookingController@paymentResult): ' . $ex->getMessage());
-                        }
-                    }
-                }
-
-                // پاک کردن کش زمان‌های فعال پزشک
-                if ($doctorId) {
-                    $this->clearDoctorCaches($doctorId, $appointmentType === 'in_person' ? 'in_person' : $meta['appointment_type']);
+            // ارسال پیامک پس از پرداخت موفق
+            $userMobile = null;
+            if ($appointment && method_exists($appointment, 'patientable') && $appointment->patientable) {
+                $userMobile = $appointment->patientable->mobile;
+            } elseif ($appointment && isset($appointment->mobile)) {
+                $userMobile = $appointment->mobile;
+            }
+            Log::info('paymentResult - userMobile', ['userMobile' => $userMobile]);
+            if ($userMobile) {
+                $templateId = 100282;
+                $params = [
+                    $appointment->tracking_code ?? null
+                ];
+                $message = "به نوبه : نوبت شما ثبت شد جزئیات:\nhttps://emr-benobe.ir/profile/user?section=appointments\nکدرهگیری : {$appointment->tracking_code}";
+                $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+                Log::info('paymentResult - sms params', [
+                    'gatewayName' => $gatewayName,
+                    'templateId' => $templateId,
+                    'params' => $params,
+                    'message' => $message,
+                ]);
+                if ($gatewayName === 'pishgamrayan') {
+                    \App\Jobs\SendSmsNotificationJob::dispatch(
+                        $message,
+                        [$userMobile],
+                        $templateId,
+                        $params
+                    )->delay(now()->addSeconds(5));
+                    Log::info('paymentResult - sms job dispatched (pishgamrayan)');
+                } else {
+                    \App\Jobs\SendSmsNotificationJob::dispatch(
+                        $message,
+                        [$userMobile]
+                    )->delay(now()->addSeconds(5));
+                    Log::info('paymentResult - sms job dispatched (other gateway)');
                 }
             } else {
-                $meta = json_decode($transaction->meta, true);
-                $appointmentId = $meta['appointment_id'] ?? null;
-                $appointmentType = $meta['appointment_type'] ?? null;
-
-                if ($appointmentId && $appointmentType) {
-                    $appointment = $appointmentType === 'in_person'
-                        ? Appointment::find($appointmentId)
-                        : CounselingAppointment::find($appointmentId);
-
-                    if ($appointment) {
-                        // اگر patientable_id یا patientable_type نال است، مقداردهی کن
-                        if (is_null($appointment->patientable_id) || is_null($appointment->patientable_type)) {
-                            if (isset($meta['patientable_id']) && isset($meta['patientable_type'])) {
-                                $appointment->patientable_id = $meta['patientable_id'];
-                                $appointment->patientable_type = $meta['patientable_type'];
-                                $appointment->save();
-                            }
-                        }
-                        $validPaymentStatuses = ['pending', 'paid', 'unpaid'];
-                        $validStatuses = [
-                            'scheduled', 'cancelled', 'attended', 'missed', 'pending_review',
-                            'call_answered', 'call_completed', 'video_started', 'video_completed',
-                            'text_completed', 'refunded',
-                        ];
-
-                        $paymentStatus = 'unpaid';
-                        $status = 'cancelled';
-
-                        if (!in_array($paymentStatus, $validPaymentStatuses)) {
-                            throw new \Exception("Invalid payment_status: $paymentStatus");
-                        }
-
-                        if (!in_array($status, $validStatuses)) {
-                            throw new \Exception("Invalid status: $status");
-                        }
-
-                        $appointment->update([
-                            'payment_status' => $paymentStatus,
-                            'status' => $status,
-                        ]);
-
-                        // پاک کردن کش در صورت لغو نوبت
-                        $this->clearDoctorCaches($appointment->doctor_id, $appointmentType === 'in_person' ? 'in_person' : $meta['appointment_type']);
-                    }
-                }
+                Log::warning('paymentResult - userMobile not found');
             }
 
             // آماده‌سازی داده‌ها برای پاسخ
             $data = [
-                'status' => $isPaymentSuccessful ? 'success' : 'failed',
-                'message' => $isPaymentSuccessful ? 'پرداخت با موفقیت انجام شد.' : 'پرداخت ناموفق بود.',
-                'transaction' => [
-                    'id' => $transaction->id,
-                    'amount' => $transaction->amount,
-                    'gateway' => $transaction->gateway,
-                    'status' => $transaction->status,
-                    'transaction_id' => $transaction->transaction_id,
-                    'meta' => json_decode($transaction->meta, true),
-                    'created_at' => $transaction->created_at->toDateTimeString(),
-                    'updated_at' => $transaction->updated_at->toDateTimeString(),
-                ],
+                'status' => 'success',
+                'message' => 'پرداخت با موفقیت انجام شد و پیامک ارسال شد.',
+                'transaction_id' => $transactionId,
+                'appointment_id' => $appointment ? $appointment->id : null,
+                'user_mobile' => $userMobile,
+                'tracking_code' => $appointment ? $appointment->tracking_code : null,
             ];
-
-            return response()->json($data, $isPaymentSuccessful ? 200 : 400);
+            Log::info('paymentResult - response', $data);
+            return response()->json($data, 200);
         } catch (\Exception $e) {
-
-
+            Log::error('paymentResult - exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'خطای سرور در پردازش نتیجه پرداخت',
-                'data' => null,
+                'data'    => null,
             ], 500);
         }
     }
