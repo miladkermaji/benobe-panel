@@ -70,13 +70,17 @@ class RegisterDoctorMedicalCenterController extends Controller
     // ثبت‌نام مرکز درمانی
     public function registerMedicalCenter(Request $request)
     {
-        $messages = [
-            'title.required' => 'وارد کردن نام مرکز درمانی الزامی است.',
-            'type.required' => 'انتخاب نوع مرکز درمانی الزامی است.',
-            'type.in' => 'نوع مرکز درمانی باید یکی از گزینه‌های مجاز باشد: بیمارستان، مرکز درمانی، کلینیک، مرکز تصویربرداری، آزمایشگاه، داروخانه یا پلی‌کلینیک.',
-            'province_id.required' => 'انتخاب استان الزامی است.',
-            'city_id.required' => 'انتخاب شهر الزامی است.',
-        ];
+       
+$messages = [
+    'title.required' => 'وارد کردن نام مرکز درمانی الزامی است.',
+    'type.required' => 'انتخاب نوع مرکز درمانی الزامی است.',
+    'type.in' => 'نوع مرکز درمانی باید یکی از گزینه‌های مجاز باشد: بیمارستان، مرکز درمانی، کلینیک، مرکز تصویربرداری، آزمایشگاه، داروخانه یا پلی‌کلینیک.',
+    'province_id.required' => 'انتخاب استان الزامی است.',
+    'province_id.exists' => 'استان انتخاب‌شده معتبر نیست.',
+    'city_id.required' => 'انتخاب شهر الزامی است.',
+    'city_id.exists' => 'شهر انتخاب‌شده معتبر نیست.',
+];
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'type' => 'required|string|in:hospital,treatment_centers,clinic,imaging_center,laboratory,pharmacy,policlinic',
