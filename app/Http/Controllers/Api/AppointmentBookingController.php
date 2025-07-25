@@ -196,10 +196,7 @@ class AppointmentBookingController extends Controller
                 'errors'  => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
-            Log::error('GetBookingDetails - Error: ' . $e->getMessage(), [
-                'request'   => $request->all(),
-                'exception' => $e->getTraceAsString(),
-            ]);
+         
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -493,10 +490,7 @@ class AppointmentBookingController extends Controller
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
-            Log::error('BookAppointment - Error: ' . $e->getMessage(), [
-                'request' => $request->all(),
-                'exception' => $e->getTraceAsString(),
-            ]);
+           
             return response()->json([
                 'status' => 'error',
                 'message' => 'خطای سرور',
@@ -813,10 +807,7 @@ if (!$transaction) {
 
             return response()->json($data, $isPaymentSuccessful ? 200 : 400);
         } catch (\Exception $e) {
-            Log::error('PaymentResult - Error: ' . $e->getMessage(), [
-                'request' => $request->all(),
-                'exception' => $e->getTraceAsString(),
-            ]);
+          
 
             return response()->json([
                 'status' => 'error',
@@ -885,14 +876,7 @@ if (!$transaction) {
                 $endTime = Carbon::parse("{$date} {$workHours[0]['end']}", 'Asia/Tehran');
                 $totalMinutes = $startTime->diffInMinutes($endTime);
                 $duration = floor($totalMinutes / $workHours[0]['max_appointments']);
-                Log::debug("GetAppointmentOptions - Calculated duration", [
-                    'doctor_id' => $doctorId,
-                    'clinic_id' => $mainClinic->id,
-                    'date' => $date,
-                    'total_minutes' => $totalMinutes,
-                    'max_appointments' => $workHours[0]['max_appointments'],
-                    'duration' => $duration,
-                ]);
+                
             }
 
             // دریافت زمان‌های رزروشده (اصلاح شده)
@@ -924,9 +908,6 @@ if (!$transaction) {
                     ->pluck('appointment_time')
                     ->toArray();
 
-            Log::debug("GetAppointmentOptions - Reserved times for doctor {$doctorId} on {$date} for service type {$serviceType}", [
-                'reserved_times' => $reservedTimes,
-            ]);
 
             // محاسبه زمان‌های فعال
             $availableTimes = [];
@@ -960,9 +941,7 @@ if (!$transaction) {
                 }
             }
 
-            Log::debug("GetAppointmentOptions - Available times for doctor {$doctorId} on {$date} for service type {$serviceType}", [
-                'available_times' => $availableTimes,
-            ]);
+            
 
             return response()->json([
                 'status' => 'success',
@@ -972,10 +951,7 @@ if (!$transaction) {
                 ],
             ], 200);
         } catch (\Exception $e) {
-            Log::error('GetAppointmentOptions - Error: ' . $e->getMessage(), [
-                'request' => $request->all(),
-                'exception' => $e->getTraceAsString(),
-            ]);
+            
             return response()->json([
                 'status' => 'error',
                 'message' => 'خطای سرور',
@@ -997,7 +973,7 @@ if (!$transaction) {
 
         // بررسی تاریخ گذشته
         if ($appointmentDateCarbon->lessThan($today)) {
-            Log::warning("CheckSlotAvailability - Appointment date {$appointmentDate} is in the past for doctor {$doctor->id}, current date: {$today->toDateString()}");
+            
             return false;
         }
 
@@ -1015,13 +991,13 @@ if (!$transaction) {
 
         $appointmentOptions = $this->getAppointmentOptions($request, $doctor->id);
         if ($appointmentOptions->getStatusCode() !== 200) {
-            Log::warning("CheckSlotAvailability - Failed to get appointment options for doctor {$doctor->id}");
+            
             return false;
         }
 
         $responseData = json_decode($appointmentOptions->getContent(), true);
         if (!isset($responseData['data']['available_times'])) {
-            Log::warning("CheckSlotAvailability - Invalid response format from getAppointmentOptions for doctor {$doctor->id}");
+            
             return false;
         }
 
@@ -1029,10 +1005,7 @@ if (!$transaction) {
 
         // بررسی اینکه زمان درخواستی در لیست زمان‌های مجاز هست یا نه
         if (!in_array($appointmentTime, $availableTimes)) {
-            Log::warning("CheckSlotAvailability - Requested time {$appointmentTime} is not in available times list for doctor {$doctor->id}", [
-                'available_times' => $availableTimes,
-                'requested_time' => $appointmentTime
-            ]);
+           
             return false;
         }
 
@@ -1047,7 +1020,7 @@ if (!$transaction) {
             if ($holidays && $holidays->holiday_dates) {
                 $holidayDates = json_decode($holidays->holiday_dates, true);
                 if (in_array($appointmentDate, $holidayDates)) {
-                    Log::warning("CheckSlotAvailability - Date {$appointmentDate} is a holiday for doctor {$doctor->id}");
+                    
                     return false;
                 }
             }
@@ -1061,7 +1034,7 @@ if (!$transaction) {
             if ($holidays && $holidays->holiday_dates) {
                 $holidayDates = json_decode($holidays->holiday_dates, true);
                 if (in_array($appointmentDate, $holidayDates)) {
-                    Log::warning("CheckSlotAvailability - Date {$appointmentDate} is a counseling holiday for doctor {$doctor->id}");
+                    
                     return false;
                 }
             }
@@ -1091,10 +1064,7 @@ if (!$transaction) {
             $appointmentSettings = json_decode($specialSchedule->appointment_settings, true);
             $emergencyTimes = json_decode($specialSchedule->emergency_times, true) ?? [];
 
-            Log::debug("CheckSlotAvailability - Using special schedule for doctor {$doctor->id}", [
-                'workHours' => $workHours,
-                'appointmentSettings' => $appointmentSettings
-            ]);
+           
         } else {
             // استفاده از برنامه کاری عادی
             $workSchedule = null;
@@ -1119,9 +1089,7 @@ if (!$transaction) {
             }
 
             if (!$workSchedule || !$workSchedule->is_working) {
-                Log::warning("CheckSlotAvailability - Doctor {$doctor->id} is not working on {$dayOfWeek} for service type {$serviceType}", [
-                    'workSchedule' => $workSchedule ? $workSchedule->toArray() : null
-                ]);
+              
                 return false;
             }
 
@@ -1129,19 +1097,12 @@ if (!$transaction) {
             $appointmentSettings = json_decode($workSchedule->appointment_settings, true);
             $emergencyTimes = json_decode($workSchedule->emergency_times, true) ?? [];
 
-            Log::debug("CheckSlotAvailability - Using regular schedule for doctor {$doctor->id}", [
-                'workHours' => $workHours,
-                'appointmentSettings' => $appointmentSettings
-            ]);
+           
         }
 
         // Validate work hours structure
         if (!is_array($workHours) || empty($workHours)) {
-            Log::error("CheckSlotAvailability - Invalid work hours structure for doctor {$doctor->id}", [
-                'workHours' => $workHours,
-                'serviceType' => $serviceType,
-                'dayOfWeek' => $dayOfWeek
-            ]);
+           
             return false;
         }
 
@@ -1149,9 +1110,7 @@ if (!$transaction) {
         $appointmentTimeCarbon = Carbon::parse($appointmentTime, 'Asia/Tehran');
         foreach ($emergencyTimes as $emergency) {
             if (!isset($emergency['start']) || !isset($emergency['end'])) {
-                Log::warning("CheckSlotAvailability - Invalid emergency time structure for doctor {$doctor->id}", [
-                    'emergency' => $emergency
-                ]);
+               
                 continue;
             }
 
@@ -1159,14 +1118,11 @@ if (!$transaction) {
                 $start = Carbon::parse($emergency['start'], 'Asia/Tehran');
                 $end = Carbon::parse($emergency['end'], 'Asia/Tehran');
                 if ($appointmentTimeCarbon->between($start, $end)) {
-                    Log::warning("CheckSlotAvailability - Appointment time {$appointmentTime} is within emergency time for doctor {$doctor->id}");
+                    
                     return false;
                 }
             } catch (\Exception $e) {
-                Log::error("CheckSlotAvailability - Error parsing emergency time for doctor {$doctor->id}", [
-                    'emergency' => $emergency,
-                    'error' => $e->getMessage()
-                ]);
+               
                 continue;
             }
         }
@@ -1177,9 +1133,7 @@ if (!$transaction) {
 
         foreach ($workHours as $slot) {
             if (!isset($slot['start']) || !isset($slot['end'])) {
-                Log::warning("CheckSlotAvailability - Invalid work hours slot structure for doctor {$doctor->id}", [
-                    'slot' => $slot
-                ]);
+               
                 continue;
             }
 
@@ -1216,33 +1170,27 @@ if (!$transaction) {
                         $existingAppointments = $existingAppointmentsQuery->count();
 
                         if ($existingAppointments >= $maxAppointments) {
-                            Log::warning("CheckSlotAvailability - Max appointments reached for doctor {$doctor->id} on {$appointmentDate} in slot {$slot['start']}-{$slot['end']}");
+                            
                             return false;
                         }
                     }
                     break;
                 }
             } catch (\Exception $e) {
-                Log::error("CheckSlotAvailability - Error parsing time for doctor {$doctor->id}", [
-                    'slot' => $slot,
-                    'error' => $e->getMessage()
-                ]);
+               
                 continue;
             }
         }
 
         if (!$isWithinWorkHours) {
-            Log::warning("CheckSlotAvailability - Appointment time {$appointmentTime} is outside working hours for doctor {$doctor->id} on {$dayOfWeek}", [
-                'workHours' => $workHours,
-                'appointmentTime' => $appointmentTime
-            ]);
+           
             return false;
         }
 
         // شرط جدید: مقایسه زمان فعلی با زمان پایان ساعات کاری برای نوبت‌های امروز
         if ($latestEndTime && $appointmentDateCarbon->isToday()) {
             if ($currentTime->greaterThan($latestEndTime)) {
-                Log::warning("CheckSlotAvailability - Current time {$currentTime->toDateTimeString()} is past the latest working hours {$latestEndTime->toDateTimeString()} for doctor {$doctor->id} on {$appointmentDate}");
+               
                 return false;
             }
         }
@@ -1264,7 +1212,7 @@ if (!$transaction) {
         }
 
         if (!$config) {
-            Log::warning("CheckSlotAvailability - Config not found for doctor {$doctor->id} and service type {$serviceType}");
+            
             return false;
         }
 
@@ -1275,11 +1223,7 @@ if (!$transaction) {
                 in_array($serviceType, $consultationTypes);
 
             if (!$isCounselingAllowed) {
-                Log::warning("CheckSlotAvailability - Counseling not allowed for doctor {$doctor->id} and service type {$serviceType}", [
-                    'online_consultation' => $config->online_consultation,
-                    'auto_scheduling' => $config->auto_scheduling,
-                    'consultation_types' => $consultationTypes,
-                ]);
+                
                 return false;
             }
         }
@@ -1290,8 +1234,7 @@ if (!$transaction) {
         $startTime = Carbon::parse("$appointmentDate $appointmentTime", 'Asia/Tehran');
         $endTime = $startTime->copy()->addMinutes($duration);
 
-        // دیباگ: لاگ کردن مقادیر ورودی
-        Log::debug("CheckSlotAvailability - Checking slot for doctor {$doctor->id}, clinic " . ($clinicId ?? 'null') . ", date {$appointmentDate}, time {$appointmentTime}, service type {$serviceType}, current time {$currentTime->toDateTimeString()}");
+       
 
         $existingAppointment = null;
         if ($serviceType === 'in_person') {
@@ -1304,9 +1247,7 @@ if (!$transaction) {
             $existingAppointment = $existingAppointmentQuery->first();
 
             if ($existingAppointment) {
-                Log::warning("CheckSlotAvailability - Slot already taken for doctor {$doctor->id} on {$appointmentDate} at {$appointmentTime} for service type {$serviceType}", [
-                    'existing_appointment' => $existingAppointment->toArray(),
-                ]);
+               
                 return false;
             }
         } else {
@@ -1319,15 +1260,13 @@ if (!$transaction) {
             $existingAppointment = $existingAppointmentQuery->first();
 
             if ($existingAppointment) {
-                Log::warning("CheckSlotAvailability - Slot already taken for doctor {$doctor->id} on {$appointmentDate} at {$appointmentTime} for service type {$serviceType}", [
-                    'existing_appointment' => $existingAppointment->toArray(),
-                ]);
+               
                 return false;
             }
         }
 
         // دیباگ: لاگ کردن در صورت عدم یافتن رزرو
-        Log::debug("CheckSlotAvailability - No existing appointment found for doctor {$doctor->id} on {$appointmentDate} at {$appointmentTime} for service type {$serviceType}");
+        
 
         return true;
     }
